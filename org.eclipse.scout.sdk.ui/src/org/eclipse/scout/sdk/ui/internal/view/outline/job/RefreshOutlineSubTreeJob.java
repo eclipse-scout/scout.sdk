@@ -127,7 +127,9 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
               m_view.getViewContentProvider().setAutoLoadChildren(true);
             }
             finally {
-              treeControl.setCursor(null);
+              if (treeControl != null && !treeControl.isDisposed()) {
+                treeControl.setCursor(null);
+              }
             }
           }
         });

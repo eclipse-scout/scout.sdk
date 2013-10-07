@@ -264,7 +264,7 @@ public class JavadocTooltip extends AbstractTooltip {
           HTMLPrinter.addParagraph(buffer, reader);
         }
       }
-      else if (curr.getElementType() == IJavaElement.LOCAL_VARIABLE || curr.getElementType() == IJavaElement.TYPE_PARAMETER) {
+      else if (curr != null && (curr.getElementType() == IJavaElement.LOCAL_VARIABLE || curr.getElementType() == IJavaElement.TYPE_PARAMETER)) {
         HTMLPrinter.addSmallHeader(buffer, getInfoText(curr, null, true));
       }
     }

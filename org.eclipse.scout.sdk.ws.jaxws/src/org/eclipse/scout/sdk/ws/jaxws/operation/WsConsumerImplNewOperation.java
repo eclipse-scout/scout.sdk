@@ -15,22 +15,20 @@ import javax.xml.ws.Service;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
-import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
-import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public class WsConsumerImplNewOperation extends ServiceNewOperation {
   /**
@@ -39,6 +37,7 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
    */
   public WsConsumerImplNewOperation(String serviceInterfaceName, String serviceName) {
     super(serviceInterfaceName, serviceName);
+    setFormatSource(true);
   }
 
   // used for generic super type
@@ -54,7 +53,7 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(final IProgressMonitor monitor, final IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // assemble supertype signature
     IType jaxWsPortType = null;
     if (TypeUtility.exists(getJaxWsPortType())) {
@@ -73,50 +72,25 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
       JaxWsSdk.logError("Could not link webservice consumer to service as service could not be found");
     }
 
-    String superTypeSignature = "<";
-    superTypeSignature += Signature.toString(SignatureCache.createTypeSignature(jaxWsServiceType.getFullyQualifiedName()));
-    superTypeSignature += ", ";
-    superTypeSignature += Signature.toString(SignatureCache.createTypeSignature(jaxWsPortType.getFullyQualifiedName()));
-    superTypeSignature += ">";
-    superTypeSignature = SignatureCache.createTypeSignature(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient).getFullyQualifiedName() + superTypeSignature);
+    String superTypeSignature = SignatureCache.createTypeSignature(JaxWsRuntimeClasses.AbstractWebServiceClient + "<" + jaxWsServiceType.getFullyQualifiedName() + ", " + jaxWsPortType.getFullyQualifiedName() + ">");
     setImplementationSuperTypeSignature(superTypeSignature);
-    super.run(monitor, workingCopyManager);
 
-    IType createdType = getCreatedServiceImplementation();
-
-    // create import directives for generic types
-    JaxWsSdkUtility.createImportDirective(createdType, jaxWsPortType);
-    JaxWsSdkUtility.createImportDirective(createdType, jaxWsServiceType);
-
-    // create ScoutWebService annotation
     if (m_createScoutWebServiceAnnotation) {
-      AnnotationUpdateOperation annotationOp = new AnnotationUpdateOperation();
-      annotationOp.setDeclaringType(createdType);
-      annotationOp.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient));
-
-      String defaultAuthFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient).getMethod(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, new String[0]).getDefaultValue().getValue();
-      // only add annotation property if different to default
-
-      if (m_authenticationHandlerQName != null && !isSameType(m_authenticationHandlerQName, defaultAuthFactory)) {
-        IType type = createType(m_authenticationHandlerQName, TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer), monitor, workingCopyManager);
-        annotationOp.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, type);
-      }
-      annotationOp.validate();
-      annotationOp.run(monitor, workingCopyManager);
+      final String defaultAuthFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebServiceClient).getMethod(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, new String[0]).getDefaultValue().getValue();
+      AnnotationSourceBuilder scoutWebServiceClientAnnot = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(JaxWsRuntimeClasses.ScoutWebServiceClient)) {
+        @Override
+        public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          if (m_authenticationHandlerQName != null && !isSameType(m_authenticationHandlerQName, defaultAuthFactory)) {
+            IType type = createType(m_authenticationHandlerQName, TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer), monitor, workingCopyManager);
+            addParameter(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER + "=" + validator.getTypeName(SignatureCache.createTypeSignature(type.getFullyQualifiedName())) + ".class");
+          }
+          super.createSource(source, lineDelimiter, ownerProject, validator);
+        }
+      };
+      getImplementationSourceBuilder().addAnnotationSourceBuilder(scoutWebServiceClientAnnot);
     }
 
-    // format icu
-    ICompilationUnit icu = createdType.getCompilationUnit();
-    Document icuDoc = new Document(icu.getBuffer().getContents());
-
-    SourceFormatOperation sourceFormatOp = new SourceFormatOperation(createdType.getJavaProject(), icuDoc, null);
-    sourceFormatOp.run(monitor, workingCopyManager);
-
-    // write document back
-    icu.getBuffer().setContents(ScoutUtility.cleanLineSeparator(icuDoc.get(), icuDoc));
-
-    // reconcilation
-    workingCopyManager.reconcile(icu, monitor);
+    super.run(monitor, workingCopyManager);
   }
 
   private IType createType(String qualifiedTypeName, IType interfaceType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {

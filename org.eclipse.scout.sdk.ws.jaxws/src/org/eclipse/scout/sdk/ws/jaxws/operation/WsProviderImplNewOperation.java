@@ -15,20 +15,19 @@ import javax.jws.WebService;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
-import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
-import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -62,7 +61,7 @@ public class WsProviderImplNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(final IProgressMonitor monitor, final IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     PrimaryTypeNewOperation implNewTypeOp = new PrimaryTypeNewOperation(m_typeName, m_packageName, m_bundle.getJavaProject());
     implNewTypeOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     implNewTypeOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
@@ -73,6 +72,7 @@ public class WsProviderImplNewOperation implements IOperation {
     else {
       JaxWsSdk.logError("Could not link webservice provider to port type as port type could not be found");
     }
+
     if (TypeUtility.exists(m_portTypeInterfaceType)) {
       // override methods
       for (IMethod method : m_portTypeInterfaceType.getMethods()) {
@@ -81,61 +81,45 @@ public class WsProviderImplNewOperation implements IOperation {
       }
     }
 
+    // create JAX-WS webservice annotation
+    AnnotationSourceBuilder webServiceAnnot = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(WebService.class.getName()));
+    if (TypeUtility.exists(m_portTypeInterfaceType)) {
+      webServiceAnnot.addParameter("endpointInterface=\"" + m_portTypeInterfaceType.getFullyQualifiedName() + "\"");
+    }
+    implNewTypeOp.addAnnotationSourceBuilder(webServiceAnnot);
+
+    // create ScoutWebService annotation
+    if (m_createScoutWebServiceAnnotation) {
+      final String defaultSessionFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, new String[0]).getDefaultValue().getValue();
+      final String defaultAuthFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, new String[0]).getDefaultValue().getValue();
+      final String defaultCredentialFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_CREDENTIAL_STRATEGY, new String[0]).getDefaultValue().getValue();
+
+      AnnotationSourceBuilder scoutWebServiceAnnot = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(JaxWsRuntimeClasses.ScoutWebService)) {
+        @Override
+        public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          if (m_sessionFactoryQName != null && !isSameType(m_sessionFactoryQName, defaultSessionFactory)) {
+            IType type = createType(m_sessionFactoryQName, TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory), monitor, workingCopyManager);
+            addParameter(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY + "=" + validator.getTypeName(SignatureCache.createTypeSignature(type.getFullyQualifiedName())) + ".class");
+          }
+          if (m_authenticationHandlerQName != null && !isSameType(m_authenticationHandlerQName, defaultAuthFactory)) {
+            IType type = createType(m_authenticationHandlerQName, TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider), monitor, workingCopyManager);
+            addParameter(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER + "=" + validator.getTypeName(SignatureCache.createTypeSignature(type.getFullyQualifiedName())) + ".class");
+          }
+          if (m_credentialValidationStrategyQName != null && !isSameType(m_credentialValidationStrategyQName, defaultCredentialFactory)) {
+            IType type = createType(m_credentialValidationStrategyQName, TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy), monitor, workingCopyManager);
+            addParameter(JaxWsRuntimeClasses.PROP_SWS_CREDENTIAL_STRATEGY + "=" + validator.getTypeName(SignatureCache.createTypeSignature(type.getFullyQualifiedName())) + ".class");
+          }
+          super.createSource(source, lineDelimiter, ownerProject, validator);
+        }
+      };
+
+      implNewTypeOp.addAnnotationSourceBuilder(scoutWebServiceAnnot);
+    }
+
     implNewTypeOp.setFormatSource(true);
     implNewTypeOp.validate();
     implNewTypeOp.run(monitor, workingCopyManager);
     m_createdType = implNewTypeOp.getCreatedType();
-
-    // create JAX-WS webservice annotation
-    AnnotationUpdateOperation annotationOp = new AnnotationUpdateOperation();
-    annotationOp.setDeclaringType(m_createdType);
-    annotationOp.setAnnotationType(TypeUtility.getType(WebService.class.getName()));
-
-    if (TypeUtility.exists(m_portTypeInterfaceType)) {
-      annotationOp.addStringProperty("endpointInterface", m_portTypeInterfaceType.getFullyQualifiedName());
-    }
-    annotationOp.validate();
-    annotationOp.run(monitor, workingCopyManager);
-
-    // create ScoutWebService annotation
-    if (m_createScoutWebServiceAnnotation) {
-      annotationOp = new AnnotationUpdateOperation();
-      annotationOp.setDeclaringType(m_createdType);
-      annotationOp.setAnnotationType(TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService));
-
-      String defaultSessionFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, new String[0]).getDefaultValue().getValue();
-      String defaultAuthFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, new String[0]).getDefaultValue().getValue();
-      String defaultCredentialFactory = (String) TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getMethod(JaxWsRuntimeClasses.PROP_SWS_CREDENTIAL_STRATEGY, new String[0]).getDefaultValue().getValue();
-
-      if (m_sessionFactoryQName != null && !isSameType(m_sessionFactoryQName, defaultSessionFactory)) {
-        IType type = createType(m_sessionFactoryQName, TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory), monitor, workingCopyManager);
-        annotationOp.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_SESSION_FACTORY, type);
-      }
-      if (m_authenticationHandlerQName != null && !isSameType(m_authenticationHandlerQName, defaultAuthFactory)) {
-        IType type = createType(m_authenticationHandlerQName, TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider), monitor, workingCopyManager);
-        annotationOp.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_AUTH_HANDLER, type);
-      }
-      if (m_credentialValidationStrategyQName != null && !isSameType(m_credentialValidationStrategyQName, defaultCredentialFactory)) {
-        IType type = createType(m_credentialValidationStrategyQName, TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy), monitor, workingCopyManager);
-        annotationOp.addTypeProperty(JaxWsRuntimeClasses.PROP_SWS_CREDENTIAL_STRATEGY, type);
-      }
-
-      annotationOp.validate();
-      annotationOp.run(monitor, workingCopyManager);
-    }
-
-    // format icu
-    ICompilationUnit icu = m_createdType.getCompilationUnit();
-    Document icuDoc = new Document(icu.getBuffer().getContents());
-
-    SourceFormatOperation sourceFormatOp = new SourceFormatOperation(m_createdType.getJavaProject(), icuDoc, null);
-    sourceFormatOp.run(monitor, workingCopyManager);
-
-    // write document back
-    icu.getBuffer().setContents(ScoutUtility.cleanLineSeparator(icuDoc.get(), icuDoc));
-
-    // reconcilation
-    workingCopyManager.reconcile(icu, monitor);
   }
 
   private IType createType(String qualifiedTypeName, IType interfaceType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
