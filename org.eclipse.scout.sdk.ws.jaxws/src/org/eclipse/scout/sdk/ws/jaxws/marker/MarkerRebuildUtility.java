@@ -130,7 +130,7 @@ public final class MarkerRebuildUtility {
       if (interfacePortTypes.size() == 0) {
         String markerSourceId = MarkerUtility.createMarker(portType.getResource(), MarkerType.Implementation, markerGroupUUID, Texts.get("WsImplXMustImplementPortTypeInterface", portType.getElementName()));
         if (portTypeInterfaceType != null) {
-          JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingPortTypeInheritanceCommand(bundle, markerGroupUUID, portType, portTypeInterfaceType, sunJaxWsBean));
+          JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingPortTypeInheritanceCommand(markerGroupUUID, portType, portTypeInterfaceType));
         }
         return false;
       }
@@ -639,7 +639,7 @@ public final class MarkerRebuildUtility {
         // validate that port type implements the endpoint interface
         if (!JaxWsSdkUtility.isJdtSubType(endpointInterfaceType.getFullyQualifiedName(), portType)) {
           String markerSourceId = MarkerUtility.createMarker(portType.getResource(), MarkerType.Implementation, markerGroupUUID, Texts.get("WsImplXMustImplementPortTypeInterface", portType.getElementName()));
-          JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingPortTypeInheritanceCommand(bundle, markerGroupUUID, portType, endpointInterfaceType, sunJaxWsBean));
+          JaxWsSdk.getDefault().addMarkerCommand(markerSourceId, new MissingPortTypeInheritanceCommand(markerGroupUUID, portType, endpointInterfaceType));
           return;
         }
       }

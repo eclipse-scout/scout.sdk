@@ -142,9 +142,7 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
     if (m_methodSources == null || m_methodSources.size() < 1) {
       return null;
     }
-    else {
-      return new ArrayList<MethodBean<T>>(m_methodSources.values()).get(0).getMethod().peekMethod();
-    }
+    return new ArrayList<MethodBean<T>>(m_methodSources.values()).get(0).getMethod().peekMethod();
   }
 
   @SuppressWarnings("unchecked")

@@ -201,7 +201,7 @@ public class SunJaxWsBean {
 
     List<ScoutXmlElement> handlers = new LinkedList<ScoutXmlElement>();
     for (ScoutXmlElement child : children) {
-      handlers.add((ScoutXmlElement) child);
+      handlers.add(child);
     }
     for (int i = 0; i < handlers.size(); i++) {
       ScoutXmlElement xmlHandler = handlers.get(i);

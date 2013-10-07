@@ -512,7 +512,7 @@ public class ProposalTextField extends TextField {
         case ProposalPopupEvent.TYPE_PROPOSAL_ACCEPTED:
           try {
             m_focusLock.acquire();
-            acceptProposalInternal((Object) event.getData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL));
+            acceptProposalInternal(event.getData(ProposalPopupEvent.IDENTIFIER_SELECTED_PROPOSAL));
             // only move to the next field, if the current field is not the last (ticket 84'140).
             Control[] siblings = getParent().getChildren();
             if (siblings[siblings.length - 1] != ProposalTextField.this) {

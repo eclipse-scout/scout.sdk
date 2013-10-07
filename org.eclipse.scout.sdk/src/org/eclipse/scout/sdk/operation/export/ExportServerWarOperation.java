@@ -232,6 +232,7 @@ public class ExportServerWarOperation implements IOperation {
     return destinationFile;
   }
 
+  @SuppressWarnings("resource")
   private File installFile(URL platformUrl, String filePath) throws IOException, ProcessingException {
     URL absSourceUrl = FileLocator.resolve(platformUrl);
     byte[] content = IOUtility.getContent(absSourceUrl.openStream());

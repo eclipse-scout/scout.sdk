@@ -27,7 +27,7 @@ public class SdkLogManager {
 
   protected IStatus createStatus(IStatus log) {
     if (log instanceof LogStatus) {
-      return (LogStatus) log;
+      return log;
     }
     else {
       return createStatus(log.getSeverity(), log.getMessage(), log.getException());

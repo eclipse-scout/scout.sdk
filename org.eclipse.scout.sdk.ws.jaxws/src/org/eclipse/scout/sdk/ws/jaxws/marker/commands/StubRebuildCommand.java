@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.marker.commands;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.util.List;
 import java.util.Map;
 
@@ -79,15 +77,6 @@ public class StubRebuildCommand extends AbstractExecutableMarkerCommand {
         }
       });
     }
-  }
-
-  private String getStacktrace(Throwable t) {
-    if (t == null) {
-      return null;
-    }
-    StringWriter writer = new StringWriter();
-    t.printStackTrace(new PrintWriter(writer));
-    return writer.toString();
   }
 
   public IScoutBundle getBundle() {

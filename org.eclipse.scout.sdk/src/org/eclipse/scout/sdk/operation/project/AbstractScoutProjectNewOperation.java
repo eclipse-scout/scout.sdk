@@ -186,8 +186,6 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
     if (StringUtility.isNullOrEmpty(getProjectNamePostfix())) {
       return getProjectName();
     }
-    else {
-      return getProjectName() + " (" + getProjectNamePostfix() + ")";
-    }
+    return getProjectName() + " (" + getProjectNamePostfix() + ")";
   }
 }

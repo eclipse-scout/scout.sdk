@@ -67,6 +67,7 @@ public class InstallBinaryFileOperation implements IOperation {
     }
   }
 
+  @SuppressWarnings("resource")
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
@@ -75,13 +76,12 @@ public class InstallBinaryFileOperation implements IOperation {
       IPath destPath = getDestinationProject().getLocation().append(getDestinationPath());
       File f = new File(destPath.toOSString());
       f.getParentFile().mkdirs();
-      IOUtility.writeContent(new FileOutputStream(f), data);
+      IOUtility.writeContent(new FileOutputStream(f), data, true);
       getDestinationProject().getFile(getDestinationPath()).refreshLocal(IResource.DEPTH_ZERO, monitor);
     }
     catch (Exception e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "", e));
     }
-
   }
 
   /**

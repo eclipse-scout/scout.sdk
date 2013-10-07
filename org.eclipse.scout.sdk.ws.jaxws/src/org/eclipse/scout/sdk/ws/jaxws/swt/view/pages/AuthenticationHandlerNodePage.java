@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.AbstractTypeChangedListener;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageLoadedListener;
@@ -39,8 +38,6 @@ public class AuthenticationHandlerNodePage extends AbstractPage {
   private Set<IPageLoadedListener> m_pageLoadedListeners;
   private P_TypeChangeListener m_handlerChangedListener;
 
-  private IScoutBundle m_bundle; // necessary to be hold as in method unloadPage, a reference to the bundle is required
-
   public AuthenticationHandlerNodePage(IPage parent, IType type) {
     setParent(parent);
     setName(type.getElementName());
@@ -51,8 +48,6 @@ public class AuthenticationHandlerNodePage extends AbstractPage {
     else {
       setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsSdk.AuthenticationHandler));
     }
-
-    m_bundle = getScoutBundle();
 
     m_pageLoadedListeners = new HashSet<IPageLoadedListener>();
     m_pageLoadedListenerLock = new Object();

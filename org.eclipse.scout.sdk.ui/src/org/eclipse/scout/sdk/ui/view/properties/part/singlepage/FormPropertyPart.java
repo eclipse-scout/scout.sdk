@@ -53,7 +53,6 @@ import org.eclipse.swt.widgets.Composite;
 public class FormPropertyPart extends JdtTypePropertyPart {
   private static final String SECTION_ID_LINKS = "section.links";
 
-  private final IType abstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
   private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
   private final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
 

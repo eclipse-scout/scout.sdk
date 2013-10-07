@@ -402,9 +402,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
       P2Utility.installUnits(ius, repoURIs, monitor);
       return FeatureInstallResult.InstallationSuccessful;
     }
-    else {
-      return FeatureInstallResult.LicenseNotAccepted;
-    }
+    return FeatureInstallResult.LicenseNotAccepted;
   }
 
   protected void refreshScoutExplorerPageAsync(final Class<? extends IPage> pageToRefresh) {

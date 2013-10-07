@@ -49,7 +49,7 @@ public class ScoutBundleAddWizard extends ScoutProjectNewWizard {
 
     Set<IFile> productFiles = getProductFiles(project.getSymbolicName());
     if (productFiles.size() > 0) {
-      m_page2 = new ProductFileSelectionWizardPage(project, productFiles);
+      m_page2 = new ProductFileSelectionWizardPage(productFiles);
       addPage(m_page2);
     }
   }

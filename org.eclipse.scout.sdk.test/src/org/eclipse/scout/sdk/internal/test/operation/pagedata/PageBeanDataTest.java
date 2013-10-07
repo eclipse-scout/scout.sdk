@@ -40,8 +40,7 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
 
     ITypeHierarchy superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(field);
     PageDataAnnotation annotation = ScoutTypeUtility.findPageDataAnnotation(field, superTypeHierarchy);
-    PageDataDtoUpdateOperation op = new PageDataDtoUpdateOperation(field, annotation, superTypeHierarchy);
-//    op.setFormatSource(false);
+    PageDataDtoUpdateOperation op = new PageDataDtoUpdateOperation(field, annotation);
     TestWorkspaceUtility.executeAndBuildWorkspace(op);
 
     IType pageData = op.getDerivedType();

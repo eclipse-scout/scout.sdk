@@ -163,22 +163,21 @@ public class BindBasesVisitor extends DefaultAstVisitor {
       }
       return false;
     }
-    else {
-      // try property holder
-      VariableType var = AstUtility.getTypeSignature(node, m_rootNode, m_serviceMethod);
-      if (var != null) {
-        PropertyBasedBindBase base = new PropertyBasedBindBase();
 
-        String[] assignedTypeSignatures = var.getAssignedTypeSignatures();
-        if (assignedTypeSignatures.length > 0) {
-          base.addAssignedSignatures(assignedTypeSignatures);
-        }
-        else if (var.getTypeSignature() != null) {
-          base.addAssignedSignature(var.getTypeSignature());
-        }
-        if (base.getAssignedSignatures().length > 0) {
-          m_bindBases.add(base);
-        }
+    // try property holder
+    VariableType var = AstUtility.getTypeSignature(node, m_rootNode, m_serviceMethod);
+    if (var != null) {
+      PropertyBasedBindBase base = new PropertyBasedBindBase();
+
+      String[] assignedTypeSignatures = var.getAssignedTypeSignatures();
+      if (assignedTypeSignatures.length > 0) {
+        base.addAssignedSignatures(assignedTypeSignatures);
+      }
+      else if (var.getTypeSignature() != null) {
+        base.addAssignedSignature(var.getTypeSignature());
+      }
+      if (base.getAssignedSignatures().length > 0) {
+        m_bindBases.add(base);
       }
     }
     //  new TableHolderFilter(formData.getParticipantTable(), ITableHolder.STATUS_DELETED)

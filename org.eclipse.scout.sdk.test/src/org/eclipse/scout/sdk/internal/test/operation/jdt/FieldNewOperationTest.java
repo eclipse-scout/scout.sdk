@@ -34,8 +34,6 @@ import org.junit.Test;
  */
 public class FieldNewOperationTest extends AbstractScoutSdkTest {
 
-  private Long foo;
-
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     setupWorkspace("resources/operation/method", "test.client", "test.shared");

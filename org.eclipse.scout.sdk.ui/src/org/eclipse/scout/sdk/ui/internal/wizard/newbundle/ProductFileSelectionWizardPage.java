@@ -43,18 +43,16 @@ public class ProductFileSelectionWizardPage extends AbstractProjectNewWizardPage
 
   private final static String PROP_SELECTED_PRODUCTS = "selectedProductFilesToModify";
 
-  private final IScoutBundle m_bundle;
   private final Set<IFile> m_productFiles;
   private final List<ITreeNode> m_productNodes;
 
   private CheckableTree m_bundleTree;
   private ITreeNode m_invisibleRootNode;
 
-  public ProductFileSelectionWizardPage(IScoutBundle project, Set<IFile> productFiles) {
+  public ProductFileSelectionWizardPage(Set<IFile> productFiles) {
     super(ProductFileSelectionWizardPage.class.getName());
     setTitle(Texts.get("SelectProductsToModify"));
     setDescription(Texts.get("ProductFileSelectionWizardMsg"));
-    m_bundle = project;
     m_productFiles = productFiles;
     m_productNodes = new ArrayList<ITreeNode>();
   }

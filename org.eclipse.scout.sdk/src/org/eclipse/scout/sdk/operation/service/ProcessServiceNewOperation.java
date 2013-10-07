@@ -53,8 +53,6 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
   private String m_permissionUpdateName;
 
   // created types
-  private IType m_createdServiceInterface;
-  private IType m_createdServiceImplementation;
   private IType m_createdReadPermission;
   private IType m_createdUpdatePermission;
   private IType m_createdCreatePermission;

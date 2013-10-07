@@ -85,7 +85,6 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
   private QName m_portTypeQName;
   private String m_alias;
   private boolean m_createBindingFile;
-  private String m_wsdlFileName;
 
   public WsProviderNewWizard(IScoutBundle bundle) {
     m_bundle = bundle;

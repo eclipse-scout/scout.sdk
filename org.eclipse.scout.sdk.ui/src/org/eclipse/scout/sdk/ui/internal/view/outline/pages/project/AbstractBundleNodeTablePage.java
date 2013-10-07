@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
+import org.eclipse.pde.internal.ui.editor.plugin.ManifestEditor;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -24,6 +25,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * @author Andreas Hoegger
  * @since 3.9.0
  */
+@SuppressWarnings("restriction")
 public abstract class AbstractBundleNodeTablePage extends AbstractPage {
 
   private final ScoutBundleNode m_bundle;
@@ -38,6 +40,12 @@ public abstract class AbstractBundleNodeTablePage extends AbstractPage {
       icon = ScoutSdkUi.getImageDescriptor(icon, SdkIcons.BinaryDecorator, IDecoration.BOTTOM_LEFT);
     }
     setImageDescriptor(icon);
+  }
+
+  @Override
+  public boolean handleDoubleClickedDelegate() {
+    ManifestEditor.openPluginEditor(m_bundle.getSymbolicName());
+    return true;
   }
 
   @Override

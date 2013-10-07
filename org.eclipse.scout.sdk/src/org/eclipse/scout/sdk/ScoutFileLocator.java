@@ -31,7 +31,17 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
  */
 public class ScoutFileLocator {
 
-  // ensure input stream will be closed!
+  /**
+   * Tries to resolve the given path in the given bundle in the workspace and (if not found in the workspace) in the
+   * platform.
+   * 
+   * @param bundleID
+   *          the bundle to search
+   * @param path
+   *          the path to search in the bundle
+   * @return The input stream to the path. Must be closed by the caller!
+   */
+  @SuppressWarnings("resource")
   public static InputStream resolve(String bundleID, String path) {
     InputStream stream = null;
     try {

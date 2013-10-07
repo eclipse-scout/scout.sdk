@@ -53,7 +53,7 @@ public class WsdlFolderPresenter extends FolderPresenter {
 
     IFolder folder = JaxWsSdkUtility.openProjectFolderDialog(
         m_bundle,
-        new WsdlFolderViewerFilter(m_bundle, rootFolder),
+        new WsdlFolderViewerFilter(rootFolder),
         Texts.get("MovingFiles"),
         Texts.get("MoveWsdlFileAndArtefacts"),
         rootFolder,

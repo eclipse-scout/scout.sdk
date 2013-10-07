@@ -109,7 +109,7 @@ public class JarSelectionWizardPage extends AbstractWorkspaceWizardPage {
         ISelection currentSelection = m_jarViewer.getSelection();
         if (!currentSelection.isEmpty()) {
           Set<File> jarFiles = getJarFiles();
-          if (jarFiles.remove((File) ((IStructuredSelection) currentSelection).getFirstElement())) {
+          if (jarFiles.remove(((IStructuredSelection) currentSelection).getFirstElement())) {
             setJarFiels(jarFiles);
           }
         }

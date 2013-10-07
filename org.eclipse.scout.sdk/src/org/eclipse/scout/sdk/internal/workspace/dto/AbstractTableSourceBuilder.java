@@ -44,13 +44,8 @@ public abstract class AbstractTableSourceBuilder extends AbstractDtoTypeSourceBu
         String superTypeSig = type.getSuperclassTypeSignature();
         return SignatureUtility.getResolvedSignature(Signature.getTypeArguments(superTypeSig)[0], type);
       }
-      else {
-        return getColumnSignature(superType, columnHierarchy);
-      }
+      return getColumnSignature(superType, columnHierarchy);
     }
-    else {
-      return null;
-    }
+    return null;
   }
-
 }

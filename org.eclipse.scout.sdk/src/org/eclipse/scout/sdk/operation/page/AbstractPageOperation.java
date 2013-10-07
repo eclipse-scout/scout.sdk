@@ -43,7 +43,6 @@ public abstract class AbstractPageOperation implements IOperation {
   private final static Pattern REGEX_LIST_ADD_ENTRY_POINT = Pattern.compile("([a-zA-Z0-9\\_\\-]*)\\.add\\(.+\\)\\;", Pattern.MULTILINE);
 
   private final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
-  private final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
   private final IType iPageWithNodes = TypeUtility.getType(RuntimeClasses.IPageWithNodes);
   private final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
 

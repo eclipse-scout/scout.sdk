@@ -33,7 +33,7 @@ public class OutlinesParser implements IPropertySourceParser<IType[]> {
     sourceBuilder.append("new Class[]{");
     if (value.length > 0) {
       for (int i = 0; i < value.length; i++) {
-        sourceBuilder.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(((IType) value[i]).getFullyQualifiedName()), importValidator)).append(".class");
+        sourceBuilder.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature((value[i]).getFullyQualifiedName()), importValidator)).append(".class");
         if (i < (value.length - 1)) {
           sourceBuilder.append(",").append(lineDelimiter).append("  ");
         }

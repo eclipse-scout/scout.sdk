@@ -460,7 +460,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   public static Image getImage(IJavaElement element) {
     Image img = null;
     try {
-      switch (((IJavaElement) element).getElementType()) {
+      switch (element.getElementType()) {
         case IJavaElement.TYPE:
           if (((IType) element).isInterface()) {
             img = getImage(Interface);

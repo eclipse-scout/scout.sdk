@@ -350,9 +350,8 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
 
   @SuppressWarnings("unchecked")
   private static String evaluateTemplate(CodeTemplateContext context, Template template) throws CoreException {
-
     // replace the user name resolver with our own to ensure we can respect the scout specific user names.
-    Iterator<TemplateVariableResolver> resolvers = (Iterator<TemplateVariableResolver>) context.getContextType().resolvers();
+    Iterator<TemplateVariableResolver> resolvers = context.getContextType().resolvers();
     while (resolvers.hasNext()) {
       TemplateVariableResolver resolver = resolvers.next();
       if (resolver instanceof GlobalTemplateVariables.User) {

@@ -34,7 +34,6 @@ public class ScoutWorkingSetWizardPage extends WizardPage implements IWorkingSet
   private TextField m_nameField;
   private IWorkingSet m_currentWorkingSet;
   private boolean m_createNewSet;
-  private String m_title;
   private String m_oldWorkingSetName;
 
   public ScoutWorkingSetWizardPage() {

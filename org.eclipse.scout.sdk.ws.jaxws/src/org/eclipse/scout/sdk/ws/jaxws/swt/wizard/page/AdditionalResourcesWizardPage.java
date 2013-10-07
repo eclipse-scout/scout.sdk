@@ -87,7 +87,7 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
             Iterator iterator = selection.iterator();
 
             while (iterator.hasNext()) {
-              m_files.remove((File) iterator.next());
+              m_files.remove(iterator.next());
             }
             m_tableViewer.refresh();
           }
@@ -126,7 +126,7 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
         Iterator iterator = selection.iterator();
 
         while (iterator.hasNext()) {
-          m_files.remove((File) iterator.next());
+          m_files.remove(iterator.next());
         }
         m_tableViewer.refresh();
       }

@@ -145,6 +145,7 @@ public class ScoutProjectIcons implements IIconProvider {
     }
   }
 
+  @SuppressWarnings("resource")
   protected void findIconInProject(ScoutIconDesc desc) {
     if (desc == null || desc.getIconName() == null) return;
 

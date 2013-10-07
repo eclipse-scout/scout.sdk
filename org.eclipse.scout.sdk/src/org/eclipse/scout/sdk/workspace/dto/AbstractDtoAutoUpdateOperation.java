@@ -131,45 +131,44 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
     if (TypeUtility.exists(m_derivedType)) {
       return m_derivedType;
     }
-    else {
-      IType type = null;
-      String signature = getDerivedTypeSignature();
-      if (!StringUtility.isNullOrEmpty(signature)) {
-        type = TypeUtility.getTypeBySignature(signature);
-        if (!TypeUtility.exists(type)) {
-          IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getModelType().getJavaProject());
-          IScoutBundle sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
-          if (sharedBundle == null) {
-            return null;
-          }
 
-          String packageName = Signature.getSignatureQualifier(signature);
-          if (StringUtility.isNullOrEmpty(packageName)) {
-            packageName = sharedBundle.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES);
-          }
-          String simpleName = (Signature.getSignatureSimpleName(Signature.getTypeErasure(signature)));
-          final String question = Texts.get("ModelDataExistsConfirmationMessage", packageName + "." + simpleName, getModelType().getElementName());
-          if (MessageBoxServiceFactory.getMessageBoxService().showYesNoQuestion(getOperationName(), question, YesNo.YES) == YesNo.YES) {
+    IType type = null;
+    String signature = getDerivedTypeSignature();
+    if (!StringUtility.isNullOrEmpty(signature)) {
+      type = TypeUtility.getTypeBySignature(signature);
+      if (!TypeUtility.exists(type)) {
+        IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getModelType().getJavaProject());
+        IScoutBundle sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+        if (sharedBundle == null) {
+          return null;
+        }
 
-            PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(simpleName, packageName, sharedBundle.getJavaProject());
-            formDataOp.setFlags(Flags.AccPublic);
-            formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
-            formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
-            OperationJob job = new OperationJob(formDataOp);
-            job.schedule();
-            try {
-              job.join();
-            }
-            catch (InterruptedException e) {
-              ScoutSdk.logError("could not join form data compilation unit create job.", e);
-            }
-            type = formDataOp.getCreatedType();
+        String packageName = Signature.getSignatureQualifier(signature);
+        if (StringUtility.isNullOrEmpty(packageName)) {
+          packageName = sharedBundle.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES);
+        }
+        String simpleName = (Signature.getSignatureSimpleName(Signature.getTypeErasure(signature)));
+        final String question = Texts.get("ModelDataExistsConfirmationMessage", packageName + "." + simpleName, getModelType().getElementName());
+        if (MessageBoxServiceFactory.getMessageBoxService().showYesNoQuestion(getOperationName(), question, YesNo.YES) == YesNo.YES) {
+
+          PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(simpleName, packageName, sharedBundle.getJavaProject());
+          formDataOp.setFlags(Flags.AccPublic);
+          formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
+          formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+          OperationJob job = new OperationJob(formDataOp);
+          job.schedule();
+          try {
+            job.join();
           }
+          catch (InterruptedException e) {
+            ScoutSdk.logError("could not join form data compilation unit create job.", e);
+          }
+          type = formDataOp.getCreatedType();
         }
       }
-      m_derivedType = type;
-      return type;
     }
+    m_derivedType = type;
+    return type;
   }
 
   private boolean isSourceEquals(String source1, String source2) {
@@ -187,9 +186,8 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
     if (sourceTrimmed1.length() != sourceTrimmed2.length()) {
       return false;
     }
-    else {
-      return sourceTrimmed1.equals(sourceTrimmed2);
-    }
+
+    return sourceTrimmed1.equals(sourceTrimmed2);
   }
 
   private static class P_FormDataStoreOperation implements IOperation {

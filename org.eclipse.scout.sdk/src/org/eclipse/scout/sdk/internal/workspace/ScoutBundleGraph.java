@@ -260,6 +260,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
     return result;
   }
 
+  @SuppressWarnings("unused")
   private static void printAsTree(Map<String, ScoutBundle> graph) {
     for (ScoutBundle p : graph.values()) {
       if (p.getDirectParentBundles().size() == 0) { // only root bundles

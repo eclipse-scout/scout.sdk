@@ -31,7 +31,6 @@ import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataDtoUpdateOperation;
 public class PageDataAutoUpdateHandler extends AbstractDtoUpdateHandler {
 
   private boolean checkType(DtoUpdateProperties properties) throws CoreException {
-
     ITypeHierarchy superTypeHierarchy = ensurePropertySuperTypeHierarchy(properties);
     if (superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IPageWithTable))) {
       PageDataAnnotation pageDataAnnotation = ensurePropertyPageDataAnnotation(properties);
@@ -43,7 +42,7 @@ public class PageDataAutoUpdateHandler extends AbstractDtoUpdateHandler {
   @Override
   public IDtoAutoUpdateOperation createUpdateOperation(DtoUpdateProperties properties) throws CoreException {
     if (checkType(properties)) {
-      return new PageDataDtoUpdateOperation(properties.getType(), ensurePropertyPageDataAnnotation(properties), ensurePropertySuperTypeHierarchy(properties));
+      return new PageDataDtoUpdateOperation(properties.getType(), ensurePropertyPageDataAnnotation(properties));
     }
     else {
       return null;

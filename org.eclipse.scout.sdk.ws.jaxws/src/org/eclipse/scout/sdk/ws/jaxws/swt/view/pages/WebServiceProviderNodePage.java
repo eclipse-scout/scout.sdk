@@ -37,7 +37,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -78,8 +77,6 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
 
   private SunJaxWsBean m_sunJaxWsBean;
   private BuildJaxWsBean m_buildJaxWsBean;
-
-  private IPrimaryTypeTypeHierarchy m_portTypeInterfaceTypeHierarchy;
 
   private IResourceListener m_sunJaxWsResourceListener;
   private IResourceListener m_buildJaxWsResourceListener;

@@ -20,14 +20,11 @@ import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 
 public class SessionFactoryNodePage extends AbstractPage {
 
   private IType m_type;
-
-  private IScoutBundle m_bundle; // necessary to be hold as in method unloadPage, a reference to the bundle is required
 
   public SessionFactoryNodePage(IPage parent, IType type) {
     setParent(parent);
@@ -39,8 +36,6 @@ public class SessionFactoryNodePage extends AbstractPage {
     else {
       setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsSdk.SessionFactory));
     }
-
-    m_bundle = getScoutBundle();
   }
 
   @Override

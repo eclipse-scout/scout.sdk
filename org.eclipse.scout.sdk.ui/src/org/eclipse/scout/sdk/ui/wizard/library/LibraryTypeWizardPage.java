@@ -227,7 +227,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
         ISelection currentSelection = m_userBundleViewer.getSelection();
         if (!currentSelection.isEmpty()) {
           Set<IScoutBundle> userBundles = getLibraryUserBundles();
-          if (userBundles.remove((IScoutBundle) ((IStructuredSelection) currentSelection).getFirstElement())) {
+          if (userBundles.remove(((IStructuredSelection) currentSelection).getFirstElement())) {
             setLibraryUserBundles(userBundles);
           }
         }

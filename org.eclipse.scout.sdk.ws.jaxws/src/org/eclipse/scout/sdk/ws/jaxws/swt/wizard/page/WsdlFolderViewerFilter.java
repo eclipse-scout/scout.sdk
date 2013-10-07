@@ -14,15 +14,12 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class WsdlFolderViewerFilter extends ViewerFilter {
 
-  private IScoutBundle m_bundle;
   private IFolder m_rootFolder;
 
-  public WsdlFolderViewerFilter(IScoutBundle bundle, IFolder rootFolder) {
-    m_bundle = bundle;
+  public WsdlFolderViewerFilter(IFolder rootFolder) {
     m_rootFolder = rootFolder;
   }
 

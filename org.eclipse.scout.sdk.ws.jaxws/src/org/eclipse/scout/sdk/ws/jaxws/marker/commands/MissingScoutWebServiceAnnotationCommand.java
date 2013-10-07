@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.ws.jaxws.operation.AnnotationUpdateOperation;
 public class MissingScoutWebServiceAnnotationCommand extends AbstractExecutableMarkerCommand {
 
   private IType m_declaringType;
-  private IType m_interfacePortType;
 
   public MissingScoutWebServiceAnnotationCommand(IType declaringType) {
     super("Missing annotation '" + TypeUtility.getType(JaxWsRuntimeClasses.ScoutWebService).getElementName() + "'");

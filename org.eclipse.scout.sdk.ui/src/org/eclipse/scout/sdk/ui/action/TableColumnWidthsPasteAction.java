@@ -80,11 +80,12 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
     msgBox.open();
   }
 
+  @SuppressWarnings("resource")
   private String getStringFromClipboard() {
     try {
       Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
       Reader reader = DataFlavor.stringFlavor.getReaderForText(clipboard.getContents(null));
-      return IOUtility.getContent(reader);
+      return IOUtility.getContent(reader, true);
     }
     catch (Exception e) {
       return null;

@@ -140,7 +140,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
       m_entityField.addModifyListener(new ModifyListener() {
         @Override
         public void modifyText(ModifyEvent e) {
-          setTargetPackageInternal((String) m_entityField.getText());
+          setTargetPackageInternal(m_entityField.getText());
           pingStateChanging();
         }
       });

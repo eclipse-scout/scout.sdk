@@ -26,27 +26,21 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.SourceRange;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
-import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceProviderNodePage;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.text.edits.ReplaceEdit;
 
 public class MissingPortTypeInheritanceCommand extends AbstractExecutableMarkerCommand {
 
-  private IScoutBundle m_bundle;
   private IType m_type;
   private IType m_portTypeInterfaceType;
-  private SunJaxWsBean m_sunJaxWsBean;
   private String m_markerGroupUUID;
 
-  public MissingPortTypeInheritanceCommand(IScoutBundle bundle, String markerGroupUUID, IType type, IType portTypeInterfaceType, SunJaxWsBean sunJaxWsBean) {
+  public MissingPortTypeInheritanceCommand(String markerGroupUUID, IType type, IType portTypeInterfaceType) {
     super("Port type must implement service interface");
-    m_bundle = bundle;
     m_type = type;
     m_portTypeInterfaceType = portTypeInterfaceType;
-    m_sunJaxWsBean = sunJaxWsBean;
     m_markerGroupUUID = markerGroupUUID;
     setSolutionDescription("By using this task, the port type '" + m_type.getElementName() + "' is changed to inherit from the service interface '" + m_portTypeInterfaceType.getElementName() + "'.");
   }

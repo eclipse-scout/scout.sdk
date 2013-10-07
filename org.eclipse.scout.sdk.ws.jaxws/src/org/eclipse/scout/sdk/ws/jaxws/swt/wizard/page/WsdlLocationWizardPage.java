@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page;
 
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -293,7 +294,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
         public void widgetSelected(SelectionEvent e) {
           IFolder folder = JaxWsSdkUtility.openProjectFolderDialog(
               m_bundle,
-              new WsdlFolderViewerFilter(m_bundle, getRootWsdlFolder()),
+              new WsdlFolderViewerFilter(getRootWsdlFolder()),
               Texts.get("WsdlFolder"),
               Texts.get("ChooseFolderForWsdlFileAndArtefacts"),
               getRootWsdlFolder(),
@@ -609,6 +610,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("PleaseEnterValidUrl")));
       return;
     }
+
     URL url;
     try {
       url = new URL(getUrl());
@@ -618,36 +620,52 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       return;
     }
 
-    InputStream is;
+    InputStream is = null;
+    byte[] content;
     // temporarily trust all HTTPS certificates
     SSLSocketFactory defaultSSLSocketFactory = HttpsURLConnection.getDefaultSSLSocketFactory();
     HostnameVerifier defaultHostnameVerifier = HttpsURLConnection.getDefaultHostnameVerifier();
     try {
-      HttpsURLConnection.setDefaultHostnameVerifier(new P_DummyHostnameVerifier());
+      try {
+        HttpsURLConnection.setDefaultHostnameVerifier(new P_DummyHostnameVerifier());
 
-      SSLContext sslContext = SSLContext.getInstance("SSL");
-      sslContext.init(null, new TrustManager[]{new P_DummyTrustManager()}, new SecureRandom());
-      HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
+        SSLContext sslContext = SSLContext.getInstance("SSL");
+        sslContext.init(null, new TrustManager[]{new P_DummyTrustManager()}, new SecureRandom());
+        HttpsURLConnection.setDefaultSSLSocketFactory(sslContext.getSocketFactory());
 
-      URLConnection connection = url.openConnection();
-      connection.setAllowUserInteraction(true); // for credentials prompt if required
-      connection.setDoOutput(true);
-      is = url.openStream();
-    }
-    catch (Exception e) {
-      multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("URLCouldNotBeAccessed"), e));
-      return;
+        URLConnection connection = url.openConnection();
+        connection.setAllowUserInteraction(true); // for credentials prompt if required
+        connection.setDoOutput(true);
+        is = url.openStream();
+      }
+      catch (Exception e) {
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("URLCouldNotBeAccessed"), e));
+        return;
+      }
+      finally {
+        HttpsURLConnection.setDefaultSSLSocketFactory(defaultSSLSocketFactory);
+        HttpsURLConnection.setDefaultHostnameVerifier(defaultHostnameVerifier);
+      }
+
+      try {
+        content = IOUtility.getContent(is, false);
+      }
+      catch (ProcessingException e) {
+        multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("CouldNotDownloadWSDLFile")));
+        return;
+      }
     }
     finally {
-      HttpsURLConnection.setDefaultSSLSocketFactory(defaultSSLSocketFactory);
-      HttpsURLConnection.setDefaultHostnameVerifier(defaultHostnameVerifier);
+      if (is != null) {
+        try {
+          is.close();
+        }
+        catch (IOException e) {
+        }
+      }
     }
 
-    byte[] content;
-    try {
-      content = IOUtility.getContent(is, true);
-    }
-    catch (ProcessingException e) {
+    if (content == null) {
       multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("CouldNotDownloadWSDLFile")));
       return;
     }

@@ -1,7 +1,6 @@
 package org.eclipse.scout.sdk.operation.export;
 
 import java.io.BufferedOutputStream;
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
@@ -93,9 +92,7 @@ public class ExportEarOperation implements IOperation {
       if (e instanceof CoreException) {
         throw (CoreException) e;
       }
-      else {
-        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not ear file", e));
-      }
+      throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not ear file", e));
     }
     finally {
       cleanUp();
@@ -114,7 +111,9 @@ public class ExportEarOperation implements IOperation {
       zipOut.flush();
     }
     finally {
-      closeSilent(zipOut);
+      if (zipOut != null) {
+        zipOut.close();
+      }
     }
     return destinationFile;
   }
@@ -141,6 +140,7 @@ public class ExportEarOperation implements IOperation {
     return fileName;
   }
 
+  @SuppressWarnings("resource")
   private File installTextFile(URL platformUrl, String filePath, Map<String, String> replacements) throws IOException, ProcessingException, CoreException {
     URL absSourceUrl = FileLocator.resolve(platformUrl);
     String s = new String(IOUtility.getContent(absSourceUrl.openStream()), "UTF-8");
@@ -162,7 +162,7 @@ public class ExportEarOperation implements IOperation {
       destFile.getParentFile().mkdirs();
     }
 
-    IOUtility.writeContent(new FileWriter(destFile), s);
+    IOUtility.writeContent(new FileWriter(destFile), s, true);
     return destFile;
   }
 
@@ -181,23 +181,25 @@ public class ExportEarOperation implements IOperation {
       return destFile;
     }
     finally {
-      closeSilent(in);
-      closeSilent(out);
+      if (in != null) {
+        try {
+          in.close();
+        }
+        catch (Exception e) {
+        }
+      }
+      if (out != null) {
+        try {
+          out.close();
+        }
+        catch (Exception e) {
+        }
+      }
     }
   }
 
   private File getDestinationFile(String relPath) {
     return new File(m_tempBuildDir + File.separator + relPath.replaceAll("\\\\\\/$", ""));
-  }
-
-  private void closeSilent(Closeable c) {
-    if (c != null) {
-      try {
-        c.close();
-      }
-      catch (Exception e) {
-      }
-    }
   }
 
   public void addModule(File... modules) {

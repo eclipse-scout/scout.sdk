@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 public class PathProposal extends SimpleProposal {
   private static final String DATA_PATH = "dataPath";
-  private IPath m_path;
 
   public PathProposal(IPath path) {
     super(path.toString(), ScoutSdkUi.getImage(ScoutSdkUi.Package));
@@ -29,5 +28,4 @@ public class PathProposal extends SimpleProposal {
   public IPath getPath() {
     return (IPath) getData(DATA_PATH);
   }
-
 }

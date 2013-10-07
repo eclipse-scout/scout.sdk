@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
-
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IPath;
@@ -110,14 +107,5 @@ public class StubRebuildAction extends AbstractLinkAction {
         }
       });
     }
-  }
-
-  private String getStacktrace(Throwable t) {
-    if (t == null) {
-      return null;
-    }
-    StringWriter writer = new StringWriter();
-    t.printStackTrace(new PrintWriter(writer));
-    return writer.toString();
   }
 }

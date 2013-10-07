@@ -235,19 +235,6 @@ public class JdtEventLoggerView extends ViewPart {
   }
 
   private class P_JdtEventListner implements IElementChangedListener {
-    public static final int CHANGED_FLAG_MASK =
-        IJavaElementDelta.F_CONTENT |
-            IJavaElementDelta.F_MODIFIERS |
-            IJavaElementDelta.F_MOVED_FROM |
-            IJavaElementDelta.F_MOVED_TO |
-            IJavaElementDelta.F_REORDER |
-            IJavaElementDelta.F_SUPER_TYPES |
-            IJavaElementDelta.F_OPENED |
-            IJavaElementDelta.F_CLOSED |
-            IJavaElementDelta.F_CATEGORIES |
-            IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED |
-            IJavaElementDelta.F_ANNOTATIONS;
-
     @Override
     public void elementChanged(ElementChangedEvent event) {
       Event logEvent = new Event(getEventType(event), "", "");
@@ -287,11 +274,8 @@ public class JdtEventLoggerView extends ViewPart {
             b.append("[changed=").append(icu.hasUnsavedChanges()).append("] ");
           }
           catch (JavaModelException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
           }
         }
-
       }
       int flags = delta.getFlags();
       b.append("[F_CONTENT=").append((flags & IJavaElementDelta.F_CONTENT) != 0).append("] ");

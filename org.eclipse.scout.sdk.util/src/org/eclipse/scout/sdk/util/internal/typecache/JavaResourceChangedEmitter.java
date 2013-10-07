@@ -401,6 +401,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     }
   }
 
+  @SuppressWarnings("unused")
   private void printEventType(int type, PrintStream out) {
     switch (type) {
       case IJavaElementDelta.ADDED:
@@ -419,7 +420,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     out.flush();
   }
 
-  @SuppressWarnings("deprecation")
+  @SuppressWarnings({"deprecation", "unused"})
   private void printJdtFlags(int flags, PrintStream out) {
     boolean first = true;
     out.print("flags for '" + flags + "'[");

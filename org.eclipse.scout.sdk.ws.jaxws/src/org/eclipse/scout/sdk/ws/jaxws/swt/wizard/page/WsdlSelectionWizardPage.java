@@ -100,7 +100,7 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
       public void widgetSelected(SelectionEvent e) {
         IFolder folder = JaxWsSdkUtility.openProjectFolderDialog(
             m_bundle,
-            new WsdlFolderViewerFilter(m_bundle, getRootWsdlFolder()),
+            new WsdlFolderViewerFilter(getRootWsdlFolder()),
             Texts.get("WsdlFolder"),
             Texts.get("ChooseFolderForWsdlFileAndArtefacts"),
             m_rootWsdlFolder, // root folder

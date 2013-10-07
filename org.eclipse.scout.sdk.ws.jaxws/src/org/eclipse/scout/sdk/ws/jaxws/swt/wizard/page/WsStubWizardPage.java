@@ -60,8 +60,6 @@ public class WsStubWizardPage extends AbstractWorkspaceWizardPage {
   private StyledTextField m_packageField;
   private Button m_packageBrowseButton;
   private Button m_createBindingFileButton;
-
-  private String m_serviceName;
   private String m_defaultPackageName;
 
   public WsStubWizardPage(IScoutBundle bundle) {

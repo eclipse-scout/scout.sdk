@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.ws.jaxws.marker.commands.IMarkerCommand;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -41,7 +40,6 @@ public class CommandExecutionDialog extends TitleAreaDialog {
 
   // fields
   private FormToolkit m_toolkit;
-  private SelectionListener m_selectAllSelectionListener;
   private String m_dialogTitle;
   private String m_headerMessage;
 

@@ -42,9 +42,7 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
     if (isDebug()) {
       return debugDoRun(monitor);
     }
-    else {
-      return doRun(monitor);
-    }
+    return doRun(monitor);
   }
 
   private final IStatus debugDoRun(IProgressMonitor monitor) {

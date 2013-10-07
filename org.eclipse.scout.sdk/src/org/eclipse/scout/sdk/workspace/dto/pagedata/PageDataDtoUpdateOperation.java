@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
 
 /**
@@ -32,15 +31,13 @@ import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
 public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
 
   private final PageDataAnnotation m_pageDataAnnotation;
-  private ITypeHierarchy m_superTypeHierarchy;
 
   /**
    * @param modelType
    */
-  public PageDataDtoUpdateOperation(IType modelType, PageDataAnnotation pageDataAnnotation, ITypeHierarchy superTypeHierarchy) {
+  public PageDataDtoUpdateOperation(IType modelType, PageDataAnnotation pageDataAnnotation) {
     super(modelType);
     m_pageDataAnnotation = pageDataAnnotation;
-    m_superTypeHierarchy = superTypeHierarchy;
   }
 
   @Override

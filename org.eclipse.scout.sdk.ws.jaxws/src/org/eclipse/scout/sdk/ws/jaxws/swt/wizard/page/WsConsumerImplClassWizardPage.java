@@ -76,7 +76,6 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
 
   private IScoutBundle m_bundle;
 
-  private Button m_createImplClassButton;
   private StyledTextField m_packageField;
   private Button m_packageBrowseButton;
   private StyledTextField m_typeNameField;

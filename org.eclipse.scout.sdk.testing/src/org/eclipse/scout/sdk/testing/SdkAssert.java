@@ -641,7 +641,7 @@ public class SdkAssert extends Assert {
       fail(message);
     }
 
-    assertEquals(message, (Double) memberOrderNr, (Double) orderNr);
+    assertEquals(message, memberOrderNr, orderNr);
   }
 
   /**

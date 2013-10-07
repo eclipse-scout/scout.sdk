@@ -181,9 +181,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
     if (startWithUpperCase) {
       return Character.toUpperCase(getBeanName().charAt(0)) + getBeanName().substring(1);
     }
-    else {
-      return Character.toLowerCase(getBeanName().charAt(0)) + getBeanName().substring(1);
-    }
+    return Character.toLowerCase(getBeanName().charAt(0)) + getBeanName().substring(1);
   }
 
   @Override

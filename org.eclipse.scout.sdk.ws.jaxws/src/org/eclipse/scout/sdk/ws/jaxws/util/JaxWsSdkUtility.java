@@ -573,27 +573,6 @@ public final class JaxWsSdkUtility {
     return TypeUtility.existsType(fqn) && !fqn.equals(noneAuthFqn);
   }
 
-  private static class TypeEntry {
-    private IType m_sourceType;
-    private IType m_binaryType;
-
-    public IType getSourceType() {
-      return m_sourceType;
-    }
-
-    public void setSourceType(IType sourceType) {
-      m_sourceType = sourceType;
-    }
-
-    public IType getBinaryType() {
-      return m_binaryType;
-    }
-
-    public void setBinaryType(IType binaryType) {
-      m_binaryType = binaryType;
-    }
-  }
-
   public static IType extractGenericSuperType(IType type, int index) {
     try {
       if (!TypeUtility.exists(type)) {

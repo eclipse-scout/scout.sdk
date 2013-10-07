@@ -121,27 +121,6 @@ public class HandlerNewOperation implements IOperation {
     workingCopyManager.reconcile(icu, monitor);
   }
 
-  private IType createType(String qualifiedTypeName, IType interfaceType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    IType type;
-    if (TypeUtility.existsType(qualifiedTypeName)) {
-      type = TypeUtility.getType(qualifiedTypeName);
-    }
-    else {
-      String typeName = Signature.getSimpleName(qualifiedTypeName);
-      String packageName = Signature.getQualifier(qualifiedTypeName);
-
-      PrimaryTypeNewOperation newTypeOp = new PrimaryTypeNewOperation(typeName, packageName, m_bundle.getJavaProject());
-      newTypeOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
-      newTypeOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
-      newTypeOp.setFlags(Flags.AccPublic);
-      newTypeOp.addInterfaceSignature(SignatureCache.createTypeSignature(interfaceType.getFullyQualifiedName()));
-      newTypeOp.run(monitor, workingCopyManager);
-      type = newTypeOp.getCreatedType();
-      workingCopyManager.register(type.getCompilationUnit(), monitor);
-    }
-    return type;
-  }
-
   @Override
   public String getOperationName() {
     return HandlerNewOperation.class.getName();

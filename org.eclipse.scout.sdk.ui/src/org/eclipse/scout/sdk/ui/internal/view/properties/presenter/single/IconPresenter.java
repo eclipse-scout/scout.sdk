@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
-import java.util.regex.Pattern;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
@@ -47,8 +45,6 @@ import org.eclipse.swt.widgets.Label;
  */
 public class IconPresenter extends AbstractMethodPresenter {
 
-  private final static Pattern REGEX = Pattern.compile("^.*\\.([^\\.]+)$");
-
   private Label m_currentIconPresenter;
   private ProposalTextField m_proposalField;
   private IIconProvider m_iconProvider;
@@ -75,7 +71,6 @@ public class IconPresenter extends AbstractMethodPresenter {
       public void proposalAccepted(ContentProposalEvent event) {
         handleProposalAccepted(event);
       }
-
     });
 
     // layout

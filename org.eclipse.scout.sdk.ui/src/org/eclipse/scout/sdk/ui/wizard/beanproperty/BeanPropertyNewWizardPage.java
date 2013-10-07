@@ -136,24 +136,20 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
     if (propertyName == null || propertyName.length() == 0) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
-    else {
-      // check existing method names
-      if (m_notAllowedNames != null &&
-          (m_notAllowedNames.contains("get" + getBeanName(true)) ||
-              m_notAllowedNames.contains("set" + getBeanName(true)) ||
-          m_notAllowedNames.contains("is" + getBeanName(true)))) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
-      if (Regex.REGEX_WELLFORMED_PROPERTY.matcher(propertyName).matches()) {
-        return Status.OK_STATUS;
-      }
-      if (Regex.REGEX_JAVAFIELD.matcher(propertyName).matches()) {
-        return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
-      }
-      else {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", propertyName));
-      }
+    // check existing method names
+    if (m_notAllowedNames != null &&
+        (m_notAllowedNames.contains("get" + getBeanName(true)) ||
+            m_notAllowedNames.contains("set" + getBeanName(true)) ||
+        m_notAllowedNames.contains("is" + getBeanName(true)))) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
+    if (Regex.REGEX_WELLFORMED_PROPERTY.matcher(propertyName).matches()) {
+      return Status.OK_STATUS;
+    }
+    if (Regex.REGEX_JAVAFIELD.matcher(propertyName).matches()) {
+      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+    }
+    return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", propertyName));
   }
 
   private IStatus getPropertyTypeStatus() {
@@ -200,9 +196,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
     if (startWithUpperCase) {
       return Character.toUpperCase(getBeanName().charAt(0)) + getBeanName().substring(1);
     }
-    else {
-      return Character.toLowerCase(getBeanName().charAt(0)) + getBeanName().substring(1);
-    }
+    return Character.toLowerCase(getBeanName().charAt(0)) + getBeanName().substring(1);
   }
 
   public void setBeanName(String beanName) {

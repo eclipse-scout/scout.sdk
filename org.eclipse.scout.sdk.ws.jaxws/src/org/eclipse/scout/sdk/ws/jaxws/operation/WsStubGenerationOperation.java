@@ -25,7 +25,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.debug.core.DebugException;
 import org.eclipse.debug.core.DebugPlugin;
 import org.eclipse.debug.core.ILaunch;
 import org.eclipse.debug.core.ILaunchConfiguration;
@@ -65,7 +64,6 @@ public class WsStubGenerationOperation implements IOperation {
   private String m_alias;
   private String m_wsdlFileName;
   private Map<String, List<String>> m_properties;
-  private String m_packageName;
   private IFolder m_wsdlFolder;
 
   private Set<IOperationFinishedListener> m_operationFinishedListeners;
@@ -281,15 +279,6 @@ public class WsStubGenerationOperation implements IOperation {
         JaxWsSdk.logError("failed to notify listener", e);
       }
     }
-  }
-
-  private boolean isSuccess(IProcess[] processes) throws DebugException {
-    for (IProcess process : processes) {
-      if (process.getExitValue() != 0) {
-        return false;
-      }
-    }
-    return true;
   }
 
   private List<String> getClasspathEntries() throws Exception {

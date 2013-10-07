@@ -53,7 +53,7 @@ public class NewScoutWorkingSetDialog extends Dialog {
   }
 
   public String getWorkingSetName() {
-    return (String) m_propertySupport.getPropertyString(PROP_WORKING_SET_NAME);
+    return m_propertySupport.getPropertyString(PROP_WORKING_SET_NAME);
   }
 
   public void setWorkingSetName(String name) {
