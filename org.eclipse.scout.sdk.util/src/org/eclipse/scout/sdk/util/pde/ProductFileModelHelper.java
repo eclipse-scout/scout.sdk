@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -348,7 +347,7 @@ public final class ProductFileModelHelper {
      * @throws CoreException
      */
     public String getEntry(String key) throws CoreException {
-      return m_model.getConfigFileProperties().getProperty(key, null);
+      return m_model.getConfigFileProperties().getProperty(key);
     }
 
     /**
@@ -360,7 +359,7 @@ public final class ProductFileModelHelper {
      * @throws CoreException
      */
     public boolean existsEntry(String key) throws CoreException {
-      return m_model.getConfigFileProperties().containsKey(key);
+      return m_model.getConfigFileProperties().containsProperty(key);
     }
 
     /**
@@ -385,7 +384,7 @@ public final class ProductFileModelHelper {
      * @throws CoreException
      */
     public void removeEntry(String key) throws CoreException {
-      m_model.getConfigFileProperties().remove(key);
+      m_model.getConfigFileProperties().removeProperty(key);
     }
 
     /**
@@ -427,13 +426,7 @@ public final class ProductFileModelHelper {
      * @throws CoreException
      */
     public Map<String, String> getEntries() throws CoreException {
-      HashMap<String, String> entries = new HashMap<String, String>();
-      for (Entry<Object, Object> entry : m_model.getConfigFileProperties().entrySet()) {
-        if (entry.getKey() instanceof String && entry.getValue() instanceof String) {
-          entries.put((String) entry.getKey(), (String) entry.getValue());
-        }
-      }
-      return entries;
+      return m_model.getConfigFileProperties().getEntries();
     }
   }
 

@@ -5,12 +5,8 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
-import java.util.Hashtable;
-import java.util.Map.Entry;
-import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,9 +17,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.pde.internal.core.iproduct.IConfigurationFileInfo;
 import org.eclipse.pde.internal.core.product.WorkspaceProductModel;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.FormatPreservingProperties;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
@@ -35,11 +30,10 @@ public final class LazyProductFileModel {
   private final IFile m_productFile;
 
   //lazily instantiated models
-  private WorkspaceProductModel m_productModel;
-  private IConfigurationFileInfo m_configFileInfo;
-  private Properties m_configFileProperties;
-  private Hashtable<Object, Object> m_origConfigFileProperties;
-  private IFile m_configIniFile;
+  private volatile WorkspaceProductModel m_productModel;
+  private volatile IConfigurationFileInfo m_configFileInfo;
+  private volatile FormatPreservingProperties m_configFileProperties;
+  private volatile IFile m_configIniFile;
 
   public LazyProductFileModel(IFile productFile) {
     if (productFile == null || !productFile.exists()) throw new IllegalArgumentException("invalid product file passed");
@@ -48,9 +42,10 @@ public final class LazyProductFileModel {
 
   public synchronized WorkspaceProductModel getWorkspaceProductModel() throws CoreException {
     if (m_productModel == null) {
-      m_productModel = new WorkspaceProductModel(m_productFile, true);
-      m_productModel.load();
-      m_productModel.setDirty(false);
+      WorkspaceProductModel tmp = new WorkspaceProductModel(m_productFile, true);
+      tmp.load();
+      tmp.setDirty(false);
+      m_productModel = tmp;
     }
     return m_productModel;
   }
@@ -71,8 +66,8 @@ public final class LazyProductFileModel {
   public synchronized IFile getConfigIniFile() throws CoreException {
     if (m_configIniFile == null) {
       String osPath = getConfigurationFileInfo().getPath(Platform.getOS());
-      if (osPath != null) {
-        IFile configIniFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(osPath));
+      if (StringUtility.hasText(osPath)) {
+        IFile configIniFile = ResourcesPlugin.getWorkspace().getRoot().getFile(new Path(osPath.trim()));
         if (ResourceUtility.exists(configIniFile)) {
           m_configIniFile = configIniFile;
         }
@@ -84,39 +79,14 @@ public final class LazyProductFileModel {
     return m_configIniFile;
   }
 
-  @SuppressWarnings("unchecked")
-  public synchronized Properties getConfigFileProperties() throws CoreException {
+  public synchronized FormatPreservingProperties getConfigFileProperties() throws CoreException {
     if (m_configFileProperties == null) {
-      m_configFileProperties = new Properties();
+      FormatPreservingProperties tmp = new FormatPreservingProperties();
       IFile configIni = getConfigIniFile();
-      if (configIni == null) {
-        return new Properties(); // no config.ini, no properties
+      if (configIni != null) {
+        tmp.load(configIni);
       }
-
-      InputStream is = null;
-      try {
-        is = configIni.getContents();
-        m_configFileProperties.load(is);
-
-        // remember all entries at the moment of property loading.
-        // this allows to check if the config file is dirty later on.
-        // shallow copy is sufficient as the properties map can only store Strings which are immutable.
-        m_origConfigFileProperties = (Hashtable<Object, Object>) m_configFileProperties.clone();
-      }
-      catch (IOException e) {
-        m_configFileProperties = null; // throw away the empty unloaded instance so that we can try again next time.
-        throw new CoreException(new ScoutStatus("unable to load product configuration file: " + configIni.getFullPath().toOSString(), e));
-      }
-      finally {
-        if (is != null) {
-          try {
-            is.close();
-          }
-          catch (IOException e) {
-            SdkUtilActivator.logWarning("could not close input stream of file '" + configIni.getFullPath() + "'.", e);
-          }
-        }
-      }
+      m_configFileProperties = tmp;
     }
     return m_configFileProperties;
   }
@@ -126,7 +96,7 @@ public final class LazyProductFileModel {
       saveProductModel();
     }
 
-    if (isConfigFileDirty()) {
+    if (m_configFileProperties != null && m_configFileProperties.isDirty()) {
       saveConfigIni();
     }
   }
@@ -140,8 +110,7 @@ public final class LazyProductFileModel {
     OutputStream stream = null;
     try {
       stream = new BufferedOutputStream(new FileOutputStream(configIni.getRawLocation().toFile()));
-      m_configFileProperties.store(stream, null);
-      stream.flush();
+      m_configFileProperties.store(stream);
     }
     catch (IOException e) {
       throw new CoreException(new ScoutStatus("unable to save product configuration file: " + configIni.getRawLocation().toOSString(), e));
@@ -154,24 +123,12 @@ public final class LazyProductFileModel {
         catch (IOException e) {
         }
       }
-      configIni.refreshLocal(IFile.DEPTH_ONE, null);
+      configIni.refreshLocal(IFile.DEPTH_ZERO, null);
     }
-  }
-
-  private boolean isConfigFileDirty() {
-    if (m_configFileProperties == null || m_origConfigFileProperties == null) return false;
-    if (m_configFileProperties.size() != m_origConfigFileProperties.size()) return true;
-
-    for (Entry<Object, Object> entry : m_configFileProperties.entrySet()) {
-      if (CompareUtility.notEquals(m_origConfigFileProperties.get(entry.getKey()), entry.getValue())) {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**
-   * TODO can be eliminated when <b>BUG 362398</b> is fixed.<br>
+   * TODO can be eliminated when <b>BUG 362398</b> is fixed (was fixed for Indigo SR1).<br>
    * When the bug is fixed call m_model.save() directly instead of calling this method.
    * 
    * @see <a href="http://bugs.eclipse.org/bugs/show_bug.cgi?id=362398">Bugzilla #362398</a>
