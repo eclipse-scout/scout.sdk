@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -30,6 +29,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -92,7 +92,7 @@ public class TreeBoxNewOperation implements IOperation {
       // update generic in supertype signature
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
       superTypeSigBuilder.append("<").append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_TREEBOX_TREE).append(">");
-      setSuperTypeSignature(Signature.createTypeSignature(superTypeSigBuilder.toString(), true));
+      setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
     }
     newOp.setFormatSource(isFormatSource());
     newOp.validate();

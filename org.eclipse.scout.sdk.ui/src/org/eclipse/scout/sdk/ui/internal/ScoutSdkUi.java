@@ -114,7 +114,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
 
     getPreferenceStore().setDefault(IDtoAutoUpdateManager.PROP_AUTO_UPDATE, true);
-    ScoutSdk.getDefault().setFormDataAutoUpdate(getPreferenceStore().getBoolean(IDtoAutoUpdateManager.PROP_AUTO_UPDATE));
+    ScoutSdk.getDefault().setDtoAutoUpdate(getPreferenceStore().getBoolean(IDtoAutoUpdateManager.PROP_AUTO_UPDATE));
 
     getPreferenceStore().setDefault(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE, false);
     DefaultTargetPackage.setIsPackageConfigurationEnabled(!getPreferenceStore().getBoolean(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE));
@@ -519,7 +519,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     public void propertyChange(PropertyChangeEvent event) {
       if (IDtoAutoUpdateManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
         Boolean autoUpdate = (Boolean) event.getNewValue();
-        ScoutSdk.getDefault().setFormDataAutoUpdate(autoUpdate);
+        ScoutSdk.getDefault().setDtoAutoUpdate(autoUpdate);
       }
       else if (DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE.equals(event.getProperty())) {
         Boolean useLegacy = (Boolean) event.getNewValue();

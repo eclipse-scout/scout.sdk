@@ -52,7 +52,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     TypeSourceBuilder interfaceSourceBuilder = getInterfaceSourceBuilder();
     IMethodSourceBuilder interfaceGetItemsBuilder = new MethodSourceBuilder("getItems");
     interfaceGetItemsBuilder.setFlags(Flags.AccInterface);
-    interfaceGetItemsBuilder.setReturnTypeSignature(Signature.createTypeSignature(RuntimeClasses.ICalendarItem + "[]", true));
+    interfaceGetItemsBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem + "[]"));
     interfaceGetItemsBuilder.addParameter(new MethodParameter("minDate", SignatureCache.createTypeSignature(Date.class.getName())));
     interfaceGetItemsBuilder.addParameter(new MethodParameter("maxDate", SignatureCache.createTypeSignature(Date.class.getName())));
     interfaceGetItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
@@ -61,7 +61,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     IMethodSourceBuilder interfaceStoreItemsBuilder = new MethodSourceBuilder("storeItems");
     interfaceStoreItemsBuilder.setFlags(Flags.AccInterface);
     interfaceStoreItemsBuilder.setReturnTypeSignature(Signature.SIG_VOID);
-    interfaceStoreItemsBuilder.addParameter(new MethodParameter("items", Signature.createTypeSignature(RuntimeClasses.ICalendarItem + "[]", true)));
+    interfaceStoreItemsBuilder.addParameter(new MethodParameter("items", SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem + "[]")));
     interfaceStoreItemsBuilder.addParameter(new MethodParameter("delta", Signature.SIG_BOOLEAN));
     interfaceStoreItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     interfaceSourceBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(interfaceStoreItemsBuilder), interfaceStoreItemsBuilder);
@@ -71,7 +71,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     IMethodSourceBuilder implementationGetItemsBuilder = new MethodSourceBuilder("getItems");
     implementationGetItemsBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
     implementationGetItemsBuilder.setFlags(Flags.AccPublic);
-    implementationGetItemsBuilder.setReturnTypeSignature(Signature.createTypeSignature(RuntimeClasses.ICalendarItem + "[]", true));
+    implementationGetItemsBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem + "[]"));
     implementationGetItemsBuilder.addParameter(new MethodParameter("minDate", SignatureCache.createTypeSignature(Date.class.getName())));
     implementationGetItemsBuilder.addParameter(new MethodParameter("maxDate", SignatureCache.createTypeSignature(Date.class.getName())));
     implementationGetItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
@@ -88,7 +88,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     implementationStoreItemsBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
     implementationStoreItemsBuilder.setFlags(Flags.AccPublic);
     implementationStoreItemsBuilder.setReturnTypeSignature(Signature.SIG_VOID);
-    implementationStoreItemsBuilder.addParameter(new MethodParameter("items", Signature.createTypeSignature(RuntimeClasses.ICalendarItem + "[]", true)));
+    implementationStoreItemsBuilder.addParameter(new MethodParameter("items", SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem + "[]")));
     implementationStoreItemsBuilder.addParameter(new MethodParameter("delta", Signature.SIG_BOOLEAN));
     implementationStoreItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     implementationStoreItemsBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(ScoutUtility.getCommentBlock("business logic here.")));

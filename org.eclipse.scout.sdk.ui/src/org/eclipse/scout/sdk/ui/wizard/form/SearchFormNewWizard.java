@@ -158,7 +158,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
     }
   } // end class P_LocationPropertyListener
 
-  private class P_InitialCheckedFilter implements ITreeNodeFilter {
+  private static class P_InitialCheckedFilter implements ITreeNodeFilter {
     @Override
     public boolean accept(ITreeNode node) {
       return TreeUtility.isOneOf(node.getType(), TYPE_HANDLER_SEARCH, TYPE_SEARCH_FORM, TYPE_SEARCH_FORM_DATA);
@@ -194,7 +194,6 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
       if (dndEvent.node.getType() == TYPE_SEARCH_FORM) {
         ITreeNode formDataNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_SEARCH_FORM_DATA));
         if (formDataNode != null) {
-
           ITreeNode oldFomDataParent = formDataNode.getParent();
           IScoutBundle formBundle = (IScoutBundle) dndEvent.node.getParent().getData();
           IScoutBundle[] sharedBundles = formBundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);

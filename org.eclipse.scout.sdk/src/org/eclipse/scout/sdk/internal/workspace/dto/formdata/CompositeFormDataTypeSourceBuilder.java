@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -78,7 +79,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           String typeErasure = Signature.getTypeErasure(formDataSuperTypeSignature);
           ITypeHierarchy superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(superType);
           ITypeSourceBuilder fieldSourceBuilder = null;
-          if (SignatureUtility.isEqualSignature(typeErasure, Signature.createTypeSignature(RuntimeClasses.AbstractTableFieldData, true))) {
+          if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableFieldData))) {
             fieldSourceBuilder = new TableFieldFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation);
           }
           else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {

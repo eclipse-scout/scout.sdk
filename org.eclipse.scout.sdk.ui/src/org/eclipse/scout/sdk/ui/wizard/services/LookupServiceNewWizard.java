@@ -170,7 +170,7 @@ public class LookupServiceNewWizard extends AbstractWorkspaceWizard {
     }
   } // end class P_LocationPropertyListener
 
-  private class P_InitialCheckerFilter implements ITreeNodeFilter {
+  private static class P_InitialCheckerFilter implements ITreeNodeFilter {
     @Override
     public boolean accept(ITreeNode node) {
       return TreeUtility.isOneOf(node.getType(), TYPE_SERVICE_IMPLEMENTATION, TYPE_SERVICE_INTERFACE, TYPE_SERVICE_REG_CLIENT, TYPE_SERVICE_REG_SERVER);

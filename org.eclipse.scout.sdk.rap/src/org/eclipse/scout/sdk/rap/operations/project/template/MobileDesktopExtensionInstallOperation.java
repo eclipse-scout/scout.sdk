@@ -70,7 +70,7 @@ public class MobileDesktopExtensionInstallOperation extends AbstractScoutProject
     IScoutBundle mobileClient = bundleGraph.getBundle(getProperties().getProperty(CreateMobileClientPluginOperation.PROP_MOBILE_BUNDLE_CLIENT_NAME, String.class));
 
     String homeFormFqn = bundleGraph.getBundle(getProperties().getProperty(CreateMobileClientPluginOperation.PROP_MOBILE_BUNDLE_CLIENT_NAME, String.class)).getPackageName("ui.forms") + ".MobileHomeForm";
-    final String homeFormSignature = Signature.createTypeSignature(homeFormFqn, true);
+    final String homeFormSignature = SignatureCache.createTypeSignature(homeFormFqn);
 
     String pck = mobileClient.getDefaultPackage(IDefaultTargetPackage.CLIENT_DESKTOP);
     final String desktopExtensionName = "DesktopExtension";

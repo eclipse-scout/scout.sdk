@@ -100,7 +100,7 @@ public class FormStackNewOperation extends FormNewOperation {
       formDataTypeNewOp.validate();
       formDataTypeNewOp.run(monitor, workingCopyManager);
       m_createdFormData = formDataTypeNewOp.getCreatedType();
-      setFormDataSignature(Signature.createTypeSignature(getCreatedFormData().getFullyQualifiedName(), true));
+      setFormDataSignature(SignatureCache.createTypeSignature(getCreatedFormData().getFullyQualifiedName()));
     }
     // service
     ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation(getServiceImplementationName());
@@ -168,8 +168,8 @@ public class FormStackNewOperation extends FormNewOperation {
       execLoadSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          String serviceInterfaceName = validator.getTypeName(Signature.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName(), true));
-          String formDataTypeName = validator.getTypeName(Signature.createTypeSignature(m_createdFormData.getFullyQualifiedName(), true));
+          String serviceInterfaceName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName()));
+          String formDataTypeName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdFormData.getFullyQualifiedName()));
           source.append(serviceInterfaceName).append(" service = ");
           source.append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(");
           source.append(serviceInterfaceName).append(".class);").append(lineDelimiter);
@@ -191,8 +191,8 @@ public class FormStackNewOperation extends FormNewOperation {
 
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          String serviceInterfaceName = validator.getTypeName(Signature.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName(), true));
-          String formDataTypeName = validator.getTypeName(Signature.createTypeSignature(m_createdFormData.getFullyQualifiedName(), true));
+          String serviceInterfaceName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName()));
+          String formDataTypeName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdFormData.getFullyQualifiedName()));
           source.append(serviceInterfaceName).append(" service = ").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
           source.append(formDataTypeName).append(" formData = new ").append(formDataTypeName).append("();").append(lineDelimiter);
           source.append("exportFormData(formData);").append(lineDelimiter);
@@ -216,7 +216,7 @@ public class FormStackNewOperation extends FormNewOperation {
     startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("startInternal(new ").append(validator.getTypeName(Signature.createTypeSignature(handlerFqn, true))).append("());");
+        source.append("startInternal(new ").append(validator.getTypeName(SignatureCache.createTypeSignature(handlerFqn))).append("());");
       }
     });
     formSourceBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodStartFormKey(startHandlerMethodBuilder), startHandlerMethodBuilder);
@@ -238,8 +238,8 @@ public class FormStackNewOperation extends FormNewOperation {
       execLoadSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          String serviceInterfaceName = validator.getTypeName(Signature.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName(), true));
-          String formDataTypeName = validator.getTypeName(Signature.createTypeSignature(m_createdFormData.getFullyQualifiedName(), true));
+          String serviceInterfaceName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName()));
+          String formDataTypeName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdFormData.getFullyQualifiedName()));
           source.append(serviceInterfaceName).append(" service = ");
           source.append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(");
           source.append(serviceInterfaceName).append(".class);").append(lineDelimiter);
@@ -253,7 +253,7 @@ public class FormStackNewOperation extends FormNewOperation {
           }
           source.append("importFormData(formData);").append(lineDelimiter);
           if (getCreatedUpdatePermission() != null) {
-            source.append("setEnabledPermission(new " + validator.getTypeName(Signature.createTypeSignature(getCreatedUpdatePermission().getFullyQualifiedName(), true))).append("());").append(lineDelimiter);
+            source.append("setEnabledPermission(new " + validator.getTypeName(SignatureCache.createTypeSignature(getCreatedUpdatePermission().getFullyQualifiedName()))).append("());").append(lineDelimiter);
           }
         }
       });
@@ -264,8 +264,8 @@ public class FormStackNewOperation extends FormNewOperation {
 
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          String serviceInterfaceName = validator.getTypeName(Signature.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName(), true));
-          String formDataTypeName = validator.getTypeName(Signature.createTypeSignature(m_createdFormData.getFullyQualifiedName(), true));
+          String serviceInterfaceName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName()));
+          String formDataTypeName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdFormData.getFullyQualifiedName()));
           source.append(serviceInterfaceName).append(" service = ").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
           source.append(formDataTypeName).append(" formData = new ").append(formDataTypeName).append("();").append(lineDelimiter);
           source.append("exportFormData(formData);").append(lineDelimiter);
@@ -289,7 +289,7 @@ public class FormStackNewOperation extends FormNewOperation {
     startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("startInternal(new ").append(validator.getTypeName(Signature.createTypeSignature(handlerFqn, true))).append("());");
+        source.append("startInternal(new ").append(validator.getTypeName(SignatureCache.createTypeSignature(handlerFqn))).append("());");
       }
     });
     formSourceBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodStartFormKey(startHandlerMethodBuilder), startHandlerMethodBuilder);

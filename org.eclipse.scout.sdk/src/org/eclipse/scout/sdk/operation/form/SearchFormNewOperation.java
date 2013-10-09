@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.holders.StringHolder;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
@@ -73,7 +72,7 @@ public class SearchFormNewOperation extends FormNewOperation {
       formDataTypeNewOp.validate();
       formDataTypeNewOp.run(monitor, workingCopyManager);
       m_createdFormDataType = formDataTypeNewOp.getCreatedType();
-      setFormDataSignature(Signature.createTypeSignature(m_createdFormDataType.getFullyQualifiedName(), true));
+      setFormDataSignature(SignatureCache.createTypeSignature(m_createdFormDataType.getFullyQualifiedName()));
 
     }
 
@@ -91,7 +90,7 @@ public class SearchFormNewOperation extends FormNewOperation {
       startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          source.append("startInternal(new ").append(validator.getTypeName(Signature.createTypeSignature(handlerFqnHolder.getValue(), true))).append("());");
+          source.append("startInternal(new ").append(validator.getTypeName(SignatureCache.createTypeSignature(handlerFqnHolder.getValue()))).append("());");
         }
       });
     }

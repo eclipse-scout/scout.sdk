@@ -37,6 +37,7 @@ import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -69,7 +70,7 @@ public final class FormDataUtility {
       String formDataTypeSignature = formDataAnnotation.getFormDataTypeSignature();
       String formDataTypeName = Signature.getSignatureSimpleName(formDataTypeSignature);
       ITypeSourceBuilder formDataSourceBuilder = null;
-      if (SignatureUtility.isEqualSignature(typeErasure, Signature.createTypeSignature(RuntimeClasses.AbstractTableFieldData, true))) {
+      if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableFieldData))) {
         formDataSourceBuilder = new TableFieldFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation);
       }
       else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {

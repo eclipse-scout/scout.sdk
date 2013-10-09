@@ -46,6 +46,17 @@ public final class AnnotationSourceBuilderFactory {
     return createFormDataAnnotation(null, null, null);
   }
 
+  public static IAnnotationSourceBuilder createPageDataAnnotation(final String pageDataTypeSignature) {
+    return new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.PageData)) {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append('@').append(SignatureUtility.getTypeReference(getSignature(), validator)).append('(');
+        source.append(SignatureUtility.getTypeReference(pageDataTypeSignature, validator));
+        source.append(".class)");
+      }
+    };
+  }
+
   public static IAnnotationSourceBuilder createFormDataAnnotation(final String formDataSignature, final FormData.SdkCommand sdkCommand, final FormData.DefaultSubtypeSdkCommand defaultSubtypeCommand) {
     return new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.FormData)) {
       @Override

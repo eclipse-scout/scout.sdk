@@ -234,6 +234,28 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   /**
+   * Gets the page data type that is referenced in the page data annotation of the given page type.<br>
+   * If the annotation does not exist or points to an inexistent page data type, null is returned.
+   * 
+   * @param page
+   *          the page for which the page data should be returned.
+   * @return the page data class or null.
+   * @throws JavaModelException
+   */
+  public static IType findPageDataForPage(IType page) throws JavaModelException {
+    if (TypeUtility.exists(page)) {
+      PageDataAnnotation anot = findPageDataAnnotation(page, TypeUtility.getSuperTypeHierarchy(page));
+      if (anot != null && !StringUtility.isNullOrEmpty(anot.getPageDataTypeSignature())) {
+        IType result = TypeUtility.getTypeBySignature(anot.getPageDataTypeSignature());
+        if (TypeUtility.exists(result)) {
+          return result;
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
    * @return Returns <code>true</code> if the given type exists and if it is annotated with an
    *         {@link IRuntimeClasses#Replace} annotation.
    */
@@ -499,42 +521,35 @@ public class ScoutTypeUtility extends TypeUtility {
       return null;
     }
 
-    try {
-      String typeSignature = getPageDataAnnotationValue(type);
-      if (StringUtility.isNullOrEmpty(typeSignature)) {
-        return null;
-      }
-
-      IType tmpType = type;
-      String superTypeSignature = null;
-      IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
-
-      do {
-        if (!superTypeHierarchy.contains(iPageWithTable)) {
-          break;
-        }
-
-        tmpType = superTypeHierarchy.getSuperclass(tmpType);
-        superTypeSignature = getPageDataAnnotationValue(tmpType);
-      }
-      while (superTypeSignature == null && tmpType != null);
-
-      if (superTypeSignature == null) {
-        superTypeSignature = Signature.createTypeSignature(RuntimeClasses.AbstractTablePageData, true);
-      }
-
-      return new PageDataAnnotation(typeSignature, superTypeSignature);
-    }
-    catch (Exception e) {
-      ScoutSdk.logWarning("could not parse @PageData annotation of type '" + type.getFullyQualifiedName() + "'.", e);
+    String typeSignature = getPageDataAnnotationValue(type);
+    if (StringUtility.isNullOrEmpty(typeSignature)) {
+      return null;
     }
 
-    return null;
+    IType tmpType = type;
+    String superTypeSignature = null;
+    IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+
+    do {
+      if (!superTypeHierarchy.contains(iPageWithTable)) {
+        break;
+      }
+
+      tmpType = superTypeHierarchy.getSuperclass(tmpType);
+      superTypeSignature = getPageDataAnnotationValue(tmpType);
+    }
+    while (superTypeSignature == null && tmpType != null);
+
+    if (superTypeSignature == null) {
+      superTypeSignature = SignatureCache.createTypeSignature(RuntimeClasses.AbstractTablePageData);
+    }
+
+    return new PageDataAnnotation(typeSignature, superTypeSignature);
   }
 
   /**
    * Checks whether the given type is annotated with a {@link IRuntimeClasses#PageData} annotation and if so, this
-   * method returns its <code>value()</code>. Otherwise <code>null</code>.
+   * method returns its <code>value()</code> as resolved type signature. Otherwise <code>null</code>.
    * 
    * @since 3.10.0-M1
    */

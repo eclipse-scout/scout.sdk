@@ -29,6 +29,7 @@ import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -70,7 +71,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
       public void selectionChanged(SelectionChangedEvent event) {
         if (!event.getSelection().isEmpty()) {
           StructuredSelection selection = (StructuredSelection) event.getSelection();
-          m_selectedType = (IType) selection.getFirstElement();
+          setSelectedTypeInternal((IType) selection.getFirstElement());
           pingStateChanging();
         }
 
@@ -81,7 +82,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
       public void doubleClick(DoubleClickEvent event) {
         if (!event.getSelection().isEmpty()) {
           StructuredSelection selection = (StructuredSelection) event.getSelection();
-          m_selectedType = (IType) selection.getFirstElement();
+          setSelectedTypeInternal((IType) selection.getFirstElement());
           pingStateChanging();
           IWizardPage page = getNextPage();
           if (page == null) {
@@ -176,6 +177,12 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
       }
     }
     pingStateChanging();
+  }
+
+  private void setSelectedTypeInternal(IType type) {
+    m_selectedType = type;
+    boolean showLocationPage = TypeUtility.getSuperTypeHierarchy(type).contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable));
+    ((PageNewWizard) getWizard()).setLocationWizardPageVisible(showLocationPage);
   }
 
   public IType getSelectedType() {

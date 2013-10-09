@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.internal.workspace.dto.pagedata;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
@@ -56,7 +56,7 @@ public class PageDataSourceBuilder extends AbstractTableBeanSourceBuilder {
             String superTableRowBeanName = getTableRowBeanName(parentTable);
             IType superTableBeanData = superPageDataType.getType(superTableRowBeanName);
             if (TypeUtility.exists(superTableBeanData)) {
-              return Signature.createTypeSignature(superTableBeanData.getFullyQualifiedName(), true);
+              return SignatureCache.createTypeSignature(superTableBeanData.getFullyQualifiedName());
             }
           }
         }
@@ -65,7 +65,7 @@ public class PageDataSourceBuilder extends AbstractTableBeanSourceBuilder {
     catch (JavaModelException e) {
       ScoutSdk.logWarning("error while computing super class signature for [" + table + "]", e);
     }
-    return Signature.createTypeSignature(RuntimeClasses.AbstractTableRowData, true);
+    return SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableRowData);
   }
 
   @Override

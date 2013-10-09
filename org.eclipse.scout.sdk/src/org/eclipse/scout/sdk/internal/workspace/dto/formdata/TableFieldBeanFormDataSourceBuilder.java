@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -57,7 +57,7 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
       IType replacedType = getLocalTypeHierarchy().getSuperclass(getModelType());
       IType replacedFormFieldDataType = ScoutTypeUtility.getFormDataType(replacedType, getLocalTypeHierarchy());
       if (replacedFormFieldDataType != null) {
-        superTypeSignature = Signature.createTypeSignature(replacedFormFieldDataType.getFullyQualifiedName(), true);
+        superTypeSignature = SignatureCache.createTypeSignature(replacedFormFieldDataType.getFullyQualifiedName());
       }
       addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createReplaceAnnotationBuilder());
     }
@@ -76,13 +76,11 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
         IType declaringType = parentTable.getDeclaringType();
         if (TypeUtility.exists(declaringType)) {
           IType formDataType = ScoutTypeUtility.getFormDataType(declaringType, fieldHierarchy);
-//          if(TypeUtility.exists(formDataType))
           String parentTableRowBeanName = getTableRowBeanName(parentTable);
 
           IType parentTableBeanData = formDataType.getType(parentTableRowBeanName);
           if (TypeUtility.exists(parentTableBeanData)) {
-//            validator.addImport(formDataType.getFullyQualifiedName());
-            return Signature.createTypeSignature(parentTableBeanData.getFullyQualifiedName(), true);
+            return SignatureCache.createTypeSignature(parentTableBeanData.getFullyQualifiedName());
           }
         }
       }
@@ -90,7 +88,7 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
     catch (JavaModelException e) {
       ScoutSdk.logWarning("error while computing super class signature for [" + table + "]", e);
     }
-    return Signature.createTypeSignature(RuntimeClasses.AbstractTableRowData, true);
+    return SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableRowData);
   }
 
   public FormDataAnnotation getFormDataAnnotation() {

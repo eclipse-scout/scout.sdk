@@ -24,7 +24,7 @@ public abstract class AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setup() throws CoreException {
-    TestUtility.setAutoUpdateFormData(false);
+    TestUtility.setAutoUpdateDto(false);
     TestUtility.showEgitMessageBoxes(false);
     TestUtility.setAutoBuildWorkspace(false);
   }

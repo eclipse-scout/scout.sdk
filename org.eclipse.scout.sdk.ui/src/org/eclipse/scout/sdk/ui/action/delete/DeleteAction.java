@@ -14,12 +14,15 @@ import java.util.ArrayList;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.util.TypeDeleteOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.dialog.MemberSelectionDialog;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.swt.SWT;
@@ -47,22 +50,36 @@ public class DeleteAction extends AbstractScoutHandler {
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-    box.setText(Texts.get("Question"));
+    JavaElementDeleteOperation deleteOperation = null;
+
     if (m_types.size() == 1) {
-      if (!StringUtility.hasText(m_name) && m_types.get(0) != null) {
-        m_name = m_types.get(0).getElementName();
+      // delete one single type
+      IType typeToDelete = m_types.get(0);
+      MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+      box.setText(Texts.get("Question"));
+      if (!StringUtility.hasText(m_name) && typeToDelete != null) {
+        m_name = typeToDelete.getElementName();
       }
       box.setMessage(Texts.get("DeleteAction_ensureRequest", m_name));
+      if (box.open() == SWT.OK) {
+        deleteOperation = new JavaElementDeleteOperation();
+        deleteOperation.addMember(typeToDelete);
+      }
     }
     else {
-      box.setMessage(Texts.get("DeleteAction_ensureRequestPlural"));
-    }
-    if (box.open() == SWT.OK) {
-      for (IType t : m_types) {
-        OperationJob job = new OperationJob(new TypeDeleteOperation(t));
-        job.schedule();
+      // delete multiple types
+      MemberSelectionDialog m_confirmDialog = new MemberSelectionDialog(shell, Texts.get("DeleteAction_ensureRequestPlural"));
+      IMember[] typesToDelete = m_types.toArray(new IMember[m_types.size()]);
+      m_confirmDialog.setMembers(typesToDelete);
+      m_confirmDialog.setSelectedMembers(typesToDelete);
+      if (m_confirmDialog.open() == Dialog.OK) {
+        deleteOperation = new JavaElementDeleteOperation();
+        deleteOperation.setMembers(m_confirmDialog.getSelectedMembers());
       }
+    }
+
+    if (deleteOperation != null) {
+      new OperationJob(deleteOperation).schedule();
     }
     return null;
   }

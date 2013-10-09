@@ -179,7 +179,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("startInternal(new ").append(validator.getTypeName(Signature.createTypeSignature(handlerFqn, true))).append("());");
+        source.append("startInternal(new ").append(validator.getTypeName(SignatureCache.createTypeSignature(handlerFqn))).append("());");
       }
     });
     formOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodStartFormKey(startHandlerMethodBuilder), startHandlerMethodBuilder);

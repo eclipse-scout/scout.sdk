@@ -89,12 +89,14 @@ public class FormPropertyPart extends JdtTypePropertyPart {
       protected IStatus run(IProgressMonitor monitor) {
         String entityName = null;
         LinksPresenterModel model = new LinksPresenterModel();
-        if (getPage().getType() != null) {
-          model.addGlobalLink(new TypeOpenLink(getPage().getType()));
-          entityName = findEntityName(getPage().getType().getElementName());
+        IType form = getPage().getType();
+
+        if (TypeUtility.exists(form)) {
+          model.addGlobalLink(new TypeOpenLink(form));
+          entityName = findEntityName(form.getElementName());
         }
+
         if (!StringUtility.isNullOrEmpty(entityName)) {
-          IType form = getPage().getType();
           // super form class
           try {
             ITypeHierarchy formSuperTypeHierarchy = ScoutTypeUtility.getSuperTypeHierarchy(form);

@@ -592,6 +592,7 @@
    <extension point="org.eclipse.scout.sdk.ui.contextMenu">
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.export.ExportScoutProjectAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.FormDataUpdateAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.PageDataUpdateAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.InstallClientSessionAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.TypeResolverFormDataAction"></contextMenu>
@@ -734,6 +735,12 @@
             page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormNodePage">
          <singlePart
                viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.FormPropertyPart">
+         </singlePart>
+      </part>
+      <part
+            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithTableNodePage">
+         <singlePart
+               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.PageWithTablePropertyPart">
          </singlePart>
       </part>
       <part

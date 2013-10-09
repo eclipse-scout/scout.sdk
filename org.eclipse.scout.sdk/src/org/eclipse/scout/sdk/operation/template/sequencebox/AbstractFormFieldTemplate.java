@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -61,7 +62,7 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
     fillFromFieldBuilder(fromFieldBuilder);
     sourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(fromFieldBuilder, order), fromFieldBuilder);
     // create from getter
-    createFormFieldGetter(Signature.createTypeSignature(sequenceBoxFqn + "." + fromFieldBuilder.getElementName(), true), declaringType, monitor, manager);
+    createFormFieldGetter(SignatureCache.createTypeSignature(sequenceBoxFqn + "." + fromFieldBuilder.getElementName()), declaringType, monitor, manager);
     order += 10;
 
     // to
@@ -73,7 +74,7 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
     fillToFieldBuilder(toFieldBuilder);
     sourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(toFieldBuilder, order), toFieldBuilder);
     // create to getter
-    createFormFieldGetter(Signature.createTypeSignature(sequenceBoxFqn + "." + toFieldBuilder.getElementName(), true), declaringType, monitor, manager);
+    createFormFieldGetter(SignatureCache.createTypeSignature(sequenceBoxFqn + "." + toFieldBuilder.getElementName()), declaringType, monitor, manager);
 
     // nls text methods
     INlsProject nlsProject = ScoutTypeUtility.findNlsProject(declaringType.getJavaProject());

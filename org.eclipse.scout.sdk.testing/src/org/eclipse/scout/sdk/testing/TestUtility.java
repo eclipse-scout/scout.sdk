@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.testing.internal.SdkTestingApi;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -110,13 +111,24 @@ public final class TestUtility {
   }
 
   /**
-   * Specifies if Scout should update the form datas automatically or not.
+   * Specifies if Scout should update DTOs automatically or not.
    * 
    * @param autoBuild
    *          true for auto update, false to disable.
+   * @deprecated Use {@link #setAutoUpdateDto(boolean)} instead. This method will be removed with Scout SDK 3.11
    */
+  @Deprecated
   public static void setAutoUpdateFormData(boolean autoBuild) {
-    org.eclipse.scout.sdk.internal.ScoutSdk.getDefault()
-        .setFormDataAutoUpdate(autoBuild);
+    setAutoUpdateDto(autoBuild);
+  }
+
+  /**
+   * Specifies if Scout should update DTOs automatically or not.
+   * 
+   * @param autoUpdate
+   *          true for auto update, false to disable.
+   */
+  public static void setAutoUpdateDto(boolean autoUpdate) {
+    ScoutSdk.getDefault().setDtoAutoUpdate(autoUpdate);
   }
 }

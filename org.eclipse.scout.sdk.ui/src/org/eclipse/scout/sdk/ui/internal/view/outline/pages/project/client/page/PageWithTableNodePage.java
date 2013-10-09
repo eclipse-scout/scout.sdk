@@ -14,8 +14,10 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
+import org.eclipse.scout.sdk.ui.action.PageDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
 import org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction;
@@ -86,7 +88,7 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class, SearchFormNewAction.class,
-        WellformScoutTypeAction.class, TableColumnWidthsPasteAction.class};
+        WellformScoutTypeAction.class, TableColumnWidthsPasteAction.class, PageDataUpdateAction.class};
   }
 
   @Override
@@ -94,6 +96,17 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
     super.prepareMenuAction(menu);
     if (menu instanceof DeleteAction) {
       DeleteAction action = (DeleteAction) menu;
+
+      // add page data
+      try {
+        IType pageDataType = ScoutTypeUtility.findPageDataForPage(getType());
+        if (TypeUtility.exists(pageDataType)) {
+          action.addType(pageDataType);
+        }
+      }
+      catch (JavaModelException e) {
+        ScoutSdkUi.logWarning("Could not parse page data of page '" + getType().getFullyQualifiedName() + "'.", e);
+      }
       action.addType(getType());
       action.setName(getName());
     }
@@ -105,6 +118,9 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
     }
     else if (menu instanceof TableColumnWidthsPasteAction) {
       ((TableColumnWidthsPasteAction) menu).init(this);
+    }
+    else if (menu instanceof PageDataUpdateAction) {
+      ((PageDataUpdateAction) menu).setPageDataOwner(getType());
     }
   }
 

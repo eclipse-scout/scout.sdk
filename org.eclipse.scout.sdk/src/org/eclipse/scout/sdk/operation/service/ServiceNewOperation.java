@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
@@ -135,7 +134,7 @@ public class ServiceNewOperation implements IOperation {
     }
     if (getImplementationProject() != null) {
       if (getCreatedServiceInterface() != null) {
-        getImplementationSourceBuilder().addInterfaceSignature(Signature.createTypeSignature(getCreatedServiceInterface().getFullyQualifiedName(), true));
+        getImplementationSourceBuilder().addInterfaceSignature(SignatureCache.createTypeSignature(getCreatedServiceInterface().getFullyQualifiedName()));
       }
       if (StringUtility.isNullOrEmpty(getImplementationSourceBuilder().getSuperTypeSignature())) {
         getImplementationSourceBuilder().setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getImplementationProject()));

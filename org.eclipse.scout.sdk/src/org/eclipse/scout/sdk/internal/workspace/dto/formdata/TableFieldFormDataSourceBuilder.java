@@ -207,7 +207,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
       IType replacedType = getLocalTypeHierarchy().getSuperclass(getModelType());
       IType replacedFormFieldDataType = ScoutTypeUtility.getFormDataType(replacedType, getLocalTypeHierarchy());
       if (replacedFormFieldDataType != null) {
-        superTypeSignature = Signature.createTypeSignature(replacedFormFieldDataType.getFullyQualifiedName(), true);
+        superTypeSignature = SignatureCache.createTypeSignature(replacedFormFieldDataType.getFullyQualifiedName());
       }
       addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createReplaceAnnotationBuilder());
     }

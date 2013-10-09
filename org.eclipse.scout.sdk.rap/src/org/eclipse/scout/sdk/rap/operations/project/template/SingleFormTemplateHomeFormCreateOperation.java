@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
@@ -113,7 +112,7 @@ public class SingleFormTemplateHomeFormCreateOperation extends AbstractScoutProj
     // end LogoutButton type
 
     // LogOutButton getter
-    IMethodSourceBuilder getLogoutButtonBuilder = MethodSourceBuilderFactory.createFieldGetterSourceBuilder(Signature.createTypeSignature(homeFormOp.getPackageName() + "." + homeFormOp.getElementName() + "." + logoutButtonBuilder.getElementName(), true));
+    IMethodSourceBuilder getLogoutButtonBuilder = MethodSourceBuilderFactory.createFieldGetterSourceBuilder(SignatureCache.createTypeSignature(homeFormOp.getPackageName() + "." + homeFormOp.getElementName() + "." + logoutButtonBuilder.getElementName()));
     homeFormOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormFieldGetterKey(getLogoutButtonBuilder), getLogoutButtonBuilder);
 
     homeFormOp.setFormatSource(true);

@@ -138,13 +138,11 @@ public class ScoutSdk extends Plugin {
     logManager.log(status);
   }
 
-  public void setFormDataAutoUpdate(boolean autoUpdate) {
+  public void setDtoAutoUpdate(boolean autoUpdate) {
     m_autoUpdateManager.setEnabled(autoUpdate);
-//    m_formDataUpdateSupport.setEnabled(autoUpdate);
   }
 
-  public boolean isFormDataAutoUpdate() {
+  public boolean isDtoAutoUpdate() {
     return m_autoUpdateManager.isEnabled();
-//    return m_formDataUpdateSupport.isEnabled();
   }
 }

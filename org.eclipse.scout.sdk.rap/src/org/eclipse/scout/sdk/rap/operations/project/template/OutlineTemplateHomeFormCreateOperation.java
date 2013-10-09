@@ -131,7 +131,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     homeFormOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(mainBoxBuilder, 10.0), mainBoxBuilder);
 
     // main box getter
-    final String mainBoxSignature = Signature.createTypeSignature(mainBoxFqn, true);
+    final String mainBoxSignature = SignatureCache.createTypeSignature(mainBoxFqn);
     IMethodSourceBuilder mainBoxGetterBuilder = MethodSourceBuilderFactory.createFieldGetterSourceBuilder(mainBoxSignature);
     homeFormOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormFieldGetterKey(mainBoxGetterBuilder), mainBoxGetterBuilder);
 
@@ -261,7 +261,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     // end LogoutButton type
 
     // LogOutButton getter
-    IMethodSourceBuilder getLogoutButtonBuilder = MethodSourceBuilderFactory.createFieldGetterSourceBuilder(Signature.createTypeSignature(mainBoxFqn + "." + logoutButtonBuilder.getElementName(), true));
+    IMethodSourceBuilder getLogoutButtonBuilder = MethodSourceBuilderFactory.createFieldGetterSourceBuilder(SignatureCache.createTypeSignature(mainBoxFqn + "." + logoutButtonBuilder.getElementName()));
     formBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormFieldGetterKey(getLogoutButtonBuilder), getLogoutButtonBuilder);
   }
 

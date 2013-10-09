@@ -268,7 +268,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     // createRow
     IMethodSourceBuilder createRowSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "createRow");
 
-    createRowSourceBuilder.setReturnTypeSignature(Signature.createTypeSignature(RuntimeClasses.AbstractTableRowData, true));
+    createRowSourceBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableRowData));
     createRowSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override
@@ -280,7 +280,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(createRowSourceBuilder), createRowSourceBuilder);
 
     IMethodSourceBuilder getRowTypeSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getRowType");
-    getRowTypeSourceBuilder.setReturnTypeSignature(Signature.createTypeSignature(Class.class.getName() + "<? extends " + RuntimeClasses.AbstractTableRowData + ">", true));
+    getRowTypeSourceBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(Class.class.getName() + "<? extends " + RuntimeClasses.AbstractTableRowData + ">"));
     getRowTypeSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override

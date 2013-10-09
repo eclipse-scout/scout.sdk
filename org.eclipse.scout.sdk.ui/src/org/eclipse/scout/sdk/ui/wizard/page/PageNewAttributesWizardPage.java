@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.ui.wizard.page;
 
 import java.util.Arrays;
 
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
@@ -26,7 +24,6 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
-import org.eclipse.scout.sdk.operation.page.PageNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
@@ -38,12 +35,10 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.swt.SWT;
@@ -60,13 +55,14 @@ import org.eclipse.swt.widgets.Group;
  */
 public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
+  public final static String PROP_TYPE_NAME = "typeName";
+
   private IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
   private IType iPageWithNodes = TypeUtility.getType(RuntimeClasses.IPageWithNodes);
   private IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
   private IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
   private INlsEntry m_nlsName;
-  private String m_typeName;
   private IType m_superType;
   private IType m_holderType;
   private String m_nameSuffix;
@@ -90,7 +86,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewPage"));
     setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_PAGES));
     m_nameSuffix = "";
-    setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IPageWithNodes, m_clientBundle.getJavaProject()));
+    setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IPageWithNodes, m_clientBundle));
   }
 
   @Override
@@ -122,11 +118,11 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
     m_typeNameField = getFieldToolkit().createStyledTextField(group, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(m_nameSuffix);
-    m_typeNameField.setText(m_typeName);
+    m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
-        m_typeName = m_typeNameField.getText();
+        setTypeNameInternal(m_typeNameField.getText());
         pingStateChanging();
       }
     });
@@ -188,22 +184,6 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     group.setLayout(new GridLayout(1, true));
     m_holderTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     return group;
-  }
-
-  @Override
-  public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    // write back members
-    PageNewOperation op = new PageNewOperation(getTypeName(), getClientBundle().getPackageName(getTargetPackage()), getClientBundle().getJavaProject());
-    op.setNlsEntry(getNlsName());
-    IType superType = getSuperType();
-    if (superType != null) {
-      op.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
-    }
-    op.setHolderType(getHolderType());
-    op.setFormatSource(true);
-    op.validate();
-    op.run(monitor, workingCopyManager);
-    return true;
   }
 
   @Override
@@ -272,13 +252,13 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   public String getTypeName() {
-    return m_typeName;
+    return getPropertyString(PROP_TYPE_NAME);
   }
 
   public void setTypeName(String typeName) {
     try {
       setStateChanging(true);
-      m_typeName = typeName;
+      setTypeNameInternal(typeName);
       if (isControlCreated()) {
         m_typeNameField.setText(typeName);
       }
@@ -286,6 +266,10 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     finally {
       setStateChanging(false);
     }
+  }
+
+  private void setTypeNameInternal(String typeName) {
+    setPropertyString(PROP_TYPE_NAME, typeName);
   }
 
   public IType getSuperType() {

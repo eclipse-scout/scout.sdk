@@ -712,7 +712,7 @@
             id="client.outline">
       </targetPackage>
       <targetPackage
-            default=".ui.desktop.outlines.pages"
+            default=""
             bundleType="CLIENT"
             id="client.page">
       </targetPackage>

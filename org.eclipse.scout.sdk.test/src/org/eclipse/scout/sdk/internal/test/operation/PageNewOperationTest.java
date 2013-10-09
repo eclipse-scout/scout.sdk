@@ -11,12 +11,16 @@
 package org.eclipse.scout.sdk.internal.test.operation;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.test.AbstractSdkTestWithSampleProject;
 import org.eclipse.scout.sdk.operation.page.PageNewOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
+import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataDtoUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Test;
 
 /**
@@ -29,37 +33,43 @@ public class PageNewOperationTest extends AbstractSdkTestWithSampleProject {
 
   @Test
   public void testNewPageWithTable() throws Exception {
-    PageNewOperation newOp = new PageNewOperation("Test01Page", getClientJavaProject().getElementName() + ".page.output", getClientJavaProject());
+    PageNewOperation newOp = new PageNewOperation("Test01Page", getClientJavaProject().getElementName() + ".page.output", getSharedJavaProject().getElementName() + ".page.output", getClientJavaProject(), getSharedJavaProject());
     newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractPageWithTable));
     newOp.setFormatSource(true);
 
-    executeBuildAssertNoCompileErrors(newOp);
+    TestWorkspaceUtility.executeAndBuildWorkspace(newOp);
+    PageDataDtoUpdateOperation updateDto = new PageDataDtoUpdateOperation(newOp.getCreatedPage(), ScoutTypeUtility.findPageDataAnnotation(newOp.getCreatedPage(), ScoutTypeUtility.getSuperTypeHierarchy(newOp.getCreatedPage())));
+    executeBuildAssertNoCompileErrors(updateDto);
 
     IType page = newOp.getCreatedPage();
     SdkAssert.assertExist(page);
     SdkAssert.assertPublic(page).assertNoMoreFlags();
     SdkAssert.assertTypeExists(page, SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE);
     SdkAssert.assertHasSuperType(page, RuntimeClasses.IPageWithTable);
+    SdkAssert.assertAnnotation(page, IRuntimeClasses.PageData);
   }
 
   @Test
   public void testNewPageWithTableExtendsible() throws Exception {
-    PageNewOperation newOp = new PageNewOperation("Test01Page", getClientJavaProject().getElementName() + ".page.output", getClientJavaProject());
+    PageNewOperation newOp = new PageNewOperation("Test01Page", getClientJavaProject().getElementName() + ".page.output", getSharedJavaProject().getElementName() + ".page.output", getClientJavaProject(), getSharedJavaProject());
     newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractExtensiblePageWithTable));
     newOp.setFormatSource(true);
 
-    executeBuildAssertNoCompileErrors(newOp);
+    TestWorkspaceUtility.executeAndBuildWorkspace(newOp);
+    PageDataDtoUpdateOperation updateDto = new PageDataDtoUpdateOperation(newOp.getCreatedPage(), ScoutTypeUtility.findPageDataAnnotation(newOp.getCreatedPage(), ScoutTypeUtility.getSuperTypeHierarchy(newOp.getCreatedPage())));
+    executeBuildAssertNoCompileErrors(updateDto);
 
     IType page = newOp.getCreatedPage();
     SdkAssert.assertExist(page);
     SdkAssert.assertPublic(page).assertNoMoreFlags();
     SdkAssert.assertTypeExists(page, SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE);
     SdkAssert.assertHasSuperType(page, RuntimeClasses.IPageWithTable);
+    SdkAssert.assertAnnotation(page, IRuntimeClasses.PageData);
   }
 
   @Test
   public void testNewPageWithNodes() throws Exception {
-    PageNewOperation newOp = new PageNewOperation("Test01Page", getClientJavaProject().getElementName() + ".page.output", getClientJavaProject());
+    PageNewOperation newOp = new PageNewOperation("Test01Page", getClientJavaProject().getElementName() + ".page.output", null, getClientJavaProject(), null);
     newOp.setSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes"));
     newOp.setFormatSource(true);
 

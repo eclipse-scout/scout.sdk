@@ -132,7 +132,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(mainBoxBuilder, 10.0), mainBoxBuilder);
 
     // main box getter
-    final String mainBoxSignature = Signature.createTypeSignature(getPackageName() + "." + getElementName() + "." + SdkProperties.TYPE_NAME_MAIN_BOX, true);
+    final String mainBoxSignature = SignatureCache.createTypeSignature(getPackageName() + "." + getElementName() + "." + SdkProperties.TYPE_NAME_MAIN_BOX);
     IMethodSourceBuilder mainBoxGetterBuilder = MethodSourceBuilderFactory.createFieldGetterSourceBuilder(mainBoxSignature);
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormFieldGetterKey(mainBoxGetterBuilder), mainBoxGetterBuilder);
 
@@ -163,7 +163,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     okButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractOkButton, getJavaProject()));
     mainboxBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(okButtonBuilder, order), okButtonBuilder);
     // getter
-    final String okButtonSignature = Signature.createTypeSignature(getPackageName() + "." + getElementName() + "." + SdkProperties.TYPE_NAME_MAIN_BOX + "." + okButtonBuilder.getElementName(), true);
+    final String okButtonSignature = SignatureCache.createTypeSignature(getPackageName() + "." + getElementName() + "." + SdkProperties.TYPE_NAME_MAIN_BOX + "." + okButtonBuilder.getElementName());
     IMethodSourceBuilder okButtonGetterBuilder = MethodSourceBuilderFactory.createFieldGetterSourceBuilder(okButtonSignature);
     formBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormFieldGetterKey(okButtonGetterBuilder), okButtonGetterBuilder);
   }
@@ -175,7 +175,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     cancelButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractCancelButton, getJavaProject()));
     mainboxBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(cancelButtonBuilder, order), cancelButtonBuilder);
     // getter
-    final String cancelButtonSignature = Signature.createTypeSignature(getPackageName() + "." + getElementName() + "." + SdkProperties.TYPE_NAME_MAIN_BOX + "." + cancelButtonBuilder.getElementName(), true);
+    final String cancelButtonSignature = SignatureCache.createTypeSignature(getPackageName() + "." + getElementName() + "." + SdkProperties.TYPE_NAME_MAIN_BOX + "." + cancelButtonBuilder.getElementName());
     IMethodSourceBuilder cancelButtonGetterBuilder = MethodSourceBuilderFactory.createFieldGetterSourceBuilder(cancelButtonSignature);
     formBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormFieldGetterKey(cancelButtonGetterBuilder), cancelButtonGetterBuilder);
   }

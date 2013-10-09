@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -29,6 +28,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -81,7 +81,7 @@ public class PlannerFieldNewOperation implements IOperation {
       superTypeSigBuilder.append("<").append(getTypeName()).append(".").append(SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE).append(",");
       superTypeSigBuilder.append(getTypeName()).append(".").append(SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP).append(",");
       superTypeSigBuilder.append(Long.class.getName()).append(",").append(Long.class.getName()).append(">");
-      newOp.setSuperTypeSignature(Signature.createTypeSignature(superTypeSigBuilder.toString(), true));
+      newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
       createPlannerTable(newOp.getSourceBuilder(), monitor, workingCopyManager);
       createActivityMap(newOp.getSourceBuilder(), monitor, workingCopyManager);
 
@@ -141,7 +141,7 @@ public class PlannerFieldNewOperation implements IOperation {
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
       superTypeSigBuilder.append("<").append(Long.class.getName()).append(",");
       superTypeSigBuilder.append(Long.class.getName()).append(">");
-      activityMapSuperTypeSig = Signature.createTypeSignature(superTypeSigBuilder.toString(), true);
+      activityMapSuperTypeSig = SignatureCache.createTypeSignature(superTypeSigBuilder.toString());
     }
     activityMapBuilder.setSuperTypeSignature(activityMapSuperTypeSig);
     // order annotation
