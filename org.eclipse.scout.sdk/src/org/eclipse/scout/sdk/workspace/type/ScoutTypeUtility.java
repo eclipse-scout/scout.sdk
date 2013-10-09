@@ -842,7 +842,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   public static IMethod getColumnGetterMethod(IType column) {
     IType table = column.getDeclaringType();
-    final String formFieldSignature = SignatureCache.createTypeSignature(column.getFullyQualifiedName()).replaceAll("\\$", ".");
+    final String formFieldSignature = SignatureUtility.DOLLAR_REPLACEMENT_REGEX.matcher(SignatureCache.createTypeSignature(column.getFullyQualifiedName())).replaceAll(".");
 
     final String regex = "^get" + column.getElementName();
     IMethod method = TypeUtility.getFirstMethod(table, new IMethodFilter() {

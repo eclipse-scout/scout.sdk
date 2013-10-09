@@ -236,7 +236,7 @@ public class CreateTemplateOperation implements IOperation {
 
   protected void updateFormFieldGetter(IType formField, IMethod templateFieldGetter, HashMap<String, P_FormField> templateFormFields, IImportValidator validator, MultiTextEdit edit, ITypeHierarchy hierarchy) {
     String fqFormFieldName = formField.getFullyQualifiedName();
-    fqFormFieldName = fqFormFieldName.replaceAll("\\$", ".");
+    fqFormFieldName = SignatureUtility.DOLLAR_REPLACEMENT_REGEX.matcher(fqFormFieldName).replaceAll(".");
     try {
       IMethod getterMethod = ScoutTypeUtility.getFormFieldGetterMethod(formField, hierarchy);
       if (TypeUtility.exists(getterMethod)) {
@@ -246,7 +246,7 @@ public class CreateTemplateOperation implements IOperation {
         IImportDeclaration formFieldImport = formField.getCompilationUnit().getImport(fqFormFieldName);
         if (TypeUtility.exists(formFieldImport)) {
           edit.addChild(new ReplaceEdit(formFieldImport.getSourceRange().getOffset(), formFieldImport.getSourceRange().getLength(),
-              "import " + templateFormField.getFormField().getFullyQualifiedName().replaceAll("\\$", ".") + ";"));
+              "import " + SignatureUtility.DOLLAR_REPLACEMENT_REGEX.matcher(templateFormField.getFormField().getFullyQualifiedName()).replaceAll(".") + ";"));
         }
         String methodSource = getterMethod.getSource();
         // deprecation comment

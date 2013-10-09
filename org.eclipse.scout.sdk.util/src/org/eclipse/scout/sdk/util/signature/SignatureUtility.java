@@ -28,7 +28,7 @@ public final class SignatureUtility {
 
   private final static Pattern QUALIFIED_SIG_REGEX = Pattern.compile("^([\\+\\[]*)([^\\<\\(\\;]*)(.*)$");
   private final static Pattern SIG_REPLACEMENT_REGEX = Pattern.compile("[\\.\\$]{1}");
-  private final static Pattern DOL_REPLACEMENT_REGEX = Pattern.compile("\\$");
+  public final static Pattern DOLLAR_REPLACEMENT_REGEX = Pattern.compile("\\$");
   private final static Pattern PARAM_SIG_REPLACEMENT_REGEX = Pattern.compile("^([^\\:]*)\\:(.*)$");
 
   /**
@@ -39,7 +39,7 @@ public final class SignatureUtility {
 
   /**
    * Kind constant for a arbitrary array signature.
-   * 
+   *
    * @see #getTypeSignatureKind(String)
    * @since 3.0
    */
@@ -51,7 +51,7 @@ public final class SignatureUtility {
   /**
    * To get the signature kind of the given signature. If a signature starts with '|' it is a arbitrary array signature
    * otherwise see {@link Signature#getTypeSignatureKind(String)}.
-   * 
+   *
    * @return the signature kind.
    * @see Signature#getTypeSignatureKind(String)
    */
@@ -202,15 +202,15 @@ public final class SignatureUtility {
     else if (signature1 == null || signature2 == null) {
       return false;
     }
-    signature1 = DOL_REPLACEMENT_REGEX.matcher(signature1).replaceAll(".");
-    signature2 = DOL_REPLACEMENT_REGEX.matcher(signature2).replaceAll(".");
+    signature1 = DOLLAR_REPLACEMENT_REGEX.matcher(signature1).replaceAll(".");
+    signature2 = DOLLAR_REPLACEMENT_REGEX.matcher(signature2).replaceAll(".");
     return signature1.equals(signature2);
   }
 
   /**
    * To get the simple type reference name within a context represented by the given importValidator. Every fully
    * qualified type name will be passed to the importValidator to decide if the import is already in use.
-   * 
+   *
    * @param fullyQuallifiedTypeName
    *          e.g. java.lang.String (not a signature).
    * @param importValidator
@@ -268,7 +268,7 @@ public final class SignatureUtility {
    * getTypeReferenceImpl("QList<?QString>;", typeA, typeA, fullyQuallifiedImpValidator)
    * -> java.util.List<? extends java.lang.String>
    * </xmp>
-   * 
+   *
    * @param signature
    *          fully parameterized signature
    * @param signatureOwner
@@ -365,7 +365,7 @@ public final class SignatureUtility {
   /**
    * To get resolved and substituted generic parameter signatures of the method. The signature starts with
    * {@link ScoutSignature#C_ARBITRARY_ARRAY} if the parameter is a arbitrary array.
-   * 
+   *
    * @param method
    *          a scout method
    * @return an array of the parameter signatures
@@ -378,7 +378,7 @@ public final class SignatureUtility {
   /**
    * To get resolved and substituted generic parameter signatures of the method. The signature starts with
    * {@link ScoutSignature#C_ARBITRARY_ARRAY} if the parameter is a arbitrary array.
-   * 
+   *
    * @param jdtMethod
    * @param contextType
    *          the type in what context the method appears, used for generic bindings.
@@ -412,7 +412,7 @@ public final class SignatureUtility {
    * not resolved use {@link ScoutSignature#getMethodParameterSignatureResolved(IMethod)} to get resolved and
    * generic substituted parameter signature</b><br>
    * <br>
-   * 
+   *
    * @param method
    * @return
    * @throws JavaModelException
@@ -439,7 +439,7 @@ public final class SignatureUtility {
 
   /**
    * To get resolved return type signature of the given method. Generic types are substituted within the method context.
-   * 
+   *
    * @param method
    *          a scout method
    * @return an array of the parameter signatures
@@ -473,7 +473,7 @@ public final class SignatureUtility {
   /**
    * returns a unique identifier of a scout method. The identifier looks like
    * 'methodname(param1Signature,param2Signature)'.
-   * 
+   *
    * @param method
    * @return an unique method identifier of the given method
    * @throws CoreException
@@ -495,7 +495,7 @@ public final class SignatureUtility {
   /**
    * returns a unique identifier of a scout method. The identifier looks like
    * 'methodname(param1Signature,param2Signature)'.
-   * 
+   *
    * @param method
    * @param contextType
    *          the type in what context the method appears, used for generic bindings.

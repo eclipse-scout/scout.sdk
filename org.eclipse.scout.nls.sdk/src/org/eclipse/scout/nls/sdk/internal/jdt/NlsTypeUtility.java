@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 public final class NlsTypeUtility {
 
@@ -49,7 +50,7 @@ public final class NlsTypeUtility {
   private static IType resolveType(final String fqn) throws CoreException {
     final TreeMap<CompositeLong, IType> matchList = new TreeMap<CompositeLong, IType>();
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
-    String fastPat = fqn.replaceAll("\\$", "\\.");
+    String fastPat = SignatureUtility.DOLLAR_REPLACEMENT_REGEX.matcher(fqn).replaceAll("\\.");
     int i = fastPat.lastIndexOf('.');
     if (i >= 0) {
       fastPat = fastPat.substring(i + 1);

@@ -29,6 +29,7 @@ import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -50,7 +51,7 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
     if (lastBoxIndex > 0) {
       parentName = parentName.substring(0, lastBoxIndex);
     }
-    String sequenceBoxFqn = (declaringType.getFullyQualifiedName() + "." + sourceBuilder.getElementName()).replaceAll("\\$", ".");
+    String sequenceBoxFqn = SignatureUtility.DOLLAR_REPLACEMENT_REGEX.matcher(declaringType.getFullyQualifiedName() + "." + sourceBuilder.getElementName()).replaceAll(".");
     double order = 10;
 
     // from
