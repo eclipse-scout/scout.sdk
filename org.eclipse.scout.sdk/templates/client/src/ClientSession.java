@@ -1,12 +1,14 @@
 package @@BUNDLE_CLIENT_NAME@@;
 
-import org.eclipse.scout.rt.client.ClientJob;
+import @@BUNDLE_CLIENT_NAME@@.ui.desktop.Desktop;
+
+import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import @@BUNDLE_CLIENT_NAME@@.ui.desktop.Desktop;
 import org.eclipse.scout.rt.client.AbstractClientSession;
-import org.eclipse.scout.rt.client.servicetunnel.http.HttpServiceTunnel;
+import org.eclipse.scout.rt.client.ClientJob;
+import org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 
 public class ClientSession extends AbstractClientSession{
