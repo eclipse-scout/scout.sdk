@@ -64,7 +64,9 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
         run(monitor, workingCopyManager);
       }
       catch (Exception e) {
-        e.initCause(m_callerTrace);
+        if (e.getCause() == e || e.getCause() == null) {
+          e.initCause(m_callerTrace);
+        }
         Status errorStatus = new Status(Status.ERROR, ScoutSdk.PLUGIN_ID, e.getMessage(), e);
         ScoutSdk.log(errorStatus);
         return errorStatus;
