@@ -98,14 +98,6 @@ public class SearchFormNewOperation extends FormNewOperation {
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodStartFormKey(startHandlerMethodBuilder), startHandlerMethodBuilder);
 
     super.run(monitor, workingCopyManager);
-
-    // TODO evaluate update form data!!!
-//    FormDataUpdateOperation formDataOp = null;
-//    if (getSearchFormDataLocationBundle() != null) {
-//      formDataOp = new FormDataUpdateOperation(getCreatedFormType());
-//      formDataOp.run(monitor, workingCopyManager);
-//      m_createdFormDataType = formDataOp.getFormDataType();
-//    }
   }
 
   @Override

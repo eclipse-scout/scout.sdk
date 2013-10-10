@@ -11,14 +11,11 @@
 package org.eclipse.scout.sdk.internal.test.operation.jdt.icu;
 
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.operation.jdt.icu.CompilationUnitNewOperation;
-import org.eclipse.scout.sdk.operation.jdt.icu.CompilationUnitUpdateOperation;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
-import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -92,15 +89,4 @@ public class CompilationUnitNewOperationTest extends AbstractScoutSdkTest {
     Assert.assertTrue(TypeUtility.exists(TypeUtility.getType("jdt.test.client.icu.output.CompilationUnitTestClass")));
     Assert.assertEquals(1, icuNewOp.getCreatedCompilationUnit().getTypes().length);
   }
-
-  @Test
-  public void testCompilationUnitUpdateOperation() throws Exception {
-    IType type = SdkAssert.assertTypeExists("jdt.test.client.icu.CompilationUnitForUpdate");
-    CompilationUnitUpdateOperation updateOp = new CompilationUnitUpdateOperation(type.getCompilationUnit());
-    TestWorkspaceUtility.executeAndBuildWorkspace(updateOp);
-    TestWorkspaceUtility.assertNoCompileErrors();
-    Assert.assertEquals(0, updateOp.getCompilationUnit().getTypes().length);
-
-  }
-
 }

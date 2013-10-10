@@ -127,22 +127,25 @@ public class JarSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
   private void openJarSelectionDialog() {
     IDialogSettings prefs = ScoutSdkUi.getDefault().getDialogSettingsSection(JarSelectionWizardPage.class.getName() + ".FileDialog", true);
-    FileDialog dialog = new FileDialog(getShell());
+    FileDialog dialog = new FileDialog(getShell(), SWT.MULTI);
     dialog.setFilterExtensions(new String[]{"*.jar"});
     dialog.setText(Texts.get("JARFileSelection"));
     String filterPath = prefs.get(PREF_FILE_DIALOG_PATH);
     if (StringUtility.hasText(filterPath)) {
       dialog.setFilterPath(filterPath);
     }
-    String fileName = dialog.open();
+    boolean ok = dialog.open() != null;
+
     // store prefs
     prefs.put(PREF_FILE_DIALOG_PATH, dialog.getFilterPath());
-    if (fileName != null) {
-      File file = new File(fileName);
-      if (file.exists()) {
-        Set<File> jarFiles = getJarFiles();
-        jarFiles.add(file);
-        setJarFiels(jarFiles);
+    if (ok) {
+      for (String fileName : dialog.getFileNames()) {
+        File file = new File(dialog.getFilterPath(), fileName);
+        if (file.exists()) {
+          Set<File> jarFiles = getJarFiles();
+          jarFiles.add(file);
+          setJarFiels(jarFiles);
+        }
       }
     }
   }

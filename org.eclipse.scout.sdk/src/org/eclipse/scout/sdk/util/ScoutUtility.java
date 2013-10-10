@@ -807,4 +807,29 @@ public final class ScoutUtility {
     }
     return null;
   }
+
+  /**
+   * Gets the status of the given java name. Checks if a name that differs from the suffix is entered and that the name
+   * is a valid java name.
+   * 
+   * @param name
+   *          The name to check
+   * @param suffix
+   *          The suffix to compare against.
+   * @return A status that describes the state of the given name
+   */
+  public static IStatus getJavaNameStatus(String name, String suffix) {
+    if (!StringUtility.hasText(name) || name.equals(suffix)) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_className"));
+    }
+    if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(name).matches()) {
+      return Status.OK_STATUS;
+    }
+    else if (Regex.REGEX_JAVAFIELD.matcher(name).matches()) {
+      return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+    }
+    else {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("NameNotValid"));
+    }
+  }
 }

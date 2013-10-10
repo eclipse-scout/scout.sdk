@@ -35,7 +35,6 @@ import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvi
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.fields.code.CodeIdField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.util.Regex;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -258,22 +257,13 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_CODE_TYPE)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
+    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_CODE_TYPE);
+    if (javaFieldNameStatus.isOK()) {
+      if (TypeUtility.existsType(getSharedBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      }
     }
-    // check not allowed names
-    if (TypeUtility.existsType(getSharedBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-    }
-    if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return Status.OK_STATUS;
-    }
-    else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
-    }
-    else {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
-    }
+    return javaFieldNameStatus;
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {

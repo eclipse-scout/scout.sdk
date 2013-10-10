@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
 import org.eclipse.scout.sdk.util.type.FieldFilters;
@@ -88,14 +89,14 @@ public class PropertyBeansRenameAction extends AbstractRenameAction {
     }
     for (IPropertyBean bean : getPropertyBeanDescriptors()) {
       if (TypeUtility.getFirstMethod(bean.getDeclaringType(), MethodFilters.getNameRegexFilter(Pattern.compile("(get|set|is)" + newName))) != null) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }
       StringBuilder fieldName = new StringBuilder();
       fieldName.append("m_").append(Character.toLowerCase(newName.charAt(0)));
       if (bean.getBeanName().length() > 1) {
         fieldName.append(newName.substring(1));
         if (TypeUtility.getFirstField(bean.getDeclaringType(), FieldFilters.getNameRegexFilter(Pattern.compile(fieldName.toString()))) != null) {
-          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
+          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
         }
       }
     }

@@ -40,6 +40,7 @@ public class PermissionNewOperation extends PrimaryTypeNewOperation {
     setFormatSource(true);
     setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.BasicPermission));
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+    setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
   }
 
   @Override

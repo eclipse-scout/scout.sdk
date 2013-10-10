@@ -268,8 +268,11 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         }
         CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
 //        context.setCompilationUnitVariables(cu);
-//        context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, typeName);
+        context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
+        context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
+        context.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
         context.setVariable(CodeTemplateContextType.ENCLOSING_METHOD, methodSourceBuilder.getElementName());
+        context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, UNDEFINED_VAR_VALUE);
 
         if (returnTypeSignature != null) {
           context.setVariable(CodeTemplateContextType.RETURN_TYPE, Signature.toString(returnTypeSignature));

@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -159,22 +159,13 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(SdkProperties.SUFFIX_COMPOSER_ENTRY)) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
+    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_COMPOSER_ENTRY);
+    if (javaFieldNameStatus.isOK()) {
+      if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      }
     }
-    // check not allowed names
-    if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-    }
-    if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return Status.OK_STATUS;
-    }
-    else if (Regex.REGEX_JAVAFIELD.matcher(getTypeName()).matches()) {
-      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
-    }
-    else {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", getTypeName()));
-    }
+    return javaFieldNameStatus;
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {

@@ -17,7 +17,6 @@ import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.scout.sdk.Texts;
@@ -26,7 +25,7 @@ import org.eclipse.scout.sdk.ui.dialog.RenameDialog;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.swt.widgets.Shell;
 
 public abstract class AbstractRenameAction extends AbstractScoutHandler {
@@ -86,16 +85,7 @@ public abstract class AbstractRenameAction extends AbstractScoutHandler {
   }
 
   protected IStatus getJavaNameStatus(String newName) {
-    if (newName.equals(getReadOnlySuffix())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name can not be null or empty");
-    }
-    if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(newName).matches()) {
-      return Status.OK_STATUS;
-    }
-    if (Regex.REGEX_JAVAFIELD.matcher(newName).matches()) {
-      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
-    }
-    return Status.OK_STATUS;
+    return ScoutUtility.getJavaNameStatus(newName, getReadOnlySuffix());
   }
 
   private class P_PropertyListener implements PropertyChangeListener {

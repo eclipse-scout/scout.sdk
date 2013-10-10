@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.pde.core.plugin.IPluginElement;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -44,13 +45,13 @@ public class ServiceRenameAction extends AbstractRenameAction {
     if (m_serviceImplementation != null) {
       String packName = m_serviceImplementation.getPackageFragment().getElementName();
       if (TypeUtility.existsType(packName + "." + newName)) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }
     }
     if (m_serviceInterface != null) {
       String packName = m_serviceInterface.getPackageFragment().getElementName();
       if (TypeUtility.existsType(packName + ".I" + newName)) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }
     }
     return inheritedStatus;

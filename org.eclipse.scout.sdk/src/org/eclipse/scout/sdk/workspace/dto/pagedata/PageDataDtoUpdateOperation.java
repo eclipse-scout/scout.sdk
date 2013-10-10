@@ -15,7 +15,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
-import org.eclipse.scout.sdk.operation.jdt.icu.CompilationUnitUpdateOperation;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
@@ -72,15 +73,17 @@ public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
     }
     ICompilationUnit dtoIcu = dtoType.getCompilationUnit();
 
-    CompilationUnitUpdateOperation icuUpdateOp = new CompilationUnitUpdateOperation(dtoIcu);
-    icuUpdateOp.addTypeSourceBuilder(pageDataSourceBuilder);
+    CompilationUnitSourceBuilder cuSourceBuilder = new CompilationUnitSourceBuilder(dtoIcu.getElementName(), dtoIcu.getParent().getElementName());
+    cuSourceBuilder.addTypeSourceBuilder(pageDataSourceBuilder);
+    cuSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
 
     SimpleImportValidator validator = new SimpleImportValidator(TypeUtility.getPackage(dtoIcu).getElementName());
+
     // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
     consumeAllTypeNamesRec(pageDataSourceBuilder, validator);
 
     StringBuilder sourceBuilder = new StringBuilder();
-    icuUpdateOp.getSourceBuilder().createSource(sourceBuilder, ResourceUtility.getLineSeparator(dtoIcu), dtoIcu.getJavaProject(), validator);
+    cuSourceBuilder.createSource(sourceBuilder, ResourceUtility.getLineSeparator(dtoIcu), dtoIcu.getJavaProject(), validator);
     String source = sourceBuilder.toString();
     return source;
   }

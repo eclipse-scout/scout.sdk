@@ -16,7 +16,8 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.operation.jdt.icu.CompilationUnitUpdateOperation;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
@@ -80,16 +81,18 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
     }
     ICompilationUnit formDataIcu = formDataType.getCompilationUnit();
 
-    CompilationUnitUpdateOperation icuUpdateOp = new CompilationUnitUpdateOperation(formDataIcu);
-    icuUpdateOp.addTypeSourceBuilder(formDataSourceBuilder);
+    CompilationUnitSourceBuilder cuSourceBuilder = new CompilationUnitSourceBuilder(formDataIcu.getElementName(), formDataIcu.getParent().getElementName());
+    cuSourceBuilder.addTypeSourceBuilder(formDataSourceBuilder);
+    cuSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
 
     SimpleImportValidator validator = new SimpleImportValidator(TypeUtility.getPackage(formDataIcu).getElementName());
+
     // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
     consumeAllTypeNamesRec(formDataSourceBuilder, validator);
 
+    // create source code
     StringBuilder sourceBuilder = new StringBuilder();
-    icuUpdateOp.getSourceBuilder().createSource(sourceBuilder, ResourceUtility.getLineSeparator(formDataIcu), formDataIcu.getJavaProject(), validator);
-    String source = sourceBuilder.toString();
-    return source;
+    cuSourceBuilder.createSource(sourceBuilder, ResourceUtility.getLineSeparator(formDataIcu), formDataIcu.getJavaProject(), validator);
+    return sourceBuilder.toString();
   }
 }

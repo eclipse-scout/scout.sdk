@@ -62,6 +62,19 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
   }
 
   @Override
+  public boolean equals(Object obj) {
+    if (!(obj instanceof AbstractDtoAutoUpdateOperation)) {
+      return false;
+    }
+    return m_modelType.equals(((AbstractDtoAutoUpdateOperation) obj).m_modelType);
+  }
+
+  @Override
+  public int hashCode() {
+    return m_modelType.hashCode();
+  }
+
+  @Override
   public void validate() throws IllegalArgumentException {
     if (!TypeUtility.exists(getModelType())) {
       throw new IllegalArgumentException("model type must exist: [" + getModelType() + "]");
@@ -85,12 +98,13 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
     if (TypeUtility.exists(derivedType)) {
       String oldSource = derivedType.getCompilationUnit().getSource();
       String newSource = createDerivedTypeSource(monitor);
+
       // format source
-      Document sourceDocument = new Document(newSource);
-      SourceFormatOperation op = new SourceFormatOperation(derivedType.getJavaProject(), sourceDocument, null);
+      SourceFormatOperation op = new SourceFormatOperation(derivedType.getJavaProject(), new Document(newSource), null);
       op.validate();
       op.run(monitor, null);
       newSource = op.getDocument().get();
+
       // compare
       if (!isSourceEquals(oldSource, newSource)) {
         // write source
@@ -171,7 +185,7 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
     return type;
   }
 
-  private boolean isSourceEquals(String source1, String source2) {
+  private static boolean isSourceEquals(String source1, String source2) {
     if (source1 == null && source2 == null) {
       return true;
     }

@@ -100,7 +100,10 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
     }
 
     if (TypeUtility.exists(getFormData())) {
-      String interfaceFqn = getInterfacePackageName() + "." + getInterfaceName();
+      String interfaceFqn = null;
+      if (getInterfaceProject() != null && getInterfacePackageName() != null) {
+        interfaceFqn = getInterfacePackageName() + "." + getInterfaceName();
+      }
       String formDataSignature = SignatureCache.createTypeSignature(getFormData().getFullyQualifiedName());
       IJavaProject nlsLookupProject = getInterfaceProject();
       if (nlsLookupProject == null) {
@@ -113,7 +116,6 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
       createLoadMethod(interfaceFqn, formDataSignature, nlsProject);
       createPrepareCreateMethod(interfaceFqn, formDataSignature, nlsProject);
       createStoreMethod(interfaceFqn, formDataSignature, nlsProject);
-
     }
     super.run(monitor, workingCopyManager);
   }

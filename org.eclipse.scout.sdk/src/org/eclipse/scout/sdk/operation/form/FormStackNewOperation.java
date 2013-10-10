@@ -137,19 +137,6 @@ public class FormStackNewOperation extends FormNewOperation {
       createModifyHandler(getSourceBuilder());
     }
     super.run(monitor, workingCopyManager);
-//    m_outForm.getCompilationUnit().reconcile(ICompilationUnit.NO_AST, false, null, monitor);
-
-//    if (getFormDataBundle() != null) {
-//      FormDataNewOperation formDataOp = new FormDataNewOperation(m_outForm, ScoutTypeUtility.findFormDataAnnotation(m_outForm, TypeUtility.getSuperTypeHierarchy(m_outForm)));
-//      formDataOp.setScoutBundle(getFormDataBundle());
-//      formOp.run(monitor, workingCopyManager);
-//
-//    }
-//    if (TypeUtility.exists(getCreatedFormData())) {
-//      FormDataUpdateOperationNew formDataUpdateOp = new FormDataUpdateOperationNew(getCreatedType(), getCreatedFormData().getCompilationUnit());
-//      formDataUpdateOp.run(monitor, workingCopyManager);
-//    }
-
   }
 
   /**

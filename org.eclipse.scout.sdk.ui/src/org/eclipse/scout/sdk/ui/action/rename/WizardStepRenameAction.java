@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -51,7 +52,7 @@ public class WizardStepRenameAction extends AbstractRenameAction {
       return inheritedStatus;
     }
     if (TypeUtility.exists(getWizardStep().getDeclaringType().getType(newName))) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     return inheritedStatus;
   }

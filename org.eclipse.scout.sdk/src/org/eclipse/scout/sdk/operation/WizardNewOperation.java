@@ -37,6 +37,7 @@ public class WizardNewOperation extends PrimaryTypeNewOperation {
     setFlags(Flags.AccPublic);
     setPackageExportPolicy(ExportPolicy.AddPackage);
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+    setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     setFormatSource(true);
   }
 

@@ -45,7 +45,6 @@ public class LocalLookupCallNewOperation extends PrimaryTypeNewOperation {
     setFormatSource(true);
     getCompilationUnitNewOp().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
-
   }
 
   @Override

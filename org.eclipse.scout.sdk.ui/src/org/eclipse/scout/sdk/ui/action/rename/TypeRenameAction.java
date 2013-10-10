@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -40,13 +41,13 @@ public class TypeRenameAction extends AbstractRenameAction {
     IType declaringType = getType().getDeclaringType();
     if (declaringType != null) {
       if (TypeUtility.exists(declaringType.getType(newName))) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }
     }
     else {
       String packName = getType().getPackageFragment().getElementName();
       if (TypeUtility.existsType(packName + "." + newName)) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }
     }
     return inheritedStatus;

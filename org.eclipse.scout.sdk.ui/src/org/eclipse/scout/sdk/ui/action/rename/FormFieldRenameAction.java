@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -48,7 +49,7 @@ public class FormFieldRenameAction extends AbstractRenameAction {
     }
     try {
       if (findInnerType(getFormField().getCompilationUnit().getAllTypes()[0], newName, true) != null) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already in use.");
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }
     }
     catch (CoreException e) {

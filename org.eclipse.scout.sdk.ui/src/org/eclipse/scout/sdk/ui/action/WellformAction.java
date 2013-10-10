@@ -36,7 +36,7 @@ public class WellformAction extends AbstractOperationAction {
 
   @Override
   public boolean isVisible() {
-    return !m_bundle.isBinary();
+    return m_bundle != null && !m_bundle.isBinary();
   }
 
   public void setScoutBundle(IScoutBundle b) {
