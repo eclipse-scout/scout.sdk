@@ -96,24 +96,25 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
       m_proposalField.setLabelProvider(createLabelProvider(getNlsProject()));
       m_proposalField.setContentProvider(createContentProvider(getNlsProject()));
       m_proposalField.setSelectionHandler(createSelectionHandler(getNlsProject()));
-      m_proposalField.setEnabled(getNlsProject() != null);
     }
 
-    try {
-      storeValueLock.acquire();
-      m_currentSourceTuple = getParser().parseSourceValue(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-      if (m_currentSourceTuple == null) {
-        String simpleText = PropertyMethodSourceUtility.parseReturnParameterString(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-        if (simpleText != null) {
-          throw new CoreException(new ScoutStatus(Status.INFO, "Text '" + simpleText + "'.", null));
+    if (getNlsProject() != null) {
+      try {
+        storeValueLock.acquire();
+        m_currentSourceTuple = getParser().parseSourceValue(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+        if (m_currentSourceTuple == null) {
+          String simpleText = PropertyMethodSourceUtility.parseReturnParameterString(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+          if (simpleText != null) {
+            throw new CoreException(new ScoutStatus(Status.INFO, "Text '" + simpleText + "'.", null));
+          }
         }
+        m_proposalField.acceptProposal(m_currentSourceTuple);
       }
-      m_proposalField.acceptProposal(m_currentSourceTuple);
-      m_proposalField.setEnabled(true);
+      finally {
+        storeValueLock.release();
+      }
     }
-    finally {
-      storeValueLock.release();
-    }
+    m_proposalField.setEnabled(getNlsProject() != null);
   }
 
   /**
