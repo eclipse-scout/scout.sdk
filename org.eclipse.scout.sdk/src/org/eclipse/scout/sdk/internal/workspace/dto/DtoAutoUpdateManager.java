@@ -162,9 +162,23 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
       m_eventCollector = eventCollector;
     }
 
+    private boolean acceptUpdateEvent(IResourceChangeEvent icu) {
+      for (IDtoAutoUpdateEventFilter filter : DtoUpdateEventFilter.getFilters()) {
+        try {
+          if (!filter.accept(icu)) {
+            return false;
+          }
+        }
+        catch (Exception e) {
+          ScoutSdk.logError("Unable to apply DTO auto update event filter '" + filter.getClass().getName() + "'. Filter is skipped.", e);
+        }
+      }
+      return true;
+    }
+
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
-      if (event != null) {
+      if (event != null && acceptUpdateEvent(event)) {
         addElementToQueueSecure(m_eventCollector, event);
       }
     }
@@ -194,20 +208,6 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     @Override
     public boolean belongsTo(Object family) {
       return RESOURCE_DELTA_CHECK_JOB_FAMILY.equals(family);
-    }
-
-    private boolean acceptUpdateEvent(IResourceChangeEvent icu) {
-      for (IDtoAutoUpdateEventFilter filter : DtoUpdateEventFilter.getFilters()) {
-        try {
-          if (!filter.accept(icu)) {
-            return false;
-          }
-        }
-        catch (Exception e) {
-          ScoutSdk.logError("Unable to apply DTO auto update event filter '" + filter.getClass().getName() + "'. Filter is skipped.", e);
-        }
-      }
-      return true;
     }
 
     /**
@@ -297,7 +297,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
           return Status.CANCEL_STATUS;
         }
 
-        if (event != null && event.getDelta() != null && acceptUpdateEvent(event)) {
+        if (event != null && event.getDelta() != null) {
           // collect all operations for the compilation units within the delta
           List<ICompilationUnit> icus = getCompilationUnitsFromDelta(event.getDelta());
           for (ICompilationUnit icu : icus) {
