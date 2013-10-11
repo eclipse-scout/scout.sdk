@@ -179,6 +179,10 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
   @Override
   public void expandAndSelectProjectLevel() {
+    IPage root = getRootPage();
+    if (root == null) {
+      return;
+    }
     try {
       m_viewContentProvider.setLoadSync(true);
       final Holder<IPage> firstBundleGroup = new Holder<IPage>(IPage.class, null);
@@ -223,7 +227,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
           }
         }
       };
-      getRootPage().accept(visitor);
+      root.accept(visitor);
       if (expandedPages.size() > 0) {
         m_viewer.setExpandedElements(expandedPages.toArray(new IPage[expandedPages.size()]));
         if (firstBundleGroup.getValue() == null) {

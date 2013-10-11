@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.util.method;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.ReturnStatement;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
@@ -47,9 +48,12 @@ public final class AstMethodReturnValueParser implements IMethodReturnValueParse
 
       @Override
       public boolean visit(SimpleName node) {
-        IJavaElement referencedElement = node.resolveTypeBinding().getJavaElement();
-        if (TypeUtility.exists(referencedElement) && referencedElement.getElementType() == IJavaElement.TYPE) {
-          ret.addReferencedType(node, ((IType) referencedElement));
+        ITypeBinding binding = node.resolveTypeBinding();
+        if (binding != null) {
+          IJavaElement referencedElement = binding.getJavaElement();
+          if (TypeUtility.exists(referencedElement) && referencedElement.getElementType() == IJavaElement.TYPE) {
+            ret.addReferencedType(node, ((IType) referencedElement));
+          }
         }
         return true;
       }

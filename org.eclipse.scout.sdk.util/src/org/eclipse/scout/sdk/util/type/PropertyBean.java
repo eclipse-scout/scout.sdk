@@ -38,6 +38,11 @@ public class PropertyBean implements IPropertyBean {
   }
 
   @Override
+  public String toString() {
+    return m_declaringType.getFullyQualifiedName() + "#" + m_beanName;
+  }
+
+  @Override
   public IType getDeclaringType() {
     return m_declaringType;
   }

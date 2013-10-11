@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.dto;
 
+import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.ICompilationUnit;
 
 /**
  * <h3>{@link IDtoAutoUpdateEventFilter}</h3>
@@ -21,12 +21,12 @@ import org.eclipse.jdt.core.ICompilationUnit;
  */
 public interface IDtoAutoUpdateEventFilter {
   /**
-   * defines if the given compilation unit should be considered to update a DTO.
+   * defines if the given resource change event should be considered to update a DTO.
    * 
-   * @param cu
-   *          The compilation unit candidate for update.
+   * @param event
+   *          The event to check
    * @return true if the event should continue processing.
    * @throws CoreException
    */
-  boolean accept(ICompilationUnit cu) throws CoreException;
+  boolean accept(IResourceChangeEvent event) throws CoreException;
 }

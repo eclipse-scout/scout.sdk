@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.ast.visitor;
 
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
@@ -58,7 +60,14 @@ public class MethodBodyAstVisitor extends DefaultAstVisitor {
 
   @Override
   public boolean visit(MethodDeclaration node) {
-    boolean isMethodInteresting = node.resolveBinding().getJavaElement().equals(m_method);
+    boolean isMethodInteresting = false;
+    IMethodBinding binding = node.resolveBinding();
+    if (binding != null) {
+      IJavaElement javaElement = binding.getJavaElement();
+      if (javaElement != null) {
+        isMethodInteresting = javaElement.equals(m_method);
+      }
+    }
     m_inMethod = isMethodInteresting;
     return isMethodInteresting;
   }

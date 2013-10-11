@@ -18,14 +18,6 @@ import java.util.Iterator;
 import java.util.Map.Entry;
 import java.util.WeakHashMap;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceChangeEvent;
-import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.BufferChangedEvent;
 import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.IBuffer;
@@ -38,7 +30,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
@@ -77,7 +68,6 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   private Object m_eventListenerLock;
   private final HierarchyCache m_hierarchyCache;
   private IBufferChangedListener m_sourceBufferListener;
-  private IResourceChangeListener m_resourceListener;
 
   public static ICompilationUnit[] getPendingWorkingCopies() {
     synchronized (INSTANCE.m_resourceLock) {
@@ -94,8 +84,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     m_sourceBufferListener = new P_SourceBufferListener();
     m_javaElementListener = new P_JavaElementChangedListener();
     JavaCore.addElementChangedListener(m_javaElementListener);
-    m_resourceListener = new P_ResourceListener();
-    ResourcesPlugin.getWorkspace().addResourceChangeListener(m_resourceListener);
+
     // ast tracker
     for (ICompilationUnit icu : JavaCore.getWorkingCopies(null)) {
       try {
@@ -523,30 +512,6 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     out.print("]");
     out.flush();
   }
-
-  private class P_ResourceListener implements IResourceChangeListener {
-    @Override
-    public void resourceChanged(final IResourceChangeEvent event) {
-      IResourceDelta delta = event.getDelta();
-      try {
-        if (delta != null) {
-          delta.accept(new IResourceDeltaVisitor() {
-            @Override
-            public boolean visit(IResourceDelta visitDelta) {
-              IResource resource = visitDelta.getResource();
-              if (resource.getType() == IFile.FILE && StringUtility.equalsIgnoreCase("java", resource.getFileExtension())) {
-                return false;
-              }
-              return true;
-            }
-          });
-        }
-      }
-      catch (CoreException e) {
-        SdkUtilActivator.logWarning(e);
-      }
-    }
-  } // end class P_ResourceListener
 
   private class P_SourceBufferListener implements IBufferChangedListener {
     @Override

@@ -798,14 +798,14 @@ public class TypeUtility {
    * convention:
    * 
    * <pre>
-   * public <em>&lt;PropertyType&gt;</em> get<em>&lt;PropertyType&gt;</em>();
-   * public void set<em>&lt;PropertyType&gt;</em>(<em>&lt;PropertyType&gt;</em> a);
+   * public <em>&lt;PropertyType&gt;</em> get<em>&lt;PropertyName&gt;</em>();
+   * public void set<em>&lt;PropertyName&gt;</em>(<em>&lt;PropertyType&gt;</em> a);
    * </pre>
    * 
    * If <code>PropertyType</code> is a boolean property, the following getter is expected
    * 
    * <pre>
-   * public boolean is<em>&lt;PropertyType&gt;</em>();
+   * public boolean is<em>&lt;PropertyName&gt;</em>();
    * </pre>
    * <p>
    * This implementation tries to determine the field by using the JDT code style settings stored in the Eclipse
@@ -824,9 +824,7 @@ public class TypeUtility {
    */
   public static IPropertyBean[] getPropertyBeans(IType type, IPropertyBeanFilter propertyFilter, Comparator<IPropertyBean> comparator) {
     HashMap<String, PropertyBean> beans = new HashMap<String, PropertyBean>();
-    IMethodFilter filter = MethodFilters.getMultiMethodFilter(
-        MethodFilters.getFlagsFilter(Flags.AccPublic),
-        MethodFilters.getNameRegexFilter(BEAN_METHOD_NAME));
+    IMethodFilter filter = MethodFilters.getMultiMethodFilter(MethodFilters.getFlagsFilter(Flags.AccPublic), MethodFilters.getNameRegexFilter(BEAN_METHOD_NAME));
     IMethod[] methods = TypeUtility.getMethods(type, filter);
     for (IMethod m : methods) {
       Matcher matcher = BEAN_METHOD_NAME.matcher(m.getElementName());
@@ -875,17 +873,9 @@ public class TypeUtility {
     }
 
     // filter
-    if (propertyFilter == null) {
-      propertyFilter = new IPropertyBeanFilter() {
-        @Override
-        public boolean accept(IPropertyBean property) {
-          return true;
-        }
-      };
-    }
-    ArrayList<PropertyBean> filteredBeans = new ArrayList<PropertyBean>();
+    ArrayList<PropertyBean> filteredBeans = new ArrayList<PropertyBean>(beans.size());
     for (PropertyBean bean : beans.values()) {
-      if (propertyFilter.accept(bean)) {
+      if (propertyFilter == null || propertyFilter.accept(bean)) {
         filteredBeans.add(bean);
       }
     }

@@ -31,6 +31,7 @@ import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.resources.WeakResourceChangeListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
@@ -171,10 +172,8 @@ public class NlsType implements INlsType {
             @Override
             public boolean visit(IResourceDelta d) {
               IResource resource = d.getResource();
-              if (resource != null && TypeUtility.exists(m_type) && resource.equals(m_type.getResource())) {
-                if (m_type.getResource().exists()) {
-                  reload();
-                }
+              if (ResourceUtility.exists(resource) && TypeUtility.exists(m_type) && resource.equals(m_type.getResource())) {
+                reload();
               }
               return true;
             }

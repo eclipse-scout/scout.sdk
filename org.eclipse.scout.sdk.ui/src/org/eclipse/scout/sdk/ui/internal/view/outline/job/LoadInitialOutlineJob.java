@@ -36,7 +36,7 @@ public class LoadInitialOutlineJob extends AbstractWorkspaceBlockingJob {
     if (c.isDisposed()) return;
     //
     Display display = c.getDisplay();
-    final IPage rootPage = (IPage) m_view.getTreeViewer().getInput();
+    final IPage rootPage = m_view.getRootPage();
     final Cursor waitCursor = new Cursor(display, SWT.CURSOR_WAIT);
     try {
       // gui thread
@@ -48,7 +48,9 @@ public class LoadInitialOutlineJob extends AbstractWorkspaceBlockingJob {
         }
       });
       // model
-      loadNodeRec(rootPage, monitor);
+      if (rootPage != null) {
+        loadNodeRec(rootPage, monitor);
+      }
     }
     finally {
       // gui thread

@@ -11,15 +11,23 @@
 package org.eclipse.scout.sdk.rap.var;
 
 import java.util.HashSet;
+import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.variables.IValueVariable;
 import org.eclipse.core.variables.IValueVariableListener;
 import org.eclipse.core.variables.VariablesPlugin;
@@ -27,7 +35,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
-import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
 /**
@@ -39,11 +46,16 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 public final class RapTargetVariable {
 
   public final static String RAP_TARGET_KEY = "scout_rap_target";
+  public final static String RESOURCE_CHANGE_JOB_FAMILY = "ScoutRapTargetResourceCheckFamily";
+  public final static P_JobRule JOB_RULE = new P_JobRule();
 
-  private final static RapTargetVariable instance = new RapTargetVariable();
+  private final static RapTargetVariable INSTANCE = new RapTargetVariable();
 
   private final EventListenerList m_listeners;
   private final P_TargetFileListener m_targetFileListener;
+
+  private final P_ResourceChangeEventHandlerJob m_resourceChangeJob;
+  private final Queue<IResourceChangeEvent> m_resourceChangeEventsToHandle;
 
   private final IValueVariable m_scoutRapTargetVariable;
   private final IRapTargetVariableListener m_valueChangeListener;
@@ -55,6 +67,8 @@ public final class RapTargetVariable {
     m_listeners = new EventListenerList();
     m_scoutRapTargetVariable = VariablesPlugin.getDefault().getStringVariableManager().getValueVariable(RAP_TARGET_KEY);
     m_oldVal = null;
+    m_resourceChangeEventsToHandle = new ConcurrentLinkedQueue<IResourceChangeEvent>();
+    m_resourceChangeJob = new P_ResourceChangeEventHandlerJob();
     m_targetFileListener = new P_TargetFileListener();
     m_valueChangeListener = new RapTargetVariableListenerAdapter() {
       @Override
@@ -66,7 +80,7 @@ public final class RapTargetVariable {
   }
 
   private void refreshResourceListener() {
-    if (getValue() == null) {
+    if (!StringUtility.hasText(getValue())) {
       // no value: register listener that waits for target files using the variable
       ResourcesPlugin.getWorkspace().addResourceChangeListener(m_targetFileListener, IResourceChangeEvent.POST_CHANGE | IResourceChangeEvent.PRE_REFRESH);
     }
@@ -152,34 +166,32 @@ public final class RapTargetVariable {
   }
 
   public static RapTargetVariable get() {
-    return instance;
+    return INSTANCE;
   }
 
-  private class P_TargetFileListener implements IResourceChangeListener {
+  public static final class P_JobRule implements ISchedulingRule {
+
+    private P_JobRule() {
+    }
+
     @Override
-    public void resourceChanged(IResourceChangeEvent event) {
-      if (getValue() == null) {
-        HashSet<IFile> collector = new HashSet<IFile>();
-        try {
-          collectTargetFiles(event.getDelta(), collector);
-          if (!collector.isEmpty()) {
-            for (IFile f : collector) {
-              try {
-                if (isScoutRapTargetVarPresent(f)) {
-                  fireEmptyVariableInUse(f);
-                  break;
-                }
-              }
-              catch (CoreException e) {
-                ScoutSdkRap.logWarning(e);
-              }
-            }
-          }
-        }
-        catch (CoreException e) {
-          ScoutSdkRap.logWarning(e);
-        }
-      }
+    public boolean contains(ISchedulingRule rule) {
+      return rule == JOB_RULE;
+    }
+
+    @Override
+    public boolean isConflicting(ISchedulingRule rule) {
+      return rule == JOB_RULE;
+    }
+  }
+
+  private final class P_ResourceChangeEventHandlerJob extends Job {
+
+    private P_ResourceChangeEventHandlerJob() {
+      super("Check for Scout rap target variable");
+      setSystem(true);
+      setUser(false);
+      setRule(JOB_RULE);
     }
 
     private boolean isScoutRapTargetVarPresent(IFile r) throws CoreException {
@@ -187,18 +199,74 @@ public final class RapTargetVariable {
       return s.contains(RAP_TARGET_KEY);
     }
 
-    private void collectTargetFiles(IResourceDelta delta, Set<IFile> res) throws CoreException {
-      if (delta == null) {
+    @Override
+    public boolean belongsTo(Object family) {
+      return RESOURCE_CHANGE_JOB_FAMILY.equals(family);
+    }
+
+    private void collectTargetFiles(IResourceDelta d, final Set<IFile> res) throws CoreException {
+      if (d == null) {
         return;
       }
 
-      for (IResource r : ResourceUtility.getAllResources(delta.getResource(), ResourceFilters.getTargetFileFilter())) {
-        res.add((IFile) r);
+      try {
+        d.accept(new IResourceDeltaVisitor() {
+          @Override
+          public boolean visit(IResourceDelta delta) throws CoreException {
+            IResource resource = delta.getResource();
+            if (ResourceUtility.exists(resource) && resource.getType() == IResource.FILE && resource.getName().toLowerCase().endsWith(".target")) {
+              res.add((IFile) resource);
+              return false;
+            }
+            return true;
+          }
+        });
       }
+      catch (CoreException e) {
+        ScoutSdkRap.logError("Could not check for .target files that use the scout rap target variable.", e);
+      }
+    }
+
+    @Override
+    protected IStatus run(IProgressMonitor monitor) {
+      IResourceChangeEvent event;
+      while ((event = m_resourceChangeEventsToHandle.poll()) != null) {
+        if (!StringUtility.hasText(getValue())) {
+          try {
+            HashSet<IFile> collector = new HashSet<IFile>();
+            collectTargetFiles(event.getDelta(), collector);
+            if (!collector.isEmpty()) {
+              for (IFile f : collector) {
+                try {
+                  if (isScoutRapTargetVarPresent(f)) {
+                    fireEmptyVariableInUse(f);
+                    break;
+                  }
+                }
+                catch (CoreException e) {
+                  ScoutSdkRap.logWarning(e);
+                }
+              }
+            }
+          }
+          catch (CoreException e) {
+            ScoutSdkRap.logWarning(e);
+          }
+        }
+      }
+      return Status.OK_STATUS;
     }
   }
 
-  private class P_VariableListener implements IValueVariableListener {
+  private final class P_TargetFileListener implements IResourceChangeListener {
+    @Override
+    public void resourceChanged(IResourceChangeEvent event) {
+      m_resourceChangeEventsToHandle.offer(event);
+      m_resourceChangeJob.schedule();
+    }
+  }
+
+  private final class P_VariableListener implements IValueVariableListener {
     @Override
     public void variablesRemoved(IValueVariable[] variables) {
     }

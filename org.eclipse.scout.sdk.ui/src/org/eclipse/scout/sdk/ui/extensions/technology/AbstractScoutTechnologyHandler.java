@@ -411,18 +411,21 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
       public void run() {
         IScoutExplorerPart explorer = ScoutSdkUi.getExplorer(false);
         if (explorer != null) {
-          INodeVisitor visitor = new INodeVisitor() {
-            @Override
-            public int visit(IPage page) {
-              if (pageToRefresh.isAssignableFrom(page.getClass())) {
-                page.markStructureDirty();
-                return CANCEL_SUBTREE;
+          IPage root = explorer.getRootPage();
+          if (root != null) {
+            INodeVisitor visitor = new INodeVisitor() {
+              @Override
+              public int visit(IPage page) {
+                if (pageToRefresh.isAssignableFrom(page.getClass())) {
+                  page.markStructureDirty();
+                  return CANCEL_SUBTREE;
+                }
+                return CONTINUE;
               }
-              return CONTINUE;
-            }
-          };
-          JdtUtility.waitForSilentWorkspace();
-          explorer.getRootPage().accept(visitor);
+            };
+            JdtUtility.waitForSilentWorkspace();
+            root.accept(visitor);
+          }
         }
       }
     });
