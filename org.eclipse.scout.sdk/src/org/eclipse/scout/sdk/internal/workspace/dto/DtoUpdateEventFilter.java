@@ -68,6 +68,6 @@ public final class DtoUpdateEventFilter {
         }
       }
     }
-    return filters;
+    return filters.clone();
   }
 }

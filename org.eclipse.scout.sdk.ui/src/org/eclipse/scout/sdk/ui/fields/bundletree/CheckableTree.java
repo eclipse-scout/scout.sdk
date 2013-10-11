@@ -484,6 +484,8 @@ public class CheckableTree extends Composite {
   } // end class P_CheckboxListener
 
   private class P_DragSourceListener implements DragSourceListener {
+    private Object[] m_expandedElements;
+
     @Override
     public void dragStart(DragSourceEvent event) {
       StructuredSelection selection = (StructuredSelection) m_viewer.getSelection();
@@ -502,6 +504,7 @@ public class CheckableTree extends Composite {
           }
         }
       }
+      m_expandedElements = m_viewer.getExpandedElements();
     }
 
     @Override
@@ -515,7 +518,14 @@ public class CheckableTree extends Composite {
 
     @Override
     public void dragFinished(DragSourceEvent event) {
-      m_viewer.refresh();
+      try {
+        m_viewer.getTree().setRedraw(false);
+        m_viewer.refresh();
+        m_viewer.setExpandedElements(m_expandedElements);
+      }
+      finally {
+        m_viewer.getTree().setRedraw(true);
+      }
     }
   } // end class P_DragSourceListener
 
