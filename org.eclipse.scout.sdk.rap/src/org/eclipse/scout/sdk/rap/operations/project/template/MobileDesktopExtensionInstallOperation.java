@@ -86,6 +86,7 @@ public class MobileDesktopExtensionInstallOperation extends AbstractScoutProject
     desktopExtensionOp.addFieldSourceBuilder(activeFieldBuilder);
     // constructor
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(desktopExtensionName);
+    constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     constructorBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {

@@ -36,12 +36,12 @@ public class ServiceMethod {
 
   public ServiceMethod(String methodName, String interfaceFqn) {
     m_interfaceSourceBuilder = new MethodSourceBuilder(methodName);
+    m_interfaceSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     m_interfaceSourceBuilder.setFlags(Flags.AccInterface);
     m_implementationSourceBuilder = new MethodSourceBuilder(methodName);
     m_implementationSourceBuilder.setFlags(Flags.AccPublic);
     if (StringUtility.hasText(interfaceFqn)) {
       m_implementationSourceBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
-      m_implementationSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodOverrideComment(interfaceFqn));
     }
     else {
       m_implementationSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());

@@ -35,7 +35,7 @@ public final class CodeIdExtensionPoint {
   private final static String ATTRIB_PRIO = "priority";
 
   private final static Object codeIdProviderExtensionsCacheLock = new Object();
-  private static ICodeIdProvider[] codeIdProviderExtensions;
+  private static volatile ICodeIdProvider[] codeIdProviderExtensions;
 
   private final static Object codeIdParsersExtensionsCacheLock = new Object();
   private static HashMap<String, TreeMap<CompositeObject, ICodeIdParser>> codeIdParsers;
@@ -44,35 +44,35 @@ public final class CodeIdExtensionPoint {
   }
 
   /**
-   * @return all extensions in the priorized order.
+   * @return all extensions in the prioritized order.
    */
   private static ICodeIdProvider[] getCodeIdProviderExtensions() {
     synchronized (codeIdProviderExtensionsCacheLock) {
-      // if(codeIdProviderExtensions==null){
-      TreeMap<CompositeObject, ICodeIdProvider> providers = new TreeMap<CompositeObject, ICodeIdProvider>();
-      IExtensionRegistry reg = Platform.getExtensionRegistry();
-      IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_POINT_NAME);
-      IExtension[] extensions = xp.getExtensions();
-      for (IExtension extension : extensions) {
-        IConfigurationElement[] providerElememts = extension.getConfigurationElements();
-        for (int i = 0; i < providerElememts.length; i++) {
-          IConfigurationElement providerElememt = providerElememts[i];
-          if (CODE_ID_PROVIDER_EXT_NAME.equals(providerElememt.getName())) {
-            String className = providerElememt.getAttribute(ATTRIB_CLASS);
+      if (codeIdProviderExtensions == null) {
+        TreeMap<CompositeObject, ICodeIdProvider> providers = new TreeMap<CompositeObject, ICodeIdProvider>();
+        IExtensionRegistry reg = Platform.getExtensionRegistry();
+        IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_POINT_NAME);
+        IExtension[] extensions = xp.getExtensions();
+        for (IExtension extension : extensions) {
+          IConfigurationElement[] providerElememts = extension.getConfigurationElements();
+          for (int i = 0; i < providerElememts.length; i++) {
+            IConfigurationElement providerElememt = providerElememts[i];
+            if (CODE_ID_PROVIDER_EXT_NAME.equals(providerElememt.getName())) {
+              String className = providerElememt.getAttribute(ATTRIB_CLASS);
 
-            ScoutSdkUi.logInfo("found code id provider: " + className);
-            try {
-              ICodeIdProvider provider = (ICodeIdProvider) providerElememt.createExecutableExtension(ATTRIB_CLASS);
-              providers.put(new CompositeObject(getPriority(providerElememt), i, provider), provider);
-            }
-            catch (Throwable t) {
-              ScoutSdkUi.logError("register code id provider: " + className, t);
+              ScoutSdkUi.logInfo("found code id provider: " + className);
+              try {
+                ICodeIdProvider provider = (ICodeIdProvider) providerElememt.createExecutableExtension(ATTRIB_CLASS);
+                providers.put(new CompositeObject(getPriority(providerElememt), i, provider), provider);
+              }
+              catch (Throwable t) {
+                ScoutSdkUi.logError("register code id provider: " + className, t);
+              }
             }
           }
         }
+        codeIdProviderExtensions = providers.values().toArray(new ICodeIdProvider[providers.size()]);
       }
-      codeIdProviderExtensions = providers.values().toArray(new ICodeIdProvider[providers.size()]);
-      //}
     }
     return codeIdProviderExtensions;
   }

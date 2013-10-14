@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.services;
 import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
+import java.util.regex.Matcher;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -26,6 +27,7 @@ import org.eclipse.jdt.internal.corext.util.Strings;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.JavaUIStatus;
 import org.eclipse.jdt.internal.ui.viewsupport.ProjectTemplateStore;
+import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IDocument;
@@ -49,6 +51,7 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>{@link JavaElementCommentBuilderService}</h3>
@@ -73,6 +76,9 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
       if (!(sourceBuilder instanceof ICompilationUnitSourceBuilder)) {
         throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create an compilation unit comment the source builder must be an instance of 'ICompilationUnitSourceBuilder'."));
       }
+      if (!isAutomaticallyAddComments()) {
+        return;
+      }
       ICompilationUnitSourceBuilder icuSourceBuilder = (ICompilationUnitSourceBuilder) sourceBuilder;
       Template template = getCodeTemplate(CodeTemplateContextType.FILECOMMENT_ID, ownerProject);
       if (template != null) {
@@ -95,13 +101,15 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
       if (!(sourceBuilder instanceof ITypeSourceBuilder)) {
         throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create a type comment the source builder must be an instance of 'ITypeSourceBuilder'."));
       }
+      if (!isAutomaticallyAddComments()) {
+        return;
+      }
       ITypeSourceBuilder typeSourceBuilder = (ITypeSourceBuilder) sourceBuilder;
       Template template = getCodeTemplate(CodeTemplateContextType.TYPECOMMENT_ID, ownerProject);
       if (template == null) {
         return;
       }
       CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
-//      context.setCompilationUnitVariables(cu);
       context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
       context.setVariable(CodeTemplateContextType.PACKAGENAME, Signature.getQualifier(typeSourceBuilder.getFullyQualifiedName()));
       context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
@@ -159,11 +167,13 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
       if (!(sourceBuilder instanceof IFieldSourceBuilder)) {
         throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create an field comment the source builder must be an instance of 'IFieldSourceBuilder'."));
       }
+      if (!isAutomaticallyAddComments()) {
+        return;
+      }
       IFieldSourceBuilder fieldSourceBuilder = (IFieldSourceBuilder) sourceBuilder;
       Template template = getCodeTemplate(CodeTemplateContextType.FIELDCOMMENT_ID, ownerProject);
       if (template != null) {
         CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
-//        context.setCompilationUnitVariables(cu);
         context.setVariable(CodeTemplateContextType.FIELD_TYPE, Signature.getSignatureSimpleName(fieldSourceBuilder.getSignature()));
         context.setVariable(CodeTemplateContextType.FIELD, fieldSourceBuilder.getElementName());
         context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
@@ -190,11 +200,13 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         if (!(sourceBuilder instanceof IMethodSourceBuilder)) {
           throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create an compilation unit comment the source builder must be an instance of 'ICompilationUnitSourceBuilder'."));
         }
+        if (!isAutomaticallyAddComments()) {
+          return;
+        }
         IMethodSourceBuilder methodSourceBuilder = (IMethodSourceBuilder) sourceBuilder;
         Template template = getCodeTemplate(CodeTemplateContextType.OVERRIDECOMMENT_ID, ownerProject);
         if (template != null) {
           CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
-//          context.setVariable(CodeTemplateContextType.M, icuSourceBuilder.getElementName());
           context.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
           context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
           context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
@@ -230,6 +242,9 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         if (!(sourceBuilder instanceof IMethodSourceBuilder)) {
           throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create a method comment the source builder must be an instance of 'IMethodSourceBuilder'."));
         }
+        if (!isAutomaticallyAddComments()) {
+          return;
+        }
         IMethodSourceBuilder methodSourceBuilder = (IMethodSourceBuilder) sourceBuilder;
         List<MethodParameter> parameters = methodSourceBuilder.getParameters();
         String[] paramSignatures = new String[parameters.size()];
@@ -244,13 +259,18 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         List<String> exceptionSignatures = methodSourceBuilder.getExceptionSignatures();
         String returnTypeSignature = methodSourceBuilder.getReturnTypeSignature();
 
+        String fieldTypeSimpleName = UNDEFINED_VAR_VALUE;
         String templateName = null;
         switch (type) {
           case METHOD_TYPE_GETTER:
             templateName = CodeTemplateContextType.GETTERCOMMENT_ID;
+            fieldTypeSimpleName = Signature.getSignatureSimpleName(methodSourceBuilder.getReturnTypeSignature());
             break;
           case METHOD_TYPE_SETTER:
             templateName = CodeTemplateContextType.SETTERCOMMENT_ID;
+            if (methodSourceBuilder.getParameters().size() > 0) {
+              fieldTypeSimpleName = Signature.getSignatureSimpleName(methodSourceBuilder.getParameters().get(0).getSignature());
+            }
             break;
           default:
             if (returnTypeSignature == null) {
@@ -268,11 +288,26 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         }
         CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
 //        context.setCompilationUnitVariables(cu);
+        String getterSetterName = UNDEFINED_VAR_VALUE;
+        Matcher matcher = TypeUtility.BEAN_METHOD_NAME.matcher(methodSourceBuilder.getElementName());
+        if (matcher.find()) {
+          getterSetterName = matcher.group(2);
+        }
         context.setVariable(CodeTemplateContextType.PROJECTNAME, ownerProject.getElementName());
         context.setVariable(CodeTemplateContextType.FILENAME, UNDEFINED_VAR_VALUE);
         context.setVariable(CodeTemplateContextType.PACKAGENAME, UNDEFINED_VAR_VALUE);
         context.setVariable(CodeTemplateContextType.ENCLOSING_METHOD, methodSourceBuilder.getElementName());
         context.setVariable(CodeTemplateContextType.ENCLOSING_TYPE, UNDEFINED_VAR_VALUE);
+        context.setVariable(CodeTemplateContextType.FIELD, getterSetterName);
+        context.setVariable(CodeTemplateContextType.FIELD_TYPE, fieldTypeSimpleName);
+        context.setVariable(CodeTemplateContextType.BARE_FIELD_NAME, getterSetterName);
+
+        if (parameters.size() > 0) {
+          context.setVariable(CodeTemplateContextType.PARAM, parameters.get(0).getName());
+        }
+        else {
+          context.setVariable(CodeTemplateContextType.PARAM, UNDEFINED_VAR_VALUE);
+        }
 
         if (returnTypeSignature != null) {
           context.setVariable(CodeTemplateContextType.RETURN_TYPE, Signature.toString(returnTypeSignature));
@@ -312,7 +347,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         int[] tagOffsets = position.getOffsets();
         for (int i = tagOffsets.length - 1; i >= 0; i--) { // from last to first
           try {
-            insertTag(document, tagOffsets[i], position.getLength(), paramNames, exceptionNames, returnType, paramNames, false, lineDelimiter);
+            insertTag(document, tagOffsets[i], position.getLength(), paramNames, exceptionNames, returnType, EMPTY, false, lineDelimiter);
           }
           catch (BadLocationException e) {
             throw new CoreException(JavaUIStatus.createError(IStatus.ERROR, e));
@@ -351,6 +386,10 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     return FIELD_COMMENT_SOURCE_BUILDER;
   }
 
+  private static boolean isAutomaticallyAddComments() {
+    return JavaPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.CODEGEN_ADD_COMMENTS);
+  }
+
   @SuppressWarnings("unchecked")
   private static String evaluateTemplate(CodeTemplateContext context, Template template) throws CoreException {
     // replace the user name resolver with our own to ensure we can respect the scout specific user names.
@@ -376,6 +415,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     }
     if (buffer == null) return null;
     String str = buffer.getString();
+
     if (Strings.containsOnlyWhitespaces(str)) {
       return null;
     }
@@ -413,7 +453,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     }
     String lineStart = textBuffer.get(region.getOffset(), offset - region.getOffset());
 
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
     for (int i = 0; i < typeParameterNames.length; i++) {
       if (buf.length() > 0) {
         buf.append(lineDelimiter).append(lineStart);

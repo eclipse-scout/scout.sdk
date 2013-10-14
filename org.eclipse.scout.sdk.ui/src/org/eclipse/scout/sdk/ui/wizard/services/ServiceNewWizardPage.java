@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -27,6 +26,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractT
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -130,10 +130,13 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    if (StringUtility.isNullOrEmpty(getTypeName()) || getTypeName().equals(getTypeNameSuffix())) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
+    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), getTypeNameSuffix());
+    if (javaFieldNameStatus.isOK()) {
+      if (TypeUtility.existsType(m_bundle.getPackageName(getTargetPackage()) + "." + getTypeName())) {
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      }
     }
-    return Status.OK_STATUS;
+    return javaFieldNameStatus;
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {

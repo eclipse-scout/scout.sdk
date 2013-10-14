@@ -52,6 +52,7 @@ public class PermissionNewOperation extends PrimaryTypeNewOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     addFieldSourceBuilder(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
+    constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super(\"" + getElementName().replaceAll(SdkProperties.SUFFIX_PERMISSION + "$", "") + "\");"));
     addMethodSourceBuilder(constructorBuilder);
     setPackageExportPolicy(ExportPolicy.AddPackage);

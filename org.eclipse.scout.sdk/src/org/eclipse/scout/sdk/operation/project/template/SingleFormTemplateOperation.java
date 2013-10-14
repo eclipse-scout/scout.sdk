@@ -33,6 +33,7 @@ import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceMethod;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
@@ -175,6 +176,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     IMethodSourceBuilder startHandlerMethodBuilder = new MethodSourceBuilder("start" + SdkProperties.TYPE_NAME_VIEW_HANDLER_PREFIX);
     startHandlerMethodBuilder.setFlags(Flags.AccPublic);
     startHandlerMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    startHandlerMethodBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override

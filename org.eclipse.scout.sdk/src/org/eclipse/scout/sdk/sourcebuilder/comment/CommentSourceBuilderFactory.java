@@ -120,7 +120,7 @@ public final class CommentSourceBuilderFactory {
     }
   }
 
-  public static final ICommentSourceBuilder createPreferencesFieldCommentBuilder() {
+  public static ICommentSourceBuilder createPreferencesFieldCommentBuilder() {
     if (javaElementCommentBuilderService != null) {
       return javaElementCommentBuilderService.createPreferencesFieldCommentBuilder();
     }

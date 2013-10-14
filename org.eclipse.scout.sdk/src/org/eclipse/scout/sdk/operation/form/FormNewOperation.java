@@ -95,6 +95,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
 
     // constructor
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
+    constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     constructorBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
@@ -192,6 +193,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     getterBuilder.setFlags(Flags.AccPublic);
     getterBuilder.setReturnTypeSignature(getFormIdSignature());
     getterBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation());
+    getterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodGetterCommentBuilder());
     getterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return " + fieldBuilder.getElementName() + ";"));
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(getterBuilder), getterBuilder);
 
@@ -201,6 +203,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     setterBuilder.setReturnTypeSignature(Signature.SIG_VOID);
     setterBuilder.setParameters(new MethodParameter[]{new MethodParameter(getPropertyName(propertyName, false), getFormIdSignature())});
     setterBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation());
+    setterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodSetterCommentBuilder());
     setterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(fieldBuilder.getElementName() + " = " + getPropertyName(propertyName, false) + ";"));
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(setterBuilder), setterBuilder);
   }

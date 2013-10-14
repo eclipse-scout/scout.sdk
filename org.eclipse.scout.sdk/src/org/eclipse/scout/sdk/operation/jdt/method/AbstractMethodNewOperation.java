@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompositeObject;
@@ -28,6 +29,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -84,17 +86,9 @@ public class AbstractMethodNewOperation implements IOperation {
     ICompilationUnit icu = getDeclaringType().getCompilationUnit();
     CompilationUnitImportValidator importValidator = new CompilationUnitImportValidator(icu);
     StringBuilder sourceBuilder = new StringBuilder();
-    m_sourceBuilder.createSource(sourceBuilder, ResourceUtility.getLineSeparator(icu), getDeclaringType().getJavaProject(), importValidator);
+    createSource(sourceBuilder, ResourceUtility.getLineSeparator(icu), getDeclaringType().getJavaProject(), importValidator);
     workingCopyManager.register(icu, monitor);
 
-//    char[] charArray = sourceBuilder.toString().toCharArray();
-//    int emptyCount = 0;
-//    for (int i = charArray.length; i > 0; i--) {
-//      if (String.valueOf(charArray[i - 1]).matches("\\s")) {
-//        emptyCount++;
-//      }
-//    }
-//    ScoutSdk.logInfo("create method:" + sourceBuilder.toString() + "\nEMPTY COUNT = " + emptyCount);
     setCreatedMethod(getDeclaringType().createMethod(sourceBuilder.toString(), getSibling(), true, monitor));
     importValidator.createImports(monitor);
     if (isFormatSource()) {
@@ -102,7 +96,10 @@ public class AbstractMethodNewOperation implements IOperation {
       formatOp.validate();
       formatOp.run(monitor, workingCopyManager);
     }
+  }
 
+  protected void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+    m_sourceBuilder.createSource(source, lineDelimiter, ownerProject, validator);
   }
 
   public IType getDeclaringType() {

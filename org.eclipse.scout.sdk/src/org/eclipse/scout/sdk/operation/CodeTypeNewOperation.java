@@ -73,7 +73,6 @@ public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
           source.append(ScoutUtility.getCommentBlock("Auto-generated value"));
         }
       }
-
     };
 
     if (StringUtility.isNullOrEmpty(getNextCodeId())) {
@@ -82,6 +81,7 @@ public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
     else {
       idFieldBuilder.setValue(getNextCodeId());
     }
+    idFieldBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesFieldCommentBuilder());
     idFieldBuilder.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     String[] typeArguments = Signature.getTypeArguments(getSuperTypeSignature());
     if (typeArguments.length > 0) {
@@ -93,6 +93,7 @@ public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
     addFieldSourceBuilder(idFieldBuilder);
     // constructor
     IMethodSourceBuilder constructorSourceBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
+    constructorSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     constructorSourceBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     constructorSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorSourceBuilder), constructorSourceBuilder);

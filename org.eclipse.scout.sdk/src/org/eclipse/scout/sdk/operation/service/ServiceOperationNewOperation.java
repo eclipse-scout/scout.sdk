@@ -12,16 +12,19 @@ package org.eclipse.scout.sdk.operation.service;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class ServiceOperationNewOperation implements IOperation {
@@ -30,27 +33,28 @@ public class ServiceOperationNewOperation implements IOperation {
   private ParameterArgument m_returnType;
   private String m_methodName;
   private IType m_serviceInterface;
-  private IType[] m_serviceImplementations;
+  private IType m_serviceImplementation;
+
   private IMethod m_createdImplementationMethod;
 
   @Override
   public String getOperationName() {
-    return "new Service Operation...";
+    return "New Service Operation...";
   }
 
   @Override
   public void validate() throws IllegalArgumentException {
     if (getServiceInterface() == null) {
-      throw new IllegalArgumentException("service interface can not be null.");
+      throw new IllegalArgumentException("service interface cannot be null.");
     }
-    if (getServiceImplementations() == null) {
-      throw new IllegalArgumentException("service implementations can not be null.");
+    if (getServiceImplementation() == null) {
+      throw new IllegalArgumentException("service implementations cannot be null.");
     }
     if (StringUtility.isNullOrEmpty(getMethodName())) {
-      throw new IllegalArgumentException("method name can not be null.");
+      throw new IllegalArgumentException("method name cannot be null.");
     }
     if (getReturnType() == null) {
-      throw new IllegalArgumentException("return parameter can not be null.");
+      throw new IllegalArgumentException("return parameter cannot be null.");
     }
 
   }
@@ -58,71 +62,55 @@ public class ServiceOperationNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
 
-    IImportValidator validator = new CompilationUnitImportValidator(m_serviceInterface.getCompilationUnit());
-
-    StringBuilder methodBody = new StringBuilder("public " + getReturnType().getType() + " " + getMethodName() + "(");
-    for (String s : getReturnType().getFullyQuallifiedImports()) {
-      validator.addImport(s);
+    ServiceMethod createMethod = new ServiceMethod(getMethodName(), getServiceInterface().getFullyQualifiedName());
+    for (ParameterArgument arg : getArguments()) {
+      createMethod.addParameter(new MethodParameter(arg.getName(), SignatureCache.createTypeSignature(arg.getType())));
     }
-    ParameterArgument[] arguments = getArguments();
-    if (arguments != null) {
-      for (int i = 0; i < arguments.length; i++) {
-        methodBody.append(arguments[i].getType() + " " + arguments[i].getName());
-        if (i < (arguments.length - 1)) {
-          methodBody.append(", ");
-        }
-        for (String imp : arguments[i].getFullyQuallifiedImports()) {
-          validator.addImport(imp);
-        }
-      }
-    }
-    methodBody.append(") throws " + validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException)));
-
-    // interface
-    workingCopyManager.register(m_serviceInterface.getCompilationUnit(), monitor);
-    IMethod method = m_serviceInterface.createMethod(methodBody.toString() + ";", null, false, monitor);
-    for (String imp : validator.getImportsToCreate()) {
-      m_serviceInterface.getCompilationUnit().createImport(imp, null, monitor);
-    }
-    // implementation
-    methodBody.insert(0, "@" + Override.class.getSimpleName() + "\n");
-    String defaultVal = ScoutUtility.getDefaultValueOf(method.getReturnType());
-    methodBody.append("{\n" + SdkProperties.TAB);
-    String body = createMethodBody(validator);
-    if (body == null) {
-      if (defaultVal != null) {
-        methodBody.append("return " + defaultVal + ";\n");
-      }
-      else {
-        methodBody.append("\n");
-      }
-    }
-    else {
-      methodBody.append(body);
-    }
-    methodBody.append("}");
-
-    // implementations
-    for (IType implType : getServiceImplementations()) {
-      IImportValidator impValidator = new CompilationUnitImportValidator(implType.getCompilationUnit());
-      for (String s : getReturnType().getFullyQuallifiedImports()) {
-        impValidator.addImport(s);
-      }
-      if (arguments != null) {
-        for (int i = 0; i < arguments.length; i++) {
-          for (String imp : arguments[i].getFullyQuallifiedImports()) {
-            impValidator.addImport(imp);
+    createMethod.setReturnTypeSignature(SignatureCache.createTypeSignature(getReturnType().getType()));
+    createMethod.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    createMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        createImports(validator);
+        String body = createMethodBody(validator);
+        source.append(ScoutUtility.getCommentBlock("business logic here.")).append(lineDelimiter);
+        if (body == null) {
+          String defaultVal = ScoutUtility.getDefaultValueOf(methodBuilder.getReturnTypeSignature());
+          if (defaultVal != null) {
+            source.append("return " + defaultVal + ";");
+          }
+          else {
+            source.append(lineDelimiter);
           }
         }
+        else {
+          source.append(body);
+        }
       }
+    });
 
-      workingCopyManager.register(implType.getCompilationUnit(), monitor);
-      IMethod createdImplementationMethod = implType.createMethod(methodBody.toString(), null, false, monitor);
-      setCreatedImplementationMethod(createdImplementationMethod);
-      for (String imp : impValidator.getImportsToCreate()) {
-        implType.getCompilationUnit().createImport(imp, null, monitor);
+    MethodNewOperation ifcMno = new MethodNewOperation(createMethod.getInterfaceSourceBuilder(), getServiceInterface(), true) {
+      @Override
+      protected void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        super.createSource(source, lineDelimiter, ownerProject, validator);
+        createImports(validator);
       }
-      implType.getCompilationUnit().createImport(RuntimeClasses.ProcessingException, null, monitor);
+    };
+    ifcMno.validate();
+    ifcMno.run(monitor, workingCopyManager);
+
+    MethodNewOperation svcMno = new MethodNewOperation(createMethod.getImplementationSourceBuilder(), getServiceImplementation(), true);
+    svcMno.validate();
+    svcMno.run(monitor, workingCopyManager);
+
+    setCreatedImplementationMethod(svcMno.getCreatedMethod());
+  }
+
+  protected void createImports(IImportValidator validator) {
+    for (ParameterArgument arg : getArguments()) {
+      for (String imp : arg.getFullyQuallifiedImports()) {
+        validator.getTypeName(SignatureCache.createTypeSignature(imp));
+      }
     }
   }
 
@@ -162,12 +150,12 @@ public class ServiceOperationNewOperation implements IOperation {
     m_serviceInterface = serviceInterface;
   }
 
-  public IType[] getServiceImplementations() {
-    return m_serviceImplementations;
+  public IType getServiceImplementation() {
+    return m_serviceImplementation;
   }
 
-  public void setServiceImplementations(IType[] serviceImplementations) {
-    m_serviceImplementations = serviceImplementations;
+  public void setServiceImplementation(IType serviceImplementation) {
+    m_serviceImplementation = serviceImplementation;
   }
 
   public IMethod getCreatedImplementationMethod() {

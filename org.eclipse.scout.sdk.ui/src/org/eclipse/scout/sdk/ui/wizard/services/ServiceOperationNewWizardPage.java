@@ -51,20 +51,17 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
   private ParameterArgument m_returnParameter;
   private ParameterArgument m_parameterArg1;
   private ParameterArgument m_parameterArg2;
-  private ParameterArgument m_parameterArg3;
-  private ParameterArgument m_parameterArg4;
-  private ParameterArgument m_parameterArg5;
 
   // local fields
-  private final IType[] m_serviceImplementations;
+  private final IType m_serviceImplementation;
   private final IType m_serviceInterface;
   private ParameterField m_parameterArg1Field;
   private ParameterField m_parameterArg2Field;
 
-  public ServiceOperationNewWizardPage(IType serviceInterface, IType[] serviceImplementations) {
+  public ServiceOperationNewWizardPage(IType serviceInterface, IType serviceImplementation) {
     super(ServiceOperationNewWizardPage.class.getName());
     m_serviceInterface = serviceInterface;
-    m_serviceImplementations = serviceImplementations;
+    m_serviceImplementation = serviceImplementation;
     setTitle(Texts.get("NewServiceOperationNoPopup"));
     setDescription(Texts.get("CreateANewServiceOperation"));
   }
@@ -133,19 +130,10 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
     if (m_parameterArg2 != null && !StringUtility.isNullOrEmpty(m_parameterArg2.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg2.getType())) {
       args.add(m_parameterArg2);
     }
-    if (m_parameterArg3 != null && !StringUtility.isNullOrEmpty(m_parameterArg3.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg3.getType())) {
-      args.add(m_parameterArg3);
-    }
-    if (m_parameterArg4 != null && !StringUtility.isNullOrEmpty(m_parameterArg4.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg4.getType())) {
-      args.add(m_parameterArg4);
-    }
-    if (m_parameterArg5 != null && !StringUtility.isNullOrEmpty(m_parameterArg5.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg5.getType())) {
-      args.add(m_parameterArg5);
-    }
     op.setArguments(args.toArray(new ParameterArgument[args.size()]));
     op.setMethodName(m_operationName);
     op.setReturnType(m_returnParameter);
-    op.setServiceImplementations(m_serviceImplementations);
+    op.setServiceImplementation(m_serviceImplementation);
     op.setServiceInterface(m_serviceInterface);
     op.run(monitor, manager);
     return true;
@@ -161,9 +149,6 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
     if (m_parameterArg2 != null) {
       multiStatus.add(getParameterStatus(m_parameterArg1, m_parameterArg2Field.getLabel()));
     }
-    // if(m_parameterArg3 != null){
-    // multiStatus.add(getParameterStatus(m_parameterArg1, m_parameterArg3Field.getLabel()));
-    // }
     super.validatePage(multiStatus);
   }
 

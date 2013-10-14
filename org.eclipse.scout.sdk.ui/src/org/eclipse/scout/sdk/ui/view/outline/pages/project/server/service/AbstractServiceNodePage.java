@@ -74,7 +74,7 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
     try {
       TreeMap<String, IMethod> interfaceMethodsMap = new TreeMap<String, IMethod>();
       if (TypeUtility.exists(getInterfaceType())) {
-        for (IMethod m : TypeUtility.getMethods(getInterfaceType(), MethodFilters.getFlagsFilter(Flags.AccPublic | Flags.AccDefault), MethodComparators.getNameComparator())) {
+        for (IMethod m : TypeUtility.getMethods(getInterfaceType())) {
           interfaceMethodsMap.put(SignatureUtility.getMethodIdentifier(m), m);
         }
       }

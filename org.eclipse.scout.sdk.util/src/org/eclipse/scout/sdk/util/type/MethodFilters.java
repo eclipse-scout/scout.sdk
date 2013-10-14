@@ -95,6 +95,13 @@ public final class MethodFilters {
     };
   }
 
+  /**
+   * Gets and creates a method filter that accepts all methods having ALL of the given flags
+   * 
+   * @param flags
+   *          The flags that each accepted method must have.
+   * @return
+   */
   public static IMethodFilter getFlagsFilter(final int flags) {
     return new IMethodFilter() {
       @Override

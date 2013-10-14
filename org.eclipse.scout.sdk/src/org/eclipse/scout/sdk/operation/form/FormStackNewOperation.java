@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
@@ -143,7 +144,7 @@ public class FormStackNewOperation extends FormNewOperation {
    * @param sourceBuilder
    * @throws CoreException
    */
-  private void createNewHandler(ITypeSourceBuilder formSourceBuilder) throws CoreException {
+  protected void createNewHandler(ITypeSourceBuilder formSourceBuilder) throws CoreException {
     ITypeSourceBuilder newHandlerBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_NEW_HANDLER);
     newHandlerBuilder.setFlags(Flags.AccPublic);
     newHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getJavaProject()));
@@ -199,6 +200,7 @@ public class FormStackNewOperation extends FormNewOperation {
     IMethodSourceBuilder startHandlerMethodBuilder = new MethodSourceBuilder("start" + SdkProperties.TYPE_NAME_NEW_HANDLER_PREFIX);
     startHandlerMethodBuilder.setFlags(Flags.AccPublic);
     startHandlerMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    startHandlerMethodBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
@@ -272,6 +274,7 @@ public class FormStackNewOperation extends FormNewOperation {
     IMethodSourceBuilder startHandlerMethodBuilder = new MethodSourceBuilder("start" + SdkProperties.TYPE_NAME_MODIFY_HANDLER_PREFIX);
     startHandlerMethodBuilder.setFlags(Flags.AccPublic);
     startHandlerMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    startHandlerMethodBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override

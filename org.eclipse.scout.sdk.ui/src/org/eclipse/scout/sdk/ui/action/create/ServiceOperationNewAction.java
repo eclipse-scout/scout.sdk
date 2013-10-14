@@ -38,6 +38,6 @@ public class ServiceOperationNewAction extends AbstractWizardAction {
 
   @Override
   protected IWizard getNewWizardInstance() {
-    return new ServiceOperationNewWizard(m_interfaceType, new IType[]{m_type});
+    return new ServiceOperationNewWizard(m_interfaceType, m_type);
   }
 }

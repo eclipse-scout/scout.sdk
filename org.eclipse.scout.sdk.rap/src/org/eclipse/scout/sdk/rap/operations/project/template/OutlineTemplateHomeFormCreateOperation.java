@@ -86,6 +86,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
 
     // constructor
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(homeFormOp.getElementName());
+    constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     constructorBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
     constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
     homeFormOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
@@ -148,6 +149,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     startViewBuilder.setReturnTypeSignature(Signature.SIG_VOID);
     startViewBuilder.setFlags(Flags.AccPublic);
     startViewBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
+    startViewBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     startViewBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {

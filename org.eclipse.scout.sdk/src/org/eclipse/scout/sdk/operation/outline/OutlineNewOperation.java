@@ -191,6 +191,7 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
 
     // constructor
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(className);
+    constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     constructorBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override

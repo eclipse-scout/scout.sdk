@@ -65,8 +65,7 @@ import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 public class TypeUtility {
 
   public static final String DEFAULT_SOURCE_FOLDER_NAME = "src";
-
-  private static final Pattern BEAN_METHOD_NAME = Pattern.compile("(get|set|is)([A-Z].*)");
+  public static final Pattern BEAN_METHOD_NAME = Pattern.compile("(get|set|is)([A-Z].*)");
 
   protected TypeUtility() {
   }

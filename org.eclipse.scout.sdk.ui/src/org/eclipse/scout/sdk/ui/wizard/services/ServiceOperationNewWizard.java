@@ -16,9 +16,9 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 
 public class ServiceOperationNewWizard extends AbstractWorkspaceWizard {
 
-  public ServiceOperationNewWizard(IType serviceInterface, IType[] serviceImpls) {
+  public ServiceOperationNewWizard(IType serviceInterface, IType serviceImpl) {
     setWindowTitle(Texts.get("NewServiceOperationNoPopup"));
-    ServiceOperationNewWizardPage page1 = new ServiceOperationNewWizardPage(serviceInterface, serviceImpls);
+    ServiceOperationNewWizardPage page1 = new ServiceOperationNewWizardPage(serviceInterface, serviceImpl);
     addPage(page1);
   }
 

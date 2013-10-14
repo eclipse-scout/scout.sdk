@@ -162,7 +162,7 @@ public class JavaCodeField extends Composite {
             }
           }
           else {
-            // textlayout unknown
+            // text layout unknown
             range.setType(JavaCodeRange.UNKNOWN);
           }
         }

@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -31,7 +32,6 @@ public class InnerTypeGetterCreateOperation extends MethodNewOperation {
 
   public InnerTypeGetterCreateOperation(IType field, IType getterDeclaringType) throws JavaModelException {
     this(field, getterDeclaringType, false);
-
   }
 
   public InnerTypeGetterCreateOperation(IType field, IType getterDeclaringType, boolean formatSource) throws JavaModelException {
@@ -39,6 +39,7 @@ public class InnerTypeGetterCreateOperation extends MethodNewOperation {
     m_field = field;
     setFlags(Flags.AccPublic);
     setReturnTypeSignature(SignatureCache.createTypeSignature(m_field.getFullyQualifiedName()));
+    setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodGetterCommentBuilder());
     setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override

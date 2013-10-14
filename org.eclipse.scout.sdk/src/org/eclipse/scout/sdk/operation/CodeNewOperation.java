@@ -33,6 +33,7 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
@@ -177,6 +178,7 @@ public class CodeNewOperation implements IOperation {
     };
     idFieldBuilder.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
     idFieldBuilder.setSignature(idSignature);
+    idFieldBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesFieldCommentBuilder());
     String nextCodeId = getNextCodeId();
     if (StringUtility.isNullOrEmpty(nextCodeId)) {
       idFieldBuilder.setValue("null");

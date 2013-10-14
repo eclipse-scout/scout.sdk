@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
@@ -53,6 +54,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     IMethodSourceBuilder interfaceGetItemsBuilder = new MethodSourceBuilder("getItems");
     interfaceGetItemsBuilder.setFlags(Flags.AccInterface);
     interfaceGetItemsBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem + "[]"));
+    interfaceGetItemsBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     interfaceGetItemsBuilder.addParameter(new MethodParameter("minDate", SignatureCache.createTypeSignature(Date.class.getName())));
     interfaceGetItemsBuilder.addParameter(new MethodParameter("maxDate", SignatureCache.createTypeSignature(Date.class.getName())));
     interfaceGetItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
@@ -61,6 +63,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     IMethodSourceBuilder interfaceStoreItemsBuilder = new MethodSourceBuilder("storeItems");
     interfaceStoreItemsBuilder.setFlags(Flags.AccInterface);
     interfaceStoreItemsBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    interfaceStoreItemsBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     interfaceStoreItemsBuilder.addParameter(new MethodParameter("items", SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem + "[]")));
     interfaceStoreItemsBuilder.addParameter(new MethodParameter("delta", Signature.SIG_BOOLEAN));
     interfaceStoreItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
@@ -87,6 +90,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     IMethodSourceBuilder implementationStoreItemsBuilder = new MethodSourceBuilder("storeItems");
     implementationStoreItemsBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
     implementationStoreItemsBuilder.setFlags(Flags.AccPublic);
+    implementationStoreItemsBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodOverrideComment(getInterfacePackageName() + "." + getInterfaceName()));
     implementationStoreItemsBuilder.setReturnTypeSignature(Signature.SIG_VOID);
     implementationStoreItemsBuilder.addParameter(new MethodParameter("items", SignatureCache.createTypeSignature(RuntimeClasses.ICalendarItem + "[]")));
     implementationStoreItemsBuilder.addParameter(new MethodParameter("delta", Signature.SIG_BOOLEAN));

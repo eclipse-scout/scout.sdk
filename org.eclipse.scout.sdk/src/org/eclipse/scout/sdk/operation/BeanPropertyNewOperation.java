@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.jdt.field.FieldNewOperation;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -129,6 +130,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
       getterOp.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return " + memberName + ";"));
       getterOp.setReturnTypeSignature(getBeanTypeSignature());
       getterOp.setFlags(Flags.AccPublic);
+      getterOp.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodGetterCommentBuilder());
       if (m_createFormDataAnnotation) {
         getterOp.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation());
       }
@@ -161,6 +163,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
       setterOp.setReturnTypeSignature(Signature.SIG_VOID);
       setterOp.setFlags(Flags.AccPublic);
       setterOp.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(content));
+      setterOp.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodSetterCommentBuilder());
       setterOp.addParameter(new MethodParameter(parameterName, getBeanTypeSignature()));
       if (m_createFormDataAnnotation) {
         setterOp.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation());

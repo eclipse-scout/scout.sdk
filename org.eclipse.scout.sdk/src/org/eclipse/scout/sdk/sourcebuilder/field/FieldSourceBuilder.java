@@ -51,7 +51,7 @@ public class FieldSourceBuilder extends AbstractAnnotatableSourceBuilder impleme
     source.append(Flags.toString(getFlags())).append(" ");
     // field type
     source.append(SignatureUtility.getTypeReference(getSignature(), validator) + " ");
-    source.append(getElementName()).append(" ");
+    source.append(getElementName());
     // init value
     createInitValue(source, lineDelimiter, ownerProject, validator);
     source.append(";");

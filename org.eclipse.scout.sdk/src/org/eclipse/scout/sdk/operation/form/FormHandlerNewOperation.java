@@ -113,6 +113,7 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
       else {
         MethodNewOperation startMethodOp = new MethodNewOperation(startMethodName, form);
         startMethodOp.setFlags(Flags.AccPublic);
+        startMethodOp.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
         startMethodOp.setSibling(sibling);
         startMethodOp.setReturnTypeSignature(Signature.SIG_VOID);
         startMethodOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
