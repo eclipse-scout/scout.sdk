@@ -54,7 +54,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * In case the service implementation bundle is not set no service implementation will be created nor any service
  * registrations added.<br>
  * In case the service interface bundle is null no service proxy registrations will be created.
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 03.02.2010
  */
@@ -114,7 +114,7 @@ public class ServiceNewOperation implements IOperation {
     if (getInterfaceProject() != null) {
       // create interface
       List<String> interfaceSignatures = getInterfaceSourceBuilder().getInterfaceSignatures();
-      String service2Signature = SignatureCache.createTypeSignature(RuntimeClasses.IService2);
+      String service2Signature = SignatureCache.createTypeSignature(RuntimeClasses.IService);
       if (interfaceSignatures.isEmpty()) {
         interfaceSignatures.add(service2Signature);
       }
@@ -137,7 +137,7 @@ public class ServiceNewOperation implements IOperation {
         getImplementationSourceBuilder().addInterfaceSignature(SignatureCache.createTypeSignature(getCreatedServiceInterface().getFullyQualifiedName()));
       }
       if (StringUtility.isNullOrEmpty(getImplementationSourceBuilder().getSuperTypeSignature())) {
-        getImplementationSourceBuilder().setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getImplementationProject()));
+        getImplementationSourceBuilder().setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getImplementationProject()));
       }
       PrimaryTypeNewOperation implementationOp = new PrimaryTypeNewOperation(getImplementationSourceBuilder(), getImplementationPackageName(), getImplementationProject());
       implementationOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());

@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link RuntimeClasses}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.01.2009
  */
@@ -178,7 +178,6 @@ public interface IRuntimeClasses {
   String ISequenceBox = "org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox"; // NO_UCD
   String IServerSession = "org.eclipse.scout.rt.server.IServerSession"; // NO_UCD
   String IService = "org.eclipse.scout.service.IService"; // NO_UCD
-  String IService2 = "org.eclipse.scout.service.IService2"; // NO_UCD
   String ISmartField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField"; // NO_UCD
   String ISMTPService = "org.eclipse.scout.rt.server.services.common.smtp.ISMTPService"; // NO_UCD
   String ISplitBox = "org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox"; // NO_UCD

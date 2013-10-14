@@ -26,7 +26,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link ServiceNewOperationTest}</h3> ...
- * 
+ *
  * @author aho
  * @since 3.8.0 14.03.2013
  */
@@ -39,7 +39,7 @@ public class ServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
     serviceOp.setImplementationPackageName("sample.server.services.test.output");
     serviceOp.setInterfaceProject(getSharedJavaProject());
     serviceOp.setInterfacePackageName("sample.shared.services.test.output");
-    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServerJavaProject()));
+    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServerJavaProject()));
 
     executeBuildAssertNoCompileErrors(serviceOp);
     SdkAssert.assertExist(serviceOp.getCreatedServiceInterface());
@@ -52,7 +52,7 @@ public class ServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
     ServiceNewOperation serviceOp = new ServiceNewOperation(null, "TestService02");
     serviceOp.setImplementationProject(getServerJavaProject());
     serviceOp.setImplementationPackageName("sample.server.services.test.output");
-    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServerJavaProject()));
+    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServerJavaProject()));
     executeBuildAssertNoCompileErrors(serviceOp);
     SdkAssert.assertNotExist(serviceOp.getCreatedServiceInterface());
     SdkAssert.assertExist(serviceOp.getCreatedServiceImplementation());
@@ -67,7 +67,7 @@ public class ServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
     serviceOp.setInterfaceProject(getSharedJavaProject());
     serviceOp.setInterfacePackageName("sample.shared.services.test.output");
     serviceOp.addProxyRegistrationProject(getClientJavaProject());
-    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServerJavaProject()));
+    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServerJavaProject()));
 
     executeBuildAssertNoCompileErrors(serviceOp);
     IType serviceInterface = serviceOp.getCreatedServiceInterface();
@@ -87,7 +87,7 @@ public class ServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
     serviceOp.setImplementationPackageName("sample.server.services.test.output");
     serviceOp.setInterfaceProject(getSharedJavaProject());
     serviceOp.setInterfacePackageName("sample.shared.services.test.output");
-    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServerJavaProject()));
+    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServerJavaProject()));
 
     String methodName = "doStuff";
     ServiceMethod method = new ServiceMethod(methodName, serviceOp.getInterfacePackageName() + "." + serviceOp.getInterfaceName());

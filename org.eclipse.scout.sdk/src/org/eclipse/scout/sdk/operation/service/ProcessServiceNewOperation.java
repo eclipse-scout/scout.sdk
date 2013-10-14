@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link ProcessServiceNewOperation}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 10.02.2010
  */
@@ -63,7 +63,7 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
 
   public ProcessServiceNewOperation(String interfaceName, String implementationName) {
     super(interfaceName, implementationName);
-    getInterfaceSourceBuilder().addInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
+    getInterfaceSourceBuilder().addInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
     getInterfaceSourceBuilder().addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createValidationStrategyProcess());
   }
 

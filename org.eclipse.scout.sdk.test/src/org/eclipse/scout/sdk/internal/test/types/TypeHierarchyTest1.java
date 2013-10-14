@@ -125,7 +125,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     serviceOp.addServiceRegistrationProject(serverBundle.getJavaProject());
     serviceOp.setImplementationProject(serverBundle.getJavaProject());
     serviceOp.setInterfaceProject(sharedBundle.getJavaProject());
-    serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
+    serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
     serviceOp.setInterfacePackageName(sharedBundle.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES) + ".notexisting");
     serviceOp.setImplementationPackageName(serverBundle.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES) + ".notexisting");
     serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, serverBundle.getJavaProject()));

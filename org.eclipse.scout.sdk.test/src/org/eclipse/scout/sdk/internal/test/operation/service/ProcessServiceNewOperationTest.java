@@ -20,7 +20,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link ProcessServiceNewOperationTest}</h3> ...
- * 
+ *
  * @author aho
  * @since 3.8.0 14.03.2013
  */
@@ -33,7 +33,7 @@ public class ProcessServiceNewOperationTest extends AbstractSdkTestWithSamplePro
     serviceOp.setImplementationPackageName("sample.server.services.test.output");
     serviceOp.setInterfaceProject(getSharedJavaProject());
     serviceOp.setInterfacePackageName("sample.shared.services.test.output");
-    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService2, getServerJavaProject()));
+    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getServerJavaProject()));
     serviceOp.setFormData(TypeUtility.getType("sample.shared.form.data.TestFormData"));
     serviceOp.setPermissionsEntityName("Test01");
     serviceOp.setPermissionsProject(getSharedJavaProject());

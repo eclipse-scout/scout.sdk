@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 
 /**
  * <h3>{@link OutlineTemplateOperation}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011
  */
@@ -137,7 +137,7 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         outlineServiceOp.setImplementationProject(server.getJavaProject());
         outlineServiceOp.setInterfaceProject(shared.getJavaProject());
         outlineServiceOp.setInterfacePackageName(shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES));
-        outlineServiceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService2));
+        outlineServiceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
         outlineServiceOp.setImplementationPackageName(server.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES));
         outlineServiceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, server.getJavaProject()));
         outlineServiceOp.run(monitor, workingCopyManager);
