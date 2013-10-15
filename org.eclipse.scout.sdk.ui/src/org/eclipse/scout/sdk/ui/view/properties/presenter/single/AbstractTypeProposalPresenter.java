@@ -36,8 +36,6 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
   @Override
   protected IType parseInput(String input) throws CoreException {
     return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-//    IType referedType = PropertyMethodSourceUtility.parseReturnParameterClass(input, getMethod().peekMethod());
-//    return referedType;
   }
 
   @Override
@@ -52,28 +50,5 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
     catch (Exception e) {
       ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-
-//    IOperation op = null;
-//    if (UiUtility.equals(getDefaultValue(), value)) {
-//      if (getMethod().isImplemented()) {
-//        op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-//      }
-//    }
-//    else {
-//      op = new ConfigPropertyMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName()) {
-//        @Override
-//        protected void createMethodBody(IMethod methodToOverride, StringBuilder sourceBuilder, String lineDelimiter, IImportValidator validator) throws JavaModelException {
-//          sourceBuilder.append("  return ");
-//          if (value != null) {
-//            sourceBuilder.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(value.getFullyQualifiedName()), validator)).append(".class;");
-//          }
-//          else {
-//            sourceBuilder.append("null;");
-//          }
-//        }
-//      };
-//      ((ConfigPropertyMethodUpdateOperation) op).setFormatSource(true);
-//    }
-//    new OperationJob(op).schedule();
   }
 }

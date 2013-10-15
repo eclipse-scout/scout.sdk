@@ -95,6 +95,11 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
 
   protected void runImpl(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     IType derivedType = ensureDerivedType();
+    if (getModelType().equals(derivedType)) {
+      ScoutSdk.logError("DTO Auto Update cannot be performed when the DTO annotation points to itself.");
+      return;
+    }
+
     if (TypeUtility.exists(derivedType)) {
       String oldSource = derivedType.getCompilationUnit().getSource();
       String newSource = createDerivedTypeSource(monitor);

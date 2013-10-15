@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
@@ -69,24 +69,17 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
   }
 
   @Override
-  protected String getTableRowDataSuperClassSignature(IType table, ITypeHierarchy fieldHierarchy) {
-    try {
-      IType parentTable = fieldHierarchy.getSuperclass(table);
-      if (TypeUtility.exists(parentTable)) {
-        IType declaringType = parentTable.getDeclaringType();
-        if (TypeUtility.exists(declaringType)) {
-          IType formDataType = ScoutTypeUtility.getFormDataType(declaringType, fieldHierarchy);
-          String parentTableRowBeanName = getTableRowBeanName(parentTable);
-
-          IType parentTableBeanData = formDataType.getType(parentTableRowBeanName);
-          if (TypeUtility.exists(parentTableBeanData)) {
-            return SignatureCache.createTypeSignature(parentTableBeanData.getFullyQualifiedName());
-          }
+  protected String getTableRowDataSuperClassSignature(IType table, ITypeHierarchy fieldHierarchy) throws CoreException {
+    IType parentTable = fieldHierarchy.getSuperclass(table);
+    if (TypeUtility.exists(parentTable)) {
+      IType declaringType = parentTable.getDeclaringType();
+      if (TypeUtility.exists(declaringType)) {
+        IType formDataType = ScoutTypeUtility.getFormDataType(declaringType, fieldHierarchy);
+        IType parentTableBeanData = getTableRowDataType(formDataType);
+        if (TypeUtility.exists(parentTableBeanData)) {
+          return SignatureCache.createTypeSignature(parentTableBeanData.getFullyQualifiedName());
         }
       }
-    }
-    catch (JavaModelException e) {
-      ScoutSdk.logWarning("error while computing super class signature for [" + table + "]", e);
     }
     return SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableRowData);
   }

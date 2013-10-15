@@ -650,7 +650,6 @@ public final class ScoutUtility {
   }
 
   public static String removeFieldSuffix(String fieldName) {
-
     if (fieldName.endsWith(SdkProperties.SUFFIX_FORM_FIELD)) {
       fieldName = fieldName.replaceAll(SdkProperties.SUFFIX_FORM_FIELD + "$", "");
     }
@@ -659,6 +658,9 @@ public final class ScoutUtility {
     }
     else if (fieldName.endsWith(SdkProperties.SUFFIX_TABLE_COLUMN)) {
       fieldName = fieldName.replaceAll(SdkProperties.SUFFIX_TABLE_COLUMN + "$", "");
+    }
+    else if (fieldName.endsWith(SdkProperties.SUFFIX_OUTLINE_PAGE)) {
+      fieldName = fieldName.replaceAll(SdkProperties.SUFFIX_OUTLINE_PAGE + "$", "");
     }
     return fieldName;
   }

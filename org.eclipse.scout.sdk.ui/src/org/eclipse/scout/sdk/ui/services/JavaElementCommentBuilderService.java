@@ -15,9 +15,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Matcher;
 
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.preferences.DefaultScope;
+import org.eclipse.core.runtime.preferences.IEclipsePreferences;
+import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
@@ -27,6 +32,7 @@ import org.eclipse.jdt.internal.corext.util.Strings;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.JavaUIStatus;
 import org.eclipse.jdt.internal.ui.viewsupport.ProjectTemplateStore;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jdt.ui.PreferenceConstants;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
@@ -76,7 +82,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
       if (!(sourceBuilder instanceof ICompilationUnitSourceBuilder)) {
         throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create an compilation unit comment the source builder must be an instance of 'ICompilationUnitSourceBuilder'."));
       }
-      if (!isAutomaticallyAddComments()) {
+      if (!isAutomaticallyAddComments(ownerProject)) {
         return;
       }
       ICompilationUnitSourceBuilder icuSourceBuilder = (ICompilationUnitSourceBuilder) sourceBuilder;
@@ -101,7 +107,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
       if (!(sourceBuilder instanceof ITypeSourceBuilder)) {
         throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create a type comment the source builder must be an instance of 'ITypeSourceBuilder'."));
       }
-      if (!isAutomaticallyAddComments()) {
+      if (!isAutomaticallyAddComments(ownerProject)) {
         return;
       }
       ITypeSourceBuilder typeSourceBuilder = (ITypeSourceBuilder) sourceBuilder;
@@ -167,7 +173,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
       if (!(sourceBuilder instanceof IFieldSourceBuilder)) {
         throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create an field comment the source builder must be an instance of 'IFieldSourceBuilder'."));
       }
-      if (!isAutomaticallyAddComments()) {
+      if (!isAutomaticallyAddComments(ownerProject)) {
         return;
       }
       IFieldSourceBuilder fieldSourceBuilder = (IFieldSourceBuilder) sourceBuilder;
@@ -200,7 +206,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         if (!(sourceBuilder instanceof IMethodSourceBuilder)) {
           throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create an compilation unit comment the source builder must be an instance of 'ICompilationUnitSourceBuilder'."));
         }
-        if (!isAutomaticallyAddComments()) {
+        if (!isAutomaticallyAddComments(ownerProject)) {
           return;
         }
         IMethodSourceBuilder methodSourceBuilder = (IMethodSourceBuilder) sourceBuilder;
@@ -242,7 +248,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
         if (!(sourceBuilder instanceof IMethodSourceBuilder)) {
           throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "to create a method comment the source builder must be an instance of 'IMethodSourceBuilder'."));
         }
-        if (!isAutomaticallyAddComments()) {
+        if (!isAutomaticallyAddComments(ownerProject)) {
           return;
         }
         IMethodSourceBuilder methodSourceBuilder = (IMethodSourceBuilder) sourceBuilder;
@@ -386,8 +392,18 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     return FIELD_COMMENT_SOURCE_BUILDER;
   }
 
-  private static boolean isAutomaticallyAddComments() {
-    return JavaPlugin.getDefault().getPreferenceStore().getBoolean(PreferenceConstants.CODEGEN_ADD_COMMENTS);
+  private static boolean isAutomaticallyAddComments(IJavaProject jp) {
+    IScopeContext[] contexts = new IScopeContext[]{new ProjectScope(jp.getProject()), InstanceScope.INSTANCE, DefaultScope.INSTANCE};
+    for (IScopeContext context : contexts) {
+      IEclipsePreferences node = context.getNode(JavaUI.ID_PLUGIN);
+      if (node != null) {
+        String val = node.get(PreferenceConstants.CODEGEN_ADD_COMMENTS, null);
+        if (val != null) {
+          return "true".equals(val);
+        }
+      }
+    }
+    return true;
   }
 
   @SuppressWarnings("unchecked")

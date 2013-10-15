@@ -15,10 +15,8 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -42,6 +40,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
  * <h3>{@link AbstractTableBeanSourceBuilder}</h3>
@@ -79,29 +78,28 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
 
   protected void visitTableBean(IType table, ITypeHierarchy fieldHierarchy) throws CoreException {
     final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn), fieldHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
-//    final String[] colunmSignatures = new String[columns.length];
-    String tableRowDataName = getElementName();
-    tableRowDataName = tableRowDataName.replaceAll("(FieldData|Data)$", "");
-    tableRowDataName = tableRowDataName + "RowData";
-    ITypeSourceBuilder tableRowDataBuilder = new TypeSourceBuilder(tableRowDataName);
+
+    String rowDataName = ScoutUtility.removeFieldSuffix(table.getDeclaringType().getElementName()) + "RowData";
+    ITypeSourceBuilder tableRowDataBuilder = new TypeSourceBuilder(rowDataName);
+
     // flags
     int flags = Flags.AccPublic | Flags.AccStatic;
-    try {
-      if (Flags.isAbstract(table.getFlags())) {
-        flags |= Flags.AccAbstract;
-      }
-    }
-    catch (JavaModelException e) {
-      ScoutSdk.logWarning("could not determ abstract flag of '" + table.getFullyQualifiedName() + "'.", e);
+    boolean isAbstract = Flags.isAbstract(table.getFlags()) || Flags.isAbstract(table.getDeclaringType().getFlags());
+    if (isAbstract) {
+      flags |= Flags.AccAbstract;
     }
     tableRowDataBuilder.setFlags(flags);
-    tableRowDataBuilder.setSuperTypeSignature(getTableRowDataSuperClassSignature(table, fieldHierarchy));//SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableRowData));
+    tableRowDataBuilder.setSuperTypeSignature(getTableRowDataSuperClassSignature(table, fieldHierarchy));
+
+    // serialVersionUidBuilder
     IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
     tableRowDataBuilder.addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
-    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(tableRowDataName);
-    tableRowDataBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
-    // visit columns
 
+    // constructor
+    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(rowDataName);
+    tableRowDataBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+
+    // visit columns
     for (int i = 0; i < columns.length; i++) {
       IType column = columns[i];
       if (ScoutTypeUtility.existsReplaceAnnotation(column)) {
@@ -143,7 +141,6 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     IMethodSourceBuilder getRowsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getRows");
     getRowsMethodBuilder.setReturnTypeSignature(Signature.createArraySignature(tableRowSignature, 1));
     getRowsMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append("return (").append(SignatureUtility.getTypeReference(Signature.createArraySignature(tableRowSignature, 1), validator)).append(") super.getRows();");
@@ -157,7 +154,6 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     setRowsMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
     setRowsMethodBuilder.addParameter(new MethodParameter("rows", Signature.createArraySignature(tableRowSignature, 1)));
     setRowsMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append("super.setRows(rows);");
@@ -168,7 +164,6 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     // addRow
     final String addRowMethodName = "addRow";
     IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "addRow", new IMethodFilter() {
-
       @Override
       public boolean accept(IMethod candidate) throws CoreException {
         if (addRowMethodName.equals(candidate.getElementName())) {
@@ -179,7 +174,6 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     });
     addRowMethodBuilder.setReturnTypeSignature(tableRowSignature);
     addRowMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append("return (").append(SignatureUtility.getTypeReference(tableRowSignature, validator)).append(") super.addRow();");
@@ -189,7 +183,6 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
 
     // addRow(int state)
     IMethodSourceBuilder addRowWithStateMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "addRow", new IMethodFilter() {
-
       @Override
       public boolean accept(IMethod candidate) throws CoreException {
         if (addRowMethodName.equals(candidate.getElementName())) {
@@ -200,7 +193,6 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     });
     addRowWithStateMethodBuilder.setReturnTypeSignature(tableRowSignature);
     addRowWithStateMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append("return (").append(SignatureUtility.getTypeReference(tableRowSignature, validator)).append(") super.addRow(");
@@ -213,10 +205,8 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     IMethodSourceBuilder rowAtMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "rowAt");
     rowAtMethodBuilder.setReturnTypeSignature(tableRowSignature);
     rowAtMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-
         source.append("return (").append(SignatureUtility.getTypeReference(tableRowSignature, validator)).append(") super.rowAt(").append(methodBuilder.getParameters().get(0).getName()).append(");");
       }
     });
@@ -225,22 +215,24 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     // createRow
     IMethodSourceBuilder createRowMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "createRow");
     createRowMethodBuilder.setReturnTypeSignature(tableRowSignature);
-    createRowMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
-      @Override
-      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("return new ").append(SignatureUtility.getTypeReference(tableRowSignature, validator)).append("();");
-      }
-    });
+    if (isAbstract) {
+      createRowMethodBuilder.setFlags(createRowMethodBuilder.getFlags() | Flags.AccAbstract);
+    }
+    else {
+      createRowMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          source.append("return new ").append(SignatureUtility.getTypeReference(tableRowSignature, validator)).append("();");
+        }
+      });
+    }
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(createRowMethodBuilder), createRowMethodBuilder);
 
     // getRowType
     IMethodSourceBuilder getRowTypeMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getRowType");
     getRowTypeMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-
         source.append("return ").append(SignatureUtility.getTypeReference(tableRowSignature, validator)).append(".class;");
       }
     });
@@ -251,17 +243,23 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
    * @param table
    * @param fieldHierarchy
    * @return
+   * @throws CoreException
    */
-  protected abstract String getTableRowDataSuperClassSignature(IType table, ITypeHierarchy fieldHierarchy);
+  protected abstract String getTableRowDataSuperClassSignature(IType table, ITypeHierarchy fieldHierarchy) throws CoreException;
 
-  protected String getTableRowBeanName(IType table) {
-    String tableRowBeanName = table.getElementName();
-    if (TypeUtility.getType(IRuntimeClasses.ITable).equals(table) || "table".equalsIgnoreCase(tableRowBeanName)) {
-      // use table fields name
-      tableRowBeanName = ScoutUtility.removeFieldSuffix(table.getDeclaringType().getElementName());
-    }
-    tableRowBeanName = tableRowBeanName + "RowData";
-    return tableRowBeanName;
+  /**
+   * Gets the row data type that is used within the given table data.
+   * 
+   * @param tableData
+   *          the table data that contains the row data.
+   * @return the type that is referenced in the
+   *         org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData#getRowType() method of
+   *         the given table data.
+   * @throws CoreException
+   */
+  protected IType getTableRowDataType(IType tableData) throws CoreException {
+    IMethod getRowTypeMethod = ScoutTypeUtility.getMethod(tableData, "getRowType");
+    return PropertyMethodSourceUtility.parseReturnParameterClass(PropertyMethodSourceUtility.getMethodReturnValue(getRowTypeMethod), getRowTypeMethod);
   }
 
   protected void addAbstractMethodImplementations() throws CoreException {

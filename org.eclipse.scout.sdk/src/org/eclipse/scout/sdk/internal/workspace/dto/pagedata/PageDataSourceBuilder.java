@@ -12,9 +12,7 @@ package org.eclipse.scout.sdk.internal.workspace.dto.pagedata;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -44,26 +42,20 @@ public class PageDataSourceBuilder extends AbstractTableBeanSourceBuilder {
   }
 
   @Override
-  protected String getTableRowDataSuperClassSignature(IType table, ITypeHierarchy fieldHierarchy) {
-    try {
-      IType parentTable = fieldHierarchy.getSuperclass(table);
-      if (TypeUtility.exists(parentTable)) {
-        IType declaringType = parentTable.getDeclaringType();
-        if (TypeUtility.exists(declaringType)) {
-          PageDataAnnotation pageDataAnnotation = ScoutTypeUtility.findPageDataAnnotation(declaringType, fieldHierarchy);
-          if (pageDataAnnotation != null) {
-            IType superPageDataType = ScoutTypeUtility.getTypeBySignature(pageDataAnnotation.getPageDataTypeSignature());
-            String superTableRowBeanName = getTableRowBeanName(parentTable);
-            IType superTableBeanData = superPageDataType.getType(superTableRowBeanName);
-            if (TypeUtility.exists(superTableBeanData)) {
-              return SignatureCache.createTypeSignature(superTableBeanData.getFullyQualifiedName());
-            }
+  protected String getTableRowDataSuperClassSignature(IType table, ITypeHierarchy fieldHierarchy) throws CoreException {
+    IType parentTable = fieldHierarchy.getSuperclass(table);
+    if (TypeUtility.exists(parentTable)) {
+      IType declaringType = parentTable.getDeclaringType();
+      if (TypeUtility.exists(declaringType)) {
+        PageDataAnnotation pageDataAnnotation = ScoutTypeUtility.findPageDataAnnotation(declaringType, fieldHierarchy);
+        if (pageDataAnnotation != null) {
+          IType superPageDataType = ScoutTypeUtility.getTypeBySignature(pageDataAnnotation.getPageDataTypeSignature());
+          IType superTableBeanData = getTableRowDataType(superPageDataType);
+          if (TypeUtility.exists(superTableBeanData)) {
+            return SignatureCache.createTypeSignature(superTableBeanData.getFullyQualifiedName());
           }
         }
       }
-    }
-    catch (JavaModelException e) {
-      ScoutSdk.logWarning("error while computing super class signature for [" + table + "]", e);
     }
     return SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableRowData);
   }
