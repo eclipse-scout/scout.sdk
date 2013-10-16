@@ -42,7 +42,6 @@ public class BaseTablePage extends AbstractPageWithTable<BaseTablePage.Table> {
 
     @Order(10)
     public class FirstColumn extends AbstractStringColumn {
-
     }
 
     @Order(20)

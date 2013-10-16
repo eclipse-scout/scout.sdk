@@ -1,21 +1,29 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package formdata.shared.services.process;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
+/**
+ * <b>NOTE:</b><br>
+ * This class is auto generated, no manual modifications recommended.
+ * 
+ * @generated
+ */
 public abstract class AbstractPersonTableFieldData extends AbstractTableFieldBeanData {
+
   private static final long serialVersionUID = 1L;
 
   public AbstractPersonTableFieldData() {
-  }
-
-  @Override
-  public AbstractPersonTableRowData[] getRows() {
-    return (AbstractPersonTableRowData[]) super.getRows();
-  }
-
-  public void setRows(AbstractPersonTableRowData[] rows) {
-    super.setRows(rows);
   }
 
   @Override
@@ -29,26 +37,30 @@ public abstract class AbstractPersonTableFieldData extends AbstractTableFieldBea
   }
 
   @Override
-  public AbstractPersonTableRowData rowAt(int idx) {
-    return (AbstractPersonTableRowData) super.rowAt(idx);
-  }
-
-  @Override
-  public AbstractPersonTableRowData createRow() {
-    return new AbstractPersonTableRowData();
-  }
+  public abstract AbstractPersonTableRowData createRow();
 
   @Override
   public Class<? extends AbstractTableRowData> getRowType() {
     return AbstractPersonTableRowData.class;
   }
 
-  public static class AbstractPersonTableRowData extends AbstractTableRowData {
+  @Override
+  public AbstractPersonTableRowData[] getRows() {
+    return (AbstractPersonTableRowData[]) super.getRows();
+  }
+
+  @Override
+  public AbstractPersonTableRowData rowAt(int index) {
+    return (AbstractPersonTableRowData) super.rowAt(index);
+  }
+
+  public void setRows(AbstractPersonTableRowData[] rows) {
+    super.setRows(rows);
+  }
+
+  public static abstract class AbstractPersonTableRowData extends AbstractTableRowData {
+
     private static final long serialVersionUID = 1L;
-
-    public AbstractPersonTableRowData() {
-    }
-
     public static final String personId = "personId";
     public static final String name = "name";
     public static final String female = "female";
@@ -58,9 +70,12 @@ public abstract class AbstractPersonTableFieldData extends AbstractTableFieldBea
     private String m_personId;
     private String m_name;
     private Boolean m_female;
-    private Boolean m_booleanValue;
-    private Boolean m_assertValue;
-    private Boolean m_switchValue;
+    private Boolean m_boolean;
+    private Boolean m_assert;
+    private Boolean m_switch;
+
+    public AbstractPersonTableRowData() {
+    }
 
     public String getPersonId() {
       return m_personId;
@@ -87,27 +102,27 @@ public abstract class AbstractPersonTableFieldData extends AbstractTableFieldBea
     }
 
     public Boolean getBoolean() {
-      return m_booleanValue;
+      return m_boolean;
     }
 
     public void setBoolean(Boolean booleanValue) {
-      m_booleanValue = booleanValue;
+      m_boolean = booleanValue;
     }
 
     public Boolean getAssert() {
-      return m_assertValue;
+      return m_assert;
     }
 
     public void setAssert(Boolean assertValue) {
-      m_assertValue = assertValue;
+      m_assert = assertValue;
     }
 
     public Boolean getSwitch() {
-      return m_switchValue;
+      return m_switch;
     }
 
     public void setSwitch(Boolean switchValue) {
-      m_switchValue = switchValue;
+      m_switch = switchValue;
     }
   }
 }

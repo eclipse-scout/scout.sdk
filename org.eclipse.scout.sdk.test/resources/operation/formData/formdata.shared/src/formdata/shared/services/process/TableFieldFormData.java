@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package formdata.shared.services.process;
 
 import java.util.Map;
@@ -6,7 +16,14 @@ import java.util.Set;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
 
+/**
+ * <b>NOTE:</b><br>
+ * This class is auto generated, no manual modifications recommended.
+ * 
+ * @generated
+ */
 public class TableFieldFormData extends AbstractFormData {
+
   private static final long serialVersionUID = 1L;
 
   public TableFieldFormData() {
@@ -21,6 +38,7 @@ public class TableFieldFormData extends AbstractFormData {
   }
 
   public static class CompanyTable extends AbstractCompanyTableFieldData {
+
     private static final long serialVersionUID = 1L;
 
     public CompanyTable() {
@@ -28,56 +46,55 @@ public class TableFieldFormData extends AbstractFormData {
   }
 
   public static class PersonTable extends AbstractTableFieldData {
+
     private static final long serialVersionUID = 1L;
-
-    public PersonTable() {
-    }
-
     public static final int PERSON_NR_COLUMN_ID = 0;
     public static final int NAME_COLUMN_ID = 1;
     public static final int AN_OBJECT_COLUMN_ID = 2;
     public static final int SMART_LONG_COLUMN_ID = 3;
     public static final int CUSTOM_COLUMN_ID = 4;
 
-    public void setPersonNr(int row, Long personNr) {
-      setValueInternal(row, PERSON_NR_COLUMN_ID, personNr);
-    }
-
-    public Long getPersonNr(int row) {
-      return (Long) getValueInternal(row, PERSON_NR_COLUMN_ID);
-    }
-
-    public void setName(int row, String name) {
-      setValueInternal(row, NAME_COLUMN_ID, name);
-    }
-
-    public String getName(int row) {
-      return (String) getValueInternal(row, NAME_COLUMN_ID);
-    }
-
-    public void setAnObject(int row, Object anObject) {
-      setValueInternal(row, AN_OBJECT_COLUMN_ID, anObject);
+    public PersonTable() {
     }
 
     public Object getAnObject(int row) {
       return getValueInternal(row, AN_OBJECT_COLUMN_ID);
     }
 
-    public void setSmartLong(int row, Long smartLong) {
-      setValueInternal(row, SMART_LONG_COLUMN_ID, smartLong);
+    public void setAnObject(int row, Object anObject) {
+      setValueInternal(row, AN_OBJECT_COLUMN_ID, anObject);
     }
 
-    public Long getSmartLong(int row) {
-      return (Long) getValueInternal(row, SMART_LONG_COLUMN_ID);
+    public Set<Map<String, Integer>> getCustom(int row) {
+      return (Set<Map<String, Integer>>) getValueInternal(row, CUSTOM_COLUMN_ID);
     }
 
     public void setCustom(int row, Set<Map<String, Integer>> custom) {
       setValueInternal(row, CUSTOM_COLUMN_ID, custom);
     }
 
-    @SuppressWarnings("unchecked")
-    public Set<Map<String, Integer>> getCustom(int row) {
-      return (Set<Map<String, Integer>>) getValueInternal(row, CUSTOM_COLUMN_ID);
+    public String getName(int row) {
+      return (String) getValueInternal(row, NAME_COLUMN_ID);
+    }
+
+    public void setName(int row, String name) {
+      setValueInternal(row, NAME_COLUMN_ID, name);
+    }
+
+    public Long getPersonNr(int row) {
+      return (Long) getValueInternal(row, PERSON_NR_COLUMN_ID);
+    }
+
+    public void setPersonNr(int row, Long personNr) {
+      setValueInternal(row, PERSON_NR_COLUMN_ID, personNr);
+    }
+
+    public Long getSmartLong(int row) {
+      return (Long) getValueInternal(row, SMART_LONG_COLUMN_ID);
+    }
+
+    public void setSmartLong(int row, Long smartLong) {
+      setValueInternal(row, SMART_LONG_COLUMN_ID, smartLong);
     }
 
     @Override
@@ -104,7 +121,6 @@ public class TableFieldFormData extends AbstractFormData {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public void setValueAt(int row, int column, Object value) {
       switch (column) {
         case PERSON_NR_COLUMN_ID:

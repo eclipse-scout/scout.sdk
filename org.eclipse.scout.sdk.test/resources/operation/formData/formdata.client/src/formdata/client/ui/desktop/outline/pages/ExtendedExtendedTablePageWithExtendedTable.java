@@ -27,6 +27,7 @@ public class ExtendedExtendedTablePageWithExtendedTable extends ExtendedTablePag
 
     @Order(30)
     public class BooleanColumn extends AbstractBooleanColumn {
+
     }
   }
 }

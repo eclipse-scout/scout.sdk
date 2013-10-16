@@ -1,57 +1,74 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package formdata.shared.services.pages;
 
 import java.math.BigDecimal;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
+/**
+ * <b>NOTE:</b><br>
+ * This class is auto generated, no manual modifications recommended.
+ * 
+ * @generated
+ */
 public class ExtendedTablePageData extends BaseTablePageData {
+
   private static final long serialVersionUID = 1L;
 
   public ExtendedTablePageData() {
   }
 
   @Override
-  public ExtendedTablePageRowData[] getRows() {
-    return (ExtendedTablePageRowData[]) super.getRows();
-  }
-
-  public void setRows(ExtendedTablePageRowData[] rows) {
-    super.setRows(rows);
+  public ExtendedTableRowData addRow() {
+    return (ExtendedTableRowData) super.addRow();
   }
 
   @Override
-  public ExtendedTablePageRowData addRow() {
-    return (ExtendedTablePageRowData) super.addRow();
+  public ExtendedTableRowData addRow(int rowState) {
+    return (ExtendedTableRowData) super.addRow(rowState);
   }
 
   @Override
-  public ExtendedTablePageRowData addRow(int rowState) {
-    return (ExtendedTablePageRowData) super.addRow(rowState);
-  }
-
-  @Override
-  public ExtendedTablePageRowData rowAt(int idx) {
-    return (ExtendedTablePageRowData) super.rowAt(idx);
-  }
-
-  @Override
-  public ExtendedTablePageRowData createRow() {
-    return new ExtendedTablePageRowData();
+  public ExtendedTableRowData createRow() {
+    return new ExtendedTableRowData();
   }
 
   @Override
   public Class<? extends AbstractTableRowData> getRowType() {
-    return ExtendedTablePageRowData.class;
+    return ExtendedTableRowData.class;
   }
 
-  public static class ExtendedTablePageRowData extends BaseTablePageData.BaseTablePageRowData {
+  @Override
+  public ExtendedTableRowData[] getRows() {
+    return (ExtendedTableRowData[]) super.getRows();
+  }
+
+  @Override
+  public ExtendedTableRowData rowAt(int index) {
+    return (ExtendedTableRowData) super.rowAt(index);
+  }
+
+  public void setRows(ExtendedTableRowData[] rows) {
+    super.setRows(rows);
+  }
+
+  public static class ExtendedTableRowData extends BaseTableRowData {
+
     private static final long serialVersionUID = 1L;
-
-    public ExtendedTablePageRowData() {
-    }
-
     public static final String intermediate = "intermediate";
     private BigDecimal m_intermediate;
+
+    public ExtendedTableRowData() {
+    }
 
     public BigDecimal getIntermediate() {
       return m_intermediate;

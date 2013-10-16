@@ -1,21 +1,30 @@
 /*******************************************************************************
- * Copyright (c) 2013 BSI Business Systems Integration AG.
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- *
+ * 
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package formdata.shared.services.process.replace;
+
+import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
+/**
+ * <b>NOTE:</b><br>
+ * This class is auto generated, no manual modifications recommended.
+ * 
+ * @generated
+ */
 public class ExtendedExtendedFormData extends ExtendedFormData {
+
   private static final long serialVersionUID = 1L;
 
   public ExtendedExtendedFormData() {
@@ -274,7 +283,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class IgnoringGroupBoxExCreateNone extends ExtendedFormData.IgnoringGroupBoxExCreate {
+  public static class IgnoringGroupBoxExCreateNone extends IgnoringGroupBoxExCreate {
+
     private static final long serialVersionUID = 1L;
 
     public IgnoringGroupBoxExCreateNone() {
@@ -283,6 +293,7 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
 
   @Replace
   public static class IgnoringGroupBoxExNoneCreate extends AbstractValueFieldData<String> {
+
     private static final long serialVersionUID = 1L;
 
     public IgnoringGroupBoxExNoneCreate() {
@@ -292,21 +303,18 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
   }
 
   @Replace
-  public static class NameExEx extends ExtendedFormData.NameEx {
+  public static class NameExEx extends NameEx {
+
     private static final long serialVersionUID = 1L;
 
     public NameExEx() {
-    }
-
-    public StringPropertyProperty getStringPropertyProperty() {
-      return getPropertyByClass(StringPropertyProperty.class);
     }
 
     /**
@@ -323,26 +331,32 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
       getStringPropertyProperty().setValue(stringProperty);
     }
 
-    public class StringPropertyProperty extends AbstractPropertyData<String> {
-      private static final long serialVersionUID = 1L;
-
-      public StringPropertyProperty() {
-      }
+    public StringPropertyProperty getStringPropertyProperty() {
+      return getPropertyByClass(StringPropertyProperty.class);
     }
 
     /**
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MANDATORY, true);
       ruleMap.put(ValidationRule.MAX_LENGTH, 15);
     }
+
+    public static class StringPropertyProperty extends AbstractPropertyData<String> {
+
+      private static final long serialVersionUID = 1L;
+
+      public StringPropertyProperty() {
+      }
+    }
   }
 
   @Replace
-  public static class SdkCommandCreateCreateCreate extends ExtendedFormData.SdkCommandCreateCreate {
+  public static class SdkCommandCreateCreateCreate extends SdkCommandCreateCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateCreateCreate() {
@@ -350,7 +364,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateCreateIgnore extends ExtendedFormData.SdkCommandCreateCreate {
+  public static class SdkCommandCreateCreateIgnore extends SdkCommandCreateCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateCreateIgnore() {
@@ -358,7 +373,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateCreateNone extends ExtendedFormData.SdkCommandCreateCreate {
+  public static class SdkCommandCreateCreateNone extends SdkCommandCreateCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateCreateNone() {
@@ -366,7 +382,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateCreateUse extends ExtendedFormData.SdkCommandCreateCreate {
+  public static class SdkCommandCreateCreateUse extends SdkCommandCreateCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateCreateUse() {
@@ -374,7 +391,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateIgnoreCreate extends ExtendedFormData.SdkCommandCreateIgnore {
+  public static class SdkCommandCreateIgnoreCreate extends SdkCommandCreateIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateIgnoreCreate() {
@@ -382,7 +400,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateIgnoreIgnore extends ExtendedFormData.SdkCommandCreateIgnore {
+  public static class SdkCommandCreateIgnoreIgnore extends SdkCommandCreateIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateIgnoreIgnore() {
@@ -390,7 +409,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateIgnoreNone extends ExtendedFormData.SdkCommandCreateIgnore {
+  public static class SdkCommandCreateIgnoreNone extends SdkCommandCreateIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateIgnoreNone() {
@@ -398,7 +418,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateIgnoreUse extends ExtendedFormData.SdkCommandCreateIgnore {
+  public static class SdkCommandCreateIgnoreUse extends SdkCommandCreateIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateIgnoreUse() {
@@ -406,7 +427,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateNoneCreate extends ExtendedFormData.SdkCommandCreateNone {
+  public static class SdkCommandCreateNoneCreate extends SdkCommandCreateNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateNoneCreate() {
@@ -414,7 +436,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateNoneIgnore extends ExtendedFormData.SdkCommandCreateNone {
+  public static class SdkCommandCreateNoneIgnore extends SdkCommandCreateNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateNoneIgnore() {
@@ -422,7 +445,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateNoneNone extends ExtendedFormData.SdkCommandCreateNone {
+  public static class SdkCommandCreateNoneNone extends SdkCommandCreateNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateNoneNone() {
@@ -430,7 +454,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateNoneUse extends ExtendedFormData.SdkCommandCreateNone {
+  public static class SdkCommandCreateNoneUse extends SdkCommandCreateNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateNoneUse() {
@@ -438,7 +463,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateUseCreate extends ExtendedFormData.SdkCommandCreateUse {
+  public static class SdkCommandCreateUseCreate extends SdkCommandCreateUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateUseCreate() {
@@ -446,7 +472,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateUseIgnore extends ExtendedFormData.SdkCommandCreateUse {
+  public static class SdkCommandCreateUseIgnore extends SdkCommandCreateUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateUseIgnore() {
@@ -454,7 +481,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateUseNone extends ExtendedFormData.SdkCommandCreateUse {
+  public static class SdkCommandCreateUseNone extends SdkCommandCreateUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateUseNone() {
@@ -462,7 +490,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateUseUse extends ExtendedFormData.SdkCommandCreateUse {
+  public static class SdkCommandCreateUseUse extends SdkCommandCreateUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateUseUse() {
@@ -470,7 +499,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandIgnoreCreateCreate extends ExtendedFormData.SdkCommandIgnoreCreate {
+  public static class SdkCommandIgnoreCreateCreate extends SdkCommandIgnoreCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreCreateCreate() {
@@ -478,7 +508,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandIgnoreCreateIgnore extends ExtendedFormData.SdkCommandIgnoreCreate {
+  public static class SdkCommandIgnoreCreateIgnore extends SdkCommandIgnoreCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreCreateIgnore() {
@@ -486,7 +517,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandIgnoreCreateNone extends ExtendedFormData.SdkCommandIgnoreCreate {
+  public static class SdkCommandIgnoreCreateNone extends SdkCommandIgnoreCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreCreateNone() {
@@ -494,7 +526,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandIgnoreCreateUse extends ExtendedFormData.SdkCommandIgnoreCreate {
+  public static class SdkCommandIgnoreCreateUse extends SdkCommandIgnoreCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreCreateUse() {
@@ -503,6 +536,7 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
 
   @Replace
   public static class SdkCommandIgnoreIgnoreCreate extends AbstractValueFieldData<String> {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreIgnoreCreate() {
@@ -512,7 +546,7 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
@@ -520,6 +554,7 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
 
   @Replace
   public static class SdkCommandIgnoreIgnoreUse extends UsingFormFieldData {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreIgnoreUse() {
@@ -529,7 +564,7 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
@@ -537,6 +572,7 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
 
   @Replace
   public static class SdkCommandIgnoreNoneCreate extends AbstractValueFieldData<String> {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreNoneCreate() {
@@ -546,7 +582,7 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
@@ -554,6 +590,7 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
 
   @Replace
   public static class SdkCommandIgnoreNoneUse extends UsingFormFieldData {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreNoneUse() {
@@ -563,14 +600,15 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
   }
 
   @Replace
-  public static class SdkCommandIgnoreUseCreate extends ExtendedFormData.SdkCommandIgnoreUse {
+  public static class SdkCommandIgnoreUseCreate extends SdkCommandIgnoreUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreUseCreate() {
@@ -578,7 +616,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandIgnoreUseIgnore extends ExtendedFormData.SdkCommandIgnoreUse {
+  public static class SdkCommandIgnoreUseIgnore extends SdkCommandIgnoreUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreUseIgnore() {
@@ -586,7 +625,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandIgnoreUseNone extends ExtendedFormData.SdkCommandIgnoreUse {
+  public static class SdkCommandIgnoreUseNone extends SdkCommandIgnoreUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreUseNone() {
@@ -594,7 +634,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandIgnoreUseUse extends ExtendedFormData.SdkCommandIgnoreUse {
+  public static class SdkCommandIgnoreUseUse extends SdkCommandIgnoreUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreUseUse() {
@@ -602,7 +643,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneCreateCreate extends ExtendedFormData.SdkCommandNoneCreate {
+  public static class SdkCommandNoneCreateCreate extends SdkCommandNoneCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneCreateCreate() {
@@ -610,7 +652,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneCreateIgnore extends ExtendedFormData.SdkCommandNoneCreate {
+  public static class SdkCommandNoneCreateIgnore extends SdkCommandNoneCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneCreateIgnore() {
@@ -618,7 +661,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneCreateNone extends ExtendedFormData.SdkCommandNoneCreate {
+  public static class SdkCommandNoneCreateNone extends SdkCommandNoneCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneCreateNone() {
@@ -626,7 +670,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneCreateUse extends ExtendedFormData.SdkCommandNoneCreate {
+  public static class SdkCommandNoneCreateUse extends SdkCommandNoneCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneCreateUse() {
@@ -634,7 +679,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneIgnoreCreate extends ExtendedFormData.SdkCommandNoneIgnore {
+  public static class SdkCommandNoneIgnoreCreate extends SdkCommandNoneIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneIgnoreCreate() {
@@ -642,7 +688,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneIgnoreIgnore extends ExtendedFormData.SdkCommandNoneIgnore {
+  public static class SdkCommandNoneIgnoreIgnore extends SdkCommandNoneIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneIgnoreIgnore() {
@@ -650,7 +697,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneIgnoreNone extends ExtendedFormData.SdkCommandNoneIgnore {
+  public static class SdkCommandNoneIgnoreNone extends SdkCommandNoneIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneIgnoreNone() {
@@ -658,7 +706,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneIgnoreUse extends ExtendedFormData.SdkCommandNoneIgnore {
+  public static class SdkCommandNoneIgnoreUse extends SdkCommandNoneIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneIgnoreUse() {
@@ -666,7 +715,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneNoneCreate extends ExtendedFormData.SdkCommandNoneNone {
+  public static class SdkCommandNoneNoneCreate extends SdkCommandNoneNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneNoneCreate() {
@@ -674,7 +724,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneNoneIgnore extends ExtendedFormData.SdkCommandNoneNone {
+  public static class SdkCommandNoneNoneIgnore extends SdkCommandNoneNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneNoneIgnore() {
@@ -682,7 +733,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneNoneNone extends ExtendedFormData.SdkCommandNoneNone {
+  public static class SdkCommandNoneNoneNone extends SdkCommandNoneNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneNoneNone() {
@@ -690,7 +742,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneNoneUse extends ExtendedFormData.SdkCommandNoneNone {
+  public static class SdkCommandNoneNoneUse extends SdkCommandNoneNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneNoneUse() {
@@ -698,7 +751,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneUseCreate extends ExtendedFormData.SdkCommandNoneUse {
+  public static class SdkCommandNoneUseCreate extends SdkCommandNoneUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneUseCreate() {
@@ -706,7 +760,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneUseIgnore extends ExtendedFormData.SdkCommandNoneUse {
+  public static class SdkCommandNoneUseIgnore extends SdkCommandNoneUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneUseIgnore() {
@@ -714,7 +769,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneUseNone extends ExtendedFormData.SdkCommandNoneUse {
+  public static class SdkCommandNoneUseNone extends SdkCommandNoneUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneUseNone() {
@@ -722,7 +778,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneUseUse extends ExtendedFormData.SdkCommandNoneUse {
+  public static class SdkCommandNoneUseUse extends SdkCommandNoneUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneUseUse() {
@@ -730,7 +787,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseCreateCreate extends ExtendedFormData.SdkCommandUseCreate {
+  public static class SdkCommandUseCreateCreate extends SdkCommandUseCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseCreateCreate() {
@@ -738,7 +796,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseCreateIgnore extends ExtendedFormData.SdkCommandUseCreate {
+  public static class SdkCommandUseCreateIgnore extends SdkCommandUseCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseCreateIgnore() {
@@ -746,7 +805,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseCreateNone extends ExtendedFormData.SdkCommandUseCreate {
+  public static class SdkCommandUseCreateNone extends SdkCommandUseCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseCreateNone() {
@@ -754,7 +814,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseCreateUse extends ExtendedFormData.SdkCommandUseCreate {
+  public static class SdkCommandUseCreateUse extends SdkCommandUseCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseCreateUse() {
@@ -762,7 +823,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseIgnoreCreate extends ExtendedFormData.SdkCommandUseIgnore {
+  public static class SdkCommandUseIgnoreCreate extends SdkCommandUseIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseIgnoreCreate() {
@@ -770,7 +832,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseIgnoreIgnore extends ExtendedFormData.SdkCommandUseIgnore {
+  public static class SdkCommandUseIgnoreIgnore extends SdkCommandUseIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseIgnoreIgnore() {
@@ -778,7 +841,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseIgnoreNone extends ExtendedFormData.SdkCommandUseIgnore {
+  public static class SdkCommandUseIgnoreNone extends SdkCommandUseIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseIgnoreNone() {
@@ -786,7 +850,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseIgnoreUse extends ExtendedFormData.SdkCommandUseIgnore {
+  public static class SdkCommandUseIgnoreUse extends SdkCommandUseIgnore {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseIgnoreUse() {
@@ -794,7 +859,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseNoneCreate extends ExtendedFormData.SdkCommandUseNone {
+  public static class SdkCommandUseNoneCreate extends SdkCommandUseNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseNoneCreate() {
@@ -802,7 +868,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseNoneIgnore extends ExtendedFormData.SdkCommandUseNone {
+  public static class SdkCommandUseNoneIgnore extends SdkCommandUseNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseNoneIgnore() {
@@ -810,7 +877,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseNoneNone extends ExtendedFormData.SdkCommandUseNone {
+  public static class SdkCommandUseNoneNone extends SdkCommandUseNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseNoneNone() {
@@ -818,7 +886,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseNoneUse extends ExtendedFormData.SdkCommandUseNone {
+  public static class SdkCommandUseNoneUse extends SdkCommandUseNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseNoneUse() {
@@ -826,7 +895,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseUseCreate extends ExtendedFormData.SdkCommandUseUse {
+  public static class SdkCommandUseUseCreate extends SdkCommandUseUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseUseCreate() {
@@ -834,7 +904,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseUseIgnore extends ExtendedFormData.SdkCommandUseUse {
+  public static class SdkCommandUseUseIgnore extends SdkCommandUseUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseUseIgnore() {
@@ -842,7 +913,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseUseNone extends ExtendedFormData.SdkCommandUseUse {
+  public static class SdkCommandUseUseNone extends SdkCommandUseUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseUseNone() {
@@ -850,7 +922,8 @@ public class ExtendedExtendedFormData extends ExtendedFormData {
   }
 
   @Replace
-  public static class SdkCommandUseUseUse extends ExtendedFormData.SdkCommandUseUse {
+  public static class SdkCommandUseUseUse extends SdkCommandUseUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseUseUse() {

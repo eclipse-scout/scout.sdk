@@ -10,11 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace.dto;
 
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.TreeSet;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -33,7 +39,9 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.FieldFilters;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -50,6 +58,8 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
  */
 public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSourceBuilder {
 
+  protected final static int ROW_DATA_FIELD_FLAGS = Flags.AccPublic | Flags.AccFinal | Flags.AccStatic;
+
   /**
    * @param elementName
    */
@@ -63,9 +73,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     try {
       IType table = FormDataUtility.findTable(getModelType(), getLocalTypeHierarchy());
       if (TypeUtility.exists(table)) {
-        if (getModelType().equals(table.getDeclaringType())) {
-          visitTableBean(table, getLocalTypeHierarchy());
-        }
+        visitTableBean(table, getLocalTypeHierarchy());
       }
       else {
         addAbstractMethodImplementations();
@@ -76,10 +84,65 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     }
   }
 
+  protected IType[] getColumns(IType table, IType rowDataSuperType, ITypeHierarchy fieldHierarchy) throws JavaModelException {
+    // collect all columns that exist in the table and all of its super classes
+    TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<IType>(ScoutTypeComparators.getOrderAnnotationComparator());
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn)), new ITypeFilter() {
+      @Override
+      public boolean accept(IType type) {
+        return !ScoutTypeUtility.existsReplaceAnnotation(type); // replaced columns already have a column data -> skip
+      }
+    });
+    IType curTableType = table;
+    do {
+      IType[] columns = TypeUtility.getInnerTypes(curTableType, filter);
+      for (IType column : columns) {
+        allColumnsUpTheHierarchy.add(column);
+      }
+      curTableType = fieldHierarchy.getSuperclass(curTableType);
+    }
+    while (TypeUtility.exists(curTableType));
+
+    // collect all columns that exist in the row data and all of its super classes
+    HashSet<String> usedColumnBeanNames = new HashSet<String>();
+    IType currentRowDataSuperType = rowDataSuperType;
+    ITypeHierarchy rowDataHierarchy = TypeUtility.getSuperTypeHierarchy(rowDataSuperType);
+    if (!RuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getFullyQualifiedName())) {
+      do {
+        IField[] columnFields = TypeUtility.getFields(currentRowDataSuperType, FieldFilters.getFlagsFilter(ROW_DATA_FIELD_FLAGS));
+        for (IField column : columnFields) {
+          Object val = TypeUtility.getFieldConstant(column);
+          if (val instanceof String) {
+            usedColumnBeanNames.add(val.toString());
+          }
+        }
+        currentRowDataSuperType = rowDataHierarchy.getSuperclass(currentRowDataSuperType);
+      }
+      while (TypeUtility.exists(currentRowDataSuperType) && !RuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getFullyQualifiedName()));
+    }
+
+    // filter the already existing columns out
+    Iterator<IType> allColumnsIterator = allColumnsUpTheHierarchy.iterator();
+    while (allColumnsIterator.hasNext()) {
+      IType col = allColumnsIterator.next();
+      String beanName = getColumnBeanName(col);
+      if (usedColumnBeanNames.contains(beanName)) {
+        // the current column is already in a row data of our parent -> we don't need it for us: remove
+        allColumnsIterator.remove();
+      }
+    }
+
+    return allColumnsUpTheHierarchy.toArray(new IType[allColumnsUpTheHierarchy.size()]);
+  }
+
+  protected String getColumnBeanName(IType column) {
+    return ScoutUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
+  }
+
   protected void visitTableBean(IType table, ITypeHierarchy fieldHierarchy) throws CoreException {
     // row data super type
-    String rowDataSuperClassSig = getTableRowDataSuperClassSignature(table, fieldHierarchy);
-//    IType rowDataSuperClassType = TypeUtility.getTypeBySignature(rowDataSuperClassSig);
+    String rowDataSuperClassSig = getTableRowDataSuperClassSignature(table);
+    IType rowDataSuperClassType = TypeUtility.getTypeBySignature(rowDataSuperClassSig);
 
     // row data class name
     String rowDataName = ScoutUtility.removeFieldSuffix(table.getDeclaringType().getElementName()) + "RowData";
@@ -87,7 +150,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
 
     // row data class flags
     int flags = Flags.AccPublic | Flags.AccStatic;
-    boolean isAbstract = Flags.isAbstract(table.getFlags()) || Flags.isAbstract(table.getDeclaringType().getFlags());
+    boolean isAbstract = Flags.isAbstract(table.getFlags()) || Flags.isAbstract(getModelType().getFlags());
     if (isAbstract) {
       flags |= Flags.AccAbstract;
     }
@@ -103,22 +166,17 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     tableRowDataBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
 
     // visit columns
-    final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn), fieldHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
-
+    IType[] columns = getColumns(table, rowDataSuperClassType, fieldHierarchy);
     for (int i = 0; i < columns.length; i++) {
       IType column = columns[i];
-      if (ScoutTypeUtility.existsReplaceAnnotation(column)) {
-        // replaced columns already have a column data
-        continue;
-      }
-      String columnBeanName = ScoutUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
-      // constant
+
+      String columnBeanName = getColumnBeanName(column);
       String constantColName = columnBeanName;
       if (ScoutUtility.isReservedJavaKeyword(constantColName)) {
         constantColName += "_";
       }
       IFieldSourceBuilder constantFieldBuilder = new FieldSourceBuilder(constantColName);
-      constantFieldBuilder.setFlags(Flags.AccPublic | Flags.AccFinal | Flags.AccStatic);
+      constantFieldBuilder.setFlags(ROW_DATA_FIELD_FLAGS);
       constantFieldBuilder.setSignature(SignatureCache.createTypeSignature(String.class.getName()));
       constantFieldBuilder.setValue("\"" + columnBeanName + "\"");
       tableRowDataBuilder.addSortedFieldSourceBuilder(new CompositeObject(SortedMemberKeyFactory.FIELD_CONSTANT + 1, i, columnBeanName), constantFieldBuilder);
@@ -126,7 +184,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
       // member
       IFieldSourceBuilder memberFieldBuilder = new FieldSourceBuilder("m_" + columnBeanName);
       memberFieldBuilder.setFlags(Flags.AccPrivate);
-      memberFieldBuilder.setSignature(getColumnSignature(column, fieldHierarchy));
+      memberFieldBuilder.setSignature(getColumnSignature(column, TypeUtility.getSuperTypeHierarchy(column)));
       tableRowDataBuilder.addSortedFieldSourceBuilder(new CompositeObject(SortedMemberKeyFactory.FIELD_MEMBER + 1, i, columnBeanName), memberFieldBuilder);
 
       // getter
@@ -250,7 +308,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
    * @return
    * @throws CoreException
    */
-  protected abstract String getTableRowDataSuperClassSignature(IType table, ITypeHierarchy fieldHierarchy) throws CoreException;
+  protected abstract String getTableRowDataSuperClassSignature(IType table) throws CoreException;
 
   /**
    * Gets the row data type that is used within the given table data.

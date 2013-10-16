@@ -4,11 +4,13 @@ Bundle-Name: formdata.client
 Bundle-SymbolicName: formdata.client;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: formdata.client.Activator
-Bundle-ActivationPolicy: lazy
-Require-Bundle: org.eclipse.core.runtime,
- org.eclipse.scout.rt.client;visibility:=reexport,
- formdata.shared
 Export-Package: formdata.client,
  formdata.client.ui.desktop,
+ formdata.client.ui.desktop.outline.pages,
  formdata.client.ui.forms
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.client;visibility:=reexport,
+ formdata.shared,
+ org.eclipse.scout.rt.extension.client;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

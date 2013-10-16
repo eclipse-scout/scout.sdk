@@ -69,12 +69,18 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
   }
 
   @Override
-  protected String getTableRowDataSuperClassSignature(IType table, ITypeHierarchy fieldHierarchy) throws CoreException {
-    IType parentTable = fieldHierarchy.getSuperclass(table);
+  protected String getTableRowDataSuperClassSignature(IType table) throws CoreException {
+    ITypeHierarchy tableHierarchy = TypeUtility.getSuperTypeHierarchy(table);
+    IType parentTable = table;
+    if (table.getDeclaringType().equals(getModelType())) {
+      // we have our own inner table: take super class of our table
+      parentTable = tableHierarchy.getSuperclass(table);
+    }
+
     if (TypeUtility.exists(parentTable)) {
       IType declaringType = parentTable.getDeclaringType();
       if (TypeUtility.exists(declaringType)) {
-        IType formDataType = ScoutTypeUtility.getFormDataType(declaringType, fieldHierarchy);
+        IType formDataType = ScoutTypeUtility.getFormDataType(declaringType, tableHierarchy);
         IType parentTableBeanData = getTableRowDataType(formDataType);
         if (TypeUtility.exists(parentTableBeanData)) {
           return SignatureCache.createTypeSignature(parentTableBeanData.getFullyQualifiedName());

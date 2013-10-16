@@ -5,7 +5,7 @@ Bundle-SymbolicName: formdata.shared;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: formdata.shared.Activator
 Export-Package: formdata.shared,
- formdata.shared.security,
+ formdata.shared.services,
  formdata.shared.services.common.text,
  formdata.shared.services.pages,
  formdata.shared.services.process,

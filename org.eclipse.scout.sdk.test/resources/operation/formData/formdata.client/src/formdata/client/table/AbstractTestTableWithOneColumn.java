@@ -8,20 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package formdata.shared.services.process;
+package formdata.client.table;
 
-import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
+import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
 
-/**
- * <b>NOTE:</b><br>
- * This class is auto generated, no manual modifications recommended.
- * 
- * @generated
- */
-public abstract class AbstractTestCheckboxFieldData extends AbstractValueFieldData<Boolean> {
+public abstract class AbstractTestTableWithOneColumn extends AbstractExtensibleTable {
+  @Order(10.0)
+  public class ColInAbstractTable extends AbstractStringColumn {
 
-  private static final long serialVersionUID = 1L;
-
-  public AbstractTestCheckboxFieldData() {
   }
 }

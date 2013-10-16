@@ -42,12 +42,18 @@ public class PageDataSourceBuilder extends AbstractTableBeanSourceBuilder {
   }
 
   @Override
-  protected String getTableRowDataSuperClassSignature(IType table, ITypeHierarchy fieldHierarchy) throws CoreException {
-    IType parentTable = fieldHierarchy.getSuperclass(table);
+  protected String getTableRowDataSuperClassSignature(IType table) throws CoreException {
+    ITypeHierarchy tableHierarchy = TypeUtility.getSuperTypeHierarchy(table);
+    IType parentTable = table;
+    if (table.getDeclaringType().equals(getModelType())) {
+      // we have our own inner table: take super class of our table
+      parentTable = tableHierarchy.getSuperclass(table);
+    }
+
     if (TypeUtility.exists(parentTable)) {
       IType declaringType = parentTable.getDeclaringType();
       if (TypeUtility.exists(declaringType)) {
-        PageDataAnnotation pageDataAnnotation = ScoutTypeUtility.findPageDataAnnotation(declaringType, fieldHierarchy);
+        PageDataAnnotation pageDataAnnotation = ScoutTypeUtility.findPageDataAnnotation(declaringType, tableHierarchy);
         if (pageDataAnnotation != null) {
           IType superPageDataType = ScoutTypeUtility.getTypeBySignature(pageDataAnnotation.getPageDataTypeSignature());
           IType superTableBeanData = getTableRowDataType(superPageDataType);

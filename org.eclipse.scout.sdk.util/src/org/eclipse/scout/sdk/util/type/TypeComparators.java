@@ -16,37 +16,42 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompositeObject;
 
 /**
- *
+ * Contains comparators for {@link IType}s.
  */
 public class TypeComparators {
-  public static Comparator<IType> getTypeNameComparator() {
-    return new Comparator<IType>() {
-      @Override
-      public int compare(IType t1, IType t2) {
-        CompositeObject ct1 = new CompositeObject(t1.getElementName(), t1.getFullyQualifiedName(), t1);
-        CompositeObject ct2 = new CompositeObject(t2.getElementName(), t2.getFullyQualifiedName(), t2);
-        return ct1.compareTo(ct2);
+
+  protected final static Comparator<IType> NAME_COMPARATOR = new Comparator<IType>() {
+    @Override
+    public int compare(IType t1, IType t2) {
+      CompositeObject ct1 = new CompositeObject(t1.getElementName(), t1.getFullyQualifiedName(), t1);
+      CompositeObject ct2 = new CompositeObject(t2.getElementName(), t2.getFullyQualifiedName(), t2);
+      return ct1.compareTo(ct2);
+    }
+  };
+
+  protected final static Comparator<IType> HASH_CODE_COMPARATOR = new Comparator<IType>() {
+    @Override
+    public int compare(IType t1, IType t2) {
+      if (t1 == null && t2 == null) {
+        return 0;
       }
-    };
+      else if (t1 == null) {
+        return -1;
+      }
+      else if (t2 == null) {
+        return 1;
+      }
+      else {
+        return t1.hashCode() - t2.hashCode();
+      }
+    }
+  };
+
+  public static Comparator<IType> getTypeNameComparator() {
+    return NAME_COMPARATOR;
   }
 
   public static Comparator<IType> getHashCodeComparator() {
-    return new Comparator<IType>() {
-      @Override
-      public int compare(IType t1, IType t2) {
-        if (t1 == null && t2 == null) {
-          return 0;
-        }
-        else if (t1 == null) {
-          return -1;
-        }
-        else if (t2 == null) {
-          return 1;
-        }
-        else {
-          return t1.hashCode() - t2.hashCode();
-        }
-      }
-    };
+    return HASH_CODE_COMPARATOR;
   }
 }

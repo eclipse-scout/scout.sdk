@@ -1,3 +1,13 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package formdata.shared.services.pages;
 
 import java.util.Date;
@@ -5,56 +15,63 @@ import java.util.Date;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.page.AbstractTablePageData;
 
+/**
+ * <b>NOTE:</b><br>
+ * This class is auto generated, no manual modifications recommended.
+ * 
+ * @generated
+ */
 public class BaseTablePageData extends AbstractTablePageData {
+
   private static final long serialVersionUID = 1L;
 
   public BaseTablePageData() {
   }
 
   @Override
-  public BaseTablePageRowData[] getRows() {
-    return (BaseTablePageRowData[]) super.getRows();
-  }
-
-  public void setRows(BaseTablePageRowData[] rows) {
-    super.setRows(rows);
+  public BaseTableRowData addRow() {
+    return (BaseTableRowData) super.addRow();
   }
 
   @Override
-  public BaseTablePageRowData addRow() {
-    return (BaseTablePageRowData) super.addRow();
+  public BaseTableRowData addRow(int rowState) {
+    return (BaseTableRowData) super.addRow(rowState);
   }
 
   @Override
-  public BaseTablePageRowData addRow(int rowState) {
-    return (BaseTablePageRowData) super.addRow(rowState);
-  }
-
-  @Override
-  public BaseTablePageRowData rowAt(int idx) {
-    return (BaseTablePageRowData) super.rowAt(idx);
-  }
-
-  @Override
-  public BaseTablePageRowData createRow() {
-    return new BaseTablePageRowData();
+  public BaseTableRowData createRow() {
+    return new BaseTableRowData();
   }
 
   @Override
   public Class<? extends AbstractTableRowData> getRowType() {
-    return BaseTablePageRowData.class;
+    return BaseTableRowData.class;
   }
 
-  public static class BaseTablePageRowData extends AbstractTableRowData {
+  @Override
+  public BaseTableRowData[] getRows() {
+    return (BaseTableRowData[]) super.getRows();
+  }
+
+  @Override
+  public BaseTableRowData rowAt(int index) {
+    return (BaseTableRowData) super.rowAt(index);
+  }
+
+  public void setRows(BaseTableRowData[] rows) {
+    super.setRows(rows);
+  }
+
+  public static class BaseTableRowData extends AbstractTableRowData {
+
     private static final long serialVersionUID = 1L;
-
-    public BaseTablePageRowData() {
-    }
-
     public static final String first = "first";
     public static final String second = "second";
     private String m_first;
     private Date m_second;
+
+    public BaseTableRowData() {
+    }
 
     public String getFirst() {
       return m_first;

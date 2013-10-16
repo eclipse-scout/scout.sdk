@@ -47,7 +47,6 @@ public class TableFieldBaseForm extends AbstractForm {
 
         @Order(10.0)
         public class FirstColumn extends AbstractStringColumn {
-
         }
 
         @Order(20.0)

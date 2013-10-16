@@ -9,44 +9,36 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class ScoutTypeComparators extends TypeComparators {
 
-  public static Comparator<IType> getOrderAnnotationComparator() {
-    return new Comparator<IType>() {
-      @Override
-      public int compare(IType t1, IType t2) {
-        Double val1 = getOrderAnnotation(t1);
-        Double val2 = getOrderAnnotation(t2);
-        if (val1 == null && val2 == null) {
-          return t1.getElementName().compareTo(t2.getElementName());
-        }
-        else if (val1 == null) {
-          return -1;
-        }
-        else if (val2 == null) {
-          return 1;
-        }
-        else if (val1.equals(val2)) {
-          return t1.getElementName().compareTo(t2.getElementName());
-        }
-        else {
-          return val1.compareTo(val2);
-        }
+  protected final static Comparator<IType> ORDER_ANNOTATION_COMPARATOR = new Comparator<IType>() {
+    @Override
+    public int compare(IType t1, IType t2) {
+      Double val1 = getOrderAnnotation(t1);
+      Double val2 = getOrderAnnotation(t2);
+      int result = val1.compareTo(val2);
+      if (result == 0) {
+        return t1.getElementName().compareTo(t2.getElementName());
       }
+      return result;
+    }
 
-      private Double getOrderAnnotation(IType type) {
-        Double sortNo = null;
-        if (TypeUtility.exists(type)) {
-          try {
-            sortNo = ScoutTypeUtility.getOrderAnnotationValue(type);
-            if (sortNo == null) {
-              ScoutSdk.logInfo("could not find @Order annotation of '" + type.getFullyQualifiedName() + "'. ");
-            }
+    private Double getOrderAnnotation(IType type) {
+      if (TypeUtility.exists(type)) {
+        try {
+          Double sortNo = ScoutTypeUtility.getOrderAnnotationValue(type);
+          if (sortNo != null) {
+            return sortNo;
           }
-          catch (Throwable t) {
-            ScoutSdk.logWarning("no @Order annotation found on '" + type.getFullyQualifiedName() + "'.", t);
-          }
+          ScoutSdk.logInfo("could not find @Order annotation of '" + type.getFullyQualifiedName() + "'. ");
         }
-        return sortNo;
+        catch (Exception e) {
+          ScoutSdk.logWarning("could not determine @Order annotation value of type '" + type.getFullyQualifiedName() + "'.", e);
+        }
       }
-    };
+      return Double.MAX_VALUE; // scout runtime returns max_value when no order annotation can be found.
+    }
+  };
+
+  public static Comparator<IType> getOrderAnnotationComparator() {
+    return ORDER_ANNOTATION_COMPARATOR;
   }
 }

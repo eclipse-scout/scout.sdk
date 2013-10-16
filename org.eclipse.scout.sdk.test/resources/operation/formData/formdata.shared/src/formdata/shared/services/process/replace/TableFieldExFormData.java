@@ -1,11 +1,26 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package formdata.shared.services.process.replace;
 
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 
-import formdata.shared.services.process.AbstractPersonTableFieldData;
-
+/**
+ * <b>NOTE:</b><br>
+ * This class is auto generated, no manual modifications recommended.
+ * 
+ * @generated
+ */
 public class TableFieldExFormData extends TableFieldBaseFormData {
+
   private static final long serialVersionUID = 1L;
 
   public TableFieldExFormData() {
@@ -32,54 +47,55 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
   }
 
   @Replace
-  public static class EmptyTableExtended extends TableFieldBaseFormData.EmptyTable {
+  public static class EmptyTableExtended extends EmptyTable {
+
     private static final long serialVersionUID = 1L;
 
     public EmptyTableExtended() {
     }
 
     @Override
-    public TableExRowData[] getRows() {
-      return (TableExRowData[]) super.getRows();
-    }
-
-    public void setRows(TableExRowData[] rows) {
-      super.setRows(rows);
+    public EmptyTableExtendedRowData addRow() {
+      return (EmptyTableExtendedRowData) super.addRow();
     }
 
     @Override
-    public TableExRowData addRow() {
-      return (TableExRowData) super.addRow();
+    public EmptyTableExtendedRowData addRow(int rowState) {
+      return (EmptyTableExtendedRowData) super.addRow(rowState);
     }
 
     @Override
-    public TableExRowData addRow(int rowState) {
-      return (TableExRowData) super.addRow(rowState);
-    }
-
-    @Override
-    public TableExRowData rowAt(int idx) {
-      return (TableExRowData) super.rowAt(idx);
-    }
-
-    @Override
-    public TableExRowData createRow() {
-      return new TableExRowData();
+    public EmptyTableExtendedRowData createRow() {
+      return new EmptyTableExtendedRowData();
     }
 
     @Override
     public Class<? extends AbstractTableRowData> getRowType() {
-      return TableExRowData.class;
+      return EmptyTableExtendedRowData.class;
     }
 
-    public static class TableExRowData extends TableFieldBaseFormData.EmptyTable.EmptyTableRowData {
+    @Override
+    public EmptyTableExtendedRowData[] getRows() {
+      return (EmptyTableExtendedRowData[]) super.getRows();
+    }
+
+    @Override
+    public EmptyTableExtendedRowData rowAt(int index) {
+      return (EmptyTableExtendedRowData) super.rowAt(index);
+    }
+
+    public void setRows(EmptyTableExtendedRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class EmptyTableExtendedRowData extends EmptyTableRowData {
+
       private static final long serialVersionUID = 1L;
-
-      public TableExRowData() {
-      }
-
       public static final String single = "single";
       private String m_single;
+
+      public EmptyTableExtendedRowData() {
+      }
 
       public String getSingle() {
         return m_single;
@@ -92,19 +108,11 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
   }
 
   @Replace
-  public static class ExtendedAddress extends TableFieldBaseFormData.AddressTable {
+  public static class ExtendedAddress extends AddressTable {
+
     private static final long serialVersionUID = 1L;
 
     public ExtendedAddress() {
-    }
-
-    @Override
-    public ExtendedAddressRowData[] getRows() {
-      return (ExtendedAddressRowData[]) super.getRows();
-    }
-
-    public void setRows(ExtendedAddressRowData[] rows) {
-      super.setRows(rows);
     }
 
     @Override
@@ -118,11 +126,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
     }
 
     @Override
-    public ExtendedAddressRowData rowAt(int idx) {
-      return (ExtendedAddressRowData) super.rowAt(idx);
-    }
-
-    @Override
     public ExtendedAddressRowData createRow() {
       return new ExtendedAddressRowData();
     }
@@ -132,14 +135,28 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       return ExtendedAddressRowData.class;
     }
 
-    public static class ExtendedAddressRowData extends TableFieldBaseFormData.AddressTable.AddressTableRowData {
+    @Override
+    public ExtendedAddressRowData[] getRows() {
+      return (ExtendedAddressRowData[]) super.getRows();
+    }
+
+    @Override
+    public ExtendedAddressRowData rowAt(int index) {
+      return (ExtendedAddressRowData) super.rowAt(index);
+    }
+
+    public void setRows(ExtendedAddressRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class ExtendedAddressRowData extends AddressTableRowData {
+
       private static final long serialVersionUID = 1L;
+      public static final String state = "state";
+      private String m_state;
 
       public ExtendedAddressRowData() {
       }
-
-      public static final String state = "state";
-      private String m_state;
 
       public String getState() {
         return m_state;
@@ -152,19 +169,11 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
   }
 
   @Replace
-  public static class ExtendedPersonTable extends TableFieldBaseFormData.PersonTable {
+  public static class ExtendedPersonTable extends PersonTable {
+
     private static final long serialVersionUID = 1L;
 
     public ExtendedPersonTable() {
-    }
-
-    @Override
-    public ExtendedPersonTableRowData[] getRows() {
-      return (ExtendedPersonTableRowData[]) super.getRows();
-    }
-
-    public void setRows(ExtendedPersonTableRowData[] rows) {
-      super.setRows(rows);
     }
 
     @Override
@@ -178,11 +187,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
     }
 
     @Override
-    public ExtendedPersonTableRowData rowAt(int idx) {
-      return (ExtendedPersonTableRowData) super.rowAt(idx);
-    }
-
-    @Override
     public ExtendedPersonTableRowData createRow() {
       return new ExtendedPersonTableRowData();
     }
@@ -192,14 +196,28 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       return ExtendedPersonTableRowData.class;
     }
 
-    public static class ExtendedPersonTableRowData extends AbstractPersonTableFieldData.AbstractPersonTableRowData {
+    @Override
+    public ExtendedPersonTableRowData[] getRows() {
+      return (ExtendedPersonTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public ExtendedPersonTableRowData rowAt(int index) {
+      return (ExtendedPersonTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(ExtendedPersonTableRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class ExtendedPersonTableRowData extends AbstractPersonTableRowData {
+
       private static final long serialVersionUID = 1L;
+      public static final String lastName = "lastName";
+      private String m_lastName;
 
       public ExtendedPersonTableRowData() {
       }
-
-      public static final String lastName = "lastName";
-      private String m_lastName;
 
       public String getLastName() {
         return m_lastName;
@@ -212,19 +230,11 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
   }
 
   @Replace
-  public static class NoTableExtended extends TableFieldBaseFormData.NoTable {
+  public static class NoTableExtended extends NoTable {
+
     private static final long serialVersionUID = 1L;
 
     public NoTableExtended() {
-    }
-
-    @Override
-    public NoTableExtendedRowData[] getRows() {
-      return (NoTableExtendedRowData[]) super.getRows();
-    }
-
-    public void setRows(NoTableExtendedRowData[] rows) {
-      super.setRows(rows);
     }
 
     @Override
@@ -238,11 +248,6 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
     }
 
     @Override
-    public NoTableExtendedRowData rowAt(int idx) {
-      return (NoTableExtendedRowData) super.rowAt(idx);
-    }
-
-    @Override
     public NoTableExtendedRowData createRow() {
       return new NoTableExtendedRowData();
     }
@@ -252,81 +257,96 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       return NoTableExtendedRowData.class;
     }
 
+    @Override
+    public NoTableExtendedRowData[] getRows() {
+      return (NoTableExtendedRowData[]) super.getRows();
+    }
+
+    @Override
+    public NoTableExtendedRowData rowAt(int index) {
+      return (NoTableExtendedRowData) super.rowAt(index);
+    }
+
+    public void setRows(NoTableExtendedRowData[] rows) {
+      super.setRows(rows);
+    }
+
     public static class NoTableExtendedRowData extends AbstractTableRowData {
+
       private static final long serialVersionUID = 1L;
+      public static final String new_ = "new";
+      private String m_new;
 
       public NoTableExtendedRowData() {
       }
 
-      public static final String new_ = "new";
-      private String m_newValue;
-
       public String getNew() {
-        return m_newValue;
+        return m_new;
       }
 
       public void setNew(String newValue) {
-        m_newValue = newValue;
+        m_new = newValue;
       }
     }
   }
 
   @Replace
-  public static class TableExtended extends TableFieldBaseFormData.Table {
+  public static class TableExtended extends Table {
+
     private static final long serialVersionUID = 1L;
 
     public TableExtended() {
     }
 
     @Override
-    public TableExRowData[] getRows() {
-      return (TableExRowData[]) super.getRows();
-    }
-
-    public void setRows(TableExRowData[] rows) {
-      super.setRows(rows);
+    public TableExtendedRowData addRow() {
+      return (TableExtendedRowData) super.addRow();
     }
 
     @Override
-    public TableExRowData addRow() {
-      return (TableExRowData) super.addRow();
+    public TableExtendedRowData addRow(int rowState) {
+      return (TableExtendedRowData) super.addRow(rowState);
     }
 
     @Override
-    public TableExRowData addRow(int rowState) {
-      return (TableExRowData) super.addRow(rowState);
-    }
-
-    @Override
-    public TableExRowData rowAt(int idx) {
-      return (TableExRowData) super.rowAt(idx);
-    }
-
-    @Override
-    public TableExRowData createRow() {
-      return new TableExRowData();
+    public TableExtendedRowData createRow() {
+      return new TableExtendedRowData();
     }
 
     @Override
     public Class<? extends AbstractTableRowData> getRowType() {
-      return TableExRowData.class;
+      return TableExtendedRowData.class;
     }
 
-    public static class TableExRowData extends TableFieldBaseFormData.Table.TableRowData {
-      private static final long serialVersionUID = 1L;
+    @Override
+    public TableExtendedRowData[] getRows() {
+      return (TableExtendedRowData[]) super.getRows();
+    }
 
-      public TableExRowData() {
+    @Override
+    public TableExtendedRowData rowAt(int index) {
+      return (TableExtendedRowData) super.rowAt(index);
+    }
+
+    public void setRows(TableExtendedRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class TableExtendedRowData extends TableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String boolean_ = "boolean";
+      private Boolean m_boolean;
+
+      public TableExtendedRowData() {
       }
 
-      public static final String boolean_ = "boolean";
-      private Boolean m_booleanValue;
-
       public Boolean getBoolean() {
-        return m_booleanValue;
+        return m_boolean;
       }
 
       public void setBoolean(Boolean booleanValue) {
-        m_booleanValue = booleanValue;
+        m_boolean = booleanValue;
       }
     }
   }

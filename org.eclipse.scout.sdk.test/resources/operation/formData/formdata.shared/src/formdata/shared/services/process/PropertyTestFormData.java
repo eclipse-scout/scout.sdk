@@ -1,22 +1,37 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package formdata.shared.services.process;
 
-import org.eclipse.scout.service.IService;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
-import java.util.HashMap;
-import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
-import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import java.util.Map;
 
+import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
+import org.eclipse.scout.rt.shared.data.form.ValidationRule;
+import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
+import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
+import org.eclipse.scout.service.IService;
+
+/**
+ * <b>NOTE:</b><br>
+ * This class is auto generated, no manual modifications recommended.
+ * 
+ * @generated
+ */
 public class PropertyTestFormData extends AbstractFormData {
+
   private static final long serialVersionUID = 1L;
 
   public PropertyTestFormData() {
-  }
-
-  public BoolObjectProperty getBoolObjectProperty() {
-    return getPropertyByClass(BoolObjectProperty.class);
   }
 
   /**
@@ -33,8 +48,8 @@ public class PropertyTestFormData extends AbstractFormData {
     getBoolObjectProperty().setValue(boolObject);
   }
 
-  public BoolPrimitiveProperty getBoolPrimitiveProperty() {
-    return getPropertyByClass(BoolPrimitiveProperty.class);
+  public BoolObjectProperty getBoolObjectProperty() {
+    return getPropertyByClass(BoolObjectProperty.class);
   }
 
   /**
@@ -51,8 +66,8 @@ public class PropertyTestFormData extends AbstractFormData {
     getBoolPrimitiveProperty().setValue(boolPrimitive);
   }
 
-  public ByteArrayProperty getByteArrayProperty() {
-    return getPropertyByClass(ByteArrayProperty.class);
+  public BoolPrimitiveProperty getBoolPrimitiveProperty() {
+    return getPropertyByClass(BoolPrimitiveProperty.class);
   }
 
   /**
@@ -69,8 +84,8 @@ public class PropertyTestFormData extends AbstractFormData {
     getByteArrayProperty().setValue(byteArray);
   }
 
-  public ComplexArrayProperty getComplexArrayProperty() {
-    return getPropertyByClass(ComplexArrayProperty.class);
+  public ByteArrayProperty getByteArrayProperty() {
+    return getPropertyByClass(ByteArrayProperty.class);
   }
 
   /**
@@ -87,8 +102,8 @@ public class PropertyTestFormData extends AbstractFormData {
     getComplexArrayProperty().setValue(complexArray);
   }
 
-  public ComplexInnerArrayProperty getComplexInnerArrayProperty() {
-    return getPropertyByClass(ComplexInnerArrayProperty.class);
+  public ComplexArrayProperty getComplexArrayProperty() {
+    return getPropertyByClass(ComplexArrayProperty.class);
   }
 
   /**
@@ -105,8 +120,8 @@ public class PropertyTestFormData extends AbstractFormData {
     getComplexInnerArrayProperty().setValue(complexInnerArray);
   }
 
-  public DoubleArrayPropertyProperty getDoubleArrayPropertyProperty() {
-    return getPropertyByClass(DoubleArrayPropertyProperty.class);
+  public ComplexInnerArrayProperty getComplexInnerArrayProperty() {
+    return getPropertyByClass(ComplexInnerArrayProperty.class);
   }
 
   /**
@@ -123,8 +138,8 @@ public class PropertyTestFormData extends AbstractFormData {
     getDoubleArrayPropertyProperty().setValue(doubleArrayProperty);
   }
 
-  public IntPrimitiveProperty getIntPrimitiveProperty() {
-    return getPropertyByClass(IntPrimitiveProperty.class);
+  public DoubleArrayPropertyProperty getDoubleArrayPropertyProperty() {
+    return getPropertyByClass(DoubleArrayPropertyProperty.class);
   }
 
   /**
@@ -141,8 +156,12 @@ public class PropertyTestFormData extends AbstractFormData {
     getIntPrimitiveProperty().setValue(intPrimitive);
   }
 
-  public ObjectPropertyProperty getObjectPropertyProperty() {
-    return getPropertyByClass(ObjectPropertyProperty.class);
+  public IntPrimitiveProperty getIntPrimitiveProperty() {
+    return getPropertyByClass(IntPrimitiveProperty.class);
+  }
+
+  public Name getName() {
+    return getFieldByClass(Name.class);
   }
 
   /**
@@ -159,8 +178,8 @@ public class PropertyTestFormData extends AbstractFormData {
     getObjectPropertyProperty().setValue(objectProperty);
   }
 
-  public PropertyTestNrProperty getPropertyTestNrProperty() {
-    return getPropertyByClass(PropertyTestNrProperty.class);
+  public ObjectPropertyProperty getObjectPropertyProperty() {
+    return getPropertyByClass(ObjectPropertyProperty.class);
   }
 
   /**
@@ -177,8 +196,8 @@ public class PropertyTestFormData extends AbstractFormData {
     getPropertyTestNrProperty().setValue(propertyTestNr);
   }
 
-  public SingleArrayPropertyProperty getSingleArrayPropertyProperty() {
-    return getPropertyByClass(SingleArrayPropertyProperty.class);
+  public PropertyTestNrProperty getPropertyTestNrProperty() {
+    return getPropertyByClass(PropertyTestNrProperty.class);
   }
 
   /**
@@ -195,8 +214,8 @@ public class PropertyTestFormData extends AbstractFormData {
     getSingleArrayPropertyProperty().setValue(singleArrayProperty);
   }
 
-  public WizardsProperty getWizardsProperty() {
-    return getPropertyByClass(WizardsProperty.class);
+  public SingleArrayPropertyProperty getSingleArrayPropertyProperty() {
+    return getPropertyByClass(SingleArrayPropertyProperty.class);
   }
 
   /**
@@ -213,95 +232,71 @@ public class PropertyTestFormData extends AbstractFormData {
     getWizardsProperty().setValue(wizards);
   }
 
-  public Name getName() {
-    return getFieldByClass(Name.class);
+  public WizardsProperty getWizardsProperty() {
+    return getPropertyByClass(WizardsProperty.class);
   }
 
-  public class BoolObjectProperty extends AbstractPropertyData<Boolean> {
+  public static class BoolObjectProperty extends AbstractPropertyData<Boolean> {
+
     private static final long serialVersionUID = 1L;
 
     public BoolObjectProperty() {
     }
   }
 
-  public class BoolPrimitiveProperty extends AbstractPropertyData<Boolean> {
+  public static class BoolPrimitiveProperty extends AbstractPropertyData<Boolean> {
+
     private static final long serialVersionUID = 1L;
 
     public BoolPrimitiveProperty() {
     }
   }
 
-  public class ByteArrayProperty extends AbstractPropertyData<byte[]> {
+  public static class ByteArrayProperty extends AbstractPropertyData<byte[]> {
+
     private static final long serialVersionUID = 1L;
 
     public ByteArrayProperty() {
     }
   }
 
-  public class ComplexArrayProperty extends AbstractPropertyData<ArrayList<List<String>>[]> {
+  public static class ComplexArrayProperty extends AbstractPropertyData<ArrayList<List<String>>[]> {
+
     private static final long serialVersionUID = 1L;
 
     public ComplexArrayProperty() {
     }
   }
 
-  public class ComplexInnerArrayProperty extends AbstractPropertyData<ArrayList<List<String[]>>> {
+  public static class ComplexInnerArrayProperty extends AbstractPropertyData<ArrayList<List<String[]>>> {
+
     private static final long serialVersionUID = 1L;
 
     public ComplexInnerArrayProperty() {
     }
   }
 
-  public class DoubleArrayPropertyProperty extends AbstractPropertyData<String[][]> {
+  public static class DoubleArrayPropertyProperty extends AbstractPropertyData<String[][]> {
+
     private static final long serialVersionUID = 1L;
 
     public DoubleArrayPropertyProperty() {
     }
   }
 
-  public class IntPrimitiveProperty extends AbstractPropertyData<Integer> {
+  public static class IntPrimitiveProperty extends AbstractPropertyData<Integer> {
+
     private static final long serialVersionUID = 1L;
 
     public IntPrimitiveProperty() {
     }
   }
 
-  public class ObjectPropertyProperty extends AbstractPropertyData<Object> {
-    private static final long serialVersionUID = 1L;
-
-    public ObjectPropertyProperty() {
-    }
-  }
-
-  public class PropertyTestNrProperty extends AbstractPropertyData<Long> {
-    private static final long serialVersionUID = 1L;
-
-    public PropertyTestNrProperty() {
-    }
-  }
-
-  public class SingleArrayPropertyProperty extends AbstractPropertyData<String[]> {
-    private static final long serialVersionUID = 1L;
-
-    public SingleArrayPropertyProperty() {
-    }
-  }
-
-  public class WizardsProperty extends AbstractPropertyData<HashMap<String, List<IService>>> {
-    private static final long serialVersionUID = 1L;
-
-    public WizardsProperty() {
-    }
-  }
-
   public static class Name extends AbstractValueFieldData<String> {
+
     private static final long serialVersionUID = 1L;
 
     public Name() {
-    }
-
-    public IntPropertyProperty getIntPropertyProperty() {
-      return getPropertyByClass(IntPropertyProperty.class);
     }
 
     /**
@@ -318,20 +313,57 @@ public class PropertyTestFormData extends AbstractFormData {
       getIntPropertyProperty().setValue(intProperty);
     }
 
-    public class IntPropertyProperty extends AbstractPropertyData<Integer> {
-      private static final long serialVersionUID = 1L;
-
-      public IntPropertyProperty() {
-      }
+    public IntPropertyProperty getIntPropertyProperty() {
+      return getPropertyByClass(IntPropertyProperty.class);
     }
 
     /**
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
+    }
+
+    public static class IntPropertyProperty extends AbstractPropertyData<Integer> {
+
+      private static final long serialVersionUID = 1L;
+
+      public IntPropertyProperty() {
+      }
+    }
+  }
+
+  public static class ObjectPropertyProperty extends AbstractPropertyData<Object> {
+
+    private static final long serialVersionUID = 1L;
+
+    public ObjectPropertyProperty() {
+    }
+  }
+
+  public static class PropertyTestNrProperty extends AbstractPropertyData<Long> {
+
+    private static final long serialVersionUID = 1L;
+
+    public PropertyTestNrProperty() {
+    }
+  }
+
+  public static class SingleArrayPropertyProperty extends AbstractPropertyData<String[]> {
+
+    private static final long serialVersionUID = 1L;
+
+    public SingleArrayPropertyProperty() {
+    }
+  }
+
+  public static class WizardsProperty extends AbstractPropertyData<HashMap<String, List<IService>>> {
+
+    private static final long serialVersionUID = 1L;
+
+    public WizardsProperty() {
     }
   }
 }

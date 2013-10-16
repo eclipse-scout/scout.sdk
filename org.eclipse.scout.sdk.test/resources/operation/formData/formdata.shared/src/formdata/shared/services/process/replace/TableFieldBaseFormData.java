@@ -1,12 +1,30 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package formdata.shared.services.process.replace;
 
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
-import formdata.shared.services.process.AbstractPersonTableFieldData;
-import formdata.shared.services.process.AbstractAddressTableFieldData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
+import formdata.shared.services.process.AbstractAddressTableFieldData;
+import formdata.shared.services.process.AbstractPersonTableFieldData;
+
+/**
+ * <b>NOTE:</b><br>
+ * This class is auto generated, no manual modifications recommended.
+ * 
+ * @generated
+ */
 public class TableFieldBaseFormData extends AbstractFormData {
+
   private static final long serialVersionUID = 1L;
 
   public TableFieldBaseFormData() {
@@ -33,6 +51,7 @@ public class TableFieldBaseFormData extends AbstractFormData {
   }
 
   public static class AddressTable extends AbstractAddressTableFieldData {
+
     private static final long serialVersionUID = 1L;
 
     public AddressTable() {
@@ -40,23 +59,23 @@ public class TableFieldBaseFormData extends AbstractFormData {
 
     @Override
     public AddressTableRowData addRow() {
-        return (AddressTableRowData) super.addRow();
-      }
+      return (AddressTableRowData) super.addRow();
+    }
 
-      @Override
-      public AddressTableRowData addRow(int rowState) {
-        return (AddressTableRowData) super.addRow(rowState);
-      }
-    
-      @Override
-      public AddressTableRowData createRow() {
-        return new AddressTableRowData();
-      }
+    @Override
+    public AddressTableRowData addRow(int rowState) {
+      return (AddressTableRowData) super.addRow(rowState);
+    }
 
-      @Override
-      public Class<? extends AbstractTableRowData> getRowType() {
-        return AddressTableRowData.class;
-      }
+    @Override
+    public AddressTableRowData createRow() {
+      return new AddressTableRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return AddressTableRowData.class;
+    }
 
     @Override
     public AddressTableRowData[] getRows() {
@@ -64,26 +83,23 @@ public class TableFieldBaseFormData extends AbstractFormData {
     }
 
     @Override
-    public AddressTableRowData rowAt(int idx) {
-      return (AddressTableRowData) super.rowAt(idx);
+    public AddressTableRowData rowAt(int index) {
+      return (AddressTableRowData) super.rowAt(index);
     }
 
-    
     public void setRows(AddressTableRowData[] rows) {
       super.setRows(rows);
     }
 
+    public static class AddressTableRowData extends AbstractAddressTableRowData {
 
-    public static class AddressTableRowData extends AbstractAddressTableFieldData.AbstractAddressTableRowData {
-    	
       private static final long serialVersionUID = 1L;
-
-        public static final String city = "city";
+      public static final String city = "city";
       private String m_city;
 
       public AddressTableRowData() {
       }
-      
+
       public String getCity() {
         return m_city;
       }
@@ -95,18 +111,10 @@ public class TableFieldBaseFormData extends AbstractFormData {
   }
 
   public static class EmptyTable extends AbstractTableFieldBeanData {
+
     private static final long serialVersionUID = 1L;
 
     public EmptyTable() {
-    }
-
-    @Override
-    public EmptyTableRowData[] getRows() {
-      return (EmptyTableRowData[]) super.getRows();
-    }
-
-    public void setRows(EmptyTableRowData[] rows) {
-      super.setRows(rows);
     }
 
     @Override
@@ -120,11 +128,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
     }
 
     @Override
-    public EmptyTableRowData rowAt(int idx) {
-      return (EmptyTableRowData) super.rowAt(idx);
-    }
-
-    @Override
     public EmptyTableRowData createRow() {
       return new EmptyTableRowData();
     }
@@ -134,7 +137,22 @@ public class TableFieldBaseFormData extends AbstractFormData {
       return EmptyTableRowData.class;
     }
 
+    @Override
+    public EmptyTableRowData[] getRows() {
+      return (EmptyTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public EmptyTableRowData rowAt(int index) {
+      return (EmptyTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(EmptyTableRowData[] rows) {
+      super.setRows(rows);
+    }
+
     public static class EmptyTableRowData extends AbstractTableRowData {
+
       private static final long serialVersionUID = 1L;
 
       public EmptyTableRowData() {
@@ -143,6 +161,7 @@ public class TableFieldBaseFormData extends AbstractFormData {
   }
 
   public static class NoTable extends AbstractTableFieldBeanData {
+
     private static final long serialVersionUID = 1L;
 
     public NoTable() {
@@ -162,25 +181,60 @@ public class TableFieldBaseFormData extends AbstractFormData {
   }
 
   public static class PersonTable extends AbstractPersonTableFieldData {
+
     private static final long serialVersionUID = 1L;
 
     public PersonTable() {
     }
-  }
 
-  public static class Table extends AbstractTableFieldBeanData {
-    private static final long serialVersionUID = 1L;
-
-    public Table() {
+    @Override
+    public AbstractPersonTableRowData addRow() {
+      return (AbstractPersonTableRowData) super.addRow();
     }
 
     @Override
-    public TableRowData[] getRows() {
-      return (TableRowData[]) super.getRows();
+    public AbstractPersonTableRowData addRow(int rowState) {
+      return (AbstractPersonTableRowData) super.addRow(rowState);
     }
 
-    public void setRows(TableRowData[] rows) {
+    @Override
+    public AbstractPersonTableRowData createRow() {
+      return new AbstractPersonTableRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return AbstractPersonTableRowData.class;
+    }
+
+    @Override
+    public AbstractPersonTableRowData[] getRows() {
+      return (AbstractPersonTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public AbstractPersonTableRowData rowAt(int index) {
+      return (AbstractPersonTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(AbstractPersonTableRowData[] rows) {
       super.setRows(rows);
+    }
+
+    public static class AbstractPersonTableRowData extends formdata.shared.services.process.AbstractPersonTableFieldData.AbstractPersonTableRowData {
+
+      private static final long serialVersionUID = 1L;
+
+      public AbstractPersonTableRowData() {
+      }
+    }
+  }
+
+  public static class Table extends AbstractTableFieldBeanData {
+
+    private static final long serialVersionUID = 1L;
+
+    public Table() {
     }
 
     @Override
@@ -194,11 +248,6 @@ public class TableFieldBaseFormData extends AbstractFormData {
     }
 
     @Override
-    public TableRowData rowAt(int idx) {
-      return (TableRowData) super.rowAt(idx);
-    }
-
-    @Override
     public TableRowData createRow() {
       return new TableRowData();
     }
@@ -208,16 +257,30 @@ public class TableFieldBaseFormData extends AbstractFormData {
       return TableRowData.class;
     }
 
+    @Override
+    public TableRowData[] getRows() {
+      return (TableRowData[]) super.getRows();
+    }
+
+    @Override
+    public TableRowData rowAt(int index) {
+      return (TableRowData) super.rowAt(index);
+    }
+
+    public void setRows(TableRowData[] rows) {
+      super.setRows(rows);
+    }
+
     public static class TableRowData extends AbstractTableRowData {
+
       private static final long serialVersionUID = 1L;
-
-      public TableRowData() {
-      }
-
       public static final String first = "first";
       public static final String second = "second";
       private String m_first;
       private String m_second;
+
+      public TableRowData() {
+      }
 
       public String getFirst() {
         return m_first;

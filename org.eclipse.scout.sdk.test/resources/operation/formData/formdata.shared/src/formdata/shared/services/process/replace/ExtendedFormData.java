@@ -1,10 +1,29 @@
+/*******************************************************************************
+ * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ * 
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
 package formdata.shared.services.process.replace;
+
+import java.util.Map;
 
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 
+/**
+ * <b>NOTE:</b><br>
+ * This class is auto generated, no manual modifications recommended.
+ * 
+ * @generated
+ */
 public class ExtendedFormData extends BaseFormData {
+
   private static final long serialVersionUID = 1L;
 
   public ExtendedFormData() {
@@ -87,6 +106,7 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   public static class FirstName extends AbstractValueFieldData<String> {
+
     private static final long serialVersionUID = 1L;
 
     public FirstName() {
@@ -96,7 +116,7 @@ public class ExtendedFormData extends BaseFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
@@ -104,6 +124,7 @@ public class ExtendedFormData extends BaseFormData {
 
   @Replace
   public static class IgnoringGroupBoxExCreate extends AbstractValueFieldData<String> {
+
     private static final long serialVersionUID = 1L;
 
     public IgnoringGroupBoxExCreate() {
@@ -113,7 +134,7 @@ public class ExtendedFormData extends BaseFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
@@ -121,6 +142,7 @@ public class ExtendedFormData extends BaseFormData {
 
   @Replace
   public static class IgnoringGroupBoxExUse extends UsingFormFieldData {
+
     private static final long serialVersionUID = 1L;
 
     public IgnoringGroupBoxExUse() {
@@ -130,14 +152,15 @@ public class ExtendedFormData extends BaseFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
   }
 
   @Replace
-  public static class NameEx extends BaseFormData.Name {
+  public static class NameEx extends Name {
+
     private static final long serialVersionUID = 1L;
 
     public NameEx() {
@@ -147,7 +170,7 @@ public class ExtendedFormData extends BaseFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.remove(ValidationRule.MANDATORY);
       ruleMap.put(ValidationRule.MAX_LENGTH, 100);
@@ -155,7 +178,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateCreate extends BaseFormData.SdkCommandCreate {
+  public static class SdkCommandCreateCreate extends SdkCommandCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateCreate() {
@@ -163,7 +187,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateIgnore extends BaseFormData.SdkCommandCreate {
+  public static class SdkCommandCreateIgnore extends SdkCommandCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateIgnore() {
@@ -171,7 +196,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateNone extends BaseFormData.SdkCommandCreate {
+  public static class SdkCommandCreateNone extends SdkCommandCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateNone() {
@@ -179,7 +205,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandCreateUse extends BaseFormData.SdkCommandCreate {
+  public static class SdkCommandCreateUse extends SdkCommandCreate {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandCreateUse() {
@@ -188,6 +215,7 @@ public class ExtendedFormData extends BaseFormData {
 
   @Replace
   public static class SdkCommandIgnoreCreate extends AbstractValueFieldData<String> {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreCreate() {
@@ -197,7 +225,7 @@ public class ExtendedFormData extends BaseFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
@@ -205,6 +233,7 @@ public class ExtendedFormData extends BaseFormData {
 
   @Replace
   public static class SdkCommandIgnoreUse extends UsingFormFieldData {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandIgnoreUse() {
@@ -214,14 +243,15 @@ public class ExtendedFormData extends BaseFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.put(ValidationRule.MAX_LENGTH, 4000);
     }
   }
 
   @Replace
-  public static class SdkCommandNoneCreate extends BaseFormData.SdkCommandNone {
+  public static class SdkCommandNoneCreate extends SdkCommandNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneCreate() {
@@ -229,7 +259,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneIgnore extends BaseFormData.SdkCommandNone {
+  public static class SdkCommandNoneIgnore extends SdkCommandNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneIgnore() {
@@ -237,7 +268,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneNone extends BaseFormData.SdkCommandNone {
+  public static class SdkCommandNoneNone extends SdkCommandNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneNone() {
@@ -245,7 +277,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandNoneUse extends BaseFormData.SdkCommandNone {
+  public static class SdkCommandNoneUse extends SdkCommandNone {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandNoneUse() {
@@ -253,7 +286,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandUseCreate extends BaseFormData.SdkCommandUse {
+  public static class SdkCommandUseCreate extends SdkCommandUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseCreate() {
@@ -261,7 +295,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandUseIgnore extends BaseFormData.SdkCommandUse {
+  public static class SdkCommandUseIgnore extends SdkCommandUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseIgnore() {
@@ -269,7 +304,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandUseNone extends BaseFormData.SdkCommandUse {
+  public static class SdkCommandUseNone extends SdkCommandUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseNone() {
@@ -277,7 +313,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SdkCommandUseUse extends BaseFormData.SdkCommandUse {
+  public static class SdkCommandUseUse extends SdkCommandUse {
+
     private static final long serialVersionUID = 1L;
 
     public SdkCommandUseUse() {
@@ -285,7 +322,8 @@ public class ExtendedFormData extends BaseFormData {
   }
 
   @Replace
-  public static class SmartEx extends BaseFormData.Smart {
+  public static class SmartEx extends Smart {
+
     private static final long serialVersionUID = 1L;
 
     public SmartEx() {
@@ -295,7 +333,7 @@ public class ExtendedFormData extends BaseFormData {
      * list of derived validation rules.
      */
     @Override
-    protected void initValidationRules(java.util.Map<String, Object> ruleMap) {
+    protected void initValidationRules(Map<String, Object> ruleMap) {
       super.initValidationRules(ruleMap);
       ruleMap.remove(ValidationRule.CODE_TYPE);
     }

@@ -35,7 +35,7 @@ public abstract class AbstractTableSourceBuilder extends AbstractDtoTypeSourceBu
   }
 
   protected String getColumnSignature(IType type, ITypeHierarchy columnHierarchy) throws IllegalArgumentException, CoreException {
-    if (type == null || type.getFullyQualifiedName().equals(Object.class.getName())) {
+    if (type == null || Object.class.getName().equals(type.getFullyQualifiedName())) {
       return null;
     }
     IType superType = columnHierarchy.getSuperclass(type);

@@ -1152,10 +1152,9 @@ public class ScoutTypeUtility extends TypeUtility {
         return createStructuredToolButton(type);
       }
       else {
-        ScoutSdk.logInfo("potential performance leek, no structured type defined for type '" + type.getFullyQualifiedName() + "'.");
+        ScoutSdk.logInfo("no structured type defined for type '" + type.getFullyQualifiedName() + "'.");
         return createUnknownStructuredType(type);
       }
-
     }
     catch (JavaModelException e) {
       ScoutSdk.logError("could not create structured type for '" + type.getFullyQualifiedName() + "'.", e);
