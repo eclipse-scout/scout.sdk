@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
@@ -23,6 +22,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**

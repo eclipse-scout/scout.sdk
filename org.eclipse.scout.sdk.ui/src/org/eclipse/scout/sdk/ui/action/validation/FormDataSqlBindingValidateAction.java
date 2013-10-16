@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.sql.binding.FormDataSqlBindingValidator;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;

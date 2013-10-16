@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.operation.form.formdata;
+package org.eclipse.scout.sdk.workspace.dto.formdata;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -27,10 +28,10 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class MultipleFormDataUpdateOperation implements IOperation {
 
-  private final IType[] m_types;
+  private final ITypeResolver m_resolver;
 
-  public MultipleFormDataUpdateOperation(IType[] types) {
-    m_types = types;
+  public MultipleFormDataUpdateOperation(ITypeResolver resolver) {
+    m_resolver = resolver;
   }
 
   @Override
@@ -40,15 +41,15 @@ public class MultipleFormDataUpdateOperation implements IOperation {
 
   @Override
   public void validate() throws IllegalArgumentException {
-    if (getTypes() == null) {
-      throw new IllegalArgumentException("types can not be null.");
+    if (m_resolver == null) {
+      throw new IllegalArgumentException("type resolver can not be null.");
     }
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     validate();
-    IType[] types = getTypes();
+    IType[] types = m_resolver.getTypes();
     monitor.beginTask("Updating Form Datas", types.length);
     int i = 0;
     for (IType t : types) {
@@ -69,12 +70,4 @@ public class MultipleFormDataUpdateOperation implements IOperation {
       monitor.worked(1);
     }
   }
-
-  /**
-   * @return the types
-   */
-  public IType[] getTypes() {
-    return m_types;
-  }
-
 }

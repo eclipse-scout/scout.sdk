@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.operation.form.formdata;
+package org.eclipse.scout.sdk.workspace.dto.formdata;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;

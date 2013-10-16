@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field;
 
-import org.eclipse.scout.sdk.ui.action.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
+import org.eclipse.scout.sdk.ui.action.dto.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;

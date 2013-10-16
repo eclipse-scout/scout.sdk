@@ -12,13 +12,14 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.form.formdata.ClientBundleUpdateFormDataOperation;
+import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.InstallClientSessionAction;
-import org.eclipse.scout.sdk.ui.action.MultipleUpdateFormDataAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
+import org.eclipse.scout.sdk.ui.action.dto.MultipleUpdateFormDataAction;
+import org.eclipse.scout.sdk.ui.action.dto.TypeResolverPageDataAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
@@ -31,6 +32,8 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.dto.formdata.ClientBundleUpdateFormDataOperation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class ClientNodePage extends AbstractBundleNodeTablePage {
@@ -129,7 +132,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, MultipleUpdateFormDataAction.class, InstallClientSessionAction.class, ScoutBundleNewAction.class};
+    return new Class[]{WellformAction.class, MultipleUpdateFormDataAction.class, InstallClientSessionAction.class, ScoutBundleNewAction.class, TypeResolverPageDataAction.class};
   }
 
   @Override
@@ -147,6 +150,16 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
     }
     else if (menu instanceof ScoutBundleNewAction) {
       ((ScoutBundleNewAction) menu).setScoutProject(getScoutBundle());
+    }
+    else if (menu instanceof TypeResolverPageDataAction) {
+      ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+          IPrimaryTypeTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
+          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
+        }
+      }, getScoutBundle());
     }
   }
 }

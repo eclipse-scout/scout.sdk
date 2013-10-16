@@ -77,19 +77,22 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
   }
 
   protected void visitTableBean(IType table, ITypeHierarchy fieldHierarchy) throws CoreException {
-    final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn), fieldHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
+    // row data super type
+    String rowDataSuperClassSig = getTableRowDataSuperClassSignature(table, fieldHierarchy);
+//    IType rowDataSuperClassType = TypeUtility.getTypeBySignature(rowDataSuperClassSig);
 
+    // row data class name
     String rowDataName = ScoutUtility.removeFieldSuffix(table.getDeclaringType().getElementName()) + "RowData";
     ITypeSourceBuilder tableRowDataBuilder = new TypeSourceBuilder(rowDataName);
 
-    // flags
+    // row data class flags
     int flags = Flags.AccPublic | Flags.AccStatic;
     boolean isAbstract = Flags.isAbstract(table.getFlags()) || Flags.isAbstract(table.getDeclaringType().getFlags());
     if (isAbstract) {
       flags |= Flags.AccAbstract;
     }
     tableRowDataBuilder.setFlags(flags);
-    tableRowDataBuilder.setSuperTypeSignature(getTableRowDataSuperClassSignature(table, fieldHierarchy));
+    tableRowDataBuilder.setSuperTypeSignature(rowDataSuperClassSig);
 
     // serialVersionUidBuilder
     IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
@@ -100,6 +103,8 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     tableRowDataBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
 
     // visit columns
+    final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn), fieldHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
+
     for (int i = 0; i < columns.length; i++) {
       IType column = columns[i];
       if (ScoutTypeUtility.existsReplaceAnnotation(column)) {

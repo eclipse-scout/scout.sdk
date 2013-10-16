@@ -13,10 +13,12 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformPagesOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
+import org.eclipse.scout.sdk.ui.action.dto.TypeResolverPageDataAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -24,6 +26,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -79,7 +82,7 @@ public class AllPagesTablePage extends AbstractPage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, PageNewAction.class};
+    return new Class[]{WellformAction.class, PageNewAction.class, TypeResolverPageDataAction.class};
   }
 
   @Override
@@ -92,6 +95,16 @@ public class AllPagesTablePage extends AbstractPage {
     }
     else if (menu instanceof PageNewAction) {
       ((PageNewAction) menu).init(getScoutBundle());
+    }
+    else if (menu instanceof TypeResolverPageDataAction) {
+      ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
+        @Override
+        public IType[] getTypes() {
+          IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+          IPrimaryTypeTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
+          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
+        }
+      }, getScoutBundle());
     }
   }
 }

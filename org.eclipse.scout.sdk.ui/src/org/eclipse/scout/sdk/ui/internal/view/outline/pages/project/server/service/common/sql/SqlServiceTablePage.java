@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.SqlServiceNewAction;
 import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
-import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;

@@ -11,9 +11,9 @@
 package org.eclipse.scout.sdk.internal.workspace.dto;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 

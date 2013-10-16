@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilder;
@@ -42,6 +41,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 

@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.type.PropertyBeanComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutPropertyBeanFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 

@@ -16,11 +16,11 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**

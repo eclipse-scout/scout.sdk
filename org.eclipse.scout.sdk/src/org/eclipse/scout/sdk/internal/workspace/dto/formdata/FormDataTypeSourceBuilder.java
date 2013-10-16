@@ -24,7 +24,6 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractDtoTypeSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
@@ -36,6 +35,7 @@ import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 

@@ -34,57 +34,54 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  */
 public class WellformClientBundleOperation implements IOperation {
 
-  private final IScoutBundle m_bundle;
+  private final IScoutBundle[] m_bundles;
 
-  public WellformClientBundleOperation(IScoutBundle bundle) {
-    m_bundle = bundle;
+  public WellformClientBundleOperation(IScoutBundle... bundles) {
+    m_bundles = bundles;
   }
 
   @Override
   public String getOperationName() {
     StringBuilder builder = new StringBuilder();
-    builder.append("Wellform '" + getBundle().getSymbolicName() + "'...");
+    builder.append("Wellform client bundle(s)...");
     return builder.toString();
   }
 
   @Override
   public void validate() throws IllegalArgumentException {
-    if (getBundle() == null) {
-      throw new IllegalArgumentException("Bundle can not be null.");
-    }
-    if (!getBundle().getType().equals(IScoutBundle.TYPE_CLIENT)) {
-      throw new IllegalArgumentException("Bundle must be a client bundle.");
+    if (m_bundles == null) {
+      throw new IllegalArgumentException("bundles can not be null.");
     }
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    HashSet<IType> allTypes = new HashSet<IType>();
-    IPackageFragmentRoot[] packageFragmentRoots = getBundle().getJavaProject().getPackageFragmentRoots();
-    for (IPackageFragmentRoot pr : packageFragmentRoots) {
-      if (!pr.isReadOnly()) {
-        collectTypesRec(pr, allTypes);
+    for (IScoutBundle bundle : m_bundles) {
+      if (IScoutBundle.TYPE_CLIENT.equals(bundle.getType())) {
+        HashSet<IType> allTypes = new HashSet<IType>();
+        IPackageFragmentRoot[] packageFragmentRoots = bundle.getJavaProject().getPackageFragmentRoots();
+        for (IPackageFragmentRoot pr : packageFragmentRoots) {
+          if (!pr.isReadOnly()) {
+            collectTypesRec(pr, allTypes);
+          }
+        }
+        wellformDesktop(allTypes, bundle, monitor, workingCopyManager);
+        wellformDesktopExtension(allTypes, bundle, monitor, workingCopyManager);
+        wellformClientSession(allTypes, bundle, monitor, workingCopyManager);
+        wellformForms(allTypes, bundle, monitor, workingCopyManager);
+        wellformSearchForms(allTypes, bundle, monitor, workingCopyManager);
+        wellformWizards(allTypes, bundle, monitor, workingCopyManager);
+        wellformLookupCalls(allTypes, bundle, monitor, workingCopyManager);
+        wellformPages(allTypes, bundle, monitor, workingCopyManager);
+        wellformOutlines(allTypes, bundle, monitor, workingCopyManager);
+        for (IType t : allTypes) {
+          if (t.exists()) {
+            JavaElementFormatOperation op = new JavaElementFormatOperation(t, true);
+            op.run(monitor, workingCopyManager);
+          }
+        }
       }
     }
-    wellformDesktop(allTypes, monitor, workingCopyManager);
-    wellformDesktopExtension(allTypes, monitor, workingCopyManager);
-    wellformClientSession(allTypes, monitor, workingCopyManager);
-    wellformForms(allTypes, monitor, workingCopyManager);
-    wellformSearchForms(allTypes, monitor, workingCopyManager);
-    wellformWizards(allTypes, monitor, workingCopyManager);
-    wellformLookupCalls(allTypes, monitor, workingCopyManager);
-    wellformPages(allTypes, monitor, workingCopyManager);
-    wellformOutlines(allTypes, monitor, workingCopyManager);
-    for (IType t : allTypes) {
-      if (t.exists()) {
-        JavaElementFormatOperation op = new JavaElementFormatOperation(t, true);
-        op.run(monitor, workingCopyManager);
-      }
-    }
-  }
-
-  public IScoutBundle getBundle() {
-    return m_bundle;
   }
 
   protected void collectTypesRec(IJavaElement element, Set<IType> collector) throws JavaModelException {
@@ -102,9 +99,9 @@ public class WellformClientBundleOperation implements IOperation {
     }
   }
 
-  protected void wellformClientSession(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+  protected void wellformClientSession(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     IType iClientSessions = TypeUtility.getType(RuntimeClasses.IClientSession);
-    IType[] clientSessions = TypeUtility.getPrimaryTypeHierarchy(iClientSessions).getAllSubtypes(iClientSessions, ScoutTypeFilters.getTypesInScoutBundles(getBundle()));
+    IType[] clientSessions = TypeUtility.getPrimaryTypeHierarchy(iClientSessions).getAllSubtypes(iClientSessions, ScoutTypeFilters.getTypesInScoutBundles(bundle));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(clientSessions, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -113,13 +110,13 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform client sessions of bundle '" + getBundle().getSymbolicName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform client sessions of bundle '" + bundle.getSymbolicName() + "'.", e);
     }
   }
 
-  protected void wellformDesktop(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+  protected void wellformDesktop(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     IType idesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
-    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getTypesInScoutBundles(getBundle()));
+    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getTypesInScoutBundles(bundle));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -128,13 +125,13 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform desktops of bundle '" + getBundle().getSymbolicName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform desktops of bundle '" + bundle.getSymbolicName() + "'.", e);
     }
   }
 
-  protected void wellformDesktopExtension(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+  protected void wellformDesktopExtension(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     IType idesktop = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
-    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getTypesInScoutBundles(getBundle()));
+    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getTypesInScoutBundles(bundle));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -143,12 +140,12 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform desktops of bundle '" + getBundle().getSymbolicName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform desktops of bundle '" + bundle.getSymbolicName() + "'.", e);
     }
   }
 
-  protected void wellformForms(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    WellformFormsOperation op = new WellformFormsOperation(getBundle());
+  protected void wellformForms(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    WellformFormsOperation op = new WellformFormsOperation(bundle);
     try {
       op.run(monitor, workingCopyManager);
       if (op.getForms() != null) {
@@ -158,12 +155,12 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform forms of bundle '" + getBundle().getSymbolicName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform forms of bundle '" + bundle.getSymbolicName() + "'.", e);
     }
   }
 
-  protected void wellformSearchForms(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    WellformSearchFormsOperation op = new WellformSearchFormsOperation(getBundle());
+  protected void wellformSearchForms(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    WellformSearchFormsOperation op = new WellformSearchFormsOperation(bundle);
     try {
       op.run(monitor, workingCopyManager);
       if (op.getSearchForms() != null) {
@@ -173,12 +170,12 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform search forms of bundle '" + getBundle().getSymbolicName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform search forms of bundle '" + bundle.getSymbolicName() + "'.", e);
     }
   }
 
-  protected void wellformWizards(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    WellformWizardsOperation op = new WellformWizardsOperation(getBundle());
+  protected void wellformWizards(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    WellformWizardsOperation op = new WellformWizardsOperation(bundle);
     try {
       op.run(monitor, workingCopyManager);
       if (op.getWizards() != null) {
@@ -188,12 +185,12 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform wizards of bundle '" + getBundle().getSymbolicName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform wizards of bundle '" + bundle.getSymbolicName() + "'.", e);
     }
   }
 
-  protected void wellformLookupCalls(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    WellformLookupCallsOperation op = new WellformLookupCallsOperation(getBundle());
+  protected void wellformLookupCalls(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    WellformLookupCallsOperation op = new WellformLookupCallsOperation(bundle);
     try {
       op.run(monitor, workingCopyManager);
       if (op.getLookupCalls() != null) {
@@ -203,12 +200,12 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform lookup calls of bundle '" + getBundle().getSymbolicName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform lookup calls of bundle '" + bundle.getSymbolicName() + "'.", e);
     }
   }
 
-  protected void wellformPages(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    WellformPagesOperation op = new WellformPagesOperation(getBundle());
+  protected void wellformPages(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    WellformPagesOperation op = new WellformPagesOperation(bundle);
     try {
       op.run(monitor, workingCopyManager);
       if (op.getPages() != null) {
@@ -218,12 +215,12 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform pages of bundle '" + getBundle().getSymbolicName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform pages of bundle '" + bundle.getSymbolicName() + "'.", e);
     }
   }
 
-  protected void wellformOutlines(Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    WellformOutlinesOperation op = new WellformOutlinesOperation(getBundle());
+  protected void wellformOutlines(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
+    WellformOutlinesOperation op = new WellformOutlinesOperation(bundle);
     try {
       op.run(monitor, workingCopyManager);
       if (op.getOutlines() != null) {
@@ -233,7 +230,7 @@ public class WellformClientBundleOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not wellform outlines of bundle '" + getBundle().getSymbolicName() + "'.", e);
+      ScoutSdk.logWarning("could not wellform outlines of bundle '" + bundle.getSymbolicName() + "'.", e);
     }
   }
 }

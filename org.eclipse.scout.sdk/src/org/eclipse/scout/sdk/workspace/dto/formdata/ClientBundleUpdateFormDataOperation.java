@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.operation.form.formdata;
+package org.eclipse.scout.sdk.workspace.dto.formdata;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -53,7 +54,7 @@ public class ClientBundleUpdateFormDataOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // collect types
-    ArrayList<IType> types = new ArrayList<IType>();
+    final ArrayList<IType> types = new ArrayList<IType>();
     IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
     IPrimaryTypeTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
     types.addAll(Arrays.asList(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getInScoutBundles(getClientBundle()))));
@@ -62,7 +63,12 @@ public class ClientBundleUpdateFormDataOperation implements IOperation {
     IPrimaryTypeTypeHierarchy formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
     types.addAll(Arrays.asList(formFieldHierarchy.getAllSubtypes(iFormField, ScoutTypeFilters.getInScoutBundles(getClientBundle()))));
 
-    MultipleFormDataUpdateOperation updateOp = new MultipleFormDataUpdateOperation(types.toArray(new IType[types.size()]));
+    MultipleFormDataUpdateOperation updateOp = new MultipleFormDataUpdateOperation(new ITypeResolver() {
+      @Override
+      public IType[] getTypes() {
+        return types.toArray(new IType[types.size()]);
+      }
+    });
     updateOp.validate();
     updateOp.run(monitor, workingCopyManager);
   }

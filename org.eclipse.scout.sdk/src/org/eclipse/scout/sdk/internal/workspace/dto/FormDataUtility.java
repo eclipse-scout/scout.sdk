@@ -33,7 +33,6 @@ import org.eclipse.scout.sdk.internal.workspace.dto.formdata.CompositeFormDataTy
 import org.eclipse.scout.sdk.internal.workspace.dto.formdata.TableFieldBeanFormDataSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.formdata.TableFieldFormDataSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.pagedata.PageDataSourceBuilder;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -44,6 +43,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;

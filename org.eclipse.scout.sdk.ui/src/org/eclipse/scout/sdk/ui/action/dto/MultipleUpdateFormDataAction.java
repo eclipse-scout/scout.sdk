@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.action;
+package org.eclipse.scout.sdk.ui.action.dto;
 
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.action.AbstractOperationAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 /**

@@ -14,8 +14,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
 
 /**

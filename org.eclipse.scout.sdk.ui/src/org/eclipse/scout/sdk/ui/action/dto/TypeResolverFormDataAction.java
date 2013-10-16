@@ -8,14 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.action;
+package org.eclipse.scout.sdk.ui.action.dto;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.scout.sdk.operation.form.formdata.MultipleFormDataUpdateOperation;
-import org.eclipse.scout.sdk.ui.action.validation.ITypeResolver;
+import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.dto.formdata.MultipleFormDataUpdateOperation;
 import org.eclipse.swt.widgets.Shell;
 
 /**
@@ -35,12 +35,12 @@ public class TypeResolverFormDataAction extends MultipleUpdateFormDataAction {
 
   @Override
   public boolean isVisible() {
-    return m_typeResolver != null && m_bundle != null && !m_bundle.isBinary();
+    return m_typeResolver != null && (m_bundle == null || !m_bundle.isBinary());
   }
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    setOperation(new MultipleFormDataUpdateOperation(m_typeResolver.getTypes()));
+    setOperation(new MultipleFormDataUpdateOperation(m_typeResolver));
     return super.execute(shell, selection, event);
   }
 }

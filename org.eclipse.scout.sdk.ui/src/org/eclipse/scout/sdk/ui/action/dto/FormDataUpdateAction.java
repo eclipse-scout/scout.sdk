@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.action;
+package org.eclipse.scout.sdk.ui.action.dto;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -17,10 +17,11 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.form.formdata.FormDataAnnotation;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;

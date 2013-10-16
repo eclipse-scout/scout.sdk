@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.action.validation;
+package org.eclipse.scout.sdk.operation;
 
 import org.eclipse.jdt.core.IType;
 
