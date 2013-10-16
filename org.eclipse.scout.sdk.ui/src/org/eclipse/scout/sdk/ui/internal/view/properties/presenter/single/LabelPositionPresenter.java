@@ -4,38 +4,42 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
-import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerSourcePropertyParser;
-import org.eclipse.scout.sdk.workspace.type.config.parser.SourcePropertyParser;
-import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
+import org.eclipse.scout.sdk.workspace.type.config.parser.FieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerFieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
-public class LabelPositionPresenter extends AbstractProposalPresenter<SourceProperty<Integer>> {
+public class LabelPositionPresenter extends AbstractProposalPresenter<FieldProperty<Integer>> {
 
-  protected static final SourceProperty<Integer> LABEL_POSITION_DEFAULT;
-  protected static final SourceProperty<Integer> LABEL_POSITION_LEFT;
-  protected static final SourceProperty<Integer> LABEL_POSITION_ON_FIELD;
-  protected static final SourceProperty<Integer> LABEL_POSITION_RIGHT;
-  protected static final SourceProperty<Integer> LABEL_POSITION_TOP;
+  protected static final UiFieldProperty<Integer> LABEL_POSITION_DEFAULT;
+  protected static final UiFieldProperty<Integer> LABEL_POSITION_LEFT;
+  protected static final UiFieldProperty<Integer> LABEL_POSITION_ON_FIELD;
+  protected static final UiFieldProperty<Integer> LABEL_POSITION_RIGHT;
+  protected static final UiFieldProperty<Integer> LABEL_POSITION_TOP;
 
-  protected static final List<SourceProperty<Integer>> PROPOSALS;
+  protected static final List<FieldProperty<Integer>> PROPOSALS;
   static {
-    LABEL_POSITION_DEFAULT = new UiSourceProperty<Integer>(Integer.valueOf(0), "default");
-    LABEL_POSITION_LEFT = new UiSourceProperty<Integer>(Integer.valueOf(1), "left");
-    LABEL_POSITION_ON_FIELD = new UiSourceProperty<Integer>(Integer.valueOf(2), "on field");
-    LABEL_POSITION_RIGHT = new UiSourceProperty<Integer>(Integer.valueOf(3), "right");
-    LABEL_POSITION_TOP = new UiSourceProperty<Integer>(Integer.valueOf(3), "top");
-    PROPOSALS = new ArrayList<SourceProperty<Integer>>();
+    IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
+    LABEL_POSITION_DEFAULT = new UiFieldProperty<Integer>(iFormField.getField("LABEL_POSITION_DEFAULT"), "default");
+    LABEL_POSITION_LEFT = new UiFieldProperty<Integer>(iFormField.getField("LABEL_POSITION_LEFT"), "left");
+    LABEL_POSITION_ON_FIELD = new UiFieldProperty<Integer>(iFormField.getField("LABEL_POSITION_ON_FIELD"), "on field");
+    LABEL_POSITION_RIGHT = new UiFieldProperty<Integer>(iFormField.getField("LABEL_POSITION_RIGHT"), "right");
+    LABEL_POSITION_TOP = new UiFieldProperty<Integer>(iFormField.getField("LABEL_POSITION_TOP"), "top");
+    PROPOSALS = new ArrayList<FieldProperty<Integer>>(5);
     PROPOSALS.add(LABEL_POSITION_DEFAULT);
     PROPOSALS.add(LABEL_POSITION_LEFT);
     PROPOSALS.add(LABEL_POSITION_ON_FIELD);
@@ -43,11 +47,11 @@ public class LabelPositionPresenter extends AbstractProposalPresenter<SourceProp
     PROPOSALS.add(LABEL_POSITION_TOP);
   }
 
-  private final SourcePropertyParser<Integer> m_parser;
+  private final FieldReferencePropertyParser<Integer> m_parser;
 
   public LabelPositionPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
-    m_parser = new IntegerSourcePropertyParser(PROPOSALS);
+    m_parser = new IntegerFieldReferencePropertyParser(PROPOSALS);
   }
 
   @Override
@@ -76,27 +80,27 @@ public class LabelPositionPresenter extends AbstractProposalPresenter<SourceProp
 
     };
     getProposalField().setLabelProvider(labelProvider);
-    StaticContentProvider provider = new StaticContentProvider(PROPOSALS.toArray(new UiSourceProperty[PROPOSALS.size()]), labelProvider);
+    StaticContentProvider provider = new StaticContentProvider(PROPOSALS.toArray(new UiFieldProperty[PROPOSALS.size()]), labelProvider);
     getProposalField().setContentProvider(provider);
   }
 
-  public SourcePropertyParser<Integer> getParser() {
+  public FieldReferencePropertyParser<Integer> getParser() {
     return m_parser;
   }
 
   @Override
-  protected SourceProperty<Integer> parseInput(String input) throws CoreException {
+  protected FieldProperty<Integer> parseInput(String input) throws CoreException {
     return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
   }
 
   @Override
-  protected synchronized void storeValue(SourceProperty<Integer> value) throws CoreException {
+  protected synchronized void storeValue(FieldProperty<Integer> value) throws CoreException {
     if (value == null) {
       getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
     }
     try {
-      ConfigPropertyUpdateOperation<SourceProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<SourceProperty<Integer>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<Integer>>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);
@@ -105,6 +109,5 @@ public class LabelPositionPresenter extends AbstractProposalPresenter<SourceProp
     catch (Exception e) {
       ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-
   }
 }

@@ -44,7 +44,7 @@ public class HorizontalAlignmentPresenter extends AbstractProposalPresenter<Sour
     LEFT = new UiSourceProperty<Integer>(Integer.valueOf(-1), "left");
     CENTER = new UiSourceProperty<Integer>(Integer.valueOf(0), "center");
     RIGHT = new UiSourceProperty<Integer>(Integer.valueOf(1), "right");
-    PROPOSALS = new ArrayList<SourceProperty<Integer>>();
+    PROPOSALS = new ArrayList<SourceProperty<Integer>>(3);
     PROPOSALS.add(LEFT);
     PROPOSALS.add(CENTER);
     PROPOSALS.add(RIGHT);

@@ -52,7 +52,7 @@ public class BorderDecorationPresenter extends AbstractProposalPresenter<FieldPr
     BORDER_DECORATION_LINE = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_LINE"), "line");
     BORDER_DECORATION_SECTION = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_SECTION"), "section");
     BORDER_DECORATION_AUTO = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_AUTO"), "auto");
-    PROPOSALS = new ArrayList<FieldProperty<String>>();
+    PROPOSALS = new ArrayList<FieldProperty<String>>(4);
     PROPOSALS.add(BORDER_DECORATION_EMPTY);
     PROPOSALS.add(BORDER_DECORATION_LINE);
     PROPOSALS.add(BORDER_DECORATION_SECTION);

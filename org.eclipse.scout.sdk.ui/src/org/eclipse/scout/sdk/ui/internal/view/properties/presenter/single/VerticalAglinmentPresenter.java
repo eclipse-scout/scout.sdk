@@ -43,7 +43,7 @@ public class VerticalAglinmentPresenter extends AbstractProposalPresenter<Source
     TOP = new UiSourceProperty<Integer>(Integer.valueOf(-1), "top");
     CENTER = new UiSourceProperty<Integer>(Integer.valueOf(0), "center");
     BOTTOM = new UiSourceProperty<Integer>(Integer.valueOf(1), "bottom");
-    PROPOSALS = new ArrayList<SourceProperty<Integer>>();
+    PROPOSALS = new ArrayList<SourceProperty<Integer>>(3);
     PROPOSALS.add(TOP);
     PROPOSALS.add(CENTER);
     PROPOSALS.add(BOTTOM);

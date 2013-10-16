@@ -48,7 +48,7 @@ public class ButtonDisplayStylePresenter extends AbstractProposalPresenter<Field
     DISPLAY_STYLE_TOGGLE = new UiFieldProperty<Integer>(iButton.getField("DISPLAY_STYLE_TOGGLE"), "toggle");
     DISPLAY_STYLE_RADIO = new UiFieldProperty<Integer>(iButton.getField("DISPLAY_STYLE_RADIO"), "radio");
     DISPLAY_STYLE_LINK = new UiFieldProperty<Integer>(iButton.getField("DISPLAY_STYLE_LINK"), "link");
-    PROPOSALS = new ArrayList<FieldProperty<Integer>>();
+    PROPOSALS = new ArrayList<FieldProperty<Integer>>(4);
     PROPOSALS.add(DISPLAY_STYLE_DEFAULT);
     PROPOSALS.add(DISPLAY_STYLE_TOGGLE);
     PROPOSALS.add(DISPLAY_STYLE_RADIO);

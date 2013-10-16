@@ -61,7 +61,7 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<FieldProperty
     VIEW_ID_S = new UiFieldProperty<String>(iForm.getField("VIEW_ID_S"), "south");
     VIEW_ID_SW = new UiFieldProperty<String>(iForm.getField("VIEW_ID_SW"), "south-west");
     VIEW_ID_W = new UiFieldProperty<String>(iForm.getField("VIEW_ID_W"), "west");
-    VIEW_ID_NW = new UiFieldProperty<String>(iForm.getField("VIEW_ID_NW"), "noth-west");
+    VIEW_ID_NW = new UiFieldProperty<String>(iForm.getField("VIEW_ID_NW"), "north-west");
     VIEW_ID_CENTER = new UiFieldProperty<String>(iForm.getField("VIEW_ID_CENTER"), "center");
     VIEW_ID_OUTLINE = new UiFieldProperty<String>(iForm.getField("VIEW_ID_OUTLINE"), "outline");
     VIEW_ID_OUTLINE_SELECTOR = new UiFieldProperty<String>(iForm.getField("VIEW_ID_OUTLINE_SELECTOR"), "outline-selector");
@@ -69,7 +69,7 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<FieldProperty
     VIEW_ID_PAGE_SEARCH = new UiFieldProperty<String>(iForm.getField("VIEW_ID_PAGE_SEARCH"), "page-search");
     VIEW_ID_PAGE_TABLE = new UiFieldProperty<String>(iForm.getField("VIEW_ID_PAGE_TABLE"), "page-table");
 
-    PROPOSALS = new ArrayList<FieldProperty<String>>();
+    PROPOSALS = new ArrayList<FieldProperty<String>>(14);
     PROPOSALS.add(VIEW_ID_N);
     PROPOSALS.add(VIEW_ID_NE);
     PROPOSALS.add(VIEW_ID_E);

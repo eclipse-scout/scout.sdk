@@ -33,7 +33,7 @@ public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter
     CENTER = new UiSourceProperty<Integer>(Integer.valueOf(0), "center");
     RIGHT = new UiSourceProperty<Integer>(Integer.valueOf(1), "right");
     DEFAULT = new UiSourceProperty<Integer>(Integer.valueOf(1000), "default");
-    PROPOSALS = new ArrayList<SourceProperty<Integer>>();
+    PROPOSALS = new ArrayList<SourceProperty<Integer>>(4);
     PROPOSALS.add(LEFT);
     PROPOSALS.add(CENTER);
     PROPOSALS.add(RIGHT);

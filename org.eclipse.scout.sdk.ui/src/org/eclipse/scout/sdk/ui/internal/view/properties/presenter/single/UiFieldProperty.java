@@ -39,5 +39,4 @@ public class UiFieldProperty<T> extends FieldProperty<T> {
   public String toString() {
     return m_diplayValue;
   }
-
 }

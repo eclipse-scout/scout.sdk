@@ -56,7 +56,7 @@ public class ButtonSystemTypePresenter extends AbstractProposalPresenter<FieldPr
     SYSTEM_TYPE_SAVE = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_SAVE"), "ok");
     SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE"), "save without change marker");
 
-    PROPOSALS = new ArrayList<FieldProperty<Integer>>();
+    PROPOSALS = new ArrayList<FieldProperty<Integer>>(7);
     PROPOSALS.add(SYSTEM_TYPE_NONE);
     PROPOSALS.add(SYSTEM_TYPE_CANCEL);
     PROPOSALS.add(SYSTEM_TYPE_CLOSE);

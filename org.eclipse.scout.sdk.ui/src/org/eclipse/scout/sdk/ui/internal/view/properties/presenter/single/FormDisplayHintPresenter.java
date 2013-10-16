@@ -48,7 +48,7 @@ public class FormDisplayHintPresenter extends AbstractProposalPresenter<FieldPro
     DISPLAY_HINT_POPUP_WINDOW = new UiFieldProperty<Integer>(iForm.getField("DISPLAY_HINT_POPUP_WINDOW"), "popup window");
     DISPLAY_HINT_POPUP_DIALOG = new UiFieldProperty<Integer>(iForm.getField("DISPLAY_HINT_POPUP_DIALOG"), "popup dialog");
     DISPLAY_HINT_VIEW = new UiFieldProperty<Integer>(iForm.getField("DISPLAY_HINT_VIEW"), "view");
-    PROPOSALS = new ArrayList<FieldProperty<Integer>>();
+    PROPOSALS = new ArrayList<FieldProperty<Integer>>(4);
     PROPOSALS.add(DISPLAY_HINT_DIALOG);
     PROPOSALS.add(DISPLAY_HINT_POPUP_WINDOW);
     PROPOSALS.add(DISPLAY_HINT_POPUP_DIALOG);

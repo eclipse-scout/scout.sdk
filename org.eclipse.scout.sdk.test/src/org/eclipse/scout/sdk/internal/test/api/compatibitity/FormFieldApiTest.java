@@ -62,5 +62,4 @@ public class FormFieldApiTest extends AbstractApiTest {
       Assert.fail(message.toString());
     }
   }
-
 }

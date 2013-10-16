@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.workspace.type.config.property;
 
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>{@link FieldProperty}</h3> ...
@@ -32,13 +33,6 @@ public class FieldProperty<T> {
 
   @SuppressWarnings("unchecked")
   public T getSourceValue() throws JavaModelException {
-    Object constant = m_constant.getConstant();
-    if (constant instanceof String) {
-      String stringConstant = (String) constant;
-      stringConstant = stringConstant.replaceAll("^\\\"", "");
-      stringConstant = stringConstant.replaceAll("\\\"$", "");
-      constant = stringConstant;
-    }
-    return (T) constant;
+    return (T) TypeUtility.getFieldConstant(m_constant);
   }
 }
