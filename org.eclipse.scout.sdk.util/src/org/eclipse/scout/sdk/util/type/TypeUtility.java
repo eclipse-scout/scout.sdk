@@ -517,24 +517,30 @@ public class TypeUtility {
   }
 
   public static IField[] getFields(IType declaringType, IFieldFilter filter, Comparator<IField> comparator) {
-    ArrayList<IField> unsortedFields = new ArrayList<IField>();
     try {
-      for (IField candidate : declaringType.getFields()) {
-        if (filter == null || filter.accept(candidate)) {
-          unsortedFields.add(candidate);
+      IField[] fields = declaringType.getFields();
+      if (filter == null && comparator == null) {
+        return fields;
+      }
+
+      Collection<IField> collector = null;
+      if (comparator == null) {
+        collector = new ArrayList<IField>(fields.length);
+      }
+      else {
+        collector = new TreeSet<IField>(comparator);
+      }
+
+      for (IField field : fields) {
+        if (filter == null || filter.accept(field)) {
+          collector.add(field);
         }
       }
+      return collector.toArray(new IField[collector.size()]);
     }
     catch (JavaModelException e) {
       SdkUtilActivator.logWarning("could not get fields of '" + declaringType.getElementName() + "'.", e);
-    }
-    if (comparator == null) {
-      return unsortedFields.toArray(new IField[unsortedFields.size()]);
-    }
-    else {
-      TreeSet<IField> sortedFields = new TreeSet<IField>(comparator);
-      sortedFields.addAll(unsortedFields);
-      return sortedFields.toArray(new IField[sortedFields.size()]);
+      return new IField[]{};
     }
   }
 
@@ -966,7 +972,13 @@ public class TypeUtility {
       return methods[0];
     }
     else if (methods.length > 1) {
-      SdkUtilActivator.logWarning("found more than one method in hierarchy");
+      StringBuilder sb = new StringBuilder(" [\n");
+      sb.append("\t\t").append(methods[0].toString());
+      for (int i = 1; i < methods.length; i++) {
+        sb.append(", \n\t\t").append(methods[i].toString());
+      }
+      sb.append("\n\t]");
+      SdkUtilActivator.logWarning("found more than one method in hierarchy" + sb.toString());
       return methods[0];
     }
     else {

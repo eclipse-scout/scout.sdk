@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.workspace.dto.pagedata;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
@@ -49,6 +50,7 @@ public class MultiplePageDataUpdateOperation implements IOperation {
     IType[] pages = m_resolver.getTypes();
     monitor.beginTask("Updating Page Datas", pages.length);
     int i = 0;
+    IProgressMonitor innerMonitor = new NullProgressMonitor();
     for (IType t : pages) {
       i++;
       monitor.setTaskName("Updating Page Data " + i + " of " + pages.length + " (" + t.getElementName() + ")");
@@ -58,7 +60,7 @@ public class MultiplePageDataUpdateOperation implements IOperation {
         if (TypeUtility.exists(pageDataType)) {
           PageDataDtoUpdateOperation op = new PageDataDtoUpdateOperation(t, annotation);
           op.validate();
-          op.run(monitor, workingCopyManager);
+          op.run(innerMonitor, workingCopyManager);
         }
       }
       if (monitor.isCanceled()) {

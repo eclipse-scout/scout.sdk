@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -201,7 +202,12 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     // row access methods
     final String tableRowSignature = Signature.createTypeSignature(tableRowDataBuilder.getElementName(), false);
     // getRows
-    IMethodSourceBuilder getRowsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getRows");
+    IMethodSourceBuilder getRowsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getRows", new IMethodFilter() {
+      @Override
+      public boolean accept(IMethod candidate) throws CoreException {
+        return candidate.getReturnType().contains(IRuntimeClasses.AbstractTableRowData);
+      }
+    });
     getRowsMethodBuilder.setReturnTypeSignature(Signature.createArraySignature(tableRowSignature, 1));
     getRowsMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
@@ -229,10 +235,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "addRow", new IMethodFilter() {
       @Override
       public boolean accept(IMethod candidate) throws CoreException {
-        if (addRowMethodName.equals(candidate.getElementName())) {
-          return candidate.getParameters().length == 0;
-        }
-        return false;
+        return candidate.getParameters().length == 0 && candidate.getReturnType().contains(IRuntimeClasses.AbstractTableRowData);
       }
     });
     addRowMethodBuilder.setReturnTypeSignature(tableRowSignature);

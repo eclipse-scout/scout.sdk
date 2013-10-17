@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
@@ -102,7 +103,7 @@ public final class MethodSourceBuilderFactory {
   }
 
   public static IMethodSourceBuilder createOverrideMethodSourceBuilder(ITypeSourceBuilder typeSourceBuilder, String methodName) throws CoreException {
-    return createOverrideMethodSourceBuilder(typeSourceBuilder, methodName, MethodFilters.getNameFilter(methodName));
+    return createOverrideMethodSourceBuilder(typeSourceBuilder, methodName, null);
   }
 
   private static IMethod getMethodToOverride(ITypeSourceBuilder typeSourceBuilder, String methodName, IMethodFilter methodFilter) {
@@ -116,7 +117,18 @@ public final class MethodSourceBuilderFactory {
       if (superCandidate != null) {
         IType superType = TypeUtility.getTypeBySignature(superCandidate);
         if (TypeUtility.exists(superType)) {
-          IMethod methodToOverride = TypeUtility.findMethodInSuperTypeHierarchy(superType, TypeUtility.getSuperTypeHierarchy(superType), methodFilter);
+
+          IMethodFilter filter = methodFilter;
+          if (StringUtility.hasText(methodName)) {
+            if (methodFilter == null) {
+              filter = MethodFilters.getNameFilter(methodName);
+            }
+            else {
+              filter = MethodFilters.getMultiMethodFilter(methodFilter, MethodFilters.getNameFilter(methodName));
+            }
+          }
+
+          IMethod methodToOverride = TypeUtility.findMethodInSuperTypeHierarchy(superType, TypeUtility.getSuperTypeHierarchy(superType), filter);
           if (TypeUtility.exists(methodToOverride)) {
             return methodToOverride;
           }

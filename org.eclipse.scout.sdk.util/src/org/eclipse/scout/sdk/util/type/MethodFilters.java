@@ -165,6 +165,12 @@ public final class MethodFilters {
     };
   }
 
+  /**
+   * creates and gets a filter that accepts all methods that fulfill all the given filters (AND).
+   * 
+   * @param filters
+   * @return
+   */
   public static IMethodFilter getMultiMethodFilter(final IMethodFilter... filters) {
     return new IMethodFilter() {
       @Override
@@ -177,7 +183,6 @@ public final class MethodFilters {
             if (!f.accept(method)) {
               return false;
             }
-
           }
           return true;
         }
