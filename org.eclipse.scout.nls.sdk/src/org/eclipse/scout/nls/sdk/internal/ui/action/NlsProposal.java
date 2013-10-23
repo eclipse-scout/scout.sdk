@@ -13,6 +13,7 @@ package org.eclipse.scout.nls.sdk.internal.ui.action;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.eclipse.jdt.internal.ui.text.java.AbstractJavaCompletionProposal;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
@@ -24,6 +25,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
@@ -37,7 +39,9 @@ import org.eclipse.text.edits.ReplaceEdit;
  * @author Andreas Hoegger
  * @since 1.1.0 (12.01.2011)
  */
-public class NlsProposal implements ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3, ICompletionProposalExtension4 {
+//suppressWarnings till bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=420186 is fixed
+@SuppressWarnings("restriction")
+public class NlsProposal extends AbstractJavaCompletionProposal implements ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3, ICompletionProposalExtension4 {
   private final INlsEntry m_nlsEntry;
   private final String m_prefix;
   private final int m_offset;
@@ -51,8 +55,13 @@ public class NlsProposal implements ICompletionProposal, ICompletionProposalExte
   }
 
   @Override
-  public void apply(IDocument document) {
-    apply(document, '\0', m_offset);
+  public String getSortString() {
+    return "1" + getDisplayString();
+  }
+
+  @Override
+  public StyledString getStyledDisplayString() {
+    return new StyledString(getDisplayString());
   }
 
   @Override
