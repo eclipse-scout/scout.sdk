@@ -31,13 +31,21 @@ import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.Clipboard;
+import org.eclipse.swt.dnd.RTFTransfer;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.MouseAdapter;
 import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TabFolder;
 import org.eclipse.swt.widgets.TabItem;
@@ -55,6 +63,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
   private NlsEntry m_nlsEntry;
   private INlsProject m_nlsProject;
   private boolean m_showProjectList;
+  private boolean m_keyToClipboard;
 
   private final String m_title;
   private final HashMap<Language, TextField<String>> m_translationFields;
@@ -63,9 +72,12 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
   private TextField<String> m_keyField;
   private SmartField m_projectProposalField;
   private Composite m_fixDialogArea;
+  private Button m_copyKeyToClipboard;
+  private Display m_display;
 
   protected AbstractNlsEntryDialog(Shell parentShell, String title, NlsEntry row, INlsProject project, boolean showProjectList) {
     super(parentShell);
+    m_display = parentShell.getDisplay();
     m_nlsProject = project;
     m_title = title;
     m_nlsEntry = row;
@@ -176,6 +188,15 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
       m_translationFields.put(l, control);
     }
 
+    m_copyKeyToClipboard = new Button(rootArea, SWT.CHECK);
+    m_copyKeyToClipboard.setText("Copy key to clipboard");
+    m_copyKeyToClipboard.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        m_keyToClipboard = m_copyKeyToClipboard.getSelection();
+      }
+    });
+
     // layout
     rootArea.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
     rootArea.setLayout(new GridLayout(1, true));
@@ -198,6 +219,9 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     data.heightHint = 100;
     translationGroup.setLayoutData(data);
     translationGroup.setLayout(new GridLayout(1, true));
+
+    data = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+    m_copyKeyToClipboard.setLayoutData(data);
     return m_fixDialogArea;
   }
 
@@ -211,9 +235,31 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
 
   public NlsEntry show() {
     if (open() == OK) {
+      if (m_keyToClipboard) {
+        copyKeyToClipboard();
+      }
       return m_nlsEntry;
     }
     return null;
+  }
+
+  /**
+   *
+   */
+  private void copyKeyToClipboard() {
+    if (m_nlsEntry != null) {
+      String key = getNlsEntry().getKey();
+      if (StringUtility.hasText(key)) {
+        Clipboard clipboard = new Clipboard(m_display);
+        String rtfData = "{\\rtf1\\b\\i " + key + "}"; // formatted as bold and italic
+        TextTransfer textTransfer = TextTransfer.getInstance();
+        RTFTransfer rtfTransfer = RTFTransfer.getInstance();
+        Transfer[] transfers = new Transfer[]{textTransfer, rtfTransfer};
+        Object[] data = new Object[]{key, rtfData};
+        clipboard.setContents(data, transfers);
+        clipboard.dispose();
+      }
+    }
   }
 
   protected void postCreate() {
