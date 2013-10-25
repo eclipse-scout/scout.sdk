@@ -1,0 +1,194 @@
+/*******************************************************************************
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
+ * All rights reserved. This program and the accompanying materials
+ * are made available under the terms of the Eclipse Public License v1.0
+ * which accompanies this distribution, and is available at
+ * http://www.eclipse.org/legal/epl-v10.html
+ *
+ * Contributors:
+ *     BSI Business Systems Integration AG - initial API and implementation
+ ******************************************************************************/
+package org.eclipse.scout.nls.sdk.internal.ui.action;
+
+import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
+import org.eclipse.jface.text.BadLocationException;
+import org.eclipse.jface.text.DocumentEvent;
+import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.IInformationControlCreator;
+import org.eclipse.jface.text.IRegion;
+import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.jface.text.contentassist.ICompletionProposal;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
+import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
+import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.scout.nls.sdk.internal.NlsCore;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.text.edits.ReplaceEdit;
+
+/**
+ * <h3>{@link AbstractNlsProposal}</h3>
+ * 
+ * @author aho
+ * @since 3.10.0 24.10.2013
+ */
+public abstract class AbstractNlsProposal implements IJavaCompletionProposal, ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3, ICompletionProposalExtension4 {
+
+  private String m_searchText;
+  private int m_initialOffset;
+  private Point m_selection = null;
+
+  public AbstractNlsProposal(String searchText, int initialOffset) {
+    m_searchText = searchText;
+    m_initialOffset = initialOffset;
+  }
+
+  public int getInitialOffset() {
+    return m_initialOffset;
+  }
+
+  public String getPrefix() {
+    return m_searchText;
+  }
+
+  @Override
+  public int getRelevance() {
+    return -1;
+  }
+
+  @Override
+  public IInformationControlCreator getInformationControlCreator() {
+    return null;
+  }
+
+  @Override
+  public CharSequence getPrefixCompletionText(IDocument document, int completionOffset) {
+    return null;
+  }
+
+  @Override
+  public int getPrefixCompletionStart(IDocument document, int completionOffset) {
+    return 0;
+  }
+
+  @Override
+  public void selected(ITextViewer viewer, boolean smartToggle) {
+  }
+
+  @Override
+  public void unselected(ITextViewer viewer) {
+  }
+
+  @Override
+  public boolean validate(IDocument document, int offset, DocumentEvent event) {
+    try {
+      Point keyRange = findKeyRange(document, offset);
+      if (keyRange != null) {
+        return keyRange.x < offset && keyRange.y >= offset;
+      }
+    }
+    catch (BadLocationException e) {
+      NlsCore.logError(e);
+    }
+    return false;
+  }
+
+  @Override
+  public void apply(IDocument document) {
+  }
+
+  @Override
+  public void apply(IDocument document, char trigger, int offset) {
+  }
+
+  @Override
+  public void apply(ITextViewer viewer, char trigger, int stateMask, int offset) {
+    apply(viewer.getDocument(), trigger, offset);
+  }
+
+  protected Point findKeyRange(IDocument document, int offset) throws BadLocationException {
+    IRegion lineRange = document.getLineInformationOfOffset(offset);
+    // find start
+    int startOffest = -1;
+    int index = offset - 1;
+    while (index > 0 && index > lineRange.getOffset()) {
+      if (document.getChar(index) == '"') {
+        if (index > 1) {
+          if (document.getChar(index - 1) != '\\') {
+            startOffest = index + 1;
+            break;
+          }
+        }
+        else {
+          startOffest = index + 1;
+          break;
+        }
+      }
+      index--;
+    }
+
+    // find end
+    int endOffset = -1;
+    index = offset;
+    boolean masked = false;
+    while ((document.getLength() > index && index < (lineRange.getOffset() + lineRange.getLength()))) {
+      if (!masked && document.getChar(index) == '"') {
+        endOffset = index;
+        break;
+      }
+      index++;
+    }
+    if (startOffest > -1 && endOffset > -1) {
+      return new Point(startOffest, endOffset);
+    }
+    return null;
+  }
+
+  protected void replaceWith(IDocument document, int offset, String replacement) throws BadLocationException {
+    Point keyRange = findKeyRange(document, offset);
+    m_selection = new Point(keyRange.x, replacement.length());
+    ReplaceEdit replaceEdit = new ReplaceEdit(keyRange.x, keyRange.y - keyRange.x, replacement);
+    try {
+      replaceEdit.apply(document);
+    }
+    catch (Exception e) {
+      NlsCore.logWarning(e);
+    }
+  }
+
+  @Override
+  public boolean isValidFor(IDocument document, int offset) {
+    return validate(document, offset, null);
+  }
+
+  @Override
+  public char[] getTriggerCharacters() {
+    return null;
+  }
+
+  @Override
+  public int getContextInformationPosition() {
+    return 0;
+  }
+
+  @Override
+  public Point getSelection(IDocument document) {
+    return m_selection;
+  }
+
+  @Override
+  public String getAdditionalProposalInfo() {
+    return null;
+  }
+
+  @Override
+  public IContextInformation getContextInformation() {
+    return null;
+  }
+
+  @Override
+  public boolean isAutoInsertable() {
+    return false;
+  }
+}

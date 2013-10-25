@@ -13,25 +13,15 @@ package org.eclipse.scout.nls.sdk.internal.ui.action;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.eclipse.jdt.internal.ui.text.java.AbstractJavaCompletionProposal;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControlCreator;
-import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.text.edits.ReplaceEdit;
 
 /**
  * <h4>NlsProposal</h4>
@@ -39,34 +29,20 @@ import org.eclipse.text.edits.ReplaceEdit;
  * @author Andreas Hoegger
  * @since 1.1.0 (12.01.2011)
  */
-//suppressWarnings till bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=420186 is fixed
-@SuppressWarnings("restriction")
-public class NlsProposal extends AbstractJavaCompletionProposal implements ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3, ICompletionProposalExtension4 {
+public class NlsProposal extends AbstractNlsProposal {
   private final INlsEntry m_nlsEntry;
-  private final String m_prefix;
-  private final int m_offset;
+
   private final Image m_image;
 
-  public NlsProposal(INlsEntry nlsEntry, String prefix, int offset, Image image) {
+  public NlsProposal(INlsEntry nlsEntry, String prefix, int initialOffset, Image image) {
+    super(prefix, initialOffset);
     m_nlsEntry = nlsEntry;
-    m_prefix = prefix;
-    m_offset = offset;
     m_image = image;
   }
 
   @Override
-  public String getSortString() {
-    return "1" + getDisplayString();
-  }
-
-  @Override
-  public StyledString getStyledDisplayString() {
-    return new StyledString(getDisplayString());
-  }
-
-  @Override
-  public Point getSelection(IDocument document) {
-    return new Point(m_offset - m_prefix.length() + m_nlsEntry.getKey().length(), 0);
+  public int getRelevance() {
+    return 1;
   }
 
   @Override
@@ -103,69 +79,36 @@ public class NlsProposal extends AbstractJavaCompletionProposal implements IComp
 
   @Override
   public void apply(IDocument document, char trigger, int offset) {
-    int offDiff = offset - m_offset;
-    ReplaceEdit replaceEdit = new ReplaceEdit(m_offset - m_prefix.length(), m_prefix.length() + offDiff, m_nlsEntry.getKey());
     try {
-      replaceEdit.apply(document);
+      replaceWith(document, offset, m_nlsEntry.getKey());
     }
-    catch (Exception e) {
-      NlsCore.logWarning(e);
+    catch (BadLocationException e) {
+      NlsCore.logError(e);
     }
-  }
-
-  @Override
-  public boolean isValidFor(IDocument document, int offset) {
-    return validate(document, offset, null);
-  }
-
-  @Override
-  public char[] getTriggerCharacters() {
-    return null;
-  }
-
-  @Override
-  public int getContextInformationPosition() {
-    return 0;
-  }
-
-  @Override
-  public void apply(ITextViewer viewer, char trigger, int stateMask, int offset) {
-    apply(viewer.getDocument(), trigger, offset);
-  }
-
-  @Override
-  public void selected(ITextViewer viewer, boolean smartToggle) {
-  }
-
-  @Override
-  public void unselected(ITextViewer viewer) {
   }
 
   @Override
   public boolean validate(IDocument document, int offset, DocumentEvent event) {
-    try {
-      String prefix = m_prefix + document.get(m_offset, offset - m_offset);
-      return m_nlsEntry.getKey().toLowerCase().startsWith(prefix.toLowerCase());
+    if (super.validate(document, offset, event)) {
+      try {
+        Point keyRange = findKeyRange(document, offset);
+
+        String prefix = document.get(keyRange.x, offset - keyRange.x);
+        return m_nlsEntry.getKey().toLowerCase().startsWith(prefix.toLowerCase());
+      }
+      catch (BadLocationException e) {
+        NlsCore.logWarning(e);
+        return false;
+      }
     }
-    catch (BadLocationException e) {
-      NlsCore.logWarning(e);
+    else {
       return false;
     }
   }
 
   @Override
-  public IInformationControlCreator getInformationControlCreator() {
-    return null;
-  }
-
-  @Override
   public CharSequence getPrefixCompletionText(IDocument document, int completionOffset) {
     return m_nlsEntry.getKey();
-  }
-
-  @Override
-  public int getPrefixCompletionStart(IDocument document, int completionOffset) {
-    return m_offset - m_prefix.length();
   }
 
   @Override

@@ -10,19 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.internal.ui.action;
 
-import org.eclipse.jdt.internal.ui.text.java.AbstractJavaCompletionProposal;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.IInformationControlCreator;
 import org.eclipse.jface.text.ITextViewer;
-import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
-import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.viewers.StyledString;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -34,7 +26,6 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.text.edits.ReplaceEdit;
 
 /**
  * <h3>{@link NewNlsProposal}</h3>
@@ -42,60 +33,33 @@ import org.eclipse.text.edits.ReplaceEdit;
  * @author Andreas Hoegger
  * @since 3.10.0 23.10.2013
  */
-// suppressWarnings till bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=420186 is fixed
-@SuppressWarnings("restriction")
-public class NewNlsProposal extends AbstractJavaCompletionProposal implements ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3, ICompletionProposalExtension4 {
+public class NewNlsProposal extends AbstractNlsProposal {
   private final Image m_image = NlsCore.getImage(NlsCore.ICON_TOOL_ADD);
-  private String m_prefix;
-  private int m_offset;
   private INlsEntry m_nlsEntry;
-  private Shell m_shell;
   private INlsProject m_project;
 
-  public NewNlsProposal(INlsProject project, Shell shell, String prefix, int offset) {
+  public NewNlsProposal(INlsProject project, Shell shell, String prefix, int initialOffset) {
+    super(prefix, initialOffset);
     m_project = project;
-    m_shell = Display.getDefault().getActiveShell();
-    m_prefix = prefix;
-    m_offset = offset;
-
   }
 
   @Override
-  public String getSortString() {
-    return "2" + getDisplayString();
-  }
-
-  @Override
-  public StyledString getStyledDisplayString() {
-    return new StyledString(getDisplayString());
-  }
-
-  @Override
-  public IInformationControlCreator getInformationControlCreator() {
-    return null;
-  }
-
-  @Override
-  public CharSequence getPrefixCompletionText(IDocument document, int completionOffset) {
-    return null;
-  }
-
-  @Override
-  public int getPrefixCompletionStart(IDocument document, int completionOffset) {
+  public int getRelevance() {
     return 0;
   }
 
   @Override
-  public void selected(ITextViewer viewer, boolean smartToggle) {
-  }
-
-  @Override
-  public void unselected(ITextViewer viewer) {
-  }
-
-  @Override
   public boolean validate(IDocument document, int offset, DocumentEvent event) {
-    return true;
+    try {
+      Point keyRange = findKeyRange(document, offset);
+      if (keyRange != null) {
+        return keyRange.x < offset && keyRange.y >= offset;
+      }
+    }
+    catch (BadLocationException e) {
+      NlsCore.logError(e);
+    }
+    return false;
   }
 
   @Override
@@ -106,8 +70,9 @@ public class NewNlsProposal extends AbstractJavaCompletionProposal implements IC
   @Override
   public void apply(IDocument document, char trigger, int offset) {
     String searchText = null;
+    int initalOffset = getInitialOffset();
     try {
-      searchText = document.get(m_offset - m_prefix.length(), m_prefix.length() + offset - m_offset);
+      searchText = document.get(initalOffset - getPrefix().length(), getPrefix().length() + offset - initalOffset);
     }
     catch (BadLocationException e1) {
       NlsCore.logWarning(e1);
@@ -124,7 +89,7 @@ public class NewNlsProposal extends AbstractJavaCompletionProposal implements IC
     if (!Language.LANGUAGE_DEFAULT.equals(devLang)) {
       entry.addTranslation(Language.LANGUAGE_DEFAULT, proposalFieldText);
     }
-    NlsEntryNewAction action = new NlsEntryNewAction(m_shell, m_project, entry, true);
+    NlsEntryNewAction action = new NlsEntryNewAction(Display.getDefault().getActiveShell(), m_project, entry, true);
     action.run();
     try {
       action.join();
@@ -135,13 +100,11 @@ public class NewNlsProposal extends AbstractJavaCompletionProposal implements IC
 
     m_nlsEntry = action.getEntry();
     if (m_nlsEntry != null) {
-      int offDiff = offset - m_offset;
-      ReplaceEdit replaceEdit = new ReplaceEdit(m_offset - m_prefix.length(), m_prefix.length() + offDiff, m_nlsEntry.getKey());
       try {
-        replaceEdit.apply(document);
+        replaceWith(document, offset, m_nlsEntry.getKey());
       }
-      catch (Exception e) {
-        NlsCore.logWarning(e);
+      catch (BadLocationException e) {
+        NlsCore.logError(e);
       }
     }
   }
@@ -162,18 +125,12 @@ public class NewNlsProposal extends AbstractJavaCompletionProposal implements IC
   }
 
   @Override
-  public Point getSelection(IDocument document) {
-    return new Point(m_offset - m_prefix.length() + m_nlsEntry.getKey().length(), 0);
-  }
-
-  @Override
   public String getAdditionalProposalInfo() {
     return null;
   }
 
   @Override
   public String getDisplayString() {
-
     return "New text...";
   }
 
