@@ -129,7 +129,6 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_CODE);
-    m_typeNameField.setText(m_typeName);
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
@@ -137,6 +136,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
+    m_typeNameField.setText(m_typeName);
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
         new AbstractJavaElementContentProvider() {
@@ -341,10 +341,10 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
   public void setTypeName(String typeName) {
     try {
       setStateChanging(true);
-      m_typeName = typeName;
       if (isControlCreated()) {
         m_typeNameField.setText(typeName);
       }
+      m_typeName = typeName;
     }
     finally {
       setStateChanging(false);

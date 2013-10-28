@@ -10,9 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -22,9 +28,32 @@ import org.eclipse.swt.widgets.Display;
 /**
  * <h3>AbstractProcessWizard</h3> ...
  */
-public class AbstractWorkspaceWizard extends AbstractWizard {
+public class AbstractWorkspaceWizard extends AbstractWizard implements IWorkspaceWizard {
+
+  public Map<CompositeObject, IOperation> m_performFinishOperations;
 
   public AbstractWorkspaceWizard() {
+    m_performFinishOperations = new TreeMap<CompositeObject, IOperation>();
+  }
+
+  @Override
+  public IOperation addAdditionalPerformFinishOperation(IOperation op, double orderNr) {
+    return m_performFinishOperations.put(new CompositeObject(orderNr, op), op);
+  }
+
+  @Override
+  public IOperation removeAdditionalPerformFinishOperation(IOperation op) {
+    CompositeObject key = null;
+    for (Entry<CompositeObject, IOperation> e : m_performFinishOperations.entrySet()) {
+      if (CompareUtility.equals(e.getValue(), op)) {
+        key = e.getKey();
+        break;
+      }
+    }
+    if (key != null) {
+      return m_performFinishOperations.remove(key);
+    }
+    return null;
   }
 
   @Override
@@ -45,7 +74,9 @@ public class AbstractWorkspaceWizard extends AbstractWizard {
         return false;
       }
       P_PerformFinishOperation performFinishOperation = new P_PerformFinishOperation(getShell().getDisplay());
-      OperationJob job = new OperationJob(performFinishOperation);
+      m_performFinishOperations.put(new CompositeObject(IWorkspaceWizard.ORDER_DEFAULT, performFinishOperation), performFinishOperation);
+
+      OperationJob job = new OperationJob(m_performFinishOperations.values());
       job.schedule();
       return true;
     }

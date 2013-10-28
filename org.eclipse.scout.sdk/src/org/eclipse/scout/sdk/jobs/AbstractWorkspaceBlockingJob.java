@@ -69,6 +69,7 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
         }
         Status errorStatus = new Status(Status.ERROR, ScoutSdk.PLUGIN_ID, e.getMessage(), e);
         ScoutSdk.log(errorStatus);
+        monitor.setCanceled(true);
         return errorStatus;
       }
     }

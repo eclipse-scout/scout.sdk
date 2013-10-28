@@ -36,6 +36,10 @@ public class CodeNewWizard extends AbstractFormFieldWizard {
     m_page1.setSuperType(superType);
   }
 
+  public CodeNewWizardPage getCodeNewWizardPage() {
+    return m_page1;
+  }
+
   @Override
   protected void postFinishDisplayThread() {
     IType createdField = m_page1.getCreatedCode();

@@ -687,6 +687,27 @@
       </proposalCategory>
    </extension>
    <extension
+         id="org.eclipse.scout.sdk.ui.formfield"
+         name="Scout form field proposals"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <javaCompletionProposalComputer
+            activate="true"
+            categoryId="org.eclipse.scout.sdk.ui.proposalCategory"
+            class="org.eclipse.scout.sdk.ui.internal.extensions.codecompletion.ScoutSdkProposalComputer">
+         <partition
+               type="__dftl_partition_content_type">
+         </partition>
+      </javaCompletionProposalComputer>
+   </extension>
+   <extension
+         id="org.eclipse.scout.sdk.ui.proposalCategory"
+         name="Scout Items"
+         point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
+      <proposalCategory
+            icon="resources/icons/eclipse_scout.gif">
+      </proposalCategory>
+   </extension>
+   <extension
          id="product"
          point="org.eclipse.core.runtime.products">
       <product
