@@ -48,7 +48,7 @@ import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
   private final static Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
-  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  private final IType iValueField = TypeUtility.getType(RuntimeClasses.IValueField);
 
   private FormDataAnnotation m_formDataAnnotation;
 
@@ -218,11 +218,14 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
             }
             String sourceSnippet = vrm.getRuleReturnExpression().getReturnStatement(validator);
             if (sourceSnippet != null) {
-              Collection<IType> referencedTypes = vrm.getRuleReturnExpression().getReferencedTypes().values();
-              for (IType refType : referencedTypes) {
-                //if the type is a form field type it is transformed to the corresponding form data field
+              Collection<IType> referencedTypesList = vrm.getRuleReturnExpression().getReferencedTypes().values();
+              IType[] referencedTypes = referencedTypesList.toArray(new IType[referencedTypesList.size()]);
+              for (int i = referencedTypes.length - 1; i >= 0; i--) {
+                IType refType = referencedTypes[i];
+
+                //if the type is a value field type it is transformed to the corresponding form data field
                 ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(refType);
-                if (h.contains(iFormField)) {
+                if (h.contains(iValueField)) {
                   String formDataFieldName = ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(refType.getElementName()));
                   return formDataFieldName + ".class";
                 }
@@ -233,11 +236,6 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
                   // the referenced type is not accessible -> remove the rule
                   return null;
                 }
-              }
-
-              // if we come here all referenced types are valid and accessible -> add them to the imports
-              for (IType refType : referencedTypes) {
-                validator.getTypeName(SignatureCache.createTypeSignature(refType.getFullyQualifiedName())); // add to imports if necessary
               }
             }
             return sourceSnippet;

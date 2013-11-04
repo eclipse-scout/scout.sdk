@@ -27,7 +27,8 @@ import org.junit.runners.Suite.SuiteClasses;
     ReplaceFormFieldTest.class,
     SimpleFormTest.class,
     TableFieldBeanTest.class,
-    TableFieldFormTest.class
+    TableFieldFormTest.class,
+    MasterFieldFormDataTest.class
 })
 public class _SuiteFormData {
 

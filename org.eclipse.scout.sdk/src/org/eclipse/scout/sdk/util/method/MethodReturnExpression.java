@@ -94,8 +94,12 @@ public class MethodReturnExpression {
     int lastPos = 0;
     StringBuilder builder = new StringBuilder(originalExpression.length() * 2);
     for (Entry<SimpleName, IType> typeNodes : getReferencedTypesInternal().entrySet()) {
-      String scopeQualifiedName = validator.getTypeName(SignatureCache.createTypeSignature(typeNodes.getValue().getFullyQualifiedName()));
-      if (!isSimpleName(scopeQualifiedName)) {
+      String fqn = typeNodes.getValue().getFullyQualifiedName();
+      String scopeQualifiedName = validator.getTypeName(SignatureCache.createTypeSignature(fqn));
+
+      boolean isPrimaryType = fqn.indexOf('$') < 0;
+      boolean isSimpleName = scopeQualifiedName.indexOf('.') < 0;
+      if (!isSimpleName && isPrimaryType) {
         // we must qualify the type reference
         int relPos = typeNodes.getKey().getStartPosition() - returnExpressionStart;
         builder.append(originalExpression.substring(lastPos, relPos));
@@ -119,9 +123,5 @@ public class MethodReturnExpression {
       }
     }
     return result;
-  }
-
-  private boolean isSimpleName(String name) {
-    return name.indexOf('.') < 0;
   }
 }

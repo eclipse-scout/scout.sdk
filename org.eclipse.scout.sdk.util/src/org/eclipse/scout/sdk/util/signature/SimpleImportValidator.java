@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 import org.eclipse.jdt.core.Signature;
 
 public class SimpleImportValidator implements IImportValidator {
-  private HashMap<String/* simpleName */, String/* packageName */> m_newImports;
+  private final HashMap<String/* simpleName */, String/* packageName */> m_newImports;
   private String m_packageName;
 
   private final static Pattern EXT_REGEX = Pattern.compile("^\\+.*$");
@@ -86,7 +86,7 @@ public class SimpleImportValidator implements IImportValidator {
 
   @Override
   public String[] getImportsToCreate() {
-    ArrayList<String> list = new ArrayList<String>();
+    ArrayList<String> list = new ArrayList<String>(m_newImports.size());
     for (Entry<String, String> e : m_newImports.entrySet()) {
       if (e.getValue().equals("java.lang")) {
         continue;
