@@ -317,7 +317,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
    * Gets the row data type that is used within the given table data.
    * 
    * @param tableData
-   *          the table data that contains the row data.
+   *          the table data that contains the row data. the type must exist.
    * @return the type that is referenced in the
    *         org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData#getRowType() method of
    *         the given table data.

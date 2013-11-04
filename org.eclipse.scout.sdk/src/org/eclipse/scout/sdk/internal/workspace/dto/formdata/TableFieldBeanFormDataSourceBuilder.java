@@ -81,9 +81,11 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
       IType declaringType = parentTable.getDeclaringType();
       if (TypeUtility.exists(declaringType)) {
         IType formDataType = ScoutTypeUtility.getFormDataType(declaringType, tableHierarchy);
-        IType parentTableBeanData = getTableRowDataType(formDataType);
-        if (TypeUtility.exists(parentTableBeanData)) {
-          return SignatureCache.createTypeSignature(parentTableBeanData.getFullyQualifiedName());
+        if (TypeUtility.exists(formDataType)) {
+          IType parentTableBeanData = getTableRowDataType(formDataType);
+          if (TypeUtility.exists(parentTableBeanData)) {
+            return SignatureCache.createTypeSignature(parentTableBeanData.getFullyQualifiedName());
+          }
         }
       }
     }

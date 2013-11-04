@@ -56,9 +56,11 @@ public class PageDataSourceBuilder extends AbstractTableBeanSourceBuilder {
         PageDataAnnotation pageDataAnnotation = ScoutTypeUtility.findPageDataAnnotation(declaringType, tableHierarchy);
         if (pageDataAnnotation != null) {
           IType superPageDataType = ScoutTypeUtility.getTypeBySignature(pageDataAnnotation.getPageDataTypeSignature());
-          IType superTableBeanData = getTableRowDataType(superPageDataType);
-          if (TypeUtility.exists(superTableBeanData)) {
-            return SignatureCache.createTypeSignature(superTableBeanData.getFullyQualifiedName());
+          if (TypeUtility.exists(superPageDataType)) {
+            IType superTableBeanData = getTableRowDataType(superPageDataType);
+            if (TypeUtility.exists(superTableBeanData)) {
+              return SignatureCache.createTypeSignature(superTableBeanData.getFullyQualifiedName());
+            }
           }
         }
       }

@@ -165,8 +165,7 @@ public final class MethodSourceBuilderFactory {
 
       // parameters
       builder.setParameters(TypeUtility.getMethodParameters(methodToOverride, localGenericMapping));
-      int flags = methodToOverride.getFlags() & (~Flags.AccTransient);
-      flags = flags & (~Flags.AccAbstract);
+      int flags = methodToOverride.getFlags() & ~(Flags.AccTransient | Flags.AccBridge | Flags.AccAbstract);
       if (Flags.isInterface(methodToOverride.getDeclaringType().getFlags()) && Flags.isPackageDefault(flags)) {
         flags = flags | Flags.AccPublic;
       }
