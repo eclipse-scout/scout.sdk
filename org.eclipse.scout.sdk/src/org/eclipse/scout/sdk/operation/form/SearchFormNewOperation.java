@@ -134,7 +134,7 @@ public class SearchFormNewOperation extends FormNewOperation {
       delOp.run(monitor, workingCopyManager);
     }
 
-    MethodNewOperation getConfiguredSearchFormOp = new MethodNewOperation(MethodSourceBuilderFactory.createOverrideMethodSourceBuilder("getConfiguredSearchForm", getTablePage()), getTablePage());
+    MethodNewOperation getConfiguredSearchFormOp = new MethodNewOperation(MethodSourceBuilderFactory.createOverrideMethodSourceBuilder("getConfiguredSearchForm", getTablePage()), getTablePage(), true);
     getConfiguredSearchFormOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override
