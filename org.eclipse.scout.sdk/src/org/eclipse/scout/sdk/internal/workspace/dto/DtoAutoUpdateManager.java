@@ -139,9 +139,10 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
   }
 
   private static <T> void addElementToQueueSecure(ArrayBlockingQueue<T> queue, T element) {
-    boolean interrupted = false;
+    boolean interrupted;
     do {
       try {
+        interrupted = false;
         queue.put(element);
       }
       catch (InterruptedException e) {
