@@ -105,7 +105,7 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
           continue;
         }
         IFile file = (IFile) resource;
-        if (file.getFileExtension() != null && file.getFileExtension().equalsIgnoreCase("jar")) {
+        if ("jar".equalsIgnoreCase(file.getFileExtension())) {
           candidates.add(file);
         }
       }

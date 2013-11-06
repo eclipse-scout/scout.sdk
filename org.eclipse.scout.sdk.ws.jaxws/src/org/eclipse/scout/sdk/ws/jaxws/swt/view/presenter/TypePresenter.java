@@ -432,7 +432,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
           if (TypeUtility.existsType(value) &&
               resource.getType() == IResource.FILE &&
               resource.getFileExtension() != null &&
-              resource.getFileExtension().equalsIgnoreCase("java") &&
+              "java".equalsIgnoreCase(resource.getFileExtension()) &&
               (resource.getName().endsWith(simpleName + ".java") ||
               resource.getName().endsWith(simpleName + ".class"))) {
             IType type = TypeUtility.getType(getValue());

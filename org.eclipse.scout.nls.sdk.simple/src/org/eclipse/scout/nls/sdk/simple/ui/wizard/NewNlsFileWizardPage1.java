@@ -340,7 +340,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
         try {
           IJavaProject jp = JavaCore.create(project);
           for (Object o : jp.getNonJavaResources()) {
-            if (o instanceof IFile && ((IFile) o).getFileExtension().equalsIgnoreCase("nls")) {
+            if (o instanceof IFile && "nls".equalsIgnoreCase(((IFile) o).getFileExtension())) {
               files.add((IFile) o);
             }
           }
