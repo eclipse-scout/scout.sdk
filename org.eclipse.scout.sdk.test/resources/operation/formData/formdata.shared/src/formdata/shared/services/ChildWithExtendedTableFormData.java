@@ -13,8 +13,6 @@ package formdata.shared.services;
 import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
-import formdata.shared.services.BaseWithExtendedTableFormData.TableInForm.TableInFormRowData;
-
 /**
  * <b>NOTE:</b><br>
  * This class is auto generated, no manual modifications recommended.
@@ -73,11 +71,15 @@ public class ChildWithExtendedTableFormData extends BaseWithExtendedTableFormDat
       super.setRows(rows);
     }
 
-    public static class ChildTableRowData extends TableInFormRowData {
+    public static class ChildTableRowData extends AbstractTableRowData {
 
       private static final long serialVersionUID = 1L;
       public static final String col1InChildForm = "col1InChildForm";
+      public static final String colInAbstractTable = "colInAbstractTable";
+      public static final String colInDesktopForm = "colInDesktopForm";
       private String m_col1InChildForm;
+      private String m_colInAbstractTable;
+      private String m_colInDesktopForm;
 
       public ChildTableRowData() {
       }
@@ -88,6 +90,22 @@ public class ChildWithExtendedTableFormData extends BaseWithExtendedTableFormDat
 
       public void setCol1InChildForm(String col1InChildForm) {
         m_col1InChildForm = col1InChildForm;
+      }
+
+      public String getColInAbstractTable() {
+        return m_colInAbstractTable;
+      }
+
+      public void setColInAbstractTable(String colInAbstractTable) {
+        m_colInAbstractTable = colInAbstractTable;
+      }
+
+      public String getColInDesktopForm() {
+        return m_colInDesktopForm;
+      }
+
+      public void setColInDesktopForm(String colInDesktopForm) {
+        m_colInDesktopForm = colInDesktopForm;
       }
     }
   }

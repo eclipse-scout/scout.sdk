@@ -35,6 +35,7 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
   public static final String ExtendedTablePage = "formdata.client.ui.desktop.outline.pages.ExtendedTablePage";
   public static final String ExtendedTablePageWithoutExtendedTableFqn = "formdata.client.ui.desktop.outline.pages.ExtendedTablePageWithoutExtendedTable";
   public static final String BaseWithExtendedTableTablePage = "formdata.client.ui.desktop.outline.pages.BaseWithExtendedTableTablePage";
+  public static final String ExtendedExtendedTablePageWithExtendedTable = "formdata.client.ui.desktop.outline.pages.ExtendedExtendedTablePageWithExtendedTable";
 
   private IType createPageData(String typeName) throws Exception {
     IType field = SdkAssert.assertTypeExists(typeName);
@@ -74,6 +75,13 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
     createPageData(BaseWithExtendedTableTablePage);
     TestWorkspaceUtility.assertNoCompileErrors();
     testApiOfBaseWithExtendedTableTablePageData();
+  }
+
+  @Test
+  public void testExtendedExtendedTablePageWithExtendedTable() throws Exception {
+    createPageData(ExtendedExtendedTablePageWithExtendedTable);
+    TestWorkspaceUtility.assertNoCompileErrors();
+    testApiOfExtendedExtendedTablePageWithExtendedTableData();
   }
 
   /**
@@ -246,44 +254,44 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertTrue(extendedTablePageWithoutExtendedTableData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedTablePageWithoutExtendedTableData1, "V");
     IMethod addRow = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "addRow", new String[]{});
-    SdkAssert.assertMethodReturnTypeSignature(addRow, "QBaseTableRowData;");
+    SdkAssert.assertMethodReturnTypeSignature(addRow, "QExtendedTablePageWithoutExtendedTableRowData;");
     SdkAssert.assertAnnotation(addRow, "java.lang.Override");
     IMethod addRow1 = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "addRow", new String[]{"I"});
-    SdkAssert.assertMethodReturnTypeSignature(addRow1, "QBaseTableRowData;");
+    SdkAssert.assertMethodReturnTypeSignature(addRow1, "QExtendedTablePageWithoutExtendedTableRowData;");
     SdkAssert.assertAnnotation(addRow1, "java.lang.Override");
     IMethod createRow = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "createRow", new String[]{});
-    SdkAssert.assertMethodReturnTypeSignature(createRow, "QBaseTableRowData;");
+    SdkAssert.assertMethodReturnTypeSignature(createRow, "QExtendedTablePageWithoutExtendedTableRowData;");
     SdkAssert.assertAnnotation(createRow, "java.lang.Override");
     IMethod getRowType = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "getRowType", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getRowType, "QClass<+QAbstractTableRowData;>;");
     SdkAssert.assertAnnotation(getRowType, "java.lang.Override");
     IMethod getRows = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "getRows", new String[]{});
-    SdkAssert.assertMethodReturnTypeSignature(getRows, "[QBaseTableRowData;");
+    SdkAssert.assertMethodReturnTypeSignature(getRows, "[QExtendedTablePageWithoutExtendedTableRowData;");
     SdkAssert.assertAnnotation(getRows, "java.lang.Override");
     IMethod rowAt = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "rowAt", new String[]{"I"});
-    SdkAssert.assertMethodReturnTypeSignature(rowAt, "QBaseTableRowData;");
+    SdkAssert.assertMethodReturnTypeSignature(rowAt, "QExtendedTablePageWithoutExtendedTableRowData;");
     SdkAssert.assertAnnotation(rowAt, "java.lang.Override");
-    IMethod setRows = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "setRows", new String[]{"[QBaseTableRowData;"});
+    IMethod setRows = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "setRows", new String[]{"[QExtendedTablePageWithoutExtendedTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
     SdkAssert.assertEquals("inner types count of 'ExtendedTablePageWithoutExtendedTableData'", 1, extendedTablePageWithoutExtendedTableData.getTypes().length);
-    // type BaseTableRowData
-    IType baseTableRowData = SdkAssert.assertTypeExists(extendedTablePageWithoutExtendedTableData, "BaseTableRowData");
-    SdkAssert.assertHasFlags(baseTableRowData, 9);
-    SdkAssert.assertHasSuperTypeSignature(baseTableRowData, "Qformdata.shared.services.pages.BaseTablePageData.BaseTableRowData;");
+    // type ExtendedTablePageWithoutExtendedTableRowData
+    IType extendedTablePageWithoutExtendedTableRowData = SdkAssert.assertTypeExists(extendedTablePageWithoutExtendedTableData, "ExtendedTablePageWithoutExtendedTableRowData");
+    SdkAssert.assertHasFlags(extendedTablePageWithoutExtendedTableRowData, 9);
+    SdkAssert.assertHasSuperTypeSignature(extendedTablePageWithoutExtendedTableRowData, "QBaseTableRowData;");
 
-    // fields of BaseTableRowData
-    SdkAssert.assertEquals("field count of 'BaseTableRowData'", 1, baseTableRowData.getFields().length);
-    IField serialVersionUID1 = SdkAssert.assertFieldExist(baseTableRowData, "serialVersionUID");
+    // fields of ExtendedTablePageWithoutExtendedTableRowData
+    SdkAssert.assertEquals("field count of 'ExtendedTablePageWithoutExtendedTableRowData'", 1, extendedTablePageWithoutExtendedTableRowData.getFields().length);
+    IField serialVersionUID1 = SdkAssert.assertFieldExist(extendedTablePageWithoutExtendedTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    SdkAssert.assertEquals("method count of 'BaseTableRowData'", 1, baseTableRowData.getMethods().length);
-    IMethod baseTableRowData1 = SdkAssert.assertMethodExist(baseTableRowData, "BaseTableRowData", new String[]{});
-    SdkAssert.assertTrue(baseTableRowData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(baseTableRowData1, "V");
+    SdkAssert.assertEquals("method count of 'ExtendedTablePageWithoutExtendedTableRowData'", 1, extendedTablePageWithoutExtendedTableRowData.getMethods().length);
+    IMethod extendedTablePageWithoutExtendedTableRowData1 = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableRowData, "ExtendedTablePageWithoutExtendedTableRowData", new String[]{});
+    SdkAssert.assertTrue(extendedTablePageWithoutExtendedTableRowData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(extendedTablePageWithoutExtendedTableRowData1, "V");
 
-    SdkAssert.assertEquals("inner types count of 'BaseTableRowData'", 0, baseTableRowData.getTypes().length);
+    SdkAssert.assertEquals("inner types count of 'ExtendedTablePageWithoutExtendedTableRowData'", 0, extendedTablePageWithoutExtendedTableRowData.getTypes().length);
   }
 
   /**
@@ -364,6 +372,76 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(setColInTable, "V");
 
     SdkAssert.assertEquals("inner types count of 'BaseWithExtendedTableTableRowData'", 0, baseWithExtendedTableTableRowData.getTypes().length);
+  }
+
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
+  private void testApiOfExtendedExtendedTablePageWithExtendedTableData() throws Exception {
+    // type ExtendedExtendedTablePageWithExtendedTableData
+    IType extendedExtendedTablePageWithExtendedTableData = SdkAssert.assertTypeExists("formdata.shared.services.pages.ExtendedExtendedTablePageWithExtendedTableData");
+    SdkAssert.assertHasFlags(extendedExtendedTablePageWithExtendedTableData, 1);
+    SdkAssert.assertHasSuperTypeSignature(extendedExtendedTablePageWithExtendedTableData, "QExtendedTablePageWithoutExtendedTableData;");
+
+    // fields of ExtendedExtendedTablePageWithExtendedTableData
+    SdkAssert.assertEquals("field count of 'ExtendedExtendedTablePageWithExtendedTableData'", 1, extendedExtendedTablePageWithExtendedTableData.getFields().length);
+    IField serialVersionUID = SdkAssert.assertFieldExist(extendedExtendedTablePageWithExtendedTableData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+
+    SdkAssert.assertEquals("method count of 'ExtendedExtendedTablePageWithExtendedTableData'", 8, extendedExtendedTablePageWithExtendedTableData.getMethods().length);
+    IMethod extendedExtendedTablePageWithExtendedTableData1 = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "ExtendedExtendedTablePageWithExtendedTableData", new String[]{});
+    SdkAssert.assertTrue(extendedExtendedTablePageWithExtendedTableData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(extendedExtendedTablePageWithExtendedTableData1, "V");
+    IMethod addRow = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "addRow", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(addRow, "QExtendedExtendedTablePageWithExtendedTableRowData;");
+    SdkAssert.assertAnnotation(addRow, "java.lang.Override");
+    IMethod addRow1 = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "addRow", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(addRow1, "QExtendedExtendedTablePageWithExtendedTableRowData;");
+    SdkAssert.assertAnnotation(addRow1, "java.lang.Override");
+    IMethod createRow = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "createRow", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(createRow, "QExtendedExtendedTablePageWithExtendedTableRowData;");
+    SdkAssert.assertAnnotation(createRow, "java.lang.Override");
+    IMethod getRowType = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "getRowType", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getRowType, "QClass<+QAbstractTableRowData;>;");
+    SdkAssert.assertAnnotation(getRowType, "java.lang.Override");
+    IMethod getRows = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "getRows", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getRows, "[QExtendedExtendedTablePageWithExtendedTableRowData;");
+    SdkAssert.assertAnnotation(getRows, "java.lang.Override");
+    IMethod rowAt = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "rowAt", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(rowAt, "QExtendedExtendedTablePageWithExtendedTableRowData;");
+    SdkAssert.assertAnnotation(rowAt, "java.lang.Override");
+    IMethod setRows = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "setRows", new String[]{"[QExtendedExtendedTablePageWithExtendedTableRowData;"});
+    SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
+
+    SdkAssert.assertEquals("inner types count of 'ExtendedExtendedTablePageWithExtendedTableData'", 1, extendedExtendedTablePageWithExtendedTableData.getTypes().length);
+    // type ExtendedExtendedTablePageWithExtendedTableRowData
+    IType extendedExtendedTablePageWithExtendedTableRowData = SdkAssert.assertTypeExists(extendedExtendedTablePageWithExtendedTableData, "ExtendedExtendedTablePageWithExtendedTableRowData");
+    SdkAssert.assertHasFlags(extendedExtendedTablePageWithExtendedTableRowData, 9);
+    SdkAssert.assertHasSuperTypeSignature(extendedExtendedTablePageWithExtendedTableRowData, "QExtendedTablePageWithoutExtendedTableRowData;");
+
+    // fields of ExtendedExtendedTablePageWithExtendedTableRowData
+    SdkAssert.assertEquals("field count of 'ExtendedExtendedTablePageWithExtendedTableRowData'", 3, extendedExtendedTablePageWithExtendedTableRowData.getFields().length);
+    IField serialVersionUID1 = SdkAssert.assertFieldExist(extendedExtendedTablePageWithExtendedTableRowData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID1, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID1, "J");
+    IField boolean_ = SdkAssert.assertFieldExist(extendedExtendedTablePageWithExtendedTableRowData, "boolean_");
+    SdkAssert.assertHasFlags(boolean_, 25);
+    SdkAssert.assertFieldSignature(boolean_, "QString;");
+    IField m_boolean = SdkAssert.assertFieldExist(extendedExtendedTablePageWithExtendedTableRowData, "m_boolean");
+    SdkAssert.assertHasFlags(m_boolean, 2);
+    SdkAssert.assertFieldSignature(m_boolean, "QBoolean;");
+
+    SdkAssert.assertEquals("method count of 'ExtendedExtendedTablePageWithExtendedTableRowData'", 3, extendedExtendedTablePageWithExtendedTableRowData.getMethods().length);
+    IMethod extendedExtendedTablePageWithExtendedTableRowData1 = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableRowData, "ExtendedExtendedTablePageWithExtendedTableRowData", new String[]{});
+    SdkAssert.assertTrue(extendedExtendedTablePageWithExtendedTableRowData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(extendedExtendedTablePageWithExtendedTableRowData1, "V");
+    IMethod getBoolean = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableRowData, "getBoolean", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getBoolean, "QBoolean;");
+    IMethod setBoolean = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableRowData, "setBoolean", new String[]{"QBoolean;"});
+    SdkAssert.assertMethodReturnTypeSignature(setBoolean, "V");
+
+    SdkAssert.assertEquals("inner types count of 'ExtendedExtendedTablePageWithExtendedTableRowData'", 0, extendedExtendedTablePageWithExtendedTableRowData.getTypes().length);
   }
 
 }

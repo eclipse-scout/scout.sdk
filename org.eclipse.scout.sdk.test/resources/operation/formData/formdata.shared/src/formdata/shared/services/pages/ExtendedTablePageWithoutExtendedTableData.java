@@ -26,44 +26,44 @@ public class ExtendedTablePageWithoutExtendedTableData extends BaseTablePageData
   }
 
   @Override
-  public BaseTableRowData addRow() {
-    return (BaseTableRowData) super.addRow();
+  public ExtendedTablePageWithoutExtendedTableRowData addRow() {
+    return (ExtendedTablePageWithoutExtendedTableRowData) super.addRow();
   }
 
   @Override
-  public BaseTableRowData addRow(int rowState) {
-    return (BaseTableRowData) super.addRow(rowState);
+  public ExtendedTablePageWithoutExtendedTableRowData addRow(int rowState) {
+    return (ExtendedTablePageWithoutExtendedTableRowData) super.addRow(rowState);
   }
 
   @Override
-  public BaseTableRowData createRow() {
-    return new BaseTableRowData();
+  public ExtendedTablePageWithoutExtendedTableRowData createRow() {
+    return new ExtendedTablePageWithoutExtendedTableRowData();
   }
 
   @Override
   public Class<? extends AbstractTableRowData> getRowType() {
-    return BaseTableRowData.class;
+    return ExtendedTablePageWithoutExtendedTableRowData.class;
   }
 
   @Override
-  public BaseTableRowData[] getRows() {
-    return (BaseTableRowData[]) super.getRows();
+  public ExtendedTablePageWithoutExtendedTableRowData[] getRows() {
+    return (ExtendedTablePageWithoutExtendedTableRowData[]) super.getRows();
   }
 
   @Override
-  public BaseTableRowData rowAt(int index) {
-    return (BaseTableRowData) super.rowAt(index);
+  public ExtendedTablePageWithoutExtendedTableRowData rowAt(int index) {
+    return (ExtendedTablePageWithoutExtendedTableRowData) super.rowAt(index);
   }
 
-  public void setRows(BaseTableRowData[] rows) {
+  public void setRows(ExtendedTablePageWithoutExtendedTableRowData[] rows) {
     super.setRows(rows);
   }
 
-  public static class BaseTableRowData extends formdata.shared.services.pages.BaseTablePageData.BaseTableRowData {
+  public static class ExtendedTablePageWithoutExtendedTableRowData extends BaseTableRowData {
 
     private static final long serialVersionUID = 1L;
 
-    public BaseTableRowData() {
+    public ExtendedTablePageWithoutExtendedTableRowData() {
     }
   }
 }

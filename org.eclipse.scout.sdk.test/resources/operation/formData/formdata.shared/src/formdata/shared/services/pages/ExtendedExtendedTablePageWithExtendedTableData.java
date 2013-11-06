@@ -59,7 +59,7 @@ public class ExtendedExtendedTablePageWithExtendedTableData extends ExtendedTabl
     super.setRows(rows);
   }
 
-  public static class ExtendedExtendedTablePageWithExtendedTableRowData extends BaseTableRowData {
+  public static class ExtendedExtendedTablePageWithExtendedTableRowData extends ExtendedTablePageWithoutExtendedTableRowData {
 
     private static final long serialVersionUID = 1L;
     public static final String boolean_ = "boolean";

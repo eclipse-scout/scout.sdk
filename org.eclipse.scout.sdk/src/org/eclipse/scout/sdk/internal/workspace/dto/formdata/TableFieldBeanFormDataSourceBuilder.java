@@ -10,16 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -68,32 +64,7 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
     return superTypeSignature;
   }
 
-  @Override
-  protected String getTableRowDataSuperClassSignature(IType table) throws CoreException {
-    ITypeHierarchy tableHierarchy = TypeUtility.getSuperTypeHierarchy(table);
-    IType parentTable = table;
-    if (table.getDeclaringType().equals(getModelType())) {
-      // we have our own inner table: take super class of our table
-      parentTable = tableHierarchy.getSuperclass(table);
-    }
-
-    if (TypeUtility.exists(parentTable)) {
-      IType declaringType = parentTable.getDeclaringType();
-      if (TypeUtility.exists(declaringType)) {
-        IType formDataType = ScoutTypeUtility.getFormDataType(declaringType, tableHierarchy);
-        if (TypeUtility.exists(formDataType)) {
-          IType parentTableBeanData = getTableRowDataType(formDataType);
-          if (TypeUtility.exists(parentTableBeanData)) {
-            return SignatureCache.createTypeSignature(parentTableBeanData.getFullyQualifiedName());
-          }
-        }
-      }
-    }
-    return SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableRowData);
-  }
-
   public FormDataAnnotation getFormDataAnnotation() {
     return m_formDataAnnotation;
   }
-
 }

@@ -188,44 +188,44 @@ public class TableFieldBaseFormData extends AbstractFormData {
     }
 
     @Override
-    public AbstractPersonTableRowData addRow() {
-      return (AbstractPersonTableRowData) super.addRow();
+    public PersonTableRowData addRow() {
+      return (PersonTableRowData) super.addRow();
     }
 
     @Override
-    public AbstractPersonTableRowData addRow(int rowState) {
-      return (AbstractPersonTableRowData) super.addRow(rowState);
+    public PersonTableRowData addRow(int rowState) {
+      return (PersonTableRowData) super.addRow(rowState);
     }
 
     @Override
-    public AbstractPersonTableRowData createRow() {
-      return new AbstractPersonTableRowData();
+    public PersonTableRowData createRow() {
+      return new PersonTableRowData();
     }
 
     @Override
     public Class<? extends AbstractTableRowData> getRowType() {
-      return AbstractPersonTableRowData.class;
+      return PersonTableRowData.class;
     }
 
     @Override
-    public AbstractPersonTableRowData[] getRows() {
-      return (AbstractPersonTableRowData[]) super.getRows();
+    public PersonTableRowData[] getRows() {
+      return (PersonTableRowData[]) super.getRows();
     }
 
     @Override
-    public AbstractPersonTableRowData rowAt(int index) {
-      return (AbstractPersonTableRowData) super.rowAt(index);
+    public PersonTableRowData rowAt(int index) {
+      return (PersonTableRowData) super.rowAt(index);
     }
 
-    public void setRows(AbstractPersonTableRowData[] rows) {
+    public void setRows(PersonTableRowData[] rows) {
       super.setRows(rows);
     }
 
-    public static class AbstractPersonTableRowData extends formdata.shared.services.process.AbstractPersonTableFieldData.AbstractPersonTableRowData {
+    public static class PersonTableRowData extends AbstractPersonTableRowData {
 
       private static final long serialVersionUID = 1L;
 
-      public AbstractPersonTableRowData() {
+      public PersonTableRowData() {
       }
     }
   }

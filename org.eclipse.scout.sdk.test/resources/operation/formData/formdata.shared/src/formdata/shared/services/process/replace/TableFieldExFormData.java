@@ -210,7 +210,7 @@ public class TableFieldExFormData extends TableFieldBaseFormData {
       super.setRows(rows);
     }
 
-    public static class ExtendedPersonTableRowData extends AbstractPersonTableRowData {
+    public static class ExtendedPersonTableRowData extends PersonTableRowData {
 
       private static final long serialVersionUID = 1L;
       public static final String lastName = "lastName";

@@ -146,7 +146,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     IType rowDataSuperClassType = TypeUtility.getTypeBySignature(rowDataSuperClassSig);
 
     // row data class name
-    String rowDataName = ScoutUtility.removeFieldSuffix(table.getDeclaringType().getElementName()) + "RowData";
+    String rowDataName = getElementName().replaceAll("(PageData|FieldData|Data)$", "") + "RowData";
     ITypeSourceBuilder tableRowDataBuilder = new TypeSourceBuilder(rowDataName);
 
     // row data class flags
@@ -305,13 +305,17 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getRowTypeMethodBuilder), getRowTypeMethodBuilder);
   }
 
-  /**
-   * @param table
-   * @param fieldHierarchy
-   * @return
-   * @throws CoreException
-   */
-  protected abstract String getTableRowDataSuperClassSignature(IType table) throws CoreException;
+  private String getTableRowDataSuperClassSignature(IType table) throws CoreException {
+    if (!SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTablePageData).equals(getSuperTypeSignature())) {
+      // use the row data in the super page data.
+      IType superType = TypeUtility.getTypeBySignature(getSuperTypeSignature());
+      IType[] rowData = superType.getTypes(); // can only be a row data
+      if (rowData.length > 0) {
+        return SignatureCache.createTypeSignature(rowData[0].getFullyQualifiedName());
+      }
+    }
+    return SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableRowData);
+  }
 
   /**
    * Gets the row data type that is used within the given table data.

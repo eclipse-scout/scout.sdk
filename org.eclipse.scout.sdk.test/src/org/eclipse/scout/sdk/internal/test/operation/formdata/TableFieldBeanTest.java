@@ -356,44 +356,44 @@ public class TableFieldBeanTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertTrue(personTable1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(personTable1, "V");
     IMethod addRow4 = SdkAssert.assertMethodExist(personTable, "addRow", new String[]{});
-    SdkAssert.assertMethodReturnTypeSignature(addRow4, "QAbstractPersonTableRowData;");
+    SdkAssert.assertMethodReturnTypeSignature(addRow4, "QPersonTableRowData;");
     SdkAssert.assertAnnotation(addRow4, "java.lang.Override");
     IMethod addRow5 = SdkAssert.assertMethodExist(personTable, "addRow", new String[]{"I"});
-    SdkAssert.assertMethodReturnTypeSignature(addRow5, "QAbstractPersonTableRowData;");
+    SdkAssert.assertMethodReturnTypeSignature(addRow5, "QPersonTableRowData;");
     SdkAssert.assertAnnotation(addRow5, "java.lang.Override");
     IMethod createRow3 = SdkAssert.assertMethodExist(personTable, "createRow", new String[]{});
-    SdkAssert.assertMethodReturnTypeSignature(createRow3, "QAbstractPersonTableRowData;");
+    SdkAssert.assertMethodReturnTypeSignature(createRow3, "QPersonTableRowData;");
     SdkAssert.assertAnnotation(createRow3, "java.lang.Override");
     IMethod getRowType3 = SdkAssert.assertMethodExist(personTable, "getRowType", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getRowType3, "QClass<+QAbstractTableRowData;>;");
     SdkAssert.assertAnnotation(getRowType3, "java.lang.Override");
     IMethod getRows2 = SdkAssert.assertMethodExist(personTable, "getRows", new String[]{});
-    SdkAssert.assertMethodReturnTypeSignature(getRows2, "[QAbstractPersonTableRowData;");
+    SdkAssert.assertMethodReturnTypeSignature(getRows2, "[QPersonTableRowData;");
     SdkAssert.assertAnnotation(getRows2, "java.lang.Override");
     IMethod rowAt2 = SdkAssert.assertMethodExist(personTable, "rowAt", new String[]{"I"});
-    SdkAssert.assertMethodReturnTypeSignature(rowAt2, "QAbstractPersonTableRowData;");
+    SdkAssert.assertMethodReturnTypeSignature(rowAt2, "QPersonTableRowData;");
     SdkAssert.assertAnnotation(rowAt2, "java.lang.Override");
-    IMethod setRows2 = SdkAssert.assertMethodExist(personTable, "setRows", new String[]{"[QAbstractPersonTableRowData;"});
+    IMethod setRows2 = SdkAssert.assertMethodExist(personTable, "setRows", new String[]{"[QPersonTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows2, "V");
 
     SdkAssert.assertEquals("inner types count of 'PersonTable'", 1, personTable.getTypes().length);
-    // type AbstractPersonTableRowData
-    IType abstractPersonTableRowData = SdkAssert.assertTypeExists(personTable, "AbstractPersonTableRowData");
-    SdkAssert.assertHasFlags(abstractPersonTableRowData, 9);
-    SdkAssert.assertHasSuperTypeSignature(abstractPersonTableRowData, "Qformdata.shared.services.process.AbstractPersonTableFieldData.AbstractPersonTableRowData;");
+    // type PersonTableRowData
+    IType personTableRowData = SdkAssert.assertTypeExists(personTable, "PersonTableRowData");
+    SdkAssert.assertHasFlags(personTableRowData, 9);
+    SdkAssert.assertHasSuperTypeSignature(personTableRowData, "QAbstractPersonTableRowData;");
 
-    // fields of AbstractPersonTableRowData
-    SdkAssert.assertEquals("field count of 'AbstractPersonTableRowData'", 1, abstractPersonTableRowData.getFields().length);
-    IField serialVersionUID7 = SdkAssert.assertFieldExist(abstractPersonTableRowData, "serialVersionUID");
+    // fields of PersonTableRowData
+    SdkAssert.assertEquals("field count of 'PersonTableRowData'", 1, personTableRowData.getFields().length);
+    IField serialVersionUID7 = SdkAssert.assertFieldExist(personTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID7, 26);
     SdkAssert.assertFieldSignature(serialVersionUID7, "J");
 
-    SdkAssert.assertEquals("method count of 'AbstractPersonTableRowData'", 1, abstractPersonTableRowData.getMethods().length);
-    IMethod abstractPersonTableRowData1 = SdkAssert.assertMethodExist(abstractPersonTableRowData, "AbstractPersonTableRowData", new String[]{});
-    SdkAssert.assertTrue(abstractPersonTableRowData1.isConstructor());
-    SdkAssert.assertMethodReturnTypeSignature(abstractPersonTableRowData1, "V");
+    SdkAssert.assertEquals("method count of 'PersonTableRowData'", 1, personTableRowData.getMethods().length);
+    IMethod personTableRowData1 = SdkAssert.assertMethodExist(personTableRowData, "PersonTableRowData", new String[]{});
+    SdkAssert.assertTrue(personTableRowData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(personTableRowData1, "V");
 
-    SdkAssert.assertEquals("inner types count of 'AbstractPersonTableRowData'", 0, abstractPersonTableRowData.getTypes().length);
+    SdkAssert.assertEquals("inner types count of 'PersonTableRowData'", 0, personTableRowData.getTypes().length);
     // type Table
     IType table = SdkAssert.assertTypeExists(tableFieldBaseFormData, "Table");
     SdkAssert.assertHasFlags(table, 9);
@@ -672,7 +672,7 @@ public class TableFieldBeanTest extends AbstractSdkTestWithFormDataProject {
     // type ExtendedPersonTableRowData
     IType extendedPersonTableRowData = SdkAssert.assertTypeExists(extendedPersonTable, "ExtendedPersonTableRowData");
     SdkAssert.assertHasFlags(extendedPersonTableRowData, 9);
-    SdkAssert.assertHasSuperTypeSignature(extendedPersonTableRowData, "QAbstractPersonTableRowData;");
+    SdkAssert.assertHasSuperTypeSignature(extendedPersonTableRowData, "QPersonTableRowData;");
 
     // fields of ExtendedPersonTableRowData
     SdkAssert.assertEquals("field count of 'ExtendedPersonTableRowData'", 3, extendedPersonTableRowData.getFields().length);
@@ -990,21 +990,33 @@ public class TableFieldBeanTest extends AbstractSdkTestWithFormDataProject {
     // type ChildTableRowData
     IType childTableRowData = SdkAssert.assertTypeExists(childTable, "ChildTableRowData");
     SdkAssert.assertHasFlags(childTableRowData, 9);
-    SdkAssert.assertHasSuperTypeSignature(childTableRowData, "QTableInFormRowData;");
+    SdkAssert.assertHasSuperTypeSignature(childTableRowData, "QAbstractTableRowData;");
 
     // fields of ChildTableRowData
-    SdkAssert.assertEquals("field count of 'ChildTableRowData'", 3, childTableRowData.getFields().length);
+    SdkAssert.assertEquals("field count of 'ChildTableRowData'", 7, childTableRowData.getFields().length);
     IField serialVersionUID2 = SdkAssert.assertFieldExist(childTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
     IField col1InChildForm = SdkAssert.assertFieldExist(childTableRowData, "col1InChildForm");
     SdkAssert.assertHasFlags(col1InChildForm, 25);
     SdkAssert.assertFieldSignature(col1InChildForm, "QString;");
+    IField colInAbstractTable = SdkAssert.assertFieldExist(childTableRowData, "colInAbstractTable");
+    SdkAssert.assertHasFlags(colInAbstractTable, 25);
+    SdkAssert.assertFieldSignature(colInAbstractTable, "QString;");
+    IField colInDesktopForm = SdkAssert.assertFieldExist(childTableRowData, "colInDesktopForm");
+    SdkAssert.assertHasFlags(colInDesktopForm, 25);
+    SdkAssert.assertFieldSignature(colInDesktopForm, "QString;");
     IField m_col1InChildForm = SdkAssert.assertFieldExist(childTableRowData, "m_col1InChildForm");
     SdkAssert.assertHasFlags(m_col1InChildForm, 2);
     SdkAssert.assertFieldSignature(m_col1InChildForm, "QString;");
+    IField m_colInAbstractTable = SdkAssert.assertFieldExist(childTableRowData, "m_colInAbstractTable");
+    SdkAssert.assertHasFlags(m_colInAbstractTable, 2);
+    SdkAssert.assertFieldSignature(m_colInAbstractTable, "QString;");
+    IField m_colInDesktopForm = SdkAssert.assertFieldExist(childTableRowData, "m_colInDesktopForm");
+    SdkAssert.assertHasFlags(m_colInDesktopForm, 2);
+    SdkAssert.assertFieldSignature(m_colInDesktopForm, "QString;");
 
-    SdkAssert.assertEquals("method count of 'ChildTableRowData'", 3, childTableRowData.getMethods().length);
+    SdkAssert.assertEquals("method count of 'ChildTableRowData'", 7, childTableRowData.getMethods().length);
     IMethod childTableRowData1 = SdkAssert.assertMethodExist(childTableRowData, "ChildTableRowData", new String[]{});
     SdkAssert.assertTrue(childTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(childTableRowData1, "V");
@@ -1012,8 +1024,15 @@ public class TableFieldBeanTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(getCol1InChildForm, "QString;");
     IMethod setCol1InChildForm = SdkAssert.assertMethodExist(childTableRowData, "setCol1InChildForm", new String[]{"QString;"});
     SdkAssert.assertMethodReturnTypeSignature(setCol1InChildForm, "V");
+    IMethod getColInAbstractTable = SdkAssert.assertMethodExist(childTableRowData, "getColInAbstractTable", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getColInAbstractTable, "QString;");
+    IMethod setColInAbstractTable = SdkAssert.assertMethodExist(childTableRowData, "setColInAbstractTable", new String[]{"QString;"});
+    SdkAssert.assertMethodReturnTypeSignature(setColInAbstractTable, "V");
+    IMethod getColInDesktopForm = SdkAssert.assertMethodExist(childTableRowData, "getColInDesktopForm", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getColInDesktopForm, "QString;");
+    IMethod setColInDesktopForm = SdkAssert.assertMethodExist(childTableRowData, "setColInDesktopForm", new String[]{"QString;"});
+    SdkAssert.assertMethodReturnTypeSignature(setColInDesktopForm, "V");
 
     SdkAssert.assertEquals("inner types count of 'ChildTableRowData'", 0, childTableRowData.getTypes().length);
   }
-
 }
