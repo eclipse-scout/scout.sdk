@@ -62,11 +62,10 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    super.run(monitor, workingCopyManager);
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    super.createType(monitor, workingCopyManager);
     // start method
     createStartMethod(getCreatedType(), monitor, workingCopyManager);
-
   }
 
   protected void createStartMethod(final IType formHandler, IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {

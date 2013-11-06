@@ -60,7 +60,7 @@ public class OutlineToolbuttonNewOperation extends ToolbuttonNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     if (TypeUtility.exists(getOutlineType())) {
       IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
       constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
@@ -74,7 +74,7 @@ public class OutlineToolbuttonNewOperation extends ToolbuttonNewOperation {
       });
       addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
     }
-    super.run(monitor, workingCopyManager);
+    super.createType(monitor, workingCopyManager);
   }
 
   public void setOutlineType(IType outlineType) {
@@ -84,5 +84,4 @@ public class OutlineToolbuttonNewOperation extends ToolbuttonNewOperation {
   public IType getOutlineType() {
     return m_outlineType;
   }
-
 }

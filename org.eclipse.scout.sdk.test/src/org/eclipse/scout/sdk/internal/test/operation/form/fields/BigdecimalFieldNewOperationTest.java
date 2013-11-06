@@ -38,6 +38,7 @@ public class BigdecimalFieldNewOperationTest extends AbstractSdkTestWithSamplePr
     IType mainBox = TypeUtility.getType("sample.client.empty.EmptyForm.MainBox");
     BigdecimalFieldNewOperation bigdecimalFieldNewOp = new BigdecimalFieldNewOperation("TestBigdecimalField01", mainBox);
     bigdecimalFieldNewOp.setSuperTypeSignature(Signature.createTypeSignature("org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField", true));
+    bigdecimalFieldNewOp.setFormatSource(false);
     IType okButton = TypeUtility.getType("sample.client.empty.EmptyForm.MainBox.OkButton");
     bigdecimalFieldNewOp.setSibling(okButton);
     executeBuildAssertNoCompileErrors(bigdecimalFieldNewOp);
@@ -57,6 +58,7 @@ public class BigdecimalFieldNewOperationTest extends AbstractSdkTestWithSamplePr
     Assert.assertTrue(TypeUtility.exists(getSharedJavaProject()));
     IType mainBox = TypeUtility.getType("sample.client.empty.EmptyForm.MainBox");
     BigdecimalFieldNewOperation bigdecimalFieldNewOp = new BigdecimalFieldNewOperation("TestBigdecimalField02", mainBox);
+    bigdecimalFieldNewOp.setFormatSource(false);
     bigdecimalFieldNewOp.setSuperTypeSignature(Signature.createTypeSignature("org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField", true));
     IType okButton = TypeUtility.getType("sample.client.empty.EmptyForm.MainBox.OkButton");
     bigdecimalFieldNewOp.setSibling(okButton);

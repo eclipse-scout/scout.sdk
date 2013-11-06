@@ -82,7 +82,6 @@ public class PackageFragementNewOperation implements IOperation {
     if (checkPoint) {
       ResourcesPlugin.getWorkspace().checkpoint(false);
     }
-
   }
 
   public IJavaProject getJavaProject() {

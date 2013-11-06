@@ -77,15 +77,15 @@ public class CompilationUnitNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-
     if (getPackageFragment() == null) {
       PackageFragementNewOperation packageOp = new PackageFragementNewOperation(getPackageFragmentName(), getJavaProject());
-//      packageOp.setNoErrorWhenPackageAlreadyExist(true);
+      packageOp.setNoErrorWhenPackageAlreadyExist(true);
       ExportPolicy packageExportPolicy = getPackageExportPolicy();
       if (ExportPolicy.AddPackageWhenNotEmpty.equals(packageExportPolicy)) {
         packageExportPolicy = ExportPolicy.AddPackage;
       }
       packageOp.setExportPackagePolicy(packageExportPolicy);
+      packageOp.validate();
       packageOp.run(monitor, workingCopyManager);
       setPackageFragment(packageOp.getCreatedPackageFragment());
     }

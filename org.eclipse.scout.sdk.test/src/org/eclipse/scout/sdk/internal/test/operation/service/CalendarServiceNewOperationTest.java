@@ -22,13 +22,13 @@ import org.junit.Test;
 /**
  * <h3>{@link CalendarServiceNewOperationTest}</h3> ...
  *
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class CalendarServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
 
   @Test
-  public void testNewSqlLookupService() throws Exception {
+  public void testNewCalendarService() throws Exception {
     CalendarServiceNewOperation serviceOp = new CalendarServiceNewOperation("ITestService01", "TestService01");
     serviceOp.setImplementationProject(getServerJavaProject());
     serviceOp.setImplementationPackageName("sample.server.services.test.output");

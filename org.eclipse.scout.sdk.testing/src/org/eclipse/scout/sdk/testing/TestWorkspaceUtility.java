@@ -114,8 +114,13 @@ public final class TestWorkspaceUtility {
     delJob.setRule(ResourcesPlugin.getWorkspace().getRoot());
     delJob.schedule();
     delJob.join();
-    ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+
+    IProgressMonitor monitor = new NullProgressMonitor();
+    ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, monitor);
     JdtUtility.waitForSilentWorkspace();
+
+    ResourcesPlugin.getWorkspace().forgetSavedTree(null);
+    ResourcesPlugin.getWorkspace().getRoot().clearHistory(monitor);
   }
 
   /**
@@ -174,13 +179,19 @@ public final class TestWorkspaceUtility {
    * @throws CoreException
    */
   public static void buildWorkspace() throws CoreException {
-    ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
-    JdtUtility.waitForRefresh();
+    final IProgressMonitor monitor = new NullProgressMonitor();
+
+    ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, monitor);
     waitForNotifyJob();
-    JdtUtility.waitForIndexesReady();
-    ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.CLEAN_BUILD, new NullProgressMonitor());
-    ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, new NullProgressMonitor());
     JdtUtility.waitForSilentWorkspace();
+
+    ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.CLEAN_BUILD, monitor);
+    JdtUtility.waitForSilentWorkspace();
+    waitForNotifyJob();
+
+    ResourcesPlugin.getWorkspace().build(IncrementalProjectBuilder.FULL_BUILD, monitor);
+    JdtUtility.waitForSilentWorkspace();
+    waitForNotifyJob();
   }
 
   private static void waitForNotifyJob() throws CoreException {

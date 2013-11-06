@@ -47,8 +47,8 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    super.run(monitor, workingCopyManager);
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    super.createType(monitor, workingCopyManager);
     createFormFieldGetter(monitor, workingCopyManager);
   }
 

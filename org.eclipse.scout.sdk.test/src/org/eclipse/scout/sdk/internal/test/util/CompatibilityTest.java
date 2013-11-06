@@ -2,10 +2,10 @@ package org.eclipse.scout.sdk.internal.test.util;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
 import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
+import org.eclipse.scout.sdk.testing.TestUtility;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
@@ -31,14 +31,20 @@ public class CompatibilityTest extends AbstractScoutSdkTest {
   }
 
   @Test
-  public void testResolveTargetPlatform() throws CoreException {
-    IProject testProject = getProject(PROJECT_NAME);
-    Assert.assertNotNull(testProject);
+  public void testResolveTargetPlatform() throws Exception {
+    try {
+      IProject testProject = getProject(PROJECT_NAME);
+      Assert.assertNotNull(testProject);
 
-    IFile targetFile = testProject.getFile("resources/test.target");
-    Assert.assertNotNull(targetFile);
-    Assert.assertTrue(targetFile.exists());
+      IFile targetFile = testProject.getFile("resources/test.target");
+      Assert.assertNotNull(targetFile);
+      Assert.assertTrue(targetFile.exists());
 
-    TargetPlatformUtility.resolveTargetPlatform(targetFile, true, new NullProgressMonitor());
+      TargetPlatformUtility.resolveTargetPlatform(targetFile, true, new NullProgressMonitor());
+    }
+    finally {
+      // reset the platform for all consecutive tests
+      TestUtility.loadRunningOsgiAsTarget("testingTarget", new NullProgressMonitor());
+    }
   }
 }

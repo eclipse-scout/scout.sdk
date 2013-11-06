@@ -88,7 +88,7 @@ public final class AstUtility {
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setCompilerOptions(member.getJavaProject().getOptions(true));
     parser.setIgnoreMethodBodies(false);
-    if (r != null) {
+    if (r != null && r.getOffset() >= 0) {
       parser.setSourceRange(r.getOffset(), r.getLength());
     }
     parser.setResolveBindings(true);

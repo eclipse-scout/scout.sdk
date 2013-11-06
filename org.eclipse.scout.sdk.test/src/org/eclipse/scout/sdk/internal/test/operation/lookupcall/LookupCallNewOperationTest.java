@@ -52,12 +52,12 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
     newOp.setServiceProxyRegistrationProject(getClientJavaProject());
     newOp.setServiceRegistrationProject(getServerJavaProject());
     newOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.server.services.lookup.AbstractLookupService"));
+
     executeBuildAssertNoCompileErrors(newOp);
 
     testApiOfTest01LookupCall();
     testApiOfTest01LookupService();
     testApiOfITest01LookupService();
-
   }
 
   @Test

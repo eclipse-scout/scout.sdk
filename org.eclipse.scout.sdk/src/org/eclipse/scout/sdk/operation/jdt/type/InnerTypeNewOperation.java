@@ -53,17 +53,25 @@ public class InnerTypeNewOperation extends AbstractTypeNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public final void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    createType(monitor, workingCopyManager);
+    formatSource(monitor, workingCopyManager);
+  }
+
+  protected void formatSource(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    if (isFormatSource()) {
+      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedType(), true);
+      formatOp.run(monitor, workingCopyManager);
+    }
+  }
+
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ICompilationUnit icu = getDeclaringType().getCompilationUnit();
     CompilationUnitImportValidator importValidator = new CompilationUnitImportValidator(icu);
     StringBuilder sourceBuilder = new StringBuilder();
     getSourceBuilder().createSource(sourceBuilder, ResourceUtility.getLineSeparator(icu), getDeclaringType().getJavaProject(), importValidator);
     setCreatedType(getDeclaringType().createType(sourceBuilder.toString(), getSibling(), true, monitor));
     importValidator.createImports(monitor);
-    if (isFormatSource()) {
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedType(), true);
-      formatOp.run(monitor, workingCopyManager);
-    }
   }
 
   public IType getDeclaringType() {

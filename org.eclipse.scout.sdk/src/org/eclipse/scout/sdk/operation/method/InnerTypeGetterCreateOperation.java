@@ -41,7 +41,6 @@ public class InnerTypeGetterCreateOperation extends MethodNewOperation {
     setReturnTypeSignature(SignatureCache.createTypeSignature(m_field.getFullyQualifiedName()));
     setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodGetterCommentBuilder());
     setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append("return getFieldByClass(");
@@ -54,5 +53,4 @@ public class InnerTypeGetterCreateOperation extends MethodNewOperation {
   public IType getField() {
     return m_field;
   }
-
 }

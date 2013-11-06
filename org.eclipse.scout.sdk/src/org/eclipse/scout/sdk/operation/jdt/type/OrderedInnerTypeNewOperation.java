@@ -48,12 +48,12 @@ public class OrderedInnerTypeNewOperation extends InnerTypeNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     if (getOrderNr() < 0) {
       updateOrderNumbers(monitor, workingCopyManager);
     }
     addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(m_orderNr));
-    super.run(monitor, workingCopyManager);
+    super.createType(monitor, workingCopyManager);
   }
 
   protected void updateOrderNumbers(IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
@@ -77,7 +77,6 @@ public class OrderedInnerTypeNewOperation extends InnerTypeNewOperation {
       orderAnnotationOp.validate();
       orderAnnotationOp.run(monitor, manager);
       manager.reconcile(getDeclaringType().getCompilationUnit(), monitor);
-
     }
   }
 

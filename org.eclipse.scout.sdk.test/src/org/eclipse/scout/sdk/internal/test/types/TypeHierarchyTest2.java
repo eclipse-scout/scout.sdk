@@ -198,7 +198,6 @@ public class TypeHierarchyTest2 extends AbstractScoutSdkTest {
 
       // second project
       IScoutBundle project2 = ScoutProjectHelper.setupNewProject("zyx.test", true, true, true);
-      assertFalse(TypeUtility.exists(iOutline));
       iOutline = SdkAssert.assertTypeExists(RuntimeClasses.IOutline);
       outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
       assertEquals(0, outlineHierarchy.getAllSubtypes(iOutline, TypeFilters.getInWorkspaceFilter()).length);

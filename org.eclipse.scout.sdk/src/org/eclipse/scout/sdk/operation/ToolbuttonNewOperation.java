@@ -49,13 +49,13 @@ public class ToolbuttonNewOperation extends OrderedInnerTypeNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     if (getNlsEntry() != null) {
       IMethodSourceBuilder nlsTextGetterBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
       nlsTextGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       getSourceBuilder().addMethodSourceBuilder(nlsTextGetterBuilder);
     }
-    super.run(monitor, workingCopyManager);
+    super.createType(monitor, workingCopyManager);
   }
 
   public void setNlsEntry(INlsEntry nlsEntry) {

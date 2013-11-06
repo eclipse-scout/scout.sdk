@@ -55,7 +55,7 @@ public class ComposerEntityNewOperation extends InnerTypeNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // serial version uid
     IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
     addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
@@ -66,8 +66,7 @@ public class ComposerEntityNewOperation extends InnerTypeNewOperation {
       nlsTextMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsTextMethodBuilder), nlsTextMethodBuilder);
     }
-    super.run(monitor, workingCopyManager);
-
+    super.createType(monitor, workingCopyManager);
   }
 
   public INlsEntry getNlsEntry() {
@@ -77,5 +76,4 @@ public class ComposerEntityNewOperation extends InnerTypeNewOperation {
   public void setNlsEntry(INlsEntry nlsEntry) {
     m_nlsEntry = nlsEntry;
   }
-
 }

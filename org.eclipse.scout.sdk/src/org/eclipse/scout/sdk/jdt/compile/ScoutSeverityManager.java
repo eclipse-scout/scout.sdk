@@ -148,7 +148,6 @@ public final class ScoutSeverityManager {
     }
     catch (CoreException e) {
       ScoutSdk.logError(e);
-
     }
   }
 

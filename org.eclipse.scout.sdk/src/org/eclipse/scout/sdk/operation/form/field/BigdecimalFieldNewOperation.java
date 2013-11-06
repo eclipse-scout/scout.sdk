@@ -86,7 +86,6 @@ public class BigdecimalFieldNewOperation implements IOperation {
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
     m_createdField = newOp.getCreatedType();
-
   }
 
   public IType getCreatedField() {
