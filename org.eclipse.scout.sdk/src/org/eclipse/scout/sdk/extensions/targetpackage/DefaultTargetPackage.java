@@ -110,12 +110,23 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
     return ret;
   }
 
+  /**
+   * Gets if users can specify the target package or if the legacy packages should be used.
+   * 
+   * @return true if the new mode is enabled in the settings. false if the legacy mode is active.
+   */
   public static boolean isPackageConfigurationEnabled() {
     synchronized (lock) {
       return isPackageConfigurationEnabled;
     }
   }
 
+  /**
+   * Sets if users can specify the target package or if the legacy packages should be used.
+   * 
+   * @param enabled
+   *          true if the new mode should be used (package can be chosen). false if the legacy mode should be active.
+   */
   public static void setIsPackageConfigurationEnabled(boolean enabled) {
     synchronized (lock) {
       isPackageConfigurationEnabled = enabled;
