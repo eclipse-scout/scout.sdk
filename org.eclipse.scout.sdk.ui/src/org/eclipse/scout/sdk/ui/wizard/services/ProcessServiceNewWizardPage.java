@@ -121,7 +121,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
 
     if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
       m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), getServerBundle(), labelColWidthPercent);
-      m_entityField.setText(getTargetPackage());
+      m_entityField.setText(getTargetPackage(null));
       m_entityField.addModifyListener(new ModifyListener() {
         @Override
         public void modifyText(ModifyEvent e) {
@@ -159,7 +159,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IStatus getStatusNameField() throws JavaModelException {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_SERVICE);
     if (javaFieldNameStatus.isOK()) {
-      if (TypeUtility.existsType(getServerBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
+      if (TypeUtility.existsType(getServerBundle().getPackageName(getTargetPackage(IDefaultTargetPackage.SERVER_SERVICES)) + "." + getTypeName())) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }
     }
@@ -174,7 +174,10 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusTargetPackge() {
-    return ScoutUtility.validatePackageName(getTargetPackage());
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      return ScoutUtility.validatePackageName(getTargetPackage(null));
+    }
+    return Status.OK_STATUS;
   }
 
   public IScoutBundle getServerBundle() {
@@ -244,8 +247,13 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     return (IType) getProperty(PROP_FORM_DATA_TYPE);
   }
 
-  public String getTargetPackage() {
-    return (String) getProperty(PROP_TARGET_PACKAGE);
+  public String getTargetPackage(String packageId) {
+    if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
+      return (String) getProperty(PROP_TARGET_PACKAGE);
+    }
+    else {
+      return DefaultTargetPackage.get(null, packageId);
+    }
   }
 
   public void setTargetPackage(String targetPackage) {
