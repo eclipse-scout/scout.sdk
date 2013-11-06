@@ -48,7 +48,9 @@ public class ProjectVersionPresenter extends AbstractPresenter {
     IScoutBundle[] scoutBundles = scoutProject.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true);
     m_bundles = new HashMap<IProject, PluginModelHelper>(scoutBundles.length);
     for (IScoutBundle sb : scoutBundles) {
-      m_bundles.put(sb.getProject(), new PluginModelHelper(sb.getProject()));
+      if (!sb.isBinary()) {
+        m_bundles.put(sb.getProject(), new PluginModelHelper(sb.getProject()));
+      }
     }
 
     createContent(getContainer());
