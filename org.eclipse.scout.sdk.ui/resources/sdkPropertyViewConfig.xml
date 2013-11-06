@@ -585,6 +585,9 @@
 		<config name="getConfiguredDisplayFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredTextWrap" type="Advanced" category="Behavior" />
 	</type>
+	<type name="org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField">
+		<config name="getConfiguredValidateOnAnyKey" type="Advanced" category="Behavior" />
+	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField">
 		<config name="getConfiguredGridW" type="Normal" category="Layout" />
 		<config name="getConfiguredGridH" type="Normal" category="Layout" />
@@ -595,7 +598,6 @@
 		<config name="getConfiguredMaxLength" type="Normal" category="Data" />
 		<config name="getConfiguredMultilineText" type="Normal" category="Behavior" />
 		<config name="getConfiguredFormatUpper" type="Advanced" category="Appearance" />
-		<config name="getConfiguredValidateOnAnyKey" type="Advanced" category="Behavior" />
 		<config name="getConfiguredWrapText" type="Normal" category="Behavior" />
 		<config name="getConfiguredValueFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredSelectAllOnFocus" type="Advanced" category="Behavior" />

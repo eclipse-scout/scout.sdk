@@ -55,32 +55,34 @@ public abstract class AbstractTooltip {
   }
 
   private void attachListeners() {
-    if (m_listener == null) {
-      m_listener = new P_PopupListener();
+    synchronized (m_lock) {
+      if (m_listener == null) {
+        m_listener = new P_PopupListener();
+      }
+      m_sourceControl.addListener(SWT.MouseExit, m_listener);
+      m_sourceControl.addListener(SWT.Dispose, m_listener);
+      m_sourceControl.addListener(SWT.KeyDown, m_listener);
+      m_sourceControl.addListener(SWT.MouseDown, m_listener);
+      m_sourceControl.addListener(SWT.MouseMove, m_listener);
+      m_sourceControl.addListener(SWT.MouseHover, m_listener);
+      m_sourceControl.addListener(SWT.FocusOut, m_listener);
     }
-    m_sourceControl.addListener(SWT.MouseExit, m_listener);
-    m_sourceControl.addListener(SWT.Dispose, m_listener);
-    m_sourceControl.addListener(SWT.KeyDown, m_listener);
-    m_sourceControl.addListener(SWT.MouseDown, m_listener);
-    m_sourceControl.addListener(SWT.MouseMove, m_listener);
-    m_sourceControl.addListener(SWT.MouseHover, m_listener);
-    m_sourceControl.addListener(SWT.FocusOut, m_listener);
-
   }
 
   private void detachListeners() {
-    if (m_listener != null) {
-      m_sourceControl.getShell().removeListener(SWT.Deactivate, m_listener);
-      m_sourceControl.removeListener(SWT.MouseExit, m_listener);
-      m_sourceControl.removeListener(SWT.Dispose, m_listener);
-      m_sourceControl.removeListener(SWT.KeyDown, m_listener);
-      m_sourceControl.removeListener(SWT.MouseDown, m_listener);
-      m_sourceControl.removeListener(SWT.MouseMove, m_listener);
-      m_sourceControl.removeListener(SWT.MouseHover, m_listener);
-      m_sourceControl.removeListener(SWT.FocusOut, m_listener);
-      m_listener = null;
+    synchronized (m_lock) {
+      if (m_listener != null) {
+        m_sourceControl.getShell().removeListener(SWT.Deactivate, m_listener);
+        m_sourceControl.removeListener(SWT.MouseExit, m_listener);
+        m_sourceControl.removeListener(SWT.Dispose, m_listener);
+        m_sourceControl.removeListener(SWT.KeyDown, m_listener);
+        m_sourceControl.removeListener(SWT.MouseDown, m_listener);
+        m_sourceControl.removeListener(SWT.MouseMove, m_listener);
+        m_sourceControl.removeListener(SWT.MouseHover, m_listener);
+        m_sourceControl.removeListener(SWT.FocusOut, m_listener);
+        m_listener = null;
+      }
     }
-
   }
 
   protected abstract void createContent(Composite parent);
@@ -163,8 +165,11 @@ public abstract class AbstractTooltip {
         Point cursorLocation = m_shell.getDisplay().getCursorLocation();
         Rectangle tooltipBounds = m_shell.getBounds();
         if (!tooltipBounds.contains(cursorLocation)) {
-          m_shell.removeListener(SWT.MouseExit, m_listener);
-          handleContentListeners(m_shell, false);
+          if (m_listener != null) {
+            m_shell.removeListener(SWT.MouseExit, m_listener);
+            m_shell.getParent().removeListener(SWT.Deactivate, m_listener);
+            handleContentListeners(m_shell, false);
+          }
           m_shell.close();
           m_shell = null;
         }
@@ -210,6 +215,5 @@ public abstract class AbstractTooltip {
       }
       return Status.OK_STATUS;
     }
-
   }
 }
