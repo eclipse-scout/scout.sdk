@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 /**
  * <h3>{@link IDtoAutoUpdateManager}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 21.08.2013
  */
 public interface IDtoAutoUpdateManager {

@@ -51,7 +51,7 @@ import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 /**
  * <h3>{@link FormDataUtility}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
 public final class FormDataUtility {

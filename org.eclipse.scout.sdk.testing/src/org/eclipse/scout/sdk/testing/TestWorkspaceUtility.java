@@ -57,7 +57,7 @@ import org.osgi.framework.Bundle;
 /**
  * <h3>{@link TestWorkspaceUtility}</h3>Contains helper methods that affect the running workspace.
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.9.0 15.03.2013
  */
 public final class TestWorkspaceUtility {

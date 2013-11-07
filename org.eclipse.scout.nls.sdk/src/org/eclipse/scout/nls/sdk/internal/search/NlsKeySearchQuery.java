@@ -50,7 +50,7 @@ public class NlsKeySearchQuery extends FileSearchQuery {
 
   @Override
   public IStatus run(IProgressMonitor monitor) throws OperationCanceledException {
-    NlsFindReferencesJob nlsFindReferencesJob = new NlsFindReferencesJob(getProject(), getLabel());
+    NlsFindKeysJob nlsFindReferencesJob = new NlsFindKeysJob(getNlsKey(), getLabel());
     nlsFindReferencesJob.run(monitor);
     Match[] matches = nlsFindReferencesJob.getMatches(getNlsKey());
     getSearchResult().removeAll();

@@ -15,7 +15,7 @@ import java.util.Map;
 /**
  * <h3>{@link ITypeGenericMapping}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.9.0 04.04.2013
  */
 public interface ITypeGenericMapping {

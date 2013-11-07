@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 /**
  * <h3>{@link ResourceFilters}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 14.03.2012
  */
 public class ResourceFilters {

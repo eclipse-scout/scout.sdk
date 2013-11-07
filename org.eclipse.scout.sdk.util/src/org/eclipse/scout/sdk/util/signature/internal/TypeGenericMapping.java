@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
 /**
  * <h3>{@link TypeGenericMapping}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.9.0 20.03.2013
  */
 public class TypeGenericMapping implements ITypeGenericMapping {

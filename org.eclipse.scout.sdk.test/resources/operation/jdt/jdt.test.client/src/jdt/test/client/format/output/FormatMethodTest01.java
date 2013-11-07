@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.ArrayList;
 
 /**
- * @author aho
+ *  @author Andreas Hoegger
  */
 public class FormatMethodTest01 {
 

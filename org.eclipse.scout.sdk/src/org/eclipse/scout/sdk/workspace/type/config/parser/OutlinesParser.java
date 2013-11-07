@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link OutlinesParser}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 30.08.2013
  */
 public class OutlinesParser implements IPropertySourceParser<IType[]> {

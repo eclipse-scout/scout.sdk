@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
 /**
  * <h3>{@link IntegerSourcePropertyParser}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 06.03.2013
  */
 public class IntegerSourcePropertyParser extends SourcePropertyParser<Integer> {

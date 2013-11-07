@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -14,36 +14,23 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
-import org.eclipse.jdt.core.search.SearchMatch;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.EventListenerList;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
-import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
+import org.eclipse.search.core.text.TextSearchMatchAccess;
+import org.eclipse.search.core.text.TextSearchRequestor;
 import org.eclipse.search.ui.text.Match;
 
-/** <h4>DefaultNlsKeySearchRequestor</h4> */
-public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor {
+/**
+ * <h3>{@link NlsKeySearchRequestor}</h3>
+ * 
+ *  @author Andreas Hoegger
+ * @since 3.10.0 07.11.2013
+ */
+public class NlsKeySearchRequestor extends TextSearchRequestor {
   private Map<String, List<Match>> m_matches;
   private EventListenerList m_eventListeners = new EventListenerList();
-  private static final Pattern PATTERN = Pattern.compile("\\s*[A-Za-z0-9_]+\\s*\\.\\s*get\\s*\\(\\s*[A-Za-z0-9_\\s,]*\\\"([^\\\"]*)\\\"\\s*[\\)\\,\\s]{1}", Pattern.MULTILINE);
-
-  /**
-   * @param project
-   */
-  public DefaultNlsKeySearchRequestor(INlsProject project) {
-    super(project);
-  }
-
-  public void addFindReferencesListener(INlsKeySearchListener listener) {
-    m_eventListeners.add(INlsKeySearchListener.class, listener);
-  }
-
-  public void removeFindReferencesListener(INlsKeySearchListener listener) {
-    m_eventListeners.remove(INlsKeySearchListener.class, listener);
-  }
 
   @Override
   public void beginReporting() {
@@ -59,12 +46,12 @@ public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor 
   }
 
   @Override
-  protected void acceptMatch(String statement, SearchMatch match) {
-    String nlsKey = parseKey(statement, match);
-    if (!StringUtility.isNullOrEmpty(nlsKey)) {
-      Match nlsMatch = new Match(match.getResource(), match.getOffset(), statement.length());
-      acceptNlsKeyMatch(nlsKey, nlsMatch);
-    }
+  public boolean acceptPatternMatch(TextSearchMatchAccess matchAccess) throws CoreException {
+    Match match = new Match(matchAccess.getFile(), matchAccess.getMatchOffset(), matchAccess.getMatchLength());
+    String key = matchAccess.getFileContent(matchAccess.getMatchOffset(), matchAccess.getMatchLength());
+    key = key.replaceAll("\\\"", "");
+    acceptNlsKeyMatch(key, match);
+    return true;
   }
 
   protected void acceptNlsKeyMatch(String nlsKey, Match match) {
@@ -96,12 +83,12 @@ public class DefaultNlsKeySearchRequestor extends AbstractNlsKeySearchRequestor 
     }
   }
 
-  private String parseKey(String statement, SearchMatch match) {
-    Matcher m = PATTERN.matcher(statement);
-    if (m.find()) {
-      return m.group(1);
-    }
-    return null;
+  public void addFindReferencesListener(INlsKeySearchListener listener) {
+    m_eventListeners.add(INlsKeySearchListener.class, listener);
+  }
+
+  public void removeFindReferencesListener(INlsKeySearchListener listener) {
+    m_eventListeners.remove(INlsKeySearchListener.class, listener);
   }
 
   public Match[] getMatches(String nlsKey) {

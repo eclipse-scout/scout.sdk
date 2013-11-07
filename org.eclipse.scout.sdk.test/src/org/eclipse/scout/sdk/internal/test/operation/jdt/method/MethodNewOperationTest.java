@@ -45,7 +45,7 @@ import org.junit.Test;
 /**
  * <h3>{@link MethodNewOperationTest}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 08.03.2013
  */
 public class MethodNewOperationTest extends AbstractSdkTestWithJdtTestProject {

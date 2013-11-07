@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
 /**
  * <h3>{@link SourcePropertyParser}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 27.02.2013
  */
 public abstract class SourcePropertyParser<T> implements IPropertySourceParser<SourceProperty<T>> {

@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 /**
  * <h3>{@link DoublePropertySourceParser}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 27.02.2013
  */
 public class DoublePropertySourceParser implements IPropertySourceParser<Double> {

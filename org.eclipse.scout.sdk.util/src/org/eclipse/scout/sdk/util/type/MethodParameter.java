@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.StringUtility;
 /**
  * <h3>{@link MethodParameter}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 06.12.2012
  */
 public class MethodParameter {

@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.sourcebuilder.ISourceBuilder;
 /**
  * <h3>{@link IAnnotationSourceBuilder}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public interface IAnnotationSourceBuilder extends ISourceBuilder {

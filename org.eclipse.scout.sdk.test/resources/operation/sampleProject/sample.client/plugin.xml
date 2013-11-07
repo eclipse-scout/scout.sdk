@@ -16,6 +16,10 @@
             factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"
             class="sample.shared.services.lookup.ICountryLookupService">
       </proxy>
+      <proxy
+            factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"
+            class="sample.shared.nls.INlsTranslationTestService">
+      </proxy>
    </extension>
 
 </plugin>

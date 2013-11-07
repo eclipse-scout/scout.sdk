@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 /**
  * <h3>{@link IDtoAutoUpdateOperation}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 16.08.2013
  */
 public interface IDtoAutoUpdateOperation extends IOperation {

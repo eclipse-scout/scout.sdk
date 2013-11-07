@@ -7,7 +7,7 @@ import signature.tests.SignatureRefType.InnerType02;
 /**
  * <h3>{@link SignatureTest}</h3> ...
  *
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 12.02.2013
  */
 public class SignatureTest {

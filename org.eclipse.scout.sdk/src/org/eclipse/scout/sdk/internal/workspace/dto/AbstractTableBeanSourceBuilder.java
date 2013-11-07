@@ -54,7 +54,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 /**
  * <h3>{@link AbstractTableBeanSourceBuilder}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
 public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSourceBuilder {

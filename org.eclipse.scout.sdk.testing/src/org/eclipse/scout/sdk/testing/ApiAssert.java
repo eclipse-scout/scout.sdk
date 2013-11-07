@@ -18,7 +18,7 @@ import org.junit.Assert;
 /**
  * <h3>{@link ApiAssert}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 22.05.2013
  */
 public class ApiAssert extends Assert {

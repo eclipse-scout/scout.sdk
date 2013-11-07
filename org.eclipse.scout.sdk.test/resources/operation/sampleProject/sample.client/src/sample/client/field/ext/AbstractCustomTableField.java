@@ -9,7 +9,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import sample.client.field.ext.AbstractCustomTableField.Table;
 
 /**
- * @author aho
+ *  @author Andreas Hoegger
  */
 public abstract class AbstractCustomTableField extends AbstractTableField<Table> {
 

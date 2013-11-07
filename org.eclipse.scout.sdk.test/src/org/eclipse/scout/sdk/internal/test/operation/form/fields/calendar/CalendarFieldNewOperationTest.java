@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * <h3>{@link CalendarFieldNewOperationTest}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class CalendarFieldNewOperationTest extends AbstractSdkTestWithSampleProject {

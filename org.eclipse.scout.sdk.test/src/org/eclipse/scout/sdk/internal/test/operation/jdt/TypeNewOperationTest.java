@@ -42,7 +42,7 @@ import org.junit.Test;
 /**
  * <h3>{@link TypeNewOperationTest}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 08.02.2013
  */
 public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {

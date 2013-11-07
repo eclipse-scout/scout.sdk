@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IMarker;
 /**
  * <h3>{@link ICompileResult}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.9.0 18.03.2013
  */
 public interface ICompileResult {

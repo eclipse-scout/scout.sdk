@@ -27,7 +27,7 @@ import org.osgi.framework.ServiceReference;
 /**
  * <h3>{@link CommentSourceBuilderFactory}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public final class CommentSourceBuilderFactory {

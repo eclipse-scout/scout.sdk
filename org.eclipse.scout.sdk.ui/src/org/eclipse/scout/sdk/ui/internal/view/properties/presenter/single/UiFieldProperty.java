@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 /**
  * <h3>{@link UiFieldProperty}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 01.03.2013
  */
 public class UiFieldProperty<T> extends FieldProperty<T> {

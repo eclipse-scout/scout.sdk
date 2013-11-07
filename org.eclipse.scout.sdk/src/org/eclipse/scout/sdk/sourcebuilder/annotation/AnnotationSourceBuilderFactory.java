@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 /**
  * <h3>{@link AnnotationSourceBuilderFactory}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public final class AnnotationSourceBuilderFactory {
