@@ -11,12 +11,17 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.action.IMenuListener;
+import org.eclipse.jface.action.IMenuManager;
+import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
+import org.eclipse.scout.nls.sdk.ui.action.NlsEntryModifyAction;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.ILazyProposalContentProvider;
@@ -38,6 +43,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.scout.sdk.workspace.type.config.parser.NlsPropertySourceParser;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Menu;
 
 /**
  * <h3>NlsTextPresenter</h3> ...
@@ -66,7 +72,41 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
     });
     m_proposalField.setEnabled(false);
     m_proposalField.setProposalDescriptionProvider(new NlsProposalDescriptionProvider());
+
+    // context menu
+    MenuManager contextMenuManager = new MenuManager();
+    contextMenuManager.setRemoveAllWhenShown(true);
+    contextMenuManager.addMenuListener(new IMenuListener() {
+
+      @Override
+      public void menuAboutToShow(IMenuManager manager) {
+        fillContextMenu(manager);
+      }
+
+    });
+    Menu menu = contextMenuManager.createContextMenu(m_proposalField);
+    m_proposalField.setMenu(menu);
+
+    m_proposalField.setMenu(menu);
     return m_proposalField;
+  }
+
+  protected void fillContextMenu(IMenuManager manager) {
+    if (m_currentSourceTuple != null) {
+      manager.add(new NlsEntryModifyAction(m_currentSourceTuple, getNlsProject()) {
+        @Override
+        protected void execute(IProgressMonitor monitor) {
+          super.execute(monitor);
+          m_proposalField.getDisplay().asyncExec(new Runnable() {
+
+            @Override
+            public void run() {
+              m_proposalField.acceptProposal(getEntry());
+            }
+          });
+        }
+      });
+    }
   }
 
   @Override
@@ -213,34 +253,6 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
     finally {
       storeValueLock.release();
     }
-
-//    try {
-//      if (storeValueLock.acquire()) {
-//        IOperation op = null;
-//        INlsEntry defaultTuple = null;
-//        String defaultKey = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethod().computeDefaultValue());
-//        if (defaultKey != null) {
-//          defaultTuple = getNlsProject().getEntry(defaultKey);
-//        }
-//        if (UiUtility.equals(defaultTuple, proposal)) {
-//          if (getMethod().isImplemented()) {
-//            op = new ScoutMethodDeleteOperation(getMethod().peekMethod());
-//          }
-//        }
-//        else {
-//          if (proposal != null) {
-//            op = new NlsTextMethodUpdateOperation(getMethod().getType(), getMethod().getMethodName(), false);
-//            ((NlsTextMethodUpdateOperation) op).setNlsEntry(proposal);
-//          }
-//        }
-//        if (op != null) {
-//          new OperationJob(op).schedule();
-//        }
-//      }
-//    }
-//    finally {
-//      storeValueLock.release();
-//    }
   }
 
   public INlsProject getNlsProject() {
