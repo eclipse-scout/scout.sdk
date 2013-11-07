@@ -66,7 +66,7 @@ public class NlsTextSelectionHandler implements IProposalSelectionHandler {
         return;
       }
       else {
-        proposalTextField.acceptProposal(null);
+        proposalTextField.acceptProposal(proposalTextField.getSelectedProposal());
       }
     }
     else if (proposal instanceof NlsTextProposal) {
