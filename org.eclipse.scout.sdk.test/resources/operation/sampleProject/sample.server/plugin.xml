@@ -34,6 +34,11 @@
             class="sample.server.services.lookup.CountryLookupService"
             session="sample.server.ServerSession">
       </service>
+      <service
+            factory="org.eclipse.scout.rt.server.services.ServerServiceFactory"
+            class="sample.server.nls.NlsTranslationTestService"
+            session="sample.server.ServerSession">
+      </service>
    </extension>
    <extension
          name=""
@@ -100,8 +105,8 @@
          name=""
          point="org.eclipse.core.runtime.products">
       <product
-            name="sample Server"
-            application="sample.server.app">
+            application="sample.server.app"
+            name="sample Server">
          <property
                name="appName"
                value="sample Server">

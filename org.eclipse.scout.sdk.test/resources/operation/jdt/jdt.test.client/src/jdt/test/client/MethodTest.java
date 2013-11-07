@@ -4,7 +4,7 @@
 package jdt.test.client;
 
 /**
- * @author aho
+ *  @author Andreas Hoegger
  *
  */
 public class MethodTest {

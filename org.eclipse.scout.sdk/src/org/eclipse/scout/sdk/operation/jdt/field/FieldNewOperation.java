@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>{@link FieldNewOperation}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 20.12.2012
  */
 public class FieldNewOperation implements IOperation {

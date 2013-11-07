@@ -23,7 +23,7 @@ import org.eclipse.swt.SWT;
 /**
  * <h3>{@link FontPropertySourceParser}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 12.03.2013
  */
 public class FontPropertySourceParser implements IPropertySourceParser<FontSpec> {

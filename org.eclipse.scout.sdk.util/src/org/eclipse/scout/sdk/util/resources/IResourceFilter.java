@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IResourceProxyVisitor;
 /**
  * <h3>{@link IResourceFilter}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 14.03.2012
  * @see ResourceFilters
  * @see IResourceProxy

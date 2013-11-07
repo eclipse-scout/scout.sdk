@@ -30,7 +30,7 @@ import org.junit.Test;
 /**
  * <h3>{@link SmartFieldTest}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 13.02.2013
  */
 public class SmartFieldTest extends AbstractScoutSdkTest {

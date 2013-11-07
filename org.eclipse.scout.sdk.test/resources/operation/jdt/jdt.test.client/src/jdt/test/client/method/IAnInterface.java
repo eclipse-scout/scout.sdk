@@ -4,7 +4,7 @@
 package jdt.test.client.method;
 
 /**
- * @author aho
+ *  @author Andreas Hoegger
  */
 public interface IAnInterface {
 

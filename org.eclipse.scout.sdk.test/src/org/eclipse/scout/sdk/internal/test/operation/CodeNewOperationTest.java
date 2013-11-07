@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * <h3>{@link CodeNewOperationTest}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class CodeNewOperationTest extends AbstractSdkTestWithSampleProject {

@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 /**
  * <h3>{@link ITypeNewOperation}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.9.0 05.04.2013
  */
 public interface ITypeNewOperation extends IOperation {

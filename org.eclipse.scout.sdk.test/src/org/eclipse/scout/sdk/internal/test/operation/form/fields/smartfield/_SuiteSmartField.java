@@ -17,7 +17,7 @@ import org.junit.runners.Suite.SuiteClasses;
 /**
  * <h3>{@link _SuiteSmartField}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 13.02.2013
  */
 @RunWith(Suite.class)

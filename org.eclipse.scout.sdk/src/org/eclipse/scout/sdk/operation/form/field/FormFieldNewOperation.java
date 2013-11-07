@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link FormFieldNewOperation}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 06.03.2013
  */
 public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {

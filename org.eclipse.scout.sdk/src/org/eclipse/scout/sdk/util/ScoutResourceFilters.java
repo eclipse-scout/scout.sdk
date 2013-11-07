@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 /**
  * <h3>{@link ScoutResourceFilters}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 14.03.2012
  */
 public class ScoutResourceFilters extends ResourceFilters {

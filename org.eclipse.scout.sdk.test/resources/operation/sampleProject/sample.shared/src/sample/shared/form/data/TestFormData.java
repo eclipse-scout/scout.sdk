@@ -6,7 +6,7 @@ package sample.shared.form.data;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 
 /**
- * @author aho
+ *  @author Andreas Hoegger
  */
 public class TestFormData extends AbstractFormData {
 

@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>{@link InnerTypeNewOperation}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 08.03.2013
  */
 public class InnerTypeNewOperation extends AbstractTypeNewOperation {

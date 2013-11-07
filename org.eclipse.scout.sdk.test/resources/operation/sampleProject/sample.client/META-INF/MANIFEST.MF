@@ -6,6 +6,7 @@ Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: sample.client.Activator
 Export-Package: sample.client,
  sample.client.empty,
+ sample.client.nls,
  sample.client.person,
  sample.client.services.lookup,
  sample.client.ui.desktop,

@@ -4,7 +4,7 @@
 package jdt.test.client.type;
 
 /**
- * @author aho
+ *  @author Andreas Hoegger
  *
  */
 public interface IMarkerInterface {

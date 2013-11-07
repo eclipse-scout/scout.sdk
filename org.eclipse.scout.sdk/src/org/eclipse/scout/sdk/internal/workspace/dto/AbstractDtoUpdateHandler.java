@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link AbstractDtoUpdateHandler}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 16.08.2013
  */
 public abstract class AbstractDtoUpdateHandler implements IDtoAutoUpdateHandler {

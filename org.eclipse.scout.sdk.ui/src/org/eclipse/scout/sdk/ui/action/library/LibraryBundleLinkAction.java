@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * <h3>{@link LibraryBundleLinkAction}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 12.03.2012
  */
 @SuppressWarnings("restriction")

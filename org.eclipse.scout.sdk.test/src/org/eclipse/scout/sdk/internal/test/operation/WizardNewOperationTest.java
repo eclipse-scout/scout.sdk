@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * <h3>{@link WizardNewOperationTest}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 15.04.2013
  */
 public class WizardNewOperationTest extends AbstractSdkTestWithSampleProject {

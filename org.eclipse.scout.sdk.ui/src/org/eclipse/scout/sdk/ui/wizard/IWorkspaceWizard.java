@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
 /**
  * <h3>{@link IWorkspaceWizard}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 28.10.2013
  */
 public interface IWorkspaceWizard {

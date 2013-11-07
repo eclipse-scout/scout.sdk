@@ -33,7 +33,7 @@ import org.eclipse.swt.graphics.Point;
 /**
  * <h3>{@link AbstractSdkProposal}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 25.10.2013
  */
 public abstract class AbstractSdkProposal implements IJavaCompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3, ICompletionProposalExtension4 {

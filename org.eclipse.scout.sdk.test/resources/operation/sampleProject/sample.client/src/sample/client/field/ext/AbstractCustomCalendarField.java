@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendar
 import org.eclipse.scout.rt.extension.client.ui.basic.calendar.AbstractExtensibleCalendar;
 
 /**
- * @author aho
+ *  @author Andreas Hoegger
  */
 public class AbstractCustomCalendarField extends AbstractCalendarField<AbstractCustomCalendarField.Calendar> {
 

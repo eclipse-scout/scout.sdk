@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 /**
  * <h3>{@link IntegerPropertySourceParser}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 27.02.2013
  */
 public class IntegerPropertySourceParser implements IPropertySourceParser<Integer> {

@@ -25,7 +25,7 @@ import org.junit.Test;
 /**
  * <h3>{@link CalendarItemProviderNewOperationTest}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class CalendarItemProviderNewOperationTest extends AbstractSdkTestWithSampleProject {

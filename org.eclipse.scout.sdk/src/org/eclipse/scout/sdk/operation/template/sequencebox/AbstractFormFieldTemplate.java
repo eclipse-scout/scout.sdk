@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link AbstractFormFieldTemplate}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.9.0 12.04.2013
  */
 public abstract class AbstractFormFieldTemplate implements IContentTemplate {

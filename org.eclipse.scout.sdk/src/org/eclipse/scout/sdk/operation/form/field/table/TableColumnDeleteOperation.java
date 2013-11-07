@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link TableColumnDeleteOperation}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.9.0 02.05.2013
  */
 public class TableColumnDeleteOperation extends JavaElementDeleteOperation {

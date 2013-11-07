@@ -35,7 +35,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 /**
  * <h3>{@link CodeNewProposal}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 25.10.2013
  */
 public class CodeNewProposal extends AbstractSdkProposal {

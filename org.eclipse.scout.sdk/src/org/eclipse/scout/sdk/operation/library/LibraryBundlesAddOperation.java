@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 /**
  * <h3>{@link LibraryBundlesAddOperation}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 13.03.2012
  */
 public class LibraryBundlesAddOperation implements IOperation {

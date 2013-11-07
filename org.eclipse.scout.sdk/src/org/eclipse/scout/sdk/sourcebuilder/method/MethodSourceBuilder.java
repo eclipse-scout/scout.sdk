@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 /**
  * <h3>{@link MethodSourceBuilder}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implements IMethodSourceBuilder {

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 /**
  * <h3>{@link IPropertySourceParser}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 25.02.2013
  */
 public interface IPropertySourceParser<T> {

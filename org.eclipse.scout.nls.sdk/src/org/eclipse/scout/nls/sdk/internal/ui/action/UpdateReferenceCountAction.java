@@ -15,7 +15,7 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.model.NlsReferenceProvider;
 import org.eclipse.scout.nls.sdk.internal.model.NlsTableModel;
 import org.eclipse.scout.nls.sdk.internal.search.INlsKeySearchListener;
-import org.eclipse.scout.nls.sdk.internal.search.NlsFindReferencesJob;
+import org.eclipse.scout.nls.sdk.internal.search.NlsFindKeysJob;
 import org.eclipse.scout.nls.sdk.internal.ui.editor.NlsTable;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.search.ui.text.Match;
@@ -25,7 +25,7 @@ public class UpdateReferenceCountAction extends Action {
   private final INlsProject m_project;
   private final NlsTable m_table;
   private final NlsTableModel m_tableModel;
-  private NlsFindReferencesJob m_job;
+  private NlsFindKeysJob m_job;
 
   public UpdateReferenceCountAction(INlsProject project, NlsTable table, NlsTableModel model) {
     m_project = project;
@@ -38,7 +38,7 @@ public class UpdateReferenceCountAction extends Action {
 
   @Override
   public void run() {
-    m_job = new NlsFindReferencesJob(m_project, getText());
+    m_job = new NlsFindKeysJob(m_project, getText());
     m_job.getSearchRequstor().addFindReferencesListener(new P_JobListener());
     m_job.schedule();
   }

@@ -62,7 +62,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 /**
  * <h3>{@link JavaElementCommentBuilderService}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 12.07.2013
  */
 @SuppressWarnings("restriction")

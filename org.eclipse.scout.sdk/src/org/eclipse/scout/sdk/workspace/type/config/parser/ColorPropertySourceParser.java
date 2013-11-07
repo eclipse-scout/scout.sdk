@@ -21,7 +21,7 @@ import org.eclipse.swt.graphics.RGB;
 /**
  * <h3>{@link ColorPropertySourceParser}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.8.0 27.02.2013
  */
 public class ColorPropertySourceParser implements IPropertySourceParser<RGB> {

@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>{@link FormHandlerDeleteOperation}</h3> ...
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.9.0 30.04.2013
  */
 public class FormHandlerDeleteOperation extends JavaElementDeleteOperation {

@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 /**
  * <h3>{@link ApiTestGenerator}</h3>
  * 
- * @author aho
+ *  @author Andreas Hoegger
  * @since 3.10.0 26.08.2013
  */
 public class ApiTestGenerator {
