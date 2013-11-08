@@ -10,7 +10,7 @@ import org.eclipse.scout.rt.extension.client.ui.basic.calendar.AbstractExtensibl
 /**
  *  @author Andreas Hoegger
  */
-public class AbstractCustomCalendarField extends AbstractCalendarField<AbstractCustomCalendarField.Calendar> {
+public abstract class AbstractCustomCalendarField extends AbstractCalendarField<AbstractCustomCalendarField.Calendar> {
 
   @Order(10)
   public class Calendar extends AbstractExtensibleCalendar {

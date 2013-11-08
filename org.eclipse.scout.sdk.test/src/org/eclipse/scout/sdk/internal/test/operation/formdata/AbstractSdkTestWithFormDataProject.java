@@ -19,10 +19,10 @@ import org.junit.BeforeClass;
 /**
  * <h3>{@link AbstractSdkTestWithFormDataProject}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
-public class AbstractSdkTestWithFormDataProject extends AbstractScoutSdkTest {
+public abstract class AbstractSdkTestWithFormDataProject extends AbstractScoutSdkTest {
 
   public static final String CLIENT_NAME = "formdata.client";
   public static final String SHARED_NAME = "formdata.shared";

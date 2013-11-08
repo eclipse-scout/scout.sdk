@@ -18,10 +18,10 @@ import org.junit.BeforeClass;
 /**
  * <h3>{@link AbstractSdkTestWithJdtTestProject}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
-public class AbstractSdkTestWithJdtTestProject extends AbstractScoutSdkTest {
+public abstract class AbstractSdkTestWithJdtTestProject extends AbstractScoutSdkTest {
 
   public static final String CLIENT_NAME = "jdt.test.client";
   public static final String SHARED_NAME = "jdt.test.shared";

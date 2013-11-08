@@ -17,7 +17,7 @@ import org.junit.BeforeClass;
 /**
  *
  */
-public class AbstractApiTest extends AbstractScoutSdkTest {
+public abstract class AbstractApiTest extends AbstractScoutSdkTest {
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
     ScoutProjectHelper.setupNewProject("api.test.project", true, true, true);

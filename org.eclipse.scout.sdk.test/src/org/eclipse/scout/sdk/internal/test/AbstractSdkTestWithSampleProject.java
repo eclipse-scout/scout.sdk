@@ -18,10 +18,10 @@ import org.junit.BeforeClass;
 /**
  * <h3>{@link AbstractSdkTestWithSampleProject}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
-public class AbstractSdkTestWithSampleProject extends AbstractScoutSdkTest {
+public abstract class AbstractSdkTestWithSampleProject extends AbstractScoutSdkTest {
 
   public static final String UI_SWING_NAME = "sample.ui.swing";
   public static final String UI_SWT_NAME = "sample.ui.swt";

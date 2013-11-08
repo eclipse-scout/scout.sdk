@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Display;
 /**
  * <h3>AbstractProcessWizard</h3> ...
  */
-public class AbstractWorkspaceWizard extends AbstractWizard implements IWorkspaceWizard {
+public abstract class AbstractWorkspaceWizard extends AbstractWizard implements IWorkspaceWizard {
 
   public Map<CompositeObject, IOperation> m_performFinishOperations;
 

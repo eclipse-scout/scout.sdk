@@ -37,10 +37,10 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>{@link AbstractMethodNewOperation}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 13.03.2013
  */
-public class AbstractMethodNewOperation implements IOperation {
+public abstract class AbstractMethodNewOperation implements IOperation {
 
   private final IType m_declaringType;
   private final IMethodSourceBuilder m_sourceBuilder;
