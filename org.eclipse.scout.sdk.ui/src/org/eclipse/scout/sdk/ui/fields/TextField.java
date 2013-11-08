@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields;
 
+import org.eclipse.scout.sdk.ui.util.StyledTextEx;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Color;
@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Menu;
  */
 public class TextField extends Composite {
 
-  private StyledText m_text;
+  private StyledTextEx m_text;
   private Label m_label;
   private Color m_backupTextBackground;
   private final int m_labelPercentage;
@@ -57,7 +57,7 @@ public class TextField extends Composite {
   protected void createContent(Composite parent) {
     m_label = new Label(parent, SWT.NONE);
     m_label.setAlignment(SWT.RIGHT);
-    m_text = new StyledText(parent, SWT.BORDER | SWT.SINGLE);
+    m_text = new StyledTextEx(parent, SWT.BORDER | SWT.SINGLE);
 
     // layout
     parent.setLayout(new FormLayout());
@@ -152,7 +152,7 @@ public class TextField extends Composite {
     return m_text.setFocus();
   }
 
-  public StyledText getTextComponent() {
+  public StyledTextEx getTextComponent() {
     return m_text;
   }
 

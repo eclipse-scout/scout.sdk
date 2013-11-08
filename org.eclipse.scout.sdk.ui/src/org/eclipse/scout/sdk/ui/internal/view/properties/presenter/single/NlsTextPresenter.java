@@ -42,7 +42,6 @@ import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.scout.sdk.workspace.type.config.parser.NlsPropertySourceParser;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Menu;
 
 /**
@@ -61,7 +60,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
   }
 
   @Override
-  protected Control createContent(Composite container) {
+  protected ProposalTextField createContent(Composite container) {
     m_proposalField = new ProposalTextField(container, ProposalTextField.STYLE_NO_LABEL);
     toolkitAdapt(m_proposalField);
     m_proposalField.addProposalAdapterListener(new IProposalAdapterListener() {

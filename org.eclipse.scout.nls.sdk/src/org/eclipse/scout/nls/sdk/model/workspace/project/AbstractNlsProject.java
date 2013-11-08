@@ -213,6 +213,7 @@ public abstract class AbstractNlsProject implements INlsProject {
 
   @Override
   public String generateNewKey(String baseText) {
+    cache();
     if (!StringUtility.hasText(baseText)) {
       return null;
     }
