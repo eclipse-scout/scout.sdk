@@ -38,7 +38,7 @@ import org.eclipse.scout.sdk.util.NamingUtility;
  * (see {@link IScoutWorkspace} and {@link IScoutWorkspaceListener} acquired from {@link ScoutSdkCore}) to replace your
  * instances when necessary.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 27.02.2013
  * @see IScoutBundleGraph
  */

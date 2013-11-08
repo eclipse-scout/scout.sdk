@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 /**
  * <h3>{@link IDtoAutoUpdateEventFilter}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 07.10.2013
  */
 public interface IDtoAutoUpdateEventFilter {

@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IFile;
 /**
  * <h3>{@link ServerProductFileFillOperation}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 10.12.2012
  */
 public class ServerProductFileFillOperation extends AbstractEquinoxSecurityInstallOperation {

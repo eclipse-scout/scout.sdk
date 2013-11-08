@@ -46,7 +46,7 @@ import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateManager;
 /**
  * <h3>{@link DtoAutoUpdateManager}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  *  @author Andreas Hoegger
  * @since 3.10.0 15.08.2013
  */

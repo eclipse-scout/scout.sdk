@@ -22,7 +22,7 @@ import org.eclipse.ui.IWorkbench;
 /**
  * <h3>{@link ScoutBundleAddWizard}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 02.03.2012
  */
 public class ScoutBundleAddWizard extends ScoutProjectNewWizard {

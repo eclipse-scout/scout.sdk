@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IFile;
 /**
  * <h3>{@link IRapTargetVariableListener}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 14.01.2013
  */
 public interface IRapTargetVariableListener extends EventListener {

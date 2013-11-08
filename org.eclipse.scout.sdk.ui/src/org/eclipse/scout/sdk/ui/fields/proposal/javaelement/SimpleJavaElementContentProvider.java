@@ -14,7 +14,7 @@ package org.eclipse.scout.sdk.ui.fields.proposal.javaelement;
 /**
  * <h3>{@link SimpleJavaElementContentProvider}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 16.04.2012
  */
 public class SimpleJavaElementContentProvider extends AbstractJavaElementContentProvider {

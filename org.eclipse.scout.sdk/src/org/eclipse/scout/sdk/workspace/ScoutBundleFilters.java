@@ -16,7 +16,7 @@ import java.util.Set;
 /**
  * <h3>{@link ScoutBundleFilters}</h3> Contains pre-defined scout bundle filters
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 23.02.2013
  * @see IScoutBundleFilter
  * @see IScoutBundle

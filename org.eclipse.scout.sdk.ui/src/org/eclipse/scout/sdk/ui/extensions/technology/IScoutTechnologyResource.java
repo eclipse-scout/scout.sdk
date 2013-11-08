@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 /**
  * <h3>{@link IScoutTechnologyResource}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 10.02.2012
  */
 public interface IScoutTechnologyResource {

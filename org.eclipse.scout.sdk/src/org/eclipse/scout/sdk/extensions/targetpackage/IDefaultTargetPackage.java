@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * <h3>{@link IDefaultTargetPackage}</h3> Specifies package identifiers to be used by IScoutBundle.getPackageName().
  * Must match the id's of the org.eclipse.scout.sdk.targetPackage extensions.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 17.12.2012
  * @see IScoutBundle
  */

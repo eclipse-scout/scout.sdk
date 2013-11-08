@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  * <h3>{@link AstMethodReturnValueParser}</h3> Full detail parser that calculates all information for a return clause in
  * the given method.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 30.09.2013
  */
 public final class AstMethodReturnValueParser implements IMethodReturnValueParser {

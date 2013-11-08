@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 /**
  * <h3>{@link ScoutBundleNode}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 12.02.2013
  */
 public class ScoutBundleNode {

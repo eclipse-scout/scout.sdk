@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 /**
  * <h3>{@link ScoutBundleNodeGroup}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 11.02.2013
  */
 public class ScoutBundleNodeGroup implements Comparable<ScoutBundleNodeGroup> {

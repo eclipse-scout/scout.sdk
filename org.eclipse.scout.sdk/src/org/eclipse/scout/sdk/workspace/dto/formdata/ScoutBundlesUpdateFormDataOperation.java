@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 /**
  * <h3>{@link ScoutBundlesUpdateFormDataOperation}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 23.02.2013
  */
 public class ScoutBundlesUpdateFormDataOperation implements IOperation {

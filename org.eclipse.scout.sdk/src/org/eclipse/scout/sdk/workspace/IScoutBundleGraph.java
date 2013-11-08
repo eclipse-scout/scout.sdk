@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.ScoutSdkCore;
  * <h3>{@link IScoutBundleGraph}</h3> The bundle graph responsible for holding and building the scout bundles and the
  * connections between them.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 31.01.2013
  * @see IScoutWorkspace#getBundleGraph()
  * @see ScoutSdkCore#getScoutWorkspace()

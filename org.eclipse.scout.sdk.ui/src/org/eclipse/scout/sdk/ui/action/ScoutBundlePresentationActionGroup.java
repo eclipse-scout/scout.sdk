@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSuppo
 /**
  * <h3>{@link ScoutBundlePresentationActionGroup}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 20.03.2013
  */
 public class ScoutBundlePresentationActionGroup extends MenuManager {

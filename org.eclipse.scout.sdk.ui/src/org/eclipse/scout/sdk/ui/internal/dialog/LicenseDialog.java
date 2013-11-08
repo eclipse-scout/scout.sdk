@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Text;
 /**
  * <h3>{@link LicenseDialog}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 16.02.2012
  */
 public class LicenseDialog extends TitleAreaDialog {

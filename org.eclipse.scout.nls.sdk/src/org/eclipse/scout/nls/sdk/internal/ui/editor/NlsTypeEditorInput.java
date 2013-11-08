@@ -18,7 +18,7 @@ import org.eclipse.ui.IPersistableElement;
 /**
  * <h3>{@link NlsTypeEditorInput}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 25.03.2013
  */
 public class NlsTypeEditorInput implements IEditorInput {

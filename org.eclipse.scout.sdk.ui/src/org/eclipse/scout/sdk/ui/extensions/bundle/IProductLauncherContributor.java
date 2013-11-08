@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPr
 /**
  * <h3>{@link IProductLauncherContributor}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 09.09.2013
  */
 public interface IProductLauncherContributor {

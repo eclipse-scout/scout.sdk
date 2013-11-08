@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.util.PropertyMap;
  * <h3>{@link INewScoutBundleHandler}</h3> Controls the behavior when a new bundle of a certain type should be created.
  * Classes of this type are contributed using the extension point 'org.eclipse.scout.sdk.ui.scoutBundle'.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 27.02.2013
  */
 public interface INewScoutBundleHandler {

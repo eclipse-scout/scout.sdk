@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.MenuItem;
 /**
  * <h3>{@link AbstractFilterMenuContributionItem}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 20.03.2013
  */
 public abstract class AbstractFilterMenuContributionItem extends ContributionItem {

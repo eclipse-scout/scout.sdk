@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateEventFilter;
 /**
  * <h3>{@link DtoUpdateEventFilter}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 07.10.2013
  */
 public final class DtoUpdateEventFilter {

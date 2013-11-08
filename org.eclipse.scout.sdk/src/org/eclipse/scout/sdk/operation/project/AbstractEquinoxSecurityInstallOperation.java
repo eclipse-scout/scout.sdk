@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>{@link AbstractEquinoxSecurityInstallOperation}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 10.12.2012
  */
 public abstract class AbstractEquinoxSecurityInstallOperation extends AbstractScoutProjectNewOperation {

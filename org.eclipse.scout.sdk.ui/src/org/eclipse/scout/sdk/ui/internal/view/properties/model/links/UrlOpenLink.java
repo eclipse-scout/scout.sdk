@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 /**
  * <h3>{@link UrlOpenLink}</h3> Link that opens the given URL in an external browser window.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 09.09.2013
  */
 public class UrlOpenLink extends AbstractLink {

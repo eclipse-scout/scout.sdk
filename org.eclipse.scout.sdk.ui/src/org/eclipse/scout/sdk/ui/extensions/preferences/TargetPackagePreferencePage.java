@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 /**
  * <h3>{@link TargetPackagePreferencePage}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 17.12.2012
  */
 public class TargetPackagePreferencePage extends AbstractScoutProjectPreferencePage<TargetPackagePreferenceScrolledContent, TargetPackageModel> {

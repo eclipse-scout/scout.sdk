@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 /**
  * <h3>{@link DefaultTargetPackage}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 17.12.2012
  */
 public final class DefaultTargetPackage implements IDefaultTargetPackage {

@@ -44,7 +44,7 @@ import org.osgi.framework.Constants;
 /**
  * <h3>{@link ScoutProjectAddOperation}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 02.03.2012
  */
 public class ScoutProjectAddOperation extends ScoutProjectNewOperation {

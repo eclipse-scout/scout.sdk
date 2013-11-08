@@ -62,7 +62,7 @@ import org.eclipse.pde.internal.core.target.provisional.NameVersionDescriptor;
  * This is done because the original class schedules a TargetPlatformResetJob with the same rule as the running
  * operation which leads to a deadlock. Solution: we do not schedule this job but run it directly in the current job.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 15.03.2013
  */
 @SuppressWarnings({"restriction", "unchecked", "deprecation"})

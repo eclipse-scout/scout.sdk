@@ -20,7 +20,7 @@ import org.eclipse.ui.IWorkingSet;
 /**
  * <h3>{@link ScoutWorkingSetTablePage}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 05.04.2013
  */
 public class ScoutWorkingSetTablePage extends AbstractPage {

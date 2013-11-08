@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * <h3>{@link IScoutProjectScrolledContent}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 17.12.2012
  */
 public interface IScoutProjectScrolledContent<T> {

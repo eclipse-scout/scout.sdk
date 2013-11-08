@@ -13,7 +13,7 @@ import org.eclipse.scout.sdk.compatibility.internal.service.ITargetPlatformCompa
 /**
  * <h3>{@link TargetPlatformUtility}</h3> Utility to (eclipse platform independent) handle target platform tasks.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 24.05.2013
  */
 public final class TargetPlatformUtility {

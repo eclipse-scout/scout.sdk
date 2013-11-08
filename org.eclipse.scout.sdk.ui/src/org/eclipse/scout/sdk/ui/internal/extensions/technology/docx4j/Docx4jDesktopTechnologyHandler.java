@@ -46,7 +46,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link Docx4jDesktopTechnologyHandler}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 03.05.2013
  */
 public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandler {

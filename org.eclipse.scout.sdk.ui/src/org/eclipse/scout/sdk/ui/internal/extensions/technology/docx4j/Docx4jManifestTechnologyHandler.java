@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 /**
  * <h3>{@link Docx4jManifestTechnologyHandler}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 23.04.2013
  */
 public class Docx4jManifestTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants, IOrbitConstants {

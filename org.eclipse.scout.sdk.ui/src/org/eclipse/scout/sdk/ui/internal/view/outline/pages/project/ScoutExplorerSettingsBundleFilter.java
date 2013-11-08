@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 /**
  * <h3>{@link ScoutExplorerSettingsBundleFilter}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 21.03.2013
  */
 public class ScoutExplorerSettingsBundleFilter implements IScoutBundleFilter {

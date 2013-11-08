@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link DefaultSuperClassModel}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 24.11.2012
  */
 public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel> {

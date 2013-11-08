@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.compatibility;
 /**
  * <h3>{@link License}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 16.02.2012
  */
 public class License {

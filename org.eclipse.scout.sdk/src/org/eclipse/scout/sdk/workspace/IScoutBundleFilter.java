@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.workspace;
 /**
  * <h3>{@link IScoutBundleFilter}</h3> A scout bundle filter
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 27.02.2013
  * @see IScoutBundle
  * @see ScoutBundleFilters

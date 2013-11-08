@@ -32,7 +32,7 @@ import org.osgi.service.prefs.BackingStoreException;
 /**
  * <h3>{@link SuperTypePreferenceScrolledContent}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 24.11.2012
  */
 public class SuperTypePreferenceScrolledContent implements IScoutProjectScrolledContent<DefaultSuperClassModel> {

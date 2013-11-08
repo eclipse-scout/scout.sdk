@@ -44,7 +44,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 /**
  * <h3>{@link BundleNodeGroupTablePage}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 11.02.2013
  */
 public class BundleNodeGroupTablePage extends AbstractPage {

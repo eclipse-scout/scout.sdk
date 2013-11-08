@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 /**
  * <h3>{@link RayoUiSwingManifestTechnologyHandler}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 19.02.2012
  */
 public class RayoUiSwingManifestTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {

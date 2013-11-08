@@ -20,7 +20,7 @@ import org.eclipse.ui.intro.IIntroSite;
 import org.eclipse.ui.intro.config.IIntroAction;
 
 /**
- * @author mvi
+ * @author Matthias Villiger
  */
 public class CreateNewScoutProjectHandler implements IIntroAction {
 

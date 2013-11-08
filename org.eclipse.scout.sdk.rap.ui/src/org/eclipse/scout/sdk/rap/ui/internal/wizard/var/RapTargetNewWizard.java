@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>{@link RapTargetNewWizard}</h3> ...
  *
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 16.01.2013
  */
 public class RapTargetNewWizard extends AbstractWorkspaceWizard {

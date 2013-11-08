@@ -50,7 +50,7 @@ import org.eclipse.scout.sdk.util.log.ScoutStatus;
  * <br>
  * As defined in the .properties file specification the files are loaded and stored using the ISO 8859-1 encoding.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 05.10.2013
  * @see #ENCODING
  * @see Properties

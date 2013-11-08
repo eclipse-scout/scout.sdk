@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 /**
  * <h3>{@link MethodReturnExpression}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 30.09.2013
  */
 public class MethodReturnExpression {

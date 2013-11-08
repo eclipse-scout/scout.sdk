@@ -34,7 +34,7 @@ import org.osgi.framework.Bundle;
 /**
  * <h3>{@link ScoutRapTargetCreationOperation}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 20.03.2012
  */
 public class ScoutRapTargetCreationOperation implements IOperation {

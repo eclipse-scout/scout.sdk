@@ -16,7 +16,7 @@ import org.eclipse.ui.IStartup;
 /**
  * <h3>{@link RapStartup}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 14.01.2013
  */
 public class RapStartup implements IStartup {

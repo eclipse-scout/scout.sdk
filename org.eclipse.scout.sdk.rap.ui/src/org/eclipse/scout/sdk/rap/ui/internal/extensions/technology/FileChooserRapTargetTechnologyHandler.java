@@ -45,7 +45,7 @@ import org.osgi.framework.Version;
 /**
  * <h3>{@link FileChooserRapTargetTechnologyHandler}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 10.04.2012
  */
 public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnologyHandler {

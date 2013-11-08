@@ -25,7 +25,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
  * <h3>{@link MethodBodyAstVisitor}</h3> An AST visitor decorator that delegates all visits that are part of the given
  * method body to the wrapped visitor
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 30.09.2013
  */
 public class MethodBodyAstVisitor extends DefaultAstVisitor {

@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>{@link SwtProductFileUpgradeOperation}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 19.01.2012
  */
 public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOperation {

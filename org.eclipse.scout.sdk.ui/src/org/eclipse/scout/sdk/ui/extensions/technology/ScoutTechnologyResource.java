@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 /**
  * <h3>{@link ScoutTechnologyResource}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 11.02.2012
  */
 public class ScoutTechnologyResource implements IScoutTechnologyResource {

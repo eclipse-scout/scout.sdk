@@ -36,7 +36,7 @@ import org.eclipse.ui.internal.WorkingSet;
 /**
  * <h3>{@link ScoutExplorerSettingsSupport}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 20.03.2013
  */
 @SuppressWarnings("restriction")

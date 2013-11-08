@@ -15,7 +15,7 @@ import org.eclipse.jdt.core.IMethod;
 /**
  * <h3>{@link IMethodReturnValueParser}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 30.09.2013
  */
 public interface IMethodReturnValueParser {

@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 /**
  * <h3>{@link FileChooserRapProductTechnologyHandler}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 13.04.2012
  */
 public class FileChooserRapProductTechnologyHandler extends AbstractScoutTechnologyHandler {

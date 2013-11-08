@@ -46,7 +46,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 /**
  * <h3>{@link AbstractScoutProjectPreferencePage}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 17.12.2012
  */
 public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProjectScrolledContent<U>, U> extends PreferencePage implements IWorkbenchPreferencePage {

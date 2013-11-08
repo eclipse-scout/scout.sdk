@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.operation.project.AbstractEquinoxSecurityInstallOpe
 /**
  * <h3>{@link RapProductEquinoxSecurityInstallOperation}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 10.12.2012
  */
 public class RapProductEquinoxSecurityInstallOperation extends AbstractEquinoxSecurityInstallOperation {

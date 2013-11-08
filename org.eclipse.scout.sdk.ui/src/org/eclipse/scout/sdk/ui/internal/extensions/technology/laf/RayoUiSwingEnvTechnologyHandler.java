@@ -49,7 +49,7 @@ import org.eclipse.text.edits.TextEdit;
 /**
  * <h3>{@link RayoUiSwingEnvTechnologyHandler}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 19.02.2012
  */
 public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHandler {

@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
  * simple (e.g. literal) clauses (without references to other types). Furthermore it is capable to handle the
  * TEXTS.get(...) methods of the nls methods.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 30.09.2013
  */
 public final class SimpleMethodReturnValueParser implements IMethodReturnValueParser {

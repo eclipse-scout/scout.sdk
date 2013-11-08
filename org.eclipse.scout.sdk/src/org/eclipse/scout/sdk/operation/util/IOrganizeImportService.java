@@ -17,7 +17,7 @@ import org.eclipse.jdt.core.ICompilationUnit;
 /**
  * <h3>{@link IOrganizeImportService}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 23.05.2013
  */
 public interface IOrganizeImportService {

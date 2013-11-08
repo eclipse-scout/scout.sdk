@@ -36,7 +36,7 @@ import org.osgi.framework.Version;
 /**
  * Helper class for basic plugin model operations.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0
  */
 @SuppressWarnings("restriction")

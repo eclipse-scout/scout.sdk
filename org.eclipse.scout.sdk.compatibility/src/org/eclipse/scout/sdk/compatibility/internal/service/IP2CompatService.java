@@ -10,7 +10,7 @@ import org.eclipse.scout.sdk.compatibility.License;
 /**
  * <h3>{@link IP2CompatService}</h3> P2 Compatibility service interface.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 03.05.2013
  */
 public interface IP2CompatService {

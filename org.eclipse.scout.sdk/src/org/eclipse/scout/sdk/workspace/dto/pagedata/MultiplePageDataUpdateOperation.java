@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link MultiplePageDataUpdateOperation}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 16.10.2013
  */
 public class MultiplePageDataUpdateOperation implements IOperation {

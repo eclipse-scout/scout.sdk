@@ -29,7 +29,7 @@ import org.osgi.service.prefs.BackingStoreException;
 /**
  * <h3>{@link TargetPackagePreferenceScrolledContent}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 24.11.2012
  */
 public class TargetPackagePreferenceScrolledContent implements IScoutProjectScrolledContent<TargetPackageModel> {

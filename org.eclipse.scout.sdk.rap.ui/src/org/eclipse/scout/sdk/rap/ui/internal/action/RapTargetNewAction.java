@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * <h3>{@link RapTargetNewAction}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 15.04.2013
  */
 public class RapTargetNewAction extends AbstractScoutHandler {

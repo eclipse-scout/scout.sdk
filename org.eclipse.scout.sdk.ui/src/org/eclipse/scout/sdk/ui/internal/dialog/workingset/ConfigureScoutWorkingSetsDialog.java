@@ -60,7 +60,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * <h3>{@link ConfigureScoutWorkingSetsDialog}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 04.04.2013
  */
 public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {

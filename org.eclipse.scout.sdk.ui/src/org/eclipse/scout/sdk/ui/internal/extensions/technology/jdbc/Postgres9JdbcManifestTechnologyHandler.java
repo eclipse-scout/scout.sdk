@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 /**
  * <h3>{@link Postgres9JdbcManifestTechnologyHandler}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 13.02.2012
  */
 public class Postgres9JdbcManifestTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {

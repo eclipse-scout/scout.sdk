@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.operation.util.IOrganizeImportService;
 /**
  * <h3>{@link OrganizeImportService}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 23.05.2013
  */
 @SuppressWarnings("restriction")

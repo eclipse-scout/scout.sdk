@@ -22,7 +22,7 @@ import org.eclipse.ui.PlatformUI;
 /**
  * <h3>{@link NewScoutWorkingSetWizard}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 20.06.2013
  */
 public class NewScoutWorkingSetWizard extends Wizard implements INewWizard {

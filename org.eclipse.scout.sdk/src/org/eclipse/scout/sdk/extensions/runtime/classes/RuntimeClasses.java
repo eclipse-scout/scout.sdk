@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link RuntimeClassExtensionPoint}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 22.11.2012
  */
 public final class RuntimeClasses implements IRuntimeClasses {

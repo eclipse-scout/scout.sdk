@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.rap;
 /**
  * <h3>{@link IScoutSdkRapConstants}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 11.02.2012
  */
 public interface IScoutSdkRapConstants {

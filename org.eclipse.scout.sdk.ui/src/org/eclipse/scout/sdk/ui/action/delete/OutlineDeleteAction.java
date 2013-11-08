@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Shell;
 /**
  * <h3>{@link OutlineDeleteAction}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 09.03.2012
  */
 public class OutlineDeleteAction extends AbstractScoutHandler {

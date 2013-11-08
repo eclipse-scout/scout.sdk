@@ -27,7 +27,7 @@ public interface IScoutHandler extends IHandler2 {
    * <h3>{@link Category}</h3> Enum for the supported context menu categories. The grouping of the menus is according to
    * the category.
    * 
-   * @author mvi
+   * @author Matthias Villiger
    * @since 3.10.0 18.09.2013
    */
   enum Category {

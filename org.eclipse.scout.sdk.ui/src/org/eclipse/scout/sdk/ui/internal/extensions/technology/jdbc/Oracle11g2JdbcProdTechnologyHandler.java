@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 /**
  * <h3>{@link Oracle11g2JdbcProdTechnologyHandler}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0 15.02.2012
  */
 public class Oracle11g2JdbcProdTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {

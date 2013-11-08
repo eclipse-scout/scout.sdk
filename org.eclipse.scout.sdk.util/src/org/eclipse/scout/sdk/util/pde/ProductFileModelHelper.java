@@ -33,7 +33,7 @@ import org.w3c.dom.Node;
 /**
  * Helper class for basic product file operations.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0
  */
 @SuppressWarnings("restriction")
@@ -99,7 +99,7 @@ public final class ProductFileModelHelper {
   /**
    * <h3>{@link DependencyType}</h3>Specifies the type of dependency in a .product file.
    * 
-   * @author mvi
+   * @author Matthias Villiger
    * @since 3.10.0 19.09.2013
    */
   public static enum DependencyType {

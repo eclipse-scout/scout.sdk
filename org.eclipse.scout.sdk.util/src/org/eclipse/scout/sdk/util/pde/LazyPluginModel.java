@@ -21,7 +21,7 @@ import org.eclipse.pde.internal.core.plugin.WorkspaceExtensionsModel;
  * This implementation uses lazy initialization of the PDE models.<br>
  * This class is thread safe.
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.8.0
  */
 @SuppressWarnings("restriction")

@@ -44,7 +44,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 /**
  * <h3>{@link MobileDesktopExtensionInstallOperation}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 08.03.2013
  */
 public class MobileDesktopExtensionInstallOperation extends AbstractScoutProjectNewOperation {

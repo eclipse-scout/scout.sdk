@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 /**
  * <h3>{@link RapTargetVariable}</h3> ...
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 14.01.2013
  */
 public final class RapTargetVariable {

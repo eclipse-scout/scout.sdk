@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 /**
  * <h3>{@link ProductFileSelectionWizardPage}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 29.05.2013
  */
 public class ProductFileSelectionWizardPage extends AbstractProjectNewWizardPage {

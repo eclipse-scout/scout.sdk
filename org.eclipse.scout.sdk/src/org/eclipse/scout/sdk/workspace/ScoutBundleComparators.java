@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.util.NamingUtility;
 /**
  * <h3>{@link ScoutBundleComparators}</h3> Contains pre-defined scout bundle comparators
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.9.0 09.02.2013
  * @see IScoutBundleComparator
  * @see IScoutBundle
