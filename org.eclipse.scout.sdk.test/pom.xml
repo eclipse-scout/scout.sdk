@@ -9,7 +9,6 @@
   Contributors:
      Stephan Leicht Vogt - initial implementation
 -->
-
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
@@ -25,42 +24,39 @@
   <packaging>eclipse-test-plugin</packaging>
 
   <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-surefire-plugin</artifactId>
-          <configuration>
-            <argLine>-Xms512m -Xmx1024m -XX:MaxPermSize=256m -DbuildingWithTycho=true</argLine>
-            <dependencies>
-              <dependency>
-                <type>eclipse-feature</type>
-                <artifactId>org.eclipse.scout.sdk</artifactId>
-              </dependency>
-              <dependency>
-                <type>p2-installable-unit</type>
-                <artifactId>org.eclipse.scout.rt.source.feature.group</artifactId>
-              </dependency>
-            </dependencies>
-            <forkedProcessTimeoutInSeconds>0</forkedProcessTimeoutInSeconds>
-            <testClass>org.eclipse.scout.sdk._SuiteAllTests</testClass>
-            <!--<testClass>org.eclipse.scout.sdk.internal.test.operation.lookupcall.LookupCallNewOperationTest</testClass>-->
-            <testSuite>org.eclipse.scout.sdk.test</testSuite>
-            <useUIHarness>true</useUIHarness>
-            <useUIThread>true</useUIThread>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
+        <artifactId>tycho-surefire-plugin</artifactId>
+        <configuration>
+          <dependencies>
+            <dependency>
+              <type>eclipse-feature</type>
+              <artifactId>org.eclipse.scout.sdk</artifactId>
+            </dependency>
+            <dependency>
+              <type>p2-installable-unit</type>
+              <artifactId>org.eclipse.scout.rt.source.feature.group</artifactId>
+            </dependency>
+          </dependencies>
+          <forkedProcessTimeoutInSeconds>0</forkedProcessTimeoutInSeconds>
+          <testClass>org.eclipse.scout.sdk._SuiteAllTests</testClass>
+          <!--<testClass>org.eclipse.scout.sdk.internal.test.operation.lookupcall.LookupCallNewOperationTest</testClass> -->
+          <testSuite>org.eclipse.scout.sdk.test</testSuite>
+          <useUIHarness>true</useUIHarness>
+          <useUIThread>true</useUIThread>
+          <argLine>${ui.test.vmargs}</argLine>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 
   <profiles>
-
     <profile>
-      <!-- By default, the SDK tests are not executed (they need a UI environment).-->
+      <!-- By default, the SDK tests are not executed (they need a UI environment). -->
       <id>skip-sdktest</id>
       <activation>
-         <activeByDefault>true</activeByDefault>
+        <activeByDefault>true</activeByDefault>
       </activation>
       <build>
         <pluginManagement>
@@ -78,10 +74,10 @@
     </profile>
 
     <profile>
-      <!-- Activate this profile to run the sdk tests, it will deactivate "skip-sdktest".-->
+      <!-- Activate this profile to run the sdk tests, it will deactivate "skip-sdktest". -->
       <id>include-sdktest</id>
       <activation>
-         <activeByDefault>false</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <build>
         <pluginManagement>
@@ -91,13 +87,12 @@
               <artifactId>tycho-surefire-plugin</artifactId>
               <configuration>
                 <skip>false</skip>
-                <!--<debugPort>5050</debugPort>-->
+                <!--<debugPort>5050</debugPort> -->
               </configuration>
             </plugin>
           </plugins>
         </pluginManagement>
       </build>
     </profile>
-
   </profiles>
 </project>
