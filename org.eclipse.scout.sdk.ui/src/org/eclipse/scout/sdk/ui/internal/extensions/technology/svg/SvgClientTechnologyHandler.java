@@ -29,9 +29,8 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
   private final static String CLIENT_SVG_BUNDLE_NAME = ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME;
   private final static String W3C_DOM_SVG_PACKAGE = ScoutProjectAddOperation.W3C_DOM_SVG_PACKAGE;
 
-  public final static String[] COMMON_SVG_PLUGINS = new String[]{
+  public final static String[] SCOUT_ONLY_SVG_PLUGINS = new String[]{
       "org.apache.batik.bridge",
-      "org.apache.batik.css",
       "org.apache.batik.dom",
       "org.apache.batik.dom.svg",
       "org.apache.batik.ext.awt",
@@ -39,13 +38,18 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
       "org.apache.batik.svggen",
       "org.apache.batik.swing",
       "org.apache.batik.transcoder",
+      "org.apache.batik.xml",
+      CLIENT_SVG_BUNDLE_NAME};
+
+  public final static String[] CORE_SVG_PLUGINS = new String[]{
+      "org.apache.batik.css",
       "org.apache.batik.util",
       "org.apache.batik.util.gui",
-      "org.apache.batik.xml",
-      CLIENT_SVG_BUNDLE_NAME,
-      "org.w3c.css.sac",
+      "org.w3c.dom.svg",
+      "org.w3c.dom.events",
       "org.w3c.dom.smil",
-      "org.w3c.dom.svg"};
+      "org.w3c.css.sac"
+  };
 
   public SvgClientTechnologyHandler() {
   }

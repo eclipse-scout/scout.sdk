@@ -98,8 +98,9 @@
       <plugin id="org.mortbay.jetty.server"/>
       <plugin id="org.mortbay.jetty.util"/>
       <plugin id="org.w3c.css.sac"/>
-      <plugin id="org.w3c.dom.smil"/>
+      <plugin id="org.w3c.dom.events"/>
       <plugin id="org.w3c.dom.svg"/>
+      <plugin id="org.w3c.dom.smil"/>
       <plugin id="org.eclipse.scout.rt.client.mobile"/>
       <plugin id="org.eclipse.scout.rt.ui.rap.mobile"/>
       <plugin id="org.eclipse.scout.rt.ui.rap.theme.rayo.mobile" fragment="true"/>

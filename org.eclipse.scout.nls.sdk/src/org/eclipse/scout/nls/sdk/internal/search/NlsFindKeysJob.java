@@ -25,7 +25,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.pde.internal.core.natures.PDE;
-import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.search.core.text.TextSearchEngine;
@@ -74,13 +73,7 @@ public class NlsFindKeysJob extends Job {
     catch (CoreException e) {
       NlsCore.logError("Could not create java projects for nls search.");
     }
-    try {
-      TuningUtility.startTimer();
-      TextSearchEngine.create().search(searchScope, m_searchRequstor, m_searchPattern, monitor);
-    }
-    finally {
-      TuningUtility.stopTimer("Key search done...");
-    }
+    TextSearchEngine.create().search(searchScope, m_searchRequstor, m_searchPattern, monitor);
     return Status.OK_STATUS;
   }
 

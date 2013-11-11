@@ -27,6 +27,8 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOperation {
 
+  public final static String E4_UI_CSS_CORE_PLUGIN_ID = "org.eclipse.e4.ui.css.core";
+
   private IFile[] m_swtProdFiles;
 
   @Override
@@ -68,7 +70,7 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
         "org.eclipse.e4.core.di.extensions",
         "org.eclipse.e4.core.services",
         "org.eclipse.e4.ui.bindings",
-        "org.eclipse.e4.ui.css.core",
+        E4_UI_CSS_CORE_PLUGIN_ID,
         "org.eclipse.e4.ui.css.swt",
         "org.eclipse.e4.ui.css.swt.theme",
         "org.eclipse.e4.ui.di",
@@ -92,6 +94,7 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
         "org.eclipse.ui.intro",
         "org.w3c.css.sac",
         "org.w3c.dom.smil",
+        "org.w3c.dom.events",
         "org.w3c.dom.svg",
         "javax.annotation",
         "javax.inject",

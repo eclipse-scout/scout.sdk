@@ -21,7 +21,7 @@ public class SvgUiSwingTechnologyHandler extends AbstractScoutTechnologyHandler 
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    selectionChangedProductFiles(resources, selected, SvgClientTechnologyHandler.COMMON_SVG_PLUGINS, SWING_SVG_PLUGIN);
+    selectionChangedProductFiles(resources, selected, SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, SWING_SVG_PLUGIN);
   }
 
   @Override
@@ -33,7 +33,7 @@ public class SvgUiSwingTechnologyHandler extends AbstractScoutTechnologyHandler 
   public TriState getSelection(IScoutBundle project) throws CoreException {
     return getSelectionProductFiles(getSwingBundlesBelow(project),
         new String[]{RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId},
-        SvgClientTechnologyHandler.COMMON_SVG_PLUGINS, SWING_SVG_PLUGIN);
+        SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, SWING_SVG_PLUGIN);
   }
 
   @Override
