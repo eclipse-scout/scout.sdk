@@ -17,7 +17,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
+import org.eclipse.osgi.service.resolver.State;
+import org.eclipse.osgi.service.resolver.StateDelta;
 import org.eclipse.pde.internal.core.IPluginModelListener;
+import org.eclipse.pde.internal.core.IStateDeltaListener;
 import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.pde.internal.core.PluginModelDelta;
 import org.eclipse.scout.commons.EventListenerList;
@@ -37,13 +40,16 @@ public final class ScoutWorkspace implements IScoutWorkspace {
 
   private final EventListenerList m_eventListeners;
   private final ScoutBundleGraph m_bundleGraph;
+  private final P_PluginModelListener m_pluginModelListener;
 
   private ScoutWorkspace() {
     m_eventListeners = new EventListenerList();
     m_bundleGraph = new ScoutBundleGraph();
+    m_pluginModelListener = new P_PluginModelListener();
 
     // bundle graph rebuild listener
-    PDECore.getDefault().getModelManager().addPluginModelListener(new P_PluginModelListener());
+    PDECore.getDefault().getModelManager().addPluginModelListener(m_pluginModelListener);
+    PDECore.getDefault().getModelManager().addStateDeltaListener(m_pluginModelListener);
 
     // initialize bundle graph
     P_BundleGraphRebuildJob j = createBundleGraphRebuildJob();
@@ -180,7 +186,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     }
   }
 
-  private final class P_PluginModelListener implements IPluginModelListener {
+  private final class P_PluginModelListener implements IPluginModelListener, IStateDeltaListener {
     @Override
     public void modelsChanged(PluginModelDelta delta) {
       try {
@@ -195,6 +201,15 @@ public final class ScoutWorkspace implements IScoutWorkspace {
 
     private boolean containsInterestingProjects(PluginModelDelta delta) throws CoreException {
       return delta.getChangedEntries().length > 0 || delta.getAddedEntries().length > 0 || delta.getRemovedEntries().length > 0;
+    }
+
+    @Override
+    public void stateResolved(StateDelta delta) {
+    }
+
+    @Override
+    public void stateChanged(State newState) {
+      rebuildGraph();
     }
   }
 }
