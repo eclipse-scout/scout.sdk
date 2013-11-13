@@ -54,7 +54,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * In case the service implementation bundle is not set no service implementation will be created nor any service
  * registrations added.<br>
  * In case the service interface bundle is null no service proxy registrations will be created.
- *
+ * 
  * @author Andreas Hoegger
  * @since 1.0.8 03.02.2010
  */
@@ -142,6 +142,7 @@ public class ServiceNewOperation implements IOperation {
       PrimaryTypeNewOperation implementationOp = new PrimaryTypeNewOperation(getImplementationSourceBuilder(), getImplementationPackageName(), getImplementationProject());
       implementationOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
       implementationOp.setFormatSource(isFormatSource());
+      implementationOp.setPackageExportPolicy(ExportPolicy.AddPackage);
       implementationOp.validate();
       implementationOp.run(monitor, workingCopyManager);
       m_createdServiceImplementation = implementationOp.getCreatedType();
