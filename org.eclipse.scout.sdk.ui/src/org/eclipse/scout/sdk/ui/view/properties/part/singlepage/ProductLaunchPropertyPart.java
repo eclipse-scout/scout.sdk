@@ -13,15 +13,12 @@ package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPresenter;
 import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
@@ -34,9 +31,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedViewPart {
   private static final String SECTION_ID_LINKS = "section.links";
-
-  final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
-  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
 
   public ProductLaunchPropertyPart() {
   }

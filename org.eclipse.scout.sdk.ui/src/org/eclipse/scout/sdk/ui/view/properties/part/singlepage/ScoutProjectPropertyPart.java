@@ -63,7 +63,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
 
   private static final String PROJECT_PROD_LAUNCHERS = "pref_scout_project_prod_launcher";
 
-  private ArrayList<ProductLaunchPresenter> m_launchPresenters = new ArrayList<ProductLaunchPresenter>();
+  private final ArrayList<ProductLaunchPresenter> m_launchPresenters = new ArrayList<ProductLaunchPresenter>();
 
   @Override
   protected void createSections() {
@@ -175,7 +175,15 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     Arrays.sort(productFiles, 0, productFiles.length, new Comparator<IFile>() {
       @Override
       public int compare(IFile o1, IFile o2) {
-        return o1.getName().compareTo(o2.getName());
+        String serverKeyWord = "server";
+        boolean o1IsServer = o1.getName().contains(serverKeyWord);
+        boolean o2IsServer = o2.getName().contains(serverKeyWord);
+        if (o1IsServer == o2IsServer) {
+          return o1.getName().compareTo(o2.getName());
+        }
+        else {
+          return Boolean.valueOf(o2IsServer).compareTo(Boolean.valueOf(o1IsServer));
+        }
       }
     });
 
