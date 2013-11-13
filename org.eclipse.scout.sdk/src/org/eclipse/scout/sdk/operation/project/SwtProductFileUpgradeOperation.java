@@ -16,6 +16,8 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.operation.util.Batik17ProductFileUpgradeOperation;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -33,7 +35,7 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
 
   @Override
   public boolean isRelevant() {
-    return PlatformVersionUtility.isE4(getTargetPlatformVersion()) && isNodeChecked(CreateUiSwtPluginOperation.BUNDLE_ID);
+    return isNodeChecked(CreateUiSwtPluginOperation.BUNDLE_ID);
   }
 
   @Override
@@ -58,11 +60,29 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
 
   @Override
   public String getOperationName() {
-    return "Upgrade SWT Products to Juno Level";
+    return "Upgrade SWT Products";
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    if (PlatformVersionUtility.isE4(getTargetPlatformVersion())) {
+      upgradeToE4(monitor, workingCopyManager);
+    }
+    if (JdtUtility.isBatik17OrNewer()) {
+      upgradeToBatik17(monitor, workingCopyManager);
+    }
+  }
+
+  private void upgradeToBatik17(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    Batik17ProductFileUpgradeOperation op = new Batik17ProductFileUpgradeOperation();
+    for (IFile f : m_swtProdFiles) {
+      op.addProductFile(f);
+    }
+    op.validate();
+    op.run(monitor, workingCopyManager);
+  }
+
+  private void upgradeToE4(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     final String[] additionalE4Plugins = new String[]{
         "org.eclipse.e4.core.commands",
         "org.eclipse.e4.core.contexts",
@@ -94,7 +114,6 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
         "org.eclipse.ui.intro",
         "org.w3c.css.sac",
         "org.w3c.dom.smil",
-        "org.w3c.dom.events",
         "org.w3c.dom.svg",
         "javax.annotation",
         "javax.inject",

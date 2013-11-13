@@ -37,8 +37,7 @@ public final class PlatformVersionUtility {
   }
 
   public static boolean isJunoOrLater(Version v) {
-    return (v.getMajor() == 3 && v.getMinor() == 8) ||
-        (v.getMajor() == 4 && v.getMinor() >= 2);
+    return (v.getMajor() == 3 && v.getMinor() == 8) || (v.getMajor() == 4 && v.getMinor() >= 2);
   }
 
   public static boolean isJuno() {
@@ -46,8 +45,7 @@ public final class PlatformVersionUtility {
   }
 
   public static boolean isJuno(Version v) {
-    return (v.getMajor() == 3 && v.getMinor() == 8) ||
-        (v.getMajor() == 4 && v.getMinor() == 2);
+    return (v.getMajor() == 3 && v.getMinor() == 8) || (v.getMajor() == 4 && v.getMinor() == 2);
   }
 
   public static boolean isE4() {
@@ -93,4 +91,5 @@ public final class PlatformVersionUtility {
     }
     return platformVersion;
   }
+
 }

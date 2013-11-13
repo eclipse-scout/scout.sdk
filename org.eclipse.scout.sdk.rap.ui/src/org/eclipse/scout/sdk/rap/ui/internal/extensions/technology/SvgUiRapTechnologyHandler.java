@@ -23,7 +23,8 @@ public class SvgUiRapTechnologyHandler extends AbstractScoutTechnologyHandler {
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    selectionChangedProductFiles(resources, selected, SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, RAP_SVG_PLUGIN);
+    selectionChangedProductFiles(resources, selected, SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, RAP_SVG_PLUGIN,
+        SvgClientTechnologyHandler.getAdditionalBatik17CorePlugins(), SvgClientTechnologyHandler.getAdditionalBatik17ScoutPlugins());
   }
 
   @Override
@@ -35,7 +36,8 @@ public class SvgUiRapTechnologyHandler extends AbstractScoutTechnologyHandler {
   public TriState getSelection(IScoutBundle project) throws CoreException {
     return getSelectionProductFiles(getRapUiBundlesBelow(project),
         new String[]{RuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId},
-        SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, RAP_SVG_PLUGIN);
+        SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, RAP_SVG_PLUGIN,
+        SvgClientTechnologyHandler.getAdditionalBatik17CorePlugins(), SvgClientTechnologyHandler.getAdditionalBatik17ScoutPlugins());
   }
 
   @Override

@@ -39,10 +39,15 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameRequestor;
 import org.eclipse.jface.text.ITextSelection;
+import org.eclipse.osgi.service.resolver.BundleDescription;
+import org.eclipse.osgi.service.resolver.State;
+import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.osgi.framework.Bundle;
+import org.osgi.framework.Version;
 
+@SuppressWarnings("restriction")
 public final class JdtUtility {
   private final static String DOUBLE_QUOTES = "\"";
   private final static Pattern LIT_ESC_1 = Pattern.compile("\\", Pattern.LITERAL);
@@ -301,6 +306,29 @@ public final class JdtUtility {
     return true;
   }
 
+  /**
+   * Gets the newest (highest) bundle with the given symbolic name that can be found in the active target platform.
+   * 
+   * @param symbolicName
+   *          the symbolic name of the bundles to check.
+   * @return The newest bundle of all having the given symbolic name.
+   */
+  public static BundleDescription getNewestBundleInActiveTargetPlatform(String symbolicName) {
+    State state = PDECore.getDefault().getModelManager().getState().getState();
+    BundleDescription[] allBundleVersions = state.getBundles(symbolicName);
+    Version v = null;
+    BundleDescription newest = null;
+    for (BundleDescription d : allBundleVersions) {
+      if (d != null) {
+        if (v == null || (d.getVersion().compareTo(v) > 0)) {
+          v = d.getVersion();
+          newest = d;
+        }
+      }
+    }
+    return newest;
+  }
+
   public static void setWorkspaceAutoBuilding(boolean autoBuild) throws CoreException {
     IWorkspaceDescription description = ResourcesPlugin.getWorkspace().getDescription();
     if (description.isAutoBuilding() != autoBuild) {
@@ -311,5 +339,10 @@ public final class JdtUtility {
 
   public static boolean isWorkspaceAutoBuilding() throws CoreException {
     return ResourcesPlugin.getWorkspace().getDescription().isAutoBuilding();
+  }
+
+  public static boolean isBatik17OrNewer() {
+    BundleDescription batikUtil = JdtUtility.getNewestBundleInActiveTargetPlatform("org.apache.batik.util");
+    return batikUtil != null && batikUtil.getVersion().getMajor() == 1 && batikUtil.getVersion().getMinor() == 7;
   }
 }

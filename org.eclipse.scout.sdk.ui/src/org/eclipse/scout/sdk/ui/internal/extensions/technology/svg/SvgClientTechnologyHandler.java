@@ -19,15 +19,13 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
-
-  private final static String CLIENT_SVG_BUNDLE_NAME = ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME;
-  private final static String W3C_DOM_SVG_PACKAGE = ScoutProjectAddOperation.W3C_DOM_SVG_PACKAGE;
 
   public final static String[] SCOUT_ONLY_SVG_PLUGINS = new String[]{
       "org.apache.batik.bridge",
@@ -39,25 +37,47 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
       "org.apache.batik.swing",
       "org.apache.batik.transcoder",
       "org.apache.batik.xml",
-      CLIENT_SVG_BUNDLE_NAME};
+      ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME
+  };
 
   public final static String[] CORE_SVG_PLUGINS = new String[]{
       "org.apache.batik.css",
       "org.apache.batik.util",
       "org.apache.batik.util.gui",
       "org.w3c.dom.svg",
-      "org.w3c.dom.events",
       "org.w3c.dom.smil",
       "org.w3c.css.sac"
+  };
+
+  private final static String[] BATIK_17_CORE_SVG_PLUGINS = new String[]{
+      "org.w3c.dom.events"
+  };
+
+  private final static String[] BATIK_17_SCOUT_ONLY_SVG_PLUGINS = new String[]{
+      "org.w3c.dom.svg.fragment"
   };
 
   public SvgClientTechnologyHandler() {
   }
 
+  public static String[] getAdditionalBatik17ScoutPlugins() {
+    if (JdtUtility.isBatik17OrNewer()) {
+      return BATIK_17_SCOUT_ONLY_SVG_PLUGINS;
+    }
+    return null;
+  }
+
+  public static String[] getAdditionalBatik17CorePlugins() {
+    if (JdtUtility.isBatik17OrNewer()) {
+      return BATIK_17_CORE_SVG_PLUGINS;
+    }
+    return null;
+  }
+
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    selectionChangedManifest(resources, selected, CLIENT_SVG_BUNDLE_NAME);
-    selectionChangedManifestImportPackage(resources, selected, new String[]{W3C_DOM_SVG_PACKAGE}, new String[]{"[1.1.0,2.0.0)"});
+    selectionChangedManifest(resources, selected, ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME);
+    selectionChangedManifestImportPackage(resources, selected, new String[]{ScoutProjectAddOperation.W3C_DOM_SVG_PACKAGE}, new String[]{"[1.1.0,2.0.0)"});
   }
 
   @Override
@@ -73,8 +93,8 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
   @Override
   public TriState getSelection(IScoutBundle project) {
     IScoutBundle[] clientBundlesBelow = getClientBundlesBelow(project);
-    TriState t1 = getSelectionManifests(clientBundlesBelow, CLIENT_SVG_BUNDLE_NAME);
-    TriState t2 = getSelectionManifestsImportPackage(clientBundlesBelow, W3C_DOM_SVG_PACKAGE);
+    TriState t1 = getSelectionManifests(clientBundlesBelow, ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME);
+    TriState t2 = getSelectionManifestsImportPackage(clientBundlesBelow, ScoutProjectAddOperation.W3C_DOM_SVG_PACKAGE);
     if (t1.equals(t2)) {
       return t1;
     }

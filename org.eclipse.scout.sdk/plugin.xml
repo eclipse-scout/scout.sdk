@@ -185,6 +185,11 @@
             referenceId="fill.ui.swt">
       </operation>
       <operation
+            class="org.eclipse.scout.sdk.operation.project.SwingProductFileUpgradeOperation"
+            id="finalize.ui.swing.products"
+            referenceId="fill.ui.swing">
+      </operation>
+      <operation
             class="org.eclipse.scout.sdk.operation.project.ServerProductFileFillOperation"
             id="fill.server.product"
             referenceId="fill.server">

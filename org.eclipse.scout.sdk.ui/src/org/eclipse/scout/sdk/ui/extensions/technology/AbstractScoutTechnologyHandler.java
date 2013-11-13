@@ -215,13 +215,17 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
 
   protected void selectionChangedProductFile(IScoutTechnologyResource r, boolean selected, String[]... pluginIds) throws CoreException {
     ProductFileModelHelper h = new ProductFileModelHelper(r.getResource());
-    for (String[] list : pluginIds) {
-      for (String pluginId : list) {
-        if (selected) {
-          h.ProductFile.addDependency(pluginId);
-        }
-        else {
-          h.ProductFile.removeDependency(pluginId);
+    if (pluginIds != null) {
+      for (String[] list : pluginIds) {
+        if (list != null) {
+          for (String pluginId : list) {
+            if (selected) {
+              h.ProductFile.addDependency(pluginId);
+            }
+            else {
+              h.ProductFile.removeDependency(pluginId);
+            }
+          }
         }
       }
     }
@@ -265,10 +269,14 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   protected boolean containsProductDependencies(IFile productFile, String[]... pluginFilters) {
     try {
       ProductFileModelHelper h = new ProductFileModelHelper(productFile);
-      for (String[] list : pluginFilters) {
-        for (String pluginId : list) {
-          if (!h.ProductFile.existsDependency(pluginId)) {
-            return false;
+      if (pluginFilters != null) {
+        for (String[] list : pluginFilters) {
+          if (list != null) {
+            for (String pluginId : list) {
+              if (!h.ProductFile.existsDependency(pluginId)) {
+                return false;
+              }
+            }
           }
         }
       }

@@ -26,10 +26,11 @@ public class SvgUiSwtTechnologyHandler extends AbstractScoutTechnologyHandler {
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutTechnologyResource resource : resources) {
       if (isE4Product(resource.getResource())) {
-        selectionChangedProductFile(resource, selected, SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SWT_SVG_PLUGIN);
+        selectionChangedProductFile(resource, selected, SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SWT_SVG_PLUGIN, SvgClientTechnologyHandler.getAdditionalBatik17ScoutPlugins());
       }
       else {
-        selectionChangedProductFile(resource, selected, SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, SWT_SVG_PLUGIN);
+        selectionChangedProductFile(resource, selected, SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, SWT_SVG_PLUGIN,
+            SvgClientTechnologyHandler.getAdditionalBatik17CorePlugins(), SvgClientTechnologyHandler.getAdditionalBatik17ScoutPlugins());
       }
     }
   }
@@ -47,7 +48,8 @@ public class SvgUiSwtTechnologyHandler extends AbstractScoutTechnologyHandler {
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
     return getSelectionProductFiles(getSwtBundlesBelow(project), new String[]{RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwtBundleId},
-        SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, SWT_SVG_PLUGIN);
+        SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, SWT_SVG_PLUGIN,
+        SvgClientTechnologyHandler.getAdditionalBatik17CorePlugins(), SvgClientTechnologyHandler.getAdditionalBatik17ScoutPlugins());
   }
 
   @Override
