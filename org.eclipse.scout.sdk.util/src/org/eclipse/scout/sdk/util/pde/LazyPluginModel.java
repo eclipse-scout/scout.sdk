@@ -14,7 +14,9 @@ import org.eclipse.pde.internal.core.bundle.BundlePluginModel;
 import org.eclipse.pde.internal.core.bundle.BundlePluginModelBase;
 import org.eclipse.pde.internal.core.bundle.WorkspaceBundleModel;
 import org.eclipse.pde.internal.core.ibundle.IBundle;
+import org.eclipse.pde.internal.core.ibundle.IBundlePluginModelBase;
 import org.eclipse.pde.internal.core.plugin.WorkspaceExtensionsModel;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
 /**
  * Base class for PDE model access of workspace plugins.<br>
@@ -33,21 +35,38 @@ public final class LazyPluginModel {
 
   // lazily instantiated models
   private volatile BundleDescription m_desc;
-  private volatile BundlePluginModelBase m_bundlePluginModel;
+  private volatile IPluginModelBase m_bundlePluginModel;
   private volatile IPluginBase m_pluginBase;
   private volatile IBundle m_bundle;
   private volatile WorkspaceBundleModel m_bundleModel;
   private volatile WorkspaceBuildModel m_buildModel;
   private volatile WorkspaceExtensionsModel m_extensionsModel;
 
+  public LazyPluginModel(IPluginModelBase modelBase) {
+    if (modelBase == null) {
+      throw new IllegalArgumentException("null project not allowed.");
+    }
+    m_project = null;
+    m_manifestFile = null;
+    m_pluginXmlFile = null;
+    m_buildPropertiesFile = null;
+    m_bundlePluginModel = modelBase;
+    m_desc = modelBase.getBundleDescription();
+    m_pluginBase = modelBase.getPluginBase(true);
+  }
+
   public LazyPluginModel(IProject project) {
-    if (project == null) throw new IllegalArgumentException("null project not allowed.");
+    if (project == null) {
+      throw new IllegalArgumentException("null project not allowed.");
+    }
     m_project = project;
     m_manifestFile = getProject().getFile(ICoreConstants.BUNDLE_FILENAME_DESCRIPTOR);
     m_pluginXmlFile = getProject().getFile(ICoreConstants.PLUGIN_FILENAME_DESCRIPTOR);
     m_buildPropertiesFile = getProject().getFile(ICoreConstants.BUILD_FILENAME_DESCRIPTOR);
 
-    if (!isInteresting()) throw new IllegalArgumentException("the passed project is not a valid plugin.");
+    if (!isInteresting()) {
+      throw new IllegalArgumentException("the passed project is not a valid plugin.");
+    }
   }
 
   private boolean isInteresting() {
@@ -57,7 +76,7 @@ public final class LazyPluginModel {
         getBuildPropertiesFile() != null /* build properties must not exist (e.g. in an imported binary project, see bug 415083) */;
   }
 
-  public BundlePluginModelBase getBundlePluginModel() {
+  public IPluginModelBase getBundlePluginModel() {
     loadBundlePluginExtensionModels();
     return m_bundlePluginModel;
   }
@@ -68,24 +87,46 @@ public final class LazyPluginModel {
   }
 
   private synchronized void loadBundlePluginExtensionModels() {
-    if (m_bundlePluginModel == null || m_extensionsModel == null) {
-      WorkspaceExtensionsModel wem = new WorkspaceExtensionsModel(getPluginXmlFile());
-      BundlePluginModel bpm = new BundlePluginModel();
+    boolean bpmCreated = false;
+    boolean wemCreated = false;
+    BundlePluginModel bpm = null;
+    WorkspaceExtensionsModel wem = m_extensionsModel;
 
-      // load bundle plug-in model
+    if (m_bundlePluginModel == null) {
+      bpm = new BundlePluginModel();
+
       bpm.setBundleDescription(getBundleDescription());
       bpm.setBundleModel(getBundleModel());
       bpm.setBuildModel(getBuildModel());
-      bpm.setExtensionsModel(wem);
       bpm.setEnabled(true);
       bpm.setDirty(false);
 
-      // load extensions model
+      bpmCreated = true;
+    }
+
+    if (m_extensionsModel == null && ResourceUtility.exists(getPluginXmlFile())) {
+      wem = new WorkspaceExtensionsModel(getPluginXmlFile());
+
       wem.load(getBundleDescription(), getPdeState());
-      wem.setBundleModel(bpm);
       wem.setDirty(false); // the model is marked dirty after a fresh load
 
+      wemCreated = true;
+    }
+
+    boolean useNewWem = wemCreated && wem != null && m_bundlePluginModel instanceof IBundlePluginModelBase;
+
+    if (bpmCreated && bpm != null) {
+      if (useNewWem) {
+        bpm.setExtensionsModel(wem);
+      }
+      else {
+        bpm.setExtensionsModel(m_extensionsModel);
+      }
       m_bundlePluginModel = bpm;
+    }
+
+    if (useNewWem && wem != null) {
+      wem.setBundleModel((IBundlePluginModelBase) m_bundlePluginModel);
       m_extensionsModel = wem;
     }
   }
@@ -98,7 +139,7 @@ public final class LazyPluginModel {
   }
 
   public synchronized IBuildModel getBuildModel() {
-    if (m_buildModel == null) {
+    if (m_buildModel == null && getBuildPropertiesFile() != null) {
       WorkspaceBuildModel tmp = new WorkspaceBuildModel(getBuildPropertiesFile());
       tmp.load();
       tmp.setDirty(false); // the model is marked dirty after a fresh load
@@ -145,11 +186,17 @@ public final class LazyPluginModel {
   }
 
   public synchronized void save() {
-    if (m_bundlePluginModel != null && m_bundlePluginModel.isDirty()) {
+    boolean baseSaved = false;
+    if (m_bundlePluginModel instanceof BundlePluginModelBase) {
       // if available: saves bundle model and extensions model
-      m_bundlePluginModel.save();
+      BundlePluginModelBase base = (BundlePluginModelBase) m_bundlePluginModel;
+      if (base.isDirty()) {
+        base.save();
+        baseSaved = true;
+      }
     }
-    else {
+
+    if (!baseSaved) {
       if (m_bundleModel != null && m_bundleModel.isDirty()) {
         m_bundleModel.save();
       }

@@ -41,8 +41,8 @@ import org.eclipse.jdt.core.search.TypeNameRequestor;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.State;
-import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.pde.LazyPluginModel;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.Version;
@@ -314,7 +314,7 @@ public final class JdtUtility {
    * @return The newest bundle of all having the given symbolic name.
    */
   public static BundleDescription getNewestBundleInActiveTargetPlatform(String symbolicName) {
-    State state = PDECore.getDefault().getModelManager().getState().getState();
+    State state = LazyPluginModel.getPdeState().getState();
     BundleDescription[] allBundleVersions = state.getBundles(symbolicName);
     Version v = null;
     BundleDescription newest = null;

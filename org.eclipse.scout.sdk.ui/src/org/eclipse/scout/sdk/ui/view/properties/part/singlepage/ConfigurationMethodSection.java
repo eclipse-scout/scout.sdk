@@ -97,13 +97,11 @@ public class ConfigurationMethodSection {
     else {
       // if collapsed by default: load content only on demand
       section.addExpansionListener(new ExpansionAdapter() {
-        private boolean isInitialized = false;
-
         @Override
         public void expansionStateChanging(ExpansionEvent e) {
-          if (!isInitialized && e.getState()) {
+          if (e.getState()) {
             createCategories(clientSection, part, section);
-            isInitialized = true;
+            section.removeExpansionListener(this);
           }
         }
       });

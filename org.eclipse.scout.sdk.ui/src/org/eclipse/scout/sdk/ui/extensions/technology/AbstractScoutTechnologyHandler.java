@@ -78,6 +78,9 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   }
 
   protected void contributeProductFiles(IScoutBundle project, List<IScoutTechnologyResource> list, boolean defaultSelection, String... bundleFilter) throws CoreException {
+    if (project == null || project.isBinary()) {
+      return;
+    }
     P_TechProductFile[] productFiles = getFilteredProductFiles(project, bundleFilter);
     for (int i = 0; i < productFiles.length; i++) {
       P_TechProductFile prodFile = productFiles[i];
@@ -120,7 +123,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
       return TriState.FALSE;
     }
 
-    PluginModelHelper pluginModel = new PluginModelHelper(project.getProject());
+    PluginModelHelper pluginModel = new PluginModelHelper(project.getSymbolicName());
     TriState ret = TriState.parseTriState(pluginModel.Manifest.existsImportPackage(importPackages[0]));
     for (int i = 1; i < importPackages.length; i++) {
       TriState tmp = TriState.parseTriState(pluginModel.Manifest.existsImportPackage(importPackages[i]));
@@ -151,7 +154,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
       return TriState.FALSE;
     }
 
-    PluginModelHelper pluginModel = new PluginModelHelper(project.getProject());
+    PluginModelHelper pluginModel = new PluginModelHelper(project.getSymbolicName());
     TriState ret = TriState.parseTriState(pluginModel.Manifest.existsDependency(pluginIds[0]));
     for (int i = 1; i < pluginIds.length; i++) {
       TriState tmp = TriState.parseTriState(pluginModel.Manifest.existsDependency(pluginIds[i]));
@@ -239,7 +242,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   }
 
   protected void selectionChangedManifest(IScoutTechnologyResource r, boolean selected, String... pluginsToHandle) throws CoreException {
-    PluginModelHelper pluginModel = new PluginModelHelper(r.getBundle().getProject());
+    PluginModelHelper pluginModel = new PluginModelHelper(r.getBundle().getSymbolicName());
     for (String pluginId : pluginsToHandle) {
       if (selected) {
         pluginModel.Manifest.addDependency(pluginId);
@@ -253,7 +256,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
 
   protected void selectionChangedManifestImportPackage(IScoutTechnologyResource[] resources, boolean selected, String[] packages, String[] versions) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
-      PluginModelHelper pluginModel = new PluginModelHelper(r.getBundle().getProject());
+      PluginModelHelper pluginModel = new PluginModelHelper(r.getBundle().getSymbolicName());
       for (int i = 0; i < Math.min(packages.length, versions.length); i++) {
         if (selected) {
           pluginModel.Manifest.addImportPackage(packages[i], versions[i]);
@@ -291,16 +294,18 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   protected P_TechProductFile[] getProductFiles(IScoutBundle[] projects) throws CoreException {
     ArrayList<P_TechProductFile> list = new ArrayList<P_TechProductFile>();
     for (IScoutBundle element : projects) {
-      IResource[] productFiles = ResourceUtility.getAllResources(element.getProject(), ResourceFilters.getProductFileFilter());
-      for (int i = 0; i < productFiles.length; i++) {
-        final IResource prodFile = productFiles[i];
-        IScoutBundle b = ScoutTypeUtility.getScoutBundle(prodFile.getProject());
+      if (!element.isBinary()) {
+        IResource[] productFiles = ResourceUtility.getAllResources(element.getProject(), ResourceFilters.getProductFileFilter());
+        for (int i = 0; i < productFiles.length; i++) {
+          final IResource prodFile = productFiles[i];
+          IScoutBundle b = ScoutTypeUtility.getScoutBundle(prodFile.getProject());
 
-        if (b != null) {
-          P_TechProductFile tpf = new P_TechProductFile();
-          tpf.bundle = b;
-          tpf.productFile = (IFile) prodFile;
-          list.add(tpf);
+          if (b != null) {
+            P_TechProductFile tpf = new P_TechProductFile();
+            tpf.bundle = b;
+            tpf.productFile = (IFile) prodFile;
+            list.add(tpf);
+          }
         }
       }
     }

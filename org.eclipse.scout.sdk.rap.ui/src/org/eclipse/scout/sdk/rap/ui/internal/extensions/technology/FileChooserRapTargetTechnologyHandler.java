@@ -18,7 +18,6 @@ import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IResourceVisitor;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
@@ -36,6 +35,7 @@ import org.eclipse.scout.sdk.ui.extensions.technology.ScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.dialog.LicenseDialog;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -147,27 +147,18 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
 
   private static ScoutTechnologyResource[] getTargetFiles(IScoutBundle project) {
     final ArrayList<ScoutTechnologyResource> ret = new ArrayList<ScoutTechnologyResource>();
-    try {
-      for (IScoutBundle b : project.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true)) {
+    for (IScoutBundle b : project.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true)) {
+      try {
         final IScoutBundle bundle = b;
-        bundle.getProject().accept(new IResourceVisitor() {
-          @Override
-          public boolean visit(IResource resource) throws CoreException {
-            if (resource != null && resource.getType() == IResource.FILE && resource.exists()) {
-              IFile f = (IFile) resource;
-              String fileName = f.getName();
-              if (fileName.toLowerCase().endsWith(".target")) {
-                boolean checked = fileName.equals(InstallTargetPlatformFileOperation.TARGET_FILE_NAME);
-                ret.add(new ScoutTechnologyResource(bundle, f, checked));
-              }
-            }
-            return true;
-          }
-        }, IResource.DEPTH_INFINITE, false);
+        IResource[] targetFiles = ResourceUtility.getAllResources(bundle.getProject(), ResourceFilters.getTargetFileFilter());
+        for (IResource r : targetFiles) {
+          boolean checked = InstallTargetPlatformFileOperation.TARGET_FILE_NAME.equals(r.getName());
+          ret.add(new ScoutTechnologyResource(bundle, (IFile) r, checked));
+        }
       }
-    }
-    catch (CoreException e) {
-      ScoutSdkRap.logError(e);
+      catch (CoreException e) {
+        ScoutSdkRap.logError(e);
+      }
     }
     return ret.toArray(new ScoutTechnologyResource[ret.size()]);
   }

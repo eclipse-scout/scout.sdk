@@ -13,6 +13,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.osgi.service.resolver.ExportPackageDescription;
+import org.eclipse.osgi.service.resolver.ImportPackageSpecification;
 import org.eclipse.pde.core.build.IBuildEntry;
 import org.eclipse.pde.core.plugin.IPluginAttribute;
 import org.eclipse.pde.core.plugin.IPluginElement;
@@ -20,8 +22,10 @@ import org.eclipse.pde.core.plugin.IPluginExtension;
 import org.eclipse.pde.core.plugin.IPluginImport;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.IPluginObject;
+import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.pde.internal.core.bundle.BundlePluginBase;
+import org.eclipse.pde.internal.core.bundle.BundlePluginModelBase;
 import org.eclipse.pde.internal.core.ibundle.IBundlePlugin;
 import org.eclipse.pde.internal.core.ibundle.IManifestHeader;
 import org.eclipse.pde.internal.core.text.bundle.BundleClasspathHeader;
@@ -34,7 +38,7 @@ import org.osgi.framework.Constants;
 import org.osgi.framework.Version;
 
 /**
- * Helper class for basic plugin model operations.
+ * Helper class for basic plug-in model operations.
  * 
  * @author Matthias Villiger
  * @since 3.8.0
@@ -43,35 +47,41 @@ import org.osgi.framework.Version;
 public class PluginModelHelper {
 
   /**
-   * Class for operations executed on the MANIFEST.MF part of a plugin model.
+   * Class for operations executed on the MANIFEST.MF part of a plug-in model.
    */
   public final ManifestPart Manifest;
 
   /**
-   * Class for operations executed on the plugin.xml part of a plugin model.
+   * Class for operations executed on the plugin.xml part of a plug-in model.
    */
   public final PluginXmlPart PluginXml;
 
   /**
-   * Class for operations executed on the build.properties part of a plugin model.
+   * Class for operations executed on the build.properties part of a plug-in model.
    */
   public final BuildPropertiesPart BuildProperties;
 
   /**
-   * Creates a new helper that operates on the workspace project with the same name as denoted by the given model base.
+   * Creates a new helper that operates on the project with the same name as denoted by the given model base.<br>
+   * <br>
+   * If there is no project in the workspace with the given name, it is searched in the plug-in registry. Then the
+   * resulting instance cannot be modified.
    * 
    * @param pluginModelBase
    *          The model base that defines the project name.
    * @throws IllegalArgumentException
    *           when no project with the same name as denoted by the given model description can be found in the
-   *           workspace or is not a valid plugin project.
+   *           workspace or is not a valid plug-in project.
    */
   public PluginModelHelper(IPluginModelBase pluginModelBase) {
-    this(pluginModelBase.getBundleDescription().getName());
+    this(createPluginModel(pluginModelBase.getBundleDescription().getName()));
   }
 
   /**
-   * Creates a new helper that operates on the workspace project with given name.
+   * Creates a new helper that operates on the plug-in with the given name.<br>
+   * <br>
+   * If there is no project in the workspace with the given name, it is searched in the plug-in registry. Then the
+   * resulting instance cannot be modified.
    * 
    * @param projectName
    *          The name of the project.
@@ -79,7 +89,17 @@ public class PluginModelHelper {
    *           when no project with the given name can be found in the workspace or is not a valid plugin project.
    */
   public PluginModelHelper(String projectName) {
-    this(ResourcesPlugin.getWorkspace().getRoot().getProject(projectName));
+    this(createPluginModel(projectName));
+  }
+
+  private static LazyPluginModel createPluginModel(String projectName) {
+    IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(projectName);
+    if (project != null && project.isAccessible()) {
+      return new LazyPluginModel(project);
+    }
+
+    IPluginModelBase model = PluginRegistry.findModel(projectName);
+    return new LazyPluginModel(model);
   }
 
   /**
@@ -88,10 +108,13 @@ public class PluginModelHelper {
    * @param project
    *          The project to modify.
    * @throws IllegalArgumentException
-   *           when the project is null or is not a valid plugin project.
+   *           when the project is null or is not a valid plug-in project.
    */
   public PluginModelHelper(IProject project) {
-    LazyPluginModel model = new LazyPluginModel(project);
+    this(new LazyPluginModel(project));
+  }
+
+  private PluginModelHelper(LazyPluginModel model) {
     Manifest = new ManifestPart(model);
     PluginXml = new PluginXmlPart(model);
     BuildProperties = new BuildPropertiesPart(model);
@@ -176,10 +199,13 @@ public class PluginModelHelper {
       if (pluginId == null || pluginId.length() < 1) return;
       synchronized (m_model.getProject()) {
         if (!existsDependency(pluginId)) {
-          IPluginImport imp = m_model.getBundlePluginModel().createImport(pluginId);
-          imp.setReexported(reexport);
-          imp.setOptional(optional);
-          m_model.getPluginBase().add(imp);
+          IPluginModelBase pluginModelBase = m_model.getBundlePluginModel();
+          if (pluginModelBase instanceof BundlePluginModelBase) {
+            IPluginImport imp = ((BundlePluginModelBase) pluginModelBase).createImport(pluginId);
+            imp.setReexported(reexport);
+            imp.setOptional(optional);
+            m_model.getPluginBase().add(imp);
+          }
         }
       }
     }
@@ -270,8 +296,22 @@ public class PluginModelHelper {
      */
     public boolean existsExportPackage(String packageName) {
       if (packageName == null || packageName.length() < 1) return false;
-      ExportPackageHeader expHeader = getExportPackageHeader();
-      return existsExportPackage(packageName, expHeader);
+      ExportPackageDescription[] exportPackages = m_model.getBundleDescription().getExportPackages();
+      for (ExportPackageDescription epd : exportPackages) {
+        if (packageName.equals(epd.getName())) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    /**
+     * Gets all exported packages defined in the plug-in project associated with this helper.
+     * 
+     * @return an array of all exported packages (is never null).
+     */
+    public ExportPackageDescription[] getAllExportedPackages() {
+      return m_model.getBundleDescription().getExportPackages();
     }
 
     /**
@@ -284,16 +324,22 @@ public class PluginModelHelper {
      */
     public boolean existsImportPackage(String packageName) {
       if (packageName == null || packageName.length() < 1) return false;
-      ImportPackageHeader impHeader = getImportPackageHeader();
-      return existsImportPackage(packageName, impHeader);
+      ImportPackageSpecification[] importedPackages = m_model.getBundleDescription().getImportPackages();
+      for (ImportPackageSpecification ips : importedPackages) {
+        if (packageName.equals(ips.getName())) {
+          return true;
+        }
+      }
+      return false;
     }
 
-    private boolean existsImportPackage(String packageName, ImportPackageHeader impHeader) {
-      return impHeader.getPackage(packageName) != null;
-    }
-
-    private boolean existsExportPackage(String packageName, ExportPackageHeader expHeader) {
-      return expHeader.getPackage(packageName) != null;
+    /**
+     * Gets all imported packages defined in the plug-in project associated with this helper.
+     * 
+     * @return an array of all imported packages (is never null).
+     */
+    public ImportPackageSpecification[] getAllImportedPackages() {
+      return m_model.getBundleDescription().getImportPackages();
     }
 
     /**
@@ -334,8 +380,8 @@ public class PluginModelHelper {
     public void addExportPackage(String packageName) {
       if (packageName == null || packageName.length() < 1) return;
       synchronized (m_model.getProject()) {
-        ExportPackageHeader expHeader = getExportPackageHeader();
-        if (!existsExportPackage(packageName, expHeader)) {
+        if (!existsExportPackage(packageName)) {
+          ExportPackageHeader expHeader = getExportPackageHeader();
           expHeader.addPackage(packageName);
           setEntryValue(Constants.EXPORT_PACKAGE, expHeader.getValue());
         }
@@ -450,7 +496,7 @@ public class PluginModelHelper {
      * @return an array with all entries.
      */
     @SuppressWarnings("unchecked")
-    public String[] getClasspathEntries() {
+    public String[] getAllClasspathEntries() {
       BundleClasspathHeader h = getBundleClasspathHeader();
       Vector<String> names = h.getElementNames();
       return names.toArray(new String[names.size()]);
@@ -512,7 +558,7 @@ public class PluginModelHelper {
      */
     public boolean existsClasspathEntry(String entry) {
       if (entry == null || entry.length() < 1) return false;
-      for (String e : getClasspathEntries()) {
+      for (String e : getAllClasspathEntries()) {
         if (e.equals(entry)) return true;
       }
       return false;
@@ -552,7 +598,7 @@ public class PluginModelHelper {
     }
 
     /**
-     * Sets the version of the plugin to the given value.<br>
+     * Sets the version of the plug-in to the given value.<br>
      * If the given value is null, this method does nothing.
      * 
      * @param newVersion
@@ -564,7 +610,7 @@ public class PluginModelHelper {
     }
 
     /**
-     * Sets the version of the plugin to the given value.<br>
+     * Sets the version of the plug-in to the given value.<br>
      * If the given value is empty or null, this method does nothing.
      * 
      * @param newVersion
@@ -576,25 +622,25 @@ public class PluginModelHelper {
     }
 
     /**
-     * Gets the version of the plugin.
+     * Gets the version of the plug-in.
      * 
-     * @return The version of this plugin.
+     * @return The version of this plug-in.
      */
     public Version getVersion() {
-      return Version.parseVersion(getVersionAsString());
+      return m_model.getBundleDescription().getVersion();
     }
 
     /**
-     * Gets the version of the plugin.
+     * Gets the version of the plug-in.
      * 
-     * @return The version of the plugin.
+     * @return The version of the plug-in.
      */
     public String getVersionAsString() {
-      return getEntry(Constants.BUNDLE_VERSION);
+      return m_model.getBundleDescription().getVersion().toString();
     }
 
     /**
-     * Gets the MANIFEST.MF file of the plugin.
+     * Gets the MANIFEST.MF file of the plug-in.
      * 
      * @return
      */
@@ -802,7 +848,7 @@ public class PluginModelHelper {
 
     private List<IPluginExtension> getPluginExtensionPoints(String extensionPointId) {
       LinkedList<IPluginExtension> result = new LinkedList<IPluginExtension>();
-      for (IPluginExtension extPoint : m_model.getExtensionsModel().getExtensions().getExtensions()) {
+      for (IPluginExtension extPoint : m_model.getBundlePluginModel().getExtensions(true).getExtensions()) {
         if (extPoint.getPoint().equals(extensionPointId)) {
           result.add(extPoint);
         }

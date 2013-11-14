@@ -24,8 +24,10 @@ import org.eclipse.pde.internal.core.IStateDeltaListener;
 import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.pde.internal.core.PluginModelDelta;
 import org.eclipse.scout.commons.EventListenerList;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspace;
@@ -48,8 +50,11 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     m_pluginModelListener = new P_PluginModelListener();
 
     // bundle graph rebuild listener
-    PDECore.getDefault().getModelManager().addPluginModelListener(m_pluginModelListener);
-    PDECore.getDefault().getModelManager().addStateDeltaListener(m_pluginModelListener);
+    PDECore pdeCore = PDECore.getDefault();
+    if (pdeCore != null) {
+      pdeCore.getModelManager().addPluginModelListener(m_pluginModelListener);
+      pdeCore.getModelManager().addStateDeltaListener(m_pluginModelListener);
+    }
 
     // initialize bundle graph
     P_BundleGraphRebuildJob j = createBundleGraphRebuildJob();
@@ -60,6 +65,48 @@ public final class ScoutWorkspace implements IScoutWorkspace {
       }
     });
     j.schedule();
+  }
+
+  public void dispose() {
+    PDECore pdeCore = PDECore.getDefault();
+    if (m_pluginModelListener != null && pdeCore != null) {
+      pdeCore.getModelManager().removePluginModelListener(m_pluginModelListener);
+      pdeCore.getModelManager().removeStateDeltaListener(m_pluginModelListener);
+    }
+
+    Job.getJobManager().cancel(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
+    P_BundleGraphRebuildShutdownJob job = new P_BundleGraphRebuildShutdownJob();
+    job.schedule();
+    try {
+      job.join(3000);
+    }
+    catch (InterruptedException e) {
+    }
+    if (job.getResult() == null) {
+      // the job is still waiting for the shutdown -> enforce it
+      Job[] jobs = Job.getJobManager().find(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
+      if (jobs != null && jobs.length > 0) {
+        for (Job j : jobs) {
+          if (j != null) {
+            Thread t = j.getThread();
+            if (t != null) {
+              t.interrupt();
+              try {
+                j.join();
+              }
+              catch (InterruptedException e) {
+              }
+            }
+          }
+        }
+      }
+
+      try {
+        job.join(3000);
+      }
+      catch (InterruptedException e1) {
+      }
+    }
   }
 
   public static ScoutWorkspace getInstance() {
@@ -144,6 +191,21 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     }
   }
 
+  private final static class P_BundleGraphRebuildShutdownJob extends JobEx {
+
+    private P_BundleGraphRebuildShutdownJob() {
+      super("wait for bundle graph job to shutdown");
+      setSystem(true);
+      setUser(false);
+    }
+
+    @Override
+    protected IStatus run(IProgressMonitor monitor) {
+      JdtUtility.waitForJobFamily(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
+      return Status.CANCEL_STATUS;
+    }
+  }
+
   private final class P_BundleGraphRebuildJob extends Job {
 
     private final ScoutWorkspaceEventList m_eventCollector;
@@ -175,7 +237,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
           return Status.CANCEL_STATUS;
         }
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         ScoutSdk.logError("Unable to build the Scout Bundle Graph.", t);
         return new ScoutStatus(t);
       }

@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.internal;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.commons.TuningUtility;
+import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoAutoUpdateManager;
 import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateHandler;
 import org.eclipse.scout.sdk.internal.workspace.dto.pagedata.PageDataAutoUpdateHandler;
@@ -33,10 +34,6 @@ public class ScoutSdk extends Plugin {
 
   private DtoAutoUpdateManager m_autoUpdateManager;
 
-  /*
-   * (non-Javadoc)
-   * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-   */
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
@@ -55,14 +52,11 @@ public class ScoutSdk extends Plugin {
     m_autoUpdateManager.addModelDataUpdateHandler(new PageDataAutoUpdateHandler());
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-   */
   @Override
   public void stop(BundleContext context) throws Exception {
     TuningUtility.finishAll();
     m_autoUpdateManager.dispose();
+    ScoutWorkspace.getInstance().dispose();
     TypeCacheAccessor.getHierarchyCache().dispose();
     TypeCacheAccessor.getTypeCache().dispose();
     TypeCacheAccessor.getJavaResourceChangedEmitter().dispose();
