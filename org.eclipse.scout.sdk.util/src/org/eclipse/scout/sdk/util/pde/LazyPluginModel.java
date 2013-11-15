@@ -113,7 +113,7 @@ public final class LazyPluginModel {
       wemCreated = true;
     }
 
-    boolean useNewWem = wemCreated && wem != null && m_bundlePluginModel instanceof IBundlePluginModelBase;
+    boolean useNewWem = wemCreated && wem != null && (bpmCreated || m_bundlePluginModel instanceof IBundlePluginModelBase);
 
     if (bpmCreated && bpm != null) {
       if (useNewWem) {
