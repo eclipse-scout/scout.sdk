@@ -10,14 +10,45 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.dto;
 
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 
 /**
- * <h3>{@link IDtoAutoUpdateManager}</h3>
+ * <h3>{@link IDtoAutoUpdateManager}</h3> Manages the lifecycle of the Scout DTO auto update feature. <br>
+ * An instance can be acquired using {@link ScoutSdkCore#getDtoAutoUpdateManager()}.
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 21.08.2013
+ * @noinstantiate This class is not intended to be instantiated by clients.
  */
 public interface IDtoAutoUpdateManager {
   public static final String PROP_AUTO_UPDATE = ScoutSdk.PLUGIN_ID + ".propAutoUpdate";
+
+  /**
+   * Gets if the DTO Auto update is enabled or not.
+   * 
+   * @return true if the auto update is enabled, false otherwise.
+   */
+  boolean isEnabled();
+
+  /**
+   * Starts or stops the manager.<br>
+   * According to the enabled flag all listeners are registered/removed and the resource event handling job is
+   * cancelled.<br>
+   * <br>
+   * If the DTO update job is already running and updating DTO classes, this job is not touched even if the manager is
+   * disabled. This way no events are lost (which would lead in obsolete DTO classes). The user can cancel the job
+   * manually anyway.
+   * 
+   * @param enabled
+   *          true if the manager should update DTO classes, false otherwise.
+   */
+  void setEnabled(boolean enabled);
+
+  /**
+   * Adds an update handler to resolve the necessary operations for a compilation unit candidate.
+   * 
+   * @param factory
+   */
+  void addModelDataUpdateHandler(IDtoAutoUpdateHandler factory);
 }

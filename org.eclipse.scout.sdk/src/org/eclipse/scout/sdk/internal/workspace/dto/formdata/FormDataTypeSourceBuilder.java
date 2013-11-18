@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -23,7 +24,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractDtoTypeSourceBuilder;
-import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
+import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
@@ -42,7 +43,7 @@ import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 /**
  * <h3>{@link FormDataTypeSourceBuilder}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
 public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
@@ -56,18 +57,29 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
    * @param modelType
    * @param elementName
    */
-  public FormDataTypeSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation) {
-    super(modelType, elementName, false);
+  public FormDataTypeSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, IProgressMonitor monitor) {
+    super(modelType, elementName, false, monitor);
     m_formDataAnnotation = formDataAnnotation;
-    setup();
+    setup(monitor);
   }
 
   @Override
-  protected void createContent() {
-    super.createContent();
-    collectProperties();
+  protected void createContent(IProgressMonitor monitor) {
+    super.createContent(monitor);
+    if (monitor.isCanceled()) {
+      return;
+    }
+
+    collectProperties(monitor);
+    if (monitor.isCanceled()) {
+      return;
+    }
+
     try {
-      collectValidationRules();
+      collectValidationRules(monitor);
+      if (monitor.isCanceled()) {
+        return;
+      }
     }
     catch (Throwable t) {
       ScoutSdk.logError("could not append validation rules to form field data '" + getModelType().getFullyQualifiedName() + "'.", t);
@@ -86,13 +98,13 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
       addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createReplaceAnnotationBuilder());
     }
     if (superTypeSignature == null) {
-      superTypeSignature = FormDataUtility.computeSuperTypeSignatureForFormData(getModelType(), getFormDataAnnotation(), getLocalTypeHierarchy());
+      superTypeSignature = DtoUtility.computeSuperTypeSignatureForFormData(getModelType(), getFormDataAnnotation(), getLocalTypeHierarchy());
 
     }
     return superTypeSignature;
   }
 
-  protected void collectValidationRules() throws CoreException {
+  protected void collectValidationRules(IProgressMonitor monitor) throws CoreException {
     // validation rules
     boolean replaceAnnotationPresent = ScoutTypeUtility.existsReplaceAnnotation(getModelType());
 
@@ -112,10 +124,17 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
       superTypeHasNoFormFieldData = ScoutTypeUtility.getFormDataType(superType, hierarchy) == null;
     }
 
-    final List<ValidationRuleMethod> list = FormDataUtility.getValidationRuleMethods(getModelType(), hierarchy.getJdtHierarchy());
+    final List<ValidationRuleMethod> list = DtoUtility.getValidationRuleMethods(getModelType(), hierarchy.getJdtHierarchy(), monitor);
+    if (monitor.isCanceled()) {
+      return;
+    }
 
     if (list.size() > 0) {
       for (Iterator<ValidationRuleMethod> it = list.iterator(); it.hasNext();) {
+        if (monitor.isCanceled()) {
+          return;
+        }
+
         ValidationRuleMethod vm = it.next();
         if (replaceAnnotationPresent) {
           if (superTypeHasNoFormFieldData && vm.isSkipRule()) {

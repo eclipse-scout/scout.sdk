@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
@@ -24,7 +25,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableSourceBuilder;
-import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
+import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilder;
@@ -48,7 +49,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link TableFieldFormDataSourceBuilder}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
 public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder {
@@ -62,20 +63,24 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
    * @param modelType
    * @param elementName
    */
-  public TableFieldFormDataSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation) {
-    super(modelType, elementName, false);
+  public TableFieldFormDataSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, IProgressMonitor monitor) {
+    super(modelType, elementName, false, monitor);
     m_formDataAnnotation = formDataAnnotation;
-    setup();
+    setup(monitor);
   }
 
   @Override
-  protected void createContent() {
-    super.createContent();
-    collectProperties();
+  protected void createContent(IProgressMonitor monitor) {
+    super.createContent(monitor);
+    collectProperties(monitor);
+    if (monitor.isCanceled()) {
+      return;
+    }
+
     try {
-      IType table = FormDataUtility.findTable(getModelType(), getLocalTypeHierarchy());
+      IType table = DtoUtility.findTable(getModelType(), getLocalTypeHierarchy());
       if (TypeUtility.exists(table)) {
-        visitTable(table);
+        visitTable(table, monitor);
       }
     }
     catch (CoreException e) {
@@ -83,7 +88,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
     }
   }
 
-  protected void visitTable(IType table) throws CoreException {
+  protected void visitTable(IType table, IProgressMonitor monitor) throws CoreException {
     final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn), getLocalTypeHierarchy()), ScoutTypeComparators.getOrderAnnotationComparator());
     final String[] colunmSignatures = new String[columns.length];
     final Map<Integer, String> columnIdMap = new HashMap<Integer, String>();
@@ -99,6 +104,10 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
         fieldBuilder.setValue(Integer.toString(i));
         addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldConstantTableColumnIdKey(fieldBuilder, i), fieldBuilder);
         columnIdMap.put(Integer.valueOf(i), constantColName);
+
+        if (monitor.isCanceled()) {
+          return;
+        }
       }
     }
     for (int i = 0; i < columns.length; i++) {
@@ -141,6 +150,9 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
         ScoutSdk.logWarning("could not add column '" + columns[i].getFullyQualifiedName() + "' to form data.", e);
       }
 
+      if (monitor.isCanceled()) {
+        return;
+      }
     }
     // getColumnCount method
     IMethodSourceBuilder getColumnCountBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getColumnCount");
@@ -151,7 +163,6 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
       // setValueAt method
       IMethodSourceBuilder setValueAtBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "setValueAt");
       setValueAtBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           source.append("  switch(column){").append(lineDelimiter);
@@ -168,13 +179,11 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
           source.append("  }");
         }
       });
-
       addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(setValueAtBuilder), setValueAtBuilder);
 
       // getValueAt method
       IMethodSourceBuilder getValueAtBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getValueAt");
       getValueAtBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           source.append("  switch(column){").append(lineDelimiter);
@@ -187,7 +196,6 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
         }
       });
       addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getValueAtBuilder), getValueAtBuilder);
-
     }
   }
 
@@ -212,7 +220,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
       addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createReplaceAnnotationBuilder());
     }
     if (superTypeSignature == null) {
-      superTypeSignature = FormDataUtility.computeSuperTypeSignatureForFormData(getModelType(), getFormDataAnnotation(), getLocalTypeHierarchy());
+      superTypeSignature = DtoUtility.computeSuperTypeSignatureForFormData(getModelType(), getFormDataAnnotation(), getLocalTypeHierarchy());
 
     }
     return superTypeSignature;

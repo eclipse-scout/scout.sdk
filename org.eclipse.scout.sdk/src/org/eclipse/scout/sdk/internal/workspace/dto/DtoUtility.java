@@ -19,6 +19,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMemberValuePair;
@@ -49,19 +50,19 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 
 /**
- * <h3>{@link FormDataUtility}</h3>
+ * <h3>{@link DtoUtility}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
-public final class FormDataUtility {
+public final class DtoUtility {
 
   private static final Pattern VALIDATION_RULE_PATTERN = Pattern.compile("[@]ValidationRule\\s*[(]\\s*([^)]*value\\s*=)?\\s*([^,)]+)([,][^)]*)?[)]", Pattern.DOTALL);
 
-  private FormDataUtility() {
+  private DtoUtility() {
   }
 
-  public static ITypeSourceBuilder createFormDataSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation) {
+  public static ITypeSourceBuilder createFormDataSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, IProgressMonitor monitor) {
     String superTypeSignature = formDataAnnotation.getSuperTypeSignature();
     if (StringUtility.hasText(superTypeSignature)) {
       IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
@@ -71,14 +72,14 @@ public final class FormDataUtility {
       String formDataTypeName = Signature.getSignatureSimpleName(formDataTypeSignature);
       ITypeSourceBuilder formDataSourceBuilder = null;
       if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableFieldData))) {
-        formDataSourceBuilder = new TableFieldFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation);
+        formDataSourceBuilder = new TableFieldFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation, monitor);
       }
       else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
         // fill table bean
-        formDataSourceBuilder = new TableFieldBeanFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation);
+        formDataSourceBuilder = new TableFieldBeanFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation, monitor);
       }
       else {
-        formDataSourceBuilder = new CompositeFormDataTypeSourceBuilder(modelType, formDataTypeName, formDataAnnotation);
+        formDataSourceBuilder = new CompositeFormDataTypeSourceBuilder(modelType, formDataTypeName, formDataAnnotation, monitor);
       }
       formDataSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("<b>NOTE:</b><br>This class is auto generated, no manual modifications recommended.\n\n@generated"));
       return formDataSourceBuilder;
@@ -86,9 +87,9 @@ public final class FormDataUtility {
     return null;
   }
 
-  public static ITypeSourceBuilder createPageDataSourceBuilder(IType modelType, PageDataAnnotation pageDataAnnotation) {
+  public static ITypeSourceBuilder createPageDataSourceBuilder(IType modelType, PageDataAnnotation pageDataAnnotation, IProgressMonitor monitor) {
     String pageDataSignature = pageDataAnnotation.getPageDataTypeSignature();
-    ITypeSourceBuilder pageDataSourceBuilder = new PageDataSourceBuilder(modelType, Signature.getSignatureSimpleName(pageDataSignature), pageDataAnnotation);
+    ITypeSourceBuilder pageDataSourceBuilder = new PageDataSourceBuilder(modelType, Signature.getSignatureSimpleName(pageDataSignature), pageDataAnnotation, monitor);
     pageDataSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("<b>NOTE:</b><br>This class is auto generated, no manual modifications recommended.\n\n@generated"));
     return pageDataSourceBuilder;
   }
@@ -157,7 +158,7 @@ public final class FormDataUtility {
     return superTypeSignature;
   }
 
-  public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+  public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy, IProgressMonitor monitor) throws JavaModelException {
     IType validationRuleType = TypeUtility.getType(RuntimeClasses.ValidationRule);
     TreeMap<String, ValidationRuleMethod> ruleMap = new TreeMap<String, ValidationRuleMethod>();
     if (superTypeHierarchy == null) {
@@ -183,10 +184,17 @@ public final class FormDataUtility {
     for (int i = 0; i < targetTypes.length; i++) {
       targetMethods[i] = targetTypes[i].getMethods();
     }
+    if (monitor.isCanceled()) {
+      return null;
+    }
 
     HashSet<String> visitedMethodNames = new HashSet<String>();
     for (int i = 0; i < targetTypes.length; i++) {
       for (IMethod annotatedMethod : targetMethods[i]) {
+        if (monitor.isCanceled()) {
+          return null;
+        }
+
         if (!TypeUtility.exists(annotatedMethod)) {
           continue;
         }

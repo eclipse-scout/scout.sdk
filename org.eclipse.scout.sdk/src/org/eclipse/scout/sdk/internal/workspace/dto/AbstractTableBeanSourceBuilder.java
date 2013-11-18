@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
@@ -54,7 +55,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 /**
  * <h3>{@link AbstractTableBeanSourceBuilder}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
 public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSourceBuilder {
@@ -64,17 +65,17 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
   /**
    * @param elementName
    */
-  public AbstractTableBeanSourceBuilder(IType modelType, String elementName, boolean setup) {
-    super(modelType, elementName, setup);
+  public AbstractTableBeanSourceBuilder(IType modelType, String elementName, boolean setup, IProgressMonitor monitor) {
+    super(modelType, elementName, setup, monitor);
   }
 
   @Override
-  protected void createContent() {
-    super.createContent();
+  protected void createContent(IProgressMonitor monitor) {
+    super.createContent(monitor);
     try {
-      IType table = FormDataUtility.findTable(getModelType(), getLocalTypeHierarchy());
+      IType table = DtoUtility.findTable(getModelType(), getLocalTypeHierarchy());
       if (TypeUtility.exists(table)) {
-        visitTableBean(table, getLocalTypeHierarchy());
+        visitTableBean(table, getLocalTypeHierarchy(), monitor);
       }
       else {
         addAbstractMethodImplementations();
@@ -85,7 +86,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     }
   }
 
-  protected IType[] getColumns(IType table, IType rowDataSuperType, ITypeHierarchy fieldHierarchy) throws JavaModelException {
+  protected IType[] getColumns(IType table, IType rowDataSuperType, ITypeHierarchy fieldHierarchy, IProgressMonitor monitor) throws JavaModelException {
     // collect all columns that exist in the table and all of its super classes
     TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<IType>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn)), new ITypeFilter() {
@@ -101,6 +102,9 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
         allColumnsUpTheHierarchy.add(column);
       }
       curTableType = fieldHierarchy.getSuperclass(curTableType);
+      if (monitor.isCanceled()) {
+        return null;
+      }
     }
     while (TypeUtility.exists(curTableType));
 
@@ -118,6 +122,9 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
           }
         }
         currentRowDataSuperType = rowDataHierarchy.getSuperclass(currentRowDataSuperType);
+        if (monitor.isCanceled()) {
+          return null;
+        }
       }
       while (TypeUtility.exists(currentRowDataSuperType) && !RuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getFullyQualifiedName()));
     }
@@ -131,6 +138,9 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
         // the current column is already in a row data of our parent -> we don't need it for us: remove
         allColumnsIterator.remove();
       }
+      if (monitor.isCanceled()) {
+        return null;
+      }
     }
 
     return allColumnsUpTheHierarchy.toArray(new IType[allColumnsUpTheHierarchy.size()]);
@@ -140,7 +150,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     return ScoutUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
   }
 
-  protected void visitTableBean(IType table, ITypeHierarchy fieldHierarchy) throws CoreException {
+  protected void visitTableBean(IType table, ITypeHierarchy fieldHierarchy, IProgressMonitor monitor) throws CoreException {
     // row data super type
     String rowDataSuperClassSig = getTableRowDataSuperClassSignature(table);
     IType rowDataSuperClassType = TypeUtility.getTypeBySignature(rowDataSuperClassSig);
@@ -165,9 +175,17 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     // constructor
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(rowDataName);
     tableRowDataBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+    if (monitor.isCanceled()) {
+      return;
+    }
+
+    // get all columns
+    IType[] columns = getColumns(table, rowDataSuperClassType, fieldHierarchy, monitor);
+    if (monitor.isCanceled()) {
+      return;
+    }
 
     // visit columns
-    IType[] columns = getColumns(table, rowDataSuperClassType, fieldHierarchy);
     for (int i = 0; i < columns.length; i++) {
       IType column = columns[i];
 
@@ -196,6 +214,9 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
       IMethodSourceBuilder setterBuilder = MethodSourceBuilderFactory.createSetter(memberFieldBuilder);
       tableRowDataBuilder.addSortedMethodSourceBuilder(new CompositeObject(SortedMemberKeyFactory.METHOD_PROPERTY_ACCESS, i, 2, setterBuilder), setterBuilder);
 
+      if (monitor.isCanceled()) {
+        return;
+      }
     }
     addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTableKey(tableRowDataBuilder), tableRowDataBuilder);
 
@@ -246,6 +267,9 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
       }
     });
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(addRowMethodBuilder), addRowMethodBuilder);
+    if (monitor.isCanceled()) {
+      return;
+    }
 
     // addRow(int state)
     IMethodSourceBuilder addRowWithStateMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "addRow", new IMethodFilter() {

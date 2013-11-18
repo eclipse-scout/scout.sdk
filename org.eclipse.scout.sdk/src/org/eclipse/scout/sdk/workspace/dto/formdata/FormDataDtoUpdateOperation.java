@@ -8,13 +8,14 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.internal.workspace.dto;
+package org.eclipse.scout.sdk.workspace.dto.formdata;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
@@ -22,13 +23,12 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
-import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link FormDataDtoUpdateOperation}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 16.08.2013
  */
 public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
@@ -73,10 +73,16 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
     FormDataAnnotation formDataAnnotation = getFormDataAnnotation();
 
     // collect all source builders for the whole form data.
-    ITypeSourceBuilder formDataSourceBuilder = FormDataUtility.createFormDataSourceBuilder(getModelType(), formDataAnnotation);
+    ITypeSourceBuilder formDataSourceBuilder = DtoUtility.createFormDataSourceBuilder(getModelType(), formDataAnnotation, monitor);
+    if (monitor.isCanceled()) {
+      return null;
+    }
 
     IType formDataType = ensureDerivedType();
     if (!TypeUtility.exists(formDataType)) {
+      return null;
+    }
+    if (monitor.isCanceled()) {
       return null;
     }
     ICompilationUnit formDataIcu = formDataType.getCompilationUnit();
@@ -89,10 +95,17 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
 
     // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
     consumeAllTypeNamesRec(formDataSourceBuilder, validator);
+    if (monitor.isCanceled()) {
+      return null;
+    }
 
     // create source code
     StringBuilder sourceBuilder = new StringBuilder();
     cuSourceBuilder.createSource(sourceBuilder, ResourceUtility.getLineSeparator(formDataIcu), formDataIcu.getJavaProject(), validator);
+    if (monitor.isCanceled()) {
+      return null;
+    }
+
     return sourceBuilder.toString();
   }
 }

@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
@@ -32,7 +33,6 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.MethodComparators;
 import org.eclipse.scout.sdk.util.type.MethodFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 /**
  * Page representing a service implementation
@@ -54,7 +54,7 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
   @Override
   public void unloadPage() {
     if (m_serviceMethodListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeMethodChangedListener(getType(), m_serviceMethodListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeMethodChangedListener(getType(), m_serviceMethodListener);
       m_serviceMethodListener = null;
     }
     super.unloadPage();
@@ -67,7 +67,7 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
     }
     if (m_serviceMethodListener == null) {
       m_serviceMethodListener = new P_ServiceMethodsListener();
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getType(), m_serviceMethodListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addMethodChangedListener(getType(), m_serviceMethodListener);
     }
     IMethod[] serviceMethods = TypeUtility.getMethods(getType(), MethodFilters.getFlagsFilter(Flags.AccPublic), MethodComparators.getNameComparator());
 

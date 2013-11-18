@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -27,7 +28,6 @@ import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -68,7 +68,7 @@ public class TablePageChildPageTablePage extends AbstractPage {
       m_iPageTypeHierarchy = null;
     }
     if (m_methodListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeMethodChangedListener(getTablePageType(), m_methodListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeMethodChangedListener(getTablePageType(), m_methodListener);
       m_methodListener = null;
     }
     super.unloadPage();
@@ -83,7 +83,7 @@ public class TablePageChildPageTablePage extends AbstractPage {
     }
     if (m_methodListener == null) {
       m_methodListener = new P_MethodListener();
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getTablePageType(), m_methodListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addMethodChangedListener(getTablePageType(), m_methodListener);
     }
     IMethod createChildPageMethod = TypeUtility.getMethod(getTablePageType(), PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE);
     if (TypeUtility.exists(createChildPageMethod)) {

@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
@@ -36,7 +37,6 @@ import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.osgi.framework.Constants;
@@ -213,7 +213,7 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
      * Can be removed when InstallJavaFileOperation has been removed.
      */
     try {
-      for (IPrimaryTypeTypeHierarchy h : TypeCacheAccessor.getHierarchyCache().getAllCachedHierarchies()) {
+      for (IPrimaryTypeTypeHierarchy h : ScoutSdkCore.getHierarchyCache().getAllCachedHierarchies()) {
         h.invalidate();
       }
     }

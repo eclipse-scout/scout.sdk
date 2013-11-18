@@ -21,7 +21,6 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
@@ -50,6 +49,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataDtoUpdateOperation;
 
 /**
  * <h3>{@link SingleFormTemplateOperation}</h3> ...

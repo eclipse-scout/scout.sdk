@@ -8,17 +8,18 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.internal.workspace.dto;
+package org.eclipse.scout.sdk.workspace.dto;
 
-import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.operation.IOperation;
 
 /**
- * <h3>{@link IDtoAutoUpdateHandler}</h3>
+ * <h3>{@link IDtoAutoUpdateOperation}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.10.0 16.08.2013
  */
-public interface IDtoAutoUpdateHandler {
+public interface IDtoAutoUpdateOperation extends IOperation {
 
-  IDtoAutoUpdateOperation createUpdateOperation(DtoUpdateProperties properties) throws CoreException;
+  IType getModelType();
 }

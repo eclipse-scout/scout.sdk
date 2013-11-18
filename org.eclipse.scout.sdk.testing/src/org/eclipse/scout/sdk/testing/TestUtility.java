@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.testing.internal.SdkTestingApi;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.ui.preferences.ScopedPreferenceStore;
@@ -129,6 +129,6 @@ public final class TestUtility {
    *          true for auto update, false to disable.
    */
   public static void setAutoUpdateDto(boolean autoUpdate) {
-    ScoutSdk.getDefault().setDtoAutoUpdate(autoUpdate);
+    ScoutSdkCore.getDtoAutoUpdateManager().setEnabled(autoUpdate);
   }
 }

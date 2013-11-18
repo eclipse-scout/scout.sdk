@@ -15,10 +15,10 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractDtoUpdateHandler;
-import org.eclipse.scout.sdk.internal.workspace.dto.DtoUpdateProperties;
-import org.eclipse.scout.sdk.internal.workspace.dto.IDtoAutoUpdateOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.dto.DtoUpdateProperties;
+import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateOperation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataDtoUpdateOperation;
 

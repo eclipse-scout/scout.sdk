@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
@@ -29,7 +30,6 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 public class TabBoxNodePage extends AbstractFormFieldNodePage {
@@ -51,7 +51,7 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
   @Override
   public void unloadPage() {
     if (m_innerTypeListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_innerTypeListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
     super.unloadPage();
@@ -61,7 +61,7 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
   protected void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormField);
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
     new KeyStrokeTablePage(this, getType());
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType());

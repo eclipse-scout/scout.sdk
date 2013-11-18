@@ -27,6 +27,7 @@ import org.eclipse.jdt.launching.IVMInstall;
 import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.pde.internal.core.ICoreConstants;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -35,7 +36,6 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 @SuppressWarnings("restriction")
 public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
@@ -132,7 +132,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
      * Can be removed when InstallJavaFileOperation has been removed.
      */
     try {
-      for (IPrimaryTypeTypeHierarchy h : TypeCacheAccessor.getHierarchyCache().getAllCachedHierarchies()) {
+      for (IPrimaryTypeTypeHierarchy h : ScoutSdkCore.getHierarchyCache().getAllCachedHierarchies()) {
         h.invalidate();
       }
     }

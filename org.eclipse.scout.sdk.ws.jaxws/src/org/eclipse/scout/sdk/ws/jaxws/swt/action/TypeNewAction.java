@@ -29,11 +29,11 @@ import org.eclipse.jdt.internal.corext.template.java.SignatureUtil;
 import org.eclipse.jdt.ui.actions.OpenNewClassWizardAction;
 import org.eclipse.jdt.ui.wizards.NewClassWizardPage;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -114,7 +114,7 @@ public abstract class TypeNewAction extends AbstractLinkAction {
 
     m_createdType = page.getCreatedType();
     if (TypeUtility.exists(m_createdType)) {
-      IWorkingCopyManager level = TypeCacheAccessor.createWorkingCopyManger();
+      IWorkingCopyManager level = ScoutSdkCore.createWorkingCopyManger();
       try {
         level.register(m_createdType.getCompilationUnit(), new NullProgressMonitor());
         TypeUtility.getType(m_createdType.getFullyQualifiedName());

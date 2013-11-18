@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -21,7 +22,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -43,7 +43,7 @@ public class MenuTablePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     if (m_menuChangedListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_menuChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_menuChangedListener);
       m_menuChangedListener = null;
     }
   }
@@ -70,7 +70,7 @@ public class MenuTablePage extends AbstractPage {
     if (m_menuChangedListener == null) {
       IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
       m_menuChangedListener = new InnerTypePageDirtyListener(this, iMenuType);
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_menuChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_menuChangedListener);
     }
     IType[] menues = ScoutTypeUtility.getMenus(getDeclaringType());
     for (IType menu : menues) {

@@ -13,9 +13,9 @@ package org.eclipse.scout.sdk.internal.test.operation.formdata;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
+import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataDtoUpdateOperation;
 import org.junit.Test;
 
 /**

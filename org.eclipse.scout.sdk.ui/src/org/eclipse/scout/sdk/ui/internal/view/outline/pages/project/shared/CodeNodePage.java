@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
@@ -23,7 +24,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
@@ -51,7 +51,7 @@ public class CodeNodePage extends AbstractScoutTypePage {
   public void unloadPage() {
     super.unloadPage();
     if (m_innerTypeListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_innerTypeListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
   }
@@ -61,7 +61,7 @@ public class CodeNodePage extends AbstractScoutTypePage {
     if (m_innerTypeListener == null) {
       IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iCode);
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
 
     IType[] codes = ScoutTypeUtility.getCodes(getType());

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.attribute;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -21,7 +22,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -59,7 +59,7 @@ public class AttributeTablePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     if (m_attributeChangedListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_attributeChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_attributeChangedListener);
       m_attributeChangedListener = null;
     }
   }
@@ -68,7 +68,7 @@ public class AttributeTablePage extends AbstractPage {
   protected void loadChildrenImpl() {
     if (m_attributeChangedListener == null) {
       m_attributeChangedListener = new InnerTypePageDirtyListener(this, iDataModelAttribute);
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_attributeChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_attributeChangedListener);
     }
     for (IType attribute : ScoutTypeUtility.getDataModelAttributes(getDeclaringType())) {
       new AttributeNodePage(this, attribute);

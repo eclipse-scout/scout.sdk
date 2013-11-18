@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.RunnableWithData;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.CompilationUnitSaveOperation;
@@ -68,7 +69,6 @@ import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodP
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
@@ -223,7 +223,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
 
     if (m_methodChangedListener == null) {
       m_methodChangedListener = new P_MethodChangedListener();
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_methodChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_methodChangedListener);
     }
 
     try {
@@ -266,7 +266,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   @Override
   protected void cleanup() {
     if (m_methodChangedListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(m_methodChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(m_methodChangedListener);
       m_methodChangedListener = null;
     }
     super.cleanup();

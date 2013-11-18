@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.workspace.dto;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
@@ -22,7 +23,6 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.internal.workspace.dto.IDtoAutoUpdateOperation;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
@@ -44,7 +44,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link AbstractDtoAutoUpdateOperation}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 16.08.2013
  */
 public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOperation {
@@ -102,20 +102,34 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
 
     if (TypeUtility.exists(derivedType)) {
       String oldSource = derivedType.getCompilationUnit().getSource();
+      if (monitor.isCanceled()) {
+        return;
+      }
+
       String newSource = createDerivedTypeSource(monitor);
+      if (newSource == null || monitor.isCanceled()) {
+        return;
+      }
 
       // format source
       SourceFormatOperation op = new SourceFormatOperation(derivedType.getJavaProject(), new Document(newSource), null);
       op.validate();
       op.run(monitor, null);
       newSource = op.getDocument().get();
+      if (monitor.isCanceled()) {
+        return;
+      }
 
       // compare
       if (!isSourceEquals(oldSource, newSource)) {
         // write source
         P_FormDataStoreOperation storeOp = new P_FormDataStoreOperation(getModelType(), derivedType.getCompilationUnit(), newSource);
+        if (monitor.isCanceled()) {
+          return;
+        }
+
         if (workingCopyManager != null) {
-          storeOp.run(monitor, workingCopyManager);
+          storeOp.run(new NullProgressMonitor(), workingCopyManager);
         }
         else {
           OperationJob job = new OperationJob(storeOp);

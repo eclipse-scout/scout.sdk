@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -21,7 +22,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -52,7 +52,7 @@ public class KeyStrokeTablePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     if (m_keystrokeChangedListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_keystrokeChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_keystrokeChangedListener);
       m_keystrokeChangedListener = null;
     }
   }
@@ -62,7 +62,7 @@ public class KeyStrokeTablePage extends AbstractPage {
     if (m_keystrokeChangedListener == null) {
       IType iKeyStrokeType = TypeUtility.getType(RuntimeClasses.IKeyStroke);
       m_keystrokeChangedListener = new InnerTypePageDirtyListener(this, iKeyStrokeType);
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_keystrokeChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_keystrokeChangedListener);
     }
     for (IType keyStroke : ScoutTypeUtility.getKeyStrokes(getDeclaringType())) {
       KeyStrokeNodePage childPage = new KeyStrokeNodePage();

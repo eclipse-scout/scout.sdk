@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.internal.workspace.dto;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -41,7 +42,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link AbstractDtoTypeSourceBuilder}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
 public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
@@ -49,25 +50,25 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
   private IType m_modelType;
   private ITypeHierarchy m_localTypeHierarchy;
 
-  public AbstractDtoTypeSourceBuilder(IType modelType, String elementName) {
-    this(modelType, elementName, true);
+  public AbstractDtoTypeSourceBuilder(IType modelType, String elementName, IProgressMonitor monitor) {
+    this(modelType, elementName, true, monitor);
   }
 
   /**
    * @param elementName
    */
-  public AbstractDtoTypeSourceBuilder(IType modelType, String elementName, boolean setup) {
+  public AbstractDtoTypeSourceBuilder(IType modelType, String elementName, boolean setup, IProgressMonitor monitor) {
     super(elementName);
     m_modelType = modelType;
     m_localTypeHierarchy = TypeUtility.getLocalTypeHierarchy(modelType);
     if (setup) {
-      setup();
+      setup(monitor);
     }
   }
 
-  protected void setup() {
+  protected void setup(IProgressMonitor monitor) {
     setupBuilder();
-    createContent();
+    createContent(monitor);
   }
 
   /**
@@ -93,11 +94,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
     }
   }
 
-  /**
-   *
-   */
-  protected void createContent() {
-
+  protected void createContent(IProgressMonitor monitor) {
     // constructor
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
@@ -105,7 +102,6 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
     // serial version uid
     IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
     addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
-
   }
 
   /**
@@ -121,11 +117,16 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
     return m_localTypeHierarchy;
   }
 
-  protected void collectProperties() {
+  protected void collectProperties(IProgressMonitor monitor) {
     IPropertyBean[] beanPropertyDescriptors = TypeUtility.getPropertyBeans(getModelType(), ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
     if (beanPropertyDescriptors != null) {
       for (IPropertyBean desc : beanPropertyDescriptors) {
         try {
+
+          if (monitor.isCanceled()) {
+            return;
+          }
+
           if (desc.getReadMethod() != null || desc.getWriteMethod() != null) {
             if (FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getReadMethod())) &&
                 FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getWriteMethod()))) {

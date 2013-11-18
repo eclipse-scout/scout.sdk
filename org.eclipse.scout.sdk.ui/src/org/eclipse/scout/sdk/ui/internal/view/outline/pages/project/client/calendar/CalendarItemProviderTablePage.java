@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.calendar;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -22,7 +23,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypeOrderChangedPageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -43,11 +43,11 @@ public class CalendarItemProviderTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_innerTypeListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
     if (m_orderChangedListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(m_orderChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(m_orderChangedListener);
       m_orderChangedListener = null;
     }
     super.unloadPage();
@@ -69,11 +69,11 @@ public class CalendarItemProviderTablePage extends AbstractPage {
 
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iCalendarItemProvider);
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getCalendarType(), m_innerTypeListener);
     }
     if (m_orderChangedListener == null) {
       m_orderChangedListener = new InnerTypeOrderChangedPageDirtyListener(this, iCalendarItemProvider, getCalendarType());
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_orderChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_orderChangedListener);
     }
 
     IType[] innerTypes = ScoutTypeUtility.getCalendarItemProviders(getCalendarType());

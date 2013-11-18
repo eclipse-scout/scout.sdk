@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -107,7 +106,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     IType superType = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
     if (superType == null) return null;
 
-    IType[] serviceImpls = TypeCacheAccessor.getHierarchyCache().getPrimaryTypeHierarchy(superType).getAllSubtypes(superType, new ITypeFilter() {
+    IType[] serviceImpls = ScoutSdkCore.getHierarchyCache().getPrimaryTypeHierarchy(superType).getAllSubtypes(superType, new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
         try {
@@ -207,7 +206,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   private static boolean isDocsService(IType service) throws JavaModelException {
     String docsInterfaceClassName = RuntimeClasses.IDocumentationTextProviderService.substring(RuntimeClasses.IDocumentationTextProviderService.lastIndexOf('.') + 1);
-    TypeHierarchy th = TypeCacheAccessor.getHierarchyCache().getSuperHierarchy(service);
+    TypeHierarchy th = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(service);
     for (IType ifs : th.getAllSuperInterfaces(service)) {
       if (docsInterfaceClassName.equals(ifs.getElementName())) {
         return true;

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -21,7 +22,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 /**
  * <h3>FormHandlersTablePage</h3> ...
@@ -41,7 +41,7 @@ public class FormHandlerTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_innerTypeListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getFormType(), m_innerTypeListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getFormType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
     super.unloadPage();
@@ -63,7 +63,7 @@ public class FormHandlerTablePage extends AbstractPage {
 
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormHandler);
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getFormType(), m_innerTypeListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getFormType(), m_innerTypeListener);
     }
     for (IType formHandlerType : TypeUtility.getInnerTypesOrdered(getFormType(), iFormHandler, TypeComparators.getTypeNameComparator())) {
       new FormHandlerNodePage(this, formHandlerType);

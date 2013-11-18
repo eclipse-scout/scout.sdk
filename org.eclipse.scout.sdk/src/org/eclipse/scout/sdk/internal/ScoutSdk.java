@@ -13,12 +13,12 @@ package org.eclipse.scout.sdk.internal;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.commons.TuningUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoAutoUpdateManager;
-import org.eclipse.scout.sdk.internal.workspace.dto.FormDataDtoUpdateHandler;
+import org.eclipse.scout.sdk.internal.workspace.dto.formdata.FormDataDtoUpdateHandler;
 import org.eclipse.scout.sdk.internal.workspace.dto.pagedata.PageDataAutoUpdateHandler;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.osgi.framework.BundleContext;
 
 /**
@@ -40,10 +40,10 @@ public class ScoutSdk extends Plugin {
     plugin = this;
     logManager = new SdkLogManager(this);
 
-    // ensure the caches and emitter are initialized.
-    TypeCacheAccessor.getHierarchyCache();
-    TypeCacheAccessor.getTypeCache();
-    TypeCacheAccessor.getJavaResourceChangedEmitter();
+    // ensure the caches and emitters are initialized.
+    ScoutSdkCore.getHierarchyCache();
+    ScoutSdkCore.getTypeCache();
+    ScoutSdkCore.getJavaResourceChangedEmitter();
 
     logInfo("Starting SCOUT SDK Plugin.");
 
@@ -57,9 +57,9 @@ public class ScoutSdk extends Plugin {
     TuningUtility.finishAll();
     m_autoUpdateManager.dispose();
     ScoutWorkspace.getInstance().dispose();
-    TypeCacheAccessor.getHierarchyCache().dispose();
-    TypeCacheAccessor.getTypeCache().dispose();
-    TypeCacheAccessor.getJavaResourceChangedEmitter().dispose();
+    ScoutSdkCore.getHierarchyCache().dispose();
+    ScoutSdkCore.getTypeCache().dispose();
+    ScoutSdkCore.getJavaResourceChangedEmitter().dispose();
 
     m_autoUpdateManager = null;
     logManager = null;
@@ -132,11 +132,12 @@ public class ScoutSdk extends Plugin {
     logManager.log(status);
   }
 
-  public void setDtoAutoUpdate(boolean autoUpdate) {
-    m_autoUpdateManager.setEnabled(autoUpdate);
-  }
-
-  public boolean isDtoAutoUpdate() {
-    return m_autoUpdateManager.isEnabled();
+  /**
+   * gets the DTO auto update manager
+   * 
+   * @return the manager instance or null if this plug-in has not yet been started.
+   */
+  public DtoAutoUpdateManager getAutoUpdateManager() {
+    return m_autoUpdateManager;
   }
 }

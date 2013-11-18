@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link FormFieldNewOperation}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 06.03.2013
  */
 public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
@@ -60,7 +60,7 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
         TypeFilters.getTopLevelTypeFilter()));
 
     if (TypeUtility.exists(form)) {
-      InnerTypeGetterCreateOperation getterMethodOp = new InnerTypeGetterCreateOperation(getCreatedType(), form, isFormatSource());
+      InnerTypeGetterCreateOperation getterMethodOp = new InnerTypeGetterCreateOperation(getCreatedType(), form, false /* do not pass the formatting in -> performance */);
       IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form);
       IJavaElement sibling = sourceHelper.getSiblingMethodFieldGetter("get" + getElementName());
       if (sibling == null && getCreatedType().getDeclaringType().equals(form)) {
@@ -69,6 +69,7 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
       getterMethodOp.setSibling(sibling);
       getterMethodOp.validate();
       getterMethodOp.run(monitor, manager);
+
       m_createdFieldGetterMethod = getterMethodOp.getCreatedMethod();
     }
   }
@@ -76,5 +77,4 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
   public IMethod getCreatedFieldGetterMethod() {
     return m_createdFieldGetterMethod;
   }
-
 }

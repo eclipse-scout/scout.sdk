@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.entity;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -21,7 +22,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -58,7 +58,7 @@ public class EntityTablePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     if (m_entityChangedListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
       m_entityChangedListener = null;
     }
   }
@@ -68,7 +68,7 @@ public class EntityTablePage extends AbstractPage {
     if (m_entityChangedListener == null) {
       IType iComposerEntity = TypeUtility.getType(RuntimeClasses.IComposerEntity);
       m_entityChangedListener = new InnerTypePageDirtyListener(this, iComposerEntity);
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
     }
     for (IType entity : ScoutTypeUtility.getDataModelEntities(getDeclaringType())) {
       new EntityNodePage(this, entity);

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.internal.workspace.dto;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -20,7 +21,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 /**
  * <h3>{@link AbstractTableSourceBuilder}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
 public abstract class AbstractTableSourceBuilder extends AbstractDtoTypeSourceBuilder {
@@ -30,8 +31,8 @@ public abstract class AbstractTableSourceBuilder extends AbstractDtoTypeSourceBu
    * @param elementName
    * @param setup
    */
-  public AbstractTableSourceBuilder(IType modelType, String elementName, boolean setup) {
-    super(modelType, elementName, setup);
+  public AbstractTableSourceBuilder(IType modelType, String elementName, boolean setup, IProgressMonitor monitor) {
+    super(modelType, elementName, setup, monitor);
   }
 
   protected String getColumnSignature(IType type, ITypeHierarchy columnHierarchy) throws IllegalArgumentException, CoreException {

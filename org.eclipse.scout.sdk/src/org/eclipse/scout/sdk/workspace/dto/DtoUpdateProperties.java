@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.internal.workspace.dto;
+package org.eclipse.scout.sdk.workspace.dto;
 
 import java.util.HashMap;
 import java.util.Map;

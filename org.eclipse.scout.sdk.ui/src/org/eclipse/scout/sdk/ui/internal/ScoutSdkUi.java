@@ -10,10 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal;
 
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ColorRegistry;
@@ -24,8 +28,9 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
-import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.internal.workspace.dto.DtoAutoUpdateManager;
 import org.eclipse.scout.sdk.operation.util.IOrganizeImportService;
 import org.eclipse.scout.sdk.service.IMessageBoxService;
 import org.eclipse.scout.sdk.sourcebuilder.comment.IJavaElementCommentBuilderService;
@@ -47,6 +52,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IViewPart;
+import org.eclipse.ui.IWorkbench;
+import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.PartInitException;
@@ -59,25 +66,21 @@ import org.osgi.framework.ServiceRegistration;
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("restriction")
 public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   // The plug-in ID
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.ui";
-  public static final String LOG_LEVEL = PLUGIN_ID + ".loglevel";
 
-  // The shared instance
-  private static ScoutSdkUi plugin;
-  private static SdkLogManager logManager;
-
-  public static final String PROPERTY_RELEASE_NOTES = PLUGIN_ID + ".releaseNotes";
-
-  private static final String IMAGE_PATH = "resources/icons/";
-
-  // COLORS
+  // Colors
   public static final String COLOR_INACTIVE_FOREGROUND = "inactiveForeground";
 
-  // FONTS
+  // Fonts
   public static final String FONT_SYSTEM_BOLD = "fontSystemBold";
+
+  // Icons
+  private static final String IMAGE_PATH = "resources/icons/";
+
+  private static ScoutSdkUi plugin;
+  private static SdkLogManager logManager;
 
   private ColorRegistry m_colorRegistry;
   private FontRegistry m_fontRegistry;
@@ -85,6 +88,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   private ServiceRegistration<IMessageBoxService> m_messageBoxServiceRegistration;
   private IPropertyChangeListener m_preferencesPropertyListener;
   private ServiceRegistration<IJavaElementCommentBuilderService> m_javaElementCommentBuilderService;
+  private IWorkbenchListener m_shutdownListener;
 
   /**
    * The constructor
@@ -114,21 +118,39 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
 
     getPreferenceStore().setDefault(IDtoAutoUpdateManager.PROP_AUTO_UPDATE, true);
-    ScoutSdk.getDefault().setDtoAutoUpdate(getPreferenceStore().getBoolean(IDtoAutoUpdateManager.PROP_AUTO_UPDATE));
+    ScoutSdkCore.getDtoAutoUpdateManager().setEnabled(getPreferenceStore().getBoolean(IDtoAutoUpdateManager.PROP_AUTO_UPDATE));
 
     getPreferenceStore().setDefault(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE, false);
     DefaultTargetPackage.setIsPackageConfigurationEnabled(!getPreferenceStore().getBoolean(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE));
+
+    m_shutdownListener = new IWorkbenchListener() {
+      @Override
+      public boolean preShutdown(IWorkbench workbench, boolean forced) {
+        new P_AutoUpdateOperationsShutdownJob().schedule();
+        return true;
+      }
+
+      @Override
+      public void postShutdown(IWorkbench workbench) {
+      }
+    };
+    PlatformUI.getWorkbench().addWorkbenchListener(m_shutdownListener);
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
-    logManager = null;
-    plugin = null;
+    PlatformUI.getWorkbench().removeWorkbenchListener(m_shutdownListener);
+
     if (m_preferencesPropertyListener != null) {
       getPreferenceStore().removePropertyChangeListener(m_preferencesPropertyListener);
       m_preferencesPropertyListener = null;
     }
+
+    logManager = null;
+    plugin = null;
+
     super.stop(context);
+
     if (m_organizeImportServiceRegistration != null) {
       m_organizeImportServiceRegistration.unregister();
       m_organizeImportServiceRegistration = null;
@@ -486,6 +508,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     getDefault().showJavaElementInEditorImpl(e, createNew);
   }
 
+  @SuppressWarnings("restriction")
   private void showJavaElementInEditorImpl(IJavaElement e, boolean createNew) {
     try {
       IEditorPart editor = null;
@@ -493,7 +516,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
         editor = JavaUI.openInEditor(e);
       }
       else {
-        editor = EditorUtility.isOpenInEditor(e);
+        editor = org.eclipse.jdt.internal.ui.javaeditor.EditorUtility.isOpenInEditor(e);
         if (editor != null) {
           PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().activate(editor);
         }
@@ -519,7 +542,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     public void propertyChange(PropertyChangeEvent event) {
       if (IDtoAutoUpdateManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
         Boolean autoUpdate = (Boolean) event.getNewValue();
-        ScoutSdk.getDefault().setDtoAutoUpdate(autoUpdate);
+        ScoutSdkCore.getDtoAutoUpdateManager().setEnabled(autoUpdate);
       }
       else if (DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE.equals(event.getProperty())) {
         Boolean useLegacy = (Boolean) event.getNewValue();
@@ -527,6 +550,42 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
           DefaultTargetPackage.setIsPackageConfigurationEnabled(!useLegacy.booleanValue());
         }
       }
+    }
+  }
+
+  private final static class P_AutoUpdateOperationsShutdownJob extends Job {
+    private P_AutoUpdateOperationsShutdownJob() {
+      super("Waiting until all derived resources have been updated...");
+      setUser(true);
+
+      // ensures the shutdown is blocked until update is complete or the user decides to cancel
+      setRule(ResourcesPlugin.getWorkspace().getRoot());
+    }
+
+    @Override
+    protected IStatus run(IProgressMonitor monitor) {
+      Job[] dtoUpdateJobs = null;
+      while (!monitor.isCanceled()) {
+        dtoUpdateJobs = getJobManager().find(DtoAutoUpdateManager.AUTO_UPDATE_JOB_FAMILY);
+        if (dtoUpdateJobs.length < 1) {
+          // no job is running -> finish
+          return Status.OK_STATUS;
+        }
+        try {
+          Thread.sleep(2000);
+        }
+        catch (InterruptedException e) {
+        }
+      }
+
+      // the dto job should be cancelled
+      if (dtoUpdateJobs != null && dtoUpdateJobs.length > 0) {
+        for (Job j : dtoUpdateJobs) {
+          j.cancel(); // will cancel as soon as possible
+        }
+      }
+
+      return Status.CANCEL_STATUS;
     }
   }
 }

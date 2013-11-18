@@ -17,9 +17,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.TuningUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 public abstract class AbstractWorkspaceBlockingJob extends Job {
 
@@ -57,7 +57,7 @@ public abstract class AbstractWorkspaceBlockingJob extends Job {
   }
 
   private final IStatus doRun(IProgressMonitor monitor) {
-    IWorkingCopyManager workingCopyManager = TypeCacheAccessor.createWorkingCopyManger();
+    IWorkingCopyManager workingCopyManager = ScoutSdkCore.createWorkingCopyManger();
     try {
       try {
         validate();

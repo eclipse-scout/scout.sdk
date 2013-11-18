@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -24,7 +25,6 @@ import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -64,7 +64,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_methodListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeMethodChangedListener(getDesktopType(), m_methodListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeMethodChangedListener(getDesktopType(), m_methodListener);
       m_methodListener = null;
     }
     if (m_outlineTypeHierarchy != null) {
@@ -84,7 +84,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
     }
     if (m_methodListener == null) {
       m_methodListener = new P_MethodListener();
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getDesktopType(), m_methodListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addMethodChangedListener(getDesktopType(), m_methodListener);
     }
     try {
       IMethod outlinesMethod = TypeUtility.getMethod(getDesktopType(), GET_CONFIGURED_OUTLINES);

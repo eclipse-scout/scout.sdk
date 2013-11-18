@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty;
 
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -26,7 +27,6 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.PropertyBeanComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutPropertyBeanFilters;
 
 /**
@@ -47,7 +47,7 @@ public class BeanPropertyTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_methodChangedListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeMethodChangedListener(getDeclaringType(), m_methodChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeMethodChangedListener(getDeclaringType(), m_methodChangedListener);
     }
     super.unloadPage();
   }
@@ -73,7 +73,7 @@ public class BeanPropertyTablePage extends AbstractPage {
   public void loadChildrenImpl() {
     if (m_methodChangedListener == null) {
       m_methodChangedListener = new P_MethodChangedListener();
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getDeclaringType(), m_methodChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addMethodChangedListener(getDeclaringType(), m_methodChangedListener);
     }
     IPropertyBean[] beans = TypeUtility.getPropertyBeans(getDeclaringType(), ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
     for (IPropertyBean bean : beans) {

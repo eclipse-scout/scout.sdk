@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
@@ -23,7 +24,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
 public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
 
@@ -42,7 +42,7 @@ public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
   @Override
   public void unloadPage() {
     if (m_innerTypeListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_innerTypeListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_innerTypeListener);
       m_innerTypeListener = null;
     }
     super.unloadPage();
@@ -52,7 +52,7 @@ public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, abstractComposerField_tree);
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
     new KeyStrokeTablePage(this, getType());
     // find tree

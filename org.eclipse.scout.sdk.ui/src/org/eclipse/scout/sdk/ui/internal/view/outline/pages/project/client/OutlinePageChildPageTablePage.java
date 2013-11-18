@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -26,7 +27,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -61,7 +61,7 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_methodListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeMethodChangedListener(getOutlineType(), m_methodListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeMethodChangedListener(getOutlineType(), m_methodListener);
     }
     super.unloadPage();
   }
@@ -70,7 +70,7 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
   protected void loadChildrenImpl() {
     if (m_methodListener == null) {
       m_methodListener = new P_MethodListener();
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addMethodChangedListener(getOutlineType(), m_methodListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addMethodChangedListener(getOutlineType(), m_methodListener);
     }
     IMethod createChildPagesMethod = TypeUtility.getMethod(getOutlineType(), NodePageChildPageTablePage.EXEC_CREATE_CHILD_PAGES);
     if (TypeUtility.exists(createChildPagesMethod)) {

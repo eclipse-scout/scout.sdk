@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
-import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
+import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
@@ -22,7 +23,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link TableFieldBeanFormDataSourceBuilder}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
 public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSourceBuilder {
@@ -34,16 +35,16 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
    * @param elementName
    * @param setup
    */
-  public TableFieldBeanFormDataSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation) {
-    super(modelType, elementName, false);
+  public TableFieldBeanFormDataSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, IProgressMonitor monitor) {
+    super(modelType, elementName, false, monitor);
     m_formDataAnnotation = formDataAnnotation;
-    setup();
+    setup(monitor);
   }
 
   @Override
-  protected void createContent() {
-    super.createContent();
-    collectProperties();
+  protected void createContent(IProgressMonitor monitor) {
+    super.createContent(monitor);
+    collectProperties(monitor);
   }
 
   @Override
@@ -58,7 +59,7 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
       addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createReplaceAnnotationBuilder());
     }
     if (superTypeSignature == null) {
-      superTypeSignature = FormDataUtility.computeSuperTypeSignatureForFormData(getModelType(), getFormDataAnnotation(), getLocalTypeHierarchy());
+      superTypeSignature = DtoUtility.computeSuperTypeSignatureForFormData(getModelType(), getFormDataAnnotation(), getLocalTypeHierarchy());
 
     }
     return superTypeSignature;

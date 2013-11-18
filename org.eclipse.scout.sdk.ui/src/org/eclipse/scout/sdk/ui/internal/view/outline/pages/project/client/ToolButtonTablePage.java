@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -21,7 +22,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 /**
@@ -62,7 +62,7 @@ public class ToolButtonTablePage extends AbstractPage {
   public void unloadPage() {
     super.unloadPage();
     if (m_toolButtonChangedListener != null) {
-      TypeCacheAccessor.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_toolButtonChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getDeclaringType(), m_toolButtonChangedListener);
       m_toolButtonChangedListener = null;
     }
   }
@@ -73,7 +73,7 @@ public class ToolButtonTablePage extends AbstractPage {
 
     if (m_toolButtonChangedListener == null) {
       m_toolButtonChangedListener = new InnerTypePageDirtyListener(this, iToolButton);
-      TypeCacheAccessor.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_toolButtonChangedListener);
+      ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_toolButtonChangedListener);
     }
     for (IType toolbutton : TypeUtility.getInnerTypesOrdered(getDeclaringType(), iToolButton, ScoutTypeComparators.getOrderAnnotationComparator())) {
       new ToolButtonNodePage(this, toolbutton);

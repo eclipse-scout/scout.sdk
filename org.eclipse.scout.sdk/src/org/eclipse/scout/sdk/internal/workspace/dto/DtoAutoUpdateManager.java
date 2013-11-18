@@ -39,15 +39,19 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.dto.DtoUpdateProperties;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateEventFilter;
+import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateHandler;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateManager;
+import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateOperation;
 
 /**
  * <h3>{@link DtoAutoUpdateManager}</h3>
  * 
  * @author Matthias Villiger
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 15.08.2013
  */
 public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
@@ -74,7 +78,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     m_enabled = new AtomicBoolean();
     m_updateHandlers = new ArrayList<IDtoAutoUpdateHandler>();
 
-    m_resourceChangeEventsToCheck = new ArrayBlockingQueue<IResourceChangeEvent>(1000, true);
+    m_resourceChangeEventsToCheck = new ArrayBlockingQueue<IResourceChangeEvent>(5000, true);
     m_dtoUpdateOperations = new ArrayBlockingQueue<IDtoAutoUpdateOperation>(2000, true);
 
     m_autoUpdateJob = new P_AutoUpdateOperationsJob(m_dtoUpdateOperations);
@@ -87,23 +91,18 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
    */
   public void dispose() {
     setEnabled(false);
+
+    // wait until all form datas have been generated. otherwise the user ends up with invalid form datas.
+    // the user still can cancel the job if desired.
+    JdtUtility.waitForJobFamily(AUTO_UPDATE_JOB_FAMILY);
   }
 
-  /**
-   * Adds a update handler to resolve the necessary operations for a compilation unit candidate.
-   * 
-   * @param factory
-   */
+  @Override
   public void addModelDataUpdateHandler(IDtoAutoUpdateHandler factory) {
     m_updateHandlers.add(factory);
   }
 
-  /**
-   * Starts or stops the manager. According to the enabled flag all listeners are registered/removed and all jobs
-   * started/cancelled.
-   * 
-   * @param enabled
-   */
+  @Override
   public synchronized void setEnabled(boolean enabled) {
     m_enabled.set(enabled);
     if (enabled) {
@@ -118,6 +117,8 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
         ResourcesPlugin.getWorkspace().removeResourceChangeListener(m_resourceChangedListener);
         m_resourceChangedListener = null;
       }
+
+      // cancel the job that checks the resource deltas
       Thread thread = m_resourceDeltaCheckJob.getThread();
       if (thread != null) {
         m_resourceDeltaCheckJob.cancel();
@@ -131,9 +132,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     }
   }
 
-  /**
-   * @return the enabled
-   */
+  @Override
   public boolean isEnabled() {
     return m_enabled.get();
   }

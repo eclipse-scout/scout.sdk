@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
+import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
 /**
  * <h3>{@link PageDataDtoUpdateOperation}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 16.08.2013
  */
 public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
@@ -65,7 +65,10 @@ public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
   @Override
   protected String createDerivedTypeSource(IProgressMonitor monitor) throws CoreException {
     PageDataAnnotation pageDataAnnotation = getPageDataAnnotation();
-    ITypeSourceBuilder pageDataSourceBuilder = FormDataUtility.createPageDataSourceBuilder(getModelType(), pageDataAnnotation);
+    ITypeSourceBuilder pageDataSourceBuilder = DtoUtility.createPageDataSourceBuilder(getModelType(), pageDataAnnotation, monitor);
+    if (monitor.isCanceled()) {
+      return null;
+    }
 
     IType dtoType = ensureDerivedType();
     if (!TypeUtility.exists(dtoType)) {
@@ -78,9 +81,15 @@ public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
     cuSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
 
     SimpleImportValidator validator = new SimpleImportValidator(TypeUtility.getPackage(dtoIcu).getElementName());
+    if (monitor.isCanceled()) {
+      return null;
+    }
 
     // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
     consumeAllTypeNamesRec(pageDataSourceBuilder, validator);
+    if (monitor.isCanceled()) {
+      return null;
+    }
 
     StringBuilder sourceBuilder = new StringBuilder();
     cuSourceBuilder.createSource(sourceBuilder, ResourceUtility.getLineSeparator(dtoIcu), dtoIcu.getJavaProject(), validator);

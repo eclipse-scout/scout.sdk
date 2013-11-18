@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -17,7 +18,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.internal.workspace.dto.FormDataUtility;
+import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
@@ -34,7 +35,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link CompositeFormDataTypeSourceBuilder}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
 public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilder {
@@ -44,23 +45,27 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
    * @param elementName
    * @param formDataAnnotation
    */
-  public CompositeFormDataTypeSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation) {
-    super(modelType, elementName, formDataAnnotation);
+  public CompositeFormDataTypeSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, IProgressMonitor monitor) {
+    super(modelType, elementName, formDataAnnotation, monitor);
   }
 
   @Override
-  protected void createContent() {
-    super.createContent();
+  protected void createContent(IProgressMonitor monitor) {
+    super.createContent(monitor);
     try {
-      createCompositeFieldFormData(getModelType(), getLocalTypeHierarchy());
+      createCompositeFieldFormData(getModelType(), getLocalTypeHierarchy(), monitor);
     }
     catch (JavaModelException e) {
       ScoutSdk.logError("could not build form data for '" + getModelType().getElementName() + "'.", e);
     }
   }
 
-  private void createCompositeFieldFormData(IType compositeType, ITypeHierarchy declaringTypeHierarchy) throws JavaModelException {
+  private void createCompositeFieldFormData(IType compositeType, ITypeHierarchy declaringTypeHierarchy, IProgressMonitor monitor) throws JavaModelException {
     for (IType formField : TypeUtility.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IFormField), declaringTypeHierarchy))) {
+      if (monitor.isCanceled()) {
+        return;
+      }
+
       if (Flags.isPublic(formField.getFlags())) {
         FormDataAnnotation fieldAnnotation = ScoutTypeUtility.findFormDataAnnotation(formField, declaringTypeHierarchy);
 
@@ -68,7 +73,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           String formDataTypeSignature = fieldAnnotation.getFormDataTypeSignature();
           String formDataTypeName = null;
           if (StringUtility.isNullOrEmpty(formDataTypeSignature)) {
-            formDataTypeName = FormDataUtility.getFormDataName(formField.getElementName());
+            formDataTypeName = DtoUtility.getFormDataName(formField.getElementName());
           }
           else {
             formDataTypeName = Signature.getSignatureSimpleName(formDataTypeSignature);
@@ -80,14 +85,14 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           ITypeHierarchy superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(superType);
           ITypeSourceBuilder fieldSourceBuilder = null;
           if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableFieldData))) {
-            fieldSourceBuilder = new TableFieldFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation);
+            fieldSourceBuilder = new TableFieldFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
           }
           else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
             // fill table bean
-            fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation);
+            fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
           }
           else {
-            fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, formDataTypeName, fieldAnnotation);
+            fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
           }
           fieldSourceBuilder.setFlags(fieldSourceBuilder.getFlags() | Flags.AccStatic);
           addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormDataPropertyKey(fieldSourceBuilder), fieldSourceBuilder);
@@ -102,7 +107,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           continue;
         }
         else if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ICompositeField), formField)) {
-          createCompositeFieldFormData(formField, declaringTypeHierarchy);
+          createCompositeFieldFormData(formField, declaringTypeHierarchy, monitor);
         }
       }
     }

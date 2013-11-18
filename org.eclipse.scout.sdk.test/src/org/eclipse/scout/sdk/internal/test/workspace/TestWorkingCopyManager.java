@@ -13,11 +13,11 @@ package org.eclipse.scout.sdk.internal.test.workspace;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.helper.ScoutProjectHelper;
 import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -29,7 +29,7 @@ public class TestWorkingCopyManager extends AbstractScoutSdkTest {
   @Test
   public void testCommitWorkingCopy() throws Exception {
     try {
-      IWorkingCopyManager manager = TypeCacheAccessor.createWorkingCopyManger();
+      IWorkingCopyManager manager = ScoutSdkCore.createWorkingCopyManger();
       NullProgressMonitor monitor = new NullProgressMonitor();
       ScoutProjectHelper.setupNewProject("abc", true, true, false);
       IType type = TypeUtility.getType("abc.client.ui.desktop.Desktop");
@@ -57,7 +57,7 @@ public class TestWorkingCopyManager extends AbstractScoutSdkTest {
       ICompilationUnit icu = type.getCompilationUnit();
       String source = icu.getSource();
       Assert.assertFalse(icu.isWorkingCopy());
-      IWorkingCopyManager manager = TypeCacheAccessor.createWorkingCopyManger();
+      IWorkingCopyManager manager = ScoutSdkCore.createWorkingCopyManger();
       manager.register(icu, monitor);
       Assert.assertTrue(icu.isWorkingCopy());
       type = TypeUtility.getType("def.client.ui.desktop.Desktop");
