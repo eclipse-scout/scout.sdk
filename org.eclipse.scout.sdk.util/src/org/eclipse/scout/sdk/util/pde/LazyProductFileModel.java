@@ -36,7 +36,12 @@ public final class LazyProductFileModel {
   private volatile IFile m_configIniFile;
 
   public LazyProductFileModel(IFile productFile) {
-    if (productFile == null || !productFile.exists()) throw new IllegalArgumentException("invalid product file passed");
+    if (productFile == null) {
+      throw new IllegalArgumentException("null product file not allowed.");
+    }
+    if (!productFile.exists()) {
+      throw new IllegalArgumentException("invalid product file passed: '" + productFile.getFullPath().toString() + "'.");
+    }
     m_productFile = productFile;
   }
 

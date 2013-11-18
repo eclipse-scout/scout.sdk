@@ -1,7 +1,6 @@
 package org.eclipse.scout.sdk.operation.project;
 
 import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
@@ -220,7 +219,8 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     try {
       return InetAddress.getLocalHost().getHostName().toLowerCase();
     }
-    catch (UnknownHostException e) {
+    catch (Exception e) {
+      ScoutSdk.logInfo("Unable to retrieve localhost name.", e);
       return null;
     }
   }

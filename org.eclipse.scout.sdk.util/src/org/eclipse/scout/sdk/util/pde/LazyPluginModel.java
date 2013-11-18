@@ -65,7 +65,7 @@ public final class LazyPluginModel {
     m_buildPropertiesFile = getProject().getFile(ICoreConstants.BUILD_FILENAME_DESCRIPTOR);
 
     if (!isInteresting()) {
-      throw new IllegalArgumentException("the passed project is not a valid plugin.");
+      throw new IllegalArgumentException("the passed project '" + project.getName() + "' is not a valid plugin.");
     }
   }
 

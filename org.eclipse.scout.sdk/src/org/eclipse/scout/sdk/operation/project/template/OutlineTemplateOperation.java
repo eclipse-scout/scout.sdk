@@ -15,8 +15,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.nls.sdk.model.util.Language;
-import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -40,7 +38,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 
 /**
  * <h3>{@link OutlineTemplateOperation}</h3> ...
- *
+ * 
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011
  */
@@ -117,15 +115,10 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
       workingCopyManager.reconcile(desktopType.getCompilationUnit(), monitor);
 
       // create the outline
-      String name = "StandardOutline";
-      NlsEntry entry = new NlsEntry(name, client.getNlsProject());
-      entry.addTranslation(Language.LANGUAGE_DEFAULT, "Standard");
-      client.getNlsProject().updateRow(entry, monitor);
-
-      OutlineNewOperation outlineOp = new OutlineNewOperation(name, client.getDefaultPackage(IDefaultTargetPackage.CLIENT_OUTLINES), client.getJavaProject());
+      OutlineNewOperation outlineOp = new OutlineNewOperation("StandardOutline", client.getDefaultPackage(IDefaultTargetPackage.CLIENT_OUTLINES), client.getJavaProject());
       outlineOp.setDesktopType(desktopType);
       outlineOp.setFormatSource(false);
-      outlineOp.setNlsEntry(entry);
+      outlineOp.setNlsEntry(client.getNlsProject().getEntry("StandardOutline"));
       outlineOp.run(monitor, workingCopyManager);
       workingCopyManager.reconcile(desktopType.getCompilationUnit(), monitor);
 
