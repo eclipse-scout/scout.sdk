@@ -37,4 +37,6 @@ public interface IScoutProjectWizardPage {
   String getProjectNamePostfix();
 
   void setBundleNodeAvailable(boolean available, boolean visible, String... extensionIds);
+
+  void setBundleNodeSelected(boolean selected, String... extensionIds);
 }

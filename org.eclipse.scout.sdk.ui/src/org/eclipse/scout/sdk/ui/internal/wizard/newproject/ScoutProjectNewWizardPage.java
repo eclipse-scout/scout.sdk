@@ -106,9 +106,6 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       }
     });
     m_invisibleRootNode = buildBundleTree();
-    for (ScoutBundleUiExtension e : ScoutBundleExtensionPoint.getExtensions()) {
-      e.getNewScoutBundleHandler().init(getWizard(), e);
-    }
     m_bundleTree = new CheckableTree(parent, m_invisibleRootNode);
 
     m_bundleTree.addCheckSelectionListener(new ICheckStateListener() {
@@ -128,6 +125,10 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     });
 
     m_bundleTree.setChecked(TreeUtility.findNodes(m_invisibleRootNode, new P_InitialCheckNodesFilter()));
+
+    for (ScoutBundleUiExtension e : ScoutBundleExtensionPoint.getExtensions()) {
+      e.getNewScoutBundleHandler().init(getWizard(), e);
+    }
 
     Control aliasGroup = createPropertiesGroup(parent);
     m_projectNameField.setFocus();
@@ -324,6 +325,14 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       }
     }
     return true;
+  }
+
+  @Override
+  public void setBundleNodeSelected(boolean selected, String... extensionIds) {
+    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByExtensionIdFilter(extensionIds));
+    for (ITreeNode n : nodes) {
+      m_bundleTree.setChecked(n, selected);
+    }
   }
 
   @Override

@@ -29,7 +29,7 @@ public class ScoutBundleUiExtension {
   private ImageDescriptor m_launcherIcon;
   private String m_bundleType;
 
-  public void setBundleID(String bundleID) {
+  public void setBundleId(String bundleID) {
     m_bundleID = bundleID;
   }
 

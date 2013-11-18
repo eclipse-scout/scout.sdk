@@ -64,7 +64,7 @@ public final class ScoutBundleExtensionPoint {
             IConfigurationElement[] elements = extension.getConfigurationElements();
             for (IConfigurationElement element : elements) {
               ScoutBundleUiExtension extensionPoint = new ScoutBundleUiExtension();
-              extensionPoint.setBundleID(element.getAttribute(attributeBundleId));
+              extensionPoint.setBundleId(element.getAttribute(attributeBundleId));
               extensionPoint.setBundleName(element.getAttribute(attributeBundleName));
               try {
                 String contribPlugin = element.getContributor().getName();
