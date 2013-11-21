@@ -22,6 +22,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.simple.operations.CreateSimpleNlsProjectOperation;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
@@ -121,7 +122,7 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     ServiceNewOperation serviceOp = new ServiceNewOperation(null, getServiceName());
     serviceOp.setImplementationProject(getJavaProject());
     serviceOp.setImplementationPackageName(getPackageName());
-    serviceOp.addServiceRegistrationProject(getJavaProject());
+    serviceOp.addServiceRegistration(new ServiceRegistrationDescription(getJavaProject()));
     serviceOp.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     // getDynamicNlsBaseName method
     IMethodSourceBuilder getDynamicNlsBaseNameBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(serviceOp.getImplementationSourceBuilder(), "getDynamicNlsBaseName");

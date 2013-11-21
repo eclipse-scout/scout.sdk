@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  *
@@ -57,7 +58,7 @@ public class WellformClientBundleOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     for (IScoutBundle bundle : m_bundles) {
-      if (IScoutBundle.TYPE_CLIENT.equals(bundle.getType())) {
+      if (IScoutBundle.TYPE_CLIENT.equals(bundle.getType()) && !bundle.isBinary()) {
         HashSet<IType> allTypes = new HashSet<IType>();
         IPackageFragmentRoot[] packageFragmentRoots = bundle.getJavaProject().getPackageFragmentRoots();
         for (IPackageFragmentRoot pr : packageFragmentRoots) {
@@ -100,8 +101,7 @@ public class WellformClientBundleOperation implements IOperation {
   }
 
   protected void wellformClientSession(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    IType iClientSessions = TypeUtility.getType(RuntimeClasses.IClientSession);
-    IType[] clientSessions = TypeUtility.getPrimaryTypeHierarchy(iClientSessions).getAllSubtypes(iClientSessions, ScoutTypeFilters.getTypesInScoutBundles(bundle));
+    IType[] clientSessions = ScoutTypeUtility.getClientSessionTypes(bundle.getJavaProject());
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(clientSessions, true);
     try {
       op.run(monitor, workingCopyManager);

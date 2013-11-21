@@ -122,7 +122,7 @@ public class WsConsumerDeleteOperation implements IOperation {
   private void unregisterService(IScoutBundle bundle, IType type, IProgressMonitor monitor) throws CoreException {
     // unregister server side
     for (IScoutBundle serverBundle : bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true)) {
-      ScoutUtility.unregisterServiceClass(serverBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, type.getFullyQualifiedName(), serverBundle.getSymbolicName() + ".ServerSession", monitor);
+      ScoutUtility.unregisterServiceClass(serverBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, type.getFullyQualifiedName());
     }
   }
 

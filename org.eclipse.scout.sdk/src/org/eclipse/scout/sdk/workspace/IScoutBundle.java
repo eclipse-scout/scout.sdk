@@ -275,13 +275,11 @@ public interface IScoutBundle extends IAdaptable {
   IEclipsePreferences getPreferences();
 
   /**
-   * checks whether this bundle contains the given java element. this method call always returns false, if this is a
-   * binary bundle.
+   * checks whether this bundle contains the given java element.
    * 
    * @param e
    *          the java element that will be searched in this bundle
    * @return true if the element is in this bundle, false otherwise.
-   * @see IScoutBundle#isBinary()
    */
   boolean contains(IJavaElement e);
 
@@ -370,5 +368,25 @@ public interface IScoutBundle extends IAdaptable {
    * @return true if it is a fragment
    */
   boolean isFragment();
+
+  /**
+   * Visits all parent or child bundles of the receiver optionally including the receiver itself in the visit.<br>
+   * <br>
+   * The visit performs a breadth first (aka level order) traversal first visiting the nearest neighbors of the receiver
+   * and then continuing with the next levels.
+   * 
+   * @param visitor
+   *          The visitor.
+   * @param includeThis
+   *          true if the receiver should be visited as well. false otherwise.
+   * @param up
+   *          true if the parents (=dependencies) of the receiver should be visited. false if the children (=dependents)
+   *          should be visited.
+   * @see IScoutBundleGraphVisitor
+   * @see IScoutBundleGraphVisitor#visit(IScoutBundle, int)
+   * @see <a
+   *      href="http://en.wikipedia.org/wiki/Breadth-first_search">http://en.wikipedia.org/wiki/Breadth-first_search</a>
+   */
+  void visit(IScoutBundleGraphVisitor visitor, boolean includeThis, boolean up);
 
 }

@@ -23,14 +23,14 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.lookupcall.LookupCallNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
-import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.scout.sdk.ui.wizard.AbstractServiceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.ui.wizard.lookupcall.LookupCallNewWizardPage.LOOKUP_SERVICE_STRATEGY;
@@ -49,7 +49,7 @@ import org.eclipse.swt.dnd.DND;
  * @author Andreas Hoegger
  * @since 1.0.8 25.08.2010
  */
-public class LookupCallNewWizard extends AbstractWorkspaceWizard {
+public class LookupCallNewWizard extends AbstractServiceWizard {
 
   public static final String TYPE_LOOKUPCALL = "lookupCall";
   public static final String TYPE_SERVICE_INTERFACE = "svcIfc";
@@ -58,10 +58,10 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
   public static final String TYPE_SERVICE_REG_SERVER = "svcRegServer";
 
   private final IScoutBundle m_sharedBundle;
-  private LookupCallNewWizardPage m_page1;
-  private BundleTreeWizardPage m_page2;
+  private final LookupCallNewWizardPage m_page1;
+  private final BundleTreeWizardPage m_page2;
+  private final ITreeNode m_locationPageRoot;
   private LookupCallNewOperation m_operation;
-  private ITreeNode m_locationPageRoot;
 
   public LookupCallNewWizard(IScoutBundle sharedBundle) {
     setWindowTitle(Texts.get("NewLookupCall"));
@@ -77,10 +77,10 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
     m_page2 = new BundleTreeWizardPage(Texts.get("LookupCallLocations"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
     m_page2.addStatusProvider(statusProvider);
     m_page2.addDndListener(new P_TreeDndListener());
+    m_page2.addCheckSelectionListener(new P_SessionCheckListener());
     addPage(m_page2);
     // init
     m_page1.addPropertyChangeListener(new P_LocationPropertyListener());
-
   }
 
   private ITreeNode createTree(IScoutBundle clientBundle, IScoutBundle sharedBundle, IScoutBundle serverBundle) {
@@ -108,7 +108,8 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
       TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1).setEnabled(false);
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2).setEnabled(false);
+      ITreeNode svcRegNode = TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
+      refreshAvailableSessions(svcRegNode, svcRegNode);
     }
 
     return rootNode;
@@ -123,15 +124,11 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
     // fill operation before gui is disposed
     IScoutBundle lookupCallBundle = m_page2.getLocationBundle(TYPE_LOOKUPCALL, true, true);
     m_operation = new LookupCallNewOperation(m_page1.getTypeName(), lookupCallBundle.getPackageName(m_page1.getTargetPackage()), ScoutUtility.getJavaProject(lookupCallBundle));
+    m_operation.setFormatSource(true);
+
     IScoutBundle serviceProxyRegBundle = m_page2.getLocationBundle(TYPE_SERVICE_REG_CLIENT, true, true);
     if (serviceProxyRegBundle != null) {
       m_operation.setServiceProxyRegistrationProject(serviceProxyRegBundle.getJavaProject());
-    }
-
-    m_operation.setFormatSource(false);
-    IScoutBundle serviceRegistrationBundle = m_page2.getLocationBundle(TYPE_SERVICE_REG_SERVER, true, true);
-    if (serviceRegistrationBundle != null) {
-      m_operation.setServiceRegistrationProject(serviceRegistrationBundle.getJavaProject());
     }
 
     IScoutBundle serviceBundle = m_page2.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
@@ -150,6 +147,10 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
         IType superTypeProp = m_page1.getServiceSuperType();
         if (superTypeProp != null) {
           m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
+          for (ServiceRegistrationDescription desc : getCheckedServiceRegistrations(m_page2.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true))) {
+            m_operation.addServiceRegistration(desc);
+            storeUsedSession(desc);
+          }
         }
         break;
       case USE_EXISTING:
@@ -169,6 +170,11 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
       ScoutSdkUi.logError("exception during perfoming finish of wizard.", e);
       return false;
     }
+  }
+
+  @Override
+  public BundleTreeWizardPage getLocationsPage() {
+    return m_page2;
   }
 
   public LookupCallNewWizardPage getPage1() {
@@ -220,13 +226,6 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
     }
   } // end class P_LocationPropertyListener
 
-  private class P_InitialCheckedFilter implements ITreeNodeFilter {
-    @Override
-    public boolean accept(ITreeNode node) {
-      return true;
-    }
-  } // end class P_InitialCheckedFilter
-
   private class P_TreeDndListener implements ITreeDndListener {
     @Override
     public boolean isDragableNode(ITreeNode node) {
@@ -253,6 +252,9 @@ public class LookupCallNewWizard extends AbstractWorkspaceWizard {
 
     @Override
     public void dndPerformed(DndEvent dndEvent) {
+      if (dndEvent.node.getType() == TYPE_SERVICE_REG_SERVER) {
+        refreshAvailableSessions(dndEvent.newNode, dndEvent.node);
+      }
       m_page1.pingStateChanging();
     }
 

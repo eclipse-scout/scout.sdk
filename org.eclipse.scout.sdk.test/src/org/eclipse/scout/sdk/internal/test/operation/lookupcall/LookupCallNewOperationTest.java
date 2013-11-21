@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.test.AbstractSdkTestWithSampleProject;
 import org.eclipse.scout.sdk.operation.lookupcall.LocalLookupCallNewOperation;
 import org.eclipse.scout.sdk.operation.lookupcall.LookupCallNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.junit.Test;
@@ -24,7 +25,7 @@ import org.junit.Test;
 /**
  * <h3>{@link LookupCallNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -50,7 +51,7 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
     newOp.setServiceInterfacePackageName(getSharedJavaProject().getElementName() + ".lookupcall.output");
     newOp.setServiceInterfaceProject(getSharedJavaProject());
     newOp.setServiceProxyRegistrationProject(getClientJavaProject());
-    newOp.setServiceRegistrationProject(getServerJavaProject());
+    newOp.addServiceRegistration(new ServiceRegistrationDescription(getServerJavaProject()));
     newOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.server.services.lookup.AbstractLookupService"));
 
     executeBuildAssertNoCompileErrors(newOp);
@@ -68,7 +69,7 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
     newOp.setServiceInterfacePackageName(getSharedJavaProject().getElementName() + ".lookupcall.output");
     newOp.setServiceInterfaceProject(getSharedJavaProject());
     newOp.setServiceProxyRegistrationProject(getClientJavaProject());
-    newOp.setServiceRegistrationProject(getServerJavaProject());
+    newOp.addServiceRegistration(new ServiceRegistrationDescription(getServerJavaProject()));
     newOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.server.services.lookup.AbstractSqlLookupService"));
 
     executeBuildAssertNoCompileErrors(newOp);

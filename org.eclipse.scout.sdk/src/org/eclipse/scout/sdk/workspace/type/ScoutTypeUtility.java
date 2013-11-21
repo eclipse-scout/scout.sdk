@@ -64,6 +64,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -1672,5 +1673,108 @@ public class ScoutTypeUtility extends TypeUtility {
     public String getSuperTypeGenericParameterSignature() {
       return m_superTypeGenericParameterSignature;
     }
+  }
+
+  /**
+   * Gets all server session classes (not abstract, not an interface, not deprecated) that are in the given scout
+   * bundle.
+   * 
+   * @param bundle
+   *          The scout bundle in which the session classes must be found.
+   * @return All server session classes in the given scout bundle ordered by name.
+   * @see IScoutBundle
+   */
+  public static IType[] getServerSessionTypes(IScoutBundle bundle) {
+    return getSessionTypes(null, bundle, TypeUtility.getType(RuntimeClasses.IServerSession));
+  }
+
+  /**
+   * Gets all client session classes (not abstract, not an interface, not deprecated) that are in the given scout
+   * bundle.
+   * 
+   * @param bundle
+   *          The scout bundle in which the session classes must be found.
+   * @return All client session classes in the given scout bundle ordered by name.
+   * @see IScoutBundle
+   */
+  public static IType[] getClientSessionTypes(IScoutBundle bundle) {
+    return getSessionTypes(null, bundle, TypeUtility.getType(RuntimeClasses.IClientSession));
+  }
+
+  /**
+   * Gets all server session classes (not abstract, not an interface, not deprecated) that are on the classpath of the
+   * given java project.<br>
+   * The session must not be within the given project. It is sufficient if the session class is on the classpath of the
+   * project to be part of the result!
+   * 
+   * @param context
+   *          The java project whose classpath should be evaluated.
+   * @return All server sessions that are on the classpath of the given java project ordered by name.
+   * @see IJavaProject
+   */
+  public static IType[] getServerSessionTypes(IJavaProject context) {
+    return getSessionTypes(context, null, TypeUtility.getType(RuntimeClasses.IServerSession));
+  }
+
+  /**
+   * Gets all client session classes (not abstract, not an interface, not deprecated) that are on the classpath of the
+   * given java project.<br>
+   * The session must not be within the given project. It is sufficient if the session class is on the classpath of the
+   * project to be part of the result!
+   * 
+   * @param context
+   *          The java project whose classpath should be evaluated.
+   * @return All client sessions that are on the classpath of the given java project ordered by name.
+   * @see IJavaProject
+   */
+  public static IType[] getClientSessionTypes(IJavaProject context) {
+    return getSessionTypes(context, null, TypeUtility.getType(RuntimeClasses.IClientSession));
+  }
+
+  /**
+   * Gets all session classes (not abstract, not an interface, not deprecated) that are on the classpath of the given
+   * java project.<br>
+   * The session must not be within the given project. It is sufficient if the session class is on the classpath of the
+   * project to be part of the result!<br>
+   * <br>
+   * The type of session to be searched is determined by the type of scout bundle that belongs to the given java
+   * project. This means the given java project must match to a scout bundle in the scout bundle graph. Otherwise a
+   * {@link NullPointerException} is thrown.<br>
+   * If the scout bundle that belongs to the given java project is of type client, client sessions are searched. If it
+   * is of type server, server sessions are returned. Otherwise null is returned.
+   * 
+   * @param context
+   * @return The session classes based on the project type ordered by name or null.
+   * @throws NullPointerException
+   *           if no {@link IScoutBundle} could be found that belongs to the given context.
+   * @see IScoutBundle
+   * @see IScoutBundleGraph
+   */
+  public static IType[] getSessionTypes(IJavaProject context) {
+    String type = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(context).getType();
+    if (IScoutBundle.TYPE_CLIENT.equals(type)) {
+      return getClientSessionTypes(context);
+    }
+    else if (IScoutBundle.TYPE_SERVER.equals(type)) {
+      return getServerSessionTypes(context);
+    }
+    return null;
+  }
+
+  private static IType[] getSessionTypes(IJavaProject context, IScoutBundle containerBundle, IType sessionBaseType) {
+    ITypeFilter sessionFilter = null;
+    if (containerBundle == null) {
+      if (context == null) {
+        sessionFilter = TypeFilters.getClassFilter();
+      }
+      else {
+        sessionFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(context));
+      }
+    }
+    else {
+      sessionFilter = ScoutTypeFilters.getTypesInScoutBundles(containerBundle);
+    }
+    ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(sessionBaseType);
+    return clientSessionHierarchy.getAllSubtypes(sessionBaseType, sessionFilter, TypeComparators.getTypeNameComparator());
   }
 }

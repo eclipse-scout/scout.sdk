@@ -28,14 +28,14 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.form.FormStackNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
-import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.scout.sdk.ui.wizard.AbstractServiceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -53,7 +53,7 @@ import org.eclipse.swt.dnd.DND;
  * @author Andreas Hoegger
  * @since 1.0.8 05.11.2009
  */
-public class FormNewWizard extends AbstractWorkspaceWizard {
+public class FormNewWizard extends AbstractServiceWizard {
 
   public static final String TYPE_FORM = "form";
   public static final String TYPE_FORM_BUTTON_OK = "okbutton";
@@ -70,22 +70,26 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
   public static final String TYPE_SERVICE_REG_SERVER = "svcRegServer";
 
   private final IScoutBundle m_clientBundle;
-  private FormNewWizardPage m_formPage;
-  private BundleTreeWizardPage m_locationPage;
-  private FormStackNewOperation m_operation;// = new FormStackNewOperation(true);
-  private ITreeNode m_locationPageRoot;
+  private final FormNewWizardPage m_formPage;
+  private final BundleTreeWizardPage m_locationPage;
+  private final ITreeNode m_locationPageRoot;
+  private FormStackNewOperation m_operation;
 
   public FormNewWizard(IScoutBundle clientBundle) {
     setWindowTitle(Texts.get("NewForm"));
-    P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_clientBundle = clientBundle;
+
     m_formPage = new FormNewWizardPage(getClientBundle());
     addPage(m_formPage);
+
     m_locationPageRoot = createTree(clientBundle);
     m_locationPage = new BundleTreeWizardPage(Texts.get("FormClassLocations"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
-    m_locationPage.addStatusProvider(statusProvider);
+    m_locationPage.addStatusProvider(new P_StatusRevalidator());
     m_locationPage.addDndListener(new P_TreeDndListener());
+    m_locationPage.addCheckSelectionListener(new P_SessionCheckListener());
+
     addPage(m_locationPage);
+
     // init
     m_formPage.addPropertyChangeListener(new P_LocationPropertyListener());
   }
@@ -93,9 +97,9 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
   private ITreeNode createTree(IScoutBundle clientBundle) {
     IScoutBundle serverBundle = null;
     IScoutBundle sharedBundle = null;
-    sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+    sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), ScoutBundleFilters.getWorkspaceBundlesFilter()), false);
     if (sharedBundle != null) {
-      serverBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), clientBundle, false);
+      serverBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), ScoutBundleFilters.getWorkspaceBundlesFilter()), clientBundle, false);
     }
 
     ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle, NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
@@ -137,7 +141,10 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
       // service implementation
       TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1);
       // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
+      ITreeNode svcRegNode = TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
+
+      // server sessions
+      refreshAvailableSessions(svcRegNode, svcRegNode);
     }
     return rootNode;
   }
@@ -189,12 +196,10 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
       m_operation.setPermissionUpdatePackage(permUpdateBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SECURITY)));
     }
 
-    IScoutBundle[] serviceRegistrationBundles = m_locationPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true);
-    List<IJavaProject> serviceRegistrationProjects = new ArrayList<IJavaProject>(serviceRegistrationBundles.length);
-    for (IScoutBundle b : serviceRegistrationBundles) {
-      serviceRegistrationProjects.add(ScoutUtility.getJavaProject(b));
+    for (ServiceRegistrationDescription desc : getCheckedServiceRegistrations(m_locationPage.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true))) {
+      m_operation.addServiceRegistration(desc);
+      storeUsedSession(desc);
     }
-    m_operation.setServiceRegistrationProjects(serviceRegistrationProjects);
 
     IScoutBundle serviceImplBundle = m_locationPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (serviceImplBundle != null) {
@@ -224,8 +229,9 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
     }
   }
 
-  public FormNewWizardPage getFormPage() {
-    return m_formPage;
+  @Override
+  public BundleTreeWizardPage getLocationsPage() {
+    return m_locationPage;
   }
 
   public IScoutBundle getClientBundle() {
@@ -280,13 +286,6 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
     }
   } // end class P_LocationPropertyListener
 
-  private class P_InitialCheckedFilter implements ITreeNodeFilter {
-    @Override
-    public boolean accept(ITreeNode node) {
-      return true;
-    }
-  } // end class P_InitialCheckedFilter
-
   private class P_TreeDndListener implements ITreeDndListener {
     @Override
     public boolean isDragableNode(ITreeNode node) {
@@ -334,6 +333,9 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
             }
           }
         }
+      }
+      else if (dndEvent.node.getType() == TYPE_SERVICE_REG_SERVER) {
+        refreshAvailableSessions(dndEvent.newNode, dndEvent.node);
       }
       m_formPage.pingStateChanging();
     }
@@ -541,13 +543,10 @@ public class FormNewWizard extends AbstractWorkspaceWizard {
       IScoutBundle serviceImplementationBundle = m_locationPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
       ITreeNode[] serviceRegistrationServerNodes = m_locationPage.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true);
       for (ITreeNode serviceRegNode : serviceRegistrationServerNodes) {
-        Object data = serviceRegNode.getParent().getData();
-        if (data instanceof IScoutBundle) {
-          IScoutBundle serviceRegistrationBundle = (IScoutBundle) data;
-          if (serviceImplementationBundle != null) {
-            if (!ScoutTypeUtility.isOnClasspath(serviceImplementationBundle, serviceRegistrationBundle)) {
-              return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getSymbolicName()));
-            }
+        IScoutBundle serviceRegistrationBundle = (IScoutBundle) serviceRegNode.getParent().getData();
+        if (serviceImplementationBundle != null) {
+          if (!ScoutTypeUtility.isOnClasspath(serviceImplementationBundle, serviceRegistrationBundle)) {
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("XIsNotOnClasspathOfServiceY", m_locationPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION), serviceRegistrationBundle.getSymbolicName()));
           }
         }
       }

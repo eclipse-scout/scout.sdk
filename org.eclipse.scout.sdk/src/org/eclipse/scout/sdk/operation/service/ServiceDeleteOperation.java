@@ -52,10 +52,10 @@ public class ServiceDeleteOperation implements IOperation {
     if (getServiceInterface() != null) {
       javaMemberDeleteOperation.addMember(getServiceInterface());
       // unregister client side
-      ScoutUtility.unregisterServiceProxy(getServiceInterface(), monitor);
+      ScoutUtility.unregisterServiceProxy(getServiceInterface());
     }
     // unregister server side
-    ScoutUtility.unregisterServiceImplementation(getServiceImplementation(), monitor);
+    ScoutUtility.unregisterServiceImplementation(getServiceImplementation());
 
     for (IType type : getAdditionalTypesToBeDeleted()) {
       javaMemberDeleteOperation.addMember(type);

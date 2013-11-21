@@ -45,7 +45,7 @@ public class SharedContextPropertyTablePage extends AbstractPage {
     setParent(parent);
     m_clientSession = clientSession;
     m_serverSession = serverSession;
-    setName(Texts.get("SharedContextTablePage"));
+    setName(Texts.get("SharedContextTablePage", clientSession.getElementName()));
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Variables));
   }
 

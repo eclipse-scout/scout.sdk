@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -35,7 +36,6 @@ import org.eclipse.scout.commons.parsers.BindModel;
 import org.eclipse.scout.commons.parsers.BindParser;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.SQLStatement;
 import org.eclipse.scout.sdk.sql.binding.ast.SqlMethodIvocationVisitor;
@@ -51,9 +51,8 @@ import org.eclipse.scout.sdk.util.ast.VariableType;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link FormDataSqlBindingValidator}</h3> ...
@@ -102,7 +101,7 @@ public class FormDataSqlBindingValidator {
 
   protected MethodSqlBindingModel processServiceMethod(IMethod serviceMethod, IProgressMonitor monitor) throws JavaModelException {
     HashMap<String, IBindBase> globalBindings = new HashMap<String, IBindBase>();
-    globalBindings.putAll(resolveServerSessionBindBases());
+    globalBindings.putAll(resolveServerSessionBindBases(serviceMethod.getJavaProject()));
     IAnnotation ignoreBindAnnotation = JdtUtility.getAnnotation(serviceMethod, SqlBindingIgnoreValidation.class.getName());
     if (TypeUtility.exists(ignoreBindAnnotation)) {
       if (ignoreBindAnnotation.getSource().startsWith("@")) {
@@ -193,12 +192,10 @@ public class FormDataSqlBindingValidator {
     return result;
   }
 
-  protected HashMap<String, IBindBase> resolveServerSessionBindBases() {
+  protected HashMap<String, IBindBase> resolveServerSessionBindBases(IJavaProject context) {
     HashMap<String, IBindBase> bindBases = new HashMap<String, IBindBase>();
     // server sessions
-    IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
-    IPrimaryTypeTypeHierarchy serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
-    for (IType serverSession : serverSessionHierarchy.getAllSubtypes(iServerSession, TypeFilters.getClassFilter())) {
+    for (IType serverSession : ScoutTypeUtility.getServerSessionTypes(context)) {
       HashSet<String> binds = new HashSet<String>();
       try {
         collectPropertyBinds(binds, serverSession, serverSession.newSupertypeHierarchy(new NullProgressMonitor()));

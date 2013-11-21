@@ -36,10 +36,11 @@ import org.eclipse.swt.widgets.Composite;
 public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
 
   private CheckableTree m_tree;
-  private boolean m_treeListenersAttached = false;
+  private boolean m_treeListenersAttached;
+
   private final ITreeNode m_rootNode;
-  private List<ITreeDndListener> m_tempListeners = new ArrayList<ITreeDndListener>();
-  private Object m_tempListenersLock = new Object();
+  private final List<ITreeDndListener> m_tempDndListeners;
+  private final List<ICheckStateListener> m_tempCheckListeners;
   private final ITreeNodeFilter m_initialCheckedFilter;
 
   public BundleTreeWizardPage(String pageTitle, String message, ITreeNode rootNode) {
@@ -48,7 +49,11 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
 
   public BundleTreeWizardPage(String pageTitle, String message, ITreeNode rootNode, ITreeNodeFilter initialCheckedFilter) {
     super(BundleTreeWizardPage.class.getName());
+    m_treeListenersAttached = false;
     m_rootNode = rootNode;
+    m_tempDndListeners = new ArrayList<ITreeDndListener>();
+    m_tempCheckListeners = new ArrayList<ICheckStateListener>();
+
     setDescription(message);
     setTitle(pageTitle);
     if (initialCheckedFilter == null) {
@@ -57,47 +62,79 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
     m_initialCheckedFilter = initialCheckedFilter;
   }
 
-  public void addDndListener(ITreeDndListener listener) {
+  public synchronized void addCheckSelectionListener(ICheckStateListener listener) {
+    if (m_treeListenersAttached) {
+      m_tree.addCheckSelectionListener(listener);
+    }
+    else {
+      m_tempCheckListeners.add(listener);
+    }
+  }
+
+  public synchronized void removeCheckSelectionListener(ICheckStateListener listener) {
+    if (m_treeListenersAttached) {
+      m_tree.removeCheckSelectionListener(listener);
+    }
+    else {
+      m_tempCheckListeners.remove(listener);
+    }
+  }
+
+  public synchronized void addDndListener(ITreeDndListener listener) {
     if (m_treeListenersAttached) {
       m_tree.addDndListener(listener);
     }
     else {
-      synchronized (m_tempListenersLock) {
-        m_tempListeners.add(listener);
-      }
+      m_tempDndListeners.add(listener);
     }
   }
 
-  public void removeDndListener(ITreeDndListener listener) {
+  public synchronized void removeDndListener(ITreeDndListener listener) {
     if (m_treeListenersAttached) {
       m_tree.removeDndListener(listener);
     }
     else {
-      synchronized (m_tempListenersLock) {
-        m_tempListeners.remove(listener);
-      }
+      m_tempDndListeners.remove(listener);
     }
   }
 
   @Override
   protected void createContent(Composite parent) {
     m_tree = new CheckableTree(parent, getRootNode());
-    synchronized (m_tempListenersLock) {
-      // listeners
-      for (ITreeDndListener l : m_tempListeners) {
+    m_tree.setChecked(TreeUtility.findNodes(getRootNode(), m_initialCheckedFilter));
+    synchronized (this) {
+      for (ITreeDndListener l : m_tempDndListeners) {
         m_tree.addDndListener(l);
       }
-      m_tempListeners.clear();
-    }
-    m_treeListenersAttached = true;
-    m_tree.addDndListener(new P_TreeDndListener());
-    m_tree.setChecked(TreeUtility.findNodes(getRootNode(), m_initialCheckedFilter));
-    m_tree.addCheckSelectionListener(new ICheckStateListener() {
-      @Override
-      public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
-        pingStateChanging();
+      m_tempDndListeners.clear();
+      m_tree.addDndListener(new ITreeDndListener() {
+        @Override
+        public void validateTarget(DndEvent dndEvent) {
+        }
+
+        @Override
+        public boolean isDragableNode(ITreeNode node) {
+          return true;
+        }
+
+        @Override
+        public void dndPerformed(DndEvent dndEvent) {
+          pingStateChanging();
+        }
+      });
+
+      for (ICheckStateListener l : m_tempCheckListeners) {
+        m_tree.addCheckSelectionListener(l);
       }
-    });
+      m_tempCheckListeners.clear();
+      m_tree.addCheckSelectionListener(new ICheckStateListener() {
+        @Override
+        public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
+          pingStateChanging();
+        }
+      });
+      m_treeListenersAttached = true;
+    }
     // layout
     parent.setLayout(new GridLayout(1, true));
 
@@ -121,7 +158,6 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
     if (isControlCreated()) {
       m_tree.getTreeViewer().refresh();
     }
-
   }
 
   public IScoutBundle[] getLocationBundles(String type, boolean visibleOnly, boolean checkedOnly) {
@@ -203,20 +239,11 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
     return text;
   }
 
-  private class P_TreeDndListener implements ITreeDndListener {
-    @Override
-    public boolean isDragableNode(ITreeNode node) {
-      return true;
-    }
+  public boolean isNodeChecked(ITreeNode node) {
+    return m_tree.isChecked(node);
+  }
 
-    @Override
-    public void validateTarget(DndEvent dndEvent) {
-    }
-
-    @Override
-    public void dndPerformed(DndEvent dndEvent) {
-      pingStateChanging();
-    }
-  } // end class P_TreeDndListener
-
+  public void setNodeChecked(ITreeNode node, boolean checked) {
+    m_tree.setChecked(node, checked);
+  }
 }

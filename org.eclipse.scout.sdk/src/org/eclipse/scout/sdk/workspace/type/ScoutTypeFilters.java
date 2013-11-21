@@ -6,6 +6,14 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class ScoutTypeFilters extends TypeFilters {
+
+  /**
+   * Creates and returns a filter that accepts all types that are in the given scout bundles.
+   * 
+   * @param bundles
+   *          The scout bundles in which the types must be.
+   * @return the newly created filter.
+   */
   public static ITypeFilter getInScoutBundles(final IScoutBundle... bundles) {
     return new ITypeFilter() {
       @Override
@@ -15,6 +23,16 @@ public class ScoutTypeFilters extends TypeFilters {
     };
   }
 
+  /**
+   * Creates and returns a filter that accepts all types that are in the given scout bundles.<br>
+   * Furthermore types that are abstract, an interface or deprecated are not accepted!
+   * 
+   * @param bundles
+   *          The scout bundles in which the types must be.
+   * @return the newly created filter.
+   * @see TypeFilters#isClass(IType)
+   * @see TypeFilters#getClassFilter()
+   */
   public static ITypeFilter getTypesInScoutBundles(final IScoutBundle... bundles) {
     return new ITypeFilter() {
       @Override

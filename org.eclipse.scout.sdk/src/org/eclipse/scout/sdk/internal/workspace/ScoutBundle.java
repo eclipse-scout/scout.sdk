@@ -63,6 +63,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleComparator;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
+import org.eclipse.scout.sdk.workspace.IScoutBundleGraphVisitor;
 import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
 
 /**
@@ -418,12 +419,13 @@ public class ScoutBundle implements IScoutBundle {
     return m_pluginModelBase;
   }
 
-  private void visit(IBundleVisitor visitor, boolean includeThis, boolean up) {
+  @Override
+  public void visit(IScoutBundleGraphVisitor visitor, boolean includeThis, boolean up) {
     if (includeThis) {
-      breadthFirstTraverse(visitor, up, this);
+      breadthFirstTraverseFromThis(visitor, up);
     }
     else {
-      breadthFirstTraverse(visitor, up, up ? m_parentBundles : m_childBundles);
+      breadthFirstTraverseNeighbors(visitor, up, up ? m_parentBundles : m_childBundles);
     }
   }
 
@@ -438,17 +440,17 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private void breadthFirstTraverse(IBundleVisitor visitor, boolean up, Set<ScoutBundle> startBundles) {
+  private void breadthFirstTraverseNeighbors(IScoutBundleGraphVisitor visitor, boolean up, Set<ScoutBundle> directNeighbors) {
     Deque<P_TraverseComposite> deck = new LinkedList<P_TraverseComposite>();
-    for (ScoutBundle start : startBundles) {
-      deck.addLast(new P_TraverseComposite(start, 0));
+    for (ScoutBundle start : directNeighbors) {
+      deck.addLast(new P_TraverseComposite(start, 1));
     }
     breadthFirstTraverse(visitor, up, deck);
   }
 
-  private void breadthFirstTraverse(IBundleVisitor visitor, boolean up, ScoutBundle b) {
+  private void breadthFirstTraverseFromThis(IScoutBundleGraphVisitor visitor, boolean up) {
     Deque<P_TraverseComposite> deck = new LinkedList<P_TraverseComposite>();
-    deck.addLast(new P_TraverseComposite(b, 0));
+    deck.addLast(new P_TraverseComposite(this, 0));
     breadthFirstTraverse(visitor, up, deck);
   }
 
@@ -459,7 +461,7 @@ public class ScoutBundle implements IScoutBundle {
    * @param visitor
    * @param up
    */
-  private static void breadthFirstTraverse(IBundleVisitor visitor, boolean up, Deque<P_TraverseComposite> deck) {
+  private static void breadthFirstTraverse(IScoutBundleGraphVisitor visitor, boolean up, Deque<P_TraverseComposite> deck) {
     while (!deck.isEmpty()) {
       P_TraverseComposite el = deck.removeFirst();
       Set<ScoutBundle> nextLevelBundles;
@@ -643,11 +645,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private interface IBundleVisitor {
-    boolean visit(IScoutBundle bundle, int traversalLevel);
-  }
-
-  private static class P_BundleCollector implements IBundleVisitor {
+  private static class P_BundleCollector implements IScoutBundleGraphVisitor {
     private final LinkedHashSet<IScoutBundle> m_collector;
     private final IScoutBundleFilter m_filter;
 
@@ -669,7 +667,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static class P_SingleBundleByLevelCollector implements IBundleVisitor {
+  private static class P_SingleBundleByLevelCollector implements IScoutBundleGraphVisitor {
     private final IScoutBundleFilter m_filter;
     private final TreeSet<IScoutBundle> m_collector;
     private int m_lastLevel;

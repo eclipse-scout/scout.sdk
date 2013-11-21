@@ -18,6 +18,7 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.test.AbstractSdkTestWithSampleProject;
 import org.eclipse.scout.sdk.operation.form.FormStackNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -28,7 +29,7 @@ import org.junit.Test;
 /**
  * <h3>{@link FormStackNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class FormStackNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -43,7 +44,7 @@ public class FormStackNewOperationTest extends AbstractSdkTestWithSampleProject 
     formOp.setFormatSource(true);
     formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, getClientJavaProject()));
     formOp.addServiceProxyRegistrationProject(getClientJavaProject());
-    formOp.addServiceRegistrationProject(getServerJavaProject());
+    formOp.addServiceRegistration(new ServiceRegistrationDescription(getServerJavaProject()));
     formOp.setCreateButtonCancel(true);
     formOp.setCreateButtonOk(true);
     formOp.setCreateModifyHandler(true);

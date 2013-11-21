@@ -24,7 +24,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -36,15 +35,11 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link ServiceNewOperation}</h3> To create a new service a service consists out of:
+ * <h3>{@link ServiceNewOperation}</h3> To create a new service.<br>
+ * A service consists out of:
  * <ul>
  * <li><b>a service implementation</b> located in client or server bundles</li>
  * <li><b>service interface</b> used mainly for remote services can be an a shared, server or client bundle</li>
@@ -66,8 +61,8 @@ public class ServiceNewOperation implements IOperation {
   private IJavaProject m_implementationProject;
   private String m_implementationPackageName;
   private TypeSourceBuilder m_implementationBuilder;
-  private List<IJavaProject> m_proxyRegistrationProjects;
-  private List<IJavaProject> m_serviceRegistrationProjects;
+  private final List<IJavaProject> m_proxyRegistrationProjects;
+  private final List<ServiceRegistrationDescription> m_serviceRegistrationDescriptions;
 
   private IType m_createdServiceInterface;
   private IType m_createdServiceImplementation;
@@ -85,7 +80,7 @@ public class ServiceNewOperation implements IOperation {
     m_interfaceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
 
     m_proxyRegistrationProjects = new ArrayList<IJavaProject>();
-    m_serviceRegistrationProjects = new ArrayList<IJavaProject>();
+    m_serviceRegistrationDescriptions = new ArrayList<ServiceRegistrationDescription>();
   }
 
   @Override
@@ -129,7 +124,8 @@ public class ServiceNewOperation implements IOperation {
       workingCopyManager.register(m_createdServiceInterface.getCompilationUnit(), monitor);
       // register
       for (IJavaProject cb : getProxyRegistrationProjects()) {
-        ScoutUtility.registerServiceClass(cb.getProject(), IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, getCreatedServiceInterface().getFullyQualifiedName(), null, RuntimeClasses.ClientProxyServiceFactory, monitor);
+        ScoutUtility.registerServiceClass(IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY,
+            getCreatedServiceInterface().getFullyQualifiedName(), new ServiceRegistrationDescription(cb, (String) null, RuntimeClasses.ClientProxyServiceFactory));
       }
     }
     if (getImplementationProject() != null) {
@@ -149,42 +145,9 @@ public class ServiceNewOperation implements IOperation {
       workingCopyManager.register(m_createdServiceImplementation.getCompilationUnit(), monitor);
 
       // register services
-      for (IJavaProject sb : getServiceRegistrationProjects()) {
-        IType sessionType = null;
-        String serviceFactory = null;
-        ITypeFilter sessionFilter = TypeFilters.getMultiTypeFilter(
-            TypeFilters.getTypesOnClasspath(sb.getJavaProject()),
-            TypeFilters.getClassFilter()
-            );
-        String projectType = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(sb).getType();
-        if (projectType.equals(IScoutBundle.TYPE_CLIENT)) {
-          serviceFactory = RuntimeClasses.ClientServiceFactory;
-          // find client session
-          IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
-          ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
-          IType[] clientSessions = clientSessionHierarchy.getAllSubtypes(iClientSession, sessionFilter, null);
-          if (clientSessions.length > 0) {
-            sessionType = clientSessions[0];
-          }
-        }
-        else if (projectType.equals(IScoutBundle.TYPE_SERVER)) {
-          serviceFactory = RuntimeClasses.ServerServiceFactory;
-          // find server session
-          IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
-          ICachedTypeHierarchy serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
-          IType[] serverSessions = serverSessionHierarchy.getAllSubtypes(iServerSession, sessionFilter, null);
-          if (serverSessions.length > 0) {
-            sessionType = serverSessions[0];
-          }
-        }
-        else if (projectType.equals(IScoutBundle.TYPE_SHARED)) {
-          sessionType = null;
-          serviceFactory = RuntimeClasses.DefaultServiceFactory;
-        }
-
-        ScoutUtility.registerServiceClass(sb.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES,
-            IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, getCreatedServiceImplementation().getFullyQualifiedName(),
-            sessionType == null ? null : sessionType.getFullyQualifiedName(), serviceFactory, monitor);
+      List<ServiceRegistrationDescription> serviceRegistrationDescs = getServiceRegistrations();
+      for (ServiceRegistrationDescription desc : serviceRegistrationDescs) {
+        ScoutUtility.registerServiceClass(IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, getCreatedServiceImplementation().getFullyQualifiedName(), desc);
       }
     }
   }
@@ -505,21 +468,20 @@ public class ServiceNewOperation implements IOperation {
     return Collections.unmodifiableList(m_proxyRegistrationProjects);
   }
 
-  public boolean addServiceRegistrationProject(IJavaProject project) {
-    return m_serviceRegistrationProjects.add(project);
+  public boolean addServiceRegistration(ServiceRegistrationDescription desc) {
+    return m_serviceRegistrationDescriptions.add(desc);
   }
 
-  public boolean removeServiceRegistrationProject(IJavaProject project) {
-    return m_serviceRegistrationProjects.remove(project);
+  public boolean removeServiceRegistration(ServiceRegistrationDescription desc) {
+    return m_serviceRegistrationDescriptions.remove(desc);
   }
 
-  public void setServiceRegistrationProjects(List<IJavaProject> projects) {
-    m_serviceRegistrationProjects.clear();
-    m_serviceRegistrationProjects.addAll(projects);
+  public void setServiceRegistrations(List<ServiceRegistrationDescription> desc) {
+    m_serviceRegistrationDescriptions.clear();
+    m_serviceRegistrationDescriptions.addAll(desc);
   }
 
-  public List<IJavaProject> getServiceRegistrationProjects() {
-    return Collections.unmodifiableList(m_serviceRegistrationProjects);
+  public List<ServiceRegistrationDescription> getServiceRegistrations() {
+    return Collections.unmodifiableList(m_serviceRegistrationDescriptions);
   }
-
 }

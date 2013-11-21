@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.lookupcall;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
@@ -21,6 +25,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.service.LookupServiceNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
@@ -41,10 +46,10 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
   private IJavaProject m_serviceProxyRegistrationProject;
   private String m_serviceInterfacePackageName;
   private IJavaProject m_serviceInterfaceProject;
-  private IJavaProject m_serviceRegistrationProject;
   private String m_serviceImplementationPackage;
   private IJavaProject m_serviceImplementationProject;
   private IType m_lookupService;
+  private final List<ServiceRegistrationDescription> m_serviceRegistrationDescriptions;
 
   //out members
   private IType m_outLookupService;
@@ -52,6 +57,7 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
 
   public LookupCallNewOperation(String lookupCallName, String packageName, IJavaProject project) throws JavaModelException {
     super(lookupCallName, packageName, project);
+    m_serviceRegistrationDescriptions = new ArrayList<ServiceRegistrationDescription>();
 
     // defaults
     setFlags(Flags.AccPublic);
@@ -83,7 +89,7 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
         serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
         serviceOp.setInterfacePackageName(getServiceInterfacePackageName());
         serviceOp.setImplementationSuperTypeSignature(getServiceSuperTypeSignature());
-        serviceOp.addServiceRegistrationProject(getServiceRegistrationProject());
+        serviceOp.setServiceRegistrations(getServiceRegistrations());
         serviceOp.validate();
         serviceOp.run(monitor, workingCopyManager);
         lookupServiceInterface = serviceOp.getCreatedServiceInterface();
@@ -136,14 +142,6 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
     return m_serviceSuperTypeSignature;
   }
 
-  public IJavaProject getServiceRegistrationProject() {
-    return m_serviceRegistrationProject;
-  }
-
-  public void setServiceRegistrationProject(IJavaProject serviceRegistrationProject) {
-    m_serviceRegistrationProject = serviceRegistrationProject;
-  }
-
   public void setServiceImplementationProject(IJavaProject serviceImplementationProject) {
     m_serviceImplementationProject = serviceImplementationProject;
   }
@@ -184,4 +182,20 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
     m_serviceInterfacePackageName = serviceInterfacePackageName;
   }
 
+  public boolean addServiceRegistration(ServiceRegistrationDescription desc) {
+    return m_serviceRegistrationDescriptions.add(desc);
+  }
+
+  public boolean removeServiceRegistration(ServiceRegistrationDescription desc) {
+    return m_serviceRegistrationDescriptions.remove(desc);
+  }
+
+  public void setServiceRegistrations(List<ServiceRegistrationDescription> desc) {
+    m_serviceRegistrationDescriptions.clear();
+    m_serviceRegistrationDescriptions.addAll(desc);
+  }
+
+  public List<ServiceRegistrationDescription> getServiceRegistrations() {
+    return Collections.unmodifiableList(m_serviceRegistrationDescriptions);
+  }
 }

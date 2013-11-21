@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -21,8 +21,24 @@ import java.util.EventObject;
 public class DndEvent extends EventObject {
   private static final long serialVersionUID = 6244205081298977102L;
 
+  /**
+   * Parent node of the one that was dragged/copied
+   */
   public ITreeNode sourceParent;
+
+  /**
+   * Node that was dragged/copied
+   */
   public ITreeNode node;
+
+  /**
+   * In case of a copy: the new node that was created under the targetParent. Otherwise: same as node.
+   */
+  public ITreeNode newNode;
+
+  /**
+   * New parent where the drag/copy was dropped.
+   */
   public ITreeNode targetParent;
 
   public boolean doit;

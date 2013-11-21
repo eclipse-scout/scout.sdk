@@ -20,14 +20,15 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.test.AbstractSdkTestWithSampleProject;
 import org.eclipse.scout.sdk.operation.service.ServiceMethod;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.junit.Test;
 
 /**
  * <h3>{@link ServiceNewOperationTest}</h3> ...
- *
- *  @author Andreas Hoegger
+ * 
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class ServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -63,7 +64,7 @@ public class ServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
     ServiceNewOperation serviceOp = new ServiceNewOperation("ITestService03", "TestService03");
     serviceOp.setImplementationProject(getServerJavaProject());
     serviceOp.setImplementationPackageName("sample.server.services.test.output");
-    serviceOp.addServiceRegistrationProject(getServerJavaProject());
+    serviceOp.addServiceRegistration(new ServiceRegistrationDescription(getServerJavaProject()));
     serviceOp.setInterfaceProject(getSharedJavaProject());
     serviceOp.setInterfacePackageName("sample.shared.services.test.output");
     serviceOp.addProxyRegistrationProject(getClientJavaProject());

@@ -78,6 +78,7 @@ public class CheckableTree extends Composite {
   private final Image m_imgCheckboxNoDisabled = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxNoDisabled);
   private final EventListenerList m_eventListeners = new EventListenerList();
   private final ArrayList<ITreeNodeFilter> m_filters = new ArrayList<ITreeNodeFilter>();
+  private final ArrayList<Object> m_tmpExpandedElements = new ArrayList<Object>();
   private final HashMap<ImageDescriptor, Image> m_icons = new HashMap<ImageDescriptor, Image>();
 
   private Tree m_tree;
@@ -484,7 +485,6 @@ public class CheckableTree extends Composite {
   } // end class P_CheckboxListener
 
   private class P_DragSourceListener implements DragSourceListener {
-    private Object[] m_expandedElements;
 
     @Override
     public void dragStart(DragSourceEvent event) {
@@ -504,7 +504,10 @@ public class CheckableTree extends Composite {
           }
         }
       }
-      m_expandedElements = m_viewer.getExpandedElements();
+      m_tmpExpandedElements.clear();
+      for (Object expanded : m_viewer.getExpandedElements()) {
+        m_tmpExpandedElements.add(expanded);
+      }
     }
 
     @Override
@@ -521,10 +524,11 @@ public class CheckableTree extends Composite {
       try {
         m_viewer.getTree().setRedraw(false);
         m_viewer.refresh();
-        m_viewer.setExpandedElements(m_expandedElements);
+        m_viewer.setExpandedElements(m_tmpExpandedElements.toArray(new Object[m_tmpExpandedElements.size()]));
       }
       finally {
         m_viewer.getTree().setRedraw(true);
+        m_tmpExpandedElements.clear();
       }
     }
   } // end class P_DragSourceListener
@@ -575,9 +579,6 @@ public class CheckableTree extends Composite {
         selectedNode.setParent(null);
       }
       else if ((m_lastOperation & DND.DROP_COPY) != 0) {
-        if (selectedNode.getChildren().size() > 0) {
-          throw new IllegalStateException("in case of copy a node can not have children.");
-        }
         selectedNode = new TreeNode(selectedNode);
       }
       if (newParentNode.getChildren(NodeFilters.getByType(selectedNode.getType())).length == 0) {
@@ -585,8 +586,12 @@ public class CheckableTree extends Composite {
         selectedNode.setParent(newParentNode);
       }
 
+      // ensure the drop target is expanded so that we can see the drop
+      m_tmpExpandedElements.add(newParentNode);
+
       DndEvent dndEvent = new DndEvent(CheckableTree.this);
       dndEvent.node = getSelectedObject();
+      dndEvent.newNode = selectedNode;
       dndEvent.sourceParent = dndEvent.node.getParent();
       dndEvent.targetParent = newParentNode;
       dndEvent.doit = true;

@@ -117,6 +117,11 @@ public class TreeNode implements ITreeNode {
   }
 
   @Override
+  public void clearChildren() {
+    m_children.clear();
+  }
+
+  @Override
   public List<ITreeNode> getChildren() {
     return m_children;
   }

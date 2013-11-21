@@ -26,14 +26,14 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
-import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.scout.sdk.ui.wizard.AbstractServiceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -44,13 +44,13 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
-public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
+public class SqlServiceNewWizard extends AbstractServiceWizard {
   public static final String TYPE_SERVICE_IMPLEMENTATION = "svcImpl";
   public static final String TYPE_SERVICE_REG_SERVER = "svcServerReg";
 
-  private ServiceNewWizardPage m_serviceNewWizardPage;
-  private BundleTreeWizardPage m_locationWizardPage;
-  private ITreeNode m_locationWizardPageRoot;
+  private final ServiceNewWizardPage m_serviceNewWizardPage;
+  private final BundleTreeWizardPage m_locationWizardPage;
+  private final ITreeNode m_locationWizardPageRoot;
   private ServiceNewOperation m_operation;
 
   public SqlServiceNewWizard(IScoutBundle serverBundle) {
@@ -59,13 +59,13 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
 
     m_locationWizardPageRoot = createTree(serverBundle);
-    m_locationWizardPage = new BundleTreeWizardPage(Texts.get("SQLServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckerFilter());
+    m_locationWizardPage = new BundleTreeWizardPage(Texts.get("SQLServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckedFilter());
     m_locationWizardPage.addStatusProvider(statusProvider);
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
+    m_locationWizardPage.addCheckSelectionListener(new P_SessionCheckListener());
 
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSQLService"), Texts.get("CreateANewSQLService"),
         TypeUtility.getType(RuntimeClasses.ISqlService), SdkProperties.SUFFIX_SQL_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_SQL));
-    m_serviceNewWizardPage.setLocationBundle(serverBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.setSuperType(serviceSuperType);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
@@ -82,7 +82,8 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1);
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
+      ITreeNode svcRegNode = TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
+      refreshAvailableSessions(svcRegNode, svcRegNode);
     }
     return rootNode;
   }
@@ -99,9 +100,9 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
       m_operation.setImplementationProject(implementationBundle.getJavaProject());
       m_operation.setImplementationPackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
-    IScoutBundle[] serverRegBundles = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_SERVER, true, true);
-    for (IScoutBundle sb : serverRegBundles) {
-      m_operation.addServiceRegistrationProject(sb.getJavaProject());
+    for (ServiceRegistrationDescription desc : getCheckedServiceRegistrations(m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true))) {
+      m_operation.addServiceRegistration(desc);
+      storeUsedSession(desc);
     }
     return true;
   }
@@ -123,6 +124,11 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
     }
   }
 
+  @Override
+  public BundleTreeWizardPage getLocationsPage() {
+    return m_locationWizardPage;
+  }
+
   private class P_LocationPropertyListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
@@ -137,13 +143,6 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
       m_locationWizardPage.pingStateChanging();
     }
   } // end class P_LocationPropertyListener
-
-  private class P_InitialCheckerFilter implements ITreeNodeFilter {
-    @Override
-    public boolean accept(ITreeNode node) {
-      return TreeUtility.isOneOf(node.getType(), TYPE_SERVICE_IMPLEMENTATION, TYPE_SERVICE_REG_SERVER);
-    }
-  } // end class P_InitialCheckerFilter
 
   private class P_TreeDndListener implements ITreeDndListener {
     @Override
@@ -171,6 +170,9 @@ public class SqlServiceNewWizard extends AbstractWorkspaceWizard {
 
     @Override
     public void dndPerformed(DndEvent dndEvent) {
+      if (dndEvent.node.getType() == TYPE_SERVICE_REG_SERVER) {
+        refreshAvailableSessions(dndEvent.newNode, dndEvent.node);
+      }
       m_serviceNewWizardPage.pingStateChanging();
     }
 

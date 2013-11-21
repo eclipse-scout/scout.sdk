@@ -218,6 +218,13 @@ public class TypeFilters {
     };
   }
 
+  /**
+   * Gets a filter that accepts only types that are classes.<br>
+   * A class is defined as a type that is neither abstract, an interface or deprecated.
+   * 
+   * @return The filter that only accepts classes.
+   * @see #isClass(IType)
+   */
   public static ITypeFilter getClassFilter() {
     return CLASS_FILTER;
   }
@@ -266,6 +273,17 @@ public class TypeFilters {
     return INTERFACE_FILTER;
   }
 
+  /**
+   * Gets if the given type is a class.<br>
+   * A class is defined as a type that is neither abstract, an interface or deprecated.
+   * 
+   * @param type
+   *          The type to check
+   * @return true if the given type has none of the following flags: abstract, interface, deprecated
+   * @see Flags#isAbstract(int)
+   * @see Flags#isInterface(int)
+   * @see Flags#isDeprecated(int)
+   */
   protected static boolean isClass(IType type) {
     try {
       int flags = type.getFlags();

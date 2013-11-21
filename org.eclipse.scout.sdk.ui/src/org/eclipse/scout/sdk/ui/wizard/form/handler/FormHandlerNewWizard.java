@@ -24,7 +24,6 @@ public class FormHandlerNewWizard extends AbstractFormFieldWizard {
   public FormHandlerNewWizard(IType formType) {
     setWindowTitle(Texts.get("NewFormHandler"));
     initWizard(formType);
-
   }
 
   @Override

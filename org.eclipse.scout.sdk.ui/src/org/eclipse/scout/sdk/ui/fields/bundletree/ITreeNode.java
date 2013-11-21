@@ -151,4 +151,9 @@ public interface ITreeNode {
    */
   void setOrderNr(int orderNr);
 
+  /**
+   * removes all children from this tree node.
+   */
+  void clearChildren();
+
 }

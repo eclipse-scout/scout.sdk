@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -170,7 +171,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
 
     m_wsConsumerImplNewOperation = new WsConsumerImplNewOperation("I" + m_wsConsumerImplClassWizardPage.getTypeName(), m_wsConsumerImplClassWizardPage.getTypeName());
     m_wsConsumerImplNewOperation.setImplementationProject(m_bundle.getJavaProject());
-    m_wsConsumerImplNewOperation.addServiceRegistrationProject(m_bundle.getJavaProject());
+    m_wsConsumerImplNewOperation.addServiceRegistration(new ServiceRegistrationDescription(m_bundle.getJavaProject()));
     m_wsConsumerImplNewOperation.setImplementationPackageName(m_wsConsumerImplClassWizardPage.getPackageName());
     m_wsConsumerImplNewOperation.setCreateScoutWebServiceAnnotation(m_wsConsumerImplClassWizardPage.isAnnotateImplClass());
     m_wsConsumerImplNewOperation.setAuthenticationHandlerQName(m_wsConsumerImplClassWizardPage.getAuthenticationHandler());

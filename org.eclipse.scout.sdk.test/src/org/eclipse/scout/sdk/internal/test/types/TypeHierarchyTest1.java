@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.operation.form.FormNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -122,7 +123,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     SdkAssert.assertNotNull(serverBundle);
     ServiceNewOperation serviceOp = new ServiceNewOperation("ITestService", "TestService");
     serviceOp.addProxyRegistrationProject(clientBundle.getJavaProject());
-    serviceOp.addServiceRegistrationProject(serverBundle.getJavaProject());
+    serviceOp.addServiceRegistration(new ServiceRegistrationDescription(serverBundle.getJavaProject()));
     serviceOp.setImplementationProject(serverBundle.getJavaProject());
     serviceOp.setInterfaceProject(sharedBundle.getJavaProject());
     serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));

@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.FormHandlerNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -41,10 +40,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class FormHandlerNewWizardPage2 extends AbstractWorkspaceWizardPage {
 
-  final IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
-
   private String m_typeName;
-
   private StyledTextField m_typeNameField;
 
   // process members
@@ -56,7 +52,6 @@ public class FormHandlerNewWizardPage2 extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewFormHandler"));
     setDescription(Texts.get("CreateANewCalendarFormHandler"));
     m_declaringType = declaringType;
-
   }
 
   @Override

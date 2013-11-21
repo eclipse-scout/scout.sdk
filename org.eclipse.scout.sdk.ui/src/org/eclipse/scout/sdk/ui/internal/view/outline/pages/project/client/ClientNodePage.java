@@ -35,6 +35,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.formdata.ClientBundleUpdateFormDataOperation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class ClientNodePage extends AbstractBundleNodeTablePage {
 
@@ -70,11 +71,11 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
   @Override
   public void loadChildrenImpl() {
     super.loadChildrenImpl();
-    IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
     IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
     IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
 
     if (m_clientSessionHierarchy == null) {
+      IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
       m_clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
       m_clientSessionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
@@ -86,11 +87,8 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       m_desktopExtensionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension);
       m_desktopExtensionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    // client session
-    IType[] clientSessions = m_clientSessionHierarchy.getAllSubtypes(iClientSession, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
-    if (clientSessions.length > 1) {
-      ScoutSdkUi.logWarning("more than one client session found.");
-    }
+    // client sessions
+    IType[] clientSessions = ScoutTypeUtility.getClientSessionTypes(getScoutBundle());
     for (IType clientSession : clientSessions) {
       new ClientSessionNodePage(this, clientSession);
     }

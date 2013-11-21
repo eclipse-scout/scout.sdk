@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceMethod;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
@@ -227,7 +228,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
   private IType createProcessService(IScoutBundle client, IScoutBundle shared, IScoutBundle server, IType formData, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws IllegalArgumentException, CoreException {
     ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation("DesktopService");
     serviceOp.addProxyRegistrationProject(client.getJavaProject());
-    serviceOp.addServiceRegistrationProject(server.getJavaProject());
+    serviceOp.addServiceRegistration(new ServiceRegistrationDescription(server.getJavaProject()));
     serviceOp.setImplementationProject(server.getJavaProject());
     serviceOp.setImplementationPackageName(server.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES));
     serviceOp.setInterfaceProject(shared.getJavaProject());

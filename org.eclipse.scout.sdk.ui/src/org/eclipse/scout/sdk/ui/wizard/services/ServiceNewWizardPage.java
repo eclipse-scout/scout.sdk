@@ -56,8 +56,6 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   private final String m_typeNameSuffix;
   private final IScoutBundle m_bundle;
 
-  private IScoutBundle m_locationBundle;
-
   public ServiceNewWizardPage(String title, String message, IType definitionType, String typeNameSuffix, IScoutBundle b, String defaultPackage) {
     super(ServiceNewWizardPage.class.getName());
     m_typeNameSuffix = typeNameSuffix;
@@ -83,7 +81,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(m_definitionType, getLocationBundle().getJavaProject(), getSuperType()), labelColWidthPercent);
+        new JavaElementAbstractTypeContentProvider(m_definitionType, m_bundle.getJavaProject(), getSuperType()), labelColWidthPercent);
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -144,21 +142,6 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
-  }
-
-  /**
-   * @param locationBundle
-   *          the locationBundle to set
-   */
-  public void setLocationBundle(IScoutBundle locationBundle) {
-    m_locationBundle = locationBundle;
-  }
-
-  /**
-   * @return the locationBundle
-   */
-  public IScoutBundle getLocationBundle() {
-    return m_locationBundle;
   }
 
   public String getTypeNameSuffix() {

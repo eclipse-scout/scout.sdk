@@ -27,12 +27,11 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.servi
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup.LookupServiceTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>ServerNodePage</h3> ...
@@ -61,21 +60,15 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
   public void loadChildrenImpl() {
     super.loadChildrenImpl();
 
-    IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
-
     if (m_serverSessionHierarchy == null) {
+      IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
       m_serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
       m_serverSessionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
 
     try {
-      ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
-      IType[] serverSessions = m_serverSessionHierarchy.getAllSubtypes(iServerSession, filter, TypeComparators.getTypeNameComparator());
-      if (serverSessions.length > 1) {
-        ScoutSdkUi.logError("The server bundle '" + getScoutBundle().getSymbolicName() + "' can have in maximum 1 server session.");
-      }
-      else if (serverSessions.length == 1) {
-        new ServerSessionNodePage(this, serverSessions[0]);
+      for (IType serverSession : ScoutTypeUtility.getServerSessionTypes(getScoutBundle())) {
+        new ServerSessionNodePage(this, serverSession);
       }
     }
     catch (Exception e) {

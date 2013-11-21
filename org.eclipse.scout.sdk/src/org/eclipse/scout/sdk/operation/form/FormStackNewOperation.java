@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
@@ -65,8 +66,8 @@ public class FormStackNewOperation extends FormNewOperation {
   private String m_serviceImplementationSuperTypeSignature;
   private String m_serviceImplementationName;
   private String m_serviceImplementationPackage;
-  private List<IJavaProject> m_serviceProxyRegistrationProjects;
-  private List<IJavaProject> m_serviceRegistrationProjects;
+  private final List<IJavaProject> m_serviceProxyRegistrationProjects;
+  private final List<ServiceRegistrationDescription> m_serviceRegistrationDescriptions;
 
   // operation members
   private IType m_createdService;
@@ -80,7 +81,7 @@ public class FormStackNewOperation extends FormNewOperation {
 
   public FormStackNewOperation(String formName, String formPackageName, IJavaProject formProject) throws JavaModelException {
     super(formName, formPackageName, formProject);
-    m_serviceRegistrationProjects = new ArrayList<IJavaProject>();
+    m_serviceRegistrationDescriptions = new ArrayList<ServiceRegistrationDescription>();
     m_serviceProxyRegistrationProjects = new ArrayList<IJavaProject>();
   }
 
@@ -122,7 +123,7 @@ public class FormStackNewOperation extends FormNewOperation {
     serviceOp.setPermissionUpdatePackageName(getPermissionUpdatePackage());
     serviceOp.setPermissionUpdateProject(getPermissionUpdateProject());
     serviceOp.setProxyRegistrationProjects(getServiceProxyRegistrationProjects());
-    serviceOp.setServiceRegistrationProjects(getServiceRegistrationProjects());
+    serviceOp.setServiceRegistrations(getServiceRegistrations());
     serviceOp.validate();
     serviceOp.run(monitor, workingCopyManager);
     m_createdService = serviceOp.getCreatedServiceImplementation();
@@ -303,26 +304,6 @@ public class FormStackNewOperation extends FormNewOperation {
    */
   public List<IJavaProject> getServiceProxyRegistrationProjects() {
     return Collections.unmodifiableList(m_serviceProxyRegistrationProjects);
-  }
-
-  /**
-   * @return the serverServiceRegistryProjects
-   */
-  public List<IJavaProject> getServiceRegistrationProjects() {
-    return Collections.unmodifiableList(m_serviceRegistrationProjects);
-  }
-
-  public boolean addServiceRegistrationProject(IJavaProject project) {
-    return m_serviceRegistrationProjects.add(project);
-  }
-
-  /**
-   * @param serverServiceRegistryProjects
-   *          the serverServiceRegistryProjects to set
-   */
-  public void setServiceRegistrationProjects(List<IJavaProject> serverServiceRegistryProjects) {
-    m_serviceRegistrationProjects.clear();
-    m_serviceRegistrationProjects.addAll(serverServiceRegistryProjects);
   }
 
   /**
@@ -616,5 +597,22 @@ public class FormStackNewOperation extends FormNewOperation {
 
   public void setServiceImplementationSuperTypeSignature(String serviceSuperTypeSignature) {
     m_serviceImplementationSuperTypeSignature = serviceSuperTypeSignature;
+  }
+
+  public boolean addServiceRegistration(ServiceRegistrationDescription desc) {
+    return m_serviceRegistrationDescriptions.add(desc);
+  }
+
+  public boolean removeServiceRegistration(ServiceRegistrationDescription desc) {
+    return m_serviceRegistrationDescriptions.remove(desc);
+  }
+
+  public void setServiceRegistration(List<ServiceRegistrationDescription> desc) {
+    m_serviceRegistrationDescriptions.clear();
+    m_serviceRegistrationDescriptions.addAll(desc);
+  }
+
+  public List<ServiceRegistrationDescription> getServiceRegistrations() {
+    return Collections.unmodifiableList(m_serviceRegistrationDescriptions);
   }
 }

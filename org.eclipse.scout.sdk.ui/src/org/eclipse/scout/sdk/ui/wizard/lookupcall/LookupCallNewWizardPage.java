@@ -185,6 +185,9 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     else {
       m_serviceSuperTypeField.setEnabled(false);
       radioButtons.setEnabled(false);
+      m_createServiceButton.setEnabled(false);
+      m_useServiceButton.setEnabled(false);
+      m_serviceSuperTypeField.setVisible(false);
     }
     m_serviceSuperTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -402,18 +405,21 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
           ((GridData) m_serviceSuperTypeField.getLayoutData()).exclude = false;
           m_lookupServiceTypeField.setVisible(false);
           ((GridData) m_lookupServiceTypeField.getLayoutData()).exclude = true;
+          getWizard().getLocationsPage().setExcludePage(false);
           break;
         case USE_EXISTING:
           m_serviceSuperTypeField.setVisible(false);
           ((GridData) m_serviceSuperTypeField.getLayoutData()).exclude = true;
           m_lookupServiceTypeField.setVisible(true);
           ((GridData) m_lookupServiceTypeField.getLayoutData()).exclude = false;
+          getWizard().getLocationsPage().setExcludePage(true);
           break;
         case NO_SERVICE:
           m_serviceSuperTypeField.setVisible(false);
           ((GridData) m_serviceSuperTypeField.getLayoutData()).exclude = true;
           m_lookupServiceTypeField.setVisible(false);
           ((GridData) m_lookupServiceTypeField.getLayoutData()).exclude = true;
+          getWizard().getLocationsPage().setExcludePage(true);
           break;
       }
       m_lookupServiceTypeField.getParent().layout(true);

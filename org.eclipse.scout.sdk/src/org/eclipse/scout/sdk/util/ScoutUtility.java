@@ -22,7 +22,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -37,6 +36,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
@@ -44,6 +44,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.method.IMethodReturnValueParser;
 import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
@@ -54,6 +55,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
+import org.eclipse.scout.sdk.workspace.IScoutBundleGraphVisitor;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
@@ -170,44 +172,39 @@ public final class ScoutUtility {
     return indent.toString();
   }
 
-  public static void registerServiceClass(IProject project, String extensionPoint, String elemType, String className, String requiredSessionClass, String serviceFactoryClass, IProgressMonitor monitor) throws CoreException {
-    PluginModelHelper h = new PluginModelHelper(project);
-    HashMap<String, String> attributes = new HashMap<String, String>();
-    attributes.put("class", className);
+  public static void registerServiceClass(String extensionPoint, String elemType, String serviceClass, ServiceRegistrationDescription desc) throws CoreException {
+    PluginModelHelper h = new PluginModelHelper(desc.targetProject.getProject());
+    HashMap<String, String> attributes = new HashMap<String, String>(3);
+    attributes.put("class", serviceClass);
+    if (desc.session != null) {
+      attributes.put("session", desc.session);
+    }
+    if (desc.serviceFactory != null) {
+      attributes.put("factory", desc.serviceFactory);
+    }
     if (!h.PluginXml.existsSimpleExtension(extensionPoint, elemType, attributes)) {
-      if (requiredSessionClass != null) {
-        attributes.put("session", requiredSessionClass);
-      }
-      if (serviceFactoryClass != null) {
-        attributes.put("factory", serviceFactoryClass);
-      }
       h.PluginXml.addSimpleExtension(extensionPoint, elemType, attributes);
       h.save();
     }
   }
 
-  public static void unregisterServiceProxy(IType interfaceType, IProgressMonitor monitor) throws CoreException {
+  public static void unregisterServiceProxy(IType interfaceType) throws CoreException {
     IScoutBundle interfaceBundle = ScoutTypeUtility.getScoutBundle(interfaceType);
     for (IScoutBundle clientBundle : interfaceBundle.getChildBundles(
         ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT)), true)) {
-      unregisterServiceClass(clientBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, interfaceType.getFullyQualifiedName(), monitor);
+      unregisterServiceClass(clientBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, interfaceType.getFullyQualifiedName());
     }
   }
 
-  public static void unregisterServiceImplementation(IType serviceType, IProgressMonitor monitor) throws CoreException {
+  public static void unregisterServiceImplementation(IType serviceType) throws CoreException {
     IScoutBundle implementationBundle = ScoutTypeUtility.getScoutBundle(serviceType);
-    ScoutUtility.unregisterServiceClass(implementationBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), monitor);
-    for (IScoutBundle serverBundle : implementationBundle.getParentBundles(
+    for (IScoutBundle serverBundle : implementationBundle.getChildBundles(
         ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER)), true)) {
-      unregisterServiceClass(serverBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName(), serverBundle.getSymbolicName() + ".ServerSession", monitor);
+      unregisterServiceClass(serverBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName());
     }
   }
 
-  public static void unregisterServiceClass(IProject project, String extensionPoint, String elemType, String className, IProgressMonitor monitor) throws CoreException {
-    unregisterServiceClass(project, extensionPoint, elemType, className, null, monitor);
-  }
-
-  public static void unregisterServiceClass(IProject project, String extensionPoint, String elemType, String className, String requiredSessionClass, IProgressMonitor monitor) throws CoreException {
+  public static void unregisterServiceClass(IProject project, String extensionPoint, String elemType, String className) throws CoreException {
     PluginModelHelper h = new PluginModelHelper(project);
     HashMap<String, String> attributes = new HashMap<String, String>(1);
     attributes.put("class", className);
@@ -833,5 +830,44 @@ public final class ScoutUtility {
     else {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("NameNotValid"));
     }
+  }
+
+  /**
+   * Gets the one type from the given candidate types that is contained in the closest (nearest) parent bundle
+   * (=dependencies) of the given reference bundle.<br>
+   * <br>
+   * Types that are not found in any of the parent bundles (=dependencies) are ignored.
+   * 
+   * @param candidates
+   *          The list of types.
+   * @param reference
+   *          The reference bundle. Must not be null.
+   * @return The one (from the given candidates) whose surrounding scout bundle has the lowest distance to the reference
+   *         bundle. Or null if the candidates do not contain any types or all of them cannot be found in the
+   *         dependencies of the reference bundle.
+   */
+  public static IType getNearestType(IType[] candidates, IScoutBundle reference) {
+    if (candidates == null || candidates.length < 1) {
+      return null;
+    }
+    final Holder<IType> result = new Holder<IType>(IType.class, null);
+    final Holder<Integer> minDistance = new Holder<Integer>(Integer.class, Integer.valueOf(Integer.MAX_VALUE));
+    for (IType c : candidates) {
+      final IType candidate = c;
+      reference.visit(new IScoutBundleGraphVisitor() {
+        @Override
+        public boolean visit(IScoutBundle bundle, int traversalLevel) {
+          if (bundle.contains(candidate)) {
+            if (traversalLevel < minDistance.getValue().intValue()) {
+              minDistance.setValue(Integer.valueOf(traversalLevel));
+              result.setValue(candidate);
+            }
+            return false;
+          }
+          return true;
+        }
+      }, true, true);
+    }
+    return result.getValue();
   }
 }

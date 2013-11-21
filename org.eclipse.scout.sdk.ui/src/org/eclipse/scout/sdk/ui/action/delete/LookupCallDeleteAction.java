@@ -84,10 +84,10 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
         @Override
         protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
           if (m_lookupServiceInterface != null && member.equals(m_lookupServiceInterface)) {
-            ScoutUtility.unregisterServiceProxy(m_lookupServiceInterface, monitor);
+            ScoutUtility.unregisterServiceProxy(m_lookupServiceInterface);
           }
           if (m_lookupService != null && member.equals(m_lookupService)) {
-            ScoutUtility.unregisterServiceImplementation(m_lookupService, monitor);
+            ScoutUtility.unregisterServiceImplementation(m_lookupService);
           }
           super.deleteMember(member, icuForOrganizeImports, monitor, manager);
         }

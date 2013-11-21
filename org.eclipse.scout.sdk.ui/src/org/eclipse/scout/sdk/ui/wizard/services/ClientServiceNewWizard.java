@@ -26,13 +26,14 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeDndListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.scout.sdk.ui.wizard.AbstractServiceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -43,30 +44,31 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
-public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
+public class ClientServiceNewWizard extends AbstractServiceWizard {
 
   public static final String TYPE_SERVICE_INTERFACE = "svcIfc";
   public static final String TYPE_SERVICE_IMPLEMENTATION = "svcImpl";
   public static final String TYPE_SERVICE_REGISTRATION = "svcReg";
 
-  private BundleTreeWizardPage m_locationWizardPage;
-  private ServiceNewWizardPage m_serviceNewWizardPage;
+  private final BundleTreeWizardPage m_locationWizardPage;
+  private final ServiceNewWizardPage m_serviceNewWizardPage;
+  private final ITreeNode m_locationPageRoot;
   private ServiceNewOperation m_operation;
-  private ITreeNode m_locationPageRoot;
 
   public ClientServiceNewWizard(IScoutBundle clientBundle) {
     setWindowTitle(Texts.get("NewClientService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewClientService"), Texts.get("CreateANewClientService"),
         TypeUtility.getType(RuntimeClasses.IService), SdkProperties.SUFFIX_SERVICE, clientBundle, DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_SERVICES));
-    m_serviceNewWizardPage.setLocationBundle(clientBundle);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
     addPage(m_serviceNewWizardPage);
+
     m_locationPageRoot = createTree(clientBundle);
-    m_locationWizardPage = new BundleTreeWizardPage(Texts.get("ServiceLocation"), Texts.get("OrganiseLocations"), m_locationPageRoot, NodeFilters.getByData((Object[]) null));
+    m_locationWizardPage = new BundleTreeWizardPage(Texts.get("ServiceLocation"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
     m_locationWizardPage.addStatusProvider(statusProvider);
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
+    m_locationWizardPage.addCheckSelectionListener(new P_SessionCheckListener());
     addPage(m_locationWizardPage);
     // init
     m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IService, clientBundle.getJavaProject()));
@@ -78,7 +80,9 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
     // service client reg
     TreeUtility.createNode(clientNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1);
     TreeUtility.createNode(clientNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), 2);
-    TreeUtility.createNode(clientNode, TYPE_SERVICE_REGISTRATION, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 3);
+    ITreeNode svcRegNode = TreeUtility.createNode(clientNode, TYPE_SERVICE_REGISTRATION, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 3);
+    //sessions
+    refreshAvailableSessions(svcRegNode, svcRegNode);
     return rootNode;
   }
 
@@ -100,8 +104,9 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
     if (superType != null) {
       m_operation.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
-    for (IScoutBundle sb : m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REGISTRATION, true, true)) {
-      m_operation.addServiceRegistrationProject(sb.getJavaProject());
+    for (ServiceRegistrationDescription desc : getCheckedServiceRegistrations(m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REGISTRATION, true, true))) {
+      m_operation.addServiceRegistration(desc);
+      storeUsedSession(desc);
     }
     return true;
   }
@@ -121,6 +126,11 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
       ScoutSdkUi.logError("error during executing operation '" + m_operation.getOperationName() + "'.", e);
       return false;
     }
+  }
+
+  @Override
+  public BundleTreeWizardPage getLocationsPage() {
+    return m_locationWizardPage;
   }
 
   private class P_LocationPropertyListener implements PropertyChangeListener {
@@ -184,6 +194,9 @@ public class ClientServiceNewWizard extends AbstractWorkspaceWizard {
 
     @Override
     public void dndPerformed(DndEvent dndEvent) {
+      if (dndEvent.node.getType() == TYPE_SERVICE_REGISTRATION) {
+        refreshAvailableSessions(dndEvent.newNode, dndEvent.node);
+      }
       m_serviceNewWizardPage.pingStateChanging();
     }
   } // end class P_TreeDndListener

@@ -86,10 +86,10 @@ public class FormDeleteAction extends AbstractScoutHandler {
         @Override
         protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
           if (m_processServiceInterface != null && member.equals(m_processServiceInterface)) {
-            ScoutUtility.unregisterServiceProxy(m_processServiceInterface, monitor);
+            ScoutUtility.unregisterServiceProxy(m_processServiceInterface);
           }
           if (m_processServiceImplementation != null && member.equals(m_processServiceImplementation)) {
-            ScoutUtility.unregisterServiceImplementation(m_processServiceImplementation, monitor);
+            ScoutUtility.unregisterServiceImplementation(m_processServiceImplementation);
           }
           super.deleteMember(member, icuForOrganizeImports, monitor, manager);
         }

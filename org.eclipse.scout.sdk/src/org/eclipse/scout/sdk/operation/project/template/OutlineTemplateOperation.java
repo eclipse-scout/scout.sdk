@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceNewOperation;
+import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -126,7 +127,7 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         // create outline service
         ServiceNewOperation outlineServiceOp = new ServiceNewOperation("IStandardOutlineService", "StandardOutlineService");
         outlineServiceOp.addProxyRegistrationProject(client.getJavaProject());
-        outlineServiceOp.addServiceRegistrationProject(server.getJavaProject());
+        outlineServiceOp.addServiceRegistration(new ServiceRegistrationDescription(server.getJavaProject()));
         outlineServiceOp.setImplementationProject(server.getJavaProject());
         outlineServiceOp.setInterfaceProject(shared.getJavaProject());
         outlineServiceOp.setInterfacePackageName(shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES));
