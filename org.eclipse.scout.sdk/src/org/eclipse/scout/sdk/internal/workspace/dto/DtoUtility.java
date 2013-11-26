@@ -94,28 +94,6 @@ public final class DtoUtility {
     return pageDataSourceBuilder;
   }
 
-  public static String getFormDataName(String typeName) {
-    String formDataName = typeName;
-    if (typeName.endsWith("Field")) {
-      formDataName = typeName.replaceAll("Field$", "");
-    }
-    else if (typeName.endsWith("Button")) {
-      formDataName = typeName.replaceAll("Button$", "");
-    }
-    else if (typeName.endsWith("Column")) {
-      formDataName = typeName.replaceAll("Column$", "");
-    }
-    String resultName = formDataName;
-//    int i = 0;
-//    if (operation != null) {
-//      while (operation.getTypeNewOperation(resultName) != null) {
-//        resultName = formDataName + i;
-//        i++;
-//      }
-//    }
-    return resultName;
-  }
-
   public static IType findTable(IType tableOwner, ITypeHierarchy hierarchy) {
 
     if (TypeUtility.exists(tableOwner)) {
@@ -153,7 +131,6 @@ public final class DtoUtility {
           ScoutSdk.logError("could not find generic type for form data of type '" + formField.getFullyQualifiedName() + "'.");
         }
       }
-
     }
     return superTypeSignature;
   }
@@ -312,5 +289,72 @@ public final class DtoUtility {
       }
     }
     return list;
+  }
+
+  /**
+   * @return Returns the form field data for the given form field or <code>null</code> if it does not have one.
+   * @since 3.8.2
+   */
+  public static IType getFormDataType(IType formField, ITypeHierarchy hierarchy) throws JavaModelException {
+    IType primaryType = getFormFieldDataPrimaryTypeRec(formField, hierarchy);
+    if (!TypeUtility.exists(primaryType)) {
+      return null;
+    }
+
+    // check if the primary type itself is the correct type
+    String formDataName = getFormDataName(formField.getElementName());
+    if (primaryType.getElementName().equals(formDataName)) {
+      return primaryType;
+    }
+
+    // search field data within form data
+    IType formDataType = primaryType.getType(formDataName);
+    if (TypeUtility.exists(formDataType)) {
+      return formDataType;
+    }
+    return null;
+  }
+
+  /**
+   * @return Returns the form field data for the given form field or <code>null</code> if it does not have one. The
+   *         method walks recursively through the list of declaring classes until it has reached a primary type.
+   * @since 3.8.2
+   */
+  private static IType getFormFieldDataPrimaryTypeRec(IType recursiveDeclaringType, ITypeHierarchy hierarchy) throws JavaModelException {
+    if (!TypeUtility.exists(recursiveDeclaringType)) {
+      return null;
+    }
+    FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(recursiveDeclaringType, hierarchy);
+    if (formDataAnnotation == null) {
+      return null;
+    }
+    if (FormDataAnnotation.isIgnore(formDataAnnotation)) {
+      return null;
+    }
+
+    IType declaringType = recursiveDeclaringType.getDeclaringType();
+    if (declaringType == null) {
+      // primary type
+      if (FormDataAnnotation.isSdkCommandCreate(formDataAnnotation) || FormDataAnnotation.isSdkCommandUse(formDataAnnotation)) {
+        return TypeUtility.getTypeBySignature(formDataAnnotation.getFormDataTypeSignature());
+      }
+      return null;
+    }
+
+    return getFormFieldDataPrimaryTypeRec(declaringType, hierarchy);
+  }
+
+  public static String getFormDataName(String typeName) {
+    String formDataName = typeName;
+    if (typeName.endsWith("Field")) {
+      formDataName = typeName.replaceAll("Field$", "");
+    }
+    else if (typeName.endsWith("Button")) {
+      formDataName = typeName.replaceAll("Button$", "");
+    }
+    else if (typeName.endsWith("Column")) {
+      formDataName = typeName.replaceAll("Column$", "");
+    }
+    return formDataName;
   }
 }

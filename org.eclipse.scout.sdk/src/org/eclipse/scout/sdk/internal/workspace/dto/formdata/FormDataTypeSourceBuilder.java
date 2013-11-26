@@ -91,7 +91,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
     String superTypeSignature = null;
     if (ScoutTypeUtility.existsReplaceAnnotation(getModelType())) {
       IType replacedType = getLocalTypeHierarchy().getSuperclass(getModelType());
-      IType replacedFormFieldDataType = ScoutTypeUtility.getFormDataType(replacedType, getLocalTypeHierarchy());
+      IType replacedFormFieldDataType = DtoUtility.getFormDataType(replacedType, getLocalTypeHierarchy());
       if (replacedFormFieldDataType != null) {
         superTypeSignature = SignatureCache.createTypeSignature(replacedFormFieldDataType.getFullyQualifiedName());
       }
@@ -121,7 +121,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
     boolean superTypeHasNoFormFieldData = false;
     if (replaceAnnotationPresent) {
       IType superType = hierarchy.getSuperclass(getModelType());
-      superTypeHasNoFormFieldData = ScoutTypeUtility.getFormDataType(superType, hierarchy) == null;
+      superTypeHasNoFormFieldData = DtoUtility.getFormDataType(superType, hierarchy) == null;
     }
 
     final List<ValidationRuleMethod> list = DtoUtility.getValidationRuleMethods(getModelType(), hierarchy.getJdtHierarchy(), monitor);

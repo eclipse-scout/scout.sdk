@@ -106,7 +106,8 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
         else if (FormDataAnnotation.isIgnore(fieldAnnotation)) {
           continue;
         }
-        else if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ICompositeField), formField)) {
+
+        if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ICompositeField), formField)) {
           createCompositeFieldFormData(formField, declaringTypeHierarchy, monitor);
         }
       }

@@ -52,7 +52,7 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
     String superTypeSignature = null;
     if (ScoutTypeUtility.existsReplaceAnnotation(getModelType())) {
       IType replacedType = getLocalTypeHierarchy().getSuperclass(getModelType());
-      IType replacedFormFieldDataType = ScoutTypeUtility.getFormDataType(replacedType, getLocalTypeHierarchy());
+      IType replacedFormFieldDataType = DtoUtility.getFormDataType(replacedType, getLocalTypeHierarchy());
       if (replacedFormFieldDataType != null) {
         superTypeSignature = SignatureCache.createTypeSignature(replacedFormFieldDataType.getFullyQualifiedName());
       }
