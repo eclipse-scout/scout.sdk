@@ -3,12 +3,14 @@ package org.eclipse.scout.sdk.util.pde;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.osgi.service.resolver.BundleDescription;
+import org.eclipse.osgi.service.resolver.State;
 import org.eclipse.pde.core.build.IBuildModel;
 import org.eclipse.pde.core.plugin.IPluginBase;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.pde.internal.core.PDEState;
+import org.eclipse.pde.internal.core.PluginModelManager;
 import org.eclipse.pde.internal.core.build.WorkspaceBuildModel;
 import org.eclipse.pde.internal.core.bundle.BundlePluginModel;
 import org.eclipse.pde.internal.core.bundle.BundlePluginModelBase;
@@ -17,6 +19,7 @@ import org.eclipse.pde.internal.core.ibundle.IBundle;
 import org.eclipse.pde.internal.core.ibundle.IBundlePluginModelBase;
 import org.eclipse.pde.internal.core.plugin.WorkspaceExtensionsModel;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
+import org.osgi.framework.Version;
 
 /**
  * Base class for PDE model access of workspace plugins.<br>
@@ -167,8 +170,32 @@ public final class LazyPluginModel {
     return m_bundleModel;
   }
 
+  /**
+   * @see PluginModelManager#getState()
+   */
   public final static PDEState getPdeState() {
     return PDECore.getDefault().getModelManager().getState();
+  }
+
+  /**
+   * @see State#getBundles()
+   */
+  public final static BundleDescription[] getBundles() {
+    return getPdeState().getState().getBundles();
+  }
+
+  /**
+   * @see State#getBundles(String)
+   */
+  public final static BundleDescription[] getBundles(String symbolicName) {
+    return getPdeState().getState().getBundles(symbolicName);
+  }
+
+  /**
+   * @see State#getBundle(String, Version)
+   */
+  public final static BundleDescription getBundle(String symbolicName, Version version) {
+    return getPdeState().getState().getBundle(symbolicName, version);
   }
 
   public synchronized BundleDescription getBundleDescription() {
