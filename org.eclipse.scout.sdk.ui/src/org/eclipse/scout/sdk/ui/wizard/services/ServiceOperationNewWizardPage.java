@@ -31,9 +31,8 @@ import org.eclipse.scout.sdk.ui.internal.fields.code.IParameterFieldListener;
 import org.eclipse.scout.sdk.ui.internal.fields.code.ParameterField;
 import org.eclipse.scout.sdk.ui.internal.fields.code.ReturnParameterField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -78,8 +77,13 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    IScoutBundle interfaceBundle = ScoutTypeUtility.getScoutBundle(m_serviceInterface.getJavaProject());
-    IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{interfaceBundle.getJavaProject()});
+    IJavaSearchScope searchScope = null;
+    if (TypeUtility.exists(m_serviceInterface)) {
+      searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{m_serviceInterface.getJavaProject()});
+    }
+    else {
+      searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{m_serviceImplementation.getJavaProject()});
+    }
 
     m_returnParameterField = new ReturnParameterField(parent, 20, m_returnParameter, searchScope);
     m_returnParameterField.setLabel(Texts.get("ReturnType"));

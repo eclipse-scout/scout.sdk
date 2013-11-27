@@ -99,7 +99,6 @@ public class ClientServiceNewWizard extends AbstractServiceWizard {
       m_operation.setInterfaceProject(interfaceBundle.getJavaProject());
       m_operation.setInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
-    m_operation.addImplementationInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
     IType superType = m_serviceNewWizardPage.getSuperType();
     if (superType != null) {
       m_operation.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));

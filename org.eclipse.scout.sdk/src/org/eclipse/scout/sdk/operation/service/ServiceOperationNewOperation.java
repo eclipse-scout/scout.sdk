@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class ServiceOperationNewOperation implements IOperation {
@@ -62,7 +63,7 @@ public class ServiceOperationNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
 
-    ServiceMethod createMethod = new ServiceMethod(getMethodName(), getServiceInterface().getFullyQualifiedName());
+    ServiceMethod createMethod = new ServiceMethod(getMethodName(), TypeUtility.exists(getServiceInterface()) ? getServiceInterface().getFullyQualifiedName() : null);
     for (ParameterArgument arg : getArguments()) {
       createMethod.addParameter(new MethodParameter(arg.getName(), SignatureCache.createTypeSignature(arg.getType())));
     }
@@ -89,15 +90,17 @@ public class ServiceOperationNewOperation implements IOperation {
       }
     });
 
-    MethodNewOperation ifcMno = new MethodNewOperation(createMethod.getInterfaceSourceBuilder(), getServiceInterface(), true) {
-      @Override
-      protected void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        super.createSource(source, lineDelimiter, ownerProject, validator);
-        createImports(validator);
-      }
-    };
-    ifcMno.validate();
-    ifcMno.run(monitor, workingCopyManager);
+    if (TypeUtility.exists(getServiceInterface())) {
+      MethodNewOperation ifcMno = new MethodNewOperation(createMethod.getInterfaceSourceBuilder(), getServiceInterface(), true) {
+        @Override
+        protected void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          super.createSource(source, lineDelimiter, ownerProject, validator);
+          createImports(validator);
+        }
+      };
+      ifcMno.validate();
+      ifcMno.run(monitor, workingCopyManager);
+    }
 
     MethodNewOperation svcMno = new MethodNewOperation(createMethod.getImplementationSourceBuilder(), getServiceImplementation(), true);
     svcMno.validate();

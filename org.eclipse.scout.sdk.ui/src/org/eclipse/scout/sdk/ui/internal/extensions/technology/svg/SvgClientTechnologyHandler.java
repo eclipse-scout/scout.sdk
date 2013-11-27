@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.svg;
 
+import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -62,14 +63,14 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
 
   public static String[] getAdditionalBatik17ScoutPlugins() {
     if (JdtUtility.isBatik17OrNewer()) {
-      return BATIK_17_SCOUT_ONLY_SVG_PLUGINS;
+      return Arrays.copyOf(BATIK_17_SCOUT_ONLY_SVG_PLUGINS, BATIK_17_SCOUT_ONLY_SVG_PLUGINS.length);
     }
     return null;
   }
 
   public static String[] getAdditionalBatik17CorePlugins() {
     if (JdtUtility.isBatik17OrNewer()) {
-      return BATIK_17_CORE_SVG_PLUGINS;
+      return Arrays.copyOf(BATIK_17_CORE_SVG_PLUGINS, BATIK_17_CORE_SVG_PLUGINS.length);
     }
     return null;
   }

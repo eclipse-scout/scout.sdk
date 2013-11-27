@@ -307,7 +307,8 @@ public final class JdtUtility {
   }
 
   /**
-   * Gets the newest (highest) bundle with the given symbolic name that can be found in the active target platform.
+   * Gets the newest (highest version) bundle with the given symbolic name that can be found in the active target
+   * platform.
    * 
    * @param symbolicName
    *          the symbolic name of the bundles to check.
@@ -343,6 +344,7 @@ public final class JdtUtility {
 
   public static boolean isBatik17OrNewer() {
     BundleDescription batikUtil = JdtUtility.getNewestBundleInActiveTargetPlatform("org.apache.batik.util");
-    return batikUtil != null && batikUtil.getVersion().getMajor() == 1 && batikUtil.getVersion().getMinor() == 7;
+    return batikUtil != null &&
+        ((batikUtil.getVersion().getMajor() == 1 && batikUtil.getVersion().getMinor() >= 7) || batikUtil.getVersion().getMajor() > 1);
   }
 }
