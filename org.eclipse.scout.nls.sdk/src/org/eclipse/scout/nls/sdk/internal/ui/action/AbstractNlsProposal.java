@@ -30,7 +30,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 /**
  * <h3>{@link AbstractNlsProposal}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 24.10.2013
  */
 public abstract class AbstractNlsProposal implements IJavaCompletionProposal, ICompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3, ICompletionProposalExtension4 {
@@ -133,13 +133,24 @@ public abstract class AbstractNlsProposal implements IJavaCompletionProposal, IC
     index = offset;
     boolean masked = false;
     while ((document.getLength() > index && index < (lineRange.getOffset() + lineRange.getLength()))) {
-      if (!masked && document.getChar(index) == '"') {
+      if (masked) {
+        masked = false; // the current character is masked -> ignore
+      }
+      else if (document.getChar(index) == '\\') {
+        masked = true; // the next character is masked and must therefore be ignored
+      }
+      else if (document.getChar(index) == '"') {
         endOffset = index;
         break;
       }
       index++;
     }
-    if (startOffest > -1 && endOffset > -1) {
+
+    if (startOffest > -1) {
+      if (endOffset < 0) {
+        // no end found: use the line end
+        endOffset = lineRange.getOffset() + lineRange.getLength();
+      }
       return new Point(startOffest, endOffset);
     }
     return null;
@@ -147,13 +158,15 @@ public abstract class AbstractNlsProposal implements IJavaCompletionProposal, IC
 
   protected void replaceWith(IDocument document, int offset, String replacement) throws BadLocationException {
     Point keyRange = findKeyRange(document, offset);
-    m_selection = new Point(keyRange.x, replacement.length());
-    ReplaceEdit replaceEdit = new ReplaceEdit(keyRange.x, keyRange.y - keyRange.x, replacement);
-    try {
-      replaceEdit.apply(document);
-    }
-    catch (Exception e) {
-      NlsCore.logWarning(e);
+    if (keyRange != null) {
+      m_selection = new Point(keyRange.x, replacement.length());
+      ReplaceEdit replaceEdit = new ReplaceEdit(keyRange.x, keyRange.y - keyRange.x, replacement);
+      try {
+        replaceEdit.apply(document);
+      }
+      catch (Exception e) {
+        NlsCore.logWarning(e);
+      }
     }
   }
 

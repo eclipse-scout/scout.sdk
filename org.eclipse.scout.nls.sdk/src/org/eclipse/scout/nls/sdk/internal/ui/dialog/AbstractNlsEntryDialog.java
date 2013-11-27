@@ -87,6 +87,11 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
   }
 
   @Override
+  public boolean isHelpAvailable() {
+    return false;
+  }
+
+  @Override
   protected final void configureShell(Shell newShell) {
     super.configureShell(newShell);
     newShell.setText(m_title);

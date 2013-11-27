@@ -22,6 +22,7 @@ import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.ui.action.NlsEntryNewAction;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Display;
@@ -80,7 +81,7 @@ public class NewNlsProposal extends AbstractNlsProposal {
     String proposalFieldText = "";
 
     if (!StringUtility.isNullOrEmpty(searchText)) {
-      proposalFieldText = searchText;
+      proposalFieldText = JdtUtility.fromStringLiteral("\"" + searchText + "\"");
     }
     String key = m_project.generateNewKey(proposalFieldText);
     NlsEntry entry = new NlsEntry(key, m_project);
