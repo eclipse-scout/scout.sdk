@@ -126,7 +126,12 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     m_shutdownListener = new IWorkbenchListener() {
       @Override
       public boolean preShutdown(IWorkbench workbench, boolean forced) {
-        new P_AutoUpdateOperationsShutdownJob().schedule();
+        try {
+          new P_AutoUpdateOperationsShutdownJob().schedule();
+        }
+        catch (Throwable e) {
+          ScoutSdkUi.logError(e);
+        }
         return true;
       }
 
