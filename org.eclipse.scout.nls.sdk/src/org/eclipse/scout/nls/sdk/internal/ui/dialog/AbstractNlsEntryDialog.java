@@ -139,7 +139,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     m_projectProposalField.addSmartFieldListener(new ISmartFieldListener() {
       @Override
       public void itemSelected(Object item) {
-        if (item instanceof INlsProject) {
+        if (item instanceof INlsProject && m_nlsProject != item) {
           m_nlsProject = (INlsProject) item;
           m_nlsEntry = new NlsEntry(m_nlsEntry, m_nlsProject);
 
