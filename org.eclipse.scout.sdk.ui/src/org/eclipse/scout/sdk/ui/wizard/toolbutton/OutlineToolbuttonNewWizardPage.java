@@ -164,10 +164,11 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
 
   protected IStatus getStatusNameField() throws JavaModelException {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_TOOL);
-    if (javaFieldNameStatus.isOK()) {
-      if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
+    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
+      return javaFieldNameStatus;
+    }
+    if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     return javaFieldNameStatus;
   }

@@ -158,10 +158,12 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_SERVICE);
-    if (javaFieldNameStatus.isOK()) {
-      if (TypeUtility.existsType(getServerBundle().getPackageName(getTargetPackage(IDefaultTargetPackage.SERVER_SERVICES)) + "." + getTypeName())) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
+    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
+      return javaFieldNameStatus;
+    }
+    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getServerBundle(), getTargetPackage(IDefaultTargetPackage.SERVER_SERVICES), getTypeName());
+    if (!existingStatus.isOK()) {
+      return existingStatus;
     }
     return javaFieldNameStatus;
   }

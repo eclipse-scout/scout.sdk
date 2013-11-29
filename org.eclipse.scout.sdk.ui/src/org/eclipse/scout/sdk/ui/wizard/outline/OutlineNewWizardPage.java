@@ -210,10 +210,12 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_OUTLINE);
-    if (javaFieldNameStatus.isOK()) {
-      if (TypeUtility.existsType(getClientBundle().getPackageName(getTargetPackage()) + "." + getTypeName())) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
+    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
+      return javaFieldNameStatus;
+    }
+    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getClientBundle(), getTargetPackage(), getTypeName());
+    if (!existingStatus.isOK()) {
+      return existingStatus;
     }
     return javaFieldNameStatus;
   }

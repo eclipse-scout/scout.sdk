@@ -258,10 +258,12 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_FORM);
-    if (javaFieldNameStatus.isOK()) {
-      if (TypeUtility.existsType(getClientBundle().getPackageName(getTargetPackage(IDefaultTargetPackage.CLIENT_FORMS)) + "." + getTypeName())) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
+    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
+      return javaFieldNameStatus;
+    }
+    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getClientBundle(), getTargetPackage(IDefaultTargetPackage.CLIENT_FORMS), getTypeName());
+    if (!existingStatus.isOK()) {
+      return existingStatus;
     }
     return javaFieldNameStatus;
   }

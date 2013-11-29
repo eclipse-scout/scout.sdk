@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractT
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -129,10 +128,12 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), getTypeNameSuffix());
-    if (javaFieldNameStatus.isOK()) {
-      if (TypeUtility.existsType(m_bundle.getPackageName(getTargetPackage()) + "." + getTypeName())) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
+    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
+      return javaFieldNameStatus;
+    }
+    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(m_bundle, getTargetPackage(), getTypeName());
+    if (!existingStatus.isOK()) {
+      return existingStatus;
     }
     return javaFieldNameStatus;
   }

@@ -19,9 +19,14 @@ import java.util.TreeSet;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceProxy;
+import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
@@ -36,6 +41,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -46,6 +52,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.method.IMethodReturnValueParser;
 import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
@@ -830,6 +837,54 @@ public final class ScoutUtility {
     else {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("NameNotValid"));
     }
+  }
+
+  /**
+   * Gets the validation status for a potential new class in the given bundle, below the given package suffix with given
+   * name.<br>
+   * The method does no check for java classes, but checks if there exists a resource with the target name already.
+   * 
+   * @param container
+   *          The bundle in which the type would be created.
+   * @param packageSuffix
+   *          The suffix under which the type would be created.
+   * @param typeName
+   *          the name of the potential type.
+   * @return the ok status if no file exists at the target location with the given name. An error status otherwise.
+   */
+  public static IStatus getTypeExistingStatus(IScoutBundle container, String packageSuffix, String typeName) {
+    if (typeName == null) {
+      return Status.OK_STATUS;
+    }
+    String pck = container.getPackageName(packageSuffix);
+    StringBuilder pathBuilder = new StringBuilder(TypeUtility.DEFAULT_SOURCE_FOLDER_NAME);
+    pathBuilder.append(IPath.SEPARATOR).append(pck.replace('.', IPath.SEPARATOR));
+
+    final BooleanHolder elementFound = new BooleanHolder(false);
+    final String typeNameComplete = typeName + ".java";
+    IFolder folder = container.getProject().getFolder(pathBuilder.toString());
+
+    if (folder.exists()) {
+      try {
+        folder.accept(new IResourceProxyVisitor() {
+          @Override
+          public boolean visit(IResourceProxy proxy) throws CoreException {
+            if (proxy.getType() == IResource.FILE && typeNameComplete.equalsIgnoreCase(proxy.getName())) {
+              elementFound.setValue(true);
+            }
+            return true;
+          }
+        }, IResource.DEPTH_ONE, IResource.NONE);
+      }
+      catch (CoreException e) {
+        return new ScoutStatus("Unable to check if the type '" + typeName + "' already exists.", e);
+      }
+    }
+
+    if (elementFound.getValue()) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+    }
+    return Status.OK_STATUS;
   }
 
   /**

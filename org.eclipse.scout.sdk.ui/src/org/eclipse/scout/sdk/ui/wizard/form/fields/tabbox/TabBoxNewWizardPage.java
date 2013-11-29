@@ -156,10 +156,11 @@ public class TabBoxNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_BOX);
-    if (javaFieldNameStatus.isOK()) {
-      if (ScoutTypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getRegexSimpleNameFilter(getTypeName())).length > 0) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
+    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
+      return javaFieldNameStatus;
+    }
+    if (ScoutTypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getRegexSimpleNameFilter(getTypeName())).length > 0) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     return javaFieldNameStatus;
   }

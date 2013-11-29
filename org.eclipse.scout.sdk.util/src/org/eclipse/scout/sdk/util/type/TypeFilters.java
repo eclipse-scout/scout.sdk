@@ -117,14 +117,38 @@ public class TypeFilters {
     };
   }
 
-  public static ITypeFilter getRegexSimpleNameFilter(final String regex) {
-    final Pattern pat = Pattern.compile(regex);
+  /**
+   * Creates and gets a new type filter that accepts all types where the simple name matches the given regex with the
+   * given regex flags.
+   * 
+   * @param regex
+   *          The expression to use
+   * @param flags
+   *          The regex flags to use. A bit mask that may include {@link Pattern#CASE_INSENSITIVE},
+   *          {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ},
+   *          {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL} and {@link Pattern#COMMENTS}
+   * @return the created filter
+   */
+  public static ITypeFilter getRegexSimpleNameFilter(final String regex, int flags) {
+    final Pattern pat = Pattern.compile(regex, flags);
     return new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
         return pat.matcher(type.getElementName()).matches();
       }
     };
+  }
+
+  /**
+   * Creates and gets a new type filter that accepts all types where the simple name matches the given regex pattern.<br>
+   * <b>Note: The given regex uses case-insensitive matching!</b>
+   * 
+   * @param regex
+   *          The regex to use for the matching.
+   * @return the created filter
+   */
+  public static ITypeFilter getRegexSimpleNameFilter(final String regex) {
+    return getRegexSimpleNameFilter(regex, Pattern.CASE_INSENSITIVE);
   }
 
   public static ITypeFilter getInnerTypeFilter(final IType type) {

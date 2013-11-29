@@ -239,10 +239,11 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
 
   protected IStatus getStatusNameField() throws JavaModelException {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_TABLE_COLUMN);
-    if (javaFieldNameStatus.isOK()) {
-      if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
+    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
+      return javaFieldNameStatus;
+    }
+    if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     return javaFieldNameStatus;
   }

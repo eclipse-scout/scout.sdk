@@ -266,10 +266,11 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusNameField() throws JavaModelException {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_MENU);
-    if (javaFieldNameStatus.isOK()) {
-      if (TypeUtility.hasInnerType(m_declaringType, getTypeName())) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
+    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
+      return javaFieldNameStatus;
+    }
+    if (TypeUtility.hasInnerType(m_declaringType, getTypeName())) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     return javaFieldNameStatus;
   }
