@@ -114,6 +114,17 @@ public final class HierarchyCache implements IHierarchyCache {
     return null;
   }
 
+  @Override
+  public void invalidateAll() {
+    synchronized (m_cacheLock) {
+      for (IPrimaryTypeTypeHierarchy h : m_cachedPrimaryTypeHierarchies.values()) {
+        if (h.isCreated()) {
+          h.invalidate();
+        }
+      }
+    }
+  }
+
   private void handleTypeChange(IType t, ITypeHierarchy superTypeHierarchy) {
     try {
       ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>(m_cachedPrimaryTypeHierarchies.size());
@@ -276,6 +287,16 @@ public final class HierarchyCache implements IHierarchyCache {
             SdkUtilActivator.logError(ex);
           }
         }
+        else if (e.getElementType() == IJavaElement.JAVA_PROJECT) {
+          if ((e.getFlags() & IJavaElementDelta.F_OPENED) != 0 || e.getFlags() == 0) {
+            // a new java project has been created/imported/opened/added in the workspace
+            invalidateAll();
+          }
+          else if ((e.getFlags() & IJavaElementDelta.F_CLOSED) != 0) {
+            // a project has been closed
+            handleJavaElementRemoved(e.getElement());
+          }
+        }
         break;
       }
       case IJavaElementDelta.REMOVED: {
@@ -291,5 +312,4 @@ public final class HierarchyCache implements IHierarchyCache {
         break;
     }
   }
-
 }

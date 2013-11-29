@@ -50,15 +50,17 @@ public class JdtEvent extends EventObject {
    * {@link JdtEvent#BUFFER_SYNC}
    */
   private final int m_eventType;
+  private final int m_flags;
   private final IJavaElement m_element;
   private IType m_declaringType;
 
   private ITypeHierarchy m_superTypeHierarchy;
 
-  public JdtEvent(Object source, int eventType, IJavaElement element) {
+  public JdtEvent(Object source, int eventType, int flags, IJavaElement element) {
     super(source);
     m_eventType = eventType;
     m_element = element;
+    m_flags = flags;
   }
 
   public int getEventType() {
@@ -220,5 +222,12 @@ public class JdtEvent extends EventObject {
       default:
         return "???";
     }
+  }
+
+  /**
+   * @see IJavaElementDelta#getFlags()
+   */
+  public int getFlags() {
+    return m_flags;
   }
 }

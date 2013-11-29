@@ -33,7 +33,6 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 @SuppressWarnings("restriction")
@@ -130,14 +129,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
      * Also used in org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation
      * Can be removed when InstallJavaFileOperation has been removed.
      */
-    try {
-      for (IPrimaryTypeTypeHierarchy h : ScoutSdkCore.getHierarchyCache().getAllCachedHierarchies()) {
-        h.invalidate();
-      }
-    }
-    catch (Exception e) {
-      //nop
-    }
+    ScoutSdkCore.getHierarchyCache().invalidateAll();
 
     // execute the operations
     execOperations(monitor, workingCopyManager, collector.toArray(new P_OperationElement[collector.size()]));

@@ -35,7 +35,6 @@ import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -212,14 +211,7 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
      * Also used in org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation
      * Can be removed when InstallJavaFileOperation has been removed.
      */
-    try {
-      for (IPrimaryTypeTypeHierarchy h : ScoutSdkCore.getHierarchyCache().getAllCachedHierarchies()) {
-        h.invalidate();
-      }
-    }
-    catch (Exception e) {
-      //nop
-    }
+    ScoutSdkCore.getHierarchyCache().invalidateAll();
 
     for (IJavaProject p : getCreatedBundlesList()) {
       String type = RuntimeBundles.getBundleType(p.getProject());

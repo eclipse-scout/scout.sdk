@@ -24,4 +24,9 @@ public interface IHierarchyCache {
   IPrimaryTypeTypeHierarchy[] getAllCachedHierarchies();
 
   void dispose();
+
+  /**
+   * Invalidates all hierarchies that are managed by this cache.
+   */
+  void invalidateAll();
 }

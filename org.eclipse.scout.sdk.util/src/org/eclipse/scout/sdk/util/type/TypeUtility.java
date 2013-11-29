@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -95,7 +96,7 @@ public class TypeUtility {
   }
 
   public static IPackageFragmentRoot getSrcPackageFragmentRoot(IJavaProject project) throws JavaModelException {
-    return project.findPackageFragmentRoot(new Path("/" + project.getElementName() + "/" + DEFAULT_SOURCE_FOLDER_NAME)); //TODO: src constant exists in SdkProperties class. move?
+    return project.findPackageFragmentRoot(new Path(IPath.SEPARATOR + project.getElementName() + IPath.SEPARATOR + DEFAULT_SOURCE_FOLDER_NAME));
   }
 
   public static IPackageFragment getPackage(IJavaElement element) {
@@ -248,7 +249,7 @@ public class TypeUtility {
     return TypeCacheAccessor.getHierarchyCache().getSuperHierarchy(type);
   }
 
-  public static IPrimaryTypeTypeHierarchy[] getAllCachedPrimaryTypeHierarchies() throws IllegalArgumentException {
+  public static IPrimaryTypeTypeHierarchy[] getAllCachedPrimaryTypeHierarchies() {
     return TypeCacheAccessor.getHierarchyCache().getAllCachedHierarchies();
   }
 
