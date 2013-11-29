@@ -436,7 +436,9 @@ public abstract class AbstractNlsProject implements INlsProject {
     try {
       ITranslationResource[] translationResources = loadTranslationResources();
       for (ITranslationResource r : translationResources) {
-        addTranslationResource(r, new NullProgressMonitor());
+        if (r.getLanguage() != null) {
+          addTranslationResource(r, new NullProgressMonitor());
+        }
       }
     }
     catch (CoreException e) {
