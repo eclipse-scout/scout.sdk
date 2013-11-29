@@ -46,7 +46,6 @@ import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
@@ -80,8 +79,17 @@ public class ScoutBundle implements IScoutBundle {
    * bundles that will stop the dependency tree processing. when one of these is found, the children are no longer
    * followed. This is to increase performance for bundles which are known to be not of interest.
    */
-  private final static Object[] EXCLUDED_BUNDLE_SYMBOLIC_NAMES = new String[]{"org.eclipse.core.runtime", "org.eclipse.equinox.http.registry",
-      "org.eclipse.equinox.common", "org.eclipse.core.net", "org.eclipse.equinox.security"};
+  private final static Set<String> EXCLUDED_BUNDLE_SYMBOLIC_NAMES;
+  static {
+    String[] bundles = new String[]{"org.eclipse.core.runtime", "org.eclipse.equinox.http.registry",
+        "org.eclipse.equinox.common", "org.eclipse.core.net", "org.eclipse.equinox.security", "org.eclipse.equinox.registry", "org.eclipse.osgi",
+        "org.eclipse.birt.chart.engine", "org.eclipse.scout.commons", "org.eclipse.core.variables", "org.eclipse.core.expressions", "org.eclipse.core.filesystem",
+        "org.eclipse.core.resources", "org.eclipse.ant.core", "org.apache.batik.util", "org.eclipse.emf.ecore", "org.eclipse.birt.core"};
+    EXCLUDED_BUNDLE_SYMBOLIC_NAMES = new HashSet<String>(bundles.length);
+    for (String bundle : bundles) {
+      EXCLUDED_BUNDLE_SYMBOLIC_NAMES.add(bundle);
+    }
+  }
 
   private final Set<IPluginModelBase> m_allDependencies;
   private final Set<IPluginModelBase> m_directDependencies;
@@ -573,7 +581,7 @@ public class ScoutBundle implements IScoutBundle {
         if (monitor != null && monitor.isCanceled()) {
           return;
         }
-        if (!CompareUtility.isOneOf(dependency.getName(), EXCLUDED_BUNDLE_SYMBOLIC_NAMES)) { // exclusions (performance)
+        if (!EXCLUDED_BUNDLE_SYMBOLIC_NAMES.contains(dependency.getName())) { // exclusions (performance)
           if (!bundle.getBundleDescription().getSymbolicName().equals(dependency.getName())) { // ignore dependencies on the bundle itself
             IPluginModelBase model = PluginRegistry.findModel(dependency.getName());
             if (model != null) {
