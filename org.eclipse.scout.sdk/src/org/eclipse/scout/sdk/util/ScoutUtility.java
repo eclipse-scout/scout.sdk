@@ -862,19 +862,28 @@ public final class ScoutUtility {
 
     final BooleanHolder elementFound = new BooleanHolder(false);
     final String typeNameComplete = typeName + ".java";
-    IFolder folder = container.getProject().getFolder(pathBuilder.toString());
+    final IFolder folder = container.getProject().getFolder(pathBuilder.toString());
 
     if (folder.exists()) {
       try {
         folder.accept(new IResourceProxyVisitor() {
+          boolean selfVisited = false;
+
           @Override
           public boolean visit(IResourceProxy proxy) throws CoreException {
-            if (proxy.getType() == IResource.FILE && typeNameComplete.equalsIgnoreCase(proxy.getName())) {
+            if (proxy.getType() == IResource.FOLDER) {
+              if (!selfVisited) {
+                selfVisited = true;
+                return true;
+              }
+              return false;
+            }
+            else if (proxy.getType() == IResource.FILE && typeNameComplete.equalsIgnoreCase(proxy.getName())) {
               elementFound.setValue(true);
             }
-            return true;
+            return false;
           }
-        }, IResource.DEPTH_ONE, IResource.NONE);
+        }, IResource.NONE);
       }
       catch (CoreException e) {
         return new ScoutStatus("Unable to check if the type '" + typeName + "' already exists.", e);
