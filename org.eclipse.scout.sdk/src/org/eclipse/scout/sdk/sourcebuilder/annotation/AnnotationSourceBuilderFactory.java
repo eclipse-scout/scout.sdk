@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 /**
  * <h3>{@link AnnotationSourceBuilderFactory}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public final class AnnotationSourceBuilderFactory {
@@ -61,21 +61,26 @@ public final class AnnotationSourceBuilderFactory {
     return new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.FormData)) {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("@" + SignatureUtility.getTypeReference(getSignature(), validator));
-        ArrayList<String> args = new ArrayList<String>();
+        String formDataTypeRef = SignatureUtility.getTypeReference(getSignature(), validator);
+        source.append("@").append(formDataTypeRef);
+        ArrayList<String> args = new ArrayList<String>(3);
         if (formDataSignature != null) {
           args.add("value = " + SignatureUtility.getTypeReference(formDataSignature, validator) + ".class");
         }
         if (sdkCommand != null) {
           StringBuilder b = new StringBuilder();
-          b.append("sdkCommand = " + SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(sdkCommand.getDeclaringClass().getName()), validator));
-          b.append("." + sdkCommand.name());
+          b.append("sdkCommand = ");
+          b.append(formDataTypeRef).append(".");
+          b.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(sdkCommand.getDeclaringClass().getName()), validator));
+          b.append(".").append(sdkCommand.name());
           args.add(b.toString());
         }
         if (defaultSubtypeCommand != null) {
           StringBuilder b = new StringBuilder();
-          b.append("defaultSubtypeSdkCommand = " + SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(defaultSubtypeCommand.getDeclaringClass().getName()), validator));
-          b.append("." + defaultSubtypeCommand.name());
+          b.append("defaultSubtypeSdkCommand = ");
+          b.append(formDataTypeRef).append(".");
+          b.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(defaultSubtypeCommand.getDeclaringClass().getName()), validator));
+          b.append(".").append(defaultSubtypeCommand.name());
           args.add(b.toString());
         }
         if (args.size() > 0) {
@@ -90,7 +95,6 @@ public final class AnnotationSourceBuilderFactory {
         }
       }
     };
-
   }
 
   public static IAnnotationSourceBuilder createValidationStrategyProcess() {
