@@ -96,8 +96,8 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   @Override
   public boolean isChildrenLoaded() {
     synchronized (m_children) {
-    return m_childrenLoaded;
-  }
+      return m_childrenLoaded;
+    }
   }
 
   @Override
@@ -206,36 +206,38 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   @Override
   public final void loadChildren() {
     synchronized (m_children) {
-    if (!isChildrenLoaded()) {
-      try {
-        loadChildrenImpl();
-        // extension point
-        ExplorerPageExtension[] extensions = ExplorerPageExtensionPoint.getExtensions(this);
-        if (extensions != null) {
-          for (ExplorerPageExtension ext : extensions) {
-            try {
-              if (ext.getFactoryClass() != null) {
-                IPageFactory factory = ext.createFactoryClass();
-                factory.createChildren(this);
+      if (!isChildrenLoaded()) {
+        try {
+          loadChildrenImpl();
+          // extension point
+          ExplorerPageExtension[] extensions = ExplorerPageExtensionPoint.getExtensions(this);
+          if (extensions != null) {
+            for (ExplorerPageExtension ext : extensions) {
+              try {
+                if (ext.getFactoryClass() != null) {
+                  IPageFactory factory = ext.createFactoryClass();
+                  factory.createChildren(this);
+                }
+                else if (ext.getPageClass() != null) {
+                  IPage childPage = ext.createPageInstance();
+                  if (childPage != null) {
+                    childPage.setParent(this);
+                  }
+                }
               }
-              else if (ext.getPageClass() != null) {
-                IPage childPage = ext.createPageInstance();
-                childPage.setParent(this);
+              catch (Throwable t) {
+                // TODO extension id to log!
+                ScoutSdkUi.logError("could not load extension '" + ext.getPageClass() + "'!", t);
               }
-            }
-            catch (Throwable t) {
-              // TODO extension id to log!
-              ScoutSdkUi.logError("could not load children of extension '" + ext.toString() + "'!", t);
             }
           }
         }
-      }
-      finally {
-        // crucial to mark children as loaded to prevent an infinite loop
-        m_childrenLoaded = true;
+        finally {
+          // crucial to mark children as loaded to prevent an infinite loop
+          m_childrenLoaded = true;
+        }
       }
     }
-  }
   }
 
   protected void loadChildrenImpl() {

@@ -124,7 +124,7 @@ public class ExplorerPageExtensionPoint {
         return getPageClass().newInstance();
       }
       catch (Exception e) {
-        ScoutSdkUi.logError("could not instanciate class '" + getPageClass().getName() + "'.");
+        ScoutSdkUi.logError("could not instanciate class '" + getPageClass().getName() + "'.", e);
         return null;
       }
     }
