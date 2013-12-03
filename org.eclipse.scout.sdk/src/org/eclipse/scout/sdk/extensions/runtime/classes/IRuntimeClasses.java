@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link RuntimeClasses}</h3> ...
- *
+ * 
  * @author Andreas Hoegger
  * @since 1.0.8 24.01.2009
  */
@@ -62,6 +62,7 @@ public interface IRuntimeClasses {
   String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory"; // NO_UCD
   String ConfigProperty = "org.eclipse.scout.commons.annotations.ConfigProperty"; // NO_UCD
   String ConfigOperation = "org.eclipse.scout.commons.annotations.ConfigOperation"; // NO_UCD
+  String DataModelConstants = "org.eclipse.scout.rt.shared.data.model.DataModelConstants"; // NO_UCD
   String DefaultOutlineTableForm = "org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm"; // NO_UCD
   String DefaultOutlineTreeForm = "org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm"; // NO_UCD
   String DefaultServiceFactory = "org.eclipse.scout.service.DefaultServiceFactory"; // NO_UCD
@@ -116,6 +117,7 @@ public interface IRuntimeClasses {
   String IValidationStrategy = "org.eclipse.scout.rt.shared.validate.IValidationStrategy"; // NO_UCD
   String IActivityMap = "org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap"; // NO_UCD
   String IBigDecimalField = "org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField"; // NO_UCD
+  String IBigIntegerField = "org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.IBigIntegerField"; // NO_UCD
   String IBookmarkStorageService = "org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService"; // NO_UCD
   String IBooleanField = "org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField"; // NO_UCD
   String IButton = "org.eclipse.scout.rt.client.ui.form.fields.button.IButton"; // NO_UCD
@@ -149,6 +151,7 @@ public interface IRuntimeClasses {
   String IDesktop = "org.eclipse.scout.rt.client.ui.desktop.IDesktop"; // NO_UCD
   String IDesktopExtension = "org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension"; // NO_UCD
   String IDoubleField = "org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField"; // NO_UCD
+  String IDNDSupport = "org.eclipse.scout.rt.client.ui.IDNDSupport"; // NO_UCD
   String IFileChooserField = "org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField"; // NO_UCD
   String IForm = "org.eclipse.scout.rt.client.ui.form.IForm"; // NO_UCD
   String IFormField = "org.eclipse.scout.rt.client.ui.form.fields.IFormField"; // NO_UCD

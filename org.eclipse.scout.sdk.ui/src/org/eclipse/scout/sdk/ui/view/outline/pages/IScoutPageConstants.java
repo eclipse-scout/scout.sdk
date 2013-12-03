@@ -20,6 +20,7 @@ public interface IScoutPageConstants {
   String BEAN_PROPERTY_NODE_PAGE = "org.eclipse.scout.sdk.page.BeanPropertyNodePage";
   String BEAN_PROPERTY_TABLE_PAGE = "org.eclipse.scout.sdk.page.BeanPropertyTablePage";
   String BIG_DECIMAL_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.BigDecimalFieldNodePage";
+  String BIG_INTEGER_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.BigIntegerFieldNodePage";
   String BOOKMARK_STORAGE_SERVICE_NODE_PAGE = "org.eclipse.scout.sdk.page.BookmarkStorageServiceNodePage";
   String BOOKMARK_STORAGE_SERVICE_TABLE_PAGE = "org.eclipse.scout.sdk.page.BookmarkStorageServiceTablePage";
   String BOOLEAN_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.BooleanFieldNodePage";

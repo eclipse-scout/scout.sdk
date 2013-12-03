@@ -47,6 +47,11 @@ public class MethodReturnExpression {
     return getReturnStatement(null);
   }
 
+  @Override
+  public String toString() {
+    return getReturnStatement();
+  }
+
   public String getReturnStatement(IImportValidator validator) {
     if (validator == null) {
       // favor the return clause if no IImportValidator is given

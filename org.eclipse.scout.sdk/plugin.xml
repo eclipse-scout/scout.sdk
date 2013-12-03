@@ -247,6 +247,12 @@
          </default>
       </element>
       <element
+            interface="org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.IBigIntegerField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.AbstractBigIntegerField">
+         </default>
+      </element>
+      <element
             interface="org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension">
          <default
                class="org.eclipse.scout.rt.client.ui.desktop.AbstractDesktopExtension">

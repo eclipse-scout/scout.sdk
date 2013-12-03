@@ -31,13 +31,17 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecMethodPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecResetSearchFilterMethodPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BigDecimalPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BigIntegerPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BooleanPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.BorderDecorationPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ButtonDisplayStylePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ButtonSystemTypePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.CodeTypeProposalPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ColorPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.ComposerAttributeTypePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.DoublePresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.DragAndDropTypePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FontPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormDisplayHintPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormViewIdPresenter;
@@ -57,6 +61,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.NlsTex
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.OutlineRootPagePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.OutlinesPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.PrimitiveTypePresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.RoundingModePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.SearchFormPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.StringPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.VerticalAglinmentPresenter;
@@ -284,15 +289,24 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new DoublePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //else if (propertyType.equals("DRAG_AND_DROP_TYPE")) {
-    // presenter for DRAG_AND_DROP_TYPE
-    //}
+    else if (propertyType.equals("BIG_DECIMAL")) {
+      presenter = new BigDecimalPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
+    else if (propertyType.equals("DRAG_AND_DROP_TYPE")) {
+      presenter = new DragAndDropTypePresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
     else if (propertyType.equals("INTEGER")) {
       presenter = new IntegerPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
     else if (propertyType.equals("LONG")) {
       presenter = new LongPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
+    else if (propertyType.equals("BIG_INTEGER")) {
+      presenter = new BigIntegerPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
     else if (propertyType.equals("STRING")) {
@@ -303,21 +317,19 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new FontPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
+    //else if (propertyType.equals("FORM_DATA")) {
+    // presenter for FORM_DATA
+    //}
+    //else if (propertyType.equals("ABSTRACT_FORM_DATA")) {
+    //  presenter for ABSTRACT_FORM_DATA
+    //}
     else if (propertyType.equals("COLOR")) {
       presenter = new ColorPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    // else if (propertyType.equals("OBJECT")) {
-    // presenter for OBJECT
+    //else if (propertyType.equals("OBJECT")) {
+    //  presenter for OBJECT
     //}
-    else if (propertyType.equals("LABEL_POSITION")) {
-      presenter = new LabelPositionPresenter(getFormToolkit(), parent);
-      presenter.setMethod(method);
-    }
-    else if (propertyType.equals("LABEL_HORIZONTAL_ALIGNMENT")) {
-      presenter = new LabelHorizontalAlignmentPresenter(getFormToolkit(), parent);
-      presenter.setMethod(method);
-    }
     else if (propertyType.equals("BUTTON_DISPLAY_STYLE")) {
       presenter = new ButtonDisplayStylePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -330,12 +342,13 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new CodeTypeProposalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //else if (propertyType.equals("COMPOSER_ATTRIBUTE_TYPE")) {
-    // presenter for COMPOSER_ATTRIBUTE_TYPE
-    //}
+    else if (propertyType.equals("COMPOSER_ATTRIBUTE_TYPE")) {
+      presenter = new ComposerAttributeTypePresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
     //else if (propertyType.equals("FILE_EXTENSIONS")) {
-    // presenter for FILE_EXTENSIONS
-    //}
+//  presenter for FILE_EXTENSIONS
+//}
     else if (propertyType.equals("FORM_DISPLAY_HINT")) {
       presenter = new FormDisplayHintPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -352,9 +365,9 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new IconPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //else if (propertyType.equals("KEY_STROKE")) {
-    // presenter for KEY_STROKE
-    //}
+    //    else if (propertyType.equals("KEY_STROKE")) {
+//      presenter for KEY_STROKE
+//    }
     else if (propertyType.equals("LOOKUP_CALL")) {
       presenter = new LookupCallProposalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -371,26 +384,29 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new OutlineRootPagePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //else if (propertyType.equals("OUTLINE")) {
-    // presenter for OUTLINE
-    //}
+    //    else if (propertyType.equals("OUTLINE")) {
+//     presenter for OUTLINE
+//    }
     else if (propertyType.equals("OUTLINES")) {
       presenter = new OutlinesPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //else if (propertyType.equals("FORM")) {
-    // presenter for FORM
-    //}
+    //    else if (propertyType.equals("FORM")) {
+//      presenter for FORM
+//    }
     else if (propertyType.equals("SEARCH_FORM")) {
       presenter = new SearchFormPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //else if (propertyType.equals("NLS_PROVIDER")) {
-    // presenter for NLS_PROVIDER (on sql services: ? extends ScoutTexts)
-    //}
-    //else if (propertyType.equals("SQL_STYLE")) {
-    // presenter for SQL_STYLE
-    //}
+    //    else if (propertyType.equals("NLS_PROVIDER")) {
+//     presenter for NLS_PROVIDER (on sql services: ? extends ScoutTexts)
+//    }
+//    else if (propertyType.equals("SQL_STYLE")) {
+//     presenter for SQL_STYLE
+//    }
+//    else if (propertyType.equals("TABLE_COLUMN")) {
+//     presenter for SQL_STYLE
+//    }
     else if (propertyType.equals("SQL")) {
       presenter = new MultiLineStringPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -407,15 +423,15 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new VerticalAglinmentPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //else if (propertyType.equals("CHART_QNAME")) {
-    // presenter for CHART_QNAME
-    //}
-    //else if (propertyType.equals("HOUR_OF_DAY")) {
-    // presenter for HOUR_OF_DAY
-    //}
-    //else if (propertyType.equals("DURATION_MINUTES")) {
-    // presenter for DURATION_MINUTES
-    //}
+    //    else if (propertyType.equals("CHART_QNAME")) {
+//     presenter for CHART_QNAME
+//    }
+//    else if (propertyType.equals("HOUR_OF_DAY")) {
+//     presenter for HOUR_OF_DAY
+//    }
+//    else if (propertyType.equals("DURATION_MINUTES")) {
+//     presenter for DURATION_MINUTES
+//    }
     else if (propertyType.equals("MENU_CLASS")) {
       presenter = new MenuProposalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
@@ -424,8 +440,20 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       presenter = new PrimitiveTypePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
+    else if (propertyType.equals("LABEL_POSITION")) {
+      presenter = new LabelPositionPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
+    else if (propertyType.equals("LABEL_HORIZONTAL_ALIGNMENT")) {
+      presenter = new LabelHorizontalAlignmentPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
     else if (propertyType.equals("BORDER_DECORATION")) {
       presenter = new BorderDecorationPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
+    else if (propertyType.equals("ROUNDING_MODE")) {
+      presenter = new RoundingModePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
 

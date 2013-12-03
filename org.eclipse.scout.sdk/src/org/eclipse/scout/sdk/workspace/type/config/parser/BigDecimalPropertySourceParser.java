@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,37 +10,34 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type.config.parser;
 
+import java.math.BigDecimal;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
- * <h3>{@link IntegerPropertySourceParser}</h3> ...
+ * <h3>{@link BigDecimalPropertySourceParser}</h3>
  * 
- * @author Andreas Hoegger
- * @since 3.8.0 27.02.2013
+ * @author Matthias Villiger
+ * @since 3.10.0 02.12.2013
  */
-public class IntegerPropertySourceParser implements IPropertySourceParser<Integer> {
+public class BigDecimalPropertySourceParser implements IPropertySourceParser<BigDecimal> {
 
   @Override
-  public Integer parseSourceValue(String source, IMethod context, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    Integer d = PropertyMethodSourceUtility.parseReturnParameterInteger(source, context, superTypeHierarchy);
-    return d;
+  public BigDecimal parseSourceValue(String source, IMethod context, ITypeHierarchy superTypeHierarchy) throws CoreException {
+    BigDecimal bd = PropertyMethodSourceUtility.parseReturnParameterBigDecimal(source);
+    return bd;
   }
 
   @Override
-  public String formatSourceValue(Integer value, String lineDelimiter, IImportValidator importValidator) throws CoreException {
+  public String formatSourceValue(BigDecimal value, String lineDelimiter, IImportValidator importValidator) throws CoreException {
     if (value == null) {
       return "null";
     }
-    else if (value.intValue() == Integer.MAX_VALUE) {
-      return "Integer.MAX_VALUE";
-    }
-    else if (value.intValue() == Integer.MIN_VALUE) {
-      return "Integer.MIN_VALUE";
-    }
-    return value.toString();
+    return "new " + importValidator.getTypeName(SignatureCache.createTypeSignature(BigDecimal.class.getName())) + "(\"" + value.toPlainString() + "\")";
   }
 }

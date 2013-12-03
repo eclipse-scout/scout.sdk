@@ -167,9 +167,6 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
             String string = event.text;
             if (string != null) {
               event.doit = m_regexAllowedCharacters.matcher(string).matches();
-              if (!event.doit) {
-                ScoutSdkUi.logInfo("not allowed input: " + string);
-              }
             }
           }
           break;

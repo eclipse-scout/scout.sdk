@@ -52,11 +52,12 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
   private ProposalTextField m_proposalField;
   private INlsEntry m_currentSourceTuple;
   private INlsProject m_nlsProject;
-  private OptimisticLock storeValueLock = new OptimisticLock();
+  private final OptimisticLock m_storeValueLock;
   private NlsPropertySourceParser m_parser;
 
   public NlsTextPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
+    m_storeValueLock = new OptimisticLock();
   }
 
   @Override
@@ -139,7 +140,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
 
     if (getNlsProject() != null) {
       try {
-        storeValueLock.acquire();
+        m_storeValueLock.acquire();
         m_currentSourceTuple = getParser().parseSourceValue(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
         if (m_currentSourceTuple == null) {
           String simpleText = PropertyMethodSourceUtility.parseReturnParameterString(getMethod().computeValue(), getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
@@ -150,7 +151,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
         m_proposalField.acceptProposal(m_currentSourceTuple);
       }
       finally {
-        storeValueLock.release();
+        m_storeValueLock.release();
       }
     }
     m_proposalField.setEnabled(getNlsProject() != null);
@@ -208,7 +209,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
    */
   protected IProposalSelectionHandler createSelectionHandler(INlsProject project) {
     if (project != null) {
-      return new NlsTextSelectionHandler(getNlsProject());
+      return new NlsTextSelectionHandler(project);
     }
     return null;
   }
@@ -238,7 +239,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
 
   protected synchronized void storeNlsText(final INlsEntry proposal) throws CoreException {
     try {
-      if (storeValueLock.acquire()) {
+      if (m_storeValueLock.acquire()) {
         ConfigPropertyUpdateOperation<INlsEntry> updateOp = new ConfigPropertyUpdateOperation<INlsEntry>(getMethod(), getParser());
         updateOp.setValue(proposal);
         OperationJob job = new OperationJob(updateOp);
@@ -250,7 +251,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
       ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
     finally {
-      storeValueLock.release();
+      m_storeValueLock.release();
     }
   }
 

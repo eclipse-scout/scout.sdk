@@ -18,20 +18,11 @@
 		<config name="execDecorateMinorTimeColumn" type="Advanced" category="Appearance" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigDecimalColumn">
-		<config name="getConfiguredFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMinFractionDigits" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMaxFractionDigits" type="Advanced" category="Appearance" />
 		<config name="getConfiguredGroupingUsed" type="Advanced" category="Appearance" />
 		<config name="getConfiguredPercent" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMultiplier" type="Advanced" category="Appearance" />
-	</type>
-	<type name="org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.AbstractBigDecimalField">
-		<config name="getConfiguredMinValue" type="Advanced" category="Data" />
-		<config name="getConfiguredMaxValue" type="Advanced" category="Data" />
-	</type>
-	<type name="org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.AbstractBigIntegerField">
-		<config name="getConfiguredMinValue" type="Advanced" category="Data" />
-		<config name="getConfiguredMaxValue" type="Advanced" category="Data" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.AbstractBookmarkMenu">
 		<config name="getConfiguredText" type="Advanced" category="Appearance" />
@@ -179,11 +170,9 @@
 		<config name="getConfiguredAutoTimeMillis" type="Advanced" category="Behavior" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.decimalfield.AbstractDecimalField">
-		<config name="getConfiguredFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredFractionDigits" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMinFractionDigits" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMaxFractionDigits" type="Advanced" category="Appearance" />
-		<config name="getConfiguredGroupingUsed" type="Advanced" category="Appearance" />
 		<config name="getConfiguredPercent" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMultiplier" type="Advanced" category="Appearance" />
 		<config name="getConfiguredHorizontalAlignment" type="Advanced" category="Layout" />
@@ -223,16 +212,11 @@
 		<config name="getConfiguredStatusBarVisible" type="Advanced" category="Appearance" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDoubleColumn">
-		<config name="getConfiguredFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMinFractionDigits" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMaxFractionDigits" type="Advanced" category="Appearance" />
 		<config name="getConfiguredGroupingUsed" type="Advanced" category="Appearance" />
 		<config name="getConfiguredPercent" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMultiplier" type="Advanced" category="Appearance" />
-	</type>
-	<type name="org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField">
-		<config name="getConfiguredMinimumValue" type="Normal" category="Data" />
-		<config name="getConfiguredMaximumValue" type="Normal" category="Data" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileChooserField">
 		<config name="getConfiguredFolderMode" type="Advanced" category="Behavior" />
@@ -368,18 +352,13 @@
 		<config name="getConfiguredZoomDelta" type="Advanced" category="Appearance" />
 		<config name="getConfiguredPanDelta" type="Advanced" category="Appearance" />
 		<config name="getConfiguredRotateDelta" type="Advanced" category="Appearance" />
-		<config name="getConfiguredDropType" type="Advanced" category="Misc" />
-		<config name="getConfiguredDragType" type="Advanced" category="Misc" />
+		<config name="getConfiguredDragType" type="Advanced" category="Data" />
+		<config name="getConfiguredDropType" type="Advanced" category="Data" />
 		<config name="execDragRequest" type="Advanced" category="BusinessLogic" />
 		<config name="execDropRequest" type="Advanced" category="BusinessLogic" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn">
-		<config name="getConfiguredFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredGroupingUsed" type="Advanced" category="Appearance" />
-	</type>
-	<type name="org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerField">
-		<config name="getConfiguredMinimumValue" type="Normal" category="Data" />
-		<config name="getConfiguredMaximumValue" type="Normal" category="Data" />
 	</type>
 	<type name="org.eclipse.scout.rt.server.services.common.jms.AbstractJmsConsumerService">
 		<config name="getConfiguredContextFactory" type="Normal" category="Data" />
@@ -407,12 +386,7 @@
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn">
 		<config name="getConfiguredPrimaryKey" type="Normal" category="Data" />
-		<config name="getConfiguredFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredGroupingUsed" type="Advanced" category="Appearance" />
-	</type>
-	<type name="org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField">
-		<config name="getConfiguredMinimumValue" type="Normal" category="Data" />
-		<config name="getConfiguredMaximumValue" type="Normal" category="Data" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.mailfield.AbstractMailField">
 		<config name="getConfiguredMailEditor" type="Advanced" category="Behavior" />
@@ -431,6 +405,9 @@
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.numberfield.AbstractNumberField">
 		<config name="getConfiguredFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredGroupingUsed" type="Advanced" category="Appearance" />
+		<config name="getConfiguredRoundingMode" type="Advanced" category="Data" />
+		<config name="getConfiguredMinValue" type="Normal" category="Data" />
+		<config name="getConfiguredMaxValue" type="Normal" category="Data" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline">
 		<config name="getConfiguredTitle" type="Normal" category="Appearance" />
@@ -601,8 +578,8 @@
 		<config name="getConfiguredWrapText" type="Normal" category="Behavior" />
 		<config name="getConfiguredValueFormat" type="Advanced" category="Appearance" />
 		<config name="getConfiguredSelectAllOnFocus" type="Advanced" category="Behavior" />
-		<config name="getConfiguredDropType" type="Advanced" category="Misc" />
-		<config name="getConfiguredDragType" type="Advanced" category="Misc" />
+		<config name="getConfiguredDragType" type="Advanced" category="Data" />
+		<config name="getConfiguredDropType" type="Advanced" category="Data" />
 		<config name="execDragRequest" type="Advanced" category="BusinessLogic" />
 		<config name="execDropRequest" type="Advanced" category="BusinessLogic" />
 		<config name="execLinkAction" type="Advanced" category="BusinessLogic" />
@@ -621,8 +598,8 @@
 		<config name="getConfiguredRowHeightHint" type="Advanced" category="Layout" />
 		<config name="getConfiguredCheckable" type="Advanced" category="Behavior" />
 		<config name="getConfiguredCheckableColumn" type="Advanced" category="Behavior" />
-		<config name="getConfiguredDropType" type="Advanced" category="Misc" />
-		<config name="getConfiguredDragType" type="Advanced" category="Misc" />
+		<config name="getConfiguredDragType" type="Advanced" category="Data" />
+		<config name="getConfiguredDropType" type="Advanced" category="Data" />
 		<config name="getConfiguredKeyboardNavigation" type="Advanced" category="Behavior" />
 		<config name="getConfiguredScrollToSelection" type="Advanced" category="Behavior" />
 		<config name="execDrag" type="Advanced" category="BusinessLogic" />
@@ -660,8 +637,8 @@
 		<config name="getConfiguredMultiCheck" type="Advanced" category="Behavior" />
 		<config name="getConfiguredCheckable" type="Advanced" category="Behavior" />
 		<config name="getConfiguredDragEnabled" type="Advanced" category="Behavior" />
-		<config name="getConfiguredDragType" type="Advanced" category="Misc" />
-		<config name="getConfiguredDropType" type="Advanced" category="Misc" />
+		<config name="getConfiguredDragType" type="Advanced" category="Data" />
+		<config name="getConfiguredDropType" type="Advanced" category="Data" />
 		<config name="getConfiguredAutoDiscardOnDelete" type="Advanced" category="Behavior" />
 		<config name="getConfiguredRootNodeVisible" type="Advanced" category="Appearance" />
 		<config name="getConfiguredRootHandlesVisible" type="Normal" category="Appearance" />

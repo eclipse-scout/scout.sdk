@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.workspace.type.config;
 import java.util.Stack;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
@@ -26,18 +27,19 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  *
  */
 public class ConfigurationMethod {
-  public static int PROPERTY_METHOD = 1;
-  public static int OPERATION_METHOD = 2;
+  public static final int PROPERTY_METHOD = 1;
+  public static final int OPERATION_METHOD = 2;
 
   private final IType m_type;
   private final ITypeHierarchy m_superTypeHierarchy;
-  private String m_methodName;
-  Stack<IMethod> m_methodStack = new Stack<IMethod>();
+  private final Stack<IMethod> m_methodStack;
+  private final String m_methodName;
+  private final int m_methodType;
   private String m_configAnnotationType;
-  private int m_methodType;
   private String m_source;
 
   public ConfigurationMethod(IType type, ITypeHierarchy superTypeHierarchy, String methodName, int methodType) {
+    m_methodStack = new Stack<IMethod>();
     m_type = type;
     m_superTypeHierarchy = superTypeHierarchy;
     m_methodName = methodName;
@@ -68,13 +70,24 @@ public class ConfigurationMethod {
     return peekMethod().getDeclaringType().equals(getType());
   }
 
+  /**
+   * Pushes the given method onto the top of this stack.<br>
+   * <b>Note: Compiler generated methods (Bridge methods) are ignored!</b>
+   * 
+   * @param method
+   *          The method to add
+   * @see Flags#AccBridge
+   */
   public void pushMethod(IMethod method) {
-    m_methodStack.push(method);
     try {
+      if (Flags.isBridge(method.getFlags())) {
+        return; // ignore compiler generated methods
+      }
+      m_methodStack.push(method);
       m_source = method.getSource();
     }
     catch (JavaModelException e) {
-      ScoutSdk.logError("could not get source of method '" + method.getElementName() + "' in type '" + method.getDeclaringType() + "'.", e);
+      ScoutSdk.logError("could not add method '" + method.getElementName() + "' in type '" + method.getDeclaringType() + "'.", e);
     }
   }
 
@@ -119,6 +132,11 @@ public class ConfigurationMethod {
     return null;
   }
 
+  /**
+   * returns the method at the top of this stack without removing it from the stack.
+   * 
+   * @return
+   */
   public IMethod peekMethod() {
     if (!m_methodStack.isEmpty()) {
       while (!m_methodStack.peek().exists()) {

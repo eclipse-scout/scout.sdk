@@ -68,8 +68,8 @@ public class MultiIntegerPresenter extends AbstractMultiValuePresenter<Integer> 
     if (value.intValue() == Integer.MAX_VALUE) {
       return "Integer.MAX_VALUE";
     }
-    else if (value.intValue() == -Integer.MAX_VALUE) {
-      return "-Integer.MAX_VALUE";
+    else if (value.intValue() == Integer.MIN_VALUE) {
+      return "Integer.MIN_VALUE";
     }
     return DecimalFormat.getNumberInstance().format(value);
   }

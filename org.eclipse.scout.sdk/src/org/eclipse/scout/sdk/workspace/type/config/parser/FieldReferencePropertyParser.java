@@ -13,24 +13,27 @@ package org.eclipse.scout.sdk.workspace.type.config.parser;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 
 /**
  * <h3>{@link FieldReferencePropertyParser}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 27.02.2013
  */
 public abstract class FieldReferencePropertyParser<T> implements IPropertySourceParser<FieldProperty<T>> {
 
   private final List<FieldProperty<T>> m_properties;
+  private final boolean m_useTypeReference;
 
-  public FieldReferencePropertyParser(List<FieldProperty<T>> properties) {
+  public FieldReferencePropertyParser(List<FieldProperty<T>> properties, boolean useTypeReference) {
     m_properties = properties;
-
+    m_useTypeReference = useTypeReference;
   }
 
   public List<FieldProperty<T>> getProperties() {
@@ -52,7 +55,17 @@ public abstract class FieldReferencePropertyParser<T> implements IPropertySource
 
   @Override
   public String formatSourceValue(FieldProperty<T> value, String lineDelimiter, IImportValidator importValidator) throws CoreException {
-    return value.getConstant().getElementName();
+    IField field = value.getConstant();
+    StringBuilder sb = new StringBuilder();
+    if (isUseTypeReference()) {
+      sb.append(importValidator.getTypeName(SignatureCache.createTypeSignature(field.getDeclaringType().getFullyQualifiedName())));
+      sb.append(".");
+    }
+    sb.append(field.getElementName());
+    return sb.toString();
   }
 
+  public boolean isUseTypeReference() {
+    return m_useTypeReference;
+  }
 }

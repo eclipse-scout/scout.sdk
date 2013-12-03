@@ -265,9 +265,6 @@ public interface SdkIcons {
   String FormFieldTemplate = Default; // TODO
   String FormFieldTemplateAdd = ToolAdd; // TODO
   String FormFieldTemplateRemove = ToolRemove; // TODO
-  String BigDecimalField = FormField; // TODO
-  String BigDecimalFieldAdd = ToolAdd; // TODO
-  String BigDecimalFieldRemove = ToolRemove; // TODO
   String BooleanField = FormField; // TODO
   String BooleanFieldAdd = ToolAdd; // TODO
   String BooleanFieldRemove = ToolRemove; // TODO
@@ -304,9 +301,9 @@ public interface SdkIcons {
   String ListboxField = FormField; // TODO
   String ListboxFieldAdd = ToolAdd; // TODO
   String ListboxFieldRemove = ToolRemove; // TODO
-  String LongField = FormField; // TODO
-  String LongFieldAdd = ToolAdd; // TODO
-  String LongFieldRemove = ToolRemove; // TODO
+  String LongField = IntegerField; // TODO
+  String LongFieldAdd = IntegerFieldAdd; // TODO
+  String LongFieldRemove = IntegerFieldRemove; // TODO
   String MailField = FormField; // TODO
   String MailFieldAdd = ToolAdd; // TODO
   String MailFieldRemove = ToolRemove; // TODO
@@ -331,6 +328,12 @@ public interface SdkIcons {
   String UnknownField = FormField; // TODO
   String UnknownFieldAdd = ToolAdd; // TODO
   String UnknownFieldRemove = ToolRemove; // TODO
+  String BigDecimalField = DoubleField; // TODO
+  String BigDecimalFieldAdd = DoubleFieldAdd; // TODO
+  String BigDecimalFieldRemove = DoubleFieldRemove; // TODO
+  String BigIntegerField = IntegerField; // TODO
+  String BigIntegerFieldAdd = IntegerFieldAdd; // TODO
+  String BigIntegerFieldRemove = IntegerFieldRemove; // TODO
 
   String BundlePresentationGrouped = "presentation_grouped.gif";
   String BundlePresentationFlatGrouped = "presentation_flatgroup.gif";

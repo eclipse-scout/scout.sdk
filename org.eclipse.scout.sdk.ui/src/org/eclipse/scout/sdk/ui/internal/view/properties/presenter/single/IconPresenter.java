@@ -49,14 +49,14 @@ public class IconPresenter extends AbstractMethodPresenter {
   private ProposalTextField m_proposalField;
   private IIconProvider m_iconProvider;
   private ScoutIconDesc m_defaultIcon;
-  private OptimisticLock storeValueLock = new OptimisticLock();
   private ScoutIconDesc m_currentSourceIcon;
-
-  private IconSourcePropertyParser m_parser;
+  private final OptimisticLock m_storeValueLock;
+  private final IconSourcePropertyParser m_parser;
 
   public IconPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
     m_parser = new IconSourcePropertyParser();
+    m_storeValueLock = new OptimisticLock();
   }
 
   @Override
@@ -102,19 +102,15 @@ public class IconPresenter extends AbstractMethodPresenter {
 
     m_defaultIcon = parseInput(getMethod().computeDefaultValue());
     try {
-      storeValueLock.acquire();
+      m_storeValueLock.acquire();
       m_currentSourceIcon = parseInput(getMethod().computeValue());
       // TODO handle not parsable see nls presenter
-      if (m_currentSourceIcon != null) {
-        m_proposalField.acceptProposal(m_currentSourceIcon);
-      }
-      else {
-        m_proposalField.acceptProposal(null);
-      }
+      m_proposalField.acceptProposal(m_currentSourceIcon);
+      updateIcon(m_currentSourceIcon);
       m_proposalField.setEnabled(true);
     }
     finally {
-      storeValueLock.release();
+      m_storeValueLock.release();
     }
   }
 
@@ -161,48 +157,54 @@ public class IconPresenter extends AbstractMethodPresenter {
     return m_defaultIcon;
   }
 
-  protected synchronized void storeValue(ScoutIconDesc value) {
-    if (value == null) {
-      m_proposalField.acceptProposal(getDefaultValue());
-      value = getDefaultValue();
+  /**
+   * must run in UI thread
+   */
+  private void updateIcon(ScoutIconDesc newIcon) {
+    Image icon = null;
+    if (newIcon != null) {
+      icon = ((ILabelProvider) m_proposalField.getLabelProvider()).getImage(newIcon);
     }
+    boolean iconAvailable = icon != null;
+    ((GridData) m_currentIconPresenter.getLayoutData()).exclude = !iconAvailable;
+    m_currentIconPresenter.setVisible(iconAvailable);
+    m_currentIconPresenter.setImage(icon);
+    getContainer().layout(true, true);
+  }
+
+  protected synchronized void storeValue(ScoutIconDesc value) {
     try {
-      ConfigPropertyUpdateOperation<ScoutIconDesc> updateOp = new ConfigPropertyUpdateOperation<ScoutIconDesc>(getMethod(), getParser());
-      updateOp.setValue(value);
-      final OperationJob job = new OperationJob(updateOp);
-      job.setDebug(true);
-      final ScoutIconDesc finalValue = value;
-      job.addJobChangeListener(new JobChangeAdapter() {
-        @Override
-        public void done(IJobChangeEvent event) {
-          job.removeJobChangeListener(this);
-          getContainer().getDisplay().asyncExec(new Runnable() {
-            @Override
-            public void run() {
-              Image icon = null;
-              if (finalValue != null) {
-                icon = ((ILabelProvider) m_proposalField.getLabelProvider()).getImage(finalValue);
-              }
-              if (icon != null) {
-                ((GridData) m_currentIconPresenter.getLayoutData()).exclude = false;
-                m_currentIconPresenter.setVisible(true);
-              }
-              else {
-                ((GridData) m_currentIconPresenter.getLayoutData()).exclude = true;
-                m_currentIconPresenter.setVisible(false);
-              }
-              m_currentIconPresenter.setImage(icon);
-              getContainer().layout(true, true);
-            }
-          });
+      if (m_storeValueLock.acquire()) {
+        if (value == null) {
+          m_proposalField.acceptProposal(getDefaultValue());
+          value = getDefaultValue();
         }
-      });
-      job.schedule();
+
+        ConfigPropertyUpdateOperation<ScoutIconDesc> updateOp = new ConfigPropertyUpdateOperation<ScoutIconDesc>(getMethod(), getParser());
+        updateOp.setValue(value);
+        final OperationJob job = new OperationJob(updateOp);
+        job.setDebug(true);
+        final ScoutIconDesc finalValue = value;
+        job.addJobChangeListener(new JobChangeAdapter() {
+          @Override
+          public void done(IJobChangeEvent event) {
+            job.removeJobChangeListener(this);
+            getContainer().getDisplay().asyncExec(new Runnable() {
+              @Override
+              public void run() {
+                updateIcon(finalValue);
+              }
+            });
+          }
+        });
+        job.schedule();
+      }
     }
     catch (Exception e) {
       ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
-
+    finally {
+      m_storeValueLock.release();
+    }
   }
-
 }

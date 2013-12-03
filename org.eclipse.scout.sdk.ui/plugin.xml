@@ -431,6 +431,18 @@
          </nodePage>
       </FormField>
       <FormField
+            active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.bigintegerfield.IBigIntegerField"
+            name="Big Integer Field">
+         <newWizard
+               inShortList="false"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.bigintegerfield.BigintegerFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.BigIntegerFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
             active="false"
             model="org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField"
             name="Mail Field">

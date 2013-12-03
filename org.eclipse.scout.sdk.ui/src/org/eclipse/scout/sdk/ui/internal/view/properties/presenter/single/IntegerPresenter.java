@@ -48,7 +48,7 @@ public class IntegerPresenter extends AbstractValuePresenter<Integer> {
     else if (value.intValue() == Integer.MAX_VALUE) {
       return SdkProperties.NUMBER_MAX;
     }
-    else if (value.intValue() == -Integer.MAX_VALUE) {
+    else if (value.intValue() == Integer.MIN_VALUE) {
       return SdkProperties.NUMBER_MIN;
     }
     return DecimalFormat.getIntegerInstance().format(value);

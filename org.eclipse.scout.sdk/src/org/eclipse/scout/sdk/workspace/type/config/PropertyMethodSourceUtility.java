@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type.config;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.regex.Matcher;
@@ -35,39 +37,18 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public final class PropertyMethodSourceUtility {
-
-  /**
-   * with "com.bsiag.test.ClassA.Field"
-   * group1 = com.bsiag.test.ClassA.
-   * group2 = ClassA.
-   * group3 = Field
-   * with "com.bsiag.test.ClassA.Field"
-   * group1 = ""
-   * group2 = null
-   * group3 = Field
-   */
-  private final static Pattern REGEX_FIELD_NEW = Pattern.compile("\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?([A-Za-z][a-zA-Z0-9_]*)\\b");
+  private final static Pattern REGEX_REFERENCED_VALUE = Pattern.compile("\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?([A-Za-z][a-zA-Z0-9_]*)\\b");
   private final static Pattern REGEX_NUMBER_PREFIX = Pattern.compile("^(\\+|\\-)?([A-Za-z0-9_\\.]*)$");
   private final static Pattern REGEX_NUMBER_INFINITY = Pattern.compile("^(\\-)?(inf)$");
-  private final static Pattern REGEX_SIMPLE_DOUBLE = Pattern.compile("^[\\+\\-0-9eEf\\.\\,']*[Dd]?$");
+  private final static Pattern REGEX_SIMPLE_DOUBLE = Pattern.compile("^[\\+\\-0-9eE\\.']*[DdfF]?$");
   private final static Pattern REGEX_SIMPLE_INTEGER = Pattern.compile("^[\\+\\-0-9eE']*$");
+  private final static Pattern REGEX_SIMPLE_BIG_INTEGER = Pattern.compile("^(new (java\\.math\\.)?BigInteger\\(\\\")?([\\+\\-0-9]*)(\\\"\\))?$");
+  private final static Pattern REGEX_SIMPLE_BIG_DECIMAL = Pattern.compile("^(new (java\\.math\\.)?BigDecimal\\(\\\")?([\\+\\-0-9eE\\.]*)(\\\"\\))?$");
   private final static Pattern REGEX_SIMPLE_LONG = Pattern.compile("^[\\+\\-0-9eE']*[lL]?$");
   private final static Pattern REGEX_SIMPLE_BOOLEAN = Pattern.compile("^(false|true)$");
-  private static final Pattern REGEX_FIELD_VALUE = Pattern.compile("=\\s*(.*)\\s*\\;", Pattern.DOTALL);
-
-  /**
-   * with com.bsiag.Test.class
-   * group1 = com.bsiag.Test.
-   * group2 = Test.
-   * group3 = class
-   * with Test.class
-   * group1 = Test.
-   * group2 = Test.
-   * group3 = class
-   */
+  private final static Pattern REGEX_FIELD_VALUE = Pattern.compile("=\\s*(.*)\\s*\\;", Pattern.DOTALL);
   private final static Pattern REGEX_CLASS_REFERENCE = Pattern.compile("\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?(class)\\b");
   private final static Pattern REGEX_NULL = Pattern.compile("\\bnull\\b");
-
   private final static Pattern REGEX_METHOD_RETURN_NON_NLS_TEXT = Pattern.compile("\\s*\"(.*)\"\\s*");
   private final static Pattern REGEX_METHOD_RETURN_NLS_TEXT = Pattern.compile("[A-Za-z0-9_-]*\\.get\\(\\s*\\\"([^\\\"]*)\\\"\\s*\\)\\s*");
 
@@ -302,17 +283,17 @@ public final class PropertyMethodSourceUtility {
     if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
       return null;
     }
+    // handle MIN_VAL / MAX_VAL
     if (parameter.equals("Integer.MAX_VALUE")) {
       return Integer.MAX_VALUE;
     }
-    // handle MIN_VAL / MAX_VAL
-    if (parameter.equals("-Integer.MAX_VALUE")) {
-      return -Integer.MAX_VALUE;
+    if (parameter.equals("Integer.MIN_VALUE")) {
+      return Integer.MIN_VALUE;
     }
     Matcher infMatcher = REGEX_NUMBER_INFINITY.matcher(parameter);
     if (infMatcher.find()) {
       if (infMatcher.group(1) != null) {
-        return -Integer.MAX_VALUE;
+        return Integer.MIN_VALUE;
       }
       else {
         return Integer.MAX_VALUE;
@@ -363,6 +344,56 @@ public final class PropertyMethodSourceUtility {
           throw new CoreException(new ScoutStatus("Error parsing parameter '" + prefix + referencedValue + "' to a decimal.", e));
         }
       }
+    }
+    throw new CustomImplementationException();
+  }
+
+  /**
+   * parses the given return clause input string into a big decimal.<br>
+   * <br>
+   * Example:<br>
+   * Input: new BigDecimal("-999999999999999999999999999999999999999999999999999999999999.056978")<br>
+   * Output: -999999999999999999999999999999999999999999999999999999999999.056978<br>
+   * <br>
+   * Input: 2358.2357<br>
+   * Output: 2358.2357
+   * 
+   * @param parameter
+   * @return
+   * @throws CoreException
+   */
+  public static BigDecimal parseReturnParameterBigDecimal(String parameter) throws CoreException {
+    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
+      return null;
+    }
+    Matcher m = REGEX_SIMPLE_BIG_DECIMAL.matcher(parameter);
+    if (m.find()) {
+      return new BigDecimal(m.group(3));
+    }
+    throw new CustomImplementationException();
+  }
+
+  /**
+   * parses the given return clause input string into a big integer.<br>
+   * <br>
+   * Example:<br>
+   * Input: new BigInteger("-999999999999999999999999999999999999999999999999999999999999")<br>
+   * Output: -999999999999999999999999999999999999999999999999999999999999<br>
+   * <br>
+   * Input: 2358<br>
+   * Output: 2358
+   * 
+   * @param parameter
+   * @return
+   * @throws CoreException
+   */
+  public static BigInteger parseReturnParameterBigInteger(String parameter) throws CoreException {
+    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
+      return null;
+    }
+    Matcher m = REGEX_SIMPLE_BIG_INTEGER.matcher(parameter);
+    if (m.find()) {
+      return new BigInteger(m.group(3));
     }
     throw new CustomImplementationException();
   }
@@ -441,22 +472,21 @@ public final class PropertyMethodSourceUtility {
   }
 
   private static String findReferencedValue(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    Matcher matcher = REGEX_FIELD_NEW.matcher(parameter);
+    Matcher matcher = REGEX_REFERENCED_VALUE.matcher(parameter);
     if (matcher.find()) {
+      IType referencedType = null;
       if (matcher.group(2) != null) {
         String typeName = matcher.group(1);
         typeName = typeName.substring(0, typeName.length() - 1);
-        IType referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), typeName);
-        if (referencedType == null) {
+        referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), typeName);
+        if (!TypeUtility.exists(referencedType)) {
           throw new CoreException(new ScoutStatus(Status.WARNING, "Reference '" + parameter + "' could not be found.", null));
         }
-        String fieldValue = findReferencedFieldValue(referencedType, matcher.group(3), superTypeHierarchy);
-        return fieldValue;
       }
       else {
-        String fieldValue = findReferencedFieldValue(method.getDeclaringType(), matcher.group(3), superTypeHierarchy);
-        return fieldValue;
+        referencedType = method.getDeclaringType();
       }
+      return findReferencedFieldValue(referencedType, matcher.group(3), superTypeHierarchy);
     }
     throw new CustomImplementationException();
   }
@@ -515,7 +545,7 @@ public final class PropertyMethodSourceUtility {
     if (input.equals("null")) {
       return "";
     }
-    Matcher matcher = REGEX_FIELD_NEW.matcher(input);
+    Matcher matcher = REGEX_REFERENCED_VALUE.matcher(input);
     if (matcher.find()) {
       if (matcher.group(2) != null) {
         String typeName = matcher.group(1);
