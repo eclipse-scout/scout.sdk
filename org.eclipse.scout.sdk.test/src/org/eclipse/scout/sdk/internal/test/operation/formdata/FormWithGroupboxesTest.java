@@ -94,10 +94,14 @@ public class FormWithGroupboxesTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    SdkAssert.assertEquals("method count of 'InnerInteger'", 1, innerInteger.getMethods().length);
+    SdkAssert.assertEquals("method count of 'InnerInteger'", 2, innerInteger.getMethods().length);
     IMethod innerInteger1 = SdkAssert.assertMethodExist(innerInteger, "InnerInteger", new String[]{});
     SdkAssert.assertTrue(innerInteger1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(innerInteger1, "V");
+    IMethod initValidationRules1 = SdkAssert.assertMethodExist(innerInteger, "initValidationRules", new String[]{"QMap<QString;QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(initValidationRules1, "V");
+    SdkAssert.assertAnnotation(initValidationRules1, "java.lang.Override");
+    SdkAssert.assertMethodValidationRules(initValidationRules1, new String[]{"ruleMap.put(ValidationRule.MAX_VALUE, Integer.MAX_VALUE);", "ruleMap.put(ValidationRule.MIN_VALUE, Integer.MIN_VALUE);"}, true);
 
     SdkAssert.assertEquals("inner types count of 'InnerInteger'", 0, innerInteger.getTypes().length);
   }
