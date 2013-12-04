@@ -49,6 +49,7 @@ import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
   private final static Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
+  private final static Pattern REGEX_CONSTRUCTOR_CALL = Pattern.compile("new\\s+[A-Za-z][a-zA-Z0-9_]{0,200}\\s*\\([^\\(\\)]*\\)");
   private final IType iValueField = TypeUtility.getType(RuntimeClasses.IValueField);
 
   private FormDataAnnotation m_formDataAnnotation;
@@ -179,7 +180,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
                 // filter out code that contains references to types that are not accessible from our bundle.
                 String generatedSourceCode = generateValidationRuleSourceCode(vm, validator);
 
-                if (!vm.isSkipRule() && (generatedSourceCode == null || containsBrackets(generatedSourceCode))) {
+                if (!vm.isSkipRule() && generatedSourceCode == null) {
                   //add javadoc warning
                   String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName('.') + " # " + vm.getImplementedMethod().getElementName();
                   source.append("/**");
@@ -256,16 +257,17 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
                   return null;
                 }
               }
+
+              // it is no reference to another form field and all types are accessible: check for foreign method calls
+              if (!REGEX_CONSTRUCTOR_CALL.matcher(sourceSnippet).matches()) { // constructors are allowed because the type is accessible (checked before)
+                String srcWithoutStrings = REGEX_STRING_LITERALS.matcher(sourceSnippet).replaceAll(""); // remove string literals
+                if (srcWithoutStrings.contains("(")) {
+                  // if it still contains a bracket: skip the rule
+                  return null;
+                }
+              }
             }
             return sourceSnippet;
-          }
-
-          private boolean containsBrackets(String genSource) {
-            if (genSource == null) {
-              return false;
-            }
-            String srcWithoutStrings = REGEX_STRING_LITERALS.matcher(genSource).replaceAll("");
-            return srcWithoutStrings.contains("(");
           }
         });
 
