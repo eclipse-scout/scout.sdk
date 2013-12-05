@@ -12,8 +12,11 @@ package org.eclipse.scout.sdk.sourcebuilder.annotation;
 
 import java.util.ArrayList;
 
+import javax.annotation.Generated;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -44,6 +47,24 @@ public final class AnnotationSourceBuilderFactory {
 
   public static IAnnotationSourceBuilder createFormDataAnnotation() {
     return createFormDataAnnotation(null, null, null);
+  }
+
+  public static IAnnotationSourceBuilder createGeneratedAnnotation(String classThatGeneratedTheCode) {
+    return createGeneratedAnnotation(classThatGeneratedTheCode, null);
+  }
+
+  public static IAnnotationSourceBuilder createGeneratedAnnotation(final String classThatGeneratedTheCode, final String comments) {
+    return new AnnotationSourceBuilder(SignatureCache.createTypeSignature(Generated.class.getName())) {
+      @Override
+      public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append('@').append(SignatureUtility.getTypeReference(getSignature(), validator)).append('(');
+        source.append("value = \"").append(classThatGeneratedTheCode).append("\"");
+        if (StringUtility.hasText(comments)) {
+          source.append(", comments = \"").append(comments).append("\"");
+        }
+        source.append(")");
+      }
+    };
   }
 
   public static IAnnotationSourceBuilder createPageDataAnnotation(final String pageDataTypeSignature) {
