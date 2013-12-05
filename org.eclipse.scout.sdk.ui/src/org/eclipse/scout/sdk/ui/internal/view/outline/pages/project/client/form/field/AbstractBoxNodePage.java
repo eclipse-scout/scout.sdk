@@ -13,8 +13,10 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
 import org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
@@ -109,12 +111,17 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
       action.setPage(this);
       action.setType(getType());
     }
+    else if (menu instanceof WellformAction) {
+      WellformAction action = (WellformAction) menu;
+      action.init(getScoutBundle(), getType());
+      action.setOperation(new WellformScoutTypeOperation(getType(), true));
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{FormFieldRenameAction.class, ShowJavaReferencesAction.class, FormFieldNewAction.class,
-        FormFieldDeleteAction.class, CreateTemplateAction.class};
+        FormFieldDeleteAction.class, CreateTemplateAction.class, WellformAction.class};
   }
 }

@@ -74,7 +74,7 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
       action.setLabel(Texts.get("WellformSharedBundle"));
       action.setOperation(new WellformSharedBundleOperation(getScoutBundle()));
     }

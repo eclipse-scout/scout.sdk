@@ -117,7 +117,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
       action.setOperation(new WellformServerBundleOperation(getScoutBundle()));
     }
     else if (menu instanceof FormDataSqlBindingValidateAction) {

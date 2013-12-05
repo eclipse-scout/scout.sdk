@@ -214,7 +214,7 @@ public class ProjectsTablePage extends AbstractPage {
       WellformAction action = (WellformAction) menu;
       IScoutBundle[] clients = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
       action.setOperation(new WellformClientBundleOperation(clients));
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
     }
   }
 

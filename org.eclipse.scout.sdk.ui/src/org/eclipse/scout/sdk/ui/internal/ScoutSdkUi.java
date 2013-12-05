@@ -75,6 +75,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   // Fonts
   public static final String FONT_SYSTEM_BOLD = "fontSystemBold";
+  public static final String FONT_SYSTEM_TITLE = "fontSystemTitle";
 
   // Icons
   private static final String IMAGE_PATH = "resources/icons/";
@@ -322,11 +323,20 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     if (m_fontRegistry == null) {
       m_fontRegistry = new FontRegistry(getDisplay());
       FontData[] systemFontData = getDisplay().getSystemFont().getFontData();
+
+      // bold font
       FontData[] systemBoldData = new FontData[systemFontData.length];
       for (int i = 0; i < systemFontData.length; i++) {
         systemBoldData[i] = new FontData(systemFontData[i].getName(), systemFontData[i].getHeight(), SWT.BOLD);
       }
       m_fontRegistry.put(FONT_SYSTEM_BOLD, systemBoldData);
+
+      // title font
+      FontData[] systemTitleData = new FontData[systemFontData.length];
+      for (int i = 0; i < systemFontData.length; i++) {
+        systemTitleData[i] = new FontData(systemFontData[i].getName(), 12, SWT.NORMAL);
+      }
+      m_fontRegistry.put(FONT_SYSTEM_TITLE, systemTitleData);
     }
     return m_fontRegistry;
   }

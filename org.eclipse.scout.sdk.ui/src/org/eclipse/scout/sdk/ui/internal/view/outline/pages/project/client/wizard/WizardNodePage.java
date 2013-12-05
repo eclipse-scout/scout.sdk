@@ -70,7 +70,7 @@ public class WizardNodePage extends AbstractScoutTypePage {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setLabel(Texts.get("WellformWizard"));
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle(), getType());
       action.setOperation(new WellformScoutTypeOperation(getType(), true));
     }
     else if (menu instanceof DeleteAction) {

@@ -96,7 +96,7 @@ public class FormNodePage extends AbstractScoutTypePage {
     }
     else if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle(), getType());
       action.setOperation(new WellformScoutTypeOperation(getType(), true));
     }
     else if (menu instanceof FormDataUpdateAction) {

@@ -77,11 +77,8 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.events.DisposeEvent;
-import org.eclipse.swt.events.DisposeListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -153,18 +150,11 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   protected Control createHead(Composite parent) {
     Composite headArea = getFormToolkit().createComposite(parent);
     Hyperlink title = getFormToolkit().createHyperlink(headArea, getPage().getName(), SWT.WRAP);
-    final Font titleFont = new Font(parent.getDisplay(), parent.getFont().getFontData()[0].getName(), 12, SWT.NORMAL);
-    title.setFont(titleFont);
+    title.setFont(ScoutSdkUi.getFont(ScoutSdkUi.FONT_SYSTEM_TITLE));
     title.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {
         UiUtility.showJavaElementInEditor(getPage().getType(), true);
-      }
-    });
-    title.addDisposeListener(new DisposeListener() {
-      @Override
-      public void widgetDisposed(DisposeEvent e) {
-        titleFont.dispose();
       }
     });
 

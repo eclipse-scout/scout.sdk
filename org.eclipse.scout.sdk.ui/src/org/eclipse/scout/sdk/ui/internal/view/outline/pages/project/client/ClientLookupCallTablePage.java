@@ -87,7 +87,7 @@ public class ClientLookupCallTablePage extends AbstractPage {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setOperation(new WellformLookupCallsOperation(getScoutBundle()));
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
       action.setLabel(Texts.get("WellformLookupCalls"));
     }
     else if (menu instanceof LocalLookupCallNewAction) {

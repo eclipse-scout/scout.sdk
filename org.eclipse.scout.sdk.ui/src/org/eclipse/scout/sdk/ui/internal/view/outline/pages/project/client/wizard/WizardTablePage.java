@@ -83,7 +83,7 @@ public class WizardTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
       action.setLabel(Texts.get("WellformAllWizards"));
       action.setOperation(new WellformWizardsOperation(getScoutBundle()));
     }

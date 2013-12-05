@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field;
 
+import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
+import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.action.dto.FormDataUpdateAction;
@@ -34,7 +36,7 @@ public abstract class AbstractFormFieldNodePage extends AbstractScoutTypePage {
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ShowJavaReferencesAction.class, FormDataUpdateAction.class,
+    return new Class[]{ShowJavaReferencesAction.class, FormDataUpdateAction.class, WellformAction.class,
         CreateTemplateAction.class, FormFieldRenameAction.class, FormFieldDeleteAction.class};
   }
 
@@ -58,6 +60,11 @@ public abstract class AbstractFormFieldNodePage extends AbstractScoutTypePage {
     else if (menu instanceof FormFieldDeleteAction) {
       FormFieldDeleteAction action = (FormFieldDeleteAction) menu;
       action.addFormFieldType(getType());
+    }
+    else if (menu instanceof WellformAction) {
+      WellformAction action = (WellformAction) menu;
+      action.init(getScoutBundle(), getType());
+      action.setOperation(new WellformScoutTypeOperation(getType(), true));
     }
   }
 }

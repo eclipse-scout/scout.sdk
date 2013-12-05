@@ -101,7 +101,7 @@ public class FormTablePage extends AbstractPage {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setOperation(new WellformFormsOperation(getScoutBundle()));
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
       action.setLabel(Texts.get("WellformAllForms"));
     }
     else if (menu instanceof FormNewAction) {

@@ -92,7 +92,7 @@ public class OutlineTablePage extends AbstractPage {
     else if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setLabel(Texts.get("WellformAllOutlines"));
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
       action.setOperation(new WellformOutlinesOperation(getScoutBundle()));
     }
   }

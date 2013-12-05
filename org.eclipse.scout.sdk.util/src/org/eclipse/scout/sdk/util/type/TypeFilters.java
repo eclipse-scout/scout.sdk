@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.type;
 
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
@@ -273,7 +272,9 @@ public class TypeFilters {
     HashSet<IType> excludedSet = null;
     if (excludedTypes != null) {
       excludedSet = new HashSet<IType>(excludedTypes.length);
-      excludedSet.addAll(Arrays.asList(excludedTypes));
+      for (IType t : excludedTypes) {
+        excludedSet.add(t);
+      }
     }
     else {
       excludedSet = new HashSet<IType>(0);

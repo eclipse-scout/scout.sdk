@@ -138,7 +138,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setOperation(new WellformClientBundleOperation(getScoutBundle()));
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
     }
     else if (menu instanceof MultipleUpdateFormDataAction) {
       ((MultipleUpdateFormDataAction) menu).setOperation(new ClientBundleUpdateFormDataOperation(getScoutBundle()));

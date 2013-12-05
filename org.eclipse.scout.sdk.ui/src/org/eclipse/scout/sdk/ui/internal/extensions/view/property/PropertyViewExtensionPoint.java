@@ -82,12 +82,10 @@ public class PropertyViewExtensionPoint {
       for (PropertyViewExtension ext : extendsions.values()) {
         try {
           int distanceToIPage = distanceToIPage(ext.getPageClass(), 0);
-
           orderedExtensions.put(new CompositeObject(-distanceToIPage, ext), ext);
         }
         catch (Throwable t) {
           ScoutSdkUi.logError("Could not determ load extension '" + ext.toString() + "'!");
-          // TODO: handle exception
         }
       }
       m_extensions = new ArrayList<PropertyViewExtension>(orderedExtensions.values());
@@ -150,7 +148,6 @@ public class PropertyViewExtensionPoint {
       }
     }
     return null;
-
   }
 
   public static IMultiPropertyViewPart createMultiPageViewPart(IPage[] pages) {

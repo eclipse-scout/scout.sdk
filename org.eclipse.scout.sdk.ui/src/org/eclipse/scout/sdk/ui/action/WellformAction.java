@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.action;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -29,6 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 public class WellformAction extends AbstractOperationAction {
 
   private IScoutBundle m_bundle;
+  private IType m_type;
 
   public WellformAction() {
     super(Texts.get("Wellform"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), null, false, Category.UDPATE);
@@ -36,18 +38,29 @@ public class WellformAction extends AbstractOperationAction {
 
   @Override
   public boolean isVisible() {
-    return m_bundle == null || !m_bundle.isBinary();
+    return (m_bundle == null || !m_bundle.isBinary()) && (m_type == null || m_type.getDeclaringType() == null);
   }
 
-  public void setScoutBundle(IScoutBundle b) {
+  public void init(IScoutBundle b) {
+    init(b, null);
+  }
+
+  public void init(IScoutBundle b, IType type) {
     m_bundle = b;
+    m_type = type;
   }
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
-    box.setMessage(Texts.get("WellformConfirmationMessage"));
-    if (box.open() == SWT.OK) {
+    if (m_type == null) {
+      // no specific type: multi type execution: show warning
+      MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
+      box.setMessage(Texts.get("WellformConfirmationMessage"));
+      if (box.open() == SWT.OK) {
+        super.execute(shell, selection, event);
+      }
+    }
+    else {
       super.execute(shell, selection, event);
     }
     return null;

@@ -134,7 +134,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
       ArrayList<IScoutBundle> bundles = new ArrayList<IScoutBundle>();
       collectBundlesRec(m_group, bundles);
       action.setOperation(new WellformClientBundleOperation(bundles.toArray(new IScoutBundle[bundles.size()])));
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
     }
   }
 

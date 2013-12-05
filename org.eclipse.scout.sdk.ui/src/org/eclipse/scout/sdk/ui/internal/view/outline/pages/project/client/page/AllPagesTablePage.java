@@ -89,7 +89,7 @@ public class AllPagesTablePage extends AbstractPage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
       action.setOperation(new WellformPagesOperation(getScoutBundle()));
       action.setLabel(Texts.get("Wellform all Pages..."));
     }

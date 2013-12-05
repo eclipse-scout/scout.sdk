@@ -96,7 +96,7 @@ public class SearchFormTablePage extends AbstractPage {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
       action.setOperation(new WellformSearchFormsOperation(getScoutBundle()));
-      action.setScoutBundle(getScoutBundle());
+      action.init(getScoutBundle());
       action.setLabel(Texts.get("WellformAllSearchForms"));
     }
     else if (menu instanceof SearchFormNewAction) {
