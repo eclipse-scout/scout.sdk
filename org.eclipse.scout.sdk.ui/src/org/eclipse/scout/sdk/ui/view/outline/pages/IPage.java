@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.view.outline.pages;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.outline.DirtyUpdateManager;
@@ -26,7 +27,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * @see IScoutExplorerPart
  * @since 3.7.0
  */
-public interface IPage {
+public interface IPage extends IAdaptable {
 
   /**
    * @return a unique identifier of the page (e.g. the fully qualified class name)

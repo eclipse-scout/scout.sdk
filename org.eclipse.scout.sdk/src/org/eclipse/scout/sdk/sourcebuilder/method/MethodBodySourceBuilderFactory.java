@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 /**
  * <h3>{@link MethodBodySourceBuilderFactory}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public final class MethodBodySourceBuilderFactory {
@@ -56,10 +56,16 @@ public final class MethodBodySourceBuilderFactory {
           source.append(lineDelimiter);
         }
         String returnTypeSignature = methodBuilder.getReturnTypeSignature();
-        if (!StringUtility.isNullOrEmpty(returnTypeSignature) && !Signature.SIG_VOID.equals(returnTypeSignature)) {
+        boolean isConstructor = StringUtility.isNullOrEmpty(returnTypeSignature);
+        if (!isConstructor && !Signature.SIG_VOID.equals(returnTypeSignature)) {
           source.append("return ");
         }
-        source.append("super.").append(methodBuilder.getElementName()).append("(");
+        source.append("super");
+        if (!isConstructor) {
+          source.append(".");
+          source.append(methodBuilder.getElementName());
+        }
+        source.append("(");
         List<MethodParameter> parameters = methodBuilder.getParameters();
         MethodParameter[] params = parameters.toArray(new MethodParameter[parameters.size()]);
         for (int i = 0; i < params.length; i++) {

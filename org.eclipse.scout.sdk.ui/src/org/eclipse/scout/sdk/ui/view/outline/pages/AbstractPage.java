@@ -19,6 +19,14 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IOpenable;
+import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -40,12 +48,14 @@ import org.eclipse.swt.graphics.Point;
 public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   private final static Point ICON_SIZE = new Point(16, 16);
+
+  private final Map<CompositeObject, IPage> m_children;
+  private final PageDirtyListener m_pageDirtyListener;
+
   private String m_name;
-  private Map<CompositeObject, IPage> m_children;
   private IPage m_parent;
   private boolean m_recursive;
   private boolean m_childrenLoaded;
-  private PageDirtyListener m_pageDirtyListener;
   private ImageDescriptor m_imageDesc;
 
   public AbstractPage() {
@@ -64,6 +74,29 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
     if (m_parent != null) {
       m_parent.addChild(this);
     }
+  }
+
+  @Override
+  public Object getAdapter(Class adapter) {
+    if (IPage.class == adapter || IAdaptable.class == adapter) {
+      return this;
+    }
+
+    IScoutBundle b = getScoutBundle();
+    if (IScoutBundle.class == adapter) {
+      return b;
+    }
+    if (b != null) {
+      if (!b.isBinary()) {
+        if (IResource.class == adapter || ISchedulingRule.class == adapter) {
+          return b.getProject();
+        }
+        if (IJavaProject.class == adapter || IParent.class == adapter || IJavaElement.class == adapter || IOpenable.class == adapter) {
+          return b.getJavaProject();
+        }
+      }
+    }
+    return Platform.getAdapterManager().getAdapter(this, adapter);
   }
 
   @Override

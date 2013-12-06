@@ -10,7 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline.pages;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.jobs.ISchedulingRule;
+import org.eclipse.jdt.core.IAnnotatable;
+import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMember;
+import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.text.IRegion;
@@ -20,6 +28,7 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -35,6 +44,23 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
 
   public AbstractScoutTypePage(String readOnlySuffix) {
     m_readOnlySuffix = readOnlySuffix;
+  }
+
+  @Override
+  public Object getAdapter(Class adapter) {
+    IType type = getType();
+    if (TypeUtility.exists(type)) {
+      if (IResource.class == adapter || ISchedulingRule.class == adapter || IFile.class == adapter) {
+        return type.getResource();
+      }
+      if (IParent.class == adapter || IJavaElement.class == adapter || IType.class == adapter || IMember.class == adapter || IAnnotatable.class == adapter) {
+        return type;
+      }
+      if (ICompilationUnit.class == adapter) {
+        return type.getCompilationUnit();
+      }
+    }
+    return super.getAdapter(adapter);
   }
 
   @Override
