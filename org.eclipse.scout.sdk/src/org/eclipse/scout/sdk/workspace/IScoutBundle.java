@@ -382,6 +382,7 @@ public interface IScoutBundle extends IAdaptable {
    * @param up
    *          true if the parents (=dependencies) of the receiver should be visited. false if the children (=dependents)
    *          should be visited.
+   * @since 3.10.0
    * @see IScoutBundleGraphVisitor
    * @see IScoutBundleGraphVisitor#visit(IScoutBundle, int)
    * @see <a

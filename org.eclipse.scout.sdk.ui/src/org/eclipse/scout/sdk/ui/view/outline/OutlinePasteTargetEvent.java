@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.view.outline;
 import java.awt.datatransfer.Transferable;
 
 import org.eclipse.jface.viewers.TreeViewer;
-import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.swt.events.TypedEvent;
 
 public class OutlinePasteTargetEvent extends TypedEvent {
@@ -21,7 +21,7 @@ public class OutlinePasteTargetEvent extends TypedEvent {
   private static final long serialVersionUID = 1L;
 
   private Transferable m_transferData;
-  private AbstractPage m_page;
+  private IPage m_page;
 
   public OutlinePasteTargetEvent(TreeViewer viewer) {
     super(viewer);
@@ -37,11 +37,11 @@ public class OutlinePasteTargetEvent extends TypedEvent {
     m_transferData = transferData;
   }
 
-  public AbstractPage getPage() {
+  public IPage getPage() {
     return m_page;
   }
 
-  public void setPage(AbstractPage page) {
+  public void setPage(IPage page) {
     m_page = page;
   }
 }

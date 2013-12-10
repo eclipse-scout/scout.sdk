@@ -144,6 +144,9 @@ public final class ScoutBundleFilters {
     if (filters == null || filters.length < 1) {
       return getAllBundlesFilter();
     }
+    if (filters.length == 1) {
+      return filters[0];
+    }
 
     return new IScoutBundleFilter() {
       @Override

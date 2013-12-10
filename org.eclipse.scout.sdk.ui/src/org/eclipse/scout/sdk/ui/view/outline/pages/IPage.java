@@ -12,12 +12,11 @@ package org.eclipse.scout.sdk.ui.view.outline.pages;
 
 import java.util.List;
 
-import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint;
-import org.eclipse.scout.sdk.ui.internal.view.outline.DirtyUpdateManager;
-import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.internal.view.outline.job.RefreshOutlineSubTreeJob;
+import org.eclipse.scout.sdk.ui.view.outline.DirtyUpdateManager;
+import org.eclipse.scout.sdk.ui.view.outline.IPageOutlineView;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -27,7 +26,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * @see IScoutExplorerPart
  * @since 3.7.0
  */
-public interface IPage extends IAdaptable {
+public interface IPage {
 
   /**
    * @return a unique identifier of the page (e.g. the fully qualified class name)
@@ -85,7 +84,7 @@ public interface IPage extends IAdaptable {
    * 
    * @return the Scout Explorer this page belongs to or null.
    */
-  ScoutExplorerPart getOutlineView();
+  IPageOutlineView getOutlineView();
 
   /**
    * Adds the given page to the child list of this page.

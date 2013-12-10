@@ -38,12 +38,12 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * <h3>{@link TemplateFromFromFieldDialog}</h3> ...
+ * <h3>{@link TemplateFromFormFieldDialog}</h3> ...
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 20.09.2010
  */
-public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
+public class TemplateFromFormFieldDialog extends AbstractStatusDialog {
 
   private StyledTextField m_templateNameField;
   private Button m_replaceExistingFormField;
@@ -61,7 +61,7 @@ public class TemplateFromFromFieldDialog extends AbstractStatusDialog {
   /**
    * @param parentShell
    */
-  public TemplateFromFromFieldDialog(Shell parentShell, String templateName, IType formField) {
+  public TemplateFromFormFieldDialog(Shell parentShell, String templateName, IType formField) {
     super(parentShell);
     m_formField = formField;
     m_templateName = templateName;

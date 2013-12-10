@@ -19,12 +19,11 @@ import org.eclipse.scout.sdk.ui.extensions.IPasteTargetDelegator;
 import org.eclipse.scout.sdk.ui.internal.extensions.CopyAndPasteExtensionPoint;
 import org.eclipse.scout.sdk.ui.view.outline.OutlineCopySourceEvent;
 import org.eclipse.scout.sdk.ui.view.outline.OutlinePasteTargetEvent;
-import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 public class ExplorerCopyAndPasteSupport {
 
-  public static boolean performPaste(TreeViewer viewer, AbstractPage page) {
-
+  public static boolean performPaste(TreeViewer viewer, IPage page) {
     OutlinePasteTargetEvent event = new OutlinePasteTargetEvent(viewer);
     Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
     event.setTransferData(clipboard.getContents(null));
@@ -37,8 +36,7 @@ public class ExplorerCopyAndPasteSupport {
     return res;
   }
 
-  public static boolean performCopy(TreeViewer viewer, AbstractPage page) {
-
+  public static boolean performCopy(TreeViewer viewer, IPage page) {
     OutlineCopySourceEvent event = new OutlineCopySourceEvent(viewer);
     event.setPage(page);
 

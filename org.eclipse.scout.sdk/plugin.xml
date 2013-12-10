@@ -923,4 +923,17 @@
             symbolicName="org.eclipse.scout.rt.docx4j.client">
       </bundle>
    </extension>
+   <extension
+         point="org.eclipse.core.runtime.adapters">
+      <factory
+            adaptableType="org.eclipse.core.resources.IResource"
+            class="org.eclipse.scout.sdk.internal.workspace.ResourcesAdapterFactory">
+         <adapter
+               type="org.eclipse.scout.sdk.workspace.IScoutBundle">
+         </adapter>
+         <adapter
+               type="org.eclipse.jdt.core.IJavaElement">
+         </adapter>
+      </factory>
+   </extension>
 </plugin>

@@ -167,7 +167,7 @@
             name="Scout Object Properties"/>
       <category
             id="org.eclipse.scout.sdk.viewcategory"
-            name="Scout (SDK)"/>
+            name="Scout"/>
    </extension>
    <extension
          point="org.eclipse.ui.editors">
@@ -199,7 +199,26 @@
             icon="resources/icons/scoutWorkingSet.png"
             id="org.eclipse.scout.newWorkingSetWizard"
             name="Scout Working Set"
-            preferredPerspectives="org.eclipse.scout.sdk.ui.internal.ScoutPerspective">
+            preferredPerspectives="org.eclipse.scout.sdk.ui.internal.ScoutPerspective"
+            project="false">
+      </wizard>
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.scout.sdk"
+            class="org.eclipse.scout.sdk.ui.wizard.code.type.CodeTypeNewWizard"
+            icon="resources/icons/codeType_add.png"
+            id="org.eclipse.scout.newCodeTypeWizard"
+            name="Scout Code Type"
+            project="false">
+      </wizard>
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.scout.sdk"
+            class="org.eclipse.scout.sdk.ui.wizard.form.FormNewWizard"
+            icon="resources/icons/form_add.png"
+            id="org.eclipse.scout.newFormWizard"
+            name="Scout Form"
+            project="false">
       </wizard>
    </extension>
    <extension
@@ -1124,7 +1143,7 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.scout.sdk.workspace.IScoutBundle"
-            class="org.eclipse.scout.sdk.ui.workingset.ScoutBundleAdapterFactory">
+            class="org.eclipse.scout.sdk.ui.workingset.ScoutBundleUiAdapterFactory">
          <adapter
                type="org.eclipse.ui.IPersistableElement">
          </adapter>

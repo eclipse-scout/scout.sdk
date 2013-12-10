@@ -3,6 +3,7 @@ package org.eclipse.scout.sdk.ui.menu;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 
 import org.eclipse.core.commands.Command;
@@ -44,7 +45,7 @@ public class MenuVisibilityTester extends PropertyTester {
     return null;
   }
 
-  private static HashMap<IPage, IContextMenuContributor> getMenuContributorsForAllPages(Class<? extends IScoutHandler> menu, IPage[] pages) {
+  private static HashMap<IPage, IContextMenuContributor> getMenuContributorsForAllPages(Class<? extends IScoutHandler> menu, List<IPage> pages) {
     HashMap<IPage, IContextMenuContributor> mapping = new HashMap<IPage, IContextMenuContributor>();
     for (IPage p : pages) {
       IContextMenuContributor c = getMenuContributor(menu, p);
@@ -66,14 +67,14 @@ public class MenuVisibilityTester extends PropertyTester {
     return true;
   }
 
-  private static IPage[] getFilteredSelection(Collection<?> c) {
+  private static List<IPage> getFilteredSelection(Collection<?> c) {
     ArrayList<IPage> ret = new ArrayList<IPage>(c.size());
     for (Object o : c) {
       if (o instanceof IPage) {
         ret.add((IPage) o);
       }
     }
-    return ret.toArray(new IPage[ret.size()]);
+    return ret;
   }
 
   @SuppressWarnings("unchecked")
@@ -84,8 +85,8 @@ public class MenuVisibilityTester extends PropertyTester {
     }
     if (receiver instanceof Collection && args != null && args.length == 3 && args[0] instanceof Class && args[1] instanceof Command && args[2] instanceof IServiceLocator) {
       if (IScoutHandler.class.isAssignableFrom((Class<?>) args[0])) {
-        IPage[] selectedNodes = getFilteredSelection((Collection<?>) receiver);
-        if (selectedNodes.length == 0) {
+        List<IPage> selectedNodes = getFilteredSelection((Collection<?>) receiver);
+        if (selectedNodes.size() == 0) {
           return false;
         }
         else {
@@ -106,7 +107,7 @@ public class MenuVisibilityTester extends PropertyTester {
             cmd.setHandler(currentMenu);
 
             // check for multi select
-            if (!currentMenu.isMultiSelectSupported() && selectedNodes.length > 1) return false;
+            if (!currentMenu.isMultiSelectSupported() && selectedNodes.size() > 1) return false;
 
             // prepare the menu
             prepareMenu(currentMenu, contributors);

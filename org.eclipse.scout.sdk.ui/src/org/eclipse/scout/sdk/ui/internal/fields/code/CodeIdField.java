@@ -2,7 +2,6 @@ package org.eclipse.scout.sdk.ui.internal.fields.code;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.ICodeIdParser;
@@ -88,7 +87,7 @@ public class CodeIdField extends Composite {
     m_nextCodeIdField.removeModifyListener(listener);
   }
 
-  public IStatus getStatus() throws JavaModelException {
+  public IStatus getStatus() {
     if (getGenericSignature() != null && !StringUtility.isNullOrEmpty(getValue())) {
       ICodeIdParser parser = CodeIdExtensionPoint.getCodeIdParser(getGenericSignature());
 

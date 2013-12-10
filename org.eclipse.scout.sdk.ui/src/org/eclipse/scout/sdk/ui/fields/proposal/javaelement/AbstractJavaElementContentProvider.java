@@ -32,7 +32,11 @@ public abstract class AbstractJavaElementContentProvider extends ContentProposal
   private Object[][] m_allProposals;
 
   protected AbstractJavaElementContentProvider() {
-    m_labelProvider = new JavaElementLabelProvider();
+    this(new JavaElementLabelProvider());
+  }
+
+  protected AbstractJavaElementContentProvider(ILabelProvider labelProvider) {
+    m_labelProvider = labelProvider;
     m_allProposals = null;
   }
 

@@ -21,6 +21,7 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.jface.fieldassist.ContentProposalAdapter;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.IContentProposal;
+import org.eclipse.jface.fieldassist.IContentProposalListener;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.fieldassist.IControlContentAdapter;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -90,6 +91,17 @@ public class EntityTextField extends Composite {
     m_proposalAdapter = new ContentProposalAdapter(m_text, m_contentProvider, m_contentProvider, KeyStroke.getInstance(SWT.CONTROL, ' '), null);
     m_proposalAdapter.setLabelProvider(m_contentProvider);
     m_proposalAdapter.setProposalAcceptanceStyle(ContentProposalAdapter.PROPOSAL_REPLACE);
+    m_proposalAdapter.addContentProposalListener(new IContentProposalListener() {
+      @Override
+      public void proposalAccepted(IContentProposal proposal) {
+        int pos = m_text.getCaretOffset();
+        String val = m_proposalAdapter.getLabelProvider().getText(proposal);
+        if (StringUtility.hasText(val)) {
+          pos = val.length();
+        }
+        m_text.setCaretOffset(pos);
+      }
+    });
 
     // layout
     FormData labelData = new FormData();

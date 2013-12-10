@@ -10,27 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline;
 
-import org.eclipse.jface.viewers.TreeViewer;
+import java.util.EventListener;
+
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.swt.events.TypedEvent;
 
-public class OutlineCopySourceEvent extends TypedEvent {
+/**
+ *
+ */
+public interface IContentProviderListener extends EventListener {
 
-  private static final long serialVersionUID = 1L;
-
-  private IPage m_page;
-
-  public OutlineCopySourceEvent(TreeViewer viewer) {
-    super(viewer);
-    widget = viewer.getControl();
-    display = viewer.getControl().getDisplay();
-  }
-
-  public IPage getPage() {
-    return m_page;
-  }
-
-  public void setPage(IPage page) {
-    m_page = page;
-  }
+  public void handleChildrenLoaded(IPage page);
 }

@@ -10,23 +10,38 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.code.type;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
 
-public class CodeTypeNewWizard extends AbstractWorkspaceWizard {
+public class CodeTypeNewWizard extends AbstractWorkspaceWizard implements INewWizard {
 
   private CodeTypeNewWizardPage m_page1;
-  private final IScoutBundle m_sharedBundle;
+  private IScoutBundle m_sharedBundle;
 
-  public CodeTypeNewWizard(IScoutBundle sharedBundle) {
-    setWindowTitle(Texts.get("NewCodeType"));
-    m_sharedBundle = sharedBundle;
-    m_page1 = new CodeTypeNewWizardPage(getSharedBundle());
-    addPage(m_page1);
+  public CodeTypeNewWizard() {
+    this(null);
   }
 
-  public IScoutBundle getSharedBundle() {
-    return m_sharedBundle;
+  public CodeTypeNewWizard(IScoutBundle sharedBundle) {
+    m_sharedBundle = sharedBundle;
+  }
+
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+
+    m_sharedBundle = UiUtility.getScoutBundleFromSelection(selection, m_sharedBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED));
+    String pck = UiUtility.getPackageSuffix(selection);
+
+    setWindowTitle(Texts.get("NewCodeType"));
+
+    m_page1 = new CodeTypeNewWizardPage(m_sharedBundle);
+    m_page1.setTargetPackage(pck);
+    addPage(m_page1);
   }
 }

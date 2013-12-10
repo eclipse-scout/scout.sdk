@@ -28,6 +28,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IImportDeclaration;
@@ -138,6 +139,41 @@ public class TypeUtility {
       return new IType[0];
     }
     return types;
+  }
+
+  /**
+   * Gets the first type in the compilation unit surrounding the given java element
+   * 
+   * @param e
+   *          the java element.
+   * @return the primary type or null.
+   * @throws JavaModelException
+   */
+  public static IType getPrimaryType(IJavaElement e) throws JavaModelException {
+    if (TypeUtility.exists(e)) {
+      // source
+      ICompilationUnit icu = (ICompilationUnit) e.getAncestor(IJavaElement.COMPILATION_UNIT);
+      if (TypeUtility.exists(icu)) {
+        IType[] candidates = icu.getTypes();
+        if (candidates != null && candidates.length > 0) {
+          IType result = candidates[0];
+          if (TypeUtility.exists(result)) {
+            return result;
+          }
+        }
+      }
+      else {
+        // binary
+        IClassFile cf = (IClassFile) e.getAncestor(IJavaElement.CLASS_FILE);
+        if (TypeUtility.exists(cf)) {
+          IType candidate = cf.getType();
+          if (TypeUtility.exists(candidate)) {
+            return candidate;
+          }
+        }
+      }
+    }
+    return null;
   }
 
   public static IType[] getInnerTypes(IType type) {

@@ -65,7 +65,11 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBund
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.BundleNodeGroupTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectsTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutWorkingSetTablePage;
+import org.eclipse.scout.sdk.ui.view.outline.DirtyUpdateManager;
+import org.eclipse.scout.sdk.ui.view.outline.IContentProviderListener;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
+import org.eclipse.scout.sdk.ui.view.outline.ViewContentProvider;
+import org.eclipse.scout.sdk.ui.view.outline.ViewLabelProvider;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -94,32 +98,34 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
    */
   public static final int IS_LINKING_ENABLED_PROPERTY = 1;
   private String LINKING_ENABLED = "OutlineView.LINKING_ENABLED"; //$NON-NLS-1$
+
   private TreeViewer m_viewer;
   private ViewContentProvider m_viewContentProvider;
   private IScoutWorkspaceListener m_workspaceListener;
+
   private final DirtyUpdateManager m_dirtyManager;
   private final HashSet<IContributionItem> m_debugMenus;
+  private final P_ReloadNodeJob m_reloadJob;
+  private final LRUCache<String/* path */, IPageFilter> m_pageFilterCache;
 
-  // filtering
   private Object m_pageFilterCacheLock = new Object();
-  private LRUCache<String/* path */, IPageFilter> m_pageFilterCache = new LRUCache<String, IPageFilter>(10000, -1);
   private P_OutlineSelectionProvider m_outlineSelectionProvider;
   private boolean m_linkingEnabled;
   private LinkWithEditorAction m_linkWithEditorAction;
-  private P_ReloadNodeJob m_reloadJob = new P_ReloadNodeJob();
 
-  /**
-   * The constructor.
-   */
   public ScoutExplorerPart() {
+    m_pageFilterCache = new LRUCache<String, IPageFilter>(1000, -1);
+    m_reloadJob = new P_ReloadNodeJob();
     m_dirtyManager = new DirtyUpdateManager(this);
     m_debugMenus = new HashSet<IContributionItem>();
   }
 
+  @Override
   public TreeViewer getTreeViewer() {
     return m_viewer;
   }
 
+  @Override
   public ViewContentProvider getViewContentProvider() {
     return m_viewContentProvider;
   }
@@ -287,18 +293,17 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
    * The page is added to the dirty structure pages list.
    * A {@link RefreshOutlineSubTreeJob} is queued after some time to reload the affected nodes
    */
+  @Override
   public void markStructureDirty(IPage newPage) {
     m_dirtyManager.notifyStructureDirty(newPage);
   }
 
-  public IPage[] fetchDirtyStructurePages() {
-    return m_dirtyManager.fetchDirtyStructurePages();
-  }
-
-  public void markFilterChanged(AbstractPage page) {
+  @Override
+  public void markFilterChanged(IPage page) {
     new FilterOutlineJob(ScoutExplorerPart.this, page).schedule();
   }
 
+  @Override
   public IPageFilter getPageFilter(IPage page) {
     String key = getPageNodePath(page);
     synchronized (m_pageFilterCacheLock) {
@@ -306,6 +311,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     }
   }
 
+  @Override
   public void addPageFilter(IPage page, IPageFilter filter) {
     String key = getPageNodePath(page);
     synchronized (m_pageFilterCacheLock) {
@@ -315,22 +321,9 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       }
       m_reloadJob.reloadDelayed(page);
     }
-
   }
 
-  public void clearPageFilter(IPage page) {
-    String key = getPageNodePath(page);
-    synchronized (m_pageFilterCacheLock) {
-      if (m_pageFilterCache.containsKey(key)) {
-        m_pageFilterCache.remove(key);
-        // reload
-        m_reloadJob.reloadDelayed(page);
-      }
-    }
-
-  }
-
-  String getPageNodePath(IPage page) {
+  private String getPageNodePath(IPage page) {
     StringBuilder b = new StringBuilder();
     IPage tmp = page;
     while (tmp != null) {
@@ -450,7 +443,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       public void selectionChanged(SelectionChangedEvent e) {
         handleNodeSelection((StructuredSelection) e.getSelection());
       }
-
     });
   }
 
@@ -459,44 +451,42 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   }
 
   private void hookKeyActions() {
-    m_viewer.getControl().addKeyListener(
-        new KeyListener() {
-          @Override
-          public void keyPressed(KeyEvent e) {
-          }
+    m_viewer.getControl().addKeyListener(new KeyListener() {
+      @Override
+      public void keyPressed(KeyEvent e) {
+      }
 
-          @Override
-          public void keyReleased(final KeyEvent e) {
-            ISelection sel = m_viewer.getSelection();
-            if (sel instanceof StructuredSelection) {
-              List list = ((IStructuredSelection) sel).toList();
-              if (list.size() == 1) {
-                Object elem = list.get(0);
-                if (elem instanceof AbstractPage) {
-                  final AbstractPage page = (AbstractPage) elem;
-                  ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                      if (e.keyCode == SWT.F5) {
-                        // act on F5
-                        page.refresh((e.stateMask == SWT.SHIFT));
-                      }
-                      else if (e.keyCode == 'v' && e.stateMask == SWT.CONTROL) {
-                        // act on CONTROL + V
-                        ExplorerCopyAndPasteSupport.performPaste(m_viewer, page);
-                      }
-                      else if (e.keyCode == 'c' && e.stateMask == SWT.CONTROL) {
-                        // act on CONTROL + C
-                        ExplorerCopyAndPasteSupport.performCopy(m_viewer, page);
-                      }
-                    }
-                  });
+      @Override
+      public void keyReleased(final KeyEvent e) {
+        ISelection sel = m_viewer.getSelection();
+        if (sel instanceof StructuredSelection) {
+          List list = ((IStructuredSelection) sel).toList();
+          if (list.size() == 1) {
+            Object elem = list.get(0);
+            if (elem instanceof IPage) {
+              final IPage page = (IPage) elem;
+              ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
+                @Override
+                public void run() {
+                  if (e.keyCode == SWT.F5) {
+                    // act on F5
+                    page.refresh((e.stateMask == SWT.SHIFT));
+                  }
+                  else if (e.keyCode == 'v' && e.stateMask == SWT.CONTROL) {
+                    // act on CONTROL + V
+                    ExplorerCopyAndPasteSupport.performPaste(m_viewer, page);
+                  }
+                  else if (e.keyCode == 'c' && e.stateMask == SWT.CONTROL) {
+                    // act on CONTROL + C
+                    ExplorerCopyAndPasteSupport.performCopy(m_viewer, page);
+                  }
                 }
-              }
+              });
             }
           }
         }
-        );
+      }
+    });
   }
 
   private void hookDoubleClickAction() {
@@ -548,10 +538,11 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   }
 
   private class P_OutlineSelectionProvider implements ISelectionProvider, ISelectionChangedListener {
-    private List<ISelectionChangedListener> m_selectionListeners;
-    private OptimisticLock m_selectionLock = new OptimisticLock();
+    private final List<ISelectionChangedListener> m_selectionListeners;
+    private final OptimisticLock m_selectionLock;
 
     public P_OutlineSelectionProvider() {
+      m_selectionLock = new OptimisticLock();
       m_selectionListeners = Collections.synchronizedList(new ArrayList<ISelectionChangedListener>());
       m_viewer.addSelectionChangedListener(this);
     }
@@ -569,12 +560,10 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     @Override
     public void removeSelectionChangedListener(ISelectionChangedListener listener) {
       m_selectionListeners.remove(listener);
-
     }
 
     @Override
     public void setSelection(ISelection selection) {
-
       if (CompareUtility.notEquals(getTreeViewer().getSelection(), selection)) {
         try {
           if (m_selectionLock.acquire()) {

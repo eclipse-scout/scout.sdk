@@ -11,8 +11,11 @@
 package org.eclipse.scout.sdk.ui.util;
 
 import org.eclipse.core.resources.IMarker;
+import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.ui.javaeditor.EditorUtility;
@@ -21,10 +24,18 @@ import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -37,6 +48,15 @@ import org.eclipse.ui.texteditor.ITextEditor;
  */
 @SuppressWarnings("restriction")
 public class UiUtility {
+  /**
+   * Shows the given java element in the java editor.
+   * 
+   * @param e
+   *          The element to focus
+   * @param createNew
+   *          indicates if a new editor should be opened if not open yet. If false, the element will only be shown if
+   *          there is a java editor open yet.
+   */
   public static void showJavaElementInEditor(IJavaElement e, boolean createNew) {
     try {
       IEditorPart editor = null;
@@ -65,6 +85,161 @@ public class UiUtility {
     }
   }
 
+  /**
+   * Gets the packages suffix of the given selection.<br>
+   * This method calculates the java package that surrounds the current selection and returns the suffix (the package
+   * part after the symbolic name of the containing bundle).
+   * 
+   * @param selection
+   *          The selection to evaluate
+   * @return A string with the package suffix or null.
+   */
+  public static String getPackageSuffix(IStructuredSelection selection) {
+    return getPackageSuffix(UiUtility.adapt(selection.getFirstElement(), IJavaElement.class));
+  }
+
+  /**
+   * Gets the packages suffix of the given element.<br>
+   * This method calculates the java package that surrounds the given element and returns the suffix (the package
+   * part after the symbolic name of the containing bundle).
+   * 
+   * @param element
+   *          The element
+   * @return A string with the package suffix or null.
+   */
+  public static String getPackageSuffix(IJavaElement element) {
+    IPackageFragment targetPackage = null;
+    if (TypeUtility.exists(element)) {
+      targetPackage = (IPackageFragment) element.getAncestor(IJavaElement.PACKAGE_FRAGMENT);
+    }
+
+    if (targetPackage != null) {
+      String pck = targetPackage.getElementName();
+      IScoutBundle declaringBundle = ScoutTypeUtility.getScoutBundle(targetPackage);
+      if (declaringBundle != null && pck.startsWith(declaringBundle.getSymbolicName())) {
+        return pck.substring(declaringBundle.getSymbolicName().length() + 1);
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Tries to calculate the most specific scout bundle that contains the given selection.
+   * The given filter is taken into account so that clients can influence which types of scout bundles around the
+   * selected one that should be used.<br>
+   * If the priorityBundle is not null, this bundle is directly returned and the selection is not evaluated.
+   * 
+   * @param selection
+   * @param priorityBundle
+   * @param filter
+   * @return
+   */
+  public static IScoutBundle getScoutBundleFromSelection(IStructuredSelection selection, IScoutBundle priorityBundle, IScoutBundleFilter filter) {
+    if (priorityBundle != null) {
+      return priorityBundle;
+    }
+
+    // parse from selection
+    if (selection != null) {
+      IScoutBundle b = UiUtility.adapt(selection.getFirstElement(), IScoutBundle.class);
+      if (b != null) {
+        if (filter.accept(b)) {
+          return b;
+        }
+        else {
+          IScoutBundle parentShared = b.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), b, true);
+          if (parentShared != null) {
+            IScoutBundle candidate = parentShared.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), filter), b, true);
+            if (candidate != null) {
+              return candidate;
+            }
+          }
+          else {
+            IScoutBundle candidate = b.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), filter), b, false);
+            if (candidate != null) {
+              return candidate;
+            }
+          }
+        }
+      }
+    }
+
+    // nothing in the selection. just choose one
+    IScoutBundle[] bundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getFilteredRootBundlesFilter(ScoutBundleFilters.getWorkspaceBundlesFilter()));
+    for (IScoutBundle root : bundles) {
+      IScoutBundle candidate = root.getChildBundle(filter, true);
+      if (candidate != null) {
+        return candidate;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Tries to convert the given element into the given class.
+   * This method respects scout IPage classes.
+   * 
+   * @param element
+   *          The element to convert.
+   * @param targetClass
+   *          The class in which it should be converted.
+   * @return the converted element or null if the conversion could not be done.
+   */
+  @SuppressWarnings("unchecked")
+  public static <T> T adapt(Object element, Class<T> targetClass) {
+    if (element == null || targetClass == null) {
+      return null;
+    }
+    if (targetClass.isInstance(element)) {
+      return (T) element;
+    }
+    if (element instanceof IPage) {
+      IPage page = (IPage) element;
+      IScoutBundle sb = page.getScoutBundle();
+      if (sb != null) {
+        element = sb;
+      }
+      if (page instanceof AbstractScoutTypePage) {
+        AbstractScoutTypePage astp = (AbstractScoutTypePage) page;
+        IType t = astp.getType();
+        if (TypeUtility.exists(t)) {
+          element = t;
+        }
+      }
+    }
+    if (element instanceof IAdaptable) {
+      IAdaptable ad = (IAdaptable) element;
+      T result = (T) ad.getAdapter(targetClass);
+      if (result == null) {
+        // try to get a resource
+        IResource r = (IResource) ad.getAdapter(IResource.class);
+        if (!ResourceUtility.exists(r)) {
+          IJavaElement je = (IJavaElement) ad.getAdapter(IJavaElement.class);
+          if (TypeUtility.exists(je)) {
+            r = je.getResource();
+          }
+        }
+
+        if (ResourceUtility.exists(r)) {
+          // try to convert from a resource
+          result = (T) r.getAdapter(targetClass);
+        }
+      }
+      return result;
+    }
+    return null;
+  }
+
+  /**
+   * Gets an image descriptor for classes.<br>
+   * The image descriptor includes flags like abstract, final, static, deprecated. Furthermore it shows different icons
+   * for interfaces and classes and includes the severity flags of the classes (e.g. error or warning).
+   * 
+   * @param type
+   *          The type for which the icon should be returned.
+   * @return The image descriptor.
+   */
   public static ImageDescriptor getTypeImageDescriptor(IType type) {
     int flags = -1;
     try {
@@ -100,19 +275,5 @@ public class UiUtility {
     }
 
     return new JavaElementImageDescriptor(desc, adornmentFlags, JavaElementImageProvider.BIG_SIZE);
-  }
-
-  public static <T> boolean equals(T a, T b) {
-    if (a instanceof String) {
-      if (((String) a).equalsIgnoreCase("null")) {
-        a = null;
-      }
-    }
-    if (b instanceof String) {
-      if (((String) b).equalsIgnoreCase("null")) {
-        b = null;
-      }
-    }
-    return CompareUtility.equals(a, b);
   }
 }

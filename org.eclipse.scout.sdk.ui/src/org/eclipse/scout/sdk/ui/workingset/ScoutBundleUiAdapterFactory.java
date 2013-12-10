@@ -4,7 +4,7 @@ import org.eclipse.core.runtime.IAdapterFactory;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.ui.IPersistableElement;
 
-public class ScoutBundleAdapterFactory implements IAdapterFactory {
+public class ScoutBundleUiAdapterFactory implements IAdapterFactory {
   @Override
   public Object getAdapter(Object adaptableObject, Class adapterType) {
     if (IPersistableElement.class.equals(adapterType)) {

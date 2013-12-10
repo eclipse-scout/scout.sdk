@@ -12,24 +12,11 @@ package org.eclipse.scout.sdk.ui.view.outline;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.ui.IWorkbenchPartSite;
 
 /**
  * <h3>IScoutExplorerPart</h3>
  */
-public interface IScoutExplorerPart {
-
-  /**
-   * Returns the site for this workbench part. The site can be <code>null</code> while the workbench part is being
-   * initialized. After
-   * the initialization is complete, this value must be non-<code>null</code> for the remainder of the part's life
-   * cycle.
-   * 
-   * @return The part site; this value may be <code>null</code> if the part
-   *         has not yet been initialized
-   */
-  IWorkbenchPartSite getSite();
-
+public interface IScoutExplorerPart extends IPageOutlineView, IDirtyManageable {
   /**
    * gets the current selection of the scout explorer tree.
    * 

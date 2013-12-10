@@ -16,10 +16,10 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
@@ -71,16 +71,17 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   private ProposalTextField m_genericTypeField;
 
   // process members
-
   private final IScoutBundle m_sharedBundle;
 
   public CodeTypeNewWizardPage(IScoutBundle sharedBundle) {
     super(CodeTypeNewWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
-    setTargetPackage(DefaultTargetPackage.get(sharedBundle, IDefaultTargetPackage.SHARED_SERVICES_CODE));
     setTitle(Texts.get("NewCodeType"));
     setDescription(Texts.get("CreateANewCodeType"));
-    m_defaultCodeType = RuntimeClasses.getSuperType(RuntimeClasses.ICodeType, ScoutUtility.getJavaProject(m_sharedBundle));
+    if (m_sharedBundle != null) {
+      setTargetPackage(DefaultTargetPackage.get(m_sharedBundle, IDefaultTargetPackage.SHARED_SERVICES_CODE));
+      m_defaultCodeType = RuntimeClasses.getSuperType(RuntimeClasses.ICodeType, ScoutUtility.getJavaProject(m_sharedBundle));
+    }
     m_superType = m_defaultCodeType;
     m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
   }
@@ -93,6 +94,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     int labelColWidthPercent = 20;
+    boolean isEnabled = getSharedBundle() != null;
     m_nextCodeIdField = new CodeIdField(parent, getSharedBundle(), labelColWidthPercent);
     m_nextCodeIdField.addModifyListener(new ModifyListener() {
       @Override
@@ -102,8 +104,13 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
+    m_nextCodeIdField.setEnabled(isEnabled);
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getSharedBundle().getNlsProject(), Texts.get("Name"), labelColWidthPercent);
+    INlsProject nls = null;
+    if (getSharedBundle() != null) {
+      nls = getSharedBundle().getNlsProject();
+    }
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, nls, Texts.get("Name"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -123,6 +130,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
         }
       }
     });
+    m_nlsNameField.setEnabled(isEnabled);
 
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_CODE_TYPE);
@@ -134,9 +142,10 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
+    m_typeNameField.setEnabled(isEnabled);
 
     if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
-      m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_sharedBundle, labelColWidthPercent);
+      m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), getSharedBundle(), labelColWidthPercent);
       m_entityField.setText(getTargetPackage());
       m_entityField.addModifyListener(new ModifyListener() {
         @Override
@@ -146,6 +155,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
         }
       });
       m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+      m_entityField.setEnabled(isEnabled);
     }
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
@@ -173,6 +183,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
         }
       }
     });
+    m_superTypeField.setEnabled(isEnabled);
 
     m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, Texts.get("GenericType"), getSharedBundle(),
         SignatureProposalProvider.DEFAULT_MOST_USED, labelColWidthPercent);
@@ -191,6 +202,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
     m_nextCodeIdField.setGenericTypeField(m_genericTypeField);
+    m_genericTypeField.setEnabled(isEnabled);
 
     // layout
     parent.setLayout(new GridLayout(1, true));
@@ -227,16 +239,19 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    try {
-      multiStatus.add(getStatusNextCodeIdField());
-      multiStatus.add(getStatusNameField());
-      multiStatus.add(getStatusSuperType());
-      multiStatus.add(getStatusGenericType());
-      multiStatus.add(getStatusTargetPackge());
+    multiStatus.add(getStatusWorkspace());
+    multiStatus.add(getStatusNextCodeIdField());
+    multiStatus.add(getStatusNameField());
+    multiStatus.add(getStatusSuperType());
+    multiStatus.add(getStatusGenericType());
+    multiStatus.add(getStatusTargetPackge());
+  }
+
+  protected IStatus getStatusWorkspace() {
+    if (getSharedBundle() == null) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoNewXWithoutScoutBundle", Texts.get("CodeType")));
     }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError("could not validate name field.", e);
-    }
+    return Status.OK_STATUS;
   }
 
   public IScoutBundle getSharedBundle() {
@@ -247,7 +262,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     return ScoutUtility.validatePackageName(getTargetPackage());
   }
 
-  protected IStatus getStatusNextCodeIdField() throws JavaModelException {
+  protected IStatus getStatusNextCodeIdField() {
     if (isControlCreated()) {
       return m_nextCodeIdField.getStatus();
     }
@@ -256,7 +271,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  protected IStatus getStatusNameField() throws JavaModelException {
+  protected IStatus getStatusNameField() {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_CODE_TYPE);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
@@ -268,14 +283,14 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     return javaFieldNameStatus;
   }
 
-  protected IStatus getStatusSuperType() throws JavaModelException {
+  protected IStatus getStatusSuperType() {
     if (getSuperType() == null) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }
 
-  protected IStatus getStatusGenericType() throws JavaModelException {
+  protected IStatus getStatusGenericType() {
     if (TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));

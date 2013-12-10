@@ -16,14 +16,14 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
+import org.eclipse.scout.sdk.ui.view.outline.IDirtyManageable;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
 public class RefreshOutlineLabelsJob extends Job {
-  private ScoutExplorerPart m_view;
+  private final IDirtyManageable m_view;
 
-  public RefreshOutlineLabelsJob(ScoutExplorerPart view, String name) {
+  public RefreshOutlineLabelsJob(IDirtyManageable view, String name) {
     super(name);
     m_view = view;
   }

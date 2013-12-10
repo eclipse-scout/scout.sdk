@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.internal.view.outline;
+package org.eclipse.scout.sdk.ui.view.outline;
 
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
@@ -31,18 +31,18 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
   private Composite m_parent;
   private Font m_fontPlain;// always null
   private Font m_fontPlainItalic;
-  private final ScoutExplorerPart m_explorerPart;
+  private final IPageFilterable m_filterable;
 
-  public ViewLabelProvider(Composite parent, ScoutExplorerPart explorerPart) {
+  public ViewLabelProvider(Composite parent, IPageFilterable explorerPart) {
     m_parent = parent;
-    m_explorerPart = explorerPart;
+    m_filterable = explorerPart;
   }
 
   @Override
   public String getText(Object obj) {
     if (obj instanceof IPage) {
       IPage p = (IPage) obj;
-      IPageFilter filter = m_explorerPart.getPageFilter(p);
+      IPageFilter filter = m_filterable.getPageFilter(p);
       if (filter == null || filter.isEmpty()) {
         return p.getName();
       }
@@ -87,7 +87,7 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
     ensureFontCache();
     if (element instanceof IPage) {
       IPage p = (IPage) element;
-      IPageFilter filter = m_explorerPart.getPageFilter(p);
+      IPageFilter filter = m_filterable.getPageFilter(p);
       if (filter == null || filter.isEmpty()) {
         return m_fontPlain;
       }

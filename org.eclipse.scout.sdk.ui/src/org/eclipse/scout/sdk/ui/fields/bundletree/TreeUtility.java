@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
@@ -90,15 +91,26 @@ public final class TreeUtility {
     return createBundleTree(scoutProject, NodeFilters.getAcceptAll());
   }
 
-  public static ITreeNode createBundleTree(IScoutBundle scoutProject, ITreeNodeFilter filter) {
+  public static ITreeNode createBundleTree(IScoutBundle scoutProject, ITreeNodeFilter treeNodeFilter) {
+    return createBundleTree(scoutProject, treeNodeFilter, null);
+  }
+
+  public static ITreeNode createBundleTree(IScoutBundle scoutProject, ITreeNodeFilter treeNodeFilter, IScoutBundleFilter scoutBundleFilter) {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
 
     HashSet<IScoutBundle> rootBundles = new HashSet<IScoutBundle>();
-    for (IScoutBundle root : scoutProject.getParentBundles(ScoutBundleFilters.getRootBundlesFilter(), true)) {
+    IScoutBundleFilter rootFilter = null;
+    if (scoutBundleFilter == null) {
+      rootFilter = ScoutBundleFilters.getRootBundlesFilter();
+    }
+    else {
+      rootFilter = ScoutBundleFilters.getFilteredRootBundlesFilter(scoutBundleFilter);
+    }
+    for (IScoutBundle root : scoutProject.getParentBundles(rootFilter, true)) {
       rootBundles.add(root);
     }
-    recAddChildNodes(rootNode, rootBundles, filter);
+    recAddChildNodes(rootNode, rootBundles, treeNodeFilter);
     return rootNode;
   }
 

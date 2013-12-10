@@ -891,7 +891,7 @@ public final class ScoutUtility {
     }
 
     if (elementFound.getValue()) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("NameXAlreadyUsed", typeName));
     }
     return Status.OK_STATUS;
   }

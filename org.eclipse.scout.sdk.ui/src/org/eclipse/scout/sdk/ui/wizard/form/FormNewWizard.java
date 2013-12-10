@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
@@ -35,6 +36,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractServiceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
@@ -46,6 +48,8 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
 
 /**
  * <h3> {@link FormNewWizard}</h3> To create a new form.
@@ -53,8 +57,7 @@ import org.eclipse.swt.dnd.DND;
  * @author Andreas Hoegger
  * @since 1.0.8 05.11.2009
  */
-public class FormNewWizard extends AbstractServiceWizard {
-
+public class FormNewWizard extends AbstractServiceWizard implements INewWizard {
   public static final String TYPE_FORM = "form";
   public static final String TYPE_FORM_BUTTON_OK = "okbutton";
   public static final String TYPE_FORM_BUTTON_CANCEL = "cancelbutton";
@@ -69,40 +72,56 @@ public class FormNewWizard extends AbstractServiceWizard {
   public static final String TYPE_SERVICE_REG_CLIENT = "svcRegClient";
   public static final String TYPE_SERVICE_REG_SERVER = "svcRegServer";
 
-  private final IScoutBundle m_clientBundle;
-  private final FormNewWizardPage m_formPage;
-  private final BundleTreeWizardPage m_locationPage;
-  private final ITreeNode m_locationPageRoot;
+  private IScoutBundle m_clientBundle;
+  private FormNewWizardPage m_formPage;
+  private BundleTreeWizardPage m_locationPage;
+  private ITreeNode m_locationPageRoot;
   private FormStackNewOperation m_operation;
 
-  public FormNewWizard(IScoutBundle clientBundle) {
-    setWindowTitle(Texts.get("NewForm"));
-    m_clientBundle = clientBundle;
+  public FormNewWizard() {
+    this(null);
+  }
 
-    m_formPage = new FormNewWizardPage(getClientBundle());
+  public FormNewWizard(IScoutBundle clientBundle) {
+    m_clientBundle = clientBundle;
+  }
+
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    setWindowTitle(Texts.get("NewForm"));
+
+    m_clientBundle = UiUtility.getScoutBundleFromSelection(selection, m_clientBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+    String pck = UiUtility.getPackageSuffix(selection);
+
+    m_formPage = new FormNewWizardPage(m_clientBundle);
+    m_formPage.addPropertyChangeListener(new P_LocationPropertyListener());
+    m_formPage.setTargetPackage(pck);
     addPage(m_formPage);
 
-    m_locationPageRoot = createTree(clientBundle);
-    m_locationPage = new BundleTreeWizardPage(Texts.get("FormClassLocations"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
-    m_locationPage.addStatusProvider(new P_StatusRevalidator());
-    m_locationPage.addDndListener(new P_TreeDndListener());
-    m_locationPage.addCheckSelectionListener(new P_SessionCheckListener());
-
-    addPage(m_locationPage);
-
-    // init
-    m_formPage.addPropertyChangeListener(new P_LocationPropertyListener());
+    m_locationPageRoot = createTree(m_clientBundle);
+    if (m_locationPageRoot != null) {
+      m_locationPage = new BundleTreeWizardPage(Texts.get("FormClassLocations"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
+      m_locationPage.addStatusProvider(new P_StatusRevalidator());
+      m_locationPage.addDndListener(new P_TreeDndListener());
+      m_locationPage.addCheckSelectionListener(new P_SessionCheckListener());
+      addPage(m_locationPage);
+    }
   }
 
   private ITreeNode createTree(IScoutBundle clientBundle) {
     IScoutBundle serverBundle = null;
     IScoutBundle sharedBundle = null;
-    sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), ScoutBundleFilters.getWorkspaceBundlesFilter()), false);
+    if (clientBundle == null) {
+      return null;
+    }
+    sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED)), false);
     if (sharedBundle != null) {
-      serverBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), ScoutBundleFilters.getWorkspaceBundlesFilter()), clientBundle, false);
+      serverBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER)), clientBundle, false);
     }
 
-    ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle, NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
+    ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle,
+        NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED),
+        ScoutBundleFilters.getWorkspaceBundlesFilter());
 
     ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(getClientBundle()));
     // form

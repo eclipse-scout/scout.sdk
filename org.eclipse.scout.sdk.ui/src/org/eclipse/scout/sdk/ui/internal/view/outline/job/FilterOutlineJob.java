@@ -14,15 +14,15 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.jobs.AbstractWorkspaceBlockingJob;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
-import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.widgets.Display;
 
 public class FilterOutlineJob extends AbstractWorkspaceBlockingJob {
-  private ScoutExplorerPart m_view;
-  private AbstractPage m_page;
+  private final ScoutExplorerPart m_view;
+  private final IPage m_page;
 
-  public FilterOutlineJob(ScoutExplorerPart view, AbstractPage page) {
+  public FilterOutlineJob(ScoutExplorerPart view, IPage page) {
     super("Filtering " + page.getName());
     m_view = view;
     m_page = page;
@@ -45,5 +45,4 @@ public class FilterOutlineJob extends AbstractWorkspaceBlockingJob {
         }
         );
   }
-
 }

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.template.CreateTemplateOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
-import org.eclipse.scout.sdk.ui.dialog.TemplateFromFromFieldDialog;
+import org.eclipse.scout.sdk.ui.dialog.TemplateFromFormFieldDialog;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Shell;
 public class CreateTemplateAction extends AbstractScoutHandler {
 
   private IType m_type;
-  private TemplateFromFromFieldDialog m_dialog;
+  private TemplateFromFormFieldDialog m_dialog;
   private IScoutBundle m_bundle;
   private IPage m_page;
 
@@ -50,7 +50,7 @@ public class CreateTemplateAction extends AbstractScoutHandler {
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     String name = "Abstract" + getType().getElementName();
-    m_dialog = new TemplateFromFromFieldDialog(shell, name, getType());
+    m_dialog = new TemplateFromFormFieldDialog(shell, name, getType());
     if (m_dialog.open() == IDialogConstants.OK_ID) {
       CreateTemplateOperation op = new CreateTemplateOperation(getType(), m_bundle);
       op.setTemplateName(m_dialog.getTemplateName());

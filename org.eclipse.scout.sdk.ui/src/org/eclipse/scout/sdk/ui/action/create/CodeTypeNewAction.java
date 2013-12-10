@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.code.type.CodeTypeNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.ui.PlatformUI;
 
 /**
  *
@@ -39,6 +40,8 @@ public class CodeTypeNewAction extends AbstractWizardAction {
 
   @Override
   protected IWizard getNewWizardInstance() {
-    return new CodeTypeNewWizard(m_bundle);
+    CodeTypeNewWizard ctnw = new CodeTypeNewWizard(m_bundle);
+    ctnw.init(PlatformUI.getWorkbench(), null);
+    return ctnw;
   }
 }

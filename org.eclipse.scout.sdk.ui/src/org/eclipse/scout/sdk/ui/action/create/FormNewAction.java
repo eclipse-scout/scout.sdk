@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.form.FormNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.ui.PlatformUI;
 
 /**
  *
@@ -34,7 +35,9 @@ public class FormNewAction extends AbstractWizardAction {
 
   @Override
   protected IWizard getNewWizardInstance() {
-    return new FormNewWizard(m_scoutBundle);
+    FormNewWizard fnw = new FormNewWizard(m_scoutBundle);
+    fnw.init(PlatformUI.getWorkbench(), null);
+    return fnw;
   }
 
   @Override

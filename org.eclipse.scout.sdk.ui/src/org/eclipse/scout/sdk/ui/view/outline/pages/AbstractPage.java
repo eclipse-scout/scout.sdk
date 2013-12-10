@@ -19,14 +19,6 @@ import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.IAdaptable;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.jobs.ISchedulingRule;
-import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IOpenable;
-import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -36,8 +28,8 @@ import org.eclipse.scout.sdk.ui.extensions.IPageFactory;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint.ExplorerPageExtension;
-import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.menu.IContextMenuProvider;
+import org.eclipse.scout.sdk.ui.view.outline.IPageOutlineView;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Point;
@@ -77,29 +69,6 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   }
 
   @Override
-  public Object getAdapter(Class adapter) {
-    if (IPage.class == adapter || IAdaptable.class == adapter) {
-      return this;
-    }
-
-    IScoutBundle b = getScoutBundle();
-    if (IScoutBundle.class == adapter) {
-      return b;
-    }
-    if (b != null) {
-      if (!b.isBinary()) {
-        if (IResource.class == adapter || ISchedulingRule.class == adapter) {
-          return b.getProject();
-        }
-        if (IJavaProject.class == adapter || IParent.class == adapter || IJavaElement.class == adapter || IOpenable.class == adapter) {
-          return b.getJavaProject();
-        }
-      }
-    }
-    return Platform.getAdapterManager().getAdapter(this, adapter);
-  }
-
-  @Override
   public IPage getParent() {
     return m_parent;
   }
@@ -111,7 +80,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   }
 
   @Override
-  public ScoutExplorerPart getOutlineView() {
+  public IPageOutlineView getOutlineView() {
     IPage parent = getParent();
     if (parent != null) return parent.getOutlineView();
     else return null;
@@ -140,7 +109,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   @Override
   public void markStructureDirty() {
-    ScoutExplorerPart o = getOutlineView();
+    IPageOutlineView o = getOutlineView();
     if (o != null) {
       o.markStructureDirty(this);
     }
@@ -225,7 +194,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   @Override
   public void refresh(boolean clearCache) {
-    ScoutExplorerPart outlineView = getOutlineView();
+    IPageOutlineView outlineView = getOutlineView();
     if (outlineView != null) {
       outlineView.markStructureDirty(this);
     }
@@ -259,7 +228,6 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
                 }
               }
               catch (Throwable t) {
-                // TODO extension id to log!
                 ScoutSdkUi.logError("could not load extension '" + ext.getPageClass() + "'!", t);
               }
             }
@@ -280,7 +248,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
    * called when filter has changed
    */
   public void refreshFilteredChildren() {
-    ScoutExplorerPart o = getOutlineView();
+    IPageOutlineView o = getOutlineView();
     if (o != null) {
       o.markFilterChanged(this);
     }

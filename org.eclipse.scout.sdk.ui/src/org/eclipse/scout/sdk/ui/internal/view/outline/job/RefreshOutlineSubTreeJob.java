@@ -22,8 +22,9 @@ import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.scout.sdk.jobs.AbstractWorkspaceBlockingJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectsTablePage;
+import org.eclipse.scout.sdk.ui.view.outline.DirtyUpdateManager;
+import org.eclipse.scout.sdk.ui.view.outline.IDirtyManageable;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -34,12 +35,14 @@ import org.eclipse.swt.widgets.Display;
 
 public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
   public static final String SELECTION_PREVENTER = "selectionPreventer";
-  private ScoutExplorerPart m_view;
+  private final IDirtyManageable m_view;
+  private final DirtyUpdateManager m_manager;
   private P_BackupNode[] m_backupTree;
   private ITreeSelection m_backupedSelection;
 
-  public RefreshOutlineSubTreeJob(ScoutExplorerPart view, String name) {
+  public RefreshOutlineSubTreeJob(IDirtyManageable view, DirtyUpdateManager manager, String name) {
     super(name);
+    m_manager = manager;
     m_view = view;
     setRule(ResourcesPlugin.getWorkspace().getRoot());
   }
@@ -49,7 +52,7 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
     if (monitor.isCanceled()) {
       return;
     }
-    final IPage[] dirtyStructureRoots = m_view.fetchDirtyStructurePages();
+    final IPage[] dirtyStructureRoots = m_manager.fetchDirtyStructurePages();
     if (dirtyStructureRoots.length == 0) {
       return;
     }

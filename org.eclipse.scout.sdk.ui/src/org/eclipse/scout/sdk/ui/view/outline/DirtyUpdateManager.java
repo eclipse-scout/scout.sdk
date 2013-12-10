@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.internal.view.outline;
+package org.eclipse.scout.sdk.ui.view.outline;
 
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -27,23 +27,22 @@ import org.eclipse.scout.sdk.util.IScoutSeverityListener;
  * The tree update job blocks the workspace to ensure synchrony execution.
  */
 public class DirtyUpdateManager {
-  private final ScoutExplorerPart m_view;
-  private LinkedList<IPage> m_structureRoots = new LinkedList<IPage>();
-  private Job m_currentRefreshSubTreeProcess;
+  private final IDirtyManageable m_view;
+  private final LinkedList<IPage> m_structureRoots;
+  private final Job m_currentRefreshSubTreeProcess;
   private Job m_currentRefreshLabelsProcess;
 
-  public DirtyUpdateManager(ScoutExplorerPart view) {
+  public DirtyUpdateManager(IDirtyManageable view) {
+    m_structureRoots = new LinkedList<IPage>();
     m_view = view;
-    m_currentRefreshSubTreeProcess = new RefreshOutlineSubTreeJob(m_view, Texts.get("Refreshing"));
+    m_currentRefreshSubTreeProcess = new RefreshOutlineSubTreeJob(m_view, this, Texts.get("Refreshing"));
     // add quality listener
-    ScoutSeverityManager.getInstance().addQualityManagerListener(
-        new IScoutSeverityListener() {
-          @Override
-          public void severityChanged(IResource r) {
-            enqueueLabelsJob();
-          }
-        }
-        );
+    ScoutSeverityManager.getInstance().addQualityManagerListener(new IScoutSeverityListener() {
+      @Override
+      public void severityChanged(IResource r) {
+        enqueueLabelsJob();
+      }
+    });
   }
 
   public void notifyStructureDirty(IPage page) {
@@ -98,5 +97,4 @@ public class DirtyUpdateManager {
       }
     }
   }
-
 }

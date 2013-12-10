@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 
@@ -89,7 +90,11 @@ public class MethodBodyAstVisitor extends DefaultAstVisitor {
 
   @Override
   public boolean visit(TypeDeclaration node) {
-    String curTypeFqn = ((IType) node.resolveBinding().getJavaElement()).getFullyQualifiedName();
-    return m_declaringTypeFqn.startsWith(curTypeFqn);
+    ITypeBinding binding = node.resolveBinding();
+    if (binding != null) {
+      String curTypeFqn = ((IType) binding.getJavaElement()).getFullyQualifiedName();
+      return m_declaringTypeFqn.startsWith(curTypeFqn);
+    }
+    return true;
   }
 }
