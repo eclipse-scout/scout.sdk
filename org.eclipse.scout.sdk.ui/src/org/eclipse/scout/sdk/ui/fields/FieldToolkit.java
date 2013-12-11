@@ -165,8 +165,10 @@ public class FieldToolkit {
 
   public ProposalTextField createJavaElementProposalField(Composite parent, String label, AbstractJavaElementContentProvider contentProvider, int labelPercentage) {
     ProposalTextField field = createProposalField(parent, label, ProposalTextField.STYLE_DEFAULT, labelPercentage);
-    field.setLabelProvider(contentProvider.getLabelProvider());
-    field.setContentProvider(contentProvider);
+    if (contentProvider != null) {
+      field.setLabelProvider(contentProvider.getLabelProvider());
+      field.setContentProvider(contentProvider);
+    }
     return field;
   }
 }

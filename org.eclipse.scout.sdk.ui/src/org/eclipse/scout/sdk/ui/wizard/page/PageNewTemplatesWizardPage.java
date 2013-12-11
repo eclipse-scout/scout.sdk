@@ -15,7 +15,6 @@ import java.util.HashSet;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -34,11 +33,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
@@ -54,7 +49,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
   final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
   private FilteredTable m_filteredTable;
   private IType m_selectedType;
-  private IScoutBundle m_clientBundle;
+  private final IScoutBundle m_clientBundle;
 
   public PageNewTemplatesWizardPage(IScoutBundle clientBundle) {
     super(PageNewTemplatesWizardPage.class.getName());
@@ -65,7 +60,9 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
+    boolean isEnabled = getClientBundle() != null;
     m_filteredTable = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
+    m_filteredTable.setEnabled(isEnabled);
     m_filteredTable.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
@@ -98,25 +95,21 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
         }
       }
     });
-    ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-        TypeFilters.getTypesOnClasspath(getClientBundle().getJavaProject()),
-        TypeFilters.getFlagsFilter(Flags.AccAbstract));
-    IType[] abstractPages = hierarchy.getAllSubtypes(iPage, filter, TypeComparators.getTypeNameComparator());
-
-    P_TableContentProvider provider = new P_TableContentProvider(abstractPages);
-    m_filteredTable.getViewer().setLabelProvider(provider);
-    m_filteredTable.getViewer().setContentProvider(provider);
-    m_filteredTable.getViewer().setInput(provider);
-
     updateUi();
+
     // layout
     parent.setLayout(new GridLayout(1, true));
-    m_filteredTable.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_BOTH | GridData.GRAB_VERTICAL));
+    GridData gd = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
+    gd.heightHint = 300;
+    m_filteredTable.setLayoutData(gd);
   }
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
+    if (getClientBundle() == null) {
+      multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoNewXWithoutScoutBundle", Texts.get("Page"))));
+    }
+
     if (getSelectedType() != null) {
       multiStatus.add(Status.OK_STATUS);
     }
@@ -154,19 +147,6 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
 
   public IScoutBundle getClientBundle() {
     return m_clientBundle;
-  }
-
-  public void setClientBundle(IScoutBundle clientBundle) {
-    try {
-      setStateChanging(true);
-      m_clientBundle = clientBundle;
-      if (isControlCreated()) {
-        updateUi();
-      }
-    }
-    finally {
-      setStateChanging(false);
-    }
   }
 
   public void setSuperType(IType selectedType) {

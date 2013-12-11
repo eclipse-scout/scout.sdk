@@ -140,6 +140,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     }
 
     Control parentPageControl = createParentPageGroup(parent);
+
     // layout
     parent.setLayout(new GridLayout(1, true));
     group.setLayout(new GridLayout(1, true));
@@ -148,6 +149,8 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     parentPageControl.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+
+    m_nlsNameField.setFocus();
   }
 
   protected Control createParentPageGroup(Composite parent) {

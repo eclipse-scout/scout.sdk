@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.services.ProcessServiceNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.ui.PlatformUI;
 
 /**
  *
@@ -39,6 +40,8 @@ public class ProcessServiceNewAction extends AbstractWizardAction {
 
   @Override
   protected IWizard getNewWizardInstance() {
-    return new ProcessServiceNewWizard(m_bundle);
+    ProcessServiceNewWizard psnw = new ProcessServiceNewWizard(m_bundle);
+    psnw.init(PlatformUI.getWorkbench(), null);
+    return psnw;
   }
 }

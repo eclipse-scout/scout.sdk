@@ -83,13 +83,12 @@ public class FormNewWizard extends AbstractServiceWizard implements INewWizard {
   }
 
   public FormNewWizard(IScoutBundle clientBundle) {
+    setWindowTitle(Texts.get("NewForm"));
     m_clientBundle = clientBundle;
   }
 
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
-    setWindowTitle(Texts.get("NewForm"));
-
     m_clientBundle = UiUtility.getScoutBundleFromSelection(selection, m_clientBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
     String pck = UiUtility.getPackageSuffix(selection);
 
@@ -98,8 +97,8 @@ public class FormNewWizard extends AbstractServiceWizard implements INewWizard {
     m_formPage.setTargetPackage(pck);
     addPage(m_formPage);
 
-    m_locationPageRoot = createTree(m_clientBundle);
-    if (m_locationPageRoot != null) {
+    if (m_clientBundle != null) {
+      m_locationPageRoot = createTree(m_clientBundle);
       m_locationPage = new BundleTreeWizardPage(Texts.get("FormClassLocations"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
       m_locationPage.addStatusProvider(new P_StatusRevalidator());
       m_locationPage.addDndListener(new P_TreeDndListener());

@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -31,6 +32,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractServiceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
@@ -40,8 +42,10 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
 
-public class ProcessServiceNewWizard extends AbstractServiceWizard {
+public class ProcessServiceNewWizard extends AbstractServiceWizard implements INewWizard {
   private static final String TYPE_PERMISSION_CREATE = "permCreate";
   private static final String TYPE_PERMISSION_READ = "permRead";
   private static final String TYPE_PERMISSION_UPDATE = "permUpdate";
@@ -50,39 +54,56 @@ public class ProcessServiceNewWizard extends AbstractServiceWizard {
   private static final String TYPE_SERVICE_REG_CLIENT = "svcClientReg";
   private static final String TYPE_SERVICE_REG_SERVER = "svcServerReg";
 
-  private final BundleTreeWizardPage m_locationWizardPage;
-  private final ProcessServiceNewWizardPage m_serviceNewWizardPage;
+  private BundleTreeWizardPage m_locationWizardPage;
+  private ProcessServiceNewWizardPage m_serviceNewWizardPage;
   private ProcessServiceNewOperation m_operation;
-  private final ITreeNode m_locationWizardPageRoot;
+  private ITreeNode m_locationWizardPageRoot;
+  private IScoutBundle m_serverBundle;
+
+  public ProcessServiceNewWizard() {
+    this(null);
+  }
 
   public ProcessServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewProcessService"));
-    P_StatusRevalidator statusProvider = new P_StatusRevalidator();
+    m_serverBundle = serverBundle;
+  }
 
-    m_serviceNewWizardPage = new ProcessServiceNewWizardPage(serverBundle);
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    m_serverBundle = UiUtility.getScoutBundleFromSelection(selection, m_serverBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER));
+    String pck = UiUtility.getPackageSuffix(selection);
+
+    m_serviceNewWizardPage = new ProcessServiceNewWizardPage(m_serverBundle);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
+    m_serviceNewWizardPage.setTargetPackage(pck);
     addPage(m_serviceNewWizardPage);
 
-    m_locationWizardPageRoot = createTree(serverBundle);
-    m_locationWizardPage = new BundleTreeWizardPage(Texts.get("ProcessServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckedFilter());
-    m_locationWizardPage.addStatusProvider(statusProvider);
-    m_locationWizardPage.addDndListener(new P_TreeDndListener());
-    m_locationWizardPage.addCheckSelectionListener(new P_SessionCheckListener());
-    addPage(m_locationWizardPage);
+    if (m_serverBundle != null) {
+      P_StatusRevalidator statusProvider = new P_StatusRevalidator();
+      m_locationWizardPageRoot = createTree(m_serverBundle);
+      m_locationWizardPage = new BundleTreeWizardPage(Texts.get("ProcessServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckedFilter());
+      m_locationWizardPage.addStatusProvider(statusProvider);
+      m_locationWizardPage.addDndListener(new P_TreeDndListener());
+      m_locationWizardPage.addCheckSelectionListener(new P_SessionCheckListener());
+      addPage(m_locationWizardPage);
 
-    // init
-    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IService, serverBundle.getJavaProject()));
+      // init
+      m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IService, m_serverBundle.getJavaProject()));
+    }
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
     IScoutBundle sharedBundle = null;
     IScoutBundle clientBundle = null;
-    sharedBundle = serverBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+    sharedBundle = serverBundle.getParentBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED)), false);
     if (sharedBundle != null) {
-      clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), serverBundle, false);
+      clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT)), serverBundle, false);
     }
 
-    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle, NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
+    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle,
+        NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED),
+        ScoutBundleFilters.getWorkspaceBundlesFilter());
 
     if (clientBundle != null) {
       ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));

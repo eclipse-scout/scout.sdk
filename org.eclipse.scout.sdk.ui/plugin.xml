@@ -220,6 +220,24 @@
             name="Scout Form"
             project="false">
       </wizard>
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.scout.sdk"
+            class="org.eclipse.scout.sdk.ui.wizard.page.PageNewWizard"
+            icon="resources/icons/page_add.png"
+            id="org.eclipse.scout.newPageWizard"
+            name="Scout Page"
+            project="false">
+      </wizard>
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.scout.sdk"
+            class="org.eclipse.scout.sdk.ui.wizard.services.ProcessServiceNewWizard"
+            icon="resources/icons/service_add.png"
+            id="org.eclipse.scout.newProcessServiceWizard"
+            name="Scout Service"
+            project="false">
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.page.PageNewOperation;
@@ -31,6 +32,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
@@ -41,42 +43,59 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.IWorkbench;
 
-public class PageNewWizard extends AbstractWorkspaceWizard {
+public class PageNewWizard extends AbstractWorkspaceWizard implements INewWizard {
 
   private final static String TYPE_PAGE = "page";
   private final static String TYPE_PAGE_DATA = "pageData";
 
   // members
-  private final IScoutBundle m_clientBundle;
-  private final ITreeNode m_locationWizardPageRoot;
+  private IScoutBundle m_clientBundle;
+  private ITreeNode m_locationWizardPageRoot;
   private IType m_holderType; // optional the outline to add the page to
   private PageNewOperation m_operation;
 
   // pages
-  private final PageNewTemplatesWizardPage m_templatePage;
-  private final PageNewAttributesWizardPage m_pageAttributePage;
-  private final BundleTreeWizardPage m_locationWizardPage;
+  private PageNewTemplatesWizardPage m_templatePage;
+  private PageNewAttributesWizardPage m_pageAttributePage;
+  private BundleTreeWizardPage m_locationWizardPage;
+
+  public PageNewWizard() {
+    this(null);
+  }
 
   public PageNewWizard(IScoutBundle clientBundle) {
     setWindowTitle(Texts.get("NewPage"));
     m_clientBundle = clientBundle;
-    P_StatusRevalidator validator = new P_StatusRevalidator();
+  }
 
-    m_templatePage = new PageNewTemplatesWizardPage(clientBundle);
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    m_clientBundle = UiUtility.getScoutBundleFromSelection(selection, m_clientBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+
+    m_templatePage = new PageNewTemplatesWizardPage(m_clientBundle);
     addPage(m_templatePage);
 
-    m_pageAttributePage = new PageNewAttributesWizardPage(clientBundle);
-    m_pageAttributePage.addPropertyChangeListener(new P_PageAttributesPropertyListener());
-    m_pageAttributePage.addStatusProvider(validator);
-    addPage(m_pageAttributePage);
+    if (m_clientBundle != null) {
+      m_locationWizardPageRoot = createTree(m_clientBundle);
 
-    m_locationWizardPageRoot = createTree(clientBundle);
-    m_locationWizardPage = new BundleTreeWizardPage(Texts.get("LookupServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckedFilter());
-    m_locationWizardPage.addStatusProvider(validator);
-    m_locationWizardPage.addDndListener(new P_TreeDndListener());
-    addPage(m_locationWizardPage);
-    m_locationWizardPage.setExcludePage(true);
+      P_StatusRevalidator validator = new P_StatusRevalidator();
+      m_pageAttributePage = new PageNewAttributesWizardPage(m_clientBundle);
+      m_pageAttributePage.addPropertyChangeListener(new P_PageAttributesPropertyListener());
+      m_pageAttributePage.addStatusProvider(validator);
+      addPage(m_pageAttributePage);
+
+      m_locationWizardPage = new BundleTreeWizardPage(Texts.get("LookupServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckedFilter());
+      m_locationWizardPage.addStatusProvider(validator);
+      m_locationWizardPage.addDndListener(new P_TreeDndListener());
+      addPage(m_locationWizardPage);
+      m_locationWizardPage.setExcludePage(true);
+
+      String pck = UiUtility.getPackageSuffix(selection);
+      m_pageAttributePage.setTargetPackage(pck);
+    }
   }
 
   public void setLocationWizardPageVisible(boolean visible) {
@@ -93,10 +112,13 @@ public class PageNewWizard extends AbstractWorkspaceWizard {
   }
 
   private static ITreeNode createTree(IScoutBundle clientBundle) {
-    IScoutBundle sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
-    ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle, NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SHARED));
+    IScoutBundle sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED)), false);
+    ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle,
+        NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SHARED),
+        ScoutBundleFilters.getWorkspaceBundlesFilter());
 
     ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
+
     // page
     TreeUtility.createNode(clientNode, TYPE_PAGE, Texts.get("Page"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class));
 

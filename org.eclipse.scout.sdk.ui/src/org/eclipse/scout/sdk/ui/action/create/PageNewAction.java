@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.
 import org.eclipse.scout.sdk.ui.wizard.page.PageNewWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.ui.PlatformUI;
 
 public class PageNewAction extends AbstractWizardAction {
   private IType m_type;
@@ -51,6 +52,7 @@ public class PageNewAction extends AbstractWizardAction {
   @Override
   protected IWizard getNewWizardInstance() {
     PageNewWizard p = new PageNewWizard(m_scoutBundle);
+    p.init(PlatformUI.getWorkbench(), null);
     if (m_type != null) {
       p.setHolderType(m_type);
     }
