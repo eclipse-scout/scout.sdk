@@ -14,9 +14,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
@@ -70,27 +70,35 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IScoutBundle m_clientBundle;
-  private final IType m_abstractSearchForm;
-  private final int m_labelColWidthPercent;
+  private IType m_abstractSearchForm;
 
   public SearchFormNewWizardPage(IScoutBundle clientBundle) {
     super(SearchFormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
-    m_abstractSearchForm = RuntimeClasses.getSuperType(RuntimeClasses.ISearchForm, ScoutUtility.getJavaProject(clientBundle));
-    m_labelColWidthPercent = 20;
+
     setTitle(Texts.get("SearchForm2"));
     setDescription(Texts.get("CreateANewSearchForm"));
-    setSuperTypeInternal(m_abstractSearchForm);
-    setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_SEARCHFORMS));
+
+    if (clientBundle != null) {
+      m_abstractSearchForm = RuntimeClasses.getSuperType(RuntimeClasses.ISearchForm, ScoutUtility.getJavaProject(clientBundle));
+      setSuperTypeInternal(m_abstractSearchForm);
+      setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_SEARCHFORMS));
+    }
   }
 
   @Override
   protected void createContent(Composite parent) {
+    int labelColWidthPercent = 20;
+    boolean isEnabled = getClientBundle() != null;
 
     Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
     group.setText(Texts.get("SearchForm"));
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, getClientBundle().getNlsProject(), Texts.get("Name"), m_labelColWidthPercent);
+    INlsProject nls = null;
+    if (getClientBundle() != null) {
+      nls = getClientBundle().getNlsProject();
+    }
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, nls, Texts.get("Name"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(getNlsName());
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -112,8 +120,9 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
         }
       }
     });
+    m_nlsNameField.setEnabled(isEnabled);
 
-    m_typeNameField = getFieldToolkit().createStyledTextField(group, Texts.get("TypeName"), m_labelColWidthPercent);
+    m_typeNameField = getFieldToolkit().createStyledTextField(group, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_SEARCH_FORM);
     m_typeNameField.setText(getTypeName());
     m_typeNameField.addModifyListener(new ModifyListener() {
@@ -123,9 +132,10 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
+    m_typeNameField.setEnabled(isEnabled);
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(iSearchForm, ScoutUtility.getJavaProject(getClientBundle()), m_abstractSearchForm), m_labelColWidthPercent);
+        new JavaElementAbstractTypeContentProvider(iSearchForm, ScoutUtility.getJavaProject(getClientBundle()), m_abstractSearchForm), labelColWidthPercent);
     m_superTypeField.acceptProposal(getSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -134,9 +144,10 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
+    m_superTypeField.setEnabled(isEnabled);
 
     if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
-      m_entityField = getFieldToolkit().createEntityTextField(group, Texts.get("EntityTextField"), m_clientBundle, m_labelColWidthPercent);
+      m_entityField = getFieldToolkit().createEntityTextField(group, Texts.get("EntityTextField"), getClientBundle(), labelColWidthPercent);
       m_entityField.setText(getTargetPackage(null));
       m_entityField.addModifyListener(new ModifyListener() {
         @Override
@@ -146,9 +157,10 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
         }
       });
       m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+      m_entityField.setEnabled(isEnabled);
     }
 
-    Control tablePageGroup = createTablePageGroup(parent);
+    Control tablePageGroup = createTablePageGroup(parent, labelColWidthPercent);
 
     // layout
     parent.setLayout(new GridLayout(1, true));
@@ -159,9 +171,11 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+
+    m_nlsNameField.setFocus();
   }
 
-  private Control createTablePageGroup(Composite parent) {
+  private Control createTablePageGroup(Composite parent, int labelColWidthPercent) {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
     group.setText(Texts.get("AutoCreate"));
     Label label = new Label(group, SWT.NONE);
@@ -172,7 +186,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
         IType[] list = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithTable, TypeFilters.getTypesOnClasspath(ScoutUtility.getJavaProject(getClientBundle())), TypeComparators.getTypeNameComparator());
         return new Object[][]{list};
       }
-    }, m_labelColWidthPercent);
+    }, labelColWidthPercent);
     m_tablePageField.acceptProposal(getTablePageType());
     m_tablePageField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -181,6 +195,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
+    m_tablePageField.setEnabled(getClientBundle() != null);
 
     // layout
     group.setLayout(new GridLayout(1, true));
@@ -207,14 +222,17 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    try {
-      multiStatus.add(getStatusNameField());
-      multiStatus.add(getStatusSuperType());
-      multiStatus.add(getStatusTargetPackge());
+    multiStatus.add(getStatusWorkspace());
+    multiStatus.add(getStatusNameField());
+    multiStatus.add(getStatusSuperType());
+    multiStatus.add(getStatusTargetPackge());
+  }
+
+  protected IStatus getStatusWorkspace() {
+    if (getClientBundle() == null) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoNewXWithoutScoutBundle", Texts.get("SearchForm")));
     }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError("could not validate name field.", e);
-    }
+    return Status.OK_STATUS;
   }
 
   protected IStatus getStatusTargetPackge() {
@@ -226,7 +244,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  protected IStatus getStatusNameField() throws JavaModelException {
+  protected IStatus getStatusNameField() {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_SEARCH_FORM);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
@@ -238,7 +256,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     return javaFieldNameStatus;
   }
 
-  protected IStatus getStatusSuperType() throws JavaModelException {
+  protected IStatus getStatusSuperType() {
     if (getSuperType() == null) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }

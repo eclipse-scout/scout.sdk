@@ -54,8 +54,6 @@ import org.eclipse.swt.widgets.Group;
  * @since 1.0.8 03.08.2009
  */
 public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
-  private final static int labelColWidthPercent = 20;
-
   private final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
 
   public static final String PROP_NLS_NAME = "nlsName";
@@ -97,6 +95,8 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     group.setText(Texts.get("Form"));
 
     boolean isEnabled = getClientBundle() != null;
+    int labelColWidthPercent = 20;
+
     INlsProject nls = null;
     if (getClientBundle() != null) {
       nls = getClientBundle().getNlsProject();
@@ -168,7 +168,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
       m_entityField.setEnabled(isEnabled);
     }
 
-    Control formIdGroup = createIdGroup(p);
+    Control formIdGroup = createIdGroup(p, labelColWidthPercent);
 
     m_nlsNameField.setFocus();
 
@@ -183,7 +183,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     group.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
-  protected Control createIdGroup(Composite parent) {
+  protected Control createIdGroup(Composite parent, int labelColWidthPercent) {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
     group.setText(Texts.get("FormId"));
 

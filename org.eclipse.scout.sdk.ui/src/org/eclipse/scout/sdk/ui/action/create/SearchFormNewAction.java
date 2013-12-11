@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.ui.wizard.form.SearchFormNewWizard;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.ui.PlatformUI;
 
 /**
  *
@@ -63,6 +64,7 @@ public class SearchFormNewAction extends AbstractWizardAction {
         }
       }
     }
+    wizard.init(PlatformUI.getWorkbench(), null);
     return wizard;
   }
 }

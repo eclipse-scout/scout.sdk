@@ -95,6 +95,9 @@ public class UiUtility {
    * @return A string with the package suffix or null.
    */
   public static String getPackageSuffix(IStructuredSelection selection) {
+    if (selection == null) {
+      return null;
+    }
     return getPackageSuffix(UiUtility.adapt(selection.getFirstElement(), IJavaElement.class));
   }
 
@@ -108,16 +111,14 @@ public class UiUtility {
    * @return A string with the package suffix or null.
    */
   public static String getPackageSuffix(IJavaElement element) {
-    IPackageFragment targetPackage = null;
     if (TypeUtility.exists(element)) {
-      targetPackage = (IPackageFragment) element.getAncestor(IJavaElement.PACKAGE_FRAGMENT);
-    }
-
-    if (targetPackage != null) {
-      String pck = targetPackage.getElementName();
-      IScoutBundle declaringBundle = ScoutTypeUtility.getScoutBundle(targetPackage);
-      if (declaringBundle != null && pck.startsWith(declaringBundle.getSymbolicName())) {
-        return pck.substring(declaringBundle.getSymbolicName().length() + 1);
+      IPackageFragment targetPackage = (IPackageFragment) element.getAncestor(IJavaElement.PACKAGE_FRAGMENT);
+      if (TypeUtility.exists(targetPackage)) {
+        String pck = targetPackage.getElementName();
+        IScoutBundle declaringBundle = ScoutTypeUtility.getScoutBundle(targetPackage);
+        if (declaringBundle != null && pck.startsWith(declaringBundle.getSymbolicName())) {
+          return pck.substring(declaringBundle.getSymbolicName().length() + 1);
+        }
       }
     }
     return null;

@@ -87,14 +87,6 @@ public final class TreeUtility {
     }
   }
 
-  public static ITreeNode createBundleTree(IScoutBundle scoutProject) {
-    return createBundleTree(scoutProject, NodeFilters.getAcceptAll());
-  }
-
-  public static ITreeNode createBundleTree(IScoutBundle scoutProject, ITreeNodeFilter treeNodeFilter) {
-    return createBundleTree(scoutProject, treeNodeFilter, null);
-  }
-
   public static ITreeNode createBundleTree(IScoutBundle scoutProject, ITreeNodeFilter treeNodeFilter, IScoutBundleFilter scoutBundleFilter) {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);

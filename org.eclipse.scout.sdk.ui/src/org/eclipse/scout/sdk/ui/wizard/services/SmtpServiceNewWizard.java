@@ -41,6 +41,7 @@ import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
 
@@ -77,7 +78,9 @@ public class SmtpServiceNewWizard extends AbstractServiceWizard {
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
 
-    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle, NodeFilters.getByType(IScoutBundle.TYPE_SHARED, IScoutBundle.TYPE_SERVER));
+    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle,
+        NodeFilters.getByType(IScoutBundle.TYPE_SHARED, IScoutBundle.TYPE_SERVER),
+        ScoutBundleFilters.getWorkspaceBundlesFilter());
 
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));

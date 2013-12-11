@@ -28,7 +28,6 @@ public class LocalLookupCallNewWizard extends AbstractWorkspaceWizard {
     setWindowTitle(Texts.get("NewLocalLookupCallNoPopup"));
     m_clientBundle = clientBundle;
     addPage(new LocalLookupCallNewWizardPage(clientBundle));
-
   }
 
   /**
@@ -37,5 +36,4 @@ public class LocalLookupCallNewWizard extends AbstractWorkspaceWizard {
   public IScoutBundle getClientBundle() {
     return m_clientBundle;
   }
-
 }

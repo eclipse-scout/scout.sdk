@@ -43,10 +43,6 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
   private final List<ICheckStateListener> m_tempCheckListeners;
   private final ITreeNodeFilter m_initialCheckedFilter;
 
-  public BundleTreeWizardPage(String pageTitle, String message, ITreeNode rootNode) {
-    this(pageTitle, message, rootNode, null);
-  }
-
   public BundleTreeWizardPage(String pageTitle, String message, ITreeNode rootNode, ITreeNodeFilter initialCheckedFilter) {
     super(BundleTreeWizardPage.class.getName());
     m_treeListenersAttached = false;

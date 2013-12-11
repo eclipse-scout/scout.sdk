@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.lookupcall.LookupCallNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.ui.PlatformUI;
 
 /**
  *
@@ -39,6 +40,8 @@ public class LookupCallNewAction extends AbstractWizardAction {
 
   @Override
   protected IWizard getNewWizardInstance() {
-    return new LookupCallNewWizard(m_type);
+    LookupCallNewWizard lcnw = new LookupCallNewWizard(m_type);
+    lcnw.init(PlatformUI.getWorkbench(), null);
+    return lcnw;
   }
 }

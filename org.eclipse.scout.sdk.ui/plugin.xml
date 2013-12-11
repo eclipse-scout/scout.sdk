@@ -238,6 +238,24 @@
             name="Scout Service"
             project="false">
       </wizard>
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.scout.sdk"
+            class="org.eclipse.scout.sdk.ui.wizard.lookupcall.LookupCallNewWizard"
+            icon="resources/icons/lookupCall_add.png"
+            id="org.eclipse.scout.newLookupCallWizard"
+            name="Scout Lookup Call"
+            project="false">
+      </wizard>
+      <wizard
+            canFinishEarly="false"
+            category="org.eclipse.scout.sdk"
+            class="org.eclipse.scout.sdk.ui.wizard.form.SearchFormNewWizard"
+            icon="resources/icons/searchForm_add.png"
+            id="org.eclipse.scout.newSearchFormWizard"
+            name="Scout Search Form"
+            project="false">
+      </wizard>
    </extension>
    <extension
          point="org.eclipse.ui.preferencePages">

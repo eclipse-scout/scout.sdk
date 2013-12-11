@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
@@ -89,9 +88,13 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     super(LookupCallNewWizardPage.class.getName());
     m_sharedBundle = sharedBundle;
     m_serverBundle = serverBundle;
-    setTargetPackage(DefaultTargetPackage.get(sharedBundle, IDefaultTargetPackage.SHARED_SERVICES_LOOKUP));
+
     setTitle(Texts.get("NewLookupCall"));
     setDescription(Texts.get("CreateANewLookupCall"));
+
+    if (sharedBundle != null) {
+      setTargetPackage(DefaultTargetPackage.get(sharedBundle, IDefaultTargetPackage.SHARED_SERVICES_LOOKUP));
+    }
     if (serverBundle != null) {
       setLookupServiceStrategy(LOOKUP_SERVICE_STRATEGY.CREATE_NEW);
       m_abstractSqlLookupService = RuntimeClasses.getSuperType(RuntimeClasses.ILookupService, serverBundle.getJavaProject());
@@ -105,6 +108,8 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     int labelPercentage = 20;
+    boolean isEnabled = getSharedBundle() != null;
+
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"), labelPercentage);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_LOOKUP_CALL);
     m_typeNameField.setText(getTypeName());
@@ -115,9 +120,10 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
+    m_typeNameField.setEnabled(isEnabled);
 
     if (DefaultTargetPackage.isPackageConfigurationEnabled()) {
-      m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), m_sharedBundle, labelPercentage);
+      m_entityField = getFieldToolkit().createEntityTextField(parent, Texts.get("EntityTextField"), getSharedBundle(), labelPercentage);
       m_entityField.setText(getTargetPackage());
       m_entityField.addModifyListener(new ModifyListener() {
         @Override
@@ -127,6 +133,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         }
       });
       m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+      m_entityField.setEnabled(isEnabled);
     }
 
     Control lookupServiceGroup = createLookupServiceGroup(parent);
@@ -136,6 +143,8 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     lookupServiceGroup.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+
+    m_typeNameField.setFocus();
   }
 
   protected Control createLookupServiceGroup(Composite parent) {
@@ -245,17 +254,20 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    try {
-      multiStatus.add(getStatusNameField());
-      multiStatus.add(getStatusSuperType());
-      multiStatus.add(getStatusLookupService());
-    }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError("could not validate name field.", e);
-    }
+    multiStatus.add(getStatusWorkspace());
+    multiStatus.add(getStatusNameField());
+    multiStatus.add(getStatusSuperType());
+    multiStatus.add(getStatusLookupService());
   }
 
-  protected IStatus getStatusNameField() throws JavaModelException {
+  protected IStatus getStatusWorkspace() {
+    if (getSharedBundle() == null) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoNewXWithoutScoutBundle", Texts.get("LookupCall")));
+    }
+    return Status.OK_STATUS;
+  }
+
+  protected IStatus getStatusNameField() {
     IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_LOOKUP_CALL);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
@@ -267,14 +279,14 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     return javaFieldNameStatus;
   }
 
-  protected IStatus getStatusSuperType() throws JavaModelException {
+  protected IStatus getStatusSuperType() {
     if (getLookupServiceStrategy() == LOOKUP_SERVICE_STRATEGY.CREATE_NEW && getServiceSuperType() == null) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }
 
-  protected IStatus getStatusLookupService() throws JavaModelException {
+  protected IStatus getStatusLookupService() {
     if (getLookupServiceStrategy() == LOOKUP_SERVICE_STRATEGY.USE_EXISTING && getLookupServiceType() == null) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheLookupCallCanNotBeNull"));
     }

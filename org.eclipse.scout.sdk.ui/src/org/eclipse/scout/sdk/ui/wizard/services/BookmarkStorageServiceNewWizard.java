@@ -86,7 +86,9 @@ public class BookmarkStorageServiceNewWizard extends AbstractServiceWizard {
       clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), serverBundle, false);
     }
 
-    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle, NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
+    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle,
+        NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED),
+        ScoutBundleFilters.getWorkspaceBundlesFilter());
 
     if (clientBundle != null) {
       ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
