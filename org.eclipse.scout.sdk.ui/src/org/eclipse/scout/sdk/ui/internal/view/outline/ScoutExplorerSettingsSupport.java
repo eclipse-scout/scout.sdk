@@ -115,7 +115,7 @@ public final class ScoutExplorerSettingsSupport {
     setShowFragments(SHOW_FRAGMENTS_ENABLED.equals(showFragments));
 
     String showBinaryBundles = preferenceStore.getString(PREF_SHOW_BINARY_BUNDLES_KEY);
-    setShowBinaryBundles(!SHOW_BINARY_BUNDLES_DISABLED.equals(showBinaryBundles));
+    setShowBinaryBundles(SHOW_BINARY_BUNDLES_ENABLED.equals(showBinaryBundles));
 
     m_hiddenBundleTypes = parseListProperty(PREF_HIDDEN_BUNDLES_TYPES);
 
