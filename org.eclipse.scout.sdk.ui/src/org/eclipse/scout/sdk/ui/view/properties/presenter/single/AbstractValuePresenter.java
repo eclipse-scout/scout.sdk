@@ -39,8 +39,7 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
     if (regexAllowedCharacters == null) {
       m_regexAllowedCharacters = null;
     }
-    else
-    {
+    else {
       m_regexAllowedCharacters = Pattern.compile(regexAllowedCharacters);
     }
   }

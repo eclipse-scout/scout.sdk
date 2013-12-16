@@ -116,7 +116,7 @@ public class UiUtility {
       if (TypeUtility.exists(targetPackage)) {
         String pck = targetPackage.getElementName();
         IScoutBundle declaringBundle = ScoutTypeUtility.getScoutBundle(targetPackage);
-        if (declaringBundle != null && pck.startsWith(declaringBundle.getSymbolicName())) {
+        if (declaringBundle != null && pck.startsWith(declaringBundle.getSymbolicName()) && pck.length() > declaringBundle.getSymbolicName().length()) {
           return pck.substring(declaringBundle.getSymbolicName().length() + 1);
         }
       }

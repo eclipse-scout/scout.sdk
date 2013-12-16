@@ -14,6 +14,7 @@ import org.eclipse.scout.sdk.ui.util.StyledTextEx;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.VerifyListener;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
@@ -84,6 +85,14 @@ public class TextField extends Composite {
   @Override
   public void removeFocusListener(FocusListener listener) {
     m_text.removeFocusListener(listener);
+  }
+
+  public void addVerifyListener(VerifyListener verifyListener) {
+    m_text.addVerifyListener(verifyListener);
+  }
+
+  public void removeVerifyListener(VerifyListener verifyListener) {
+    m_text.removeVerifyListener(verifyListener);
   }
 
   public void addModifyListener(ModifyListener listener) {

@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.sourcebuilder.annotation;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import javax.annotation.Generated;
@@ -42,6 +43,13 @@ public final class AnnotationSourceBuilderFactory {
   public static IAnnotationSourceBuilder createOrderAnnotation(double orderNr) {
     AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.Order));
     orderAnnoation.addParameter(Double.toString(orderNr));
+    return orderAnnoation;
+  }
+
+  public static IAnnotationSourceBuilder createPriorityAnnotation(float priority) {
+    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.Ranking));
+    BigDecimal convert = new BigDecimal(priority);
+    orderAnnoation.addParameter(convert.toString() + "f");
     return orderAnnoation;
   }
 
