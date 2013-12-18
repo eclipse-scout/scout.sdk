@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.workspace.type.config;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.util.regex.Matcher;
@@ -369,6 +370,32 @@ public final class PropertyMethodSourceUtility {
     Matcher m = REGEX_SIMPLE_BIG_DECIMAL.matcher(parameter);
     if (m.find()) {
       return new BigDecimal(m.group(3));
+    }
+    throw new CustomImplementationException();
+  }
+
+  /**
+   * parses the given return clause input string into the corresponding rounding mode enum value.
+   * 
+   * @param parameter
+   *          The return clause
+   * @return The bigdecimal value of the return clause.
+   * @throws CoreException
+   *           In case the value could not be parsed.
+   */
+  public static RoundingMode parseReturnParameterRoundingMode(String parameter) throws CoreException {
+    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
+      return null;
+    }
+    if (parameter.startsWith(RoundingMode.class.getName()) && parameter.length() > RoundingMode.class.getName().length()) {
+      parameter = parameter.substring(RoundingMode.class.getName().length() + 1);
+    }
+    if (parameter.startsWith(RoundingMode.class.getSimpleName()) && parameter.length() > RoundingMode.class.getSimpleName().length()) {
+      parameter = parameter.substring(RoundingMode.class.getSimpleName().length() + 1);
+    }
+    RoundingMode mode = RoundingMode.valueOf(parameter);
+    if (mode != null) {
+      return mode;
     }
     throw new CustomImplementationException();
   }
