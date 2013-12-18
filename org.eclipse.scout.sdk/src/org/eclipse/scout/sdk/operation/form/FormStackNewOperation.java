@@ -607,7 +607,7 @@ public class FormStackNewOperation extends FormNewOperation {
     return m_serviceRegistrationDescriptions.remove(desc);
   }
 
-  public void setServiceRegistration(List<ServiceRegistrationDescription> desc) {
+  public void setServiceRegistrations(List<ServiceRegistrationDescription> desc) {
     m_serviceRegistrationDescriptions.clear();
     m_serviceRegistrationDescriptions.addAll(desc);
   }

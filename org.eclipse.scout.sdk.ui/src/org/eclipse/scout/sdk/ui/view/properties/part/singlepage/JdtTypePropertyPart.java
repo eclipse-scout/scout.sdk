@@ -555,14 +555,14 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
           }
           break;
         case JdtEvent.BUFFER_DIRTY:
-          if (event.getElementType() == IJavaElement.COMPILATION_UNIT && getPage().getType().getCompilationUnit().equals(event.getElement())) {
+          if (event.getElementType() == IJavaElement.COMPILATION_UNIT && event.getElement().equals(getPage().getType().getCompilationUnit())) {
             m_markDirtyJob.cancel();
             m_markDirtyJob.setDirty(true);
             m_markDirtyJob.schedule(150);
           }
           break;
         case JdtEvent.BUFFER_SYNC:
-          if (event.getElementType() == IJavaElement.COMPILATION_UNIT && getPage().getType().getCompilationUnit().equals(event.getElement())) {
+          if (event.getElementType() == IJavaElement.COMPILATION_UNIT && event.getElement().equals(getPage().getType().getCompilationUnit())) {
             m_markDirtyJob.cancel();
             m_markDirtyJob.setDirty(false);
             m_markDirtyJob.schedule(150);

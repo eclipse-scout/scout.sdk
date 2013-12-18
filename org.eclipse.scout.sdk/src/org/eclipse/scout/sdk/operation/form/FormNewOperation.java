@@ -55,6 +55,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
   private String m_formIdSignature;
   private boolean m_createButtonOk;
   private boolean m_createButtonCancel;
+  private boolean m_createMainBox;
 
   private IType m_createdMainBox;
   private IMethod m_createdNlsLabelMethod;
@@ -70,6 +71,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     getSourceBuilder().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
     getCompilationUnitNewOp().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     setFormatSource(true);
+    setCreateMainBox(true);
   }
 
   @Override
@@ -86,6 +88,14 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     super.validate();
   }
 
+  protected void createConstructor(ITypeSourceBuilder formBuilder, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
+    constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
+    constructorBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
+    formBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+  }
+
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
 
@@ -93,12 +103,8 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
       addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation(getFormDataSignature(), SdkCommand.CREATE, null));
     }
 
-    // constructor
-    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
-    constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
-    constructorBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
-    constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+    createConstructor(getSourceBuilder(), monitor, workingCopyManager);
+
     // nls text method
     if (getNlsEntry() != null) {
       IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TITLE);
@@ -110,7 +116,9 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
       createFormIdProperty(getSourceBuilder());
     }
 
-    createMainBox(getSourceBuilder(), monitor, workingCopyManager);
+    if (isCreateMainBox()) {
+      createMainBox(getSourceBuilder(), monitor, workingCopyManager);
+    }
 
     super.run(monitor, workingCopyManager);
 
@@ -285,6 +293,14 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
 
   public boolean isCreateButtonCancel() {
     return m_createButtonCancel;
+  }
+
+  public boolean isCreateMainBox() {
+    return m_createMainBox;
+  }
+
+  public void setCreateMainBox(boolean createMainBox) {
+    m_createMainBox = createMainBox;
   }
 
 }
