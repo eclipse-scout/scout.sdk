@@ -38,7 +38,7 @@ public class OverrideUnimplementedMethodsOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    RefactoringASTParser parser = new RefactoringASTParser(AST.JLS3);
+    RefactoringASTParser parser = new RefactoringASTParser(AST.JLS4);
     CompilationUnit cu = parser.parse(m_type.getCompilationUnit(), true);
     ITypeBinding typeBinding = ASTNodes.getTypeBinding(cu, m_type);
     AddUnimplementedMethodsOperation op = new AddUnimplementedMethodsOperation(cu, typeBinding, null, -1, true, true, true);

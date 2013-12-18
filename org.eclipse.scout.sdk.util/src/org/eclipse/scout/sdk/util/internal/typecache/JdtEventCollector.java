@@ -43,7 +43,7 @@ public class JdtEventCollector {
   }
 
   private CompilationUnit createAst() {
-    ASTParser parser = ASTParser.newParser(AST.JLS3);
+    ASTParser parser = ASTParser.newParser(AST.JLS4);
     parser.setCompilerOptions(JavaCore.getOptions());
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setSource(getCompilationUnit());

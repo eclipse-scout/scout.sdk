@@ -462,7 +462,7 @@ public class TypeUtility {
   }
 
   public static ISourceRange getContentSourceRange(IMethod method) throws JavaModelException {
-    ASTParser parser = ASTParser.newParser(AST.JLS3);
+    ASTParser parser = ASTParser.newParser(AST.JLS4);
     parser.setCompilerOptions(method.getJavaProject().getOptions(true));
     parser.setKind(ASTParser.K_CLASS_BODY_DECLARATIONS);
     parser.setSource(method.getSource().toCharArray());

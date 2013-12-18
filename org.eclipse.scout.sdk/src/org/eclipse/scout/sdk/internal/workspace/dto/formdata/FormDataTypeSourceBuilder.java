@@ -191,15 +191,11 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
                     source.append(" * '" + vm.getRuleReturnExpression() + "' is not accessible from here.");
                   }
                   source.append(lineDelimiter);
-                  source.append(" * generatedSourceCode: ");
-                  source.append(generatedSourceCode);
-                  source.append(lineDelimiter);
                   source.append(" * at " + fqn);
                   source.append(lineDelimiter);
                   source.append("*/");
                 }
                 else {
-
                   String ruleDecl;
                   if (vm.getRuleField() != null) {
                     validator.getTypeName(SignatureCache.createTypeSignature(vm.getRuleField().getDeclaringType().getFullyQualifiedName())); // add to imports if necessary
@@ -280,5 +276,4 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
   public FormDataAnnotation getFormDataAnnotation() {
     return m_formDataAnnotation;
   }
-
 }

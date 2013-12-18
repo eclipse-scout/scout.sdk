@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -38,7 +38,7 @@ class FineGrainedAstAnalyzer {
     }
     CompilationUnit oldAst = null;
     if (oldAst == null) {
-      ASTParser parser = ASTParser.newParser(AST.JLS3);
+      ASTParser parser = ASTParser.newParser(AST.JLS4);
       parser.setCompilerOptions(JavaCore.getOptions());
       parser.setKind(ASTParser.K_COMPILATION_UNIT);
       parser.setSource(oldContent.toCharArray());
@@ -46,7 +46,7 @@ class FineGrainedAstAnalyzer {
     }
     CompilationUnit newAst = m_delta.getCompilationUnitAST();
     if (newAst == null) {
-      ASTParser parser = ASTParser.newParser(AST.JLS3);
+      ASTParser parser = ASTParser.newParser(AST.JLS4);
       parser.setCompilerOptions(JavaCore.getOptions());
       parser.setKind(ASTParser.K_COMPILATION_UNIT);
       parser.setSource(newContent.toCharArray());

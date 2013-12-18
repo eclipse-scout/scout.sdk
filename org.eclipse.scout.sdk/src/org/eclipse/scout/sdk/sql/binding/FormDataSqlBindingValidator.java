@@ -326,7 +326,7 @@ public class FormDataSqlBindingValidator {
   }
 
   protected ASTNode createMethodAst(IMethod method) throws JavaModelException {
-    ASTParser parser = ASTParser.newParser(AST.JLS3);
+    ASTParser parser = ASTParser.newParser(AST.JLS4);
     parser.setCompilerOptions(method.getJavaProject().getOptions(true));
     parser.setBindingsRecovery(true);
     parser.setResolveBindings(true);
@@ -338,7 +338,7 @@ public class FormDataSqlBindingValidator {
   protected CompilationUnit getCachedAst(ICompilationUnit icu) {
     CompilationUnit ast = m_astCache.get(icu);
     if (ast == null) {
-      ASTParser parser = ASTParser.newParser(AST.JLS3);
+      ASTParser parser = ASTParser.newParser(AST.JLS4);
       parser.setCompilerOptions(icu.getJavaProject().getOptions(true));
       parser.setKind(ASTParser.K_COMPILATION_UNIT);
       parser.setSource(icu);

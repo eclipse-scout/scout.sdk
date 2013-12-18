@@ -70,7 +70,7 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
 
     String source = cu.getSource();
     Document document = new Document(source);
-    ASTParser parser = ASTParser.newParser(AST.JLS3);
+    ASTParser parser = ASTParser.newParser(AST.JLS4);
     parser.setIgnoreMethodBodies(true);
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setCompilerOptions(swingEnv.getJavaProject().getOptions(true));

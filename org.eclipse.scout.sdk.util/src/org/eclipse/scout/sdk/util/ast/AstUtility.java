@@ -84,7 +84,7 @@ public final class AstUtility {
       // could not find source range
       SdkUtilActivator.logWarning("Could not calculate source range for member '" + member.toString() + "'.", e);
     }
-    ASTParser parser = ASTParser.newParser(AST.JLS3);
+    ASTParser parser = ASTParser.newParser(AST.JLS4);
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setCompilerOptions(member.getJavaProject().getOptions(true));
     parser.setIgnoreMethodBodies(false);

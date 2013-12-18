@@ -94,7 +94,7 @@ public class CodeNewOperation implements IOperation {
     ICompilationUnit cu = getDeclaringType().getCompilationUnit();
     String source = cu.getSource();
     Document document = new Document(source);
-    ASTParser parser = ASTParser.newParser(AST.JLS3);
+    ASTParser parser = ASTParser.newParser(AST.JLS4);
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setCompilerOptions(cu.getJavaProject().getOptions(true));
     parser.setIgnoreMethodBodies(true);
