@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.sourcebuilder.annotation;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import javax.annotation.Generated;
@@ -20,6 +19,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
+import org.eclipse.scout.commons.annotations.Priority;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
@@ -46,10 +46,17 @@ public final class AnnotationSourceBuilderFactory {
     return orderAnnoation;
   }
 
-  public static IAnnotationSourceBuilder createPriorityAnnotation(float priority) {
+  /**
+   * Creates a Priority annotation using the given priority value.
+   * 
+   * @param priority
+   *          Must be a string (without ending 'f') containing a valid float value.
+   * @return The created builder.
+   * @see Priority
+   */
+  public static IAnnotationSourceBuilder createPriorityAnnotation(String priority) {
     AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.Ranking));
-    BigDecimal convert = new BigDecimal(priority);
-    orderAnnoation.addParameter(convert.toString() + "f");
+    orderAnnoation.addParameter(priority + "f");
     return orderAnnoation;
   }
 

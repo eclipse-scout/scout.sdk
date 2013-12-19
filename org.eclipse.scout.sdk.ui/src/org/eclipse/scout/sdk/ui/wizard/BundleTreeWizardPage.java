@@ -21,7 +21,6 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -188,18 +187,22 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
     return result.toArray(new ITreeNode[result.size()]);
   }
 
-  public IScoutBundle getLocationBundle(String type, boolean visibleOnly, boolean checkedOnly) {
-    ITreeNode node = getTreeNode(type, visibleOnly, checkedOnly);
-    if (node != null) {
-      try {
-        return (IScoutBundle) node.getParent().getData();
+  public static IScoutBundle getLocationBundle(ITreeNode node) {
+    ITreeNode searchNode = node;
+    IScoutBundle bundle = null;
+    while (bundle == null && searchNode != null) {
+      Object o = searchNode.getData();
+      if (o instanceof IScoutBundle) {
+        return (IScoutBundle) o;
       }
-      catch (ClassCastException e) {
-        ScoutSdkUi.logError("Tree node data not instance of " + IScoutBundle.class.getName());
-        return null;
-      }
+      searchNode = searchNode.getParent();
     }
     return null;
+  }
+
+  public IScoutBundle getLocationBundle(String type, boolean visibleOnly, boolean checkedOnly) {
+    ITreeNode node = getTreeNode(type, visibleOnly, checkedOnly);
+    return getLocationBundle(node);
   }
 
   public ITreeNode getTreeNode(String type, boolean visibleOnly, boolean checkedOnly) {

@@ -340,20 +340,19 @@ public class TypeFilters {
   }
 
   public static ITypeFilter getMultiTypeFilter(final ITypeFilter... filters) {
+    if (filters == null) {
+      return null;
+    }
+
     return new ITypeFilter() {
       @Override
       public boolean accept(IType candidate) {
-        if (filters == null) {
-          return true;
-        }
-        else {
-          for (ITypeFilter f : filters) {
-            if (!f.accept(candidate)) {
-              return false;
-            }
+        for (ITypeFilter f : filters) {
+          if (!f.accept(candidate)) {
+            return false;
           }
-          return true;
         }
+        return true;
       }
     };
   }

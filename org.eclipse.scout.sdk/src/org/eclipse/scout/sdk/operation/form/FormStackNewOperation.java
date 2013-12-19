@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.service.ProcessServiceNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
@@ -98,6 +99,7 @@ public class FormStackNewOperation extends FormNewOperation {
       PrimaryTypeNewOperation formDataTypeNewOp = new PrimaryTypeNewOperation(formDataTypeName, getFormDataPackage(), getFormDataProject().getJavaProject());
       formDataTypeNewOp.addMethodSourceBuilder(MethodSourceBuilderFactory.createConstructorSourceBuilder(formDataTypeName));
       formDataTypeNewOp.setFlags(Flags.AccPublic);
+      formDataTypeNewOp.setPackageExportPolicy(ExportPolicy.AddPackage);
       formDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
       formDataTypeNewOp.validate();
       formDataTypeNewOp.run(monitor, workingCopyManager);

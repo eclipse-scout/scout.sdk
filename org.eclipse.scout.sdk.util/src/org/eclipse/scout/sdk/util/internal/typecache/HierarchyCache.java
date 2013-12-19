@@ -106,7 +106,7 @@ public final class HierarchyCache implements IHierarchyCache {
   public TypeHierarchy getSuperHierarchy(IType type) {
     try {
       ITypeHierarchy hierarchy = type.newSupertypeHierarchy(null);
-      return new TypeHierarchy(null, hierarchy);
+      return new TypeHierarchy(type, hierarchy);
     }
     catch (JavaModelException e) {
       SdkUtilActivator.logWarning("could not build super hierarchy '" + type.getFullyQualifiedName() + "'.", e);
