@@ -59,15 +59,15 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
 
   private static final JavaResourceChangedEmitter INSTANCE = new JavaResourceChangedEmitter(HierarchyCache.getInstance());
 
-  private P_JavaElementChangedListener m_javaElementListener;
-  private Object m_resourceLock = new Object();
-  private HashMap<ICompilationUnit, JdtEventCollector> m_eventCollectors;
-  private EventListenerList m_eventListeners = new EventListenerList();
-  private WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>> m_innerTypeChangedListeners;
-  private WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>> m_methodChangedListeners;
-  private Object m_eventListenerLock;
+  private final P_JavaElementChangedListener m_javaElementListener;
+  private final Object m_resourceLock;
+  private final HashMap<ICompilationUnit, JdtEventCollector> m_eventCollectors;
+  private final EventListenerList m_eventListeners;
+  private final WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>> m_innerTypeChangedListeners;
+  private final WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>> m_methodChangedListeners;
+  private final Object m_eventListenerLock;
   private final HierarchyCache m_hierarchyCache;
-  private IBufferChangedListener m_sourceBufferListener;
+  private final IBufferChangedListener m_sourceBufferListener;
 
   public static ICompilationUnit[] getPendingWorkingCopies() {
     synchronized (INSTANCE.m_resourceLock) {
@@ -79,8 +79,10 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     m_hierarchyCache = hierarchyCache;
     m_eventCollectors = new HashMap<ICompilationUnit, JdtEventCollector>();
     m_eventListenerLock = new Object();
+    m_resourceLock = new Object();
     m_innerTypeChangedListeners = new WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>>();
     m_methodChangedListeners = new WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>>();
+    m_eventListeners = new EventListenerList();
     m_sourceBufferListener = new P_SourceBufferListener();
     m_javaElementListener = new P_JavaElementChangedListener();
     JavaCore.addElementChangedListener(m_javaElementListener);
@@ -359,7 +361,12 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
         }
       }
       for (IJavaResourceChangedListener l : listeners) {
-        l.handleEvent(e);
+        try {
+          l.handleEvent(e);
+        }
+        catch (Exception ex) {
+          SdkUtilActivator.logWarning("error during listener notification.", ex);
+        }
       }
     }
     // method
@@ -385,7 +392,12 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
         }
       }
       for (IJavaResourceChangedListener l : listeners) {
-        l.handleEvent(e);
+        try {
+          l.handleEvent(e);
+        }
+        catch (Exception ex) {
+          SdkUtilActivator.logWarning("error during listener notification.", ex);
+        }
       }
     }
   }
