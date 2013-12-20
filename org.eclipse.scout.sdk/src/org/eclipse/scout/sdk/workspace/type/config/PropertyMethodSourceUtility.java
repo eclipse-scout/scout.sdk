@@ -507,7 +507,13 @@ public final class PropertyMethodSourceUtility {
         typeName = typeName.substring(0, typeName.length() - 1);
         referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), typeName);
         if (!TypeUtility.exists(referencedType)) {
-          throw new CoreException(new ScoutStatus(Status.WARNING, "Reference '" + parameter + "' could not be found.", null));
+          IType[] possibleMatches = TypeUtility.getTypes(typeName);
+          if (possibleMatches.length == 1) {
+            referencedType = possibleMatches[0];
+          }
+          else {
+            throw new CoreException(new ScoutStatus(Status.WARNING, "Reference '" + parameter + "' could not be found.", null));
+          }
         }
       }
       else {
