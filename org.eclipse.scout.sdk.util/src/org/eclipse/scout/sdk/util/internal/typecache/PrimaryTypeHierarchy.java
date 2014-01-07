@@ -26,14 +26,14 @@ import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 /**
  *
  */
-public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPrimaryTypeTypeHierarchy {
+public final class PrimaryTypeHierarchy extends CachedTypeHierarchy implements IPrimaryTypeTypeHierarchy {
 
-  private ITypeFilter m_primaryTypeFilter = new P_PrimaryTypeFilter();
+  private final static ITypeFilter PRIMARY_TYPE_FILTER = new P_PrimaryTypeFilter();
 
   /**
    * @param type
    */
-  public PrimaryTypeTypeHierarchy(IType type) {
+  public PrimaryTypeHierarchy(IType type) {
     super(type);
   }
 
@@ -41,10 +41,10 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getAllSubtypes(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getAllSubtypes(type, internalFilter, comparator);
   }
@@ -53,10 +53,10 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getAllClasses(ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getAllClasses(internalFilter, comparator);
   }
@@ -65,10 +65,10 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getAllInterfaces(ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getAllInterfaces(internalFilter, comparator);
   }
@@ -77,10 +77,10 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getAllSuperclasses(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getAllSuperclasses(type, internalFilter, comparator);
   }
@@ -89,10 +89,10 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getAllSuperInterfaces(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getAllSuperInterfaces(type, internalFilter, comparator);
   }
@@ -101,10 +101,10 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getAllSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getAllSupertypes(type, internalFilter, comparator);
   }
@@ -113,10 +113,10 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getAllTypes(ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getAllTypes(internalFilter, comparator);
   }
@@ -125,10 +125,10 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getSubclasses(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getSubclasses(type, internalFilter, comparator);
   }
@@ -137,17 +137,17 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getSubtypes(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getSubtypes(type, internalFilter, comparator);
   }
 
   @Override
   public IType getSuperclass(IType type) {
-    if (m_primaryTypeFilter.accept(type)) {
+    if (PRIMARY_TYPE_FILTER.accept(type)) {
       return super.getSuperclass(type);
     }
     return null;
@@ -157,10 +157,10 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getSuperInterfaces(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getSuperInterfaces(type, internalFilter, comparator);
   }
@@ -169,10 +169,10 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
   public IType[] getSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator) {
     ITypeFilter internalFilter = null;
     if (filter == null) {
-      internalFilter = m_primaryTypeFilter;
+      internalFilter = PRIMARY_TYPE_FILTER;
     }
     else {
-      internalFilter = TypeFilters.getMultiTypeFilter(filter, m_primaryTypeFilter);
+      internalFilter = TypeFilters.getMultiTypeFilter(filter, PRIMARY_TYPE_FILTER);
     }
     return super.getSupertypes(type, internalFilter, comparator);
   }
@@ -215,7 +215,6 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
     try {
       ITypeHierarchy hierarchy = JavaCore.newTypeHierarchy(region, null, null);
       return new CombinedHierarchy(getType(), hierarchy);
-
     }
     catch (JavaModelException e) {
       SdkUtilActivator.logError("could not create combined type hierarchy for '" + getType().getFullyQualifiedName() + "'.", e);
@@ -223,7 +222,7 @@ public class PrimaryTypeTypeHierarchy extends CachedTypeHierarchy implements IPr
     }
   }
 
-  private class P_PrimaryTypeFilter implements ITypeFilter {
+  private final static class P_PrimaryTypeFilter implements ITypeFilter {
     @Override
     public boolean accept(IType type) {
       return type.getDeclaringType() == null;

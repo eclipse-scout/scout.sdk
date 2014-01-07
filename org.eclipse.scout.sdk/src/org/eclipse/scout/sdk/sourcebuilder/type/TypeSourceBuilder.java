@@ -22,19 +22,25 @@ import java.util.TreeMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.sourcebuilder.AbstractAnnotatableSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.IAnnotationSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>{@link TypeSourceBuilder}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implements ITypeSourceBuilder {
@@ -76,6 +82,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
   @Override
   public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
     super.createSource(source, lineDelimiter, ownerProject, validator);
+    createClassIdAnnotation(source, lineDelimiter, ownerProject, validator);
     // type definition
     source.append(Flags.toString(getFlags())).append(" ");
     source.append(((getFlags() & Flags.AccInterface) != 0) ? ("interface ") : ("class "));
@@ -103,6 +110,22 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
     createTypeContent(source, lineDelimiter, ownerProject, validator);
     source.append(lineDelimiter);
     source.append("}");
+  }
+
+  protected void createClassIdAnnotation(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+    if (ClassIdGenerators.isAutomaticallyCreateClassIdAnnotation() && !StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
+      IType iTypeWithClassId = TypeUtility.getType(IRuntimeClasses.ITypeWithClassId);
+      if (TypeUtility.exists(iTypeWithClassId)) {
+        IType superType = TypeUtility.getTypeBySignature(getSuperTypeSignature());
+        if (TypeUtility.exists(superType)) {
+          if (TypeUtility.getSuperTypeHierarchy(superType).contains(iTypeWithClassId)) {
+            IAnnotationSourceBuilder createClassIdAnnotation = AnnotationSourceBuilderFactory.createClassIdAnnotation(this);
+            createClassIdAnnotation.createSource(source, lineDelimiter, ownerProject, validator);
+            source.append(lineDelimiter);
+          }
+        }
+      }
+    }
   }
 
   /**

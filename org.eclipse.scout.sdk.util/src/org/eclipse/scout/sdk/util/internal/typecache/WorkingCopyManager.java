@@ -43,7 +43,6 @@ public class WorkingCopyManager implements IWorkingCopyManager {
 
   @Override
   public boolean register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException {
-    SdkUtilActivator.logInfo(getClass().getSimpleName() + ": register workingcopy for " + icu.getElementName());
     if (icu.isReadOnly()) {
       throw new IllegalArgumentException("try to get a working copy of the read only icu '" + icu.getElementName() + "'.");
     }
@@ -59,7 +58,6 @@ public class WorkingCopyManager implements IWorkingCopyManager {
 
   @Override
   public void unregisterAll(IProgressMonitor monitor) {
-    SdkUtilActivator.logInfo(getClass().getSimpleName() + ": unregister all workingcopies");
     synchronized (LOCK) {
       for (Iterator<ICompilationUnit> it = m_workingCopies.iterator(); it.hasNext();) {
         releaseCompilationUnit(it.next(), monitor);
@@ -70,7 +68,6 @@ public class WorkingCopyManager implements IWorkingCopyManager {
 
   @Override
   public void unregister(ICompilationUnit icu, IProgressMonitor monitor) {
-    SdkUtilActivator.logInfo(getClass().getSimpleName() + ": unregister workingcopy for: '" + icu.getElementName() + "'");
     synchronized (LOCK) {
       if (m_workingCopies.remove(icu)) {
         releaseCompilationUnit(icu, monitor);
@@ -79,11 +76,9 @@ public class WorkingCopyManager implements IWorkingCopyManager {
   }
 
   public void discardAll(IProgressMonitor monitor) {
-
   }
 
   private void releaseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor) {
-
     try {
       if (!monitor.isCanceled()) {
         icu.commitWorkingCopy(true, monitor);
@@ -115,7 +110,6 @@ public class WorkingCopyManager implements IWorkingCopyManager {
 
   @Override
   public void reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException {
-    SdkUtilActivator.logInfo(getClass().getSimpleName() + ": reconcile compilation unit '" + icu.getElementName() + "'");
     synchronized (LOCK) {
       if (!m_workingCopies.contains(icu)) {
         throw new CoreException(new ScoutStatus("compilation unit " + icu.getElementName() + " has not been registered"));

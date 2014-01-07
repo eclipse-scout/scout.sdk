@@ -723,6 +723,7 @@
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ui.action.delete.OutlineDeleteAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ui.action.create.ClassIdNewAction"></contextMenu>
   <contextMenu
         class="org.eclipse.scout.sdk.ui.action.library.LibraryBundleNewAction">
   </contextMenu>
@@ -1184,5 +1185,14 @@
                type="org.eclipse.ui.IPersistableElement">
          </adapter>
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.jdt.ui.quickAssistProcessors">
+      <quickAssistProcessor
+            class="org.eclipse.scout.sdk.ui.extensions.quickassist.ClassIdQuickAssistProcessor"
+            id="org.eclipse.scout.sdk.ui.classIdGenerationProcessor"
+            name="Generate Class Id"
+            requiredSourceLevel="1.6">
+      </quickAssistProcessor>
    </extension>
 </plugin>

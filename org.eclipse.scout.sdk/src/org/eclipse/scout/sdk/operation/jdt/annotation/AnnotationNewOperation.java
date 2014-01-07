@@ -10,30 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.jdt.annotation;
 
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IAnnotatable;
-import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.ISourceRange;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.jdt.core.ToolFactory;
-import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.IAnnotationSourceBuilder;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.SourceRange;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
@@ -46,15 +41,14 @@ import org.eclipse.text.edits.TextEdit;
 /**
  * <h3>{@link AnnotationNewOperation}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 06.12.2012
  */
 public class AnnotationNewOperation implements IOperation {
 
-  private static final Pattern PATTERN = Pattern.compile("\\s*");
+  private final static Pattern REGEX_WHITE_SPACE_START = Pattern.compile("^(\\s+).*");
 
   private IAnnotationSourceBuilder m_sourceBuilder;
-
   private final IMember m_declaringType;
 
   /**
@@ -88,102 +82,88 @@ public class AnnotationNewOperation implements IOperation {
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getDeclaringType().getCompilationUnit());
     Document doc = new Document(getDeclaringType().getCompilationUnit().getSource());
 
-    TextEdit edit = createEdit(validator, doc.getDefaultLineDelimiter());
-    if (edit != null) {
-      try {
-        edit.apply(doc);
-        getDeclaringType().getCompilationUnit().getBuffer().setContents(doc.get());
-        // create imports
-        for (String fqi : validator.getImportsToCreate()) {
-          getDeclaringType().getCompilationUnit().createImport(fqi, null, monitor);
-        }
+    TextEdit edit = createEdit(validator, doc, ResourceUtility.getLineSeparator(getDeclaringType().getCompilationUnit()));
+    try {
+      edit.apply(doc);
+      getDeclaringType().getCompilationUnit().getBuffer().setContents(doc.get());
+
+      // create imports
+      for (String fqi : validator.getImportsToCreate()) {
+        getDeclaringType().getCompilationUnit().createImport(fqi, null, monitor);
       }
-      catch (Exception e) {
-        ScoutSdk.logWarning("could not add annotation to '" + getDeclaringType().getElementName() + "'.");
-      }
+    }
+    catch (Exception e) {
+      ScoutSdk.logWarning("could not add annotation to '" + getDeclaringType().getElementName() + "'.");
     }
   }
 
-  protected ISourceRange getAnnotationReplaceRange() throws JavaModelException {
+  protected ISourceRange getAnnotationReplaceRange(Document sourceDocument, String newLine) throws JavaModelException, BadLocationException {
     String sn = Signature.getSignatureSimpleName(getSignature());
     String fqn = Signature.getSignatureQualifier(getSignature()) + "." + sn;
-    for (IAnnotation a : getExistingAnnotations()) {
-      String annotationName = a.getElementName();
-      if (sn.equals(annotationName) || fqn.equals(annotationName)) {
-        ISourceRange existingRange = a.getSourceRange();
-        return existingRange;
-      }
-    }
+    int newLineLength = newLine.length();
 
-    ISourceRange sourceRange = getDeclaringType().getSourceRange();
-    int insertPos = sourceRange.getOffset();
-    ISourceRange javadocRange = getDeclaringType().getJavadocRange();
-    if (javadocRange != null) {
-      insertPos = javadocRange.getOffset() + javadocRange.getLength();
-    }
-    return new SourceRange(insertPos + getJdtAnnotationOffsetFix(), 0);
-  }
+    IRegion lineOfMemberName = sourceDocument.getLineInformationOfOffset(getDeclaringType().getNameRange().getOffset());
+    int lineBeforeMemberNameEndPos = lineOfMemberName.getOffset() - newLineLength;
+    int lastLineStart = sourceDocument.getLineInformationOfOffset(getDeclaringType().getSourceRange().getOffset()).getOffset();
+    IRegion lineInfo = sourceDocument.getLineInformationOfOffset(lineBeforeMemberNameEndPos);
+    IRegion result = lineOfMemberName;
+    boolean isReplaceExisting = false;
+    boolean isInBlockComment = false;
+    while (lineInfo.getOffset() >= lastLineStart) {
+      String lineSource = sourceDocument.get(lineInfo.getOffset(), lineInfo.getLength());
+      if (lineSource != null) {
+        lineSource = ScoutUtility.removeComments(lineSource.trim());
+        if (lineSource.length() > 0) {
+          if (!isInBlockComment && lineSource.endsWith("*/")) {
+            isInBlockComment = true;
+          }
+          else if (isInBlockComment && lineSource.startsWith("/*")) {
+            isInBlockComment = false;
+          }
 
-  private int getJdtAnnotationOffsetFix() throws JavaModelException {
-    // Fix for JDT bug with annotation creation and source ranges not updated properly
-    try {
-      String annotationStart = "@";
-      IAnnotation[] existings = getExistingAnnotations();
-      for (IAnnotation sample : existings) {
-        String src = sample.getSource();
-        if (!src.startsWith(annotationStart)) {
-          String ownerSrc = getDeclaringType().getSource();
-          int fixCandidate = ownerSrc.indexOf(annotationStart);
-          if (fixCandidate > 0) {
-            ISourceRange annoRange = sample.getSourceRange();
-            SourceRange r = new SourceRange(fixCandidate, annoRange.getLength());
-
-            int start = r.getOffset() + annotationStart.length();
-            int end = r.getOffset() + r.getLength();
-            if (start >= 0 && start < ownerSrc.length() && end > start && end < ownerSrc.length()) {
-              String check = ownerSrc.substring(start, end);
-              if (check.startsWith(sample.getElementName())) {
-                return fixCandidate;
+          if (!isInBlockComment) {
+            if (lineSource.charAt(0) == '@') {
+              result = lineInfo;
+              if (lineSource.startsWith("@" + sn) || lineSource.startsWith("@" + fqn)) {
+                // the annotation that should be created already exists -> replace it
+                isReplaceExisting = true;
+                break;
               }
             }
           }
         }
       }
+      lineInfo = sourceDocument.getLineInformationOfOffset(lineInfo.getOffset() - newLineLength); // one line up
     }
-    catch (Exception e) {
-      ScoutSdk.logWarning(e);
-    }
-    return 0;
+
+    return new SourceRange(result.getOffset(), isReplaceExisting ? result.getLength() : 0);
   }
 
-  public TextEdit createEdit(IImportValidator validator, String NL) throws CoreException {
+  protected String getIndent(Document sourceDocument, ISourceRange replaceRange) throws BadLocationException {
+    IRegion line = sourceDocument.getLineInformationOfOffset(replaceRange.getOffset());
+    Matcher matcher = REGEX_WHITE_SPACE_START.matcher(sourceDocument.get(line.getOffset(), line.getLength()));
+    if (matcher.find()) {
+      return matcher.group(1);
+    }
+    return "";
+  }
+
+  public TextEdit createEdit(IImportValidator validator, Document sourceDocument, String NL) throws CoreException {
     try {
-      ISourceRange replaceRange = getAnnotationReplaceRange();
-      // check empty line
-      char[] characters = getDeclaringType().getCompilationUnit().getBuffer().getCharacters();
-      if (replaceRange.getOffset() >= 0 && replaceRange.getOffset() <= characters.length
-          && replaceRange.getOffset() + replaceRange.getLength() >= 0 && replaceRange.getOffset() + replaceRange.getLength() <= characters.length) {
-        StringBuilder builder = new StringBuilder();
-        getSourceBuilder().createSource(builder, ResourceUtility.getLineSeparator(getDeclaringType().getCompilationUnit()), getDeclaringType().getJavaProject(), validator);
-        Document sourceDocument = new Document(getDeclaringType().getCompilationUnit().getSource());
-        IRegion lineInfo = sourceDocument.getLineInformationOfOffset(replaceRange.getOffset());
-        String line = sourceDocument.get(lineInfo.getOffset(), lineInfo.getLength());
-        String prefix = line.substring(0, replaceRange.getOffset() - lineInfo.getOffset());
-        String postfix = line.substring(replaceRange.getOffset() - lineInfo.getOffset() + replaceRange.getLength(), line.length());
-        CodeFormatter formatter = ToolFactory.createCodeFormatter(getDeclaringType().getJavaProject().getOptions(false));
-        if (PATTERN.matcher(prefix).matches() && !PATTERN.matcher(postfix).matches()) {
-          builder.append(NL + formatter.createIndentationString(1));
-        }
-        else if (PATTERN.matcher(postfix).matches() && !PATTERN.matcher(prefix).matches()) {
-          builder.insert(0, NL + formatter.createIndentationString(1));
-        }
-        return new ReplaceEdit(replaceRange.getOffset(), replaceRange.getLength(), builder.toString());
+      // find insert/replace range
+      ISourceRange replaceRange = getAnnotationReplaceRange(sourceDocument, NL);
+
+      // create new source
+      StringBuilder builder = new StringBuilder(getIndent(sourceDocument, replaceRange));
+      getSourceBuilder().createSource(builder, NL, getDeclaringType().getJavaProject(), validator);
+      if (replaceRange.getLength() == 0) {
+        builder.append(NL);
       }
+      return new ReplaceEdit(replaceRange.getOffset(), replaceRange.getLength(), builder.toString());
     }
     catch (BadLocationException e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not find insert location for annotation.", e));
     }
-    return null;
   }
 
   public IAnnotationSourceBuilder getSourceBuilder() {
@@ -226,23 +206,5 @@ public class AnnotationNewOperation implements IOperation {
    */
   public String[] getParameters() {
     return m_sourceBuilder.getParameters();
-  }
-
-  private IAnnotation[] getExistingAnnotations() throws JavaModelException {
-    switch (getDeclaringType().getElementType()) {
-      case IMember.FIELD:
-      case IMember.METHOD:
-      case IMember.TYPE:
-      case IMember.LOCAL_VARIABLE:
-        return ((IAnnotatable) getDeclaringType()).getAnnotations();
-      default:
-        return new IAnnotation[0];
-    }
-  }
-
-  public static AnnotationNewOperation createOrderAnnotation(IType declaringType, double orderNr) {
-    AnnotationNewOperation orderAnnoation = new AnnotationNewOperation(SignatureCache.createTypeSignature(RuntimeClasses.Order), declaringType);
-    orderAnnoation.addParameter(Double.toString(orderNr));
-    return orderAnnoation;
   }
 }

@@ -37,14 +37,14 @@ public final class HierarchyCache implements IHierarchyCache {
   private static final HierarchyCache INSTANCE = new HierarchyCache();
 
   private final Object m_cacheLock;
-  private final HashMap<IType, PrimaryTypeTypeHierarchy> m_cachedPrimaryTypeHierarchies;
+  private final HashMap<IType, PrimaryTypeHierarchy> m_cachedPrimaryTypeHierarchies;
 
   public static HierarchyCache getInstance() {
     return INSTANCE;
   }
 
   private HierarchyCache() {
-    m_cachedPrimaryTypeHierarchies = new HashMap<IType, PrimaryTypeTypeHierarchy>();
+    m_cachedPrimaryTypeHierarchies = new HashMap<IType, PrimaryTypeHierarchy>();
     m_cacheLock = new Object();
   }
 
@@ -70,7 +70,7 @@ public final class HierarchyCache implements IHierarchyCache {
     else if (TypeUtility.exists(type.getDeclaringType())) {
       throw new IllegalArgumentException("type '" + type.getElementName() + "' must be a primary type.");
     }
-    PrimaryTypeTypeHierarchy hierarchy = null;
+    PrimaryTypeHierarchy hierarchy = null;
     synchronized (m_cacheLock) {
       hierarchy = m_cachedPrimaryTypeHierarchies.get(type);
       if (hierarchy != null && (!TypeUtility.exists(hierarchy.getType()) || !TypeUtility.exists(hierarchy.getType().getJavaProject()))) {
@@ -79,7 +79,7 @@ public final class HierarchyCache implements IHierarchyCache {
         hierarchy = null;
       }
       if (hierarchy == null) {
-        hierarchy = new PrimaryTypeTypeHierarchy(type);
+        hierarchy = new PrimaryTypeHierarchy(type);
         m_cachedPrimaryTypeHierarchies.put(type, hierarchy);
       }
     }

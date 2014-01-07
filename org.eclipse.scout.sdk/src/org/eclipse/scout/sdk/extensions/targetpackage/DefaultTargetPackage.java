@@ -50,8 +50,9 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
   private final static String ATTRIB_TYPE = "bundleType";
 
   private static Map<String /* packageId */, TargetPackageEntry> defaultValues = null;
-  private static boolean isPackageConfigurationEnabled;
-  private final static Object lock = new Object();
+  private static boolean isPackageConfigurationEnabled = true;
+
+  private final static Object LOCK = new Object();
   private final static Map<IScoutBundle, Map<String /* packageId */, StringHolder /* configured value */>> configuredValues = new HashMap<IScoutBundle, Map<String, StringHolder>>();
   private final static Map<IScoutBundle, IPreferenceChangeListener> registeredListeners = new HashMap<IScoutBundle, IPreferenceChangeListener>();
 
@@ -60,7 +61,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
 
   private static Map<String, TargetPackageEntry> getDefaults() {
     if (defaultValues == null) {
-      synchronized (lock) {
+      synchronized (LOCK) {
         if (defaultValues == null) {
           Map<String, TargetPackageEntry> tmp = new HashMap<String, TargetPackageEntry>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
@@ -116,7 +117,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
    * @return true if the new mode is enabled in the settings. false if the legacy mode is active.
    */
   public static boolean isPackageConfigurationEnabled() {
-    synchronized (lock) {
+    synchronized (LOCK) {
       return isPackageConfigurationEnabled;
     }
   }
@@ -128,7 +129,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
    *          true if the new mode should be used (package can be chosen). false if the legacy mode should be active.
    */
   public static void setIsPackageConfigurationEnabled(boolean enabled) {
-    synchronized (lock) {
+    synchronized (LOCK) {
       isPackageConfigurationEnabled = enabled;
     }
   }
@@ -180,7 +181,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
   }
 
   private static String getConfiguredDefaultPackageCached(IScoutBundle context, String packageId) {
-    synchronized (lock) {
+    synchronized (LOCK) {
       Map<String, StringHolder> projectConfigs = configuredValues.get(context);
       if (projectConfigs == null) {
         projectConfigs = new HashMap<String, StringHolder>();

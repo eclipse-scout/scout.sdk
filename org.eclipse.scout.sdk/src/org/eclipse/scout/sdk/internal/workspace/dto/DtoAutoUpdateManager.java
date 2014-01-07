@@ -75,7 +75,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
   private final P_AutoUpdateOperationsJob m_autoUpdateJob;
 
   public DtoAutoUpdateManager() {
-    m_enabled = new AtomicBoolean();
+    m_enabled = new AtomicBoolean(true);
     m_updateHandlers = new ArrayList<IDtoAutoUpdateHandler>();
 
     m_resourceChangeEventsToCheck = new ArrayBlockingQueue<IResourceChangeEvent>(5000, true);

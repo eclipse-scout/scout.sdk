@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.extensions.preferences;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateManager;
@@ -30,6 +31,7 @@ public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements
 
   private BooleanFieldEditor m_updateFormDataAutomaticallyField;
   private BooleanFieldEditor m_targetPackageConfigEnabledField;
+  private BooleanFieldEditor m_automaticallyCreateClassIdAnnotation;
 
   public ScoutSdkPreferencePage() {
     super(GRID);
@@ -47,8 +49,12 @@ public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements
   public void createFieldEditors() {
     m_updateFormDataAutomaticallyField = new BooleanFieldEditor(IDtoAutoUpdateManager.PROP_AUTO_UPDATE, Texts.get("UpdateModelDataAutomatically"), getFieldEditorParent());
     addField(m_updateFormDataAutomaticallyField);
+
     m_targetPackageConfigEnabledField = new BooleanFieldEditor(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE, Texts.get("UseLegacyTargetPackage"), getFieldEditorParent());
     addField(m_targetPackageConfigEnabledField);
+
+    m_automaticallyCreateClassIdAnnotation = new BooleanFieldEditor(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION, Texts.get("AutomaticallyCreateClassIdAnnotation"), getFieldEditorParent());
+    addField(m_automaticallyCreateClassIdAnnotation);
   }
 
   @Override

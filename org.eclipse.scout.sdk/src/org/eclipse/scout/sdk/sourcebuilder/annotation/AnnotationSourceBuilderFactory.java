@@ -16,12 +16,18 @@ import javax.annotation.Generated;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ClassId;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.InjectFieldTo;
 import org.eclipse.scout.commons.annotations.Priority;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerationContext;
+import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
@@ -41,7 +47,7 @@ public final class AnnotationSourceBuilderFactory {
   }
 
   public static IAnnotationSourceBuilder createOrderAnnotation(double orderNr) {
-    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.Order));
+    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(IRuntimeClasses.Order));
     orderAnnoation.addParameter(Double.toString(orderNr));
     return orderAnnoation;
   }
@@ -50,14 +56,49 @@ public final class AnnotationSourceBuilderFactory {
    * Creates a Priority annotation using the given priority value.
    * 
    * @param priority
-   *          Must be a string (without ending 'f') containing a valid float value.
+   *          Must be a string containing a valid float value (without 'f' suffix).
    * @return The created builder.
    * @see Priority
    */
   public static IAnnotationSourceBuilder createPriorityAnnotation(String priority) {
-    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.Ranking));
+    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(IRuntimeClasses.Ranking));
     orderAnnoation.addParameter(priority + "f");
     return orderAnnoation;
+  }
+
+  /**
+   * Creates a new {@link ClassId} annotation source builder for the given generation context.
+   * 
+   * @param context
+   *          The context for which the annotation should be created.
+   * @return the created source builder
+   */
+  public static IAnnotationSourceBuilder createClassIdAnnotation(ClassIdGenerationContext context) {
+    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(IRuntimeClasses.ClassId));
+    orderAnnoation.addParameter(JdtUtility.toStringLiteral(ClassIdGenerators.generateNewId(context)));
+    return orderAnnoation;
+  }
+
+  /**
+   * Creates a new {@link ClassId} annotation source builder for the given type.
+   * 
+   * @param parentTypeSourceBuilder
+   *          the type source builder for which the annotation sould be created.
+   * @return the created source builder
+   */
+  public static IAnnotationSourceBuilder createClassIdAnnotation(TypeSourceBuilder parentTypeSourceBuilder) {
+    return createClassIdAnnotation(new ClassIdGenerationContext(parentTypeSourceBuilder));
+  }
+
+  /**
+   * Creates a new {@link ClassId} annotation source builder for the given type.
+   * 
+   * @param declaringType
+   *          The type for which the annotation should be created.
+   * @return the created source builder
+   */
+  public static IAnnotationSourceBuilder createClassIdAnnotation(IType declaringType) {
+    return createClassIdAnnotation(new ClassIdGenerationContext(declaringType));
   }
 
   public static IAnnotationSourceBuilder createFormDataAnnotation() {
@@ -83,7 +124,7 @@ public final class AnnotationSourceBuilderFactory {
   }
 
   public static IAnnotationSourceBuilder createPageDataAnnotation(final String pageDataTypeSignature) {
-    return new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.PageData)) {
+    return new AnnotationSourceBuilder(SignatureCache.createTypeSignature(IRuntimeClasses.PageData)) {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append('@').append(SignatureUtility.getTypeReference(getSignature(), validator)).append('(');
@@ -94,7 +135,7 @@ public final class AnnotationSourceBuilderFactory {
   }
 
   public static IAnnotationSourceBuilder createFormDataAnnotation(final String formDataSignature, final FormData.SdkCommand sdkCommand, final FormData.DefaultSubtypeSdkCommand defaultSubtypeCommand) {
-    return new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.FormData)) {
+    return new AnnotationSourceBuilder(SignatureCache.createTypeSignature(IRuntimeClasses.FormData)) {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         String formDataTypeRef = SignatureUtility.getTypeReference(getSignature(), validator);
@@ -134,11 +175,11 @@ public final class AnnotationSourceBuilderFactory {
   }
 
   public static IAnnotationSourceBuilder createValidationStrategyProcess() {
-    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.InputValidation)) {
+    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(IRuntimeClasses.InputValidation)) {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append("@" + SignatureUtility.getTypeReference(getSignature(), validator));
-        source.append("(").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.IValidationStrategy)));
+        source.append("(").append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.IValidationStrategy)));
         source.append(".PROCESS.class)");
       }
     };
@@ -158,7 +199,7 @@ public final class AnnotationSourceBuilderFactory {
   }
 
   public static IAnnotationSourceBuilder createReplaceAnnotationBuilder() {
-    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(RuntimeClasses.Replace));
+    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(IRuntimeClasses.Replace));
     return sourceBuilder;
   }
 }

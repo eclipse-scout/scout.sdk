@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformSharedBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.action.create.ClassIdNewAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
@@ -81,11 +82,14 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
     else if (menu instanceof ScoutBundleNewAction) {
       ((ScoutBundleNewAction) menu).setScoutProject(getScoutBundle());
     }
+    else if (menu instanceof ClassIdNewAction) {
+      ((ClassIdNewAction) menu).setScoutBundle(getScoutBundle());
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, ScoutBundleNewAction.class};
+    return new Class[]{WellformAction.class, ScoutBundleNewAction.class, ClassIdNewAction.class};
   }
 }

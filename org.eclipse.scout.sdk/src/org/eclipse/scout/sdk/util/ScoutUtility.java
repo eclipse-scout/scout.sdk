@@ -75,10 +75,17 @@ public final class ScoutUtility {
   public final static String JAVA_MARKER = "java ";
   private final static Pattern REGEX_LINE_SEP_CLEAN = Pattern.compile("(\\n)\\r");
   private final static Pattern REGEX_LINE_SEP_CLEAN2 = Pattern.compile("\\r(\\n)");
+  private final static Pattern REGEX_LINE_SET_CLEAN3 = Pattern.compile("\\n+$");
+  private final static Pattern REGEX_LINE_SET_CLEAN4 = Pattern.compile("\\n");
   private final static Pattern REGEX_PACKAGE_NAME = Pattern.compile("^[0-9a-zA-Z\\.\\_]*$");
   private final static Pattern REGEX_PACKAGE_NAME_START = Pattern.compile("[a-zA-Z]{1}.*$");
   private final static Pattern REGEX_PACKAGE_NAME_END = Pattern.compile("^.*[a-zA-Z]{1}$");
   private final static Pattern REGEX_CONTAINS_UPPER_CASE = Pattern.compile(".*[A-Z].*");
+
+  private final static Pattern REGEX_COMMENT_REMOVE_1 = Pattern.compile("\\/\\/.*?\\\r\\\n");
+  private final static Pattern REGEX_COMMENT_REMOVE_2 = Pattern.compile("\\/\\/.*?\\\n");
+  private final static Pattern REGEX_COMMENT_REMOVE_3 = Pattern.compile("(?s)\\/\\*.*?\\*\\/");
+
   private final static Object LOCK = new Object();
   private final static ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<String>();
 
@@ -140,14 +147,9 @@ public final class ScoutUtility {
       return null;
     }
     String retVal = methodBody;
-    try {
-      retVal = methodBody.replaceAll("\\/\\/.*?\\\r\\\n", "");
-      retVal = retVal.replaceAll("\\/\\/.*?\\\n", "");
-      retVal = retVal.replaceAll("(?s)\\/\\*.*?\\*\\/", "");
-    }
-    catch (Throwable t) {
-      // nop
-    }
+    retVal = REGEX_COMMENT_REMOVE_1.matcher(retVal).replaceAll("");
+    retVal = REGEX_COMMENT_REMOVE_2.matcher(retVal).replaceAll("");
+    retVal = REGEX_COMMENT_REMOVE_3.matcher(retVal).replaceAll("");
     return retVal;
   }
 
@@ -163,8 +165,8 @@ public final class ScoutUtility {
     buffer = REGEX_LINE_SEP_CLEAN.matcher(buffer).replaceAll("$1");
     buffer = REGEX_LINE_SEP_CLEAN2.matcher(buffer).replaceAll("$1");
     // max 1 newline at the end
-    buffer = buffer.replaceAll("\\n+$", "\n");
-    return buffer.replaceAll("\\n", separator);
+    buffer = REGEX_LINE_SET_CLEAN3.matcher(buffer).replaceAll("\n");
+    return REGEX_LINE_SET_CLEAN4.matcher(buffer).replaceAll(separator);
   }
 
   public static String getIndent(IType type) {

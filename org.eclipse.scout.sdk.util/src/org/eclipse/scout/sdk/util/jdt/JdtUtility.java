@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.jdt;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IWorkspaceDescription;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -33,11 +30,15 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.ToolFactory;
+import org.eclipse.jdt.core.compiler.ITerminalSymbols;
+import org.eclipse.jdt.core.compiler.InvalidInputException;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameRequestor;
+import org.eclipse.jdt.internal.core.util.PublicScanner;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.State;
@@ -49,21 +50,6 @@ import org.osgi.framework.Version;
 
 @SuppressWarnings("restriction")
 public final class JdtUtility {
-  private final static String DOUBLE_QUOTES = "\"";
-  private final static Pattern LIT_ESC_1 = Pattern.compile("\\", Pattern.LITERAL);
-  private final static String REP_1 = Matcher.quoteReplacement("\\\\");
-  private final static Pattern LIT_ESC_2 = Pattern.compile("\"", Pattern.LITERAL);
-  private final static String REP_2 = Matcher.quoteReplacement("\\\"");
-  private final static Pattern LIT_ESC_3 = Pattern.compile("\n", Pattern.LITERAL);
-  private final static String REP_3 = Matcher.quoteReplacement("\\n");
-  private final static Pattern LIT_ESC_4 = Pattern.compile("\r", Pattern.LITERAL);
-  private final static String REP_4 = Matcher.quoteReplacement("");
-  private final static Pattern LIT_ESC_5 = Pattern.compile("\\\\", Pattern.LITERAL);
-  private final static String REP_5 = Matcher.quoteReplacement("\\");
-  private final static Pattern LIT_ESC_6 = Pattern.compile("\\\"", Pattern.LITERAL);
-  private final static String REP_6 = Matcher.quoteReplacement("\"");
-  private final static Pattern LIT_ESC_7 = Pattern.compile("([^\\\\]{1})\\\\n");
-  private final static String REP_7 = "$1\n";
 
   private JdtUtility() {
   }
@@ -100,15 +86,19 @@ public final class JdtUtility {
 
   public static IAnnotation getAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
     try {
-      IAnnotation annotation = element.getAnnotation(fullyQuallifiedAnnotation);
-      // workaround since annotations are not cached properly from jdt
-      if (TypeUtility.exists(annotation) && (annotation.getSource() == null || annotation.getSource().startsWith("@"))) {
+      String simpleName = Signature.getSimpleName(fullyQuallifiedAnnotation);
+      String startSimple = '@' + simpleName;
+      String startFq = '@' + fullyQuallifiedAnnotation;
+
+      IAnnotation annotation = element.getAnnotation(simpleName);
+
+      // workaround since annotations are not cached properly from JDT
+      if (TypeUtility.exists(annotation) && (annotation.getSource() == null || (annotation.getSource().startsWith(startSimple) || annotation.getSource().startsWith(startFq)))) {
         return annotation;
       }
       else {
-        String simpleName = Signature.getSimpleName(fullyQuallifiedAnnotation);
-        annotation = element.getAnnotation(simpleName);
-        if (TypeUtility.exists(annotation) && (annotation.getSource() == null || annotation.getSource().startsWith("@"))) {
+        annotation = element.getAnnotation(fullyQuallifiedAnnotation);
+        if (TypeUtility.exists(annotation) && (annotation.getSource() == null || (annotation.getSource().startsWith(startSimple) || annotation.getSource().startsWith(startFq)))) {
           return annotation;
         }
       }
@@ -130,12 +120,64 @@ public final class JdtUtility {
    */
   public static String toStringLiteral(String s) {
     if (s == null) return null;
-    String escaped = s;
-    escaped = LIT_ESC_1.matcher(escaped).replaceAll(REP_1);
-    escaped = LIT_ESC_2.matcher(escaped).replaceAll(REP_2);
-    escaped = LIT_ESC_3.matcher(escaped).replaceAll(REP_3);
-    escaped = LIT_ESC_4.matcher(escaped).replaceAll(REP_4);
-    return DOUBLE_QUOTES + escaped + DOUBLE_QUOTES;
+
+    int len = s.length();
+    StringBuilder b = new StringBuilder(len + 2);
+    b.append('"'); // opening delimiter
+    for (int i = 0; i < len; i++) {
+      char c = s.charAt(i);
+      switch (c) {
+        case '\b':
+          b.append("\\b");
+          break;
+        case '\t':
+          b.append("\\t");
+          break;
+        case '\n':
+          b.append("\\n");
+          break;
+        case '\f':
+          b.append("\\f");
+          break;
+        case '\r':
+          b.append("\\r");
+          break;
+        case '\"':
+          b.append("\\\"");
+          break;
+        case '\\':
+          b.append("\\\\");
+          break;
+        case '\0':
+          b.append("\\0");
+          break;
+        case '\1':
+          b.append("\\1");
+          break;
+        case '\2':
+          b.append("\\2");
+          break;
+        case '\3':
+          b.append("\\3");
+          break;
+        case '\4':
+          b.append("\\4");
+          break;
+        case '\5':
+          b.append("\\5");
+          break;
+        case '\6':
+          b.append("\\6");
+          break;
+        case '\7':
+          b.append("\\7");
+          break;
+        default:
+          b.append(c);
+      }
+    }
+    b.append('"'); // closing delimiter
+    return b.toString();
   }
 
   /**
@@ -146,14 +188,32 @@ public final class JdtUtility {
    *          the literal with leading and ending double-quotes
    * @return the original (un-escaped) string. if it is no valid literal string, null is returned.
    */
-  public static String fromStringLiteral(String l) {
-    if (l == null || l.length() < 2 || !l.startsWith(DOUBLE_QUOTES) || !l.endsWith(DOUBLE_QUOTES)) return null;
-    String inner = l.substring(1, l.length() - 1);
-    String ret = inner;
-    ret = LIT_ESC_7.matcher(ret).replaceAll(REP_7);
-    ret = LIT_ESC_5.matcher(ret).replaceAll(REP_5);
-    ret = LIT_ESC_6.matcher(ret).replaceAll(REP_6);
-    return ret;
+  public static String fromStringLiteral(String s) {
+    if (s == null) {
+      return null;
+    }
+
+    int len = s.length();
+    if (len < 2 || s.charAt(0) != '"' || s.charAt(len - 1) != '"') {
+      return null;
+    }
+
+    PublicScanner scanner = (PublicScanner) ToolFactory.createScanner(true, true, false, "1.7", "1.7");
+
+    char[] source = s.toCharArray();
+    scanner.setSource(source);
+    scanner.resetTo(0, source.length);
+
+    try {
+      int tokenType = scanner.getNextToken();
+      if (tokenType == ITerminalSymbols.TokenNameStringLiteral) {
+        return scanner.getCurrentStringLiteral();
+      }
+    }
+    catch (InvalidInputException e) {
+      SdkUtilActivator.logWarning("String '" + s + "' is not a valid java string literal.");
+    }
+    return null;
   }
 
   public static IJavaElement findJavaElement(IJavaElement element, int offset, int lenght) throws JavaModelException {

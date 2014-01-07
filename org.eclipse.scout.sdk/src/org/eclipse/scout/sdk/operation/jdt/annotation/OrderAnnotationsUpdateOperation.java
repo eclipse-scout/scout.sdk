@@ -15,14 +15,17 @@ import java.util.HashMap;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IBuffer;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.TextEdit;
@@ -51,25 +54,32 @@ public class OrderAnnotationsUpdateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    workingCopyManager.register(getDeclaringType().getCompilationUnit(), monitor);
-    IBuffer buffer = getDeclaringType().getCompilationUnit().getBuffer();
+    ICompilationUnit icu = getDeclaringType().getCompilationUnit();
+    workingCopyManager.register(icu, monitor);
+    IBuffer buffer = icu.getBuffer();
     Document sourceDoc = new Document(buffer.getContents());
     MultiTextEdit multiEdit = new MultiTextEdit();
-    IImportValidator validator = new CompilationUnitImportValidator(getDeclaringType().getCompilationUnit());
+    IImportValidator validator = new CompilationUnitImportValidator(icu);
+    String orderSignature = SignatureCache.createTypeSignature(RuntimeClasses.Order);
+    String NL = ResourceUtility.getLineSeparator(icu);
+
     for (OrderAnnotation orderAnnotation : m_orderAnnotations.values()) {
-      if (orderAnnotation.getType() != null) {
-        String orderSignature = SignatureCache.createTypeSignature(RuntimeClasses.Order);
+      if (TypeUtility.exists(orderAnnotation.getType())) {
         AnnotationNewOperation op = new AnnotationNewOperation(orderSignature, orderAnnotation.getType());
         op.addParameter("" + orderAnnotation.getOrderNr());
-        TextEdit edit = op.createEdit(validator, sourceDoc.getDefaultLineDelimiter());
-        if (edit != null) {
-          multiEdit.addChild(edit);
-        }
+        TextEdit edit = op.createEdit(validator, sourceDoc, NL);
+        multiEdit.addChild(edit);
       }
     }
+
     try {
       multiEdit.apply(sourceDoc);
       buffer.setContents(sourceDoc.get());
+
+      // create imports
+      for (String fqi : validator.getImportsToCreate()) {
+        icu.createImport(fqi, null, monitor);
+      }
     }
     catch (Exception e) {
       ScoutSdk.logWarning("could not update order annotations.", e);

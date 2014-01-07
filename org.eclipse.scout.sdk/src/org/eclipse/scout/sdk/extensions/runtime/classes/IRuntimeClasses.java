@@ -57,6 +57,7 @@ public interface IRuntimeClasses {
   String FormData = "org.eclipse.scout.commons.annotations.FormData"; // NO_UCD
   String PageData = "org.eclipse.scout.commons.annotations.PageData"; // NO_UCD
   String Replace = "org.eclipse.scout.commons.annotations.Replace"; // NO_UCD
+  String ClassId = "org.eclipse.scout.commons.annotations.ClassId"; // NO_UCD
   String InjectFieldTo = "org.eclipse.scout.commons.annotations.InjectFieldTo"; // NO_UCD
   String ClientProxyServiceFactory = "org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"; // NO_UCD
   String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory"; // NO_UCD
@@ -196,6 +197,7 @@ public interface IRuntimeClasses {
   String ITreeBox = "org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox"; // NO_UCD
   String ITreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField"; // NO_UCD
   String ITreeNode = "org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode"; // NO_UCD
+  String ITypeWithClassId = "org.eclipse.scout.commons.ITypeWithClassId"; // NO_UCD
   String IValueField = "org.eclipse.scout.rt.client.ui.form.fields.IValueField"; // NO_UCD
   String IViewButton = "org.eclipse.scout.rt.client.ui.action.view.IViewButton"; // NO_UCD
   String IWizard = "org.eclipse.scout.rt.client.ui.wizard.IWizard"; // NO_UCD

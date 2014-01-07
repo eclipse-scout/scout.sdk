@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperati
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.OrganizeAllImportsAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.action.create.ClassIdNewAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
 import org.eclipse.scout.sdk.ui.action.dto.MultipleUpdateFormDataAction;
 import org.eclipse.scout.sdk.ui.action.dto.TypeResolverPageDataAction;
@@ -92,7 +93,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{OrganizeAllImportsAction.class, MultipleUpdateFormDataAction.class, TypeResolverPageDataAction.class,
-        FormDataSqlBindingValidateAction.class, ExportScoutProjectAction.class, ScoutBundleNewAction.class, WellformAction.class};
+        FormDataSqlBindingValidateAction.class, ExportScoutProjectAction.class, ScoutBundleNewAction.class, WellformAction.class, ClassIdNewAction.class};
   }
 
   @Override
@@ -110,6 +111,9 @@ public class BundleNodeGroupTablePage extends AbstractPage {
           return resolveServices();
         }
       });
+    }
+    else if (menu instanceof ClassIdNewAction) {
+      ((ClassIdNewAction) menu).setScoutBundle(getScoutBundle());
     }
     else if (menu instanceof ExportScoutProjectAction) {
       ((ExportScoutProjectAction) menu).setScoutProject(getScoutBundle());

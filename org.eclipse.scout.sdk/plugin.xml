@@ -6,6 +6,7 @@
    <extension-point id="targetPackage" name="targetPackage" schema="schema/targetPackage.exsd"/>
    <extension-point id="runtimeBundles" name="runtimeBundles" schema="schema/runtimeBundles.exsd"/>
    <extension-point id="dtoUpdateEventFilter" name="dtoUpdateEventFilter" schema="schema/dtoUpdateEventFilter.exsd"/>
+   <extension-point id="classIdGenerator" name="ClassId Generators" schema="schema/classIdGenerator.exsd"/>
    <extension
          id="formPropertyBean"
          name="Scout Problem"
@@ -935,5 +936,12 @@
                type="org.eclipse.jdt.core.IJavaElement">
          </adapter>
       </factory>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.classIdGenerator">
+      <generator
+            class="org.eclipse.scout.sdk.extensions.classidgenerators.DefaultUniversallyUniqueClassIdGenerator"
+            priority="-10000">
+      </generator>
    </extension>
 </plugin>

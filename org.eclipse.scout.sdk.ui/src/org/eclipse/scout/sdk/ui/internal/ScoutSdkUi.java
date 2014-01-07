@@ -29,6 +29,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoAutoUpdateManager;
 import org.eclipse.scout.sdk.operation.util.IOrganizeImportService;
@@ -123,6 +124,9 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
     getPreferenceStore().setDefault(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE, false);
     DefaultTargetPackage.setIsPackageConfigurationEnabled(!getPreferenceStore().getBoolean(DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE));
+
+    getPreferenceStore().setDefault(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION, false);
+    ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(getPreferenceStore().getBoolean(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION));
 
     m_shutdownListener = new IWorkbenchListener() {
       @Override
@@ -557,12 +561,20 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     public void propertyChange(PropertyChangeEvent event) {
       if (IDtoAutoUpdateManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
         Boolean autoUpdate = (Boolean) event.getNewValue();
-        ScoutSdkCore.getDtoAutoUpdateManager().setEnabled(autoUpdate);
+        if (autoUpdate != null) {
+          ScoutSdkCore.getDtoAutoUpdateManager().setEnabled(autoUpdate.booleanValue());
+        }
       }
       else if (DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE.equals(event.getProperty())) {
         Boolean useLegacy = (Boolean) event.getNewValue();
         if (useLegacy != null) {
           DefaultTargetPackage.setIsPackageConfigurationEnabled(!useLegacy.booleanValue());
+        }
+      }
+      else if (ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION.equals(event.getProperty())) {
+        Boolean automaticallyCreate = (Boolean) event.getNewValue();
+        if (automaticallyCreate != null) {
+          ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(automaticallyCreate.booleanValue());
         }
       }
     }

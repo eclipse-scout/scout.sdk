@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 /**
  * <h3>{@link RoundingModePropertyParser}</h3>
  * 
- * @author mvi
+ * @author Matthias Villiger
  * @since 3.10.0 18.12.2013
  */
 public class RoundingModePropertyParser implements IPropertySourceParser<RoundingMode> {

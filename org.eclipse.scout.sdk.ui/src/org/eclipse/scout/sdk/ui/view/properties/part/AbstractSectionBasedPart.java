@@ -56,6 +56,9 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
   @Override
   public final void createPart(Composite parent) {
     init();
+    if (parent.isDisposed()) {
+      return;
+    }
     m_formToolkit = new PropertyViewFormToolkit(parent.getDisplay());
     m_form = m_formToolkit.createScrolledForm(parent);
     try {

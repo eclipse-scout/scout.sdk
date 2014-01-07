@@ -74,7 +74,6 @@ public class StringPresenter extends AbstractValuePresenter<String> {
 
   @Override
   protected int getTextAlignment() {
-    return SWT.RIGHT;
+    return SWT.LEFT;
   }
-
 }
