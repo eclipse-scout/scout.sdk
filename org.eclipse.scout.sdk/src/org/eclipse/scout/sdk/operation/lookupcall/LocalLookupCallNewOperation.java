@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.operation.lookupcall;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -64,7 +65,8 @@ public class LocalLookupCallNewOperation extends PrimaryTypeNewOperation {
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         String refLookupRow = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.LookupRow));
         String refArrayList = validator.getTypeName(SignatureCache.createTypeSignature(ArrayList.class.getName()));
-        source.append(refArrayList).append("<").append(refLookupRow).append("> rows = new ").append(refArrayList).append("<").append(refLookupRow).append(">();").append(lineDelimiter);
+        String refList = validator.getTypeName(SignatureCache.createTypeSignature(List.class.getName()));
+        source.append(refList).append("<").append(refLookupRow).append("> rows = new ").append(refArrayList).append("<").append(refLookupRow).append(">();").append(lineDelimiter);
         source.append("  ").append(ScoutUtility.getCommentBlock("create lookup rows here.")).append(lineDelimiter);
         source.append("  return rows;");
       }

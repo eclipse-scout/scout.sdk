@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
@@ -163,6 +164,19 @@ public class TypeFilters {
           }
         }
         return false;
+      }
+    };
+  }
+
+  public static ITypeFilter getTypesInProject(final IJavaProject project) {
+    return new ITypeFilter() {
+
+      @Override
+      public boolean accept(IType type) {
+        if (!TypeUtility.exists(type)) {
+          return false;
+        }
+        return CompareUtility.equals(type.getJavaProject(), project);
       }
     };
   }
