@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class CreateSharedPluginOperation extends AbstractCreateScoutBundleOperation {
   public final static String PROP_BUNDLE_SHARED_NAME = "BUNDLE_SHARED_NAME";
   public final static String PROP_TEXT_SERVICE_NAME = "TEXT_PROV_SVC_NAME";
+  public final static String PROP_DOC_TEXT_SERVICE_NAME = "DOC_TEXT_PROV_SVC_NAME";
 
   public final static String SHARED_PROJECT_NAME_SUFFIX = ".shared";
   public final static String BUNDLE_ID = "org.eclipse.scout.sdk.ui.SharedBundle";
@@ -50,5 +51,6 @@ public class CreateSharedPluginOperation extends AbstractCreateScoutBundleOperat
     new InstallTextFileOperation("templates/shared/build.properties", "build.properties", project, props).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/shared/plugin.xml", "plugin.xml", project, props).run(monitor, workingCopyManager);
     new InstallTextFileOperation("templates/shared/resources/texts/Texts.properties", "resources/texts/Texts.properties", project, props).run(monitor, workingCopyManager);
+    new InstallTextFileOperation("templates/shared/resources/docs/Docs.properties", "resources/docs/Docs.properties", project, props).run(monitor, workingCopyManager);
   }
 }

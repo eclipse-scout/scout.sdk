@@ -93,12 +93,11 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
 
   protected void fillContextMenu(IMenuManager manager) {
     if (m_currentSourceTuple != null) {
-      manager.add(new NlsEntryModifyAction(m_currentSourceTuple, getNlsProject()) {
+      manager.add(new NlsEntryModifyAction(getContainer().getShell(), m_currentSourceTuple, getNlsProject()) {
         @Override
         protected void execute(IProgressMonitor monitor) {
           super.execute(monitor);
           m_proposalField.getDisplay().asyncExec(new Runnable() {
-
             @Override
             public void run() {
               m_proposalField.acceptProposal(getEntry());

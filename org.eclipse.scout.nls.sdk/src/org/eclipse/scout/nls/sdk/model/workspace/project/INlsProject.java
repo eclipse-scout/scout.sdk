@@ -201,6 +201,15 @@ public interface INlsProject {
    * 
    * @param baseText
    *          The input text a key should be generated for.
+   * @return The key generated from the given input text. The result may already exist in the NlsProject.
+   */
+  String generateKey(String baseText);
+
+  /**
+   * Generates a new key based on the given input text.
+   * 
+   * @param baseText
+   *          The input text a key should be generated for.
    * @return a new key. it is guaranteed, that this key does not exist in this project at the time of key generation.
    */
   String generateNewKey(String baseText);

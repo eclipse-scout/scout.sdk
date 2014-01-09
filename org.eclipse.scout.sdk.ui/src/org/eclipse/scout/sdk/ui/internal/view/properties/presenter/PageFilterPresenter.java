@@ -56,7 +56,7 @@ public class PageFilterPresenter extends AbstractPresenter {
     createContent(getContainer());
   }
 
-  private void createContent(Composite container) {
+  protected void createContent(Composite container) {
     m_filterExpressionField = getToolkit().createText(container, "", SWT.BORDER);
     m_resetFilter = getToolkit().createImageHyperlink(container, SWT.PUSH);
     m_resetFilter.setImage(ScoutSdkUi.getImage(ScoutSdkUi.ToolDelete));

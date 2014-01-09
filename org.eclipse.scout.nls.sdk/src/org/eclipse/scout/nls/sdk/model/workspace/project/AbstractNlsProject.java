@@ -212,42 +212,57 @@ public abstract class AbstractNlsProject implements INlsProject {
   }
 
   @Override
+  public String generateKey(String baseText) {
+    return generateKey(baseText, false);
+  }
+
+  @Override
   public String generateNewKey(String baseText) {
+    return generateKey(baseText, true);
+  }
+
+  /**
+   * The output of this method must fulfill the regex for key-validation defined in
+   * org.eclipse.scout.nls.sdk.ui.InputValidator#REGEX_NLS_KEY_NAME
+   */
+  protected String generateKey(String baseText, boolean appendFreeNumSuffix) {
     cache();
     if (!StringUtility.hasText(baseText)) {
       return null;
     }
     else {
-      String[] split = baseText.split(" ");
       StringBuilder ret = new StringBuilder(baseText.length());
-      for (String splitValue : split) {
-        splitValue = splitValue.replaceAll("[^a-zA-Z0-9_.]*", "").trim();
+
+      // remove not allowed characters
+      baseText = baseText.replaceAll("[^a-zA-Z0-9_.\\-\\s]*", "").trim();
+
+      // camel case multiple words
+      String[] split = baseText.split(" ");
+      for (int i = 0; i < split.length; i++) {
+        String splitValue = split[i];
         if (splitValue.length() > 0) {
-          ret.append(Character.toUpperCase(splitValue.charAt(0)) + (splitValue.length() > 1 ? splitValue.substring(1) : ""));
+          char first = splitValue.charAt(0);
+          if (split.length > 1) {
+            first = Character.toUpperCase(first);
+          }
+          ret.append(first);
+          if (splitValue.length() > 1) {
+            ret.append(splitValue.substring(1));
+          }
         }
       }
 
-      boolean changed = false;
-      do {
-        changed = false;
-        while (ret.length() > 0 && ret.charAt(0) == '.') {
-          ret.deleteCharAt(0);
-          changed = true;
-        }
-        while (ret.length() > 0 && ret.charAt(0) == '_') {
-          ret.deleteCharAt(0);
-          changed = true;
-        }
-        while (ret.length() > 0 && ret.charAt(0) >= '0' && ret.charAt(0) <= '9') {
-          ret.deleteCharAt(0);
-          changed = true;
-        }
+      // remove not allowed characters from the start
+      while (ret.length() > 0 && (ret.charAt(0) == '.' || ret.charAt(0) == '_' || ret.charAt(0) == '-')) {
+        ret.deleteCharAt(0);
       }
-      while (changed);
 
-      while (ret.length() > 0 && ret.charAt(ret.length() - 1) == '.') {
+      // remove not allowed characters from the end
+      while (ret.length() > 0 && (ret.charAt(ret.length() - 1) == '.' || ret.charAt(ret.length() - 1) == '-')) {
         ret.deleteCharAt(ret.length() - 1);
       }
+
+      // ensure max length
       int maxLength = 190;
       String newKey;
       if (ret.length() > maxLength) {
@@ -257,10 +272,13 @@ public abstract class AbstractNlsProject implements INlsProject {
         newKey = ret.toString();
       }
 
-      int i = 0;
+      // add unique ending number if requested
       String result = newKey;
-      while (m_entries.containsKey(result)) {
-        result = newKey + i++;
+      if (appendFreeNumSuffix) {
+        int i = 0;
+        while (m_entries.containsKey(result)) {
+          result = newKey + i++;
+        }
       }
       return result;
     }

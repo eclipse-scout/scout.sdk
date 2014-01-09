@@ -190,6 +190,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     getProperties().setProperty(PROP_CURRENT_DATE, SimpleDateFormat.getDateInstance(SimpleDateFormat.DEFAULT).format(new Date()));
     getProperties().setProperty(PROP_USER_NAME, ScoutUtility.getUsername());
     getProperties().setProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, "Default");
+    getProperties().setProperty(CreateSharedPluginOperation.PROP_DOC_TEXT_SERVICE_NAME, "DefaultDocumentation");
   }
 
   private void execOperations(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, P_OperationElement[] ops) throws CoreException, IllegalArgumentException {

@@ -100,7 +100,6 @@
 		<config name="getConfiguredMaxLevel" type="Advanced" category="Data" />
 		<config name="getConfiguredText" type="Normal" category="Appearance" />
 		<config name="getConfiguredIconId" type="Advanced" category="Appearance" />
-		<config name="getConfiguredDoc" type="Advanced" category="Misc" />
 		<config name="execCreateCodes" type="Advanced" category="BusinessLogic" />
 		<config name="execCreateCode" type="Advanced" category="BusinessLogic" />
 		<config name="execLoadCodes" type="Advanced" category="BusinessLogic" />
@@ -127,7 +126,6 @@
 		<config name="getConfiguredAlwaysIncludeSortAtEnd" type="Advanced" category="Behavior" />
 		<config name="getConfiguredHorizontalAlignment" type="Advanced" category="Layout" />
 		<config name="getConfiguredAutoOptimizeWidth" type="Advanced" category="Behavior" />
-		<config name="getConfiguredDoc" type="Advanced" category="Misc" />
 		<config name="getConfiguredMandatory" type="Advanced" category="Behavior" />
 		<config name="execInitColumn" type="Advanced" category="BusinessLogic" />
 		<config name="execDisposeColumn" type="Advanced" category="BusinessLogic" />
@@ -235,7 +233,6 @@
 		<config name="getConfiguredSubTitle" type="Advanced" category="Appearance" />
 		<config name="getConfiguredCloseTimer" type="Advanced" category="Behavior" />
 		<config name="getConfiguredCustomTimer" type="Advanced" category="Behavior" />
-		<config name="getConfiguredDoc" type="Advanced" category="Misc" />
 		<config name="getConfiguredCancelVerificationText" type="Advanced" category="Appearance" />
 		<config name="getConfiguredDisplayHint" type="Normal" category="Layout" />
 		<config name="getConfiguredDisplayViewId" type="Normal" category="Layout" />
@@ -295,7 +292,6 @@
 		<config name="getConfiguredMasterField" type="Advanced" category="Data" />
 		<config name="getConfiguredMasterRequired" type="Advanced" category="Behavior" />
 		<config name="getConfiguredFocusable" type="Advanced" category="Behavior" />
-		<config name="getConfiguredDoc" type="Advanced" category="Misc" />
 		<config name="execInitField" type="Normal" category="BusinessLogic" />
 		<config name="execIsSaveNeeded" type="Advanced" category="BusinessLogic" />
 		<config name="execMarkSaved" type="Advanced" category="BusinessLogic" />
@@ -414,7 +410,6 @@
 		<config name="getConfiguredEnabled" type="Advanced" category="Behavior" />
 		<config name="getConfiguredVisible" type="Advanced" category="Appearance" />
 		<config name="getConfiguredSortNo" type="Advanced" category="Appearance" />
-		<config name="getConfiguredDoc" type="Advanced" category="Misc" />
 		<config name="execCreateChildPages" type="Normal" category="BusinessLogic" />
 		<config name="execDrop" type="Advanced" category="BusinessLogic" />
 	</type>
@@ -425,7 +420,6 @@
 		<config name="getConfiguredTableVisible" type="Advanced" category="Layout" />
 		<config name="getConfiguredTitle" type="Normal" category="Appearance" />
 		<config name="getConfiguredIconId" type="Normal" category="Appearance" />
-		<config name="getConfiguredDoc" type="Advanced" category="Misc" />
 		<config name="execInitPage" type="Normal" category="BusinessLogic" />
 		<config name="execDisposePage" type="Advanced" category="BusinessLogic" />
 		<config name="execDataChanged" type="Advanced" category="BusinessLogic" />
@@ -701,7 +695,6 @@
 		<config name="getConfiguredTitle" type="Normal" category="Appearance" />
 		<config name="getConfiguredTitleHtml" type="Advanced" category="Appearance" />
 		<config name="getConfiguredTooltipText" type="Advanced" category="Appearance" />
-		<config name="getConfiguredDoc" type="Advanced" category="Misc" />
 		<config name="getConfiguredIconId" type="Advanced" category="Appearance" />
 		<config name="getConfiguredWizardNo" type="Advanced" category="Data" />
 		<config name="execCreateContainerForm" type="Advanced" category="BusinessLogic" />
@@ -724,7 +717,6 @@
 		<config name="getConfiguredTitleHtml" type="Advanced" category="Appearance" />
 		<config name="getConfiguredDescriptionHtml" type="Advanced" category="Appearance" />
 		<config name="getConfiguredIconId" type="Advanced" category="Appearance" />
-		<config name="getConfiguredDoc" type="Advanced" category="Misc" />
 		<config name="execActivate" type="Normal" category="BusinessLogic" />
 		<config name="execDeactivate" type="Normal" category="BusinessLogic" />
 		<config name="execDispose" type="Advanced" category="BusinessLogic" />
@@ -735,7 +727,6 @@
 	<type name="org.eclipse.scout.rt.server.services.common.workflow.AbstractWorkflowService">
 		<config name="getConfiguredDefinitionText" type="Advanced" category="Appearance" />
 		<config name="getConfiguredDefinitionActive" type="Advanced" category="Appearance" />
-		<config name="getConfiguredDoc" type="Advanced" category="Misc" />
 		<config name="execCollectAvailableWorkflowTypes" type="Advanced" category="BusinessLogic" />
 		<config name="execCollectFilteredWorkflows" type="Advanced" category="BusinessLogic" />
 		<config name="execNew" type="Advanced" category="BusinessLogic" />
@@ -767,7 +758,6 @@
 	<type name="org.eclipse.scout.rt.shared.services.lookup.LookupCall">
 		<config name="getConfiguredService" type="Normal" category="Data" />
 		<config name="getConfiguredMasterRequired" type="Normal" category="Behavior" />
-		<config name="getConfiguredDoc" type="Advanced" category="Misc" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField">
 		<config name="execCreateDataModel" type="Normal" category="Data" />

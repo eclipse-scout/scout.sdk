@@ -33,7 +33,7 @@ public class FillSharedPluginOperation extends AbstractScoutProjectNewOperation 
   public boolean isRelevant() {
     return isNodeChecked(CreateSharedPluginOperation.BUNDLE_ID);
   }
-  
+
   @Override
   public void init() {
     String sharedPluginName = getProperties().getProperty(CreateSharedPluginOperation.PROP_BUNDLE_SHARED_NAME, String.class);
@@ -52,15 +52,21 @@ public class FillSharedPluginOperation extends AbstractScoutProjectNewOperation 
     return getProperties().getProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, String.class);
   }
 
+  private String getDocTextProviderServiceName() {
+    return getProperties().getProperty(CreateSharedPluginOperation.PROP_DOC_TEXT_SERVICE_NAME, String.class);
+  }
+
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String txtSvcName = getTextProviderServiceName();
+    String docSvcName = getDocTextProviderServiceName();
 
     String destPathPref = TypeUtility.DEFAULT_SOURCE_FOLDER_NAME + "/" + m_project.getName().replace('.', '/') + "/";
     Map<String, String> props = getStringProperties();
     new InstallJavaFileOperation("templates/shared/src/Activator.java", destPathPref + "Activator.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/shared/src/Icons.java", destPathPref + "Icons.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/shared/src/DefaultTextProviderService.java", destPathPref + "services/common/text/" + txtSvcName + "TextProviderService.java", m_project, props).run(monitor, workingCopyManager);
+    new InstallJavaFileOperation("templates/shared/src/DocumentationTextProviderService.java", destPathPref + "services/common/text/" + docSvcName + "TextProviderService.java", m_project, props).run(monitor, workingCopyManager);
     m_project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 }

@@ -99,6 +99,7 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
     getProperties().setProperty(FillClientPluginOperation.PROP_INSTALL_DESKTOP_EXT, true);
     getProperties().setProperty(CreateClientPluginOperation.PROP_INSTALL_ICONS, false);
     getProperties().setProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, name);
+    getProperties().setProperty(CreateSharedPluginOperation.PROP_DOC_TEXT_SERVICE_NAME, name + "Documentation");
     getProperties().setProperty(CreateServerPluginOperation.PROP_INSTALL_HTML_RESOURCES, false);
     getProperties().setProperty(CreateServerPluginOperation.PROP_INSTALL_PRODUCTS, false);
     getProperties().setProperty(FillServerPluginOperation.PROP_INSTALL_ACCESS_CONTROL_SVC_CLASS, false);

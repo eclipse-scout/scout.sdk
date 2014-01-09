@@ -230,7 +230,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     // second check class annotation
     try {
       IAnnotation a = JdtUtility.getAnnotation(registration, RuntimeClasses.Ranking);
-      Double val = JdtUtility.getNumericAnnotationValue(a, "value");
+      Double val = JdtUtility.getAnnotationValueNumeric(a, "value");
       if (val != null) {
         return val.floatValue();
       }

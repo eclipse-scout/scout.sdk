@@ -207,9 +207,9 @@ public final class ScoutUtility {
 
   public static void unregisterServiceImplementation(IType serviceType) throws CoreException {
     IScoutBundle implementationBundle = ScoutTypeUtility.getScoutBundle(serviceType);
-    for (IScoutBundle serverBundle : implementationBundle.getChildBundles(
-        ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER)), true)) {
-      unregisterServiceClass(serverBundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName());
+    // do not limit filter to a scout-bundle-type because every scout-bundle type can hold service implementations (e.g. text services in the shared bundle).
+    for (IScoutBundle bundle : implementationBundle.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true)) {
+      unregisterServiceClass(bundle.getProject(), IRuntimeClasses.EXTENSION_POINT_SERVICES, IRuntimeClasses.EXTENSION_ELEMENT_SERVICE, serviceType.getFullyQualifiedName());
     }
   }
 

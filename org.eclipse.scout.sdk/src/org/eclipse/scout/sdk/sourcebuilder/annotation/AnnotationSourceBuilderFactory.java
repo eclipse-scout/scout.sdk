@@ -74,8 +74,19 @@ public final class AnnotationSourceBuilderFactory {
    * @return the created source builder
    */
   public static IAnnotationSourceBuilder createClassIdAnnotation(ClassIdGenerationContext context) {
+    return createClassIdAnnotation(ClassIdGenerators.generateNewId(context));
+  }
+
+  /**
+   * Creates a new {@link ClassId} annotation source builder
+   * 
+   * @param classIdValue
+   *          the class id value to use
+   * @return the created source builder
+   */
+  public static IAnnotationSourceBuilder createClassIdAnnotation(String classIdValue) {
     AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(IRuntimeClasses.ClassId));
-    orderAnnoation.addParameter(JdtUtility.toStringLiteral(ClassIdGenerators.generateNewId(context)));
+    orderAnnoation.addParameter(JdtUtility.toStringLiteral(classIdValue));
     return orderAnnoation;
   }
 
@@ -83,7 +94,7 @@ public final class AnnotationSourceBuilderFactory {
    * Creates a new {@link ClassId} annotation source builder for the given type.
    * 
    * @param parentTypeSourceBuilder
-   *          the type source builder for which the annotation sould be created.
+   *          the type source builder for which the annotation should be created.
    * @return the created source builder
    */
   public static IAnnotationSourceBuilder createClassIdAnnotation(TypeSourceBuilder parentTypeSourceBuilder) {

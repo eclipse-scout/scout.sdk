@@ -45,7 +45,6 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.Regex;
@@ -261,7 +260,7 @@ public class ScoutTypeUtility extends TypeUtility {
    *         {@link IRuntimeClasses#Replace} annotation.
    */
   public static boolean existsReplaceAnnotation(IAnnotatable element) {
-    IAnnotation annotation = JdtUtility.getAnnotation(element, RuntimeClasses.Replace);
+    IAnnotation annotation = JdtUtility.getAnnotation(element, IRuntimeClasses.Replace);
     return TypeUtility.exists(annotation);
   }
 
@@ -339,7 +338,7 @@ public class ScoutTypeUtility extends TypeUtility {
   private static void fillFormDataAnnotation(IJavaElement element, FormDataAnnotation formDataAnnotation, boolean isOwner) throws JavaModelException {
     IAnnotation annotation = null;
     if (element instanceof IAnnotatable) {
-      annotation = JdtUtility.getAnnotation((IAnnotatable) element, RuntimeClasses.FormData);
+      annotation = JdtUtility.getAnnotation((IAnnotatable) element, IRuntimeClasses.FormData);
     }
     if (TypeUtility.exists(annotation)) {
       // context type
@@ -453,7 +452,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
     IType tmpType = type;
     String superTypeSignature = null;
-    IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+    IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
 
     do {
       if (!superTypeHierarchy.contains(iPageWithTable)) {
@@ -466,7 +465,7 @@ public class ScoutTypeUtility extends TypeUtility {
     while (superTypeSignature == null && tmpType != null);
 
     if (superTypeSignature == null) {
-      superTypeSignature = SignatureCache.createTypeSignature(RuntimeClasses.AbstractTablePageData);
+      superTypeSignature = SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTablePageData);
     }
 
     return new PageDataAnnotation(typeSignature, superTypeSignature);
@@ -513,7 +512,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   private static void collectPotentialMasterFields(IType type, Set<IType> collector, ITypeHierarchy formFieldHierarchy) {
     if (TypeUtility.exists(type)) {
-      if (formFieldHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IValueField), type)) {
+      if (formFieldHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IValueField), type)) {
         collector.add(type);
       }
       for (IType subType : TypeUtility.getInnerTypes(type)) {
@@ -565,16 +564,21 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IType[] getFormFields(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IFormField), ScoutTypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IFormField), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getFormFields(IType declaringType, ITypeHierarchy hierarchy) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IFormField), hierarchy, ScoutTypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IFormField), hierarchy, ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static Double getOrderAnnotationValue(IAnnotatable a) throws JavaModelException {
-    IAnnotation annotation = JdtUtility.getAnnotation(a, RuntimeClasses.Order);
-    return JdtUtility.getNumericAnnotationValue(annotation, "value");
+    IAnnotation annotation = JdtUtility.getAnnotation(a, IRuntimeClasses.Order);
+    return JdtUtility.getAnnotationValueNumeric(annotation, "value");
+  }
+
+  public static String getClassIdAnnotationValue(IType t) throws JavaModelException {
+    IAnnotation annotation = JdtUtility.getAnnotation(t, IRuntimeClasses.ClassId);
+    return JdtUtility.getAnnotationValueString(annotation, "value");
   }
 
   public static IType[] getFormFieldsWithoutButtons(IType declaringType) {
@@ -582,13 +586,13 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IType[] getFormFieldsWithoutButtons(IType declaringType, ITypeHierarchy hierarchy) {
-    ITypeFilter notButtonFilter = TypeFilters.invertFilter(TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IButton), hierarchy));
-    ITypeFilter formFieldFilter = TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IFormField), hierarchy);
+    ITypeFilter notButtonFilter = TypeFilters.invertFilter(TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IButton), hierarchy));
+    ITypeFilter formFieldFilter = TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IFormField), hierarchy);
     return TypeUtility.getInnerTypes(declaringType, TypeFilters.getMultiTypeFilter(formFieldFilter, notButtonFilter));
   }
 
   public static IType[] getTrees(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.ITree), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.ITree), TypeComparators.getTypeNameComparator());
   }
 
   public static void setSource(IMember element, String source, IWorkingCopyManager workingCopyManager, IProgressMonitor monitor) throws CoreException {
@@ -602,11 +606,11 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IType[] getTables(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.ITable), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.ITable), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getColumns(IType table) {
-    return getInnerTypes(table, TypeUtility.getType(RuntimeClasses.IColumn), ScoutTypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(table, TypeUtility.getType(IRuntimeClasses.IColumn), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getPrimaryKeyColumns(IType table) {
@@ -630,51 +634,51 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IType[] getCodes(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.ICode), ScoutTypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.ICode), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getKeyStrokes(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IKeyStroke), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IKeyStroke), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getToolbuttons(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getWizardSteps(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IWizardStep), ScoutTypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IWizardStep), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getCalendar(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.ICalendar), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.ICalendar), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getCalendarItemProviders(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.ICalendarItemProvider), ScoutTypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getMenus(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IMenu), ScoutTypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IMenu), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getButtons(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IButton), ScoutTypeComparators.getOrderAnnotationComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IButton), ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
   public static IType[] getDataModelEntities(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IDataModelEntity), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IDataModelEntity), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getDataModelAttributes(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IDataModelAttribute), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IDataModelAttribute), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getFormFieldData(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.AbstractFormFieldData), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getFormHandlers(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(RuntimeClasses.IFormHandler), TypeComparators.getTypeNameComparator());
+    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IFormHandler), TypeComparators.getTypeNameComparator());
   }
 
   public static IType[] getServiceImplementations(IType serviceInterface) {
@@ -682,7 +686,7 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IType[] getServiceImplementations(IType serviceInterface, ITypeFilter filter) {
-    ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IService));
+    ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.IService));
     ITypeFilter serviceImplFilter = null;
     if (filter == null) {
       serviceImplFilter = TypeFilters.getMultiTypeFilter(
@@ -699,7 +703,7 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IType getServiceInterface(IType service) {
-    ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IService));
+    ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.IService));
     IType[] interfaces = serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
     if (interfaces.length > 0) {
       return interfaces[0];
@@ -736,7 +740,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   public static IMethod getFormFieldGetterMethod(final IType formField, ITypeHierarchy hierarchy) {
     IType form = TypeUtility.getAncestor(formField, TypeFilters.getMultiTypeFilterOr(
-        TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
+        TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
         TypeFilters.getTopLevelTypeFilter()));
 
     if (TypeUtility.exists(form)) {
@@ -849,12 +853,12 @@ public class ScoutTypeUtility extends TypeUtility {
             newMethod.pushMethod(m);
           }
           else {
-            IAnnotation configOpAnnotation = JdtUtility.getAnnotation(m, RuntimeClasses.ConfigOperation);
+            IAnnotation configOpAnnotation = JdtUtility.getAnnotation(m, IRuntimeClasses.ConfigOperation);
             if (TypeUtility.exists(configOpAnnotation)) {
               newMethod = new ConfigurationMethod(declaringType, superTypeHierarchy, methodName, ConfigurationMethod.OPERATION_METHOD);
               newMethod.pushMethod(m);
             }
-            IAnnotation configPropAnnotation = JdtUtility.getAnnotation(m, RuntimeClasses.ConfigProperty);
+            IAnnotation configPropAnnotation = JdtUtility.getAnnotation(m, IRuntimeClasses.ConfigProperty);
             if (TypeUtility.exists(configPropAnnotation)) {
               String configPropertyType = null;
               for (IMemberValuePair p : configPropAnnotation.getMemberValuePairs()) {
@@ -880,7 +884,7 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IType getFistProcessButton(IType declaringType, ITypeHierarchy hierarchy) {
-    ITypeFilter buttonFilter = TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IButton), hierarchy);
+    ITypeFilter buttonFilter = TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IButton), hierarchy);
     for (IType field : getFormFields(declaringType, hierarchy)) {
       if (buttonFilter.accept(field)) {
         IMethod m = TypeUtility.getMethod(field, "getConfiguredProcessButton");
@@ -992,88 +996,88 @@ public class ScoutTypeUtility extends TypeUtility {
   public static IStructuredType createStructuredType(IType type) {
     try {
       org.eclipse.jdt.core.ITypeHierarchy supertypeHierarchy = type.newSupertypeHierarchy(null);
-      if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ICompositeField))) {
+      if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeField))) {
         return createStructuredCompositeField(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ITableField))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITableField))) {
         return createStructuredTableField(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ITreeField))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITreeField))) {
         return createStructuredTreeField(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IPlannerField))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPlannerField))) {
         return createStructuredPlannerField(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IComposerField))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IComposerField))) {
         return createStructuredComposer(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IDataModelAttribute))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDataModelAttribute))) {
         return createStructuredComposer(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IDataModelEntity))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDataModelEntity))) {
         return createStructuredComposer(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IFormField))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IFormField))) {
         return createStructuredFormField(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IForm))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm))) {
         return createStructuredForm(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ICalendar))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICalendar))) {
         return createStructuredCalendar(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ICodeType))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType))) {
         return createStructuredCodeType(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ICode))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
         return createStructuredCode(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IDesktop))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktop))) {
         return createStructuredDesktop(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IDesktopExtension))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension))) {
         return createStructuredDesktop(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IOutline))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IOutline))) {
         return createStructuredOutline(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IPageWithNodes))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithNodes))) {
         return createStructuredPageWithNodes(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IPageWithTable))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable))) {
         return createStructuredPageWithTable(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.ITable))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))) {
         return createStructuredTable(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IWizard))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IWizard))) {
         return createStructuredWizard(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IWizardStep))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IWizardStep))) {
         return createStructuredWizardStep(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IMenu))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IMenu))) {
         return createStructuredMenu(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IColumn))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IColumn))) {
         return createStructuredColumn(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IActivityMap))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IActivityMap))) {
         return createStructuredActivityMap(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IFormHandler))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IFormHandler))) {
         return createStructuredFormHandler(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IKeyStroke))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IKeyStroke))) {
         return createStructuredKeyStroke(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IButton))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IButton))) {
         return createStructuredButton(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IViewButton))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IViewButton))) {
         return createStructuredViewButton(type);
       }
-      else if (supertypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IToolButton))) {
+      else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IToolButton))) {
         return createStructuredToolButton(type);
       }
       else {
@@ -1609,7 +1613,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @see IScoutBundle
    */
   public static IType[] getServerSessionTypes(IScoutBundle bundle) {
-    return getSessionTypes(null, bundle, TypeUtility.getType(RuntimeClasses.IServerSession));
+    return getSessionTypes(null, bundle, TypeUtility.getType(IRuntimeClasses.IServerSession));
   }
 
   /**
@@ -1622,7 +1626,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @see IScoutBundle
    */
   public static IType[] getClientSessionTypes(IScoutBundle bundle) {
-    return getSessionTypes(null, bundle, TypeUtility.getType(RuntimeClasses.IClientSession));
+    return getSessionTypes(null, bundle, TypeUtility.getType(IRuntimeClasses.IClientSession));
   }
 
   /**
@@ -1637,7 +1641,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @see IJavaProject
    */
   public static IType[] getServerSessionTypes(IJavaProject context) {
-    return getSessionTypes(context, null, TypeUtility.getType(RuntimeClasses.IServerSession));
+    return getSessionTypes(context, null, TypeUtility.getType(IRuntimeClasses.IServerSession));
   }
 
   /**
@@ -1652,7 +1656,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @see IJavaProject
    */
   public static IType[] getClientSessionTypes(IJavaProject context) {
-    return getSessionTypes(context, null, TypeUtility.getType(RuntimeClasses.IClientSession));
+    return getSessionTypes(context, null, TypeUtility.getType(IRuntimeClasses.IClientSession));
   }
 
   /**

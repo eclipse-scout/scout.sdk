@@ -64,7 +64,7 @@ public final class JdtUtility {
     return TypeUtility.exists(getAnnotation(element, fullyQuallifiedAnnotation));
   }
 
-  public static Double getNumericAnnotationValue(IAnnotation annotation, String name) throws JavaModelException {
+  public static Double getAnnotationValueNumeric(IAnnotation annotation, String name) throws JavaModelException {
     if (TypeUtility.exists(annotation)) {
       IMemberValuePair[] memberValues = annotation.getMemberValuePairs();
       for (IMemberValuePair p : memberValues) {
@@ -78,6 +78,23 @@ public final class JdtUtility {
               return ((Integer) p.getValue()).doubleValue();
           }
           break;
+        }
+      }
+    }
+    return null;
+  }
+
+  public static String getAnnotationValueString(IAnnotation annotation, String name) throws JavaModelException {
+    if (TypeUtility.exists(annotation)) {
+      IMemberValuePair[] memberValues = annotation.getMemberValuePairs();
+      for (IMemberValuePair p : memberValues) {
+        if (name.equals(p.getMemberName())) {
+          Object val = p.getValue();
+          if (val != null) {
+            if (p.getValueKind() == IMemberValuePair.K_CHAR || p.getValueKind() == IMemberValuePair.K_STRING) {
+              return "" + val;
+            }
+          }
         }
       }
     }

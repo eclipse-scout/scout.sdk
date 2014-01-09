@@ -21,10 +21,8 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.swt.SWT;
 
-/** <h4>InputValidator</h4> */
-public class InputValidator {
-  private static final InputValidator instance = new InputValidator();
-  private final static Pattern REGEX_NLS_KEY_NAME = Pattern.compile("\\b[A-Za-z][a-zA-Z0-9_.]{0,200}\\b");
+public final class InputValidator {
+  private final static Pattern REGEX_NLS_KEY_NAME = Pattern.compile("\\b[A-Za-z0-9][a-zA-Z0-9_.\\-]{0,200}\\b");
 
   private InputValidator() {
   }
@@ -34,10 +32,6 @@ public class InputValidator {
   }
 
   public static IInputValidator getNlsKeyValidator(INlsProject project, String[] exceptions) {
-    return instance.getNlsKeyValidatorInternal(project, exceptions);
-  }
-
-  private IInputValidator getNlsKeyValidatorInternal(INlsProject project, String[] exceptions) {
     return new P_KeyEntryValidator(project, exceptions);
   }
 
@@ -51,12 +45,11 @@ public class InputValidator {
         else {
           return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, SWT.OK, "The default translation must be set.", null);
         }
-
       }
     };
   }
 
-  private class P_KeyEntryValidator implements IInputValidator {
+  private final static class P_KeyEntryValidator implements IInputValidator {
     private final HashSet<String> m_exceptions;
     private final INlsProject m_project;
 

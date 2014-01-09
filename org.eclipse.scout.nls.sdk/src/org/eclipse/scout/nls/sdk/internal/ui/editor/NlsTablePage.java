@@ -251,7 +251,7 @@ public class NlsTablePage extends Composite {
           });
           manager.add(new Separator());
         }
-        manager.add(new NlsEntryModifyAction(entry, m_nlsProjects));
+        manager.add(new NlsEntryModifyAction(getShell(), entry, m_nlsProjects));
         manager.add(new Separator());
       }
       manager.add(new FindReferencesAction(m_nlsProjects, entry.getKey()));

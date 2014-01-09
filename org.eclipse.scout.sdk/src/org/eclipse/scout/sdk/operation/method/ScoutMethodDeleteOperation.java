@@ -27,9 +27,15 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class ScoutMethodDeleteOperation implements IOperation {
 
   private final IMethod m_method;
+  private boolean m_organizeImports;
 
   public ScoutMethodDeleteOperation(IMethod method) {
+    this(method, true);
+  }
+
+  public ScoutMethodDeleteOperation(IMethod method, boolean organizeImports) {
     m_method = method;
+    m_organizeImports = organizeImports;
   }
 
   @Override
@@ -55,11 +61,22 @@ public class ScoutMethodDeleteOperation implements IOperation {
     ICompilationUnit compilationUnit = getMethod().getCompilationUnit();
     workingCopyManager.register(compilationUnit, monitor);
     getMethod().delete(true, monitor);
-    OrganizeImportOperation op = new OrganizeImportOperation(compilationUnit);
-    op.run(monitor, workingCopyManager);
+
+    if (isOrganizeImports()) {
+      OrganizeImportOperation op = new OrganizeImportOperation(compilationUnit);
+      op.run(monitor, workingCopyManager);
+    }
   }
 
   public IMethod getMethod() {
     return m_method;
+  }
+
+  public boolean isOrganizeImports() {
+    return m_organizeImports;
+  }
+
+  public void setOrganizeImports(boolean organizeImports) {
+    m_organizeImports = organizeImports;
   }
 }

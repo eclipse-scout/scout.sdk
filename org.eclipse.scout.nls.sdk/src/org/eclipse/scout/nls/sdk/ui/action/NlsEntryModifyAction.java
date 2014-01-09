@@ -16,18 +16,20 @@ import org.eclipse.scout.nls.sdk.internal.ui.dialog.NlsEntryModifyDialog;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.Shell;
 
 /** <h4>NlsEntryNewAction</h4> */
 public class NlsEntryModifyAction extends AbstractWorkspaceAction {
 
   private NlsEntry m_entry;
   private final INlsProject m_project;
+  private final Shell m_parentShell;
 
-  public NlsEntryModifyAction(INlsEntry entry, INlsProject project) {
+  public NlsEntryModifyAction(Shell parentShell, INlsEntry entry, INlsProject project) {
     super("Modify Entry...", true);
     m_entry = new NlsEntry(entry);
     m_project = project;
+    m_parentShell = parentShell;
     setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.Text));
   }
 
@@ -40,7 +42,7 @@ public class NlsEntryModifyAction extends AbstractWorkspaceAction {
 
   @Override
   protected boolean interactWithUi() {
-    NlsEntryModifyDialog dialog = new NlsEntryModifyDialog(Display.getDefault().getActiveShell(), m_entry, m_project);
+    NlsEntryModifyDialog dialog = new NlsEntryModifyDialog(m_parentShell, m_entry, m_project);
     m_entry = dialog.show();
     return m_entry != null;
   }

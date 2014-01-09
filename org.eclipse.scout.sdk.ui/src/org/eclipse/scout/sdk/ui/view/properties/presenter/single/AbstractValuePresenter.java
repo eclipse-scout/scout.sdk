@@ -93,15 +93,6 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
 
   }
 
-//  /**
-//   * to write the value to the source
-//   *
-//   * @param value
-//   * @return
-//   * @throws CoreException
-//   */
-//  protected abstract String formatSourceValue(T value, IImportValidator validator) throws CoreException;
-
   /**
    * to write the value to the ui component
    * 

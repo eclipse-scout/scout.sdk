@@ -17,7 +17,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.Flags;
@@ -54,11 +53,9 @@ import org.eclipse.text.edits.TextEdit;
 public class ClassIdNewOperation implements IOperation {
 
   private final IScoutBundle m_bundle;
-  private final IProgressMonitor m_nullProgressMonitor;
 
   public ClassIdNewOperation(IScoutBundle startBundle) {
     m_bundle = startBundle;
-    m_nullProgressMonitor = new NullProgressMonitor();
   }
 
   @Override
@@ -141,8 +138,8 @@ public class ClassIdNewOperation implements IOperation {
     }
   }
 
-  protected void createClassIdsForIcu(ICompilationUnit icu, Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    workingCopyManager.register(icu, m_nullProgressMonitor);
+  public static void createClassIdsForIcu(ICompilationUnit icu, Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    workingCopyManager.register(icu, null);
 
     IBuffer buffer = icu.getBuffer();
     Document sourceDoc = new Document(buffer.getContents());
@@ -153,9 +150,11 @@ public class ClassIdNewOperation implements IOperation {
       AnnotationNewOperation op = new AnnotationNewOperation(AnnotationSourceBuilderFactory.createClassIdAnnotation(t), t);
       TextEdit edit = op.createEdit(validator, sourceDoc, NL);
       multiEdit.addChild(edit);
-      monitor.worked(1);
-      if (monitor.isCanceled()) {
-        return;
+      if (monitor != null) {
+        monitor.worked(1);
+        if (monitor.isCanceled()) {
+          return;
+        }
       }
     }
 
@@ -165,7 +164,7 @@ public class ClassIdNewOperation implements IOperation {
 
       // create imports
       for (String fqi : validator.getImportsToCreate()) {
-        icu.createImport(fqi, null, m_nullProgressMonitor);
+        icu.createImport(fqi, null, null);
       }
     }
     catch (BadLocationException e) {

@@ -149,11 +149,6 @@ public class CompanyForm extends AbstractForm {
     return "Company";
   }
 
-  @Override
-  protected String getConfiguredDoc() {
-    return "This is the CompanyForm form";
-  }
-
   public MainBox getMainBox() {
     return (MainBox) getRootGroupBox();
   }
