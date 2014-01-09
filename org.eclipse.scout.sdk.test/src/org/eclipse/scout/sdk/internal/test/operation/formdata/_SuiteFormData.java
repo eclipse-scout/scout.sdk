@@ -28,6 +28,7 @@ import org.junit.runners.Suite.SuiteClasses;
     SimpleFormTest.class,
     TableFieldBeanTest.class,
     TableFieldFormTest.class,
+    TableFieldWithIgnoredColumnsTest.class,
     MasterFieldFormDataTest.class
 })
 public class _SuiteFormData {

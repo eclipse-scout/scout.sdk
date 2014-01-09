@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -86,13 +87,14 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     }
   }
 
-  protected IType[] getColumns(IType table, IType rowDataSuperType, ITypeHierarchy fieldHierarchy, IProgressMonitor monitor) throws JavaModelException {
+  protected IType[] getColumns(IType table, IType rowDataSuperType, final ITypeHierarchy fieldHierarchy, IProgressMonitor monitor) throws JavaModelException {
     // collect all columns that exist in the table and all of its super classes
     TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<IType>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn)), new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
-        return !ScoutTypeUtility.existsReplaceAnnotation(type); // replaced columns already have a column data -> skip
+        SdkColumnCommand command = ScoutTypeUtility.findColumnDataSdkColumnCommand(type, fieldHierarchy);
+        return command == null || command == SdkColumnCommand.CREATE;
       }
     });
     IType curTableType = table;

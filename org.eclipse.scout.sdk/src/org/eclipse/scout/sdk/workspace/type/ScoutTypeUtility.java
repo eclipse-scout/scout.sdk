@@ -40,6 +40,7 @@ import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.TypeLiteral;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -493,6 +494,72 @@ public class ScoutTypeUtility extends TypeUtility {
         String simpleName = ((String) value).replaceAll("\\.class$", "");
         return ScoutUtility.getReferencedTypeSignature(type, simpleName);
       }
+    }
+
+    return null;
+  }
+
+  /**
+   * Parses the possible available {@link IRuntimeClasses#ColumnData} annotation on the given type. If the type is not
+   * annotated, <code>null</code> is returned.
+   * 
+   * @since 3.10.0-M5
+   */
+  public static SdkColumnCommand findColumnDataSdkColumnCommand(IType type, ITypeHierarchy superTypeHierarchy) {
+    if (!TypeUtility.exists(type)) {
+      return null;
+    }
+
+    SdkColumnCommand sdkColumnCommand = getColumnDataAnnotationValue(type);
+    if (sdkColumnCommand == SdkColumnCommand.IGNORE || !existsReplaceAnnotation(type)) {
+      return sdkColumnCommand;
+    }
+
+    IType replacedType = superTypeHierarchy.getSuperclass(type);
+    if (findColumnDataSdkColumnCommand(replacedType, superTypeHierarchy) != SdkColumnCommand.IGNORE) {
+      return SdkColumnCommand.IGNORE;
+    }
+    if (sdkColumnCommand == null) {
+      return SdkColumnCommand.IGNORE;
+    }
+    return sdkColumnCommand;
+  }
+
+  /**
+   * Checks whether the given type is annotated with a {@link IRuntimeClasses#ColumnData} annotation and if so, this
+   * method returns its <code>value()</code> as resolved type signature. Otherwise <code>null</code>.
+   * 
+   * @since 3.10.0-M5
+   */
+  private static SdkColumnCommand getColumnDataAnnotationValue(IType type) {
+    if (!TypeUtility.exists(type)) {
+      return null;
+    }
+
+    IAnnotation annotation = JdtUtility.getAnnotation(type, IRuntimeClasses.ColumnData);
+    if (!TypeUtility.exists(annotation)) {
+      return null;
+    }
+
+    try {
+      for (IMemberValuePair p : annotation.getMemberValuePairs()) {
+        if ("value".equals(p.getMemberName())) {
+          Object value = p.getValue();
+          try {
+            Matcher m = PATTERN.matcher((String) value);
+            if (m.find() && m.group().length() > 0) {
+              return SdkColumnCommand.valueOf(m.group());
+            }
+          }
+          catch (Exception e) {
+            ScoutSdk.logError("cannot parse @ColumnData.value(): '" + value + "'", e);
+          }
+          break;
+        }
+      }
+    }
+    catch (JavaModelException me) {
+      ScoutSdk.logError("exception while reading values", me);
     }
 
     return null;

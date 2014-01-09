@@ -56,6 +56,7 @@ public interface IRuntimeClasses {
   String BasicPermission = "java.security.BasicPermission"; // NO_UCD
   String FormData = "org.eclipse.scout.commons.annotations.FormData"; // NO_UCD
   String PageData = "org.eclipse.scout.commons.annotations.PageData"; // NO_UCD
+  String ColumnData = "org.eclipse.scout.commons.annotations.ColumnData"; // NO_UCD
   String Replace = "org.eclipse.scout.commons.annotations.Replace"; // NO_UCD
   String ClassId = "org.eclipse.scout.commons.annotations.ClassId"; // NO_UCD
   String InjectFieldTo = "org.eclipse.scout.commons.annotations.InjectFieldTo"; // NO_UCD

@@ -26,7 +26,7 @@ import org.junit.Test;
 /**
  * <h3>{@link PageBeanDataTest}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 19.08.2013
  */
 public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
@@ -172,6 +172,7 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
     IType extendedTablePageData = SdkAssert.assertTypeExists("formdata.shared.services.pages.ExtendedTablePageData");
     SdkAssert.assertHasFlags(extendedTablePageData, 1);
     SdkAssert.assertHasSuperTypeSignature(extendedTablePageData, "QBaseTablePageData;");
+    SdkAssert.assertAnnotation(extendedTablePageData, "javax.annotation.Generated");
 
     // fields of ExtendedTablePageData
     SdkAssert.assertEquals("field count of 'ExtendedTablePageData'", 1, extendedTablePageData.getFields().length);
@@ -211,18 +212,24 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertHasSuperTypeSignature(extendedTableRowData, "QBaseTableRowData;");
 
     // fields of ExtendedTableRowData
-    SdkAssert.assertEquals("field count of 'ExtendedTableRowData'", 3, extendedTableRowData.getFields().length);
+    SdkAssert.assertEquals("field count of 'ExtendedTableRowData'", 5, extendedTableRowData.getFields().length);
     IField serialVersionUID1 = SdkAssert.assertFieldExist(extendedTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
     IField intermediate = SdkAssert.assertFieldExist(extendedTableRowData, "intermediate");
     SdkAssert.assertHasFlags(intermediate, 25);
     SdkAssert.assertFieldSignature(intermediate, "QString;");
+    IField ignoredColumnEx = SdkAssert.assertFieldExist(extendedTableRowData, "ignoredColumnEx");
+    SdkAssert.assertHasFlags(ignoredColumnEx, 25);
+    SdkAssert.assertFieldSignature(ignoredColumnEx, "QString;");
     IField m_intermediate = SdkAssert.assertFieldExist(extendedTableRowData, "m_intermediate");
     SdkAssert.assertHasFlags(m_intermediate, 2);
     SdkAssert.assertFieldSignature(m_intermediate, "QBigDecimal;");
+    IField m_ignoredColumnEx = SdkAssert.assertFieldExist(extendedTableRowData, "m_ignoredColumnEx");
+    SdkAssert.assertHasFlags(m_ignoredColumnEx, 2);
+    SdkAssert.assertFieldSignature(m_ignoredColumnEx, "QDate;");
 
-    SdkAssert.assertEquals("method count of 'ExtendedTableRowData'", 3, extendedTableRowData.getMethods().length);
+    SdkAssert.assertEquals("method count of 'ExtendedTableRowData'", 5, extendedTableRowData.getMethods().length);
     IMethod extendedTableRowData1 = SdkAssert.assertMethodExist(extendedTableRowData, "ExtendedTableRowData", new String[]{});
     SdkAssert.assertTrue(extendedTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedTableRowData1, "V");
@@ -230,6 +237,10 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(getIntermediate, "QBigDecimal;");
     IMethod setIntermediate = SdkAssert.assertMethodExist(extendedTableRowData, "setIntermediate", new String[]{"QBigDecimal;"});
     SdkAssert.assertMethodReturnTypeSignature(setIntermediate, "V");
+    IMethod getIgnoredColumnEx = SdkAssert.assertMethodExist(extendedTableRowData, "getIgnoredColumnEx", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getIgnoredColumnEx, "QDate;");
+    IMethod setIgnoredColumnEx = SdkAssert.assertMethodExist(extendedTableRowData, "setIgnoredColumnEx", new String[]{"QDate;"});
+    SdkAssert.assertMethodReturnTypeSignature(setIgnoredColumnEx, "V");
 
     SdkAssert.assertEquals("inner types count of 'ExtendedTableRowData'", 0, extendedTableRowData.getTypes().length);
   }

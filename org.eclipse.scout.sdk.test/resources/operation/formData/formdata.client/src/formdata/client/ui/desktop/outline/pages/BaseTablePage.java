@@ -10,6 +10,8 @@
  ******************************************************************************/
 package formdata.client.ui.desktop.outline.pages;
 
+import org.eclipse.scout.commons.annotations.ColumnData;
+import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.PageData;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -40,12 +42,22 @@ public class BaseTablePage extends AbstractPageWithTable<BaseTablePage.Table> {
       return getColumnSet().getColumnByClass(SecondColumn.class);
     }
 
+    public IgnoredColumn getIgnoredColumn() {
+      return getColumnSet().getColumnByClass(IgnoredColumn.class);
+    }
+
     @Order(10)
     public class FirstColumn extends AbstractStringColumn {
     }
 
     @Order(20)
     public class SecondColumn extends AbstractDateColumn {
+
+    }
+
+    @Order(30)
+    @ColumnData(SdkColumnCommand.IGNORE)
+    public class IgnoredColumn extends AbstractDateColumn {
 
     }
   }

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package formdata.client.ui.desktop.outline.pages;
 
+import org.eclipse.scout.commons.annotations.ColumnData;
+import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.PageData;
 import org.eclipse.scout.commons.annotations.Replace;
@@ -26,12 +28,25 @@ public class ExtendedTablePage extends BaseTablePage {
       return getColumnSet().getColumnByClass(IntermediateColumn.class);
     }
 
+    public SecondColumnEx getSecondColumnEx() {
+      return getColumnSet().getColumnByClass(SecondColumnEx.class);
+    }
+
+    public IgnoredColumnEx getIgnoredColumnEx() {
+      return getColumnSet().getColumnByClass(IgnoredColumnEx.class);
+    }
+
     @Order(15)
     public class IntermediateColumn extends AbstractBigDecimalColumn {
     }
 
     @Replace
     public class SecondColumnEx extends SecondColumn {
+    }
+
+    @Replace
+    @ColumnData(SdkColumnCommand.CREATE)
+    public class IgnoredColumnEx extends IgnoredColumn {
     }
   }
 }
