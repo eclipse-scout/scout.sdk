@@ -35,15 +35,7 @@ public class Bug77596Test extends AbstractScoutSdkTest {
 
   private IStructuredType getCompanyFormHelper() {
     IType form = SdkAssert.assertTypeExists("com.bsiag.miniapp.client.ui.forms.CompanyForm");
-    IStructuredType helper = null;
-    /*try {
-      TuningUtility.startTimer();*/
-    helper = ScoutTypeUtility.createStructuredForm(form);
-    /*}
-    finally {
-      TuningUtility.stopTimer("time to build structure helper.");
-    }*/
-    return helper;
+    return ScoutTypeUtility.createStructuredForm(form);
   }
 
   @Test
@@ -54,7 +46,7 @@ public class Bug77596Test extends AbstractScoutSdkTest {
     Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_MEMBER).length == 4);
     Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONSTRUCTOR).length == 1);
     Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONFIG_EXEC).length == 0);
-    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONFIG_PROPERTY).length == 2);
+    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONFIG_PROPERTY).length == 1);
     Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_FORM_DATA_BEAN).length == 4);
     Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_OVERRIDDEN).length == 0);
     Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_START_HANDLER).length == 2);
