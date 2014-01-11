@@ -18,12 +18,12 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -73,7 +73,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           String formDataTypeSignature = fieldAnnotation.getFormDataTypeSignature();
           String formDataTypeName = null;
           if (StringUtility.isNullOrEmpty(formDataTypeSignature)) {
-            formDataTypeName = DtoUtility.getFormDataName(formField.getElementName());
+            formDataTypeName = ScoutUtility.removeFieldSuffix(formField.getElementName());
           }
           else {
             formDataTypeName = Signature.getSignatureSimpleName(formDataTypeSignature);

@@ -946,8 +946,7 @@ public final class JaxWsSdkUtility {
       // get default value
       propertyValue.setInherited(true);
 
-      String fqnAnnotationType = getFullyQualifiedNameFromName(declaringType, annotation.getElementName());
-      IType type = TypeUtility.getType(fqnAnnotationType);
+      IType type = TypeUtility.getReferencedType(declaringType, annotation.getElementName());
       if (TypeUtility.exists(type)) {
         String fqn = (String) type.getMethod(property, new String[0]).getDefaultValue().getValue();
         if (StringUtility.hasText(fqn)) {
@@ -1289,36 +1288,10 @@ public final class JaxWsSdkUtility {
    *          the signature obtained by {@link IField#getTypeSignature()} or {@link IMethod#getReturnType()},
    *          respectively
    * @return the fully qualified name
+   * @throws JavaModelException
    */
-  private static String getFullyQualifiedNameFromSignature(IType declaringType, String signature) {
-    return getFullyQualifiedNameFromName(declaringType, StringUtility.join(".", Signature.getSignatureQualifier(signature), Signature.getSignatureSimpleName(signature)));
-  }
-
-  /**
-   * To obtain the fully qualified name
-   * 
-   * @param declaringType
-   *          the type which contains possible import directives
-   * @param name
-   *          the name as in declaring type
-   * @return the fully qualified name
-   */
-  private static String getFullyQualifiedNameFromName(IType declaringType, String name) {
-    try {
-      String[][] fullyQualifiedSignature = declaringType.resolveType(name);
-      if (fullyQualifiedSignature != null && fullyQualifiedSignature.length > 0) {
-        if (!StringUtility.isNullOrEmpty(fullyQualifiedSignature[0][0])) {
-          return fullyQualifiedSignature[0][0] + "." + fullyQualifiedSignature[0][1];
-        }
-        else {
-          return fullyQualifiedSignature[0][1];
-        }
-      }
-    }
-    catch (Exception e) {
-      JaxWsSdk.logError(e);
-    }
-    return null;
+  private static String getFullyQualifiedNameFromSignature(IType declaringType, String signature) throws JavaModelException {
+    return TypeUtility.getReferencedTypeFqn(declaringType, StringUtility.join(".", Signature.getSignatureQualifier(signature), Signature.getSignatureSimpleName(signature)));
   }
 
   private static <T> void removeDuplicateEntries(List<T> list) {

@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.util.internal.typecache;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IResource;
@@ -23,6 +22,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -37,9 +37,6 @@ import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeCache;
 
-/**
- *
- */
 public final class TypeCache implements ITypeCache {
 
   private final static TypeCache INSTANCE = new TypeCache();
@@ -75,94 +72,103 @@ public final class TypeCache implements ITypeCache {
     }
   }
 
-  @Override
   public IType[] getAllCachedTypes() {
     ArrayList<IType> types = new ArrayList<IType>();
     synchronized (m_cacheLock) {
-      for (List<IType> lists : m_cache.values()) {
-        for (IType t : lists) {
-          types.add(t);
-        }
+      for (ArrayList<IType> lists : m_cache.values()) {
+        types.addAll(lists);
       }
     }
     return types.toArray(new IType[types.size()]);
   }
 
   @Override
-  public IType getType(String fullyQualifiedName) {
-    ArrayList<IType> types = getTypesInternal(fullyQualifiedName);
+  public IType getType(String typeName) {
+    ArrayList<IType> types = getTypesInternal(typeName);
+    if (types != null && types.size() > 0) {
+      return types.get(0);
+    }
+    return null;
+  }
+
+  @Override
+  public IType getType(String typeName, IJavaProject classpath) {
+    ArrayList<IType> types = getTypesInternal(typeName);
     if (types != null) {
-      if (types.size() == 1) {
-        return types.get(0);
-      }
-      if (types.size() > 1) {
-        // can happen e.g. when multiple jre versions are used in the workspace (e.g. a jre1.5 and a jre1.6 for other bundles).
-        SdkUtilActivator.logInfo("found more than one type match for '" + fullyQualifiedName + "' (matches: '" + types.size() + "').");
-        return types.get(0);
+      for (IType t : types) {
+        if (classpath.isOnClasspath(t)) {
+          return t;
+        }
       }
     }
     return null;
   }
 
   @Override
-  public IType[] getTypes(String fullyQualifiedName) {
-    ArrayList<IType> types = getTypesInternal(fullyQualifiedName);
+  public IType[] getTypes(String typeName) {
+    ArrayList<IType> types = getTypesInternal(typeName);
     if (types == null) {
       return new IType[]{};
     }
     return types.toArray(new IType[types.size()]);
   }
 
-  private ArrayList<IType> getTypesInternal(String fullyQualifiedName) {
-    if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
+  @Override
+  public IType[] getTypes(String typeName, IJavaProject classpath) {
+    ArrayList<IType> types = getTypesInternal(typeName);
+    ArrayList<IType> result = new ArrayList<IType>(types.size());
+    if (types != null) {
+      for (IType t : types) {
+        if (classpath.isOnClasspath(t)) {
+          result.add(t);
+        }
+      }
+    }
+    return result.toArray(new IType[result.size()]);
+  }
+
+  private ArrayList<IType> getTypesInternal(String typeName) {
+    if (StringUtility.isNullOrEmpty(typeName)) {
       return null;
     }
-    fullyQualifiedName = fullyQualifiedName.replace('$', '.');
+    typeName = typeName.replace('$', '.');
     ArrayList<IType> types = null;
     synchronized (m_cacheLock) {
-      types = m_cache.get(fullyQualifiedName);
-      if (types == null) {
-        types = new ArrayList<IType>();
-      }
-      else if (types.size() > 0) {
-        // keep cache clean
-        Iterator<IType> it = types.iterator();
-        while (it.hasNext()) {
-          IType type = it.next();
-          if (!TypeUtility.exists(type)) {
-            it.remove();
+      types = m_cache.get(typeName);
+      if (types != null) {
+        if (types.size() > 0) {
+          // keep cache clean
+          Iterator<IType> it = types.iterator();
+          while (it.hasNext()) {
+            IType type = it.next();
+            if (!TypeUtility.exists(type)) {
+              it.remove();
+            }
           }
         }
-      }
-      if (types.size() == 0) {
-        m_cache.remove(fullyQualifiedName);
+        if (types.size() == 0) {
+          m_cache.remove(typeName);
+          types = null;
+        }
       }
     }
-    if (types.size() == 0) {
+
+    if (types == null) {
+      // search the type
       try {
-        types = resolveType(fullyQualifiedName);
+        types = resolveType(typeName);
       }
       catch (CoreException e) {
-        SdkUtilActivator.logError("error resolving type '" + fullyQualifiedName + "'.", e);
+        SdkUtilActivator.logError("error resolving type '" + typeName + "'.", e);
       }
+
       synchronized (m_cacheLock) {
-        if (types.size() > 0) {
-          m_cache.put(fullyQualifiedName, types);
-        }
-        else {
-          m_cache.remove(fullyQualifiedName);
+        if (types != null && types.size() > 0) {
+          m_cache.put(typeName, types);
         }
       }
     }
     return types;
-  }
-
-  @Override
-  public boolean existsType(String fullyQualifiedName) {
-    if (StringUtility.isNullOrEmpty(fullyQualifiedName)) {
-      return false;
-    }
-    return TypeUtility.exists(getType(fullyQualifiedName));
   }
 
   private ArrayList<IType> resolveType(final String fqn) throws CoreException {
@@ -174,7 +180,7 @@ public final class TypeCache implements ITypeCache {
       fastPat = fastPat.substring(i + 1);
     }
     if (!StringUtility.hasText(fastPat)) {
-      return new ArrayList<IType>();
+      return null;
     }
 
     new SearchEngine().search(
@@ -188,7 +194,7 @@ public final class TypeCache implements ITypeCache {
               TypeDeclarationMatch typeMatch = (TypeDeclarationMatch) match;
 
               IType t = (IType) typeMatch.getElement();
-              if (t.exists() && t.getJavaProject().exists() && t.getFullyQualifiedName('.').indexOf(fqn) >= 0) {
+              if (TypeUtility.exists(t) && t.getFullyQualifiedName('.').indexOf(fqn) >= 0) {
                 matchList.put(new CompositeLong(t.isBinary() ? 1 : 0, matchList.size()), t);
               }
             }
@@ -200,7 +206,7 @@ public final class TypeCache implements ITypeCache {
     return new ArrayList<IType>(matchList.values());
   }
 
-  private class P_ResourceListener implements IResourceChangeListener {
+  private final class P_ResourceListener implements IResourceChangeListener {
     @Override
     public void resourceChanged(final IResourceChangeEvent event) {
       IResourceDelta delta = event.getDelta();

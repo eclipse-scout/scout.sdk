@@ -17,7 +17,6 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
@@ -28,16 +27,8 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.search.IJavaSearchConstants;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.jdt.core.search.SearchParticipant;
-import org.eclipse.jdt.core.search.SearchPattern;
-import org.eclipse.jdt.core.search.SearchRequestor;
-import org.eclipse.pde.internal.core.natures.PDE;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 
-@SuppressWarnings("restriction")
 public final class NlsJdtUtility {
 
   private NlsJdtUtility() {
@@ -97,33 +88,6 @@ public final class NlsJdtUtility {
     return null;
   }
 
-  public static void findReferences(String fullyQuallifiedField, int searchType, SearchRequestor collector,
-      IProgressMonitor monitor) throws CoreException {
-
-    List<IJavaProject> jProjects = new LinkedList<IJavaProject>();
-    IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-    for (IProject project : projects) {
-      if (project.isOpen() && project.hasNature(JavaCore.NATURE_ID) && project.hasNature(PDE.PLUGIN_NATURE)) {
-        jProjects.add(JavaCore.create(project));
-      }
-    }
-    IJavaSearchScope scope = SearchEngine.createJavaSearchScope(jProjects.toArray(new IJavaElement[jProjects.size()]),
-        true);
-
-    SearchPattern pattern = SearchPattern.createPattern(fullyQuallifiedField, searchType,
-        IJavaSearchConstants.REFERENCES, SearchPattern.R_EXACT_MATCH);
-    SearchEngine engine = new SearchEngine();
-
-    try {
-
-      engine.search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, scope, collector,
-          monitor);
-    }
-    catch (CoreException e) {
-      NlsCore.logWarning(e);
-    }
-  }
-
   public static List<IPackageFragment> getPluginPackages(IProject project) {
     IJavaProject jp = JavaCore.create(project);
     return getPluginPackages(jp);
@@ -131,7 +95,7 @@ public final class NlsJdtUtility {
 
   /**
    * Returns all packages in any of the project's source folders.
-   * 
+   *
    * @param jProject
    * @return
    */

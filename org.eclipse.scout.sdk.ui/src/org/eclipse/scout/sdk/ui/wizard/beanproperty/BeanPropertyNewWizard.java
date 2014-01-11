@@ -13,8 +13,11 @@ package org.eclipse.scout.sdk.ui.wizard.beanproperty;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
+import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.BeanPropertyNewOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
@@ -25,7 +28,8 @@ public class BeanPropertyNewWizard extends AbstractWorkspaceWizard {
 
   public BeanPropertyNewWizard(IType declaringType) {
     setWindowTitle(Texts.get("NewProperty"));
-    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(TypeUtility.newSearchScope(declaringType.getJavaProject()));
+    IJavaSearchScope createJavaSearchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{declaringType.getJavaProject()});
+    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(createJavaSearchScope);
     BeanPropertyNewOperation op = new BeanPropertyNewOperation(declaringType);
     beanPropertyWizardPage.setOperation(op);
     // find all used method names

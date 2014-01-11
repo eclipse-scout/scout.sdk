@@ -148,7 +148,7 @@ public class SqlBindCompletionProposalProcessor {
     if (element.getElementType() == IJavaElement.METHOD) {
       IMethod method = (IMethod) element;
       for (String parameter : method.getParameterTypes()) {
-        String fqs = SignatureUtility.getQuallifiedSignature(parameter, method.getDeclaringType());
+        String fqs = SignatureUtility.getQualifiedSignature(parameter, method.getDeclaringType());
         if (SignatureUtility.getTypeSignatureKind(fqs) == Signature.CLASS_TYPE_SIGNATURE) {
           String fqn = Signature.getSignatureQualifier(fqs) + "." + Signature.getSignatureSimpleName(fqs);
           IType candidate = TypeUtility.getType(fqn);

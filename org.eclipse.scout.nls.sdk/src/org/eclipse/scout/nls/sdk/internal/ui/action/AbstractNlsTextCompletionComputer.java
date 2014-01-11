@@ -15,20 +15,11 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.search.IJavaSearchConstants;
-import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.jdt.core.search.SearchMatch;
-import org.eclipse.jdt.core.search.SearchParticipant;
-import org.eclipse.jdt.core.search.SearchPattern;
-import org.eclipse.jdt.core.search.SearchRequestor;
-import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
@@ -38,6 +29,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>{@link AbstractNlsTextCompletionComputer}</h3>
@@ -72,16 +64,17 @@ public abstract class AbstractNlsTextCompletionComputer implements IJavaCompleti
       if (m.find()) {
         String prefix = linePart.substring(m.start(2), offset - lineInfo.getOffset());
         IType contextType = findContextType(context.getCompilationUnit(), offset);
-        IType referencedType = getReferencedType(contextType, m.group(1));
-        if (referencedType != null) {
-          INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{referencedType, contextType});
-          if (nlsProject == null) {
-            return proposals;
+        if (TypeUtility.exists(contextType)) {
+          IType referencedType = TypeUtility.getReferencedType(contextType, m.group(1));
+          if (TypeUtility.exists(referencedType)) {
+            INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{referencedType, contextType});
+            if (nlsProject == null) {
+              return proposals;
+            }
+            collectProposals(proposals, nlsProject, prefix, offset);
           }
-          collectProposals(proposals, nlsProject, prefix, offset);
         }
       }
-
     }
     catch (Exception e) {
       NlsCore.logWarning("could not compute nls proposals.", e);
@@ -128,67 +121,4 @@ public abstract class AbstractNlsTextCompletionComputer implements IJavaCompleti
     }
     return (IType) element.getAncestor(IJavaElement.TYPE);
   }
-
-  private IType getReferencedType(IType declaringType, String typeName) throws JavaModelException {
-    ICompilationUnit compilationUnit = declaringType.getCompilationUnit();
-    if (compilationUnit != null) {
-      IImportDeclaration[] imports = compilationUnit.getImports();
-      for (IImportDeclaration imp : imports) {
-        if (imp.getElementName().endsWith("." + typeName)) {
-          IType foundType = findType(imp.getElementName());
-          if (foundType != null) {
-            return foundType;
-          }
-        }
-      }
-    }
-    String[][] resolvedTypeName = declaringType.resolveType(typeName);
-    if (resolvedTypeName != null && resolvedTypeName.length == 1) {
-      String fqName = resolvedTypeName[0][0];
-      if (fqName != null && fqName.length() > 0) {
-        fqName = fqName + ".";
-      }
-      fqName = fqName + resolvedTypeName[0][1];
-      IType foundType = findType(fqName);
-      if (foundType != null) {
-        return foundType;
-      }
-    }
-    NlsCore.logWarning("could not find referenced type '" + typeName + "' in '" + declaringType.getFullyQualifiedName() + "'.");
-    return null;
-  }
-
-  private IType findType(String fqn) {
-    SearchEngine searchEngine = new SearchEngine();
-    final List<IType> matchList = new ArrayList<IType>();
-    try {
-      searchEngine.search(
-          SearchPattern.createPattern(
-              fqn,
-              IJavaSearchConstants.TYPE,
-              IJavaSearchConstants.DECLARATIONS,
-              SearchPattern.R_EXACT_MATCH),
-          new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
-          SearchEngine.createWorkspaceScope(),
-          new SearchRequestor() {
-            @Override
-            public void acceptSearchMatch(SearchMatch match) throws CoreException {
-              if (match instanceof TypeDeclarationMatch) {
-                TypeDeclarationMatch typeMatch = (TypeDeclarationMatch) match;
-                IType t = (IType) typeMatch.getElement();
-                matchList.add(t);
-              }
-            }
-          }, null);
-      if (matchList.size() > 0) {
-        return matchList.get(0);
-      }
-    }
-    catch (CoreException e) {
-      NlsCore.logWarning(e);
-    }
-    return null;
-
-  }
-
 }

@@ -18,7 +18,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.nls.sdk.extension.INlsProjectProvider;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
-import org.eclipse.scout.nls.sdk.internal.jdt.NlsTypeUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.simple.model.ws.NlsType;
 import org.eclipse.scout.nls.sdk.simple.model.ws.nlsfile.AbstractNlsFile;
@@ -72,7 +71,7 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
           try {
             AbstractNlsFile nlsFile = AbstractNlsFile.loadNlsFile(f);
             if (PluginRegistry.findModel(nlsFile.getProject()) != null && nlsFile.getNlsTypeName() != null) {
-              IType type = NlsTypeUtility.getType(nlsFile.getNlsTypeName());
+              IType type = TypeUtility.getType(nlsFile.getNlsTypeName());
               INlsProject simpleProj = getNlsProject(type);
               if (simpleProj != null) {
                 // fast pre-check: is it directly a simple project?

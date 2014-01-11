@@ -2,11 +2,14 @@ package org.eclipse.scout.sdk;
 
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
+import org.eclipse.scout.sdk.util.internal.typecache.HierarchyCache;
+import org.eclipse.scout.sdk.util.internal.typecache.JavaResourceChangedEmitter;
+import org.eclipse.scout.sdk.util.internal.typecache.TypeCache;
+import org.eclipse.scout.sdk.util.internal.typecache.WorkingCopyManager;
 import org.eclipse.scout.sdk.util.typecache.IHierarchyCache;
 import org.eclipse.scout.sdk.util.typecache.IJavaResourceChangedEmitter;
 import org.eclipse.scout.sdk.util.typecache.ITypeCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspace;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateManager;
 
@@ -40,7 +43,7 @@ public final class ScoutSdkCore {
    * @see IWorkingCopyManager
    */
   public static IWorkingCopyManager createWorkingCopyManger() {
-    return TypeCacheAccessor.createWorkingCopyManger();
+    return new WorkingCopyManager();
   }
 
   /**
@@ -50,7 +53,7 @@ public final class ScoutSdkCore {
    * @see ITypeCache
    */
   public static ITypeCache getTypeCache() {
-    return TypeCacheAccessor.getTypeCache();
+    return TypeCache.getInstance();
   }
 
   /**
@@ -60,7 +63,7 @@ public final class ScoutSdkCore {
    * @see IHierarchyCache
    */
   public static IHierarchyCache getHierarchyCache() {
-    return TypeCacheAccessor.getHierarchyCache();
+    return HierarchyCache.getInstance();
   }
 
   /**
@@ -70,7 +73,7 @@ public final class ScoutSdkCore {
    * @see IJavaResourceChangedEmitter
    */
   public static IJavaResourceChangedEmitter getJavaResourceChangedEmitter() {
-    return TypeCacheAccessor.getJavaResourceChangedEmitter();
+    return JavaResourceChangedEmitter.getInstance();
   }
 
   /**

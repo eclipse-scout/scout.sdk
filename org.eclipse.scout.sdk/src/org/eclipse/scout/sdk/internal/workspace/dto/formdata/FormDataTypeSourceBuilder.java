@@ -17,10 +17,16 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.Expression;
+import org.eclipse.jdt.core.dom.IBinding;
+import org.eclipse.jdt.core.dom.Name;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractDtoTypeSourceBuilder;
@@ -38,6 +44,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 
 /**
@@ -100,7 +107,6 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
     }
     if (superTypeSignature == null) {
       superTypeSignature = DtoUtility.computeSuperTypeSignatureForFormData(getModelType(), getFormDataAnnotation(), getLocalTypeHierarchy());
-
     }
     return superTypeSignature;
   }
@@ -178,7 +184,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
             for (ValidationRuleMethod vm : list) {
               try {
                 // filter out code that contains references to types that are not accessible from our bundle.
-                String generatedSourceCode = generateValidationRuleSourceCode(vm, validator);
+                String generatedSourceCode = generateValidationRuleSourceCode(vm, ownerProject, validator);
 
                 if (!vm.isSkipRule() && generatedSourceCode == null) {
                   //add javadoc warning
@@ -228,7 +234,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
             }
           }
 
-          private String generateValidationRuleSourceCode(ValidationRuleMethod vrm, IImportValidator validator) throws CoreException {
+          private String generateValidationRuleSourceCode(ValidationRuleMethod vrm, IJavaProject formDataProject, IImportValidator validator) throws CoreException {
             if (vrm.getRuleReturnExpression() == null) {
               return null;
             }
@@ -240,17 +246,19 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
                 IType refType = referencedTypes[i];
 
                 //if the type is a value field type it is transformed to the corresponding form data field
-                ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(refType);
-                if (h.contains(iValueField)) {
-                  String formDataFieldName = ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(refType.getElementName()));
-                  return formDataFieldName + ".class";
+                if (!Flags.isAbstract(refType.getFlags())) {
+                  ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(refType);
+                  if (h.contains(iValueField)) {
+                    String formDataFieldName = ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(refType.getElementName()));
+                    return formDataFieldName + ".class";
+                  }
                 }
 
                 // check if the referenced type is accessible from the bundle that contains the form data
                 IMethod implementedMethod = vrm.getImplementedMethod();
-                if (TypeUtility.exists(implementedMethod) && !TypeUtility.isOnClasspath(refType, implementedMethod.getJavaProject())) {
-                  // the referenced type is not accessible -> remove the rule
-                  return null;
+                if (TypeUtility.exists(implementedMethod) && !TypeUtility.isOnClasspath(refType, formDataProject)) {
+                  // the referenced type is not accessible. check if it is a reference to a field
+                  return getFieldValue(vrm);
                 }
               }
 
@@ -264,6 +272,23 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
               }
             }
             return sourceSnippet;
+          }
+
+          private String getFieldValue(ValidationRuleMethod vrm) throws JavaModelException {
+            Expression returnExpression = vrm.getRuleReturnExpression().getReturnExpression();
+            if (returnExpression instanceof Name) {
+              IBinding b = ((Name) returnExpression).resolveBinding();
+              if (b != null) {
+                IJavaElement e = b.getJavaElement();
+                if (TypeUtility.exists(e) && e.getElementType() == IJavaElement.FIELD) {
+                  IField field = (IField) e;
+                  if (field.getSource() != null) {
+                    return PropertyMethodSourceUtility.getFieldValue(field);
+                  }
+                }
+              }
+            }
+            return null;
           }
         });
 

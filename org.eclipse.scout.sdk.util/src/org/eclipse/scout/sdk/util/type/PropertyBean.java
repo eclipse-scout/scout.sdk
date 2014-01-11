@@ -78,7 +78,7 @@ public class PropertyBean implements IPropertyBean {
       try {
         String methodSig = getReadMethod().getSignature();
         beanSignature = Signature.getReturnType(methodSig);
-        beanSignature = SignatureUtility.getQuallifiedSignature(beanSignature, getReadMethod().getDeclaringType());
+        beanSignature = SignatureUtility.getQualifiedSignature(beanSignature, getReadMethod().getDeclaringType());
         return beanSignature;
       }
       catch (JavaModelException e) {
@@ -91,7 +91,7 @@ public class PropertyBean implements IPropertyBean {
         String[] paramSignature = Signature.getParameterTypes(methodSig);
         if (paramSignature != null && paramSignature.length == 1) {
           beanSignature = paramSignature[0];
-          beanSignature = SignatureUtility.getQuallifiedSignature(beanSignature, getWriteMethod().getDeclaringType());
+          beanSignature = SignatureUtility.getQualifiedSignature(beanSignature, getWriteMethod().getDeclaringType());
           return beanSignature;
         }
       }

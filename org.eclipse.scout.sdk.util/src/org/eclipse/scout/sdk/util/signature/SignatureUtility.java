@@ -30,6 +30,7 @@ public final class SignatureUtility {
   private final static Pattern SIG_REPLACEMENT_REGEX = Pattern.compile("[\\.\\$]{1}");
   public final static Pattern DOLLAR_REPLACEMENT_REGEX = Pattern.compile("\\$");
   private final static Pattern PARAM_SIG_REPLACEMENT_REGEX = Pattern.compile("^([^\\:]*)\\:(.*)$");
+  private final static Pattern SIG_END = Pattern.compile("(^.*)\\;$");
 
   /**
    * Character constant indicating an arbitrary array type in a signature.
@@ -229,16 +230,12 @@ public final class SignatureUtility {
         signature = Signature.getTypeErasure(signature);
         signature = SIG_REPLACEMENT_REGEX.matcher(signature).replaceAll(".");
         if (startsWith(signature, Signature.C_UNRESOLVED)) {
+          // unresolved
           if (signatureOwner != null) {
-            // unresolved
-            String[][] resolvedTypeName = signatureOwner.resolveType(Signature.getSignatureSimpleName(signature));
-            if (resolvedTypeName != null && resolvedTypeName.length == 1) {
-              String fqName = resolvedTypeName[0][0];
-              if (fqName != null && fqName.length() > 0) {
-                fqName = fqName + ".";
-              }
-              fqName = fqName + resolvedTypeName[0][1];
-              sigBuilder.append(validator.getTypeName(SignatureCache.createTypeSignature(fqName)));
+            String simpleName = Signature.getSignatureSimpleName(signature);
+            String referencedTypeSignature = getReferencedTypeSignature(signatureOwner, simpleName);
+            if (referencedTypeSignature != null) {
+              sigBuilder.append(validator.getTypeName(referencedTypeSignature));
             }
           }
           else {
@@ -496,7 +493,7 @@ public final class SignatureUtility {
     return params != null && params.length > 0;
   }
 
-  public static String getQuallifiedSignature(String signature, IType jdtType) throws JavaModelException {
+  public static String getQualifiedSignature(String signature, IType jdtType) throws JavaModelException {
     if (getTypeSignatureKind(signature) == Signature.BASE_TYPE_SIGNATURE) {
       return signature;
     }
@@ -506,26 +503,22 @@ public final class SignatureUtility {
         String prefix = m.group(1);
         String simpleSignature = m.group(2);
         String postfix = m.group(3);
-        if (simpleSignature.startsWith("Q")) {
-          String[][] resolvedTypeName = jdtType.resolveType(Signature.getSignatureSimpleName(simpleSignature + ";"));
-          if (resolvedTypeName != null && resolvedTypeName.length == 1) {
-            String fqName = resolvedTypeName[0][0];
-            if (fqName != null && fqName.length() > 0) {
-              fqName = fqName + ".";
-            }
-            fqName = fqName + resolvedTypeName[0][1];
-            simpleSignature = SignatureCache.createTypeSignature(fqName).replaceAll("(^.*)\\;$", "$1");
+        if (startsWith(simpleSignature, Signature.C_UNRESOLVED)) {
+          String simpleName = Signature.getSignatureSimpleName(simpleSignature + ";");
+          String referencedTypeSignature = getReferencedTypeSignature(jdtType, simpleName);
+          if (referencedTypeSignature != null) {
+            simpleSignature = SIG_END.matcher(referencedTypeSignature).replaceAll("$1");
             signature = prefix + simpleSignature + postfix;
           }
         }
         String[] typeArguments = Signature.getTypeArguments(signature);
 
         for (String typeArg : typeArguments) {
-          signature.replaceFirst("^([^<]*\\<.*)(" + quoteRegexSpecialCharacters(typeArg) + ")(.*)$", "$1" + getQuallifiedSignature(typeArg, jdtType) + "$3");
+          signature.replaceFirst("^([^<]*\\<.*)(" + quoteRegexSpecialCharacters(typeArg) + ")(.*)$", "$1" + getQualifiedSignature(typeArg, jdtType) + "$3");
         }
       }
       else {
-        SdkUtilActivator.logWarning("could not quallify types of signature '" + signature + "'");
+        SdkUtilActivator.logWarning("could not qualify types of signature '" + signature + "'");
       }
       return signature;
     }
@@ -677,14 +670,10 @@ public final class SignatureUtility {
             }
           }
           else if (TypeUtility.exists(contextType)) {
-            String[][] resolvedTypeName = contextType.resolveType(Signature.getSignatureSimpleName(unresolvedSignature));
-            if (resolvedTypeName != null && resolvedTypeName.length == 1) {
-              String fqName = resolvedTypeName[0][0];
-              if (fqName != null && fqName.length() > 0) {
-                fqName = fqName + ".";
-              }
-              fqName = fqName + resolvedTypeName[0][1];
-              unresolvedSignature = SignatureCache.createTypeSignature(fqName);
+            String simpleName = Signature.getSignatureSimpleName(unresolvedSignature);
+            String referencedTypeSignature = getReferencedTypeSignature(contextType, simpleName);
+            if(referencedTypeSignature != null) {
+              unresolvedSignature = referencedTypeSignature;
             }
           }
         }
@@ -706,5 +695,13 @@ public final class SignatureUtility {
         break;
     }
     return sigBuilder.toString();
+  }
+
+  public static String getReferencedTypeSignature(IType declaringType, String typeName) throws JavaModelException {
+    String referencedTypeFqn = TypeUtility.getReferencedTypeFqn(declaringType, typeName);
+    if (referencedTypeFqn != null) {
+      return SignatureCache.createTypeSignature(referencedTypeFqn);
+    }
+    return null;
   }
 }

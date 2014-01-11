@@ -77,6 +77,7 @@ public class ScoutTypeUtility extends TypeUtility {
   private static final Pattern RETURN_TRUE_PATTERN = Pattern.compile("return\\s*true", Pattern.MULTILINE);
   private final static Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
   private final static Pattern SUFF_REGEX = Pattern.compile("(^.*)\\;$");
+  private final static Pattern SUFF_CLASS_REGEX = Pattern.compile("\\.class$");
 
   private ScoutTypeUtility() {
   }
@@ -361,8 +362,8 @@ public class ScoutTypeUtility extends TypeUtility {
         Object value = p.getValue();
         if ("value".equals(memberName)) {
           try {
-            String simpleName = ((String) value).replaceAll("\\.class$", "");
-            valueSignature = ScoutUtility.getReferencedTypeSignature(contextType, simpleName);
+            String simpleName = SUFF_CLASS_REGEX.matcher((String) value).replaceAll("");
+            valueSignature = SignatureUtility.getReferencedTypeSignature(contextType, simpleName);
           }
           catch (Exception e) {
             ScoutSdk.logError("could not parse formdata annotation value '" + value + "'.", e);
@@ -491,8 +492,8 @@ public class ScoutTypeUtility extends TypeUtility {
     for (IMemberValuePair p : annotation.getMemberValuePairs()) {
       if ("value".equals(p.getMemberName())) {
         Object value = p.getValue();
-        String simpleName = ((String) value).replaceAll("\\.class$", "");
-        return ScoutUtility.getReferencedTypeSignature(type, simpleName);
+        String simpleName = SUFF_CLASS_REGEX.matcher((String) value).replaceAll("");
+        return SignatureUtility.getReferencedTypeSignature(type, simpleName);
       }
     }
 
@@ -1035,14 +1036,10 @@ public class ScoutTypeUtility extends TypeUtility {
     }
     else {
       if (workingSig.length() > 0 && workingSig.charAt(0) == Signature.C_UNRESOLVED) {
-        String[][] resolvedTypeName = type.resolveType(Signature.getSignatureSimpleName(workingSig));
-        if (resolvedTypeName != null && resolvedTypeName.length == 1) {
-          String fqName = resolvedTypeName[0][0];
-          if (fqName != null && fqName.length() > 0) {
-            fqName = fqName + ".";
-          }
-          fqName = fqName + resolvedTypeName[0][1];
-          workingSig = SignatureCache.createTypeSignature(fqName);
+        String simpleName = Signature.getSignatureSimpleName(workingSig);
+        String sig = SignatureUtility.getReferencedTypeSignature(type, simpleName);
+        if (sig != null) {
+          workingSig = sig;
         }
       }
       workingSig = SUFF_REGEX.matcher(workingSig).replaceAll("$1");

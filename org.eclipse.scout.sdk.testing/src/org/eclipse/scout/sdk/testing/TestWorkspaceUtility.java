@@ -45,6 +45,7 @@ import org.eclipse.scout.sdk.jdt.compile.ICompileResult;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.internal.typecache.TypeCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -57,7 +58,7 @@ import org.osgi.framework.Bundle;
 /**
  * <h3>{@link TestWorkspaceUtility}</h3>Contains helper methods that affect the running workspace.
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.9.0 15.03.2013
  */
 public final class TestWorkspaceUtility {
@@ -355,7 +356,7 @@ public final class TestWorkspaceUtility {
     for (IPrimaryTypeTypeHierarchy h : TypeUtility.getAllCachedPrimaryTypeHierarchies()) {
       out.println(" - " + h.getType().getFullyQualifiedName());
     }
-    out.println("TypeCache: (size='" + TypeUtility.getAllCachedTypes().length + "')");
+    out.println("TypeCache: (size='" + TypeCache.getInstance().getAllCachedTypes().length + "')");
 
     out.println("--- END [" + title + "] ----");
   }

@@ -488,7 +488,7 @@ public final class PropertyMethodSourceUtility {
     if (matcher.find()) {
       String className = matcher.group(1);
       className = className.substring(0, className.length() - 1);
-      IType referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), className);
+      IType referencedType = TypeUtility.getReferencedType(method.getDeclaringType(), className);
       if (referencedType == null) {
         ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
         throw new CoreException(new ScoutStatus(Status.WARNING, "Referenced type '" + parameter + "' could not be found.", null));
@@ -505,7 +505,7 @@ public final class PropertyMethodSourceUtility {
       if (matcher.group(2) != null) {
         String typeName = matcher.group(1);
         typeName = typeName.substring(0, typeName.length() - 1);
-        referencedType = ScoutUtility.getReferencedType(method.getDeclaringType(), typeName);
+        referencedType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName);
         if (!TypeUtility.exists(referencedType)) {
           IType[] possibleMatches = TypeUtility.getTypes(typeName);
           if (possibleMatches.length == 1) {
@@ -532,19 +532,27 @@ public final class PropertyMethodSourceUtility {
     return retVal;
   }
 
-  private static String findFieldValueInHierarchy(IType type, String name, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+  public static String getFieldValue(IField field) throws JavaModelException {
+    String source = field.getSource();
+    if (source == null) {
+      throw new NoSourceException(field.getDeclaringType().getElementName());
+    }
+    Matcher matcher = REGEX_FIELD_VALUE.matcher(ScoutUtility.removeComments(source));
+    if (matcher.find()) {
+      return matcher.group(1);
+    }
+    return null;
+  }
+
+  public static String findFieldValueInHierarchy(IType type, String name, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
     if (!TypeUtility.exists(type)) {
       return null;
     }
     IField field = type.getField(name);
     if (TypeUtility.exists(field)) {
-      String source = field.getSource();
-      if (source == null) {
-        throw new NoSourceException(type.getElementName());
-      }
-      Matcher matcher = REGEX_FIELD_VALUE.matcher(ScoutUtility.removeComments(source));
-      if (matcher.find()) {
-        return matcher.group(1);
+      String val = getFieldValue(field);
+      if (val != null) {
+        return val;
       }
     }
     String value = null;

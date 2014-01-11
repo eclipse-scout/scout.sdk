@@ -298,52 +298,6 @@ public final class ScoutUtility {
     return false;
   }
 
-  /**
-   * <xmp>
-   * import xx.yy.B;
-   * class A{
-   * }
-   * // getReferencedType(A, "B") returns the type B
-   * </xmp>
-   * 
-   * @param declaringType
-   * @param typeName
-   * @return
-   * @throws JavaModelException
-   */
-  public static IType getReferencedType(IType declaringType, String typeName) throws JavaModelException {
-    String[][] resolvedTypeName = declaringType.resolveType(typeName);
-    if (resolvedTypeName != null && resolvedTypeName.length == 1) {
-      String fqName = resolvedTypeName[0][0];
-      if (fqName != null && fqName.length() > 0) {
-        fqName = fqName + ".";
-      }
-      fqName = fqName + resolvedTypeName[0][1];
-      IType foundType = TypeUtility.getType(fqName);
-      if (foundType != null) {
-        return foundType;
-      }
-    }
-    ScoutSdk.logWarning("could not find referenced type '" + typeName + "' in '" + declaringType.getFullyQualifiedName() + "'.");
-    return null;
-  }
-
-  public static String getReferencedTypeSignature(IType declaringType, String simpleTypeName) throws JavaModelException {
-    String[][] resolvedTypeName = declaringType.resolveType(simpleTypeName);
-    if (resolvedTypeName == null) {
-      return Signature.createTypeSignature(simpleTypeName, false);
-    }
-    else if (resolvedTypeName.length > 0) {
-      StringBuilder fqnBuilder = new StringBuilder();
-      if (!StringUtility.isNullOrEmpty(resolvedTypeName[0][0])) {
-        fqnBuilder.append(resolvedTypeName[0][0] + ".");
-      }
-      fqnBuilder.append(resolvedTypeName[0][1]);
-      return SignatureCache.createTypeSignature(fqnBuilder.toString());
-    }
-    return null;
-  }
-
   public static String sourceCodeToSql(String source) {
     StringBuilder buf = new StringBuilder();
     StringBuilder outsideSqlCode = new StringBuilder();

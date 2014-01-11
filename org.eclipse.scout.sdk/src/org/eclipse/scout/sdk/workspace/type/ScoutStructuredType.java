@@ -399,7 +399,7 @@ public class ScoutStructuredType implements IStructuredType {
             m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
             break;
           case FIELD_UNKNOWN:
-        	break;
+            break;
           case METHOD_UNCATEGORIZED:
             break;
           case TYPE_UNCATEGORIZED:
@@ -456,16 +456,9 @@ public class ScoutStructuredType implements IStructuredType {
     if (SignatureUtility.getTypeSignatureKind(signature) == Signature.BASE_TYPE_SIGNATURE) {
       return Signature.getSignatureSimpleName(signature);
     }
-    if (signature.startsWith("Q")) {
-      String[][] resolvedTypeName = jdtType.resolveType(Signature.getSignatureSimpleName(signature));
-      if (resolvedTypeName != null && resolvedTypeName.length == 1) {
-        String fqName = resolvedTypeName[0][0];
-        if (fqName != null && fqName.length() > 0) {
-          fqName = fqName + ".";
-        }
-        fqName = fqName + resolvedTypeName[0][1];
-        return fqName;
-      }
+    if (signature.length() > 0 && signature.charAt(0) == Signature.C_UNRESOLVED) {
+      String simpleName = Signature.getSignatureSimpleName(signature);
+      return TypeUtility.getReferencedTypeFqn(jdtType, simpleName);
     }
     return null;
   }
@@ -816,6 +809,7 @@ public class ScoutStructuredType implements IStructuredType {
 
   protected void visitTypeComposerAttribute(ArrayList<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<IType>(TypeComparators.getTypeNameComparator());
+    @SuppressWarnings("deprecation")
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IComposerAttribute), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();

@@ -50,20 +50,18 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
-import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.jdt.core.search.SearchEngine;
-import org.eclipse.jdt.internal.codeassist.impl.AssistOptions;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.internal.typecache.HierarchyCache;
+import org.eclipse.scout.sdk.util.internal.typecache.TypeCache;
 import org.eclipse.scout.sdk.util.jdt.SourceRange;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeCache;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
-import org.eclipse.scout.sdk.util.typecache.TypeCacheAccessor;
 
-@SuppressWarnings("restriction")
 public class TypeUtility {
 
   public static final String DEFAULT_SOURCE_FOLDER_NAME = "src";
@@ -72,28 +70,36 @@ public class TypeUtility {
   protected TypeUtility() {
   }
 
-  public static IType getType(String fullyQualifiedName) {
-    return TypeCacheAccessor.getTypeCache().getType(fullyQualifiedName);
+  /**
+   * @see ITypeCache#getType(String)
+   */
+  public static IType getType(String typeName) {
+    return TypeCache.getInstance().getType(typeName);
   }
 
-  public static IType[] getTypes(String fullyQualifiedName) {
-    return TypeCacheAccessor.getTypeCache().getTypes(fullyQualifiedName);
+  /**
+   * @see ITypeCache#getTypes(String)
+   */
+  public static IType[] getTypes(String typeName) {
+    return TypeCache.getInstance().getTypes(typeName);
   }
 
-  public static boolean existsType(String fullyQualifiedName) {
-    return TypeCacheAccessor.getTypeCache().existsType(fullyQualifiedName);
+  /**
+   * @see ITypeCache#getType(String, IJavaProject)
+   */
+  public static IType getType(String typeName, IJavaProject classpath) {
+    return TypeCache.getInstance().getType(typeName, classpath);
   }
 
-  public static IType[] getAllCachedTypes() {
-    return TypeCacheAccessor.getTypeCache().getAllCachedTypes();
+  /**
+   * @see ITypeCache#getTypes(String, IJavaProject)
+   */
+  public static IType[] getTypes(String typeName, IJavaProject classpath) {
+    return TypeCache.getInstance().getTypes(typeName, classpath);
   }
 
-  public static IJavaSearchScope newSearchScope(IJavaElement element) {
-    return newSearchScope(new IJavaElement[]{element});
-  }
-
-  public static IJavaSearchScope newSearchScope(IJavaElement[] elements) {
-    return SearchEngine.createJavaSearchScope(elements);
+  public static boolean existsType(String typeName) {
+    return exists(getType(typeName));
   }
 
   public static IPackageFragmentRoot getSrcPackageFragmentRoot(IJavaProject project) throws JavaModelException {
@@ -113,10 +119,10 @@ public class TypeUtility {
     ArrayList<IPackageFragment> subPackages = new ArrayList<IPackageFragment>();
     String prefix = packageFragment.getElementName() + ".";
     IPackageFragmentRoot packageFragmentRoot = (IPackageFragmentRoot) packageFragment.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
-    if (TypeUtility.exists(packageFragmentRoot)) {
+    if (exists(packageFragmentRoot)) {
       try {
         for (IJavaElement candidate : packageFragmentRoot.getChildren()) {
-          if (TypeUtility.exists(candidate) && candidate.getElementType() == IJavaElement.PACKAGE_FRAGMENT && candidate.getElementName().startsWith(prefix)) {
+          if (exists(candidate) && candidate.getElementType() == IJavaElement.PACKAGE_FRAGMENT && candidate.getElementName().startsWith(prefix)) {
             subPackages.add((IPackageFragment) candidate);
           }
         }
@@ -150,14 +156,14 @@ public class TypeUtility {
    * @throws JavaModelException
    */
   public static IType getPrimaryType(IJavaElement e) throws JavaModelException {
-    if (TypeUtility.exists(e)) {
+    if (exists(e)) {
       // source
       ICompilationUnit icu = (ICompilationUnit) e.getAncestor(IJavaElement.COMPILATION_UNIT);
-      if (TypeUtility.exists(icu)) {
+      if (exists(icu)) {
         IType[] candidates = icu.getTypes();
         if (candidates != null && candidates.length > 0) {
           IType result = candidates[0];
-          if (TypeUtility.exists(result)) {
+          if (exists(result)) {
             return result;
           }
         }
@@ -165,9 +171,9 @@ public class TypeUtility {
       else {
         // binary
         IClassFile cf = (IClassFile) e.getAncestor(IJavaElement.CLASS_FILE);
-        if (TypeUtility.exists(cf)) {
+        if (exists(cf)) {
           IType candidate = cf.getType();
-          if (TypeUtility.exists(candidate)) {
+          if (exists(candidate)) {
             return candidate;
           }
         }
@@ -232,7 +238,7 @@ public class TypeUtility {
    */
   public static IType[] getInnerTypesOrdered(IType declaringType, IType superType, Comparator<IType> comparator) {
     ITypeHierarchy combinedTypeHierarchy = getLocalTypeHierarchy(declaringType);
-    IType[] allSubtypes = TypeUtility.getInnerTypes(declaringType, TypeFilters.getSubtypeFilter(superType, combinedTypeHierarchy), comparator);
+    IType[] allSubtypes = getInnerTypes(declaringType, TypeFilters.getSubtypeFilter(superType, combinedTypeHierarchy), comparator);
     return allSubtypes;
   }
 
@@ -262,7 +268,7 @@ public class TypeUtility {
         region.add(e);
       }
     }
-    return TypeCacheAccessor.getHierarchyCache().getLocalHierarchy(region);
+    return HierarchyCache.getInstance().getLocalHierarchy(region);
   }
 
   private static void addBinaryInnerTypesToRegionRec(IType declaringType, IRegion region) {
@@ -278,15 +284,15 @@ public class TypeUtility {
   }
 
   public static ITypeHierarchy getLocalTypeHierarchy(IRegion region) {
-    return TypeCacheAccessor.getHierarchyCache().getLocalHierarchy(region);
+    return HierarchyCache.getInstance().getLocalHierarchy(region);
   }
 
   public static ITypeHierarchy getSuperTypeHierarchy(IType type) {
-    return TypeCacheAccessor.getHierarchyCache().getSuperHierarchy(type);
+    return HierarchyCache.getInstance().getSuperHierarchy(type);
   }
 
   public static IPrimaryTypeTypeHierarchy[] getAllCachedPrimaryTypeHierarchies() {
-    return TypeCacheAccessor.getHierarchyCache().getAllCachedHierarchies();
+    return HierarchyCache.getInstance().getAllCachedHierarchies();
   }
 
   /**
@@ -302,7 +308,7 @@ public class TypeUtility {
    *           if the given type is not a primary type.
    */
   public static IPrimaryTypeTypeHierarchy getPrimaryTypeHierarchy(IType type) throws IllegalArgumentException {
-    return TypeCacheAccessor.getHierarchyCache().getPrimaryTypeHierarchy(type);
+    return HierarchyCache.getInstance().getPrimaryTypeHierarchy(type);
   }
 
   public static boolean hasInnerType(IType declaringType, String typeName) {
@@ -345,7 +351,7 @@ public class TypeUtility {
   public static IMethod findMethodInSuperClassHierarchy(IType type, org.eclipse.jdt.core.ITypeHierarchy hierarchy, IMethodFilter filter) {
     if (exists(type)) {
       IMethod method = getFirstMethod(type, filter);
-      if (TypeUtility.exists(method)) {
+      if (exists(method)) {
         return method;
       }
       else {
@@ -536,7 +542,7 @@ public class TypeUtility {
 
   public static IType getAncestor(IType type, ITypeFilter filter) {
     IType ancestorType = type;
-    while (TypeUtility.exists(ancestorType)) {
+    while (exists(ancestorType)) {
       if (filter.accept(ancestorType)) {
         return ancestorType;
       }
@@ -635,7 +641,7 @@ public class TypeUtility {
     IType superType = superTypeHierarchy.getSuperclass(method.getDeclaringType());
     IMethodFilter overrideFilter = MethodFilters.getSuperMethodFilter(method);
     while (superType != null) {
-      IMethod superMethod = TypeUtility.getFirstMethod(superType, overrideFilter);
+      IMethod superMethod = getFirstMethod(superType, overrideFilter);
       if (superMethod != null) {
         return superMethod;
       }
@@ -749,43 +755,54 @@ public class TypeUtility {
     return null;
   }
 
-  public static IType getReferencedType(IType declaringType, String typeName) throws JavaModelException {
+  public static String getReferencedTypeFqn(IType declaringType, String typeName) throws JavaModelException {
+    // 1. check the imports (performance improvement)
     ICompilationUnit compilationUnit = declaringType.getCompilationUnit();
     if (compilationUnit != null) {
+      String searchString = '.' + typeName;
       IImportDeclaration[] imports = compilationUnit.getImports();
       for (IImportDeclaration imp : imports) {
-        if (imp.getElementName().endsWith("." + typeName)) {
-          IType foundType = TypeUtility.getType(imp.getElementName());
-          if (foundType != null) {
-            return foundType;
-          }
+        if (imp.getElementName().endsWith(searchString)) {
+          return imp.getElementName();
         }
       }
     }
+
+    // 2. try to resolve
     String[][] resolvedTypeName = declaringType.resolveType(typeName);
     if (resolvedTypeName != null && resolvedTypeName.length == 1) {
-      String fqName = resolvedTypeName[0][0];
-      if (fqName != null && fqName.length() > 0) {
-        fqName = fqName + ".";
+      String pck = resolvedTypeName[0][0];
+      StringBuilder fqName = new StringBuilder();
+      if (pck != null && pck.length() > 0) {
+        fqName.append(pck);
+        fqName.append('.');
       }
-      fqName = fqName + resolvedTypeName[0][1];
-      IType foundType = getType(fqName);
-      if (foundType != null) {
-        return foundType;
-      }
+      fqName.append(resolvedTypeName[0][1]); // class simple name
+      return fqName.toString();
     }
 
+    // 3. try to find a matching type on the classpath
     // some types may not be part of the compilation unit (e.g. declaringType is binary, then there is no compilation unit) and cannot be resolved in the class file.
     // this can happen when e.g. only a reference to a final static field is in the class file and there is no other reference to the class.
     // then the compiler removes this reference and directly puts the value of the field in the class file even though the reference remains in the source of the class.
     // the originating class can then not be found anymore. This happens e.g. with the AbstractIcons reference in AbstractSmartField.
     // to solve this, try to find a unique type in the workspace with the simple name. If there is only one match, we are happy.
-    IType[] candidates = TypeUtility.getTypes(typeName);
-    if (candidates != null && candidates.length == 1) {
-      return candidates[0];
+    if (exists(declaringType.getJavaProject())) {
+      IType[] candidates = getTypes(typeName, declaringType.getJavaProject());
+      if (candidates.length == 1) {
+        return candidates[0].getFullyQualifiedName();
+      }
     }
 
     SdkUtilActivator.logWarning("could not find referenced type '" + typeName + "' in '" + declaringType.getFullyQualifiedName() + "'.");
+    return null;
+  }
+
+  public static IType getReferencedType(IType declaringType, String typeName) throws JavaModelException {
+    String referencedTypeFqn = getReferencedTypeFqn(declaringType, typeName);
+    if (referencedTypeFqn != null) {
+      return getType(referencedTypeFqn);
+    }
     return null;
   }
 
@@ -809,10 +826,10 @@ public class TypeUtility {
    * @return true if element was found in the classpath of project
    */
   public static boolean isOnClasspath(IJavaElement element, IJavaProject project) {
-    if (!TypeUtility.exists(element)) {
+    if (!exists(element)) {
       return false;
     }
-    if (!TypeUtility.exists(project)) {
+    if (!exists(project)) {
       return false;
     }
 
@@ -867,7 +884,7 @@ public class TypeUtility {
   public static IPropertyBean[] getPropertyBeans(IType type, IPropertyBeanFilter propertyFilter, Comparator<IPropertyBean> comparator) {
     HashMap<String, PropertyBean> beans = new HashMap<String, PropertyBean>();
     IMethodFilter filter = MethodFilters.getMultiMethodFilter(MethodFilters.getFlagsFilter(Flags.AccPublic), MethodFilters.getNameRegexFilter(BEAN_METHOD_NAME));
-    IMethod[] methods = TypeUtility.getMethods(type, filter);
+    IMethod[] methods = getMethods(type, filter);
     for (IMethod m : methods) {
       Matcher matcher = BEAN_METHOD_NAME.matcher(m.getElementName());
       if (matcher.matches()) {
@@ -923,14 +940,20 @@ public class TypeUtility {
     }
 
     // fields
-    IField[] fieldCandidates = TypeUtility.getFields(type, FieldFilters.getPrivateNotStaticNotFinalNotAbstract(), null);
+    IField[] fieldCandidates = getFields(type, FieldFilters.getPrivateNotStaticNotFinalNotAbstract(), null);
     HashMap<String, IField> fields = new HashMap<String, IField>();
     for (IField field : fieldCandidates) {
       fields.put(field.getElementName(), field);
     }
-    AssistOptions assistOptions = new AssistOptions(type.getJavaProject().getOptions(true));
+
+    // get field pre- and suffixes
+    @SuppressWarnings("restriction")
+    org.eclipse.jdt.internal.codeassist.impl.AssistOptions assistOptions = new org.eclipse.jdt.internal.codeassist.impl.AssistOptions(type.getJavaProject().getOptions(true));
+    @SuppressWarnings("restriction")
     String[] fieldPrefixes = toStringArray(assistOptions.fieldPrefixes, "m_", "");
+    @SuppressWarnings("restriction")
     String[] fieldSuffixes = toStringArray(assistOptions.fieldSuffixes, "");
+
     for (PropertyBean bean : filteredBeans) {
       IField field = findFieldForPropertyBean(bean.getBeanName(), fields, fieldPrefixes, fieldSuffixes);
       if (field != null) {
@@ -1021,18 +1044,18 @@ public class TypeUtility {
     else {
       // super types
       IType superType = superTypeHierarchy.getSuperclass(type);
-      if (TypeUtility.exists(superType) && !superType.getElementName().equals(Object.class.getName())) {
+      if (exists(superType) && !superType.getElementName().equals(Object.class.getName())) {
         method = findMethodInSuperTypeHierarchy(superType, superTypeHierarchy, filter);
       }
-      if (TypeUtility.exists(method)) {
+      if (exists(method)) {
         return method;
       }
       // interfaces
       for (IType intType : superTypeHierarchy.getSuperInterfaces(type)) {
-        if (TypeUtility.exists(intType) && !intType.getElementName().equals(Object.class.getName())) {
+        if (exists(intType) && !intType.getElementName().equals(Object.class.getName())) {
           method = findMethodInSuperTypeHierarchy(intType, superTypeHierarchy, filter);
         }
-        if (TypeUtility.exists(method)) {
+        if (exists(method)) {
           return method;
         }
       }
