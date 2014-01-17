@@ -755,7 +755,19 @@ public class TypeUtility {
     return null;
   }
 
-  public static String getReferencedTypeFqn(IType declaringType, String typeName) throws JavaModelException {
+  /**
+   * Tries to find the fully qualified class name of the given simple name based on the context of the given type.
+   * 
+   * @param declaringType
+   *          The context type for which the simple name should be resolved.
+   * @param typeName
+   *          The type name to resolve.
+   * @param searchOnClassPath
+   *          specifies if the classpath of the {@link IJavaProject} of the declaringType should be searched as well.
+   * @return The fully qualified name of the given simple name for the given context or null.
+   * @throws JavaModelException
+   */
+  public static String getReferencedTypeFqn(IType declaringType, String typeName, boolean searchOnClassPath) throws JavaModelException {
     // 1. check the imports (performance improvement)
     ICompilationUnit compilationUnit = declaringType.getCompilationUnit();
     if (compilationUnit != null) {
@@ -781,25 +793,29 @@ public class TypeUtility {
       return fqName.toString();
     }
 
-    // 3. try to find a matching type on the classpath
-    // some types may not be part of the compilation unit (e.g. declaringType is binary, then there is no compilation unit) and cannot be resolved in the class file.
-    // this can happen when e.g. only a reference to a final static field is in the class file and there is no other reference to the class.
-    // then the compiler removes this reference and directly puts the value of the field in the class file even though the reference remains in the source of the class.
-    // the originating class can then not be found anymore. This happens e.g. with the AbstractIcons reference in AbstractSmartField.
-    // to solve this, try to find a unique type in the workspace with the simple name. If there is only one match, we are happy.
-    if (exists(declaringType.getJavaProject())) {
-      IType[] candidates = getTypes(typeName, declaringType.getJavaProject());
-      if (candidates.length == 1) {
-        return candidates[0].getFullyQualifiedName();
+    if (searchOnClassPath) {
+      // 3. try to find a matching type on the classpath
+      // some types may not be part of the compilation unit (e.g. declaringType is binary, then there is no compilation unit) and cannot be resolved in the class file.
+      // this can happen when e.g. only a reference to a final static field is in the class file and there is no other reference to the class.
+      // then the compiler removes this reference and directly puts the value of the field in the class file even though the reference remains in the source of the class.
+      // the originating class can then not be found anymore. This happens e.g. with the AbstractIcons reference in AbstractSmartField.
+      // to solve this, try to find a unique type in the workspace with the simple name. If there is only one match, we are happy.
+      if (exists(declaringType.getJavaProject())) {
+        IType[] candidates = getTypes(typeName, declaringType.getJavaProject());
+        if (candidates.length == 1) {
+          return candidates[0].getFullyQualifiedName();
+        }
       }
     }
-
-    SdkUtilActivator.logWarning("could not find referenced type '" + typeName + "' in '" + declaringType.getFullyQualifiedName() + "'.");
     return null;
   }
 
-  public static IType getReferencedType(IType declaringType, String typeName) throws JavaModelException {
-    String referencedTypeFqn = getReferencedTypeFqn(declaringType, typeName);
+  /**
+   * @return The {@link IType} of the fully qualified name found or null.
+   * @see TypeUtility#getReferencedTypeFqn(IType, String, boolean)
+   */
+  public static IType getReferencedType(IType declaringType, String typeName, boolean searchOnClassPath) throws JavaModelException {
+    String referencedTypeFqn = getReferencedTypeFqn(declaringType, typeName, searchOnClassPath);
     if (referencedTypeFqn != null) {
       return getType(referencedTypeFqn);
     }

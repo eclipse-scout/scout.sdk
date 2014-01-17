@@ -65,7 +65,7 @@ public abstract class AbstractNlsTextCompletionComputer implements IJavaCompleti
         String prefix = linePart.substring(m.start(2), offset - lineInfo.getOffset());
         IType contextType = findContextType(context.getCompilationUnit(), offset);
         if (TypeUtility.exists(contextType)) {
-          IType referencedType = TypeUtility.getReferencedType(contextType, m.group(1));
+          IType referencedType = TypeUtility.getReferencedType(contextType, m.group(1), false);
           if (TypeUtility.exists(referencedType)) {
             INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{referencedType, contextType});
             if (nlsProject == null) {

@@ -458,7 +458,7 @@ public class ScoutStructuredType implements IStructuredType {
     }
     if (signature.length() > 0 && signature.charAt(0) == Signature.C_UNRESOLVED) {
       String simpleName = Signature.getSignatureSimpleName(signature);
-      return TypeUtility.getReferencedTypeFqn(jdtType, simpleName);
+      return TypeUtility.getReferencedTypeFqn(jdtType, simpleName, false);
     }
     return null;
   }

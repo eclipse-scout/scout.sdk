@@ -17,11 +17,9 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.Expression;
@@ -56,7 +54,7 @@ import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
   private final static Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
-  private final static Pattern REGEX_CONSTRUCTOR_CALL = Pattern.compile("new\\s+[A-Za-z][a-zA-Z0-9_]{0,200}\\s*\\([^\\(\\)]*\\)");
+  private final static Pattern REGEX_CONSTRUCTOR_CALL = Pattern.compile("new\\s+[A-Za-z][a-zA-Z0-9_\\.]{0,200}\\s*\\([^\\(\\)]*\\)");
   private final IType iValueField = TypeUtility.getType(RuntimeClasses.IValueField);
 
   private FormDataAnnotation m_formDataAnnotation;
@@ -188,7 +186,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
                 if (!vm.isSkipRule() && generatedSourceCode == null) {
                   //add javadoc warning
-                  String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName('.') + " # " + vm.getImplementedMethod().getElementName();
+                  String fqn = vm.getImplementedMethod().getDeclaringType().getFullyQualifiedName('.') + "#" + vm.getImplementedMethod().getElementName();
                   source.append("/**");
                   source.append(lineDelimiter);
                   source.append(" * XXX not processed ValidationRule(" + vm.getRuleName() + ")");
@@ -245,20 +243,21 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
               for (int i = referencedTypes.length - 1; i >= 0; i--) {
                 IType refType = referencedTypes[i];
 
-                //if the type is a value field type it is transformed to the corresponding form data field
-                if (!Flags.isAbstract(refType.getFlags())) {
+                if (!TypeUtility.isOnClasspath(refType, formDataProject)) {
+                  // 1. check for field reference. if found: extract the value of the field
+                  String fieldVal = getFieldValue(vrm);
+                  if (fieldVal != null) {
+                    return fieldVal;
+                  }
+
+                  // 2. if the type is a value field type it is transformed to the corresponding form data field
                   ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(refType);
                   if (h.contains(iValueField)) {
                     String formDataFieldName = ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(refType.getElementName()));
                     return formDataFieldName + ".class";
                   }
-                }
 
-                // check if the referenced type is accessible from the bundle that contains the form data
-                IMethod implementedMethod = vrm.getImplementedMethod();
-                if (TypeUtility.exists(implementedMethod) && !TypeUtility.isOnClasspath(refType, formDataProject)) {
-                  // the referenced type is not accessible. check if it is a reference to a field
-                  return getFieldValue(vrm);
+                  return null; // type is not accessible
                 }
               }
 

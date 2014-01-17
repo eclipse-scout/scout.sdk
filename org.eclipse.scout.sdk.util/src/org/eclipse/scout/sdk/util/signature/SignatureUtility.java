@@ -233,7 +233,7 @@ public final class SignatureUtility {
           // unresolved
           if (signatureOwner != null) {
             String simpleName = Signature.getSignatureSimpleName(signature);
-            String referencedTypeSignature = getReferencedTypeSignature(signatureOwner, simpleName);
+            String referencedTypeSignature = getReferencedTypeSignature(signatureOwner, simpleName, false);
             if (referencedTypeSignature != null) {
               sigBuilder.append(validator.getTypeName(referencedTypeSignature));
             }
@@ -505,7 +505,7 @@ public final class SignatureUtility {
         String postfix = m.group(3);
         if (startsWith(simpleSignature, Signature.C_UNRESOLVED)) {
           String simpleName = Signature.getSignatureSimpleName(simpleSignature + ";");
-          String referencedTypeSignature = getReferencedTypeSignature(jdtType, simpleName);
+          String referencedTypeSignature = getReferencedTypeSignature(jdtType, simpleName, false);
           if (referencedTypeSignature != null) {
             simpleSignature = SIG_END.matcher(referencedTypeSignature).replaceAll("$1");
             signature = prefix + simpleSignature + postfix;
@@ -671,8 +671,8 @@ public final class SignatureUtility {
           }
           else if (TypeUtility.exists(contextType)) {
             String simpleName = Signature.getSignatureSimpleName(unresolvedSignature);
-            String referencedTypeSignature = getReferencedTypeSignature(contextType, simpleName);
-            if(referencedTypeSignature != null) {
+            String referencedTypeSignature = getReferencedTypeSignature(contextType, simpleName, false);
+            if (referencedTypeSignature != null) {
               unresolvedSignature = referencedTypeSignature;
             }
           }
@@ -697,8 +697,12 @@ public final class SignatureUtility {
     return sigBuilder.toString();
   }
 
-  public static String getReferencedTypeSignature(IType declaringType, String typeName) throws JavaModelException {
-    String referencedTypeFqn = TypeUtility.getReferencedTypeFqn(declaringType, typeName);
+  /**
+   * @return The resolved signature
+   * @see TypeUtility#getReferencedTypeFqn(IType, String, boolean)
+   */
+  public static String getReferencedTypeSignature(IType declaringType, String typeName, boolean searchOnClassPath) throws JavaModelException {
+    String referencedTypeFqn = TypeUtility.getReferencedTypeFqn(declaringType, typeName, searchOnClassPath);
     if (referencedTypeFqn != null) {
       return SignatureCache.createTypeSignature(referencedTypeFqn);
     }

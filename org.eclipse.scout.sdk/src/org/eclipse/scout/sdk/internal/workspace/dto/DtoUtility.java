@@ -245,7 +245,7 @@ public final class DtoUtility {
             }
           }
           else if (!fieldSource.startsWith("\"") && lastDot > 0) {
-            IType fieldBaseType = TypeUtility.getReferencedType(annotatedMethod.getDeclaringType(), fieldSource.substring(0, lastDot));
+            IType fieldBaseType = TypeUtility.getReferencedType(annotatedMethod.getDeclaringType(), fieldSource.substring(0, lastDot), false);
 
             if (fieldBaseType != null) {
               ruleField = fieldBaseType.getField(fieldSource.substring(lastDot + 1));

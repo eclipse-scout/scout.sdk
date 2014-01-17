@@ -946,7 +946,7 @@ public final class JaxWsSdkUtility {
       // get default value
       propertyValue.setInherited(true);
 
-      IType type = TypeUtility.getReferencedType(declaringType, annotation.getElementName());
+      IType type = TypeUtility.getReferencedType(declaringType, annotation.getElementName(), false);
       if (TypeUtility.exists(type)) {
         String fqn = (String) type.getMethod(property, new String[0]).getDefaultValue().getValue();
         if (StringUtility.hasText(fqn)) {
@@ -1291,7 +1291,7 @@ public final class JaxWsSdkUtility {
    * @throws JavaModelException
    */
   private static String getFullyQualifiedNameFromSignature(IType declaringType, String signature) throws JavaModelException {
-    return TypeUtility.getReferencedTypeFqn(declaringType, StringUtility.join(".", Signature.getSignatureQualifier(signature), Signature.getSignatureSimpleName(signature)));
+    return TypeUtility.getReferencedTypeFqn(declaringType, StringUtility.join(".", Signature.getSignatureQualifier(signature), Signature.getSignatureSimpleName(signature)), false);
   }
 
   private static <T> void removeDuplicateEntries(List<T> list) {

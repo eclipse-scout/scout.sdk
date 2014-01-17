@@ -363,7 +363,7 @@ public class ScoutTypeUtility extends TypeUtility {
         if ("value".equals(memberName)) {
           try {
             String simpleName = SUFF_CLASS_REGEX.matcher((String) value).replaceAll("");
-            valueSignature = SignatureUtility.getReferencedTypeSignature(contextType, simpleName);
+            valueSignature = SignatureUtility.getReferencedTypeSignature(contextType, simpleName, true);
           }
           catch (Exception e) {
             ScoutSdk.logError("could not parse formdata annotation value '" + value + "'.", e);
@@ -493,7 +493,7 @@ public class ScoutTypeUtility extends TypeUtility {
       if ("value".equals(p.getMemberName())) {
         Object value = p.getValue();
         String simpleName = SUFF_CLASS_REGEX.matcher((String) value).replaceAll("");
-        return SignatureUtility.getReferencedTypeSignature(type, simpleName);
+        return SignatureUtility.getReferencedTypeSignature(type, simpleName, true);
       }
     }
 
@@ -1007,7 +1007,7 @@ public class ScoutTypeUtility extends TypeUtility {
         String signature = signatureMapping.get(0).getSuperTypeGenericParameterSignature();
         for (int i = 1; i < signatureMapping.size(); i++) {
           String replacement = signatureMapping.get(i).getSuperTypeGenericParameterSignature();
-          replacement = replacement.substring(0, replacement.length() - 1);
+          replacement = Matcher.quoteReplacement(replacement.substring(0, replacement.length() - 1));
           signature = signature.replaceAll("[T,L,Q]" + signatureMapping.get(i).getSuperTypeGenericParameterName(), replacement);
         }
         return SignatureUtility.getResolvedSignature(signature, type);
@@ -1037,7 +1037,7 @@ public class ScoutTypeUtility extends TypeUtility {
     else {
       if (workingSig.length() > 0 && workingSig.charAt(0) == Signature.C_UNRESOLVED) {
         String simpleName = Signature.getSignatureSimpleName(workingSig);
-        String sig = SignatureUtility.getReferencedTypeSignature(type, simpleName);
+        String sig = SignatureUtility.getReferencedTypeSignature(type, simpleName, false);
         if (sig != null) {
           workingSig = sig;
         }

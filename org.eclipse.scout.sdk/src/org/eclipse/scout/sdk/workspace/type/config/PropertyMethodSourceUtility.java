@@ -488,7 +488,7 @@ public final class PropertyMethodSourceUtility {
     if (matcher.find()) {
       String className = matcher.group(1);
       className = className.substring(0, className.length() - 1);
-      IType referencedType = TypeUtility.getReferencedType(method.getDeclaringType(), className);
+      IType referencedType = TypeUtility.getReferencedType(method.getDeclaringType(), className, true);
       if (referencedType == null) {
         ScoutSdk.logWarning("referenced type could not be found '" + method.getElementName() + "' in class '" + method.getDeclaringType().getFullyQualifiedName() + "'");
         throw new CoreException(new ScoutStatus(Status.WARNING, "Referenced type '" + parameter + "' could not be found.", null));
@@ -505,7 +505,7 @@ public final class PropertyMethodSourceUtility {
       if (matcher.group(2) != null) {
         String typeName = matcher.group(1);
         typeName = typeName.substring(0, typeName.length() - 1);
-        referencedType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName);
+        referencedType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName, true);
         if (!TypeUtility.exists(referencedType)) {
           IType[] possibleMatches = TypeUtility.getTypes(typeName);
           if (possibleMatches.length == 1) {
@@ -592,7 +592,7 @@ public final class PropertyMethodSourceUtility {
         String typeName = matcher.group(1);
         String fieldName = matcher.group(3);
         typeName = typeName.substring(0, typeName.length() - 1);
-        IType iconsType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName);
+        IType iconsType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName, true);
         if (TypeUtility.exists(iconsType)) {
           ITypeHierarchy iconsSuperTypeHierarchy = iconsType.newSupertypeHierarchy(null);
           while (TypeUtility.exists(iconsType)) {
