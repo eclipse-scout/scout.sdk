@@ -41,9 +41,11 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -52,11 +54,11 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.internal.typecache.HierarchyCache;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeCache;
-import org.eclipse.scout.sdk.util.jdt.SourceRange;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeCache;
@@ -133,11 +135,6 @@ public class TypeUtility {
     }
 
     return subPackages.toArray(new IPackageFragment[subPackages.size()]);
-  }
-
-  public static boolean isSubtype(IType type, IType potentialSubtype, org.eclipse.jdt.core.ITypeHierarchy hierarchy) {
-    HashSet<IType> allSubtypes = new HashSet<IType>(Arrays.asList(hierarchy.getAllSubtypes(type)));
-    return allSubtypes.contains(potentialSubtype);
   }
 
   public static IType[] toArray(IType... types) {
@@ -246,7 +243,7 @@ public class TypeUtility {
     if (signature == null) {
       return null;
     }
-    return getType(SignatureUtility.getFullyQuallifiedName(signature));
+    return getType(SignatureUtility.getFullyQualifiedName(signature));
   }
 
   /**
@@ -814,13 +811,19 @@ public class TypeUtility {
   }
 
   public static boolean isGenericType(IType type) {
-    try {
-      return exists(type) && (type.getTypeParameters().length > 0);
+    return getTypeParameters(type).length > 0;
+  }
+
+  public static ITypeParameter[] getTypeParameters(IType type) {
+    if (TypeUtility.exists(type)) {
+      try {
+        return type.getTypeParameters();
+      }
+      catch (JavaModelException e) {
+        SdkUtilActivator.logWarning("could not get generic information of type: " + type.getFullyQualifiedName(), e);
+      }
     }
-    catch (JavaModelException e) {
-      SdkUtilActivator.logWarning("could not get generic information of type: " + type.getFullyQualifiedName(), e);
-      return false;
-    }
+    return new ITypeParameter[]{};
   }
 
   /**
@@ -1083,8 +1086,8 @@ public class TypeUtility {
   private static IField findFieldForPropertyBean(String beanName, HashMap<String, IField> fields, String[] fieldPrefixes, String[] fieldSuffixes) {
     for (String prefix : fieldPrefixes) {
       for (String suffix : fieldSuffixes) {
-        IField field = fields.get(prefix + decapitalize(beanName) + suffix);
-        if (field != null) {
+        IField field = fields.get(prefix + NamingUtility.ensureStartWithLowerCase(beanName) + suffix);
+        if (TypeUtility.exists(field)) {
           return field;
         }
       }
@@ -1115,19 +1118,4 @@ public class TypeUtility {
     }
     return result.toArray(new String[result.size()]);
   }
-
-  /**
-   * Converts the given property name to its field name (according to JavaBeans spec).
-   * 
-   * @param s
-   * @return
-   */
-  private static String decapitalize(String s) {
-    if (s == null || s.length() == 0) return "";
-    if (s.length() >= 2 && Character.isUpperCase(s.charAt(0)) && Character.isUpperCase(s.charAt(1))) {
-      return s;
-    }
-    return Character.toLowerCase(s.charAt(0)) + s.substring(1);
-  }
-
 }

@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.internal.typecache;
 
-import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
@@ -19,6 +19,7 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
@@ -107,14 +108,23 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
 
   @Override
   public boolean isSubtype(IType type, IType potentialSubtype) {
-    HashSet<IType> allSubTypes = new HashSet<IType>(Arrays.asList(getAllSubtypes(type)));
-    allSubTypes.add(type);
+    if (CompareUtility.equals(type, potentialSubtype)) {
+      return true;
+    }
+
+    revalidate(null);
+    HashSet<IType> allSubTypes = (HashSet<IType>) getTypesFilteredAndSortedImpl(m_hierarchy.getAllSubtypes(type), null, null);
     return allSubTypes.contains(potentialSubtype);
   }
 
   @Override
   public boolean containsInSubHierarchy(IType type, IType[] potentialSubtypes) {
-    HashSet<IType> allSubTypes = new HashSet<IType>(Arrays.asList(getAllSubtypes(type)));
+    if (potentialSubtypes == null) {
+      return false;
+    }
+
+    revalidate(null);
+    HashSet<IType> allSubTypes = (HashSet<IType>) getTypesFilteredAndSortedImpl(m_hierarchy.getAllSubtypes(type), null, null);
     allSubTypes.add(type);
     for (IType pt : potentialSubtypes) {
       if (allSubTypes.contains(pt)) {
@@ -312,6 +322,11 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   }
 
   private static IType[] getTypesFilteredAndSorted(IType[] types, ITypeFilter filter, Comparator<IType> comparator) {
+    Collection<IType> result = getTypesFilteredAndSortedImpl(types, filter, comparator);
+    return result.toArray(new IType[result.size()]);
+  }
+
+  private static Collection<IType> getTypesFilteredAndSortedImpl(IType[] types, ITypeFilter filter, Comparator<IType> comparator) {
     Set<IType> result = null;
     if (comparator == null) {
       result = new HashSet<IType>();
@@ -327,6 +342,6 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
         }
       }
     }
-    return result.toArray(new IType[result.size()]);
+    return result;
   }
 }

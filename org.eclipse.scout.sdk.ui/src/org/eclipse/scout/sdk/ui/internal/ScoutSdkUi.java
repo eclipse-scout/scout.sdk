@@ -590,7 +590,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     }
   }
 
-  private final static class P_AutoUpdateOperationsShutdownJob extends Job {
+  private static final class P_AutoUpdateOperationsShutdownJob extends Job {
     private P_AutoUpdateOperationsShutdownJob() {
       super("Waiting until all derived resources have been updated...");
       setUser(true);

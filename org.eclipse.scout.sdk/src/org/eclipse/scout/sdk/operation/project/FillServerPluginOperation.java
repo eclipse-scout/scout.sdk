@@ -23,9 +23,9 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class FillServerPluginOperation extends AbstractScoutProjectNewOperation {
   private IProject m_project;
 
-  public final static String PROP_INSTALL_SERVER_APP_CLASS = "INSTALL_SERVER_APP_CLASS";
-  public final static String PROP_INSTALL_SERVER_SESSION_CLASS = "INSTALL_SERVER_SESSION_CLASS";
-  public final static String PROP_INSTALL_ACCESS_CONTROL_SVC_CLASS = "INSTALL_ACCESS_CONTROL_SVC_CLASS";
+  public static final String PROP_INSTALL_SERVER_APP_CLASS = "INSTALL_SERVER_APP_CLASS";
+  public static final String PROP_INSTALL_SERVER_SESSION_CLASS = "INSTALL_SERVER_SESSION_CLASS";
+  public static final String PROP_INSTALL_ACCESS_CONTROL_SVC_CLASS = "INSTALL_ACCESS_CONTROL_SVC_CLASS";
 
   @Override
   public String getOperationName() {

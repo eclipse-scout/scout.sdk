@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
@@ -45,7 +46,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
  */
 public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
 
-  public final static String TEMPLATE_ID = "ID_OUTLINE_TEMPLATE";
+  public static final String TEMPLATE_ID = "ID_OUTLINE_TEMPLATE";
 
   @Override
   public String getOperationName() {
@@ -81,12 +82,16 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
       execOpenOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          source.append("//If it is a mobile or tablet device, the DesktopExtension in the mobile plugin takes care of starting the correct forms.").append(lineDelimiter);
-          source.append("if (!UserAgentUtility.isDesktopDevice()) {").append(lineDelimiter);
+          // mobile case
+          source.append("//If it is a mobile or tablet device, the DesktopExtension in the mobile plugin takes care of starting the correct forms.\n");
+          source.append("if (!").append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.UserAgentUtility)));
+          source.append(".isDesktopDevice()) {").append(lineDelimiter);
           source.append("  return;").append(lineDelimiter);
-          source.append("}\n").append(lineDelimiter);
+          source.append("}").append(lineDelimiter).append(lineDelimiter);
+
+          // outline tree
           source.append("// outline tree").append(lineDelimiter);
-          String treeFormRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.DefaultOutlineTreeForm));
+          String treeFormRef = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.DefaultOutlineTreeForm));
           source.append(treeFormRef).append(" treeForm = new ").append(treeFormRef).append("();").append(lineDelimiter);
           ScoutIconDesc icon = client.getIconProvider().getIcon("eclipse_scout");
           if (icon != null) {
@@ -95,9 +100,10 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
           }
           source.append("treeForm.startView();").append(lineDelimiter);
           source.append(lineDelimiter);
-          // tree form
+
+          // outline table
           source.append("//outline table").append(lineDelimiter);
-          String tableFormRef = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.DefaultOutlineTableForm));
+          String tableFormRef = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.DefaultOutlineTableForm));
           source.append(tableFormRef).append(" tableForm=new ").append(tableFormRef).append("();").append(lineDelimiter);
           if (icon != null) {
             String iconsRef = validator.getTypeName(SignatureCache.createTypeSignature(icon.getConstantField().getDeclaringType().getFullyQualifiedName()));
@@ -105,8 +111,12 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
           }
           source.append("tableForm.startView();").append(lineDelimiter);
           source.append(lineDelimiter);
-          source.append("if (getAvailableOutlines().length > 0) {").append(lineDelimiter);
-          source.append("setOutline(getAvailableOutlines()[0]);").append(lineDelimiter);
+
+          // activate first outline
+          source.append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.IOutline))).append(" firstOutline = ");
+          source.append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.CollectionUtility))).append(".firstElement(getAvailableOutlines());").append(lineDelimiter);
+          source.append("if (firstOutline != null) {").append(lineDelimiter);
+          source.append("  setOutline(firstOutline);").append(lineDelimiter);
           source.append("}").append(lineDelimiter);
         }
       });
@@ -131,9 +141,9 @@ public class OutlineTemplateOperation extends AbstractScoutProjectNewOperation {
         outlineServiceOp.setImplementationProject(server.getJavaProject());
         outlineServiceOp.setInterfaceProject(shared.getJavaProject());
         outlineServiceOp.setInterfacePackageName(shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES));
-        outlineServiceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
+        outlineServiceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(IRuntimeClasses.IService));
         outlineServiceOp.setImplementationPackageName(server.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES));
-        outlineServiceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, server.getJavaProject()));
+        outlineServiceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IService, server.getJavaProject()));
         outlineServiceOp.run(monitor, workingCopyManager);
       }
     }

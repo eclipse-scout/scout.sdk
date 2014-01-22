@@ -173,28 +173,28 @@ public final class LazyPluginModel {
   /**
    * @see PluginModelManager#getState()
    */
-  public final static PDEState getPdeState() {
+  public static PDEState getPdeState() {
     return PDECore.getDefault().getModelManager().getState();
   }
 
   /**
    * @see State#getBundles()
    */
-  public final static BundleDescription[] getBundles() {
+  public static BundleDescription[] getBundles() {
     return getPdeState().getState().getBundles();
   }
 
   /**
    * @see State#getBundles(String)
    */
-  public final static BundleDescription[] getBundles(String symbolicName) {
+  public static BundleDescription[] getBundles(String symbolicName) {
     return getPdeState().getState().getBundles(symbolicName);
   }
 
   /**
    * @see State#getBundle(String, Version)
    */
-  public final static BundleDescription getBundle(String symbolicName, Version version) {
+  public static BundleDescription getBundle(String symbolicName, Version version) {
     return getPdeState().getState().getBundle(symbolicName, version);
   }
 

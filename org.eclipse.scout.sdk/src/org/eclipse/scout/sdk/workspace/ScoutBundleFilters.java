@@ -24,23 +24,23 @@ import java.util.Set;
  */
 public final class ScoutBundleFilters {
 
-  private final static IScoutBundleFilter ROOT_BUNDLES = new IScoutBundleFilter() {
+  private static final IScoutBundleFilter ROOT_BUNDLES = new IScoutBundleFilter() {
     @Override
     public boolean accept(IScoutBundle bundle) {
       return bundle.getDirectParentBundles().size() == 0;
     }
   };
 
-  private final static IScoutBundleFilter ALL_BUNDLES = null;
+  private static final IScoutBundleFilter ALL_BUNDLES = null;
 
-  private final static IScoutBundleFilter WORKSPACE_BUNDLES = new IScoutBundleFilter() {
+  private static final IScoutBundleFilter WORKSPACE_BUNDLES = new IScoutBundleFilter() {
     @Override
     public boolean accept(IScoutBundle bundle) {
       return !bundle.isBinary();
     }
   };
 
-  private final static IScoutBundleFilter NO_FRAGMENTS = new IScoutBundleFilter() {
+  private static final IScoutBundleFilter NO_FRAGMENTS = new IScoutBundleFilter() {
     @Override
     public boolean accept(IScoutBundle bundle) {
       return !bundle.isFragment();

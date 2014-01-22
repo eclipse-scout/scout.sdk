@@ -12,8 +12,6 @@ package com.bsiag.miniapp.client.ui.desktop;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.services.common.bookmark.IBookmarkService;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -31,7 +29,6 @@ import com.bsiag.miniapp.client.ClientSession;
 import com.bsiag.miniapp.shared.Icons;
 
 public class Desktop extends AbstractDesktop implements IDesktop {
-  private static IScoutLogger LOG = ScoutLogManager.getLogger(Desktop.class);
 
   public Desktop() {
   }
@@ -58,11 +55,6 @@ public class Desktop extends AbstractDesktop implements IDesktop {
     Bookmark bm = bookmarkService.getStartBookmark();
     if (bm != null) {
       bookmarkService.activate(bm);
-    }
-    else {
-      if (getAvailableOutlines().length > 0) {
-        setOutline(getAvailableOutlines()[0]);
-      }
     }
   }
 

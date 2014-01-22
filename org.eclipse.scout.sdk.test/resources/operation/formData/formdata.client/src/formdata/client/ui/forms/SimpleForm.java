@@ -91,12 +91,12 @@ public class SimpleForm extends AbstractForm {
     public class DoubleField extends AbstractDoubleField {
 
       @Override
-      protected Double getConfiguredMaximumValue() {
+      protected Double getConfiguredMaxValue() {
         return -Double.MAX_VALUE;
       }
 
       @Override
-      protected Double getConfiguredMinimumValue() {
+      protected Double getConfiguredMinValue() {
         return 0.0;
       }
     }

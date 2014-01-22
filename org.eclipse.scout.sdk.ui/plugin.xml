@@ -474,6 +474,18 @@
       </FormField>
       <FormField
             active="true"
+            model="org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField"
+            name="Proposal Field">
+         <newWizard
+               inShortList="true"
+               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.proposalfield.ProposalFieldNewWizard">
+         </newWizard>
+         <nodePage
+               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.ProposalFieldNodePage">
+         </nodePage>
+      </FormField>
+      <FormField
+            active="true"
             model="org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField"
             name="Long Field">
          <newWizard

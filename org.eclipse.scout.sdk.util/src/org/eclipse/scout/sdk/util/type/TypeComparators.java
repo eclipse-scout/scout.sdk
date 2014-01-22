@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.CompositeObject;
  */
 public class TypeComparators {
 
-  protected final static Comparator<IType> NAME_COMPARATOR = new Comparator<IType>() {
+  protected static final Comparator<IType> NAME_COMPARATOR = new Comparator<IType>() {
     @Override
     public int compare(IType t1, IType t2) {
       CompositeObject ct1 = new CompositeObject(t1.getElementName(), t1.getFullyQualifiedName(), t1);
@@ -31,7 +31,7 @@ public class TypeComparators {
     }
   };
 
-  protected final static Comparator<IType> HASH_CODE_COMPARATOR = new Comparator<IType>() {
+  protected static final Comparator<IType> HASH_CODE_COMPARATOR = new Comparator<IType>() {
     @Override
     public int compare(IType t1, IType t2) {
       if (t1 == null && t2 == null) {
@@ -49,7 +49,7 @@ public class TypeComparators {
     }
   };
 
-  protected final static Comparator<IType> SOURCE_RANGE_COMPARATOR = new Comparator<IType>() {
+  protected static final Comparator<IType> SOURCE_RANGE_COMPARATOR = new Comparator<IType>() {
 
     @Override
     public int compare(IType t1, IType t2) {

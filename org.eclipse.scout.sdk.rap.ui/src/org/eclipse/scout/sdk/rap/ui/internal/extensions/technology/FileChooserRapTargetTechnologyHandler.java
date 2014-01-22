@@ -50,12 +50,12 @@ import org.osgi.framework.Version;
  */
 public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  private final static String RAP_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/rt/rap/incubator/2.0/fileupload/";
-  private final static String RAP_INCUBATOR_FEATURE_NAME = "org.eclipse.rap.fileupload.feature.feature.group";
-  private final static Version RAP_INCUBATOR_FEATURE_VERSION = new Version(1, 5, 100, "20130107-1047"); // the supported version. must be present at the update site
+  private static final String RAP_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/rt/rap/incubator/2.0/fileupload/";
+  private static final String RAP_INCUBATOR_FEATURE_NAME = "org.eclipse.rap.fileupload.feature.feature.group";
+  private static final Version RAP_INCUBATOR_FEATURE_VERSION = new Version(1, 5, 100, "20130107-1047"); // the supported version. must be present at the update site
 
-  private final static String SCOUT_INCUBATOR_FEATURE_NAME = "org.eclipse.scout.rt.ui.rap.incubator.filechooser.source.feature.group";
-  private final static String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/3.9";
+  private static final String SCOUT_INCUBATOR_FEATURE_NAME = "org.eclipse.scout.rt.ui.rap.incubator.filechooser.source.feature.group";
+  private static final String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/3.9";
 
   @Override
   public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {

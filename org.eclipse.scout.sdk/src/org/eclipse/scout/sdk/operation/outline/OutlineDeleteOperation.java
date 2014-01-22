@@ -24,7 +24,7 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
@@ -48,13 +48,13 @@ import org.eclipse.text.edits.ReplaceEdit;
  */
 public class OutlineDeleteOperation extends JavaElementDeleteOperation {
 
-  private final IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
-  private final IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
-
   private final IType[] m_desktops;
   private final IType m_outline;
 
   public OutlineDeleteOperation(IType outlineType) {
+    IType iDesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
+    IType iDesktopExtension = TypeUtility.getType(IRuntimeClasses.IDesktopExtension);
+
     IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(iDesktop);
     IPrimaryTypeTypeHierarchy pthExt = TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension);
 
@@ -94,7 +94,7 @@ public class OutlineDeleteOperation extends JavaElementDeleteOperation {
   }
 
   private void removeOutlineViewButton(IType desktop, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    IType iViewButton = TypeUtility.getType(RuntimeClasses.IViewButton);
+    IType iViewButton = TypeUtility.getType(IRuntimeClasses.IViewButton);
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(desktop);
     IType[] allViewButtons = TypeUtility.getInnerTypes(desktop, TypeFilters.getSubtypeFilter(iViewButton, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
 
@@ -109,7 +109,7 @@ public class OutlineDeleteOperation extends JavaElementDeleteOperation {
   }
 
   private void removeFromConfiguredOutlines(IType desktop, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    IMethod method = TypeUtility.getMethod(desktop, "getConfiguredOutlines");
+    IMethod method = TypeUtility.getMethod(desktop, OutlineNewOperation.GET_CONFIGURED_OUTLINES);
     if (TypeUtility.exists(method)) {
       String source = method.getSource();
       String replacement = null;
@@ -121,18 +121,6 @@ public class OutlineDeleteOperation extends JavaElementDeleteOperation {
         Matcher sm = Pattern.compile("([a-zA-Z0-9\\_\\-]*\\.add\\(\\s*" + m_outline.getElementName() + ".class\\s*\\)\\s*;)", Pattern.MULTILINE).matcher(source);
         if (sm.find()) {
           replacement = sm.group(1);
-        }
-        else {
-          Matcher am = Pattern.compile("\\s*return\\s*new\\s*Class\\[\\]\\{[^\\}]*(" + m_outline.getFullyQualifiedName() + ".class\\s*[,]?)[^\\}]*\\}\\s*\\;", Pattern.MULTILINE).matcher(source);
-          if (am.find()) {
-            replacement = am.group(1);
-          }
-          else {
-            Matcher asm = Pattern.compile("\\s*return\\s*new\\s*Class\\[\\]\\{[^\\}]*(" + m_outline.getElementName() + ".class\\s*[,]?)[^\\}]*\\}\\s*\\;", Pattern.MULTILINE).matcher(source);
-            if (asm.find()) {
-              replacement = asm.group(1);
-            }
-          }
         }
       }
 

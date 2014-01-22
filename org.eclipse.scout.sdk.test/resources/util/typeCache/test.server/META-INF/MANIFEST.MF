@@ -17,7 +17,6 @@ Bundle-ClassPath: .
 Import-Package: javax.servlet;version="2.4.0",
  javax.servlet.http;version="2.4.0",
  javax.activation;resolution:=optional,
- javax.jms;resolution:=optional,
  javax.mail;resolution:=optional,
  javax.mail.event;resolution:=optional,
  javax.mail.internet;resolution:=optional,

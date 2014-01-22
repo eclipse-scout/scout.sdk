@@ -18,17 +18,18 @@ import java.util.HashSet;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.ui.dialog.JavaElementSelectionDialog;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractJavaElementListPresenter;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -43,7 +44,6 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>OutlinesPresenter</h3> ...
  */
 public class OutlinesPresenter extends AbstractJavaElementListPresenter {
-  final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
   private IPropertySourceParser<IType[]> m_parser;
 
@@ -63,6 +63,7 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
 
   @Override
   protected void handleAddComponent() {
+    IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
     HashSet<IJavaElement> sourceProposals = new HashSet<IJavaElement>(Arrays.asList(getSourceProps()));
     ArrayList<IJavaElement> candidates = new ArrayList<IJavaElement>();
     ICachedTypeHierarchy outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
@@ -101,11 +102,10 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
     try {
       ConfigPropertyUpdateOperation<IType[]> updateOp = new ConfigPropertyUpdateOperation<IType[]>(getMethod(), getParser()) {
         @Override
-        protected void appendToMethodSourceBuilder(IMethodSourceBuilder sourceBuilder) {
-          sourceBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createSupressWarningUnchecked());
+        protected void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          source.append(getParser().formatSourceValue(getValue(), lineDelimiter, validator));
         }
       };
-
       updateOp.setValue(types);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

@@ -20,7 +20,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IParent;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
@@ -115,7 +115,7 @@ public class WellformClientBundleOperation implements IOperation {
   }
 
   protected void wellformDesktop(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    IType idesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
+    IType idesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
     IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getTypesInScoutBundles(bundle));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
@@ -130,7 +130,7 @@ public class WellformClientBundleOperation implements IOperation {
   }
 
   protected void wellformDesktopExtension(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    IType idesktop = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
+    IType idesktop = TypeUtility.getType(IRuntimeClasses.IDesktopExtension);
     IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getTypesInScoutBundles(bundle));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {

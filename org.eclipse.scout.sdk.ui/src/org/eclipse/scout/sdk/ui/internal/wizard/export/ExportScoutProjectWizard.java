@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements IExportScoutProjectWizard {
-  private final static Pattern ALIAS_REGEX = Pattern.compile(".*products.*/([^-]*)-.*.product");
+  private static final Pattern ALIAS_REGEX = Pattern.compile(".*products.*/([^-]*)-.*.product");
 
   private final ExportScoutProjectWizardPage m_page1;
   private final IScoutBundle m_project;

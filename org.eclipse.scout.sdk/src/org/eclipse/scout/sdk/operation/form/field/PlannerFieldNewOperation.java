@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -56,7 +57,7 @@ public class PlannerFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IPlannerField, getDeclaringType().getJavaProject()));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IPlannerField, getDeclaringType().getJavaProject()));
   }
 
   @Override
@@ -74,8 +75,8 @@ public class PlannerFieldNewOperation implements IOperation {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     newOp.setSibling(getSibling());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
-    if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractPlannerField)) {
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
+    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractPlannerField)) {
       // super type sig
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
       superTypeSigBuilder.append("<").append(getTypeName()).append(".").append(SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE).append(",");
@@ -109,7 +110,7 @@ public class PlannerFieldNewOperation implements IOperation {
   private void createPlannerTable(ITypeSourceBuilder sourceBuilder, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ITypeSourceBuilder tableBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE);
     tableBuilder.setFlags(Flags.AccPublic);
-    tableBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getDeclaringType().getJavaProject()));
+    tableBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITable, getDeclaringType().getJavaProject()));
     // order annotation
     tableBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
     // getConfiguredAutoResizeColumns method
@@ -133,14 +134,14 @@ public class PlannerFieldNewOperation implements IOperation {
   private void createActivityMap(ITypeSourceBuilder sourceBuilder, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     ITypeSourceBuilder activityMapBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP);
     activityMapBuilder.setFlags(Flags.AccPublic);
-    String activityMapSuperTypeSig = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IActivityMap, getDeclaringType().getJavaProject());
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(activityMapSuperTypeSig);
-    if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractActivityMap) ||
-        CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractExtensibleActivityMap)) {
+    String activityMapSuperTypeSig = RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IActivityMap, getDeclaringType().getJavaProject());
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(activityMapSuperTypeSig);
+    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractActivityMap) ||
+        CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractExtensibleActivityMap)) {
       // super type sig
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
-      superTypeSigBuilder.append("<").append(Long.class.getName()).append(",");
-      superTypeSigBuilder.append(Long.class.getName()).append(">");
+      superTypeSigBuilder.append('<').append(Long.class.getName()).append(',');
+      superTypeSigBuilder.append(Long.class.getName()).append('>');
       activityMapSuperTypeSig = SignatureCache.createTypeSignature(superTypeSigBuilder.toString());
     }
     activityMapBuilder.setSuperTypeSignature(activityMapSuperTypeSig);

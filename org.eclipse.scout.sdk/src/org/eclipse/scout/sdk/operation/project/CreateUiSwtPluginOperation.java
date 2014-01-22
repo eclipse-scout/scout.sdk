@@ -30,12 +30,12 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  * com.google.rcp.ui.swt
  */
 public class CreateUiSwtPluginOperation extends AbstractCreateScoutBundleOperation {
-  public final static String PROP_BUNDLE_SWT_NAME = "BUNDLE_SWT_NAME";
-  public final static String PROP_PRODUCT_FILE_DEV = "SWT_PROD_FILE_DEV";
-  public final static String PROP_PRODUCT_FILE_PROD = "SWT_PROD_FILE_PROD";
+  public static final String PROP_BUNDLE_SWT_NAME = "BUNDLE_SWT_NAME";
+  public static final String PROP_PRODUCT_FILE_DEV = "SWT_PROD_FILE_DEV";
+  public static final String PROP_PRODUCT_FILE_PROD = "SWT_PROD_FILE_PROD";
 
-  public final static String BUNDLE_ID = "org.eclipse.scout.sdk.ui.UiSwtBundle";
-  public final static String SWING_UI_PROJECT_NAME_SUFFIX = ".ui.swt";
+  public static final String BUNDLE_ID = "org.eclipse.scout.sdk.ui.UiSwtBundle";
+  public static final String SWING_UI_PROJECT_NAME_SUFFIX = ".ui.swt";
 
   @Override
   public boolean isRelevant() {

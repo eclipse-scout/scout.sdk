@@ -13,12 +13,13 @@ package org.eclipse.scout.sdk.ui.fields;
 import java.util.ArrayList;
 
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
@@ -31,6 +32,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextLabelProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.nls.NlsTextSelectionHandler;
 import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureLabelProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureSubTypeProposalProvider;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -101,6 +103,14 @@ public class FieldToolkit {
     return field;
   }
 
+  public ProposalTextField createSignatureSubTypeProposalField(Composite parent, String label, String baseTypeSignature, IJavaProject project, int labelPercentage) {
+    SignatureProposalProvider proposalProvider = new SignatureSubTypeProposalProvider(baseTypeSignature, project);
+    ProposalTextField field = createProposalField(parent, label, ProposalTextField.STYLE_DEFAULT, labelPercentage);
+    field.setContentProvider(proposalProvider);
+    field.setLabelProvider(proposalProvider.getLabelProvider());
+    return field;
+  }
+
   public ProposalTextField createSiblingProposalField(Composite parent, IType declaringType, IType siblingDeclaringType, int labelPercentage) {
     ITypeHierarchy localHierarchy = TypeUtility.getLocalTypeHierarchy(declaringType);
     return createSiblingProposalField(parent, declaringType, siblingDeclaringType, localHierarchy, labelPercentage);
@@ -149,7 +159,7 @@ public class FieldToolkit {
 
   public ProposalTextField createFormFieldSiblingProposalField(Composite parent, IType declaringType, int labelPercentage) {
     ITypeHierarchy localHierarchy = TypeUtility.getLocalTypeHierarchy(declaringType);
-    ProposalTextField field = createSiblingProposalField(parent, declaringType, TypeUtility.getType(RuntimeClasses.IFormField), localHierarchy, labelPercentage);
+    ProposalTextField field = createSiblingProposalField(parent, declaringType, TypeUtility.getType(IRuntimeClasses.IFormField), localHierarchy, labelPercentage);
     SiblingProposal selectedProposal = SiblingProposal.SIBLING_END;
     IType firstButton = ScoutTypeUtility.getFistProcessButton(declaringType, localHierarchy);
     if (firstButton != null) {

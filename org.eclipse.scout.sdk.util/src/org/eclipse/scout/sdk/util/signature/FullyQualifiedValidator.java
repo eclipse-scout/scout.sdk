@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,7 +15,7 @@ import org.eclipse.jdt.core.Signature;
 /**
  *
  */
-public class FullyQuallifiedValidator implements IImportValidator {
+public class FullyQualifiedValidator implements IImportValidator {
 
   @Override
   public void addImport(String fqn) {
@@ -30,7 +30,6 @@ public class FullyQuallifiedValidator implements IImportValidator {
   public String getTypeName(String singleTypeSignature) {
     String pckName = Signature.getSignatureQualifier(singleTypeSignature);
     String simpleName = Signature.getSignatureSimpleName(singleTypeSignature);
-    return pckName + "." + simpleName;
+    return new StringBuilder(pckName).append('.').append(simpleName).toString();
   }
-
 }

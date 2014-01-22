@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
@@ -60,9 +61,9 @@ import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataDtoUpdateOperation;
  */
 public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperation {
 
-  public final static String TEMPLATE_ID = "ID_SINGLE_FORM_TEMPLATE";
+  public static final String TEMPLATE_ID = "ID_SINGLE_FORM_TEMPLATE";
 
-  public final static String FORM_NAME = "DesktopForm";
+  public static final String FORM_NAME = "DesktopForm";
 
   @Override
   public String getOperationName() {
@@ -94,7 +95,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     // form data
     PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(FORM_NAME + "Data", shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES), shared.getJavaProject());
     formDataOp.setFlags(Flags.AccPublic);
-    formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
+    formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormData));
     formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
     formDataOp.validate();
     formDataOp.run(monitor, workingCopyManager);
@@ -116,7 +117,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     formOp.setFormDataSignature(formDataSignature);
     formOp.setCreateButtonCancel(false);
     formOp.setCreateButtonOk(false);
-    formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, client.getJavaProject()));
+    formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IForm, client.getJavaProject()));
     formOp.setFormatSource(true);
     // getConfiguredIconId method
     final ScoutIconDesc icon = client.getIconProvider().getIcon("eclipse_scout");
@@ -150,7 +151,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     // form handler
     ITypeSourceBuilder viewHandlerBuilder = new TypeSourceBuilder("ViewHandler");
     viewHandlerBuilder.setFlags(Flags.AccPublic);
-    viewHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, client.getJavaProject()));
+    viewHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IFormHandler, client.getJavaProject()));
     formOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormHandlerKey(viewHandlerBuilder), viewHandlerBuilder);
 
     // execLoad method
@@ -161,7 +162,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           String serviceInterfaceName = validator.getTypeName(SignatureCache.createTypeSignature(serviceInterface.getFullyQualifiedName()));
           source.append(serviceInterfaceName).append(" service = ");
-          source.append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
+          source.append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
           String formDataRef = validator.getTypeName(formDataSignature);
           source.append(formDataRef).append(" formData = new ").append(formDataRef).append("();").append(lineDelimiter);
           source.append("exportFormData(formData);").append(lineDelimiter);
@@ -178,7 +179,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     startHandlerMethodBuilder.setFlags(Flags.AccPublic);
     startHandlerMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
     startHandlerMethodBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
-    startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
@@ -201,11 +202,10 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     if (TypeUtility.exists(desktopType)) {
       MethodOverrideOperation execOpenOp = new MethodOverrideOperation("execOpened", desktopType, false);
       execOpenOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           source.append("//If it is a mobile or tablet device, the DesktopExtension in the mobile plugin takes care of starting the correct forms.\n");
-          source.append("if (!").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.UserAgentUtility)));
+          source.append("if (!").append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.UserAgentUtility)));
           source.append(".isDesktopDevice()) {").append(lineDelimiter);
           source.append("  return;").append(lineDelimiter);
           source.append("}").append(lineDelimiter);

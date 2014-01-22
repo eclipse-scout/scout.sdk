@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
@@ -100,7 +101,7 @@ public class FormStackNewOperation extends FormNewOperation {
       formDataTypeNewOp.addMethodSourceBuilder(MethodSourceBuilderFactory.createConstructorSourceBuilder(formDataTypeName));
       formDataTypeNewOp.setFlags(Flags.AccPublic);
       formDataTypeNewOp.setPackageExportPolicy(ExportPolicy.AddPackage);
-      formDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
+      formDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormData));
       formDataTypeNewOp.validate();
       formDataTypeNewOp.run(monitor, workingCopyManager);
       m_createdFormData = formDataTypeNewOp.getCreatedType();
@@ -150,7 +151,7 @@ public class FormStackNewOperation extends FormNewOperation {
   protected void createNewHandler(ITypeSourceBuilder formSourceBuilder) throws CoreException {
     ITypeSourceBuilder newHandlerBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_NEW_HANDLER);
     newHandlerBuilder.setFlags(Flags.AccPublic);
-    newHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getJavaProject()));
+    newHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IFormHandler, getJavaProject()));
     formSourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormHandlerKey(newHandlerBuilder), newHandlerBuilder);
 
     if (m_createdServiceInterface != null && m_createdFormData != null) {
@@ -162,7 +163,7 @@ public class FormStackNewOperation extends FormNewOperation {
           String serviceInterfaceName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName()));
           String formDataTypeName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdFormData.getFullyQualifiedName()));
           source.append(serviceInterfaceName).append(" service = ");
-          source.append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(");
+          source.append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.SERVICES))).append(".getService(");
           source.append(serviceInterfaceName).append(".class);").append(lineDelimiter);
           source.append(formDataTypeName).append(" formData = new ").append(formDataTypeName).append("();").append(lineDelimiter);
           source.append("exportFormData(formData);").append(lineDelimiter);
@@ -184,7 +185,7 @@ public class FormStackNewOperation extends FormNewOperation {
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           String serviceInterfaceName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName()));
           String formDataTypeName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdFormData.getFullyQualifiedName()));
-          source.append(serviceInterfaceName).append(" service = ").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
+          source.append(serviceInterfaceName).append(" service = ").append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
           source.append(formDataTypeName).append(" formData = new ").append(formDataTypeName).append("();").append(lineDelimiter);
           source.append("exportFormData(formData);").append(lineDelimiter);
           if (TypeUtility.exists(TypeUtility.getMethod(m_createdServiceInterface, "create"))) {
@@ -204,7 +205,7 @@ public class FormStackNewOperation extends FormNewOperation {
     startHandlerMethodBuilder.setFlags(Flags.AccPublic);
     startHandlerMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
     startHandlerMethodBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
-    startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
@@ -221,7 +222,7 @@ public class FormStackNewOperation extends FormNewOperation {
   protected void createModifyHandler(ITypeSourceBuilder formSourceBuilder) throws CoreException {
     ITypeSourceBuilder modifyHandlerBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_MODIFY_HANDLER);
     modifyHandlerBuilder.setFlags(Flags.AccPublic);
-    modifyHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getJavaProject()));
+    modifyHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IFormHandler, getJavaProject()));
     formSourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormHandlerKey(modifyHandlerBuilder), modifyHandlerBuilder);
 
     if (m_createdServiceInterface != null && m_createdFormData != null) {
@@ -233,7 +234,7 @@ public class FormStackNewOperation extends FormNewOperation {
           String serviceInterfaceName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName()));
           String formDataTypeName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdFormData.getFullyQualifiedName()));
           source.append(serviceInterfaceName).append(" service = ");
-          source.append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(");
+          source.append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.SERVICES))).append(".getService(");
           source.append(serviceInterfaceName).append(".class);").append(lineDelimiter);
           source.append(formDataTypeName).append(" formData = new ").append(formDataTypeName).append("();").append(lineDelimiter);
           source.append("exportFormData(formData);").append(lineDelimiter);
@@ -258,7 +259,7 @@ public class FormStackNewOperation extends FormNewOperation {
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           String serviceInterfaceName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdServiceInterface.getFullyQualifiedName()));
           String formDataTypeName = validator.getTypeName(SignatureCache.createTypeSignature(m_createdFormData.getFullyQualifiedName()));
-          source.append(serviceInterfaceName).append(" service = ").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
+          source.append(serviceInterfaceName).append(" service = ").append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.SERVICES))).append(".getService(").append(serviceInterfaceName).append(".class);").append(lineDelimiter);
           source.append(formDataTypeName).append(" formData = new ").append(formDataTypeName).append("();").append(lineDelimiter);
           source.append("exportFormData(formData);").append(lineDelimiter);
           if (TypeUtility.exists(TypeUtility.getMethod(m_createdServiceInterface, "store"))) {
@@ -278,7 +279,7 @@ public class FormStackNewOperation extends FormNewOperation {
     startHandlerMethodBuilder.setFlags(Flags.AccPublic);
     startHandlerMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
     startHandlerMethodBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
-    startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    startHandlerMethodBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     startHandlerMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {

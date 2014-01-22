@@ -19,7 +19,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
@@ -79,7 +79,7 @@ public class MenuNewOperation implements IOperation {
     OrderedInnerTypeNewOperation menuNewOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType());
     menuNewOp.setSuperTypeSignature(getSuperTypeSignature());
     menuNewOp.setFlags(Flags.AccPublic);
-    menuNewOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IMenu));
+    menuNewOp.setOrderDefinitionType(TypeUtility.getType(IRuntimeClasses.IMenu));
     menuNewOp.setSibling(getSibling());
     // getConfiguredLabel method
     if (getNlsEntry() != null) {
@@ -111,7 +111,7 @@ public class MenuNewOperation implements IOperation {
           String formTypeName = validator.getTypeName(SignatureCache.createTypeSignature(getFormToOpen().getFullyQualifiedName()));
           source.append(formTypeName + " ").append(FORM_NAME).append(" = new ").append(formTypeName).append("();").append(lineDelimiter);
           if (getFormHandler() != null) {
-            IType table = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.ITable), hierarchy));
+            IType table = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITable), hierarchy));
             if (!isNewFormHandler && TypeUtility.exists(table)) {
               IType[] columns = ScoutTypeUtility.getPrimaryKeyColumns(table);
               for (IType col : columns) {
@@ -132,7 +132,7 @@ public class MenuNewOperation implements IOperation {
           else {
             source.append(ScoutUtility.getCommentBlock("start form here.")).append(lineDelimiter);
           }
-          IType pageWithTable = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IPageWithTable), hierarchy));
+          IType pageWithTable = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IPageWithTable), hierarchy));
           if (TypeUtility.exists(pageWithTable)) {
             source.append("\n" + FORM_NAME + ".waitFor();").append(lineDelimiter);
             source.append("if (" + FORM_NAME + ".isFormStored()) {").append(lineDelimiter);

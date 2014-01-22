@@ -19,7 +19,7 @@ import org.eclipse.ui.services.IServiceLocator;
 
 public class MenuVisibilityTester extends PropertyTester {
 
-  private final static int MENU_PREPARATION_MAX_DURATION = 15; // ms
+  private static final int MENU_PREPARATION_MAX_DURATION = 15; // ms
 
   private static <T> boolean contains(T[] list, T toSearch) {
     if (list == null) return false;

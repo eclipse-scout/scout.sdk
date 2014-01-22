@@ -106,7 +106,7 @@ public class DragAndDropTypePresenter extends AbstractProposalPresenter<FieldPro
     }
   }
 
-  private final static class NoneFieldProperty extends UiFieldProperty<Integer> {
+  private static final class NoneFieldProperty extends UiFieldProperty<Integer> {
     private NoneFieldProperty() {
       super(new VirtualNoneField(), "None");
     }
@@ -118,7 +118,7 @@ public class DragAndDropTypePresenter extends AbstractProposalPresenter<FieldPro
   }
 
   @SuppressWarnings("restriction")
-  private final static class VirtualNoneField extends org.eclipse.jdt.internal.core.ResolvedSourceField {
+  private static final class VirtualNoneField extends org.eclipse.jdt.internal.core.ResolvedSourceField {
     public VirtualNoneField() {
       super(null, "0", null);
     }

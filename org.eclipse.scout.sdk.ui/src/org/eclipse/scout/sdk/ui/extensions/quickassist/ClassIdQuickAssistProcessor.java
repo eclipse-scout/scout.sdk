@@ -202,7 +202,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     return null;
   }
 
-  private final static class ClassIdAddProposal extends CUCorrectionProposal {
+  private static final class ClassIdAddProposal extends CUCorrectionProposal {
 
     private final CompilationUnitRewrite m_rewrite;
 
@@ -221,7 +221,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     }
   }
 
-  private final static class ClassIdTarget {
+  private static final class ClassIdTarget {
 
     private final TypeDeclaration td;
     private final IType type;

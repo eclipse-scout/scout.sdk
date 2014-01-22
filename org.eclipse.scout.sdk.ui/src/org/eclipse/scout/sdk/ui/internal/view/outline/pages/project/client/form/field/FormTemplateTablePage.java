@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.dto.TypeResolverFormDataAction;
@@ -69,7 +69,7 @@ public class FormTemplateTablePage extends AbstractPage {
   }
 
   protected IType[] resolveFormTemplates() {
-    IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+    IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
 
     if (m_formHierarchy == null) {
       m_formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);

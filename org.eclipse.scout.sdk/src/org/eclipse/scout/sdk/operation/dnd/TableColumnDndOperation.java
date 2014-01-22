@@ -16,7 +16,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
@@ -33,9 +32,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  *
  */
 public class TableColumnDndOperation extends AbstractTypeDndOperation {
-
-  final IType iTableField = TypeUtility.getType(RuntimeClasses.ITableField);
-  final IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
 
   /**
    * @param type

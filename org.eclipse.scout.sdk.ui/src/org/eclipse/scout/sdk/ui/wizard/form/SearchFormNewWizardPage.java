@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -57,9 +58,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
   public static final String PROP_TABLE_PAGE = "tablePage";
   public static final String PROP_TARGET_PACKAGE = "targetPackage";
 
-  private final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
-  private final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
-  private final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+  private final IType iSearchForm = TypeUtility.getType(IRuntimeClasses.ISearchForm);
 
   // ui fields
   private ProposalTextField m_nlsNameField;
@@ -80,7 +79,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewSearchForm"));
 
     if (clientBundle != null) {
-      m_abstractSearchForm = RuntimeClasses.getSuperType(RuntimeClasses.ISearchForm, ScoutUtility.getJavaProject(clientBundle));
+      m_abstractSearchForm = RuntimeClasses.getSuperType(IRuntimeClasses.ISearchForm, ScoutUtility.getJavaProject(clientBundle));
       setSuperTypeInternal(m_abstractSearchForm);
       setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_SEARCHFORMS));
     }
@@ -183,6 +182,8 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     m_tablePageField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("TablePage"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
+        IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
+        IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
         IType[] list = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithTable, TypeFilters.getTypesOnClasspath(ScoutUtility.getJavaProject(getClientBundle())), TypeComparators.getTypeNameComparator());
         return new Object[][]{list};
       }
@@ -245,11 +246,11 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_SEARCH_FORM);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_SEARCH_FORM);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getClientBundle(), getTargetPackage(IDefaultTargetPackage.CLIENT_SEARCHFORMS), getTypeName());
+    IStatus existingStatus = ScoutUtility.validateTypeNotExisting(getClientBundle(), getTargetPackage(IDefaultTargetPackage.CLIENT_SEARCHFORMS), getTypeName());
     if (!existingStatus.isOK()) {
       return existingStatus;
     }

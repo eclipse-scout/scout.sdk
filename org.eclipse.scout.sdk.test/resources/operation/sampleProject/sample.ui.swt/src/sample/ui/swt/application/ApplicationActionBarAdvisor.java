@@ -1,5 +1,11 @@
 package sample.ui.swt.application;
 
+import java.util.List;
+
+import sample.ui.swt.Activator;
+import sample.ui.swt.SwtEnvironment;
+import sample.ui.swt.application.button.CoolbarButton;
+
 import org.eclipse.jface.action.ICoolBarManager;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.IToolBarManager;
@@ -17,10 +23,6 @@ import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
 
-import sample.ui.swt.Activator;
-import sample.ui.swt.SwtEnvironment;
-import sample.ui.swt.application.button.CoolbarButton;
-
 /**
  * <h3>ApplicationActionBarAdvisor</h3> Used for menu contributions.
  */
@@ -28,7 +30,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
 
   private static IScoutLogger logger = ScoutLogManager.getLogger(ApplicationActionBarAdvisor.class);
 
-  final static int NUM_OUTLINE_BUTTONS = 0;
+  static final int NUM_OUTLINE_BUTTONS = 0;
   private CoolbarButton[] m_coolbarButton = new CoolbarButton[NUM_OUTLINE_BUTTONS];
 
   public ApplicationActionBarAdvisor(IActionBarConfigurer configurer) {
@@ -49,12 +51,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
   }
 
   public void initViewButtons(IDesktop d) {
-    IViewButton[] viewButtons = d.getViewButtons();
+    List<IViewButton> viewButtons = d.getViewButtons();
     int start = 0;
-    int end = Math.min(m_coolbarButton.length, viewButtons.length);
+    int end = Math.min(m_coolbarButton.length, viewButtons.size());
     for (int i = start; i < end; i++) {
       CoolbarButton b = m_coolbarButton[i];
-      IViewButton v = viewButtons[i];
+      IViewButton v = viewButtons.get(i);
 
       b.setEnabled(v.isEnabled() && v.isEnabledGranted());
       if (v.isVisible() && v.isVisibleGranted()) {
@@ -66,12 +68,12 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
     }
 
-    IToolButton[] toolButtons = d.getToolButtons();
+    List<IToolButton> toolButtons = d.getToolButtons();
     start = end + 1;
-    end = Math.min(m_coolbarButton.length, start + toolButtons.length);
+    end = Math.min(m_coolbarButton.length, start + toolButtons.size());
     for (int i = start; i < end; i++) {
       CoolbarButton b = m_coolbarButton[i];
-      IToolButton v = toolButtons[i - start];
+      IToolButton v = toolButtons.get(i - start);
 
       b.setEnabled(v.isEnabled() && v.isEnabledGranted());
       if (v.isVisible() && v.isVisibleGranted()) {
@@ -83,7 +85,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
       }
     }
 
-    if (viewButtons.length + toolButtons.length > NUM_OUTLINE_BUTTONS) {
+    if (viewButtons.size() + toolButtons.size() > NUM_OUTLINE_BUTTONS) {
       logger.warn("There are more buttons configured in the desktop model than prepared in the SWT UI. Consider to increase 'NUM_OUTLINE_BUTTONS' in class '" + getClass().getName() + "'.");
     }
   }
@@ -97,3 +99,4 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor {
     }
   }
 }
+

@@ -13,11 +13,13 @@ package org.eclipse.scout.sdk.ui.wizard.lookupcall;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -28,10 +30,13 @@ import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.MoreElementsProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -61,14 +66,12 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     CREATE_NEW, USE_EXISTING, NO_SERVICE
   }
 
-  private final IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
-  private final IType abstractLookupService = TypeUtility.getType(RuntimeClasses.AbstractLookupService);
-
   public static final String PROP_TYPE_NAME = "typeName";
   public static final String PROP_SERVICE_SUPER_TYPE = "serviceSuperType";
   public static final String PROP_LOOKUP_SERVICE = "lookupService";
   public static final String PROP_LOOKUP_SERVICE_STRATEGY = "lookupServiceStrategy";
   public static final String PROP_TARGET_PACKAGE = "targetPackage";
+  public static final String PROP_GENERIC_TYPE = "genericType";
 
   // ui fields
   private StyledTextField m_typeNameField;
@@ -77,6 +80,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   private Button m_noServiceButton;
   private ProposalTextField m_serviceSuperTypeField;
   private ProposalTextField m_lookupServiceTypeField;
+  private ProposalTextField m_genericTypeField;
   private EntityTextField m_entityField;
 
   // process members
@@ -97,7 +101,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     }
     if (serverBundle != null) {
       setLookupServiceStrategy(LOOKUP_SERVICE_STRATEGY.CREATE_NEW);
-      m_abstractSqlLookupService = RuntimeClasses.getSuperType(RuntimeClasses.ILookupService, serverBundle.getJavaProject());
+      m_abstractSqlLookupService = RuntimeClasses.getSuperType(IRuntimeClasses.ILookupService, serverBundle.getJavaProject());
       setServiceSuperTypeInternal(m_abstractSqlLookupService);
     }
     else {
@@ -136,6 +140,17 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       m_entityField.setEnabled(isEnabled);
     }
 
+    m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, Texts.get("KeyType"), getSharedBundle(), SignatureProposalProvider.DEFAULT_MOST_USED, labelPercentage);
+    m_genericTypeField.acceptProposal(getGenericTypeSignature());
+    m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
+      public void proposalAccepted(ContentProposalEvent event) {
+        setGenericTypeSignatureInternal((String) event.proposal);
+        pingStateChanging();
+      }
+    });
+    m_genericTypeField.setEnabled(isEnabled);
+
     Control lookupServiceGroup = createLookupServiceGroup(parent);
 
     // layout
@@ -143,6 +158,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     lookupServiceGroup.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_genericTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
     m_typeNameField.setFocus();
   }
@@ -168,17 +184,20 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_serviceSuperTypeField = getFieldToolkit().createProposalField(group, Texts.get("LookupServiceSuperType"));
     if (serverAvailable) {
-      AbstractJavaElementContentProvider contentProvider = new AbstractJavaElementContentProvider() {
+      final AbstractJavaElementContentProvider contentProvider = new AbstractJavaElementContentProvider() {
         @Override
         protected Object[][] computeProposals() {
+          IType abstractLookupService = TypeUtility.getType(IRuntimeClasses.AbstractLookupService);
           List<Object> proposals = new ArrayList<Object>();
           proposals.add(abstractLookupService);
           if (m_abstractSqlLookupService != null) {
             proposals.add(m_abstractSqlLookupService);
           }
           proposals.add(MoreElementsProposal.INSTANCE);
-          ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
-          IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+
+          ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.ILookupService));
+          ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject()), TypeFilters.getTypeParamSubTypeFilter(getGenericTypeSignature(), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE));
+          IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(filter, TypeComparators.getTypeNameComparator());
           for (IType t : abstractLookupServices) {
             if (!proposals.contains(t)) {
               proposals.add(t);
@@ -190,6 +209,14 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       m_serviceSuperTypeField.setContentProvider(contentProvider);
       m_serviceSuperTypeField.setLabelProvider(contentProvider.getLabelProvider());
       m_serviceSuperTypeField.acceptProposal(getServiceSuperType());
+
+      m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+        @Override
+        public void proposalAccepted(ContentProposalEvent event) {
+          contentProvider.invalidateCache();
+          pingStateChanging();
+        }
+      });
     }
     else {
       m_serviceSuperTypeField.setEnabled(false);
@@ -201,23 +228,46 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_serviceSuperTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setServiceSuperTypeInternal((IType) event.proposal);
+        IType t = (IType) event.proposal;
+        setServiceSuperTypeInternal(t);
+        m_genericTypeField.setEnabled(TypeUtility.isGenericType(t));
+        if (getGenericTypeSignature() == null && TypeUtility.exists(t)) {
+          try {
+            String lookupSvcKeyTypeSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, t.newSupertypeHierarchy(null), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
+            if (lookupSvcKeyTypeSig != null) {
+              setGenericTypeSignature(lookupSvcKeyTypeSig);
+            }
+          }
+          catch (CoreException e) {
+            ScoutSdkUi.logError(e);
+          }
+        }
         pingStateChanging();
       }
     });
 
     m_lookupServiceTypeField = getFieldToolkit().createProposalField(group, Texts.get("LookupService"));
     if (getSharedBundle() != null) {
-      AbstractJavaElementContentProvider contentProvider = new AbstractJavaElementContentProvider() {
+      final AbstractJavaElementContentProvider contentProvider = new AbstractJavaElementContentProvider() {
         @Override
         protected Object[][] computeProposals() {
+          IType iLookupService = TypeUtility.getType(IRuntimeClasses.ILookupService);
           ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
-          IType[] lookupServices = lookupServiceHierarchy.getAllInterfaces(TypeFilters.getTypesOnClasspath(getSharedBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
+          ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getSharedBundle().getJavaProject()), TypeFilters.getTypeParamSubTypeFilter(getGenericTypeSignature(), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE));
+          IType[] lookupServices = lookupServiceHierarchy.getAllInterfaces(filter, TypeComparators.getTypeNameComparator());
           return new Object[][]{lookupServices};
         }
       };
       m_lookupServiceTypeField.setContentProvider(contentProvider);
       m_lookupServiceTypeField.setLabelProvider(contentProvider.getLabelProvider());
+
+      m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+        @Override
+        public void proposalAccepted(ContentProposalEvent event) {
+          contentProvider.invalidateCache();
+          pingStateChanging();
+        }
+      });
     }
     else {
       m_lookupServiceTypeField.setEnabled(false);
@@ -258,6 +308,50 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     multiStatus.add(getStatusNameField());
     multiStatus.add(getStatusSuperType());
     multiStatus.add(getStatusLookupService());
+    multiStatus.add(getStatusGenericType());
+    multiStatus.add(getStatusGenericTypeToSuperClass());
+    multiStatus.add(getStatusGenericTypeToLookupService());
+  }
+
+  protected IStatus getStatusGenericTypeToLookupService() {
+    if (getLookupServiceStrategy() == LOOKUP_SERVICE_STRATEGY.USE_EXISTING && getLookupServiceType() != null) {
+      IType superType = getGenericTypeOf(getLookupServiceType());
+      if (TypeUtility.exists(superType)) {
+        IType generic = TypeUtility.getTypeBySignature(getGenericTypeSignature());
+        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(superType)) {
+          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
+        }
+      }
+    }
+    return Status.OK_STATUS;
+  }
+
+  protected IStatus getStatusGenericTypeToSuperClass() {
+    if (getLookupServiceStrategy() == LOOKUP_SERVICE_STRATEGY.CREATE_NEW && getGenericTypeSignature() != null) {
+      IType superType = getGenericTypeOf(getServiceSuperType());
+      if (TypeUtility.exists(superType)) {
+        IType generic = TypeUtility.getTypeBySignature(getGenericTypeSignature());
+        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(superType)) {
+          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
+        }
+      }
+    }
+    return Status.OK_STATUS;
+  }
+
+  protected IType getGenericTypeOf(IType lookupType) {
+    if (TypeUtility.exists(lookupType)) {
+      try {
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(lookupType, lookupType.newSupertypeHierarchy(null), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
+        if (typeParamSig != null) {
+          return TypeUtility.getTypeBySignature(typeParamSig);
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError(e);
+      }
+    }
+    return null;
   }
 
   protected IStatus getStatusWorkspace() {
@@ -268,11 +362,11 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_LOOKUP_CALL);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_LOOKUP_CALL);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getSharedBundle(), getTargetPackage(), getTypeName());
+    IStatus existingStatus = ScoutUtility.validateTypeNotExisting(getSharedBundle(), getTargetPackage(), getTypeName());
     if (!existingStatus.isOK()) {
       return existingStatus;
     }
@@ -289,6 +383,13 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IStatus getStatusLookupService() {
     if (getLookupServiceStrategy() == LOOKUP_SERVICE_STRATEGY.USE_EXISTING && getLookupServiceType() == null) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheLookupCallCanNotBeNull"));
+    }
+    return Status.OK_STATUS;
+  }
+
+  protected IStatus getStatusGenericType() {
+    if (getGenericTypeSignature() == null) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }
@@ -460,5 +561,26 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected void setTargetPackageInternal(String targetPackage) {
     setProperty(PROP_TARGET_PACKAGE, targetPackage);
+  }
+
+  public String getGenericTypeSignature() {
+    return (String) getProperty(PROP_GENERIC_TYPE);
+  }
+
+  public void setGenericTypeSignature(String genericType) {
+    try {
+      setStateChanging(true);
+      setGenericTypeSignatureInternal(genericType);
+      if (isControlCreated()) {
+        m_genericTypeField.acceptProposal(genericType);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setGenericTypeSignatureInternal(String genericType) {
+    setProperty(PROP_GENERIC_TYPE, genericType);
   }
 }

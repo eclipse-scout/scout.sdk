@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -32,7 +33,7 @@ public class FormFieldRenameAction extends AbstractRenameAction {
     transaction.add(getFormField(), newName);
     IMethod getter = ScoutTypeUtility.getFormFieldGetterMethod(getFormField());
     if (TypeUtility.exists(getter)) {
-      transaction.add(getter, "get" + Character.toUpperCase(newName.charAt(0)) + newName.substring(1));
+      transaction.add(getter, "get" + NamingUtility.ensureStartWithUpperCase(newName));
     }
   }
 

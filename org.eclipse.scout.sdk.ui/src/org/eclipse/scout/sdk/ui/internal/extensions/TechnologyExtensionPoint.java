@@ -17,17 +17,17 @@ import org.eclipse.scout.sdk.ui.internal.extensions.technology.Technology;
 
 public final class TechnologyExtensionPoint {
 
-  public final static String EXTENSION_ID = "technology";
-  public final static String TAG_TECH = "technology";
-  public final static String TAG_HANDLER = "handler";
-  public final static String ATTR_NAME = "name";
-  public final static String ATTR_ID = "id";
-  public final static String ATTR_TECH = "technology";
-  public final static String ATTR_CLASS = "class";
-  public final static String ATTR_CATEGORY = "category";
+  public static final String EXTENSION_ID = "technology";
+  public static final String TAG_TECH = "technology";
+  public static final String TAG_HANDLER = "handler";
+  public static final String ATTR_NAME = "name";
+  public static final String ATTR_ID = "id";
+  public static final String ATTR_TECH = "technology";
+  public static final String ATTR_CLASS = "class";
+  public static final String ATTR_CATEGORY = "category";
 
   private static volatile HashSet<Technology> technologies;
-  private final static Object lock = new Object();
+  private static final Object lock = new Object();
 
   private TechnologyExtensionPoint() {
   }

@@ -13,12 +13,12 @@ package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
@@ -26,7 +26,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.osgi.framework.Bundle;
 
@@ -44,27 +43,27 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
 
   @Override
   public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-    List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-    if (!(context instanceof JavaContentAssistInvocationContext)
-        || Platform.getBundle(ScoutSdkUi.PLUGIN_ID).getState() != Bundle.ACTIVE) {
+    List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(1);
+    if (!(context instanceof JavaContentAssistInvocationContext) || Platform.getBundle(ScoutSdkUi.PLUGIN_ID).getState() != Bundle.ACTIVE) {
       return proposals;
     }
-    try {
-      JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-      ICompilationUnit icu = javaContext.getCompilationUnit();
-      IJavaElement element = JdtUtility.findJavaElement(icu, context.getInvocationOffset(), 0);
+
+    JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
+    IJavaElement element = javaContext.getCoreContext().getEnclosingElement();
+    if (TypeUtility.exists(element)) {
       if (element.getElementType() == IJavaElement.TYPE) {
         IType declaringType = (IType) element;
-        if (TypeUtility.isSubtype(TypeUtility.getType(IRuntimeClasses.ICodeType), declaringType, declaringType.newSupertypeHierarchy(monitor)) ||
-            TypeUtility.isSubtype(TypeUtility.getType(IRuntimeClasses.ICode), declaringType, declaringType.newSupertypeHierarchy(monitor))) {
-          proposals.add(new CodeNewProposal(declaringType));
+        try {
+          ITypeHierarchy supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
+          if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
+            proposals.add(new CodeNewProposal(declaringType));
+          }
+        }
+        catch (JavaModelException e) {
+          ScoutSdkUi.logError("Could not calculate code completion proposals. ", e);
         }
       }
     }
-    catch (CoreException e) {
-      ScoutSdkUi.logError(e);
-    }
-
     return proposals;
   }
 

@@ -36,7 +36,7 @@ public class SharedContextPropertyNodePage extends AbstractPage {
     if (desc == null) {
       desc = getClientDesc();
     }
-    setName(NamingUtility.toVariableName(desc.getBeanName()) + " (" + Signature.getSignatureSimpleName(desc.getBeanSignature()) + ")");
+    setName(NamingUtility.ensureStartWithLowerCase(desc.getBeanName()) + " (" + Signature.getSignatureSimpleName(desc.getBeanSignature()) + ")");
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Variable));
   }
 

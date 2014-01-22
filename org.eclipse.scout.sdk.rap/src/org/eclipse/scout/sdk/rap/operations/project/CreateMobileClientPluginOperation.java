@@ -29,8 +29,8 @@ import org.osgi.framework.Bundle;
 
 public class CreateMobileClientPluginOperation extends AbstractCreateScoutBundleOperation {
 
-  public final static String PROP_MOBILE_BUNDLE_CLIENT_NAME = "BUNDLE_MOBILE_CLIENT_NAME";
-  public final static String MOBILE_CLIENT_PROJECT_NAME_SUFFIX = ".client.mobile";
+  public static final String PROP_MOBILE_BUNDLE_CLIENT_NAME = "BUNDLE_MOBILE_CLIENT_NAME";
+  public static final String MOBILE_CLIENT_PROJECT_NAME_SUFFIX = ".client.mobile";
 
   @Override
   public String getOperationName() {

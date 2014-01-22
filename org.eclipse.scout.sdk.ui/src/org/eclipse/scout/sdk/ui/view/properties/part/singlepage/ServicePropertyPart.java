@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinkGroup;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.TypeOpenLink;
@@ -41,8 +41,7 @@ import org.eclipse.swt.widgets.Composite;
 public class ServicePropertyPart extends JdtTypePropertyPart {
   private static final String SECTION_ID_LINKS = "section.links";
 
-  private final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
-  private final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+  private final IType basicPermission = TypeUtility.getType(IRuntimeClasses.BasicPermission);
 
   @Override
   protected void createSections() {
@@ -72,6 +71,7 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
 
     if (!StringUtility.isNullOrEmpty(entityName)) {
       // form
+      IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
       if (TypeUtility.exists(iForm) && getPage().getInterfaceType() != null) /* can be null on a server-only-project (bugzilla ticket 325428) */{
         String formRegex = entityName + SdkProperties.SUFFIX_FORM;
         IScoutBundle interfaceBundle = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(getPage().getInterfaceType());

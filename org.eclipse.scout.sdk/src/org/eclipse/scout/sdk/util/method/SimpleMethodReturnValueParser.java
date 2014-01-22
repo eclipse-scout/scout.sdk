@@ -27,10 +27,10 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
  */
 public final class SimpleMethodReturnValueParser implements IMethodReturnValueParser {
 
-  public final static Pattern REGEX_PROPERTY_METHOD_REPRESENTER_VALUE = Pattern.compile("\\{.*return\\s*((.*\\\".*\\\".*)|([^\\\"]*))\\s*\\;.*\\}", Pattern.DOTALL);
-  public final static Pattern REGEX_TYPE_REFERENCE = Pattern.compile("([a-zA-Z_][a-zA-Z0-9_]{0,200})\\.{1}", Pattern.DOTALL);
+  public static final Pattern REGEX_PROPERTY_METHOD_REPRESENTER_VALUE = Pattern.compile("\\{.*return\\s*((.*\\\".*\\\".*)|([^\\\"]*))\\s*\\;.*\\}", Pattern.DOTALL);
+  public static final Pattern REGEX_TYPE_REFERENCE = Pattern.compile("([a-zA-Z_][a-zA-Z0-9_]{0,200})\\.{1}", Pattern.DOTALL);
 
-  public final static IMethodReturnValueParser INSTANCE = new SimpleMethodReturnValueParser();
+  public static final IMethodReturnValueParser INSTANCE = new SimpleMethodReturnValueParser();
 
   private SimpleMethodReturnValueParser() {
   }

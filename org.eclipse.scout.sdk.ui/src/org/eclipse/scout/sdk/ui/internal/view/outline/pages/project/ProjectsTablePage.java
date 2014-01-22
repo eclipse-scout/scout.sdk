@@ -18,7 +18,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
@@ -194,7 +194,7 @@ public class ProjectsTablePage extends AbstractPage {
       ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
-          IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+          IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
           IPrimaryTypeTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
           return formHierarchy.getAllSubtypes(iForm);
         }
@@ -204,7 +204,7 @@ public class ProjectsTablePage extends AbstractPage {
       ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
-          IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+          IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
           IPrimaryTypeTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
           return pageWithTableHierarchy.getAllSubtypes(iPageWithTable);
         }

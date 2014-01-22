@@ -34,11 +34,11 @@ public final class CommentSourceBuilderFactory {
 
   private static IJavaElementCommentBuilderService javaElementCommentBuilderService;
 
-  private final static Pattern REGEX_COMMENT_PATTERN1 = Pattern.compile("^s*\\/\\*\\*s*$");
-  private final static Pattern REGEX_COMMENT_PATTERN2 = Pattern.compile("^s*\\*\\*\\/s*$");
-  private final static Pattern REGEX_COMMENT_PATTERN3 = Pattern.compile("^s*\\*.*$");
+  private static final Pattern REGEX_COMMENT_PATTERN1 = Pattern.compile("^s*\\/\\*\\*s*$");
+  private static final Pattern REGEX_COMMENT_PATTERN2 = Pattern.compile("^s*\\*\\*\\/s*$");
+  private static final Pattern REGEX_COMMENT_PATTERN3 = Pattern.compile("^s*\\*.*$");
 
-  private final static ICommentSourceBuilder emptyCommentSourceBuilder = new ICommentSourceBuilder() {
+  private static final ICommentSourceBuilder emptyCommentSourceBuilder = new ICommentSourceBuilder() {
     @Override
     public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
     }

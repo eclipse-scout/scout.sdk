@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
@@ -40,7 +40,7 @@ public class MySqlJdbcProdTechnologyHandler extends AbstractScoutTechnologyHandl
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
     return getSelectionProductFiles(getServerBundlesBelow(project),
-        new String[]{RuntimeClasses.ScoutServerBundleId},
+        new String[]{IRuntimeClasses.ScoutServerBundleId},
         new String[]{MY_SQL_JDBC_FRAGMENT, MY_SQL_JDBC_PLUGIN});
   }
 
@@ -51,7 +51,7 @@ public class MySqlJdbcProdTechnologyHandler extends AbstractScoutTechnologyHandl
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getServerBundlesBelow(project), list, RuntimeClasses.ScoutServerBundleId);
+    contributeProductFiles(getServerBundlesBelow(project), list, IRuntimeClasses.ScoutServerBundleId);
   }
 
   private IScoutBundle[] getServerBundlesBelow(IScoutBundle start) {

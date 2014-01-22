@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
@@ -38,9 +39,9 @@ public class ToolbuttonNewOperation extends OrderedInnerTypeNewOperation {
   public ToolbuttonNewOperation(String toolbuttonElementName, IType declaringType, boolean formatSource) {
     super(toolbuttonElementName, declaringType, formatSource);
     // defaults
-    setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IToolButton));
+    setOrderDefinitionType(TypeUtility.getType(IRuntimeClasses.IToolButton));
     setFlags(Flags.AccPublic);
-    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IToolButton, declaringType.getJavaProject()));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IToolButton, declaringType.getJavaProject()));
   }
 
   @Override

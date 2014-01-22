@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -60,7 +61,7 @@ public class CalendarServiceNewWizard extends AbstractServiceWizard {
     setWindowTitle(Texts.get("NewCalendarService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewCalendarService"), Texts.get("CreateANewCalendarService"),
-        TypeUtility.getType(RuntimeClasses.ICalendarService), SdkProperties.SUFFIX_CALENDAR_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_CALENDAR));
+        TypeUtility.getType(IRuntimeClasses.ICalendarService), SdkProperties.SUFFIX_CALENDAR_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_CALENDAR));
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
     addPage(m_serviceNewWizardPage);
@@ -73,7 +74,7 @@ public class CalendarServiceNewWizard extends AbstractServiceWizard {
     addPage(m_locationWizardPage);
 
     // init
-    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IService, serverBundle.getJavaProject()));
+    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IService, serverBundle.getJavaProject()));
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
@@ -138,7 +139,7 @@ public class CalendarServiceNewWizard extends AbstractServiceWizard {
       m_operation.setInterfaceProject(interfaceBundle.getJavaProject());
       m_operation.setInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
-    m_operation.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.ICalendarService));
+    m_operation.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ICalendarService));
     return true;
   }
 

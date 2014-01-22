@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.ToolbuttonNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -69,7 +69,7 @@ public class ToolButtonTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iToolButton = TypeUtility.getType(RuntimeClasses.IToolButton);
+    IType iToolButton = TypeUtility.getType(IRuntimeClasses.IToolButton);
 
     if (m_toolButtonChangedListener == null) {
       m_toolButtonChangedListener = new InnerTypePageDirtyListener(this, iToolButton);

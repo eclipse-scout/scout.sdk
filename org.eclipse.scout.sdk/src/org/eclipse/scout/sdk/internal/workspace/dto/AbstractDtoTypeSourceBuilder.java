@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
-import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
@@ -130,18 +130,18 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
           if (desc.getReadMethod() != null || desc.getWriteMethod() != null) {
             if (FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getReadMethod())) &&
                 FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getWriteMethod()))) {
-              String beanName = ScoutUtility.ensureValidParameterName(desc.getBeanName());
-              String lowerCaseBeanName = ScoutUtility.ensureStartWithLowerCase(beanName);
-              final String upperCaseBeanName = ScoutUtility.ensureStartWithUpperCase(beanName);
+              String beanName = NamingUtility.ensureValidParameterName(desc.getBeanName());
+              String lowerCaseBeanName = NamingUtility.ensureStartWithLowerCase(beanName);
+              final String upperCaseBeanName = NamingUtility.ensureStartWithUpperCase(beanName);
 
               String propName = upperCaseBeanName + "Property";
               String resolvedSignature = SignatureUtility.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());
-              String unboxedSignature = ScoutUtility.unboxPrimitiveSignature(resolvedSignature);
+              String unboxedSignature = SignatureUtility.unboxPrimitiveSignature(resolvedSignature);
 
               // property class
               TypeSourceBuilder propertyTypeBuilder = new TypeSourceBuilder(propName);
               propertyTypeBuilder.setFlags(Flags.AccPublic | Flags.AccStatic);
-              String superTypeSig = SignatureCache.createTypeSignature(RuntimeClasses.AbstractPropertyData);
+              String superTypeSig = SignatureCache.createTypeSignature(IRuntimeClasses.AbstractPropertyData);
               superTypeSig = superTypeSig.replaceAll("\\;$", "<" + unboxedSignature + ">;");
               propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
               IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();

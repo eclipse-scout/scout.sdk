@@ -27,7 +27,7 @@ import org.junit.Test;
 /**
  * <h3>{@link OutlineNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 15.04.2013
  */
 public class OutlineNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -53,7 +53,6 @@ public class OutlineNewOperationTest extends AbstractSdkTestWithSampleProject {
     IType outline = outlineOp.getCreatedType();
     SdkAssert.assertExist(outline);
     testApiOfTest01Outline();
-
   }
 
   @Test
@@ -75,7 +74,6 @@ public class OutlineNewOperationTest extends AbstractSdkTestWithSampleProject {
 
     SdkAssert.assertMethodExist(desktop, "getConfiguredOutlines");
     IType viewButton = SdkAssert.assertTypeExists(desktop, "Test02Outline" + SdkProperties.SUFFIX_VIEW_BUTTON);
-    SdkAssert.assertMethodExist(viewButton, "getConfiguredText");
     SdkAssert.assertHasSuperType(viewButton, RuntimeClasses.IViewButton);
   }
 

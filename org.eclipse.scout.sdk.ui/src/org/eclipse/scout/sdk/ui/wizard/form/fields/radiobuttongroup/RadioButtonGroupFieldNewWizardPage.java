@@ -16,11 +16,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.RadioButtonGroupFieldNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -34,7 +34,6 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -73,7 +72,7 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
     setDescription(Texts.get("CreateANewRadioButtonGroup"));
     m_declaringType = declaringType;
     // default
-    m_abstractRadioButtonGroup = RuntimeClasses.getSuperType(RuntimeClasses.IRadioButtonGroup, m_declaringType.getJavaProject());
+    m_abstractRadioButtonGroup = RuntimeClasses.getSuperType(IRuntimeClasses.IRadioButtonGroup, m_declaringType.getJavaProject());
     setSuperType(m_abstractRadioButtonGroup);
     m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
     m_sibling = SiblingProposal.SIBLING_END;
@@ -175,30 +174,18 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    try {
-      multiStatus.add(getStatusNameField());
-      multiStatus.add(getStatusGenericType());
-      if (isControlCreated()) {
-        m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
-      }
-    }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError("could not validate name field.", e);
+    multiStatus.add(getStatusNameField());
+    multiStatus.add(getStatusGenericType());
+    if (isControlCreated()) {
+      m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     }
   }
 
-  protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_BUTTON_GROUP);
-    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
-      return javaFieldNameStatus;
-    }
-    if (ScoutTypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getRegexSimpleNameFilter(getTypeName())).length > 0) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-    }
-    return javaFieldNameStatus;
+  protected IStatus getStatusNameField() {
+    return ScoutUtility.validateFormFieldName(getTypeName(), SdkProperties.SUFFIX_BUTTON_GROUP, m_declaringType);
   }
 
-  protected IStatus getStatusGenericType() throws JavaModelException {
+  protected IStatus getStatusGenericType() {
     if (TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));

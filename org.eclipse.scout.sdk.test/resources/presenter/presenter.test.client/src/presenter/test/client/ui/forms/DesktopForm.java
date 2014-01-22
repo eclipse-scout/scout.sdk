@@ -8,7 +8,6 @@ import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.IValueField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
-import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.longfield.AbstractLongField;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
@@ -140,7 +139,7 @@ public class DesktopForm extends AbstractForm {
     public class CodeTypePresenterTestField extends AbstractSmartField<Long> {
 
       @Override
-      protected Class<? extends ICodeType<Long>> getConfiguredCodeType() {
+      protected Class<? extends ICodeType<?, Long>> getConfiguredCodeType() {
         return TestCodeType.class;
       }
     }
@@ -149,7 +148,7 @@ public class DesktopForm extends AbstractForm {
     public class LookupCallProposalPresenterTestField extends AbstractSmartField<Long> {
 
       @Override
-      protected Class<? extends LookupCall> getConfiguredLookupCall() {
+      protected Class<? extends LookupCall<Long>> getConfiguredLookupCall() {
         return TestLookupCall.class;
       }
     }
@@ -226,8 +225,7 @@ public class DesktopForm extends AbstractForm {
     }
 
     @Order(120.0)
-    public class StringPresenterTestField extends AbstractDoubleField {
-
+    public class StringPresenterTestField extends AbstractStringField {
       @Override
       protected String getConfiguredFormat() {
         return "aa";
@@ -238,7 +236,7 @@ public class DesktopForm extends AbstractForm {
     public class LongPresenterTestField extends AbstractLongField {
 
       @Override
-      protected Long getConfiguredMaximumValue() {
+      protected Long getConfiguredMaxValue() {
         return 100L;
       }
     }

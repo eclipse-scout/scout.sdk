@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.page.LinkPageOperation;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
@@ -41,8 +41,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
 
-  private IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
-  private IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
+  private IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
+  private IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
 
   private IType m_holderType;
   private IType m_pageType;

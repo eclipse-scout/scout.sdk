@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.internal.workspace.dto.pagedata;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractDtoUpdateHandler;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -32,7 +31,7 @@ public class PageDataAutoUpdateHandler extends AbstractDtoUpdateHandler {
 
   private boolean checkType(DtoUpdateProperties properties) throws CoreException {
     ITypeHierarchy superTypeHierarchy = ensurePropertySuperTypeHierarchy(properties);
-    if (superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IPageWithTable))) {
+    if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable))) {
       PageDataAnnotation pageDataAnnotation = ensurePropertyPageDataAnnotation(properties);
       return pageDataAnnotation != null && StringUtility.hasText(pageDataAnnotation.getSuperPageDataTypeSignature());
     }

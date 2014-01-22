@@ -12,13 +12,12 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformSharedBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.ClassIdNewAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutBundleNode;
@@ -47,7 +46,7 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
     super.loadChildrenImpl();
 
     if (getScoutBundle().getIconProvider() != null) {
-      IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
+      IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
       ICachedTypeHierarchy iconHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
       IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), null);
       if (iconTypes.length > 0) {
@@ -57,18 +56,8 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
 
     new PermissionTablePage(this);
     new CodeTypeTablePage(this);
-    try {
-      new LookupCallTablePage(this);
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logWarning("could not create LookupCallTablePage in project '" + getScoutBundle().getSymbolicName() + "'", e);
-    }
-    try {
-      new LibrariesTablePage(this, getScoutBundle());
-    }
-    catch (Exception e) {
-      ScoutSdkUi.logWarning("Error occured while loading '" + LibrariesTablePage.class.getSimpleName() + "' node in bundle '" + getScoutBundle().getSymbolicName() + "'.", e);
-    }
+    new LookupCallTablePage(this);
+    new LibrariesTablePage(this, getScoutBundle());
   }
 
   @Override

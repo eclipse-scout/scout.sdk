@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.composer.ComposerEntityNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -50,7 +51,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iComposerEntity = TypeUtility.getType(RuntimeClasses.IDataModelEntity);
+  private final IType iComposerEntity = TypeUtility.getType(IRuntimeClasses.IDataModelEntity);
 
   public static final String PROP_NLS_NAME = "nlsName";
   public static final String PROP_TYPE_NAME = "typeName";
@@ -72,7 +73,7 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
 
     // default values
-    m_abstractComposerEntity = RuntimeClasses.getSuperType(RuntimeClasses.IDataModelEntity, m_declaringType.getJavaProject());
+    m_abstractComposerEntity = RuntimeClasses.getSuperType(IRuntimeClasses.IDataModelEntity, m_declaringType.getJavaProject());
     setSuperTypeInternal(m_abstractComposerEntity);
   }
 
@@ -159,7 +160,7 @@ public class EntityNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_COMPOSER_ENTRY);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_COMPOSER_ENTRY);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }

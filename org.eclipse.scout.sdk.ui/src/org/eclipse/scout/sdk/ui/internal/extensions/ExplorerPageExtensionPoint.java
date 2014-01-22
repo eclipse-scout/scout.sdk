@@ -36,7 +36,7 @@ public final class ExplorerPageExtensionPoint {
 
   private final HashMap<String /* parentId */, List<ExplorerPageExtension> /* extensions */> m_pages = new HashMap<String, List<ExplorerPageExtension>>();
 
-  private final static ExplorerPageExtensionPoint instance = new ExplorerPageExtensionPoint();
+  private static final ExplorerPageExtensionPoint instance = new ExplorerPageExtensionPoint();
 
   private ExplorerPageExtensionPoint() {
     init();

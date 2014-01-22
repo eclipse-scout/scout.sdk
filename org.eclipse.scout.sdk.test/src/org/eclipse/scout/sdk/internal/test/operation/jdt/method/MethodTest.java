@@ -359,13 +359,13 @@ public class MethodTest extends AbstractScoutSdkTest {
     SdkAssert.assertEquals("field count of 'ListboxField'", 0, listboxField.getFields().length);
 
     SdkAssert.assertEquals("method count of 'ListboxField'", 2, listboxField.getMethods().length);
-    IMethod execValidateValue1 = SdkAssert.assertMethodExist(listboxField, "execValidateValue", new String[]{"[QLong;"});
-    SdkAssert.assertMethodReturnTypeSignature(execValidateValue1, "[QLong;");
+    IMethod execValidateValue1 = SdkAssert.assertMethodExist(listboxField, "execValidateValue", new String[]{"QSet<QLong;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(execValidateValue1, "QSet<QLong;>;");
     SdkAssert.assertAnnotation(execValidateValue1, "java.lang.Override");
-    IMethod execFormatValue1 = SdkAssert.assertMethodExist(listboxField, "execFormatValue", new String[]{"[QLong;"});
+    IMethod execFormatValue1 = SdkAssert.assertMethodExist(listboxField, "execFormatValue", new String[]{"QSet<QLong;>;"});
     SdkAssert.assertMethodReturnTypeSignature(execFormatValue1, "QString;");
     SdkAssert.assertAnnotation(execFormatValue1, "java.lang.Override");
-
+    
     SdkAssert.assertEquals("inner types count of 'ListboxField'", 0, listboxField.getTypes().length);
     // type TableField
     IType tableField = SdkAssert.assertTypeExists(mainBox, "TableField");

@@ -33,18 +33,22 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
-import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
-import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.javadoc.JavaDoc;
@@ -72,9 +76,9 @@ import org.eclipse.text.edits.TextEdit;
  *
  */
 public class CreateTemplateOperation implements IOperation {
-  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
-  private final IType iCompositeField = TypeUtility.getType(RuntimeClasses.ICompositeField);
-  private final static Pattern SUPER_CLASS_PATTERN = Pattern.compile("\\sextends\\s*(" + Regex.REGEX_JAVAFIELD + "(\\<[^{]*\\>)?)", Pattern.MULTILINE);
+  private final IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
+  private final IType iCompositeField = TypeUtility.getType(IRuntimeClasses.ICompositeField);
+  private static final Pattern SUPER_CLASS_PATTERN = Pattern.compile("\\sextends\\s*(" + IRegEx.JAVAFIELD + "(\\<[^{]*\\>)?)", Pattern.MULTILINE);
 
   private String m_templateName;
   private String m_packageName;
@@ -141,20 +145,46 @@ public class CreateTemplateOperation implements IOperation {
         }
       }
     };
+
+    typeSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+    String superclassTypeSignature = SignatureUtility.getResolvedSignature(getFormField().getSuperclassTypeSignature(), getFormField());
+    typeSourceBuilder.setSuperTypeSignature(superclassTypeSignature);
+
+    ITypeHierarchy formFieldSuperTypeHierarchy = TypeUtility.getSuperTypeHierarchy(getFormField());
+    boolean needsWrappingBox = formFieldSuperTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeField)) &&
+        formFieldSuperTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField));
+    // if a template is a composite and a value field it cannot be handled correctly in the form data generation. therefore it must be wrapped within a surrounding group box which is no value field.
+    if (needsWrappingBox) {
+      typeSourceBuilder.setFlags(Flags.AccPublic);
+
+      ITypeSourceBuilder wrappingTypeSourceBuilder = new TypeSourceBuilder(getTemplateName() + "Wrapper");
+      wrappingTypeSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+      wrappingTypeSourceBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, getTemplateBundle()));
+
+      // getConfiguredBorderVisible
+      IMethodSourceBuilder getConfiguredBorderVisible = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(wrappingTypeSourceBuilder, "getConfiguredBorderVisible");
+      getConfiguredBorderVisible.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          source.append("return false;");
+        }
+      });
+      wrappingTypeSourceBuilder.addMethodSourceBuilder(getConfiguredBorderVisible);
+
+      wrappingTypeSourceBuilder.addTypeSourceBuilder(typeSourceBuilder);
+      typeSourceBuilder = wrappingTypeSourceBuilder;
+    }
+    typeSourceBuilder.setFlags(Flags.AccAbstract | Flags.AccPublic);
+
     PrimaryTypeNewOperation op = new PrimaryTypeNewOperation(typeSourceBuilder, getPackageName(), ScoutUtility.getJavaProject(getTemplateBundle()));
     op.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
-    op.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
 
-    String superclassTypeSignature = SignatureUtility.getResolvedSignature(getFormField().getSuperclassTypeSignature(), getFormField());
-
-    op.setSuperTypeSignature(superclassTypeSignature);
-    op.setFlags(Flags.AccAbstract | Flags.AccPublic);
     IScoutBundle sharedBundle = getTemplateBundle().getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
     IType formDataType = null;
     if (isCreateExternalFormData() && sharedBundle != null) {
       PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(getFormDataPackageSuffix()), sharedBundle.getJavaProject());
       formDataOp.setFlags(Flags.AccAbstract | Flags.AccPublic);
-      formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
+      formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormData));
       formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
       formDataOp.validate();
       formDataOp.run(monitor, workingCopyManager);
@@ -210,23 +240,32 @@ public class CreateTemplateOperation implements IOperation {
         edit.addChild(new ReplaceEdit(getFormField().getSourceRange().getOffset() + superClassMatcher.start(1), superClassMatcher.end(1) - superClassMatcher.start(1),
             validator.getTypeName(SignatureCache.createTypeSignature(templateType.getFullyQualifiedName()))));
       }
+
+      // getter methods
       IMethod templateFieldGetter = ScoutTypeUtility.getFormFieldGetterMethod(getFormField(), hierarchy);
       if (TypeUtility.exists(templateFieldGetter)) {
         for (IType formField : ScoutTypeUtility.getFormFields(getFormField(), formFieldHierarhy)) {
           updateFormFieldGetter(formField, templateFieldGetter, newFormFields, validator, edit, formFieldHierarhy);
         }
       }
-      Document sourceDoc = new Document();
-      IBuffer buffer = getFormField().getCompilationUnit().getBuffer();
-      sourceDoc.set(buffer.getContents());
+
       try {
+        // update form
+        Document sourceDoc = new Document();
+        IBuffer buffer = getFormField().getCompilationUnit().getBuffer();
+        sourceDoc.set(buffer.getContents());
         edit.apply(sourceDoc);
-        SourceFormatOperation sourceFormatOp = new SourceFormatOperation(getFormField().getJavaProject(), sourceDoc, null);
-        sourceFormatOp.run(monitor, workingCopyManager);
         buffer.setContents(ScoutUtility.cleanLineSeparator(sourceDoc.get(), sourceDoc));
+
+        // create imports
         for (String fqi : validator.getImportsToCreate()) {
           getFormField().getCompilationUnit().createImport(fqi, null, monitor);
         }
+
+        // format and organize
+        JavaElementFormatOperation jefo = new JavaElementFormatOperation(getFormField().getCompilationUnit(), true);
+        jefo.validate();
+        jefo.run(monitor, workingCopyManager);
       }
       catch (Exception e) {
         ScoutSdk.logError("could not create template for '" + getFormField().getFullyQualifiedName() + "'.", e);
@@ -236,7 +275,7 @@ public class CreateTemplateOperation implements IOperation {
 
   protected void updateFormFieldGetter(IType formField, IMethod templateFieldGetter, HashMap<String, P_FormField> templateFormFields, IImportValidator validator, MultiTextEdit edit, ITypeHierarchy hierarchy) {
     String fqFormFieldName = formField.getFullyQualifiedName();
-    fqFormFieldName = SignatureUtility.DOLLAR_REPLACEMENT_REGEX.matcher(fqFormFieldName).replaceAll(".");
+    fqFormFieldName = IRegEx.DOLLAR_REPLACEMENT.matcher(fqFormFieldName).replaceAll(".");
     try {
       IMethod getterMethod = ScoutTypeUtility.getFormFieldGetterMethod(formField, hierarchy);
       if (TypeUtility.exists(getterMethod)) {
@@ -246,7 +285,7 @@ public class CreateTemplateOperation implements IOperation {
         IImportDeclaration formFieldImport = formField.getCompilationUnit().getImport(fqFormFieldName);
         if (TypeUtility.exists(formFieldImport)) {
           edit.addChild(new ReplaceEdit(formFieldImport.getSourceRange().getOffset(), formFieldImport.getSourceRange().getLength(),
-              "import " + SignatureUtility.DOLLAR_REPLACEMENT_REGEX.matcher(templateFormField.getFormField().getFullyQualifiedName()).replaceAll(".") + ";"));
+              "import " + IRegEx.DOLLAR_REPLACEMENT.matcher(templateFormField.getFormField().getFullyQualifiedName()).replaceAll(".") + ";"));
         }
         String methodSource = getterMethod.getSource();
         // deprecation comment

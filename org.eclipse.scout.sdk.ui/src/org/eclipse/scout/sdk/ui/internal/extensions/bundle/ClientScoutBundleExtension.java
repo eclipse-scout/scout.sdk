@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class ClientScoutBundleExtension implements INewScoutBundleHandler {
 
-  public final static String ID = "org.eclipse.scout.sdk.ui.ClientBundle";
+  public static final String ID = "org.eclipse.scout.sdk.ui.ClientBundle";
 
   @Override
   public void init(IScoutProjectWizard wizard, ScoutBundleUiExtension extension) {

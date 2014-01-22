@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -49,7 +50,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iWizard = TypeUtility.getType(RuntimeClasses.IWizard);
+  private final IType iWizard = TypeUtility.getType(IRuntimeClasses.IWizard);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -71,7 +72,7 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewWizard"));
     setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_WIZARDS));
     m_clientBundle = clientBundle;
-    m_abstractWizard = RuntimeClasses.getSuperType(RuntimeClasses.IWizard, clientBundle.getJavaProject());
+    m_abstractWizard = RuntimeClasses.getSuperType(IRuntimeClasses.IWizard, clientBundle.getJavaProject());
     m_superType = m_abstractWizard;
   }
 
@@ -180,11 +181,11 @@ public class WizardNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_WIZARD);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_WIZARD);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getClientBundle(), getTargetPackage(), getTypeName());
+    IStatus existingStatus = ScoutUtility.validateTypeNotExisting(getClientBundle(), getTargetPackage(), getTypeName());
     if (!existingStatus.isOK()) {
       return existingStatus;
     }

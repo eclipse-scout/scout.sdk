@@ -30,6 +30,15 @@ public interface IRuntimeClasses {
   String ScoutUiSwtBundleId = RuntimeBundles.getBundleSymbolicName(IScoutBundle.TYPE_UI_SWT);
   String ScoutUiSwingBundleId = RuntimeBundles.getBundleSymbolicName(IScoutBundle.TYPE_UI_SWING);
 
+  // generic names
+  String TYPE_PARAM_CODE__CODE_ID = "T";
+  String TYPE_PARAM_CODETYPE__CODE_TYPE_ID = "CODE_TYPE_ID";
+  String TYPE_PARAM_CODETYPE__CODE_ID = "CODE_ID";
+  String TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE = "KEY_TYPE";
+  String TYPE_PARAM_LOOKUPCALL__KEY_TYPE = "KEY_TYPE";
+  String TYPE_PARAM_VALUEFIELD__VALUE_TYPE = "T";
+  String TYPE_PARAM_COLUMN_VALUE_TYPE = "T";
+
   //extension points
   String EXTENSION_POINT_SERVICES = "org.eclipse.scout.service.services"; // NO_UCD
   String EXTENSION_POINT_CLIENT_SERVICE_PROXIES = EXTENSION_POINT_SERVICES;
@@ -70,8 +79,6 @@ public interface IRuntimeClasses {
   String DefaultServiceFactory = "org.eclipse.scout.service.DefaultServiceFactory"; // NO_UCD
   String CopyWidthsOfColumnsMenu = "org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu"; // NO_UCD
   String LocalLookupCall = "org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall"; // NO_UCD
-  String LookupCall = "org.eclipse.scout.rt.shared.services.lookup.LookupCall"; // NO_UCD
-  String LookupRow = "org.eclipse.scout.rt.shared.services.lookup.LookupRow"; // NO_UCD
   String Order = "org.eclipse.scout.commons.annotations.Order"; // NO_UCD
   String Ranking = "org.eclipse.scout.commons.annotations.Priority"; // NO_UCD
   String SearchFilter = "org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter"; // NO_UCD
@@ -82,6 +89,7 @@ public interface IRuntimeClasses {
   String VetoException = "org.eclipse.scout.commons.exception.VetoException"; // NO_UCD
   String ResourceServlet = "org.eclipse.scout.rt.server.ResourceServlet"; // NO_UCD
   String UserAgentUtility = "org.eclipse.scout.rt.shared.ui.UserAgentUtility"; // NO_UCD
+  String CollectionUtility = "org.eclipse.scout.commons.CollectionUtility"; // NO_UCD
 
   String AbstractFormData = "org.eclipse.scout.rt.shared.data.form.AbstractFormData"; // NO_UCD
   String AbstractFormFieldData = "org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData"; // NO_UCD
@@ -91,6 +99,7 @@ public interface IRuntimeClasses {
   String AbstractTableRowData = "org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData"; // NO_UCD
   String AbstractTablePageData = "org.eclipse.scout.rt.shared.data.page.AbstractTablePageData"; // NO_UCD
 
+  String AbstractCodeTypeWithGeneric = "org.eclipse.scout.rt.shared.services.common.code.AbstractCodeTypeWithGeneric"; // NO_UCD
   String AbstractComposerField_Tree = "org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField.Tree"; // NO_UCD
   String AbstractIcons = "org.eclipse.scout.rt.shared.AbstractIcons"; // NO_UCD
   String AbstractLookupService = "org.eclipse.scout.rt.server.services.lookup.AbstractLookupService"; // NO_UCD
@@ -166,6 +175,8 @@ public interface IRuntimeClasses {
   String ILabelField = "org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField"; // NO_UCD
   String IListBox = "org.eclipse.scout.rt.client.ui.form.fields.listbox.IListBox"; // NO_UCD
   String ILongField = "org.eclipse.scout.rt.client.ui.form.fields.longfield.ILongField"; // NO_UCD
+  String ILookupCall = "org.eclipse.scout.rt.shared.services.lookup.ILookupCall"; // NO_UCD
+  String ILookupRow = "org.eclipse.scout.rt.shared.services.lookup.ILookupRow"; // NO_UCD
   String ILookupService = "org.eclipse.scout.rt.shared.services.lookup.ILookupService"; // NO_UCD
   String IMailField = "org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField"; // NO_UCD
   String ITextProviderService = "org.eclipse.scout.rt.shared.services.common.text.ITextProviderService"; // NO_UCD
@@ -184,6 +195,7 @@ public interface IRuntimeClasses {
   String IServerSession = "org.eclipse.scout.rt.server.IServerSession"; // NO_UCD
   String IService = "org.eclipse.scout.service.IService"; // NO_UCD
   String ISmartField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField"; // NO_UCD
+  String IProposalField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField"; // NO_UCD
   String ISMTPService = "org.eclipse.scout.rt.server.services.common.smtp.ISMTPService"; // NO_UCD
   String ISplitBox = "org.eclipse.scout.rt.client.ui.form.fields.splitbox.ISplitBox"; // NO_UCD
   String ISqlService = "org.eclipse.scout.rt.server.services.common.jdbc.ISqlService"; // NO_UCD

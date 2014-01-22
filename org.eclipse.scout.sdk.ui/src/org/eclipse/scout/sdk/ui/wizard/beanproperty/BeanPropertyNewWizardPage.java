@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.beanproperty;
 
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -18,10 +19,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IBeanPropertyNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
@@ -31,8 +33,15 @@ import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureLabelProvider
 import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.IRegEx;
+import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.type.MethodFilters;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -54,12 +63,18 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
   private Set<String> m_notAllowedNames;
 
   private final IJavaSearchScope m_searchScope;
+  private final IType m_declaringType;
+  private IType[] m_allValueFields;
 
-  public BeanPropertyNewWizardPage(IJavaSearchScope searchScope) {
+  public BeanPropertyNewWizardPage(IJavaSearchScope searchScope, IType declaringType) {
     super(BeanPropertyNewWizardPage.class.getName());
     m_searchScope = searchScope;
+    m_declaringType = declaringType;
     setTitle(Texts.get("NewPropertyBean"));
     setDescription(Texts.get("NewPropertyBeanDesc"));
+
+    ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(m_declaringType);
+    m_allValueFields = ScoutTypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IValueField), typeHierarchy));
   }
 
   @Override
@@ -96,39 +111,16 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    // m_beanGenericTypeField=new ProposalTextField(parent, new BcElementProposalProvider(getProjectGroup(), false, false));
-    // m_beanGenericTypeField.setEnabled(false);
-    // m_beanGenericTypeField.acceptProposal(getBeanGenericType());
-    // m_beanGenericTypeField.setLabelText(Texts.get("Dialog_propertyBean_genericLabel"));
-    // m_beanGenericTypeField.addProposalAdapterListener(new IProposalAdapterListener(){
-    // public void proposalAccepted(ContentProposalEvent event){
-    // m_beanGenericType=(IBCTypeProposal)event.proposal;
-    // pingStateChanging();
-    // }
-    // });
-
     parent.setLayout(new GridLayout(1, true));
     // layout
     m_beanNameField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
     m_beanTypeField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
-    // m_beanGenericTypeField.setLayoutData(new GridData(GridData.FILL_HORIZONTAL|GridData.GRAB_HORIZONTAL));
   }
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-
-    // m_propertyName
-    IStatus status = getPropertyNameStatus();
-    multiStatus.add(status);
+    multiStatus.add(getPropertyNameStatus());
     multiStatus.add(getPropertyTypeStatus());
-    // m_beanType
-    // IStatus typeStatus=getPropertyTypeStatus();
-    // ControlStatusFactory.applyStatusToField(m_beanTypeField, typeStatus);
-    // multiStatus.add(typeStatus);
-    // // m_genericType
-    // IStatus genericStatus=getBeanGenericStatus();
-    // ControlStatusFactory.applyStatusToField(m_beanGenericTypeField, genericStatus);
-    // multiStatus.add(genericStatus);
   }
 
   private IStatus getPropertyNameStatus() {
@@ -136,19 +128,35 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
     if (propertyName == null || propertyName.length() == 0) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_className"));
     }
+
+    String name = NamingUtility.ensureStartWithUpperCase(getBeanName());
     // check existing method names
-    if (m_notAllowedNames != null &&
-        (m_notAllowedNames.contains("get" + getBeanName(true)) ||
-            m_notAllowedNames.contains("set" + getBeanName(true)) ||
-        m_notAllowedNames.contains("is" + getBeanName(true)))) {
+    if (m_notAllowedNames != null) {
+      if (m_notAllowedNames.contains("get" + name) || m_notAllowedNames.contains("set" + name) || m_notAllowedNames.contains("is" + name)) {
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      }
+    }
+
+    // check that no value field has the same name. this could lead to errors in form data generation (duplicate methods).
+    for (IType valueField : m_allValueFields) {
+      String fieldName = ScoutUtility.removeFieldSuffix(valueField.getElementName());
+      if (name.equals(fieldName)) {
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      }
+    }
+
+    if (TypeUtility.getMethods(m_declaringType, MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is)" + name))).length > 0) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
-    if (Regex.REGEX_WELLFORMED_PROPERTY.matcher(propertyName).matches()) {
+
+    if (IRegEx.WELLFORMED_PROPERTY.matcher(propertyName).matches()) {
       return Status.OK_STATUS;
     }
-    if (Regex.REGEX_JAVAFIELD.matcher(propertyName).matches()) {
+
+    if (IRegEx.JAVAFIELD.matcher(propertyName).matches()) {
       return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
+
     return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", propertyName));
   }
 
@@ -187,16 +195,6 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
 
   public String getBeanName() {
     return m_beanName;
-  }
-
-  public String getBeanName(boolean startWithUpperCase) {
-    if (StringUtility.isNullOrEmpty(getBeanName())) {
-      return null;
-    }
-    if (startWithUpperCase) {
-      return Character.toUpperCase(getBeanName().charAt(0)) + getBeanName().substring(1);
-    }
-    return Character.toLowerCase(getBeanName().charAt(0)) + getBeanName().substring(1);
   }
 
   public void setBeanName(String beanName) {

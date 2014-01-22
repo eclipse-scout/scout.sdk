@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
@@ -60,7 +60,7 @@ public class MySqlJdbcManifestTechnologyHandler extends AbstractScoutTechnologyH
 
   @Override
   public void postSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
-    TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.ISqlService)).invalidate();
+    TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.ISqlService)).invalidate();
 
     if (m_newPluginsInstalled) {
       P2Utility.promptForRestart();

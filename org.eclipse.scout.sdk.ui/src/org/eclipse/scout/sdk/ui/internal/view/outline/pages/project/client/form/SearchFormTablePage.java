@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformSearchFormsOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -75,7 +75,7 @@ public class SearchFormTablePage extends AbstractPage {
   }
 
   protected IType[] resolveSearchForms() {
-    IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
+    IType iSearchForm = TypeUtility.getType(IRuntimeClasses.ISearchForm);
 
     if (m_searchFormHierarchy == null) {
       m_searchFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSearchForm);

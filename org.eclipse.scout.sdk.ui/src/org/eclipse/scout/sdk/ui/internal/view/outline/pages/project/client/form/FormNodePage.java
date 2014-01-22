@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
@@ -65,7 +65,7 @@ public class FormNodePage extends AbstractScoutTypePage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iGroupBox = TypeUtility.getType(RuntimeClasses.IGroupBox);
+    IType iGroupBox = TypeUtility.getType(IRuntimeClasses.IGroupBox);
 
     if (m_mainBoxListener == null) {
       m_mainBoxListener = new InnerTypePageDirtyListener(this, iGroupBox);

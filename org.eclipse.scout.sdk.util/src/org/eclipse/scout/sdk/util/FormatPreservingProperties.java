@@ -433,7 +433,7 @@ public class FormatPreservingProperties implements Serializable {
     }
   }
 
-  private final static class P_PropertyLine implements Serializable {
+  private static final class P_PropertyLine implements Serializable {
 
     private static final long serialVersionUID = 1L;
 

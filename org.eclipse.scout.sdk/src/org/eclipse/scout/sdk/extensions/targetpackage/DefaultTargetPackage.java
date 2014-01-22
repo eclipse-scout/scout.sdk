@@ -38,23 +38,23 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
  */
 public final class DefaultTargetPackage implements IDefaultTargetPackage {
 
-  public final static String PROP_USE_LEGACY_TARGET_PACKAGE = ScoutSdk.PLUGIN_ID + ".propDefaultTargetPackageConfigEnabled";
+  public static final String PROP_USE_LEGACY_TARGET_PACKAGE = ScoutSdk.PLUGIN_ID + ".propDefaultTargetPackageConfigEnabled";
 
-  private final static String PREFERENCES_PREFIX = "default.target.package.";
-  private final static String PACKAGE_PREFIX = ".";
+  private static final String PREFERENCES_PREFIX = "default.target.package.";
+  private static final String PACKAGE_PREFIX = ".";
 
-  private final static String EXTENSION_POINT_NAME = "targetPackage";
-  private final static String TAG_NAME = "targetPackage";
-  private final static String ATTRIB_DEFAULT_PACKAGE = "default";
-  private final static String ATTRIB_ID = "id";
-  private final static String ATTRIB_TYPE = "bundleType";
+  private static final String EXTENSION_POINT_NAME = "targetPackage";
+  private static final String TAG_NAME = "targetPackage";
+  private static final String ATTRIB_DEFAULT_PACKAGE = "default";
+  private static final String ATTRIB_ID = "id";
+  private static final String ATTRIB_TYPE = "bundleType";
 
   private static Map<String /* packageId */, TargetPackageEntry> defaultValues = null;
   private static boolean isPackageConfigurationEnabled = true;
 
-  private final static Object LOCK = new Object();
-  private final static Map<IScoutBundle, Map<String /* packageId */, StringHolder /* configured value */>> configuredValues = new HashMap<IScoutBundle, Map<String, StringHolder>>();
-  private final static Map<IScoutBundle, IPreferenceChangeListener> registeredListeners = new HashMap<IScoutBundle, IPreferenceChangeListener>();
+  private static final Object LOCK = new Object();
+  private static final Map<IScoutBundle, Map<String /* packageId */, StringHolder /* configured value */>> configuredValues = new HashMap<IScoutBundle, Map<String, StringHolder>>();
+  private static final Map<IScoutBundle, IPreferenceChangeListener> registeredListeners = new HashMap<IScoutBundle, IPreferenceChangeListener>();
 
   private DefaultTargetPackage() {
   }

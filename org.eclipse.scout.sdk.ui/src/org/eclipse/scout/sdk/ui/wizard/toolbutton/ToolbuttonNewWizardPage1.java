@@ -25,7 +25,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -42,8 +42,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
-  private final IType iToolbutton = TypeUtility.getType(RuntimeClasses.IToolButton);
-  private final IType abstractOutlineViewButton = TypeUtility.getType(RuntimeClasses.AbstractOutlineViewButton);
+  private final IType iToolbutton = TypeUtility.getType(IRuntimeClasses.IToolButton);
+  private final IType abstractOutlineViewButton = TypeUtility.getType(IRuntimeClasses.AbstractOutlineViewButton);
 
   private IType m_declaringType;
   private FilteredTable m_filteredTable;

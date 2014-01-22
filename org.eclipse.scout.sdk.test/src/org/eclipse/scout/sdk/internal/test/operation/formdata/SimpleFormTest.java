@@ -43,6 +43,7 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     IType simpleFormData = SdkAssert.assertTypeExists("formdata.shared.services.process.SimpleFormData");
     SdkAssert.assertHasFlags(simpleFormData, 1);
     SdkAssert.assertHasSuperTypeSignature(simpleFormData, "QAbstractFormData;");
+    SdkAssert.assertAnnotation(simpleFormData, "javax.annotation.Generated");
 
     // fields of SimpleFormData
     SdkAssert.assertEquals("field count of 'SimpleFormData'", 1, simpleFormData.getFields().length);
@@ -113,7 +114,7 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     IMethod initValidationRules1 = SdkAssert.assertMethodExist(doubleT, "initValidationRules", new String[]{"QMap<QString;QObject;>;"});
     SdkAssert.assertMethodReturnTypeSignature(initValidationRules1, "V");
     SdkAssert.assertAnnotation(initValidationRules1, "java.lang.Override");
-    SdkAssert.assertMethodValidationRules(initValidationRules1, new String[]{"ruleMap.put(ValidationRule.MAX_VALUE, java.lang.Double.MAX_VALUE);", "ruleMap.put(ValidationRule.MIN_VALUE, -java.lang.Double.MAX_VALUE);"}, true);
+    SdkAssert.assertMethodValidationRules(initValidationRules1, new String[]{"ruleMap.put(ValidationRule.MAX_VALUE, -java.lang.Double.MAX_VALUE);", "ruleMap.put(ValidationRule.MIN_VALUE, 0.0);"}, true);
 
     SdkAssert.assertEquals("inner types count of 'Double'", 0, doubleT.getTypes().length);
     // type SampleComposer

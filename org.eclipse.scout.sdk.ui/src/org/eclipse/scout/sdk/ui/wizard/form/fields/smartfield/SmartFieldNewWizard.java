@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.ui.wizard.form.fields.smartfield;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -27,7 +29,7 @@ public class SmartFieldNewWizard extends AbstractFormFieldWizard {
   @Override
   public void initWizard(IType declaringType) {
     super.initWizard(declaringType);
-    m_page1 = new SmartFieldNewWizardPage(getDeclaringType());
+    m_page1 = new SmartFieldNewWizardPage(getDeclaringType(), Texts.get("NewSmartField"), Texts.get("CreateANewSmartField"), RuntimeClasses.getSuperType(IRuntimeClasses.ISmartField, declaringType.getJavaProject()));
     addPage(m_page1);
   }
 

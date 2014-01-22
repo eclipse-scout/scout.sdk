@@ -45,6 +45,7 @@ public class ListBoxFormTest extends AbstractSdkTestWithFormDataProject {
     IType listBoxFormData = SdkAssert.assertTypeExists("formdata.shared.services.process.ListBoxFormData");
     SdkAssert.assertHasFlags(listBoxFormData, 1);
     SdkAssert.assertHasSuperTypeSignature(listBoxFormData, "QAbstractFormData;");
+    SdkAssert.assertAnnotation(listBoxFormData, "javax.annotation.Generated");
 
     // fields of ListBoxFormData
     SdkAssert.assertEquals("field count of 'ListBoxFormData'", 1, listBoxFormData.getFields().length);
@@ -63,7 +64,7 @@ public class ListBoxFormTest extends AbstractSdkTestWithFormDataProject {
     // type ListBox
     IType listBox = SdkAssert.assertTypeExists(listBoxFormData, "ListBox");
     SdkAssert.assertHasFlags(listBox, 9);
-    SdkAssert.assertHasSuperTypeSignature(listBox, "QAbstractValueFieldData<[QLong;>;");
+    SdkAssert.assertHasSuperTypeSignature(listBox, "QAbstractValueFieldData<QSet<QLong;>;>;");
 
     // fields of ListBox
     SdkAssert.assertEquals("field count of 'ListBox'", 1, listBox.getFields().length);
@@ -78,5 +79,4 @@ public class ListBoxFormTest extends AbstractSdkTestWithFormDataProject {
 
     SdkAssert.assertEquals("inner types count of 'ListBox'", 0, listBox.getTypes().length);
   }
-
 }

@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
-import org.eclipse.scout.sdk.util.jdt.ElementChangedListenerEx;
+import org.eclipse.scout.sdk.util.jdt.AbstractElementChangedListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * <h3>PageWithTableNodePage</h3> ...
  */
 public class PageWithTableNodePage extends AbstractScoutTypePage {
-  public final static String METHOD_EXEC_CREATE_CHILD_PAGE = "execCreateChildPage";
+  public static final String METHOD_EXEC_CREATE_CHILD_PAGE = "execCreateChildPage";
   private P_MethodChangedListener m_methodChangedListener;
 
   public PageWithTableNodePage(IPage parent, IType type) {
@@ -124,7 +124,7 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
     }
   }
 
-  private class P_MethodChangedListener extends ElementChangedListenerEx {
+  private class P_MethodChangedListener extends AbstractElementChangedListener {
     @Override
     protected boolean visit(int kind, int flags, IJavaElement e, CompilationUnit ast) {
       if (e != null && e.getElementType() == IJavaElement.METHOD) {
@@ -132,9 +132,8 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
         IType declaringType = method.getDeclaringType();
         if (TypeUtility.exists(declaringType) && declaringType.equals(getType()) && METHOD_EXEC_CREATE_CHILD_PAGE.equals(method.getElementName())) {
           markStructureDirty();
-          return true;
+          return false;
         }
-        return false;
       }
       return super.visit(kind, flags, e, ast);
     }

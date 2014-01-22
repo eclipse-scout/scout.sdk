@@ -17,18 +17,18 @@ import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 
 public class PropertyViewConfig {
 
-  private final static String TAG_TYPE = "type";
-  private final static String TAG_CONFIG = "config";
-  private final static String PROP_TYPE_NAME = "name";
-  private final static String PROP_CONFIG_NAME = "name";
-  private final static String PROP_CONFIG_TYPE = "type";
-  private final static String PROP_CONFIG_CATEGORY = "category";
-  private final static String PROP_CONFIG_ORDER = "order";
+  private static final String TAG_TYPE = "type";
+  private static final String TAG_CONFIG = "config";
+  private static final String PROP_TYPE_NAME = "name";
+  private static final String PROP_CONFIG_NAME = "name";
+  private static final String PROP_CONFIG_TYPE = "type";
+  private static final String PROP_CONFIG_CATEGORY = "category";
+  private static final String PROP_CONFIG_ORDER = "order";
 
   private final HashMap<String, HashMap<String, Config>> m_typeConfigs;
 
-  public final static ConfigTypes DEFAULT_CONFIG_TYPE = ConfigTypes.Advanced;
-  public final static ConfigCategory DEFAULT_CONFIG_CATEGORY = ConfigCategory.Misc;
+  public static final ConfigTypes DEFAULT_CONFIG_TYPE = ConfigTypes.Advanced;
+  public static final ConfigCategory DEFAULT_CONFIG_CATEGORY = ConfigCategory.Misc;
 
   /**
    * Method priority.

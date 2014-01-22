@@ -27,6 +27,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.TriState;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.OrganizeImportOperation;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
@@ -54,7 +55,7 @@ import org.eclipse.text.edits.TextEdit;
  */
 public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  private final static Pattern RAYO_ENV_REGEX = Pattern.compile("public.*class.*extends.*RayoSwingEnvironment.*", Pattern.DOTALL);
+  private static final Pattern RAYO_ENV_REGEX = Pattern.compile("public.*class.*extends.*RayoSwingEnvironment.*", Pattern.DOTALL);
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, final boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
@@ -86,7 +87,7 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
       newSuperClassType = root.getAST().newSimpleType(root.getAST().newQualifiedName(root.getAST().newName("com.bsiag.scout.rt.ui.swing.rayo"), root.getAST().newSimpleName("RayoSwingEnvironment")));
     }
     else {
-      String fqn = RuntimeClasses.getSuperTypeName(RuntimeClasses.ISwingEnvironment, swingEnv.getJavaProject());
+      String fqn = RuntimeClasses.getSuperTypeName(IRuntimeClasses.ISwingEnvironment, swingEnv.getJavaProject());
       String className = NamingUtility.getSimpleName(fqn);
       String pckName = NamingUtility.getPackage(fqn);
 
@@ -165,7 +166,7 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
 
   private IType[] getSwingEnvironments(IScoutBundle bundle) {
     IScoutBundle[] swingBundles = bundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
-    IType baseType = TypeUtility.getType(RuntimeClasses.ISwingEnvironment);
+    IType baseType = TypeUtility.getType(IRuntimeClasses.ISwingEnvironment);
     if (TypeUtility.exists(baseType)) {
       IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(baseType);
       return hierarchy.getAllSubtypes(baseType, ScoutTypeFilters.getTypesInScoutBundles(swingBundles));

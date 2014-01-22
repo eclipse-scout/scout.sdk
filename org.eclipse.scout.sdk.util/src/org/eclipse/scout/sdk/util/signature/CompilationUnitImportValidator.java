@@ -81,7 +81,7 @@ public class CompilationUnitImportValidator implements IImportValidator {
       String usedPackageName = findUsedPackageName(plainSimpleName);
       if (usedPackageName != null) {
         if (!usedPackageName.equals(pckName)) {
-          // fully quallified
+          // fully qualified
           return prefix + pckName + "." + simpleName;
         }
         else {

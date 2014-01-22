@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * <h3>{@link CalendarFieldNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class CalendarFieldNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -40,7 +40,6 @@ public class CalendarFieldNewOperationTest extends AbstractSdkTestWithSampleProj
     executeBuildAssertNoCompileErrors(fieldNewOp);
 
     testApiOfMainBox();
-    // additional asserts
 
     IType field = fieldNewOp.getCreatedCalendarField();
     SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
@@ -94,7 +93,7 @@ public class CalendarFieldNewOperationTest extends AbstractSdkTestWithSampleProj
     // type TestField01
     IType testField01 = SdkAssert.assertTypeExists(mainBox, "TestField01");
     SdkAssert.assertHasFlags(testField01, 1);
-    SdkAssert.assertHasSuperTypeSignature(testField01, "QAbstractCalendarField;");
+    SdkAssert.assertHasSuperTypeSignature(testField01, "QAbstractCalendarField<QCalendar;>;");
     SdkAssert.assertAnnotation(testField01, "org.eclipse.scout.commons.annotations.Order");
 
     // fields of TestField01

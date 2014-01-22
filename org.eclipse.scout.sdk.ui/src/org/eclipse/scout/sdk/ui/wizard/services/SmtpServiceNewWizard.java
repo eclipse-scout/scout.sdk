@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -56,10 +57,10 @@ public class SmtpServiceNewWizard extends AbstractServiceWizard {
 
   public SmtpServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewSmtpService"));
-    IType smtpServiceType = RuntimeClasses.getSuperType(RuntimeClasses.ISMTPService, serverBundle.getJavaProject());
+    IType smtpServiceType = RuntimeClasses.getSuperType(IRuntimeClasses.ISMTPService, serverBundle.getJavaProject());
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSmtpService"), Texts.get("CreateANewSMTPService"),
-        TypeUtility.getType(RuntimeClasses.ISMTPService), SdkProperties.SUFFIX_SMTP_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_SMTP));
+        TypeUtility.getType(IRuntimeClasses.ISMTPService), SdkProperties.SUFFIX_SMTP_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_SMTP));
     m_serviceNewWizardPage.setSuperType(smtpServiceType);
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
@@ -77,20 +78,17 @@ public class SmtpServiceNewWizard extends AbstractServiceWizard {
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
-
     ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle,
         NodeFilters.getByType(IScoutBundle.TYPE_SHARED, IScoutBundle.TYPE_SERVER),
         ScoutBundleFilters.getWorkspaceBundlesFilter());
 
-    if (serverBundle != null) {
-      ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
-      // service implementation
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1);
-      // service implementation
-      ITreeNode svcRegNode = TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
-      //session
-      refreshAvailableSessions(svcRegNode, svcRegNode);
-    }
+    ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
+    // service implementation
+    TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1);
+    // service implementation
+    ITreeNode svcRegNode = TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
+    //session
+    refreshAvailableSessions(svcRegNode, svcRegNode);
     return rootNode;
   }
 

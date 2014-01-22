@@ -17,8 +17,9 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.lookupcall.LocalLookupCallNewOperation;
@@ -28,11 +29,13 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureSubTypeProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -54,16 +57,18 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  protected final IType localLookupCall = TypeUtility.getType(RuntimeClasses.LocalLookupCall);
+  private final IType localLookupCall = TypeUtility.getType(IRuntimeClasses.LocalLookupCall);
 
   public static final String PROP_TYPE_NAME = "typeName";
   public static final String PROP_SUPER_TYPE = "superType";
   public static final String PROP_TARGET_PACKAGE = "targetPackage";
+  public static final String PROP_GENERIC_TYPE = "genericType";
 
   // ui fields
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
   private EntityTextField m_entityField;
+  private ProposalTextField m_genericTypeField;
 
   // process members
   private IScoutBundle m_clientBundle;
@@ -91,6 +96,8 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    final SignatureSubTypeProposalProvider proposalProvider = new SignatureSubTypeProposalProvider(getGenericTypeOfSuperClass(), m_clientBundle.getJavaProject());
+
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("LookupCallSuperType"),
         new AbstractJavaElementContentProvider() {
           @Override
@@ -105,6 +112,11 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         setLookupCallSuperTypeInternal((IType) event.proposal);
+        IType genericTypeOfSuperClass = getGenericTypeOfSuperClass();
+        if (getGenericTypeSignature() == null && TypeUtility.exists(genericTypeOfSuperClass)) {
+          m_genericTypeField.acceptProposal(SignatureCache.createTypeSignature(genericTypeOfSuperClass.getFullyQualifiedName()));
+        }
+        proposalProvider.setBaseType(genericTypeOfSuperClass);
         pingStateChanging();
       }
     });
@@ -122,9 +134,22 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       m_entityField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     }
 
+    m_genericTypeField = getFieldToolkit().createProposalField(parent, Texts.get("KeyType"), ProposalTextField.STYLE_DEFAULT, labelColWidthPercent);
+    m_genericTypeField.setContentProvider(proposalProvider);
+    m_genericTypeField.setLabelProvider(proposalProvider.getLabelProvider());
+    m_genericTypeField.acceptProposal(getGenericTypeSignature());
+    m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
+      public void proposalAccepted(ContentProposalEvent event) {
+        setGenericTypeSignatureInternal((String) event.proposal);
+        pingStateChanging();
+      }
+    });
+
     // layout
     parent.setLayout(new GridLayout(1, true));
 
+    m_genericTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
@@ -134,16 +159,46 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     return (LocalLookupCallNewWizard) super.getWizard();
   }
 
+  protected IType getGenericTypeOfSuperClass() {
+    if (TypeUtility.exists(getLookupCallSuperType())) {
+      try {
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getLookupCallSuperType(), getLookupCallSuperType().newSupertypeHierarchy(null), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
+        if (typeParamSig != null) {
+          return TypeUtility.getTypeBySignature(typeParamSig);
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError(e);
+      }
+    }
+    return null;
+  }
+
   @Override
   protected void validatePage(MultiStatus multiStatus) {
     try {
       multiStatus.add(getStatusNameField());
       multiStatus.add(getStatusSuperType());
       multiStatus.add(getStatusTargetPackge());
+      multiStatus.add(getStatusGenericType());
+      multiStatus.add(getStatusGenericTypeToSuperClass());
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError("could not validate name field.", e);
     }
+  }
+
+  protected IStatus getStatusGenericTypeToSuperClass() {
+    if (getGenericTypeSignature() != null) {
+      IType superType = getGenericTypeOfSuperClass();
+      if (TypeUtility.exists(superType)) {
+        IType generic = TypeUtility.getTypeBySignature(getGenericTypeSignature());
+        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(superType)) {
+          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
+        }
+      }
+    }
+    return Status.OK_STATUS;
   }
 
   @Override
@@ -152,7 +207,11 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     op.setFormatSource(true);
     IType superTypeProp = getLookupCallSuperType();
     if (superTypeProp != null) {
-      op.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
+      StringBuilder superType = new StringBuilder(superTypeProp.getFullyQualifiedName());
+      superType.append('<');
+      superType.append(Signature.toString(getGenericTypeSignature()));
+      superType.append('>');
+      op.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.toString()));
     }
     op.validate();
     op.run(monitor, manager);
@@ -163,12 +222,19 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     return ScoutUtility.validatePackageName(getTargetPackage());
   }
 
+  protected IStatus getStatusGenericType() {
+    if (getGenericTypeSignature() == null) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
+    }
+    return Status.OK_STATUS;
+  }
+
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_LOOKUP_CALL);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_LOOKUP_CALL);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getClientBundle(), getTargetPackage(), getTypeName());
+    IStatus existingStatus = ScoutUtility.validateTypeNotExisting(getClientBundle(), getTargetPackage(), getTypeName());
     if (!existingStatus.isOK()) {
       return existingStatus;
     }
@@ -247,5 +313,26 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected void setTargetPackageInternal(String targetPackage) {
     setProperty(PROP_TARGET_PACKAGE, targetPackage);
+  }
+
+  public String getGenericTypeSignature() {
+    return (String) getProperty(PROP_GENERIC_TYPE);
+  }
+
+  public void setGenericTypeSignature(String genericType) {
+    try {
+      setStateChanging(true);
+      setGenericTypeSignatureInternal(genericType);
+      if (isControlCreated()) {
+        m_genericTypeField.acceptProposal(genericType);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  protected void setGenericTypeSignatureInternal(String genericType) {
+    setProperty(PROP_GENERIC_TYPE, genericType);
   }
 }

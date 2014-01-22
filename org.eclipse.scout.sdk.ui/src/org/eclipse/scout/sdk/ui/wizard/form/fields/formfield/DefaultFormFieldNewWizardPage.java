@@ -16,11 +16,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.DefaultFormFieldNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -35,7 +35,6 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -52,7 +51,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  private final IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -74,7 +73,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   public DefaultFormFieldNewWizardPage(IType declaringType) {
     super(DefaultFormFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
-    m_abstractFormField = RuntimeClasses.getSuperType(RuntimeClasses.IFormField, m_declaringType.getJavaProject());
+    m_abstractFormField = RuntimeClasses.getSuperType(IRuntimeClasses.IFormField, m_declaringType.getJavaProject());
     m_superType = m_abstractFormField;
     m_sibling = SiblingProposal.SIBLING_END;
   }
@@ -125,10 +124,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
         try {
           setStateChanging(true);
           m_superType = (IType) event.proposal;
-
-          if (getSuperType() != null && TypeUtility.isGenericType(getSuperType())) {
-            m_genericTypeField.setEnabled(true);
-          }
+          m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
         }
         finally {
           setStateChanging(false);
@@ -198,36 +194,24 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    try {
-      multiStatus.add(getStatusNameField());
-      multiStatus.add(getStatusSuperType());
-      multiStatus.add(getStatusGenericType());
-    }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError("could not validate name field.", e);
-    }
+    multiStatus.add(getStatusNameField());
+    multiStatus.add(getStatusSuperType());
+    multiStatus.add(getStatusGenericType());
   }
 
-  protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_FORM_FIELD);
-    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
-      return javaFieldNameStatus;
-    }
-    if (ScoutTypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getRegexSimpleNameFilter(getTypeName())).length > 0) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-    }
-    return javaFieldNameStatus;
+  protected IStatus getStatusNameField() {
+    return ScoutUtility.validateFormFieldName(getTypeName(), SdkProperties.SUFFIX_FORM_FIELD, m_declaringType);
   }
 
-  protected IStatus getStatusSuperType() throws JavaModelException {
+  protected IStatus getStatusSuperType() {
     if (getSuperType() == null) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }
 
-  protected IStatus getStatusGenericType() throws JavaModelException {
-    if (getSuperType() != null && TypeUtility.isGenericType(getSuperType())) {
+  protected IStatus getStatusGenericType() {
+    if (TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
       }

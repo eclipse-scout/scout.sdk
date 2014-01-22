@@ -27,7 +27,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
@@ -104,7 +104,7 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
     members.add(getLookupCall());
     selectedMembers.add(getLookupCall());
     // find lookup service
-    IType iService = TypeUtility.getType(RuntimeClasses.ILookupService);
+    IType iService = TypeUtility.getType(IRuntimeClasses.ILookupService);
     ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     if (m_lookupServiceInterface == null) {
       String serviceName = getLookupCall().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_LOOKUP_CALL + "$", "I$1" + SdkProperties.SUFFIX_LOOKUP_SERVICE);
@@ -152,17 +152,18 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
     @Override
     public void handleSelectionChanged(IMember[] selection) {
       m_confirmDialog.setMessage("");
-      HashSet<IMember> members = new HashSet<IMember>(Arrays.asList(selection));
       boolean canOk = true;
       if (selection == null || selection.length == 0) {
         canOk = false;
       }
-      if (m_lookupService != null && m_lookupServiceInterface != null && (members.contains(m_lookupServiceInterface) != members.contains(m_lookupService))) {
-        m_confirmDialog.setMessage(Texts.get("ProcessServiceSelection"), IMessageProvider.ERROR);
-        canOk = false;
+      else {
+        HashSet<IMember> members = new HashSet<IMember>(Arrays.asList(selection));
+        if (m_lookupService != null && m_lookupServiceInterface != null && (members.contains(m_lookupServiceInterface) != members.contains(m_lookupService))) {
+          m_confirmDialog.setMessage(Texts.get("ProcessServiceSelection"), IMessageProvider.ERROR);
+          canOk = false;
+        }
       }
       m_confirmDialog.getOkButton().setEnabled(canOk);
-
     }
   }
 }

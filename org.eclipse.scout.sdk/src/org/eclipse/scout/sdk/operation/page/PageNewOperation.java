@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
@@ -84,7 +85,7 @@ public class PageNewOperation extends AbstractPageOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
 
     PrimaryTypeNewOperation newOp = new PrimaryTypeNewOperation(getTypeName(), getPackageNamePage(), getPageJavaProject());
     newOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
@@ -94,12 +95,12 @@ public class PageNewOperation extends AbstractPageOperation {
 
     // page data
     ITypeHierarchy pageSuperTypeHierarchy = TypeUtility.getSuperTypeHierarchy(TypeUtility.getType(superTypeFqn));
-    if (getPageDataJavaProject() != null && pageSuperTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.IPageWithTable))) {
+    if (getPageDataJavaProject() != null && pageSuperTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable))) {
       String pageDataTypeName = getTypeName() + "Data";
       PrimaryTypeNewOperation pageDataTypeNewOp = new PrimaryTypeNewOperation(pageDataTypeName, getPackageNamePageData(), getPageDataJavaProject());
       pageDataTypeNewOp.addMethodSourceBuilder(MethodSourceBuilderFactory.createConstructorSourceBuilder(pageDataTypeName));
       pageDataTypeNewOp.setFlags(Flags.AccPublic);
-      pageDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractTablePageData));
+      pageDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTablePageData));
       pageDataTypeNewOp.setPackageExportPolicy(ExportPolicy.AddPackage);
       pageDataTypeNewOp.setFormatSource(false);
       pageDataTypeNewOp.validate();
@@ -120,10 +121,10 @@ public class PageNewOperation extends AbstractPageOperation {
     }
 
     // table inner type
-    if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractPageWithTable) || CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractExtensiblePageWithTable)) {
+    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractPageWithTable) || CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractExtensiblePageWithTable)) {
       ITypeSourceBuilder tableSourceBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE);
       tableSourceBuilder.setFlags(Flags.AccPublic);
-      tableSourceBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getPageJavaProject()));
+      tableSourceBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITable, getPageJavaProject()));
       tableSourceBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
       newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTableKey(tableSourceBuilder), tableSourceBuilder);
 

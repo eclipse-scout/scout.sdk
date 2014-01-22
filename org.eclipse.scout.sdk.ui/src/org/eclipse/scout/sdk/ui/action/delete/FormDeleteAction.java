@@ -29,7 +29,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
@@ -120,7 +120,7 @@ public class FormDeleteAction extends AbstractScoutHandler {
     }
     // find process service
     String formName = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "$1");
-    IType iService = TypeUtility.getType(RuntimeClasses.IService);
+    IType iService = TypeUtility.getType(IRuntimeClasses.IService);
     ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     if (m_processServiceInterface == null) {
       ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getFormType().getJavaProject()), TypeFilters.getInterfaceFilter());
@@ -173,17 +173,19 @@ public class FormDeleteAction extends AbstractScoutHandler {
     @Override
     public void handleSelectionChanged(IMember[] selection) {
       m_confirmDialog.setMessage("");
-      HashSet<IMember> members = new HashSet<IMember>(Arrays.asList(selection));
       boolean canOk = true;
       if (selection == null || selection.length == 0) {
         canOk = false;
       }
-      if (m_processServiceImplementation != null && m_processServiceInterface != null && (members.contains(m_processServiceInterface) != members.contains(m_processServiceImplementation))) {
-        m_confirmDialog.setMessage(Texts.get("ProcessServiceSelection"), IMessageProvider.ERROR);
-        canOk = false;
-      }
-      if (m_formType != null && m_formData != null && (members.contains(m_formType) != members.contains(m_formData))) {
-        m_confirmDialog.setMessage(Texts.get("FormDataDeleteWithForm", m_formData.getElementName()), IMessageProvider.WARNING);
+      else {
+        HashSet<IMember> members = new HashSet<IMember>(Arrays.asList(selection));
+        if (m_processServiceImplementation != null && m_processServiceInterface != null && (members.contains(m_processServiceInterface) != members.contains(m_processServiceImplementation))) {
+          m_confirmDialog.setMessage(Texts.get("ProcessServiceSelection"), IMessageProvider.ERROR);
+          canOk = false;
+        }
+        if (m_formType != null && m_formData != null && (members.contains(m_formType) != members.contains(m_formData))) {
+          m_confirmDialog.setMessage(Texts.get("FormDataDeleteWithForm", m_formData.getElementName()), IMessageProvider.WARNING);
+        }
       }
       m_confirmDialog.getOkButton().setEnabled(canOk);
     }

@@ -20,6 +20,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
+import org.eclipse.scout.sdk.util.IRegEx;
 
 /**
  * <h3>{@link ResourcesContentProvider}</h3> ...
@@ -50,7 +51,7 @@ public class ResourcesContentProvider extends ContentProposalProvider implements
       searchPattern = "*";
     }
     else {
-      searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
+      searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
     }
     char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
     ArrayList<Object> collector = new ArrayList<Object>();

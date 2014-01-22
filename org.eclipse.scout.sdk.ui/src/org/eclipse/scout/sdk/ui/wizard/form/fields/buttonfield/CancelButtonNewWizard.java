@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -26,7 +27,7 @@ public class CancelButtonNewWizard extends ButtonFieldNewWizard {
   @Override
   public void initWizard(IType declaringType) {
     super.initWizard(declaringType);
-    getButtonFieldWizardPage().setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.AbstractCancelButton, declaringType.getJavaProject()));
+    getButtonFieldWizardPage().setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.AbstractCancelButton, declaringType.getJavaProject()));
     INlsProject nlsProject = ScoutTypeUtility.getScoutBundle(declaringType.getJavaProject()).getNlsProject();
     INlsEntry entry = null;
     if (nlsProject != null) {

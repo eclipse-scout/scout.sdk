@@ -12,7 +12,7 @@ package formdata.shared.services.process.replace;
 
 import org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType;
 
-public class TestingCodeType extends AbstractCodeType<Long> {
+public class TestingCodeType extends AbstractCodeType<Long, Long> {
 
   private static final long serialVersionUID = 1L;
 

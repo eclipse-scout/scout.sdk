@@ -59,11 +59,6 @@ public class Desktop extends AbstractDesktop implements IDesktop {
     if (bm != null) {
       bookmarkService.activate(bm);
     }
-    else {
-      if (getAvailableOutlines().length > 0) {
-        setOutline(getAvailableOutlines()[0]);
-      }
-    }
   }
 
   @Order(10.0)

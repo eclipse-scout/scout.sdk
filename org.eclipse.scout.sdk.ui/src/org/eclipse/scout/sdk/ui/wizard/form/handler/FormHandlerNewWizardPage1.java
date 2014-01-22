@@ -26,6 +26,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -48,7 +49,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
-  final IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
+  private final IType iFormHandler = TypeUtility.getType(IRuntimeClasses.IFormHandler);
+
   private IType m_declaringType;
   private boolean m_showAllTemplates;
 
@@ -81,7 +83,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
       }
     });
     List<HandlerTemplate> templates = new ArrayList<HandlerTemplate>();
-    IType formHandler = RuntimeClasses.getSuperType(RuntimeClasses.IFormHandler, m_declaringType.getJavaProject());
+    IType formHandler = RuntimeClasses.getSuperType(IRuntimeClasses.IFormHandler, m_declaringType.getJavaProject());
     templates.add(new HandlerTemplate(Texts.get("FormHandlerNEW"), formHandler, HandlerTemplate.ID_NEW));
     templates.add(new HandlerTemplate(Texts.get("FormHandlerMODIFY"), formHandler, HandlerTemplate.ID_MODIFY));
     templates.add(new HandlerTemplate(Texts.get("FormHandler"), formHandler, HandlerTemplate.ID_CUSTOM));

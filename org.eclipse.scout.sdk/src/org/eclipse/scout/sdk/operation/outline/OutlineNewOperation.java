@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.outline;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +34,6 @@ import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
-import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
@@ -53,6 +54,8 @@ import org.eclipse.text.edits.InsertEdit;
  */
 public class OutlineNewOperation extends PrimaryTypeNewOperation {
 
+  public static final String GET_CONFIGURED_OUTLINES = "getConfiguredOutlines";
+
   // in members
   private INlsEntry m_nlsEntry;
   private IType m_desktopType;
@@ -62,7 +65,7 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
 
     // defaults
     setFlags(Flags.AccPublic);
-    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IOutline, getJavaProject()));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IOutline, getJavaProject()));
     getCompilationUnitNewOp().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
     setPackageExportPolicy(ExportPolicy.AddPackage);
@@ -97,8 +100,7 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
   }
 
   private void addOutlineToDesktop(final IType outlineType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    String methodName = "getConfiguredOutlines";
-    IMethod method = TypeUtility.getMethod(getDesktopType(), methodName);
+    IMethod method = TypeUtility.getMethod(getDesktopType(), GET_CONFIGURED_OUTLINES);
     if (TypeUtility.exists(method)) {
       MethodUpdateContentOperation updateContentOp = new MethodUpdateContentOperation(method) {
         @Override
@@ -124,29 +126,6 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
               ScoutSdk.logError("could not update method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.", e);
             }
           }
-          else {
-            // try 'return new Class[]{}' pattern
-            matcher = Pattern.compile("\\s*return\\s*new\\s*Class\\[\\]\\{([a-zA-Z0-9\\.\\,\\s\\_\\-]*)\\}\\s*\\;", Pattern.MULTILINE).matcher(methodBody.get());
-            if (matcher.find()) {
-              String list = matcher.group(1).trim();
-              boolean appendComma = !list.endsWith(",") && !(list.length() == 0);
-              int pos = matcher.end(1);
-              String addSource = validator.getTypeName(SignatureCache.createTypeSignature(outlineType.getFullyQualifiedName())) + ".class";
-              if (methodBody.get().contains(addSource)) {
-                return;
-              }
-              InsertEdit edit = new InsertEdit(pos, (appendComma ? ", " : "") + addSource);
-              try {
-                edit.apply(methodBody);
-              }
-              catch (Exception e) {
-                ScoutSdk.logError("could not update method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.", e);
-              }
-            }
-            else {
-              ScoutSdk.logWarning("could find insert position for an additional outline in method '" + getMethod().getElementName() + "' in type '" + getMethod().getDeclaringType().getFullyQualifiedName() + "'.");
-            }
-          }
         }
       };
       updateContentOp.setFormatSource(true);
@@ -154,22 +133,43 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
       updateContentOp.run(monitor, workingCopyManager);
     }
     else {
-      IMethodSourceBuilder overrideBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(methodName, getDesktopType());
+      IMethodSourceBuilder overrideBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(GET_CONFIGURED_OUTLINES, getDesktopType());
       overrideBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          source.append("return new Class[]{").append(validator.getTypeName(SignatureCache.createTypeSignature(outlineType.getFullyQualifiedName()))).append(".class};");
+          source.append(getOutlinesMethodBody(new IType[]{outlineType}, validator, lineDelimiter));
         }
       });
       MethodNewOperation overrideOp = new MethodNewOperation(overrideBuilder, getDesktopType());
       overrideOp.setFormatSource(true);
       IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getDesktopType());
-      overrideOp.setSibling(structuredType.getSiblingMethodConfigGetConfigured(methodName));
-      overrideOp.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createSupressWarningUnchecked());
+      overrideOp.setSibling(structuredType.getSiblingMethodConfigGetConfigured(GET_CONFIGURED_OUTLINES));
       overrideOp.validate();
       overrideOp.run(monitor, workingCopyManager);
 
     }
+  }
+
+  public static String getOutlinesMethodBody(IType[] outlineTypes, IImportValidator validator, String lineDelimiter) {
+    StringBuilder source = new StringBuilder();
+    String listRef = validator.getTypeName(SignatureCache.createTypeSignature(List.class.getName()));
+    String arrayListRef = validator.getTypeName(SignatureCache.createTypeSignature(ArrayList.class.getName()));
+    String classRef = validator.getTypeName(SignatureCache.createTypeSignature(Class.class.getName()));
+    String iOutlineRef = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.IOutline));
+
+    StringBuilder genericPart = new StringBuilder().append('<').append(classRef).append("<? extends ").append(iOutlineRef).append(">>");
+
+    source.append(listRef).append(genericPart).append(" outlines = ").append("new ").append(arrayListRef).append(genericPart).append("();").append(lineDelimiter);
+    if (outlineTypes != null && outlineTypes.length > 0) {
+      for (IType t : outlineTypes) {
+        if (TypeUtility.exists(t)) {
+          String outlineRef = validator.getTypeName(SignatureCache.createTypeSignature(t.getFullyQualifiedName()));
+          source.append("outlines.add(").append(outlineRef).append(".class);").append(lineDelimiter);
+        }
+      }
+    }
+    source.append("return outlines;");
+    return source.toString();
   }
 
   private void addOutlineButtonToDesktop(IType outlineType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
@@ -186,8 +186,8 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
     final boolean isExtension = desktopSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension));
 
     OrderedInnerTypeNewOperation outlineButtonOp = new OrderedInnerTypeNewOperation(className, getDesktopType());
-    outlineButtonOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IViewButton));
-    outlineButtonOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractOutlineViewButton, getDesktopType().getJavaProject()));
+    outlineButtonOp.setOrderDefinitionType(TypeUtility.getType(IRuntimeClasses.IViewButton));
+    outlineButtonOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.AbstractOutlineViewButton, getDesktopType().getJavaProject()));
     outlineButtonOp.setFlags(Flags.AccPublic);
 
     // constructor

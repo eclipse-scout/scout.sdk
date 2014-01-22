@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.operation.form.field.calendar;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
@@ -26,6 +26,6 @@ public class CalendarItemProviderNewOperation extends OrderedInnerTypeNewOperati
 
   public CalendarItemProviderNewOperation(String typeName, IType declaringType, boolean formatSource) {
     super(typeName, declaringType, formatSource);
-    setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.ICalendarItemProvider));
+    setOrderDefinitionType(TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider));
   }
 }

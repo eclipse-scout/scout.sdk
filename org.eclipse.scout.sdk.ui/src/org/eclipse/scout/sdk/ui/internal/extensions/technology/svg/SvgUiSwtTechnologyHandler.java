@@ -6,7 +6,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.SwtProductFileUpgradeOperation;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class SvgUiSwtTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  public final static String[] SWT_SVG_PLUGIN = new String[]{"org.eclipse.scout.svg.ui.swt"};
+  public static final String[] SWT_SVG_PLUGIN = new String[]{"org.eclipse.scout.svg.ui.swt"};
 
   public SvgUiSwtTechnologyHandler() {
   }
@@ -47,14 +47,14 @@ public class SvgUiSwtTechnologyHandler extends AbstractScoutTechnologyHandler {
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    return getSelectionProductFiles(getSwtBundlesBelow(project), new String[]{RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwtBundleId},
+    return getSelectionProductFiles(getSwtBundlesBelow(project), new String[]{IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwtBundleId},
         SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, SWT_SVG_PLUGIN,
         SvgClientTechnologyHandler.getAdditionalBatik17CorePlugins(), SvgClientTechnologyHandler.getAdditionalBatik17ScoutPlugins());
   }
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getSwtBundlesBelow(project), list, RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwtBundleId);
+    contributeProductFiles(getSwtBundlesBelow(project), list, IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwtBundleId);
   }
 
   private IScoutBundle[] getSwtBundlesBelow(IScoutBundle start) {

@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page
 import java.util.ArrayList;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -30,11 +30,11 @@ public class PageNodePageHelper {
     ArrayList<AbstractPage> pages = new ArrayList<AbstractPage>();
     for (IType type : types) {
       if (TypeUtility.exists(type)) {
-        if (pageTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IPageWithNodes), type)) {
+        if (pageTypeHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IPageWithNodes), type)) {
           // create page with node
           pages.add(new PageWithNodeNodePage(parentPage, type));
         }
-        else if (pageTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IPageWithTable), type)) {
+        else if (pageTypeHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IPageWithTable), type)) {
           // create page with table
           pages.add(new PageWithTableNodePage(parentPage, type));
         }

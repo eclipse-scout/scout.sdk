@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
  */
 public class SharedScoutBundleExtension implements INewScoutBundleHandler {
 
-  public final static String ID = "org.eclipse.scout.sdk.ui.SharedBundle";
+  public static final String ID = "org.eclipse.scout.sdk.ui.SharedBundle";
 
   @Override
   public void init(IScoutProjectWizard wizard, ScoutBundleUiExtension extension) {

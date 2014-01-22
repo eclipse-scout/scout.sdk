@@ -26,7 +26,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.ScoutFileLocator;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -41,11 +41,11 @@ import org.eclipse.swt.graphics.ImageData;
 
 public class ScoutProjectIcons implements IIconProvider {
 
-  private final static String[] PREDEFINED_EXTENSIONS = new String[]{"png", "ico", "gif"};
-  private final static String[] PREDEFINED_SUB_FOLDERS = new String[]{"resources/icons/internal/", "resources/icons/"};
+  private static final String[] PREDEFINED_EXTENSIONS = new String[]{"png", "ico", "gif"};
+  private static final String[] PREDEFINED_SUB_FOLDERS = new String[]{"resources/icons/internal/", "resources/icons/"};
 
   private final Object cacheLock = new Object();
-  private final IType abstractIcons = TypeUtility.getType(RuntimeClasses.AbstractIcons);
+  private final IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
   private final IScoutBundle m_bundle;
   private final IPrimaryTypeTypeHierarchy m_iconsHierarchy;
 
@@ -101,9 +101,9 @@ public class ScoutProjectIcons implements IIconProvider {
       projects.add(parentBundle.getSymbolicName());
     }
 
-    projects.add(RuntimeClasses.ScoutClientBundleId);
-    projects.add(RuntimeClasses.ScoutUiSwtBundleId);
-    projects.add(RuntimeClasses.ScoutUiSwingBundleId);
+    projects.add(IRuntimeClasses.ScoutClientBundleId);
+    projects.add(IRuntimeClasses.ScoutUiSwtBundleId);
+    projects.add(IRuntimeClasses.ScoutUiSwingBundleId);
 
     String[] result = projects.toArray(new String[projects.size()]);
     Arrays.sort(result, Collections.reverseOrder()); //TODO: correct to use natural ordering?

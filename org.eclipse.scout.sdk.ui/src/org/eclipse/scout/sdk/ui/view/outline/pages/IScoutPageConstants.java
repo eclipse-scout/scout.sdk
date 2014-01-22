@@ -108,6 +108,7 @@ public interface IScoutPageConstants {
   String SHARED_CONTEXT_PROPERTY_TABLE_PAGE = "org.eclipse.scout.sdk.page.SharedContextPropertyTablePage";
   String SHARED_NODE_PAGE = "org.eclipse.scout.sdk.page.SharedNodePage";
 
+  String PROPOSAL_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.ProposalFieldNodePage";
   String SMART_FIELD_NODE_PAGE = "org.eclipse.scout.sdk.page.SmartFieldNodePage";
   String SMTP_SERVICE_NODE_PAGE = "org.eclipse.scout.sdk.page.SmtpServiceNodePage";
   String SMTP_SERVICE_TABLE_PAGE = "org.eclipse.scout.sdk.page.SmtpServiceTablePage";

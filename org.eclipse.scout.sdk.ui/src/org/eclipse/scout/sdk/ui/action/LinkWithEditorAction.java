@@ -104,10 +104,8 @@ public class LinkWithEditorAction extends Action {
   private class P_PropertyListener implements IPropertyListener {
     @Override
     public void propertyChanged(Object aSource, int propId) {
-      switch (propId) {
-        case ScoutExplorerPart.IS_LINKING_ENABLED_PROPERTY:
-          updateLinkingEnabled(((ScoutExplorerPart) aSource).isLinkingEnabled());
-          break;
+      if (propId == ScoutExplorerPart.IS_LINKING_ENABLED_PROPERTY) {
+        updateLinkingEnabled(((ScoutExplorerPart) aSource).isLinkingEnabled());
       }
     }
   } // end class P_PropertyListener

@@ -16,7 +16,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  public final static String[] SCOUT_ONLY_SVG_PLUGINS = new String[]{
+  public static final String[] SCOUT_ONLY_SVG_PLUGINS = new String[]{
       "org.apache.batik.bridge",
       "org.apache.batik.dom",
       "org.apache.batik.dom.svg",
@@ -41,7 +41,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
       ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME
   };
 
-  public final static String[] CORE_SVG_PLUGINS = new String[]{
+  public static final String[] CORE_SVG_PLUGINS = new String[]{
       "org.apache.batik.css",
       "org.apache.batik.util",
       "org.apache.batik.util.gui",
@@ -50,11 +50,11 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
       "org.w3c.css.sac"
   };
 
-  private final static String[] BATIK_17_CORE_SVG_PLUGINS = new String[]{
+  private static final String[] BATIK_17_CORE_SVG_PLUGINS = new String[]{
       "org.w3c.dom.events"
   };
 
-  private final static String[] BATIK_17_SCOUT_ONLY_SVG_PLUGINS = new String[]{
+  private static final String[] BATIK_17_SCOUT_ONLY_SVG_PLUGINS = new String[]{
       "org.w3c.dom.svg.fragment"
   };
 
@@ -83,7 +83,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
 
   @Override
   public void postSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
-    TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IFormField)).invalidate();
+    TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.IFormField)).invalidate();
   }
 
   @Override

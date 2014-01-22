@@ -14,7 +14,6 @@ Export-Package: test.shared,
  test.shared.services.common.text,
  test.shared.services.process
 Import-Package: javax.activation;resolution:=optional,
- javax.jms;resolution:=optional,
  javax.mail;resolution:=optional,
  javax.mail.event;resolution:=optional,
  javax.mail.internet;resolution:=optional,

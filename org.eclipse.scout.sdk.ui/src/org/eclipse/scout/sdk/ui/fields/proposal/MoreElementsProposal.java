@@ -21,10 +21,10 @@ import org.eclipse.swt.graphics.Image;
  * @since 3.8.0 16.04.2012
  */
 public final class MoreElementsProposal implements ISeparatorProposal {
-  private final static String LINE = "---------------";
-  private final static String LABEL = LINE + " " + Texts.get("MoreElements") + " " + LINE;
+  private static final String LINE = "---------------";
+  private static final String LABEL = LINE + " " + Texts.get("MoreElements") + " " + LINE;
 
-  public final static ISeparatorProposal INSTANCE = new MoreElementsProposal();
+  public static final ISeparatorProposal INSTANCE = new MoreElementsProposal();
 
   private MoreElementsProposal() {
   }

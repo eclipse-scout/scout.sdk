@@ -87,7 +87,7 @@ public class JavaCodeField extends Composite {
       public void proposalAccepted(IContentProposal proposal) {
         JavaTypeProposal tp = (JavaTypeProposal) proposal;
         JavaCodeRange codeRange = new JavaCodeRange(tp.getContent());
-        codeRange.setFullyQuallifiedName(tp.getType().getFullyQualifiedName());
+        codeRange.setFullyQualifiedName(tp.getType().getFullyQualifiedName());
         codeRange.setType(JavaCodeRange.QUALIFIED_TYPE);
         m_ranges.put(proposal.getContent(), codeRange);
         handleTextModified(true);
@@ -120,7 +120,7 @@ public class JavaCodeField extends Composite {
     ArrayList<String> imports = new ArrayList<String>();
     for (JavaCodeRange range : m_ranges.values()) {
       if (range.getType() == JavaCodeRange.QUALIFIED_TYPE) {
-        imports.add(range.getFullyQuallifiedName());
+        imports.add(range.getFullyQualifiedName());
       }
     }
     return imports.toArray(new String[imports.size()]);
@@ -154,7 +154,7 @@ public class JavaCodeField extends Composite {
             // accept
             JavaTypeProposal proposal = (JavaTypeProposal) pros[0];
             if (!proposal.isPrimitive()) {
-              range.setFullyQuallifiedName(proposal.getType().getFullyQualifiedName());
+              range.setFullyQualifiedName(proposal.getType().getFullyQualifiedName());
               range.setType(JavaCodeRange.QUALIFIED_TYPE);
             }
             else {
@@ -258,7 +258,7 @@ public class JavaCodeField extends Composite {
             m_shell.setLayout(new FormLayout());
             Label l = new Label(m_shell, SWT.SINGLE);
             l.setBackground(m_shell.getBackground());
-            l.setText(range.getFullyQuallifiedName());
+            l.setText(range.getFullyQualifiedName());
             FormData data = new FormData();
             data.top = new FormAttachment(0, 5);
             data.left = new FormAttachment(0, 5);

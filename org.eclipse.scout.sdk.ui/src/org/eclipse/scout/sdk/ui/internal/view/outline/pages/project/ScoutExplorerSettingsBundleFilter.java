@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
  */
 public class ScoutExplorerSettingsBundleFilter implements IScoutBundleFilter {
 
-  private final static IScoutBundleFilter INSTANCE = new ScoutExplorerSettingsBundleFilter();
+  private static final IScoutBundleFilter INSTANCE = new ScoutExplorerSettingsBundleFilter();
 
   private ScoutExplorerSettingsBundleFilter() {
   }

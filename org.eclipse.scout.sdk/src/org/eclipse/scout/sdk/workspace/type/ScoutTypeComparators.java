@@ -9,7 +9,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class ScoutTypeComparators extends TypeComparators {
 
-  protected final static Comparator<IType> ORDER_ANNOTATION_COMPARATOR = new Comparator<IType>() {
+  protected static final Comparator<IType> ORDER_ANNOTATION_COMPARATOR = new Comparator<IType>() {
     @Override
     public int compare(IType t1, IType t2) {
       Double val1 = getOrderAnnotation(t1);

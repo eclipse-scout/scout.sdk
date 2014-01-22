@@ -24,7 +24,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.scout.commons.holders.BooleanHolder;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractDtoTypeSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.method.IMethodReturnExpressionRewrite;
@@ -52,9 +53,9 @@ import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
  */
 public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
-  private final static Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
-  private final static Pattern REGEX_CONSTRUCTOR_CALL = Pattern.compile("new\\s+[A-Za-z][a-zA-Z0-9_\\.]{0,200}\\s*\\([^\\(\\)]*\\)");
-  private final IType iValueField = TypeUtility.getType(RuntimeClasses.IValueField);
+  private static final Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
+  private static final Pattern REGEX_CONSTRUCTOR_CALL = Pattern.compile("new\\s+[A-Za-z][a-zA-Z0-9_\\.]{0,200}\\s*\\([^\\(\\)]*\\)");
+  private final IType iValueField = TypeUtility.getType(IRuntimeClasses.IValueField);
 
   private FormDataAnnotation m_formDataAnnotation;
 
@@ -259,7 +260,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
                   IType type = (IType) element;
                   ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(type);
                   if (h.contains(iValueField)) {
-                    String formDataFieldName = ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(type.getElementName()));
+                    String formDataFieldName = NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(type.getElementName()));
                     buffer.append(formDataFieldName);
                     return true; // rewrite done
                   }

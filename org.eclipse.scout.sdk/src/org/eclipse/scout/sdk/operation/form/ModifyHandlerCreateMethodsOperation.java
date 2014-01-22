@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.operation.form;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -54,9 +54,9 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
     String TAB = SdkProperties.TAB;
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getFormHandler().getCompilationUnit());
     workingCopyManager.register(getFormHandler().getCompilationUnit(), monitor);
-    String processingExceptionClass = SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ProcessingException, validator);
+    String processingExceptionClass = SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ProcessingException, validator);
     String serviceInterfaceName = SignatureUtility.getTypeReferenceFromFqn(getServiceInterface().getFullyQualifiedName(), validator);
-    String servicesName = SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.SERVICES, validator);
+    String servicesName = SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.SERVICES, validator);
     String formDataName = SignatureUtility.getTypeReferenceFromFqn(getFormData().getFullyQualifiedName(), validator);
     if (isCreateExecLoad()) {
       // execLoad on formhandler

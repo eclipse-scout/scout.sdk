@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.KeyStrokeNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -60,7 +60,7 @@ public class KeyStrokeTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_keystrokeChangedListener == null) {
-      IType iKeyStrokeType = TypeUtility.getType(RuntimeClasses.IKeyStroke);
+      IType iKeyStrokeType = TypeUtility.getType(IRuntimeClasses.IKeyStroke);
       m_keystrokeChangedListener = new InnerTypePageDirtyListener(this, iKeyStrokeType);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_keystrokeChangedListener);
     }

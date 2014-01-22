@@ -17,7 +17,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
 import org.eclipse.scout.sdk.operation.template.IContentTemplate;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -27,9 +27,9 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 /**
  * <h3>{@link AbstractFormFieldTemplate}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.9.0 12.04.2013
  */
 public abstract class AbstractFormFieldTemplate implements IContentTemplate {
@@ -51,7 +51,7 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
     if (lastBoxIndex > 0) {
       parentName = parentName.substring(0, lastBoxIndex);
     }
-    String sequenceBoxFqn = SignatureUtility.DOLLAR_REPLACEMENT_REGEX.matcher(declaringType.getFullyQualifiedName() + "." + sourceBuilder.getElementName()).replaceAll(".");
+    String sequenceBoxFqn = IRegEx.DOLLAR_REPLACEMENT.matcher(declaringType.getFullyQualifiedName() + "." + sourceBuilder.getElementName()).replaceAll(".");
     double order = 10;
 
     // from
@@ -108,7 +108,7 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
     // find form
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(declaringType.getCompilationUnit());
     IType form = TypeUtility.getAncestor(declaringType, TypeFilters.getMultiTypeFilterOr(
-        TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
+        TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
         TypeFilters.getTopLevelTypeFilter()));
 
     if (TypeUtility.exists(form)) {

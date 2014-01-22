@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -24,12 +24,12 @@ public class JaxWsServerProdTechnologyHandler extends AbstractScoutTechnologyHan
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    return getSelectionProductFiles(getServerBundlesBelow(project), new String[]{RuntimeClasses.ScoutServerBundleId}, new String[]{JaxWsServerManifestTechnologyHandler.JAXWS_RUNTIME_PLUGIN});
+    return getSelectionProductFiles(getServerBundlesBelow(project), new String[]{IRuntimeClasses.ScoutServerBundleId}, new String[]{JaxWsServerManifestTechnologyHandler.JAXWS_RUNTIME_PLUGIN});
   }
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getServerBundlesBelow(project), list, RuntimeClasses.ScoutServerBundleId);
+    contributeProductFiles(getServerBundlesBelow(project), list, IRuntimeClasses.ScoutServerBundleId);
   }
 
   @Override

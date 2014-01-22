@@ -91,7 +91,6 @@ public final class TreeUtility {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
 
-    HashSet<IScoutBundle> rootBundles = new HashSet<IScoutBundle>();
     IScoutBundleFilter rootFilter = null;
     if (scoutBundleFilter == null) {
       rootFilter = ScoutBundleFilters.getRootBundlesFilter();
@@ -99,8 +98,12 @@ public final class TreeUtility {
     else {
       rootFilter = ScoutBundleFilters.getFilteredRootBundlesFilter(scoutBundleFilter);
     }
-    for (IScoutBundle root : scoutProject.getParentBundles(rootFilter, true)) {
-      rootBundles.add(root);
+
+    HashSet<IScoutBundle> rootBundles = new HashSet<IScoutBundle>();
+    if (scoutProject != null) {
+      for (IScoutBundle root : scoutProject.getParentBundles(rootFilter, true)) {
+        rootBundles.add(root);
+      }
     }
     recAddChildNodes(rootNode, rootBundles, treeNodeFilter);
     return rootNode;

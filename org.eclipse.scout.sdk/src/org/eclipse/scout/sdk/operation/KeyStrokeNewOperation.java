@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -63,9 +64,9 @@ public class KeyStrokeNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     OrderedInnerTypeNewOperation keyStrokeOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), isFormatSource());
-    keyStrokeOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IKeyStroke));
+    keyStrokeOp.setOrderDefinitionType(TypeUtility.getType(IRuntimeClasses.IKeyStroke));
     keyStrokeOp.setSibling(getSibling());
-    keyStrokeOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IKeyStroke, getDeclaringType().getJavaProject()));
+    keyStrokeOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IKeyStroke, getDeclaringType().getJavaProject()));
     keyStrokeOp.setFlags(Flags.AccPublic);
     if (!StringUtility.isNullOrEmpty(getKeyStroke())) {
       IMethodSourceBuilder getConfiguredKeyStrokeBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(keyStrokeOp.getSourceBuilder(), "getConfiguredKeyStroke");

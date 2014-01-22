@@ -32,7 +32,7 @@ public class SharedContextBeanPropertyNewWizard extends AbstractWorkspaceWizard 
   public SharedContextBeanPropertyNewWizard(IType serverSessionType, IType clientSessionType) {
     setWindowTitle(Texts.get("NewSharedContextProperty"));
     IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{serverSessionType.getJavaProject()});
-    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(searchScope);
+    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(searchScope, serverSessionType);
 
     SharedContextBeanPropertyNewOperation op = new SharedContextBeanPropertyNewOperation(serverSessionType, clientSessionType);
     beanPropertyWizardPage.setOperation(op);

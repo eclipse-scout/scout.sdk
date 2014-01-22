@@ -31,22 +31,22 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider.Normaliz
  */
 public class NlsTextProposal implements Comparable<NlsTextProposal> {
 
-  public final static NlsTextProposal NEW_NLS_TEXT_PROPOSAL = new NlsTextProposal(null, null, true) {
+  public static final NlsTextProposal NEW_NLS_TEXT_PROPOSAL = new NlsTextProposal(null, null, true) {
     @Override
     public String toString() {
       return "NEW_NLS_TEXT_PROPOSAL";
     }
   };
 
-  public final static int MATCH_DEV_LANG_TRANSLATION = 1;
-  public final static int MATCH_KEY = 2;
-  public final static int MATCH_FOREIGN_LANG = 4;
+  public static final int MATCH_DEV_LANG_TRANSLATION = 1;
+  public static final int MATCH_KEY = 2;
+  public static final int MATCH_FOREIGN_LANG = 4;
 
-  private final static Pattern REGEX_CR = Pattern.compile("\r", Pattern.LITERAL);
-  private final static Pattern REGEX_LF = Pattern.compile("\n", Pattern.LITERAL);
+  private static final Pattern REGEX_CR = Pattern.compile("\r", Pattern.LITERAL);
+  private static final Pattern REGEX_LF = Pattern.compile("\n", Pattern.LITERAL);
 
-  private final static String KEY_PREFIX = " (";
-  private final static String FOREIGN_LANG_PREFIX = "=";
+  private static final String KEY_PREFIX = " (";
+  private static final String FOREIGN_LANG_PREFIX = "=";
 
   private int m_matchKind;
   private String m_matchedForeignLangTranslation;

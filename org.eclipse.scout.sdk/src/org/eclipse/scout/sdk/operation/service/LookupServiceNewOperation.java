@@ -14,7 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
@@ -55,7 +55,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     TypeSourceBuilder serviceSourceBuilder = getImplementationSourceBuilder();
     IType serviceSuperType = TypeUtility.getTypeBySignature(serviceSourceBuilder.getSuperTypeSignature());
-    if (TypeUtility.getSuperTypeHierarchy(serviceSuperType).contains(TypeUtility.getType(RuntimeClasses.AbstractSqlLookupService))) {
+    if (TypeUtility.getSuperTypeHierarchy(serviceSuperType).contains(TypeUtility.getType(IRuntimeClasses.AbstractSqlLookupService))) {
       IMethodSourceBuilder getConfiguredSqlSelectMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(serviceSourceBuilder, "getConfiguredSqlSelect");
       getConfiguredSqlSelectMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override

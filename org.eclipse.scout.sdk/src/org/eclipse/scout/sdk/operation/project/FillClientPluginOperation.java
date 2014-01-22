@@ -22,8 +22,8 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class FillClientPluginOperation extends AbstractScoutProjectNewOperation {
 
-  public final static String PROP_INSTALL_CLIENT_SESSION = "INSTALL_CLIENT_SESSION";
-  public final static String PROP_INSTALL_DESKTOP_EXT = "INSTALL_DESKTOP_EXT";
+  public static final String PROP_INSTALL_CLIENT_SESSION = "INSTALL_CLIENT_SESSION";
+  public static final String PROP_INSTALL_DESKTOP_EXT = "INSTALL_DESKTOP_EXT";
 
   private IProject m_clientProject;
 

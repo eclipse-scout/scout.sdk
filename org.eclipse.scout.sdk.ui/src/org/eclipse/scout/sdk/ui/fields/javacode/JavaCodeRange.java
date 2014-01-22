@@ -23,18 +23,18 @@ public class JavaCodeRange {
   public int lenght = -1;
 
   private final String m_text;
-  public String m_fullyQuallifiedName;
+  public String m_fullyQualifiedName;
 
   public JavaCodeRange(String text) {
     m_text = text;
   }
 
-  public String getFullyQuallifiedName() {
-    return m_fullyQuallifiedName;
+  public String getFullyQualifiedName() {
+    return m_fullyQualifiedName;
   }
 
-  public void setFullyQuallifiedName(String fullyQuallifiedName) {
-    m_fullyQuallifiedName = fullyQuallifiedName;
+  public void setFullyQualifiedName(String fullyQualifiedName) {
+    m_fullyQualifiedName = fullyQualifiedName;
   }
 
   public String getText() {
@@ -60,8 +60,8 @@ public class JavaCodeRange {
   @Override
   public int hashCode() {
     int hashCode = 0;
-    if (m_fullyQuallifiedName != null) {
-      hashCode = hashCode ^ m_fullyQuallifiedName.hashCode();
+    if (m_fullyQualifiedName != null) {
+      hashCode = hashCode ^ m_fullyQualifiedName.hashCode();
     }
     return hashCode ^ m_text.hashCode() ^ getType() ^ offset ^ lenght;
   }

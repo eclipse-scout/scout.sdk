@@ -22,7 +22,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.ProgressIndicator;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.FormNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinkGroup;
@@ -53,8 +53,8 @@ import org.eclipse.swt.widgets.Composite;
 public class FormPropertyPart extends JdtTypePropertyPart {
   private static final String SECTION_ID_LINKS = "section.links";
 
-  private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
-  private final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
+  private final IType iService = TypeUtility.getType(IRuntimeClasses.IService);
+  private final IType basicPermission = TypeUtility.getType(IRuntimeClasses.BasicPermission);
 
   @Override
   protected void createSections() {

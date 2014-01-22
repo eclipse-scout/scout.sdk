@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
@@ -43,8 +44,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class WizardStepNewOperation implements IOperation {
 
-  final IType iWizardStep = TypeUtility.getType(RuntimeClasses.IWizardStep);
-
   // in member
   private final IType m_declaringType;
   private final String m_typeName;
@@ -66,7 +65,7 @@ public class WizardStepNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default values
-    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IWizardStep, getDeclaringType().getJavaProject());
+    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IWizardStep, getDeclaringType().getJavaProject());
   }
 
   @Override
@@ -86,6 +85,7 @@ public class WizardStepNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    IType iWizardStep = TypeUtility.getType(IRuntimeClasses.IWizardStep);
     OrderedInnerTypeNewOperation wizardStepOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), false);
     wizardStepOp.setFlags(Flags.AccPublic);
     wizardStepOp.setSuperTypeSignature(getSuperTypeSignature());
@@ -99,8 +99,8 @@ public class WizardStepNewOperation implements IOperation {
     }
     // form
     if (getForm() != null) {
-      String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
-      if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractWizardStep)) {
+      String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
+      if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractWizardStep)) {
         // update generic in supertype signature
         StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
         superTypeSigBuilder.append("<").append(getForm().getFullyQualifiedName()).append(">");

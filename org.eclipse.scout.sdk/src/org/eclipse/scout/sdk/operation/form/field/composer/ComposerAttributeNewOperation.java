@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.type.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -25,15 +26,12 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>WizardStepNewOperation</h3> ...
  */
 public class ComposerAttributeNewOperation extends InnerTypeNewOperation {
-
-  final IType iDataModelAttribute = TypeUtility.getType(RuntimeClasses.IDataModelAttribute);
 
   // in member
   private INlsEntry m_nlsEntry;
@@ -48,7 +46,7 @@ public class ComposerAttributeNewOperation extends InnerTypeNewOperation {
 
     // default values
     setFlags(Flags.AccPublic);
-    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IDataModelAttribute, getDeclaringType().getJavaProject()));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IDataModelAttribute, getDeclaringType().getJavaProject()));
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
   }
 

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.rap.operations.project.template;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
@@ -50,7 +52,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
  */
 public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProjectNewOperation {
 
-  private final static String OUTLINE_TABLE_FIELD_NAME = "OutlinesTableField";
+  private static final String OUTLINE_TABLE_FIELD_NAME = "OutlinesTableField";
 
   @Override
   public boolean isRelevant() {
@@ -87,7 +89,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     // constructor
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(homeFormOp.getElementName());
     constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
-    constructorBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    constructorBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
     homeFormOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
 
@@ -111,7 +113,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     getConfiguredTitleBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("return ").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.TEXTS))).append(".get(\"MobileOutlineChooserTitle\");");
+        source.append("return ").append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.TEXTS))).append(".get(\"MobileOutlineChooserTitle\");");
       }
     });
     homeFormOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredTitleBuilder), getConfiguredTitleBuilder);
@@ -125,7 +127,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     ITypeSourceBuilder mainBoxBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_MAIN_BOX);
     mainBoxBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
     mainBoxBuilder.setFlags(Flags.AccPublic);
-    mainBoxBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IGroupBox, mobileClient.getJavaProject()));
+    mainBoxBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, mobileClient.getJavaProject()));
     // fill main box
     String mainBoxFqn = packageName + "." + homeFormOp.getElementName() + "." + SdkProperties.TYPE_NAME_MAIN_BOX;
     fillMainBox(mainBoxBuilder, mainBoxFqn, homeFormOp.getSourceBuilder(), mobileClient.getJavaProject(), monitor, workingCopyManager);
@@ -139,7 +141,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     // view handler
     ITypeSourceBuilder viewHandlerBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_VIEW_HANDLER);
     viewHandlerBuilder.setFlags(Flags.AccPublic);
-    viewHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, mobileClient.getJavaProject()));
+    viewHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IFormHandler, mobileClient.getJavaProject()));
     fillViewHandler(viewHandlerBuilder, mainBoxFqn, monitor, workingCopyManager);
     homeFormOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormHandlerKey(viewHandlerBuilder), viewHandlerBuilder);
 
@@ -176,8 +178,9 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append(validator.getTypeName(outlinesTableFieldTableSignature)).append(" table = getOutlinesTableField().getTable();").append(lineDelimiter);
+        String listTypeName = validator.getTypeName(SignatureCache.createTypeSignature(List.class.getName()));
         String outlineTypeName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.IOutline));
-        source.append(outlineTypeName).append("[] outlines = getDesktop().getAvailableOutlines();").append(lineDelimiter);
+        source.append(listTypeName).append('<').append(outlineTypeName).append("> outlines = getDesktop().getAvailableOutlines();").append(lineDelimiter);
         source.append("for (").append(outlineTypeName).append(" outline : outlines) {").append(lineDelimiter);
         source.append("if (outline.isVisible() && outline.getRootNode() != null) {").append(lineDelimiter);
         source.append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.ITableRow))).append(" row = table.createRow(new Object[]{outline, outline.getTitle()});").append(lineDelimiter);
@@ -240,13 +243,13 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     ITypeSourceBuilder logoutButtonBuilder = new TypeSourceBuilder("LogoutButton");
     logoutButtonBuilder.setFlags(Flags.AccPublic);
     logoutButtonBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(20));
-    logoutButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IButton, mobileClient));
+    logoutButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IButton, mobileClient));
     // getConfiguredLabel method
     IMethodSourceBuilder getConfiguredLabelBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(logoutButtonBuilder, "getConfiguredLabel");
     getConfiguredLabelBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("return ").append(validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.TEXTS))).append(".get(\"Logoff\");");
+        source.append("return ").append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.TEXTS))).append(".get(\"Logoff\");");
       }
     });
     logoutButtonBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredLabelBuilder), getConfiguredLabelBuilder);
@@ -281,7 +284,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     ITypeSourceBuilder outlinesTableFieldBuilder = new TypeSourceBuilder(OUTLINE_TABLE_FIELD_NAME);
     String genericTableFqn = new StringBuilder(mainBoxFqn).append('.').append(outlinesTableFieldBuilder.getElementName()).append('.').append(tableBuilder.getElementName()).toString();
     outlinesTableFieldBuilder.setFlags(Flags.AccPublic);
-    outlinesTableFieldBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(RuntimeClasses.ITableField, mobileClient) + "<" + genericTableFqn.toString() + ">"));
+    outlinesTableFieldBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.ITableField, mobileClient) + "<" + genericTableFqn.toString() + ">"));
     outlinesTableFieldBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
 
     // method getConfiguredLabelVisible
@@ -342,10 +345,10 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     execRowsSelectedBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("if (rows == null || rows.length == 0) {").append(lineDelimiter);
+        source.append("if (rows == null || rows.size() == 0) {").append(lineDelimiter);
         source.append("  return;").append(lineDelimiter);
         source.append("}").append(lineDelimiter);
-        source.append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.IOutline))).append(" outline = getOutlineColumn().getValue(rows[0]);").append(lineDelimiter);
+        source.append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.IOutline))).append(" outline = getOutlineColumn().getValue(rows.get(0));").append(lineDelimiter);
         source.append(validator.getTypeName(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.mobile.ui.desktop.MobileDesktopUtility"))).append(".activateOutline(outline);").append(lineDelimiter);
         source.append("getDesktop().removeForm(").append(formBuilder.getElementName()).append(".this);").append(lineDelimiter);
         source.append("clearSelectionDelayed();");
@@ -356,7 +359,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     // OutlineColumn type
     ITypeSourceBuilder outlineColumnBuilder = new TypeSourceBuilder("OutlineColumn");
     outlineColumnBuilder.setFlags(Flags.AccPublic);
-    IType superType = RuntimeClasses.getSuperType(RuntimeClasses.IColumn, mobileClient);
+    IType superType = RuntimeClasses.getSuperType(IRuntimeClasses.IColumn, mobileClient);
     if (TypeUtility.isGenericType(superType)) {
       outlineColumnBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName() + "<" + IRuntimeClasses.IOutline + ">"));
     }
@@ -374,7 +377,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     // LabelColumn type
     ITypeSourceBuilder labelColumnBuilder = new TypeSourceBuilder("LabelColumn");
     labelColumnBuilder.setFlags(Flags.AccPublic);
-    labelColumnBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IStringColumn, mobileClient));
+    labelColumnBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IStringColumn, mobileClient));
     labelColumnBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(20));
 
     tableBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTableColumnKey(labelColumnBuilder, 20), labelColumnBuilder);

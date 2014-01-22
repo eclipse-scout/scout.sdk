@@ -39,7 +39,7 @@ import org.eclipse.swt.graphics.Point;
  */
 public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
-  private final static Point ICON_SIZE = new Point(16, 16);
+  private static final Point ICON_SIZE = new Point(16, 16);
 
   private final Map<CompositeObject, IPage> m_children;
   private final PageDirtyListener m_pageDirtyListener;

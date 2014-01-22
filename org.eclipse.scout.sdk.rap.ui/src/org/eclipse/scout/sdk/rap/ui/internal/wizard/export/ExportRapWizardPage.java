@@ -16,8 +16,8 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ExportRapWizardPage extends AbstractExportProductWizardPage {
 
-  private final static String SETTINGS_PRODUCT_FILE = "productFileRapSetting";
-  private final static String SETTINGS_WAR_FILE_NAME = "warFileNameRapSetting";
+  private static final String SETTINGS_PRODUCT_FILE = "productFileRapSetting";
+  private static final String SETTINGS_WAR_FILE_NAME = "warFileNameRapSetting";
 
   public ExportRapWizardPage(IScoutBundle scoutProject) {
     super(scoutProject, ExportRapWizardPage.class.getName(), Texts.get("ExportRapWebArchive"), IScoutSdkRapConstants.ScoutUiRapBundleId,

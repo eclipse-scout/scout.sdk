@@ -41,13 +41,13 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * @since 3.9.0 31.01.2013
  */
 public final class RuntimeBundles {
-  private final static String EXTENSION_POINT_NAME = "runtimeBundles";
-  private final static String TAG_NAME = "bundle";
-  private final static String ATTRIB_NAME = "symbolicName";
-  private final static String ATTRIB_TYPE = "type";
-  private final static String ATTRIB_ORDER = "order";
+  private static final String EXTENSION_POINT_NAME = "runtimeBundles";
+  private static final String TAG_NAME = "bundle";
+  private static final String ATTRIB_NAME = "symbolicName";
+  private static final String ATTRIB_TYPE = "type";
+  private static final String ATTRIB_ORDER = "order";
 
-  private final static Object lock = new Object();
+  private static final Object lock = new Object();
   private static Set<String /* symbolic name */> allScoutRtBundles = null;
   private static Map<String /* symbolic name */, String /* type */> bundleToTypeMap = null;
   private static Map<String /* type */, String /* symbolic name */> typeToBundleMap = null;

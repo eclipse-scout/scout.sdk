@@ -197,12 +197,6 @@ public final class AnnotationSourceBuilderFactory {
     return sourceBuilder;
   }
 
-  public static IAnnotationSourceBuilder createSupressWarningUnchecked() {
-    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(SuppressWarnings.class.getName()));
-    sourceBuilder.addParameter("\"unchecked\"");
-    return sourceBuilder;
-  }
-
   public static IAnnotationSourceBuilder createInjectFieldTo(String param) {
     AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(InjectFieldTo.class.getName()));
     sourceBuilder.addParameter(param);

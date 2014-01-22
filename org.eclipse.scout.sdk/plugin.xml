@@ -653,6 +653,16 @@
          </default>
       </element>
       <element
+            interface="org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField">
+         <default
+               class="org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.form.fields.smartfield.AbstractExtensibleProposalField"
+               priority="10">
+         </default>
+      </element>
+      <element
             interface="org.eclipse.scout.rt.server.services.common.smtp.ISMTPService">
          <default
                class="org.eclipse.scout.rt.server.services.common.smtp.AbstractSMTPService">
@@ -662,6 +672,12 @@
             interface="org.eclipse.scout.rt.shared.services.lookup.ILookupService">
          <default
                class="org.eclipse.scout.rt.server.services.lookup.AbstractSqlLookupService">
+         </default>
+      </element>
+      <element
+            interface="org.eclipse.scout.rt.shared.services.lookup.ILookupCall">
+         <default
+               class="org.eclipse.scout.rt.shared.services.lookup.LookupCall">
          </default>
       </element>
       <element

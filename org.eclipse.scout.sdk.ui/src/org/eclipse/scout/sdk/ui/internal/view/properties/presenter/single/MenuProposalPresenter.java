@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
@@ -25,6 +24,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
 
@@ -35,8 +35,6 @@ import org.eclipse.swt.widgets.Composite;
  * @since 3.8.0 04.12.2012
  */
 public class MenuProposalPresenter extends AbstractTypeProposalPresenter {
-
-  private final static Pattern STAR_REPLACE_REGEX = Pattern.compile("\\*$");
 
   public MenuProposalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -65,7 +63,7 @@ public class MenuProposalPresenter extends AbstractTypeProposalPresenter {
         searchPattern = "*";
       }
       else {
-        searchPattern = STAR_REPLACE_REGEX.matcher(searchPattern).replaceAll("") + "*";
+        searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
       }
       char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
       ArrayList<IType> collector = new ArrayList<IType>();

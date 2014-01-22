@@ -4,17 +4,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.shared.services.lookup.AbstractCodeTypeLookupCall;
-import org.eclipse.scout.rt.shared.services.lookup.LookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupRow;
+import org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall;
 
-public class CountryLookupCall extends AbstractCodeTypeLookupCall {
+public class CountryLookupCall extends LocalLookupCall<Long> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
-    ArrayList<LookupRow> rows = new ArrayList<LookupRow>();
-    //TODO [aho] create lookup rows here.
-    return rows;
+  protected List<ILookupRow<Long>> execCreateLookupRows() throws ProcessingException {
+    return new ArrayList<ILookupRow<Long>>();
   }
 }

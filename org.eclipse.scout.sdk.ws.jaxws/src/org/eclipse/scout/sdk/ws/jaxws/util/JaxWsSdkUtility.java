@@ -293,28 +293,6 @@ public final class JaxWsSdkUtility {
     }
   }
 
-  public static String toStartWithLowerCase(String property) {
-    if (!StringUtility.hasText(property)) {
-      return null;
-    }
-    if (property.length() == 1) {
-      return property.toLowerCase();
-    }
-
-    return property.substring(0, 1).toLowerCase() + property.substring(1);
-  }
-
-  public static String toStartWithUpperCase(String property) {
-    if (!StringUtility.hasText(property)) {
-      return null;
-    }
-    if (property.length() == 1) {
-      return property.toUpperCase();
-    }
-
-    return property.substring(0, 1).toUpperCase() + property.substring(1);
-  }
-
   /**
    * Excludes the composite from the layout manager if it does not contain any children and triggers to relayout the
    * composite.
@@ -325,11 +303,9 @@ public final class JaxWsSdkUtility {
     if (composite != null && !composite.isDisposed()) {
       if (composite.getLayoutData() instanceof GridData) {
         if (composite.getChildren().length == 0) {
-//          ((GridData) composite.getLayoutData()).exclude = true; // exclude does not work properly
           ((GridData) composite.getLayoutData()).heightHint = 0; // therefore this workaround is used, but as a drawback, the section has to collapsed and expanded
         }
         else {
-//          ((GridData) composite.getLayoutData()).exclude = false; // exclude does not work properly
           ((GridData) composite.getLayoutData()).heightHint = SWT.DEFAULT; // therefore this workaround is used, but as a drawback, the section has to collapsed and expanded
         }
       }

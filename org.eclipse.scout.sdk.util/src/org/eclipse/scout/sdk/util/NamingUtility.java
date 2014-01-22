@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util;
 
-import java.text.ParseException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CompareUtility;
@@ -24,11 +26,54 @@ import org.eclipse.scout.commons.StringUtility;
  */
 public final class NamingUtility {
 
-  private final static Pattern CAMEL_CASE_PATTERN = Pattern.compile("[^abcdefghijklmnopqrstuvwxyz0123456789]");
+  private static final Pattern CAMEL_CASE_PATTERN = Pattern.compile("[^abcdefghijklmnopqrstuvwxyz0123456789]");
+  private static final Object LOCK = new Object();
+  private static Set<String> javaKeyWords = null;
 
   private NamingUtility() {
   }
 
+  public static String ensureValidParameterName(String parameterName) {
+    if (isReservedJavaKeyword(parameterName)) {
+      return parameterName + "Value";
+    }
+    return parameterName;
+  }
+
+  public static Set<String> getJavaKeyWords() {
+    if (javaKeyWords == null) {
+      synchronized (LOCK) {
+        if (javaKeyWords == null) {
+          String[] keyWords = new String[]{"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum",
+              "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected",
+              "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true"};
+          HashSet<String> tmp = new HashSet<String>(keyWords.length);
+          for (String s : keyWords) {
+            tmp.add(s);
+          }
+          javaKeyWords = Collections.unmodifiableSet(tmp);
+        }
+      }
+    }
+    return javaKeyWords;
+  }
+
+  /**
+   * @return Returns <code>true</code> if the given word is a reserved java keyword. Otherwise <code>false</code>.
+   * @throws NullPointerException
+   *           if the given word is <code>null</code>.
+   * @since 3.8.3
+   */
+  public static boolean isReservedJavaKeyword(String word) {
+    return getJavaKeyWords().contains(word.toLowerCase());
+  }
+
+  /**
+   * Gets the simple name of the given fully qualified name.
+   * 
+   * @param qualifiedName
+   * @return The simple name (part after the last dot).
+   */
   public static String getSimpleName(String qualifiedName) {
     int i = qualifiedName.lastIndexOf('.');
     if (i >= 0) {
@@ -39,6 +84,12 @@ public final class NamingUtility {
     }
   }
 
+  /**
+   * Gets the package of the given fully qualified name.
+   * 
+   * @param qualifiedClassName
+   * @return The package part (all before the last dot).
+   */
   public static String getPackage(String qualifiedClassName) {
     int i = qualifiedClassName.lastIndexOf('.');
     if (i >= 0) {
@@ -49,54 +100,53 @@ public final class NamingUtility {
     }
   }
 
-  public static String parseJavaTypeName(String name, String text, String[] discouragedSuffixes) throws ParseException {
-    if (text == null) text = "";
-    if (text.length() <= 1) {
+  /**
+   * ensures the given java name starts with a lower case character.
+   * 
+   * @param name
+   *          The name to handle.
+   * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
+   *         Otherwise the input string is returned with the first character modified to lower case.
+   */
+  public static String ensureStartWithLowerCase(String name) {
+    if (name == null) {
       return null;
     }
-    else if (!Character.isJavaIdentifierStart(text.charAt(0))) {
-      throw new ParseException(name + " must start with upper case A-Z", 0);
+    name = name.trim();
+    if (name.length() == 0) {
+      return name;
     }
-    else if (!Character.isUpperCase(text.charAt(0))) {
-      text = Character.toUpperCase(text.charAt(0)) + text.substring(1);
-    }
-    else {
-      String textLow = text.toLowerCase();
-      if (discouragedSuffixes != null) {
-        for (int i = 0; i < discouragedSuffixes.length; i++) {
-          if (textLow.endsWith(discouragedSuffixes[i].toLowerCase())) {
-            throw new ParseException(name + " must not end with '" + discouragedSuffixes[i] + "'", 0);
-          }
-        }
-      }
-      for (int i = 1; i < text.length(); i++) {
-        if (!Character.isJavaIdentifierPart(text.charAt(i))) {
-          throw new ParseException("'" + text + "' is not a valid java name", 0);
-        }
-      }
-    }
-    // all checks ok
-    return text;
-  }
 
-  public static String removeSuffixes(String s, String... suffixes) {
-    return StringUtility.removeSuffixes(s, suffixes);
+    StringBuilder sb = new StringBuilder(name.length());
+    sb.append(Character.toLowerCase(name.charAt(0)));
+    if (name.length() > 1) {
+      sb.append(name.substring(1));
+    }
+    return sb.toString();
   }
 
   /**
-   * lowercase java-bean name
+   * ensures the given java name starts with an upper case character.
+   * 
+   * @param name
+   *          The name to handle.
+   * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
+   *         Otherwise the input string is returned with the first character modified to upper case.
    */
-  public static String toVariableName(String javaName) {
-    if (javaName == null || javaName.length() == 0) return null;
-    return Character.toLowerCase(javaName.charAt(0)) + javaName.substring(1);
-  }
-
-  /**
-   * uppercase java-bean name
-   */
-  public static String toBeanName(String javaName) {
-    if (javaName == null || javaName.length() == 0) return null;
-    return Character.toUpperCase(javaName.charAt(0)) + javaName.substring(1);
+  public static String ensureStartWithUpperCase(String name) {
+    if (name == null) {
+      return null;
+    }
+    name = name.trim();
+    if (name.length() == 0) {
+      return name;
+    }
+    StringBuilder sb = new StringBuilder(name.length());
+    sb.append(Character.toUpperCase(name.charAt(0)));
+    if (name.length() > 1) {
+      sb.append(name.substring(1));
+    }
+    return sb.toString();
   }
 
   public static String toJavaCamelCase(String input) {
@@ -179,8 +229,7 @@ public final class NamingUtility {
           camel.append(t);
         }
         else {
-          camel.append(Character.toUpperCase(t.charAt(0)));
-          camel.append(t.substring(1));
+          camel.append(ensureStartWithUpperCase(t));
         }
       }
     }

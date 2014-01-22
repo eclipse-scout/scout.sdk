@@ -965,7 +965,7 @@ public class PluginModelHelper {
   }
 
   public static class BuildPropertiesPart {
-    private final static String BINARY_BUILD_INCLUDES = "bin.includes";
+    private static final String BINARY_BUILD_INCLUDES = "bin.includes";
 
     private final LazyPluginModel m_model;
 

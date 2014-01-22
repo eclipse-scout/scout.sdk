@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
@@ -30,7 +30,7 @@ public class Docx4jProdTechnologyHandler extends AbstractScoutTechnologyHandler 
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
       ProductFileModelHelper h = new ProductFileModelHelper(r.getResource());
-      if (h.ProductFile.existsDependency(RuntimeClasses.ScoutClientBundleId)) {
+      if (h.ProductFile.existsDependency(IRuntimeClasses.ScoutClientBundleId)) {
         selectionChangedProductFile(r, selected, new String[]{XML_GRAPHICS_PLUGIN_NAME, APACHE_COMMONS_PLUGIN_NAME, APACHE_COMMONS_LOGGING_PLUGIN_NAME, DOCX4J_PLUGIN,
             DOCX4J_SCOUT_PLUGIN, DOCX4J_SCOUT_CLIENT_PLUGIN, LOGGING_BRIDGE_LOG4J_FRAGMENT});
       }
@@ -44,7 +44,7 @@ public class Docx4jProdTechnologyHandler extends AbstractScoutTechnologyHandler 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
     return getSelectionProductFiles(getProductBundles(project),
-        new String[]{RuntimeClasses.ScoutSharedBundleId},
+        new String[]{IRuntimeClasses.ScoutSharedBundleId},
         new String[]{XML_GRAPHICS_PLUGIN_NAME, APACHE_COMMONS_PLUGIN_NAME, APACHE_COMMONS_LOGGING_PLUGIN_NAME, DOCX4J_PLUGIN, DOCX4J_SCOUT_PLUGIN,
             LOGGING_BRIDGE_LOG4J_FRAGMENT});
   }
@@ -56,7 +56,7 @@ public class Docx4jProdTechnologyHandler extends AbstractScoutTechnologyHandler 
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getProductBundles(project), list, RuntimeClasses.ScoutSharedBundleId);
+    contributeProductFiles(getProductBundles(project), list, IRuntimeClasses.ScoutSharedBundleId);
   }
 
   private IScoutBundle[] getProductBundles(IScoutBundle start) {

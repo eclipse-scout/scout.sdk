@@ -41,6 +41,7 @@ import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
@@ -360,7 +361,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
 
   public void setTypeName(String typeName) {
     try {
-      typeName = JaxWsSdkUtility.toStartWithUpperCase(typeName);
+      typeName = NamingUtility.ensureStartWithUpperCase(typeName);
       setStateChanging(true);
       setTypeNameInternal(typeName);
       if (isControlCreated()) {

@@ -29,7 +29,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -38,8 +38,8 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  *
  */
 public class ConfigPropertyType {
-  private final static Pattern CONFIG_PROPERTY_REGEX = Pattern.compile("^(" + RuntimeClasses.ConfigProperty.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(SignatureCache.createTypeSignature(RuntimeClasses.ConfigProperty)) + ")$");
-  private final static Pattern CONFIG_OPERATION_REGEX = Pattern.compile("^(" + RuntimeClasses.ConfigOperation.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(SignatureCache.createTypeSignature(RuntimeClasses.ConfigOperation)) + ")$");
+  private static final Pattern CONFIG_PROPERTY_REGEX = Pattern.compile("^(" + IRuntimeClasses.ConfigProperty.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(SignatureCache.createTypeSignature(IRuntimeClasses.ConfigProperty)) + ")$");
+  private static final Pattern CONFIG_OPERATION_REGEX = Pattern.compile("^(" + IRuntimeClasses.ConfigOperation.replaceAll("\\.", "\\.") + "|" + Signature.getSignatureSimpleName(SignatureCache.createTypeSignature(IRuntimeClasses.ConfigOperation)) + ")$");
 
   private final IType m_type;
   private TreeMap<String, ConfigurationMethod> m_configurationMethods;
@@ -120,7 +120,7 @@ public class ConfigPropertyType {
     String ret = val.toString();
     String configPropClassName = ConfigProperty.class.getSimpleName();
     if (ret.contains(configPropClassName)) {
-      // if the configuration method is a source method and no binary method the final static String constants are not replaced by the compiler yet.
+      // if the configuration method is a source method and no binary method the static final String constants are not replaced by the compiler yet.
       // in this case not the value of the constant (e.g. "TEXT") is in the annotation value, but the reference to the constant (e.g. ConfigProperty.TEXT).
       // then parse the value of the constant within the ConfigProperty class.
       String constantName = ret.substring(configPropClassName.length() + 1);
@@ -172,34 +172,36 @@ public class ConfigPropertyType {
     ConfigurationMethod newMethod = null;
     try {
       for (IType t : m_affectedTypes) {
-        IMethod m = TypeUtility.getMethod(t, methodName);
-        if (TypeUtility.exists(m)) {
-          if (newMethod != null) {
-            newMethod.pushMethod(m);
-          }
-          else {
-            for (IAnnotation a : m.getAnnotations()) {
-              if (TypeUtility.exists(a)) {
-                String annotationName = a.getElementName();
-                if (CONFIG_PROPERTY_REGEX.matcher(annotationName).matches()) {
-                  String configPropertyType = null;
-                  for (IMemberValuePair p : a.getMemberValuePairs()) {
-                    if ("value".equals(p.getMemberName())) {
-                      configPropertyType = (String) p.getValue();
+        if (TypeUtility.exists(t)) {
+          IMethod m = TypeUtility.getMethod(t, methodName);
+          if (TypeUtility.exists(m)) {
+            if (newMethod != null) {
+              newMethod.pushMethod(m);
+            }
+            else {
+              for (IAnnotation a : m.getAnnotations()) {
+                if (TypeUtility.exists(a)) {
+                  String annotationName = a.getElementName();
+                  if (CONFIG_PROPERTY_REGEX.matcher(annotationName).matches()) {
+                    String configPropertyType = null;
+                    for (IMemberValuePair p : a.getMemberValuePairs()) {
+                      if ("value".equals(p.getMemberName())) {
+                        configPropertyType = (String) p.getValue();
+                        break;
+                      }
+                    }
+                    if (!StringUtility.isNullOrEmpty(configPropertyType)) {
+                      newMethod = new ConfigurationMethod(getType(), m_superTypeHierarchy, methodName, ConfigurationMethod.PROPERTY_METHOD);
+                      newMethod.setConfigAnnotationType(configPropertyType);
+                      newMethod.pushMethod(m);
                       break;
                     }
                   }
-                  if (!StringUtility.isNullOrEmpty(configPropertyType)) {
-                    newMethod = new ConfigurationMethod(getType(), m_superTypeHierarchy, methodName, ConfigurationMethod.PROPERTY_METHOD);
-                    newMethod.setConfigAnnotationType(configPropertyType);
+                  else if (CONFIG_OPERATION_REGEX.matcher(annotationName).matches()) {
+                    newMethod = new ConfigurationMethod(getType(), m_superTypeHierarchy, methodName, ConfigurationMethod.OPERATION_METHOD);
                     newMethod.pushMethod(m);
                     break;
                   }
-                }
-                else if (CONFIG_OPERATION_REGEX.matcher(annotationName).matches()) {
-                  newMethod = new ConfigurationMethod(getType(), m_superTypeHierarchy, methodName, ConfigurationMethod.OPERATION_METHOD);
-                  newMethod.pushMethod(m);
-                  break;
                 }
               }
             }

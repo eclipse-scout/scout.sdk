@@ -45,11 +45,11 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
  */
 public final class RapTargetVariable {
 
-  public final static String RAP_TARGET_KEY = "scout_rap_target";
-  public final static String RESOURCE_CHANGE_JOB_FAMILY = "ScoutRapTargetResourceCheckFamily";
-  public final static P_JobRule JOB_RULE = new P_JobRule();
+  public static final String RAP_TARGET_KEY = "scout_rap_target";
+  public static final String RESOURCE_CHANGE_JOB_FAMILY = "ScoutRapTargetResourceCheckFamily";
+  public static final P_JobRule JOB_RULE = new P_JobRule();
 
-  private final static RapTargetVariable INSTANCE = new RapTargetVariable();
+  private static final RapTargetVariable INSTANCE = new RapTargetVariable();
 
   private final EventListenerList m_listeners;
   private final P_TargetFileListener m_targetFileListener;

@@ -80,7 +80,7 @@ public class ConfigPropertyUpdateOperation<T> implements IOperation {
 
           @Override
           public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-            source.append("return ").append(getParser().formatSourceValue(getValue(), lineDelimiter, validator)).append(";");
+            ConfigPropertyUpdateOperation.this.createSource(methodBuilder, source, lineDelimiter, ownerProject, validator);
           }
         };
         MethodNewOperation methodOverrideOp = new MethodNewOperation(MethodSourceBuilderFactory.createMethodSourceBuilder(getMethod().peekMethod(), getMethod().getType(), bodyBuilder), getMethod().getType());
@@ -94,6 +94,13 @@ public class ConfigPropertyUpdateOperation<T> implements IOperation {
     catch (JavaElementNotExistException e) {
       ScoutSdk.logWarning(e);
     }
+  }
+
+  /**
+   * To modify how the source of the method should be created.
+   */
+  protected void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+    source.append("return ").append(getParser().formatSourceValue(getValue(), lineDelimiter, validator)).append(";");
   }
 
   /**

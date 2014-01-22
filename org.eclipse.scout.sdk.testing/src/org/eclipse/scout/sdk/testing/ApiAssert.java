@@ -18,16 +18,16 @@ import org.junit.Assert;
 /**
  * <h3>{@link ApiAssert}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 22.05.2013
  */
 public class ApiAssert extends Assert {
 
-  static public void assertConstantValue(IField field, Object constantValue) throws JavaModelException {
+  public static void assertConstantValue(IField field, Object constantValue) throws JavaModelException {
     assertConstantValue(null, field, constantValue);
   }
 
-  static public void assertConstantValue(String message, IField field, Object constantValue) throws JavaModelException {
+  public static void assertConstantValue(String message, IField field, Object constantValue) throws JavaModelException {
     if (!CompareUtility.equals(field.getConstant(), constantValue)) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Field ");

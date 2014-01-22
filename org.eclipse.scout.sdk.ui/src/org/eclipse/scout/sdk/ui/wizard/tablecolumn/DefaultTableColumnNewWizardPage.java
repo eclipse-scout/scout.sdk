@@ -18,13 +18,12 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.table.TableColumnNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroup;
@@ -160,7 +159,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       }
     });
 
-    m_siblingField = getFieldToolkit().createSiblingProposalField(fieldGroup, m_declaringType, TypeUtility.getType(RuntimeClasses.IColumn));
+    m_siblingField = getFieldToolkit().createSiblingProposalField(fieldGroup, m_declaringType, TypeUtility.getType(IRuntimeClasses.IColumn));
     m_siblingField.acceptProposal(m_sibling);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -225,20 +224,15 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    try {
-      multiStatus.add(getStatusNameField());
-      multiStatus.add(getStatusGenericType());
-      if (isControlCreated()) {
-        m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
-      }
-    }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError("could not validate name field.", e);
+    multiStatus.add(getStatusNameField());
+    multiStatus.add(getStatusGenericType());
+    if (isControlCreated()) {
+      m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
     }
   }
 
-  protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_TABLE_COLUMN);
+  protected IStatus getStatusNameField() {
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_TABLE_COLUMN);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
@@ -255,7 +249,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     return m_createdColumn;
   }
 
-  protected IStatus getStatusGenericType() throws JavaModelException {
+  protected IStatus getStatusGenericType() {
     if (TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Generic type can not be null!");

@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.ButtonFieldNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -32,7 +33,6 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -72,7 +72,7 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(title);
     setDescription(message);
     m_declaringType = declaringType;
-    setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IButton, m_declaringType.getJavaProject()));
+    setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IButton, m_declaringType.getJavaProject()));
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
@@ -161,14 +161,7 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), m_readOnlySuffix);
-    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
-      return javaFieldNameStatus;
-    }
-    if (ScoutTypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getRegexSimpleNameFilter(getTypeName())).length > 0) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-    }
-    return javaFieldNameStatus;
+    return ScoutUtility.validateFormFieldName(getTypeName(), m_readOnlySuffix, m_declaringType);
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {

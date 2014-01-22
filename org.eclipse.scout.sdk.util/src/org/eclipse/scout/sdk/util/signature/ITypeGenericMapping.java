@@ -23,7 +23,7 @@ public interface ITypeGenericMapping {
   /**
    * @return
    */
-  String getFullyQuallifiedName();
+  String getFullyQualifiedName();
 
   /**
    * @param paramName

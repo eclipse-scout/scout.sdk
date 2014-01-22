@@ -88,7 +88,7 @@ public class CodeIdField extends Composite {
   }
 
   public IStatus getStatus() {
-    if (getGenericSignature() != null && !StringUtility.isNullOrEmpty(getValue())) {
+    if (StringUtility.hasText(getGenericSignature())) {
       ICodeIdParser parser = CodeIdExtensionPoint.getCodeIdParser(getGenericSignature());
 
       if (parser != null) {
@@ -139,5 +139,15 @@ public class CodeIdField extends Composite {
 
   public ProposalTextField getGenericTypeField() {
     return m_genericTypeField;
+  }
+
+  @Override
+  public boolean getEnabled() {
+    return m_nextCodeIdField.getEnabled();
+  }
+
+  @Override
+  public void setEnabled(boolean enabled) {
+    m_nextCodeIdField.setEnabled(enabled);
   }
 }

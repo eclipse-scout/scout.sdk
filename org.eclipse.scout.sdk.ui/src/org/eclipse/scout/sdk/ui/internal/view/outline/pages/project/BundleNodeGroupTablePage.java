@@ -17,7 +17,7 @@ import java.util.List;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -125,7 +125,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
       ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
-          IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+          IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
           IPrimaryTypeTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
           ArrayList<IScoutBundle> bundles = new ArrayList<IScoutBundle>();
           collectBundlesRec(m_group, bundles);
@@ -152,7 +152,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
   }
 
   protected IType[] resolveServices() {
-    IType iService = TypeUtility.getType(RuntimeClasses.IService);
+    IType iService = TypeUtility.getType(IRuntimeClasses.IService);
     IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     IScoutBundle[] serverBundles = getScoutBundle().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
 

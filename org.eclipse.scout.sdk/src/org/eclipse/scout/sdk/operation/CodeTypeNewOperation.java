@@ -15,10 +15,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -83,18 +82,16 @@ public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
     }
     idFieldBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesFieldCommentBuilder());
     idFieldBuilder.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
-    String[] typeArguments = Signature.getTypeArguments(getSuperTypeSignature());
-    if (typeArguments.length > 0) {
-      idFieldBuilder.setSignature(typeArguments[0]);
-    }
-    else {
-      idFieldBuilder.setSignature(SignatureCache.createTypeSignature(Object.class.getName()));
-    }
+
+    IMethodSourceBuilder getIdSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(getSourceBuilder(), "getId");
+    getIdSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return ID;"));
+
+    idFieldBuilder.setSignature(getIdSourceBuilder.getReturnTypeSignature());
     addFieldSourceBuilder(idFieldBuilder);
     // constructor
     IMethodSourceBuilder constructorSourceBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
     constructorSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
-    constructorSourceBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    constructorSourceBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     constructorSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorSourceBuilder), constructorSourceBuilder);
 
@@ -105,8 +102,7 @@ public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
       addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsSourceBuilder), nlsSourceBuilder);
     }
     // get id method
-    IMethodSourceBuilder getIdSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(getSourceBuilder(), "getId");
-    getIdSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return ID;"));
+
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getIdSourceBuilder), getIdSourceBuilder);
 
     super.run(monitor, workingCopyManager);

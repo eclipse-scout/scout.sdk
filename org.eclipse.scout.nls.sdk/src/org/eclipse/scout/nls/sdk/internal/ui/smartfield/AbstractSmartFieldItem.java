@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.internal.ui.smartfield;
 
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.swt.graphics.Image;
 
 public abstract class AbstractSmartFieldItem implements Comparable<AbstractSmartFieldItem> {
@@ -26,11 +25,10 @@ public abstract class AbstractSmartFieldItem implements Comparable<AbstractSmart
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof AbstractSmartFieldItem)) {
-      return false;
+    if (obj instanceof AbstractSmartFieldItem) {
+      return getText().equals(((AbstractSmartFieldItem) obj).getText());
     }
-    AbstractSmartFieldItem other = (AbstractSmartFieldItem) obj;
-    return CompareUtility.equals(getText(), other.getText());
+    return false;
   }
 
   @Override

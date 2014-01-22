@@ -1,6 +1,7 @@
 package a;
 
 import org.eclipse.core.internal.resources.File;
+@SuppressWarnings("restriction")
 public class MethodTestType {
 
   public Integer getInteger() {

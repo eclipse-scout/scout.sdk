@@ -31,11 +31,11 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final static String SETTINGS_CLIENT_EXPORT_FOLDER = "clientExportFolderSetting";
-  private final static String SETTINGS_PRODUCT_FILE_CLIENT = "clientProductFileSetting";
+  private static final String SETTINGS_CLIENT_EXPORT_FOLDER = "clientExportFolderSetting";
+  private static final String SETTINGS_PRODUCT_FILE_CLIENT = "clientProductFileSetting";
 
-  private final static String PROP_CLIENT_EXPORT_FOLDER = "clientExportFolder";
-  private final static String PROP_PRODUCT_FILE_CLIENT = "clientProductFile";
+  private static final String PROP_CLIENT_EXPORT_FOLDER = "clientExportFolder";
+  private static final String PROP_PRODUCT_FILE_CLIENT = "clientProductFile";
 
   private final IScoutBundle m_scoutProject;
 

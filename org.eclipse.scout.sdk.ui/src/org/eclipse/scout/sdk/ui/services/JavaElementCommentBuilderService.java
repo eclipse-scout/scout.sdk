@@ -76,7 +76,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
 
   private static final UsernameResolver USERNAME_RESOLVER = new UsernameResolver();
 
-  private final static ICommentSourceBuilder COMPILATION_UNIT_COMMENT_BUILDER = new ICommentSourceBuilder() {
+  private static final ICommentSourceBuilder COMPILATION_UNIT_COMMENT_BUILDER = new ICommentSourceBuilder() {
     @Override
     public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
       if (!(sourceBuilder instanceof ICompilationUnitSourceBuilder)) {
@@ -101,7 +101,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     }
   };
 
-  private final static ICommentSourceBuilder TYPE_COMMENT_SOURCE_BUILDER = new ICommentSourceBuilder() {
+  private static final ICommentSourceBuilder TYPE_COMMENT_SOURCE_BUILDER = new ICommentSourceBuilder() {
     @Override
     public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
       if (!(sourceBuilder instanceof ITypeSourceBuilder)) {
@@ -163,11 +163,11 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     }
   };
 
-  private final static ICommentSourceBuilder METHOD_COMMENT_SOURCE_BUILDER = createMethodSourceBuilder(METHOD_TYPE_NORMAL);
-  private final static ICommentSourceBuilder METHOD_GETTER_COMMENT_SOURCE_BUILDER = createMethodSourceBuilder(METHOD_TYPE_GETTER);
-  private final static ICommentSourceBuilder METHOD_SETTER_COMMENT_SOURCE_BUILDER = createMethodSourceBuilder(METHOD_TYPE_SETTER);
+  private static final ICommentSourceBuilder METHOD_COMMENT_SOURCE_BUILDER = createMethodSourceBuilder(METHOD_TYPE_NORMAL);
+  private static final ICommentSourceBuilder METHOD_GETTER_COMMENT_SOURCE_BUILDER = createMethodSourceBuilder(METHOD_TYPE_GETTER);
+  private static final ICommentSourceBuilder METHOD_SETTER_COMMENT_SOURCE_BUILDER = createMethodSourceBuilder(METHOD_TYPE_SETTER);
 
-  private final static ICommentSourceBuilder FIELD_COMMENT_SOURCE_BUILDER = new ICommentSourceBuilder() {
+  private static final ICommentSourceBuilder FIELD_COMMENT_SOURCE_BUILDER = new ICommentSourceBuilder() {
     @Override
     public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
       if (!(sourceBuilder instanceof IFieldSourceBuilder)) {
@@ -224,9 +224,9 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
           seeBuilder.append(interfaceFqn).append("#").append(methodSourceBuilder.getElementName()).append("(");
           Iterator<MethodParameter> parameterIterator = methodSourceBuilder.getParameters().iterator();
           if (parameterIterator.hasNext()) {
-            seeBuilder.append(SignatureUtility.getFullyQuallifiedName(parameterIterator.next().getSignature()));
+            seeBuilder.append(SignatureUtility.getFullyQualifiedName(parameterIterator.next().getSignature()));
             while (parameterIterator.hasNext()) {
-              seeBuilder.append(", ").append(SignatureUtility.getFullyQuallifiedName(parameterIterator.next().getSignature()));
+              seeBuilder.append(", ").append(SignatureUtility.getFullyQualifiedName(parameterIterator.next().getSignature()));
             }
           }
           seeBuilder.append(")");
@@ -525,7 +525,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     return true;
   }
 
-  private final static class UsernameResolver extends GlobalTemplateVariables.User {
+  private static final class UsernameResolver extends GlobalTemplateVariables.User {
     @Override
     protected String resolve(TemplateContext context) {
       return ScoutUtility.getUsername();

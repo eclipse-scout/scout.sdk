@@ -60,8 +60,8 @@ public final class JdtUtility {
     return javaElement;
   }
 
-  public static boolean hasAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
-    return TypeUtility.exists(getAnnotation(element, fullyQuallifiedAnnotation));
+  public static boolean hasAnnotation(IAnnotatable element, String fullyQualifiedAnnotation) {
+    return TypeUtility.exists(getAnnotation(element, fullyQualifiedAnnotation));
   }
 
   public static Double getAnnotationValueNumeric(IAnnotation annotation, String name) throws JavaModelException {
@@ -101,27 +101,36 @@ public final class JdtUtility {
     return null;
   }
 
-  public static IAnnotation getAnnotation(IAnnotatable element, String fullyQuallifiedAnnotation) {
-    try {
-      String simpleName = Signature.getSimpleName(fullyQuallifiedAnnotation);
-      String startSimple = '@' + simpleName;
-      String startFq = '@' + fullyQuallifiedAnnotation;
+  public static IAnnotation getAnnotation(IAnnotatable element, String fullyQualifiedAnnotation) {
+    String simpleName = Signature.getSimpleName(fullyQualifiedAnnotation);
+    String startSimple = '@' + simpleName;
+    String startFq = '@' + fullyQualifiedAnnotation;
 
-      IAnnotation annotation = element.getAnnotation(simpleName);
-
-      // workaround since annotations are not cached properly from JDT
-      if (TypeUtility.exists(annotation) && (annotation.getSource() == null || (annotation.getSource().startsWith(startSimple) || annotation.getSource().startsWith(startFq)))) {
+    String annotSource = null;
+    IAnnotation annotation = element.getAnnotation(simpleName);
+    if (TypeUtility.exists(annotation)) {
+      try {
+        annotSource = annotation.getSource();
+      }
+      catch (Exception e) {
+        SdkUtilActivator.logWarning("Could not get source of annotation '" + fullyQualifiedAnnotation + "' in element '" + element.toString() + "'.", e);
+      }
+      if (annotSource == null || annotSource.startsWith(startSimple) || annotSource.startsWith(startFq)) {
         return annotation;
       }
-      else {
-        annotation = element.getAnnotation(fullyQuallifiedAnnotation);
-        if (TypeUtility.exists(annotation) && (annotation.getSource() == null || (annotation.getSource().startsWith(startSimple) || annotation.getSource().startsWith(startFq)))) {
-          return annotation;
-        }
-      }
     }
-    catch (JavaModelException e) {
-      SdkUtilActivator.logError("could not get annotation '" + fullyQuallifiedAnnotation + "' of '" + element + "'", e);
+
+    annotation = element.getAnnotation(fullyQualifiedAnnotation);
+    if (TypeUtility.exists(annotation)) {
+      try {
+        annotSource = annotation.getSource();
+      }
+      catch (Exception e) {
+        SdkUtilActivator.logWarning("Could not get source of annotation '" + fullyQualifiedAnnotation + "' in element '" + element.toString() + "'.", e);
+      }
+      if (annotSource == null || annotSource.startsWith(startSimple) || annotSource.startsWith(startFq)) {
+        return annotation;
+      }
     }
     return null;
   }
@@ -225,7 +234,11 @@ public final class JdtUtility {
     try {
       int tokenType = scanner.getNextToken();
       if (tokenType == ITerminalSymbols.TokenNameStringLiteral) {
-        return scanner.getCurrentStringLiteral();
+        String literal = scanner.getCurrentStringLiteral();
+        if (scanner.getNextChar() == -1) {
+          // no more chars coming: valid single string literal
+          return literal;
+        }
       }
     }
     catch (InvalidInputException e) {
@@ -234,7 +247,7 @@ public final class JdtUtility {
     return null;
   }
 
-  public static IJavaElement findJavaElement(IJavaElement element, int offset, int lenght) throws JavaModelException {
+  private static IJavaElement findJavaElement(IJavaElement element, int offset, int lenght) throws JavaModelException {
     if (element == null) {
       return null;
     }

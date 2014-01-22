@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class ServerExportEntryHandler implements IExportScoutProjectEntryHandler {
 
-  public final static String ID = "server";
+  public static final String ID = "server";
 
   public ServerExportEntryHandler() {
   }

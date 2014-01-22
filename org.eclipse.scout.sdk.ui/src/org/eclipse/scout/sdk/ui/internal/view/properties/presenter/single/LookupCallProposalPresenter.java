@@ -10,24 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
-import java.util.ArrayList;
-
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.compiler.CharOperation;
+import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 
@@ -35,7 +33,8 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>CodeTypePresenter</h3> ...
  */
 public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
-  final IType lookupCall = TypeUtility.getType(RuntimeClasses.LookupCall);
+
+  private P_ContentProvider m_contentProvider;
 
   public LookupCallProposalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -44,19 +43,28 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
   @Override
   protected void createProposalFieldProviders(ProposalTextField proposalField) {
     JavaElementLabelProvider labelProvider = new JavaElementLabelProvider();
+    m_contentProvider = new P_ContentProvider(labelProvider);
     getProposalField().setLabelProvider(labelProvider);
-    getProposalField().setContentProvider(new P_ContentProvider(labelProvider));
+    getProposalField().setContentProvider(m_contentProvider);
   }
 
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
     if (method != null) {
+      m_contentProvider.setType(method.getType());
       getProposalField().setInput(method.getType());
       super.init(method);
     }
     else {
+      m_contentProvider.setType(null);
       getProposalField().setInput(null);
     }
+  }
+
+  @Override
+  public synchronized void dispose() {
+    m_contentProvider.dispose();
+    super.dispose();
   }
 
   /**
@@ -68,51 +76,36 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
    * @author Andreas Hoegger
    * @since 3.8.0 15.02.2012
    */
-  private class P_ContentProvider extends ContentProposalProvider {
-
-    private IType[] m_proposals;
-    private final ILabelProvider m_labelProvider;
+  private static final class P_ContentProvider extends AbstractCachedTypeContentProposalProvider {
 
     private P_ContentProvider(ILabelProvider labelProvider) {
-      m_labelProvider = labelProvider;
+      super(labelProvider);
     }
 
     @Override
-    public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-      ensureCache();
-      if (!StringUtility.hasText(searchPattern)) {
-        searchPattern = "*";
-      }
-      else {
-        searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
-      }
-      char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
-      ArrayList<Object> collector = new ArrayList<Object>();
-      for (Object proposal : m_proposals) {
-        if (CharOperation.match(pattern, m_labelProvider.getText(proposal).toCharArray(), false)) {
-          collector.add(proposal);
-        }
-      }
-      return collector.toArray(new Object[collector.size()]);
-    }
+    protected Object[] computeProposals() {
+      IType iLookupCall = TypeUtility.getType(IRuntimeClasses.ILookupCall);
 
-    @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      if (m_proposals != null) {
-        m_proposals = null;
+      String genericSignature = null;
+      try {
+        ITypeHierarchy supertypeHierarchy = getType().newSupertypeHierarchy(null);
+        if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField))) {
+          genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, IRuntimeClasses.IValueField, IRuntimeClasses.TYPE_PARAM_VALUEFIELD__VALUE_TYPE);
+        }
+        else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IColumn))) {
+          genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
+        }
       }
-    }
+      catch (CoreException e) {
+        ScoutSdkUi.logError(e);
+      }
 
-    private void ensureCache() {
-      if (m_proposals == null) {
-        if (getMethod() != null) {
-          m_proposals = TypeUtility.getPrimaryTypeHierarchy(lookupCall).getAllSubtypes(lookupCall,
-              TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeComparators.getTypeNameComparator());
-        }
-        else {
-          m_proposals = new IType[0];
-        }
-      }
+      ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupCall);
+      ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(),
+          TypeFilters.getNoGenericTypesFilter(),
+          TypeFilters.getTypesOnClasspath(getType().getJavaProject()),
+          TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
+      return typeHierarchy.getAllSubtypes(iLookupCall, filter, TypeComparators.getTypeNameComparator());
     }
   }
 }

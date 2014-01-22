@@ -26,6 +26,7 @@ import org.eclipse.scout.sdk.ui.operation.sourceedit.SourceEditOperation;
 import org.eclipse.scout.sdk.ui.wizard.IWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
 import org.eclipse.scout.sdk.ui.wizard.code.CodeNewWizard;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.graphics.Image;
@@ -35,7 +36,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 /**
  * <h3>{@link CodeNewProposal}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 25.10.2013
  */
 public class CodeNewProposal extends AbstractSdkProposal {
@@ -80,7 +81,7 @@ public class CodeNewProposal extends AbstractSdkProposal {
     }
 
     wizard.initWizard(getDeclaringType());
-    if (codeName != null) {
+    if (codeName != null && IRegEx.JAVAFIELD.matcher(codeName).matches()) {
       wizard.getCodeNewWizardPage().setTypeName(codeName.trim());
     }
     // sibling check

@@ -14,8 +14,9 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -25,7 +26,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>{@link FormHandlerDeleteOperation}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.9.0 30.04.2013
  */
 public class FormHandlerDeleteOperation extends JavaElementDeleteOperation {
@@ -56,12 +57,12 @@ public class FormHandlerDeleteOperation extends JavaElementDeleteOperation {
     // find form
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getFormHandler().getCompilationUnit());
     IType form = TypeUtility.getAncestor(getFormHandler(), TypeFilters.getMultiTypeFilterOr(
-        TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
+        TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
         TypeFilters.getTopLevelTypeFilter()));
     if (TypeUtility.exists(form) && TypeUtility.exists(getFormHandler())) {
       String startMethodName = getFormHandler().getElementName().replaceFirst(SdkProperties.SUFFIX_FORM_HANDLER + "\\b", "");
       if (startMethodName.length() > 1) {
-        startMethodName = Character.toUpperCase(startMethodName.charAt(0)) + startMethodName.substring(1);
+        startMethodName = NamingUtility.ensureStartWithUpperCase(startMethodName);
         startMethodName = "start" + startMethodName;
       }
       return TypeUtility.getMethod(form, startMethodName);

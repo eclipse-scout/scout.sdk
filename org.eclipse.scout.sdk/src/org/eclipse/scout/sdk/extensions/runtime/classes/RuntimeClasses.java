@@ -43,18 +43,18 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * @since 3.8.0 22.11.2012
  */
 public final class RuntimeClasses implements IRuntimeClasses {
-  private final static String PREFERENCES_PREFIX = "default.super.types.";
+  private static final String PREFERENCES_PREFIX = "default.super.types.";
 
-  private final static String EXTENSION_POINT_NAME = "runtimeClasses";
-  private final static String TAG_NAME = "element";
-  private final static String ATTRIB_INTERFACE = "interface";
-  private final static String TAG_DEFAULT_NAME = "default";
-  private final static String ATTRIB_DEFAULT_PRIO = "priority";
-  private final static String ATTRIB_DEFAULT_CLASS = "class";
+  private static final String EXTENSION_POINT_NAME = "runtimeClasses";
+  private static final String TAG_NAME = "element";
+  private static final String ATTRIB_INTERFACE = "interface";
+  private static final String TAG_DEFAULT_NAME = "default";
+  private static final String ATTRIB_DEFAULT_PRIO = "priority";
+  private static final String ATTRIB_DEFAULT_CLASS = "class";
 
-  private final static Object lock = new Object();
-  private final static Map<IScoutBundle, Map<String /* interfaceFqn */, StringHolder /* configured value */>> configuredValues = new HashMap<IScoutBundle, Map<String, StringHolder>>();
-  private final static Map<IScoutBundle, IPreferenceChangeListener> registeredListeners = new HashMap<IScoutBundle, IPreferenceChangeListener>();
+  private static final Object lock = new Object();
+  private static final Map<IScoutBundle, Map<String /* interfaceFqn */, StringHolder /* configured value */>> configuredValues = new HashMap<IScoutBundle, Map<String, StringHolder>>();
+  private static final Map<IScoutBundle, IPreferenceChangeListener> registeredListeners = new HashMap<IScoutBundle, IPreferenceChangeListener>();
   private static Map<String /* interfaceFqn */, TreeMap<Double, String> /* default values */> defaultValues = null;
 
   private RuntimeClasses() {

@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
@@ -61,7 +62,7 @@ public class TableColumnNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default values
-    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IColumn, getDeclaringType().getJavaProject());
+    m_superTypeSignature = RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IColumn, getDeclaringType().getJavaProject());
   }
 
   @Override
@@ -82,7 +83,7 @@ public class TableColumnNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     OrderedInnerTypeNewOperation columnOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), isFormatSource());
-    columnOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IColumn));
+    columnOp.setOrderDefinitionType(TypeUtility.getType(IRuntimeClasses.IColumn));
     columnOp.setSibling(getSibling());
     columnOp.setSuperTypeSignature(getSuperTypeSignature());
     columnOp.setFlags(Flags.AccPublic);

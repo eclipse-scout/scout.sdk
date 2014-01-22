@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -60,7 +61,7 @@ public class ClientServiceNewWizard extends AbstractServiceWizard {
     setWindowTitle(Texts.get("NewClientService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewClientService"), Texts.get("CreateANewClientService"),
-        TypeUtility.getType(RuntimeClasses.IService), SdkProperties.SUFFIX_SERVICE, clientBundle, DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_SERVICES));
+        TypeUtility.getType(IRuntimeClasses.IService), SdkProperties.SUFFIX_SERVICE, clientBundle, DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_SERVICES));
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
     addPage(m_serviceNewWizardPage);
@@ -72,7 +73,7 @@ public class ClientServiceNewWizard extends AbstractServiceWizard {
     m_locationWizardPage.addCheckSelectionListener(new P_SessionCheckListener());
     addPage(m_locationWizardPage);
     // init
-    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IService, clientBundle.getJavaProject()));
+    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IService, clientBundle.getJavaProject()));
   }
 
   private ITreeNode createTree(IScoutBundle clientBundle) {

@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformPagesOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -69,7 +69,7 @@ public class AllPagesTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+    IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
 
     if (m_cachedTypeHierarchy == null) {
       m_cachedTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
@@ -100,7 +100,7 @@ public class AllPagesTablePage extends AbstractPage {
       ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
-          IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+          IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
           IPrimaryTypeTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
           return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
         }

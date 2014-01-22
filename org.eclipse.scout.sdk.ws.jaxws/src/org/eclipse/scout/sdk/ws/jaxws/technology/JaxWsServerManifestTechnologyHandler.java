@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class JaxWsServerManifestTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  public final static String JAXWS_RUNTIME_PLUGIN = ScoutProjectAddOperation.JAXWS_RUNTIME_PLUGIN;
+  public static final String JAXWS_RUNTIME_PLUGIN = ScoutProjectAddOperation.JAXWS_RUNTIME_PLUGIN;
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {

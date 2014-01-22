@@ -25,15 +25,15 @@ import org.eclipse.scout.sdk.operation.template.InstallTextFileOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class CreateServerPluginOperation extends AbstractCreateScoutBundleOperation {
-  public final static String PROP_BUNDLE_SERVER_NAME = "BUNDLE_SERVER_NAME";
-  public final static String PROP_FS_ROOT = "FS_ROOT";
-  public final static String PROP_PRODUCT_FILE_DEV = "SERVER_PROD_FILE_DEV";
-  public final static String PROP_PRODUCT_FILE_PROD = "SERVER_PROD_FILE_PROD";
-  public final static String PROP_INSTALL_PRODUCTS = "INSTALL_SERVER_PRODUCTS";
-  public final static String PROP_INSTALL_HTML_RESOURCES = "INSTALL_HTML_RESOURCES";
+  public static final String PROP_BUNDLE_SERVER_NAME = "BUNDLE_SERVER_NAME";
+  public static final String PROP_FS_ROOT = "FS_ROOT";
+  public static final String PROP_PRODUCT_FILE_DEV = "SERVER_PROD_FILE_DEV";
+  public static final String PROP_PRODUCT_FILE_PROD = "SERVER_PROD_FILE_PROD";
+  public static final String PROP_INSTALL_PRODUCTS = "INSTALL_SERVER_PRODUCTS";
+  public static final String PROP_INSTALL_HTML_RESOURCES = "INSTALL_HTML_RESOURCES";
 
-  public final static String BUNDLE_ID = "org.eclipse.scout.sdk.ui.ServerBundle";
-  public final static String SERVER_PROJECT_NAME_SUFFIX = ".server";
+  public static final String BUNDLE_ID = "org.eclipse.scout.sdk.ui.ServerBundle";
+  public static final String SERVER_PROJECT_NAME_SUFFIX = ".server";
 
   @Override
   public String getOperationName() {

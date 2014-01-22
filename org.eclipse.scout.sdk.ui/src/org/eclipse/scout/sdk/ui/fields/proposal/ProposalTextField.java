@@ -528,7 +528,6 @@ public class ProposalTextField extends TextField {
           updateProposals();
           break;
         case ProposalPopupEvent.TYPE_PROPOSAL_SELECTED:
-          updateProposals();
           break;
         default:
           break;

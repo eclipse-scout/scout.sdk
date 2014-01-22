@@ -48,8 +48,8 @@ import org.eclipse.ui.IWorkbench;
 
 public class PageNewWizard extends AbstractWorkspaceWizard implements INewWizard {
 
-  private final static String TYPE_PAGE = "page";
-  private final static String TYPE_PAGE_DATA = "pageData";
+  private static final String TYPE_PAGE = "page";
+  private static final String TYPE_PAGE_DATA = "pageData";
 
   // members
   private IScoutBundle m_clientBundle;
@@ -179,7 +179,7 @@ public class PageNewWizard extends AbstractWorkspaceWizard implements INewWizard
     }
   }
 
-  private final static class P_TreeDndListener implements ITreeDndListener {
+  private static final class P_TreeDndListener implements ITreeDndListener {
     @Override
     public boolean isDragableNode(ITreeNode node) {
       return TYPE_PAGE_DATA.equals(node.getType());
@@ -248,7 +248,7 @@ public class PageNewWizard extends AbstractWorkspaceWizard implements INewWizard
     }
   }
 
-  private final static class P_InitialCheckedFilter implements ITreeNodeFilter {
+  private static final class P_InitialCheckedFilter implements ITreeNodeFilter {
     @Override
     public boolean accept(ITreeNode node) {
       return TreeUtility.isOneOf(node.getType(), TYPE_PAGE, TYPE_PAGE_DATA);

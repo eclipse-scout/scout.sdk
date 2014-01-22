@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
@@ -35,7 +35,7 @@ public class F2ProdTechnologyHandler extends AbstractScoutTechnologyHandler impl
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
     return getSelectionProductFiles(getProductBundles(project),
-        new String[]{RuntimeClasses.ScoutClientBundleId},
+        new String[]{IRuntimeClasses.ScoutClientBundleId},
         new String[]{F2_PLUGIN});
   }
 
@@ -46,7 +46,7 @@ public class F2ProdTechnologyHandler extends AbstractScoutTechnologyHandler impl
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getProductBundles(project), list, RuntimeClasses.ScoutSharedBundleId);
+    contributeProductFiles(getProductBundles(project), list, IRuntimeClasses.ScoutSharedBundleId);
   }
 
   private IScoutBundle[] getProductBundles(IScoutBundle start) {

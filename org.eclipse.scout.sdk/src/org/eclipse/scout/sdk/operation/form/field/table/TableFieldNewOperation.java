@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.form.field.FormFieldNewOperation;
@@ -59,8 +60,8 @@ public class TableFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITableField, getDeclaringType().getJavaProject()));
-    setTableSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getDeclaringType().getJavaProject()));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITableField, getDeclaringType().getJavaProject()));
+    setTableSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITable, getDeclaringType().getJavaProject()));
   }
 
   @Override
@@ -85,14 +86,14 @@ public class TableFieldNewOperation implements IOperation {
       nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
     // TODO aho check generic type table!!!
-    if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractTableField)) {
+    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractTableField)) {
       // create inner type table
       ITypeSourceBuilder tableBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_TABLEFIELD_TABLE);
       tableBuilder.setFlags(Flags.AccPublic);
       if (getTableSuperTypeSignature() == null) {
-        setTableSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITable, getDeclaringType().getJavaProject()));
+        setTableSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITable, getDeclaringType().getJavaProject()));
       }
       tableBuilder.setSuperTypeSignature(getTableSuperTypeSignature());
       tableBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));

@@ -16,7 +16,7 @@ import java.util.Arrays;
 public class ParameterArgument {
   private String m_name;
   private String m_type;
-  private ArrayList<String> m_fullyQuallifiedImports = new ArrayList<String>();
+  private ArrayList<String> m_fullyQualifiedImports = new ArrayList<String>();
 
   public ParameterArgument() {
 
@@ -43,17 +43,17 @@ public class ParameterArgument {
     m_type = type;
   }
 
-  public ArrayList<String> getFullyQuallifiedImports() {
-    return m_fullyQuallifiedImports;
+  public ArrayList<String> getFullyQualifiedImports() {
+    return m_fullyQualifiedImports;
   }
 
-  public void addFullyQuallifiedImport(String fullyQuallifiedImport) {
-    m_fullyQuallifiedImports.add(fullyQuallifiedImport);
+  public void addFullyQualifiedImport(String fullyQualifiedImport) {
+    m_fullyQualifiedImports.add(fullyQualifiedImport);
   }
 
-  public void setFullyQuallifiedImports(String[] allImports) {
-    m_fullyQuallifiedImports.clear();
-    m_fullyQuallifiedImports.addAll(Arrays.asList(allImports));
+  public void setFullyQualifiedImports(String[] allImports) {
+    m_fullyQualifiedImports.clear();
+    m_fullyQualifiedImports.addAll(Arrays.asList(allImports));
   }
 
 }

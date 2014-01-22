@@ -25,8 +25,8 @@ import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
  */
 public class ResourceFilters {
 
-  private final static IResourceFilter PRODUCT_FILE_FILTER = getFileExtensionFilter("product");
-  private final static IResourceFilter TARGET_FILE_FILTER = getFileExtensionFilter("target");
+  private static final IResourceFilter PRODUCT_FILE_FILTER = getFileExtensionFilter("product");
+  private static final IResourceFilter TARGET_FILE_FILTER = getFileExtensionFilter("target");
 
   /**
    * @param fileName

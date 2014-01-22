@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -54,9 +55,6 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   private static final String PROP_FORM_DATA_TYPE = "formDataType";
   private static final String PROP_TARGET_PACKAGE = "targetPackage";
 
-  private final IType iService = TypeUtility.getType(RuntimeClasses.IService);
-  private final IType abstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
-
   // ui fields
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
@@ -95,7 +93,8 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
 
     JavaElementAbstractTypeContentProvider content = null;
     if (isEnabled) {
-      IType abstractService = RuntimeClasses.getSuperType(RuntimeClasses.IService, getServerBundle().getJavaProject());
+      IType iService = TypeUtility.getType(IRuntimeClasses.IService);
+      IType abstractService = RuntimeClasses.getSuperType(IRuntimeClasses.IService, getServerBundle().getJavaProject());
       content = new JavaElementAbstractTypeContentProvider(iService, getServerBundle().getJavaProject(), abstractService);
     }
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), content, labelColWidthPercent);
@@ -112,6 +111,7 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     m_formDataTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("FormData"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
+        IType abstractFormData = TypeUtility.getType(IRuntimeClasses.AbstractFormData);
         ICachedTypeHierarchy formDataHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractFormData);
         IType[] formDataTypes = formDataHierarchy.getAllSubtypes(abstractFormData, TypeFilters.getTypesOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
         return new Object[][]{formDataTypes};
@@ -171,11 +171,11 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_SERVICE);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_SERVICE);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getServerBundle(), getTargetPackage(IDefaultTargetPackage.SERVER_SERVICES), getTypeName());
+    IStatus existingStatus = ScoutUtility.validateTypeNotExisting(getServerBundle(), getTargetPackage(IDefaultTargetPackage.SERVER_SERVICES), getTypeName());
     if (!existingStatus.isOK()) {
       return existingStatus;
     }

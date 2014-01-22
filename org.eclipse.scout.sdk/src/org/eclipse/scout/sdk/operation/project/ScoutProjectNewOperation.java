@@ -38,14 +38,14 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 @SuppressWarnings("restriction")
 public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
-  private final static String EXT_TAG_NAME = "operation";
-  private final static String EXT_NAME = "newProjectOperation";
-  private final static String EXT_ATTR_CLASS_NAME = "class";
-  private final static String EXT_ATTR_ID_NAME = "id";
-  private final static String EXT_ATTR_REF_NAME = "referenceId";
-  private final static String EXT_ATTR_REF_TYPE_NAME = "execAfterReference";
-  private final static String EXEC_ENV_PREFIX = "JavaSE-";
-  private final static String MIN_JVM_VERSION = "1.6";
+  private static final String EXT_TAG_NAME = "operation";
+  private static final String EXT_NAME = "newProjectOperation";
+  private static final String EXT_ATTR_CLASS_NAME = "class";
+  private static final String EXT_ATTR_ID_NAME = "id";
+  private static final String EXT_ATTR_REF_NAME = "referenceId";
+  private static final String EXT_ATTR_REF_TYPE_NAME = "execAfterReference";
+  private static final String EXEC_ENV_PREFIX = "JavaSE-";
+  private static final String MIN_JVM_VERSION = "1.6";
 
   public ScoutProjectNewOperation() {
   }

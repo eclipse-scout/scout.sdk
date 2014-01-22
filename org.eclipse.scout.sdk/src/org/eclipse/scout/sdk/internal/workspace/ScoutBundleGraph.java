@@ -47,11 +47,29 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
   private final ReentrantReadWriteLock m_lock;
 
   private volatile Map<String /*symbolic name*/, ScoutBundle> m_bundleGraph;
-  private Map<IPath, IPluginModelBase> m_targetPlatformBundles;
+  private volatile Map<IPath, IPluginModelBase> m_targetPlatformBundles;
 
   ScoutBundleGraph() {
     m_dependencyIssues = new HashSet<String>();
     m_lock = new ReentrantReadWriteLock(true);
+  }
+
+  /**
+   * clears the bundle graph and removes all elements.
+   */
+  void dispose() {
+    try {
+      m_lock.writeLock().lock();
+      if (m_bundleGraph != null) {
+        m_bundleGraph.clear();
+        m_bundleGraph = null;
+      }
+      m_targetPlatformBundles = null;
+      m_dependencyIssues.clear();
+    }
+    finally {
+      m_lock.writeLock().unlock();
+    }
   }
 
   /**

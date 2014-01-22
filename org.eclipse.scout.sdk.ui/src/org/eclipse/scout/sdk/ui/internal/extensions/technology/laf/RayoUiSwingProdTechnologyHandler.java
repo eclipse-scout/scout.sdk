@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -34,10 +34,10 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
  */
 public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {
 
-  private final static String SCOUT_LAF_KEY = "scout.laf";
-  private final static String RAYO_LAF_NAME = "com.bsiag.scout.rt.ui.swing.laf.rayo.Rayo";
-  private final static String RAYO_LAF_FRAME_KEY = "scout.laf.useLafFrameAndDialog";
-  private final static String RAYO_LAF_FRAME_NAME = "true";
+  private static final String SCOUT_LAF_KEY = "scout.laf";
+  private static final String RAYO_LAF_NAME = "com.bsiag.scout.rt.ui.swing.laf.rayo.Rayo";
+  private static final String RAYO_LAF_FRAME_KEY = "scout.laf.useLafFrameAndDialog";
+  private static final String RAYO_LAF_FRAME_NAME = "true";
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
@@ -60,10 +60,10 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
     TriState ret = getSelectionProductFiles(getSwingBundlesBelow(project),
-        new String[]{RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId},
+        new String[]{IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId},
         new String[]{RAYO_LAF_PLUGIN, RAYO_LAF_FRAGMENT});
 
-    P_TechProductFile[] productFiles = getFilteredProductFiles(getSwingBundlesBelow(project), new String[]{RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId});
+    P_TechProductFile[] productFiles = getFilteredProductFiles(getSwingBundlesBelow(project), new String[]{IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId});
     if (productFiles == null || productFiles.length == 0) {
       return null;
     }
@@ -84,7 +84,7 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getSwingBundlesBelow(project), list, RuntimeClasses.ScoutClientBundleId, RuntimeClasses.ScoutUiSwingBundleId);
+    contributeProductFiles(getSwingBundlesBelow(project), list, IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId);
   }
 
   private boolean isRayoLafEnabledInConfigIni(IFile productFile) {

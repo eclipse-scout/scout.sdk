@@ -13,12 +13,12 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 public final class ExportScoutProjectEntryExtensionPoint {
 
-  public final static String EXTENSION_ID = "exportScoutProjectEntry";
-  public final static String ATTR_ICON = "icon";
-  public final static String ATTR_ID = "id";
-  public final static String ATTR_NAME = "name";
-  public final static String ATTR_ORDER = "order";
-  public final static String ATTR_CLASS = "class";
+  public static final String EXTENSION_ID = "exportScoutProjectEntry";
+  public static final String ATTR_ICON = "icon";
+  public static final String ATTR_ID = "id";
+  public static final String ATTR_NAME = "name";
+  public static final String ATTR_ORDER = "order";
+  public static final String ATTR_CLASS = "class";
 
   private ExportScoutProjectEntryExtensionPoint() {
   }

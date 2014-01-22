@@ -15,7 +15,6 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -29,9 +28,9 @@ import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.jface.text.contentassist.IContextInformationValidator;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -45,9 +44,9 @@ import org.eclipse.swt.graphics.Image;
  * @since 1.0.8 09.02.2010
  */
 public class SqlBindCompletionProposalProcessor {
-  private final IType AbstractFormData = TypeUtility.getType(RuntimeClasses.AbstractFormData);
-  private final IType AbstractFormFieldData = TypeUtility.getType(RuntimeClasses.AbstractFormFieldData);
-  private final IType AbstractPropertyData = TypeUtility.getType(RuntimeClasses.AbstractPropertyData);
+  private final IType AbstractFormData = TypeUtility.getType(IRuntimeClasses.AbstractFormData);
+  private final IType AbstractFormFieldData = TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData);
+  private final IType AbstractPropertyData = TypeUtility.getType(IRuntimeClasses.AbstractPropertyData);
 
   private final Image m_image;
   private static final Pattern REGEX_QUOTES = Pattern.compile("\\\"");
@@ -75,14 +74,14 @@ public class SqlBindCompletionProposalProcessor {
       HashSet<ICompletionProposal> collector = new HashSet<ICompletionProposal>();
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formData);
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
-        String propName = getBeanName(t.getElementName());
+        String propName = NamingUtility.ensureStartWithLowerCase(t.getElementName());
         SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
         addInnerTypesInSuperClasses(t, t.newSupertypeHierarchy(null), collector, prefix, propName + ".", context);
       }
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractPropertyData, hierarchy))) {
         String propName = t.getElementName();
-        propName = getBeanName(propName.replaceAll("Property$", ""));
+        propName = NamingUtility.ensureStartWithLowerCase(propName.replaceAll("Property$", ""));
         SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
       }
@@ -102,22 +101,12 @@ public class SqlBindCompletionProposalProcessor {
     return NO_PROPOSALS;
   }
 
-  private String getBeanName(String elementName) {
-    if (elementName == null) {
-      return null;
-    }
-    if (elementName.length() > 1) {
-      return Character.toLowerCase(elementName.charAt(0)) + elementName.substring(1);
-    }
-    return elementName.toLowerCase();
-  }
-
   private void addInnerTypesInSuperClasses(IType baseType, org.eclipse.jdt.core.ITypeHierarchy baseTypeSuperHierarchy, HashSet<ICompletionProposal> collector,
       String prefix, String namePrefix, JavaContentAssistInvocationContext context) throws JavaModelException {
     for (IType superClass : baseTypeSuperHierarchy.getAllSuperclasses(baseType)) {
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(superClass);
       for (IType innerType : TypeUtility.getInnerTypes(superClass, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
-        SqlBindProposal prop = new SqlBindProposal(namePrefix + getBeanName(innerType.getElementName()), prefix, context.getInvocationOffset(), m_image);
+        SqlBindProposal prop = new SqlBindProposal(namePrefix + NamingUtility.ensureStartWithLowerCase(innerType.getElementName()), prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
         addInnerTypesInSuperClasses(innerType, innerType.newSupertypeHierarchy(null), collector, prefix, prop.getDisplayString() + ".", context);
       }
@@ -143,8 +132,7 @@ public class SqlBindCompletionProposalProcessor {
   }
 
   private IType getFormDataParameterType(JavaContentAssistInvocationContext context) throws JavaModelException {
-    ICompilationUnit icu = context.getCompilationUnit();
-    IJavaElement element = JdtUtility.findJavaElement(icu, context.getInvocationOffset(), 0);
+    IJavaElement element = context.getCoreContext().getEnclosingElement();
     if (element.getElementType() == IJavaElement.METHOD) {
       IMethod method = (IMethod) element;
       for (String parameter : method.getParameterTypes()) {

@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.fields.proposal.javaelement;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -46,7 +45,11 @@ public abstract class AbstractJavaElementContentProvider extends ContentProposal
 
   protected abstract Object[][] computeProposals();
 
-  private Object[][] getAllProposals() {
+  public synchronized void invalidateCache() {
+    m_allProposals = null;
+  }
+
+  protected synchronized Object[][] getAllProposals() {
     if (m_allProposals == null) {
       m_allProposals = computeProposals();
     }
@@ -70,7 +73,7 @@ public abstract class AbstractJavaElementContentProvider extends ContentProposal
     }
 
     for (Object[] group : getAllProposals()) {
-      Collection<Object> groupResult = getProposals(pattern, group, searchRangeSupport, monitor);
+      List<Object> groupResult = getProposals(pattern, group, searchRangeSupport, monitor);
       if (result.size() > 0 && groupResult.size() > 0) {
         result.add(MoreElementsProposal.INSTANCE);
       }
@@ -79,7 +82,7 @@ public abstract class AbstractJavaElementContentProvider extends ContentProposal
     return result.toArray(new Object[result.size()]);
   }
 
-  private Collection<Object> getProposals(NormalizedPattern pattern, Object[] proposals, ISearchRangeConsumer searchRangeSupport, IProgressMonitor monitor) {
+  protected List<Object> getProposals(NormalizedPattern pattern, Object[] proposals, ISearchRangeConsumer searchRangeSupport, IProgressMonitor monitor) {
     if (proposals == null) {
       return new ArrayList<Object>(0);
     }
@@ -94,7 +97,7 @@ public abstract class AbstractJavaElementContentProvider extends ContentProposal
     return result;
   }
 
-  private class P_EmptySearchRangeSupport implements ISearchRangeConsumer {
+  private final static class P_EmptySearchRangeSupport implements ISearchRangeConsumer {
 
     @Override
     public int[] getMatchRanges(Object element) {

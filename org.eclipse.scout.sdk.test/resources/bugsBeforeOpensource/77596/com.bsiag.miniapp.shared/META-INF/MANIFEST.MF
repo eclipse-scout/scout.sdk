@@ -14,7 +14,6 @@ Export-Package: com.bsiag.miniapp.shared,
  com.bsiag.miniapp.shared.security,
  com.bsiag.miniapp.shared.services.common.text
 Import-Package: javax.activation;resolution:=optional,
- javax.jms;resolution:=optional,
  javax.mail;resolution:=optional,
  javax.mail.event;resolution:=optional,
  javax.mail.internet;resolution:=optional,

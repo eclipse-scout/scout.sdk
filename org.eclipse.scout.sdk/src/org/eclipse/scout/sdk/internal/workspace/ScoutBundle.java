@@ -52,7 +52,7 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -73,13 +73,13 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
  */
 public class ScoutBundle implements IScoutBundle {
 
-  private final static Pattern REGEX_LEADING_DOTS = Pattern.compile("^\\.*");
+  private static final Pattern REGEX_LEADING_DOTS = Pattern.compile("^\\.*");
 
   /**
    * bundles that will stop the dependency tree processing. when one of these is found, the children are no longer
    * followed. This is to increase performance for bundles which are known to be not of interest.
    */
-  private final static Set<String> EXCLUDED_BUNDLE_SYMBOLIC_NAMES;
+  private static final Set<String> EXCLUDED_BUNDLE_SYMBOLIC_NAMES;
   static {
     String[] bundles = new String[]{"org.eclipse.core.runtime", "org.eclipse.equinox.http.registry",
         "org.eclipse.equinox.common", "org.eclipse.core.net", "org.eclipse.equinox.security", "org.eclipse.equinox.registry", "org.eclipse.osgi",
@@ -305,7 +305,7 @@ public class ScoutBundle implements IScoutBundle {
           try {
             registerNlsServiceListener();
             result = new Holder<INlsProject>(INlsProject.class, null);
-            INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(RuntimeClasses.TEXTS), this});
+            INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(IRuntimeClasses.TEXTS), this});
             result.setValue(nlsProject);
             m_nlsProjectHolder = result;
           }
@@ -328,7 +328,7 @@ public class ScoutBundle implements IScoutBundle {
           try {
             registerNlsServiceListener();
             result = new Holder<INlsProject>(INlsProject.class, null);
-            INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(RuntimeClasses.IDocumentationTextProviderService), this});
+            INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(IRuntimeClasses.IDocumentationTextProviderService), this});
             result.setValue(nlsProject);
             m_docsNlsProjectHolder = result;
           }
@@ -439,7 +439,7 @@ public class ScoutBundle implements IScoutBundle {
 
   private void registerNlsServiceListener() {
     if (m_textProvidersChangedListener == null) {
-      IType abstractDynamicNlsTextProviderService = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+      IType abstractDynamicNlsTextProviderService = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
       if (TypeUtility.exists(abstractDynamicNlsTextProviderService)) {
         IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
         m_textProvidersChangedListener = new P_TextProviderServiceHierarchyChangedListener(this);
@@ -559,7 +559,7 @@ public class ScoutBundle implements IScoutBundle {
     m_nlsProjectHolder = null;
     m_docsNlsProjectHolder = null;
     if (m_textProvidersChangedListener != null) {
-      IType abstractDynamicNlsTextProviderService = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+      IType abstractDynamicNlsTextProviderService = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
       if (TypeUtility.exists(abstractDynamicNlsTextProviderService)) {
         IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
         pth.removeHierarchyListener(m_textProvidersChangedListener);

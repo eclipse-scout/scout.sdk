@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type;
 
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.IPropertyBeanFilter;
@@ -33,10 +33,10 @@ public final class ScoutPropertyBeanFilters {
     return new IPropertyBeanFilter() {
       @Override
       public boolean accept(IPropertyBean property) {
-        if (property.getReadMethod() == null || JdtUtility.getAnnotation(property.getReadMethod(), RuntimeClasses.FormData) == null) {
+        if (property.getReadMethod() == null || JdtUtility.getAnnotation(property.getReadMethod(), IRuntimeClasses.FormData) == null) {
           return false;
         }
-        if (property.getWriteMethod() == null || JdtUtility.getAnnotation(property.getWriteMethod(), RuntimeClasses.FormData) == null) {
+        if (property.getWriteMethod() == null || JdtUtility.getAnnotation(property.getWriteMethod(), IRuntimeClasses.FormData) == null) {
           return false;
         }
         return true;

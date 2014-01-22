@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.operation.template.sequencebox;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -25,7 +26,7 @@ public class DoubleFromToTemplate extends AbstractFormFieldTemplate {
 
   @Override
   public void apply(ITypeSourceBuilder sourceBuilder, IType declaringType, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    apply(sourceBuilder, declaringType, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IDoubleField, declaringType.getJavaProject()), monitor, manager);
+    apply(sourceBuilder, declaringType, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IDoubleField, declaringType.getJavaProject()), monitor, manager);
   }
 
 }

@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
@@ -35,6 +36,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
@@ -67,7 +69,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     // defaults
     setPackageExportPolicy(ExportPolicy.AddPackage);
     setFlags(Flags.AccPublic);
-    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, getJavaProject()));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IForm, getJavaProject()));
     getSourceBuilder().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
     getCompilationUnitNewOp().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     setFormatSource(true);
@@ -91,7 +93,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
   protected void createConstructor(ITypeSourceBuilder formBuilder, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
     constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
-    constructorBuilder.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    constructorBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
     formBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
   }
@@ -137,7 +139,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     ITypeSourceBuilder mainBoxBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_MAIN_BOX);
     mainBoxBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
     mainBoxBuilder.setFlags(Flags.AccPublic);
-    mainBoxBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IGroupBox, getJavaProject()));
+    mainBoxBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, getJavaProject()));
     addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(mainBoxBuilder, 10.0), mainBoxBuilder);
 
     // main box getter
@@ -169,7 +171,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     ITypeSourceBuilder okButtonBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_OK_BUTTON);
     okButtonBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(order));
     okButtonBuilder.setFlags(Flags.AccPublic);
-    okButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractOkButton, getJavaProject()));
+    okButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.AbstractOkButton, getJavaProject()));
     mainboxBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(okButtonBuilder, order), okButtonBuilder);
     // getter
     final String okButtonSignature = SignatureCache.createTypeSignature(getPackageName() + "." + getElementName() + "." + SdkProperties.TYPE_NAME_MAIN_BOX + "." + okButtonBuilder.getElementName());
@@ -181,7 +183,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     ITypeSourceBuilder cancelButtonBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_CANCEL_BUTTON);
     cancelButtonBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(order));
     cancelButtonBuilder.setFlags(Flags.AccPublic);
-    cancelButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractCancelButton, getJavaProject()));
+    cancelButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.AbstractCancelButton, getJavaProject()));
     mainboxBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(cancelButtonBuilder, order), cancelButtonBuilder);
     // getter
     final String cancelButtonSignature = SignatureCache.createTypeSignature(getPackageName() + "." + getElementName() + "." + SdkProperties.TYPE_NAME_MAIN_BOX + "." + cancelButtonBuilder.getElementName());
@@ -191,13 +193,13 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
 
   protected void createFormIdProperty(ITypeSourceBuilder formBuilder) {
     String propertyName = getFormIdName();
-    IFieldSourceBuilder fieldBuilder = new FieldSourceBuilder("m_" + getPropertyName(propertyName, false));
+    IFieldSourceBuilder fieldBuilder = new FieldSourceBuilder("m_" + NamingUtility.ensureStartWithLowerCase(propertyName));
     fieldBuilder.setSignature(getFormIdSignature());
     fieldBuilder.setFlags(Flags.AccPrivate);
     addFieldSourceBuilder(fieldBuilder);
 
     // getter
-    IMethodSourceBuilder getterBuilder = new MethodSourceBuilder("get" + getPropertyName(propertyName, true));
+    IMethodSourceBuilder getterBuilder = new MethodSourceBuilder("get" + NamingUtility.ensureStartWithUpperCase(propertyName));
     getterBuilder.setFlags(Flags.AccPublic);
     getterBuilder.setReturnTypeSignature(getFormIdSignature());
     getterBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation());
@@ -206,26 +208,14 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(getterBuilder), getterBuilder);
 
     // setter
-    IMethodSourceBuilder setterBuilder = new MethodSourceBuilder("set" + getPropertyName(propertyName, true));
+    IMethodSourceBuilder setterBuilder = new MethodSourceBuilder("set" + NamingUtility.ensureStartWithUpperCase(propertyName));
     setterBuilder.setFlags(Flags.AccPublic);
     setterBuilder.setReturnTypeSignature(Signature.SIG_VOID);
-    setterBuilder.setParameters(new MethodParameter[]{new MethodParameter(getPropertyName(propertyName, false), getFormIdSignature())});
+    setterBuilder.setParameters(new MethodParameter[]{new MethodParameter(NamingUtility.ensureStartWithLowerCase(propertyName), getFormIdSignature())});
     setterBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation());
     setterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodSetterCommentBuilder());
-    setterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(fieldBuilder.getElementName() + " = " + getPropertyName(propertyName, false) + ";"));
+    setterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(fieldBuilder.getElementName() + " = " + NamingUtility.ensureStartWithLowerCase(propertyName) + ";"));
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(setterBuilder), setterBuilder);
-  }
-
-  private static String getPropertyName(String propertyName, boolean startWithUpperCase) {
-    if (StringUtility.isNullOrEmpty(propertyName)) {
-      return null;
-    }
-    if (startWithUpperCase) {
-      return Character.toUpperCase(propertyName.charAt(0)) + propertyName.substring(1);
-    }
-    else {
-      return Character.toLowerCase(propertyName.charAt(0)) + propertyName.substring(1);
-    }
   }
 
   public IType getCreatedMainBox() {

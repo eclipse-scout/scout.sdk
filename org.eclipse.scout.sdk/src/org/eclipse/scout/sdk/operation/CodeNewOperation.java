@@ -29,7 +29,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
@@ -52,8 +52,6 @@ import org.eclipse.text.edits.TextEdit;
  * <h3>CodeNewOperation</h3> ...
  */
 public class CodeNewOperation implements IOperation {
-
-  final IType iCode = TypeUtility.getType(RuntimeClasses.ICode);
 
   // in members
   private final IType m_declaringType;
@@ -149,6 +147,7 @@ public class CodeNewOperation implements IOperation {
     // This is needed because if a new child Code is created inside an old (not static) Code, this leads to compilation errors.
     setStaticModifierForAllCodes();
 
+    IType iCode = TypeUtility.getType(IRuntimeClasses.ICode);
     OrderedInnerTypeNewOperation codeOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType());
     codeOp.setFormatSource(false);
     codeOp.setSibling(getSibling());

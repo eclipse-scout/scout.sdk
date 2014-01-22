@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.operation.util.wellform;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
@@ -25,8 +25,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  *
  */
 public class WellformOutlinesOperation implements IOperation {
-
-  private final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
 
   private final IScoutBundle m_clientBundle;
   private IType[] m_outlines;
@@ -50,6 +48,7 @@ public class WellformOutlinesOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // find types
+    IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
     m_outlines = formHierarchy.getAllSubtypes(iOutline, ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()));
     // format types

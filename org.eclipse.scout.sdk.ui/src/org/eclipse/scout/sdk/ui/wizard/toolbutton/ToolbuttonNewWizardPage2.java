@@ -14,21 +14,18 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ToolbuttonNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -48,8 +45,6 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>CalendarItemProviderNewWizardPage</h3> ...
  */
 public class ToolbuttonNewWizardPage2 extends AbstractWorkspaceWizardPage {
-
-  final IType iToolbutton = TypeUtility.getType(RuntimeClasses.IToolButton);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -106,7 +101,7 @@ public class ToolbuttonNewWizardPage2 extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_siblingField = getFieldToolkit().createSiblingProposalField(parent, m_declaringType, TypeUtility.getType(RuntimeClasses.IToolButton));
+    m_siblingField = getFieldToolkit().createSiblingProposalField(parent, m_declaringType, TypeUtility.getType(IRuntimeClasses.IToolButton));
     m_siblingField.acceptProposal(m_sibling);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -155,23 +150,11 @@ public class ToolbuttonNewWizardPage2 extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    try {
-      multiStatus.add(getStatusNameField());
-    }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError("could not validate name field.", e);
-    }
+    multiStatus.add(getStatusNameField());
   }
 
-  protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_TOOL);
-    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
-      return javaFieldNameStatus;
-    }
-    if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-    }
-    return javaFieldNameStatus;
+  protected IStatus getStatusNameField() {
+    return ScoutUtility.validateFormFieldName(getTypeName(), SdkProperties.SUFFIX_TOOL, m_declaringType);
   }
 
   public INlsEntry getNlsName() {

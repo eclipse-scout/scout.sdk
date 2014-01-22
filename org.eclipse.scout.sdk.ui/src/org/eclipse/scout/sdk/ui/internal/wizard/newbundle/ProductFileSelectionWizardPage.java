@@ -35,7 +35,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ProductFileSelectionWizardPage extends AbstractProjectNewWizardPage {
 
-  private final static String PROP_SELECTED_PRODUCTS = "selectedProductFilesToModify";
+  private static final String PROP_SELECTED_PRODUCTS = "selectedProductFilesToModify";
   private final IScoutBundle m_scoutBundle;
   private CheckableTree m_bundleTree;
 

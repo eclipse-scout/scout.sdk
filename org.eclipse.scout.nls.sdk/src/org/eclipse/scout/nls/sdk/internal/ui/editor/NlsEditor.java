@@ -32,7 +32,7 @@ public class NlsEditor extends MultiPageEditorPart {
 
   private int m_tablePageIndex = -1;
 
-  public final static String EDITOR_ID = "org.eclipse.scout.nls.sdk.nlsEditor";
+  public static final String EDITOR_ID = "org.eclipse.scout.nls.sdk.nlsEditor";
 
   @Override
   public void init(IEditorSite site, IEditorInput input) throws PartInitException {

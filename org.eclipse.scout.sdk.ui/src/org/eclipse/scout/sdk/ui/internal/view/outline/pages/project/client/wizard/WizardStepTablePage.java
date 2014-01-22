@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wiza
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.WizardStepNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -61,7 +61,7 @@ public class WizardStepTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iWizardStep = TypeUtility.getType(RuntimeClasses.IWizardStep);
+    IType iWizardStep = TypeUtility.getType(IRuntimeClasses.IWizardStep);
 
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iWizardStep);

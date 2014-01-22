@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
@@ -61,7 +61,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
   }
 
   private void createCompositeFieldFormData(IType compositeType, ITypeHierarchy declaringTypeHierarchy, IProgressMonitor monitor) throws JavaModelException {
-    for (IType formField : TypeUtility.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IFormField), declaringTypeHierarchy))) {
+    for (IType formField : TypeUtility.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IFormField), declaringTypeHierarchy))) {
       if (monitor.isCanceled()) {
         return;
       }
@@ -86,15 +86,15 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           String typeErasure = Signature.getTypeErasure(formDataSuperTypeSignature);
           ITypeHierarchy superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(superType);
           ITypeSourceBuilder fieldSourceBuilder = null;
-          if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableFieldData))) {
+          if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableFieldData))) {
             fieldSourceBuilder = new TableFieldFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
           }
-          else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
+          else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.AbstractTableFieldBeanData))) {
             // fill table bean
             fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
           }
-          else if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ICompositeField), formField)
-              && !declaringTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IValueField), formField)) {
+          else if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.ICompositeField), formField)
+              && !declaringTypeHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IValueField), formField)) {
             // field extends a field template.
             fieldExtendsTemplateField = true;
             fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
@@ -115,7 +115,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           continue;
         }
 
-        if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ICompositeField), formField) && !fieldExtendsTemplateField) {
+        if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.ICompositeField), formField) && !fieldExtendsTemplateField) {
           createCompositeFieldFormData(formField, declaringTypeHierarchy, monitor);
         }
       }

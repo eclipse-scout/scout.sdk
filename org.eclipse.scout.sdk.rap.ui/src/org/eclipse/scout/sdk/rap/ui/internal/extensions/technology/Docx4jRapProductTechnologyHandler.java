@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
@@ -42,7 +42,7 @@ public class Docx4jRapProductTechnologyHandler extends AbstractScoutTechnologyHa
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
     return getSelectionProductFiles(getProductBundles(project),
-        new String[]{RuntimeClasses.ScoutSharedBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId},
+        new String[]{IRuntimeClasses.ScoutSharedBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId},
         new String[]{XML_GRAPHICS_PLUGIN_NAME, APACHE_COMMONS_PLUGIN_NAME, APACHE_COMMONS_LOGGING_PLUGIN_NAME, DOCX4J_PLUGIN, DOCX4J_SCOUT_PLUGIN,
             DOCX4J_SCOUT_CLIENT_PLUGIN, LOGGING_BRIDGE_LOG4J_FRAGMENT});
   }
@@ -54,7 +54,7 @@ public class Docx4jRapProductTechnologyHandler extends AbstractScoutTechnologyHa
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getProductBundles(project), list, RuntimeClasses.ScoutSharedBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId);
+    contributeProductFiles(getProductBundles(project), list, IRuntimeClasses.ScoutSharedBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId);
   }
 
   private IScoutBundle[] getProductBundles(IScoutBundle start) {

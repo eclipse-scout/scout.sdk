@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.PermissionNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -62,7 +62,7 @@ public class PermissionTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
+    IType basicPermission = TypeUtility.getType(IRuntimeClasses.BasicPermission);
 
     if (m_basicPermissionHierarchy == null) {
       m_basicPermissionHierarchy = TypeUtility.getPrimaryTypeHierarchy(basicPermission);

@@ -12,7 +12,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.TableFieldNodePage;
@@ -62,7 +62,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
   private boolean fastDetection(String content) {
     try {
-      Object identifier = TypeUtility.getFieldConstant(TypeUtility.getType(RuntimeClasses.CopyWidthsOfColumnsMenu).getField(TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER));
+      Object identifier = TypeUtility.getFieldConstant(TypeUtility.getType(IRuntimeClasses.CopyWidthsOfColumnsMenu).getField(TABLE_MENU_COLUMN_COPY_CLIPBOARD_IDENTIFIER));
       if (identifier instanceof String) {
         return content.startsWith(identifier.toString());
       }

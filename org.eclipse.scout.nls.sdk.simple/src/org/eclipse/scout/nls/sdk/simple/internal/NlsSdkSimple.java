@@ -28,7 +28,6 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.HostSpecification;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
@@ -205,8 +204,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
     return files;
   }
 
-  public static List<INlsFolder> getFoldersOfProject(IProject project, IPath path, boolean runntimeDir)
-      throws JavaModelException, CoreException {
+  public static List<INlsFolder> getFoldersOfProject(IProject project, IPath path, boolean runntimeDir) throws CoreException {
     List<INlsFolder> folders = new LinkedList<INlsFolder>();
     if (project.isOpen()) {
       if (project.hasNature(JavaCore.NATURE_ID)) {

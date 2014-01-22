@@ -36,6 +36,8 @@ public class BigDecimalPresenter extends AbstractValuePresenter<BigDecimal> {
   private final IPropertySourceParser<BigDecimal> m_parser;
   private final NumberFormat m_formatter;
 
+  //TODO: fix bigdecmial presenter
+
   public BigDecimalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, "[\\-\\+0-9eE\\.']*");
     m_parser = new BigDecimalPropertySourceParser();

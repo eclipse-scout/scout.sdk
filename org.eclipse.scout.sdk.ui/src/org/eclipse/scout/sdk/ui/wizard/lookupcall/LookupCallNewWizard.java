@@ -20,9 +20,12 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.lookupcall.LookupCallNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
@@ -120,15 +123,15 @@ public class LookupCallNewWizard extends AbstractServiceWizard implements INewWi
         clientRegNode.setEnabled(false);
       }
     }
-    if (sharedBundle != null) {
-      ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
-      // formData
-      TreeUtility.createNode(sharedNode, TYPE_LOOKUPCALL, Texts.get("LookupCall"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1).setEnabled(false);
-      if (serverBundle != null) {
-        // service interface
-        TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), 2).setEnabled(false);
-      }
+
+    ITreeNode sharedNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(sharedBundle));
+    // formData
+    TreeUtility.createNode(sharedNode, TYPE_LOOKUPCALL, Texts.get("LookupCall"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1).setEnabled(false);
+    if (serverBundle != null) {
+      // service interface
+      TreeUtility.createNode(sharedNode, TYPE_SERVICE_INTERFACE, Texts.get("IService"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Interface), 2).setEnabled(false);
     }
+
     if (serverBundle != null) {
       ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
       // service implementation
@@ -151,6 +154,14 @@ public class LookupCallNewWizard extends AbstractServiceWizard implements INewWi
     m_operation = new LookupCallNewOperation(m_page1.getTypeName(), lookupCallBundle.getPackageName(m_page1.getTargetPackage()), ScoutUtility.getJavaProject(lookupCallBundle));
     m_operation.setFormatSource(true);
 
+    StringBuilder superType = new StringBuilder();
+    superType.append(RuntimeClasses.getSuperTypeName(IRuntimeClasses.ILookupCall, lookupCallBundle));
+    superType.append('<');
+    superType.append(Signature.toString(m_page1.getGenericTypeSignature()));
+    superType.append('>');
+
+    m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.toString()));
+
     IScoutBundle serviceProxyRegBundle = m_page2.getLocationBundle(TYPE_SERVICE_REG_CLIENT, true, true);
     if (serviceProxyRegBundle != null) {
       m_operation.setServiceProxyRegistrationProject(serviceProxyRegBundle.getJavaProject());
@@ -171,7 +182,11 @@ public class LookupCallNewWizard extends AbstractServiceWizard implements INewWi
       case CREATE_NEW:
         IType superTypeProp = m_page1.getServiceSuperType();
         if (superTypeProp != null) {
-          m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
+          StringBuilder svcSuperTypeSig = new StringBuilder(superTypeProp.getFullyQualifiedName());
+          svcSuperTypeSig.append('<');
+          svcSuperTypeSig.append(Signature.toString(m_page1.getGenericTypeSignature()));
+          svcSuperTypeSig.append('>');
+          m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(svcSuperTypeSig.toString()));
           for (ServiceRegistrationDescription desc : getCheckedServiceRegistrations(m_page2.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true))) {
             m_operation.addServiceRegistration(desc);
             storeUsedSession(desc);

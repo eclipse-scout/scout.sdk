@@ -77,6 +77,7 @@ import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodP
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
@@ -209,27 +210,30 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     }
 
     // documentation
-    INlsProject docsNlsProject = getPage().getScoutBundle().getDocsNlsProject();
-    if (docsNlsProject != null) {
-      IType iTypeWithClassId = TypeUtility.getType(IRuntimeClasses.ITypeWithClassId);
-      if (TypeUtility.exists(iTypeWithClassId)) {
-        if (TypeUtility.getSuperTypeHierarchy(getPage().getType()).contains(iTypeWithClassId)) {
-          // documentation is supported
-          final ISection docSection = createSection(SECTION_ID_DOCUMENTATION, Texts.get("Documentation"));
-          docSection.setExpanded(wasSectionExpanded(SECTION_ID_DOCUMENTATION, false));
-          if (docSection.isExpanded()) {
-            createDocumentationSectionContent(docSection);
-          }
-          else {
-            docSection.addExpansionListener(new ExpansionAdapter() {
-              @Override
-              public void expansionStateChanging(ExpansionEvent e) {
-                if (e.getState()) {
-                  createDocumentationSectionContent(docSection);
-                  docSection.removeExpansionListener(this);
+    IScoutBundle bundle = getPage().getScoutBundle();
+    if (bundle != null) {
+      INlsProject docsNlsProject = bundle.getDocsNlsProject();
+      if (docsNlsProject != null) {
+        IType iTypeWithClassId = TypeUtility.getType(IRuntimeClasses.ITypeWithClassId);
+        if (TypeUtility.exists(iTypeWithClassId) && TypeUtility.exists(getPage().getType())) {
+          if (TypeUtility.getSuperTypeHierarchy(getPage().getType()).contains(iTypeWithClassId)) {
+            // documentation is supported
+            final ISection docSection = createSection(SECTION_ID_DOCUMENTATION, Texts.get("Documentation"));
+            docSection.setExpanded(wasSectionExpanded(SECTION_ID_DOCUMENTATION, false));
+            if (docSection.isExpanded()) {
+              createDocumentationSectionContent(docSection);
+            }
+            else {
+              docSection.addExpansionListener(new ExpansionAdapter() {
+                @Override
+                public void expansionStateChanging(ExpansionEvent e) {
+                  if (e.getState()) {
+                    createDocumentationSectionContent(docSection);
+                    docSection.removeExpansionListener(this);
+                  }
                 }
-              }
-            });
+              });
+            }
           }
         }
       }

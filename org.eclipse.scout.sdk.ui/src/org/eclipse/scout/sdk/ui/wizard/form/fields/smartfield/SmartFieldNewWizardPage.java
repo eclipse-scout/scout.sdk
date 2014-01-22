@@ -16,12 +16,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.SmartFieldNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
@@ -35,8 +34,12 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -51,10 +54,6 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>DefaultFormFieldNewWizardPage</h3> ...
  */
 public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
-  final IType iSmartField = TypeUtility.getType(RuntimeClasses.ISmartField);
-  final IType iLookupCall = TypeUtility.getType(RuntimeClasses.LookupCall);
-  final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
-
   private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;
@@ -73,22 +72,26 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   // process members
   private final IType m_declaringType;
+  private final String m_title;
+  private final String m_desc;
   private IType m_createdField;
 
-  public SmartFieldNewWizardPage(IType declaringType) {
+  public SmartFieldNewWizardPage(IType declaringType, String title, String desc, IType superType) {
     super(SmartFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
     // default
-    setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.ISmartField, m_declaringType.getJavaProject()));
+    setSuperType(superType);
     m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
     m_sibling = SiblingProposal.SIBLING_END;
     m_codeTypeDefinesGenericType = false;
+    m_title = title;
+    m_desc = desc;
   }
 
   @Override
   protected void createContent(Composite parent) {
-    setTitle(Texts.get("NewSmartField"));
-    setDescription(Texts.get("CreateANewSmartField"));
+    setTitle(m_title);
+    setDescription(m_desc);
 
     m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
@@ -122,6 +125,30 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    final AbstractJavaElementContentProvider codeTypeContentProvider = new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        IType iCodeType = TypeUtility.getType(IRuntimeClasses.ICodeType);
+
+        ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
+        ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(m_declaringType.getJavaProject()), TypeFilters.getClassFilter(),
+            TypeFilters.getTypeParamSubTypeFilter(getGenericSignature(), IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
+        IType[] classes = typeHierarchy.getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator());
+        return new Object[][]{classes};
+      }
+    };
+    final AbstractJavaElementContentProvider lookupCallContentProvider = new AbstractJavaElementContentProvider() {
+      @Override
+      protected Object[][] computeProposals() {
+        IType iLookupCall = TypeUtility.getType(IRuntimeClasses.ILookupCall);
+        ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupCall);
+        ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(m_declaringType.getJavaProject()),
+            TypeFilters.getTypeParamSubTypeFilter(getGenericSignature(), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
+        IType[] classes = typeHierarchy.getAllSubtypes(iLookupCall, filter, TypeComparators.getTypeNameComparator());
+        return new Object[][]{classes};
+      }
+    };
+
     m_genericTypeField = getFieldToolkit().createSignatureProposalField(parent, Texts.get("GenericType"), ScoutTypeUtility.getScoutBundle(m_declaringType), SignatureProposalProvider.DEFAULT_MOST_USED);
     m_genericTypeField.acceptProposal(getGenericSignature());
     m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
@@ -129,16 +156,13 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_genericSignature = (String) event.proposal;
+        codeTypeContentProvider.invalidateCache();
+        lookupCallContentProvider.invalidateCache();
         pingStateChanging();
       }
     });
 
-    m_codeTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("CodeType"), new AbstractJavaElementContentProvider() {
-      @Override
-      protected Object[][] computeProposals() {
-        return new Object[][]{ScoutTypeUtility.getClassesOnClasspath(iCodeType, m_declaringType.getJavaProject())};
-      }
-    });
+    m_codeTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("CodeType"), codeTypeContentProvider);
     m_codeTypeField.acceptProposal(getCodeType());
     m_codeTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -147,21 +171,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
           m_codeType = (IType) event.proposal;
           m_lookupCallField.acceptProposal(null);
           m_lookupCallField.setEnabled(m_codeType == null);
-          m_codeTypeDefinesGenericType = false;
-          if (TypeUtility.exists(m_codeType)) {
-            String s;
-            try {
-              s = ScoutTypeUtility.computeFormFieldGenericType(m_codeType, TypeUtility.getSuperTypeHierarchy(m_codeType));
-              if (s != null) {
-                m_codeTypeDefinesGenericType = true;
-                m_genericSignature = s;
-                m_genericTypeField.acceptProposal(getGenericSignature());
-              }
-            }
-            catch (CoreException e) {
-              ScoutSdkUi.logError("failed to get generic type of code type '" + m_codeType.getElementName() + "'.", e);
-            }
-          }
+          readGenericType(m_codeType, getCodeTypeGenericTypeSignature());
         }
         finally {
           setStateChanging(false);
@@ -170,12 +180,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
-    m_lookupCallField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("LookupCall"), new AbstractJavaElementContentProvider() {
-      @Override
-      protected Object[][] computeProposals() {
-        return new Object[][]{ScoutTypeUtility.getClassesOnClasspath(iLookupCall, m_declaringType.getJavaProject())};
-      }
-    });
+    m_lookupCallField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("LookupCall"), lookupCallContentProvider);
     m_lookupCallField.acceptProposal(getLookupCall());
     m_lookupCallField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -185,6 +190,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
           m_lookupCall = (IType) event.proposal;
           m_codeTypeField.acceptProposal(null);
           m_codeTypeField.setEnabled(m_lookupCall == null);
+          readGenericType(m_lookupCall, getLookupCallGenericTypeSignature());
         }
         finally {
           setStateChanging(false);
@@ -212,6 +218,40 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     m_codeTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_lookupCallField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_siblingField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+  }
+
+  private String getCodeTypeGenericTypeSignature() {
+    try {
+      return ScoutTypeUtility.getCodeIdGenericTypeSignature(m_codeType);
+    }
+    catch (CoreException e) {
+      ScoutSdkUi.logError("Could not compute generic type of code type '" + m_codeType.getFullyQualifiedName() + "'.", e);
+      return null;
+    }
+  }
+
+  private String getLookupCallGenericTypeSignature() {
+    if (m_lookupCall == null) {
+      return null;
+    }
+    try {
+      return ScoutTypeUtility.computeFormFieldGenericType(m_lookupCall, TypeUtility.getSuperTypeHierarchy(m_lookupCall));
+    }
+    catch (CoreException e) {
+      ScoutSdkUi.logError("Could not compute generic type of lookup call '" + m_lookupCall.getFullyQualifiedName() + "'.", e);
+      return null;
+    }
+  }
+
+  private void readGenericType(IType genericDefiningType, String signature) {
+    m_codeTypeDefinesGenericType = false;
+    if (TypeUtility.exists(genericDefiningType)) {
+      if (signature != null) {
+        m_codeTypeDefinesGenericType = true;
+        m_genericSignature = signature;
+        m_genericTypeField.acceptProposal(getGenericSignature());
+      }
+    }
   }
 
   @Override
@@ -249,30 +289,61 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void validatePage(MultiStatus multiStatus) {
-    try {
-      multiStatus.add(getStatusNameField());
-      multiStatus.add(getStatusGenericType());
-      if (isControlCreated()) {
-        m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()) && !m_codeTypeDefinesGenericType);
+    multiStatus.add(getStatusNameField());
+    multiStatus.add(getStatusGenericType());
+    multiStatus.add(getStatusGenericTypeToLookupCall());
+    multiStatus.add(getStatusGenericTypeToCodeType());
+    if (isControlCreated()) {
+      m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()) && !m_codeTypeDefinesGenericType);
+    }
+  }
+
+  protected IType getGenericType(IType t, String genericDefiningType, String paramName) {
+    if (TypeUtility.exists(t)) {
+      try {
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, t.newSupertypeHierarchy(null), genericDefiningType, paramName);
+        if (typeParamSig != null) {
+          return TypeUtility.getTypeBySignature(typeParamSig);
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError(e);
       }
     }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError("could not validate name field.", e);
-    }
+    return null;
   }
 
-  protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_FORM_FIELD);
-    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
-      return javaFieldNameStatus;
+  protected IStatus getStatusGenericTypeToLookupCall() {
+    if (getLookupCall() != null) {
+      IType lookupCallKeyType = getGenericType(getLookupCall(), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
+      if (TypeUtility.exists(lookupCallKeyType)) {
+        IType generic = TypeUtility.getTypeBySignature(getGenericSignature());
+        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(lookupCallKeyType)) {
+          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("LookupCallDoesNotMatchGeneric"));
+        }
+      }
     }
-    if (ScoutTypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getRegexSimpleNameFilter(getTypeName())).length > 0) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-    }
-    return javaFieldNameStatus;
+    return Status.OK_STATUS;
   }
 
-  protected IStatus getStatusGenericType() throws JavaModelException {
+  protected IStatus getStatusGenericTypeToCodeType() {
+    if (getCodeType() != null) {
+      IType codeTypeKeyType = getGenericType(getCodeType(), IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID);
+      if (TypeUtility.exists(codeTypeKeyType)) {
+        IType generic = TypeUtility.getTypeBySignature(getGenericSignature());
+        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(codeTypeKeyType)) {
+          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("CodeTypeDoesNotMatchGeneric"));
+        }
+      }
+    }
+    return Status.OK_STATUS;
+  }
+
+  protected IStatus getStatusNameField() {
+    return ScoutUtility.validateFormFieldName(getTypeName(), SdkProperties.SUFFIX_FORM_FIELD, m_declaringType);
+  }
+
+  protected IStatus getStatusGenericType() {
     if (TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));

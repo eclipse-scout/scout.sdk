@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
@@ -77,7 +77,7 @@ public class NodePageChildPageTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+    IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
 
     if (m_iPageTypeHierarchy == null) {
       m_iPageTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);

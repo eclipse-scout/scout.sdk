@@ -18,6 +18,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -54,7 +55,7 @@ import org.eclipse.swt.widgets.Group;
  * @since 1.0.8 03.08.2009
  */
 public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
-  private final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
+  private final IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
 
   public static final String PROP_NLS_NAME = "nlsName";
   public static final String PROP_TYPE_NAME = "typeName";
@@ -79,7 +80,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     super(FormNewWizardPage.class.getName());
     m_clientBundle = clientBundle;
     if (clientBundle != null) {
-      m_abstractForm = RuntimeClasses.getSuperType(RuntimeClasses.IForm, ScoutUtility.getJavaProject(m_clientBundle));
+      m_abstractForm = RuntimeClasses.getSuperType(IRuntimeClasses.IForm, ScoutUtility.getJavaProject(m_clientBundle));
       setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_FORMS));
     }
 
@@ -274,11 +275,11 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_FORM);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_FORM);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getClientBundle(), getTargetPackage(IDefaultTargetPackage.CLIENT_FORMS), getTypeName());
+    IStatus existingStatus = ScoutUtility.validateTypeNotExisting(getClientBundle(), getTargetPackage(IDefaultTargetPackage.CLIENT_FORMS), getTypeName());
     if (!existingStatus.isOK()) {
       return existingStatus;
     }

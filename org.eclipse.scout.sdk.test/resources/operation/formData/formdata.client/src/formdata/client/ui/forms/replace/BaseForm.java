@@ -110,7 +110,7 @@ public class BaseForm extends AbstractForm {
       @Order(20.0)
       public class SmartField extends AbstractSmartField<Long> {
         @Override
-        protected Class<? extends ICodeType<?>> getConfiguredCodeType() {
+        protected Class<? extends ICodeType<?, Long>> getConfiguredCodeType() {
           return TestingCodeType.class;
         }
       }

@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -54,7 +55,7 @@ public class SmartFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    String superTypeName = RuntimeClasses.getSuperTypeName(RuntimeClasses.ISmartField, getDeclaringType().getJavaProject());
+    String superTypeName = RuntimeClasses.getSuperTypeName(IRuntimeClasses.ISmartField, getDeclaringType().getJavaProject());
     setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeName + "<" + Long.class.getName() + ">"));
   }
 
@@ -78,14 +79,16 @@ public class SmartFieldNewOperation implements IOperation {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.setSibling(getSibling());
+
     // getConfiguredLabel method
     if (getNlsEntry() != null) {
       IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
       nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
-    // getConfiguredCodeType method
+
     if (getCodeType() != null) {
+      // code type
       IMethodSourceBuilder getConfiguredCodeTypeBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), "getConfiguredCodeType");
       getConfiguredCodeTypeBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
@@ -98,6 +101,7 @@ public class SmartFieldNewOperation implements IOperation {
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredCodeTypeBuilder), getConfiguredCodeTypeBuilder);
     }
     else if (getLookupCall() != null) {
+      // lookup call
       IMethodSourceBuilder getConfiguredLookupCallBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), "getConfiguredLookupCall");
       getConfiguredLookupCallBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
@@ -109,39 +113,11 @@ public class SmartFieldNewOperation implements IOperation {
       });
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredLookupCallBuilder), getConfiguredLookupCallBuilder);
     }
+
     newOp.setFormatSource(isFormatSource());
     newOp.validate();
     newOp.run(monitor, workingCopyManager);
     m_createdField = newOp.getCreatedType();
-
-//    if (getCodeType() != null) {
-//      MethodOverrideOperation codetypeOp = new MethodOverrideOperation("getConfiguredCodeType", m_createdField);
-//      codetypeOp.setGenericWildcardReplacement(SignatureCache.createTypeSignature("?"));
-//      codetypeOp.setMethodBody(new IMethodBodyBuilder() {
-//        @Override
-//        public void createBody(IMethodNewOperation operation, StringBuilder sourceBuilder, String lineDelimiter, IImportValidator validator) throws CoreException {
-//          sourceBuilder.append("return ");
-//          sourceBuilder.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getCodeType().getFullyQualifiedName()), validator));
-//          sourceBuilder.append(".class;");
-//        }
-//      });
-//      codetypeOp.validate();
-//      codetypeOp.run(monitor, workingCopyManager);
-//
-//    }
-//    else if (getLookupCall() != null) {
-//      MethodOverrideOperation lookupCallOp = new MethodOverrideOperation("getConfiguredLookupCall", m_createdField);
-//      lookupCallOp.setMethodBody(new IMethodBodyBuilder() {
-//        @Override
-//        public void createBody(IMethodNewOperation operation, StringBuilder sourceBuilder, String lineDelimiter, IImportValidator validator) throws CoreException {
-//          String lookupCallRef = validator.getTypeName(SignatureCache.createTypeSignature(getLookupCall().getFullyQualifiedName()));
-//          sourceBuilder.append("return ").append(lookupCallRef).append(".class;");
-//        }
-//      });
-//      lookupCallOp.validate();
-//      lookupCallOp.run(monitor, workingCopyManager);
-//    }
-
   }
 
   public IType getCreatedField() {
@@ -203,5 +179,4 @@ public class SmartFieldNewOperation implements IOperation {
   public void setSibling(IJavaElement sibling) {
     m_sibling = sibling;
   }
-
 }

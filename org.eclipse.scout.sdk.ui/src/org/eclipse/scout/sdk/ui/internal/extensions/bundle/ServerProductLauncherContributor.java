@@ -13,8 +13,8 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
 public class ServerProductLauncherContributor implements IProductLauncherContributor {
 
-  public final static String JETTY_PORT_CONFIG_KEY = "org.eclipse.equinox.http.jetty.http.port";
-  public final static String JETTY_PATH_CONFIG_KEY = "org.eclipse.equinox.http.jetty.context.path";
+  public static final String JETTY_PORT_CONFIG_KEY = "org.eclipse.equinox.http.jetty.http.port";
+  public static final String JETTY_PATH_CONFIG_KEY = "org.eclipse.equinox.http.jetty.context.path";
 
   private JettyProductUrlOpenLink m_startPageLink;
   private JettyProductUrlOpenLink m_processServletLink;

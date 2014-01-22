@@ -104,12 +104,12 @@ public final class SdkProperties {
 
   public static String getMethodPresenterName(IMethod method) {
     String name = method.getElementName();
-    Matcher m = Regex.REGEX_PROPERTY_METHOD_TRIM.matcher(name);
+    Matcher m = IRegEx.PROPERTY_METHOD_TRIM.matcher(name);
     if (m.find()) {
       name = m.group(1);
     }
     name = REGEX_METHOD_PRESENTER_NAME.matcher(name).replaceAll(" $1").trim();
-    name = Character.toUpperCase(name.charAt(0)) + name.substring(1);
+    name = NamingUtility.ensureStartWithUpperCase(name);
     return name;
   }
 }

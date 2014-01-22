@@ -18,10 +18,10 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 public class ContextMenuContributorExtensionPoint {
 
-  private final static Object contextMenuExtensionsCacheLock = new Object();
+  private static final Object contextMenuExtensionsCacheLock = new Object();
   private static List<IScoutHandler> contextMenuExtensions;
 
-  private final static Object contextMenuContributorExtensionsCacheLock = new Object();
+  private static final Object contextMenuContributorExtensionsCacheLock = new Object();
   private static MenuContributionInfo[] contextMenuContributorExtensions;
   private static Map<IScoutHandler.Category, ArrayList<IScoutHandler>> contextMenuByCat;
 

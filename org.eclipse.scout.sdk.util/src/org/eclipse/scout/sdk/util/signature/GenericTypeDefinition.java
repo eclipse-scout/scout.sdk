@@ -18,7 +18,7 @@ package org.eclipse.scout.sdk.util.signature;
  */
 public class GenericTypeDefinition {
 
-  public GenericTypeDefinition(String fullyQuallifiedName, String superTypeSignature, String[] interfaceSignatures) {
+  public GenericTypeDefinition(String fullyQualifiedName, String superTypeSignature, String[] interfaceSignatures) {
 
   }
 

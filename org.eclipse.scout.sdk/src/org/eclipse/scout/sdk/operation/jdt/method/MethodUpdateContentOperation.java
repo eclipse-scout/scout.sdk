@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
@@ -26,7 +27,6 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.util.jdt.SourceRange;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -100,8 +100,7 @@ public class MethodUpdateContentOperation implements IOperation {
           ISourceRange methodSourceRange = getMethod().getSourceRange();
           int offset = methodSourceRange.getOffset();
           int length = methodSourceRange.getLength() + divLength;
-          SourceFormatOperation sourceFormatOp = new SourceFormatOperation(getMethod().getJavaProject(), doc,
-              new SourceRange(offset, length));
+          SourceFormatOperation sourceFormatOp = new SourceFormatOperation(getMethod().getJavaProject(), doc, new SourceRange(offset, length));
           sourceFormatOp.run(monitor, workingCopyManager);
         }
         icu.getBuffer().setContents(ScoutUtility.cleanLineSeparator(doc.get(), doc));

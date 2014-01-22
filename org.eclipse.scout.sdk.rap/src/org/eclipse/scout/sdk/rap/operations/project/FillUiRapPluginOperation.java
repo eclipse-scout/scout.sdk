@@ -34,13 +34,13 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
   public static final String ECLIPSE_EMF_ECORE_FEATURE = "org.eclipse.emf.ecore.feature.group";
   public static final String ECLIPSE_EMF_COMMON_FEATURE = "org.eclipse.emf.common.feature.group";
 
-  public final static String PROP_TARGET_STRATEGY = "propTargetStrategy";
-  public final static String PROP_EXTRACT_TARGET_FOLDER = "propExtractTargetFolder";
-  public final static String PROP_LOCAL_TARGET_FOLDER = "propLocalTargetFolder";
-  public final static String PROP_TARGET_FILE = "propTargetFile";
-  public final static String PROP_DOWNLOAD_ECLIPSE_PLATFORM = "propDownloadEclipsePlatform";
+  public static final String PROP_TARGET_STRATEGY = "propTargetStrategy";
+  public static final String PROP_EXTRACT_TARGET_FOLDER = "propExtractTargetFolder";
+  public static final String PROP_LOCAL_TARGET_FOLDER = "propLocalTargetFolder";
+  public static final String PROP_TARGET_FILE = "propTargetFile";
+  public static final String PROP_DOWNLOAD_ECLIPSE_PLATFORM = "propDownloadEclipsePlatform";
 
-  private final static String RAP_TARGET_VARIABLE = "${" + RapTargetVariable.RAP_TARGET_KEY + "}";
+  private static final String RAP_TARGET_VARIABLE = "${" + RapTargetVariable.RAP_TARGET_KEY + "}";
 
   private IProject m_project;
 

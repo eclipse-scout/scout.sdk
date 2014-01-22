@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.PageLinkAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
@@ -74,7 +74,7 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
     }
     IMethod createChildPagesMethod = TypeUtility.getMethod(getOutlineType(), NodePageChildPageTablePage.EXEC_CREATE_CHILD_PAGES);
     if (TypeUtility.exists(createChildPagesMethod)) {
-      IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+      IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
       PageNodePageHelper.createRepresentationFor(this, ScoutTypeUtility.getNewTypeOccurencesInMethod(createChildPagesMethod), TypeUtility.getPrimaryTypeHierarchy(iPage));
     }
   }

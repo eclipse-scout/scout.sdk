@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
@@ -77,7 +78,7 @@ public class MobileDesktopExtensionInstallOperation extends AbstractScoutProject
     PrimaryTypeNewOperation desktopExtensionOp = new PrimaryTypeNewOperation(desktopExtensionName, pck, mobileClient.getJavaProject());
     desktopExtensionOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     desktopExtensionOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
-    desktopExtensionOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IDesktopExtension, mobileClient));
+    desktopExtensionOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IDesktopExtension, mobileClient));
     desktopExtensionOp.setFlags(Flags.AccPublic);
     // fields
     final String homeFormFieldName = "m_homeForm";
@@ -148,7 +149,7 @@ public class MobileDesktopExtensionInstallOperation extends AbstractScoutProject
     properties.put("active", "true");
     properties.put("class", desktopExtension.getFullyQualifiedName());
     PluginModelHelper pmh = new PluginModelHelper(mobileClient.getSymbolicName());
-    pmh.PluginXml.addSimpleExtension(RuntimeClasses.EXTENSION_POINT_DESKTOP_EXTENSIONS, RuntimeClasses.EXTENSION_ELEMENT_DESKTOP_EXTENSION, properties);
+    pmh.PluginXml.addSimpleExtension(IRuntimeClasses.EXTENSION_POINT_DESKTOP_EXTENSIONS, IRuntimeClasses.EXTENSION_ELEMENT_DESKTOP_EXTENSION, properties);
     pmh.save();
   }
 }

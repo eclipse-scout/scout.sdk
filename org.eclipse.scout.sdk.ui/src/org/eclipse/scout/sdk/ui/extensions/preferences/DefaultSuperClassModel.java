@@ -29,8 +29,8 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * @since 3.8.0 24.11.2012
  */
 public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel> {
-  private final static Pattern INTERFACE_REGEX = Pattern.compile(".*(\\.I|.Abstract)([^\\.]*)$");
-  private final static Pattern SPLIT_REGEX = Pattern.compile("([A-Z])");
+  private static final Pattern INTERFACE_REGEX = Pattern.compile(".*(\\.I|.Abstract)([^\\.]*)$");
+  private static final Pattern SPLIT_REGEX = Pattern.compile("([A-Z])");
 
   final String interfaceFqn;
   final String defaultVal;

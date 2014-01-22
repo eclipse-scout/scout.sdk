@@ -20,7 +20,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -122,6 +122,8 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
 
       // compare
       if (!isSourceEquals(oldSource, newSource)) {
+        oldSource = null;
+
         // write source
         P_FormDataStoreOperation storeOp = new P_FormDataStoreOperation(getModelType(), derivedType.getCompilationUnit(), newSource);
         if (monitor.isCanceled()) {
@@ -186,7 +188,7 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
 
           PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(simpleName, packageName, sharedBundle.getJavaProject());
           formDataOp.setFlags(Flags.AccPublic);
-          formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
+          formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormData));
           formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
           OperationJob job = new OperationJob(formDataOp);
           job.schedule();

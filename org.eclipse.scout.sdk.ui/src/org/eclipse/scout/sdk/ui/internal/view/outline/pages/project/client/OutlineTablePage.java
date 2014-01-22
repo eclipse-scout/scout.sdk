@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformOutlinesOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
@@ -66,7 +66,7 @@ public class OutlineTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
+    IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
 
     if (m_outlineHierarchy == null) {
       m_outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);

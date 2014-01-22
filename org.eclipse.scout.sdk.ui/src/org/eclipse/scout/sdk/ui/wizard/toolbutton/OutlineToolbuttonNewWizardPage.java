@@ -20,7 +20,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.OutlineToolbuttonNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
@@ -49,9 +49,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  final IType iToolButton = TypeUtility.getType(RuntimeClasses.IToolButton);
-  final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
-
   private IType m_outline;
   private String m_typeName;
   private SiblingProposal m_sibling;
@@ -78,6 +75,7 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
     m_outlineField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("Outline"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
+        IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
         return new Object[][]{ScoutTypeUtility.getClassesOnClasspath(iOutline, m_declaringType.getJavaProject())};
       }
     });
@@ -109,7 +107,7 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
       }
     });
 
-    m_siblingField = getFieldToolkit().createSiblingProposalField(parent, m_declaringType, TypeUtility.getType(RuntimeClasses.IToolButton));
+    m_siblingField = getFieldToolkit().createSiblingProposalField(parent, m_declaringType, TypeUtility.getType(IRuntimeClasses.IToolButton));
     m_siblingField.acceptProposal(m_sibling);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -163,7 +161,7 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_TOOL);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_TOOL);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }

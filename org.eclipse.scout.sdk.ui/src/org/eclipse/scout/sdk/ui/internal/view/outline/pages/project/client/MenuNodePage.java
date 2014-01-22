@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.MenuNewAction;
@@ -59,7 +59,7 @@ public class MenuNodePage extends AbstractScoutTypePage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
+    IType iMenuType = TypeUtility.getType(IRuntimeClasses.IMenu);
 
     if (m_menuChangedListener == null) {
       m_menuChangedListener = new InnerTypePageDirtyListener(this, iMenuType);

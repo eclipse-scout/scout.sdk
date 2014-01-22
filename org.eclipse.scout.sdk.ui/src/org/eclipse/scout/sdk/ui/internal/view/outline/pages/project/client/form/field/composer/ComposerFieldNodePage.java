@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.attribute.AttributeTablePage;
@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
 
-  protected IType abstractComposerField_tree = TypeUtility.getType(RuntimeClasses.AbstractComposerField_Tree);
+  protected IType abstractComposerField_tree = TypeUtility.getType(IRuntimeClasses.AbstractComposerField_Tree);
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public ComposerFieldNodePage() {

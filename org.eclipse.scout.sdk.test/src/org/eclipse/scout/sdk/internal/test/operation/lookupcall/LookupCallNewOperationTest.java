@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.internal.test.operation.lookupcall;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.test.AbstractSdkTestWithSampleProject;
 import org.eclipse.scout.sdk.operation.lookupcall.LocalLookupCallNewOperation;
@@ -52,7 +53,8 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
     newOp.setServiceInterfaceProject(getSharedJavaProject());
     newOp.setServiceProxyRegistrationProject(getClientJavaProject());
     newOp.addServiceRegistration(new ServiceRegistrationDescription(getServerJavaProject()));
-    newOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.server.services.lookup.AbstractLookupService"));
+    newOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.server.services.lookup.AbstractLookupService<java.lang.Object>"));
+    newOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ILookupCall, getSharedJavaProject()) + "<java.lang.Object>");
 
     executeBuildAssertNoCompileErrors(newOp);
 
@@ -70,7 +72,8 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
     newOp.setServiceInterfaceProject(getSharedJavaProject());
     newOp.setServiceProxyRegistrationProject(getClientJavaProject());
     newOp.addServiceRegistration(new ServiceRegistrationDescription(getServerJavaProject()));
-    newOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.server.services.lookup.AbstractSqlLookupService"));
+    newOp.setServiceSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.server.services.lookup.AbstractSqlLookupService<java.lang.Object>"));
+    newOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ILookupCall, getSharedJavaProject()) + "<java.lang.Object>");
 
     executeBuildAssertNoCompileErrors(newOp);
 
@@ -96,7 +99,7 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
 
     SdkAssert.assertEquals("method count of 'CountryLookupCall'", 1, countryLookupCall.getMethods().length);
     IMethod execCreateLookupRows = SdkAssert.assertMethodExist(countryLookupCall, "execCreateLookupRows", new String[]{});
-    SdkAssert.assertMethodReturnTypeSignature(execCreateLookupRows, "QList<QLookupRow;>;");
+    SdkAssert.assertMethodReturnTypeSignature(execCreateLookupRows, "QList<+QILookupRow<QObject;>;>;");
     SdkAssert.assertAnnotation(execCreateLookupRows, "java.lang.Override");
 
     SdkAssert.assertEquals("inner types count of 'CountryLookupCall'", 0, countryLookupCall.getTypes().length);
@@ -119,7 +122,7 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
 
     SdkAssert.assertEquals("method count of 'Test01LookupCall'", 1, test01LookupCall.getMethods().length);
     IMethod getConfiguredService = SdkAssert.assertMethodExist(test01LookupCall, "getConfiguredService", new String[]{});
-    SdkAssert.assertMethodReturnTypeSignature(getConfiguredService, "QClass<+QILookupService;>;");
+    SdkAssert.assertMethodReturnTypeSignature(getConfiguredService, "QClass<+QILookupService<QObject;>;>;");
     SdkAssert.assertAnnotation(getConfiguredService, "java.lang.Override");
 
     SdkAssert.assertEquals("inner types count of 'Test01LookupCall'", 0, test01LookupCall.getTypes().length);
@@ -132,24 +135,24 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
     // type Test01LookupService
     IType test01LookupService = SdkAssert.assertTypeExists("sample.server.lookupcall.output.Test01LookupService");
     SdkAssert.assertHasFlags(test01LookupService, 1);
-    SdkAssert.assertHasSuperTypeSignature(test01LookupService, "QAbstractLookupService;");
+    SdkAssert.assertHasSuperTypeSignature(test01LookupService, "QAbstractLookupService<QObject;>;");
     SdkAssert.assertHasSuperIntefaceSignatures(test01LookupService, new String[]{"QITest01LookupService;"});
 
     // fields of Test01LookupService
     SdkAssert.assertEquals("field count of 'Test01LookupService'", 0, test01LookupService.getFields().length);
 
     SdkAssert.assertEquals("method count of 'Test01LookupService'", 4, test01LookupService.getMethods().length);
-    IMethod getDataByAll = SdkAssert.assertMethodExist(test01LookupService, "getDataByAll", new String[]{"QLookupCall;"});
-    SdkAssert.assertMethodReturnTypeSignature(getDataByAll, "[QLookupRow;");
+    IMethod getDataByAll = SdkAssert.assertMethodExist(test01LookupService, "getDataByAll", new String[]{"QILookupCall<QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(getDataByAll, "QList<+QILookupRow<QObject;>;>;");
     SdkAssert.assertAnnotation(getDataByAll, "java.lang.Override");
-    IMethod getDataByKey = SdkAssert.assertMethodExist(test01LookupService, "getDataByKey", new String[]{"QLookupCall;"});
-    SdkAssert.assertMethodReturnTypeSignature(getDataByKey, "[QLookupRow;");
+    IMethod getDataByKey = SdkAssert.assertMethodExist(test01LookupService, "getDataByKey", new String[]{"QILookupCall<QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(getDataByKey, "QList<+QILookupRow<QObject;>;>;");
     SdkAssert.assertAnnotation(getDataByKey, "java.lang.Override");
-    IMethod getDataByRec = SdkAssert.assertMethodExist(test01LookupService, "getDataByRec", new String[]{"QLookupCall;"});
-    SdkAssert.assertMethodReturnTypeSignature(getDataByRec, "[QLookupRow;");
+    IMethod getDataByRec = SdkAssert.assertMethodExist(test01LookupService, "getDataByRec", new String[]{"QILookupCall<QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(getDataByRec, "QList<+QILookupRow<QObject;>;>;");
     SdkAssert.assertAnnotation(getDataByRec, "java.lang.Override");
-    IMethod getDataByText = SdkAssert.assertMethodExist(test01LookupService, "getDataByText", new String[]{"QLookupCall;"});
-    SdkAssert.assertMethodReturnTypeSignature(getDataByText, "[QLookupRow;");
+    IMethod getDataByText = SdkAssert.assertMethodExist(test01LookupService, "getDataByText", new String[]{"QILookupCall<QObject;>;"});
+    SdkAssert.assertMethodReturnTypeSignature(getDataByText, "QList<+QILookupRow<QObject;>;>;");
     SdkAssert.assertAnnotation(getDataByText, "java.lang.Override");
 
     SdkAssert.assertEquals("inner types count of 'Test01LookupService'", 0, test01LookupService.getTypes().length);
@@ -162,7 +165,7 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
     // type ITest01LookupService
     IType iTest01LookupService = SdkAssert.assertTypeExists("sample.shared.lookupcall.output.ITest01LookupService");
     SdkAssert.assertHasFlags(iTest01LookupService, 513);
-    SdkAssert.assertHasSuperIntefaceSignatures(iTest01LookupService, new String[]{"QILookupService;"});
+    SdkAssert.assertHasSuperIntefaceSignatures(iTest01LookupService, new String[]{"QILookupService<QObject;>;"});
 
     // fields of ITest01LookupService
     SdkAssert.assertEquals("field count of 'ITest01LookupService'", 0, iTest01LookupService.getFields().length);
@@ -189,7 +192,7 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
 
     SdkAssert.assertEquals("method count of 'Test02LookupCall'", 1, test02LookupCall.getMethods().length);
     IMethod getConfiguredService = SdkAssert.assertMethodExist(test02LookupCall, "getConfiguredService", new String[]{});
-    SdkAssert.assertMethodReturnTypeSignature(getConfiguredService, "QClass<+QILookupService;>;");
+    SdkAssert.assertMethodReturnTypeSignature(getConfiguredService, "QClass<+QILookupService<QObject;>;>;");
     SdkAssert.assertAnnotation(getConfiguredService, "java.lang.Override");
 
     SdkAssert.assertEquals("inner types count of 'Test02LookupCall'", 0, test02LookupCall.getTypes().length);
@@ -202,7 +205,7 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
     // type Test02LookupService
     IType test02LookupService = SdkAssert.assertTypeExists("sample.server.lookupcall.output.Test02LookupService");
     SdkAssert.assertHasFlags(test02LookupService, 1);
-    SdkAssert.assertHasSuperTypeSignature(test02LookupService, "QAbstractSqlLookupService;");
+    SdkAssert.assertHasSuperTypeSignature(test02LookupService, "QAbstractSqlLookupService<QObject;>;");
     SdkAssert.assertHasSuperIntefaceSignatures(test02LookupService, new String[]{"QITest02LookupService;"});
 
     // fields of Test02LookupService
@@ -223,7 +226,7 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
     // type ITest02LookupService
     IType iTest02LookupService = SdkAssert.assertTypeExists("sample.shared.lookupcall.output.ITest02LookupService");
     SdkAssert.assertHasFlags(iTest02LookupService, 513);
-    SdkAssert.assertHasSuperIntefaceSignatures(iTest02LookupService, new String[]{"QILookupService;"});
+    SdkAssert.assertHasSuperIntefaceSignatures(iTest02LookupService, new String[]{"QILookupService<QObject;>;"});
 
     // fields of ITest02LookupService
     SdkAssert.assertEquals("field count of 'ITest02LookupService'", 0, iTest02LookupService.getFields().length);
@@ -232,5 +235,4 @@ public class LookupCallNewOperationTest extends AbstractSdkTestWithSampleProject
 
     SdkAssert.assertEquals("inner types count of 'ITest02LookupService'", 0, iTest02LookupService.getTypes().length);
   }
-
 }

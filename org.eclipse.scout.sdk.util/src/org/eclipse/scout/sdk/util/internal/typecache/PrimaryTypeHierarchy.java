@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
  */
 public final class PrimaryTypeHierarchy extends CachedTypeHierarchy implements IPrimaryTypeTypeHierarchy {
 
-  private final static ITypeFilter PRIMARY_TYPE_FILTER = new P_PrimaryTypeFilter();
+  private static final ITypeFilter PRIMARY_TYPE_FILTER = new P_PrimaryTypeFilter();
 
   /**
    * @param type
@@ -222,7 +222,7 @@ public final class PrimaryTypeHierarchy extends CachedTypeHierarchy implements I
     }
   }
 
-  private final static class P_PrimaryTypeFilter implements ITypeFilter {
+  private static final class P_PrimaryTypeFilter implements ITypeFilter {
     @Override
     public boolean accept(IType type) {
       return type.getDeclaringType() == null;

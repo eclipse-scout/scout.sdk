@@ -36,7 +36,7 @@ import org.osgi.framework.Version;
 public class RapScoutBundleExtension implements INewScoutBundleHandler {
   private boolean m_rapUiSelected;
 
-  public final static String ID = "org.eclipse.scout.sdk.ui.UiRapBundle";
+  public static final String ID = "org.eclipse.scout.sdk.ui.UiRapBundle";
 
   public RapScoutBundleExtension() {
     m_rapUiSelected = true;/* by default all nodes are checked */

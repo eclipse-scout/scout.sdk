@@ -3,7 +3,6 @@
   <extension point="org.eclipse.scout.service.services">
     <service class="org.eclipse.scout.rt.server.services.common.bookmark.FileSystemBookmarkStorageService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="test.server.ServerSession"/>
     <service class="org.eclipse.scout.rt.server.services.common.workflow.WorkflowProviderService" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory" session="test.server.ServerSession"/>
-    <service class="test.server.services.process.CompanyProcessService" session="test.server.ServerSession" factory="org.eclipse.scout.rt.server.services.ServerServiceFactory"/>
   </extension>
   <extension point="org.eclipse.equinox.http.registry.servlets">
     <servlet alias="/process" class="org.eclipse.scout.rt.server.ServiceTunnelServlet">
@@ -20,7 +19,7 @@
     </servlet>
   </extension>
   <extension point="org.eclipse.scout.http.servletfilter.filters">
-    <filter aliases="/" class="org.eclipse.scout.rt.server.servlet.filter.BasicSecurityFilter" ranking="20">
+    <filter aliases="/" class="org.eclipse.scout.http.servletfilter.security.BasicSecurityFilter" ranking="20">
       <init-param name="realm" value="BSIAG Development"/>
       <init-param name="users" value="admin=manager,allen=allen,blake=blake"/>
     </filter>

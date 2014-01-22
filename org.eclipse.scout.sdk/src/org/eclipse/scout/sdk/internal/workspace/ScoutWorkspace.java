@@ -37,17 +37,19 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 @SuppressWarnings("restriction")
 public final class ScoutWorkspace implements IScoutWorkspace {
 
-  final static String BUNDLE_GRAPH_REBUILD_JOB_FAMILY = "rebuildScoutBundleGraphJobFamily";
-  private final static ScoutWorkspace INSTANCE = new ScoutWorkspace();
+  static final String BUNDLE_GRAPH_REBUILD_JOB_FAMILY = "rebuildScoutBundleGraphJobFamily";
+  private static final ScoutWorkspace INSTANCE = new ScoutWorkspace();
 
-  private final EventListenerList m_eventListeners;
+  private EventListenerList m_eventListeners;
   private final ScoutBundleGraph m_bundleGraph;
   private final P_PluginModelListener m_pluginModelListener;
+  private final Object m_lock;
 
   private ScoutWorkspace() {
     m_eventListeners = new EventListenerList();
     m_bundleGraph = new ScoutBundleGraph();
     m_pluginModelListener = new P_PluginModelListener();
+    m_lock = new Object();
 
     // bundle graph rebuild listener
     PDECore pdeCore = PDECore.getDefault();
@@ -68,44 +70,49 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   }
 
   public void dispose() {
-    PDECore pdeCore = PDECore.getDefault();
-    if (m_pluginModelListener != null && pdeCore != null) {
-      pdeCore.getModelManager().removePluginModelListener(m_pluginModelListener);
-      pdeCore.getModelManager().removeStateDeltaListener(m_pluginModelListener);
-    }
+    synchronized (m_lock) {
+      PDECore pdeCore = PDECore.getDefault();
+      if (m_pluginModelListener != null && pdeCore != null) {
+        pdeCore.getModelManager().removePluginModelListener(m_pluginModelListener);
+        pdeCore.getModelManager().removeStateDeltaListener(m_pluginModelListener);
+      }
 
-    Job.getJobManager().cancel(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
-    P_BundleGraphRebuildShutdownJob job = new P_BundleGraphRebuildShutdownJob();
-    job.schedule();
-    try {
-      job.join(3000);
-    }
-    catch (InterruptedException e) {
-    }
-    if (job.getResult() == null) {
-      // the job is still waiting for the shutdown -> enforce it
-      Job[] jobs = Job.getJobManager().find(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
-      if (jobs != null && jobs.length > 0) {
-        for (Job j : jobs) {
-          if (j != null) {
-            Thread t = j.getThread();
-            if (t != null) {
-              t.interrupt();
-              try {
-                j.join();
-              }
-              catch (InterruptedException e) {
+      Job.getJobManager().cancel(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
+      P_BundleGraphRebuildShutdownJob job = new P_BundleGraphRebuildShutdownJob();
+      job.schedule();
+      try {
+        job.join(3000);
+      }
+      catch (InterruptedException e) {
+      }
+      if (job.getResult() == null) {
+        // the job is still waiting for the shutdown -> enforce it
+        Job[] jobs = Job.getJobManager().find(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
+        if (jobs != null && jobs.length > 0) {
+          for (Job j : jobs) {
+            if (j != null) {
+              Thread t = j.getThread();
+              if (t != null) {
+                t.interrupt();
+                try {
+                  j.join();
+                }
+                catch (InterruptedException e) {
+                }
               }
             }
           }
         }
+
+        try {
+          job.join(3000);
+        }
+        catch (InterruptedException e1) {
+        }
       }
 
-      try {
-        job.join(3000);
-      }
-      catch (InterruptedException e1) {
-      }
+      m_bundleGraph.dispose();
+      m_eventListeners = new EventListenerList(); // loose all old listeners
     }
   }
 
@@ -115,12 +122,16 @@ public final class ScoutWorkspace implements IScoutWorkspace {
 
   @Override
   public void addWorkspaceListener(IScoutWorkspaceListener listener) {
-    m_eventListeners.add(IScoutWorkspaceListener.class, listener);
+    synchronized (m_lock) {
+      m_eventListeners.add(IScoutWorkspaceListener.class, listener);
+    }
   }
 
   @Override
   public void removeWorkspaceListener(IScoutWorkspaceListener listener) {
-    m_eventListeners.remove(IScoutWorkspaceListener.class, listener);
+    synchronized (m_lock) {
+      m_eventListeners.remove(IScoutWorkspaceListener.class, listener);
+    }
   }
 
   @Override
@@ -181,7 +192,11 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   }
 
   private void fireWorkspaceEvent(ScoutWorkspaceEvent e) {
-    for (IScoutWorkspaceListener l : m_eventListeners.getListeners(IScoutWorkspaceListener.class)) {
+    IScoutWorkspaceListener[] listeners = null;
+    synchronized (m_lock) {
+      listeners = m_eventListeners.getListeners(IScoutWorkspaceListener.class);
+    }
+    for (IScoutWorkspaceListener l : listeners) {
       try {
         l.workspaceChanged(e);
       }
@@ -191,7 +206,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     }
   }
 
-  private final static class P_BundleGraphRebuildShutdownJob extends JobEx {
+  private static final class P_BundleGraphRebuildShutdownJob extends JobEx {
 
     private P_BundleGraphRebuildShutdownJob() {
       super("wait for bundle graph job to shutdown");

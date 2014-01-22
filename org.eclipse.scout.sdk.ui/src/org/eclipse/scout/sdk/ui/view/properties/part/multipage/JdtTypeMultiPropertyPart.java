@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.multi.AbstractMultiMethodPresenter;
-import org.eclipse.scout.sdk.util.jdt.ElementChangedListenerEx;
+import org.eclipse.scout.sdk.util.jdt.AbstractElementChangedListener;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyTypeSet;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
@@ -244,22 +244,22 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
     }
   }
 
-  private class P_MethodChangedListener2 extends ElementChangedListenerEx {
+  private class P_MethodChangedListener2 extends AbstractElementChangedListener {
     @Override
     protected boolean visit(int kind, int flags, IJavaElement e, CompilationUnit ast) {
       if (e != null && e.getElementType() == IJavaElement.METHOD) {
         handleMethodChanged((IMethod) e);
-        return true;
+        return false;
       }
       return super.visit(kind, flags, e, ast);
     }
   } // end class P_MethodChangedListener2
 
-  private class P_DelayedUpdateJob extends Job {
-    private Object m_delayedUpdateLock = new Object();
-    private ConfigurationMethodSet m_methodSet;
-    private AbstractMultiMethodPresenter m_presenter;
+  private static final class P_DelayedUpdateJob extends Job {
+    private final Object m_delayedUpdateLock = new Object();
     private final Display m_display;
+    private AbstractMultiMethodPresenter m_presenter;
+    private ConfigurationMethodSet m_methodSet;
 
     /**
      * @param name

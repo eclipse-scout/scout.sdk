@@ -6,7 +6,7 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider;
 import org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceNewAction;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 public class TextServiceTablePage extends AbstractPage {
 
-  private final IType abstractDynamicNlsTextProviderService = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
   private ICachedTypeHierarchy m_serviceHierarchy;
 
   public TextServiceTablePage() {
@@ -62,6 +61,7 @@ public class TextServiceTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_serviceHierarchy == null) {
+      IType abstractDynamicNlsTextProviderService = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }

@@ -6,7 +6,7 @@ import org.osgi.framework.BundleContext;
 
 public class SdkUtilActivator extends Plugin {
 
-  public final static String PLUGIN_ID = "org.eclipse.scout.sdk.util";
+  public static final String PLUGIN_ID = "org.eclipse.scout.sdk.util";
 
   private static SdkUtilActivator plugin;
   private static SdkLogManager logManager;

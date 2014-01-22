@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.method.ScoutMethodDeleteOperation;
 import org.eclipse.scout.sdk.ui.fields.tooltip.CustomTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
@@ -232,7 +232,7 @@ public class MethodErrorPresenterContent extends Composite {
   }
 
   private static String removeLeadingCommentAndAnnotationLines(String methodBody) {
-    Matcher matcherMethodDefinition = Regex.REGEX_METHOD_DEFINITION.matcher(methodBody);
+    Matcher matcherMethodDefinition = IRegEx.METHOD_DEFINITION.matcher(methodBody);
     if (matcherMethodDefinition.find()) {
       methodBody = methodBody.substring(matcherMethodDefinition.start());
     }

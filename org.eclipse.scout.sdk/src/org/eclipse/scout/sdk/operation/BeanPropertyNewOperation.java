@@ -23,6 +23,7 @@ import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -65,7 +66,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
   public BeanPropertyNewOperation(IType parentType, String beanName, String beanSignature, int methodFlags) {
     m_declaringType = parentType;
     m_beanSignature = beanSignature;
-    m_beanName = Character.toLowerCase(beanName.charAt(0)) + beanName.substring(1);
+    m_beanName = NamingUtility.ensureStartWithLowerCase(beanName);
     m_methodFlags = methodFlags;
     m_createGetterMethod = true;
     m_createSetterMethod = true;
@@ -98,7 +99,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
     // field
     String memberName;
     if (m_correctSpelling) {
-      memberName = getBeanName(false);
+      memberName = NamingUtility.ensureStartWithLowerCase(getBeanName());
     }
     else {
       memberName = getBeanName();
@@ -124,7 +125,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
         //    if (beanTypeString.equals("boolean")) {
         prefix = "is";
       }
-      String getterName = prefix + getBeanName(true);
+      String getterName = prefix + NamingUtility.ensureStartWithUpperCase(getBeanName());
 
       MethodNewOperation getterOp = new MethodNewOperation(getterName, getDeclaringType(), false);
       getterOp.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return " + memberName + ";"));
@@ -142,11 +143,11 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
 
     if (isCreateSetterMethod()) {
       // setter
-      String setterName = "set" + getBeanName(true);
+      String setterName = "set" + NamingUtility.ensureStartWithUpperCase(getBeanName());
 
       String parameterName = null;
       if (m_correctSpelling) {
-        parameterName = getBeanName(false);
+        parameterName = NamingUtility.ensureStartWithLowerCase(getBeanName());
       }
       else {
         parameterName = getBeanName();
@@ -174,17 +175,6 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
       setterOp.run(monitor, workingCopyManager);
     }
 
-  }
-
-  @Override
-  public String getBeanName(boolean startWithUpperCase) {
-    if (StringUtility.isNullOrEmpty(getBeanName())) {
-      return null;
-    }
-    if (startWithUpperCase) {
-      return Character.toUpperCase(getBeanName().charAt(0)) + getBeanName().substring(1);
-    }
-    return Character.toLowerCase(getBeanName().charAt(0)) + getBeanName().substring(1);
   }
 
   @Override

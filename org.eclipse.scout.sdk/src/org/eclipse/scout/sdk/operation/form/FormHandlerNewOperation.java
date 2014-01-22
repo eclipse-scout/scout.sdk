@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodOverrideOperation;
@@ -25,6 +26,7 @@ import org.eclipse.scout.sdk.operation.jdt.type.InnerTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
@@ -53,7 +55,7 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
     // defaults
     setFlags(Flags.AccPublic);
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
-    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getDeclaringType().getJavaProject()));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IFormHandler, getDeclaringType().getJavaProject()));
   }
 
   @Override
@@ -73,7 +75,7 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
     // find form
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formHandler.getCompilationUnit());
     IType form = TypeUtility.getAncestor(formHandler, TypeFilters.getMultiTypeFilterOr(
-        TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
+        TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
         TypeFilters.getTopLevelTypeFilter()));
 
     String handlerName = getElementName();
@@ -81,7 +83,7 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
     if (TypeUtility.exists(form) && handlerName != null && handlerName.length() > 1) {
       String startMethodName = handlerName.replaceFirst(SdkProperties.SUFFIX_FORM_HANDLER + "\\b", "");
       if (startMethodName.length() > 1) {
-        startMethodName = Character.toUpperCase(startMethodName.charAt(0)) + startMethodName.substring(1);
+        startMethodName = NamingUtility.ensureStartWithUpperCase(startMethodName);
         startMethodName = "start" + startMethodName;
       }
 
@@ -115,7 +117,7 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
         startMethodOp.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
         startMethodOp.setSibling(sibling);
         startMethodOp.setReturnTypeSignature(Signature.SIG_VOID);
-        startMethodOp.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+        startMethodOp.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
         startMethodOp.setMethodBodySourceBuilder(bodyBuilder);
         startMethodOp.setSibling(sibling);
         startMethodOp.validate();

@@ -15,7 +15,7 @@ import java.security.InvalidParameterException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -82,13 +82,13 @@ public class ServiceRegistrationDescription {
       throw new InvalidParameterException("could not find a scout bundle for service registration.");
     }
     if (IScoutBundle.TYPE_CLIENT.equals(b.getType())) {
-      return RuntimeClasses.ClientServiceFactory;
+      return IRuntimeClasses.ClientServiceFactory;
     }
     else if (IScoutBundle.TYPE_SERVER.equals(b.getType())) {
-      return RuntimeClasses.ServerServiceFactory;
+      return IRuntimeClasses.ServerServiceFactory;
     }
     else if (IScoutBundle.TYPE_SHARED.equals(b.getType())) {
-      return RuntimeClasses.DefaultServiceFactory;
+      return IRuntimeClasses.DefaultServiceFactory;
     }
     else {
       throw new UnsupportedOperationException("scout project type '" + b.getType() + "' is not supported yet.");

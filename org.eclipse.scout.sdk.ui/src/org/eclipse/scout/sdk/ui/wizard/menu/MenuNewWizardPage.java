@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.MenuNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -62,8 +63,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
   private static final String PROP_FORM_TO_OPEN = "formToOpen";
   private static final String PROP_FORM_HANDLER = "formHandler";
 
-  private final IType iMenuType = TypeUtility.getType(RuntimeClasses.IMenu);
-  private final IType iFormType = TypeUtility.getType(RuntimeClasses.IForm);
+  private final IType iMenuType = TypeUtility.getType(IRuntimeClasses.IMenu);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -86,7 +86,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewMenu"));
     setDescription(Texts.get("CreateANewMenu"));
     m_declaringType = declaringType;
-    m_abstractMenuType = RuntimeClasses.getSuperType(RuntimeClasses.IMenu, m_declaringType.getJavaProject());
+    m_abstractMenuType = RuntimeClasses.getSuperType(IRuntimeClasses.IMenu, m_declaringType.getJavaProject());
     m_superType = m_abstractMenuType;
     setSiblingInternal(SiblingProposal.SIBLING_END);
 
@@ -166,6 +166,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
     m_formToOpenField = getFieldToolkit().createJavaElementProposalField(groupBox, Texts.get("FormToStart"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
+        IType iFormType = TypeUtility.getType(IRuntimeClasses.IForm);
         ITypeHierarchy cachedFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormType);
         ITypeFilter formsFilter = TypeFilters.getMultiTypeFilter(
             TypeFilters.getTypesOnClasspath(getDeclaringType().getJavaProject()),
@@ -265,7 +266,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_MENU);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_MENU);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }

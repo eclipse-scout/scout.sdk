@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformServerBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -62,7 +62,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
     super.loadChildrenImpl();
 
     if (m_serverSessionHierarchy == null) {
-      IType iServerSession = TypeUtility.getType(RuntimeClasses.IServerSession);
+      IType iServerSession = TypeUtility.getType(IRuntimeClasses.IServerSession);
       m_serverSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iServerSession);
       m_serverSessionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
@@ -102,7 +102,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
   }
 
   protected IType[] resolveServices() {
-    IType iService = TypeUtility.getType(RuntimeClasses.IService);
+    IType iService = TypeUtility.getType(IRuntimeClasses.IService);
     IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     IType[] services = serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
     return services;

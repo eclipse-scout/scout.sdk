@@ -19,9 +19,9 @@ import org.eclipse.swt.widgets.Composite;
 
 public class ExportServerWizardPage extends AbstractExportProductWizardPage {
 
-  private final static Pattern SERVER_URL_PATTERN = Pattern.compile("\\/([^\\/]*)\\/process");
-  private final static String SETTINGS_PRODUCT_FILE = "productFileSetting";
-  private final static String SETTINGS_WAR_FILE_NAME = "warFileNameSetting";
+  private static final Pattern SERVER_URL_PATTERN = Pattern.compile("\\/([^\\/]*)\\/process");
+  private static final String SETTINGS_PRODUCT_FILE = "productFileSetting";
+  private static final String SETTINGS_WAR_FILE_NAME = "warFileNameSetting";
 
   public ExportServerWizardPage(IScoutBundle scoutProject) {
     super(scoutProject, ExportServerWizardPage.class.getName(), Texts.get("ExportWebArchive"), IRuntimeClasses.ScoutServerBundleId,

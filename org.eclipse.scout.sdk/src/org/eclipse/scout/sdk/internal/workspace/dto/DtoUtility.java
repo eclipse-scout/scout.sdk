@@ -28,7 +28,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.formdata.CompositeFormDataTypeSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.formdata.TableFieldBeanFormDataSourceBuilder;
@@ -76,10 +76,10 @@ public final class DtoUtility {
       String formDataTypeSignature = formDataAnnotation.getFormDataTypeSignature();
       String formDataTypeName = Signature.getSignatureSimpleName(formDataTypeSignature);
       ITypeSourceBuilder formDataSourceBuilder = null;
-      if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableFieldData))) {
+      if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableFieldData))) {
         formDataSourceBuilder = new TableFieldFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation, monitor);
       }
-      else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(RuntimeClasses.AbstractTableFieldBeanData))) {
+      else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.AbstractTableFieldBeanData))) {
         // fill table bean
         formDataSourceBuilder = new TableFieldBeanFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation, monitor);
       }
@@ -115,7 +115,7 @@ public final class DtoUtility {
       if (hierarchy == null) {
         hierarchy = TypeUtility.getLocalTypeHierarchy(tableOwner);
       }
-      IType[] tables = TypeUtility.getInnerTypes(tableOwner, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.ITable), hierarchy), null);
+      IType[] tables = TypeUtility.getInnerTypes(tableOwner, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITable), hierarchy), null);
       if (tables.length > 0) {
         if (tables.length > 1) {
           ScoutSdk.logWarning("table field '" + tableOwner.getFullyQualifiedName() + "' contains more than one table! Taking first for dto creation.");
@@ -151,7 +151,7 @@ public final class DtoUtility {
   }
 
   public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy, IProgressMonitor monitor) throws JavaModelException {
-    IType validationRuleType = TypeUtility.getType(RuntimeClasses.ValidationRule);
+    IType validationRuleType = TypeUtility.getType(IRuntimeClasses.ValidationRule);
     TreeMap<String, ValidationRuleMethod> ruleMap = new TreeMap<String, ValidationRuleMethod>();
     if (superTypeHierarchy == null) {
       try {
@@ -193,7 +193,7 @@ public final class DtoUtility {
         if (visitedMethodNames.contains(annotatedMethod.getElementName())) {
           continue;
         }
-        IAnnotation validationRuleAnnotation = JdtUtility.getAnnotation(annotatedMethod, RuntimeClasses.ValidationRule);
+        IAnnotation validationRuleAnnotation = JdtUtility.getAnnotation(annotatedMethod, IRuntimeClasses.ValidationRule);
         if (!TypeUtility.exists(validationRuleAnnotation)) {
           continue;
         }

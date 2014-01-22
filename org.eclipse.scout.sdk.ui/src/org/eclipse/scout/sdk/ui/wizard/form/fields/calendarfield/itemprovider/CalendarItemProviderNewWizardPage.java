@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.calendar.CalendarItemProviderNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -47,7 +48,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iCalendarItemProvider = TypeUtility.getType(RuntimeClasses.ICalendarItemProvider);
+  private final IType iCalendarItemProvider = TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider);
 
   private String m_typeName;
   private IType m_defaultCalendarItemProvider;
@@ -67,7 +68,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
     setTitle(Texts.get("NewCalendarItemProvider"));
     setDescription(Texts.get("CreateANewCalendarItemProvider"));
     m_declaringType = declaringType;
-    m_defaultCalendarItemProvider = RuntimeClasses.getSuperType(RuntimeClasses.ICalendarItemProvider, m_declaringType.getJavaProject());
+    m_defaultCalendarItemProvider = RuntimeClasses.getSuperType(IRuntimeClasses.ICalendarItemProvider, m_declaringType.getJavaProject());
     m_superType = m_defaultCalendarItemProvider;
     m_sibling = SiblingProposal.SIBLING_END;
   }
@@ -149,14 +150,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_CALENDAR_ITEM_PROVIDER);
-    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
-      return javaFieldNameStatus;
-    }
-    if (TypeUtility.exists(m_declaringType.getType(getTypeName()))) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-    }
-    return javaFieldNameStatus;
+    return ScoutUtility.validateFormFieldName(getTypeName(), SdkProperties.SUFFIX_CALENDAR_ITEM_PROVIDER, m_declaringType);
   }
 
   protected IStatus getStatusSuperType() throws JavaModelException {

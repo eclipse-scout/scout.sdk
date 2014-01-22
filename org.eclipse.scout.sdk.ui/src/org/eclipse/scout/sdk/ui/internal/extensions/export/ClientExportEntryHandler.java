@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class ClientExportEntryHandler implements IExportScoutProjectEntryHandler {
 
-  public final static String ID = "ui.client";
+  public static final String ID = "ui.client";
 
   public ClientExportEntryHandler() {
   }

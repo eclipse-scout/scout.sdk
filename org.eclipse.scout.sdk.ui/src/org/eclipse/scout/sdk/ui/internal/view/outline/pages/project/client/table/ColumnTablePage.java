@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.tabl
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
 import org.eclipse.scout.sdk.ui.action.create.TableColumnNewAction;
@@ -63,7 +63,7 @@ public class ColumnTablePage extends AbstractPage {
   @Override
   public void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
-      IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
+      IType iColumn = TypeUtility.getType(IRuntimeClasses.IColumn);
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iColumn);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getColumnDeclaringType(), m_innerTypeListener);
     }

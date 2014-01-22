@@ -45,7 +45,7 @@ import org.junit.Test;
 /**
  * <h3>{@link MethodNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 08.03.2013
  */
 public class MethodNewOperationTest extends AbstractSdkTestWithJdtTestProject {
@@ -199,8 +199,7 @@ public class MethodNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     Assert.assertTrue(TypeUtility.exists(createdMethod));
     Assert.assertTrue(TypeUtility.exists(TypeUtility.getMethod(declaringType, methodName)));
     Assert.assertEquals(methodToOverride.getFlags(), createdMethod.getFlags());
-    Assert.assertEquals("QClass<+QICodeType<*>;>;", createdMethod.getReturnType());
-
+    Assert.assertEquals("QClass<+QICodeType<*QLong;>;>;", createdMethod.getReturnType());
   }
 
   @Test

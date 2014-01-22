@@ -12,8 +12,8 @@ import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 
 public class DeployableProductFileNodeFilter implements ITreeNodeFilter {
 
-  public final static String BUNDLE_ID_HTTP_REGISTRY = "org.eclipse.equinox.http.registry";
-  public final static String BUNDLE_ID_HTTP_SERVLETBRIDGE = "org.eclipse.equinox.http.servletbridge";
+  public static final String BUNDLE_ID_HTTP_REGISTRY = "org.eclipse.equinox.http.registry";
+  public static final String BUNDLE_ID_HTTP_SERVLETBRIDGE = "org.eclipse.equinox.http.servletbridge";
 
   private final String m_bundleSymbolicNameFilter;
 

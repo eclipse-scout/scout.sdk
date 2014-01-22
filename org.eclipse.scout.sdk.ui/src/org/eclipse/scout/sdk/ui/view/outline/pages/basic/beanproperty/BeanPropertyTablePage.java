@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.BeanPropertyNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -95,7 +95,7 @@ public class BeanPropertyTablePage extends AbstractPage {
   private class P_MethodChangedListener implements IJavaResourceChangedListener {
     @Override
     public void handleEvent(JdtEvent event) {
-      if (JdtUtility.hasAnnotation((IAnnotatable) event.getElement(), RuntimeClasses.FormData)) {
+      if (JdtUtility.hasAnnotation((IAnnotatable) event.getElement(), IRuntimeClasses.FormData)) {
         markStructureDirty();
       }
     }

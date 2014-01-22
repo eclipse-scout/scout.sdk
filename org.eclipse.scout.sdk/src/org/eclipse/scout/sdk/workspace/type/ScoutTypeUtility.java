@@ -48,7 +48,7 @@ import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.ast.visitor.MethodBodyAstVisitor;
@@ -75,9 +75,9 @@ public class ScoutTypeUtility extends TypeUtility {
 
   private static final Pattern PATTERN = Pattern.compile("[^\\.]*$");
   private static final Pattern RETURN_TRUE_PATTERN = Pattern.compile("return\\s*true", Pattern.MULTILINE);
-  private final static Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
-  private final static Pattern SUFF_REGEX = Pattern.compile("(^.*)\\;$");
-  private final static Pattern SUFF_CLASS_REGEX = Pattern.compile("\\.class$");
+  private static final Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
+  private static final Pattern SUFF_REGEX = Pattern.compile("(^.*)\\;$");
+  private static final Pattern SUFF_CLASS_REGEX = Pattern.compile("\\.class$");
 
   private ScoutTypeUtility() {
   }
@@ -151,7 +151,7 @@ public class ScoutTypeUtility extends TypeUtility {
         String src = method.getSource();
         if (src != null) {
           src = ScoutUtility.removeComments(src);
-          Matcher matcher = Regex.REGEX_METHOD_NEW_TYPE_OCCURRENCES.matcher(src);
+          Matcher matcher = IRegEx.METHOD_NEW_TYPE_OCCURRENCES.matcher(src);
           while (matcher.find()) {
             try {
               String resolvedSignature = SignatureUtility.getResolvedSignature(org.eclipse.jdt.core.Signature.createTypeSignature(matcher.group(1), false), method.getDeclaringType());
@@ -701,6 +701,39 @@ public class ScoutTypeUtility extends TypeUtility {
     return ret.toArray(new IType[ret.size()]);
   }
 
+  public static String getCodeIdGenericTypeSignature(IType codeType) throws CoreException {
+    if (!TypeUtility.exists(codeType)) {
+      return null;
+    }
+    return getCodeIdGenericTypeSignature(codeType, codeType.newSupertypeHierarchy(null));
+  }
+
+  /**
+   * Gets the signature of the generic describing the data type of nested code types.
+   * 
+   * @param codeType
+   *          The code type whose generic attribute should be parsed
+   * @param superTypeHierarchy
+   * @return the signature of the 'CODE_ID' generic parameter of the given code type class or null.
+   * @throws CoreException
+   */
+  public static String getCodeIdGenericTypeSignature(IType codeType, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy) throws CoreException {
+    return SignatureUtility.resolveGenericParameterInSuperHierarchy(codeType, superTypeHierarchy, IRuntimeClasses.ICodeType, "CODE_ID");
+  }
+
+  public static String getCodeSignature(IType codeType, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy) throws CoreException {
+    if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.AbstractCodeTypeWithGeneric))) {
+      return SignatureUtility.resolveGenericParameterInSuperHierarchy(codeType, superTypeHierarchy, IRuntimeClasses.AbstractCodeTypeWithGeneric, "CODE");
+    }
+    else {
+      String codeIdSig = getCodeIdGenericTypeSignature(codeType, superTypeHierarchy);
+      if (codeIdSig == null) {
+        return null;
+      }
+      return SignatureCache.createTypeSignature(IRuntimeClasses.ICode + '<' + Signature.toString(codeIdSig) + '>');
+    }
+  }
+
   public static IType[] getCodes(IType declaringType) {
     return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.ICode), ScoutTypeComparators.getOrderAnnotationComparator());
   }
@@ -785,13 +818,6 @@ public class ScoutTypeUtility extends TypeUtility {
     return abstractTypes;
   }
 
-  public static IType[] getAbstractTypesOnClasspath(IType superType, IJavaProject project, IType... excludedTypes) {
-    ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(superType);
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNotInTypes(excludedTypes), TypeFilters.getAbstractOnClasspath(project));
-    IType[] abstractTypes = typeHierarchy.getAllSubtypes(superType, filter, TypeComparators.getTypeNameComparator());
-    return abstractTypes;
-  }
-
   public static IType[] getClassesOnClasspath(IType superType, IJavaProject project) {
     ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(superType);
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(
@@ -839,7 +865,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   public static IMethod getColumnGetterMethod(IType column) {
     IType table = column.getDeclaringType();
-    final String formFieldSignature = SignatureUtility.DOLLAR_REPLACEMENT_REGEX.matcher(SignatureCache.createTypeSignature(column.getFullyQualifiedName())).replaceAll(".");
+    final String formFieldSignature = IRegEx.DOLLAR_REPLACEMENT.matcher(SignatureCache.createTypeSignature(column.getFullyQualifiedName())).replaceAll(".");
 
     final String regex = "^get" + column.getElementName();
     IMethod method = TypeUtility.getFirstMethod(table, new IMethodFilter() {
@@ -1010,7 +1036,7 @@ public class ScoutTypeUtility extends TypeUtility {
           replacement = Matcher.quoteReplacement(replacement.substring(0, replacement.length() - 1));
           signature = signature.replaceAll("[T,L,Q]" + signatureMapping.get(i).getSuperTypeGenericParameterName(), replacement);
         }
-        return SignatureUtility.getResolvedSignature(signature, type);
+        return SignatureUtility.getResolvedSignature(signature, type, type);
       }
       else {
         return computeFormFieldGenericType(superType, formFieldHierarchy);

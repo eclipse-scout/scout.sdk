@@ -20,7 +20,9 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
@@ -61,7 +63,7 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
 
     // defaults
     setFlags(Flags.AccPublic);
-    setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.LookupCall));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ILookupCall, project));
     setPackageExportPolicy(ExportPolicy.AddPackage);
     setFormatSource(true);
     getCompilationUnitNewOp().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
@@ -86,7 +88,16 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
         serviceOp.setImplementationProject(getServiceImplementationProject());
         serviceOp.setImplementationPackageName(getServiceImplementationPackage());
         serviceOp.setInterfaceProject(getServiceInterfaceProject());
-        serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
+
+        StringBuilder ifcSuperInterface = new StringBuilder(IRuntimeClasses.ILookupService);
+        String[] typeParams = Signature.getTypeArguments(getServiceSuperTypeSignature());
+        if (typeParams != null && typeParams.length > 0) {
+          ifcSuperInterface.append('<');
+          ifcSuperInterface.append(Signature.toString(typeParams[0]));
+          ifcSuperInterface.append('>');
+        }
+
+        serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(ifcSuperInterface.toString()));
         serviceOp.setInterfacePackageName(getServiceInterfacePackageName());
         serviceOp.setImplementationSuperTypeSignature(getServiceSuperTypeSignature());
         serviceOp.setServiceRegistrations(getServiceRegistrations());

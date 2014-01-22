@@ -242,6 +242,10 @@ public class UiUtility {
    * @return The image descriptor.
    */
   public static ImageDescriptor getTypeImageDescriptor(IType type) {
+    return getTypeImageDescriptor(type, true);
+  }
+
+  public static ImageDescriptor getTypeImageDescriptor(IType type, boolean showSeverity) {
     int flags = -1;
     try {
       flags = type.getFlags();
@@ -251,7 +255,10 @@ public class UiUtility {
 
     boolean isInterface = Flags.isInterface(flags);
     boolean isInner = TypeUtility.exists(type.getDeclaringType());
-    int severity = ScoutSeverityManager.getInstance().getSeverityOf(type);
+    int severity = 0;
+    if (showSeverity) {
+      ScoutSeverityManager.getInstance().getSeverityOf(type);
+    }
     ImageDescriptor desc = JavaElementImageProvider.getTypeImageDescriptor(isInner, isInterface, flags, false);
 
     int adornmentFlags = 0;

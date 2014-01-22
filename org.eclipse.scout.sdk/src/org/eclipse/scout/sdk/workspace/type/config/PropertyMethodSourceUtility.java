@@ -38,20 +38,20 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public final class PropertyMethodSourceUtility {
-  private final static Pattern REGEX_REFERENCED_VALUE = Pattern.compile("\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?([A-Za-z][a-zA-Z0-9_]*)\\b");
-  private final static Pattern REGEX_NUMBER_PREFIX = Pattern.compile("^(\\+|\\-)?([A-Za-z0-9_\\.]*)$");
-  private final static Pattern REGEX_NUMBER_INFINITY = Pattern.compile("^(\\-)?(inf)$");
-  private final static Pattern REGEX_SIMPLE_DOUBLE = Pattern.compile("^[\\+\\-0-9eE\\.']*[DdfF]?$");
-  private final static Pattern REGEX_SIMPLE_INTEGER = Pattern.compile("^[\\+\\-0-9eE']*$");
-  private final static Pattern REGEX_SIMPLE_BIG_INTEGER = Pattern.compile("^(new (java\\.math\\.)?BigInteger\\(\\\")?([\\+\\-0-9]*)(\\\"\\))?$");
-  private final static Pattern REGEX_SIMPLE_BIG_DECIMAL = Pattern.compile("^(new (java\\.math\\.)?BigDecimal\\(\\\")?([\\+\\-0-9eE\\.]*)(\\\"\\))?$");
-  private final static Pattern REGEX_SIMPLE_LONG = Pattern.compile("^[\\+\\-0-9eE']*[lL]?$");
-  private final static Pattern REGEX_SIMPLE_BOOLEAN = Pattern.compile("^(false|true)$");
-  private final static Pattern REGEX_FIELD_VALUE = Pattern.compile("=\\s*(.*)\\s*\\;", Pattern.DOTALL);
-  private final static Pattern REGEX_CLASS_REFERENCE = Pattern.compile("\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?(class)\\b");
-  private final static Pattern REGEX_NULL = Pattern.compile("\\bnull\\b");
-  private final static Pattern REGEX_METHOD_RETURN_NON_NLS_TEXT = Pattern.compile("\\s*\"(.*)\"\\s*");
-  private final static Pattern REGEX_METHOD_RETURN_NLS_TEXT = Pattern.compile("[A-Za-z0-9_-]*\\.get\\(\\s*\\\"([^\\\"]*)\\\"\\s*\\)\\s*");
+  private static final Pattern REGEX_REFERENCED_VALUE = Pattern.compile("\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?([A-Za-z][a-zA-Z0-9_]*)\\b");
+  private static final Pattern REGEX_NUMBER_PREFIX = Pattern.compile("^(\\+|\\-)?([A-Za-z0-9_\\.]*)$");
+  private static final Pattern REGEX_NUMBER_INFINITY = Pattern.compile("^(\\-)?(inf)$");
+  private static final Pattern REGEX_SIMPLE_DOUBLE = Pattern.compile("^[\\+\\-0-9eE\\.']*[DdfF]?$");
+  private static final Pattern REGEX_SIMPLE_INTEGER = Pattern.compile("^[\\+\\-0-9eE']*$");
+  private static final Pattern REGEX_SIMPLE_BIG_INTEGER = Pattern.compile("^(new (java\\.math\\.)?BigInteger\\(\\\")?([\\+\\-0-9]*)(\\\"\\))?$");
+  private static final Pattern REGEX_SIMPLE_BIG_DECIMAL = Pattern.compile("^(new (java\\.math\\.)?BigDecimal\\(\\\")?([\\+\\-0-9eE\\.]*)(\\\"\\))?$");
+  private static final Pattern REGEX_SIMPLE_LONG = Pattern.compile("^[\\+\\-0-9eE']*[lL]?$");
+  private static final Pattern REGEX_SIMPLE_BOOLEAN = Pattern.compile("^(false|true)$");
+  private static final Pattern REGEX_FIELD_VALUE = Pattern.compile("=\\s*(.*)\\s*\\;", Pattern.DOTALL);
+  private static final Pattern REGEX_CLASS_REFERENCE = Pattern.compile("\\b(([A-Za-z][a-zA-Z0-9_]*\\.)*)?(class)\\b");
+  private static final Pattern REGEX_NULL = Pattern.compile("\\bnull\\b");
+  private static final Pattern REGEX_METHOD_RETURN_NON_NLS_TEXT = Pattern.compile("\\s*\"(.*)\"\\s*");
+  private static final Pattern REGEX_METHOD_RETURN_NLS_TEXT = Pattern.compile("[A-Za-z0-9_-]*\\.get\\(\\s*\\\"([^\\\"]*)\\\"\\s*\\)\\s*");
 
   private PropertyMethodSourceUtility() {
   }

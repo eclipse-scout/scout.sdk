@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
@@ -63,7 +63,7 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
 
   public ProcessServiceNewOperation(String interfaceName, String implementationName) {
     super(interfaceName, implementationName);
-    getInterfaceSourceBuilder().addInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
+    getInterfaceSourceBuilder().addInterfaceSignature(SignatureCache.createTypeSignature(IRuntimeClasses.IService));
     getInterfaceSourceBuilder().addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createValidationStrategyProcess());
   }
 
@@ -127,16 +127,16 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
     ServiceMethod createMethod = new ServiceMethod("create", interfaceFqn);
     createMethod.addParameter(new MethodParameter("formData", formDataSignature));
     createMethod.setReturnTypeSignature(formDataSignature);
-    createMethod.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    createMethod.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     createMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         IType createPermission = getCreatedCreatePermission();
         if (createPermission != null) {
-          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, validator));
+          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ACCESS, validator));
           source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(createPermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
-          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, validator)).append("(");
+          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.VetoException, validator)).append("(");
           if (nlsProject != null) {
             source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
             source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
@@ -162,16 +162,16 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
     ServiceMethod loadMethod = new ServiceMethod("load", interfaceFqn);
     loadMethod.addParameter(new MethodParameter("formData", formDataSignature));
     loadMethod.setReturnTypeSignature(formDataSignature);
-    loadMethod.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    loadMethod.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     loadMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         IType readPermission = getCreatedReadPermission();
         if (readPermission != null) {
-          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, validator));
+          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ACCESS, validator));
           source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(readPermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
-          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, validator)).append("(");
+          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.VetoException, validator)).append("(");
           if (nlsProject != null) {
             source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
             source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
@@ -197,16 +197,16 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
     ServiceMethod serviceMethod = new ServiceMethod("prepareCreate", interfaceFqn);
     serviceMethod.addParameter(new MethodParameter("formData", formDataSignature));
     serviceMethod.setReturnTypeSignature(formDataSignature);
-    serviceMethod.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    serviceMethod.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     serviceMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         IType createPermission = getCreatedCreatePermission();
         if (createPermission != null) {
-          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, validator));
+          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ACCESS, validator));
           source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(createPermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
-          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, validator)).append("(");
+          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.VetoException, validator)).append("(");
           if (nlsProject != null) {
             source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
             source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
@@ -232,16 +232,16 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
     ServiceMethod serviceMethod = new ServiceMethod("store", interfaceFqn);
     serviceMethod.addParameter(new MethodParameter("formData", formDataSignature));
     serviceMethod.setReturnTypeSignature(formDataSignature);
-    serviceMethod.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    serviceMethod.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     serviceMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         IType updatePermission = getCreatedUpdatePermission();
         if (updatePermission != null) {
-          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.ACCESS, validator));
+          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ACCESS, validator));
           source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(updatePermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
-          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(RuntimeClasses.VetoException, validator)).append("(");
+          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.VetoException, validator)).append("(");
           if (nlsProject != null) {
             source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
             source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");

@@ -11,14 +11,14 @@
 package formdata.client.ui.forms.replace;
 
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
+import org.eclipse.scout.rt.shared.services.lookup.ILookupCall;
 
 import formdata.shared.services.process.replace.TestingLookupCall;
 
 public abstract class AbstractLookupField extends AbstractSmartField<Long> {
 
   @Override
-  protected Class<? extends LookupCall> getConfiguredLookupCall() {
+  protected Class<? extends ILookupCall<Long>> getConfiguredLookupCall() {
     return TestingLookupCall.class;
   }
 }

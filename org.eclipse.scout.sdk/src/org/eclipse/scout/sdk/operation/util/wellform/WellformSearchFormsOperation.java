@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.operation.util.wellform;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
@@ -25,9 +25,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  *
  */
 public class WellformSearchFormsOperation implements IOperation {
-
-  private final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
-  private final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
 
   private final IScoutBundle m_clientBundle;
   private IType[] m_searchForms;
@@ -50,6 +47,9 @@ public class WellformSearchFormsOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
+    IType iSearchForm = TypeUtility.getType(IRuntimeClasses.ISearchForm);
+
     // find all forms
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
     m_searchForms = formHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()));

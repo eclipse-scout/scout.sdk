@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
@@ -170,7 +171,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     if (pf != null) {
       pf = pf.trim();
       if (pf.length() > 1) {
-        alias += Character.toUpperCase(pf.charAt(0)) + pf.substring(1);
+        alias += NamingUtility.ensureStartWithUpperCase(pf);
       }
     }
     m_projectAliasNameField.setText(alias);

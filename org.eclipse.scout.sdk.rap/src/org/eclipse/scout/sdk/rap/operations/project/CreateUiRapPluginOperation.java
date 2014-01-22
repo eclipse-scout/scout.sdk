@@ -27,12 +27,12 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
 
 public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperation {
-  public final static String PROP_BUNDLE_RAP_NAME = "BUNDLE_RAP_NAME";
-  public final static String PROP_PRODUCT_FILE_DEV = "RAP_PROD_FILE_DEV";
-  public final static String PROP_PRODUCT_FILE_PROD = "RAP_PROD_FILE_PROD";
+  public static final String PROP_BUNDLE_RAP_NAME = "BUNDLE_RAP_NAME";
+  public static final String PROP_PRODUCT_FILE_DEV = "RAP_PROD_FILE_DEV";
+  public static final String PROP_PRODUCT_FILE_PROD = "RAP_PROD_FILE_PROD";
 
-  public final static String BUNDLE_ID = "org.eclipse.scout.sdk.ui.UiRapBundle";
-  public final static String RAP_UI_PROJECT_NAME_SUFFIX = ".ui.rap";
+  public static final String BUNDLE_ID = "org.eclipse.scout.sdk.ui.UiRapBundle";
+  public static final String RAP_UI_PROJECT_NAME_SUFFIX = ".ui.rap";
 
   @Override
   public String getOperationName() {

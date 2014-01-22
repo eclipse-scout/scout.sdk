@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.util.NamingUtility;
  * @see IScoutBundleGraph
  */
 public final class ScoutBundleComparators {
-  private final static IScoutBundleComparator SYMBOLIC_NAME_COMPARATOR = new IScoutBundleComparator() {
+  private static final IScoutBundleComparator SYMBOLIC_NAME_COMPARATOR = new IScoutBundleComparator() {
     @Override
     public int compare(IScoutBundle o1, IScoutBundle o2) {
       return o1.getSymbolicName().compareTo(o2.getSymbolicName());

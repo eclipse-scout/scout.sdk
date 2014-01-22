@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.AttributeNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class AttributeTablePage extends AbstractPage {
 
-  protected IType iDataModelAttribute = TypeUtility.getType(RuntimeClasses.IDataModelAttribute);
+  protected IType iDataModelAttribute = TypeUtility.getType(IRuntimeClasses.IDataModelAttribute);
   private final IType m_declaringType;
 
   private InnerTypePageDirtyListener m_attributeChangedListener;

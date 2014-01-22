@@ -69,7 +69,7 @@ public class ParameterField extends Composite {
       @Override
       public void focusLost(FocusEvent e) {
         m_parameter.setType(m_parameterType.getText());
-        m_parameter.setFullyQuallifiedImports(m_parameterType.getAllImports());
+        m_parameter.setFullyQualifiedImports(m_parameterType.getAllImports());
         notifyParameterChanged();
       }
     });

@@ -85,7 +85,7 @@ public abstract class AbstractRenameAction extends AbstractScoutHandler {
   }
 
   protected IStatus getJavaNameStatus(String newName) {
-    return ScoutUtility.getJavaNameStatus(newName, getReadOnlySuffix());
+    return ScoutUtility.validateJavaName(newName, getReadOnlySuffix());
   }
 
   private class P_PropertyListener implements PropertyChangeListener {

@@ -10,19 +10,14 @@
  ******************************************************************************/
 package com.bsiag.miniapp.client.ui.forms;
 
-import java.io.File;
-import java.util.Date;
+import java.util.List;
 
-import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.dnd.FileListTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.holders.ByteArrayHolder;
-import org.eclipse.scout.commons.holders.NVPair;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -35,8 +30,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.services.common.jdbc.ILegacySqlQueryService;
-import org.eclipse.scout.service.SERVICES;
+
 import com.bsiag.miniapp.shared.services.process.AbstractDocumentTableFieldData;
 
 /**
@@ -94,49 +88,13 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
     }
 
     @Override
-    protected TransferObject execDrag(ITableRow[] rows) throws ProcessingException {
-      Long[] pkList = getDocumentNrColumn().getSelectedValues();
-      String[] pathList = getNameColumn().getSelectedValues();
-      File[] fileList = new File[pathList.length];
-      for (int i = 0; i < pathList.length; i++) {
-        if (!IOUtility.fileExists(pathList[i])) {
-          ByteArrayHolder content = new ByteArrayHolder();
-          SERVICES.getService(ILegacySqlQueryService.class).select(
-              "SELECT  C.DOCUMENT " +
-                  "FROM    ORS_DOCUMENT D, ORS_DOCUMENT_CONTENT C " +
-                  "WHERE   D.DOCUMENT_NR=:documentNr " +
-                  "AND     D.DOCUMENT_NR=C.DOCUMENT_NR(+) " +
-                  "INTO    :content"
-              , new NVPair("content", content)
-              , new NVPair("documentNr", pkList[i])
-              );
-          if (pathList[i] != null && content.getValue() != null) {
-            pathList[i] = IOUtility.createTempFile(pathList[i], content.getValue()).getAbsolutePath();
-          }
-        }
-        fileList[i] = new File(pathList[i]);
-      }
-      FileListTransferObject trf = new FileListTransferObject(fileList);
-      return trf;
+    protected TransferObject execDrag(List<ITableRow> rows) throws ProcessingException {
+      return super.execDrag(rows);
     }
 
     @Override
-    protected void execDrop(ITableRow rows, TransferObject t) throws ProcessingException {
-      if (t.isFileList()) {
-        FileListTransferObject fileTransferable = (FileListTransferObject) t;
-        for (File f : fileTransferable.getFileList()) {
-          if (f != null && f.exists() && getNameColumn().findRow(f.getAbsolutePath()) == null) {
-            ITableRow row = createRow();
-            row = addRow(row, true);
-            int rowIndex = row.getRowIndex();
-            getNameColumn().setValue(rowIndex, f.getAbsolutePath());
-            getDescriptionColumn().setValue(rowIndex, IOUtility.getFileName(f.getAbsolutePath()));
-            getRegisteredOnColumn().setValue(rowIndex, new Date());
-            getContentColumn().setValue(rowIndex, IOUtility.getContent(f.getAbsolutePath()));
-            getChangedOnColumn().setValue(rowIndex, new Date(f.lastModified()));
-          }
-        }
-      }
+    protected void execDrop(ITableRow row, TransferObject t) throws ProcessingException {
+      super.execDrop(row, t);
     }
 
     public DocumentNrColumn getDocumentNrColumn() {

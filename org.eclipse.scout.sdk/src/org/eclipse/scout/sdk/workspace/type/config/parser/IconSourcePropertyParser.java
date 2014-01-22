@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
  */
 public class IconSourcePropertyParser implements IPropertySourceParser<ScoutIconDesc> {
 
-  private final static Pattern REGEX = Pattern.compile("^.*\\.([^\\.]+)$");
+  private static final Pattern REGEX = Pattern.compile("^.*\\.([^\\.]+)$");
   private IIconProvider m_iconProvider;
 
   public IconSourcePropertyParser() {

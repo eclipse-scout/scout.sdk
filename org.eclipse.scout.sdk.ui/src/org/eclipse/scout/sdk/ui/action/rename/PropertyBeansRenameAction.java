@@ -18,10 +18,10 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.type.FieldFilters;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.MethodFilters;
@@ -51,33 +51,21 @@ public class PropertyBeansRenameAction extends AbstractRenameAction {
 
   @Override
   protected void fillTransaction(JdtRenameTransaction transaction, String newName) throws CoreException {
-    String oldNameLower = getBeanName(getOldName(), false);
-    String oldNameUpper = getBeanName(getOldName(), true);
+    String oldNameLower = NamingUtility.ensureStartWithLowerCase(getOldName());
+    String oldNameUpper = NamingUtility.ensureStartWithUpperCase(getOldName());
     for (IPropertyBean d : getPropertyBeanDescriptors()) {
       for (IMember m : d.getAllMembers()) {
         String elementName = m.getElementName();
         switch (m.getElementType()) {
           case IMember.FIELD:
-            transaction.add((IField) m, elementName.replaceAll(oldNameLower, getBeanName(newName, false)));
+            transaction.add((IField) m, elementName.replaceAll(oldNameLower, NamingUtility.ensureStartWithLowerCase(newName)));
             break;
           case IMember.METHOD:
-            transaction.add((IMethod) m, elementName.replaceAll(oldNameUpper, getBeanName(newName, true)));
+            transaction.add((IMethod) m, elementName.replaceAll(oldNameUpper, NamingUtility.ensureStartWithUpperCase(newName)));
             break;
         }
 
       }
-    }
-  }
-
-  public String getBeanName(String name, boolean startWithUpperCase) {
-    if (StringUtility.isNullOrEmpty(name) || name.length() < 2) {
-      return null;
-    }
-    if (startWithUpperCase) {
-      return Character.toUpperCase(name.charAt(0)) + name.substring(1);
-    }
-    else {
-      return Character.toLowerCase(name.charAt(0)) + name.substring(1);
     }
   }
 

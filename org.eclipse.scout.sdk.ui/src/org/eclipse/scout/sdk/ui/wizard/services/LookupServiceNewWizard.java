@@ -20,8 +20,10 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -61,7 +63,7 @@ public class LookupServiceNewWizard extends AbstractServiceWizard {
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
 
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewLookupService"), Texts.get("CreateANewLookupService"),
-        TypeUtility.getType(RuntimeClasses.ILookupService), SdkProperties.SUFFIX_LOOKUP_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_LOOKUP));
+        TypeUtility.getType(IRuntimeClasses.ILookupService), SdkProperties.SUFFIX_LOOKUP_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_LOOKUP));
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
     addPage(m_serviceNewWizardPage);
@@ -74,7 +76,7 @@ public class LookupServiceNewWizard extends AbstractServiceWizard {
     addPage(m_locationWizardPage);
 
     // init
-    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.ILookupService, serverBundle.getJavaProject()));
+    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.ILookupService, serverBundle.getJavaProject()));
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
@@ -117,8 +119,9 @@ public class LookupServiceNewWizard extends AbstractServiceWizard {
   protected boolean beforeFinish() throws CoreException {
     m_operation = new LookupServiceNewOperation(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     IType superType = m_serviceNewWizardPage.getSuperType();
+    String genericPart = "<" + Signature.toString(m_serviceNewWizardPage.getGenericTypeSignature()) + ">";
     if (superType != null) {
-      m_operation.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
+      m_operation.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName() + genericPart));
     }
     IScoutBundle implementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
     if (implementationBundle != null) {
@@ -137,8 +140,8 @@ public class LookupServiceNewWizard extends AbstractServiceWizard {
     if (interfaceBundle != null) {
       m_operation.setInterfaceProject(interfaceBundle.getJavaProject());
       m_operation.setInterfacePackageName(interfaceBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
+      m_operation.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ILookupService + genericPart));
     }
-    m_operation.addImplementationInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
     return true;
   }
 

@@ -57,7 +57,7 @@ public class TreeBoxNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITreeBox, getDeclaringType().getJavaProject()));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITreeBox, getDeclaringType().getJavaProject()));
   }
 
   @Override
@@ -81,12 +81,12 @@ public class TreeBoxNewOperation implements IOperation {
       nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
     if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractTreeBox)) {
       // create inner type calendar
       ITypeSourceBuilder treeBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_TREEBOX_TREE);
       treeBuilder.setFlags(Flags.AccPublic);
-      treeBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITree, getDeclaringType().getJavaProject()));
+      treeBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITree, getDeclaringType().getJavaProject()));
       treeBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
       newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTeeKey(treeBuilder), treeBuilder);
       // update generic in supertype signature

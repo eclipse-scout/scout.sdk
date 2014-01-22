@@ -33,17 +33,18 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeCache;
 
 public final class TypeCache implements ITypeCache {
 
-  private final static TypeCache INSTANCE = new TypeCache();
+  private static final TypeCache INSTANCE = new TypeCache();
 
   private final Object m_cacheLock;
-  private HashMap<String, ArrayList<IType>> m_cache;
-  private P_ResourceListener m_resourceChangeListener;
+  private final HashMap<String, ArrayList<IType>> m_cache;
+  private final P_ResourceListener m_resourceChangeListener;
 
   public static TypeCache getInstance() {
     return INSTANCE;
@@ -58,12 +59,8 @@ public final class TypeCache implements ITypeCache {
 
   @Override
   public void dispose() {
-    if (m_cache != null) {
-      clearCache();
-    }
     ResourcesPlugin.getWorkspace().removeResourceChangeListener(m_resourceChangeListener);
-    m_resourceChangeListener = null;
-    m_cache = null;
+    clearCache();
   }
 
   private void clearCache() {
@@ -116,12 +113,14 @@ public final class TypeCache implements ITypeCache {
   @Override
   public IType[] getTypes(String typeName, IJavaProject classpath) {
     ArrayList<IType> types = getTypesInternal(typeName);
+    if (types == null) {
+      return new IType[]{};
+    }
+
     ArrayList<IType> result = new ArrayList<IType>(types.size());
-    if (types != null) {
-      for (IType t : types) {
-        if (classpath.isOnClasspath(t)) {
-          result.add(t);
-        }
+    for (IType t : types) {
+      if (classpath.isOnClasspath(t)) {
+        result.add(t);
       }
     }
     return result.toArray(new IType[result.size()]);
@@ -174,11 +173,7 @@ public final class TypeCache implements ITypeCache {
   private ArrayList<IType> resolveType(final String fqn) throws CoreException {
     final TreeMap<CompositeLong, IType> matchList = new TreeMap<CompositeLong, IType>();
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
-    String fastPat = fqn;
-    int i = fastPat.lastIndexOf('.');
-    if (i >= 0) {
-      fastPat = fastPat.substring(i + 1);
-    }
+    String fastPat = NamingUtility.getSimpleName(fqn);
     if (!StringUtility.hasText(fastPat)) {
       return null;
     }

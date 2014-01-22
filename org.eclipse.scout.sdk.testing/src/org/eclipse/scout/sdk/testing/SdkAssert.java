@@ -521,11 +521,11 @@ public class SdkAssert extends Assert {
 
   }
 
-  public static void assertHasSuperTypeSignature(IType type, String superTypeSignature) throws JavaModelException, CoreException {
+  public static void assertHasSuperTypeSignature(IType type, String superTypeSignature) throws CoreException {
     assertHasSuperTypeSignature(null, type, superTypeSignature);
   }
 
-  public static void assertHasSuperTypeSignature(String message, IType type, String superTypeSignature) throws JavaModelException, CoreException {
+  public static void assertHasSuperTypeSignature(String message, IType type, String superTypeSignature) throws CoreException {
     String refSuperTypeSig = SignatureUtility.getResolvedSignature(type.getSuperclassTypeSignature(), type);
     superTypeSignature = SignatureUtility.getResolvedSignature(superTypeSignature, type);
     if (!CompareUtility.equals(refSuperTypeSig, superTypeSignature)) {
@@ -538,11 +538,11 @@ public class SdkAssert extends Assert {
     }
   }
 
-  public static void assertHasSuperIntefaceSignatures(IType type, String[] interfaceSignatures) throws JavaModelException, CoreException {
+  public static void assertHasSuperIntefaceSignatures(IType type, String[] interfaceSignatures) throws CoreException {
     assertHasSuperIntefaceSignatures(null, type, interfaceSignatures);
   }
 
-  public static void assertHasSuperIntefaceSignatures(String message, IType type, String[] interfaceSignatures) throws JavaModelException, CoreException {
+  public static void assertHasSuperIntefaceSignatures(String message, IType type, String[] interfaceSignatures) throws CoreException {
     String[] refInterfaceSignatures = type.getSuperInterfaceTypeSignatures();
     if (refInterfaceSignatures.length == interfaceSignatures.length) {
       // resolve

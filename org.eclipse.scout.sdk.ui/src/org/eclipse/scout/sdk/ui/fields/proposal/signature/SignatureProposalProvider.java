@@ -41,6 +41,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.MoreElementsProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 
 public class SignatureProposalProvider extends ContentProposalProvider {
@@ -74,15 +75,14 @@ public class SignatureProposalProvider extends ContentProposalProvider {
       SignatureCache.createTypeSignature(Set.class.getName()),
       SignatureCache.createTypeSignature(String.class.getName()),
       SignatureCache.createTypeSignature(TreeMap.class.getName()),
-      SignatureCache.createTypeSignature(TreeSet.class.getName()),
-      SignatureCache.createTypeSignature(java.util.Vector.class.getName())
+      SignatureCache.createTypeSignature(TreeSet.class.getName())
   };
 
   private SearchEngine m_searchEngine;
   private final boolean m_supportsGenerics;
   private String[] m_primitivSignatures;
   private final IJavaSearchScope m_searchScope;
-  private final String[] m_mostUsedSignatures;
+  private String[] m_mostUsedSignatures;
   private final ILabelProvider m_labelProvider;
   private int m_maxProposalAmount = 100; // default
 
@@ -104,6 +104,10 @@ public class SignatureProposalProvider extends ContentProposalProvider {
 
   public String[] getMostUsedSignatures() {
     return m_mostUsedSignatures;
+  }
+
+  public void setMostUsedSignatures(String[] mostUsedSignatures) {
+    m_mostUsedSignatures = mostUsedSignatures;
   }
 
   public String[] getPrimitivSignatures() {
@@ -132,7 +136,7 @@ public class SignatureProposalProvider extends ContentProposalProvider {
       searchPattern = "*";
     }
     else {
-      searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
+      searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
     }
     int counter = 0;
     ArrayList<Object> result = new ArrayList<Object>(Math.min(getMaxProposalAmount(), 100));
@@ -169,7 +173,7 @@ public class SignatureProposalProvider extends ContentProposalProvider {
     return result.toArray(new Object[result.size()]);
   }
 
-  private Collection<Object> collectTypes(String searchPattern, int maxResultSize, IProgressMonitor monitor) {
+  protected Collection<Object> collectTypes(String searchPattern, int maxResultSize, IProgressMonitor monitor) {
     P_SearchRequestor searchRequestor = new P_SearchRequestor(monitor, maxResultSize);
     // do not allow empty search
     if (searchPattern.length() == 1) {
@@ -190,10 +194,6 @@ public class SignatureProposalProvider extends ContentProposalProvider {
     catch (CoreException e) {
       if (e.getStatus().matches(IStatus.ERROR)) {
         ScoutSdkUi.logWarning(e);
-        return searchRequestor.getResult();
-      }
-      if (e.getStatus().matches(IStatus.CANCEL)) {
-        return searchRequestor.getResult();
       }
     }
     return searchRequestor.getResult();
@@ -217,7 +217,7 @@ public class SignatureProposalProvider extends ContentProposalProvider {
       }
       if (match instanceof TypeDeclarationMatch) {
         IType type = (IType) match.getElement();
-        if (!m_supportsGenerics && (type.getTypeParameters().length > 0)) {
+        if (!isSupportsGenerics() && (type.getTypeParameters().length > 0)) {
           return;
         }
         m_foundTypes.put(new CompositeObject("A", type.getElementName(), type.getFullyQualifiedName()), SignatureCache.createTypeSignature(type.getFullyQualifiedName()));

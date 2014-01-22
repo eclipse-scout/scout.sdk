@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.util.IScoutSeverityListener;
 
 public final class ScoutSeverityManager {
 
-  private final static ScoutSeverityManager instance = new ScoutSeverityManager();
+  private static final ScoutSeverityManager instance = new ScoutSeverityManager();
 
   public static ScoutSeverityManager getInstance() {
     return instance;

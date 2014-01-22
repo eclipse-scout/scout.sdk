@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -42,7 +42,7 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
    */
   public FormFieldNewOperation(String name, IType declaringType) {
     super(name, declaringType);
-    setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IFormField));
+    setOrderDefinitionType(TypeUtility.getType(IRuntimeClasses.IFormField));
     setFlags(Flags.AccPublic);
   }
 
@@ -56,7 +56,7 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
     // find form
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType().getCompilationUnit());
     IType form = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getMultiTypeFilterOr(
-        TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IForm), hierarchy),
+        TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
         TypeFilters.getTopLevelTypeFilter()));
 
     if (TypeUtility.exists(form)) {

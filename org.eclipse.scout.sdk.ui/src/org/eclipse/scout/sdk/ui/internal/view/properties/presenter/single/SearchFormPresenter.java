@@ -19,12 +19,13 @@ import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -37,9 +38,6 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>SearchFormPresenter</h3> ...
  */
 public class SearchFormPresenter extends AbstractTypeProposalPresenter {
-  final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
-  final IType iSearchForm = TypeUtility.getType(RuntimeClasses.ISearchForm);
-
   public SearchFormPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
@@ -88,7 +86,7 @@ public class SearchFormPresenter extends AbstractTypeProposalPresenter {
         searchPattern = "*";
       }
       else {
-        searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
+        searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
       }
       char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
       ArrayList<Object> collector = new ArrayList<Object>();
@@ -111,6 +109,7 @@ public class SearchFormPresenter extends AbstractTypeProposalPresenter {
       if (m_proposals == null) {
         if (getMethod() != null) {
           IScoutBundle sb = ScoutTypeUtility.getScoutBundle(getMethod().getType());
+          IType iSearchForm = TypeUtility.getType(IRuntimeClasses.ISearchForm);
           m_proposals = TypeUtility.getPrimaryTypeHierarchy(iSearchForm).getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(sb),
               TypeComparators.getTypeNameComparator());
         }

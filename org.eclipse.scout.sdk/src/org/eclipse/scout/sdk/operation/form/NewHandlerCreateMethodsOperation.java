@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.operation.form;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -66,9 +66,9 @@ public class NewHandlerCreateMethodsOperation implements IOperation {
     String TAB = SdkProperties.TAB;
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getFormHandler().getCompilationUnit());
     workingCopyManager.register(getFormHandler().getCompilationUnit(), monitor);
-    String processingExceptionClass = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException), validator);
+    String processingExceptionClass = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException), validator);
     String serviceInterfaceName = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getServiceInterface().getFullyQualifiedName()), validator);
-    String servicesName = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(RuntimeClasses.SERVICES), validator);
+    String servicesName = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.SERVICES), validator);
     String formDataName = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getFormData().getFullyQualifiedName()), validator);
     if (isCreateExecLoad()) {
       // execLoad on formhandler

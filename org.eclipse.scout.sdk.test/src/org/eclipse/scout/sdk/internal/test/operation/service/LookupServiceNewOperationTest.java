@@ -21,7 +21,7 @@ import org.junit.Test;
 /**
  * <h3>{@link LookupServiceNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class LookupServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -33,8 +33,8 @@ public class LookupServiceNewOperationTest extends AbstractSdkTestWithSampleProj
     serviceOp.setImplementationPackageName("sample.server.services.test.output");
     serviceOp.setInterfaceProject(getSharedJavaProject());
     serviceOp.setInterfacePackageName("sample.shared.services.test.output");
-    serviceOp.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractSqlLookupService));
-    serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
+    serviceOp.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractSqlLookupService + "<java.lang.Object>"));
+    serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService + "<java.lang.Object>"));
 
     executeBuildAssertNoCompileErrors(serviceOp);
     IType interfaceType = serviceOp.getCreatedServiceInterface();
@@ -53,8 +53,8 @@ public class LookupServiceNewOperationTest extends AbstractSdkTestWithSampleProj
     serviceOp.setImplementationPackageName("sample.server.services.test.output");
     serviceOp.setInterfaceProject(getSharedJavaProject());
     serviceOp.setInterfacePackageName("sample.shared.services.test.output");
-    serviceOp.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractLookupService));
-    serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService));
+    serviceOp.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractLookupService + "<java.lang.Object>"));
+    serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.ILookupService + "<java.lang.Object>"));
 
     executeBuildAssertNoCompileErrors(serviceOp);
     IType interfaceType = serviceOp.getCreatedServiceInterface();

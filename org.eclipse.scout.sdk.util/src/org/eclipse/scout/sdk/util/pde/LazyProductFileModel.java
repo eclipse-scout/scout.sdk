@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 @SuppressWarnings("restriction")
 public final class LazyProductFileModel {
 
-  private final static Pattern FRAGMENT_PATTERN = Pattern.compile("^(\\sfragment\\=\\\")([^\\\"]*)(\\\")");
+  private static final Pattern FRAGMENT_PATTERN = Pattern.compile("^(\\sfragment\\=\\\")([^\\\"]*)(\\\")");
 
   private final IFile m_productFile;
 

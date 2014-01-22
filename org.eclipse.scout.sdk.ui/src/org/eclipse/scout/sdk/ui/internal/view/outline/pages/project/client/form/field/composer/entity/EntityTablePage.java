@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.EntityNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -67,7 +67,7 @@ public class EntityTablePage extends AbstractPage {
   protected void loadChildrenImpl() {
     if (m_entityChangedListener == null) {
       @SuppressWarnings("deprecation")
-      IType iComposerEntity = TypeUtility.getType(RuntimeClasses.IComposerEntity);
+      IType iComposerEntity = TypeUtility.getType(IRuntimeClasses.IComposerEntity);
       m_entityChangedListener = new InnerTypePageDirtyListener(this, iComposerEntity);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
     }

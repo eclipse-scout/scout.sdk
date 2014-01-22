@@ -109,7 +109,7 @@ public class ServiceNewOperation implements IOperation {
     if (getInterfaceProject() != null) {
       // create interface
       List<String> interfaceSignatures = getInterfaceSourceBuilder().getInterfaceSignatures();
-      String service2Signature = SignatureCache.createTypeSignature(RuntimeClasses.IService);
+      String service2Signature = SignatureCache.createTypeSignature(IRuntimeClasses.IService);
       if (interfaceSignatures.isEmpty()) {
         interfaceSignatures.add(service2Signature);
       }
@@ -125,7 +125,7 @@ public class ServiceNewOperation implements IOperation {
       // register
       for (IJavaProject cb : getProxyRegistrationProjects()) {
         ScoutUtility.registerServiceClass(IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY,
-            getCreatedServiceInterface().getFullyQualifiedName(), new ServiceRegistrationDescription(cb, (String) null, RuntimeClasses.ClientProxyServiceFactory));
+            getCreatedServiceInterface().getFullyQualifiedName(), new ServiceRegistrationDescription(cb, (String) null, IRuntimeClasses.ClientProxyServiceFactory));
       }
     }
     if (getImplementationProject() != null) {
@@ -133,7 +133,7 @@ public class ServiceNewOperation implements IOperation {
         getImplementationSourceBuilder().addInterfaceSignature(SignatureCache.createTypeSignature(getCreatedServiceInterface().getFullyQualifiedName()));
       }
       if (StringUtility.isNullOrEmpty(getImplementationSourceBuilder().getSuperTypeSignature())) {
-        getImplementationSourceBuilder().setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, getImplementationProject()));
+        getImplementationSourceBuilder().setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IService, getImplementationProject()));
       }
       PrimaryTypeNewOperation implementationOp = new PrimaryTypeNewOperation(getImplementationSourceBuilder(), getImplementationPackageName(), getImplementationProject());
       implementationOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());

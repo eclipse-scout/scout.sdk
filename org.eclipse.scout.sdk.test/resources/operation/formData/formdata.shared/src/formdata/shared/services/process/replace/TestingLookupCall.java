@@ -12,7 +12,7 @@ package formdata.shared.services.process.replace;
 
 import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
-public class TestingLookupCall extends LookupCall {
+public class TestingLookupCall extends LookupCall<Long> {
 
   private static final long serialVersionUID = 1L;
 

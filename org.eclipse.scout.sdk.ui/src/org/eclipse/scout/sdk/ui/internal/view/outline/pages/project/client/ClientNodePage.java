@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -72,11 +72,11 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
   @Override
   public void loadChildrenImpl() {
     super.loadChildrenImpl();
-    IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
-    IType iDesktopExtension = TypeUtility.getType(RuntimeClasses.IDesktopExtension);
+    IType iDesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
+    IType iDesktopExtension = TypeUtility.getType(IRuntimeClasses.IDesktopExtension);
 
     if (m_clientSessionHierarchy == null) {
-      IType iClientSession = TypeUtility.getType(RuntimeClasses.IClientSession);
+      IType iClientSession = TypeUtility.getType(IRuntimeClasses.IClientSession);
       m_clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
       m_clientSessionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
@@ -158,7 +158,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
         @Override
         public IType[] getTypes() {
-          IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+          IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
           IPrimaryTypeTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
           return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
         }

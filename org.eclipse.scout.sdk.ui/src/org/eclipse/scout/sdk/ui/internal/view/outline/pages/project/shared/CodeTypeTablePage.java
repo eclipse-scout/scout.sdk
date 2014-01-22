@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformCodeTypesOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
@@ -63,7 +63,7 @@ public class CodeTypeTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
+    IType iCodeType = TypeUtility.getType(IRuntimeClasses.ICodeType);
 
     if (m_codeTypeHierarchy == null) {
       m_codeTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);

@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.util.jdt.ElementChangedListenerEx;
+import org.eclipse.scout.sdk.util.jdt.AbstractElementChangedListener;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.PropertyBean;
@@ -135,16 +135,15 @@ public class SharedContextPropertyTablePage extends AbstractPage {
     }
   }
 
-  private class P_MethodChangedListener extends ElementChangedListenerEx {
+  private class P_MethodChangedListener extends AbstractElementChangedListener {
     @Override
     protected boolean visit(int kind, int flags, IJavaElement e, CompilationUnit ast) {
       if (e != null && e.getElementType() == IJavaElement.METHOD) {
         IType declaringType = ((IMethod) e).getDeclaringType();
         if (declaringType.equals(m_clientSession) || declaringType.equals(m_serverSession)) {
           markStructureDirty();
-          return true;
+          return false;
         }
-        return false;
       }
       return super.visit(kind, flags, e, ast);
     }

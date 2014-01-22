@@ -18,7 +18,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -63,10 +64,21 @@ public class LocalLookupCallNewOperation extends PrimaryTypeNewOperation {
     execCreateLookupRowsBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        String refLookupRow = validator.getTypeName(SignatureCache.createTypeSignature(RuntimeClasses.LookupRow));
+        String refLookupRow = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.ILookupRow));
         String refArrayList = validator.getTypeName(SignatureCache.createTypeSignature(ArrayList.class.getName()));
+
+        String refGenericType = null;
+        String[] args = Signature.getTypeArguments(getSuperTypeSignature());
+        if (args != null && args.length > 0) {
+          refGenericType = validator.getTypeName(args[0]);
+        }
+        else {
+          refGenericType = validator.getTypeName(SignatureCache.createTypeSignature(Object.class.getName()));
+        }
+
         String refList = validator.getTypeName(SignatureCache.createTypeSignature(List.class.getName()));
-        source.append(refList).append("<").append(refLookupRow).append("> rows = new ").append(refArrayList).append("<").append(refLookupRow).append(">();").append(lineDelimiter);
+        source.append(refList).append("< ? extends ").append(refLookupRow).append('<').append(refGenericType).append('>').append("> rows = new ");
+        source.append(refArrayList).append('<').append(refLookupRow).append('<').append(refGenericType).append('>').append(">();").append(lineDelimiter);
         source.append("  ").append(ScoutUtility.getCommentBlock("create lookup rows here.")).append(lineDelimiter);
         source.append("  return rows;");
       }

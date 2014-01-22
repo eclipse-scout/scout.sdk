@@ -22,7 +22,6 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeHierarchy;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -103,7 +102,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
     }
 
-    IType superType = TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService);
+    IType superType = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
     if (superType == null) return null;
 
     IType[] serviceImpls = ScoutSdkCore.getHierarchyCache().getPrimaryTypeHierarchy(superType).getAllSubtypes(superType, new ITypeFilter() {
@@ -166,6 +165,11 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
           return Integer.valueOf(i1).compareTo(Integer.valueOf(i2));
         }
 
+        if (o1.svc.textProvider.isBinary() != o2.svc.textProvider.isBinary()) {
+          // prefer source types
+          return Boolean.valueOf(o1.svc.textProvider.isBinary()).compareTo(Boolean.valueOf(o2.svc.textProvider.isBinary()));
+        }
+
         return o1.svc.textProvider.getElementName().compareTo(o2.svc.textProvider.getElementName());
       }
     });
@@ -205,10 +209,9 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static boolean isDocsService(IType service) throws JavaModelException {
-    String docsInterfaceClassName = RuntimeClasses.IDocumentationTextProviderService.substring(RuntimeClasses.IDocumentationTextProviderService.lastIndexOf('.') + 1);
     TypeHierarchy th = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(service);
     for (IType ifs : th.getAllSuperInterfaces(service)) {
-      if (docsInterfaceClassName.equals(ifs.getElementName())) {
+      if (IRuntimeClasses.IDocumentationTextProviderService.equals(ifs.getFullyQualifiedName())) {
         return true;
       }
     }
@@ -229,7 +232,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
     // second check class annotation
     try {
-      IAnnotation a = JdtUtility.getAnnotation(registration, RuntimeClasses.Ranking);
+      IAnnotation a = JdtUtility.getAnnotation(registration, IRuntimeClasses.Ranking);
       Double val = JdtUtility.getAnnotationValueNumeric(a, "value");
       if (val != null) {
         return val.floatValue();
@@ -355,7 +358,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
       else if (args.length == 2 && args[0] instanceof IType) {
         IType t1 = (IType) args[0];
-        boolean returnDocServices = !(RuntimeClasses.TEXTS.equals(t1.getFullyQualifiedName()));
+        boolean returnDocServices = !(IRuntimeClasses.TEXTS.equals(t1.getFullyQualifiedName()));
 
         if (args[1] instanceof IScoutBundle || args[1] == null) {
           // all text services in the given project with given kind (texts or normal)

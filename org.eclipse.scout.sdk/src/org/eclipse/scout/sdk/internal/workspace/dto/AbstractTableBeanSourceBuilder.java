@@ -26,7 +26,6 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.annotations.ColumnData.SdkColumnCommand;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilder;
@@ -38,6 +37,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
@@ -61,7 +61,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
  */
 public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSourceBuilder {
 
-  protected final static int ROW_DATA_FIELD_FLAGS = Flags.AccPublic | Flags.AccFinal | Flags.AccStatic;
+  protected static final int ROW_DATA_FIELD_FLAGS = Flags.AccPublic | Flags.AccFinal | Flags.AccStatic;
 
   /**
    * @param elementName
@@ -90,7 +90,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
   protected IType[] getColumns(IType table, IType rowDataSuperType, final ITypeHierarchy fieldHierarchy, IProgressMonitor monitor) throws JavaModelException {
     // collect all columns that exist in the table and all of its super classes
     TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<IType>(ScoutTypeComparators.getOrderAnnotationComparator());
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn)), new ITypeFilter() {
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn)), new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
         SdkColumnCommand command = ScoutTypeUtility.findColumnDataSdkColumnCommand(type, fieldHierarchy);
@@ -114,7 +114,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     HashSet<String> usedColumnBeanNames = new HashSet<String>();
     IType currentRowDataSuperType = rowDataSuperType;
     ITypeHierarchy rowDataHierarchy = TypeUtility.getSuperTypeHierarchy(rowDataSuperType);
-    if (!RuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getFullyQualifiedName())) {
+    if (!IRuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getFullyQualifiedName())) {
       do {
         IField[] columnFields = TypeUtility.getFields(currentRowDataSuperType, FieldFilters.getFlagsFilter(ROW_DATA_FIELD_FLAGS));
         for (IField column : columnFields) {
@@ -128,7 +128,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
           return null;
         }
       }
-      while (TypeUtility.exists(currentRowDataSuperType) && !RuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getFullyQualifiedName()));
+      while (TypeUtility.exists(currentRowDataSuperType) && !IRuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getFullyQualifiedName()));
     }
 
     // filter the already existing columns out
@@ -149,7 +149,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
   }
 
   protected String getColumnBeanName(IType column) {
-    return ScoutUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
+    return NamingUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
   }
 
   protected void visitTableBean(IType table, ITypeHierarchy fieldHierarchy, IProgressMonitor monitor) throws CoreException {
@@ -193,7 +193,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
 
       String columnBeanName = getColumnBeanName(column);
       String constantColName = columnBeanName;
-      if (ScoutUtility.isReservedJavaKeyword(constantColName)) {
+      if (NamingUtility.isReservedJavaKeyword(constantColName)) {
         constantColName += "_";
       }
       IFieldSourceBuilder constantFieldBuilder = new FieldSourceBuilder(constantColName);
@@ -362,24 +362,24 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     // createRow
     IMethodSourceBuilder createRowSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "createRow");
 
-    createRowSourceBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableRowData));
+    createRowSourceBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableRowData));
     createRowSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("return new ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableRowData), validator));
+        source.append("return new ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableRowData), validator));
         source.append("(){").append(lineDelimiter).append("private static final long serialVersionUID = 1L;").append(lineDelimiter).append("};");
       }
     });
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(createRowSourceBuilder), createRowSourceBuilder);
 
     IMethodSourceBuilder getRowTypeSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getRowType");
-    getRowTypeSourceBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(Class.class.getName() + "<? extends " + RuntimeClasses.AbstractTableRowData + ">"));
+    getRowTypeSourceBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(Class.class.getName() + "<? extends " + IRuntimeClasses.AbstractTableRowData + ">"));
     getRowTypeSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("return ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(RuntimeClasses.AbstractTableRowData), validator)).append(".class;");
+        source.append("return ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableRowData), validator)).append(".class;");
       }
     });
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getRowTypeSourceBuilder), getRowTypeSourceBuilder);

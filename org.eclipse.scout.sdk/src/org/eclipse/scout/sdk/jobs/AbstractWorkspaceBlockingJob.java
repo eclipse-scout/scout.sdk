@@ -15,13 +15,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.commons.TuningUtility;
+import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
-public abstract class AbstractWorkspaceBlockingJob extends Job {
+public abstract class AbstractWorkspaceBlockingJob extends JobEx {
 
   private boolean m_debug = false;
   private Exception m_callerTrace;

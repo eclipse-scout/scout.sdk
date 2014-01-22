@@ -226,7 +226,7 @@ public class ExtendedForm extends BaseForm {
 
     @Override
     @ValidationRule(value = ValidationRule.CODE_TYPE, skip = true)
-    protected Class<? extends ICodeType<?>> getConfiguredCodeType() {
+    protected Class<? extends ICodeType<?, Long>> getConfiguredCodeType() {
       return super.getConfiguredCodeType();
     }
   }

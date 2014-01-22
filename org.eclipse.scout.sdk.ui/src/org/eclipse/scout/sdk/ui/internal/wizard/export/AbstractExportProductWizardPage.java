@@ -28,8 +28,8 @@ import org.eclipse.swt.widgets.Composite;
 
 public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final static String PROP_PRODUCT_FILE = "productFile";
-  private final static String PROP_WAR_FILE_NAME = "warFileName";
+  private static final String PROP_PRODUCT_FILE = "productFile";
+  private static final String PROP_WAR_FILE_NAME = "warFileName";
 
   private final IScoutBundle m_scoutProject;
   private final String m_symbolicNameFilter;

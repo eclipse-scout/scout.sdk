@@ -21,9 +21,9 @@ public class SimpleImportValidator implements IImportValidator {
   private final HashMap<String/* simpleName */, String/* packageName */> m_newImports;
   private String m_packageName;
 
-  private final static Pattern EXT_REGEX = Pattern.compile("^\\+.*$");
-  private final static Pattern EXT_REPL_REGEX = Pattern.compile("^\\+");
-  private final static Pattern PLAIN_REPL_REGEX = Pattern.compile("^[\\[\\+]*");
+  private static final Pattern EXT_REGEX = Pattern.compile("^\\+.*$");
+  private static final Pattern EXT_REPL_REGEX = Pattern.compile("^\\+");
+  private static final Pattern PLAIN_REPL_REGEX = Pattern.compile("^[\\[\\+]*");
 
   public SimpleImportValidator() {
     this(null);

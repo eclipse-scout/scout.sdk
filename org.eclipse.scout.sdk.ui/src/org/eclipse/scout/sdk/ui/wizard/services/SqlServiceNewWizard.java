@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -56,7 +57,7 @@ public class SqlServiceNewWizard extends AbstractServiceWizard {
 
   public SqlServiceNewWizard(IScoutBundle serverBundle) {
     setWindowTitle(Texts.get("NewSQLService"));
-    IType serviceSuperType = RuntimeClasses.getSuperType(RuntimeClasses.ISqlService, serverBundle.getJavaProject());
+    IType serviceSuperType = RuntimeClasses.getSuperType(IRuntimeClasses.ISqlService, serverBundle.getJavaProject());
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
 
     m_locationWizardPageRoot = createTree(serverBundle);
@@ -66,7 +67,7 @@ public class SqlServiceNewWizard extends AbstractServiceWizard {
     m_locationWizardPage.addCheckSelectionListener(new P_SessionCheckListener());
 
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSQLService"), Texts.get("CreateANewSQLService"),
-        TypeUtility.getType(RuntimeClasses.ISqlService), SdkProperties.SUFFIX_SQL_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_SQL));
+        TypeUtility.getType(IRuntimeClasses.ISqlService), SdkProperties.SUFFIX_SQL_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_SQL));
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.setSuperType(serviceSuperType);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
@@ -82,12 +83,11 @@ public class SqlServiceNewWizard extends AbstractServiceWizard {
     ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle,
         NodeFilters.getByType(IScoutBundle.TYPE_SHARED, IScoutBundle.TYPE_SERVER),
         ScoutBundleFilters.getWorkspaceBundlesFilter());
-    if (serverBundle != null) {
-      ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
-      TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1);
-      ITreeNode svcRegNode = TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
-      refreshAvailableSessions(svcRegNode, svcRegNode);
-    }
+
+    ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
+    TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1);
+    ITreeNode svcRegNode = TreeUtility.createNode(serverNode, TYPE_SERVICE_REG_SERVER, Texts.get("ServiceRegistration"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Public), 2);
+    refreshAvailableSessions(svcRegNode, svcRegNode);
     return rootNode;
   }
 

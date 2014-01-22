@@ -25,11 +25,11 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class CreateClientPluginOperation extends AbstractCreateScoutBundleOperation {
 
-  public final static String PROP_BUNDLE_CLIENT_NAME = "BUNDLE_CLIENT_NAME";
-  public final static String PROP_INSTALL_ICONS = "INSTALL_ICONS";
+  public static final String PROP_BUNDLE_CLIENT_NAME = "BUNDLE_CLIENT_NAME";
+  public static final String PROP_INSTALL_ICONS = "INSTALL_ICONS";
 
-  public final static String CLIENT_PROJECT_NAME_SUFFIX = ".client";
-  public final static String BUNDLE_ID = "org.eclipse.scout.sdk.ui.ClientBundle";
+  public static final String CLIENT_PROJECT_NAME_SUFFIX = ".client";
+  public static final String BUNDLE_ID = "org.eclipse.scout.sdk.ui.ClientBundle";
 
   @Override
   public String getOperationName() {

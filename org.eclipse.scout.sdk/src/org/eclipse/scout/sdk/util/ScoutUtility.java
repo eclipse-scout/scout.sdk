@@ -10,11 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util;
 
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -51,7 +47,6 @@ import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.method.IMethodReturnValueParser;
 import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
@@ -59,6 +54,7 @@ import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
@@ -72,24 +68,19 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
  */
 public final class ScoutUtility {
 
-  public final static String JAVA_MARKER = "java ";
-  private final static Pattern REGEX_LINE_SEP_CLEAN = Pattern.compile("(\\n)\\r");
-  private final static Pattern REGEX_LINE_SEP_CLEAN2 = Pattern.compile("\\r(\\n)");
-  private final static Pattern REGEX_LINE_SET_CLEAN3 = Pattern.compile("\\n+$");
-  private final static Pattern REGEX_LINE_SET_CLEAN4 = Pattern.compile("\\n");
-  private final static Pattern REGEX_PACKAGE_NAME = Pattern.compile("^[0-9a-zA-Z\\.\\_]*$");
-  private final static Pattern REGEX_PACKAGE_NAME_START = Pattern.compile("[a-zA-Z]{1}.*$");
-  private final static Pattern REGEX_PACKAGE_NAME_END = Pattern.compile("^.*[a-zA-Z]{1}$");
-  private final static Pattern REGEX_CONTAINS_UPPER_CASE = Pattern.compile(".*[A-Z].*");
+  private static final Pattern REGEX_LINE_SEP_CLEAN = Pattern.compile("(\\n)\\r");
+  private static final Pattern REGEX_LINE_SEP_CLEAN2 = Pattern.compile("\\r(\\n)");
+  private static final Pattern REGEX_LINE_SET_CLEAN3 = Pattern.compile("\\n+$");
+  private static final Pattern REGEX_LINE_SET_CLEAN4 = Pattern.compile("\\n");
+  private static final Pattern REGEX_PACKAGE_NAME = Pattern.compile("^[0-9a-zA-Z\\.\\_]*$");
+  private static final Pattern REGEX_PACKAGE_NAME_START = Pattern.compile("[a-zA-Z]{1}.*$");
+  private static final Pattern REGEX_PACKAGE_NAME_END = Pattern.compile("^.*[a-zA-Z]{1}$");
+  private static final Pattern REGEX_CONTAINS_UPPER_CASE = Pattern.compile(".*[A-Z].*");
+  private static final Pattern REGEX_COMMENT_REMOVE_1 = Pattern.compile("\\/\\/.*?\\\r\\\n");
+  private static final Pattern REGEX_COMMENT_REMOVE_2 = Pattern.compile("\\/\\/.*?\\\n");
+  private static final Pattern REGEX_COMMENT_REMOVE_3 = Pattern.compile("(?s)\\/\\*.*?\\*\\/");
 
-  private final static Pattern REGEX_COMMENT_REMOVE_1 = Pattern.compile("\\/\\/.*?\\\r\\\n");
-  private final static Pattern REGEX_COMMENT_REMOVE_2 = Pattern.compile("\\/\\/.*?\\\n");
-  private final static Pattern REGEX_COMMENT_REMOVE_3 = Pattern.compile("(?s)\\/\\*.*?\\*\\/");
-
-  private final static Object LOCK = new Object();
-  private final static ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<String>();
-
-  private static Set<String> javaKeyWords = null;
+  private static final ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<String>();
 
   private ScoutUtility() {
   }
@@ -221,36 +212,6 @@ public final class ScoutUtility {
     h.save();
   }
 
-  public static String unboxPrimitiveSignature(String signature) {
-    if (Signature.getTypeSignatureKind(signature) == Signature.BASE_TYPE_SIGNATURE) {
-      if (Signature.SIG_BOOLEAN.equals(signature)) {
-        signature = SignatureCache.createTypeSignature(Boolean.class.getName());
-      }
-      else if (Signature.SIG_BYTE.equals(signature)) {
-        signature = SignatureCache.createTypeSignature(Byte.class.getName());
-      }
-      else if (Signature.SIG_CHAR.equals(signature)) {
-        signature = SignatureCache.createTypeSignature(Character.class.getName());
-      }
-      else if (Signature.SIG_DOUBLE.equals(signature)) {
-        signature = SignatureCache.createTypeSignature(Double.class.getName());
-      }
-      else if (Signature.SIG_FLOAT.equals(signature)) {
-        signature = SignatureCache.createTypeSignature(Float.class.getName());
-      }
-      else if (Signature.SIG_INT.equals(signature)) {
-        signature = SignatureCache.createTypeSignature(Integer.class.getName());
-      }
-      else if (Signature.SIG_LONG.equals(signature)) {
-        signature = SignatureCache.createTypeSignature(Long.class.getName());
-      }
-      else if (Signature.SIG_SHORT.equals(signature)) {
-        signature = SignatureCache.createTypeSignature(Short.class.getName());
-      }
-    }
-    return signature;
-  }
-
   public static String getDefaultValueOf(String parameter) {
     if (parameter.length() == 1) {
       switch (parameter.charAt(0)) {
@@ -298,212 +259,6 @@ public final class ScoutUtility {
     return false;
   }
 
-  public static String sourceCodeToSql(String source) {
-    StringBuilder buf = new StringBuilder();
-    StringBuilder outsideSqlCode = new StringBuilder();
-    // meta levels
-    boolean incomment1 = false;// /*...*/
-    boolean incomment0 = false;// //...
-    boolean instring = false;// "..."
-    for (int i = 0; i < source.length(); i++) {
-      char ch = source.charAt(i);
-      if (ch == '\\') {
-        buf.append(ch);
-        buf.append(source.charAt(i + 1));
-        i++;
-      }
-      else if ((!incomment1) && (ch == '/' && source.charAt(i + 1) == '*' && source.charAt(i + 2) != '+')) {
-        // go into comment 1
-        incomment1 = true;
-        i++;
-        buf.append("/**");
-      }
-      else if (incomment1 && (ch == '*' && source.charAt(i + 1) == '/')) {
-        // go out of comment 1
-        i++;
-        incomment1 = false;
-        buf.append("**/");
-      }
-      else if ((!incomment1) && (!incomment0) && (ch == '/' && source.charAt(i + 1) == '/')) {
-        // go into comment 0
-        incomment0 = true;
-        i++;
-        buf.append("/**");
-        if (i + 1 >= source.length()) {
-          incomment0 = false;// eot
-          buf.append("**/");
-        }
-      }
-      else if ((!incomment1) && (incomment0) && (ch == '\n' || ch == '\r' || i + 1 >= source.length())) {
-        // go out of comment 0
-        incomment0 = false;
-        buf.append("**/");
-        buf.append(ch);
-      }
-      else if ((!incomment1) && (!incomment0) && (!instring) && (ch == '"')) {
-        // go into string
-        instring = true;
-      }
-      else if ((!incomment1) && (!incomment0) && (instring) && (ch == '"')) {
-        // go out of string
-        instring = false;
-      }
-      else if (incomment1 || incomment0 || instring) {
-        // inside meta
-        buf.append(ch);
-      }
-      else if (ch == ' ' || ch == '\t' || ch == '\r' || ch == '\n') {
-        // out of meta: white space
-        buf.append(ch);
-      }
-      else if (ch == '+') {
-        // out of meta: concatenation
-        if (outsideSqlCode.length() > 0) {
-          buf.append("*/");
-          outsideSqlCode.setLength(0);
-        }
-      }
-      else {
-        // out of string/comment: java code
-        if (outsideSqlCode.length() == 0) {
-          buf.append("/* " + JAVA_MARKER);
-        }
-        outsideSqlCode.append(ch);
-        buf.append(ch);
-      }
-    }
-    if (outsideSqlCode.length() > 0) {
-      buf.append("*/");
-      outsideSqlCode.setLength(0);
-    }
-    return buf.toString();
-  }
-
-  public static String sqlToSourceCode(String sql) {
-    // ignore empty lines
-    sql = sql.replace("[\\n\\r]+", "\\n");
-    // meta levels
-    boolean incomment = false;// /**...**/
-    StringBuilder buf = new StringBuilder();
-    StringBuilder currentSqlLine = new StringBuilder();
-    for (int i = 0; i < sql.length(); i++) {
-      char ch = sql.charAt(i);
-      if (ch == '\\') {
-        if (incomment) {
-          buf.append(ch);
-          buf.append(sql.charAt(i + 1));
-        }
-        else {
-          if (currentSqlLine.length() == 0) currentSqlLine.append("\"");
-          currentSqlLine.append(ch);
-          currentSqlLine.append(sql.charAt(i + 1));
-        }
-        i++;
-      }
-      else if ((!incomment) && (ch == '/' && sql.charAt(i + 1) == '*' && sql.charAt(i + 2) == '*')) {
-        // go into comment
-        incomment = true;
-        i = i + 2;
-        if (currentSqlLine.length() > 0) {
-          String line = currentSqlLine.toString();
-          buf.append(line);
-          if (!line.endsWith(" ")) {
-            buf.append(" ");
-          }
-          buf.append("\"+");
-          currentSqlLine.setLength(0);
-        }
-        buf.append("/+++");
-      }
-      else if (incomment && (ch == '*' && sql.charAt(i + 1) == '*' && sql.charAt(i + 2) == '/')) {
-        // go out of comment
-        i = i + 2;
-        incomment = false;
-        buf.append("+++/");
-      }
-      else if (incomment) {
-        // inside meta
-        buf.append(ch);
-      }
-      else if (ch == '\r' || ch == '\n') {
-        // out of meta: newline
-        if (currentSqlLine.length() > 0) {
-          String line = currentSqlLine.toString();
-          buf.append(line);
-          if (!line.endsWith(" ")) {
-            buf.append(" ");
-          }
-          buf.append("\"+");
-          currentSqlLine.setLength(0);
-        }
-        buf.append("\n");
-      }
-      else {
-        // out of string/comment: sql code
-        if (currentSqlLine.length() == 0) currentSqlLine.append("\"");
-        currentSqlLine.append(ch);
-      }
-    }
-    if (currentSqlLine.length() > 0) {
-      String line = currentSqlLine.toString();
-      buf.append(line);
-      buf.append("\"");
-      currentSqlLine.setLength(0);
-    }
-    String s = buf.toString();
-    s = s.replaceAll("/\\*([^+*].*[^*])\\*/", "\"+$1+\"");
-    s = s.replaceAll("/\\+\\+\\+", "/*");
-    s = s.replaceAll("\\+\\+\\+/", "*/");
-    return s;
-  }
-
-  public static String[] getSourceCodeLines(String source) {
-    if (source == null) return new String[0];
-    if (source.indexOf('\n') >= 0) {
-      return source.replace("\r", "").split("[\\n]");
-    }
-    else {
-      return source.replace("\n", "").split("[\\r]");
-    }
-  }
-
-  public static int getSourceCodeIndent(String source, boolean includeFirstLine) {
-    String[] a = getSourceCodeLines(source);
-    int min = 102400;
-    int count = 0;
-    for (int i = 0; i < a.length; i++) {
-      if (i > 0 || includeFirstLine) {
-        String s = a[i];
-        if (s.trim().length() > 0) {
-          int index = 0;
-          while (index < s.length() && (s.charAt(index) == ' ' || s.charAt(index) == '\t')) {
-            index++;
-          }
-          min = Math.min(min, index);
-          count++;
-        }
-      }
-    }
-    return (count > 0 ? min : 0);
-  }
-
-  public static String addSourceCodeIndent(String source, int indent, boolean includeFirstLine) {
-    StringBuffer buf = new StringBuffer();
-    String[] a = getSourceCodeLines(source);
-    char[] prefix = new char[indent];
-    Arrays.fill(prefix, ' ');
-    for (int i = 0; i < a.length; i++) {
-      if (i > 0 || includeFirstLine) {
-        buf.append(prefix);
-      }
-      buf.append(a[i]);
-      if (i + 1 < a.length) {
-        buf.append('\n');
-      }
-    }
-    return buf.toString();
-  }
-
   /**
    * Gets the bundle type for the given product file. This is the type of first type-defining-bundle that is found in
    * the dependencies of the given project.
@@ -520,23 +275,6 @@ public final class ScoutUtility {
     ProductFileModelHelper pfmh = new ProductFileModelHelper(productFile);
     String[] symbolicNames = pfmh.ProductFile.getPluginSymbolicNames();
     return RuntimeBundles.getBundleType(symbolicNames);
-  }
-
-  public static String removeSourceCodeIndent(String source, int indent) {
-    StringBuffer buf = new StringBuffer();
-    String[] a = getSourceCodeLines(source);
-    for (int i = 0; i < a.length; i++) {
-      String s = a[i];
-      int index = 0;
-      while (index < indent && index < s.length() && (s.charAt(index) == ' ' || s.charAt(index) == '\t')) {
-        index++;
-      }
-      buf.append(s.substring(index));
-      if (i + 1 < a.length) {
-        buf.append('\n');
-      }
-    }
-    return buf.toString();
   }
 
   public static IJavaProject getJavaProject(IScoutBundle bundle) {
@@ -587,28 +325,6 @@ public final class ScoutUtility {
     return ret.toArray(new String[ret.size()]);
   }
 
-  public static String ensureStartWithUpperCase(String name) {
-    StringBuilder builder = new StringBuilder();
-    if (!StringUtility.isNullOrEmpty(name)) {
-      builder.append(Character.toUpperCase(name.charAt(0)));
-      if (name.length() > 1) {
-        builder.append(name.substring(1));
-      }
-    }
-    return builder.toString();
-  }
-
-  public static String ensureStartWithLowerCase(String name) {
-    StringBuilder builder = new StringBuilder();
-    if (!StringUtility.isNullOrEmpty(name)) {
-      builder.append(Character.toLowerCase(name.charAt(0)));
-      if (name.length() > 1) {
-        builder.append(name.substring(1));
-      }
-    }
-    return builder.toString();
-  }
-
   public static String removeFieldSuffix(String fieldName) {
     if (fieldName.endsWith(SdkProperties.SUFFIX_FORM_FIELD)) {
       fieldName = fieldName.replaceAll(SdkProperties.SUFFIX_FORM_FIELD + "$", "");
@@ -623,41 +339,6 @@ public final class ScoutUtility {
       fieldName = fieldName.replaceAll(SdkProperties.SUFFIX_OUTLINE_PAGE + "$", "");
     }
     return fieldName;
-  }
-
-  public static String ensureValidParameterName(String parameterName) {
-    if (isReservedJavaKeyword(parameterName)) {
-      return parameterName + "Value";
-    }
-    return parameterName;
-  }
-
-  public static Set<String> getJavaKeyWords() {
-    if (javaKeyWords == null) {
-      synchronized (LOCK) {
-        if (javaKeyWords == null) {
-          String[] keyWords = new String[]{"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum",
-              "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected",
-              "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true"};
-          HashSet<String> tmp = new HashSet<String>(keyWords.length);
-          for (String s : keyWords) {
-            tmp.add(s);
-          }
-          javaKeyWords = Collections.unmodifiableSet(tmp);
-        }
-      }
-    }
-    return javaKeyWords;
-  }
-
-  /**
-   * @return Returns <code>true</code> if the given word is a reserved java keyword. Otherwise <code>false</code>.
-   * @throws NullPointerException
-   *           if the given word is <code>null</code>.
-   * @since 3.8.3
-   */
-  public static boolean isReservedJavaKeyword(String word) {
-    return getJavaKeyWords().contains(word.toLowerCase());
   }
 
   public static IStatus validatePackageName(String pckName) {
@@ -686,15 +367,6 @@ public final class ScoutUtility {
       return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("PackageOnlyLowerCase"));
     }
     return Status.OK_STATUS;
-  }
-
-  private static String getContainingJavaKeyWord(String s) {
-    for (String keyWord : getJavaKeyWords()) {
-      if (s.startsWith(keyWord + ".") || s.endsWith("." + keyWord) || s.contains("." + keyWord + ".")) {
-        return keyWord;
-      }
-    }
-    return null;
   }
 
   public static IStatus validateNewBundleName(String bundleName) {
@@ -733,6 +405,15 @@ public final class ScoutUtility {
     return Status.OK_STATUS;
   }
 
+  private static String getContainingJavaKeyWord(String s) {
+    for (String keyWord : NamingUtility.getJavaKeyWords()) {
+      if (s.startsWith(keyWord + ".") || s.endsWith("." + keyWord) || s.contains("." + keyWord + ".")) {
+        return keyWord;
+      }
+    }
+    return null;
+  }
+
   public static String getMethodReturnValue(IMethod method, IImportValidator validator) {
     return getMethodReturnExpression(method).getReturnStatement(validator);
   }
@@ -752,12 +433,7 @@ public final class ScoutUtility {
   }
 
   public static INlsEntry getReturnNlsEntry(IMethod method) throws CoreException {
-    String value = getMethodReturnValue(method);
-    return getReturnNlsEntry(value, method);
-  }
-
-  private static INlsEntry getReturnNlsEntry(String value, IMethod method) throws CoreException {
-    String key = PropertyMethodSourceUtility.parseReturnParameterNlsKey(value);
+    String key = PropertyMethodSourceUtility.parseReturnParameterNlsKey(getMethodReturnValue(method));
     if (!StringUtility.isNullOrEmpty(key)) {
       INlsProject nlsProject = ScoutTypeUtility.findNlsProject(method);
       if (nlsProject == null) {
@@ -780,19 +456,50 @@ public final class ScoutUtility {
    *          The suffix to compare against.
    * @return A status that describes the state of the given name
    */
-  public static IStatus getJavaNameStatus(String name, String suffix) {
+  public static IStatus validateJavaName(String name, String suffix) {
     if (!StringUtility.hasText(name) || name.equals(suffix)) {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_className"));
     }
-    if (Regex.REGEX_WELLFORMD_JAVAFIELD.matcher(name).matches()) {
+    if (IRegEx.WELLFORMD_JAVAFIELD.matcher(name).matches()) {
       return Status.OK_STATUS;
     }
-    else if (Regex.REGEX_JAVAFIELD.matcher(name).matches()) {
+    else if (IRegEx.JAVAFIELD.matcher(name).matches()) {
       return new Status(IStatus.WARNING, ScoutSdk.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
     }
     else {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("NameNotValid"));
     }
+  }
+
+  /**
+   * Gets the status of a form field to be created.
+   * 
+   * @param name
+   *          The name of the field
+   * @param suffix
+   *          The suffix of the name to be used.
+   * @param declaringType
+   *          The type in which the field should be created.
+   * @return A status that describes the state of such a form field in the given context.
+   */
+  public static IStatus validateFormFieldName(String name, String suffix, IType declaringType) {
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(name, suffix);
+    if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
+      return javaFieldNameStatus;
+    }
+    if (ScoutTypeUtility.getAllTypes(declaringType.getCompilationUnit(), TypeFilters.getElementNameFilter(name)).length > 0) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+    }
+    try {
+      if (TypeUtility.exists(TypeUtility.getMethod(TypeUtility.getPrimaryType(declaringType), "get" + name, new String[]{}))) {
+        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      }
+    }
+    catch (CoreException e) {
+      ScoutSdk.logError(e);
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Unknown Error. See Error Log View for details.");
+    }
+    return javaFieldNameStatus;
   }
 
   /**
@@ -808,7 +515,7 @@ public final class ScoutUtility {
    *          the name of the potential type.
    * @return the ok status if no file exists at the target location with the given name. An error status otherwise.
    */
-  public static IStatus getTypeExistingStatus(IScoutBundle container, String packageSuffix, String typeName) {
+  public static IStatus validateTypeNotExisting(IScoutBundle container, String packageSuffix, String typeName) {
     if (typeName == null) {
       return Status.OK_STATUS;
     }

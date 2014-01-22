@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.cale
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.CalendarItemProviderNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -65,7 +65,7 @@ public class CalendarItemProviderTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iCalendarItemProvider = TypeUtility.getType(RuntimeClasses.ICalendarItemProvider);
+    IType iCalendarItemProvider = TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider);
 
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iCalendarItemProvider);

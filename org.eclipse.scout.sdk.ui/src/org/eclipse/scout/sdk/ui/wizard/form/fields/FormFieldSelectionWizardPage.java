@@ -30,8 +30,9 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
@@ -40,6 +41,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
@@ -57,7 +59,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  private final IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
 
   private final IType m_declaringType;
   private AbstractScoutWizardPage m_nextPage;
@@ -87,11 +89,13 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     IPrimaryTypeTypeHierarchy formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
     IType[] abstractFormFields = formFieldHierarchy.getAllSubtypes(iFormField, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()));
     for (IType formField : abstractFormFields) {
-      IFormFieldExtension formFieldExtension = FormFieldExtensionPoint.findExtension(formField, 1);
-      if (formFieldExtension != null && formFieldExtension.isInShortList()) {
-        m_modelTypeShortList.add(formField);
+      if (!TypeUtility.exists(JdtUtility.getAnnotation(formField, ScoutSdkIgnore.class.getName()))) {
+        IFormFieldExtension formFieldExtension = FormFieldExtensionPoint.findExtension(formField, 1);
+        if (formFieldExtension != null && formFieldExtension.isInShortList()) {
+          m_modelTypeShortList.add(formField);
+        }
+        elements.add(formField);
       }
-      elements.add(formField);
     }
     // ui
     m_table = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);

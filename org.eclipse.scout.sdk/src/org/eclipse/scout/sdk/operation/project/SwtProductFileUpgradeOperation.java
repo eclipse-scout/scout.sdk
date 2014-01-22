@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOperation {
 
-  public final static String E4_UI_CSS_CORE_PLUGIN_ID = "org.eclipse.e4.ui.css.core";
+  public static final String E4_UI_CSS_CORE_PLUGIN_ID = "org.eclipse.e4.ui.css.core";
 
   private IFile[] m_swtProdFiles;
 

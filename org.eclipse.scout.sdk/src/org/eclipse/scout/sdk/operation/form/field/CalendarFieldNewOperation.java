@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -55,7 +56,7 @@ public class CalendarFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = fomatSource;
     // default
-    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ICalendarField, getDeclaringType().getJavaProject()));
+    setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ICalendarField, getDeclaringType().getJavaProject()));
   }
 
   @Override
@@ -84,18 +85,18 @@ public class CalendarFieldNewOperation implements IOperation {
       nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
-    if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractCalendarField)) {
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
+    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractCalendarField)) {
       // create inner type calendar
       ITypeSourceBuilder calendarBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR);
       calendarBuilder.setFlags(Flags.AccPublic);
-      calendarBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ICalendar, getDeclaringType().getJavaProject()));
+      calendarBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ICalendar, getDeclaringType().getJavaProject()));
       calendarBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
       newOp.addTypeSourceBuilder(calendarBuilder);
       // update generic in super type signature
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
-      superTypeSigBuilder.append("<").append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR).append(">");
-      setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
+      superTypeSigBuilder.append("<").append(calendarBuilder.getFullyQualifiedName().replace('$', '.')).append(">");
+      newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
     }
 
     newOp.setFormatSource(isFormatSource());

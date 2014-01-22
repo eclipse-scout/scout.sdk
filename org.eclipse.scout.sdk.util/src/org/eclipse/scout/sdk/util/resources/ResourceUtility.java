@@ -61,7 +61,7 @@ import org.eclipse.scout.sdk.util.log.ScoutStatus;
 @SuppressWarnings("restriction")
 public final class ResourceUtility {
 
-  public final static int BUF_SIZE = 8192;
+  public static final int BUF_SIZE = 8192;
 
   private ResourceUtility() {
   }

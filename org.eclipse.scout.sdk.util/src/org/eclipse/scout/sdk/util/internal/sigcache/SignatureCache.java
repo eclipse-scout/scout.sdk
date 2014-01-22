@@ -23,7 +23,7 @@ import org.eclipse.jdt.core.Signature;
  */
 public final class SignatureCache {
 
-  private final static Map<String, String> m_sigMap = new HashMap<String, String>(256);
+  private static final Map<String, String> m_sigMap = new HashMap<String, String>(256);
 
   private SignatureCache() {
   }

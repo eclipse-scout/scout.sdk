@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  */
 public final class AstMethodReturnValueParser implements IMethodReturnValueParser {
 
-  public final static AstMethodReturnValueParser INSTANCE = new AstMethodReturnValueParser();
+  public static final AstMethodReturnValueParser INSTANCE = new AstMethodReturnValueParser();
 
   private AstMethodReturnValueParser() {
   }

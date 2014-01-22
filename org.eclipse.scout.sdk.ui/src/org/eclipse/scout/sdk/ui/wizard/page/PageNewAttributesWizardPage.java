@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -54,12 +55,12 @@ import org.eclipse.swt.widgets.Group;
  */
 public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
-  public final static String PROP_TYPE_NAME = "typeName";
+  public static final String PROP_TYPE_NAME = "typeName";
 
-  private IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
-  private IType iPageWithNodes = TypeUtility.getType(RuntimeClasses.IPageWithNodes);
-  private IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
-  private IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
+  private IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
+  private IType iPageWithNodes = TypeUtility.getType(IRuntimeClasses.IPageWithNodes);
+  private IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
+  private IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
 
   private INlsEntry m_nlsName;
   private IType m_superType;
@@ -85,7 +86,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewPage"));
     setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_PAGES));
     m_nameSuffix = "";
-    setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IPageWithNodes, m_clientBundle));
+    setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IPageWithNodes, m_clientBundle));
   }
 
   @Override
@@ -214,11 +215,11 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), m_nameSuffix);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), m_nameSuffix);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getClientBundle(), getTargetPackage(), getTypeName());
+    IStatus existingStatus = ScoutUtility.validateTypeNotExisting(getClientBundle(), getTargetPackage(), getTypeName());
     if (!existingStatus.isOK()) {
       return existingStatus;
     }

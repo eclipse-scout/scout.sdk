@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class ExportEarOperation implements IOperation {
 
-  public final static String META_INF = "META-INF";
+  public static final String META_INF = "META-INF";
 
   private final ArrayList<File> m_modules;
   private String m_earFileName;

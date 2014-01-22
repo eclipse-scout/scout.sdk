@@ -8,8 +8,8 @@ import org.eclipse.ui.IMemento;
 
 public class ScoutBundleWorkingSetFactory implements IElementFactory {
 
-  public final static String ID = "org.eclipse.scout.sdk.ui.workingset.factory";
-  public final static String TAG_SYMBOLIC_NAME = "scoutBundleSymbolicName";
+  public static final String ID = "org.eclipse.scout.sdk.ui.workingset.factory";
+  public static final String TAG_SYMBOLIC_NAME = "scoutBundleSymbolicName";
 
   @Override
   public IAdaptable createElement(IMemento memento) {

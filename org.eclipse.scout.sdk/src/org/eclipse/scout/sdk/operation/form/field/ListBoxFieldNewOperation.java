@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -42,6 +43,7 @@ public class ListBoxFieldNewOperation implements IOperation {
   private INlsEntry m_nlsEntry;
   private String m_superTypeSignature;
   private IType m_codeType;
+  private IType m_lookupCall;
   private IJavaElement m_sibling;
   private IType m_createdField;
 
@@ -54,7 +56,7 @@ public class ListBoxFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(RuntimeClasses.IListBox, getDeclaringType().getJavaProject()) + "<" + Long.class.getName() + ">"));
+    setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.IListBox, getDeclaringType().getJavaProject()) + "<" + Long.class.getName() + ">"));
   }
 
   @Override
@@ -76,14 +78,16 @@ public class ListBoxFieldNewOperation implements IOperation {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
     newOp.setSibling(getSibling());
+
     // getConfiguredLabel method
     if (getNlsEntry() != null) {
       IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
       nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
-    // code type
+
     if (getCodeType() != null) {
+      // code type
       IMethodSourceBuilder getConfiguredCodeTypeBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), "getConfiguredCodeType");
       getConfiguredCodeTypeBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
@@ -95,6 +99,19 @@ public class ListBoxFieldNewOperation implements IOperation {
         }
       });
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredCodeTypeBuilder), getConfiguredCodeTypeBuilder);
+    }
+    else if (getLookupCall() != null) {
+      // lookup call
+      IMethodSourceBuilder getConfiguredLookupCallBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), "getConfiguredLookupCall");
+      getConfiguredLookupCallBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          source.append("return ");
+          source.append(validator.getTypeName(SignatureCache.createTypeSignature(getLookupCall().getFullyQualifiedName())));
+          source.append(".class;");
+        }
+      });
+      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredLookupCallBuilder), getConfiguredLookupCallBuilder);
     }
 
     newOp.setFormatSource(isFormatSource());
@@ -160,4 +177,11 @@ public class ListBoxFieldNewOperation implements IOperation {
     m_sibling = sibling;
   }
 
+  public IType getLookupCall() {
+    return m_lookupCall;
+  }
+
+  public void setLookupCall(IType lookupCall) {
+    m_lookupCall = lookupCall;
+  }
 }

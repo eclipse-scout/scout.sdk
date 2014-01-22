@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.FormHandlerNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -59,7 +59,7 @@ public class FormHandlerTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iFormHandler = TypeUtility.getType(RuntimeClasses.IFormHandler);
+    IType iFormHandler = TypeUtility.getType(IRuntimeClasses.IFormHandler);
 
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormHandler);

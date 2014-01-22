@@ -42,7 +42,7 @@ import org.eclipse.ui.internal.WorkingSet;
 @SuppressWarnings("restriction")
 public final class ScoutExplorerSettingsSupport {
 
-  private final static ScoutExplorerSettingsSupport INSTANCE = new ScoutExplorerSettingsSupport();
+  private static final ScoutExplorerSettingsSupport INSTANCE = new ScoutExplorerSettingsSupport();
 
   public static enum BundlePresentation {
     Grouped,
@@ -52,29 +52,29 @@ public final class ScoutExplorerSettingsSupport {
     FlatGroups,
   }
 
-  public final static String SCOUT_WOKRING_SET_ID = "org.eclipse.scout.sdk.ui.workingSet";
+  public static final String SCOUT_WOKRING_SET_ID = "org.eclipse.scout.sdk.ui.workingSet";
 
-  public final static String PREF_BUNDLE_DISPLAY_STYLE_KEY = "org.eclipse.scout.sdk.ui.view.scoutExplorer.bundleDisplayStyle";
-  public final static String PREF_SHOW_FRAGMENTS_KEY = "org.eclipse.scout.sdk.view.ui.scoutExplorer.showFragments";
-  public final static String PREF_SHOW_BINARY_BUNDLES_KEY = "org.eclipse.scout.sdk.ui.view.scoutExplorer.showBinaryBundles";
-  public final static String PREF_HIDDEN_BUNDLES_TYPES = "org.eclipse.scout.sdk.ui.view.scoutExplorer.hiddenBundleTypes";
-  public final static String PREF_HIDDEN_WORKING_SETS = "org.eclipse.scout.sdk.ui.view.scoutExplorer.hiddenWorkingSets";
-  public final static String PREF_WORKING_SETS_ORDER = "org.eclipse.scout.sdk.ui.view.scoutExplorer.workingSetsOrder";
+  public static final String PREF_BUNDLE_DISPLAY_STYLE_KEY = "org.eclipse.scout.sdk.ui.view.scoutExplorer.bundleDisplayStyle";
+  public static final String PREF_SHOW_FRAGMENTS_KEY = "org.eclipse.scout.sdk.view.ui.scoutExplorer.showFragments";
+  public static final String PREF_SHOW_BINARY_BUNDLES_KEY = "org.eclipse.scout.sdk.ui.view.scoutExplorer.showBinaryBundles";
+  public static final String PREF_HIDDEN_BUNDLES_TYPES = "org.eclipse.scout.sdk.ui.view.scoutExplorer.hiddenBundleTypes";
+  public static final String PREF_HIDDEN_WORKING_SETS = "org.eclipse.scout.sdk.ui.view.scoutExplorer.hiddenWorkingSets";
+  public static final String PREF_WORKING_SETS_ORDER = "org.eclipse.scout.sdk.ui.view.scoutExplorer.workingSetsOrder";
 
-  private final static String DISPLAY_STYLE_GROUPED = "grouped"; // default
-  private final static String DISPLAY_STYLE_HIERARCHICAL = "hierarchical";
-  private final static String DISPLAY_STYLE_FLAT = "flat";
-  private final static String DISPLAY_STYLE_WORKING_SET = "workingSet";
-  private final static String DISPLAY_STYLE_FLAT_GROUPS = "flatGroups";
+  private static final String DISPLAY_STYLE_GROUPED = "grouped"; // default
+  private static final String DISPLAY_STYLE_HIERARCHICAL = "hierarchical";
+  private static final String DISPLAY_STYLE_FLAT = "flat";
+  private static final String DISPLAY_STYLE_WORKING_SET = "workingSet";
+  private static final String DISPLAY_STYLE_FLAT_GROUPS = "flatGroups";
 
-  private final static String SHOW_FRAGMENTS_ENABLED = "true";
-  private final static String SHOW_FRAGMENTS_DISABLED = "false"; // default
+  private static final String SHOW_FRAGMENTS_ENABLED = "true";
+  private static final String SHOW_FRAGMENTS_DISABLED = "false"; // default
 
-  private final static String SHOW_BINARY_BUNDLES_ENABLED = "true"; // default
-  private final static String SHOW_BINARY_BUNDLES_DISABLED = "false";
+  private static final String SHOW_BINARY_BUNDLES_ENABLED = "true"; // default
+  private static final String SHOW_BINARY_BUNDLES_DISABLED = "false";
 
-  public final static char DELIMITER = ',';
-  public final static String OTHER_PROJECTS_WORKING_SET_NAME = "Other Projects";
+  public static final char DELIMITER = ',';
+  public static final String OTHER_PROJECTS_WORKING_SET_NAME = "Other Projects";
 
   private BundlePresentation m_bundlePresentation;
   private boolean m_showFragments;

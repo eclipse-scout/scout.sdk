@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
@@ -68,7 +68,7 @@ public class ServiceOperationNewOperation implements IOperation {
       createMethod.addParameter(new MethodParameter(arg.getName(), SignatureCache.createTypeSignature(arg.getType())));
     }
     createMethod.setReturnTypeSignature(SignatureCache.createTypeSignature(getReturnType().getType()));
-    createMethod.addExceptionSignature(SignatureCache.createTypeSignature(RuntimeClasses.ProcessingException));
+    createMethod.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     createMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
@@ -111,7 +111,7 @@ public class ServiceOperationNewOperation implements IOperation {
 
   protected void createImports(IImportValidator validator) {
     for (ParameterArgument arg : getArguments()) {
-      for (String imp : arg.getFullyQuallifiedImports()) {
+      for (String imp : arg.getFullyQualifiedImports()) {
         validator.getTypeName(SignatureCache.createTypeSignature(imp));
       }
     }

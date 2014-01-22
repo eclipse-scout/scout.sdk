@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
@@ -81,7 +82,7 @@ public class MasterFieldPresenter extends AbstractTypeProposalPresenter {
         searchPattern = "*";
       }
       else {
-        searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
+        searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
       }
       char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
       ArrayList<Object> collector = new ArrayList<Object>();

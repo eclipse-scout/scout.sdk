@@ -40,14 +40,14 @@ public class ButtonGroup<T> extends Composite {
   /**
    * Creates radio buttons
    */
-  public final static int BUTTON_TYPE_RADIO = SWT.RADIO;
+  public static final int BUTTON_TYPE_RADIO = SWT.RADIO;
 
   /**
    * Creates check boxes
    */
-  public final static int BUTTON_TYPE_CHECK = SWT.CHECK;
+  public static final int BUTTON_TYPE_CHECK = SWT.CHECK;
 
-  private final static String VALUE = "value";
+  private static final String VALUE = "value";
 
   private List<Button> m_buttons;
   private final int m_type;

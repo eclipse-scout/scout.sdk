@@ -27,7 +27,6 @@ import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
@@ -45,7 +44,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
  * @since 1.0.8 09.02.2011
  */
 public class ResourceServletFolderTree {
-  public final static String NODE_TYPE_FOLDER = "folder";
+  public static final String NODE_TYPE_FOLDER = "folder";
 
   private ITreeNode m_rootNode;
 
@@ -81,7 +80,7 @@ public class ResourceServletFolderTree {
                 for (IPluginObject po : e.getChildren()) {
                   if (po instanceof IPluginElement) {
                     IPluginElement pe = (IPluginElement) po;
-                    if (CompareUtility.equals(RuntimeClasses.ResourceServlet, pe.getAttribute("class").getValue()) && pe.getChildCount() > 0) {
+                    if (CompareUtility.equals(IRuntimeClasses.ResourceServlet, pe.getAttribute("class").getValue()) && pe.getChildCount() > 0) {
                       P_ResourceServletExtension ext = new P_ResourceServletExtension();
                       for (IPluginObject resourceServletPo : pe.getChildren()) {
                         if (resourceServletPo instanceof IPluginElement && CompareUtility.equals(resourceServletPo.getName(), "init-param")) {

@@ -15,10 +15,10 @@ import org.osgi.framework.ServiceReference;
 import org.osgi.framework.Version;
 
 public class ScoutCompatibilityActivator extends Plugin {
-  public final static String PLUGIN_ID = "org.eclipse.scout.sdk.compatibility";
-  public final static String EXT_NAME = "activator";
-  public final static String EXT_ATTRIB_CLASS_NAME = "class";
-  public final static String EXT_ATTRIB_VERSION_NAME = "platformVersion";
+  public static final String PLUGIN_ID = "org.eclipse.scout.sdk.compatibility";
+  public static final String EXT_NAME = "activator";
+  public static final String EXT_ATTRIB_CLASS_NAME = "class";
+  public static final String EXT_ATTRIB_VERSION_NAME = "platformVersion";
 
   private static ScoutCompatibilityActivator instance;
 

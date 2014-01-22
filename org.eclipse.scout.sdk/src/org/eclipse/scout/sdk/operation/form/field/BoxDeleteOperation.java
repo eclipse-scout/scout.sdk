@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 public class BoxDeleteOperation implements IOperation {
 
-  private final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
+  private final IType iColumn = TypeUtility.getType(IRuntimeClasses.IColumn);
   private final IType m_boxType;
   private boolean m_formatSource;
   private String m_name;

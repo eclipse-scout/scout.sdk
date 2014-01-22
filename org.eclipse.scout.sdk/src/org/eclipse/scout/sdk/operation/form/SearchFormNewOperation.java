@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.holders.StringHolder;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
@@ -68,7 +69,7 @@ public class SearchFormNewOperation extends FormNewOperation {
       PrimaryTypeNewOperation formDataTypeNewOp = new PrimaryTypeNewOperation(formDataTypeName, getSearchFormDataPackageName(), ScoutUtility.getJavaProject(getSearchFormDataLocationBundle()));
       formDataTypeNewOp.addMethodSourceBuilder(MethodSourceBuilderFactory.createConstructorSourceBuilder(formDataTypeName));
       formDataTypeNewOp.setFlags(Flags.AccPublic);
-      formDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractFormData));
+      formDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormData));
       formDataTypeNewOp.validate();
       formDataTypeNewOp.run(monitor, workingCopyManager);
       m_createdFormDataType = formDataTypeNewOp.getCreatedType();
@@ -80,7 +81,7 @@ public class SearchFormNewOperation extends FormNewOperation {
     if (isCreateSearchHandler()) {
       ITypeSourceBuilder newHandlerBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_SEARCH_HANDLER);
       newHandlerBuilder.setFlags(Flags.AccPublic);
-      newHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IFormHandler, getJavaProject()));
+      newHandlerBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IFormHandler, getJavaProject()));
       addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormHandlerKey(newHandlerBuilder), newHandlerBuilder);
       handlerFqnHolder.setValue(getPackageName() + "." + getElementName() + "." + newHandlerBuilder.getElementName());
     }
@@ -111,7 +112,7 @@ public class SearchFormNewOperation extends FormNewOperation {
       ITypeSourceBuilder mainBoxBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_MAIN_BOX);
       mainBoxBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
       mainBoxBuilder.setFlags(Flags.AccPublic);
-      mainBoxBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IGroupBox, getJavaProject()));
+      mainBoxBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, getJavaProject()));
       formBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(mainBoxBuilder, 10.0), mainBoxBuilder);
     }
   }

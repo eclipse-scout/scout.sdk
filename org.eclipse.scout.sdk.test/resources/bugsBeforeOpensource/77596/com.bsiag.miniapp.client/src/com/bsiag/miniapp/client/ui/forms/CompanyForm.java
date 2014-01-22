@@ -15,11 +15,8 @@ import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
-import java.util.regex.Pattern;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
@@ -32,7 +29,6 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
-import org.eclipse.scout.commons.dnd.ImageTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -41,7 +37,6 @@ import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
-import org.eclipse.scout.rt.client.ui.basic.filechooser.FileChooser;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.ITableRow;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
@@ -105,7 +100,6 @@ public class CompanyForm extends AbstractForm {
 
   private Long m_companyNr;
   private boolean m_internal = false;
-  private Long m_smartPriv = null;
   private boolean m_dataChangedTriggerDisabled;
 
   @FormData
@@ -455,32 +449,6 @@ public class CompanyForm extends AbstractForm {
 
         @Override
         protected void execDropRequest(TransferObject t) throws ProcessingException {
-          if (t.isFileList()) {
-            FileListTransferObject fileTransferable = (FileListTransferObject) t;
-            if (fileTransferable.getFiles() != null && fileTransferable.getFiles().length == 1) {
-              // getfirst
-              File f = fileTransferable.getFiles()[0];
-              if (f != null && f.exists() && f.isFile()) {
-                if (Pattern.matches("[^\\.]*\\.(gif|png|jpg|jpeg)", f.getName().toLowerCase())) {
-                  byte[] content = null;
-                  try {
-                    content = IOUtility.getContent(new FileInputStream(f), true);
-                  }
-                  catch (Exception e) {
-                    // nop
-                    return;
-                  }
-                  insertImage(content, f.getAbsolutePath());
-                }
-              }
-            }
-          }
-          else if (t.isImage()) {
-            ImageTransferObject imageTransferable = (ImageTransferObject) t;
-            if (imageTransferable.getImage() instanceof BufferedImage) {
-              insertImage((BufferedImage) imageTransferable.getImage());
-            }
-          }
         }
 
         private ITableRow findImageTableRow() throws ProcessingException {
@@ -596,20 +564,7 @@ public class CompanyForm extends AbstractForm {
 
           @Override
           protected void execAction() throws ProcessingException {
-            getTabBox().setSelectedTab(getDocumentsBox());
-            FileChooser chooser = new FileChooser(null, new String[]{"gif", "png", "jpg", "jpeg"}, true);
-            File[] files = chooser.startChooser();
-            if (files.length > 0) {
-              byte[] content = null;
-              try {
-                content = IOUtility.getContent(new FileInputStream(files[0]), true);
-              }
-              catch (Exception e) {
-                // nop
-                return;
-              }
-              insertImage(content, files[0].getAbsolutePath());
-            }
+
           }
         }
 
@@ -1132,12 +1087,12 @@ public class CompanyForm extends AbstractForm {
         public class OpenBillsField extends AbstractDoubleField {
 
           @Override
-          protected Double getConfiguredMinimumValue() {
+          protected Double getConfiguredMinValue() {
             return -999999999.0;
           }
 
           @Override
-          protected Double getConfiguredMaximumValue() {
+          protected Double getConfiguredMaxValue() {
             return 999999999.0;
           }
 
@@ -1288,12 +1243,12 @@ public class CompanyForm extends AbstractForm {
         public class InvoicesDueField extends AbstractDoubleField {
 
           @Override
-          protected Double getConfiguredMinimumValue() {
+          protected Double getConfiguredMinValue() {
             return -999999999.0;
           }
 
           @Override
-          protected Double getConfiguredMaximumValue() {
+          protected Double getConfiguredMaxValue() {
             return 999999999.0;
           }
 

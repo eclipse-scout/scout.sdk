@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.util.IRegEx;
 
 public class SimpleProposalProvider extends ContentProposalProvider {
 
@@ -36,7 +37,7 @@ public class SimpleProposalProvider extends ContentProposalProvider {
       searchPattern = "*";
     }
     else {
-      searchPattern = searchPattern.replaceAll("\\*$", "").toLowerCase() + "*";
+      searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("").toLowerCase() + "*";
     }
 
     ArrayList<Object> props = new ArrayList<Object>();

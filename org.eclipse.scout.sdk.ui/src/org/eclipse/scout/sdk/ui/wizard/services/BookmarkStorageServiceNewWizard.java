@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -61,8 +62,8 @@ public class BookmarkStorageServiceNewWizard extends AbstractServiceWizard {
     setWindowTitle(Texts.get("NewBookmarkService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewBookmarkStorageService"), Texts.get("CreateANewBookmarkStorageService"),
-        TypeUtility.getType(RuntimeClasses.IBookmarkStorageService), SdkProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_BOOKMARK));
-    m_serviceNewWizardPage.setSuperType(TypeUtility.getType(RuntimeClasses.IBookmarkStorageService));
+        TypeUtility.getType(IRuntimeClasses.IBookmarkStorageService), SdkProperties.SUFFIX_BOOKMARK_STORAGE_SERVICE, serverBundle, DefaultTargetPackage.get(serverBundle, IDefaultTargetPackage.SERVER_SERVICES_BOOKMARK));
+    m_serviceNewWizardPage.setSuperType(TypeUtility.getType(IRuntimeClasses.IBookmarkStorageService));
     m_serviceNewWizardPage.addStatusProvider(statusProvider);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
     addPage(m_serviceNewWizardPage);
@@ -75,7 +76,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractServiceWizard {
     addPage(m_locationWizardPage);
 
     // init
-    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(RuntimeClasses.IBookmarkStorageService, serverBundle.getJavaProject()));
+    m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IBookmarkStorageService, serverBundle.getJavaProject()));
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
@@ -128,7 +129,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractServiceWizard {
       m_operation.setImplementationPackageName(implementationBundle.getPackageName(m_serviceNewWizardPage.getTargetPackage()));
     }
 
-    m_operation.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IBookmarkStorageService));
+    m_operation.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(IRuntimeClasses.IBookmarkStorageService));
 
     IScoutBundle[] regProxyLocations = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
     for (IScoutBundle cb : regProxyLocations) {

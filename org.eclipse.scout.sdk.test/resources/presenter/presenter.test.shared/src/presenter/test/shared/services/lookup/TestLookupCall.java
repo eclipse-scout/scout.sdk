@@ -1,15 +1,14 @@
 package presenter.test.shared.services.lookup;
 
-import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 import org.eclipse.scout.rt.shared.services.lookup.ILookupService;
-import presenter.test.shared.services.lookup.ITestLookupService;
+import org.eclipse.scout.rt.shared.services.lookup.LookupCall;
 
-public class TestLookupCall extends LookupCall{
+public class TestLookupCall extends LookupCall<Long> {
 
   private static final long serialVersionUID = 1L;
 
   @Override
-  protected Class<? extends ILookupService> getConfiguredService() {
+  protected Class<? extends ILookupService<Long>> getConfiguredService() {
     return ITestLookupService.class;
   }
 }

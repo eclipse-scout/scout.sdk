@@ -10,6 +10,9 @@
  ******************************************************************************/
 package presenter.test.client.ui.desktop;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
@@ -34,8 +37,10 @@ public class Desktop extends AbstractDesktop implements IDesktop {
   }
 
   @Override
-  protected Class<? extends IOutline>[] getConfiguredOutlines() {
-    return new Class[]{TestOutline.class};
+  protected List<Class<? extends IOutline>> getConfiguredOutlines() {
+    List<Class<? extends IOutline>> outlines = new ArrayList<Class<? extends IOutline>>();
+    outlines.add(TestOutline.class);
+    return outlines;
   }
 
   @Override

@@ -47,7 +47,7 @@ import org.eclipse.ui.part.ViewPart;
  */
 public class ScoutPropertyView extends ViewPart {
 
-  private final static P_HashCodeComparator HASH_CODE_COMPARATOR = new P_HashCodeComparator();
+  private static final P_HashCodeComparator HASH_CODE_COMPARATOR = new P_HashCodeComparator();
 
   private Composite m_content;
   private IPropertyViewPart m_currentPart;
@@ -222,7 +222,7 @@ public class ScoutPropertyView extends ViewPart {
     }
   } // end class P_SelectionListener
 
-  private final static class P_HashCodeComparator implements Comparator<Object> {
+  private static final class P_HashCodeComparator implements Comparator<Object> {
     @Override
     public int compare(Object o1, Object o2) {
       if (o1 == null && o2 == null) {

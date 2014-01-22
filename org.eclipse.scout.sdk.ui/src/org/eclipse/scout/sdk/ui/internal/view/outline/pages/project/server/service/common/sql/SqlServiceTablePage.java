@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.SqlServiceNewAction;
@@ -80,7 +80,7 @@ public class SqlServiceTablePage extends AbstractPage {
   }
 
   protected IType[] resolveServices() {
-    IType iSqlService = TypeUtility.getType(RuntimeClasses.ISqlService);
+    IType iSqlService = TypeUtility.getType(IRuntimeClasses.ISqlService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSqlService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());

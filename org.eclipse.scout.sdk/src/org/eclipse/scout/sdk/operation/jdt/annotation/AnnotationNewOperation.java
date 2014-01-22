@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
@@ -29,7 +30,6 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.IAnnotationSourceBuilder;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.util.jdt.SourceRange;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
@@ -46,7 +46,7 @@ import org.eclipse.text.edits.TextEdit;
  */
 public class AnnotationNewOperation implements IOperation {
 
-  private final static Pattern REGEX_WHITE_SPACE_START = Pattern.compile("^(\\s+).*");
+  private static final Pattern REGEX_WHITE_SPACE_START = Pattern.compile("^(\\s+).*");
 
   private IAnnotationSourceBuilder m_sourceBuilder;
   private final IMember m_declaringType;

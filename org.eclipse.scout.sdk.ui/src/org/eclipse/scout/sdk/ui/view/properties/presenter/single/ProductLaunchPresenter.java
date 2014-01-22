@@ -29,7 +29,7 @@ import org.eclipse.pde.internal.ui.IPDEUIConstants;
 import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
@@ -76,9 +76,9 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   private P_LaunchListener m_launchListener;
   private P_RecomputeLaunchStateJob m_stateUpdateJob;
 
-  private final static Object m_lock = new Object();
-  private final static String MAC_OS_X_SWING_WARNING_MESSAGE_KEY = "scoutSwingMacOsXWarningKey";
-  public final static String TERMINATED_MODE = "terminated";
+  private static final Object m_lock = new Object();
+  private static final String MAC_OS_X_SWING_WARNING_MESSAGE_KEY = "scoutSwingMacOsXWarningKey";
+  public static final String TERMINATED_MODE = "terminated";
 
   /**
    * @param toolkit
@@ -272,7 +272,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       try {
         IPreferenceStore store = ScoutSdkUi.getDefault().getPreferenceStore();
         ProductFileModelHelper pfmh = new ProductFileModelHelper(m_productFile);
-        if (pfmh.ProductFile.existsDependency(RuntimeClasses.ScoutUiSwingBundleId)) {
+        if (pfmh.ProductFile.existsDependency(IRuntimeClasses.ScoutUiSwingBundleId)) {
           // it is a swing product to be launched on Mac OS X: show help box
           String doNotShowAgainString = store.getString(MAC_OS_X_SWING_WARNING_MESSAGE_KEY);
           boolean doNotShowAgain = MessageDialogWithToggle.ALWAYS.equals(doNotShowAgainString);

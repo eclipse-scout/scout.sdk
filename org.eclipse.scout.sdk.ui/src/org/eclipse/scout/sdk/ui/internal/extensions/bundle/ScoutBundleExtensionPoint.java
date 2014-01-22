@@ -35,18 +35,18 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
  */
 public final class ScoutBundleExtensionPoint {
 
-  private final static String extensionId = "scoutBundle";
-  private final static String attributeBundleId = "id";
-  private final static String attributeBundleName = "bundleName";
-  private final static String attributeBundleType = "bundleType";
-  private final static String attributeOrderNumber = "orderNumber";
-  private final static String attributeClass = "bundleNewHandler";
-  private final static String attributeProductLauncherContributor = "productLauncherContributor";
-  private final static String attributeBundlePage = "bundlePage";
-  private final static String attributeIcon = "icon";
-  private final static String attributeLauncherIcon = "launcherIcon";
+  private static final String extensionId = "scoutBundle";
+  private static final String attributeBundleId = "id";
+  private static final String attributeBundleName = "bundleName";
+  private static final String attributeBundleType = "bundleType";
+  private static final String attributeOrderNumber = "orderNumber";
+  private static final String attributeClass = "bundleNewHandler";
+  private static final String attributeProductLauncherContributor = "productLauncherContributor";
+  private static final String attributeBundlePage = "bundlePage";
+  private static final String attributeIcon = "icon";
+  private static final String attributeLauncherIcon = "launcherIcon";
 
-  private final static Object lock = new Object();
+  private static final Object lock = new Object();
   private static Map<String /* bundle type */, ScoutBundleUiExtension> allExtensions = null;
 
   private ScoutBundleExtensionPoint() {

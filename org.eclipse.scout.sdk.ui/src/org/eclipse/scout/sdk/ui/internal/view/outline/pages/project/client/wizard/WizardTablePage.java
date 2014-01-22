@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wiza
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformWizardsOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
@@ -67,7 +67,7 @@ public class WizardTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iWizard = TypeUtility.getType(RuntimeClasses.IWizard);
+    IType iWizard = TypeUtility.getType(IRuntimeClasses.IWizard);
 
     if (m_wizardHierarchy == null) {
       m_wizardHierarchy = TypeUtility.getPrimaryTypeHierarchy(iWizard);

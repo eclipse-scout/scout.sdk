@@ -61,7 +61,7 @@ public class SmartDialog {
   private P_SmartFieldTableModel m_smartTableModel;
   private List<ISmartDialogListener> m_smartDialogListeners = new LinkedList<ISmartDialogListener>();
   private Point m_defaultSize = new Point(200, 250);
-  private final static Collator COLLATOR = Collator.getInstance(Locale.getDefault());
+  private static final Collator COLLATOR = Collator.getInstance(Locale.getDefault());
 
   public SmartDialog(Shell parentShell) {
     m_smartTableModel = new P_SmartFieldTableModel();

@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.ClientServiceNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -64,7 +64,7 @@ public class ClientServiceTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType iService = TypeUtility.getType(RuntimeClasses.IService);
+    IType iService = TypeUtility.getType(IRuntimeClasses.IService);
 
     if (m_servieHierarchy == null) {
       m_servieHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);

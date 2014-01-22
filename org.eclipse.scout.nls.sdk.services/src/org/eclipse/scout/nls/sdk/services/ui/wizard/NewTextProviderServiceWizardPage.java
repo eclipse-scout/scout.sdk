@@ -41,6 +41,7 @@ import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProv
 import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.ui.wizard.ResourceProposalModel;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -51,7 +52,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.util.Regex;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -69,9 +70,6 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 
 public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPage {
-
-  // base interface
-  private final IType iTextProviderService = TypeUtility.getType(RuntimeClasses.ITextProviderService);
 
   // properties
   private static final String PROP_TRANSLATION_FOLDER = "translationFolder";
@@ -101,7 +99,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_bundle = bundle;
     m_languagesToCreate = new HashSet<String>();
     m_existingServicesInPlugin = getTextProviderServicesInSamePlugin();
-    m_defaultProposal = RuntimeClasses.getSuperType(RuntimeClasses.ITextProviderService, ScoutUtility.getJavaProject(bundle));
+    m_defaultProposal = RuntimeClasses.getSuperType(IRuntimeClasses.ITextProviderService, ScoutUtility.getJavaProject(bundle));
   }
 
   private NlsServiceType[] getTextProviderServicesInSamePlugin() {
@@ -151,6 +149,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     Group group = new Group(parent, SWT.NONE);
     group.setText("Text Provider Service Class");
 
+    IType iTextProviderService = TypeUtility.getType(IRuntimeClasses.ITextProviderService);
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(group, "Super Class",
         new JavaElementAbstractTypeContentProvider(iTextProviderService, ScoutUtility.getJavaProject(m_bundle), m_defaultProposal));
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -254,7 +253,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_translationFileName.setInputValidator(new IInputValidator() {
       @Override
       public IStatus isValid(String value) {
-        if (Regex.REGEX_JAVAFIELD.matcher(value).matches()) {
+        if (IRegEx.JAVAFIELD.matcher(value).matches()) {
           return Status.OK_STATUS;
         }
         return Status.CANCEL_STATUS;
@@ -310,7 +309,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     else if (TypeUtility.existsType(m_bundle.getPackageName(getTargetPackage()) + "." + getClassName())) {
       multiStatus.add(new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Name already used. Choose another name."));
     }
-    else if (!Regex.REGEX_JAVAFIELD.matcher(getClassName()).matches()) {
+    else if (!IRegEx.JAVAFIELD.matcher(getClassName()).matches()) {
       multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "The service class name is invalid."));
     }
 

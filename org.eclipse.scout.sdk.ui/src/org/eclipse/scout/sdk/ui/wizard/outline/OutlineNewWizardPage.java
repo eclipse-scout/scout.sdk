@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
@@ -52,7 +53,7 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>OutlineNewWizardPage</h3> ...
  */
 public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
-  private final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
+  private final IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
 
   private INlsEntry m_nlsName;
   private String m_typeName;
@@ -81,7 +82,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewOutline"));
     setTargetPackage(DefaultTargetPackage.get(clientBundle, IDefaultTargetPackage.CLIENT_OUTLINES));
     // default values
-    m_abstractOutline = RuntimeClasses.getSuperType(RuntimeClasses.IOutline, m_clientBundle.getJavaProject());
+    m_abstractOutline = RuntimeClasses.getSuperType(IRuntimeClasses.IOutline, m_clientBundle.getJavaProject());
     m_superType = m_abstractOutline;
     setAddToDesktop(TypeUtility.exists(getDesktopType()));
     setAddToDesktopEnabled(TypeUtility.exists(getDesktopType()));
@@ -209,11 +210,11 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_OUTLINE);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_OUTLINE);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getClientBundle(), getTargetPackage(), getTypeName());
+    IStatus existingStatus = ScoutUtility.validateTypeNotExisting(getClientBundle(), getTargetPackage(), getTypeName());
     if (!existingStatus.isOK()) {
       return existingStatus;
     }

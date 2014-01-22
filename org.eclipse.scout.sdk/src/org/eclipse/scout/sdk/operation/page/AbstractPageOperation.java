@@ -21,13 +21,14 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodOverrideOperation;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodUpdateContentOperation;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
@@ -40,17 +41,17 @@ import org.eclipse.text.edits.InsertEdit;
 
 public abstract class AbstractPageOperation implements IOperation {
 
-  private final static Pattern REGEX_LIST_ADD_ENTRY_POINT = Pattern.compile("([a-zA-Z0-9\\_\\-]*)\\.add\\(.+\\)\\;", Pattern.MULTILINE);
-
-  private final IType iOutline = TypeUtility.getType(RuntimeClasses.IOutline);
-  private final IType iPageWithNodes = TypeUtility.getType(RuntimeClasses.IPageWithNodes);
-  private final IType iPageWithTable = TypeUtility.getType(RuntimeClasses.IPageWithTable);
+  private static final Pattern REGEX_LIST_ADD_ENTRY_POINT = Pattern.compile("([a-zA-Z0-9\\_\\-]*)\\.add\\(.+\\)\\;", Pattern.MULTILINE);
+  private static final String CHILD_PAGE_VAR_NAME = "childPage";
 
   private IType m_holderType;
-  private final static String CHILD_PAGE_VAR_NAME = "childPage";
 
   protected void addToHolder(IType page, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (getHolderType() != null) {
+      IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
+      IType iPageWithNodes = TypeUtility.getType(IRuntimeClasses.IPageWithNodes);
+      IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
+
       ITypeHierarchy superTypeHierarchy = getHolderType().newSupertypeHierarchy(monitor);
       if (superTypeHierarchy.contains(iOutline)) {
         addToOutline(page, getHolderType(), monitor, workingCopyManager);
@@ -66,7 +67,7 @@ public abstract class AbstractPageOperation implements IOperation {
 
   private String getChildPageAddSource(IType pageType, String listName, String lineDelimiter, IImportValidator validator) {
     String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
-    String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
+    String varName = NamingUtility.ensureStartWithLowerCase(pageType.getElementName());
 
     StringBuilder bodyBuilder = new StringBuilder();
     bodyBuilder.append(SdkProperties.TAB).append(SdkProperties.TAB).append(pageRef).append(" ").append(varName).append(" = new ").append(pageRef).append("();").append(lineDelimiter);
@@ -149,7 +150,7 @@ public abstract class AbstractPageOperation implements IOperation {
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           String pageRef = validator.getTypeName(SignatureCache.createTypeSignature(pageType.getFullyQualifiedName()));
-          String varName = Character.toLowerCase(pageType.getElementName().charAt(0)) + pageType.getElementName().substring(1);
+          String varName = NamingUtility.ensureStartWithLowerCase(pageType.getElementName());
           source.append(pageRef).append(" ").append(varName).append(" = new ").append(pageRef).append("();").append(lineDelimiter);
           source.append("pageList.add(").append(varName).append(");").append(lineDelimiter);
         }

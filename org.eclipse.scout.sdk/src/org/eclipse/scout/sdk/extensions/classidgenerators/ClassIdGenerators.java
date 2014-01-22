@@ -33,16 +33,16 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
  */
 public final class ClassIdGenerators {
 
-  private final static String EXTENSION_POINT_NAME = "classIdGenerator";
-  private final static String TAG_NAME = "generator";
-  private final static String ATTRIB_CLASS = "class";
-  private final static String ATTRIB_PRIO = "priority";
+  private static final String EXTENSION_POINT_NAME = "classIdGenerator";
+  private static final String TAG_NAME = "generator";
+  private static final String ATTRIB_CLASS = "class";
+  private static final String ATTRIB_PRIO = "priority";
 
-  private final static Object LOCK = new Object();
+  private static final Object LOCK = new Object();
   private static volatile Collection<IClassIdGenerator> allGeneratorsOrdered = null;
 
   private static boolean automaticallyCreateClassIdAnnotation = false;
-  public final static String PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION = ScoutSdk.PLUGIN_ID + ".propAutomaticallyCreateClassIdAnnotation";
+  public static final String PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION = ScoutSdk.PLUGIN_ID + ".propAutomaticallyCreateClassIdAnnotation";
 
   private ClassIdGenerators() {
   }

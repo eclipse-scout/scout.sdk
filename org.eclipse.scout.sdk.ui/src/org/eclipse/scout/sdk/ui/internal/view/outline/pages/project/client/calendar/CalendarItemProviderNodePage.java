@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.calendar;
 
-import org.eclipse.jdt.core.IMember;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
@@ -52,7 +51,7 @@ public class CalendarItemProviderNodePage extends AbstractScoutTypePage {
     super.prepareMenuAction(menu);
     if (menu instanceof MemberListDeleteAction) {
       MemberListDeleteAction action = (MemberListDeleteAction) menu;
-      action.setTypesToDelete(new IMember[]{getType()});
+      action.addMemberToDelete(getType());
       action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProviderRemove));
     }
   }

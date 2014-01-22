@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.serv
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.ProcessServiceNewAction;
@@ -78,13 +78,13 @@ public class ServerServicesTablePage extends AbstractPage {
 
   protected IType[] resolveServices() {
 
-    IType iService = TypeUtility.getType(RuntimeClasses.IService);
-    IType iSqlService = TypeUtility.getType(RuntimeClasses.ISqlService);
-    IType iBookmarkStorageService = TypeUtility.getType(RuntimeClasses.IBookmarkStorageService);
-    IType iCalendarService = TypeUtility.getType(RuntimeClasses.ICalendarService);
-    IType iSMTPService = TypeUtility.getType(RuntimeClasses.ISMTPService);
-    IType iAccessControlService = TypeUtility.getType(RuntimeClasses.IAccessControlService);
-    IType iLookupService = TypeUtility.getType(RuntimeClasses.ILookupService);
+    IType iService = TypeUtility.getType(IRuntimeClasses.IService);
+    IType iSqlService = TypeUtility.getType(IRuntimeClasses.ISqlService);
+    IType iBookmarkStorageService = TypeUtility.getType(IRuntimeClasses.IBookmarkStorageService);
+    IType iCalendarService = TypeUtility.getType(IRuntimeClasses.ICalendarService);
+    IType iSMTPService = TypeUtility.getType(IRuntimeClasses.ISMTPService);
+    IType iAccessControlService = TypeUtility.getType(IRuntimeClasses.IAccessControlService);
+    IType iLookupService = TypeUtility.getType(IRuntimeClasses.ILookupService);
 
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);

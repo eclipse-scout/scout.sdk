@@ -33,6 +33,7 @@ import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.fields.table.ISeparator;
@@ -52,8 +53,8 @@ import org.eclipse.swt.widgets.Composite;
  * <h3> {@link TableColumnNewWizardPage1}</h3> ...
  */
 public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
-  final IType iColumn = TypeUtility.getType(RuntimeClasses.IColumn);
-  final IType iSmartColumn = TypeUtility.getType(RuntimeClasses.ISmartColumn);
+  private final IType iColumn = TypeUtility.getType(IRuntimeClasses.IColumn);
+  private final IType iSmartColumn = TypeUtility.getType(IRuntimeClasses.ISmartColumn);
 
   private IType m_declaringType;
   private CONTINUE_OPERATION m_nextOperation;
@@ -199,13 +200,13 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       ArrayList<Object> templates = new ArrayList<Object>();
       IJavaProject javaProject = m_declaringType.getJavaProject();
 
-      IType stringCol = RuntimeClasses.getSuperType(RuntimeClasses.IStringColumn, javaProject);
-      IType boolCol = RuntimeClasses.getSuperType(RuntimeClasses.IBooleanColumn, javaProject);
-      IType dateCol = RuntimeClasses.getSuperType(RuntimeClasses.IDateColumn, javaProject);
-      IType doubleCol = RuntimeClasses.getSuperType(RuntimeClasses.IDoubleColumn, javaProject);
-      IType intCol = RuntimeClasses.getSuperType(RuntimeClasses.IIntegerColumn, javaProject);
-      IType longCol = RuntimeClasses.getSuperType(RuntimeClasses.ILongColumn, javaProject);
-      IType smartCol = RuntimeClasses.getSuperType(RuntimeClasses.ISmartColumn, javaProject);
+      IType stringCol = RuntimeClasses.getSuperType(IRuntimeClasses.IStringColumn, javaProject);
+      IType boolCol = RuntimeClasses.getSuperType(IRuntimeClasses.IBooleanColumn, javaProject);
+      IType dateCol = RuntimeClasses.getSuperType(IRuntimeClasses.IDateColumn, javaProject);
+      IType doubleCol = RuntimeClasses.getSuperType(IRuntimeClasses.IDoubleColumn, javaProject);
+      IType intCol = RuntimeClasses.getSuperType(IRuntimeClasses.IIntegerColumn, javaProject);
+      IType longCol = RuntimeClasses.getSuperType(IRuntimeClasses.ILongColumn, javaProject);
+      IType smartCol = RuntimeClasses.getSuperType(IRuntimeClasses.ISmartColumn, javaProject);
 
       templates.add(stringCol);
       templates.add(boolCol);

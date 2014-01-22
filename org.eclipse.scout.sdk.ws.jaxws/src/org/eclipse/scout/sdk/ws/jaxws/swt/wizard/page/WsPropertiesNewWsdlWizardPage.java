@@ -30,6 +30,7 @@ import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -732,7 +733,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
     setAlias(serviceName);
     setUrlPattern(serviceName);
 
-    setServiceOperationName(JaxWsSdkUtility.toStartWithLowerCase(serviceName.substring(0, serviceName.length() - "WebService".length())));
+    setServiceOperationName(NamingUtility.ensureStartWithLowerCase(serviceName.substring(0, serviceName.length() - "WebService".length())));
   }
 
   private void loadIllegalValues() {

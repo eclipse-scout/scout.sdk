@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.LookupCallNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -62,14 +62,14 @@ public class LookupCallTablePage extends AbstractPage {
 
   @Override
   public void loadChildrenImpl() {
-    IType lookupCall = TypeUtility.getType(RuntimeClasses.LookupCall);
+    IType iLookupCall = TypeUtility.getType(IRuntimeClasses.ILookupCall);
 
     if (m_lookupCallHierarchy == null) {
-      m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(lookupCall);
+      m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupCall);
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
-    IType[] lookupCallTypes = m_lookupCallHierarchy.getAllSubtypes(lookupCall, filter, TypeComparators.getTypeNameComparator());
+    IType[] lookupCallTypes = m_lookupCallHierarchy.getAllSubtypes(iLookupCall, filter, TypeComparators.getTypeNameComparator());
     for (IType type : lookupCallTypes) {
       new LookupCallNodePage(this, type);
     }

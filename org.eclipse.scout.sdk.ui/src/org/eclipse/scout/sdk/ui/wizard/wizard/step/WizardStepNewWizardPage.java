@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.WizardStepNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -61,7 +62,7 @@ import org.eclipse.swt.widgets.Group;
  */
 public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iWizardStep = TypeUtility.getType(RuntimeClasses.IWizardStep);
+  private final IType iWizardStep = TypeUtility.getType(IRuntimeClasses.IWizardStep);
 
   private static final String PROP_NLS_NAME = "nlsName";
   private static final String PROP_TYPE_NAME = "typeName";
@@ -87,7 +88,7 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewWizardStep"));
     setDescription(Texts.get("CreateANewWizardStep"));
     m_declaringType = declaringType;
-    m_abstractWizardStep = RuntimeClasses.getSuperType(RuntimeClasses.IWizardStep, m_declaringType.getJavaProject());
+    m_abstractWizardStep = RuntimeClasses.getSuperType(IRuntimeClasses.IWizardStep, m_declaringType.getJavaProject());
     // default values
     setSuperTypeInternal(m_abstractWizardStep);
     setSibling(SiblingProposal.SIBLING_END);
@@ -173,9 +174,9 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
     AbstractJavaElementContentProvider contentProvider = new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
-        ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(RuntimeClasses.IForm));
+        ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.IForm));
         ITypeFilter formsFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(m_declaringType.getJavaProject()));
-        IType[] forms = formHierarchy.getAllSubtypes(TypeUtility.getType(RuntimeClasses.IForm), formsFilter, TypeComparators.getTypeNameComparator());
+        IType[] forms = formHierarchy.getAllSubtypes(TypeUtility.getType(IRuntimeClasses.IForm), formsFilter, TypeComparators.getTypeNameComparator());
         return new Object[][]{forms};
       }
     };
@@ -270,7 +271,7 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_WIZARD_STEP);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_WIZARD_STEP);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }

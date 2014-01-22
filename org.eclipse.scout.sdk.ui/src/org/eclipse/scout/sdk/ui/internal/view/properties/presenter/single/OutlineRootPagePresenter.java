@@ -19,12 +19,13 @@ import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -35,7 +36,6 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>OutlineRootPagePresenter</h3> ...
  */
 public class OutlineRootPagePresenter extends AbstractTypeProposalPresenter {
-  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
 
   public OutlineRootPagePresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -85,7 +85,7 @@ public class OutlineRootPagePresenter extends AbstractTypeProposalPresenter {
         searchPattern = "*";
       }
       else {
-        searchPattern = searchPattern.replaceAll("\\*$", "") + "*";
+        searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
       }
       char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
       ArrayList<Object> collector = new ArrayList<Object>();
@@ -107,6 +107,7 @@ public class OutlineRootPagePresenter extends AbstractTypeProposalPresenter {
     private void ensureCache() {
       if (m_proposals == null) {
         if (getMethod() != null) {
+          IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
           m_proposals = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPage,
               TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeComparators.getTypeNameComparator());
         }

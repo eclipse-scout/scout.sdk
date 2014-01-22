@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class SwingScoutBundleExtension implements INewScoutBundleHandler {
 
-  public final static String ID = "org.eclipse.scout.sdk.ui.UiSwingBundle";
+  public static final String ID = "org.eclipse.scout.sdk.ui.UiSwingBundle";
 
   @Override
   public void init(IScoutProjectWizard wizard, ScoutBundleUiExtension extension) {

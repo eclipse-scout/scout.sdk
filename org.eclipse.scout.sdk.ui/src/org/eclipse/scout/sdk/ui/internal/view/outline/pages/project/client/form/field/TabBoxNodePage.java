@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
@@ -33,8 +33,8 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 public class TabBoxNodePage extends AbstractFormFieldNodePage {
-  IType igroupBox = TypeUtility.getType(RuntimeClasses.IGroupBox);
-  IType iFormField = TypeUtility.getType(RuntimeClasses.IFormField);
+  IType igroupBox = TypeUtility.getType(IRuntimeClasses.IGroupBox);
+  IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
 
   private InnerTypePageDirtyListener m_innerTypeListener;
 

@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.KeyStrokeNewOperation;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -45,7 +46,7 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iKeyStroke = TypeUtility.getType(RuntimeClasses.IKeyStroke);
+  private final IType iKeyStroke = TypeUtility.getType(IRuntimeClasses.IKeyStroke);
 
   private String m_typeName;
   private IType m_superType;
@@ -66,7 +67,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewKeyStroke"));
     // default
     m_declaringType = declaringType;
-    m_abstractKeyStroke = RuntimeClasses.getSuperType(RuntimeClasses.IKeyStroke, m_declaringType.getJavaProject());
+    m_abstractKeyStroke = RuntimeClasses.getSuperType(IRuntimeClasses.IKeyStroke, m_declaringType.getJavaProject());
     m_superType = m_abstractKeyStroke;
   }
 
@@ -142,7 +143,7 @@ public class KeyStrokeNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_KEY_STROKE);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_KEY_STROKE);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }

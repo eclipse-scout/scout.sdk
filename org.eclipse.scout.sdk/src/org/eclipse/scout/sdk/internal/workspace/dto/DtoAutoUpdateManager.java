@@ -14,9 +14,9 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 import java.util.Set;
 import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.resources.IFile;
@@ -56,8 +56,8 @@ import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateOperation;
  */
 public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
 
-  public final static String AUTO_UPDATE_JOB_FAMILY = "AUTO_UPDATE_JOB_FAMILY";
-  public final static String RESOURCE_DELTA_CHECK_JOB_FAMILY = "RESOURCE_DELTA_CHECK_JOB_FAMILY";
+  public static final String AUTO_UPDATE_JOB_FAMILY = "AUTO_UPDATE_JOB_FAMILY";
+  public static final String RESOURCE_DELTA_CHECK_JOB_FAMILY = "RESOURCE_DELTA_CHECK_JOB_FAMILY";
 
   private final AtomicBoolean m_enabled;
   private final List<IDtoAutoUpdateHandler> m_updateHandlers;
@@ -137,24 +137,56 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     return m_enabled.get();
   }
 
-  private static <T> void addElementToQueueSecure(ArrayBlockingQueue<T> queue, T element) {
+  /**
+   * Securely inserts the given element in the given queue.<br>
+   * If the thread is interrupted to often while waiting for space in the queue it gives up.
+   * 
+   * @param queue
+   *          The queue to insert to
+   * @param element
+   *          The element to insert
+   * @param timeout
+   *          The timeout.<br>
+   *          <0=no time limit. We wait until there is free space (infinite waiting).<br>
+   *          0=no timeout, no waiting. Either it can be inserted now or we give up.<br>
+   *          >0=we wait for this amount. The meaning of the timeout is defined by the unit parameter which must be
+   *          specified in this case.
+   * @param unit
+   *          The {@link TimeUnit} that defines the meaning of timeout
+   * @return true if the element has been added to the queue within the given timeout range. false otherwise.
+   */
+  private static <T> boolean addElementToQueueSecure(ArrayBlockingQueue<T> queue, T element, long timeout, TimeUnit unit) {
     boolean interrupted;
+    int numInterrupted = 0;
     do {
       try {
         interrupted = false;
-        queue.put(element);
+        if (timeout == 0) {
+          // immediate insert try (no waiting)
+          return queue.offer(element);
+        }
+        else if (timeout < 0) {
+          // no time limit to wait for space
+          queue.put(element);
+          return true;
+        }
+        else {
+          // specific time to wait
+          return queue.offer(element, timeout, unit);
+        }
       }
       catch (InterruptedException e) {
-        interrupted = true;
+        interrupted = numInterrupted++ < 10;
       }
     }
     while (interrupted);
+    return false; // we had to much interrupts. we don't want to wait any longer (no endless looping).
   }
 
   /**
    * The resource change listener that adds the given event to the queue to execute later on
    */
-  private final static class P_ResourceChangedListener implements IResourceChangeListener {
+  private static final class P_ResourceChangedListener implements IResourceChangeListener {
 
     private final ArrayBlockingQueue<IResourceChangeEvent> m_eventCollector;
 
@@ -179,7 +211,10 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
       if (event != null && acceptUpdateEvent(event)) {
-        addElementToQueueSecure(m_eventCollector, event);
+        if (!addElementToQueueSecure(m_eventCollector, event, 10, TimeUnit.SECONDS)) {
+          // element could not be added within the given timeout
+          ScoutSdk.logWarning("No more space in the Scout DTO auto update event queue. Skipping event.");
+        }
       }
     }
   } // end class P_ResourceChangedListener
@@ -187,7 +222,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
   /**
    * Job that iterates over all resource change events and checks if they require a DTO update.
    */
-  private final static class P_ResourceChangeEventCheckJob extends JobEx {
+  private static final class P_ResourceChangeEventCheckJob extends JobEx {
 
     private final List<IDtoAutoUpdateHandler> m_handlers;
     private final ArrayBlockingQueue<IResourceChangeEvent> m_queueToConsume;
@@ -306,8 +341,12 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
               boolean modified = false;
               for (IDtoAutoUpdateOperation op : operations) {
                 if (!m_operationCollector.contains(op)) {
-                  addElementToQueueSecure(m_operationCollector, op);
-                  modified = true;
+                  if (addElementToQueueSecure(m_operationCollector, op, -1, null)) {
+                    modified = true;
+                  }
+                  else {
+                    ScoutSdk.logWarning("To many thread interrupts while waiting for space in the Scout DTO auto update event queue. Skipping compilation unit '" + icu.getElementName() + "'.");
+                  }
                 }
               }
 
@@ -315,7 +354,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
               // this way the user has a faster response time and we can already start in parallel (even though we may abort again).
               if (modified) {
                 m_dtoUpdateJob.abort();
-                m_dtoUpdateJob.schedule(200);
+                m_dtoUpdateJob.schedule(1000); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
               }
             }
           }
@@ -328,12 +367,12 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
   /**
    * Job that executes all dto update operations that have been discovered.
    */
-  private final static class P_AutoUpdateOperationsJob extends Job {
+  private static final class P_AutoUpdateOperationsJob extends Job {
 
-    private final Queue<IDtoAutoUpdateOperation> m_queueToConsume;
+    private final ArrayBlockingQueue<IDtoAutoUpdateOperation> m_queueToConsume;
     private boolean m_isAborted;
 
-    private P_AutoUpdateOperationsJob(Queue<IDtoAutoUpdateOperation> queueToConsume) {
+    private P_AutoUpdateOperationsJob(ArrayBlockingQueue<IDtoAutoUpdateOperation> queueToConsume) {
       super("Auto-updating derived resources");
       setRule(DtoAutoUpdateJobRule.INSTANCE);
       setPriority(Job.DECORATE);
@@ -417,9 +456,9 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     }
   }
 
-  public final static class DtoAutoUpdateJobRule implements ISchedulingRule {
+  public static final class DtoAutoUpdateJobRule implements ISchedulingRule {
 
-    public final static DtoAutoUpdateJobRule INSTANCE = new DtoAutoUpdateJobRule();
+    public static final DtoAutoUpdateJobRule INSTANCE = new DtoAutoUpdateJobRule();
 
     private DtoAutoUpdateJobRule() {
     }

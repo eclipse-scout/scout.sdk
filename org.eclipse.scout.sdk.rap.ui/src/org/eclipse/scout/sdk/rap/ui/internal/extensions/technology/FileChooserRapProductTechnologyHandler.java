@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
  */
 public class FileChooserRapProductTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  public final static String[] RAP_FILE_CHOOSER_PLUGINS = new String[]{"org.eclipse.scout.rt.ui.rap.incubator.filechooser",
+  public static final String[] RAP_FILE_CHOOSER_PLUGINS = new String[]{"org.eclipse.scout.rt.ui.rap.incubator.filechooser",
       "org.apache.commons.fileupload", "org.apache.commons.io", "org.eclipse.rap.rwt.supplemental.filedialog", "org.eclipse.rap.rwt.supplemental.fileupload"};
 
   @Override
@@ -42,7 +42,7 @@ public class FileChooserRapProductTechnologyHandler extends AbstractScoutTechnol
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
     return getSelectionProductFiles(getRapUiBundlesBelow(project),
-        new String[]{RuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId},
+        new String[]{IRuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId},
         RAP_FILE_CHOOSER_PLUGINS);
   }
 
@@ -53,7 +53,7 @@ public class FileChooserRapProductTechnologyHandler extends AbstractScoutTechnol
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getRapUiBundlesBelow(project), list, RuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId);
+    contributeProductFiles(getRapUiBundlesBelow(project), list, IRuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId);
   }
 
   private IScoutBundle[] getRapUiBundlesBelow(IScoutBundle start) {

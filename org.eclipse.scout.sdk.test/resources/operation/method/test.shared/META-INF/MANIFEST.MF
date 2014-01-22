@@ -11,7 +11,6 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.shared;visibility:=reexport
 Export-Package: test.shared
 Import-Package: javax.activation;resolution:=optional,
- javax.jms;resolution:=optional,
  javax.mail;resolution:=optional,
  javax.mail.event;resolution:=optional,
  javax.mail.internet;resolution:=optional,

@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.MenuNewOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
@@ -51,8 +52,8 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  private final static String EXCEL_EXPORT_MENU_TYPE_NAME = "ExportToExcelMenu";
-  private final static String EXCEL_EXPORT_NLS_KEY = "ExportToExcelMenu";
+  private static final String EXCEL_EXPORT_MENU_TYPE_NAME = "ExportToExcelMenu";
+  private static final String EXCEL_EXPORT_NLS_KEY = "ExportToExcelMenu";
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
@@ -70,7 +71,7 @@ public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandl
           r.getBundle().getNlsProject().updateRow(newEntry, monitor);
         }
         mno.setNlsEntry(nlsEntry);
-        mno.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IMenu, r.getBundle()));
+        mno.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IMenu, r.getBundle()));
         mno.validate();
         mno.run(monitor, workingCopyManager);
 
@@ -158,7 +159,7 @@ public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandl
 
   private IType getDesktopToolsMenu(IScoutBundle startBundle) {
     IScoutBundle clients[] = getClientBundlesBelow(startBundle);
-    IType iDesktop = TypeUtility.getType(RuntimeClasses.IDesktop);
+    IType iDesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
     ICachedTypeHierarchy desktopHierarchy = TypeUtility.getPrimaryTypeHierarchy(iDesktop);
     IType[] desktops = desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(clients));
     if (desktops != null && desktops.length == 1) {

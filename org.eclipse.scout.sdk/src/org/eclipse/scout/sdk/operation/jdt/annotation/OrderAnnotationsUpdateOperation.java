@@ -18,7 +18,7 @@ import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -60,7 +60,7 @@ public class OrderAnnotationsUpdateOperation implements IOperation {
     Document sourceDoc = new Document(buffer.getContents());
     MultiTextEdit multiEdit = new MultiTextEdit();
     IImportValidator validator = new CompilationUnitImportValidator(icu);
-    String orderSignature = SignatureCache.createTypeSignature(RuntimeClasses.Order);
+    String orderSignature = SignatureCache.createTypeSignature(IRuntimeClasses.Order);
     String NL = ResourceUtility.getLineSeparator(icu);
 
     for (OrderAnnotation orderAnnotation : m_orderAnnotations.values()) {

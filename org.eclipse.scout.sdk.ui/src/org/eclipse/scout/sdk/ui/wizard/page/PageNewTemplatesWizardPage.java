@@ -29,7 +29,6 @@ import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -46,7 +45,8 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>PageNewWizardPage1</h3> ...
  */
 public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
-  final IType iPage = TypeUtility.getType(RuntimeClasses.IPage);
+  private final IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
+
   private FilteredTable m_filteredTable;
   private IType m_selectedType;
   private final IScoutBundle m_clientBundle;

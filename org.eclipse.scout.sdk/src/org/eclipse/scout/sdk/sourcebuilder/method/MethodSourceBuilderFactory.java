@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.sourcebuilder.method;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFac
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
-import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 /**
  * <h3>{@link MethodSourceBuilderFactory}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public final class MethodSourceBuilderFactory {
@@ -144,9 +144,9 @@ public final class MethodSourceBuilderFactory {
       return null;
     }
     else {
-      Map<String, ITypeGenericMapping> genericMapping = new HashMap<String, ITypeGenericMapping>();
-      SignatureUtility.resolveGenericParametersInSuperHierarchy(SignatureCache.createTypeSignature(typeSourceBuilder.getElementName()), new String[0],
-          typeSourceBuilder.getSuperTypeSignature(), typeSourceBuilder.getInterfaceSignatures().toArray(new String[typeSourceBuilder.getInterfaceSignatures().size()]), genericMapping);
+      LinkedHashMap<String, ITypeGenericMapping> genericMapping = new LinkedHashMap<String, ITypeGenericMapping>();
+      SignatureUtility.resolveGenericParametersInSuperHierarchy(SignatureCache.createTypeSignature(typeSourceBuilder.getElementName()), typeSourceBuilder.getSuperTypeSignature(),
+          typeSourceBuilder.getInterfaceSignatures().toArray(new String[typeSourceBuilder.getInterfaceSignatures().size()]), genericMapping);
 
       MethodSourceBuilder builder = new MethodSourceBuilder(methodName);
 
@@ -250,8 +250,8 @@ public final class MethodSourceBuilderFactory {
     StringBuilder methodName = new StringBuilder();
     methodName.append("set");
     String field = fieldName.replaceFirst("m\\_", "");
-    String paramName = ScoutUtility.ensureValidParameterName(field);
-    methodName.append(ScoutUtility.ensureStartWithUpperCase(field));
+    String paramName = NamingUtility.ensureValidParameterName(field);
+    methodName.append(NamingUtility.ensureStartWithUpperCase(field));
     IMethodSourceBuilder setterBuilder = new MethodSourceBuilder(methodName.toString());
     setterBuilder.setFlags(Flags.AccPublic);
     setterBuilder.setReturnTypeSignature(Signature.SIG_VOID);

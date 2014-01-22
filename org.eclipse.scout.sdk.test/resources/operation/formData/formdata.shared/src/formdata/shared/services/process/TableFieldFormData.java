@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -65,6 +65,7 @@ public class TableFieldFormData extends AbstractFormData {
       setValueInternal(row, AN_OBJECT_COLUMN_ID, anObject);
     }
 
+    @SuppressWarnings("unchecked")
     public Set<Map<String, Integer>> getCustom(int row) {
       return (Set<Map<String, Integer>>) getValueInternal(row, CUSTOM_COLUMN_ID);
     }
@@ -120,6 +121,7 @@ public class TableFieldFormData extends AbstractFormData {
       }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public void setValueAt(int row, int column, Object value) {
       switch (column) {

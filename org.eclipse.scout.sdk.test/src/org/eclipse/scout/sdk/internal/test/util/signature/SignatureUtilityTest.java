@@ -4,17 +4,16 @@
 package org.eclipse.scout.sdk.internal.test.util.signature;
 
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
-import org.eclipse.scout.sdk.util.signature.FullyQuallifiedValidator;
+import org.eclipse.scout.sdk.util.signature.FullyQualifiedValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -96,7 +95,7 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
   @Test(timeout = 200L)
   public void testClassParameterized() throws Exception {
     String signature = "[Ljava.lang.Class<+[Lcom.bsiag.scout.client.ui.desktop.outline.IOutline;>;";
-    FullyQuallifiedValidator validator = new FullyQuallifiedValidator();
+    FullyQualifiedValidator validator = new FullyQualifiedValidator();
 
     String result = SignatureUtility.getTypeReference(signature, validator);
     Assert.assertEquals("java.lang.Class<? extends com.bsiag.scout.client.ui.desktop.outline.IOutline[]>[]", result);
@@ -105,7 +104,7 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
   @Test(timeout = 4L)
   public void testComplexNestedArrayListHashMapArray() throws Exception {
     String signature = "[Ljava.util.HashMap<Ljava.util.ArrayList<[[Ljava.lang.String;>;Lorg.eclipse.scout.sdk.workspace.member.IScoutType;>;";
-    FullyQuallifiedValidator validator = new FullyQuallifiedValidator();
+    FullyQualifiedValidator validator = new FullyQualifiedValidator();
     String result = SignatureUtility.getTypeReference(signature, validator);
     Assert.assertEquals("java.util.HashMap<java.util.ArrayList<java.lang.String[][]>, org.eclipse.scout.sdk.workspace.member.IScoutType>[]", result);
   }
@@ -168,27 +167,27 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
 
   @Test
   public void testGenericResolver01() throws Exception {
-    Map<String, ITypeGenericMapping> collector = new HashMap<String, ITypeGenericMapping>();
+    LinkedHashMap<String, ITypeGenericMapping> collector = new LinkedHashMap<String, ITypeGenericMapping>();
     String superTypeSignature = Signature.createTypeSignature("signature.tests.generic.AbstractClass01<" + String.class.getName() + "," + Integer.class.getName() + ">", true);
-    SignatureUtility.resolveGenericParametersInSuperHierarchy(Signature.createTypeSignature("signature.tests.generic.output.TestType", true), null, superTypeSignature, null, collector);
+    SignatureUtility.resolveGenericParametersInSuperHierarchy(Signature.createTypeSignature("signature.tests.generic.output.TestType", true), superTypeSignature, null, collector);
     Assert.assertEquals(Signature.createTypeSignature(String.class.getName(), true), collector.get("signature.tests.generic.IInterface01").getParameterSignature("GENERIC"));
     Assert.assertEquals(Signature.createTypeSignature(Integer.class.getName(), true), collector.get("signature.tests.generic.IInterface02").getParameterSignature("A"));
   }
 
   @Test
   public void testGenericResolver02() throws Exception {
-    Map<String, ITypeGenericMapping> collector = new HashMap<String, ITypeGenericMapping>();
+    LinkedHashMap<String, ITypeGenericMapping> collector = new LinkedHashMap<String, ITypeGenericMapping>();
     String superTypeSignature = Signature.createTypeSignature("signature.tests.generic.AbstractClass02<" + Integer.class.getName() + ">", true);
-    SignatureUtility.resolveGenericParametersInSuperHierarchy(Signature.createTypeSignature("signature.tests.generic.output.TestType", true), null, superTypeSignature, null, collector);
+    SignatureUtility.resolveGenericParametersInSuperHierarchy(Signature.createTypeSignature("signature.tests.generic.output.TestType", true), superTypeSignature, null, collector);
     Assert.assertEquals(Signature.createTypeSignature(String.class.getName(), true), collector.get("signature.tests.generic.IInterface01").getParameterSignature("GENERIC"));
     Assert.assertEquals(Signature.createTypeSignature(List.class.getName() + "<" + Integer.class.getName() + ">", true), collector.get("signature.tests.generic.IInterface02").getParameterSignature("A"));
   }
 
   @Test
   public void testGenericResolver03() throws Exception {
-    Map<String, ITypeGenericMapping> collector = new HashMap<String, ITypeGenericMapping>();
+    LinkedHashMap<String, ITypeGenericMapping> collector = new LinkedHashMap<String, ITypeGenericMapping>();
     String superTypeSignature = Signature.createTypeSignature("org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField<" + Integer.class.getName() + ">", true);
-    SignatureUtility.resolveGenericParametersInSuperHierarchy(Signature.createTypeSignature("signature.tests.generic.output.TestType", true), null, superTypeSignature, null, collector);
+    SignatureUtility.resolveGenericParametersInSuperHierarchy(Signature.createTypeSignature("signature.tests.generic.output.TestType", true), superTypeSignature, null, collector);
     Assert.assertEquals(Signature.createTypeSignature(Integer.class.getName(), true), collector.get("org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField").getParameterSignature("T"));
   }
 

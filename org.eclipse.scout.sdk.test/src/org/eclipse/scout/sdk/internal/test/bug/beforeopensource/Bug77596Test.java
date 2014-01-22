@@ -43,7 +43,7 @@ public class Bug77596Test extends AbstractScoutSdkTest {
     IStructuredType helper = getCompanyFormHelper();
     Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_LOGGER).length == 1);
     Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_STATIC).length == 1);
-    Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_MEMBER).length == 4);
+    Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_MEMBER).length == 3);
     Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONSTRUCTOR).length == 1);
     Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONFIG_EXEC).length == 0);
     Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONFIG_PROPERTY).length == 1);

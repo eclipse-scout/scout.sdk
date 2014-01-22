@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.PermissionNewOperation;
@@ -46,8 +46,8 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>CodeTypeWizardPage</h3> ...
  */
 public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
-  private final IType basicPermission = TypeUtility.getType(RuntimeClasses.BasicPermission);
-  private final IType basicHierarchyPermission = TypeUtility.getType(RuntimeClasses.BasicHierarchyPermission);
+  private final IType basicPermission = TypeUtility.getType(IRuntimeClasses.BasicPermission);
+  private final IType basicHierarchyPermission = TypeUtility.getType(IRuntimeClasses.BasicHierarchyPermission);
 
   private String m_packageName;
   private String m_typeName;
@@ -149,11 +149,11 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IStatus getStatusNameField() throws JavaModelException {
-    IStatus javaFieldNameStatus = ScoutUtility.getJavaNameStatus(getTypeName(), SdkProperties.SUFFIX_PERMISSION);
+    IStatus javaFieldNameStatus = ScoutUtility.validateJavaName(getTypeName(), SdkProperties.SUFFIX_PERMISSION);
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    IStatus existingStatus = ScoutUtility.getTypeExistingStatus(getSharedBundle(), getTargetPackage(), getTypeName());
+    IStatus existingStatus = ScoutUtility.validateTypeNotExisting(getSharedBundle(), getTargetPackage(), getTypeName());
     if (!existingStatus.isOK()) {
       return existingStatus;
     }

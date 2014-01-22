@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
@@ -96,21 +97,24 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     String beanReference = SignatureUtility.getTypeReference(getBeanTypeSignature(), serverSession, validator);
     String sigTypeSimpleName = beanReference.replaceAll("([^<]*).*", "$1");
 
+    String beanName = NamingUtility.ensureStartWithUpperCase(getBeanName());
+    String varName = NamingUtility.ensureStartWithLowerCase(getBeanName());
+
     // setter
     StringBuilder sourceSetter = new StringBuilder();
     sourceSetter.append(methodFlagsToString());
-    sourceSetter.append(" void set" + getBeanName(true) + "(");
+    sourceSetter.append(" void set" + beanName + "(");
     sourceSetter.append(beanReference);
-    sourceSetter.append(" " + getBeanName(false) + "){\n" + SdkProperties.TAB);
-    sourceSetter.append("setSharedContextVariable(\"" + getBeanName(false) + "\"," + sigTypeSimpleName + ".class," + getBeanName(false) + ");\n}\n");
+    sourceSetter.append(" " + varName + "){\n" + SdkProperties.TAB);
+    sourceSetter.append("setSharedContextVariable(\"" + varName + "\"," + sigTypeSimpleName + ".class," + varName + ");\n}\n");
     IMethod writeMethod = serverSession.createMethod(sourceSetter.toString(), getSiblingServerSession(), true, monitor);
     // getter
     StringBuilder sourceGetter = new StringBuilder();
     sourceGetter.append(methodFlagsToString());
     sourceGetter.append(" " + beanReference + " ");
 
-    sourceGetter.append("get" + getBeanName(true) + "() {\n" + SdkProperties.TAB);
-    sourceGetter.append("return getSharedContextVariable(\"" + getBeanName(false) + "\"," + sigTypeSimpleName + ".class);\n}\n");
+    sourceGetter.append("get" + beanName + "() {\n" + SdkProperties.TAB);
+    sourceGetter.append("return getSharedContextVariable(\"" + varName + "\"," + sigTypeSimpleName + ".class);\n}\n");
     serverSession.createMethod(sourceGetter.toString(), writeMethod, true, monitor);
     // imports
     for (String imp : validator.getImportsToCreate()) {
@@ -124,12 +128,15 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     String beanReference = SignatureUtility.getTypeReference(getBeanTypeSignature(), clientSession, validator);
     String sigTypeSimpleName = beanReference.replaceAll("([^<]*).*", "$1");
 
+    String beanName = NamingUtility.ensureStartWithUpperCase(getBeanName());
+    String varName = NamingUtility.ensureStartWithLowerCase(getBeanName());
+
     // getter
     StringBuilder sourceGetter = new StringBuilder();
     sourceGetter.append(methodFlagsToString());
     sourceGetter.append(" " + beanReference + " ");
-    sourceGetter.append("get" + getBeanName(true) + "() {\n" + SdkProperties.TAB);
-    sourceGetter.append("return getSharedContextVariable(\"" + getBeanName(false) + "\"," + sigTypeSimpleName + ".class);\n}\n");
+    sourceGetter.append("get" + beanName + "() {\n" + SdkProperties.TAB);
+    sourceGetter.append("return getSharedContextVariable(\"" + varName + "\"," + sigTypeSimpleName + ".class);\n}\n");
     clientSession.createMethod(sourceGetter.toString(), getSiblingClientSession(), true, monitor);
     // imports
     for (String imp : validator.getImportsToCreate()) {
@@ -174,19 +181,6 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
       methodFlagsString = " final";
     }
     return methodFlagsString;
-  }
-
-  @Override
-  public String getBeanName(boolean startWithUpperCase) {
-    if (StringUtility.isNullOrEmpty(getBeanName())) {
-      return null;
-    }
-    if (startWithUpperCase) {
-      return Character.toUpperCase(getBeanName().charAt(0)) + getBeanName().substring(1);
-    }
-    else {
-      return Character.toLowerCase(getBeanName().charAt(0)) + getBeanName().substring(1);
-    }
   }
 
   @Override

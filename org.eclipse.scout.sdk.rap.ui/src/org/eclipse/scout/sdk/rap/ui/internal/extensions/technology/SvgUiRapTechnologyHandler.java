@@ -5,7 +5,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class SvgUiRapTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  public final static String[] RAP_SVG_PLUGIN = new String[]{"org.eclipse.scout.svg.ui.rap"};
+  public static final String[] RAP_SVG_PLUGIN = new String[]{"org.eclipse.scout.svg.ui.rap"};
 
   public SvgUiRapTechnologyHandler() {
   }
@@ -35,7 +35,7 @@ public class SvgUiRapTechnologyHandler extends AbstractScoutTechnologyHandler {
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
     return getSelectionProductFiles(getRapUiBundlesBelow(project),
-        new String[]{RuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId},
+        new String[]{IRuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId},
         SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, RAP_SVG_PLUGIN,
         SvgClientTechnologyHandler.getAdditionalBatik17CorePlugins(), SvgClientTechnologyHandler.getAdditionalBatik17ScoutPlugins());
   }
@@ -43,7 +43,7 @@ public class SvgUiRapTechnologyHandler extends AbstractScoutTechnologyHandler {
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
     for (IScoutBundle e : getRapUiBundlesBelow(project)) {
-      contributeProductFiles(e, list, false, RuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId);
+      contributeProductFiles(e, list, false, IRuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId);
     }
   }
 

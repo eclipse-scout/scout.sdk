@@ -26,7 +26,7 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.osgi.framework.Bundle;
 
 public final class FormFieldExtensionPoint {
-  private final static FormFieldExtensionPoint instance = new FormFieldExtensionPoint();
+  private static final FormFieldExtensionPoint instance = new FormFieldExtensionPoint();
 
   private List<IFormFieldExtension> m_extensions;
 
@@ -184,7 +184,7 @@ public final class FormFieldExtensionPoint {
             ScoutSdkUi.logWarning("could not create super type hierarchy of '" + modelType.getFullyQualifiedName() + "'.", e);
             continue;
           }
-          int distance = -distanceToIFormField(modelType, TypeUtility.getType(RuntimeClasses.IFormField), 0, superTypeHierarchy);
+          int distance = -distanceToIFormField(modelType, TypeUtility.getType(IRuntimeClasses.IFormField), 0, superTypeHierarchy);
           CompositeObject key = new CompositeObject(distance, modelType.getFullyQualifiedName());
           FormFieldExtension formFieldExtension = formFieldExtensions.get(key);
           if (formFieldExtension == null) {

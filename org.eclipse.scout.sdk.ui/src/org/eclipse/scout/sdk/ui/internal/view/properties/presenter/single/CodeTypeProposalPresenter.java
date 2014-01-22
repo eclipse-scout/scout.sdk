@@ -11,20 +11,21 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
-import org.eclipse.scout.sdk.ui.fields.proposal.StaticContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 
@@ -32,7 +33,8 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>CodeTypePresenter</h3> ...
  */
 public class CodeTypeProposalPresenter extends AbstractTypeProposalPresenter {
-  final IType iCodeType = TypeUtility.getType(RuntimeClasses.ICodeType);
+
+  private P_ContentProvider m_contentProvider;
 
   public CodeTypeProposalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -42,19 +44,28 @@ public class CodeTypeProposalPresenter extends AbstractTypeProposalPresenter {
   protected void createProposalFieldProviders(ProposalTextField proposalField) {
     // done in init
     JavaElementLabelProvider labelProvider = new JavaElementLabelProvider();
+    m_contentProvider = new P_ContentProvider(labelProvider);
     getProposalField().setLabelProvider(labelProvider);
-    getProposalField().setContentProvider(new P_ContentProvider(labelProvider));
+    getProposalField().setContentProvider(m_contentProvider);
   }
 
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
     if (method != null) {
+      m_contentProvider.setType(method.getType());
       getProposalField().setInput(method.getType());
       super.init(method);
     }
     else {
+      m_contentProvider.setType(null);
       getProposalField().setInput(null);
     }
+  }
+
+  @Override
+  public synchronized void dispose() {
+    m_contentProvider.dispose();
+    super.dispose();
   }
 
   /**
@@ -66,33 +77,36 @@ public class CodeTypeProposalPresenter extends AbstractTypeProposalPresenter {
    * @author Andreas Hoegger
    * @since 3.8.0 15.02.2012
    */
-  private class P_ContentProvider extends StaticContentProvider {
+  private static final class P_ContentProvider extends AbstractCachedTypeContentProposalProvider {
 
     private P_ContentProvider(ILabelProvider labelProvider) {
-      super(null, labelProvider);
+      super(labelProvider);
     }
 
     @Override
-    public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-      ensureCache();
-      return super.getProposals(searchPattern, monitor);
-    }
+    protected Object[] computeProposals() {
+      IType iCodeType = TypeUtility.getType(IRuntimeClasses.ICodeType);
 
-    @Override
-    public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      setElements(null);
-    }
-
-    private void ensureCache() {
-      if (getElements() == null) {
-        if (getMethod() != null) {
-          ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()), TypeFilters.getClassFilter());
-          setElements(TypeUtility.getPrimaryTypeHierarchy(iCodeType).getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator()));
+      String genericSignature = null;
+      try {
+        ITypeHierarchy supertypeHierarchy = getType().newSupertypeHierarchy(null);
+        if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField))) {
+          genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, IRuntimeClasses.IValueField, IRuntimeClasses.TYPE_PARAM_VALUEFIELD__VALUE_TYPE);
         }
-        else {
-          setElements(new IType[0]);
+        else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IColumn))) {
+          genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
         }
       }
+      catch (CoreException e) {
+        ScoutSdkUi.logError(e);
+      }
+
+      ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
+      ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(),
+          TypeFilters.getNoGenericTypesFilter(),
+          TypeFilters.getTypesOnClasspath(getType().getJavaProject()),
+          TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
+      return typeHierarchy.getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator());
     }
   }
 }

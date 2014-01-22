@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceDeleteAction;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.EditorSelectionVisitor;
@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 public class TextServiceNodePage extends AbstractServiceNodePage {
 
   public TextServiceNodePage(AbstractPage parentPage, IType type) {
-    super(parentPage, type, TypeUtility.getType(RuntimeClasses.AbstractDynamicNlsTextProviderService), SdkProperties.SUFFIX_TEXT_SERVICE);
+    super(parentPage, type, TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService), SdkProperties.SUFFIX_TEXT_SERVICE);
     setName(type.getElementName());
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Text));
   }

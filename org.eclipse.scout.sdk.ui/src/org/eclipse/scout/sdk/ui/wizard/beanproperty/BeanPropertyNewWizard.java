@@ -29,7 +29,8 @@ public class BeanPropertyNewWizard extends AbstractWorkspaceWizard {
   public BeanPropertyNewWizard(IType declaringType) {
     setWindowTitle(Texts.get("NewProperty"));
     IJavaSearchScope createJavaSearchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{declaringType.getJavaProject()});
-    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(createJavaSearchScope);
+
+    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(createJavaSearchScope, declaringType);
     BeanPropertyNewOperation op = new BeanPropertyNewOperation(declaringType);
     beanPropertyWizardPage.setOperation(op);
     // find all used method names
@@ -41,5 +42,4 @@ public class BeanPropertyNewWizard extends AbstractWorkspaceWizard {
     beanPropertyWizardPage.setNotAllowedNames(notAllowedMethodNames);
     addPage(beanPropertyWizardPage);
   }
-
 }

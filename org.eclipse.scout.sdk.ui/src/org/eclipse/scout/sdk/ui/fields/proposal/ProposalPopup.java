@@ -83,7 +83,7 @@ public class ProposalPopup extends Window {
    * setInitialPopupSize.
    */
   private static final int MINIMUM_HEIGHT = 100;
-  private static final int DEFAULT_WIDTH = 300;
+  private static final int DEFAULT_WIDTH = 400;
   private static final int DEFAULT_HEIGHT = 300;
 
   public static final Object[] LOADING_PROPOSAL = new Object[]{new ISeparatorProposal() {
@@ -266,11 +266,11 @@ public class ProposalPopup extends Window {
 
   private void handleProposalSelection(Object proposal) {
     // refresh selected label
-    if (m_selectedProposal != null) {
-      m_tableViewer.update(m_selectedProposal, new String[]{"label"});
-    }
+    Object old = m_selectedProposal;
     m_selectedProposal = null;
-
+    if (old != null) {
+      m_tableViewer.update(old, new String[]{"label"});
+    }
     m_selectedProposal = proposal;
     if (m_selectedProposal != null) {
       m_tableViewer.update(m_selectedProposal, new String[]{"label"});
@@ -299,13 +299,7 @@ public class ProposalPopup extends Window {
   }
 
   public void updatePattern(String pattern, Object input) {
-    String lastSearchText = null;
-    if (getInput() != null) {
-      lastSearchText = getInput().getPattern();
-    }
-    if (CompareUtility.notEquals(pattern, lastSearchText)) {
-      setInput(new SearchPatternInput(input, pattern));
-    }
+    setInput(new SearchPatternInput(input, pattern));
   }
 
   public SearchPatternInput getInput() {
@@ -313,38 +307,29 @@ public class ProposalPopup extends Window {
   }
 
   public void setInput(SearchPatternInput input) {
-    SearchPatternInput oldInput = getInput();
-    if (!CompareUtility.equals(oldInput, input)) {
-      // if old input equals new input except proposals and in old input proposal are loaded -> void
-      if (oldInput != null && input != null && CompareUtility.equals(oldInput.getInput(), input.getInput())
-          && CompareUtility.equals(oldInput.getPattern(), input.getPattern())
-          && oldInput.getProposals() != null && input.getProposals() == null) {
-        return;
-      }
-      m_input = input;
-      if (getShell() != null && !getShell().isDisposed()) {
-        try {
-          m_uiLock.acquire();
-          m_tableViewer.getTable().setRedraw(false);
-          m_tableViewer.setInput(m_input);
-          // Default to the first selection if there is no selection. This is the case, every time the popup is opened.
-          if (m_tableViewer.getSelection().isEmpty()) {
-            Object proposal = m_tableViewer.getElementAt(0);
-            if (proposal != null) {
-              m_tableViewer.setSelection(new StructuredSelection(proposal));
-            }
+    m_input = input;
+    if (getShell() != null && !getShell().isDisposed()) {
+      try {
+        m_uiLock.acquire();
+        m_tableViewer.getTable().setRedraw(false);
+        m_tableViewer.setInput(m_input);
+        // Default to the first selection if there is no selection. This is the case, every time the popup is opened.
+        if (m_tableViewer.getSelection().isEmpty()) {
+          Object proposal = m_tableViewer.getElementAt(0);
+          if (proposal != null) {
+            m_tableViewer.setSelection(new StructuredSelection(proposal));
           }
-          if (m_itemCountLabel != null) {
-            m_itemCountLabel.setText(m_tableViewer.getTable().getItemCount() + " " + Texts.get("ItemsFound"));
-          }
-          updateDescription(m_selectedProposal);
         }
-        finally {
-          m_tableViewer.getTable().setRedraw(true);
-          m_uiLock.release();
+        if (m_itemCountLabel != null) {
+          m_itemCountLabel.setText(m_tableViewer.getTable().getItemCount() + " " + Texts.get("ItemsFound"));
         }
-        constrainShellSize();
+        updateDescription(m_selectedProposal);
       }
+      finally {
+        m_tableViewer.getTable().setRedraw(true);
+        m_uiLock.release();
+      }
+      constrainShellSize();
     }
   }
 
@@ -420,13 +405,7 @@ public class ProposalPopup extends Window {
       shell = getShell();
     }
 
-    // provide a hook for adjusting the bounds. This is only
-    // necessary when there is content driven sizing that must be
-    // adjusted each time the dialog is opened.
-//    adjustBounds();
-
     // limit the shell size to the display size
-//    adjustShellBounds(false);
     constrainShellSize();
     shell.setVisible(true);
     return OK;
@@ -487,7 +466,6 @@ public class ProposalPopup extends Window {
     finally {
       shell.setRedraw(true);
     }
-
   }
 
   private void updateDescription(Object proposal) {
@@ -510,12 +488,7 @@ public class ProposalPopup extends Window {
         ((GridLayout) m_proposalDescriptionArea.getParent().getLayout()).numColumns = 1;
         ((GridData) m_proposalDescriptionArea.getLayoutData()).exclude = true;
       }
-//      getShell().layout(true);
-//      adjustBounds();
       constrainShellSize();
-//      adjustShellBounds(true);
-//      m_proposalDescriptionArea.setExpandHorizontal(true);
-//      m_proposalDescriptionArea.setExpandVertical(true);
     }
   }
 
@@ -579,7 +552,12 @@ public class ProposalPopup extends Window {
       listeners = m_selectionListeners.toArray(new IProposalPopupListener[m_selectionListeners.size()]);
     }
     for (IProposalPopupListener listener : listeners) {
-      listener.popupChanged(event);
+      try {
+        listener.popupChanged(event);
+      }
+      catch (Exception e) {
+        ScoutSdkUi.logError("Error in IProposalPopupListener listener.", e);
+      }
     }
   }
 

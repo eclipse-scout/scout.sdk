@@ -21,6 +21,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
+import org.eclipse.scout.sdk.util.IRegEx;
 
 /**
  * <h3>{@link IconContentProvider}</h3> ...
@@ -45,7 +46,7 @@ public class IconContentProvider extends ContentProposalProvider implements IStr
       searchPattern = "*";
     }
     else {
-      searchPattern = searchPattern.replaceAll("\\*$", "").toLowerCase() + "*";
+      searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("").toLowerCase() + "*";
     }
 
     char[] pattern = searchPattern.toCharArray();

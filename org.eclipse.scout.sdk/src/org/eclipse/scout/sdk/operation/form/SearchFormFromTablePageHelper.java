@@ -20,6 +20,7 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
@@ -70,13 +71,13 @@ public final class SearchFormFromTablePageHelper {
       searchFormBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execResetSearchFilterBuilder), execResetSearchFilterBuilder);
     }
     // main box
-    ITypeSourceBuilder mainBoxBuilder = addFormField(SdkProperties.TYPE_NAME_MAIN_BOX, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IGroupBox, searchFormProject), 10, searchFormFqn, searchFormBuilder, searchFormBuilder);
+    ITypeSourceBuilder mainBoxBuilder = addFormField(SdkProperties.TYPE_NAME_MAIN_BOX, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, searchFormProject), 10, searchFormFqn, searchFormBuilder, searchFormBuilder);
     String mainBoxFqn = searchFormFqn + "." + mainBoxBuilder.getElementName();
     // tabbox
-    ITypeSourceBuilder tabBoxBuilder = addFormField("TabBox", RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ITabBox, searchFormProject), 10, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
+    ITypeSourceBuilder tabBoxBuilder = addFormField("TabBox", RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITabBox, searchFormProject), 10, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
     String tabBoxFqn = mainBoxFqn + "." + tabBoxBuilder.getElementName();
     // field box (group box)
-    ITypeSourceBuilder fieldBoxBuilder = addFormField("Field" + SdkProperties.SUFFIX_GROUP_BOX, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IGroupBox, searchFormProject), 10, tabBoxFqn, tabBoxBuilder, searchFormBuilder);
+    ITypeSourceBuilder fieldBoxBuilder = addFormField("Field" + SdkProperties.SUFFIX_GROUP_BOX, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, searchFormProject), 10, tabBoxFqn, tabBoxBuilder, searchFormBuilder);
     String fieldBoxFqn = tabBoxFqn + "." + fieldBoxBuilder.getElementName();
     INlsEntry searchCriteriaEntry = null;
     if (nlsProvider != null) {
@@ -100,7 +101,7 @@ public final class SearchFormFromTablePageHelper {
     // fields
     double fieldOrder = 10;
     ITypeHierarchy tablePageHierarchy = TypeUtility.getLocalTypeHierarchy(tablePage);
-    IType[] tables = TypeUtility.getInnerTypes(tablePage, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.ITable), tablePageHierarchy));
+    IType[] tables = TypeUtility.getInnerTypes(tablePage, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITable), tablePageHierarchy));
     if (tables.length > 0) {
       IType table = tables[0];
       int i = 1;
@@ -108,7 +109,7 @@ public final class SearchFormFromTablePageHelper {
         table = tables[i];
       }
       if (TypeUtility.exists(table)) {
-        IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn), tablePageHierarchy));
+        IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), tablePageHierarchy));
         for (IType column : columns) {
           ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(column, "getConfiguredDisplayable");
           String retVal = ScoutUtility.getMethodReturnValue(configurationMethod.peekMethod());
@@ -121,9 +122,9 @@ public final class SearchFormFromTablePageHelper {
     }
     // end field box
     // button reset
-    addFormField("Reset" + SdkProperties.SUFFIX_BUTTON, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IButton, searchFormProject), fieldOrder, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
+    addFormField("Reset" + SdkProperties.SUFFIX_BUTTON, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IButton, searchFormProject), fieldOrder, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
     // button search
-    addFormField("Search" + SdkProperties.SUFFIX_BUTTON, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IButton, searchFormProject), fieldOrder, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
+    addFormField("Search" + SdkProperties.SUFFIX_BUTTON, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IButton, searchFormProject), fieldOrder, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
   }
 
   private static ITypeSourceBuilder addFormField(String fieldName, String superTypeSignature, double orderNr, String fieldOwnerFqn, ITypeSourceBuilder fieldOwnerBuilder, ITypeSourceBuilder fieldGetterOwnerBuilder) throws CoreException {
@@ -158,38 +159,38 @@ public final class SearchFormFromTablePageHelper {
       nlsEntry = ScoutUtility.getReturnNlsEntry(nlsMethod);
     }
     String fieldNamePlain = column.getElementName().replace(SdkProperties.SUFFIX_COLUMN, "");
-    if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IBigDecimalColumn), column)) {
-      return addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IBigDecimalField, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+    if (tablePageHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IBigDecimalColumn), column)) {
+      return addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IBigDecimalField, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
     }
-    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IBooleanColumn), column)) {
-      return addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IBooleanField, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IBooleanColumn), column)) {
+      return addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IBooleanField, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
     }
-    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IDateColumn), column)) {
-      ITypeSourceBuilder sequenceBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_BOX, nlsEntry, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ISequenceBox, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
-      fillSequenceBox(sequenceBoxBuilder, fieldOwnerFqn + "." + sequenceBoxBuilder.getElementName(), RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IDateField, searchFormProject), fieldGetterOwnerBuilder, nlsProject);
+    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IDateColumn), column)) {
+      ITypeSourceBuilder sequenceBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_BOX, nlsEntry, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ISequenceBox, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+      fillSequenceBox(sequenceBoxBuilder, fieldOwnerFqn + "." + sequenceBoxBuilder.getElementName(), RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IDateField, searchFormProject), fieldGetterOwnerBuilder, nlsProject);
       return sequenceBoxBuilder;
     }
-    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IDoubleColumn), column)) {
-      ITypeSourceBuilder sequenceBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_BOX, nlsEntry, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ISequenceBox, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
-      fillSequenceBox(sequenceBoxBuilder, fieldOwnerFqn + "." + sequenceBoxBuilder.getElementName(), RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IDoubleField, searchFormProject), fieldGetterOwnerBuilder, nlsProject);
+    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IDoubleColumn), column)) {
+      ITypeSourceBuilder sequenceBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_BOX, nlsEntry, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ISequenceBox, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+      fillSequenceBox(sequenceBoxBuilder, fieldOwnerFqn + "." + sequenceBoxBuilder.getElementName(), RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IDoubleField, searchFormProject), fieldGetterOwnerBuilder, nlsProject);
       return sequenceBoxBuilder;
     }
-    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IIntegerColumn), column)) {
-      ITypeSourceBuilder sequenceBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_BOX, nlsEntry, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ISequenceBox, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
-      fillSequenceBox(sequenceBoxBuilder, fieldOwnerFqn + "." + sequenceBoxBuilder.getElementName(), RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IIntegerField, searchFormProject), fieldGetterOwnerBuilder, nlsProject);
+    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IIntegerColumn), column)) {
+      ITypeSourceBuilder sequenceBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_BOX, nlsEntry, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ISequenceBox, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+      fillSequenceBox(sequenceBoxBuilder, fieldOwnerFqn + "." + sequenceBoxBuilder.getElementName(), RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IIntegerField, searchFormProject), fieldGetterOwnerBuilder, nlsProject);
       return sequenceBoxBuilder;
     }
-    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ILongColumn), column)) {
-      ITypeSourceBuilder sequenceBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_BOX, nlsEntry, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ISequenceBox, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
-      fillSequenceBox(sequenceBoxBuilder, fieldOwnerFqn + "." + sequenceBoxBuilder.getElementName(), RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ILongField, searchFormProject), fieldGetterOwnerBuilder, nlsProject);
+    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.ILongColumn), column)) {
+      ITypeSourceBuilder sequenceBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_BOX, nlsEntry, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ISequenceBox, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+      fillSequenceBox(sequenceBoxBuilder, fieldOwnerFqn + "." + sequenceBoxBuilder.getElementName(), RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ILongField, searchFormProject), fieldGetterOwnerBuilder, nlsProject);
       return sequenceBoxBuilder;
     }
-    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ISmartColumn), column)) {
+    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.ISmartColumn), column)) {
       IMethod codeTypeMethod = TypeUtility.getMethod(column, "getConfiguredCodeType");
       if (TypeUtility.exists(codeTypeMethod)) {
         final IType codeType = PropertyMethodSourceUtility.parseReturnParameterClass(PropertyMethodSourceUtility.getMethodReturnValue(codeTypeMethod), codeTypeMethod);
         // listbox
-        ITypeSourceBuilder listBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(RuntimeClasses.IListBox, searchFormProject) + "<" + Long.class.getName() + ">"), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+        ITypeSourceBuilder listBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.IListBox, searchFormProject) + "<" + Long.class.getName() + ">"), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
         if (TypeUtility.exists(codeType)) {
           // getConfiguredCodeType method
           IMethodSourceBuilder getConfiguredCodeTypeBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(listBoxBuilder, "getConfiguredCodeType");
@@ -202,7 +203,7 @@ public final class SearchFormFromTablePageHelper {
         if (TypeUtility.exists(lookupCallMethod)) {
           final IType lookupCall = PropertyMethodSourceUtility.parseReturnParameterClass(PropertyMethodSourceUtility.getMethodReturnValue(lookupCallMethod), lookupCallMethod);
           // smartfield
-          ITypeSourceBuilder smartFieldBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.ISmartField, searchFormProject) + "<" + Long.class.getName() + ">"), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+          ITypeSourceBuilder smartFieldBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ISmartField, searchFormProject) + "<" + Long.class.getName() + ">"), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
           if (TypeUtility.exists(lookupCall)) {
             // getConfiguredLookupCall method
             IMethodSourceBuilder getConfiguredCodeTypeBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(smartFieldBuilder, "getConfiguredLookupCall");
@@ -213,8 +214,8 @@ public final class SearchFormFromTablePageHelper {
         }
       }
     }
-    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IStringColumn), column)) {
-      return addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IStringField, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+    else if (tablePageHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IStringColumn), column)) {
+      return addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IStringField, searchFormProject), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
     }
     return null;
   }

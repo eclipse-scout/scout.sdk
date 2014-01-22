@@ -22,7 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
@@ -35,6 +35,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
@@ -89,7 +90,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
   }
 
   protected void visitTable(IType table, IProgressMonitor monitor) throws CoreException {
-    final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(RuntimeClasses.IColumn), getLocalTypeHierarchy()), ScoutTypeComparators.getOrderAnnotationComparator());
+    final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), getLocalTypeHierarchy()), ScoutTypeComparators.getOrderAnnotationComparator());
     final String[] colunmSignatures = new String[columns.length];
     final Map<Integer, String> columnIdMap = new HashMap<Integer, String>();
 
@@ -113,9 +114,9 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
     for (int i = 0; i < columns.length; i++) {
       try {
         IType column = columns[i];
-        String upperColName = ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
-        String lowerColName = ScoutUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
-        String methodParameterName = ScoutUtility.ensureValidParameterName(lowerColName);
+        String upperColName = NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
+        String lowerColName = NamingUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
+        String methodParameterName = NamingUtility.ensureValidParameterName(lowerColName);
         final String colSignature = getColumnSignature(column, getLocalTypeHierarchy());
         colunmSignatures[i] = colSignature;
         // setter
@@ -168,7 +169,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
           source.append("  switch(column){").append(lineDelimiter);
           for (int i = 0; i < columns.length; i++) {
             source.append("    case " + getColumnConstantName(i, columnIdMap) + ":").append(lineDelimiter);
-            source.append("set").append(ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(columns[i].getElementName())));
+            source.append("set").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(columns[i].getElementName())));
             source.append("(row,");
             if (!OBJECT_SIG.equals(colunmSignatures[i])) {
               source.append("(").append(SignatureUtility.getTypeReference(colunmSignatures[i], validator)).append(") ");
@@ -189,7 +190,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
           source.append("  switch(column){").append(lineDelimiter);
           for (int i = 0; i < columns.length; i++) {
             source.append("    case " + getColumnConstantName(i, columnIdMap) + ":").append(lineDelimiter);
-            source.append("return get").append(ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(columns[i].getElementName()))).append("(row);").append(lineDelimiter);
+            source.append("return get").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(columns[i].getElementName()))).append("(row);").append(lineDelimiter);
           }
           source.append("    default: return null;").append(lineDelimiter);
           source.append("  }");

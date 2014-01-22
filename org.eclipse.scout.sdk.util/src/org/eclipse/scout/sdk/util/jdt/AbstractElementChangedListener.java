@@ -14,6 +14,7 @@ import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.IElementChangedListener;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
+import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDelta;
 import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDeltaManager;
@@ -27,7 +28,7 @@ import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDeltaMana
  *       Therefore this class is taking this into account and tries to report as precise as possible down to fine
  *       grained levels
  */
-public class ElementChangedListenerEx implements IElementChangedListener {
+public abstract class AbstractElementChangedListener implements IElementChangedListener {
   public static final int CHANGED_FLAG_MASK =
       IJavaElementDelta.F_CONTENT |
           IJavaElementDelta.F_MODIFIERS |
@@ -65,7 +66,7 @@ public class ElementChangedListenerEx implements IElementChangedListener {
         }
         case IJavaElementDelta.CHANGED: {
           if (e.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
-            if (!visitPackageModify(flags, e, ast)) return false;
+            if (!visitPackageModify(flags, (IPackageFragment) e, ast)) return false;
           }
           if ((flags & CHANGED_FLAG_MASK) != 0) {
             // workaround: try to find out what really changed
@@ -105,6 +106,8 @@ public class ElementChangedListenerEx implements IElementChangedListener {
    *          IJavaElement
    * @param ast
    *          CompilationUnit AST (can be null)
+   * @return true if the listener should continue to visit the changes delta tree. false if no further visiting is
+   *         desired.
    */
   protected boolean visit(int kind, int flags, IJavaElement e, CompilationUnit ast) {
     return true;
@@ -117,6 +120,8 @@ public class ElementChangedListenerEx implements IElementChangedListener {
    *          IJavaElement
    * @param cu
    *          CompilationUnit AST (can be null)
+   * @return true if the listener should continue to visit the changes delta tree. false if no further visiting is
+   *         desired.
    */
   protected boolean visitAdd(int flags, IJavaElement e, CompilationUnit ast) {
     return true;
@@ -129,6 +134,8 @@ public class ElementChangedListenerEx implements IElementChangedListener {
    *          IJavaElement
    * @param cu
    *          CompilationUnit AST (can be null)
+   * @return true if the listener should continue to visit the changes delta tree. false if no further visiting is
+   *         desired.
    */
   protected boolean visitRemove(int flags, IJavaElement e, CompilationUnit ast) {
     return true;
@@ -141,12 +148,21 @@ public class ElementChangedListenerEx implements IElementChangedListener {
    *          IJavaElement
    * @param cu
    *          CompilationUnit AST (can be null)
+   * @return true if the listener should continue to visit the changes delta tree. false if no further visiting is
+   *         desired.
    */
   protected boolean visitModify(int flags, IJavaElement e, CompilationUnit ast) {
     return true;
   }
 
-  protected boolean visitPackageModify(int flags, IJavaElement e, CompilationUnit ast) {
+  /**
+   * @param flags
+   * @param e
+   * @param ast
+   * @return true if the listener should continue to visit the changes delta tree. false if no further visiting is
+   *         desired.
+   */
+  protected boolean visitPackageModify(int flags, IPackageFragment e, CompilationUnit ast) {
     return true;
   }
 }

@@ -14,12 +14,15 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
@@ -27,7 +30,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
  */
 public class TypeFilters {
 
-  private final static ITypeFilter INTERFACE_FILTER = new ITypeFilter() {
+  private static final ITypeFilter INTERFACE_FILTER = new ITypeFilter() {
     @Override
     public boolean accept(IType candidate) {
       try {
@@ -40,28 +43,34 @@ public class TypeFilters {
       }
     }
   };
-  private final static ITypeFilter EXISTS_FILTER = new ITypeFilter() {
+  private static final ITypeFilter EXISTS_FILTER = new ITypeFilter() {
     @Override
     public boolean accept(IType type) {
       return TypeUtility.exists(type);
     }
   };
-  private final static ITypeFilter CLASS_FILTER = new ITypeFilter() {
+  private static final ITypeFilter CLASS_FILTER = new ITypeFilter() {
     @Override
     public boolean accept(IType candidate) {
       return isClass(candidate);
     }
   };
-  private final static ITypeFilter TOP_LEVEL_FILTER = new ITypeFilter() {
+  private static final ITypeFilter TOP_LEVEL_FILTER = new ITypeFilter() {
     @Override
     public boolean accept(IType type) {
       return TypeUtility.exists(type) && !TypeUtility.exists(type.getDeclaringType());
     }
   };
-  private final static ITypeFilter IN_WORKSPACE_FILTER = new ITypeFilter() {
+  private static final ITypeFilter IN_WORKSPACE_FILTER = new ITypeFilter() {
     @Override
     public boolean accept(IType type) {
       return !type.isBinary() && !type.isReadOnly();
+    }
+  };
+  private static final ITypeFilter NO_GENERIC_FILTER = new ITypeFilter() {
+    @Override
+    public boolean accept(IType type) {
+      return !TypeUtility.isGenericType(type);
     }
   };
 
@@ -334,6 +343,10 @@ public class TypeFilters {
     }
   }
 
+  public static ITypeFilter getNoGenericTypesFilter() {
+    return NO_GENERIC_FILTER;
+  }
+
   public static ITypeFilter getMultiTypeFilterOr(final ITypeFilter... filters) {
     return new ITypeFilter() {
       @Override
@@ -367,6 +380,68 @@ public class TypeFilters {
           }
         }
         return true;
+      }
+    };
+  }
+
+  public static ITypeFilter getTypeParamSuperTypeFilter(final String baseSig, final String paramDefiningSuperTypeFqn, final String paramName) {
+    return getTypeParamFilter(baseSig, paramDefiningSuperTypeFqn, paramName, false);
+  }
+
+  /**
+   * Creates and gets a new filter that returns all types whose type parameter is a sub-type of a given base parameter<br>
+   * <br>
+   * Note: This filter is expensive! Use only on small lists.
+   * 
+   * @param baseSig
+   *          The base signature the type parameter must be a sub-type of.
+   * @param paramDefiningSuperTypeFqn
+   *          The fully qualified name of the class defining the type parameter
+   * @param paramName
+   *          The name of the type parameter
+   * @return The new created filter.
+   */
+  public static ITypeFilter getTypeParamSubTypeFilter(final String baseSig, final String paramDefiningSuperTypeFqn, final String paramName) {
+    return getTypeParamFilter(baseSig, paramDefiningSuperTypeFqn, paramName, true);
+  }
+
+  private static ITypeFilter getTypeParamFilter(final String baseSig, final String paramDefiningSuperTypeFqn, final String paramName, final boolean sub) {
+    if (baseSig == null) {
+      return new ITypeFilter() {
+        @Override
+        public boolean accept(IType type) {
+          return true;
+        }
+      };
+    }
+
+    final IType baseType = TypeUtility.getTypeBySignature(baseSig);
+    final String objectSig = SignatureCache.createTypeSignature(Object.class.getName());
+    return new ITypeFilter() {
+      @Override
+      public boolean accept(IType type) {
+        try {
+          String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, type.newSupertypeHierarchy(null), paramDefiningSuperTypeFqn, paramName);
+          if (typeParamSig != null) {
+            if (objectSig.equals(typeParamSig)) {
+              return true;
+            }
+            IType typeParam = TypeUtility.getTypeBySignature(typeParamSig);
+            if (TypeUtility.exists(typeParam)) {
+              if (sub) {
+                return TypeUtility.getSuperTypeHierarchy(typeParam).contains(baseType);
+              }
+              else {
+                return TypeUtility.getSuperTypeHierarchy(baseType).contains(typeParam);
+              }
+            }
+          }
+          return true; // generic is not specified -> Object
+        }
+        catch (CoreException e) {
+          SdkUtilActivator.logWarning("Could not evaluate generic parameters of type '" + type.getFullyQualifiedName() + "'.", e);
+          return false;
+        }
       }
     };
   }

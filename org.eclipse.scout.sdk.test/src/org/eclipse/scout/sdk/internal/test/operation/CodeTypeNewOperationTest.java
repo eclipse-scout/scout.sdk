@@ -31,7 +31,7 @@ import org.junit.Test;
 /**
  * <h3>{@link CodeTypeNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class CodeTypeNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -41,7 +41,7 @@ public class CodeTypeNewOperationTest extends AbstractSdkTestWithSampleProject {
     Assert.assertTrue(TypeUtility.exists(getSharedJavaProject()));
     IScoutBundle sharedBundle = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(getSharedJavaProject());
     CodeTypeNewOperation codeTypeOp = new CodeTypeNewOperation("CodeType01", DefaultTargetPackage.get(sharedBundle, IDefaultTargetPackage.SHARED_SERVICES_CODE), sharedBundle.getJavaProject());
-    codeTypeOp.setSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType<" + Long.class.getName() + ">"));
+    codeTypeOp.setSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.shared.services.common.code.AbstractCodeType<" + Long.class.getName() + ", " + Long.class.getName() + ">"));
     // nls
     INlsProject nlsProject = ScoutTypeUtility.findNlsProject(getSharedJavaProject());
     INlsEntry entry = nlsProject.getEntry("Text02");
@@ -51,14 +51,16 @@ public class CodeTypeNewOperationTest extends AbstractSdkTestWithSampleProject {
 
     SdkAssert.assertExist(codeTypeOp.getCreatedType());
     testApiOfCodeType01();
-
   }
 
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
   private void testApiOfCodeType01() throws Exception {
     // type CodeType01
     IType codeType01 = SdkAssert.assertTypeExists("services.code.CodeType01");
     SdkAssert.assertHasFlags(codeType01, 1);
-    SdkAssert.assertHasSuperTypeSignature(codeType01, "QAbstractCodeType<QLong;>;");
+    SdkAssert.assertHasSuperTypeSignature(codeType01, "QAbstractCodeType<QLong;QLong;>;");
 
     // fields of CodeType01
     SdkAssert.assertEquals("field count of 'CodeType01'", 2, codeType01.getFields().length);
