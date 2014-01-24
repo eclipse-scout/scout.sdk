@@ -10,21 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.Expression;
-import org.eclipse.jdt.core.dom.IBinding;
-import org.eclipse.jdt.core.dom.Name;
+import org.eclipse.jdt.core.dom.QualifiedName;
+import org.eclipse.jdt.core.dom.SimpleName;
+import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractDtoTypeSourceBuilder;
@@ -37,12 +36,12 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.method.IMethodReturnExpressionRewrite;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.scout.sdk.workspace.type.validationrule.ValidationRuleMethod;
 
 /**
@@ -236,31 +235,47 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
             if (vrm.getRuleReturnExpression() == null) {
               return null;
             }
-            String sourceSnippet = vrm.getRuleReturnExpression().getReturnStatement(validator);
-            if (sourceSnippet != null) {
-              Collection<IType> referencedTypesList = vrm.getRuleReturnExpression().getReferencedTypes().values();
-              IType[] referencedTypes = referencedTypesList.toArray(new IType[referencedTypesList.size()]);
-              for (int i = referencedTypes.length - 1; i >= 0; i--) {
-                IType refType = referencedTypes[i];
 
-                if (!TypeUtility.isOnClasspath(refType, formDataProject)) {
-                  // 1. check for field reference. if found: extract the value of the field
-                  String fieldVal = getFieldValue(vrm);
-                  if (fieldVal != null) {
-                    return fieldVal;
+            final BooleanHolder rewritePossible = new BooleanHolder(true);
+            final Map<SimpleName, IJavaElement> referencedElements = vrm.getRuleReturnExpression().getReferencedElements();
+            String sourceSnippet = vrm.getRuleReturnExpression().getReturnStatement(validator, formDataProject, new IMethodReturnExpressionRewrite() {
+              @Override
+              public boolean rewriteElement(SimpleName node, IJavaElement element, IImportValidator v, IJavaProject classPath, StringBuffer buffer) {
+                if (element.getElementType() == IJavaElement.TYPE) {
+                  if (node.getParent() instanceof QualifiedName) {
+                    QualifiedName parent = (QualifiedName) node.getParent();
+                    if (node == parent.getQualifier()) {
+                      if (referencedElements.containsKey(parent.getName())) {
+                        // type can be ignored because we will handle the second part of the qualified name
+                        return true;
+                      }
+                    }
+                    if (parent.getParent() instanceof QualifiedName) {
+                      // we are not the leaf -> ignore
+                      return true;
+                    }
                   }
 
-                  // 2. if the type is a value field type it is transformed to the corresponding form data field
-                  ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(refType);
+                  IType type = (IType) element;
+                  ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(type);
                   if (h.contains(iValueField)) {
-                    String formDataFieldName = ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(refType.getElementName()));
-                    return formDataFieldName + ".class";
+                    String formDataFieldName = ScoutUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(type.getElementName()));
+                    buffer.append(formDataFieldName);
+                    return true; // rewrite done
                   }
-
-                  return null; // type is not accessible
                 }
-              }
 
+                rewritePossible.setValue(false);
+                return false;
+              }
+            });
+
+            if (!rewritePossible.getValue()) {
+              // we could not rewrite the statement so that all references could be resolved in the context of the form data
+              return null;
+            }
+
+            if (sourceSnippet != null) {
               // it is no reference to another form field and all types are accessible: check for foreign method calls
               if (!REGEX_CONSTRUCTOR_CALL.matcher(sourceSnippet).matches()) { // constructors are allowed because the type is accessible (checked before)
                 String srcWithoutStrings = REGEX_STRING_LITERALS.matcher(sourceSnippet).replaceAll(""); // remove string literals
@@ -271,23 +286,6 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
               }
             }
             return sourceSnippet;
-          }
-
-          private String getFieldValue(ValidationRuleMethod vrm) throws JavaModelException {
-            Expression returnExpression = vrm.getRuleReturnExpression().getReturnExpression();
-            if (returnExpression instanceof Name) {
-              IBinding b = ((Name) returnExpression).resolveBinding();
-              if (b != null) {
-                IJavaElement e = b.getJavaElement();
-                if (TypeUtility.exists(e) && e.getElementType() == IJavaElement.FIELD) {
-                  IField field = (IField) e;
-                  if (field.getSource() != null) {
-                    return PropertyMethodSourceUtility.getFieldValue(field);
-                  }
-                }
-              }
-            }
-            return null;
           }
         });
 

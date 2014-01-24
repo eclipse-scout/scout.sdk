@@ -37,10 +37,12 @@ import org.eclipse.scout.sdk.service.IMessageBoxService;
 import org.eclipse.scout.sdk.sourcebuilder.comment.IJavaElementCommentBuilderService;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
 import org.eclipse.scout.sdk.ui.internal.service.SwtMessageBoxService;
+import org.eclipse.scout.sdk.ui.services.AstFlattenerProviderService;
 import org.eclipse.scout.sdk.ui.services.JavaElementCommentBuilderService;
 import org.eclipse.scout.sdk.ui.services.OrganizeImportService;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
+import org.eclipse.scout.sdk.util.method.ISimpleNameAstFlattenerProviderService;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -90,6 +92,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   private ServiceRegistration<IMessageBoxService> m_messageBoxServiceRegistration;
   private IPropertyChangeListener m_preferencesPropertyListener;
   private ServiceRegistration<IJavaElementCommentBuilderService> m_javaElementCommentBuilderService;
+  private ServiceRegistration<ISimpleNameAstFlattenerProviderService> m_astFlattenerProviderService;
   private IWorkbenchListener m_shutdownListener;
 
   /**
@@ -112,6 +115,9 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     }
     if (m_javaElementCommentBuilderService == null) {
       m_javaElementCommentBuilderService = context.registerService(IJavaElementCommentBuilderService.class, new JavaElementCommentBuilderService(), null);
+    }
+    if (m_astFlattenerProviderService == null) {
+      m_astFlattenerProviderService = context.registerService(ISimpleNameAstFlattenerProviderService.class, new AstFlattenerProviderService(), null);
     }
 
     if (m_preferencesPropertyListener == null) {
@@ -172,6 +178,10 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     if (m_messageBoxServiceRegistration != null) {
       m_messageBoxServiceRegistration.unregister();
       m_messageBoxServiceRegistration = null;
+    }
+    if (m_astFlattenerProviderService != null) {
+      m_astFlattenerProviderService.unregister();
+      m_astFlattenerProviderService = null;
     }
   }
 
