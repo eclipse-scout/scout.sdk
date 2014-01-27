@@ -66,6 +66,8 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
         return;
       }
 
+      boolean fieldExtendsTemplateField = false;
+
       if (Flags.isPublic(formField.getFlags())) {
         FormDataAnnotation fieldAnnotation = ScoutTypeUtility.findFormDataAnnotation(formField, declaringTypeHierarchy);
 
@@ -91,6 +93,12 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
             // fill table bean
             fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
           }
+          else if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ICompositeField), formField)
+              && !declaringTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.IValueField), formField)) {
+            // field extends a field template.
+            fieldExtendsTemplateField = true;
+            fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
+          }
           else {
             fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
           }
@@ -107,7 +115,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           continue;
         }
 
-        if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ICompositeField), formField)) {
+        if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(RuntimeClasses.ICompositeField), formField) && !fieldExtendsTemplateField) {
           createCompositeFieldFormData(formField, declaringTypeHierarchy, monitor);
         }
       }
