@@ -71,13 +71,13 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<ViewId> {
           case PageSearch:
             return "Page Search";
           case NorthEast:
-            return "Noth-East";
+            return "North-East";
           case SouthEast:
             return "South-East";
           case SouthWest:
             return "South-West";
           case NothWest:
-            return "Noth-West";
+            return "North-West";
           default:
             return value.toString();
         }
