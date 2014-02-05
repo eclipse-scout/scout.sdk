@@ -243,6 +243,9 @@ public class TypeUtility {
   }
 
   public static IType getTypeBySignature(String signature) {
+    if (signature == null) {
+      return null;
+    }
     return getType(SignatureUtility.getFullyQuallifiedName(signature));
   }
 
