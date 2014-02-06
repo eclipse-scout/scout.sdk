@@ -13,8 +13,8 @@
    <launcherArgs>
       <vmArgs>-Xms32m
 -Xmx512m
--XX:MaxPermSize=256m
 -Dorg.eclipse.rap.rwt.developmentMode=true
+@@MAX_PERM_SIZE@@
 </vmArgs>
    </launcherArgs>
 

@@ -505,7 +505,7 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
 
     JaxWsSdkUtility.sortTypesByName(types, true);
 
-    return SearchEngine.createJavaSearchScope(types.toArray(new IType[types.size()]));
+    return SearchEngine.createJavaSearchScope(types.toArray(new IJavaElement[types.size()]));
   }
 
   private IPackageFragment[] openBrowsePackagesDialog() {

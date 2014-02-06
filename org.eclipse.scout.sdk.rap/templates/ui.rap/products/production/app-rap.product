@@ -13,7 +13,7 @@
    <launcherArgs>
       <vmArgs>-Xms32m
 -Xmx512m
--XX:MaxPermSize=256m
+@@MAX_PERM_SIZE@@
 </vmArgs>
    </launcherArgs>
 

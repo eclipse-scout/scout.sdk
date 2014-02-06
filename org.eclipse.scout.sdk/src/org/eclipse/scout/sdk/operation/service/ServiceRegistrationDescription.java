@@ -33,7 +33,7 @@ public class ServiceRegistrationDescription {
   public String serviceFactory;
 
   public ServiceRegistrationDescription(IJavaProject targetProj, IType sessClass, String factoryClass) {
-    this(targetProj, sessClass == null ? null : sessClass.getFullyQualifiedName(), factoryClass);
+    this(targetProj, getFqn(sessClass), factoryClass);
   }
 
   public ServiceRegistrationDescription(IJavaProject targetProj, String sessClass, String factoryClass) {
@@ -42,8 +42,15 @@ public class ServiceRegistrationDescription {
     serviceFactory = factoryClass;
   }
 
+  private static String getFqn(IType t) {
+    if (t == null) {
+      return null;
+    }
+    return t.getFullyQualifiedName();
+  }
+
   public ServiceRegistrationDescription(IJavaProject targetProj, IType sessClass) {
-    this(targetProj, sessClass == null ? null : sessClass.getFullyQualifiedName());
+    this(targetProj, getFqn(sessClass));
   }
 
   public ServiceRegistrationDescription(IJavaProject targetProj, String sessClass) {

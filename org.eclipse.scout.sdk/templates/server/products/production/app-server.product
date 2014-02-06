@@ -15,7 +15,7 @@
       <programArgsWin>-os ${target.os} -ws ${target.ws} -arch ${target.arch} -nl ${target.nl}</programArgsWin>
       <vmArgs>-Xms64m
 -Xmx512m
--XX:MaxPermSize=256m</vmArgs>
+@@MAX_PERM_SIZE@@</vmArgs>
    </launcherArgs>
 
    <launcher>

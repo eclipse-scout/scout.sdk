@@ -13,12 +13,11 @@ package org.eclipse.scout.sdk.ui.services;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.dom.AST;
-import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
 import org.eclipse.jdt.internal.corext.codemanipulation.OrganizeImportsOperation;
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
+import org.eclipse.jdt.ui.SharedASTProvider;
 import org.eclipse.scout.sdk.operation.util.IOrganizeImportService;
 
 /**
@@ -32,16 +31,9 @@ public class OrganizeImportService implements IOrganizeImportService {
 
   @Override
   public void organize(ICompilationUnit cu, IProgressMonitor monitor) throws CoreException {
-    final ASTParser parser = ASTParser.newParser(AST.JLS4);
-    parser.setResolveBindings(true);
-    parser.setStatementsRecovery(true);
-    parser.setBindingsRecovery(true);
-    parser.setSource(cu);
-    CompilationUnit astRoot = (CompilationUnit) parser.createAST(null);
-
+    CompilationUnit astRoot = SharedASTProvider.getAST(cu, SharedASTProvider.WAIT_YES, monitor);
     CodeGenerationSettings settings = JavaPreferencesSettings.getCodeGenerationSettings(cu.getJavaProject());
     OrganizeImportsOperation organizeImps = new OrganizeImportsOperation(cu, astRoot, settings.importIgnoreLowercase, !cu.isWorkingCopy(), true, null);
     organizeImps.run(monitor);
   }
-
 }

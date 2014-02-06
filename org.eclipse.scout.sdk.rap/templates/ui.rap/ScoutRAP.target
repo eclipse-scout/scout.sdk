@@ -4,6 +4,6 @@
   <locations>
 @@RAP_LOCATION@@  </locations>
   <launcherArgs>
-    <vmArgs>-Xms256m -Xmx512m -XX:MaxPermSize=256m</vmArgs>
+    <vmArgs>-Xms256m -Xmx512m @@MAX_PERM_SIZE@@</vmArgs>
   </launcherArgs>
 </target>
