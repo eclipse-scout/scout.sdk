@@ -183,6 +183,7 @@
 		<config name="execOpened" type="Normal" category="BusinessLogic" />
 		<config name="execClosing" type="Normal" category="BusinessLogic" />
 		<config name="execGuiAttached" type="Normal" category="BusinessLogic" />
+		<config name="execBeforeClosing" type="Normal" category="BusinessLogic" />
 		<config name="execGuiDetached" type="Normal" category="BusinessLogic" />
 		<config name="execOutlineChanged" type="Advanced" category="BusinessLogic" />
 		<config name="execPageSearchFormChanged" type="Advanced" category="BusinessLogic" />
