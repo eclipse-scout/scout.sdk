@@ -159,7 +159,6 @@ public class NlsFilterComponent extends Composite {
       INlsEntry nlsEntry = (INlsEntry) element;
       if (m_lang == Language.LANGUAGE_KEY) {
         text = nlsEntry.getKey();
-
       }
       else {
         text = nlsEntry.getTranslation(m_lang);

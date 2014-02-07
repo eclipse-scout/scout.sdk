@@ -18,11 +18,11 @@ public class Language {
 
   public static final Language LANGUAGE_DEFAULT = new Language(new Locale("default"));
   public static final Language LANGUAGE_KEY = new Language(new Locale("key"));
+
   private boolean m_isLocal;
   private final Locale m_locale;
 
   public Language(Locale locale) {
-
     if (locale == null) {
       NlsCore.logError("locale cannot be null! ", new Exception());
       throw new NullPointerException();
@@ -47,7 +47,6 @@ public class Language {
       return false;
     }
     return hashCode() == obj.hashCode();
-
   }
 
   @Override

@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -24,10 +25,11 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
  * <h4>NlsEntry</h4>
  */
 public class NlsEntry implements INlsEntry {
+
   private String m_key;
-  private HashMap<Language, String> m_translations = new HashMap<Language, String>();
-  private int m_referenceCount = -1;
+  private HashMap<Language, String> m_translations;
   private final INlsProject m_project;
+  private final ReentrantReadWriteLock m_lock;
 
   /**
    * copy constructor used to apply modifications to the NlsProject
@@ -39,11 +41,15 @@ public class NlsEntry implements INlsEntry {
   }
 
   public NlsEntry(INlsEntry row, INlsProject project) {
+    m_lock = new ReentrantReadWriteLock(true);
     m_project = project;
+    m_translations = new HashMap<Language, String>();
     update(row);
   }
 
   public NlsEntry(String key, INlsProject project) {
+    m_lock = new ReentrantReadWriteLock(true);
+    m_translations = new HashMap<Language, String>();
     m_project = project;
     m_key = key;
   }
@@ -64,32 +70,50 @@ public class NlsEntry implements INlsEntry {
       return false;
     }
     NlsEntry other = (NlsEntry) obj;
-    return CompareUtility.equals(m_key, other.m_key) &&
-        CompareUtility.equals(m_translations, other.m_translations) &&
-        CompareUtility.equals(getType(), other.getType());
+
+    try {
+      m_lock.readLock().lock();
+      return CompareUtility.equals(m_key, other.m_key) &&
+          CompareUtility.equals(m_translations, other.m_translations) &&
+          CompareUtility.equals(getType(), other.getType());
+    }
+    finally {
+      m_lock.readLock().unlock();
+    }
   }
 
   @Override
   public int hashCode() {
-    int hash = 0;
-    if (m_key != null) {
-      hash ^= m_key.hashCode();
+    try {
+      m_lock.readLock().lock();
+      int hash = 0;
+      if (m_key != null) {
+        hash ^= m_key.hashCode();
+      }
+      hash ^= m_translations.hashCode();
+      hash ^= getType();
+      return hash;
     }
-    hash ^= m_translations.hashCode();
-    hash ^= getType();
-    return hash;
+    finally {
+      m_lock.readLock().unlock();
+    }
   }
 
   /**
    * @param superRow
    */
   public void update(INlsEntry refEntry) {
-    m_translations = new HashMap<Language, String>();
-    m_key = refEntry.getKey();
-    for (Entry<Language, String> entry : refEntry.getAllTranslations().entrySet()) {
-      addTranslationInternal(entry.getKey(), entry.getValue());
+    try {
+      m_lock.writeLock().lock();
+      m_translations = new HashMap<Language, String>();
+      m_key = refEntry.getKey();
+      for (Entry<Language, String> entry : refEntry.getAllTranslations().entrySet()) {
+        addTranslationInternal(entry.getKey(), entry.getValue());
+      }
     }
-    m_referenceCount = refEntry.getReferenceCount();
+    finally {
+      m_lock.writeLock().unlock();
+    }
   }
 
   @Override
@@ -99,14 +123,26 @@ public class NlsEntry implements INlsEntry {
 
   @Override
   public Map<Language, String> getAllTranslations() {
-    return new HashMap<Language, String>(m_translations);
+    try {
+      m_lock.readLock().lock();
+      return new HashMap<Language, String>(m_translations);
+    }
+    finally {
+      m_lock.readLock().unlock();
+    }
   }
 
   protected void addTranslationInternal(Language language, String text) {
-    if (text == null || text.equals("")) {
-      text = null;
+    try {
+      m_lock.writeLock().lock();
+      if (text == null || "".equals(text)) {
+        text = null;
+      }
+      m_translations.put(language, text);
     }
-    m_translations.put(language, text);
+    finally {
+      m_lock.writeLock().unlock();
+    }
   }
 
   public void addTranslation(Language language, String text) {
@@ -114,7 +150,13 @@ public class NlsEntry implements INlsEntry {
   }
 
   public void removeTranslation(Language language) {
-    m_translations.remove(language);
+    try {
+      m_lock.writeLock().lock();
+      m_translations.remove(language);
+    }
+    finally {
+      m_lock.writeLock().unlock();
+    }
   }
 
   @Override
@@ -124,32 +166,28 @@ public class NlsEntry implements INlsEntry {
 
   @Override
   public String getTranslation(Language language, boolean defaultIfNotExist) {
-    String translation = m_translations.get(language);
-    if (translation == null && defaultIfNotExist) {
-      Locale locale = new Locale(language.getLocale().getLanguage(), language.getLocale().getCountry());
-      translation = m_translations.get(new Language(locale));
-      if (translation == null) {
-        locale = new Locale(locale.getLanguage());
+    try {
+      m_lock.readLock().lock();
+      String translation = m_translations.get(language);
+      if (translation == null && defaultIfNotExist) {
+        Locale locale = new Locale(language.getLocale().getLanguage(), language.getLocale().getCountry());
         translation = m_translations.get(new Language(locale));
         if (translation == null) {
-          translation = m_translations.get(Language.LANGUAGE_DEFAULT);
+          locale = new Locale(locale.getLanguage());
+          translation = m_translations.get(new Language(locale));
           if (translation == null) {
-            translation = "!" + getKey() + "!";
+            translation = m_translations.get(Language.LANGUAGE_DEFAULT);
+            if (translation == null) {
+              translation = "!" + getKey() + "!";
+            }
           }
         }
       }
+      return translation;
     }
-    return translation;
-  }
-
-  @Override
-  public int getReferenceCount() {
-    return m_referenceCount;
-  }
-
-  public void setReferenceCount(int refCount) {
-    m_referenceCount = refCount;
-
+    finally {
+      m_lock.readLock().unlock();
+    }
   }
 
   @Override
@@ -158,6 +196,12 @@ public class NlsEntry implements INlsEntry {
   }
 
   public void setKey(String key) {
-    m_key = key;
+    try {
+      m_lock.writeLock().lock();
+      m_key = key;
+    }
+    finally {
+      m_lock.writeLock().unlock();
+    }
   }
 }
