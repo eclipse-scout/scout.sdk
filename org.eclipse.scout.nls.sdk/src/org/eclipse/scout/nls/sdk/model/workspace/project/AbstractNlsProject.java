@@ -530,28 +530,27 @@ public abstract class AbstractNlsProject implements INlsProject {
 
   private void handleTranlationResourceChanged(TranslationResourceEvent event) {
     try {
-      if (m_translationResourceEventLock.acquire()) {
-        Map<INlsEntry, NlsProjectEvent> addEvents = new HashMap<INlsEntry, NlsProjectEvent>();
-        Map<INlsEntry, NlsProjectEvent> modifyEvents = new HashMap<INlsEntry, NlsProjectEvent>();
-        Map<INlsEntry, NlsProjectEvent> removeEvents = new HashMap<INlsEntry, NlsProjectEvent>();
-        handleTranslationResourceChangedRec(addEvents, modifyEvents, removeEvents, event);
-        // fire
-        NlsProjectEvent multiEvent = new NlsProjectEvent(this);
-        for (NlsProjectEvent e : addEvents.values()) {
-          multiEvent.addChildEvent(e);
-        }
-        for (NlsProjectEvent e : removeEvents.values()) {
-          multiEvent.addChildEvent(e);
-        }
-        for (NlsProjectEvent e : modifyEvents.values()) {
-          multiEvent.addChildEvent(e);
-        }
-        if (multiEvent.getChildEvents().length == 1) {
-          fireNlsProjectEvent(multiEvent.getChildEvents()[0]);
-        }
-        else if (multiEvent.getChildEvents().length > 1) {
-          fireNlsProjectEvent(multiEvent);
-        }
+      m_translationResourceEventLock.acquire();
+      Map<INlsEntry, NlsProjectEvent> addEvents = new HashMap<INlsEntry, NlsProjectEvent>();
+      Map<INlsEntry, NlsProjectEvent> modifyEvents = new HashMap<INlsEntry, NlsProjectEvent>();
+      Map<INlsEntry, NlsProjectEvent> removeEvents = new HashMap<INlsEntry, NlsProjectEvent>();
+      handleTranslationResourceChangedRec(addEvents, modifyEvents, removeEvents, event);
+      // fire
+      NlsProjectEvent multiEvent = new NlsProjectEvent(this);
+      for (NlsProjectEvent e : addEvents.values()) {
+        multiEvent.addChildEvent(e);
+      }
+      for (NlsProjectEvent e : removeEvents.values()) {
+        multiEvent.addChildEvent(e);
+      }
+      for (NlsProjectEvent e : modifyEvents.values()) {
+        multiEvent.addChildEvent(e);
+      }
+      if (multiEvent.getChildEvents().length == 1) {
+        fireNlsProjectEvent(multiEvent.getChildEvents()[0]);
+      }
+      else if (multiEvent.getChildEvents().length > 1) {
+        fireNlsProjectEvent(multiEvent);
       }
     }
     finally {
