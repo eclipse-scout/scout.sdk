@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
@@ -35,6 +34,7 @@ import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.extensions.technology.ScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
@@ -70,7 +70,7 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
 
     String source = cu.getSource();
     Document document = new Document(source);
-    ASTParser parser = ASTParser.newParser(AST.JLS4);
+    ASTParser parser = AstUtility.newParser();
     parser.setIgnoreMethodBodies(true);
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setCompilerOptions(swingEnv.getJavaProject().getOptions(true));

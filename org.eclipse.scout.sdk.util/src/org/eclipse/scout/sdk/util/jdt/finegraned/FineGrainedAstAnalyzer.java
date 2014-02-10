@@ -17,11 +17,11 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.sdk.util.ast.AstUtility;
 
 class FineGrainedAstAnalyzer {
   private IJavaElementDelta m_delta;
@@ -38,7 +38,7 @@ class FineGrainedAstAnalyzer {
     }
     CompilationUnit oldAst = null;
     if (oldAst == null) {
-      ASTParser parser = ASTParser.newParser(AST.JLS4);
+      ASTParser parser = AstUtility.newParser();
       parser.setCompilerOptions(JavaCore.getOptions());
       parser.setKind(ASTParser.K_COMPILATION_UNIT);
       parser.setSource(oldContent.toCharArray());
@@ -46,7 +46,7 @@ class FineGrainedAstAnalyzer {
     }
     CompilationUnit newAst = m_delta.getCompilationUnitAST();
     if (newAst == null) {
-      ASTParser parser = ASTParser.newParser(AST.JLS4);
+      ASTParser parser = AstUtility.newParser();
       parser.setCompilerOptions(JavaCore.getOptions());
       parser.setKind(ASTParser.K_COMPILATION_UNIT);
       parser.setSource(newContent.toCharArray());

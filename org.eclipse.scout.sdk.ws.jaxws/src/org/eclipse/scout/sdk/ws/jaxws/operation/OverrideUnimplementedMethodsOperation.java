@@ -14,13 +14,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.internal.corext.codemanipulation.AddUnimplementedMethodsOperation;
 import org.eclipse.jdt.internal.corext.dom.ASTNodes;
 import org.eclipse.jdt.internal.corext.refactoring.util.RefactoringASTParser;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -38,7 +38,7 @@ public class OverrideUnimplementedMethodsOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    RefactoringASTParser parser = new RefactoringASTParser(AST.JLS4);
+    RefactoringASTParser parser = new RefactoringASTParser(AstUtility.getLatestAstApiLevel());
     CompilationUnit cu = parser.parse(m_type.getCompilationUnit(), true);
     ITypeBinding typeBinding = ASTNodes.getTypeBinding(cu, m_type);
     AddUnimplementedMethodsOperation op = new AddUnimplementedMethodsOperation(cu, typeBinding, null, -1, true, true, true);

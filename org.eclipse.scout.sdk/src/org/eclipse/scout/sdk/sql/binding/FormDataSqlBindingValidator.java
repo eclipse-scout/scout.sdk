@@ -26,7 +26,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -326,7 +325,7 @@ public class FormDataSqlBindingValidator {
   }
 
   protected ASTNode createMethodAst(IMethod method) throws JavaModelException {
-    ASTParser parser = ASTParser.newParser(AST.JLS4);
+    ASTParser parser = AstUtility.newParser();
     parser.setCompilerOptions(method.getJavaProject().getOptions(true));
     parser.setBindingsRecovery(true);
     parser.setResolveBindings(true);
@@ -338,7 +337,7 @@ public class FormDataSqlBindingValidator {
   protected CompilationUnit getCachedAst(ICompilationUnit icu) {
     CompilationUnit ast = m_astCache.get(icu);
     if (ast == null) {
-      ASTParser parser = ASTParser.newParser(AST.JLS4);
+      ASTParser parser = AstUtility.newParser();
       parser.setCompilerOptions(icu.getJavaProject().getOptions(true));
       parser.setKind(ASTParser.K_COMPILATION_UNIT);
       parser.setSource(icu);

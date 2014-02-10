@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -41,6 +40,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -94,7 +94,7 @@ public class CodeNewOperation implements IOperation {
     ICompilationUnit cu = getDeclaringType().getCompilationUnit();
     String source = cu.getSource();
     Document document = new Document(source);
-    ASTParser parser = ASTParser.newParser(AST.JLS4);
+    ASTParser parser = AstUtility.newParser();
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setCompilerOptions(cu.getJavaProject().getOptions(true));
     parser.setIgnoreMethodBodies(true);

@@ -44,7 +44,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.ASTVisitor;
@@ -53,6 +52,7 @@ import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.Holder;
+import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.internal.typecache.HierarchyCache;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeCache;
@@ -471,7 +471,7 @@ public class TypeUtility {
   }
 
   public static ISourceRange getContentSourceRange(IMethod method) throws JavaModelException {
-    ASTParser parser = ASTParser.newParser(AST.JLS4);
+    ASTParser parser = AstUtility.newParser();
     parser.setCompilerOptions(method.getJavaProject().getOptions(true));
     parser.setKind(ASTParser.K_CLASS_BODY_DECLARATIONS);
     parser.setSource(method.getSource().toCharArray());
@@ -529,18 +529,6 @@ public class TypeUtility {
       params.add(new MethodParameter(paramNames[i], resolvedParamSignatures[i]));
     }
     return params.toArray(new MethodParameter[params.size()]);
-  }
-
-  public static String[] toSignatureArray(List<MethodParameter> parameters) {
-    if (parameters == null || parameters.isEmpty()) {
-      return new String[0];
-    }
-    String[] result = new String[parameters.size()];
-    int i = 0;
-    for (MethodParameter param : parameters) {
-      result[i++] = param.getSignature();
-    }
-    return result;
   }
 
   public static IType getAncestor(IType type, ITypeFilter filter) {

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.ast;
 
+import java.lang.reflect.Field;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
@@ -84,7 +86,7 @@ public final class AstUtility {
       // could not find source range
       SdkUtilActivator.logWarning("Could not calculate source range for member '" + member.toString() + "'.", e);
     }
-    ASTParser parser = ASTParser.newParser(AST.JLS4);
+    ASTParser parser = newParser();
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setCompilerOptions(member.getJavaProject().getOptions(true));
     parser.setIgnoreMethodBodies(false);
@@ -107,6 +109,29 @@ public final class AstUtility {
     }
 
     ast.accept(visitor);
+  }
+
+  public static ASTParser newParser() {
+    return ASTParser.newParser(getLatestAstApiLevel());
+  }
+
+  public static int getLatestAstApiLevel() {
+    int result = AST.JLS4; // min support Java 7 Level
+    try {
+      String fieldNamePrefix = "JLS";
+      int apiLevel = 8;
+      Field declaredField = AST.class.getDeclaredField(fieldNamePrefix + apiLevel);
+
+      while (declaredField != null && int.class.equals(declaredField.getType())) {
+        result = declaredField.getInt(null);
+        apiLevel++;
+        declaredField = AST.class.getDeclaredField(fieldNamePrefix + apiLevel);
+      }
+    }
+    catch (Exception e) {
+      // occurs e.g. when the field does not exist
+    }
+    return result;
   }
 
   public static String resolveReturnValueSignature(String typeSignature, String methodName) {

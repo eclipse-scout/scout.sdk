@@ -17,10 +17,10 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedAstMatcher;
 import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDelta;
@@ -43,7 +43,7 @@ public class JdtEventCollector {
   }
 
   private CompilationUnit createAst() {
-    ASTParser parser = ASTParser.newParser(AST.JLS4);
+    ASTParser parser = AstUtility.newParser();
     parser.setCompilerOptions(JavaCore.getOptions());
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
     parser.setSource(getCompilationUnit());
