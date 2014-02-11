@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout Multilanguage Support for Scout Services
 Bundle-SymbolicName: org.eclipse.scout.nls.sdk.services;singleton:=true
-Bundle-Version: 3.10.0.qualifier
+Bundle-Version: 4.0.0.qualifier
 Bundle-Activator: org.eclipse.scout.nls.sdk.services.internal.NlsSdkService
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.7.0,4.0.0)",
