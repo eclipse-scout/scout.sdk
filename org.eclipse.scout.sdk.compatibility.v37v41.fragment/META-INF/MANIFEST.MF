@@ -3,7 +3,7 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Scout SDK Compatibility Fragment for Eclipse Indigo
 Bundle-SymbolicName: org.eclipse.scout.sdk.compatibility.v37v41.fragment;singleton:=true
 Bundle-Version: 4.0.0.qualifier
-Fragment-Host: org.eclipse.scout.sdk.compatibility;bundle-version="3.10.0"
+Fragment-Host: org.eclipse.scout.sdk.compatibility;bundle-version="4.0.0"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.jdt.core,
