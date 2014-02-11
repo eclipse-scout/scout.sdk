@@ -250,15 +250,15 @@ public final class TreeUtility {
           IProject fileProject = file.getProject();
           IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(fileProject);
           ITreeNode bundleNode = null;
-          if (bundle == null) {
-            // the product is in any other project
+          if (bundle == null || ScoutBundleExtensionPoint.getExtension(bundle.getType()) == null) {
+            // the product is in any other project or the scout project has no UI presentation
             bundleNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(fileProject));
             if (bundleNode == null) {
               bundleNode = createProjectTreeNode(rootNode, fileProject, visibleFilter);
             }
           }
           else {
-            // the product is inside a scout bundle
+            // the product is inside a scout bundle with UI presentation
             bundleNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(bundle));
             if (bundleNode == null) {
               bundleNode = createBundleTreeNode(rootNode, bundle, visibleFilter);
