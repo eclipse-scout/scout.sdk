@@ -140,6 +140,7 @@ public final class ScoutSeverityManager {
             }
             break;
           default:
+            break;
         }
       }
       else if (obj instanceof IResource) {

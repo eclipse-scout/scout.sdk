@@ -84,7 +84,7 @@ public class PropertyViewExtensionPoint {
           int distanceToIPage = distanceToIPage(ext.getPageClass(), 0);
           orderedExtensions.put(new CompositeObject(-distanceToIPage, ext), ext);
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           ScoutSdkUi.logError("Could not determ load extension '" + ext.toString() + "'!");
         }
       }

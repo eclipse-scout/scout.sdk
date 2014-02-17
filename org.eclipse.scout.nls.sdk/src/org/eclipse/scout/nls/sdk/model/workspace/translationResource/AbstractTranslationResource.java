@@ -113,7 +113,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
       try {
         listener.translationResourceChanged(event);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         NlsCore.logError("error during listener notification.", t);
       }
     }

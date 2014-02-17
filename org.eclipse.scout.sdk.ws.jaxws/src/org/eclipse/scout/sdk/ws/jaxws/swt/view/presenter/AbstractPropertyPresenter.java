@@ -441,6 +441,7 @@ public abstract class AbstractPropertyPresenter<T> extends AbstractPresenter {
         break;
       default:
         image = ScoutSdkUi.getImage(ScoutSdkUi.StatusInfo);
+        break;
     }
 
     if (!StringUtility.hasText(info)) {
@@ -519,7 +520,7 @@ public abstract class AbstractPropertyPresenter<T> extends AbstractPresenter {
         try {
           listener.propertyChanged(m_presenterId, newValue);
         }
-        catch (Throwable t) {
+        catch (Exception t) {
           // nop
         }
       }

@@ -72,6 +72,7 @@ public class IoFileLabelProvider extends SelectionStateLabelProvider implements 
       case 1:
         return file.getParent();
       default:
+        break;
     }
     return "";
   }

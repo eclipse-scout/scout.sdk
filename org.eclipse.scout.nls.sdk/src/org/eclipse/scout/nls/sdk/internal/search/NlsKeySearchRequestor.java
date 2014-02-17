@@ -25,7 +25,7 @@ import org.eclipse.search.ui.text.Match;
 /**
  * <h3>{@link NlsKeySearchRequestor}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 07.11.2013
  */
 public class NlsKeySearchRequestor extends TextSearchRequestor {
@@ -39,7 +39,7 @@ public class NlsKeySearchRequestor extends TextSearchRequestor {
       try {
         l.beginReporting();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         NlsCore.logError("error during listener notification.", t);
       }
     }
@@ -65,7 +65,7 @@ public class NlsKeySearchRequestor extends TextSearchRequestor {
       try {
         l.foundMatch(nlsKey, match);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         NlsCore.logError("error during listener notification.", t);
       }
     }
@@ -77,7 +77,7 @@ public class NlsKeySearchRequestor extends TextSearchRequestor {
       try {
         l.endReporting();
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         NlsCore.logError("error during listener notification.", t);
       }
     }

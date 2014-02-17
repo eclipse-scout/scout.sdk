@@ -127,7 +127,7 @@ public class ExportEarOperation implements IOperation {
       }
       IOUtility.deleteDirectory(m_tempBuildDir);
     }
-    catch (Throwable t) {
+    catch (Exception t) {
     }
   }
 

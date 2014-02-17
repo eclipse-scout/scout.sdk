@@ -33,8 +33,8 @@ import org.eclipse.swt.widgets.Shell;
  * <h3>JdtRenameTransaction</h3> ...
  */
 public class JdtRenameTransaction {
-  private ArrayList<RenameSupport> m_list = new ArrayList<RenameSupport>();
-  private HashSet<ICompilationUnit> m_touchedCompilationUntis = new HashSet<ICompilationUnit>();
+  private final ArrayList<RenameSupport> m_list = new ArrayList<RenameSupport>();
+  private final HashSet<ICompilationUnit> m_touchedCompilationUntis = new HashSet<ICompilationUnit>();
 
   public JdtRenameTransaction() {
   }
@@ -112,7 +112,7 @@ public class JdtRenameTransaction {
       }
       m_touchedCompilationUntis.clear();
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       ScoutSdkUi.logError("rename failed.", t);
     }
   }

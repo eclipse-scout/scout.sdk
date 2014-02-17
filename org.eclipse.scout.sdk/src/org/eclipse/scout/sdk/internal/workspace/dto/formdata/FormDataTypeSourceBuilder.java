@@ -86,7 +86,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
         return;
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       ScoutSdk.logError("could not append validation rules to form field data '" + getModelType().getFullyQualifiedName() + "'.", t);
     }
   }

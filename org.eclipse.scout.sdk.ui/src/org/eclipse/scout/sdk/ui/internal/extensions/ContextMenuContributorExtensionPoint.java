@@ -69,7 +69,7 @@ public class ContextMenuContributorExtensionPoint {
                 MenuContributionInfo info = new MenuContributionInfo(ext, clazz);
                 list.add(info);
               }
-              catch (Throwable t) {
+              catch (Exception t) {
                 ScoutSdkUi.logError("create context menu contributor: " + element.getAttribute("class"), t);
               }
               return true;
@@ -110,7 +110,7 @@ public class ContextMenuContributorExtensionPoint {
                 IScoutHandler ext = (IScoutHandler) element.createExecutableExtension("class");
                 list.add(ext);
               }
-              catch (Throwable t) {
+              catch (Exception t) {
                 ScoutSdkUi.logError("create context menu: " + element.getAttribute("class"), t);
               }
               return true;

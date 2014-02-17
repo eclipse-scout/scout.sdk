@@ -185,7 +185,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
       try {
         l.workspaceChanged(e);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         ScoutSdk.logError("error during listener notification.", t);
       }
     }

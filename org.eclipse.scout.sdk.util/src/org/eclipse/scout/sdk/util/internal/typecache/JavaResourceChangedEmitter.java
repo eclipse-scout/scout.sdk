@@ -243,6 +243,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
         else {
           addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, (collector != null) ? kind : CHANGED_EXTERNAL, flags, e));
         }
+        break;
     }
 
     if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
@@ -407,16 +408,22 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     switch (type) {
       case IJavaElementDelta.ADDED:
         out.print("ADDED");
+        break;
       case IJavaElementDelta.REMOVED:
         out.print("REMOVED");
+        break;
       case IJavaElementDelta.CHANGED:
         out.print("CHANGED");
+        break;
       case JdtEvent.BUFFER_DIRTY:
         out.print("BUFFER_DIRTY");
+        break;
       case JdtEvent.BUFFER_SYNC:
         out.print("BUFFER_SYNC");
+        break;
       default:
         out.print("UNDEFINED");
+        break;
     }
     out.flush();
   }

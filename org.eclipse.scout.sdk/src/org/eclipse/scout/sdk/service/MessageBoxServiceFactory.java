@@ -42,7 +42,7 @@ public class MessageBoxServiceFactory {
         }
       }
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       ScoutSdk.logError("Exception while acquiring " + IMessageBoxService.class.getSimpleName(), t);
     }
     finally {

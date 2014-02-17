@@ -191,6 +191,7 @@ public final class JdtUtility {
           break;
         default:
           b.append(c);
+          break;
       }
     }
     b.append('"'); // closing delimiter

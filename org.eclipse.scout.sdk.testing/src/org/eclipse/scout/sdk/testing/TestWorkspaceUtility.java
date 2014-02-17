@@ -107,7 +107,7 @@ public final class TestWorkspaceUtility {
           }
         }
         catch (Exception e) {
-          e.printStackTrace();
+          //nop
         }
         return Status.OK_STATUS;
       }
@@ -317,7 +317,7 @@ public final class TestWorkspaceUtility {
             try {
               in.close();
             }
-            catch (Throwable t) {
+            catch (Exception t) {
               // nop
             }
           }
@@ -325,7 +325,7 @@ public final class TestWorkspaceUtility {
             try {
               out.close();
             }
-            catch (Throwable t) {
+            catch (Exception t) {
               // nop
             }
           }

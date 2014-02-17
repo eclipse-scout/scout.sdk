@@ -64,7 +64,7 @@ public final class CodeIdExtensionPoint {
                 ICodeIdProvider provider = (ICodeIdProvider) providerElememt.createExecutableExtension(ATTRIB_CLASS);
                 providers.put(new CompositeObject(getPriority(providerElememt), i, provider), provider);
               }
-              catch (Throwable t) {
+              catch (Exception t) {
                 ScoutSdk.logError("register code id provider: " + className, t);
               }
             }
@@ -114,7 +114,7 @@ public final class CodeIdExtensionPoint {
                 }
                 typeParsers.put(new CompositeObject(prio, i, parser), parser);
               }
-              catch (Throwable t) {
+              catch (Exception t) {
                 ScoutSdk.logError("register code id parser: " + className, t);
               }
             }
@@ -144,7 +144,7 @@ public final class CodeIdExtensionPoint {
           break;
         }
       }
-      catch (Throwable e) {
+      catch (Exception e) {
         ScoutSdk.logWarning("Exception in codeIdExtension '" + p.getClass().getName() + "'", e);
       }
     }

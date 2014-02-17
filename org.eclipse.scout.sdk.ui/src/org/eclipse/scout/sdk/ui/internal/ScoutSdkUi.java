@@ -140,7 +140,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
         try {
           new P_AutoUpdateOperationsShutdownJob().schedule();
         }
-        catch (Throwable e) {
+        catch (Exception e) {
           ScoutSdkUi.logError(e);
         }
         return true;

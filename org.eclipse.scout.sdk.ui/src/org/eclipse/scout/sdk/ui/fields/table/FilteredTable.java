@@ -238,6 +238,7 @@ public class FilteredTable extends Composite {
             break;
           default:
             m_pattern = pattern + ANY_STRING;
+            break;
         }
         return;
       }

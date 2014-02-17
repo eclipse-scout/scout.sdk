@@ -522,7 +522,7 @@ public abstract class AbstractNlsProject implements INlsProject {
       try {
         listener.notifyProjectChanged(event);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         NlsCore.logError("error during listener notification.", t);
       }
     }

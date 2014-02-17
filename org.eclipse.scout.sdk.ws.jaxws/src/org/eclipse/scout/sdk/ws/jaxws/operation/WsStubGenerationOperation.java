@@ -168,7 +168,7 @@ public class WsStubGenerationOperation implements IOperation {
             args,
             monitor);
       }
-      catch (Throwable e) {
+      catch (Exception e) {
         exception = e;
       }
       finally {

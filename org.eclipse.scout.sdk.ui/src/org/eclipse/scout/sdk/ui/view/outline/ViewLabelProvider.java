@@ -111,7 +111,7 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
           }
         }
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         ScoutSdkUi.logWarning(t);
       }
     }

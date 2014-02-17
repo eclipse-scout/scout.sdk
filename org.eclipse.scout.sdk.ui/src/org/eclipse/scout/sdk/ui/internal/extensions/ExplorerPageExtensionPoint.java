@@ -85,7 +85,7 @@ public final class ExplorerPageExtensionPoint {
         try {
           clazz = (Class<? extends T>) bundle.loadClass(clazzName);
         }
-        catch (Throwable tt) {
+        catch (Exception tt) {
           ScoutSdkUi.logWarning("could not load class of extension '" + element.getName() + "'.", tt);
         }
       }

@@ -62,7 +62,7 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
       }
     }
     catch (CoreException e) {
-      e.printStackTrace();
+      ScoutSdkUi.logError(e);
     }
 
     return proposals;

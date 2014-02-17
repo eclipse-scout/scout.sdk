@@ -164,7 +164,7 @@ public class ProductSelectionField extends TextField {
       try {
         l.productSelected(productFile);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         ScoutSdkUi.logError("error during listener notification.", t);
       }
     }

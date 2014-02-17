@@ -37,7 +37,7 @@ public class MenuVisibilityTester extends PropertyTester {
           return c;
         }
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         ScoutSdkUi.logError("Could not get supported menues for extension '" + c.toString() + "'!");
       }
     }

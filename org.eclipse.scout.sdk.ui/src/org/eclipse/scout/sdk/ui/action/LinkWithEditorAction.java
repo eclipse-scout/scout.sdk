@@ -107,8 +107,8 @@ public class LinkWithEditorAction extends Action {
       switch (propId) {
         case ScoutExplorerPart.IS_LINKING_ENABLED_PROPERTY:
           updateLinkingEnabled(((ScoutExplorerPart) aSource).isLinkingEnabled());
+          break;
       }
-
     }
   } // end class P_PropertyListener
 

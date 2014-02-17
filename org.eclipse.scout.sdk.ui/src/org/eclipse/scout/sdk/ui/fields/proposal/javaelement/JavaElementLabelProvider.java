@@ -49,6 +49,7 @@ public class JavaElementLabelProvider extends SearchRangeStyledLabelProvider imp
                 break;
               default:
                 textBuilder.append(parentElement.getAncestor(IJavaElement.PACKAGE_FRAGMENT).getElementName());
+                break;
             }
             textBuilder.append(")");
             break;

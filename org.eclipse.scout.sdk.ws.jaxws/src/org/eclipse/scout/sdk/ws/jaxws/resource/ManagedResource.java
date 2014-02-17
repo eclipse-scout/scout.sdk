@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -197,7 +197,7 @@ public class ManagedResource {
         try {
           entry.getListener().changed(element, event);
         }
-        catch (Throwable e) {
+        catch (Exception e) {
           // failsafe
           JaxWsSdk.logError("Error occured while notifying listener about change", e);
         }

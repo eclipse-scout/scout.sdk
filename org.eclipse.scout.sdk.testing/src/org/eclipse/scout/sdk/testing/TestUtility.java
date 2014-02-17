@@ -71,7 +71,7 @@ public final class TestUtility {
       store.setValue("show_initial_config_dialog", show);
       store.setValue("show_rebase_confirm", show);
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       // NOP
     }
   }

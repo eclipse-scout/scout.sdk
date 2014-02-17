@@ -209,7 +209,7 @@ public class FileSelectionField extends TextField {
       try {
         l.fileSelected(file);
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         ScoutSdkUi.logError("error during listener notification.", t);
       }
     }

@@ -57,7 +57,7 @@ public class TechnologyPresenter extends AbstractPresenter {
         }
         m_techModels.add(uiModel);
       }
-      catch (Throwable tt) {
+      catch (Exception tt) {
         ScoutSdkUi.logError("unable to load model for technology " + t.getId(), tt);
       }
     }

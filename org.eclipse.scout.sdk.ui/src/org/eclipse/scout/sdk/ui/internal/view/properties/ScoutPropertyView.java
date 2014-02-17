@@ -149,7 +149,7 @@ public class ScoutPropertyView extends ViewPart {
         }
       }
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       if (m_currentPart != null) {
         m_currentPart.dispose();
         m_currentPart = null;

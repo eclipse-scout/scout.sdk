@@ -288,7 +288,7 @@ public final class JaxWsSdkUtility {
       OrganizeImportsOperation op = new OrganizeImportsOperation(type.getCompilationUnit(), astRoot, settings.importIgnoreLowercase, !type.getCompilationUnit().isWorkingCopy(), true, chooseImportQuery);
       op.run(new NullProgressMonitor());
     }
-    catch (Throwable e) {
+    catch (Exception e) {
       JaxWsSdk.logError(e);
     }
   }

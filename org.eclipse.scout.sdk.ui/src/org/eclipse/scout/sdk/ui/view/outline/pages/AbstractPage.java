@@ -227,7 +227,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
                   }
                 }
               }
-              catch (Throwable t) {
+              catch (Exception t) {
                 ScoutSdkUi.logError("could not load extension '" + ext.getPageClass() + "'!", t);
               }
             }

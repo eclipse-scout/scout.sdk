@@ -87,7 +87,7 @@ public class LogStatus extends Status {
       }
       return trace[traceIndex];
     }
-    catch (Throwable t) {
+    catch (Exception t) {
       return null;
     }
   }
