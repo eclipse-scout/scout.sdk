@@ -100,42 +100,41 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
     finally {
       try {
         // gui thread
-        if (treeControl == null || treeControl.isDisposed()) {
-          return;
-        }
-        display.syncExec(new Runnable() {
-          @Override
-          public void run() {
-            try {
-              if (treeControl == null || treeControl.isDisposed()) {
-                return;
-              }
-              if (dirtyStructureRoots.length > 0) {
-                try {
-                  treeViewer.setData(SELECTION_PREVENTER, this);
+        if (treeControl != null && !treeControl.isDisposed()) {
+          display.syncExec(new Runnable() {
+            @Override
+            public void run() {
+              try {
+                if (treeControl == null || treeControl.isDisposed()) {
+                  return;
+                }
+                if (dirtyStructureRoots.length > 0) {
+                  try {
+                    treeViewer.setData(SELECTION_PREVENTER, this);
 
-                  for (IPage p : dirtyStructureRoots) {
-                    treeViewer.refresh(p, true);
+                    for (IPage p : dirtyStructureRoots) {
+                      treeViewer.refresh(p, true);
+                    }
+                    for (int i = 0; i < m_backupTree.length; i++) {
+                      m_backupTree[i].restoreGui(dirtyStructureRoots[i]);
+                    }
                   }
-                  for (int i = 0; i < m_backupTree.length; i++) {
-                    m_backupTree[i].restoreGui(dirtyStructureRoots[i]);
+                  finally {
+                    treeViewer.setData(SELECTION_PREVENTER, null);
                   }
+                  // restore selection
+                  restoreSelectionInUiThread();
                 }
-                finally {
-                  treeViewer.setData(SELECTION_PREVENTER, null);
-                }
-                // restore selection
-                restoreSelectionInUiThread();
+                m_view.getViewContentProvider().setAutoLoadChildren(true);
               }
-              m_view.getViewContentProvider().setAutoLoadChildren(true);
-            }
-            finally {
-              if (treeControl != null && !treeControl.isDisposed()) {
-                treeControl.setCursor(null);
+              finally {
+                if (treeControl != null && !treeControl.isDisposed()) {
+                  treeControl.setCursor(null);
+                }
               }
             }
-          }
-        });
+          });
+        }
       }
       finally {
         waitCursor.dispose();

@@ -1,4 +1,4 @@
-package org.eclipse.scout.sdk.ui.internal.fields.code.parsers;
+package org.eclipse.scout.sdk.extensions.codeid.parsers;
 
 public class DoubleCodeIdParser extends AbstractNumberCodeIdParser {
   public DoubleCodeIdParser() {

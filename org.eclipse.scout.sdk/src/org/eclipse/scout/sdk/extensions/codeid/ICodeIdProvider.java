@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.extensions;
+package org.eclipse.scout.sdk.extensions.codeid;
 
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 

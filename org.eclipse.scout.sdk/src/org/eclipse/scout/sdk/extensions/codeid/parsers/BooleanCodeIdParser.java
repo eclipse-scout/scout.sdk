@@ -1,7 +1,6 @@
-package org.eclipse.scout.sdk.ui.internal.fields.code.parsers;
+package org.eclipse.scout.sdk.extensions.codeid.parsers;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ui.extensions.ICodeIdParser;
 
 public class BooleanCodeIdParser implements ICodeIdParser {
   @Override

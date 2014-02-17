@@ -1,6 +1,5 @@
-package org.eclipse.scout.sdk.ui.internal.fields.code.parsers;
+package org.eclipse.scout.sdk.extensions.codeid.parsers;
 
-import org.eclipse.scout.sdk.ui.extensions.ICodeIdParser;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 
 public class StringCodeIdParser implements ICodeIdParser {

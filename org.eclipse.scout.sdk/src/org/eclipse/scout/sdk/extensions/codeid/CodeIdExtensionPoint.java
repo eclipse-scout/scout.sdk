@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.ui.internal.extensions;
+package org.eclipse.scout.sdk.extensions.codeid;
 
 import java.util.HashMap;
 import java.util.TreeMap;
@@ -19,9 +19,8 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.sdk.ui.extensions.ICodeIdParser;
-import org.eclipse.scout.sdk.ui.extensions.ICodeIdProvider;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.extensions.codeid.parsers.ICodeIdParser;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
@@ -51,7 +50,7 @@ public final class CodeIdExtensionPoint {
       if (codeIdProviderExtensions == null) {
         TreeMap<CompositeObject, ICodeIdProvider> providers = new TreeMap<CompositeObject, ICodeIdProvider>();
         IExtensionRegistry reg = Platform.getExtensionRegistry();
-        IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_POINT_NAME);
+        IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);
         IExtension[] extensions = xp.getExtensions();
         for (IExtension extension : extensions) {
           IConfigurationElement[] providerElememts = extension.getConfigurationElements();
@@ -60,13 +59,13 @@ public final class CodeIdExtensionPoint {
             if (CODE_ID_PROVIDER_EXT_NAME.equals(providerElememt.getName())) {
               String className = providerElememt.getAttribute(ATTRIB_CLASS);
 
-              ScoutSdkUi.logInfo("found code id provider: " + className);
+              ScoutSdk.logInfo("found code id provider: " + className);
               try {
                 ICodeIdProvider provider = (ICodeIdProvider) providerElememt.createExecutableExtension(ATTRIB_CLASS);
                 providers.put(new CompositeObject(getPriority(providerElememt), i, provider), provider);
               }
               catch (Throwable t) {
-                ScoutSdkUi.logError("register code id provider: " + className, t);
+                ScoutSdk.logError("register code id provider: " + className, t);
               }
             }
           }
@@ -84,7 +83,7 @@ public final class CodeIdExtensionPoint {
       priority = Integer.MAX_VALUE - Integer.parseInt(prio); /* descending order: highest prio first */
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("could not parse priority of " + EXTENSION_POINT_NAME + " extension '" + element.getName() + "'", e);
+      ScoutSdk.logWarning("could not parse priority of " + EXTENSION_POINT_NAME + " extension '" + element.getName() + "'", e);
     }
     return priority;
   }
@@ -94,7 +93,7 @@ public final class CodeIdExtensionPoint {
       if (codeIdParsers == null) {
         HashMap<String, TreeMap<CompositeObject, ICodeIdParser>> parsers = new HashMap<String, TreeMap<CompositeObject, ICodeIdParser>>();
         IExtensionRegistry reg = Platform.getExtensionRegistry();
-        IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_POINT_NAME);
+        IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);
         IExtension[] extensions = xp.getExtensions();
         for (IExtension extension : extensions) {
           IConfigurationElement[] codeIdElements = extension.getConfigurationElements();
@@ -104,7 +103,7 @@ public final class CodeIdExtensionPoint {
               String className = parserElememt.getAttribute(ATTRIB_CLASS);
               String genericTypeSignature = SignatureCache.createTypeSignature(parserElememt.getAttribute(ATTRIB_GENERIC_TYPE));
               int prio = getPriority(parserElememt);
-              ScoutSdkUi.logInfo("found code id parser: " + className);
+              ScoutSdk.logInfo("found code id parser: " + className);
 
               try {
                 ICodeIdParser parser = (ICodeIdParser) parserElememt.createExecutableExtension(ATTRIB_CLASS);
@@ -116,7 +115,7 @@ public final class CodeIdExtensionPoint {
                 typeParsers.put(new CompositeObject(prio, i, parser), parser);
               }
               catch (Throwable t) {
-                ScoutSdkUi.logError("register code id parser: " + className, t);
+                ScoutSdk.logError("register code id parser: " + className, t);
               }
             }
           }
@@ -146,7 +145,7 @@ public final class CodeIdExtensionPoint {
         }
       }
       catch (Throwable e) {
-        ScoutSdkUi.logWarning("Exception in codeIdExtension '" + p.getClass().getName() + "'", e);
+        ScoutSdk.logWarning("Exception in codeIdExtension '" + p.getClass().getName() + "'", e);
       }
     }
     return value;

@@ -57,22 +57,15 @@ public class LoadInitialOutlineJob extends AbstractWorkspaceBlockingJob {
       display.asyncExec(new Runnable() {
         @Override
         public void run() {
-          if (monitor.isCanceled()) {
-            return;
+          if (!m_view.getTreeViewer().getTree().isDisposed()) {
+            if (!monitor.isCanceled()) {
+              m_view.expandAndSelectProjectLevel();
+              m_view.getTreeViewer().refresh();
+              m_view.getViewContentProvider().setAutoLoadChildren(true);
+            }
+            m_view.getTreeViewer().getControl().setCursor(null);
           }
 
-          m_view.expandAndSelectProjectLevel();
-          if (monitor.isCanceled()) {
-            return;
-          }
-
-          m_view.getTreeViewer().refresh();
-          if (monitor.isCanceled()) {
-            return;
-          }
-
-          m_view.getViewContentProvider().setAutoLoadChildren(true);
-          m_view.getTreeViewer().getControl().setCursor(null);
           waitCursor.dispose();
         }
       });

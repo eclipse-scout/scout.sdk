@@ -1,4 +1,4 @@
-package org.eclipse.scout.sdk.ui.extensions;
+package org.eclipse.scout.sdk.extensions.codeid.parsers;
 
 public interface ICodeIdParser {
   boolean isValid(String val);
