@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
+import java.util.Map;
+
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
@@ -80,8 +82,9 @@ public abstract class AbstractCreateEclipseJavaPluginOperation extends AbstractC
 
     if (isUseDefaultJdtPrefs()) {
       // default scout preferences
-      new InstallTextFileOperation("templates/all/.settings/org.eclipse.jdt.core.prefs", ".settings/org.eclipse.jdt.core.prefs", project).run(monitor, workingCopyManager);
-      new InstallTextFileOperation("templates/all/.settings/org.eclipse.jdt.ui.prefs", ".settings/org.eclipse.jdt.ui.prefs", project).run(monitor, workingCopyManager);
+      Map<String, String> props = getStringProperties();
+      new InstallTextFileOperation("templates/all/.settings/org.eclipse.jdt.core.prefs", ".settings/org.eclipse.jdt.core.prefs", project, props).run(monitor, workingCopyManager);
+      new InstallTextFileOperation("templates/all/.settings/org.eclipse.jdt.ui.prefs", ".settings/org.eclipse.jdt.ui.prefs", project, props).run(monitor, workingCopyManager);
     }
 
     addCreatedBundle(getJavaProject());

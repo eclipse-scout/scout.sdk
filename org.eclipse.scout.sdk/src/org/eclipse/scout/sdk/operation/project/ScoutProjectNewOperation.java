@@ -198,17 +198,19 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
         }
       }
     }
-    return -1.0;
+    return 1.6;
   }
 
   protected void putInitialProperties() {
     String javaExecEnvId = computeExecutionEnvironment();
     String maxPermSize = "";
-    if (getExecEnvVersion(javaExecEnvId) < 1.8) {
+    double javaVersion = getExecEnvVersion(javaExecEnvId);
+    if (javaVersion < 1.8) {
       maxPermSize = "-XX:MaxPermSize=256m";
     }
 
     getProperties().setProperty(PROP_EXEC_ENV, javaExecEnvId);
+    getProperties().setProperty(PROP_JAVA_VERSION, "" + javaVersion);
     getProperties().setProperty(PROP_MAX_PERM_SIZE, maxPermSize);
     getProperties().setProperty(PROP_OS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_OS));
     getProperties().setProperty(PROP_WS, ScoutSdk.getDefault().getBundle().getBundleContext().getProperty(ICoreConstants.OSGI_WS));

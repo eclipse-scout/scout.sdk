@@ -28,6 +28,7 @@ public interface IScoutProjectNewOperation extends IOperation {
   String PROP_CURRENT_DATE = "CURRENT_DATE";
   String PROP_USER_NAME = "USER_NAME";
   String PROP_EXEC_ENV = "EXECUTION_ENVIRONMENT";
+  String PROP_JAVA_VERSION = "JAVA_VERSION";
   String PROP_MAX_PERM_SIZE = "MAX_PERM_SIZE";
 
   /**
