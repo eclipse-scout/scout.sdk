@@ -41,13 +41,15 @@ public interface IMarketplaceConstants {
   String RAYO_LAF_FRAGMENT = "com.bsiag.scout.rt.ui.swing.laf.rayo.fragment";
 
   // docx4j support
-  String SCOUT_DOCX4J_FEATURE_URL = "http://tools.bsiag.com/marketplace/docx4j/3.10";
-  String DOCX4J_FEATURE = "org.eclipse.scout.docx4j.source.feature.group";
+  String SCOUT_DOCX4J_FEATURE_URL = "http://tools.bsiag.com/marketplace/docx4j/4.0";
+  String DOCX4J_CORE_FEATURE = "org.eclipse.scout.docx4j.core.source.feature.group";
+  String DOCX4J_CLIENT_FEATURE = "org.eclipse.scout.rt.docx4j.client.source.feature.group";
+  String DOCX4J_LIBS_FEATURE = "org.eclipse.scout.docx4j.libs.source.feature.group";
+  String DOCX4J_SDK_FEATURE = "org.eclipse.scout.sdk.docx4j.source.feature.group";
   String DOCX4J_PLUGIN = "com.bsiag.org.docx4j";
   String DOCX4J_SCOUT_PLUGIN = "org.eclipse.scout.docx4j";
   String DOCX4J_SCOUT_CLIENT_PLUGIN = "org.eclipse.scout.rt.docx4j.client";
   String DOCX4J_SDK_PLUGIN = "org.eclipse.scout.sdk.docx4j";
-  String DOCX4J_SDK_FEATURE = "org.eclipse.scout.sdk.docx4j.source.feature.group";
 
   // logging bridge
   String SCOUT_LOGGING_BRIDGE_FEATURE_URL = "http://tools.bsiag.com/marketplace/logging_bridge/3.10";
