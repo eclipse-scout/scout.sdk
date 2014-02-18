@@ -1,5 +1,6 @@
 package org.eclipse.scout.sdk.ui.extensions.quickassist;
 
+import java.util.ArrayList;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -10,8 +11,12 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
+import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.ITypeBinding;
+import org.eclipse.jdt.core.dom.MarkerAnnotation;
+import org.eclipse.jdt.core.dom.Modifier;
+import org.eclipse.jdt.core.dom.NormalAnnotation;
 import org.eclipse.jdt.core.dom.SingleMemberAnnotation;
 import org.eclipse.jdt.core.dom.StringLiteral;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
@@ -28,10 +33,13 @@ import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerationConte
 import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.util.proposal.CUCorrectionProposal;
+import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.text.edits.TextEdit;
+import org.eclipse.text.edits.TextEditGroup;
 
 @SuppressWarnings("restriction")
 public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
@@ -60,7 +68,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
 
     // annotation
     SingleMemberAnnotation newAnnotation = td.getAST().newSingleMemberAnnotation();
-    newAnnotation.setTypeName(td.getAST().newSimpleName("ClassId"));
+    newAnnotation.setTypeName(td.getAST().newSimpleName(NamingUtility.getSimpleName(IRuntimeClasses.ClassId)));
 
     // value
     StringLiteral id = td.getAST().newStringLiteral();
@@ -73,9 +81,67 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     }
 
     // add the annotation
-    listRewrite.insertFirst(newAnnotation, cuRewrite.createGroupDescription(""));
+    TextEditGroup group = cuRewrite.createGroupDescription("");
+    ASTNode sibling = getSibling(td, id.getEscapedValue(), newAnnotation);
+    if (sibling == null) {
+      listRewrite.insertLast(newAnnotation, group);
+    }
+    else {
+      listRewrite.insertBefore(newAnnotation, sibling, group);
+    }
 
     return cuRewrite;
+  }
+
+  private ASTNode getSibling(final TypeDeclaration td, String newAnnotValue, SingleMemberAnnotation newAnnotation) {
+    final ArrayList<Annotation> annotations = new ArrayList<Annotation>();
+    td.accept(new DefaultAstVisitor() {
+      @Override
+      public boolean visitNode(ASTNode node) {
+        return false;
+      }
+
+      @Override
+      public boolean visit(TypeDeclaration node) {
+        return node == td;
+      }
+
+      @Override
+      public boolean visit(MarkerAnnotation node) {
+        annotations.add(node);
+        return super.visit(node);
+      }
+
+      @Override
+      public boolean visit(NormalAnnotation node) {
+        annotations.add(node);
+        return super.visit(node);
+      }
+
+      @Override
+      public boolean visit(SingleMemberAnnotation node) {
+        annotations.add(node);
+        return super.visit(node);
+      }
+    });
+
+    if (annotations.size() > 0) {
+      // there are already annotations. find the best sibling
+      int newAnnotLen = newAnnotation.getTypeName().getFullyQualifiedName().length() + newAnnotValue.length() + 3;
+      Annotation[] orderedAnnotations = annotations.toArray(new Annotation[annotations.size()]);
+      for (int i = orderedAnnotations.length - 1; i >= 0; i--) {
+        int len = orderedAnnotations[i].getLength();
+        if (len > 0 && len >= newAnnotLen) {
+          return orderedAnnotations[i];
+        }
+      }
+    }
+    for (Object o : td.modifiers()) {
+      if (o instanceof Modifier) {
+        return (Modifier) o;
+      }
+    }
+    return null;
   }
 
   private boolean isClassIdImportPresent(ICompilationUnit icu) throws JavaModelException {
@@ -87,14 +153,14 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     return false;
   }
 
-  private ClassIdTarget getSelectedType(IInvocationContext context) {
+  private ClassIdTarget getSelectedType(IInvocationContext context) throws JavaModelException {
     ClassIdTarget t = getTarget(context.getCoveringNode());
     return applyFilter(t);
   }
 
-  private ClassIdTarget applyFilter(ClassIdTarget input) {
+  private ClassIdTarget applyFilter(ClassIdTarget input) throws JavaModelException {
     if (input != null) {
-      if (TypeUtility.exists(input.type) && !input.type.isBinary()) {
+      if (TypeUtility.exists(input.type) && !input.type.isBinary() && !input.type.isAnonymous()) {
         IAnnotation annotation = JdtUtility.getAnnotation(input.type, IRuntimeClasses.ClassId);
         if (!TypeUtility.exists(annotation)) {
           IType filterType = TypeUtility.getType(IRuntimeClasses.ITypeWithClassId);
