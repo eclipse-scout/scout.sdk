@@ -366,6 +366,7 @@
 		<config name="getConfiguredJmsPassword" type="Normal" category="Data" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.labelfield.AbstractLabelField">
+	    <config name="getConfiguredSelectable" type="Advanced" category="Behavior" />
 		<config name="getConfiguredWrapText" type="Advanced" category="Behavior" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox">
