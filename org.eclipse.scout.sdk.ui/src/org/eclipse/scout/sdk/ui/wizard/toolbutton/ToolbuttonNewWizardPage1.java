@@ -42,8 +42,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
-  final IType iToolbutton = TypeUtility.getType(RuntimeClasses.IToolButton);
-  final IType abstractOutlineViewButton = TypeUtility.getType(RuntimeClasses.AbstractOutlineViewButton);
+  private final IType iToolbutton = TypeUtility.getType(RuntimeClasses.IToolButton);
+  private final IType abstractOutlineViewButton = TypeUtility.getType(RuntimeClasses.AbstractOutlineViewButton);
 
   private IType m_declaringType;
   private FilteredTable m_filteredTable;

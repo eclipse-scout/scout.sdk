@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>{@link OutlineToolbuttonNewOperation}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.9.0 05.04.2013
  */
 public class OutlineToolbuttonNewOperation extends ToolbuttonNewOperation {
@@ -42,7 +42,6 @@ public class OutlineToolbuttonNewOperation extends ToolbuttonNewOperation {
   public OutlineToolbuttonNewOperation(String outlineButtonElementName, IType declaringType, boolean formatSource) {
     super(outlineButtonElementName, declaringType, false);
     setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractOutlineViewButton));
-
   }
 
   @Override

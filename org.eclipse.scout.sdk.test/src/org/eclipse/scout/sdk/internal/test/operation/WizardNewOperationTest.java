@@ -24,7 +24,7 @@ import org.junit.Test;
 /**
  * <h3>{@link WizardNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 15.04.2013
  */
 public class WizardNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -48,7 +48,7 @@ public class WizardNewOperationTest extends AbstractSdkTestWithSampleProject {
   }
 
   @Test
-  public void testNewOutlineOnDesktop() throws Exception {
+  public void testNewWizard2() throws Exception {
     WizardNewOperation newOp = new WizardNewOperation("Test02Wizard", getClientJavaProject().getElementName() + ".wizard.output", getClientJavaProject());
     newOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IWizard, getClientJavaProject()));
     // nls

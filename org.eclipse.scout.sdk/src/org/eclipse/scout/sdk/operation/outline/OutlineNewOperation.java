@@ -184,6 +184,7 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
     workingCopyManager.reconcile(getDesktopType().getCompilationUnit(), monitor);
     ITypeHierarchy desktopSuperHierarchy = TypeUtility.getSuperTypeHierarchy(getDesktopType());
     final boolean isExtension = desktopSuperHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension));
+
     OrderedInnerTypeNewOperation outlineButtonOp = new OrderedInnerTypeNewOperation(className, getDesktopType());
     outlineButtonOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IViewButton));
     outlineButtonOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.AbstractOutlineViewButton, getDesktopType().getJavaProject()));
@@ -193,7 +194,6 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
     IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(className);
     constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     constructorBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append("super(");
@@ -207,16 +207,8 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
       }
     });
     outlineButtonOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
-    // nls method
-    if (getNlsEntry() != null) {
-      IMethodSourceBuilder nlsTextMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(outlineButtonOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
-      nlsTextMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
-      outlineButtonOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsTextMethodBuilder), nlsTextMethodBuilder);
-    }
-
     outlineButtonOp.validate();
     outlineButtonOp.run(monitor, workingCopyManager);
-
   }
 
   public INlsEntry getNlsEntry() {

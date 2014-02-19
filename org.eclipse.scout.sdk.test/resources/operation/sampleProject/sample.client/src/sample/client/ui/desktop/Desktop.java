@@ -155,10 +155,5 @@ public class Desktop extends AbstractExtensibleDesktop implements IDesktop {
     public FirstOutlineViewButton() {
       super(Desktop.this, FirstOutline.class);
     }
-
-    @Override
-    protected String getConfiguredText() {
-      return TEXTS.get("First");
-    }
   }
 }
