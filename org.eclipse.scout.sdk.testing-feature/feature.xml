@@ -24,6 +24,7 @@
 
    <requires>
       <import feature="org.eclipse.scout.sdk" version="4.0.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.scout.sdk.source" version="4.0.0" match="greaterOrEqual"/>
       <import plugin="org.junit" version="4.9.0" match="compatible"/>
    </requires>
 
