@@ -58,7 +58,23 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
       img = NlsCore.getImage(NlsCore.Text);
     }
     return img;
+  }
 
+  /**
+   * Gets the language that belongs to the given column index of the table.
+   * 
+   * @param colIndex
+   *          The zero based column index of the table.
+   * @return The language of the column if the given index has a language. Null otherwise (e.g. when the index of the
+   *         key column is passed or when the index is out of bounds).
+   */
+  public Language getLanguageOfColumn(int colIndex) {
+    Language[] allLanguages = getProjects().getAllLanguages();
+    int offset = (NlsTable.AMOUNT_UTILITY_COLS + 1);
+    if (allLanguages != null && colIndex >= offset && allLanguages.length > 0 && (allLanguages.length + offset) > colIndex) {
+      return allLanguages[colIndex - offset];
+    }
+    return null;
   }
 
   @Override
@@ -78,10 +94,12 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
       default: {
         String text = "";
         if (columnIndex > 0) {
-          Language lang = getProjects().getAllLanguages()[columnIndex - (NlsTable.AMOUNT_UTILITY_COLS + 1)];
-          text = row.getTranslation(lang);
-          if (text == null) {
-            return "";
+          Language lang = getLanguageOfColumn(columnIndex);
+          if (lang != null) {
+            text = row.getTranslation(lang);
+            if (text == null) {
+              return "";
+            }
           }
         }
         return text.replace("\n", " ").replace("\r", "");

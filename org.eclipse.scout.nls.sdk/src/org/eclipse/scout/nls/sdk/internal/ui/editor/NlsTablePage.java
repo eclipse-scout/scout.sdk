@@ -32,6 +32,7 @@ import org.eclipse.scout.nls.sdk.internal.ui.action.UpdateReferenceCountAction;
 import org.eclipse.scout.nls.sdk.internal.ui.wizard.importExport.NlsExportAction;
 import org.eclipse.scout.nls.sdk.internal.ui.wizard.importExport.NlsImportAction;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProjectListener;
@@ -232,7 +233,13 @@ public class NlsTablePage extends Composite {
         }
         if (row != null) {
           NlsEntry e = entries.get(0);
-          addSingleSelectMenues(menuManager, e, cursorPos.y, row.getText(cursorPos.y), e instanceof InheritedNlsEntry);
+          int colIndex = cursorPos.y;
+          String txt = null;
+          Language languageOfColumn = m_tableModel.getLanguageOfColumn(colIndex);
+          if (languageOfColumn != null) {
+            txt = e.getTranslation(languageOfColumn);
+          }
+          addSingleSelectMenues(menuManager, e, colIndex, txt, e instanceof InheritedNlsEntry);
         }
       }
       else if (entries.size() > 1) {

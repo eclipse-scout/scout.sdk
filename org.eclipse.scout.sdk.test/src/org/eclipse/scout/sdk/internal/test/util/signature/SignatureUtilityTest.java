@@ -92,7 +92,7 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
     Assert.assertTrue(imports.contains("java.util.List"));
   }
 
-  @Test(timeout = 200L)
+  @Test(timeout = 250L)
   public void testClassParameterized() throws Exception {
     String signature = "[Ljava.lang.Class<+[Lcom.bsiag.scout.client.ui.desktop.outline.IOutline;>;";
     FullyQualifiedValidator validator = new FullyQualifiedValidator();
@@ -101,7 +101,7 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
     Assert.assertEquals("java.lang.Class<? extends com.bsiag.scout.client.ui.desktop.outline.IOutline[]>[]", result);
   }
 
-  @Test(timeout = 4L)
+  @Test(timeout = 8L)
   public void testComplexNestedArrayListHashMapArray() throws Exception {
     String signature = "[Ljava.util.HashMap<Ljava.util.ArrayList<[[Ljava.lang.String;>;Lorg.eclipse.scout.sdk.workspace.member.IScoutType;>;";
     FullyQualifiedValidator validator = new FullyQualifiedValidator();
