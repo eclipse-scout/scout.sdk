@@ -84,7 +84,7 @@ public class PageNewOperation extends AbstractPageOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
 
     PrimaryTypeNewOperation newOp = new PrimaryTypeNewOperation(getTypeName(), getPackageNamePage(), getPageJavaProject());
     newOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());

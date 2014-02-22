@@ -246,7 +246,7 @@ public class TypeUtility {
     if (signature == null) {
       return null;
     }
-    return getType(SignatureUtility.getFullyQuallifiedName(signature));
+    return getType(SignatureUtility.getFullyQualifiedName(signature));
   }
 
   /**

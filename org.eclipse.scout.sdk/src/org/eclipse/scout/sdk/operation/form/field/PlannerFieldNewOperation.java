@@ -74,7 +74,7 @@ public class PlannerFieldNewOperation implements IOperation {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     newOp.setSibling(getSibling());
     newOp.setSuperTypeSignature(getSuperTypeSignature());
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
     if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractPlannerField)) {
       // super type sig
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
@@ -134,7 +134,7 @@ public class PlannerFieldNewOperation implements IOperation {
     ITypeSourceBuilder activityMapBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP);
     activityMapBuilder.setFlags(Flags.AccPublic);
     String activityMapSuperTypeSig = RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IActivityMap, getDeclaringType().getJavaProject());
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(activityMapSuperTypeSig);
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(activityMapSuperTypeSig);
     if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractActivityMap) ||
         CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractExtensibleActivityMap)) {
       // super type sig

@@ -62,7 +62,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 /**
  * <h3>{@link JavaElementCommentBuilderService}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 12.07.2013
  */
 @SuppressWarnings("restriction")
@@ -224,9 +224,9 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
           seeBuilder.append(interfaceFqn).append("#").append(methodSourceBuilder.getElementName()).append("(");
           Iterator<MethodParameter> parameterIterator = methodSourceBuilder.getParameters().iterator();
           if (parameterIterator.hasNext()) {
-            seeBuilder.append(SignatureUtility.getFullyQuallifiedName(parameterIterator.next().getSignature()));
+            seeBuilder.append(SignatureUtility.getFullyQualifiedName(parameterIterator.next().getSignature()));
             while (parameterIterator.hasNext()) {
-              seeBuilder.append(", ").append(SignatureUtility.getFullyQuallifiedName(parameterIterator.next().getSignature()));
+              seeBuilder.append(", ").append(SignatureUtility.getFullyQualifiedName(parameterIterator.next().getSignature()));
             }
           }
           seeBuilder.append(")");

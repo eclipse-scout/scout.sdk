@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 /**
  * <h3>{@link ApiTestGenerator}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 26.08.2013
  */
 public class ApiTestGenerator {
@@ -256,7 +256,7 @@ public class ApiTestGenerator {
     try {
       for (IAnnotation a : annotatable.getAnnotations()) {
         String annotationSignature = SignatureUtility.getResolvedSignature(Signature.createTypeSignature(a.getElementName(), false), resolveContext);
-        source.append(sdkAssertRef).append(".assertAnnotation(").append(annotatableRef).append(", \"").append(SignatureUtility.getFullyQuallifiedName(annotationSignature)).append("\");").append(NL);
+        source.append(sdkAssertRef).append(".assertAnnotation(").append(annotatableRef).append(", \"").append(SignatureUtility.getFullyQualifiedName(annotationSignature)).append("\");").append(NL);
       }
     }
     catch (CoreException e) {

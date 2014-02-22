@@ -99,7 +99,7 @@ public class WizardStepNewOperation implements IOperation {
     }
     // form
     if (getForm() != null) {
-      String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+      String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
       if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractWizardStep)) {
         // update generic in supertype signature
         StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);

@@ -84,7 +84,7 @@ public class CalendarFieldNewOperation implements IOperation {
       nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
     if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractCalendarField)) {
       // create inner type calendar
       ITypeSourceBuilder calendarBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR);

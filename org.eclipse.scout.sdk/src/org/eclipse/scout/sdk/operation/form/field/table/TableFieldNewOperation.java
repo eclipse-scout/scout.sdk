@@ -85,7 +85,7 @@ public class TableFieldNewOperation implements IOperation {
       nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
     // TODO aho check generic type table!!!
     if (CompareUtility.equals(superTypeFqn, RuntimeClasses.AbstractTableField)) {
       // create inner type table

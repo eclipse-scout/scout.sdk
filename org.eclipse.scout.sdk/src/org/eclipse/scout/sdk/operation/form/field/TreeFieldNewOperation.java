@@ -84,7 +84,7 @@ public class TreeFieldNewOperation implements IOperation {
       nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
-    String superTypeFqn = SignatureUtility.getFullyQuallifiedName(getSuperTypeSignature());
+    String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
     if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractTreeField)) {
       // create inner type calendar
       ITypeSourceBuilder treeBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_TREEBOX_TREE);

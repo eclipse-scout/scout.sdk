@@ -976,9 +976,17 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static String computeFormFieldGenericType(IType type, ITypeHierarchy formFieldHierarchy) throws CoreException {
-    if (type == null || type.getFullyQualifiedName().equals(Object.class.getName())) {
+    if (!TypeUtility.exists(type) || type.getFullyQualifiedName().equals(Object.class.getName())) {
       return null;
     }
+
+    // try value fields
+    String sig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, formFieldHierarchy.getJdtHierarchy(), IRuntimeClasses.IValueField, "T");
+    if (sig != null) {
+      return sig;
+    }
+
+    // for own models
     IType superType = formFieldHierarchy.getSuperclass(type);
     if (TypeUtility.exists(superType)) {
       if (TypeUtility.isGenericType(superType)) {
@@ -1010,7 +1018,7 @@ public class ScoutTypeUtility extends TypeUtility {
           replacement = Matcher.quoteReplacement(replacement.substring(0, replacement.length() - 1));
           signature = signature.replaceAll("[T,L,Q]" + signatureMapping.get(i).getSuperTypeGenericParameterName(), replacement);
         }
-        return SignatureUtility.getResolvedSignature(signature, type);
+        return SignatureUtility.getResolvedSignature(signature, type, type);
       }
       else {
         return computeFormFieldGenericType(superType, formFieldHierarchy);
