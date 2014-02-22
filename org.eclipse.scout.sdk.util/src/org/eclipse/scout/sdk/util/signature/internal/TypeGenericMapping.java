@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.util.signature.internal;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -27,11 +27,11 @@ import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
 public class TypeGenericMapping implements ITypeGenericMapping {
 
   private final String m_fullyQualifiedName;
-  private Map<String /*parameter name*/, String /*param signature*/> m_parameters;
+  private final Map<String /*parameter name*/, String /*param signature*/> m_parameters;
 
   public TypeGenericMapping(String fullyQualliefiedName) {
     m_fullyQualifiedName = fullyQualliefiedName;
-    m_parameters = new HashMap<String, String>();
+    m_parameters = new LinkedHashMap<String, String>();
   }
 
   @Override
@@ -66,10 +66,6 @@ public class TypeGenericMapping implements ITypeGenericMapping {
         builder.append(" | ").append(e.getKey()).append(" -> ").append(e.getValue());
       }
     }
-
-//    for (Entry<String, String> e : m_parameters.entrySet()) {
-//      builder.append(" | ").append(e.getKey()).append(" -> ").append(e.getValue());
-//    }
     builder.append('}');
     return builder.toString();
   }

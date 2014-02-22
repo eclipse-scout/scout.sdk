@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -36,9 +37,17 @@ public abstract class AbstractTableSourceBuilder extends AbstractDtoTypeSourceBu
   }
 
   protected String getColumnSignature(IType type, ITypeHierarchy columnHierarchy) throws IllegalArgumentException, CoreException {
-    if (type == null || Object.class.getName().equals(type.getFullyQualifiedName())) {
+    if (!TypeUtility.exists(type) || Object.class.getName().equals(type.getFullyQualifiedName())) {
       return null;
     }
+
+    // try IColumn first
+    String sig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, columnHierarchy.getJdtHierarchy(), IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
+    if (sig != null) {
+      return sig;
+    }
+
+    // try other models
     IType superType = columnHierarchy.getSuperclass(type);
     if (TypeUtility.exists(superType)) {
       if (TypeUtility.isGenericType(superType)) {

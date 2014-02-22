@@ -77,6 +77,7 @@ public class ScoutTypeUtility extends TypeUtility {
   private static final Pattern RETURN_TRUE_PATTERN = Pattern.compile("return\\s*true", Pattern.MULTILINE);
   private static final Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
   private static final Pattern SUFF_REGEX = Pattern.compile("(^.*)\\;$");
+
   private static final Pattern SUFF_CLASS_REGEX = Pattern.compile("\\.class$");
 
   private ScoutTypeUtility() {
@@ -1002,9 +1003,17 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static String computeFormFieldGenericType(IType type, ITypeHierarchy formFieldHierarchy) throws CoreException {
-    if (type == null || type.getFullyQualifiedName().equals(Object.class.getName())) {
+    if (!TypeUtility.exists(type) || type.getFullyQualifiedName().equals(Object.class.getName())) {
       return null;
     }
+
+    // try value fields
+    String sig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, formFieldHierarchy.getJdtHierarchy(), IRuntimeClasses.IValueField, IRuntimeClasses.TYPE_PARAM_VALUEFIELD__VALUE_TYPE);
+    if (sig != null) {
+      return sig;
+    }
+
+    // for own models
     IType superType = formFieldHierarchy.getSuperclass(type);
     if (TypeUtility.exists(superType)) {
       if (TypeUtility.isGenericType(superType)) {
