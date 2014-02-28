@@ -922,6 +922,9 @@
             symbolicName="org.eclipse.scout.http.servletfilter">
       </bundle>
       <bundle
+            symbolicName="org.eclipse.scout.rt.server.commons">
+      </bundle>
+      <bundle
             symbolicName="org.eclipse.scout.jaxws216">
       </bundle>
       <bundle

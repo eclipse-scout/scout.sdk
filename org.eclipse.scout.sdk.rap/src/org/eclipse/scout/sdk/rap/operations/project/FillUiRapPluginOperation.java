@@ -98,7 +98,7 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
       return;
     }
 
-    InstallTargetPlatformFileOperation op = new InstallTargetPlatformFileOperation(m_project);
+    InstallTargetPlatformFileOperation op = new InstallTargetPlatformFileOperation(m_project, getStringProperties());
     if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING) {
       // set the environment variable
       RapTargetVariable.get().setValue(getLocalTargetFolder());

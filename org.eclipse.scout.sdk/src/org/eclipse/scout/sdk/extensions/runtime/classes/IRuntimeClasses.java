@@ -43,7 +43,7 @@ public interface IRuntimeClasses {
   String EXTENSION_POINT_SERVICES = "org.eclipse.scout.service.services"; // NO_UCD
   String EXTENSION_POINT_CLIENT_SERVICE_PROXIES = EXTENSION_POINT_SERVICES;
   String EXTENSION_POINT_DESKTOP_EXTENSIONS = "org.eclipse.scout.rt.extension.client.desktopExtensions"; // NO_UCD
-  String EXTENSION_POINT_SERVLET_FILTERS = "org.eclipse.scout.http.servletfilter.filters"; // NO_UCD
+  String EXTENSION_POINT_SERVLET_FILTERS = "org.eclipse.scout.rt.server.commons.filters"; // NO_UCD
   String EXTENSION_POINT_EQUINOX_SERVLETS = "org.eclipse.equinox.http.registry.servlets"; // NO_UCD
   String EXTENSION_POINT_PRODUCTS = "org.eclipse.core.runtime.products"; // NO_UCD
 

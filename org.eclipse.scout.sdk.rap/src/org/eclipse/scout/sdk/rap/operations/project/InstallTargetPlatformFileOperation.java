@@ -14,8 +14,8 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
@@ -47,8 +47,8 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
     void contributeXml(StringBuilder sb, IProgressMonitor monitor) throws CoreException;
   }
 
-  public InstallTargetPlatformFileOperation(IProject dstProject) {
-    super("templates/ui.rap/ScoutRAP.target", TARGET_FILE_NAME, ScoutSdkRap.getDefault().getBundle(), dstProject, new HashMap<String, String>());
+  public InstallTargetPlatformFileOperation(IProject dstProject, Map<String, String> properties) {
+    super("templates/ui.rap/ScoutRAP.target", TARGET_FILE_NAME, ScoutSdkRap.getDefault().getBundle(), dstProject, properties);
     m_entryList = new ArrayList<ITargetEntryContributor>();
     m_installLocation = ResourceUtility.getEclipseInstallLocation();
   }
@@ -178,7 +178,7 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    StringBuilder locations = new StringBuilder(1024);
+    StringBuilder locations = new StringBuilder();
     for (ITargetEntryContributor entry : m_entryList) {
       entry.contributeXml(locations, monitor);
     }

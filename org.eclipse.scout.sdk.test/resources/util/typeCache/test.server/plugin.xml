@@ -18,8 +18,8 @@
         </init-param>
     </servlet>
   </extension>
-  <extension point="org.eclipse.scout.http.servletfilter.filters">
-    <filter aliases="/" class="org.eclipse.scout.http.servletfilter.security.BasicSecurityFilter" ranking="20">
+  <extension point="org.eclipse.scout.rt.server.commons.filters">
+    <filter aliases="/" class="org.eclipse.scout.rt.server.commons.servletfilter.security.BasicSecurityFilter" ranking="20">
       <init-param name="realm" value="BSIAG Development"/>
       <init-param name="users" value="admin=manager,allen=allen,blake=blake"/>
     </filter>

@@ -12,7 +12,7 @@ Export-Package: presenter.test.server,
 Require-Bundle: org.eclipse.core.runtime,
  presenter.test.shared,
  org.eclipse.scout.rt.server,
- org.eclipse.scout.http.servletfilter,
+ org.eclipse.scout.rt.server.commons,
  org.eclipse.equinox.http.registry,
  org.eclipse.scout.rt.jdbc.derby
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
