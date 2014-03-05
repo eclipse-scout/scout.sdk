@@ -29,7 +29,6 @@
    </vm>
 
    <plugins>
-      <plugin id="javax.servlet"/>
       <plugin id="javax.xml"/>
       <plugin id="jdt.test.server"/>
       <plugin id="jdt.test.shared"/>
