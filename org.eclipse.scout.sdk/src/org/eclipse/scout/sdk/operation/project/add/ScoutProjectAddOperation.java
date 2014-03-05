@@ -50,7 +50,7 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
 
   public static final String CLIENT_SVG_BUNDLE_NAME = "org.eclipse.scout.svg.client";
   public static final String W3C_DOM_SVG_PACKAGE = "org.w3c.dom.svg";
-  public static final String DERBY_JDBC_PLUGIN = "org.eclipse.scout.rt.jdbc.derby";
+  public static final String DERBY_JDBC_PLUGIN = "org.eclipse.scout.rt.jdbc.derby10";
   public static final String JAXWS_RUNTIME_PLUGIN = "org.eclipse.scout.jaxws216";
 
   public static final String PROP_EXISTING_BUNDLE = "parentScoutBundle";

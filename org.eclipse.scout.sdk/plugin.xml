@@ -943,6 +943,9 @@
             symbolicName="org.eclipse.scout.rt.jdbc.derby10">
       </bundle>
       <bundle
+            symbolicName="org.eclipse.scout.rt.jdbc.derby">
+      </bundle>
+      <bundle
             symbolicName="org.eclipse.scout.rt.ui.svg.calendar">
       </bundle>
       <bundle

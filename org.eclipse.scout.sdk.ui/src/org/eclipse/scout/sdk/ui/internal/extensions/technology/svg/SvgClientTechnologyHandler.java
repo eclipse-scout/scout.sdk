@@ -55,7 +55,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
   };
 
   private static final String[] BATIK_17_SCOUT_ONLY_SVG_PLUGINS = new String[]{
-      "org.w3c.dom.svg.fragment"
+      "org.eclipse.scout.org.w3c.dom.svg.fragment"
   };
 
   public SvgClientTechnologyHandler() {
