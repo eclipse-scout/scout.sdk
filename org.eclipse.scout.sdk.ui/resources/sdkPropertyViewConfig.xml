@@ -313,6 +313,7 @@
 		<config name="execFinally" type="Advanced" category="BusinessLogic" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox">
+	    <config name="getConfiguredBodyGrid" type="Advanced" category="Layout" />
 		<config name="getConfiguredGridUseUiHeight" type="Advanced" category="Layout" />
 		<config name="getConfiguredGridColumnCount" type="Normal" category="Layout" />
 		<config name="getConfiguredGridW" type="Normal" category="Layout" />

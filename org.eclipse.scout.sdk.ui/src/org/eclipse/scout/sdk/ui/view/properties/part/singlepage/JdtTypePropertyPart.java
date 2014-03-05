@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.RunnableWithData;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
@@ -49,6 +50,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.DragAn
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FontPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormDisplayHintPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.FormViewIdPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.GroupBoxBodyGridPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.HorizontalAlignmentPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.IconPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.IntegerPresenter;
@@ -313,195 +315,156 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
 
   AbstractMethodPresenter createConfigMethodPresenter(Composite parent, ConfigurationMethod method) {
     AbstractMethodPresenter presenter = null;
-    String propertyType = method.getConfigAnnotationType();
+    String propertyType = StringUtility.uppercase(method.getConfigAnnotationType());
 
-    if (propertyType.equals("BOOLEAN")) {
+    if ("BOOLEAN".equals(propertyType)) {
       presenter = new BooleanPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("DOUBLE")) {
+    else if ("DOUBLE".equals(propertyType)) {
       presenter = new DoublePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("BIG_DECIMAL")) {
+    else if ("BIG_DECIMAL".equals(propertyType)) {
       presenter = new BigDecimalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("DRAG_AND_DROP_TYPE")) {
+    else if ("DRAG_AND_DROP_TYPE".equals(propertyType)) {
       presenter = new DragAndDropTypePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("INTEGER")) {
+    else if ("INTEGER".equals(propertyType)) {
       presenter = new IntegerPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("LONG")) {
+    else if ("LONG".equals(propertyType)) {
       presenter = new LongPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("BIG_INTEGER")) {
+    else if ("BIG_INTEGER".equals(propertyType)) {
       presenter = new BigIntegerPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("STRING")) {
+    else if ("STRING".equals(propertyType)) {
       presenter = new StringPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("FONT")) {
+    else if ("FONT".equals(propertyType)) {
       presenter = new FontPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //else if (propertyType.equals("FORM_DATA")) {
-    // presenter for FORM_DATA
-    //}
-    //else if (propertyType.equals("ABSTRACT_FORM_DATA")) {
-    //  presenter for ABSTRACT_FORM_DATA
-    //}
-    else if (propertyType.equals("COLOR")) {
+    else if ("COLOR".equals(propertyType)) {
       presenter = new ColorPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //else if (propertyType.equals("OBJECT")) {
-    //  presenter for OBJECT
-    //}
-    else if (propertyType.equals("BUTTON_DISPLAY_STYLE")) {
+    else if ("BUTTON_DISPLAY_STYLE".equals(propertyType)) {
       presenter = new ButtonDisplayStylePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("BUTTON_SYSTEM_TYPE")) {
+    else if ("BUTTON_SYSTEM_TYPE".equals(propertyType)) {
       presenter = new ButtonSystemTypePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("CODE_TYPE")) {
+    else if ("CODE_TYPE".equals(propertyType)) {
       presenter = new CodeTypeProposalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("COMPOSER_ATTRIBUTE_TYPE")) {
+    else if ("COMPOSER_ATTRIBUTE_TYPE".equals(propertyType)) {
       presenter = new ComposerAttributeTypePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //else if (propertyType.equals("FILE_EXTENSIONS")) {
-//  presenter for FILE_EXTENSIONS
-//}
-    else if (propertyType.equals("FORM_DISPLAY_HINT")) {
+    else if ("FORM_DISPLAY_HINT".equals(propertyType)) {
       presenter = new FormDisplayHintPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("FORM_VIEW_ID")) {
+    else if ("FORM_VIEW_ID".equals(propertyType)) {
       presenter = new FormViewIdPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("HORIZONTAL_ALIGNMENT")) {
+    else if ("HORIZONTAL_ALIGNMENT".equals(propertyType)) {
       presenter = new HorizontalAlignmentPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("ICON_ID")) {
+    else if ("ICON_ID".equals(propertyType)) {
       presenter = new IconPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //    else if (propertyType.equals("KEY_STROKE")) {
-//      presenter for KEY_STROKE
-//    }
-    else if (propertyType.equals("LOOKUP_CALL")) {
+    else if ("LOOKUP_CALL".equals(propertyType)) {
       presenter = new LookupCallProposalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("LOOKUP_SERVICE")) {
+    else if ("LOOKUP_SERVICE".equals(propertyType)) {
       presenter = new LookupServiceProposalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("MASTER_FIELD")) {
+    else if ("MASTER_FIELD".equals(propertyType)) {
       presenter = new MasterFieldPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("OUTLINE_ROOT_PAGE")) {
+    else if ("OUTLINE_ROOT_PAGE".equals(propertyType)) {
       presenter = new OutlineRootPagePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //    else if (propertyType.equals("OUTLINE")) {
-//     presenter for OUTLINE
-//    }
-    else if (propertyType.equals("OUTLINES")) {
+    else if ("OUTLINES".equals(propertyType)) {
       presenter = new OutlinesPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //    else if (propertyType.equals("FORM")) {
-//      presenter for FORM
-//    }
-    else if (propertyType.equals("SEARCH_FORM")) {
+    else if ("SEARCH_FORM".equals(propertyType)) {
       presenter = new SearchFormPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //    else if (propertyType.equals("NLS_PROVIDER")) {
-//     presenter for NLS_PROVIDER (on sql services: ? extends ScoutTexts)
-//    }
-//    else if (propertyType.equals("SQL_STYLE")) {
-//     presenter for SQL_STYLE
-//    }
-//    else if (propertyType.equals("TABLE_COLUMN")) {
-//     presenter for SQL_STYLE
-//    }
-    else if (propertyType.equals("SQL")) {
+    else if ("SQL".equals(propertyType)) {
       presenter = new MultiLineStringPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("TEXT")) {
+    else if ("TEXT".equals(propertyType)) {
       presenter = new NlsTextPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //    else if (propertyType.equals("DOC")) {
-//      presenter = new NlsDocsTextPresenter(getFormToolkit(), parent);
-//      presenter.setMethod(method);
-//    }
-    else if (propertyType.equals("VERTICAL_ALIGNMENT")) {
+    else if ("VERTICAL_ALIGNMENT".equals(propertyType)) {
       presenter = new VerticalAglinmentPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    //    else if (propertyType.equals("CHART_QNAME")) {
-//     presenter for CHART_QNAME
-//    }
-//    else if (propertyType.equals("HOUR_OF_DAY")) {
-//     presenter for HOUR_OF_DAY
-//    }
-//    else if (propertyType.equals("DURATION_MINUTES")) {
-//     presenter for DURATION_MINUTES
-//    }
-    else if (propertyType.equals("MENU_CLASS")) {
+    else if ("MENU_CLASS".equals(propertyType)) {
       presenter = new MenuProposalPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("PRIMITIVE_TYPE")) {
+    else if ("PRIMITIVE_TYPE".equals(propertyType)) {
       presenter = new PrimitiveTypePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("LABEL_POSITION")) {
+    else if ("LABEL_POSITION".equals(propertyType)) {
       presenter = new LabelPositionPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("LABEL_HORIZONTAL_ALIGNMENT")) {
+    else if ("LABEL_HORIZONTAL_ALIGNMENT".equals(propertyType)) {
       presenter = new LabelHorizontalAlignmentPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("BORDER_DECORATION")) {
+    else if ("BORDER_DECORATION".equals(propertyType)) {
       presenter = new BorderDecorationPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
-    else if (propertyType.equals("ROUNDING_MODE")) {
+    else if ("ROUNDING_MODE".equals(propertyType)) {
       presenter = new RoundingModePresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
+    else if ("GROUP_BOX_BODY_GRID".equals(propertyType)) {
+      presenter = new GroupBoxBodyGridPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
+    else {
+      // fall back for all other property types
+      presenter = new ExecMethodPresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
 
     // layout
-    if (presenter != null) {
-      GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-      layoutData.widthHint = 200;
-      presenter.getContainer().setLayoutData(layoutData);
-      presenter.setEnabled(isPresenterEnabled(method));
-      m_methodPresenters.put(method.getMethodName(), presenter);
-    }
-    else {
-      ScoutSdkUi.logWarning("Could not find a presenter for property '" + propertyType + "'.");
-    }
+    GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
+    layoutData.widthHint = 200;
+    presenter.getContainer().setLayoutData(layoutData);
+    presenter.setEnabled(isPresenterEnabled(method));
+    m_methodPresenters.put(method.getMethodName(), presenter);
 
     return presenter;
   }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -19,22 +19,29 @@ import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
 import org.eclipse.scout.sdk.util.IRegEx;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>MasterFieldPresenter</h3> ...
+ * <h3>{@link GroupBoxBodyGridPresenter}</h3>
+ * 
+ * @author Matthias Villiger
+ * @since 4.0.0 05.03.2014
  */
-public class MasterFieldPresenter extends AbstractTypeProposalPresenter {
+public class GroupBoxBodyGridPresenter extends AbstractTypeProposalPresenter {
 
-  public MasterFieldPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
+  public GroupBoxBodyGridPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
   }
 
@@ -56,15 +63,6 @@ public class MasterFieldPresenter extends AbstractTypeProposalPresenter {
     }
   }
 
-  /**
-   * <h3>{@link P_ContentProvider}</h3> ...
-   * The local lazy content provider.
-   * It is kept lazy to ensure the proposals are only loaded when used. So the creation of the property view is
-   * performance optimized.
-   * 
-   * @author Andreas Hoegger
-   * @since 3.8.0 15.02.2012
-   */
   private class P_ContentProvider extends ContentProposalProvider {
 
     private IType[] m_proposals;
@@ -103,11 +101,14 @@ public class MasterFieldPresenter extends AbstractTypeProposalPresenter {
     private void ensureCache() {
       if (m_proposals == null) {
         if (getMethod() != null) {
-          m_proposals = ScoutTypeUtility.getPotentialMasterFields(getMethod().getType());
+          IType iGroupBoxBodyGrid = TypeUtility.getType(IRuntimeClasses.IGroupBoxBodyGrid);
+          if (TypeUtility.exists(iGroupBoxBodyGrid)) {
+            ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()));
+            m_proposals = TypeUtility.getPrimaryTypeHierarchy(iGroupBoxBodyGrid).getAllSubtypes(iGroupBoxBodyGrid, filter, TypeComparators.getTypeNameComparator());
+            return;
+          }
         }
-        else {
-          m_proposals = new IType[0];
-        }
+        m_proposals = new IType[0];
       }
     }
   }

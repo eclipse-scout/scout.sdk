@@ -168,6 +168,7 @@ public interface IRuntimeClasses {
   String IFormField = "org.eclipse.scout.rt.client.ui.form.fields.IFormField"; // NO_UCD
   String IFormHandler = "org.eclipse.scout.rt.client.ui.form.IFormHandler"; // NO_UCD
   String IGroupBox = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox"; // NO_UCD
+  String IGroupBoxBodyGrid = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid"; // NO_UCD
   String IHtmlField = "org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField"; // NO_UCD
   String IImageField = "org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField"; // NO_UCD
   String IIntegerField = "org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField"; // NO_UCD
