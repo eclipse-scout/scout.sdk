@@ -8,12 +8,12 @@ import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
-import org.eclipse.scout.rt.ui.swt.menu.SwtScoutMenuContributionItem;
+import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuContributionItem;
 import org.eclipse.ui.actions.CompoundContributionItem;
-
 import empty.project.ui.swt.Activator;
 
 public class DesktopMenuBar extends CompoundContributionItem {
+
 
   @Override
   protected IContributionItem[] getContributionItems() {
@@ -22,7 +22,7 @@ public class DesktopMenuBar extends CompoundContributionItem {
       if (env.getClientSession() != null && env.getClientSession().getDesktop() != null) {
         List<IMenu> menus = env.getClientSession().getDesktop().getMenus();
         List<IMenu> consolidatedMenus = SwtMenuUtility.consolidateMenus(menus);
-        List<IContributionItem> swtContributionItems = new ArrayList<IContributionItem>(consolidatedMenus.size());
+        List<IContributionItem> swtContributionItems = new ArrayList<IContributionItem>();
         for (IMenu menu : consolidatedMenus) {
           swtContributionItems.add(new SwtScoutMenuContributionItem(menu, env));
         }
