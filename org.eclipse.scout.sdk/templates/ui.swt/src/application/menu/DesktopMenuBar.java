@@ -1,18 +1,17 @@
 package @@BUNDLE_SWT_NAME@@.application.menu;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
-import @@BUNDLE_SWT_NAME@@.Activator;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
 import org.eclipse.scout.rt.ui.swt.ISwtEnvironment;
 import org.eclipse.scout.rt.ui.swt.SwtMenuUtility;
-import org.eclipse.scout.rt.ui.swt.menu.SwtScoutMenuContributionItem;
+import org.eclipse.scout.rt.ui.swt.action.SwtScoutMenuContributionItem;
 import org.eclipse.ui.actions.CompoundContributionItem;
+import @@BUNDLE_SWT_NAME@@.Activator;
 
 public class DesktopMenuBar extends CompoundContributionItem {
 
@@ -23,7 +22,7 @@ public class DesktopMenuBar extends CompoundContributionItem {
       if (env.getClientSession() != null && env.getClientSession().getDesktop() != null) {
         List<IMenu> menus = env.getClientSession().getDesktop().getMenus();
         List<IMenu> consolidatedMenus = SwtMenuUtility.consolidateMenus(menus);
-        List<IContributionItem> swtContributionItems = new ArrayList<IContributionItem>(consolidatedMenus.size());
+        List<IContributionItem> swtContributionItems = new ArrayList<IContributionItem>();
         for (IMenu menu : consolidatedMenus) {
           swtContributionItems.add(new SwtScoutMenuContributionItem(menu, env));
         }
@@ -37,7 +36,7 @@ public class DesktopMenuBar extends CompoundContributionItem {
   public boolean isDirty() {
     boolean isDirty = super.isDirty();
     if (!isDirty && getParent() instanceof IMenuManager) {
-      isDirty = ((IMenuManager)getParent()).isDirty();
+      isDirty = ((IMenuManager) getParent()).isDirty();
     }
     return isDirty;
   }
