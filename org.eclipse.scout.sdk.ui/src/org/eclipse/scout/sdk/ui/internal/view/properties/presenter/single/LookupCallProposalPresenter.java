@@ -11,8 +11,10 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -76,7 +78,7 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
    * @author Andreas Hoegger
    * @since 3.8.0 15.02.2012
    */
-  private static final class P_ContentProvider extends AbstractCachedTypeContentProposalProvider {
+  private final class P_ContentProvider extends AbstractCachedTypeContentProposalProvider {
 
     private P_ContentProvider(ILabelProvider labelProvider) {
       super(labelProvider);
@@ -88,13 +90,17 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
 
       String genericSignature = null;
       try {
+        String paramName = IRuntimeClasses.TYPE_PARAM_VALUEFIELD__VALUE_TYPE;
+        IMethod defaultMethod = getMethod().getDefaultMethod();
+        String[] typeParameters = Signature.getTypeArguments(defaultMethod.getReturnType());
+        if (typeParameters != null && typeParameters.length == 1) {
+          typeParameters = Signature.getTypeArguments(typeParameters[0]);
+          if (typeParameters != null && typeParameters.length == 1) {
+            paramName = Signature.getSignatureSimpleName(typeParameters[0]);
+          }
+        }
         ITypeHierarchy supertypeHierarchy = getType().newSupertypeHierarchy(null);
-        if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField))) {
-          genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, IRuntimeClasses.IValueField, IRuntimeClasses.TYPE_PARAM_VALUEFIELD__VALUE_TYPE);
-        }
-        else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IColumn))) {
-          genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
-        }
+        genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, defaultMethod.getDeclaringType().getFullyQualifiedName(), paramName);
       }
       catch (CoreException e) {
         ScoutSdkUi.logError(e);
