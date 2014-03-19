@@ -143,11 +143,16 @@ public class CodeIdField extends Composite {
 
   @Override
   public boolean getEnabled() {
+    if (m_nextCodeIdField == null) {
+      return false;
+    }
     return m_nextCodeIdField.getEnabled();
   }
 
   @Override
   public void setEnabled(boolean enabled) {
-    m_nextCodeIdField.setEnabled(enabled);
+    if (m_nextCodeIdField != null) {
+      m_nextCodeIdField.setEnabled(enabled);
+    }
   }
 }

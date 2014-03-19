@@ -389,7 +389,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IStatus getStatusGenericType() {
     if (getGenericTypeSignature() == null) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("PleaseChooseAKeyType"));
     }
     return Status.OK_STATUS;
   }

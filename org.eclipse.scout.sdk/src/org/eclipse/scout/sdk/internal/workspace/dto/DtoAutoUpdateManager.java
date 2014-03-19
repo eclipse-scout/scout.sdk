@@ -230,7 +230,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     private final P_AutoUpdateOperationsJob m_dtoUpdateJob;
 
     private P_ResourceChangeEventCheckJob(List<IDtoAutoUpdateHandler> handlers, ArrayBlockingQueue<IResourceChangeEvent> queueToConsume, ArrayBlockingQueue<IDtoAutoUpdateOperation> operationCollector, P_AutoUpdateOperationsJob autoUpdateJob) {
-      super("checks if resource deltas require a Scout DTO update");
+      super("Check if resource deltas require a Scout DTO update");
       setSystem(true);
       setUser(false);
       setPriority(DECORATE);
