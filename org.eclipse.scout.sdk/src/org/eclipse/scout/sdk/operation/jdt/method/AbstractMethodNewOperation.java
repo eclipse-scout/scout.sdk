@@ -92,7 +92,7 @@ public abstract class AbstractMethodNewOperation implements IOperation {
     setCreatedMethod(getDeclaringType().createMethod(sourceBuilder.toString(), getSibling(), true, monitor));
     importValidator.createImports(monitor);
     if (isFormatSource()) {
-      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedMethod(), true);
+      JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedMethod(), false);
       formatOp.validate();
       formatOp.run(monitor, workingCopyManager);
     }

@@ -74,7 +74,6 @@ public class SearchFormNewOperation extends FormNewOperation {
       formDataTypeNewOp.run(monitor, workingCopyManager);
       m_createdFormDataType = formDataTypeNewOp.getCreatedType();
       setFormDataSignature(SignatureCache.createTypeSignature(m_createdFormDataType.getFullyQualifiedName()));
-
     }
 
     final StringHolder handlerFqnHolder = new StringHolder();

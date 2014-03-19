@@ -20,12 +20,14 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.Expression;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.internal.core.dom.NaiveASTFlattener;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
@@ -197,15 +199,16 @@ public class MethodReturnExpression {
     private boolean rewriteField(SimpleName node, IField f, IImportValidator validator, IJavaProject classPath, StringBuffer buffer) {
       int fieldFlags = 0;
       int typeFlags = 0;
+      IType declaringType = f.getDeclaringType();
+
       try {
         fieldFlags = f.getFlags();
-        typeFlags = f.getDeclaringType().getFlags();
+        typeFlags = declaringType.getFlags();
       }
       catch (JavaModelException e) {
         ScoutSdk.logError(e);
       }
 
-      IType declaringType = f.getDeclaringType();
       if (Flags.isInterface(typeFlags) || (Flags.isStatic(fieldFlags) && Flags.isFinal(fieldFlags))) { // only constants
         if (validator != null && (Flags.isInterface(typeFlags) || Flags.isPublic(fieldFlags)) && (classPath == null || TypeUtility.isOnClasspath(declaringType, classPath))) {
           // reference to field possible
@@ -216,6 +219,18 @@ public class MethodReturnExpression {
           // extract value
           try {
             String value = PropertyMethodSourceUtility.getFieldValue(f);
+            if (validator != null) {
+              // check if we must qualify the source of the field
+              String scopeQualifiedName = validator.getTypeName(f.getTypeSignature());
+              String simpleName = Signature.getSignatureSimpleName(f.getTypeSignature());
+              if (CompareUtility.notEquals(scopeQualifiedName, simpleName)) {
+                if (!value.contains("." + simpleName)) {
+                  // the type must be qualified
+                  value = value.replace(simpleName, scopeQualifiedName);
+                }
+              }
+            }
+
             if (value != null) {
               buffer.append(value);
               return true;

@@ -44,7 +44,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 /**
  * <h3>{@link SearchFormFromTablePageHelper}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.9.0 21.05.2013
  */
 public final class SearchFormFromTablePageHelper {
@@ -122,9 +122,9 @@ public final class SearchFormFromTablePageHelper {
     }
     // end field box
     // button reset
-    addFormField("Reset" + SdkProperties.SUFFIX_BUTTON, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IButton, searchFormProject), fieldOrder, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
+    addFormField("Reset" + SdkProperties.SUFFIX_BUTTON, SignatureCache.createTypeSignature(IRuntimeClasses.AbstractResetButton), fieldOrder, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
     // button search
-    addFormField("Search" + SdkProperties.SUFFIX_BUTTON, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IButton, searchFormProject), fieldOrder, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
+    addFormField("Search" + SdkProperties.SUFFIX_BUTTON, SignatureCache.createTypeSignature(IRuntimeClasses.AbstractSearchButton), fieldOrder + 10, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
   }
 
   private static ITypeSourceBuilder addFormField(String fieldName, String superTypeSignature, double orderNr, String fieldOwnerFqn, ITypeSourceBuilder fieldOwnerBuilder, ITypeSourceBuilder fieldGetterOwnerBuilder) throws CoreException {

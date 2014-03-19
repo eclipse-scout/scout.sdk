@@ -100,7 +100,6 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-
     if (!StringUtility.isNullOrEmpty(getFormDataSignature())) {
       addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation(getFormDataSignature(), SdkCommand.CREATE, null));
     }
