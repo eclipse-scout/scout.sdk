@@ -52,7 +52,8 @@ public class SearchFormNewAction extends AbstractWizardAction {
   @Override
   protected IWizard getNewWizardInstance() {
     SearchFormNewWizard wizard = new SearchFormNewWizard(m_scoutRes);
-    if (m_type != null) {
+    wizard.init(PlatformUI.getWorkbench(), null);
+    if (TypeUtility.exists(m_type)) {
       wizard.setTablePage(m_type);
       IMethod titleMethod = TypeUtility.getMethod(m_type, "getConfiguredTitle");
       if (TypeUtility.exists(titleMethod)) {
@@ -64,7 +65,6 @@ public class SearchFormNewAction extends AbstractWizardAction {
         }
       }
     }
-    wizard.init(PlatformUI.getWorkbench(), null);
     return wizard;
   }
 }
