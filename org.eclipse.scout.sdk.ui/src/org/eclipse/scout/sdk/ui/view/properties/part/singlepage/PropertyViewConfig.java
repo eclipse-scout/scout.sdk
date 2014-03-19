@@ -4,16 +4,21 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlParser;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class PropertyViewConfig {
 
@@ -150,13 +155,18 @@ public class PropertyViewConfig {
   private void load() {
     try {
       URL url = FileLocator.find(ScoutSdkUi.getDefault().getBundle(), new Path("resources/sdkPropertyViewConfig.xml"), null);
-      ScoutXmlParser parser = new ScoutXmlParser();
       InputStream is = null;
       try {
         is = url.openStream();
-        ScoutXmlDocument xmlDoc = parser.parse(is);
-        for (ScoutXmlElement o : xmlDoc.getRoot().getChildren(TAG_TYPE)) {
-          loadType(o);
+        DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = factory.newDocumentBuilder();
+        Document xmlDoc = docBuilder.parse(is);
+        NodeList childNodes = xmlDoc.getDocumentElement().getChildNodes();
+        for (int i = 0; i < childNodes.getLength(); i++) {
+          Node item = childNodes.item(i);
+          if (TAG_TYPE.equals(item.getNodeName()) && item instanceof Element) {
+            loadType((Element) item);
+          }
         }
       }
       finally {
@@ -195,7 +205,7 @@ public class PropertyViewConfig {
     return null;
   }
 
-  private void loadType(ScoutXmlElement type) {
+  private void loadType(Element type) {
     if (type == null) return;
     String name = type.getAttribute(PROP_TYPE_NAME);
     if (name == null || name.trim().length() < 1) return;
@@ -203,8 +213,12 @@ public class PropertyViewConfig {
     HashMap<String, Config> c = new HashMap<String, Config>(20);
     m_typeConfigs.put(name, c);
 
-    for (ScoutXmlElement o : type.getChildren(TAG_CONFIG)) {
-      loadConfig(c, o);
+    NodeList childNodes = type.getChildNodes();
+    for (int i = 0; i < childNodes.getLength(); i++) {
+      Node item = childNodes.item(i);
+      if (TAG_CONFIG.equals(item.getNodeName()) && item instanceof Element) {
+        loadConfig(c, (Element) item);
+      }
     }
   }
 
@@ -236,18 +250,29 @@ public class PropertyViewConfig {
     }
   }
 
-  private void loadConfig(HashMap<String, Config> tc, ScoutXmlElement config) {
+  private void loadConfig(HashMap<String, Config> tc, Element config) {
     if (config == null) return;
     String name = config.getAttribute(PROP_CONFIG_NAME);
-    String type = config.getAttribute(PROP_CONFIG_TYPE, ConfigTypes.Advanced.toString());
-    String category = config.getAttribute(PROP_CONFIG_CATEGORY, ConfigCategory.Misc.toString());
-    String order = config.getAttribute(PROP_CONFIG_ORDER, null);
+    if (StringUtility.hasText(name)) {
+      String type = config.getAttribute(PROP_CONFIG_TYPE);
+      if (!StringUtility.hasText(type)) {
+        type = ConfigTypes.Advanced.toString();
+      }
+      String category = config.getAttribute(PROP_CONFIG_CATEGORY);
+      if (!StringUtility.hasText(category)) {
+        category = ConfigCategory.Misc.toString();
+      }
+      String order = config.getAttribute(PROP_CONFIG_ORDER);
+      if (!StringUtility.hasText(order)) {
+        order = null;
+      }
 
-    Config c = new Config();
-    c.category = parseConfigCategory(category);
-    c.type = parseConfigType(type);
-    c.order = parseOrder(order);
+      Config c = new Config();
+      c.category = parseConfigCategory(category);
+      c.type = parseConfigType(type);
+      c.order = parseOrder(order);
 
-    tc.put(name, c);
+      tc.put(name, c);
+    }
   }
 }
