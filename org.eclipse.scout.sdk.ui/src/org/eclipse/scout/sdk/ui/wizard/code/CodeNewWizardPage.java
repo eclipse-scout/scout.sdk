@@ -188,10 +188,15 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
           }
 
           IType genericTypeOfSuperClass = getGenericTypeOfSuperClass();
-          if (getGenericSignature() == null && TypeUtility.exists(genericTypeOfSuperClass)) {
-            m_genericTypeField.acceptProposal(SignatureCache.createTypeSignature(genericTypeOfSuperClass.getFullyQualifiedName()));
+          try {
+            if (TypeUtility.exists(genericTypeOfSuperClass) && (getGenericSignature() == null || !TypeUtility.getTypeBySignature(getGenericSignature()).newSupertypeHierarchy(null).contains(genericTypeOfSuperClass))) {
+              m_genericTypeField.acceptProposal(SignatureCache.createTypeSignature(genericTypeOfSuperClass.getFullyQualifiedName()));
+            }
+            proposalProvider.setBaseType(genericTypeOfSuperClass);
           }
-          proposalProvider.setBaseType(genericTypeOfSuperClass);
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError(e);
+          }
         }
         finally {
           setStateChanging(false);
@@ -317,7 +322,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
     return null;
   }
 
-  protected IStatus getStatusCodeIdField() throws JavaModelException {
+  protected IStatus getStatusCodeIdField() {
     if (isControlCreated() && m_nextCodeIdField.getEnabled()) {
       return m_nextCodeIdField.getStatus();
     }
@@ -340,14 +345,14 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
     return javaFieldNameStatus;
   }
 
-  protected IStatus getStatusSuperType() throws JavaModelException {
+  protected IStatus getStatusSuperType() {
     if (getSuperType() == null) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
   }
 
-  protected IStatus getStatusGenericType() throws JavaModelException {
+  protected IStatus getStatusGenericType() {
     if (TypeUtility.isGenericType(getSuperType())) {
       if (getGenericSignature() == null) {
         return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));

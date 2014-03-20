@@ -34,10 +34,13 @@ public interface IRuntimeClasses {
   String TYPE_PARAM_CODE__CODE_ID = "T";
   String TYPE_PARAM_CODETYPE__CODE_TYPE_ID = "CODE_TYPE_ID";
   String TYPE_PARAM_CODETYPE__CODE_ID = "CODE_ID";
+  String TYPE_PARAM_CODETYPE__CODE = "CODE";
   String TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE = "KEY_TYPE";
   String TYPE_PARAM_LOOKUPCALL__KEY_TYPE = "KEY_TYPE";
   String TYPE_PARAM_VALUEFIELD__VALUE_TYPE = "T";
   String TYPE_PARAM_COLUMN_VALUE_TYPE = "T";
+  String TYPE_PARAM_RADIOBUTTON__VALUE_TYPE = "T";
+  String TYPE_PARAM_RADIOBUTTONGROUP__VALUE_TYPE = "T";
 
   //extension points
   String EXTENSION_POINT_SERVICES = "org.eclipse.scout.service.services"; // NO_UCD
@@ -107,7 +110,6 @@ public interface IRuntimeClasses {
   String AbstractDynamicNlsTextProviderService = "org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService"; // NO_UCD
 
   String AbstractOutlineViewButton = "org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutlineViewButton"; // NO_UCD
-  String AbstractRadioButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton"; // NO_UCD
   String AbstractCancelButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton"; // NO_UCD
   String AbstractOkButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton"; // NO_UCD
   String AbstractResetButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractResetButton"; // NO_UCD
@@ -189,6 +191,7 @@ public interface IRuntimeClasses {
   String IPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable"; // NO_UCD
   String IPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField"; // NO_UCD
   String IPropertyObserver = "org.eclipse.scout.commons.beans.IPropertyObserver"; // NO_UCD
+  String IRadioButton = "org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton"; // NO_UCD
   String IRadioButtonGroup = "org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.IRadioButtonGroup"; // NO_UCD
   String IScoutLogger = "org.eclipse.scout.commons.logger.IScoutLogger"; // NO_UCD
   String ISearchForm = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm"; // NO_UCD

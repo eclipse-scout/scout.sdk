@@ -719,12 +719,12 @@ public class ScoutTypeUtility extends TypeUtility {
    * @throws CoreException
    */
   public static String getCodeIdGenericTypeSignature(IType codeType, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy) throws CoreException {
-    return SignatureUtility.resolveGenericParameterInSuperHierarchy(codeType, superTypeHierarchy, IRuntimeClasses.ICodeType, "CODE_ID");
+    return SignatureUtility.resolveGenericParameterInSuperHierarchy(codeType, superTypeHierarchy, IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID);
   }
 
   public static String getCodeSignature(IType codeType, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy) throws CoreException {
     if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.AbstractCodeTypeWithGeneric))) {
-      return SignatureUtility.resolveGenericParameterInSuperHierarchy(codeType, superTypeHierarchy, IRuntimeClasses.AbstractCodeTypeWithGeneric, "CODE");
+      return SignatureUtility.resolveGenericParameterInSuperHierarchy(codeType, superTypeHierarchy, IRuntimeClasses.AbstractCodeTypeWithGeneric, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE);
     }
     else {
       String codeIdSig = getCodeIdGenericTypeSignature(codeType, superTypeHierarchy);

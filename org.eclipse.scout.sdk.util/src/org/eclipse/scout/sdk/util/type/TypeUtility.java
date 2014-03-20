@@ -814,6 +814,41 @@ public class TypeUtility {
     return getTypeParameters(type).length > 0;
   }
 
+  /**
+   * Gets the type that is more specific. This means:<br>
+   * If a is a sub-type of b or b is null: a is returned.<br>
+   * If b is a sub-type of b or a is null: b is returned.<br>
+   * If both are null or they have no common super-type: null is returned.
+   * 
+   * @param a
+   *          The first {@link IType}
+   * @param b
+   *          The second {@link IType}
+   * @return The more specific type or null according to the rule described above.
+   * @throws JavaModelException
+   *           Occurred during super-type creation.
+   */
+  public static IType getMoreSpecificType(IType a, IType b) throws JavaModelException {
+    if (!exists(a) && !exists(b)) {
+      return null;
+    }
+    if (!exists(a)) {
+      return b;
+    }
+    if (!exists(b)) {
+      return a;
+    }
+    if (a.newSupertypeHierarchy(null).contains(b)) {
+      return a;
+    }
+    else if (b.newSupertypeHierarchy(null).contains(a)) {
+      return b;
+    }
+    else {
+      return null;
+    }
+  }
+
   public static ITypeParameter[] getTypeParameters(IType type) {
     if (TypeUtility.exists(type)) {
       try {

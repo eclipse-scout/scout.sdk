@@ -601,9 +601,13 @@
          </default>
       </element>
       <element
-            interface="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton">
+            interface="org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton">
          <default
                class="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton">
+         </default>
+         <default
+               class="org.eclipse.scout.rt.extension.client.ui.form.fields.button.AbstractExtensibleRadioButton"
+               priority="10">
          </default>
       </element>
       <element

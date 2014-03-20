@@ -16,6 +16,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
@@ -28,11 +31,16 @@ import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureSubTypeProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -48,20 +56,25 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 
+  private final IType iRadioButton = TypeUtility.getType(IRuntimeClasses.IRadioButton);
+
   private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;
+  private String m_genericSignature;
   private SiblingProposal m_sibling;
 
   private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
   private ProposalTextField m_superTypeField;
+  private ProposalTextField m_genericTypeField;
   private ProposalTextField m_siblingField;
 
   // process members
   private final IType m_declaringType;
-  private final IType m_abstractRadioButton;
   private IType m_createdRadioButton;
+  private IType m_radioButtonGroupValueType;
+  private String m_radioButtonGroupValueTypeSig;
 
   public RadioButtonNewWizardPage(IType declaringType) {
     super(RadioButtonNewWizardPage.class.getName());
@@ -70,14 +83,11 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
 
     // default values
-    m_abstractRadioButton = RuntimeClasses.getSuperType(IRuntimeClasses.AbstractRadioButton, m_declaringType.getJavaProject());
-    m_superType = m_abstractRadioButton;
     m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override
   protected void createContent(Composite parent) {
-
     m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -99,6 +109,37 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    ITypeFilter filter = null;
+    try {
+      ITypeHierarchy radioGroupSuperTypeHierarchy = m_declaringType.newSupertypeHierarchy(null);
+      m_radioButtonGroupValueTypeSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(m_declaringType, radioGroupSuperTypeHierarchy, IRuntimeClasses.IRadioButtonGroup, IRuntimeClasses.TYPE_PARAM_RADIOBUTTONGROUP__VALUE_TYPE);
+      if (m_radioButtonGroupValueTypeSig != null) {
+        m_radioButtonGroupValueType = TypeUtility.getTypeBySignature(m_radioButtonGroupValueTypeSig);
+        filter = TypeFilters.getTypeParamSubTypeFilter(m_radioButtonGroupValueTypeSig, IRuntimeClasses.IRadioButton, IRuntimeClasses.TYPE_PARAM_RADIOBUTTON__VALUE_TYPE);
+      }
+    }
+    catch (CoreException e1) {
+      ScoutSdkUi.logWarning("Cannot resolve RadioButtonGroup generic type.", e1);
+    }
+
+    // default super type
+    IType defaultSuperType = RuntimeClasses.getSuperType(IRuntimeClasses.IRadioButton, m_declaringType.getJavaProject());
+    if (filter == null || filter.accept(defaultSuperType)) {
+      m_superType = defaultSuperType;
+      if (m_radioButtonGroupValueTypeSig != null) {
+        setGenericSignature(m_radioButtonGroupValueTypeSig);
+      }
+    }
+
+    final SignatureSubTypeProposalProvider genericProposalProvider = new SignatureSubTypeProposalProvider(getGenericTypeOfSuperClass(), m_declaringType.getJavaProject());
+    IType genericTypeOfSuperClass = getGenericTypeOfSuperClass();
+    try {
+      genericProposalProvider.setBaseType(TypeUtility.getMoreSpecificType(genericTypeOfSuperClass, m_radioButtonGroupValueType));
+    }
+    catch (JavaModelException e1) {
+      ScoutSdkUi.logWarning("Cannot resolve generic base type.", e1);
+    }
+
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_BUTTON);
     m_typeNameField.setText(m_typeName);
@@ -111,12 +152,36 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(m_abstractRadioButton, m_declaringType.getJavaProject(), m_abstractRadioButton));
+        new JavaElementAbstractTypeContentProvider(iRadioButton, m_declaringType.getJavaProject(), filter, defaultSuperType));
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
         m_superType = (IType) event.proposal;
+        pingStateChanging();
+
+        IType gtosc = getGenericTypeOfSuperClass();
+        try {
+          if (TypeUtility.exists(gtosc) && (getGenericSignature() == null || !TypeUtility.getTypeBySignature(getGenericSignature()).newSupertypeHierarchy(null).contains(gtosc))) {
+            m_genericTypeField.acceptProposal(SignatureCache.createTypeSignature(gtosc.getFullyQualifiedName()));
+          }
+          genericProposalProvider.setBaseType(TypeUtility.getMoreSpecificType(gtosc, m_radioButtonGroupValueType));
+        }
+        catch (JavaModelException e) {
+          ScoutSdkUi.logError(e);
+        }
+      }
+    });
+
+    m_genericTypeField = getFieldToolkit().createProposalField(parent, Texts.get("ValueType"), ProposalTextField.STYLE_DEFAULT);
+    m_genericTypeField.setContentProvider(genericProposalProvider);
+    m_genericTypeField.setLabelProvider(genericProposalProvider.getLabelProvider());
+    m_genericTypeField.acceptProposal(getGenericSignature());
+    m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
+    m_genericTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
+      public void proposalAccepted(ContentProposalEvent event) {
+        m_genericSignature = (String) event.proposal;
         pingStateChanging();
       }
     });
@@ -137,6 +202,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     m_nlsNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_typeNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_genericTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_siblingField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
@@ -146,9 +212,15 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getNlsName() != null) {
       op.setNlsEntry(getNlsName());
     }
-    IType superTypeProp = getSuperType();
-    if (superTypeProp != null) {
-      op.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
+    if (getSuperType() != null) {
+      String sig = null;
+      if (getGenericSignature() != null) {
+        sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
+      }
+      else {
+        sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName());
+      }
+      op.setSuperTypeSignature(sig);
     }
     SiblingProposal siblingProposal = getSibling();
     if (siblingProposal == SiblingProposal.SIBLING_END) {
@@ -169,6 +241,11 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
   protected void validatePage(MultiStatus multiStatus) {
     multiStatus.add(getStatusNameField());
     multiStatus.add(getStatusSuperType());
+    multiStatus.add(getStatusGenericType());
+    multiStatus.add(getStatusGenericTypeToSuperClass());
+    if (isControlCreated()) {
+      m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
+    }
   }
 
   protected IStatus getStatusNameField() {
@@ -180,6 +257,43 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TheSuperTypeCanNotBeNull"));
     }
     return Status.OK_STATUS;
+  }
+
+  protected IStatus getStatusGenericType() {
+    if (TypeUtility.isGenericType(getSuperType())) {
+      if (getGenericSignature() == null) {
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeCanNotBeNull"));
+      }
+    }
+    return Status.OK_STATUS;
+  }
+
+  protected IStatus getStatusGenericTypeToSuperClass() {
+    if (getGenericSignature() != null) {
+      IType superType = getGenericTypeOfSuperClass();
+      if (TypeUtility.exists(superType)) {
+        IType generic = TypeUtility.getTypeBySignature(getGenericSignature());
+        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(superType)) {
+          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
+        }
+      }
+    }
+    return Status.OK_STATUS;
+  }
+
+  protected IType getGenericTypeOfSuperClass() {
+    if (TypeUtility.exists(getSuperType())) {
+      try {
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), getSuperType().newSupertypeHierarchy(null), IRuntimeClasses.IRadioButton, IRuntimeClasses.TYPE_PARAM_RADIOBUTTON__VALUE_TYPE);
+        if (typeParamSig != null) {
+          return TypeUtility.getTypeBySignature(typeParamSig);
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError(e);
+      }
+    }
+    return null;
   }
 
   /**
@@ -245,6 +359,23 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     finally {
       setStateChanging(false);
     }
+  }
+
+  public void setGenericSignature(String genericSignature) {
+    try {
+      setStateChanging(true);
+      m_genericSignature = genericSignature;
+      if (isControlCreated()) {
+        m_genericTypeField.acceptProposal(genericSignature);
+      }
+    }
+    finally {
+      setStateChanging(false);
+    }
+  }
+
+  public String getGenericSignature() {
+    return m_genericSignature;
   }
 
   public SiblingProposal getSibling() {
