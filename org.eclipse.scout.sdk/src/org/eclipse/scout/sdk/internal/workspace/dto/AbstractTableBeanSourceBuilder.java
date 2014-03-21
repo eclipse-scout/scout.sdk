@@ -62,6 +62,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSourceBuilder {
 
   protected static final int ROW_DATA_FIELD_FLAGS = Flags.AccPublic | Flags.AccFinal | Flags.AccStatic;
+  protected static final String ABS_TABLE_ROW_DATA_SIMPLE_NAME = NamingUtility.getSimpleName(IRuntimeClasses.AbstractTableRowData);
 
   /**
    * @param elementName
@@ -228,7 +229,8 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     IMethodSourceBuilder getRowsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getRows", new IMethodFilter() {
       @Override
       public boolean accept(IMethod candidate) throws CoreException {
-        return candidate.getReturnType().contains(IRuntimeClasses.AbstractTableRowData);
+        // choose the narrowed overload from the abstract super class instead of the method defined in the interface
+        return candidate.getReturnType().contains(ABS_TABLE_ROW_DATA_SIMPLE_NAME);
       }
     });
     getRowsMethodBuilder.setReturnTypeSignature(Signature.createArraySignature(tableRowSignature, 1));
@@ -258,7 +260,8 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "addRow", new IMethodFilter() {
       @Override
       public boolean accept(IMethod candidate) throws CoreException {
-        return candidate.getParameters().length == 0 && candidate.getReturnType().contains(IRuntimeClasses.AbstractTableRowData);
+        // choose the narrowed overload from the abstract super class instead of the method defined in the interface
+        return candidate.getParameters().length == 0 && candidate.getReturnType().contains(ABS_TABLE_ROW_DATA_SIMPLE_NAME);
       }
     });
     addRowMethodBuilder.setReturnTypeSignature(tableRowSignature);
