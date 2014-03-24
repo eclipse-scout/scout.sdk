@@ -83,8 +83,12 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.ControlEvent;
+import org.eclipse.swt.events.ControlListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -99,7 +103,8 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 /**
- * <h3>JdtTypePropertyPart</h3> ...
+ * *
+ * h3>JdtTypePropertyPart</h3> ...
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 19.07.2010
@@ -155,11 +160,41 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     m_icuNotSyncStatus = new Status(IStatus.INFO, ScoutSdkUi.PLUGIN_ID, Texts.get("SaveTheFile", getPage().getType().getPath().toOSString()));
   }
 
+  private int getTitleHyperlinkWidth() {
+    final int TEXT_SPACE_MARGIN_RIGHT = 110;
+    Rectangle b = getForm().getParent().getBounds();
+    int w = Math.max(b.width - TEXT_SPACE_MARGIN_RIGHT, 110);
+    return w;
+  }
+
   @Override
-  protected Control createHead(Composite parent) {
+  protected Control createHead(final Composite parent) {
     Composite headArea = getFormToolkit().createComposite(parent);
-    Hyperlink title = getFormToolkit().createHyperlink(headArea, getPage().getName(), SWT.WRAP);
-    title.setFont(ScoutSdkUi.getFont(ScoutSdkUi.FONT_SYSTEM_TITLE));
+    final Font font = ScoutSdkUi.getFont(ScoutSdkUi.FONT_SYSTEM_TITLE);
+    String text = UiUtility.getTextForBounds(getPage().getName(), font, parent, getTitleHyperlinkWidth());
+    final Hyperlink title = getFormToolkit().createHyperlink(headArea, text, SWT.WRAP);
+    title.addControlListener(new ControlListener() {
+      @Override
+      public void controlResized(ControlEvent e) {
+        try {
+          getForm().setRedraw(false);
+          String txt = UiUtility.getTextForBounds(getPage().getName(), font, parent, getTitleHyperlinkWidth());
+          title.setText(txt);
+          getForm().reflow(true);
+          getForm().getParent().layout(true, true);
+        }
+        finally {
+          getForm().setRedraw(true);
+        }
+      }
+
+      @Override
+      public void controlMoved(ControlEvent e) {
+      }
+    });
+    title.setToolTipText(getPage().getName());
+    title.setFont(font);
+
     title.addHyperlinkListener(new HyperlinkAdapter() {
       @Override
       public void linkActivated(HyperlinkEvent e) {

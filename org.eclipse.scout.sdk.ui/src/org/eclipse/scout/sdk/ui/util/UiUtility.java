@@ -25,6 +25,7 @@ import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -36,6 +37,10 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.swt.graphics.Drawable;
+import org.eclipse.swt.graphics.Font;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -82,6 +87,90 @@ public class UiUtility {
     }
     catch (Exception ex) {
       ScoutSdkUi.logWarning(ex);
+    }
+  }
+
+  /**
+   * Returns the extent of the given string. No tab
+   * expansion or carriage return processing will be performed.
+   * <p>
+   * The <em>extent</em> of a string is the width and height of the rectangular area it would cover if drawn in the
+   * given font.
+   * </p>
+   * 
+   * @param text
+   * @param f
+   * @param context
+   * @return a point containing the extent of the string
+   */
+  public static Point getTextBounds(String text, Font f, Drawable context) {
+    GC gc = new GC(context);
+    gc.setFont(f);
+    return gc.stringExtent(text);
+  }
+
+  /**
+   * Gets the shortened text based on the given input so that the text returned is smaller than the given bounds.
+   * 
+   * @param origText
+   *          The original text that should be shortened to match into bounds.
+   * @param f
+   *          The {@link Font} to use to calculate the text length.
+   * @param context
+   *          The context in which the calculation should be performed.
+   * @param bounds
+   *          The number of pixels. The returned text will be shorter than this limit if rendered in the given context
+   *          with the given font.
+   * @return The text shortened to given bounds including an ellipsis if it has been cut.
+   */
+  public static String getTextForBounds(String origText, Font f, Drawable context, int bounds) {
+    return getTextForBounds(origText, f, context, bounds, "…");
+  }
+
+  /**
+   * Gets the shortened text based on the given input so that the text returned is smaller than the given bounds.
+   * 
+   * @param origText
+   *          The original text that should be shortened to match into bounds.
+   * @param f
+   *          The {@link Font} to use to calculate the text length.
+   * @param context
+   *          The context in which the calculation should be performed.
+   * @param bounds
+   *          The number of pixels. The returned text will be shorter than this limit if rendered in the given context
+   *          with the given font.
+   * @param ellipsis
+   *          The suffix to add if the given origText has been shortened or null if no suffix should be added.
+   * @return The text shortened to given bounds including the given ellipsis if it has been cut.
+   */
+  public static String getTextForBounds(String origText, Font f, Drawable context, int bounds, String ellipsis) {
+    if (bounds <= 0) {
+      return origText;
+    }
+
+    String cleanedEllipsis = null;
+    if (StringUtility.hasText(ellipsis)) {
+      cleanedEllipsis = ellipsis;
+    }
+    else {
+      cleanedEllipsis = "";
+    }
+    StringBuilder sb = new StringBuilder(origText);
+    GC gc = new GC(context);
+    gc.setFont(f);
+
+    Point p = gc.stringExtent(sb.toString());
+    while (p.x > bounds && sb.length() > 0) {
+      sb.deleteCharAt(sb.length() - 1);
+      p = gc.stringExtent(sb.toString() + cleanedEllipsis);
+    }
+
+    String ret = sb.toString();
+    if (ret.equals(origText)) {
+      return origText;
+    }
+    else {
+      return sb.toString() + cleanedEllipsis;
     }
   }
 

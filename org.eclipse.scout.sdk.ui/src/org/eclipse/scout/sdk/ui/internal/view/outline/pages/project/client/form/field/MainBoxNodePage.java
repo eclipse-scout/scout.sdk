@@ -25,7 +25,6 @@ public class MainBoxNodePage extends AbstractBoxNodePage {
 
   public MainBoxNodePage() {
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Mainbox));
-
   }
 
   @Override

@@ -64,7 +64,6 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
     try {
       m_form.setRedraw(false);
       m_form.setDelayedReflow(true);
-      //m_form.setText(Texts.get("Properties"));
       createHeadInternal(m_form);
 
       // sections
