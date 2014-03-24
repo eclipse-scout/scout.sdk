@@ -57,9 +57,11 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.entity.EntityNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.entity.EntityTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.AllPagesTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithNodeNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithTableNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.childpage.NodePageChildPageTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.childpage.TablePageChildPageTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.ColumnNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.ColumnTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.TableNodePage;
@@ -358,6 +360,9 @@ public class EditorSelectionVisitor implements INodeVisitor {
     else if (page instanceof PageWithTableNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
+    else if (page instanceof PageNodePage) {
+      return visitPageWithType((AbstractScoutTypePage) page);
+    }
     else if (page instanceof TableNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
@@ -447,6 +452,9 @@ public class EditorSelectionVisitor implements INodeVisitor {
     }
     else if (page instanceof FormTemplateTablePage) {
       return CONTINUE;
+    }
+    else if (page instanceof TablePageChildPageTablePage) {
+      return CANCEL_SUBTREE;
     }
     else if (page instanceof FormFieldTemplateTablePage) {
       return visitTypeInHierarchyPage(TypeUtility.getType(IRuntimeClasses.IFormField));
