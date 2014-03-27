@@ -61,17 +61,27 @@ public abstract class AbstractNlsTextCompletionComputer implements IJavaCompleti
       IRegion lineInfo = doc.getLineInformationOfOffset(offset);
       String linePart = doc.get(lineInfo.getOffset(), lineInfo.getLength());//offset - lineInfo.getOffset());
       Matcher m = PATTERN.matcher(linePart);
-      if (m.find()) {
-        String prefix = linePart.substring(m.start(2), offset - lineInfo.getOffset());
+      int cursorPosInLine = offset - lineInfo.getOffset();
+      int matchingStart = -1;
+      String refType = null;
+      while (m.find()) {
+        int match = m.start(2);
+        if (match <= cursorPosInLine && match > matchingStart) {
+          matchingStart = match; // find closest match left to the cursor
+          refType = m.group(1);
+        }
+      }
+
+      if (matchingStart >= 0 && refType != null) {
+        String prefix = linePart.substring(matchingStart, offset - lineInfo.getOffset());
         IType contextType = findContextType(context.getCompilationUnit(), offset);
         if (TypeUtility.exists(contextType)) {
-          IType referencedType = TypeUtility.getReferencedType(contextType, m.group(1), false);
+          IType referencedType = TypeUtility.getReferencedType(contextType, refType, false);
           if (TypeUtility.exists(referencedType)) {
             INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{referencedType, contextType});
-            if (nlsProject == null) {
-              return proposals;
+            if (nlsProject != null) {
+              collectProposals(proposals, nlsProject, prefix, offset);
             }
-            collectProposals(proposals, nlsProject, prefix, offset);
           }
         }
       }
