@@ -211,7 +211,7 @@ public final class SignatureUtility {
    *          an import validator to decide simple name vs. fully qualified name.
    * @return the type reference
    * @throws CoreException
-   * @see {@link FullyQualifiedValidator}, {@link IImportValidator}, {@link SimpleImportValidator}
+   * @see {@link IImportValidator}, {@link ImportValidator}, {@link CompilationUnitImportValidator}
    */
   private static String getTypeReference(String signature, IType signatureOwner, IType contextType, IImportValidator validator) throws CoreException {
     StringBuilder sigBuilder = new StringBuilder();

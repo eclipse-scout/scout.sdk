@@ -25,10 +25,11 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -87,7 +88,7 @@ public class MethodUpdateContentOperation implements IOperation {
       try {
         ICompilationUnit icu = getMethod().getDeclaringType().getCompilationUnit();
         workingCopyManager.register(icu, monitor);
-        CompilationUnitImportValidator validator = new CompilationUnitImportValidator(icu);
+        ImportValidator validator = new ImportValidator(icu);
         Document methodBodyDocument = new Document(icu.getBuffer().getText(contentRange.getOffset(), contentRange.getLength()));
         int initialLenght = methodBodyDocument.getLength();
         updateMethodBody(methodBodyDocument, validator);
@@ -105,9 +106,8 @@ public class MethodUpdateContentOperation implements IOperation {
         }
         icu.getBuffer().setContents(ScoutUtility.cleanLineSeparator(doc.get(), doc));
         workingCopyManager.reconcile(icu, monitor);
-        for (String importType : validator.getImportsToCreate()) {
-          getMethod().getCompilationUnit().createImport(importType, null, monitor);
-        }
+
+        new ImportsCreateOperation(icu, validator).run(monitor, workingCopyManager);
       }
       catch (BadLocationException e) {
         throw new CoreException(new Status(Status.ERROR, ScoutSdk.PLUGIN_ID, "could not update method: " + getMethod().getElementName(), e));

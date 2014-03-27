@@ -94,7 +94,7 @@ import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -1011,7 +1011,7 @@ public final class JaxWsSdkUtility {
 
   public static String resolveTypeName(IType declaringType, IType typeToBeResolved) throws CoreException {
     String typeSignature = SignatureCache.createTypeSignature(typeToBeResolved.getFullyQualifiedName());
-    CompilationUnitImportValidator validator = new CompilationUnitImportValidator(declaringType.getCompilationUnit());
+    ImportValidator validator = new ImportValidator(declaringType.getCompilationUnit());
     return SignatureUtility.getTypeReference(typeSignature, declaringType, validator);
   }
 

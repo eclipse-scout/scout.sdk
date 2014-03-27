@@ -20,19 +20,20 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.sourcebuilder.ICommentSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.IAnnotationSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link FieldNewOperation}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 20.12.2012
  */
 public class FieldNewOperation implements IOperation {
@@ -69,12 +70,11 @@ public class FieldNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ICompilationUnit icu = getDeclaringType().getCompilationUnit();
-    CompilationUnitImportValidator importValidator = new CompilationUnitImportValidator(icu);
+    ImportValidator importValidator = new ImportValidator(icu);
     StringBuilder sourceBuilder = new StringBuilder();
     m_sourceBuilder.createSource(sourceBuilder, ResourceUtility.getLineSeparator(icu), getDeclaringType().getJavaProject(), importValidator);
     setCreatedField(getDeclaringType().createField(sourceBuilder.toString(), getSibling(), true, monitor));
-    importValidator.createImports(monitor);
-
+    new ImportsCreateOperation(icu, importValidator).run(monitor, workingCopyManager);
   }
 
   protected IFieldSourceBuilder getSourceBuilder() {

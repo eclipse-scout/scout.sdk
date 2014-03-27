@@ -38,6 +38,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
@@ -53,8 +54,8 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.javadoc.JavaDoc;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -218,7 +219,7 @@ public class CreateTemplateOperation implements IOperation {
 
     if (isReplaceFieldWithTemplate()) {
       workingCopyManager.register(getFormField().getCompilationUnit(), monitor);
-      IImportValidator validator = new CompilationUnitImportValidator(getFormField().getCompilationUnit());
+      IImportValidator validator = new ImportValidator(getFormField().getCompilationUnit());
       ITypeHierarchy formFieldHierarhy = TypeUtility.getLocalTypeHierarchy(getFormField());
       MultiTextEdit edit = new MultiTextEdit();
       int start = Integer.MAX_VALUE;
@@ -258,9 +259,7 @@ public class CreateTemplateOperation implements IOperation {
         buffer.setContents(ScoutUtility.cleanLineSeparator(sourceDoc.get(), sourceDoc));
 
         // create imports
-        for (String fqi : validator.getImportsToCreate()) {
-          getFormField().getCompilationUnit().createImport(fqi, null, monitor);
-        }
+        new ImportsCreateOperation(getFormField().getCompilationUnit(), validator).run(monitor, workingCopyManager);
 
         // format and organize
         JavaElementFormatOperation jefo = new JavaElementFormatOperation(getFormField().getCompilationUnit(), true);

@@ -10,6 +10,7 @@ import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.Annotation;
 import org.eclipse.jdt.core.dom.CompilationUnit;
@@ -33,7 +34,6 @@ import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerationConte
 import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.util.proposal.CUCorrectionProposal;
-import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -68,7 +68,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
 
     // annotation
     SingleMemberAnnotation newAnnotation = td.getAST().newSingleMemberAnnotation();
-    newAnnotation.setTypeName(td.getAST().newSimpleName(NamingUtility.getSimpleName(IRuntimeClasses.ClassId)));
+    newAnnotation.setTypeName(td.getAST().newSimpleName(Signature.getSimpleName(IRuntimeClasses.ClassId)));
 
     // value
     StringLiteral id = td.getAST().newStringLiteral();

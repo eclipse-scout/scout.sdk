@@ -27,12 +27,13 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.IAnnotationSourceBuilder;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -79,7 +80,7 @@ public class AnnotationNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     workingCopyManager.register(getDeclaringType().getCompilationUnit(), monitor);
-    CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getDeclaringType().getCompilationUnit());
+    ImportValidator validator = new ImportValidator(getDeclaringType().getCompilationUnit());
     Document doc = new Document(getDeclaringType().getCompilationUnit().getSource());
 
     TextEdit edit = createEdit(validator, doc, ResourceUtility.getLineSeparator(getDeclaringType().getCompilationUnit()));
@@ -88,9 +89,7 @@ public class AnnotationNewOperation implements IOperation {
       getDeclaringType().getCompilationUnit().getBuffer().setContents(doc.get());
 
       // create imports
-      for (String fqi : validator.getImportsToCreate()) {
-        getDeclaringType().getCompilationUnit().createImport(fqi, null, monitor);
-      }
+      new ImportsCreateOperation(getDeclaringType().getCompilationUnit(), validator).run(monitor, workingCopyManager);
     }
     catch (Exception e) {
       ScoutSdk.logWarning("could not add annotation to '" + getDeclaringType().getElementName() + "'.");

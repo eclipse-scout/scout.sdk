@@ -15,9 +15,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -52,7 +53,7 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     String TAB = SdkProperties.TAB;
-    CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getFormHandler().getCompilationUnit());
+    ImportValidator validator = new ImportValidator(getFormHandler().getCompilationUnit());
     workingCopyManager.register(getFormHandler().getCompilationUnit(), monitor);
     String processingExceptionClass = SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ProcessingException, validator);
     String serviceInterfaceName = SignatureUtility.getTypeReferenceFromFqn(getServiceInterface().getFullyQualifiedName(), validator);
@@ -97,9 +98,7 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
       getFormHandler().createMethod(execStoreBuilder.toString(), null, true, monitor);
     }
     // imports
-    for (String s : validator.getImportsToCreate()) {
-      getFormHandler().getCompilationUnit().createImport(s, null, monitor);
-    }
+    new ImportsCreateOperation(getFormHandler().getCompilationUnit(), validator).run(monitor, workingCopyManager);
   }
 
   public boolean isCreateExecStore() {

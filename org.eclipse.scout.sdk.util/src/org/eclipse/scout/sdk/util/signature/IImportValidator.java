@@ -10,29 +10,44 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.signature;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.Signature;
 
+/**
+ * <h3>{@link IImportValidator}</h3>
+ * 
+ * @author Andreas Hoegger
+ * @since 3.7.0
+ */
 public interface IImportValidator {
 
   /**
    * To get the scope qualified name to use for this signature.
    * 
-   * @see Signature
    * @param singleTypeSignature
-   *          a simple type signature e.g. 'Ljava.lang.String;'
+   *          a signature e.g. 'Ljava.lang.String;'
    * @return a simple name if the import is not used so far (e.g. String) or the fully qualified name if there is an
    *         other type with the same simple name in the scope (e.g. java.lang.String).
+   * @see Signature
    */
   String getTypeName(String singleTypeSignature);
 
   /**
-   * @return the imports has to be created of this validator
+   * Gets the list of imports to be created.<br>
+   * This list consists of all names added using {@link #addImport(String)} or that have automatically been added using
+   * {@link #getTypeName(String)}.
+   * 
+   * @return An array containing all fully qualified names that needs to be created
    */
-  String[] getImportsToCreate();
+  Set<String> getImportsToCreate();
 
   /**
+   * Adds the given fully qualified name to the list of imports to be created.<br>
+   * Any already existing mapping for the same simple name of the given qualified name will be replaced.
+   * 
    * @param fqn
-   *          fully qualified type name
+   *          The fully qualified name to add.
    */
   void addImport(String fqn);
 

@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.Type;
@@ -34,7 +35,6 @@ import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHan
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.extensions.technology.ScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -88,8 +88,8 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
     }
     else {
       String fqn = RuntimeClasses.getSuperTypeName(IRuntimeClasses.ISwingEnvironment, swingEnv.getJavaProject());
-      String className = NamingUtility.getSimpleName(fqn);
-      String pckName = NamingUtility.getPackage(fqn);
+      String className = Signature.getSimpleName(fqn);
+      String pckName = Signature.getQualifier(fqn);
 
       newSuperClassType = root.getAST().newSimpleType(root.getAST().newQualifiedName(root.getAST().newName(pckName), root.getAST().newSimpleName(className)));
     }

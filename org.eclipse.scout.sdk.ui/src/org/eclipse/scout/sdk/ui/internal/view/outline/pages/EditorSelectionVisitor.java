@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 
+import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -102,7 +103,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanProper
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
-import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -523,7 +524,8 @@ public class EditorSelectionVisitor implements INodeVisitor {
   protected int visitBeanPropertyTablePage(BeanPropertyTablePage page) {
     if (getCurrentElement().getElementType() == IJavaElement.METHOD) {
       IMethod method = (IMethod) getCurrentElement();
-      if (TypeUtility.exists(method.getAnnotation(NamingUtility.getSimpleName(IRuntimeClasses.ConfigProperty)))) {
+      IAnnotation annotation = JdtUtility.getAnnotation(method, IRuntimeClasses.ConfigProperty);
+      if (TypeUtility.exists(annotation)) {
         return CONTINUE_BRANCH;
       }
     }

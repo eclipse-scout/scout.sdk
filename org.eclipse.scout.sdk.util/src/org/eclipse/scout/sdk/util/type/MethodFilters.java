@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 
 /**
  *
@@ -30,24 +31,18 @@ public final class MethodFilters {
   }
 
   public static IMethodFilter getFilterWithAnnotation(final IType annotationType) {
+    final String fqn = annotationType.getFullyQualifiedName();
     return new IMethodFilter() {
       @Override
       public boolean accept(IMethod method) {
-        IAnnotation annotation = method.getAnnotation(annotationType.getElementName());
-        if (TypeUtility.exists(annotation)) {
-          return true;
-        }
-        annotation = method.getAnnotation(annotationType.getFullyQualifiedName());
+        IAnnotation annotation = JdtUtility.getAnnotation(method, fqn);
         return TypeUtility.exists(annotation);
       }
 
       @Override
       public String toString() {
-        StringBuilder text = new StringBuilder();
-        text.append("filter for method with annotation ");
-        if (annotationType != null) {
-          text.append(annotationType.getFullyQualifiedName());
-        }
+        StringBuilder text = new StringBuilder("filter for methods with annotation ");
+        text.append(fqn);
         return text.toString();
       }
     };

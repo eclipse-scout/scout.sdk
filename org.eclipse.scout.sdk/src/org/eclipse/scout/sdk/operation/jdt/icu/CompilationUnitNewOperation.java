@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.sourcebuilder.compilationunit.ICompilationUnitSourc
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -92,7 +92,7 @@ public class CompilationUnitNewOperation implements IOperation {
 
     // create icu
     StringBuilder source = new StringBuilder();
-    createSource(source, ResourceUtility.getLineSeparator(getPackageFragment()), getPackageFragment().getJavaProject(), new SimpleImportValidator(getPackageFragment().getElementName()));
+    createSource(source, ResourceUtility.getLineSeparator(getPackageFragment()), getPackageFragment().getJavaProject(), new ImportValidator(getPackageFragment().getElementName()));
 
     ICompilationUnit createdCompilationUnit = getPackageFragment().createCompilationUnit(getSourceBuilder().getElementName(), source.toString(), true, monitor);
     workingCopyManager.register(createdCompilationUnit, monitor);

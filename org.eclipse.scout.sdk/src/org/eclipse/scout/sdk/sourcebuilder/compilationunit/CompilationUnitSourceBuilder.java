@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
@@ -29,7 +30,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 /**
  * <h3>{@link CompilationUnitSourceBuilder}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuilder implements ICompilationUnitSourceBuilder {
@@ -77,8 +78,8 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
     }
 
     // imports
-    String[] importsToCreate = validator.getImportsToCreate();
-    if (importsToCreate.length > 0) {
+    Set<String> importsToCreate = validator.getImportsToCreate();
+    if (importsToCreate.size() > 0) {
       for (String imp : importsToCreate) {
         headerSourceBuilder.append("import ").append(imp).append(";").append(lineDelimiter);
       }

@@ -16,17 +16,18 @@ import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link InnerTypeNewOperation}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 08.03.2013
  */
 public class InnerTypeNewOperation extends AbstractTypeNewOperation {
@@ -67,11 +68,11 @@ public class InnerTypeNewOperation extends AbstractTypeNewOperation {
 
   protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ICompilationUnit icu = getDeclaringType().getCompilationUnit();
-    CompilationUnitImportValidator importValidator = new CompilationUnitImportValidator(icu);
+    ImportValidator importValidator = new ImportValidator(icu);
     StringBuilder sourceBuilder = new StringBuilder();
     getSourceBuilder().createSource(sourceBuilder, ResourceUtility.getLineSeparator(icu), getDeclaringType().getJavaProject(), importValidator);
     setCreatedType(getDeclaringType().createType(sourceBuilder.toString(), getSibling(), true, monitor));
-    importValidator.createImports(monitor);
+    new ImportsCreateOperation(icu, importValidator).run(monitor, workingCopyManager);
   }
 
   public IType getDeclaringType() {

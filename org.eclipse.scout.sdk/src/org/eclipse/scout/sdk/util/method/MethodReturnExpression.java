@@ -31,6 +31,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.osgi.framework.BundleContext;
@@ -220,13 +221,17 @@ public class MethodReturnExpression {
           try {
             String value = PropertyMethodSourceUtility.getFieldValue(f);
             if (validator != null) {
-              // check if we must qualify the source of the field
-              String scopeQualifiedName = validator.getTypeName(f.getTypeSignature());
-              String simpleName = Signature.getSignatureSimpleName(f.getTypeSignature());
-              if (CompareUtility.notEquals(scopeQualifiedName, simpleName)) {
-                if (!value.contains("." + simpleName)) {
-                  // the type must be qualified
-                  value = value.replace(simpleName, scopeQualifiedName);
+              String typeSignature = f.getTypeSignature();
+              int kind = SignatureUtility.getTypeSignatureKind(typeSignature);
+              if (kind != Signature.BASE_TYPE_SIGNATURE) { // no need to rewrite primitive types
+                // check if we must qualify the source of the field
+                String scopeQualifiedName = validator.getTypeName(typeSignature);
+                String simpleName = Signature.getSignatureSimpleName(typeSignature);
+                if (CompareUtility.notEquals(scopeQualifiedName, simpleName)) {
+                  if (!value.contains("." + simpleName)) {
+                    // the type must be qualified
+                    value = value.replace(simpleName, scopeQualifiedName);
+                  }
                 }
               }
             }

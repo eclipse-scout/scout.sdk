@@ -62,7 +62,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSourceBuilder {
 
   protected static final int ROW_DATA_FIELD_FLAGS = Flags.AccPublic | Flags.AccFinal | Flags.AccStatic;
-  protected static final String ABS_TABLE_ROW_DATA_SIMPLE_NAME = NamingUtility.getSimpleName(IRuntimeClasses.AbstractTableRowData);
+  protected static final String ABS_TABLE_ROW_DATA_SIMPLE_NAME = Signature.getSimpleName(IRuntimeClasses.AbstractTableRowData);
 
   /**
    * @param elementName

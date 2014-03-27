@@ -21,10 +21,11 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.text.edits.MultiTextEdit;
@@ -59,7 +60,7 @@ public class OrderAnnotationsUpdateOperation implements IOperation {
     IBuffer buffer = icu.getBuffer();
     Document sourceDoc = new Document(buffer.getContents());
     MultiTextEdit multiEdit = new MultiTextEdit();
-    IImportValidator validator = new CompilationUnitImportValidator(icu);
+    IImportValidator validator = new ImportValidator(icu);
     String orderSignature = SignatureCache.createTypeSignature(IRuntimeClasses.Order);
     String NL = ResourceUtility.getLineSeparator(icu);
 
@@ -77,9 +78,7 @@ public class OrderAnnotationsUpdateOperation implements IOperation {
       buffer.setContents(sourceDoc.get());
 
       // create imports
-      for (String fqi : validator.getImportsToCreate()) {
-        icu.createImport(fqi, null, monitor);
-      }
+      new ImportsCreateOperation(icu, validator).run(monitor, workingCopyManager);
     }
     catch (Exception e) {
       ScoutSdk.logWarning("could not update order annotations.", e);

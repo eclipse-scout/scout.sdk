@@ -18,10 +18,11 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -93,7 +94,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
 
   protected void runServer(IType serverSession, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     manager.register(serverSession.getCompilationUnit(), monitor);
-    IImportValidator validator = new CompilationUnitImportValidator(serverSession.getCompilationUnit());
+    IImportValidator validator = new ImportValidator(serverSession.getCompilationUnit());
     String beanReference = SignatureUtility.getTypeReference(getBeanTypeSignature(), serverSession, validator);
     String sigTypeSimpleName = beanReference.replaceAll("([^<]*).*", "$1");
 
@@ -117,14 +118,12 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     sourceGetter.append("return getSharedContextVariable(\"" + varName + "\"," + sigTypeSimpleName + ".class);\n}\n");
     serverSession.createMethod(sourceGetter.toString(), writeMethod, true, monitor);
     // imports
-    for (String imp : validator.getImportsToCreate()) {
-      serverSession.getCompilationUnit().createImport(imp, null, monitor);
-    }
+    new ImportsCreateOperation(serverSession.getCompilationUnit(), validator).run(monitor, manager);
   }
 
   protected void runClient(IType clientSession, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     manager.register(clientSession.getCompilationUnit(), monitor);
-    IImportValidator validator = new CompilationUnitImportValidator(clientSession.getCompilationUnit());
+    IImportValidator validator = new ImportValidator(clientSession.getCompilationUnit());
     String beanReference = SignatureUtility.getTypeReference(getBeanTypeSignature(), clientSession, validator);
     String sigTypeSimpleName = beanReference.replaceAll("([^<]*).*", "$1");
 
@@ -138,10 +137,8 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     sourceGetter.append("get" + beanName + "() {\n" + SdkProperties.TAB);
     sourceGetter.append("return getSharedContextVariable(\"" + varName + "\"," + sigTypeSimpleName + ".class);\n}\n");
     clientSession.createMethod(sourceGetter.toString(), getSiblingClientSession(), true, monitor);
-    // imports
-    for (String imp : validator.getImportsToCreate()) {
-      clientSession.getCompilationUnit().createImport(imp, null, monitor);
-    }
+
+    new ImportsCreateOperation(clientSession.getCompilationUnit(), validator).run(monitor, manager);
   }
 
   public IType getClientSession() {

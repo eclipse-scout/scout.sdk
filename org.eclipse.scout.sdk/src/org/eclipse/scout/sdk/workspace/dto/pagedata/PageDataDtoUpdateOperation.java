@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
 
@@ -80,7 +80,7 @@ public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
     cuSourceBuilder.addTypeSourceBuilder(pageDataSourceBuilder);
     cuSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
 
-    SimpleImportValidator validator = new SimpleImportValidator(TypeUtility.getPackage(dtoIcu).getElementName());
+    ImportValidator validator = new ImportValidator(TypeUtility.getPackage(dtoIcu).getElementName());
     if (monitor.isCanceled()) {
       return null;
     }

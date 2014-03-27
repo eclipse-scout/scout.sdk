@@ -15,7 +15,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ui.fields.proposal.SelectionStateLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
-import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -29,7 +29,7 @@ public class SignatureLabelProvider extends SelectionStateLabelProvider {
   public String getText(Object element) {
     String signature = (String) element;
     try {
-      return SignatureUtility.getTypeReference(signature, new SimpleImportValidator());
+      return SignatureUtility.getTypeReference(signature, new ImportValidator());
     }
     catch (CoreException e) {
       ScoutSdkUi.logWarning("unable to get text of signature '" + element + "'", e);

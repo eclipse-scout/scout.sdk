@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -91,7 +91,7 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
     cuSourceBuilder.addTypeSourceBuilder(formDataSourceBuilder);
     cuSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
 
-    SimpleImportValidator validator = new SimpleImportValidator(TypeUtility.getPackage(formDataIcu).getElementName());
+    ImportValidator validator = new ImportValidator(TypeUtility.getPackage(formDataIcu).getElementName());
 
     // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
     consumeAllTypeNamesRec(formDataSourceBuilder, validator);

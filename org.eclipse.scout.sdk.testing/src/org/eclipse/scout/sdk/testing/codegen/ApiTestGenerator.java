@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.testing.internal.SdkTestingApi;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
-import org.eclipse.scout.sdk.util.signature.SimpleImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
@@ -55,7 +55,7 @@ public class ApiTestGenerator {
   }
 
   public String buildSource() throws JavaModelException {
-    IImportValidator validator = new SimpleImportValidator();
+    IImportValidator validator = new ImportValidator();
     StringBuilder sourceBuilder = new StringBuilder();
     sourceBuilder.append("/**").append(NL);
     sourceBuilder.append("* @Generated with ").append(getClass().getName()).append(NL);

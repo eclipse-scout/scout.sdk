@@ -31,11 +31,12 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.annotation.AnnotationNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -144,7 +145,7 @@ public class ClassIdNewOperation implements IOperation {
     IBuffer buffer = icu.getBuffer();
     Document sourceDoc = new Document(buffer.getContents());
     MultiTextEdit multiEdit = new MultiTextEdit();
-    IImportValidator validator = new CompilationUnitImportValidator(icu);
+    IImportValidator validator = new ImportValidator(icu);
     String NL = ResourceUtility.getLineSeparator(icu);
     for (IType t : types) {
       if (!t.isAnonymous() && !t.isBinary()) {
@@ -163,11 +164,7 @@ public class ClassIdNewOperation implements IOperation {
     try {
       multiEdit.apply(sourceDoc);
       buffer.setContents(sourceDoc.get());
-
-      // create imports
-      for (String fqi : validator.getImportsToCreate()) {
-        icu.createImport(fqi, null, null);
-      }
+      new ImportsCreateOperation(icu, validator).run(monitor, workingCopyManager);
     }
     catch (BadLocationException e) {
       ScoutSdk.logWarning("Could not update @ClassId annotations for compilation unit '" + icu.getElementName() + "'.", e);

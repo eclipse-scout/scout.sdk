@@ -24,6 +24,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchMatch;
@@ -33,7 +34,6 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.scout.commons.CompositeLong;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeCache;
@@ -173,7 +173,7 @@ public final class TypeCache implements ITypeCache {
   private ArrayList<IType> resolveType(final String fqn) throws CoreException {
     final TreeMap<CompositeLong, IType> matchList = new TreeMap<CompositeLong, IType>();
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
-    String fastPat = NamingUtility.getSimpleName(fqn);
+    String fastPat = Signature.getSimpleName(fqn);
     if (!StringUtility.hasText(fastPat)) {
       return null;
     }

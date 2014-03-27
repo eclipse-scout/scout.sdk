@@ -22,14 +22,15 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.sourcebuilder.ICommentSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.IAnnotationSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.signature.CompilationUnitImportValidator;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -84,13 +85,15 @@ public abstract class AbstractMethodNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     ICompilationUnit icu = getDeclaringType().getCompilationUnit();
-    CompilationUnitImportValidator importValidator = new CompilationUnitImportValidator(icu);
+    ImportValidator importValidator = new ImportValidator(icu);
     StringBuilder sourceBuilder = new StringBuilder();
     createSource(sourceBuilder, ResourceUtility.getLineSeparator(icu), getDeclaringType().getJavaProject(), importValidator);
     workingCopyManager.register(icu, monitor);
 
     setCreatedMethod(getDeclaringType().createMethod(sourceBuilder.toString(), getSibling(), true, monitor));
-    importValidator.createImports(monitor);
+
+    new ImportsCreateOperation(icu, importValidator).run(monitor, workingCopyManager);
+
     if (isFormatSource()) {
       JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedMethod(), false);
       formatOp.validate();

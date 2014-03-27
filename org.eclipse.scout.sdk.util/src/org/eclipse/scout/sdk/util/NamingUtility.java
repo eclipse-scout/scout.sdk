@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.StringUtility;
 
 /**
  * <h3>{@link NamingUtility}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.11.2010
  */
@@ -69,40 +69,8 @@ public final class NamingUtility {
   }
 
   /**
-   * Gets the simple name of the given fully qualified name.
-   * 
-   * @param qualifiedName
-   * @return The simple name (part after the last dot).
-   */
-  public static String getSimpleName(String qualifiedName) {
-    int i = qualifiedName.lastIndexOf('.');
-    if (i >= 0) {
-      return qualifiedName.substring(i + 1);
-    }
-    else {
-      return qualifiedName;
-    }
-  }
-
-  /**
-   * Gets the package of the given fully qualified name.
-   * 
-   * @param qualifiedClassName
-   * @return The package part (all before the last dot).
-   */
-  public static String getPackage(String qualifiedClassName) {
-    int i = qualifiedClassName.lastIndexOf('.');
-    if (i >= 0) {
-      return qualifiedClassName.substring(0, i);
-    }
-    else {
-      return qualifiedClassName;
-    }
-  }
-
-  /**
    * ensures the given java name starts with a lower case character.
-   * 
+   *
    * @param name
    *          The name to handle.
    * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
@@ -127,7 +95,7 @@ public final class NamingUtility {
 
   /**
    * ensures the given java name starts with an upper case character.
-   * 
+   *
    * @param name
    *          The name to handle.
    * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
@@ -155,7 +123,7 @@ public final class NamingUtility {
 
   /**
    * Method calculates the levenshtein distance, also known as string edit distance.
-   * 
+   *
    * @param s1
    *          The first string.
    * @param s2
@@ -210,7 +178,7 @@ public final class NamingUtility {
 
   /**
    * converts the given input string into a valid java camel case name.<br>
-   * 
+   *
    * @param input
    * @param lowerCaseFirstToken
    *          if true, the first token uses lower case as e.g. used for method names.
