@@ -30,14 +30,22 @@ import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IQuickAssistProcessor;
 import org.eclipse.jface.text.IDocument;
+import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.util.proposal.CUCorrectionProposal;
 import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.Point;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
 
@@ -51,12 +59,31 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
   }
 
   @Override
-  public IJavaCompletionProposal[] getAssists(IInvocationContext context, IProblemLocation[] locations) throws CoreException {
-    ClassIdTarget selectedType = getSelectedType(context);
+  public IJavaCompletionProposal[] getAssists(final IInvocationContext context, IProblemLocation[] locations) throws CoreException {
+    final ClassIdTarget selectedType = getTarget(context.getCoveringNode());
     if (selectedType != null) {
-      CompilationUnitRewrite rewrite = createRewrite(selectedType.type, selectedType.td);
-      ClassIdAddProposal prop = new ClassIdAddProposal(rewrite);
-      return new IJavaCompletionProposal[]{prop};
+      ArrayList<IJavaCompletionProposal> proposals = new ArrayList<IJavaCompletionProposal>(2);
+      if (!TypeUtility.exists(selectedType.annotation)) {
+        CompilationUnitRewrite rewrite = createRewrite(selectedType.type, selectedType.td);
+        proposals.add(new ClassIdAddProposal(rewrite));
+      }
+
+      ClassIdDocumentationSupport support = new ClassIdDocumentationSupport(selectedType.type);
+      if (support.getNlsProject() != null) {
+        proposals.add(new EditDocumentationProposal(support));
+        support.addModifiedListener(new IClassIdDocumentationListener() {
+          @Override
+          public void modified(int eventType, INlsEntry entry, IType owner) {
+            if (eventType == IClassIdDocumentationListener.TYPE_NLS_VALUE_CREATED_NEW_CLASS_ID) {
+              ScoutSdkUi.showJavaElementInEditor(selectedType.type, false);
+            }
+          }
+        });
+      }
+
+      if (proposals.size() > 0) {
+        return proposals.toArray(new IJavaCompletionProposal[proposals.size()]);
+      }
     }
     return null;
   }
@@ -153,29 +180,6 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     return false;
   }
 
-  private ClassIdTarget getSelectedType(IInvocationContext context) throws JavaModelException {
-    ClassIdTarget t = getTarget(context.getCoveringNode());
-    return applyFilter(t);
-  }
-
-  private ClassIdTarget applyFilter(ClassIdTarget input) throws JavaModelException {
-    if (input != null) {
-      if (TypeUtility.exists(input.type) && !input.type.isBinary() && !input.type.isAnonymous()) {
-        IAnnotation annotation = JdtUtility.getAnnotation(input.type, IRuntimeClasses.ClassId);
-        if (!TypeUtility.exists(annotation)) {
-          IType filterType = TypeUtility.getType(IRuntimeClasses.ITypeWithClassId);
-          if (TypeUtility.exists(filterType)) {
-            ITypeHierarchy superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(input.type);
-            if (superTypeHierarchy.contains(filterType)) {
-              return input;
-            }
-          }
-        }
-      }
-    }
-    return null;
-  }
-
   private ClassIdTarget getTarget(ASTNode selectedNode) {
     if (selectedNode != null && selectedNode.getParent() != null) {
       if (selectedNode.getNodeType() == ASTNode.SIMPLE_NAME || selectedNode.getNodeType() == ASTNode.QUALIFIED_NAME || selectedNode.getNodeType() == ASTNode.MODIFIER || selectedNode.getNodeType() == ASTNode.TYPE_DECLARATION) {
@@ -194,7 +198,22 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
         if (resolveTypeBinding != null) {
           IJavaElement javaElement = resolveTypeBinding.getJavaElement();
           if (TypeUtility.exists(javaElement) && javaElement.getElementType() == IJavaElement.TYPE) {
-            return new ClassIdTarget(typeDecl, (IType) javaElement);
+            IType t = (IType) javaElement;
+            try {
+              if (!t.isBinary() && !t.isAnonymous()) {
+                IType filterType = TypeUtility.getType(IRuntimeClasses.ITypeWithClassId);
+                if (TypeUtility.exists(filterType)) {
+                  ITypeHierarchy superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(t);
+                  if (superTypeHierarchy.contains(filterType)) {
+                    IAnnotation annotation = JdtUtility.getAnnotation(t, IRuntimeClasses.ClassId);
+                    return new ClassIdTarget(typeDecl, t, annotation);
+                  }
+                }
+              }
+            }
+            catch (JavaModelException e) {
+              ScoutSdkUi.logError("Unable to check if type '" + t.getFullyQualifiedName() + "' is anonymous.", e);
+            }
           }
         }
       }
@@ -221,14 +240,63 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
     }
   }
 
+  private static final class EditDocumentationProposal implements IJavaCompletionProposal {
+
+    private final ClassIdDocumentationSupport m_support;
+
+    private EditDocumentationProposal(ClassIdDocumentationSupport support) {
+      m_support = support;
+    }
+
+    @Override
+    public void apply(IDocument document) {
+      Shell shell = ScoutSdkUi.getShell();
+      if (shell != null) {
+        m_support.editDocumentation(shell);
+      }
+    }
+
+    @Override
+    public Point getSelection(IDocument document) {
+      return null;
+    }
+
+    @Override
+    public String getAdditionalProposalInfo() {
+      return Texts.get("EditDocumentationForClass", m_support.getType().getFullyQualifiedName().replace('$', '.'));
+    }
+
+    @Override
+    public String getDisplayString() {
+      return Texts.get("EditDocumentation");
+    }
+
+    @Override
+    public Image getImage() {
+      return ScoutSdkUi.getImage(SdkIcons.Text);
+    }
+
+    @Override
+    public IContextInformation getContextInformation() {
+      return null;
+    }
+
+    @Override
+    public int getRelevance() {
+      return 0;
+    }
+  }
+
   private static final class ClassIdTarget {
 
     private final TypeDeclaration td;
     private final IType type;
+    private final IAnnotation annotation;
 
-    private ClassIdTarget(TypeDeclaration td, IType type) {
+    private ClassIdTarget(TypeDeclaration td, IType type, IAnnotation annotation) {
       this.td = td;
       this.type = type;
+      this.annotation = annotation;
     }
   }
 }

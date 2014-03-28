@@ -96,7 +96,7 @@ public class AnnotationNewOperation implements IOperation {
     }
   }
 
-  protected ISourceRange getAnnotationReplaceRange(Document sourceDocument, String newLine) throws JavaModelException, BadLocationException {
+  protected ISourceRange getAnnotationReplaceRange(Document sourceDocument, String newLine, String newAnnotationSource) throws JavaModelException, BadLocationException {
     String sn = Signature.getSignatureSimpleName(getSignature());
     String fqn = Signature.getSignatureQualifier(getSignature()) + "." + sn;
     int newLineLength = newLine.length();
@@ -104,6 +104,7 @@ public class AnnotationNewOperation implements IOperation {
     IRegion lineOfMemberName = sourceDocument.getLineInformationOfOffset(getDeclaringType().getNameRange().getOffset());
     int lineBeforeMemberNameEndPos = lineOfMemberName.getOffset() - newLineLength;
     int lastLineStart = sourceDocument.getLineInformationOfOffset(getDeclaringType().getSourceRange().getOffset()).getOffset();
+    int newAnnotationLen = newAnnotationSource.length();
     IRegion lineInfo = sourceDocument.getLineInformationOfOffset(lineBeforeMemberNameEndPos);
     IRegion result = lineOfMemberName;
     boolean isReplaceExisting = false;
@@ -122,9 +123,14 @@ public class AnnotationNewOperation implements IOperation {
 
           if (!isInBlockComment) {
             if (lineSource.charAt(0) == '@') {
-              result = lineInfo;
+              // if the existing annotation is longer than the one to insert (to ensure the annotations get from short to long)
+              if (lineSource.length() > newAnnotationLen) {
+                result = lineInfo;
+              }
+
               if (lineSource.startsWith("@" + sn) || lineSource.startsWith("@" + fqn)) {
                 // the annotation that should be created already exists -> replace it
+                result = lineInfo;
                 isReplaceExisting = true;
                 break;
               }
@@ -149,15 +155,21 @@ public class AnnotationNewOperation implements IOperation {
 
   public TextEdit createEdit(IImportValidator validator, Document sourceDocument, String NL) throws CoreException {
     try {
-      // find insert/replace range
-      ISourceRange replaceRange = getAnnotationReplaceRange(sourceDocument, NL);
-
       // create new source
-      StringBuilder builder = new StringBuilder(getIndent(sourceDocument, replaceRange));
+      StringBuilder builder = new StringBuilder();
       getSourceBuilder().createSource(builder, NL, getDeclaringType().getJavaProject(), validator);
+
+      // find insert/replace range
+      ISourceRange replaceRange = getAnnotationReplaceRange(sourceDocument, NL, builder.toString());
+
+      // insert indentation at the beginning
+      builder.insert(0, getIndent(sourceDocument, replaceRange));
+
+      // insert newline at the end if required
       if (replaceRange.getLength() == 0) {
         builder.append(NL);
       }
+
       return new ReplaceEdit(replaceRange.getOffset(), replaceRange.getLength(), builder.toString());
     }
     catch (BadLocationException e) {
