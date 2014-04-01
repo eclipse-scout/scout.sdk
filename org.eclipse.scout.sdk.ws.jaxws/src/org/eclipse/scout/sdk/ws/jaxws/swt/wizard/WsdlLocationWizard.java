@@ -142,12 +142,12 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
     if (m_sunJaxWsBean != null) { // webservice provider
       // update entry in sunJaxWs.xml
       m_sunJaxWsBean.setWsdl(wsdlFilePath);
-      ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED, monitor, m_sunJaxWsBean.getAlias());
+      ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED, monitor, m_sunJaxWsBean.getAlias());
     }
     else { // webservice consumer
       // update entry in buildJaxWs.xml
       m_buildJaxWsBean.setWsdl(wsdlFilePath);
-      ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor, m_buildJaxWsBean.getAlias());
+      ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor, m_buildJaxWsBean.getAlias());
     }
 
     if (m_stubGenerationOperation != null) {

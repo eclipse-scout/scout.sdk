@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
@@ -22,11 +21,12 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.HandlerChainFilterWizard;
 import org.eclipse.swt.widgets.Shell;
+import org.w3c.dom.Element;
 
 public class HandlerChainFilterEditAction extends AbstractLinkAction {
 
   private SunJaxWsBean m_sunJaxWsBean;
-  private ScoutXmlElement m_xmlHandlerChain;
+  private Element m_xmlHandlerChain;
   private IScoutBundle m_bundle;
 
   public HandlerChainFilterEditAction() {
@@ -40,7 +40,7 @@ public class HandlerChainFilterEditAction extends AbstractLinkAction {
     return !m_bundle.isBinary();
   }
 
-  public void init(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean, ScoutXmlElement xmlHandlerChain) {
+  public void init(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean, Element xmlHandlerChain) {
     m_bundle = bundle;
     m_sunJaxWsBean = sunJaxWsBean;
     m_xmlHandlerChain = xmlHandlerChain;

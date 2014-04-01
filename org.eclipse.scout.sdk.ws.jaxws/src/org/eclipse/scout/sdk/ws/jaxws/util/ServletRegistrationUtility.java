@@ -17,8 +17,6 @@ import java.util.Set;
 import org.eclipse.pde.core.plugin.IPluginAttribute;
 import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -26,6 +24,8 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public final class ServletRegistrationUtility {
 
@@ -43,12 +43,12 @@ public final class ServletRegistrationUtility {
       return null;
     }
 
-    ScoutXmlDocument document = ResourceFactory.getBuildJaxWsResource(bundle).loadXml();
-    if (document == null || document.getRoot() == null) {
+    Document document = ResourceFactory.getBuildJaxWsResource(bundle).loadXml();
+    if (document == null || document.getDocumentElement() == null) {
       return null;
     }
 
-    ScoutXmlElement xml = document.getRoot().getChild(XML_SERVLET_BUNDLE);
+    Element xml = JaxWsSdkUtility.getChildElement(document.getDocumentElement().getChildNodes(), XML_SERVLET_BUNDLE);
     if (xml == null) {
       return null;
     }

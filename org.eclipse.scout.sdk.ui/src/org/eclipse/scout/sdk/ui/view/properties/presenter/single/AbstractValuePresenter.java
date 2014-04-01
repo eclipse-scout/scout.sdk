@@ -165,6 +165,9 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
           try {
             T value = parseDisplayInput(input);
             String displayValue = formatDisplayValue(value);
+            if (displayValue == null) {
+              displayValue = "";
+            }
             getTextComponent().setText(displayValue);
             if (!CompareUtility.equals(value, getCurrentSourceValue())) {
               storeValue(value);

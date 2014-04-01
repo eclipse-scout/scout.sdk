@@ -16,8 +16,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -25,7 +23,10 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class SunJaxWsEntryCreateOperation implements IOperation {
 
@@ -59,10 +60,12 @@ public class SunJaxWsEntryCreateOperation implements IOperation {
       SunJaxWsFileCreateOperation op = new SunJaxWsFileCreateOperation(m_bundle);
       op.run(monitor, workingCopyManager);
     }
-    ScoutXmlDocument xmlDocument = ResourceFactory.getSunJaxWsResource(m_bundle).loadXml();
-    String namespacePrefix = xmlDocument.getRoot().getNamePrefix();
+    Document xmlDocument = ResourceFactory.getSunJaxWsResource(m_bundle).loadXml();
+    String namespacePrefix = JaxWsSdkUtility.getXmlPrefix(xmlDocument.getDocumentElement());
 
-    ScoutXmlElement endpointXml = xmlDocument.getRoot().addChild(StringUtility.join(":", namespacePrefix, SunJaxWsBean.XML_ENDPOINT));
+    Element endpointXml = xmlDocument.createElement(StringUtility.join(":", namespacePrefix, SunJaxWsBean.XML_ENDPOINT));
+    xmlDocument.getDocumentElement().appendChild(endpointXml);
+
     SunJaxWsBean bean = new SunJaxWsBean(endpointXml);
     bean.setAlias(m_alias);
     bean.setImplementation(m_implTypeQualifiedName);
@@ -76,7 +79,7 @@ public class SunJaxWsEntryCreateOperation implements IOperation {
     bean.setWsdl(PathNormalizer.toWsdlPath(m_wsdlProjectRelativePath.toString()));
     m_createdSunJaxWsBean = bean;
 
-    ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_createdSunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_ENTRY_ADDED, monitor, m_alias);
+    ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_createdSunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_ENTRY_ADDED, monitor, m_alias);
   }
 
   @Override

@@ -18,7 +18,6 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.ui.fields.TextField;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -32,7 +31,7 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Label;
 
 public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
@@ -46,7 +45,7 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
   private Button m_newWsdlRadioButton;
   private Button m_existingWsdlRadioButton;
 
-  private Text m_descriptionField;
+  private Label m_descriptionField;
   private TextField m_wsdlFolderField;
   private Button m_browseButton;
   private IFolder m_rootWsdlFolder;
@@ -82,9 +81,7 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
     m_existingWsdlRadioButton.setSelection(!isNewWsdl());
 
     // WSDL folder
-    m_descriptionField = new Text(parent, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
-    m_descriptionField.setEnabled(false);
-    m_descriptionField.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+    m_descriptionField = new Label(parent, SWT.WRAP);
     m_descriptionField.setText(Texts.get("ChooseFolderForWsdlFileAndArtefacts"));
 
     m_wsdlFolderField = new TextField(parent);
@@ -121,31 +118,25 @@ public class WsdlSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
     FormData formData = new FormData();
     formData.top = new FormAttachment(0, 0);
-    formData.left = new FormAttachment(40, 5);
+    formData.left = new FormAttachment(0, 5);
     formData.right = new FormAttachment(100, 0);
     m_newWsdlRadioButton.setLayoutData(formData);
 
     formData = new FormData();
     formData.top = new FormAttachment(m_newWsdlRadioButton, 5, SWT.BOTTOM);
-    formData.left = new FormAttachment(40, 5);
-    formData.right = new FormAttachment(100, 0);
-    m_existingWsdlRadioButton.setLayoutData(formData);
-
-    formData = new FormData();
-    formData.top = new FormAttachment(m_newWsdlRadioButton, 5, SWT.BOTTOM);
-    formData.left = new FormAttachment(40, 5);
+    formData.left = new FormAttachment(0, 5);
     formData.right = new FormAttachment(100, 0);
     m_existingWsdlRadioButton.setLayoutData(formData);
 
     formData = new FormData();
     formData.top = new FormAttachment(m_existingWsdlRadioButton, 20, SWT.BOTTOM);
-    formData.left = new FormAttachment(40, 5);
+    formData.left = new FormAttachment(0, 5);
     formData.right = new FormAttachment(100, 0);
     m_descriptionField.setLayoutData(formData);
 
     formData = new FormData();
     formData.top = new FormAttachment(m_descriptionField, 5, SWT.BOTTOM);
-    formData.left = new FormAttachment(0, 50);
+    formData.left = new FormAttachment(-5, 0);
     formData.right = new FormAttachment(100, -75);
     m_wsdlFolderField.setLayoutData(formData);
 

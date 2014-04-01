@@ -253,7 +253,19 @@ public class ProductLaunchPresenter extends AbstractPresenter {
       protected IStatus run(IProgressMonitor monitor) {
         try {
           EclipseLaunchShortcut shortCut = new EclipseLaunchShortcut();
-          shortCut.launch(new StructuredSelection(m_productFile), (debug) ? (ILaunchManager.DEBUG_MODE) : (ILaunchManager.RUN_MODE));
+          int iteration = 0;
+          boolean success = false;
+          while (!success && iteration < 10) {
+            try {
+              shortCut.launch(new StructuredSelection(m_productFile), (debug) ? (ILaunchManager.DEBUG_MODE) : (ILaunchManager.RUN_MODE));
+              success = true;
+            }
+            catch (NullPointerException npe) {
+              // sometimes happens in PDE. try again
+              Thread.sleep(200);
+            }
+            iteration++;
+          }
         }
         catch (Exception e) {
           ScoutSdkUi.logInfo("could not start product '" + getProductFile().getName() + "'", e);

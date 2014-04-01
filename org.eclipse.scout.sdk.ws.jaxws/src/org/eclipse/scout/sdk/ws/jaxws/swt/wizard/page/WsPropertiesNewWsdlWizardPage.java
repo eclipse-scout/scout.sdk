@@ -26,8 +26,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.NamingUtility;
@@ -56,6 +54,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 @SuppressWarnings("restriction")
 public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
@@ -90,7 +90,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
   private Composite m_wsdlStyleRadioComposite;
   private List<Button> m_wsdlStyleRadioButtons;
 
-  private ScoutXmlDocument m_sunJaxWsXml;
+  private Document m_sunJaxWsXml;
   private Set<String> m_illegalAliasNames;
   private Set<String> m_illegalUrlPatterns;
 
@@ -741,7 +741,8 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
     Set<String> illegalUrlPatterns = new HashSet<String>();
 
     if (m_sunJaxWsXml != null) {
-      for (ScoutXmlElement xmlSunJaxWs : m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
+      String fqn = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(m_sunJaxWsXml.getDocumentElement()), SunJaxWsBean.XML_ENDPOINT);
+      for (Element xmlSunJaxWs : JaxWsSdkUtility.getChildElements(m_sunJaxWsXml.getDocumentElement().getChildNodes(), fqn)) {
         SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(xmlSunJaxWs);
         illegalAliases.add(sunJaxWsBean.getAlias());
         illegalUrlPatterns.add(sunJaxWsBean.getUrlPattern());

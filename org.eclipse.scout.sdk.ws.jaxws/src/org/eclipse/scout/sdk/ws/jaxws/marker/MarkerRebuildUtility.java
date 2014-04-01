@@ -35,7 +35,6 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -78,6 +77,7 @@ import org.eclipse.scout.sdk.ws.jaxws.validator.IServletAliasValidation;
 import org.eclipse.scout.sdk.ws.jaxws.validator.IUrlPatternValidation;
 import org.eclipse.scout.sdk.ws.jaxws.validator.ServletAliasValidator;
 import org.eclipse.scout.sdk.ws.jaxws.validator.UrlPatternValidator;
+import org.w3c.dom.Element;
 
 @SuppressWarnings("restriction")
 public final class MarkerRebuildUtility {
@@ -585,7 +585,7 @@ public final class MarkerRebuildUtility {
     sunJaxWsBean.visitHandlers(new IHandlerVisitor() {
 
       @Override
-      public boolean visit(ScoutXmlElement xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount) {
+      public boolean visit(Element xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount) {
         if (fullyQualifiedName == null) {
           MarkerUtility.createMarker(ResourceFactory.getSunJaxWsResource(bundle).getFile(), MarkerType.HandlerClass, markerGroupUUID, "Missing handler class");
           return false;

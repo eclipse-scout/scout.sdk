@@ -20,8 +20,6 @@ import org.eclipse.pde.core.plugin.IPluginAttribute;
 import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
@@ -38,6 +36,8 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class JaxWsServletRegistrationOperation implements IOperation {
 
@@ -79,18 +79,18 @@ public class JaxWsServletRegistrationOperation implements IOperation {
       op.run(monitor, workingCopyManager);
     }
     // ensure servlet registration in build-jaxws.xml
-    ScoutXmlDocument document = buildJaxWsResource.loadXml();
-    ScoutXmlElement xml = document.getRoot().getChild(ServletRegistrationUtility.XML_SERVLET_BUNDLE);
+    Document document = buildJaxWsResource.loadXml();
+    Element xml = JaxWsSdkUtility.getFirstChildElementByTagName(document.getDocumentElement(), ServletRegistrationUtility.XML_SERVLET_BUNDLE);
     if (xml == null) {
-      xml = document.getRoot().addChild(ServletRegistrationUtility.XML_SERVLET_BUNDLE);
+      xml = document.createElement(ServletRegistrationUtility.XML_SERVLET_BUNDLE);
+      document.getDocumentElement().appendChild(xml);
     }
-
     if (xml.hasAttribute(ServletRegistrationUtility.XML_NAME)) {
       oldServletRegBundleName = xml.getAttribute(ServletRegistrationUtility.XML_NAME);
       xml.removeAttribute(ServletRegistrationUtility.XML_NAME);
     }
     xml.setAttribute(ServletRegistrationUtility.XML_NAME, m_registrationBundle.getSymbolicName());
-    ResourceFactory.getBuildJaxWsResource(m_bundle, true).storeXml(xml.getDocument(), IResourceListener.EVENT_BUILDJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
+    ResourceFactory.getBuildJaxWsResource(m_bundle, true).storeXml(xml.getOwnerDocument(), IResourceListener.EVENT_BUILDJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
 
     String jaxWsServletClass = TypeUtility.getType(JaxWsRuntimeClasses.JaxWsServlet).getFullyQualifiedName();
 
@@ -148,12 +148,14 @@ public class JaxWsServletRegistrationOperation implements IOperation {
             JaxWsSdkUtility.exists(sunJaxWsResource.getFile())) {
           String bundleNameOfRegistration = ServletRegistrationUtility.getBuildJaxServletRegistrationBundleName(candidateBundle);
           if (bundleNameOfRegistration != null && bundleNameOfRegistration.equals(m_registrationBundle.getSymbolicName())) {
-            ScoutXmlDocument sunJaxWsXmlDocument = sunJaxWsResource.loadXml();
+            Document sunJaxWsXmlDocument = sunJaxWsResource.loadXml();
             if (sunJaxWsXmlDocument == null) {
               continue;
             }
             List<String> changedEntries = new ArrayList<String>();
-            for (ScoutXmlElement sunJaxWsXmlEntry : sunJaxWsXmlDocument.getRoot().getChildren(StringUtility.join(":", sunJaxWsXmlDocument.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
+            Element root = sunJaxWsXmlDocument.getDocumentElement();
+            String tagName = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(root), SunJaxWsBean.XML_ENDPOINT);
+            for (Element sunJaxWsXmlEntry : JaxWsSdkUtility.getChildElements(root.getChildNodes(), tagName)) {
               SunJaxWsBean sunJaxWsEntryBean = new SunJaxWsBean(sunJaxWsXmlEntry);
               changedEntries.add(sunJaxWsEntryBean.getAlias());
 
@@ -183,7 +185,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
         urlPattern = PathNormalizer.toUrlPattern(alias, urlPattern);
       }
       m_sunJaxWsBean.setUrlPattern(urlPattern);
-      ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED, m_sunJaxWsBean.getAlias());
+      ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED, m_sunJaxWsBean.getAlias());
     }
   }
 

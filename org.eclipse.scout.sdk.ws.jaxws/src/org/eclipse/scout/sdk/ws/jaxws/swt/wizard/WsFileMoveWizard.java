@@ -20,8 +20,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -45,6 +43,8 @@ import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class WsFileMoveWizard extends AbstractWorkspaceWizard {
 
@@ -129,9 +129,9 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
     for (IFile bindingFile : bindingFiles) {
       XmlResource xmlResource = new XmlResource(m_bundle);
       xmlResource.setFile(bindingFile);
-      ScoutXmlDocument xmlDocument = xmlResource.loadXml();
-      String namespacePrefix = xmlDocument.getRoot().getNamePrefix();
-      ScoutXmlElement xmlBindings = xmlDocument.getChild(StringUtility.join(":", namespacePrefix, "bindings"));
+      Document xmlDocument = xmlResource.loadXml();
+      String namespacePrefix = JaxWsSdkUtility.getXmlPrefix(xmlDocument.getDocumentElement());
+      Element xmlBindings = JaxWsSdkUtility.getChildElement(xmlDocument.getDocumentElement().getChildNodes(), StringUtility.join(":", namespacePrefix, "bindings"));
       if (xmlBindings != null && xmlBindings.hasAttribute("wsdlLocation")) {
         String wsdlLocation = xmlBindings.getAttribute("wsdlLocation");
         String schemaDefiningFileName = new Path(wsdlLocation).toFile().getName();

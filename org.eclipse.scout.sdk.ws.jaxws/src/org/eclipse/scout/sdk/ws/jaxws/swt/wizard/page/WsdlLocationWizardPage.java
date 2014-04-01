@@ -82,7 +82,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.FileDialog;
-import org.eclipse.swt.widgets.Text;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
@@ -118,7 +118,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
   private boolean m_rebuildStubOptionVisible;
   private boolean m_wsdlFolderVisible;
 
-  private Text m_wsdlFolderDescriptionField;
+  private Label m_wsdlFolderDescriptionField;
   private TextField m_wsdlFolderField;
   private Button m_wsdlFolderBrowseButton;
   private IFolder m_rootWsdlFolder;
@@ -276,9 +276,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
 
     // WSDL folder
     if (isWsdlFolderVisible()) {
-      m_wsdlFolderDescriptionField = new Text(parent, SWT.WRAP | SWT.MULTI | SWT.READ_ONLY);
-      m_wsdlFolderDescriptionField.setEnabled(false);
-      m_wsdlFolderDescriptionField.setForeground(ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_DARK_GRAY));
+      m_wsdlFolderDescriptionField = new Label(parent, SWT.WRAP);
       m_wsdlFolderDescriptionField.setText(Texts.get("ChooseFolderForWsdlFileAndArtefacts"));
 
       m_wsdlFolderField = new TextField(parent);
@@ -318,7 +316,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
 
     FormData formData = new FormData();
     formData.top = new FormAttachment(0, 0);
-    formData.left = new FormAttachment(40, 5);
+    formData.left = new FormAttachment(0, 5);
     formData.right = new FormAttachment(100, 0);
     m_fileSystemRadioButton.setLayoutData(formData);
 
@@ -330,7 +328,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
 
     formData = new FormData();
     formData.top = new FormAttachment(0, 0);
-    formData.left = new FormAttachment(0, 50);
+    formData.left = new FormAttachment(0, 0);
     formData.right = new FormAttachment(100, -75);
     m_pathField.setLayoutData(formData);
 
@@ -342,13 +340,13 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
 
     formData = new FormData();
     formData.top = new FormAttachment(m_browseButton, 5, SWT.BOTTOM);
-    formData.left = new FormAttachment(40, 5);
+    formData.left = new FormAttachment(19, 1);
     formData.right = new FormAttachment(100, 0);
     m_addFilesLink.setLayoutData(formData);
 
     formData = new FormData();
     formData.top = new FormAttachment(m_fileSystemContainer, 10, SWT.BOTTOM);
-    formData.left = new FormAttachment(40, 5);
+    formData.left = new FormAttachment(0, 5);
     formData.right = new FormAttachment(100, 0);
     m_urlRadioButton.setLayoutData(formData);
 
@@ -360,15 +358,15 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
 
     formData = new FormData();
     formData.top = new FormAttachment(0, 0);
-    formData.left = new FormAttachment(0, 0);
+    formData.left = new FormAttachment(-3, 0);
     formData.right = new FormAttachment(100, 0);
     m_urlField.setLayoutData(formData);
 
     Control referenceControl = m_urlContainer;
     if (isWsdlFolderVisible()) {
       formData = new FormData();
-      formData.top = new FormAttachment(m_urlContainer, 20, SWT.BOTTOM);
-      formData.left = new FormAttachment(40, 5);
+      formData.top = new FormAttachment(m_urlContainer, 40, SWT.BOTTOM);
+      formData.left = new FormAttachment(0, 5);
       formData.right = new FormAttachment(100, 0);
       m_wsdlFolderDescriptionField.setLayoutData(formData);
 

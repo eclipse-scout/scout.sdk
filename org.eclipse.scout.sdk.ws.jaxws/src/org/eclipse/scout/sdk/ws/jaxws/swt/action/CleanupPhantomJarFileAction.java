@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -23,8 +24,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -47,6 +46,8 @@ import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class CleanupPhantomJarFileAction extends AbstractLinkAction {
 
@@ -129,13 +130,15 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
     Set<IFile> jarFiles = new HashSet<IFile>();
 
     XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(m_bundle);
-    ScoutXmlDocument sunJaxWsXmlDocument = sunJaxWsResource.loadXml();
+    Document sunJaxWsXmlDocument = sunJaxWsResource.loadXml();
 
-    if (sunJaxWsXmlDocument == null || sunJaxWsXmlDocument.getRoot() == null) {
+    if (sunJaxWsXmlDocument == null || sunJaxWsXmlDocument.getDocumentElement() == null) {
       return new IFile[0];
     }
 
-    for (ScoutXmlElement sunJaxWsXml : sunJaxWsXmlDocument.getRoot().getChildren(StringUtility.join(":", sunJaxWsXmlDocument.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT))) {
+    String tagName = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(sunJaxWsXmlDocument.getDocumentElement()), SunJaxWsBean.XML_ENDPOINT);
+    List<Element> childElements = JaxWsSdkUtility.getChildElements(sunJaxWsXmlDocument.getDocumentElement().getChildNodes(), tagName);
+    for (Element sunJaxWsXml : childElements) {
       SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
       BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.Provider);
       if (buildJaxWsBean == null) {

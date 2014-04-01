@@ -10,18 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.model;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
 import java.util.List;
 
 import javax.xml.namespace.QName;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class SunJaxWsBean {
 
@@ -43,22 +42,22 @@ public class SunJaxWsBean {
   public static final String XML_HANDLER_FILTER_SERVICE = "service-name-pattern";
   public static final String XML_HANDLER_FILTER_PORT = "port-name-pattern";
 
-  private ScoutXmlElement m_xml;
+  private Element m_xml;
 
-  public SunJaxWsBean(ScoutXmlElement xml) {
+  public SunJaxWsBean(Element xml) {
     m_xml = xml;
   }
 
-  public ScoutXmlElement getXml() {
+  public Element getXml() {
     return m_xml;
   }
 
-  public void setXml(ScoutXmlElement xml) {
+  public void setXml(Element xml) {
     m_xml = xml;
   }
 
   public String getAlias() {
-    return m_xml.getAttribute(XML_ALIAS, null);
+    return JaxWsSdkUtility.getXmlAttribute(m_xml, XML_ALIAS, null);
   }
 
   public void setAlias(String alias) {
@@ -67,7 +66,7 @@ public class SunJaxWsBean {
   }
 
   public String getImplementation() {
-    return m_xml.getAttribute(XML_IMPLEMENTATION, null);
+    return JaxWsSdkUtility.getXmlAttribute(m_xml, XML_IMPLEMENTATION, null);
   }
 
   public void setImplementation(String implementation) {
@@ -76,7 +75,7 @@ public class SunJaxWsBean {
   }
 
   public String getService() {
-    return m_xml.getAttribute(XML_SERVICE, null);
+    return JaxWsSdkUtility.getXmlAttribute(m_xml, XML_SERVICE, null);
   }
 
   public QName getServiceQNameSafe() {
@@ -94,7 +93,7 @@ public class SunJaxWsBean {
   }
 
   public String getPort() {
-    return m_xml.getAttribute(XML_PORT, null);
+    return JaxWsSdkUtility.getXmlAttribute(m_xml, XML_PORT, null);
   }
 
   public QName getPortQNameSafe() {
@@ -112,7 +111,7 @@ public class SunJaxWsBean {
   }
 
   public String getWsdl() {
-    return m_xml.getAttribute(XML_WSDL, null);
+    return JaxWsSdkUtility.getXmlAttribute(m_xml, XML_WSDL, null);
   }
 
   public void setWsdl(String wsdl) {
@@ -121,7 +120,7 @@ public class SunJaxWsBean {
   }
 
   public String getUrlPattern() {
-    return m_xml.getAttribute(XML_URL_PATTERN, null);
+    return JaxWsSdkUtility.getXmlAttribute(m_xml, XML_URL_PATTERN, null);
   }
 
   public void setUrlPattern(String urlPattern) {
@@ -129,103 +128,70 @@ public class SunJaxWsBean {
     m_xml.setAttribute(XML_URL_PATTERN, urlPattern);
   }
 
-  public List<ScoutXmlElement> getHandlerChains() {
-    ScoutXmlElement xmlChains = m_xml.getChild(toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS));
-
+  public List<Element> getHandlerChains() {
+    Element xmlChains = JaxWsSdkUtility.getFirstChildElementByTagName(m_xml, toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS));
     if (xmlChains == null) {
-      return new ArrayList<ScoutXmlElement>(0);
+      return Collections.emptyList();
     }
-
-    List<ScoutXmlElement> children = xmlChains.getChildren(toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAIN));
-    if (children == null) {
-      return new ArrayList<ScoutXmlElement>(0);
-    }
-
-    List<ScoutXmlElement> chains = new ArrayList<ScoutXmlElement>();
-    for (ScoutXmlElement child : children) {
-      chains.add(child);
-    }
-    return chains;
+    return JaxWsSdkUtility.getChildElements(xmlChains.getChildNodes(), toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAIN));
   }
 
-  public void setHandlerChains(List<ScoutXmlElement> xmlHandlerChains) {
-    if (m_xml.hasChild(toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS))) {
-      m_xml.removeChildren(toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS));
+  public void setHandlerChains(List<Element> xmlHandlerChains) {
+    List<Element> childElements = JaxWsSdkUtility.getChildElements(m_xml.getChildNodes(), toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS));
+    for (Element existing : childElements) {
+      m_xml.removeChild(existing);
     }
-    for (ScoutXmlElement chain : xmlHandlerChains) {
-      m_xml.addChild(chain);
+    for (Element chain : xmlHandlerChains) {
+      m_xml.appendChild(chain);
     }
   }
 
   public String toQualifiedName(String elementName) {
-    return StringUtility.join(":", m_xml.getRoot().getNamePrefix(), elementName);
+    return StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(m_xml.getOwnerDocument().getDocumentElement()), elementName);
   }
 
   public void visitHandlers(IHandlerVisitor visitor) {
-    String handlerXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER);
-    String handlerClazzXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER_CLASS);
-
-    for (ScoutXmlElement xmlHandlerChain : getHandlerChains()) {
-      List<ScoutXmlElement> children = xmlHandlerChain.getChildren(handlerXmlElementName);
-      if (children == null || children.size() == 0) {
-        continue;
-      }
-
-      List<ScoutXmlElement> handlers = new LinkedList<ScoutXmlElement>();
-      for (ScoutXmlElement child : children) {
-        handlers.add(child);
-      }
-      for (int i = 0; i < handlers.size(); i++) {
-        ScoutXmlElement xmlHandler = handlers.get(i);
-
-        ScoutXmlElement xmlHandlerClazzElement = xmlHandler.getChild(handlerClazzXmlElementName);
-        String fqn = null;
-        if (xmlHandlerClazzElement != null) {
-          fqn = xmlHandlerClazzElement.getText();
-        }
-        if (!visitor.visit(xmlHandler, fqn, i, handlers.size())) {
-          return;
-        }
-      }
+    for (Element xmlHandlerChain : getHandlerChains()) {
+      visitHandlers(xmlHandlerChain, visitor);
     }
   }
 
-  public void visitHandlers(ScoutXmlElement xmlHandlerChain, IHandlerVisitor visitor) {
+  public void visitHandlers(Element xmlHandlerChain, IHandlerVisitor visitor) {
     String handlerXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER);
     String handlerClazzXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER_CLASS);
 
-    List<ScoutXmlElement> children = xmlHandlerChain.getChildren(handlerXmlElementName);
+    List<Element> children = JaxWsSdkUtility.getChildElements(xmlHandlerChain.getChildNodes(), handlerXmlElementName);
     if (children == null || children.size() == 0) {
       return;
     }
 
-    List<ScoutXmlElement> handlers = new LinkedList<ScoutXmlElement>();
-    for (ScoutXmlElement child : children) {
-      handlers.add(child);
-    }
-    for (int i = 0; i < handlers.size(); i++) {
-      ScoutXmlElement xmlHandler = handlers.get(i);
+    for (int i = 0; i < children.size(); i++) {
+      Element xmlHandler = children.get(i);
 
-      ScoutXmlElement xmlHandlerClazzElement = xmlHandler.getChild(handlerClazzXmlElementName);
+      Element xmlHandlerClazzElement = JaxWsSdkUtility.getFirstChildElementByTagName(xmlHandler, handlerClazzXmlElementName);
       String fqn = null;
       if (xmlHandlerClazzElement != null) {
-        fqn = xmlHandlerClazzElement.getText();
+        fqn = xmlHandlerClazzElement.getTextContent();
       }
-      if (!visitor.visit(xmlHandler, fqn, i, handlers.size())) {
+      if (!visitor.visit(xmlHandler, fqn, i, children.size())) {
         return;
       }
     }
   }
 
-  public boolean swapHandler(ScoutXmlElement xmlHandlerChain, int oldIndex, int newIndex) {
+  public boolean swapHandler(Element xmlHandlerChain, int oldIndex, int newIndex) {
     String handlerXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER);
-    List<ScoutXmlElement> handlerChildren = xmlHandlerChain.getChildren(handlerXmlElementName);
+    List<Element> handlerChildren = JaxWsSdkUtility.getChildElements(xmlHandlerChain.getChildNodes(), handlerXmlElementName);
     try {
       Collections.swap(handlerChildren, oldIndex, newIndex);
 
       // update chain in memory
-      xmlHandlerChain.removeChildren(handlerChildren);
-      xmlHandlerChain.addChildren(handlerChildren);
+      for (Element e : handlerChildren) {
+        xmlHandlerChain.removeChild(e);
+      }
+      for (Element e : handlerChildren) {
+        xmlHandlerChain.appendChild(e);
+      }
       return true;
     }
     catch (IndexOutOfBoundsException e) {
@@ -240,21 +206,27 @@ public class SunJaxWsBean {
    * @return true if successful, false otherwise
    */
   public boolean reload(IScoutBundle bundle) {
-    ScoutXmlDocument newDocument = ResourceFactory.getSunJaxWsResource(bundle).loadXml();
-    if (newDocument == null || newDocument.getRoot() == null) {
+    Document newDocument = ResourceFactory.getSunJaxWsResource(bundle).loadXml();
+    if (newDocument == null) {
       return false;
     }
 
-    ScoutXmlElement rootXml = newDocument.getRoot();
-    if (rootXml == null || !rootXml.hasChild(toQualifiedName(SunJaxWsBean.XML_ENDPOINT))) {
+    Element rootXml = newDocument.getDocumentElement();
+    if (rootXml == null) {
       return false;
     }
 
-    ScoutXmlElement xml = rootXml.getChild(toQualifiedName(SunJaxWsBean.XML_ENDPOINT), SunJaxWsBean.XML_ALIAS, getAlias());
-    if (xml == null) {
+    List<Element> endpoints = JaxWsSdkUtility.getChildElements(rootXml.getChildNodes(), toQualifiedName(SunJaxWsBean.XML_ENDPOINT));
+    if (endpoints.size() < 1) {
       return false;
     }
-    setXml(xml);
+
+    List<Element> childElementsWithAttributes = JaxWsSdkUtility.getChildElementsWithAttributes(rootXml, toQualifiedName(SunJaxWsBean.XML_ENDPOINT), SunJaxWsBean.XML_ALIAS, getAlias());
+
+    if (childElementsWithAttributes.size() < 1) {
+      return false;
+    }
+    setXml(childElementsWithAttributes.get(0));
     return true;
   }
 
@@ -262,30 +234,27 @@ public class SunJaxWsBean {
     if (!StringUtility.hasText(alias)) {
       return null;
     }
-    ScoutXmlDocument document = ResourceFactory.getSunJaxWsResource(bundle).loadXml();
-    if (document == null || document.getRoot() == null) {
+    Document document = ResourceFactory.getSunJaxWsResource(bundle).loadXml();
+    if (document == null) {
       return null;
     }
 
-    ScoutXmlElement rootXml = document.getRoot();
+    Element rootXml = document.getDocumentElement();
     if (rootXml == null) {
       return null;
     }
-    String xmlEndpoint = StringUtility.join(":", rootXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT);
-    if (!rootXml.hasChild(xmlEndpoint)) {
+
+    String xmlEndpoint = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(rootXml), SunJaxWsBean.XML_ENDPOINT);
+    List<Element> xml = JaxWsSdkUtility.getChildElementsWithAttributes(rootXml, xmlEndpoint, SunJaxWsBean.XML_ALIAS, alias);
+    if (xml.size() < 1) {
       return null;
     }
 
-    ScoutXmlElement xml = rootXml.getChild(xmlEndpoint, SunJaxWsBean.XML_ALIAS, alias);
-    if (xml == null) {
-      return null;
-    }
-
-    return new SunJaxWsBean(xml);
+    return new SunJaxWsBean(xml.get(0));
   }
 
   public static interface IHandlerVisitor {
 
-    public boolean visit(ScoutXmlElement xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount);
+    public boolean visit(Element xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount);
   }
 }

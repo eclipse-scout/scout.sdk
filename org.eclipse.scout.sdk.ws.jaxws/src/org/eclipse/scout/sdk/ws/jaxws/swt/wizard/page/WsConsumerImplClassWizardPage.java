@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page;
 import java.beans.PropertyChangeListener;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
@@ -33,10 +34,7 @@ import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.TypeCastUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -64,6 +62,8 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.dialogs.SelectionDialog;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 @SuppressWarnings("restriction")
 public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
@@ -498,14 +498,14 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
     Set<String> illegalTypeNames = new HashSet<String>();
 
     XmlResource buildJaxWsResource = ResourceFactory.getBuildJaxWsResource(m_bundle);
-    ScoutXmlDocument xmlDocument = buildJaxWsResource.loadXml();
+    Document xmlDocument = buildJaxWsResource.loadXml();
     if (!buildJaxWsResource.existsFile()) {
       return illegalTypeNames;
     }
-    if (xmlDocument.getRoot().hasChild(BuildJaxWsBean.XML_CONSUMER)) {
-      ScoutXmlElement[] xmlElements = TypeCastUtility.castValue(xmlDocument.getRoot().getChildren(BuildJaxWsBean.XML_CONSUMER), ScoutXmlElement[].class);
-
-      for (ScoutXmlElement xmlElement : xmlElements) {
+    Element consumer = JaxWsSdkUtility.getChildElement(xmlDocument.getChildNodes(), BuildJaxWsBean.XML_CONSUMER);
+    if (consumer != null) {
+      List<Element> xmlElements = JaxWsSdkUtility.getChildElements(xmlDocument.getDocumentElement().getChildNodes(), BuildJaxWsBean.XML_CONSUMER);
+      for (Element xmlElement : xmlElements) {
         illegalTypeNames.add(xmlElement.getAttribute(BuildJaxWsBean.XML_ALIAS));
       }
     }

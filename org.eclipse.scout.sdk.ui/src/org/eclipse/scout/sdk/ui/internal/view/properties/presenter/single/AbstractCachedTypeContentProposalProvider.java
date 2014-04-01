@@ -44,16 +44,16 @@ public abstract class AbstractCachedTypeContentProposalProvider extends ContentP
     m_labelProvider = labelProvider;
   }
 
-  public IType getType() {
+  public synchronized IType getType() {
     return m_type;
   }
 
-  public void setType(IType t) {
+  public synchronized void setType(IType t) {
     m_type = t;
     reset();
   }
 
-  protected synchronized void reset() {
+  protected void reset() {
     if (m_listener != null) {
       JavaCore.removeElementChangedListener(m_listener);
       m_listener = null;

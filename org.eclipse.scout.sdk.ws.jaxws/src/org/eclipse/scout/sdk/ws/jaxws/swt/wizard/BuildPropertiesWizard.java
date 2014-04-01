@@ -19,7 +19,6 @@ import java.util.Map.Entry;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -29,6 +28,7 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.BuildPropertiesWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.BuildProperty;
+import org.w3c.dom.Document;
 
 public class BuildPropertiesWizard extends AbstractWorkspaceWizard {
 
@@ -72,7 +72,7 @@ public class BuildPropertiesWizard extends AbstractWorkspaceWizard {
     m_buildJaxWsBean.setProperties(propertyMap);
 
     // store buildJaxWsBean
-    ScoutXmlDocument xmlDocument = m_buildJaxWsBean.getXml().getDocument();
+    Document xmlDocument = m_buildJaxWsBean.getXml().getOwnerDocument();
     ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(xmlDocument, IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, monitor, m_buildJaxWsBean.getAlias());
 
     return true;

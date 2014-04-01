@@ -21,8 +21,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -35,6 +33,8 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ElementBean;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class WsFilesMoveOperation implements IOperation {
 
@@ -83,13 +83,13 @@ public class WsFilesMoveOperation implements IOperation {
           case ID_WSDL_SUNJAXWS_REGISTRATION: {
             wsdlFileName = new Path(m_sunJaxWsBean.getWsdl()).lastSegment();
             m_sunJaxWsBean.setWsdl(PathNormalizer.toWsdlPath(m_destination.getProjectRelativePath().append(wsdlFileName).toString()));
-            ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED, monitor, m_sunJaxWsBean.getAlias());
+            ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED, monitor, m_sunJaxWsBean.getAlias());
             break;
           }
           case ID_WSDL_BUILDJAXWS_REGISTRATION: {
             wsdlFileName = new Path(m_buildJaxWsBean.getWsdl()).lastSegment();
             m_buildJaxWsBean.setWsdl(PathNormalizer.toWsdlPath(m_destination.getProjectRelativePath().append(wsdlFileName).toString()));
-            ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor, m_buildJaxWsBean.getAlias());
+            ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_buildJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_BUILDJAXWS_WSDL_CHANGED, monitor, m_buildJaxWsBean.getAlias());
             break;
           }
           case ID_BINDING_FILE: {
@@ -97,9 +97,10 @@ public class WsFilesMoveOperation implements IOperation {
 
             XmlResource xmlResource = new XmlResource(m_bundle);
             xmlResource.setFile(bindingFile);
-            ScoutXmlDocument xmlDocument = xmlResource.loadXml();
-            String namespacePrefix = xmlDocument.getRoot().getNamePrefix();
-            ScoutXmlElement xmlBindings = xmlDocument.getChild(StringUtility.join(":", namespacePrefix, "bindings"));
+            Document xmlDocument = xmlResource.loadXml();
+            String namespacePrefix = JaxWsSdkUtility.getXmlPrefix(xmlDocument.getOwnerDocument().getDocumentElement());
+            String fqn = StringUtility.join(":", namespacePrefix, "bindings");
+            Element xmlBindings = JaxWsSdkUtility.getChildElement(xmlDocument.getDocumentElement().getChildNodes(), fqn);
             if (xmlBindings.hasAttribute("wsdlLocation")) {
               xmlBindings.removeAttribute("wsdlLocation");
               xmlBindings.setAttribute("wsdlLocation", (String) element.getData());

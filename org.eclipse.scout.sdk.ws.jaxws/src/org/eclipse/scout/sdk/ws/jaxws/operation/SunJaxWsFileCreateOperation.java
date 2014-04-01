@@ -12,14 +12,14 @@ package org.eclipse.scout.sdk.ws.jaxws.operation;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.w3c.dom.Document;
 
 public class SunJaxWsFileCreateOperation implements IOperation {
 
@@ -35,15 +35,10 @@ public class SunJaxWsFileCreateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    ScoutXmlDocument xmlDocument = new ScoutXmlDocument();
-    xmlDocument.setXmlVersion("1.0");
-    xmlDocument.setXmlEncoding("UTF-8");
-    xmlDocument.setPrettyPrint(true);
-    ScoutXmlElement rootXml = xmlDocument.setRoot("endpoints");
-    rootXml.setNamespace("jws", SunJaxWsBean.NS_ENDPOINT);
-    rootXml.setName("jws:endpoints");
-    rootXml.setAttribute("version", "2.0");
-    ResourceFactory.getSunJaxWsResource(m_bundle, true).storeXml(xmlDocument, IResourceListener.EVENT_SUNJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
+    Document document = JaxWsSdkUtility.createNewXmlDocument("jws:endpoints");
+    document.getDocumentElement().setAttribute("xmlns:jws", SunJaxWsBean.NS_ENDPOINT);
+    document.getDocumentElement().setAttribute("version", "2.0");
+    ResourceFactory.getSunJaxWsResource(m_bundle, true).storeXml(document, IResourceListener.EVENT_SUNJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
   }
 
   @Override

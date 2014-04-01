@@ -17,8 +17,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -28,6 +26,8 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class BuildJaxWsEntryCreateOperation implements IOperation {
 
@@ -63,14 +63,16 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
       BuildJaxWsFileCreateOperation op = new BuildJaxWsFileCreateOperation(m_bundle);
       op.run(monitor, workingCopyManager);
     }
-    ScoutXmlDocument xmlDocument = buildJaxWsResource.loadXml();
+    Document xmlDocument = buildJaxWsResource.loadXml();
 
-    ScoutXmlElement xml;
+    Element xml;
     if (m_webserviceEnum == WebserviceEnum.Provider) {
-      xml = xmlDocument.getRoot().addChild(BuildJaxWsBean.XML_PROVIDER);
+      xml = xmlDocument.createElement(BuildJaxWsBean.XML_PROVIDER);
+      xmlDocument.getDocumentElement().appendChild(xml);
     }
     else {
-      xml = xmlDocument.getRoot().addChild(BuildJaxWsBean.XML_CONSUMER);
+      xml = xmlDocument.createElement(BuildJaxWsBean.XML_CONSUMER);
+      xmlDocument.getDocumentElement().appendChild(xml);
     }
 
     BuildJaxWsBean bean = new BuildJaxWsBean(xml, m_webserviceEnum);
@@ -81,7 +83,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
     bean.setProperties(m_buildProperties);
     m_createdBuildJaxWsBean = bean;
 
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_createdBuildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_ENTRY_ADDED, monitor, m_alias);
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(m_createdBuildJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_BUILDJAXWS_ENTRY_ADDED, monitor, m_alias);
   }
 
   @Override

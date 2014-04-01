@@ -18,7 +18,6 @@ import java.util.Set;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
@@ -47,6 +46,7 @@ import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageLoadedListener;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
+import org.w3c.dom.Element;
 
 public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractSinglePageSectionBasedViewPart {
 
@@ -141,9 +141,9 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
       }
 
       // create handler chain sections
-      List<ScoutXmlElement> xmlHandlerChains = sunJaxWsBean.getHandlerChains();
+      List<Element> xmlHandlerChains = sunJaxWsBean.getHandlerChains();
       for (int i = 0; i < xmlHandlerChains.size(); i++) {
-        ScoutXmlElement xmlHandlerChain = xmlHandlerChains.get(i);
+        Element xmlHandlerChain = xmlHandlerChains.get(i);
         final String sectionId = SECTION_ID_HANDLER_CHAIN_PREFIX + Integer.toString(i);
         m_sectionsIdentifiers.add(sectionId);
         ISection section = createSection(sectionId, "", null, false);
@@ -193,12 +193,12 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
         sunJaxWsBean.visitHandlers(xmlHandlerChain, new IHandlerVisitor() {
 
           @Override
-          public boolean visit(ScoutXmlElement xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount) {
+          public boolean visit(Element xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount) {
             String handlerClassElementName = getPage().getSunJaxWsBean().toQualifiedName(SunJaxWsBean.XML_HANDLER_CLASS);
-            ScoutXmlElement xmlHandlerClassElement = xmlHandlerElement.getChild(handlerClassElementName);
+            Element xmlHandlerClassElement = JaxWsSdkUtility.getChildElement(xmlHandlerElement.getChildNodes(), handlerClassElementName);
             String handlerClass = null;
             if (xmlHandlerClassElement != null) {
-              handlerClass = xmlHandlerClassElement.getText();
+              handlerClass = xmlHandlerClassElement.getTextContent();
             }
 
             HandlerPresenter p = new HandlerPresenter(m_bundle, getSection(sectionId).getSectionClient(), handlerIndex, handlerCount, getFormToolkit());
@@ -221,14 +221,14 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
     }
   }
 
-  private FilterTypeEnum getFilterType(SunJaxWsBean sunJaxWsBean, ScoutXmlElement xmlHandlerChain) {
-    if (xmlHandlerChain.hasChild(sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PROTOCOL))) {
+  private FilterTypeEnum getFilterType(SunJaxWsBean sunJaxWsBean, Element xmlHandlerChain) {
+    if (JaxWsSdkUtility.getChildElement(xmlHandlerChain.getChildNodes(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PROTOCOL)) != null) {
       return FilterTypeEnum.ProtocolFilter;
     }
-    else if (xmlHandlerChain.hasChild(sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_SERVICE))) {
+    else if (JaxWsSdkUtility.getChildElement(xmlHandlerChain.getChildNodes(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_SERVICE)) != null) {
       return FilterTypeEnum.ServiceFilter;
     }
-    else if (xmlHandlerChain.hasChild(sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PORT))) {
+    else if (JaxWsSdkUtility.getChildElement(xmlHandlerChain.getChildNodes(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PORT)) != null) {
       return FilterTypeEnum.PortFilter;
     }
     return FilterTypeEnum.NoFilter;

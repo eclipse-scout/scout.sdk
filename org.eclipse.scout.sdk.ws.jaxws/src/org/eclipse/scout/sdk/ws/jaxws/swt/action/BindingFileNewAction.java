@@ -95,7 +95,7 @@ public class BindingFileNewAction extends AbstractLinkAction {
     new OperationJob(op).schedule();
 
     m_buildJaxWsBean.setProperties(properties);
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, m_buildJaxWsBean.getAlias());
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, m_buildJaxWsBean.getAlias());
     return null;
   }
 }

@@ -69,7 +69,7 @@ public class BindingFilePresenter extends FilePresenter {
     m_buildJaxWsBean.setProperties(propertiers);
 
     // store property map
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, m_buildJaxWsBean.getAlias());
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, m_buildJaxWsBean.getAlias());
     return newFile;
   }
 
@@ -89,7 +89,7 @@ public class BindingFilePresenter extends FilePresenter {
 
     // store property map
     m_buildJaxWsBean.setProperties(propertiers);
-    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, m_buildJaxWsBean.getAlias());
+    ResourceFactory.getBuildJaxWsResource(m_bundle).storeXmlAsync(m_buildJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED, m_buildJaxWsBean.getAlias());
   }
 
   private boolean removeBindingFileEntry(Map<String, List<String>> properties, String bindingFileRaw) {

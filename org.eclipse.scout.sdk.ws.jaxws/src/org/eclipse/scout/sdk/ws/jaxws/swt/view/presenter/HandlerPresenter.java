@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -43,11 +42,12 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
+import org.w3c.dom.Element;
 
 public class HandlerPresenter extends TypePresenter {
 
   private SunJaxWsBean m_sunJaxWsBean;
-  private ScoutXmlElement m_xmlHandlerElement;
+  private Element m_xmlHandlerElement;
   private IPresenterValueChangedListener m_valueChangedListener;
   private int m_handlerIndex;
   private int m_handlerCount;
@@ -90,10 +90,10 @@ public class HandlerPresenter extends TypePresenter {
 
       @Override
       public void linkActivated(org.eclipse.ui.forms.events.HyperlinkEvent e) {
-        ScoutXmlElement xmlChain = m_xmlHandlerElement.getParent();
+        Element xmlChain = JaxWsSdkUtility.getParentElement(m_xmlHandlerElement);
         if (m_sunJaxWsBean.swapHandler(xmlChain, m_handlerIndex, m_handlerIndex - 1)) {
           // persist
-          ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
+          ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
         }
       }
     });
@@ -106,10 +106,10 @@ public class HandlerPresenter extends TypePresenter {
 
       @Override
       public void linkActivated(org.eclipse.ui.forms.events.HyperlinkEvent e) {
-        ScoutXmlElement xmlChain = m_xmlHandlerElement.getParent();
+        Element xmlChain = JaxWsSdkUtility.getParentElement(m_xmlHandlerElement);
         if (m_sunJaxWsBean.swapHandler(xmlChain, m_handlerIndex, m_handlerIndex + 1)) {
           // persist
-          ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
+          ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
         }
       }
     });
@@ -146,10 +146,10 @@ public class HandlerPresenter extends TypePresenter {
   @Override
   protected void execResetAction() throws CoreException {
     // remove itself
-    m_xmlHandlerElement.getParent().removeChild(m_xmlHandlerElement);
+    JaxWsSdkUtility.getParentElement(m_xmlHandlerElement).removeChild(m_xmlHandlerElement);
 
     // persist
-    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
+    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
   }
 
   public SunJaxWsBean getSunJaxWsBean() {
@@ -160,11 +160,11 @@ public class HandlerPresenter extends TypePresenter {
     m_sunJaxWsBean = sunJaxWsBean;
   }
 
-  public ScoutXmlElement getXmlHandlerElement() {
+  public Element getXmlHandlerElement() {
     return m_xmlHandlerElement;
   }
 
-  public void setXmlHandlerElement(ScoutXmlElement xmlHandlerElement) {
+  public void setXmlHandlerElement(Element xmlHandlerElement) {
     m_xmlHandlerElement = xmlHandlerElement;
   }
 
@@ -187,15 +187,19 @@ public class HandlerPresenter extends TypePresenter {
       String fqn = (String) value;
       String handlerClassElementName = m_sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_CLASS);
 
-      m_xmlHandlerElement.removeChild(handlerClassElementName);
-      ScoutXmlElement child = m_xmlHandlerElement.addChild();
-      child.setName(handlerClassElementName);
-      child.addText(fqn);
+      Element old = JaxWsSdkUtility.getChildElement(m_xmlHandlerElement.getChildNodes(), handlerClassElementName);
+      if (old != null) {
+        m_xmlHandlerElement.removeChild(old);
+      }
+
+      Element child = m_xmlHandlerElement.getOwnerDocument().createElement(handlerClassElementName);
+      child.setTextContent(fqn);
+      m_xmlHandlerElement.appendChild(child);
 
       updateTransactionalIcon(fqn);
 
       // persist
-      ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
+      ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
     }
   }
 

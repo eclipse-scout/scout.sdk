@@ -17,11 +17,12 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class BuildJaxWsBean {
 
@@ -33,24 +34,24 @@ public class BuildJaxWsBean {
   public static final String XML_PROPERTY_VALUE = "value";
   public static final String XML_WSDL = "wsdl";
 
-  private ScoutXmlElement m_xml;
+  private Element m_xml;
   private WebserviceEnum m_webserviceEnum;
 
-  public BuildJaxWsBean(ScoutXmlElement xml, WebserviceEnum webserviceEnum) {
+  public BuildJaxWsBean(Element xml, WebserviceEnum webserviceEnum) {
     m_xml = xml;
     m_webserviceEnum = webserviceEnum;
   }
 
-  public ScoutXmlElement getXml() {
+  public Element getXml() {
     return m_xml;
   }
 
-  public void setXml(ScoutXmlElement xml) {
+  public void setXml(Element xml) {
     m_xml = xml;
   }
 
   public String getAlias() {
-    return m_xml.getAttribute(XML_ALIAS, null);
+    return JaxWsSdkUtility.getXmlAttribute(m_xml, XML_ALIAS, null);
   }
 
   public void setAlias(String alias) {
@@ -74,17 +75,17 @@ public class BuildJaxWsBean {
    * @return
    */
   public String getWsdl() {
-    return m_xml.getAttribute(XML_WSDL, null);
+    return JaxWsSdkUtility.getXmlAttribute(m_xml, XML_WSDL, null);
   }
 
   public Map<String, List<String>> getPropertiers() {
     Map<String, List<String>> properties = new HashMap<String, List<String>>();
 
-    List<ScoutXmlElement> children = m_xml.getChildren(XML_PROPERTY);
-    for (ScoutXmlElement xmlProperty : children) {
-      String name = xmlProperty.getAttribute(XML_PROPERTY_NAME, null);
+    List<Element> children = JaxWsSdkUtility.getChildElements(m_xml.getChildNodes(), XML_PROPERTY);
+    for (Element xmlProperty : children) {
+      String name = JaxWsSdkUtility.getXmlAttribute(xmlProperty, XML_PROPERTY_NAME, null);
       if (!StringUtility.isNullOrEmpty(name)) {
-        String value = xmlProperty.getAttribute(XML_PROPERTY_VALUE, null);
+        String value = JaxWsSdkUtility.getXmlAttribute(xmlProperty, XML_PROPERTY_VALUE, null);
         if (!properties.containsKey(name)) {
           properties.put(name, new LinkedList<String>());
         }
@@ -95,22 +96,23 @@ public class BuildJaxWsBean {
   }
 
   public void setProperties(Map<String, List<String>> properties) {
-    m_xml.removeChildren(XML_PROPERTY);
-
+    JaxWsSdkUtility.removeAllChildElements(m_xml, XML_PROPERTY);
     if (properties == null || properties.size() == 0) {
       return;
     }
     for (Entry<String, List<String>> property : properties.entrySet()) {
       String name = property.getKey();
       if (property.getValue() == null || property.getValue().size() == 0) {
-        ScoutXmlElement xmlProperty = m_xml.addChild(XML_PROPERTY);
+        Element xmlProperty = m_xml.getOwnerDocument().createElement(XML_PROPERTY);
         xmlProperty.setAttribute(XML_PROPERTY_NAME, property.getKey());
+        m_xml.appendChild(xmlProperty);
       }
       else {
         for (String value : property.getValue()) {
-          ScoutXmlElement xmlProperty = m_xml.addChild(XML_PROPERTY);
+          Element xmlProperty = m_xml.getOwnerDocument().createElement(XML_PROPERTY);
           xmlProperty.setAttribute(XML_PROPERTY_NAME, name);
           xmlProperty.setAttribute(XML_PROPERTY_VALUE, value);
+          m_xml.appendChild(xmlProperty);
         }
       }
     }
@@ -123,12 +125,12 @@ public class BuildJaxWsBean {
    * @return true if successful, false otherwise
    */
   public boolean reload(IScoutBundle bundle) {
-    ScoutXmlDocument newDocument = ResourceFactory.getBuildJaxWsResource(bundle).loadXml();
-    if (newDocument == null || newDocument.getRoot() == null) {
+    Document newDocument = ResourceFactory.getBuildJaxWsResource(bundle).loadXml();
+    if (newDocument == null) {
       return false;
     }
 
-    ScoutXmlElement rootXml = newDocument.getRoot();
+    Element rootXml = newDocument.getDocumentElement();
     if (rootXml == null) {
       return false;
     }
@@ -140,12 +142,12 @@ public class BuildJaxWsBean {
     else {
       nodeName = BuildJaxWsBean.XML_CONSUMER;
     }
-    ScoutXmlElement xml = newDocument.getRoot().getChild(nodeName, BuildJaxWsBean.XML_ALIAS, getAlias());
-    if (xml == null) {
+    List<Element> xml = JaxWsSdkUtility.getChildElementsWithAttributes(rootXml, nodeName, BuildJaxWsBean.XML_ALIAS, getAlias());
+    if (xml.size() < 1) {
       return false;
     }
 
-    setXml(xml);
+    setXml(xml.get(0));
     return true;
   }
 
@@ -153,8 +155,8 @@ public class BuildJaxWsBean {
     if (!StringUtility.hasText(alias)) {
       return null;
     }
-    ScoutXmlDocument document = ResourceFactory.getBuildJaxWsResource(bundle).loadXml();
-    if (document == null || document.getRoot() == null) {
+    Document document = ResourceFactory.getBuildJaxWsResource(bundle).loadXml();
+    if (document == null) {
       return null;
     }
 
@@ -166,16 +168,16 @@ public class BuildJaxWsBean {
       nodeName = BuildJaxWsBean.XML_CONSUMER;
     }
 
-    ScoutXmlElement rootXml = document.getRoot();
-    if (rootXml == null || !rootXml.hasChild(nodeName)) {
+    Element rootXml = document.getDocumentElement();
+    if (rootXml == null) {
       return null;
     }
 
-    ScoutXmlElement xml = document.getRoot().getChild(nodeName, BuildJaxWsBean.XML_ALIAS, alias);
-    if (xml == null) {
+    List<Element> xml = JaxWsSdkUtility.getChildElementsWithAttributes(rootXml, nodeName, BuildJaxWsBean.XML_ALIAS, alias);
+    if (xml.size() < 1) {
       return null;
     }
 
-    return new BuildJaxWsBean(xml, webserviceEnum);
+    return new BuildJaxWsBean(xml.get(0), webserviceEnum);
   }
 }

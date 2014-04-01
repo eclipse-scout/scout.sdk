@@ -16,7 +16,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -25,6 +24,7 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ElementBean;
+import org.w3c.dom.Document;
 
 public class WsProviderCodeFirstDeleteOperation implements IOperation {
 
@@ -64,8 +64,8 @@ public class WsProviderCodeFirstDeleteOperation implements IOperation {
 
   private void deleteSunJaxWsXmlEntry(IProgressMonitor monitor) throws CoreException {
     String alias = m_sunJaxWsBean.getAlias();
-    ScoutXmlDocument xmlDocument = m_sunJaxWsBean.getXml().getDocument();
-    xmlDocument.getRoot().removeChild(m_sunJaxWsBean.getXml());
+    Document xmlDocument = m_sunJaxWsBean.getXml().getOwnerDocument();
+    xmlDocument.getDocumentElement().removeChild(m_sunJaxWsBean.getXml());
     ResourceFactory.getSunJaxWsResource(m_bundle).storeXml(xmlDocument, IResourceListener.EVENT_SUNJAXWS_ENTRY_REMOVED, monitor, alias);
   }
 

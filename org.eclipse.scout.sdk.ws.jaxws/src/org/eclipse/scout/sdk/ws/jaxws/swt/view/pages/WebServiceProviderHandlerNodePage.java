@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -19,7 +20,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.IntegerHolder;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -35,7 +35,9 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean.IHandlerVisitor;
+import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageLoadedListener;
+import org.w3c.dom.Element;
 
 public class WebServiceProviderHandlerNodePage extends AbstractPage implements IMarkerRebuildListener {
 
@@ -72,8 +74,15 @@ public class WebServiceProviderHandlerNodePage extends AbstractPage implements I
 
   public void reloadPage(int dataMask) {
     if ((dataMask & DATA_SUN_JAXWS_ENTRY) > 0) {
-      ScoutXmlElement xmlRoot = getSunJaxWsResource().loadXml().getRoot();
-      ScoutXmlElement sunJaxWsXml = xmlRoot.getChild(StringUtility.join(":", xmlRoot.getNamePrefix(), SunJaxWsBean.XML_ENDPOINT), "name", m_alias);
+      Element xmlRoot = getSunJaxWsResource().loadXml().getDocumentElement();
+      String tagName = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(xmlRoot), SunJaxWsBean.XML_ENDPOINT);
+      String requiredAttributeName = "name";
+
+      Element sunJaxWsXml = null;
+      List<Element> childElementsWithAttributes = JaxWsSdkUtility.getChildElementsWithAttributes(xmlRoot, tagName, requiredAttributeName, m_alias);
+      if (childElementsWithAttributes.size() > 0) {
+        sunJaxWsXml = childElementsWithAttributes.get(0);
+      }
       m_sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
     }
 
@@ -121,9 +130,8 @@ public class WebServiceProviderHandlerNodePage extends AbstractPage implements I
 
     // calculate quality of handlers
     getSunJaxWsBean().visitHandlers(new IHandlerVisitor() {
-
       @Override
-      public boolean visit(ScoutXmlElement xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount) {
+      public boolean visit(Element xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount) {
         IType type = TypeUtility.getType(fullyQualifiedName);
         if (TypeUtility.exists(type)) {
           qualityHolder.setValue(Math.max(qualityHolder.getValue(), ScoutSeverityManager.getInstance().getSeverityOf(type)));

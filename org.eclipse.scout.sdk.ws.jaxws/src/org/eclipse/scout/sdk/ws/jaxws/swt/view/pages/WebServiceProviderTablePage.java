@@ -18,8 +18,6 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -35,11 +33,13 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 public class WebServiceProviderTablePage extends AbstractPage {
 
   private IScoutBundle m_bundle; // necessary to be hold as in method unloadPage, a reference to the bundle is required
-  private ScoutXmlDocument m_sunJaxWsXml;
+  private Document m_sunJaxWsXml;
   private IResourceListener m_resourceListener;
 
   public WebServiceProviderTablePage(IPage parent) {
@@ -95,7 +95,7 @@ public class WebServiceProviderTablePage extends AbstractPage {
     if (m_sunJaxWsXml == null) {
       m_sunJaxWsXml = getSunJaxWsResource().loadXml();
     }
-    for (ScoutXmlElement sunJaxWsXml : getEndpoints()) {
+    for (Element sunJaxWsXml : getEndpoints()) {
       SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
       BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.Provider);
 
@@ -112,11 +112,12 @@ public class WebServiceProviderTablePage extends AbstractPage {
     return ResourceFactory.getSunJaxWsResource(m_bundle);
   }
 
-  private List<ScoutXmlElement> getEndpoints() {
-    if (m_sunJaxWsXml == null || m_sunJaxWsXml.getRoot() == null) {
+  private List<Element> getEndpoints() {
+    if (m_sunJaxWsXml == null || m_sunJaxWsXml.getDocumentElement() == null) {
       return Collections.emptyList();
     }
-    return m_sunJaxWsXml.getRoot().getChildren(StringUtility.join(":", m_sunJaxWsXml.getRoot().getNamePrefix(), SunJaxWsBean.XML_ENDPOINT));
+    String fqn = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(m_sunJaxWsXml.getDocumentElement()), SunJaxWsBean.XML_ENDPOINT);
+    return JaxWsSdkUtility.getChildElements(m_sunJaxWsXml.getDocumentElement().getChildNodes(), fqn);
   }
 
   private class P_SunJaxWsResourceListener implements IResourceListener {
@@ -137,7 +138,7 @@ public class WebServiceProviderTablePage extends AbstractPage {
       final Set<String> endpoints = new HashSet<String>();
       final Set<String> endpointsLoaded = new HashSet<String>();
 
-      for (ScoutXmlElement sunJaxWsXml : getEndpoints()) {
+      for (Element sunJaxWsXml : getEndpoints()) {
         SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
         endpoints.add(sunJaxWsBean.getAlias());
       }

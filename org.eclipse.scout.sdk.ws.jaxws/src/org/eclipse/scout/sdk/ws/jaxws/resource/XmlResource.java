@@ -14,13 +14,12 @@
 package org.eclipse.scout.sdk.ws.jaxws.resource;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlParser;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -28,16 +27,17 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.w3c.dom.Document;
 
 public class XmlResource extends ManagedResource {
 
-  private ScoutXmlDocument m_xmlDocument;
+  private Document m_xmlDocument;
 
   public XmlResource(IScoutBundle bundle) {
     super(bundle.getProject());
   }
 
-  public ScoutXmlDocument loadXml() {
+  public Document loadXml() {
     synchronized (m_fileLock) {
       if (!existsFile()) {
         m_xmlDocument = null;
@@ -47,21 +47,30 @@ public class XmlResource extends ManagedResource {
       if (m_xmlDocument == null || m_file.getModificationStamp() != m_modificationStamp) {
         m_xmlDocument = null;
         m_modificationStamp = m_file.getModificationStamp();
-        ScoutXmlParser parser = new ScoutXmlParser();
-        parser.setXmlEncoding("UTF-8");
+
+        InputStream is = null;
         try {
-          m_xmlDocument = parser.parse(m_file.getLocation().toFile());
+          is = m_file.getContents();
+          m_xmlDocument = JaxWsSdkUtility.createNewXmlDocument(is);
         }
         catch (Exception e) {
           JaxWsSdk.logWarning("Failed to parse XML file '" + m_file.getName() + "'.", e);
         }
+        finally {
+          if (is != null) {
+            try {
+              is.close();
+            }
+            catch (IOException e) {
+            }
+          }
+        }
       }
     }
-
     return m_xmlDocument;
   }
 
-  public void storeXmlAsync(final ScoutXmlDocument xmlDocument, final int notificationEvent, final String... notificationElements) {
+  public void storeXmlAsync(final Document xmlDocument, final int notificationEvent, final String... notificationElements) {
     IOperation op = new IOperation() {
 
       @Override
@@ -81,20 +90,18 @@ public class XmlResource extends ManagedResource {
     new OperationJob(op).schedule();
   }
 
-  public void storeXml(ScoutXmlDocument xmlDocument, int notificationEvent, IProgressMonitor monitor, String... notificationElements) throws CoreException {
+  public void storeXml(Document xmlDocument, int notificationEvent, IProgressMonitor monitor, String... notificationElements) throws CoreException {
     try {
       synchronized (m_fileLock) {
         if (m_file == null) {
           throw new CoreException(new ScoutStatus("File must not be null"));
         }
 
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        xmlDocument.write(os);
-
+        String xmlContent = JaxWsSdkUtility.getXmlContent(xmlDocument);
         m_modificationStamp = ManagedResource.API_MODIFICATION_STAMP;
         try {
           JaxWsSdkUtility.ensureFileAccessibleAndRegistered(m_file, true);
-          m_file.setContents(new ByteArrayInputStream(os.toByteArray()), true, true, monitor);
+          m_file.setContents(new ByteArrayInputStream(xmlContent.getBytes("UTF-8")), true, true, monitor);
           m_xmlDocument = xmlDocument;
         }
         finally {

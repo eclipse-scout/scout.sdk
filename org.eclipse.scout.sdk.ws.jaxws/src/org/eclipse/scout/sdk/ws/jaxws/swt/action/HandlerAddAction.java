@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument.ScoutXmlElement;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -21,13 +20,14 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.swt.widgets.Shell;
+import org.w3c.dom.Element;
 
 public class HandlerAddAction extends AbstractLinkAction {
 
   private IScoutBundle m_bundle;
 
   private SunJaxWsBean m_sunJaxWsBean;
-  private ScoutXmlElement m_xmlHandlerChain;
+  private Element m_xmlHandlerChain;
 
   public HandlerAddAction() {
     super(Texts.get("AddHandler"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolAdd));
@@ -40,7 +40,7 @@ public class HandlerAddAction extends AbstractLinkAction {
     return !m_bundle.isBinary();
   }
 
-  public void init(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean, ScoutXmlElement xmlHandlerChain) {
+  public void init(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean, Element xmlHandlerChain) {
     m_bundle = bundle;
     m_sunJaxWsBean = sunJaxWsBean;
     m_xmlHandlerChain = xmlHandlerChain;
@@ -48,11 +48,11 @@ public class HandlerAddAction extends AbstractLinkAction {
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    ScoutXmlElement xmlHandler = m_xmlHandlerChain.addChild();
-    xmlHandler.setName(m_sunJaxWsBean.toQualifiedName("handler"));
+    Element xmlHandler = m_xmlHandlerChain.getOwnerDocument().createElement(m_sunJaxWsBean.toQualifiedName("handler"));
+    m_xmlHandlerChain.appendChild(xmlHandler);
 
     // persist
-    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
+    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
     return null;
   }
 }

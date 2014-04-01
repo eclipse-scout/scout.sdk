@@ -38,6 +38,6 @@ public class UrlPatternDefaultCommand extends AbstractExecutableMarkerCommand {
   public void execute(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     m_sunJaxWsBean.setUrlPattern(m_defaultUrlPattern);
     XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(m_bundle);
-    sunJaxWsResource.storeXmlAsync(m_sunJaxWsBean.getXml().getDocument(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED, m_sunJaxWsBean.getAlias());
+    sunJaxWsResource.storeXmlAsync(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED, m_sunJaxWsBean.getAlias());
   }
 }

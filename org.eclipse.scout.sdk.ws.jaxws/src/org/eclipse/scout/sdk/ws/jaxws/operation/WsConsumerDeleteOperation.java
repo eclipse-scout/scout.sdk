@@ -17,7 +17,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.commons.xmlparser.ScoutXmlDocument;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -30,6 +29,7 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ElementBean;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
+import org.w3c.dom.Document;
 
 public class WsConsumerDeleteOperation implements IOperation {
 
@@ -87,8 +87,8 @@ public class WsConsumerDeleteOperation implements IOperation {
       return;
     }
     String alias = m_buildJaxWsBean.getAlias();
-    ScoutXmlDocument xmlDocument = m_buildJaxWsBean.getXml().getDocument();
-    xmlDocument.getRoot().removeChild(m_buildJaxWsBean.getXml());
+    Document xmlDocument = m_buildJaxWsBean.getXml().getOwnerDocument();
+    xmlDocument.getDocumentElement().removeChild(m_buildJaxWsBean.getXml());
     ResourceFactory.getBuildJaxWsResource(m_bundle).storeXml(xmlDocument, IResourceListener.EVENT_BUILDJAXWS_ENTRY_ADDED, monitor, alias);
   }
 
