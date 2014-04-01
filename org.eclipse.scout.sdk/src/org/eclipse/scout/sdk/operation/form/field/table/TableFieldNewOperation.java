@@ -30,7 +30,6 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -77,7 +76,7 @@ public class TableFieldNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     FormFieldNewOperation newOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
-    newOp.setSuperTypeSignature(getSuperTypeSignature());
+
     newOp.setSibling(getSibling());
 
     // getConfiguredLabel method
@@ -87,7 +86,6 @@ public class TableFieldNewOperation implements IOperation {
       newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
     String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
-    // TODO aho check generic type table!!!
     if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractTableField)) {
       // create inner type table
       ITypeSourceBuilder tableBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_TABLEFIELD_TABLE);
@@ -99,10 +97,15 @@ public class TableFieldNewOperation implements IOperation {
       tableBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
       newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTableKey(tableBuilder), tableBuilder);
       // update generic in supertype signature
-      StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
-      superTypeSigBuilder.append("<").append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_TABLEFIELD_TABLE).append(">");
-      setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
+      String tableFieldSuperTypeSig = getSuperTypeSignature();
+      if (StringUtility.hasText(tableFieldSuperTypeSig) && tableFieldSuperTypeSig.endsWith(";")) {
+        StringBuilder sigBuilder = new StringBuilder(tableFieldSuperTypeSig.substring(0, tableFieldSuperTypeSig.length() - 1));
+        sigBuilder.append("<Q").append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_TABLEFIELD_TABLE).append(";>;");
+        tableFieldSuperTypeSig = sigBuilder.toString();
+      }
+      setSuperTypeSignature(tableFieldSuperTypeSig);
     }
+    newOp.setSuperTypeSignature(getSuperTypeSignature());
 
     newOp.setFormatSource(isFormatSource());
     newOp.validate();
