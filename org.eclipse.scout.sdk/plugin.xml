@@ -944,6 +944,12 @@
             symbolicName="org.eclipse.scout.rt.extension.client">
       </bundle>
       <bundle
+            symbolicName="org.eclipse.scout.jaxws22y">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.ui.rap.incubator.filechooser">
+      </bundle>
+      <bundle
             symbolicName="org.eclipse.scout.rt.jdbc.derby10">
       </bundle>
       <bundle
