@@ -143,6 +143,8 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
         catch (Exception e) {
           ScoutSdkUi.logError(e);
         }
+        catch (NoClassDefFoundError er) {
+        }
         return true;
       }
 
