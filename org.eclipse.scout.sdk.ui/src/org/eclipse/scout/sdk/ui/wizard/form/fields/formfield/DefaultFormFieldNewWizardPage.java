@@ -32,6 +32,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractT
 import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -94,7 +95,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
           m_nlsName = (INlsEntry) event.proposal;
           if (m_nlsName != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(m_nlsName.getKey());
+              m_typeNameField.setText(NamingUtility.toJavaCamelCase(m_nlsName.getKey(), false));
             }
           }
         }

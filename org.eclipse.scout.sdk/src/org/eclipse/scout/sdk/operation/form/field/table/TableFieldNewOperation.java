@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -79,12 +80,6 @@ public class TableFieldNewOperation implements IOperation {
 
     newOp.setSibling(getSibling());
 
-    // getConfiguredLabel method
-    if (getNlsEntry() != null) {
-      IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
-      nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
-      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
-    }
     String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
     if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractTableField)) {
       // create inner type table
@@ -96,16 +91,25 @@ public class TableFieldNewOperation implements IOperation {
       tableBuilder.setSuperTypeSignature(getTableSuperTypeSignature());
       tableBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
       newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTableKey(tableBuilder), tableBuilder);
+
       // update generic in supertype signature
       String tableFieldSuperTypeSig = getSuperTypeSignature();
-      if (StringUtility.hasText(tableFieldSuperTypeSig) && tableFieldSuperTypeSig.endsWith(";")) {
+      if (StringUtility.hasText(tableFieldSuperTypeSig) && tableFieldSuperTypeSig.charAt(tableFieldSuperTypeSig.length() - 1) == Signature.C_SEMICOLON) {
         StringBuilder sigBuilder = new StringBuilder(tableFieldSuperTypeSig.substring(0, tableFieldSuperTypeSig.length() - 1));
-        sigBuilder.append("<Q").append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_TABLEFIELD_TABLE).append(";>;");
+        sigBuilder.append(Signature.C_GENERIC_START).append(Signature.C_UNRESOLVED).append(newOp.getElementName()).append(".");
+        sigBuilder.append(tableBuilder.getElementName()).append(Signature.C_SEMICOLON).append(Signature.C_GENERIC_END).append(Signature.C_SEMICOLON);
         tableFieldSuperTypeSig = sigBuilder.toString();
       }
       setSuperTypeSignature(tableFieldSuperTypeSig);
     }
     newOp.setSuperTypeSignature(getSuperTypeSignature());
+
+    // getConfiguredLabel method
+    if (getNlsEntry() != null) {
+      IMethodSourceBuilder nlsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(newOp.getSourceBuilder(), SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
+      nlsMethodBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
+      newOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
+    }
 
     newOp.setFormatSource(isFormatSource());
     newOp.validate();

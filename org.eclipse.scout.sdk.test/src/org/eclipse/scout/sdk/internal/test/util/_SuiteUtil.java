@@ -29,6 +29,7 @@ import org.junit.runners.Suite.SuiteClasses;
     CompatibilityTest.class,
     RegexTest.class,
     ImportValidatorTest.class,
+    UtilitiesTest.class,
     // suites
     _SuiteSignature.class})
 public class _SuiteUtil {

@@ -13,20 +13,18 @@ package org.eclipse.scout.sdk.util;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 
 /**
- * <h3>{@link NamingUtility}</h3> ...
- *
+ * <h3>{@link NamingUtility}</h3>
+ * 
  * @author Andreas Hoegger
  * @since 1.0.8 24.11.2010
  */
 public final class NamingUtility {
 
-  private static final Pattern CAMEL_CASE_PATTERN = Pattern.compile("[^abcdefghijklmnopqrstuvwxyz0123456789]");
   private static final Object LOCK = new Object();
   private static Set<String> javaKeyWords = null;
 
@@ -70,7 +68,7 @@ public final class NamingUtility {
 
   /**
    * ensures the given java name starts with a lower case character.
-   *
+   * 
    * @param name
    *          The name to handle.
    * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
@@ -95,7 +93,7 @@ public final class NamingUtility {
 
   /**
    * ensures the given java name starts with an upper case character.
-   *
+   * 
    * @param name
    *          The name to handle.
    * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
@@ -123,7 +121,7 @@ public final class NamingUtility {
 
   /**
    * Method calculates the levenshtein distance, also known as string edit distance.
-   *
+   * 
    * @param s1
    *          The first string.
    * @param s2
@@ -178,7 +176,7 @@ public final class NamingUtility {
 
   /**
    * converts the given input string into a valid java camel case name.<br>
-   *
+   * 
    * @param input
    * @param lowerCaseFirstToken
    *          if true, the first token uses lower case as e.g. used for method names.
@@ -188,17 +186,28 @@ public final class NamingUtility {
     if (!StringUtility.hasText(input)) {
       return null;
     }
+
+    final String ALLOWED_CHARS = "abcdefghijklmnopqrstuvwxyz0123456789";
     StringBuilder camel = new StringBuilder(input.length());
-    String[] tokens = CAMEL_CASE_PATTERN.split(input.toLowerCase());
-    for (int i = 0; i < tokens.length; i++) {
-      String t = tokens[i];
-      if (StringUtility.hasText(t)) {
-        if (i == 0 && lowerCaseFirstToken) {
-          camel.append(t);
+    char[] charArray = input.toCharArray();
+    boolean nextCharUpper = !lowerCaseFirstToken;
+    for (int i = 0; i < charArray.length; i++) {
+      char cur = charArray[i];
+      char curLower = Character.toLowerCase(cur);
+      if (ALLOWED_CHARS.indexOf(curLower) >= 0) {
+        // allowed chars
+        if (nextCharUpper) {
+          cur = Character.toUpperCase(cur);
+          nextCharUpper = false;
         }
-        else {
-          camel.append(ensureStartWithUpperCase(t));
+        else if (i == 0) {
+          cur = curLower;
         }
+        camel.append(cur);
+      }
+      else {
+        // skip not allowed char and use upper case for next char
+        nextCharUpper = true;
       }
     }
     return camel.toString();

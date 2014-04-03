@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementC
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
@@ -109,9 +110,8 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
           setNlsNameInternal(newName);
           if (newName != null) {
             if (oldEntry == null || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText()) || oldEntry.getKey().equals(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(newName.getKey());
+              m_typeNameField.setText(NamingUtility.toJavaCamelCase(newName.getKey(), false));
             }
-
           }
         }
         finally {

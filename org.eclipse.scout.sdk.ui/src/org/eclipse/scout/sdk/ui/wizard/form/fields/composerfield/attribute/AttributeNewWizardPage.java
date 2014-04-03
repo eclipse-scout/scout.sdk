@@ -30,6 +30,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
@@ -91,7 +92,7 @@ public class AttributeNewWizardPage extends AbstractWorkspaceWizardPage {
           setNlsNameInternal(newEntry);
           if (newEntry != null) {
             if (oldEntry == null || oldEntry.getKey().equals(m_typeNameField.getModifiableText()) || StringUtility.isNullOrEmpty(m_typeNameField.getModifiableText())) {
-              m_typeNameField.setText(newEntry.getKey());
+              m_typeNameField.setText(NamingUtility.toJavaCamelCase(newEntry.getKey(), false));
             }
           }
         }
