@@ -17,6 +17,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.Flags;
@@ -164,7 +165,7 @@ public class ClassIdNewOperation implements IOperation {
     try {
       multiEdit.apply(sourceDoc);
       buffer.setContents(sourceDoc.get());
-      new ImportsCreateOperation(icu, validator).run(monitor, workingCopyManager);
+      new ImportsCreateOperation(icu, validator).run(new NullProgressMonitor(), workingCopyManager);
     }
     catch (BadLocationException e) {
       ScoutSdk.logWarning("Could not update @ClassId annotations for compilation unit '" + icu.getElementName() + "'.", e);

@@ -85,9 +85,9 @@ public final class AnnotationSourceBuilderFactory {
    * @return the created source builder
    */
   public static IAnnotationSourceBuilder createClassIdAnnotation(String classIdValue) {
-    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(IRuntimeClasses.ClassId));
-    orderAnnoation.addParameter(JdtUtility.toStringLiteral(classIdValue));
-    return orderAnnoation;
+    AnnotationSourceBuilder classIdAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(IRuntimeClasses.ClassId));
+    classIdAnnoation.addParameter(JdtUtility.toStringLiteral(classIdValue));
+    return classIdAnnoation;
   }
 
   /**
