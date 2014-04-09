@@ -106,7 +106,6 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
         "org.eclipse.emf.ecore",
         "org.eclipse.emf.ecore.change",
         "org.eclipse.emf.ecore.xmi",
-        "org.eclipse.equinox.concurrent",
         "org.eclipse.equinox.ds",
         "org.eclipse.equinox.event",
         "org.eclipse.equinox.util",

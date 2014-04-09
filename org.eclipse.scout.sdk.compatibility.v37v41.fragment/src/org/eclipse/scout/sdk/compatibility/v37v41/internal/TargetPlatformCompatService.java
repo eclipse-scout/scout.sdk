@@ -1,11 +1,21 @@
 package org.eclipse.scout.sdk.compatibility.v37v41.internal;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -13,31 +23,61 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.equinox.p2.metadata.IInstallableUnit;
-import org.eclipse.pde.internal.core.PDECore;
+import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.pde.internal.core.target.ExternalFileTargetHandle;
 import org.eclipse.pde.internal.core.target.IUBundleContainer;
-import org.eclipse.pde.internal.core.target.TargetDefinition;
+import org.eclipse.pde.internal.core.target.TargetDefinitionPersistenceHelper;
+import org.eclipse.pde.internal.core.target.WorkspaceFileTargetHandle;
 import org.eclipse.pde.internal.core.target.provisional.IBundleContainer;
 import org.eclipse.pde.internal.core.target.provisional.ITargetDefinition;
 import org.eclipse.pde.internal.core.target.provisional.ITargetHandle;
 import org.eclipse.pde.internal.core.target.provisional.ITargetPlatformService;
+import org.eclipse.pde.internal.core.target.provisional.NameVersionDescriptor;
+import org.eclipse.scout.sdk.compatibility.P2Utility;
+import org.eclipse.scout.sdk.compatibility.internal.FeatureDefinition;
+import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.compatibility.internal.ScoutCompatibilityActivator;
 import org.eclipse.scout.sdk.compatibility.internal.service.ITargetPlatformCompatService;
 import org.eclipse.scout.sdk.compatibility.v37v41.internal.provisional.LoadTargetDefinitionJobSync;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 @SuppressWarnings("restriction")
 public class TargetPlatformCompatService implements ITargetPlatformCompatService {
+
+  private interface ITargetFileModification {
+    void contribute(List<IBundleContainer> liveList, Map<IUBundleContainer, Set<FeatureDefinition>> features, ITargetPlatformService svc) throws CoreException;
+  }
+
   @Override
   public IStatus resolveTargetPlatform(IFile targetFile, boolean loadPlatform, IProgressMonitor monitor) throws CoreException {
-    ITargetPlatformService targetService = (ITargetPlatformService) PDECore.getDefault().acquireService(ITargetPlatformService.class.getName());
+    ITargetPlatformService targetService = ScoutCompatibilityActivator.getDefault().acquireService(ITargetPlatformService.class);
     ITargetHandle handle = targetService.getTarget(targetFile);
     ITargetDefinition def = handle.getTargetDefinition();
     return resolveTarget(def, loadPlatform, monitor);
   }
 
   @Override
+  public URI getCurrentTargetFile() throws CoreException {
+    ITargetPlatformService targetService = ScoutCompatibilityActivator.getDefault().acquireService(ITargetPlatformService.class);
+    ITargetHandle workspaceTargetHandle = targetService.getWorkspaceTargetHandle();
+    if (workspaceTargetHandle instanceof WorkspaceFileTargetHandle && workspaceTargetHandle.exists()) {
+      IFile f = ((WorkspaceFileTargetHandle) workspaceTargetHandle).getTargetFile();
+      if (f != null && f.exists()) {
+        return f.getLocationURI();
+      }
+    }
+    else if (workspaceTargetHandle instanceof ExternalFileTargetHandle && workspaceTargetHandle.exists()) {
+      return ((ExternalFileTargetHandle) workspaceTargetHandle).getLocation();
+    }
+    return null;
+  }
+
+  @Override
   public IStatus resolveTargetPlatform(Set<File> absolutePaths, String targetName, boolean loadPlatform, IProgressMonitor monitor) throws CoreException {
-    ITargetPlatformService tpService = (ITargetPlatformService) PDECore.getDefault().acquireService(ITargetPlatformService.class.getName());
+    ITargetPlatformService tpService = ScoutCompatibilityActivator.getDefault().acquireService(ITargetPlatformService.class);
     ITargetDefinition targetDef = tpService.newTarget();
     targetDef.setName(targetName);
 
@@ -65,74 +105,252 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
   }
 
   @Override
-  public void removeInstallableUnitsFromTarget(IFile targetFile, String[] unitIds) throws CoreException {
-    ITargetPlatformService svc = (ITargetPlatformService) PDECore.getDefault().acquireService(ITargetPlatformService.class.getName());
-    ITargetHandle handle = svc.getTarget(targetFile);
-    TargetDefinition td = (TargetDefinition) handle.getTargetDefinition();
-    IBundleContainer[] features = td.getBundleContainers();
-    if (features != null && features.length > 0) {
-      ArrayList<IBundleContainer> newList = new ArrayList<IBundleContainer>(features.length);
-      for (IBundleContainer container : features) {
-        if (container instanceof IUBundleContainer) {
-          IUBundleContainer iuContainer = (IUBundleContainer) container;
-          IInstallableUnit[] units = iuContainer.getInstallableUnits();
-          for (IInstallableUnit unit : units) {
-            if (!isInList(unit.getId(), unitIds)) {
-              newList.add(container);
+  public void removeInstallableUnitsFromTarget(IFile targetFile, final String[] unitIds) throws CoreException {
+    modifyTargetFile(targetFile, new ITargetFileModification() {
+      @Override
+      public void contribute(List<IBundleContainer> liveList, Map<IUBundleContainer, Set<FeatureDefinition>> features, ITargetPlatformService svc) throws CoreException {
+        for (Set<FeatureDefinition> featureOfContainer : features.values()) {
+          Iterator<FeatureDefinition> it = featureOfContainer.iterator();
+          while (it.hasNext()) {
+            FeatureDefinition def = it.next();
+            for (String featureToRemove : unitIds) {
+              if (featureToRemove != null && featureToRemove.equals(def.id)) {
+                it.remove();
+              }
             }
           }
         }
-        else {
-          newList.add(container);
-        }
       }
-      td.setBundleContainers(newList.toArray(new IBundleContainer[newList.size()]));
-      svc.saveTargetDefinition(td);
-    }
+    });
   }
 
-  private boolean isInList(String search, String[] list) {
-    for (String s : list) {
-      if (search.equals(s)) {
-        return true;
+  @Override
+  public void addDirectoryLocationToTarget(IFile targetFile, final String[] dirs) throws CoreException {
+    modifyTargetFile(targetFile, new ITargetFileModification() {
+      @Override
+      public void contribute(List<IBundleContainer> liveList, Map<IUBundleContainer, Set<FeatureDefinition>> features, ITargetPlatformService svc) {
+        for (String dir : dirs) {
+          if (dir != null && dir.trim().length() > 0) {
+            liveList.add(svc.newDirectoryContainer(dir));
+          }
+        }
+      }
+    });
+  }
+
+  @Override
+  public void addInstallableUnitToTarget(IFile targetFile, final String unitId, final String version, final String repository, final IProgressMonitor monitor) throws CoreException {
+    modifyTargetFile(targetFile, new ITargetFileModification() {
+      @Override
+      public void contribute(List<IBundleContainer> liveList, Map<IUBundleContainer, Set<FeatureDefinition>> features, ITargetPlatformService svc) throws CoreException {
+        try {
+          String ver = version;
+          if (ver == null || ver.trim().length() < 1) {
+            ver = P2Utility.getLatestVersion(unitId, URIUtil.fromString(repository), monitor);
+          }
+
+          IUBundleContainer container = getContainer(repository, features.keySet());
+          FeatureDefinition fd = new FeatureDefinition();
+          fd.id = unitId;
+          fd.version = ver;
+          if (container == null) {
+            URI uri = URIUtil.fromString(repository);
+            IUBundleContainer newIULocation = (IUBundleContainer) svc.newIUContainer(new String[]{unitId}, new String[]{ver}, new URI[]{uri}, 0);
+            Set<FeatureDefinition> set = new HashSet<FeatureDefinition>(1);
+            set.add(fd);
+            features.put(newIULocation, set);
+          }
+          else {
+            features.get(container).add(fd);
+          }
+        }
+        catch (URISyntaxException e) {
+          throw new CoreException(new Status(IStatus.ERROR, ScoutCompatibilityActivator.PLUGIN_ID, "Unable to parse url '" + repository + "'.", e));
+        }
+      }
+    });
+  }
+
+//
+//  @Override
+//  public void addInstallableUnitsToTarget(IFile targetFile, String[] unitIds, String[] versions, String[] repositories) throws CoreException {
+//    URI[] uris = new URI[repositories.length];
+//    try {
+//      for (int i = 0; i < repositories.length; i++) {
+//        uris[i] = new URI(repositories[i]);
+//      }
+//    }
+//    catch (URISyntaxException e) {
+//      throw new CoreException(new Status(IStatus.ERROR, ScoutCompatibilityActivator.PLUGIN_ID, "invalid URI provided", e));
+//    }
+//
+//    ITargetPlatformService svc = ScoutCompatibilityActivator.getDefault().acquireService(ITargetPlatformService.class);
+//    ITargetHandle handle = svc.getTarget(targetFile);
+//    ITargetDefinition td = handle.getTargetDefinition();
+//    IBundleContainer[] features = td.getBundleContainers();
+//
+//    int s = unitIds.length;
+//    if (features != null) {
+//      s += features.length;
+//    }
+//    ArrayList<IBundleContainer> newList = new ArrayList<IBundleContainer>(s);
+//    if (features != null && features.length > 0) {
+//      for (IBundleContainer container : features) {
+//        newList.add(container);
+//      }
+//    }
+//    for (int i = 0; i < unitIds.length; i++) {
+//      IUBundleContainer group = (IUBundleContainer) svc.newIUContainer(new String[]{unitIds[i]}, new String[]{versions[i]}, new URI[]{uris[i]},
+//          IUBundleContainer.INCLUDE_SOURCE);
+//      newList.add(group);
+//    }
+//    td.setBundleContainers(newList.toArray(new IBundleContainer[newList.size()]));
+//    svc.saveTargetDefinition(td);
+//  }
+
+  /**
+   * workaround for bug https://bugs.eclipse.org/bugs/show_bug.cgi?id=432494
+   */
+  private Set<FeatureDefinition> getValueOf(Map<IUBundleContainer, Set<FeatureDefinition>> map, IUBundleContainer objectToFind) {
+    for (Entry<IUBundleContainer, Set<FeatureDefinition>> entry : map.entrySet()) {
+      if (objectToFind != null && objectToFind.equals(entry.getKey())) {
+        return entry.getValue();
+      }
+    }
+    return null;
+  }
+
+  private boolean isRepository(Element location, IUBundleContainer iubc) throws URISyntaxException {
+    final String REPOSITORY = "repository"; // from org.eclipse.pde.internal.core.target.TargetDefinitionPersistenceHelper.REPOSITORY
+    final String ATTR_LOCATION = "location";
+    NodeList repositories = location.getElementsByTagName(REPOSITORY);
+    for (int i = 0; i < repositories.getLength(); i++) {
+      Element candidate = (Element) repositories.item(i);
+      if (candidate.hasAttribute(ATTR_LOCATION)) {
+        String loc = candidate.getAttribute(ATTR_LOCATION);
+        URI uri = URIUtil.fromString(loc);
+        for (URI repoUri : iubc.getRepositories()) {
+          if (URIUtil.sameURI(uri, repoUri)) {
+            return true;
+          }
+        }
       }
     }
     return false;
   }
 
-  @Override
-  public void addInstallableUnitsToTarget(IFile targetFile, String[] unitIds, String[] versions, String[] repositories) throws CoreException {
-    URI[] uris = new URI[repositories.length];
-    try {
-      for (int i = 0; i < repositories.length; i++) {
-        uris[i] = new URI(repositories[i]);
+  private List<NameVersionDescriptor> getFeatures(IUBundleContainer iubc, Document document) throws URISyntaxException {
+    final String LOCATION = "location"; // from org.eclipse.pde.internal.core.target.TargetDefinitionPersistenceHelper.LOCATION
+    final String INSTALLABLE_UNIT = "unit"; // from org.eclipse.pde.internal.core.target.TargetDefinitionPersistenceHelper.INSTALLABLE_UNIT
+    final String ATTR_ID = "id"; // from org.eclipse.pde.internal.core.target.TargetDefinitionPersistenceHelper.ATTR_ID
+    final String ATTR_VERSION = "version"; // from org.eclipse.pde.internal.core.target.TargetDefinitionPersistenceHelper.ATTR_VERSION
+
+    NodeList locations = document.getDocumentElement().getElementsByTagName(LOCATION);
+    ArrayList<NameVersionDescriptor> result = new ArrayList<NameVersionDescriptor>(locations.getLength());
+    for (int i = 0; i < locations.getLength(); i++) {
+      Element location = (Element) locations.item(i);
+      if (isRepository(location, iubc)) {
+        NodeList childNodes = location.getChildNodes();
+        for (int j = 0; j < childNodes.getLength(); j++) {
+          Node nn = childNodes.item(j);
+          if (nn.getNodeType() == Node.ELEMENT_NODE && INSTALLABLE_UNIT.equals(nn.getNodeName())) {
+            Element e = (Element) nn;
+            if (e.hasAttribute(ATTR_ID)) {
+              String id = e.getAttribute(ATTR_ID);
+              String version = e.getAttribute(ATTR_VERSION);
+              result.add(new NameVersionDescriptor(id, version));
+            }
+          }
+        }
       }
     }
-    catch (URISyntaxException e) {
-      throw new CoreException(new Status(IStatus.ERROR, ScoutCompatibilityActivator.PLUGIN_ID, "invalid URI provided", e));
-    }
+    return result;
+  }
 
-    ITargetPlatformService svc = (ITargetPlatformService) PDECore.getDefault().acquireService(ITargetPlatformService.class.getName());
+  private static IUBundleContainer getContainer(String uri, Set<IUBundleContainer> containers) throws URISyntaxException {
+    URI searchUri = URIUtil.fromString(uri);
+    for (IUBundleContainer container : containers) {
+      for (URI repo : container.getRepositories()) {
+        if (URIUtil.sameURI(searchUri, repo)) {
+          return container;
+        }
+      }
+    }
+    return null;
+  }
+
+  private void modifyTargetFile(IFile targetFile, ITargetFileModification modification) throws CoreException {
+    final String encoding = "UTF-8";
+    ITargetPlatformService svc = ScoutCompatibilityActivator.getDefault().acquireService(ITargetPlatformService.class);
     ITargetHandle handle = svc.getTarget(targetFile);
     ITargetDefinition td = handle.getTargetDefinition();
     IBundleContainer[] features = td.getBundleContainers();
-
-    int s = unitIds.length;
+    int size = 1;
     if (features != null) {
-      s += features.length;
+      size += features.length;
     }
-    ArrayList<IBundleContainer> newList = new ArrayList<IBundleContainer>(s);
-    if (features != null && features.length > 0) {
-      for (IBundleContainer container : features) {
-        newList.add(container);
+
+    try {
+      ByteArrayOutputStream out = new ByteArrayOutputStream();
+      TargetDefinitionPersistenceHelper.persistXML(td, out);
+      String xml = out.toString(encoding);
+      DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+      Document document = docBuilder.parse(new ByteArrayInputStream(xml.getBytes(encoding)));
+
+      Map<IUBundleContainer, Set<FeatureDefinition>> p2FeatureMap = new HashMap<IUBundleContainer, Set<FeatureDefinition>>(size);
+      List<IBundleContainer> locations = new ArrayList<IBundleContainer>(size);
+      if (features != null) {
+        for (IBundleContainer container : features) {
+          if (container instanceof IUBundleContainer) {
+            IUBundleContainer iubc = (IUBundleContainer) container;
+            List<NameVersionDescriptor> fs = getFeatures(iubc, document);
+
+            Set<FeatureDefinition> featureSet = getValueOf(p2FeatureMap, iubc);
+            if (featureSet == null) {
+              featureSet = new HashSet<FeatureDefinition>(fs.size());
+              p2FeatureMap.put(iubc, featureSet);
+            }
+
+            for (NameVersionDescriptor f : fs) {
+              FeatureDefinition fd = new FeatureDefinition();
+              fd.id = f.getId();
+              fd.version = f.getVersion();
+              featureSet.add(fd);
+            }
+          }
+          else {
+            locations.add(container);
+          }
+        }
       }
+
+      modification.contribute(locations, p2FeatureMap, svc);
+
+      for (Entry<IUBundleContainer, Set<FeatureDefinition>> entry : p2FeatureMap.entrySet()) {
+        if (!entry.getValue().isEmpty()) {
+          String[] unitIds = new String[entry.getValue().size()];
+          String[] versions = new String[entry.getValue().size()];
+          int i = 0;
+          for (FeatureDefinition f : entry.getValue()) {
+            unitIds[i] = f.id;
+            if (f.version == null) {
+              versions[i] = PlatformVersionUtility.EMPTY_VERSION_STR;
+            }
+            else {
+              versions[i] = f.version;
+            }
+            i++;
+          }
+
+          locations.add(svc.newIUContainer(unitIds, versions, entry.getKey().getRepositories(), IUBundleContainer.INCLUDE_SOURCE));
+        }
+      }
+
+      td.setBundleContainers(locations.toArray(new IBundleContainer[locations.size()]));
+      svc.saveTargetDefinition(td);
     }
-    for (int i = 0; i < unitIds.length; i++) {
-      IUBundleContainer group = (IUBundleContainer) svc.newIUContainer(new String[]{unitIds[i]}, new String[]{versions[i]}, new URI[]{uris[i]},
-          IUBundleContainer.INCLUDE_SOURCE);
-      newList.add(group);
+    catch (Exception e) {
+      throw new CoreException(new Status(IStatus.ERROR, ScoutCompatibilityActivator.PLUGIN_ID, "Unable to parse installable units.", e));
     }
-    td.setBundleContainers(newList.toArray(new IBundleContainer[newList.size()]));
-    svc.saveTargetDefinition(td);
   }
 }

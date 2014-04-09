@@ -32,18 +32,13 @@ public class SvgUiSwingTechnologyHandler extends AbstractScoutTechnologyHandler 
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    return getSelectionProductFiles(getSwingBundlesBelow(project),
-        new String[]{IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId},
+    return getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId},
         SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, SWING_SVG_PLUGIN,
         SvgClientTechnologyHandler.getAdditionalBatik17CorePlugins(), SvgClientTechnologyHandler.getAdditionalBatik17ScoutPlugins());
   }
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getSwingBundlesBelow(project), list, IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId);
-  }
-
-  private IScoutBundle[] getSwingBundlesBelow(IScoutBundle start) {
-    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
+    contributeProductFiles(list, IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId);
   }
 }

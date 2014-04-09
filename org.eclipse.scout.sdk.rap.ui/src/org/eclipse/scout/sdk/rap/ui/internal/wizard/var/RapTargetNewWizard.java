@@ -15,7 +15,7 @@ import java.io.File;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation.TARGET_STRATEGY;
+import org.eclipse.scout.sdk.rap.operations.project.AppendRapTargetOperation.TARGET_STRATEGY;
 import org.eclipse.scout.sdk.rap.operations.project.ScoutRapTargetCreationOperation;
 import org.eclipse.scout.sdk.rap.ui.internal.wizard.project.RapTargetPlatformWizardPage;
 import org.eclipse.scout.sdk.rap.var.RapTargetVariable;
@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link RapTargetNewWizard}</h3> ...
- *
+ * 
  * @author Matthias Villiger
  * @since 3.9.0 16.01.2013
  */

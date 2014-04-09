@@ -85,14 +85,13 @@ public class ScoutCompatibilityActivator extends Plugin {
     super.stop(context);
   }
 
-  public Object acquireService(String type) {
-    ServiceReference<?> reference = m_context.getServiceReference(type);
+  public <S> S acquireService(Class<S> clazz) {
+    ServiceReference<S> reference = m_context.getServiceReference(clazz);
     try {
       if (reference == null) {
         return null;
       }
-      Object service = m_context.getService(reference);
-      return service;
+      return m_context.getService(reference);
     }
     finally {
       m_context.ungetService(reference);

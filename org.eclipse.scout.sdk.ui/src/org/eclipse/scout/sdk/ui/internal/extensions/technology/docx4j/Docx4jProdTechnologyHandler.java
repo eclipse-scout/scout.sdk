@@ -23,9 +23,6 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
  */
 public class Docx4jProdTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants, IOrbitConstants {
 
-  public Docx4jProdTechnologyHandler() {
-  }
-
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
@@ -43,8 +40,7 @@ public class Docx4jProdTechnologyHandler extends AbstractScoutTechnologyHandler 
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    return getSelectionProductFiles(getProductBundles(project),
-        new String[]{IRuntimeClasses.ScoutSharedBundleId},
+    return getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutSharedBundleId},
         new String[]{XML_GRAPHICS_PLUGIN_NAME, APACHE_COMMONS_PLUGIN_NAME, APACHE_COMMONS_LOGGING_PLUGIN_NAME, DOCX4J_PLUGIN, DOCX4J_SCOUT_PLUGIN,
             LOGGING_BRIDGE_LOG4J_FRAGMENT});
   }
@@ -56,10 +52,8 @@ public class Docx4jProdTechnologyHandler extends AbstractScoutTechnologyHandler 
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getProductBundles(project), list, IRuntimeClasses.ScoutSharedBundleId);
-  }
-
-  private IScoutBundle[] getProductBundles(IScoutBundle start) {
-    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), false);
+    contributeProductFiles(list, IRuntimeClasses.ScoutSharedBundleId, IRuntimeClasses.ScoutUiSwingBundleId);
+    contributeProductFiles(list, IRuntimeClasses.ScoutSharedBundleId, IRuntimeClasses.ScoutUiSwtBundleId);
+    contributeProductFiles(list, IRuntimeClasses.ScoutSharedBundleId, IRuntimeClasses.ScoutServerBundleId);
   }
 }

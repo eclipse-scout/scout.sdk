@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
-import java.net.MalformedURLException;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -68,7 +67,7 @@ public class CreateUiSwtPluginOperation extends AbstractCreateScoutBundleOperati
       new InstallBinaryFileOperation("templates/ui.swt/resources/icons/eclipseScout32x32.gif", project, "resources/icons/eclipseScout32x32.gif").run(monitor, workingCopyManager);
       new InstallBinaryFileOperation("templates/ui.swt/resources/icons/progress_view.gif", project, "resources/icons/progress_view.gif").run(monitor, workingCopyManager);
     }
-    catch (MalformedURLException e) {
+    catch (Exception e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));
     }
 

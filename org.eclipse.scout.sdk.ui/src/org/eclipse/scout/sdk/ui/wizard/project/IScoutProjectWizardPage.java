@@ -21,6 +21,7 @@ public interface IScoutProjectWizardPage {
   String PROP_PROJECT_NAME_POSTFIX = "projectNamePostfix";
   String PROP_SELECTED_BUNDLES = "selectedBundles";
   String PROP_USE_DEFAULT_JDT_PREFS = "useDefaultJdtPrefs";
+  String PROP_ECLIPSE_TARGET_PLATFORM = "eclipseTargetPlatform";
 
   void addPropertyChangeListener(PropertyChangeListener listener);
 

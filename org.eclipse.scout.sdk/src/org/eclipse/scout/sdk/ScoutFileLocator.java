@@ -21,6 +21,7 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 
 /**
@@ -70,9 +71,15 @@ public class ScoutFileLocator {
   }
 
   private static InputStream resolvePlatform(String bundleId, String path) throws IOException {
-    URL url = FileLocator.resolve(new URL("platform:/plugin/" + bundleId + "/" + path));
-    if (url != null) {
-      return url.openStream();
+    try {
+      URL u = URIUtil.toURL(URIUtil.fromString("platform:/plugin/" + bundleId + "/" + path));
+      URL url = FileLocator.resolve(u);
+      if (url != null) {
+        return url.openStream();
+      }
+    }
+    catch (URISyntaxException e) {
+      ScoutSdk.logError(e);
     }
     return null;
   }

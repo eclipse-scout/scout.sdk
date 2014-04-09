@@ -7,6 +7,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -20,6 +21,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
@@ -82,8 +84,8 @@ public class ExportEarOperation implements IOperation {
       HashMap<String, String> props = new HashMap<String, String>();
       props.put("DISPLAY_NAME", cutExtension(new File(getEarFileName()).getName()));
       props.put("MODULE_LIST", moduleXml.toString());
-      installTextFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/ear/application.xml"), META_INF + "/application.xml", props);
-      installTextFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/ear/MANIFEST.MF"), META_INF + "/MANIFEST.MF", props);
+      installTextFile("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/ear/application.xml", META_INF + "/application.xml", props);
+      installTextFile("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/ear/MANIFEST.MF", META_INF + "/MANIFEST.MF", props);
 
       // pack ear
       m_createdEarFile = packEar();
@@ -141,8 +143,8 @@ public class ExportEarOperation implements IOperation {
   }
 
   @SuppressWarnings("resource")
-  private File installTextFile(URL platformUrl, String filePath, Map<String, String> replacements) throws IOException, ProcessingException, CoreException {
-    URL absSourceUrl = FileLocator.resolve(platformUrl);
+  private File installTextFile(String platformUrl, String filePath, Map<String, String> replacements) throws IOException, ProcessingException, CoreException, URISyntaxException {
+    URL absSourceUrl = FileLocator.resolve(URIUtil.toURL(URIUtil.fromString(platformUrl)));
     String s = new String(IOUtility.getContent(absSourceUrl.openStream()), "UTF-8");
 
     if (replacements != null) {

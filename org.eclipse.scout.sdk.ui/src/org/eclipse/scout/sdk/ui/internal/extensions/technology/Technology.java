@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.EventListenerList;
@@ -73,8 +74,8 @@ public class Technology implements Comparable<Technology> {
     // collect all resources from all handlers
     HashSet<IScoutTechnologyResource> allResources = new HashSet<IScoutTechnologyResource>();
     for (IScoutTechnologyHandler handler : getHandlers(project)) {
-      IScoutTechnologyResource[] resources = handler.getModifactionResourceCandidates(project);
-      if (resources != null && resources.length > 0) {
+      List<IScoutTechnologyResource> resources = handler.getModifactionResourceCandidates(project);
+      if (resources.size() > 0) {
         for (IScoutTechnologyResource res : resources) {
           res.setHandler(handler);
           allResources.add(res);
@@ -137,10 +138,10 @@ public class Technology implements Comparable<Technology> {
   private ITreeNode getModificationResourcesTree(IScoutTechnologyResource[] resources) {
     HashMap<String, ArrayList<IScoutTechnologyResource>> mapping = new HashMap<String, ArrayList<IScoutTechnologyResource>>();
     for (IScoutTechnologyResource res : resources) {
-      ArrayList<IScoutTechnologyResource> list = mapping.get(res.getBundle().getProject().getName());
+      ArrayList<IScoutTechnologyResource> list = mapping.get(res.getResource().getProject().getName());
       if (list == null) {
         list = new ArrayList<IScoutTechnologyResource>();
-        mapping.put(res.getBundle().getProject().getName(), list);
+        mapping.put(res.getResource().getProject().getName(), list);
       }
       list.add(res);
     }
@@ -273,6 +274,7 @@ public class Technology implements Comparable<Technology> {
     @Override
     public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
       try {
+
         // map the checked resources to the contributing handler
         HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> resourcesToModify = new HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>>();
         for (ITreeNode selectedNode : m_selectedNodes) {
@@ -287,10 +289,12 @@ public class Technology implements Comparable<Technology> {
           }
         }
 
+        monitor.beginTask(getOperationName(), resourcesToModify.size() * 3);
+
         // fire pre-selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
         for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
           try {
-            if (!entry.getKey().preSelectionChanged(m_newSelection, monitor)) {
+            if (!entry.getKey().preSelectionChanged(m_newSelection, new SubProgressMonitor(monitor, 1))) {
               return; // cancel the execution if a handler requests an abort
             }
           }
@@ -298,28 +302,31 @@ public class Technology implements Comparable<Technology> {
             ScoutSdkUi.logError("Error while preparing technology changes.", e);
             return; // cancel further processing
           }
+          monitor.worked(1);
         }
 
         // fire selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
         for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
           try {
-            entry.getKey().selectionChanged(entry.getValue().toArray(new IScoutTechnologyResource[entry.getValue().size()]), m_newSelection, monitor, workingCopyManager);
+            entry.getKey().selectionChanged(entry.getValue().toArray(new IScoutTechnologyResource[entry.getValue().size()]), m_newSelection, new SubProgressMonitor(monitor, 1), workingCopyManager);
           }
           catch (CoreException e) {
             ScoutSdkUi.logError("Error while applying technology changes.", e);
             return; // cancel further processing
           }
+          monitor.worked(1);
         }
 
         // fire post-selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
         for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
           try {
-            entry.getKey().postSelectionChanged(m_newSelection, monitor);
+            entry.getKey().postSelectionChanged(m_newSelection, new SubProgressMonitor(monitor, 1));
           }
           catch (CoreException e) {
             ScoutSdkUi.logError("Error while finishing technology changes.", e);
             return; // cancel further processing
           }
+          monitor.worked(1);
         }
 
         success = true;
@@ -333,12 +340,13 @@ public class Technology implements Comparable<Technology> {
             fireSelectionChanged(wasSuccessful == m_newSelection);
           }
         });
+        monitor.done();
       }
     }
 
     @Override
     public String getOperationName() {
-      return "change technology selection...";
+      return "Changing Technology Selection...";
     }
 
     @Override

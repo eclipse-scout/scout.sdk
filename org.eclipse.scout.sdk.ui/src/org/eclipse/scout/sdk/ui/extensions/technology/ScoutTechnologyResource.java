@@ -15,6 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
  * <h3>{@link ScoutTechnologyResource}</h3> ...
@@ -51,10 +52,18 @@ public class ScoutTechnologyResource implements IScoutTechnologyResource {
 
   @Override
   public ImageDescriptor getBundleImage() {
-    ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
-    if (uiExt != null) {
-      return uiExt.getIcon();
+    if (getBundle() != null) {
+      ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(getBundle().getType());
+      if (uiExt != null) {
+        return uiExt.getIcon();
+      }
     }
+
+    IWorkbenchAdapter wbAdapter = (IWorkbenchAdapter) m_resource.getProject().getAdapter(IWorkbenchAdapter.class);
+    if (wbAdapter != null) {
+      return wbAdapter.getImageDescriptor(m_resource.getProject());
+    }
+
     return null;
   }
 

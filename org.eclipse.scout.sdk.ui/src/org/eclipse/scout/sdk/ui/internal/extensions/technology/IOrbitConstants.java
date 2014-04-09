@@ -17,7 +17,7 @@ package org.eclipse.scout.sdk.ui.internal.extensions.technology;
  * @since 3.9.0 02.05.2013
  */
 public interface IOrbitConstants {
-  String ORBIT_UPDATESITE_URL = "http://download.eclipse.org/tools/orbit/downloads/drops/R20140114142710/repository/";
+  String ORBIT_UPDATESITE_URL = "http://download.eclipse.org/tools/orbit/downloads/drops/S20140227085123/repository/";
   String XML_GRAPHICS_FEATURE_NAME = "org.apache.xmlgraphics";
   String XML_GRAPHICS_PLUGIN_NAME = "org.apache.xmlgraphics";
   String APACHE_COMMONS_PLUGIN_NAME = "org.apache.commons.io";

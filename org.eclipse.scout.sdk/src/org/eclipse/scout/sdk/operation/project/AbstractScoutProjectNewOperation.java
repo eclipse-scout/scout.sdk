@@ -10,10 +10,15 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.util.PropertyMap;
 import org.osgi.framework.Version;
 
 public abstract class AbstractScoutProjectNewOperation implements IScoutProjectNewOperation {
+
+  public static final String UPDATE_SITE_URL_LUNA = "http://download.eclipse.org/releases/luna";
+  public static final String UPDATE_SITE_URL_JUNO_38 = "http://download.eclipse.org/eclipse/updates/3.8";
+  public static final String UPDATE_SITE_URL_INDIGO = "http://download.eclipse.org/releases/indigo";
 
   private PropertyMap m_properties;
 
@@ -67,6 +72,19 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
       getProperties().setProperty(PROP_CREATED_PRODUCT_FILES, list);
     }
     return list;
+  }
+
+  protected String getUpdateSiteUrl() {
+    Version targetPlatformVersion = getTargetPlatformVersion();
+    if (PlatformVersionUtility.isIndigo(targetPlatformVersion)) {
+      return UPDATE_SITE_URL_INDIGO;
+    }
+    else if (PlatformVersionUtility.isLuna(targetPlatformVersion)) {
+      return UPDATE_SITE_URL_LUNA;
+    }
+    else {
+      return UPDATE_SITE_URL_JUNO_38;
+    }
   }
 
   @SuppressWarnings("unchecked")

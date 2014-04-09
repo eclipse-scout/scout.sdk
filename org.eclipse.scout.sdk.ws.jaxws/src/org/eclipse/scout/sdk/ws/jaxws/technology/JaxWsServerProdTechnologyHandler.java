@@ -14,9 +14,6 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 public class JaxWsServerProdTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  public JaxWsServerProdTechnologyHandler() {
-  }
-
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedProductFiles(resources, selected, new String[]{JaxWsServerManifestTechnologyHandler.JAXWS_RUNTIME_PLUGIN});
@@ -24,20 +21,16 @@ public class JaxWsServerProdTechnologyHandler extends AbstractScoutTechnologyHan
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    return getSelectionProductFiles(getServerBundlesBelow(project), new String[]{IRuntimeClasses.ScoutServerBundleId}, new String[]{JaxWsServerManifestTechnologyHandler.JAXWS_RUNTIME_PLUGIN});
+    return getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutServerBundleId}, new String[]{JaxWsServerManifestTechnologyHandler.JAXWS_RUNTIME_PLUGIN});
   }
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getServerBundlesBelow(project), list, IRuntimeClasses.ScoutServerBundleId);
+    contributeProductFiles(list, IRuntimeClasses.ScoutServerBundleId);
   }
 
   @Override
   public boolean isActive(IScoutBundle project) {
     return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false) != null;
-  }
-
-  private IScoutBundle[] getServerBundlesBelow(IScoutBundle start) {
-    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
   }
 }

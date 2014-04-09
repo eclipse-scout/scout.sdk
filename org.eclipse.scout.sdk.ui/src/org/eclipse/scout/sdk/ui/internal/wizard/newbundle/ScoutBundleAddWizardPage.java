@@ -10,11 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.newbundle;
 
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutBundleNodeGroup;
 import org.eclipse.scout.sdk.ui.internal.wizard.newproject.ScoutProjectNewWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 /**
@@ -40,11 +43,22 @@ public class ScoutBundleAddWizardPage extends ScoutProjectNewWizardPage {
   }
 
   @Override
+  protected IStatus getStatusTargetProject() {
+    return Status.OK_STATUS;
+  }
+
+  @Override
+  protected IStatus getStatusTargetPlatform() {
+    return Status.OK_STATUS;
+  }
+
+  @Override
   protected void createContent(Composite parent) {
     super.createContent(parent);
 
     m_projectNameField.setText(m_name);
     m_postFixField.setText(m_postfix);
+    ((GridData) m_eclipseTargetPlatform.getLayoutData()).exclude = true;
 
     // force re-validate and dynamic page add/remove
     ITreeNode[] backup = m_bundleTree.getCheckedNodes();

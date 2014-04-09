@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.rap.operations.project;
 
-import java.net.MalformedURLException;
-
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -89,7 +87,7 @@ public class CreateUiRapPluginOperation extends AbstractCreateScoutBundleOperati
       getProperties().setProperty(PROP_PRODUCT_FILE_PROD, prodProdInstallOp.getCreatedFile());
       addCreatedProductFile(prodProdInstallOp.getCreatedFile());
     }
-    catch (MalformedURLException e) {
+    catch (Exception e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdkRap.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));
     }
   }

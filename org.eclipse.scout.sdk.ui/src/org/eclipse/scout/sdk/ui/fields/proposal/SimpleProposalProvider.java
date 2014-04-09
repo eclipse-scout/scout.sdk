@@ -37,7 +37,7 @@ public class SimpleProposalProvider extends ContentProposalProvider {
       searchPattern = "*";
     }
     else {
-      searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("").toLowerCase() + "*";
+      searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("").toLowerCase().trim() + "*";
     }
 
     ArrayList<Object> props = new ArrayList<Object>();

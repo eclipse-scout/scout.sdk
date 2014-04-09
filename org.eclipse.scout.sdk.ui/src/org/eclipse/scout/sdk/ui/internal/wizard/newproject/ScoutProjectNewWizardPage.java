@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 
 import java.beans.PropertyChangeListener;
+import java.util.ArrayList;
 import java.util.HashSet;
 
 import org.eclipse.core.runtime.IStatus;
@@ -20,9 +21,11 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
+import org.eclipse.scout.sdk.operation.project.CreateTargetProjectOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
+import org.eclipse.scout.sdk.ui.fields.TextField;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ICheckStateListener;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
@@ -30,6 +33,12 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
+import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
+import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
+import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleLabelProvider;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleProposal;
+import org.eclipse.scout.sdk.ui.fields.proposal.SimpleProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.wizard.project.AbstractProjectNewWizardPage;
@@ -43,6 +52,9 @@ import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.FormAttachment;
+import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.FormLayout;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
@@ -50,6 +62,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
+import org.osgi.framework.Version;
 
 /**
  * <h3>ScoutProjectNewWizardPage</h3> ...
@@ -61,12 +74,18 @@ import org.eclipse.swt.widgets.Label;
 public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage implements IScoutProjectWizardPage {
   private static final String TYPE_BUNDLE = "bundle";
 
+  private static final String PROP_CURR_TARGET = "curr";
+  private static final String PROP_RECOMMENDED_TARGET = "recomm";
+  private static final String PROP_PLATFORM_VERSION = "vers";
+
   protected StyledTextField m_projectNameField;
   protected StyledTextField m_postFixField;
   protected CheckableTree m_bundleTree;
   protected ITreeNode m_invisibleRootNode;
-  protected StyledTextField m_projectAliasNameField;
+
+  protected ProposalTextField m_eclipseTargetPlatform;
   protected Button m_useDefaultScoutPreferences;
+  protected StyledTextField m_projectAliasNameField;
 
   public ScoutProjectNewWizardPage() {
     super(ScoutProjectNewWizardPage.class.getName());
@@ -145,6 +164,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   private ITreeNode buildBundleTree() {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
+
     for (ScoutBundleUiExtension e : ScoutBundleExtensionPoint.getExtensions()) {
       TreeUtility.createNode(rootNode, TYPE_BUNDLE, e.getBundleName(), e.getIcon(), e.getOrderNumber(), e, false);
     }
@@ -177,12 +197,87 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     m_projectAliasNameField.setText(alias);
   }
 
+  protected SimpleProposal[] getTargetPlatformProposals() {
+    final String RECOMMENDED_VERSION = "3.8";
+    final String[][] supportedPlatforms = new String[][]{{"Indigo", "3.7"}, {"Juno", "3.8"}, {"Luna", "4.4"}};
+    ArrayList<SimpleProposal> ret = new ArrayList<SimpleProposal>(supportedPlatforms.length);
+    for (String[] platform : supportedPlatforms) {
+      String codeName = platform[0];
+      String ver = platform[1];
+      boolean isCurrent = isCurrentPlatform(ver);
+      boolean isRecommended = Boolean.valueOf(RECOMMENDED_VERSION.equals(ver));
+
+      StringBuilder txt = new StringBuilder("Eclipse ");
+      txt.append(codeName).append(" (").append(ver);
+      if (isCurrent) {
+        txt.append(", ").append(Texts.get("currrent"));
+      }
+      if (isRecommended) {
+        txt.append(", ").append(Texts.get("recommended"));
+      }
+      txt.append(")");
+      SimpleProposal prop = new SimpleProposal(txt.toString(), null);
+      prop.setData(PROP_CURR_TARGET, Boolean.valueOf(isCurrent));
+      prop.setData(PROP_RECOMMENDED_TARGET, isRecommended);
+      prop.setData(PROP_PLATFORM_VERSION, ver);
+      ret.add(prop);
+    }
+    return ret.toArray(new SimpleProposal[ret.size()]);
+  }
+
+  protected boolean isCurrentPlatform(String ver) {
+    String curPlatform = PlatformVersionUtility.getPlatformVersion().toString();
+    return curPlatform.startsWith(ver);
+  }
+
+  protected void setTargetPlatformDefaultSelection(SimpleProposal[] targetPlatformProposals) {
+    SimpleProposal recommended = null;
+    SimpleProposal current = null;
+    for (SimpleProposal p : targetPlatformProposals) {
+      Boolean reco = (Boolean) p.getData(PROP_RECOMMENDED_TARGET);
+      if (reco.booleanValue()) {
+        recommended = p;
+      }
+      Boolean curr = (Boolean) p.getData(PROP_CURR_TARGET);
+      if (curr.booleanValue()) {
+        current = p;
+      }
+    }
+    if (current != null) {
+      m_eclipseTargetPlatform.acceptProposal(current);
+      setTargetPlatformVersionInternal((String) current.getData(PROP_PLATFORM_VERSION));
+    }
+    else if (recommended != null) {
+      m_eclipseTargetPlatform.acceptProposal(recommended);
+      setTargetPlatformVersionInternal((String) recommended.getData(PROP_PLATFORM_VERSION));
+    }
+  }
+
   protected Control createPropertiesGroup(Composite parent) {
     Group group = new Group(parent, SWT.SHADOW_IN);
     group.setText(Texts.get("ProjectProperties"));
 
-    Label label = new Label(group, SWT.NONE);
-    label.setText(Texts.get("ProjectAliasHelp"));
+    SimpleProposal[] targetPlatformProposals = getTargetPlatformProposals();
+    SimpleProposalProvider provider = new SimpleProposalProvider(targetPlatformProposals);
+    m_eclipseTargetPlatform = getFieldToolkit().createProposalField(group, Texts.get("EclipsePlatform"), SWT.NONE);
+    m_eclipseTargetPlatform.setContentProvider(provider);
+    m_eclipseTargetPlatform.setLabelProvider(new SimpleLabelProvider());
+    m_eclipseTargetPlatform.addProposalAdapterListener(new IProposalAdapterListener() {
+      @Override
+      public void proposalAccepted(ContentProposalEvent event) {
+        SimpleProposal proposal = (SimpleProposal) event.proposal;
+        if (proposal != null) {
+          setTargetPlatformVersionInternal((String) proposal.getData(PROP_PLATFORM_VERSION));
+        }
+        else {
+          setTargetPlatformVersionInternal(null);
+        }
+        pingStateChanging();
+      }
+    });
+    setTargetPlatformDefaultSelection(targetPlatformProposals);
+
+    Composite prefButton = createPreferencesButton(group);
 
     m_projectAliasNameField = getFieldToolkit().createStyledTextField(group, Texts.get("ProjectAlias"));
     m_projectAliasNameField.addModifyListener(new ModifyListener() {
@@ -192,8 +287,33 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
         pingStateChanging();
       }
     });
+    Composite infoLabel = createInfoLabel(group);
 
-    m_useDefaultScoutPreferences = new Button(group, SWT.CHECK);
+    // layout
+    group.setLayout(new GridLayout(1, true));
+
+    infoLabel.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_eclipseTargetPlatform.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    m_projectAliasNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+    prefButton.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+
+    return group;
+  }
+
+  protected Composite createPreferencesButton(Composite p) {
+    Composite parent = new Composite(p, SWT.NONE);
+    Label lbl = new Label(parent, SWT.NONE);
+
+    // layout
+    parent.setLayout(new FormLayout());
+    FormData labelData = new FormData();
+    labelData.top = new FormAttachment(0, 4);
+    labelData.left = new FormAttachment(0, 0);
+    labelData.right = new FormAttachment(TextField.DEFAULT_LABEL_PERCENTAGE, 0);
+    labelData.bottom = new FormAttachment(100, 0);
+    lbl.setLayoutData(labelData);
+
+    m_useDefaultScoutPreferences = new Button(parent, SWT.CHECK);
     m_useDefaultScoutPreferences.setText(Texts.get("UseDefaultScoutJDTPreferences"));
     m_useDefaultScoutPreferences.setSelection(isUseDefaultJdtPrefs());
     m_useDefaultScoutPreferences.addSelectionListener(new SelectionAdapter() {
@@ -204,14 +324,37 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       }
     });
 
+    FormData textData = new FormData();
+    textData.top = new FormAttachment(0, 0);
+    textData.left = new FormAttachment(lbl, 5);
+    textData.right = new FormAttachment(100, 0);
+    textData.bottom = new FormAttachment(100, 0);
+    m_useDefaultScoutPreferences.setLayoutData(textData);
+    return parent;
+  }
+
+  protected Composite createInfoLabel(Composite p) {
+    Composite parent = new Composite(p, SWT.NONE);
+    Label lbl = new Label(parent, SWT.NONE);
+
     // layout
-    group.setLayout(new GridLayout(1, true));
+    parent.setLayout(new FormLayout());
+    FormData labelData = new FormData();
+    labelData.top = new FormAttachment(0, 4);
+    labelData.left = new FormAttachment(0, 0);
+    labelData.right = new FormAttachment(TextField.DEFAULT_LABEL_PERCENTAGE, 0);
+    labelData.bottom = new FormAttachment(100, 0);
+    lbl.setLayoutData(labelData);
 
-    label.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    m_projectAliasNameField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-    m_useDefaultScoutPreferences.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-
-    return group;
+    Label label = new Label(parent, SWT.NONE);
+    label.setText(Texts.get("ProjectAliasHelp"));
+    FormData textData = new FormData();
+    textData.top = new FormAttachment(0, 0);
+    textData.left = new FormAttachment(lbl, 5);
+    textData.right = new FormAttachment(100, 0);
+    textData.bottom = new FormAttachment(100, 0);
+    label.setLayoutData(textData);
+    return parent;
   }
 
   @Override
@@ -227,7 +370,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, getProjectName().trim());
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME_POSTFIX, postfix);
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, getProjectAlias().trim());
-    properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, PlatformVersionUtility.getPlatformVersion());
+    properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, new Version(getTargetPlatformVersion()));
     properties.setProperty(IScoutProjectNewOperation.PROP_USE_DEFAULT_JDT_PREFS, isUseDefaultJdtPrefs());
 
     // go through all node extensions and put properties which node has been checked
@@ -261,6 +404,8 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     multiStatus.add(getStatusProjectName());
     multiStatus.add(getStatusProjectPostfix());
     multiStatus.add(getStatusProjectAlias());
+    multiStatus.add(getStatusTargetPlatform());
+    multiStatus.add(getStatusTargetProject());
     for (ITreeNode node : TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible())) {
       if (m_bundleTree.isChecked(node)) {
         ScoutBundleUiExtension ext = (ScoutBundleUiExtension) node.getData();
@@ -271,6 +416,18 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     }
   }
 
+  protected IStatus getStatusTargetPlatform() {
+    if (StringUtility.isNullOrEmpty(getTargetPlatformVersion())) {
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("PleaseChooseATargetPlatform"));
+    }
+    SimpleProposal p = (SimpleProposal) m_eclipseTargetPlatform.getSelectedProposal();
+    boolean isCurrent = Boolean.valueOf((Boolean) p.getData(PROP_CURR_TARGET));
+    if (!isCurrent) {
+      return new Status(IStatus.INFO, ScoutSdkUi.PLUGIN_ID, Texts.get("ACompleteEclipsePlatformWillBeDownloaded"));
+    }
+    return Status.OK_STATUS;
+  }
+
   protected IStatus getStatusProjectPostfix() {
     if (StringUtility.isNullOrEmpty(getProjectNamePostfix())) {
       return Status.OK_STATUS;
@@ -279,8 +436,13 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       return Status.OK_STATUS;
     }
     else {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Project postfix is not valid.");
+      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ProjectPostfixIsNotValid"));
     }
+  }
+
+  protected IStatus getStatusTargetProject() {
+    String targetPluginName = AbstractScoutProjectNewOperation.getPluginName(getProjectName(), getProjectNamePostfix(), CreateTargetProjectOperation.TARGET_PROJECT_NAME_SUFFIX);
+    return ScoutUtility.validateNewBundleName(targetPluginName);
   }
 
   protected IStatus getStatusProjectName() {
@@ -354,6 +516,14 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       }
     }
     return false;
+  }
+
+  public String getTargetPlatformVersion() {
+    return getPropertyString(PROP_ECLIPSE_TARGET_PLATFORM);
+  }
+
+  private void setTargetPlatformVersionInternal(String version) {
+    setPropertyString(PROP_ECLIPSE_TARGET_PLATFORM, version);
   }
 
   @Override
@@ -492,4 +662,64 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       return false;
     }
   }
+//
+//  private static final class P_TargetPlatformContentProvider extends ContentProposalProvider {
+//
+//    private final ILabelProvider m_labelProvider;
+//
+//    private P_TargetPlatformContentProvider() {
+//      m_labelProvider = new P_TargetPlatformLabelProvider();
+//    }
+//
+//    @Override
+//    public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
+//      if (!StringUtility.hasText(searchPattern)) {
+//        searchPattern = "*";
+//      }
+//      else {
+//        searchPattern = searchPattern.trim();
+//      }
+//
+//
+//    }
+//  }
+//
+//  private static final class P_TargetPlatformLabelProvider implements ILabelProvider {
+//
+//    @Override
+//    public void addListener(ILabelProviderListener listener) {
+//    }
+//
+//    @Override
+//    public void dispose() {
+//    }
+//
+//    @Override
+//    public boolean isLabelProperty(Object element, String property) {
+//      return false;
+//    }
+//
+//    @Override
+//    public void removeListener(ILabelProviderListener listener) {
+//    }
+//
+//    @Override
+//    public Image getImage(Object element) {
+//      return null;
+//    }
+//
+//    @Override
+//    public String getText(Object element) {
+//      return ((TargetPlatformItem) element).getDisplayName();
+//    }
+//  }
+//
+//  private static final class TargetPlatformItem {
+//    private String codeName;
+//    private String version;
+//
+//    private String getDisplayName() {
+//      return "Eclipse " + codeName + " (" + version + ")";
+//    }
+//  }
 }

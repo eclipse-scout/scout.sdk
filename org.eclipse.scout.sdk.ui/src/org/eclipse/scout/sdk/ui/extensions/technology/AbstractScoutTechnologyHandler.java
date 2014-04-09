@@ -17,15 +17,20 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.compatibility.License;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
+import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
+import org.eclipse.scout.sdk.operation.project.CreateTargetProjectOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.dialog.LicenseDialog;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
@@ -38,7 +43,6 @@ import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link AbstractScoutTechnologyHandler}</h3> ...
@@ -59,31 +63,48 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   }
 
   @Override
-  public IScoutTechnologyResource[] getModifactionResourceCandidates(IScoutBundle project) throws CoreException {
+  public List<IScoutTechnologyResource> getModifactionResourceCandidates(IScoutBundle project) throws CoreException {
     ArrayList<IScoutTechnologyResource> ret = new ArrayList<IScoutTechnologyResource>();
     contributeResources(project, ret);
-    return ret.toArray(new IScoutTechnologyResource[ret.size()]);
+    return ret;
   }
 
   protected abstract void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException;
 
-  protected void contributeProductFiles(IScoutBundle[] projects, List<IScoutTechnologyResource> list, String... bundleFilter) throws CoreException {
-    for (IScoutBundle e : projects) {
-      contributeProductFiles(e, list, bundleFilter);
+  protected boolean showLicenseDialog(boolean selected, IProgressMonitor monitor, String[] featureIds, String[] featureUrls) throws CoreException {
+    if (!selected) {
+      return true;
+    }
+    try {
+      final BooleanHolder licAccepted = new BooleanHolder(false);
+      URI[] uris = new URI[featureUrls.length];
+      for (int i = 0; i < uris.length; i++) {
+        uris[i] = URIUtil.fromString(featureUrls[i]);
+      }
+      final Map<String, License[]> lic = P2Utility.getLicenses(featureIds, uris, monitor);
+
+      ScoutSdkUi.getDisplay().syncExec(new Runnable() {
+        @Override
+        public void run() {
+          LicenseDialog licDialog = new LicenseDialog(ScoutSdkUi.getShell(), lic);
+          if (licDialog.open() == Dialog.OK) {
+            licAccepted.setValue(true);
+          }
+        }
+      });
+      return licAccepted.getValue();
+    }
+    catch (URISyntaxException e) {
+      throw new CoreException(new ScoutStatus(e));
     }
   }
 
-  private void contributeProductFiles(IScoutBundle project, List<IScoutTechnologyResource> list, String... bundleFilter) throws CoreException {
-    contributeProductFiles(project, list, true, bundleFilter);
+  protected void contributeProductFiles(List<IScoutTechnologyResource> list, String... bundleFilter) throws CoreException {
+    contributeProductFiles(list, true, bundleFilter);
   }
 
-  protected void contributeProductFiles(IScoutBundle project, List<IScoutTechnologyResource> list, boolean defaultSelection, String... bundleFilter) throws CoreException {
-    if (project == null || project.isBinary()) {
-      return;
-    }
-    P_TechProductFile[] productFiles = getFilteredProductFiles(project, bundleFilter);
-    for (int i = 0; i < productFiles.length; i++) {
-      P_TechProductFile prodFile = productFiles[i];
+  protected void contributeProductFiles(List<IScoutTechnologyResource> list, boolean defaultSelection, String... bundleFilter) throws CoreException {
+    for (P_TechProductFile prodFile : getFilteredProductFiles(bundleFilter)) {
       list.add(new ScoutTechnologyResource(prodFile.bundle, prodFile.productFile, defaultSelection));
     }
   }
@@ -165,40 +186,45 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     return ret;
   }
 
-  protected TriState getSelectionProductFiles(IScoutBundle[] projects, String[] filterPluginIds, String[]... pluginIds) throws CoreException {
-    if (projects == null || projects.length == 0) {
-      return TriState.FALSE;
-    }
-
-    TriState ret = getSelectionProductFiles(projects[0], filterPluginIds, pluginIds);
-    for (int i = 1; i < projects.length; i++) {
-      TriState tmp = getSelectionProductFiles(projects[i], filterPluginIds, pluginIds);
-      if (tmp != null) {
-        if (ret == null) {
-          ret = tmp;
-        }
-        else if (tmp != ret) {
-          return TriState.UNDEFINED;
-        }
-      }
-    }
-    return ret;
-  }
-
-  private TriState getSelectionProductFiles(IScoutBundle project, String[] filterPluginIds, String[]... pluginIds) throws CoreException {
-    P_TechProductFile[] productFiles = getFilteredProductFiles(project, filterPluginIds);
-    if (productFiles == null || productFiles.length == 0) {
+  protected TriState getSelectionProductFiles(String[] filterPluginIds, String[]... pluginIds) throws CoreException {
+    List<P_TechProductFile> productFiles = getFilteredProductFiles(filterPluginIds);
+    if (productFiles.size() == 0) {
       return null;
     }
 
-    TriState ret = TriState.parseTriState(containsProductDependencies(productFiles[0].productFile, pluginIds));
-    for (int i = 1; i < productFiles.length; i++) {
-      TriState tmp = TriState.parseTriState(containsProductDependencies(productFiles[i].productFile, pluginIds));
+    TriState ret = TriState.parseTriState(containsProductDependencies(productFiles.get(0).productFile, pluginIds));
+    for (int i = 1; i < productFiles.size(); i++) {
+      TriState tmp = TriState.parseTriState(containsProductDependencies(productFiles.get(i).productFile, pluginIds));
       if (ret != tmp) {
         return TriState.UNDEFINED;
       }
     }
     return ret;
+  }
+
+  protected TriState getSelectionTargetFileContainsFeature(List<ScoutTechnologyResource> files, String... featureIds) throws CoreException {
+    if (files.size() < 1) {
+      return TriState.FALSE;
+    }
+
+    TriState ret = TriState.parseTriState(isTargetContainingFeature(files.get(0).getResource(), featureIds));
+    for (int i = 1; i < files.size(); i++) {
+      TriState tmp = TriState.parseTriState(isTargetContainingFeature(files.get(i).getResource(), featureIds));
+      if (ret != tmp) {
+        return TriState.UNDEFINED;
+      }
+    }
+    return ret;
+  }
+
+  private boolean isTargetContainingFeature(IFile targetFile, String... featureIds) throws CoreException {
+    String content = ResourceUtility.getContent(targetFile);
+    for (String id : featureIds) {
+      if (!content.contains(id)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   @Override
@@ -233,6 +259,27 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
       }
     }
     h.save();
+  }
+
+  protected void selectionChangedTargetFiles(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, String[] featureIds, String[] featureVersions, String[] featureUrls) throws CoreException {
+    for (IScoutTechnologyResource r : resources) {
+      if (selected) {
+        for (int i = 0; i < featureIds.length; i++) {
+          TargetPlatformUtility.addInstallableUnitToTarget(r.getResource(), featureIds[i], featureVersions[i], featureUrls[i], monitor);
+        }
+      }
+      else {
+        TargetPlatformUtility.removeInstallableUnitsFromTarget(r.getResource(), featureIds);
+      }
+    }
+    if (resources.length == 1) {
+      try {
+        TargetPlatformUtility.resolveTargetPlatform(resources[0].getResource(), true, monitor);
+      }
+      catch (IllegalStateException e) {
+        ScoutSdkUi.logError("Unable to resolve target file '" + resources[0].getResource().getFullPath().toOSString() + "'.", e);
+      }
+    }
   }
 
   protected void selectionChangedManifest(IScoutTechnologyResource[] resources, boolean selected, String... pluginsToHandle) throws CoreException {
@@ -291,44 +338,44 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     }
   }
 
-  protected P_TechProductFile[] getProductFiles(IScoutBundle[] projects) throws CoreException {
-    ArrayList<P_TechProductFile> list = new ArrayList<P_TechProductFile>();
-    for (IScoutBundle element : projects) {
-      if (!element.isBinary()) {
-        IResource[] productFiles = ResourceUtility.getAllResources(element.getProject(), ResourceFilters.getProductFileFilter());
-        for (int i = 0; i < productFiles.length; i++) {
-          final IResource prodFile = productFiles[i];
-          IScoutBundle b = ScoutTypeUtility.getScoutBundle(prodFile.getProject());
-
-          if (b != null) {
-            P_TechProductFile tpf = new P_TechProductFile();
-            tpf.bundle = b;
-            tpf.productFile = (IFile) prodFile;
-            list.add(tpf);
-          }
-        }
-      }
+  protected List<ScoutTechnologyResource> getTargetFiles() throws CoreException {
+    final ArrayList<ScoutTechnologyResource> ret = new ArrayList<ScoutTechnologyResource>();
+    for (IResource r : ResourceUtility.getAllResources(ResourceFilters.getTargetFileFilter())) {
+      IProject p = r.getProject();
+      IScoutBundle sb = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(p);
+      boolean checked = p.getName().endsWith(CreateTargetProjectOperation.TARGET_PROJECT_NAME_SUFFIX);
+      ret.add(new ScoutTechnologyResource(sb, (IFile) r, checked));
     }
-    return list.toArray(new P_TechProductFile[list.size()]);
+    return ret;
+  }
+
+  protected List<P_TechProductFile> getProductFiles() throws CoreException {
+    ArrayList<P_TechProductFile> list = new ArrayList<P_TechProductFile>();
+    for (IResource r : ResourceUtility.getAllResources(ResourceFilters.getProductFileFilter())) {
+      IProject p = r.getProject();
+      IScoutBundle sb = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(p);
+
+      P_TechProductFile tpf = new P_TechProductFile();
+      tpf.bundle = sb;
+      tpf.productFile = (IFile) r;
+      list.add(tpf);
+    }
+    return list;
   }
 
   protected IScoutTechnologyResource getManifestResource(IScoutBundle bundle) {
     return new ScoutTechnologyResource(bundle, bundle.getProject().getFile(ICoreConstants.BUNDLE_FILENAME_DESCRIPTOR));
   }
 
-  protected P_TechProductFile[] getFilteredProductFiles(IScoutBundle project, String... pluginFilter) throws CoreException {
-    return getFilteredProductFiles(new IScoutBundle[]{project}, pluginFilter);
-  }
-
-  protected P_TechProductFile[] getFilteredProductFiles(IScoutBundle[] projects, String... pluginFilter) throws CoreException {
-    P_TechProductFile[] candidates = getProductFiles(projects);
-    ArrayList<P_TechProductFile> ret = new ArrayList<P_TechProductFile>(candidates.length);
+  protected List<P_TechProductFile> getFilteredProductFiles(String... pluginFilter) throws CoreException {
+    List<P_TechProductFile> candidates = getProductFiles();
+    List<P_TechProductFile> ret = new ArrayList<P_TechProductFile>(candidates.size());
     for (P_TechProductFile candidate : candidates) {
       if (containsProductDependencies(candidate.productFile, pluginFilter)) {
         ret.add(candidate);
       }
     }
-    return ret.toArray(new P_TechProductFile[ret.size()]);
+    return ret;
   }
 
   /**
@@ -382,7 +429,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
       for (int i = 0; i < maxNum; i++) {
         if (!JdtUtility.areAllPluginsInstalled(definingPlugins[i])) {
           // remember which of the given features require installation
-          repos.add(new URI(featureUrls[i]));
+          repos.add(URIUtil.fromString(featureUrls[i]));
           featureIdsToInstall.add(featureIds[i]);
         }
       }

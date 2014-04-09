@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 /**
  * <h3>{@link F2ProdTechnologyHandler}</h3>
  * 
- * @author jgu
+ * @author Judith Gull
  * @since 3.10.0 02.07.2013
  */
 public class F2ProdTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants, IOrbitConstants {
@@ -34,9 +34,7 @@ public class F2ProdTechnologyHandler extends AbstractScoutTechnologyHandler impl
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    return getSelectionProductFiles(getProductBundles(project),
-        new String[]{IRuntimeClasses.ScoutClientBundleId},
-        new String[]{F2_PLUGIN});
+    return getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutClientBundleId}, new String[]{F2_PLUGIN});
   }
 
   @Override
@@ -46,10 +44,6 @@ public class F2ProdTechnologyHandler extends AbstractScoutTechnologyHandler impl
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getProductBundles(project), list, IRuntimeClasses.ScoutSharedBundleId);
-  }
-
-  private IScoutBundle[] getProductBundles(IScoutBundle start) {
-    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), false);
+    contributeProductFiles(list, IRuntimeClasses.ScoutSharedBundleId);
   }
 }

@@ -16,6 +16,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.zip.ZipOutputStream;
 
@@ -28,6 +29,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.pde.internal.core.exports.FeatureExportInfo;
 import org.eclipse.pde.internal.core.exports.ProductExportOperation;
 import org.eclipse.pde.internal.core.iproduct.IProduct;
@@ -97,9 +99,9 @@ public class ExportServerWarOperation implements IOperation {
       }
       result = buildServerProduct(monitor);
       if (result.isOK()) {
-        installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/lib/" + SERVLET_BRIDGE_JAR_NAME), WEB_INF + "/lib/" + SERVLET_BRIDGE_JAR_NAME);
-        installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/web.xml"), WEB_INF + "/web.xml");
-        installFile(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/eclipse/launch.ini"), WEB_INF + "/eclipse/launch.ini");
+        installFile("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/lib/" + SERVLET_BRIDGE_JAR_NAME, WEB_INF + "/lib/" + SERVLET_BRIDGE_JAR_NAME);
+        installFile("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/web.xml", WEB_INF + "/web.xml");
+        installFile("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/server.war/eclipse/launch.ini", WEB_INF + "/eclipse/launch.ini");
         m_resultingWarFile = packWar();
 
         if (m_clientZipFile != null && m_clientZipFile.exists()) {
@@ -233,8 +235,8 @@ public class ExportServerWarOperation implements IOperation {
   }
 
   @SuppressWarnings("resource")
-  private File installFile(URL platformUrl, String filePath) throws IOException, ProcessingException {
-    URL absSourceUrl = FileLocator.resolve(platformUrl);
+  private File installFile(String platformUrl, String filePath) throws IOException, ProcessingException, URISyntaxException {
+    URL absSourceUrl = FileLocator.resolve(URIUtil.toURL(URIUtil.fromString(platformUrl)));
     byte[] content = IOUtility.getContent(absSourceUrl.openStream());
     File destFile = new File(m_tempBuildDir + File.separator + filePath.replaceAll("\\\\\\/$", ""));
     if (!destFile.exists()) {

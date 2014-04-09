@@ -21,19 +21,23 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
+import org.eclipse.scout.sdk.operation.project.CreateTargetProjectOperation;
 import org.eclipse.scout.sdk.operation.project.FillClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.FillServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
+import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -91,15 +95,24 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
     if (!StringUtility.hasText(name) || name.trim().length() < 2) {
       name = getProperties().getProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, String.class);
     }
-    int lastDotPos = name.lastIndexOf('.');
-    name = Character.toUpperCase(name.charAt(lastDotPos + 1)) + name.substring(lastDotPos + 2);
+    name = NamingUtility.toJavaCamelCase(name, false);
+
+    IFile currentTargetFile = null;
+    try {
+      currentTargetFile = ResourceUtility.getCurrentTargetFile();
+    }
+    catch (CoreException e) {
+      ScoutSdk.logError("Unable to retrieve the current target file.", e);
+    }
 
     getProperties().setProperty(PROP_EXISTING_BUNDLE, m_project);
+    getProperties().setProperty(CreateTargetProjectOperation.PROP_TARGET_FILE, currentTargetFile);
+    getProperties().setProperty(PROP_TARGET_PLATFORM_VERSION, JdtUtility.getTargetPlatformVersion());
     getProperties().setProperty(FillClientPluginOperation.PROP_INSTALL_CLIENT_SESSION, false);
     getProperties().setProperty(FillClientPluginOperation.PROP_INSTALL_DESKTOP_EXT, true);
     getProperties().setProperty(CreateClientPluginOperation.PROP_INSTALL_ICONS, false);
     getProperties().setProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, name);
-    getProperties().setProperty(CreateSharedPluginOperation.PROP_DOC_TEXT_SERVICE_NAME, name + "Documentation");
+    getProperties().setProperty(CreateSharedPluginOperation.PROP_DOC_TEXT_SERVICE_NAME, name + ScoutProjectNewOperation.DOCUMENTATION_SVC_SUFFIX);
     getProperties().setProperty(CreateServerPluginOperation.PROP_INSTALL_HTML_RESOURCES, false);
     getProperties().setProperty(CreateServerPluginOperation.PROP_INSTALL_PRODUCTS, false);
     getProperties().setProperty(FillServerPluginOperation.PROP_INSTALL_ACCESS_CONTROL_SVC_CLASS, false);
@@ -205,14 +218,6 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
       pmh.save();
 
     }
-
-    /**
-     * Workaround: required because java files created with
-     * org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation do not fire all events!
-     * Also used in org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation
-     * Can be removed when InstallJavaFileOperation has been removed.
-     */
-    ScoutSdkCore.getHierarchyCache().invalidateAll();
 
     for (IJavaProject p : getCreatedBundlesList()) {
       String type = RuntimeBundles.getBundleType(p.getProject());

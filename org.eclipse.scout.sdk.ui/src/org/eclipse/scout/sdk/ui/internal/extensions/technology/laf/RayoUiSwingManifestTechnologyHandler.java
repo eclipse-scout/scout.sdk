@@ -15,7 +15,6 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.compatibility.P2Utility;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
@@ -31,33 +30,9 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
  */
 public class RayoUiSwingManifestTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {
 
-  private boolean m_newPluginsInstalled;
-
-  @Override
-  public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
-    m_newPluginsInstalled = false;
-    if (selected) {
-      FeatureInstallResult result = ensureFeatureInstalled(SCOUT_RAYO_LAF_FEATURE, SCOUT_RAYO_FEATURE_URL, monitor, RAYO_LAF_PLUGIN, RAYO_LAF_FRAGMENT);
-      if (FeatureInstallResult.LicenseNotAccepted.equals(result)) {
-        return false; // abort processing if the installation would be necessary but the license was not accepted.
-      }
-      else if (FeatureInstallResult.InstallationSuccessful.equals(result)) {
-        m_newPluginsInstalled = true; // remember if we have installed new plugins so that we can ask for a restart later on.
-      }
-    }
-    return true;
-  }
-
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedManifest(resources, selected, RAYO_LAF_PLUGIN);
-  }
-
-  @Override
-  public void postSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
-    if (m_newPluginsInstalled) {
-      P2Utility.promptForRestart();
-    }
   }
 
   @Override

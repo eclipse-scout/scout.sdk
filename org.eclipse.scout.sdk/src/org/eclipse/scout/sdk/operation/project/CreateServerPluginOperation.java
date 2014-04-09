@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.operation.project;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -96,7 +95,7 @@ public class CreateServerPluginOperation extends AbstractCreateScoutBundleOperat
       try {
         new InstallBinaryFileOperation("templates/server/resources/html/scout.gif", project, "resources/html/scout.gif").run(monitor, workingCopyManager);
       }
-      catch (MalformedURLException e) {
+      catch (Exception e) {
         throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not install 'resources/html/scout.gif'."));
       }
     }

@@ -4,15 +4,14 @@ import java.net.URI;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.LinkedHashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.SubMonitor;
 import org.eclipse.core.runtime.jobs.Job;
@@ -115,7 +114,7 @@ public class P2CompatService implements IP2CompatService {
   private IProvisioningAgent getAgent() throws CoreException {
     IPath stateLocation = ScoutCompatibilityActivator.getDefault().getStateLocation();
     URI stateLocationURI = stateLocation.toFile().toURI();
-    IProvisioningAgentProvider agentProvider = (IProvisioningAgentProvider) ScoutCompatibilityActivator.getDefault().acquireService(IProvisioningAgentProvider.SERVICE_NAME);
+    IProvisioningAgentProvider agentProvider = ScoutCompatibilityActivator.getDefault().acquireService(IProvisioningAgentProvider.class);
     if (agentProvider == null) {
       IStatus status = new Status(IStatus.ERROR, ScoutCompatibilityActivator.PLUGIN_ID, "Agent provider service not available");
       throw new CoreException(status);
@@ -152,12 +151,12 @@ public class P2CompatService implements IP2CompatService {
     for (int i = 0; i < rootIUs.length; i++) {
       String rootIuId = rootIUs[i];
       IQuery<IInstallableUnit> latestQuery = QueryUtil.createLatestQuery(QueryUtil.createIUQuery(rootIuId));
-      IQueryResult<IInstallableUnit> queryResult = metadataRepository.query(latestQuery, new NullProgressMonitor());
+      IQueryResult<IInstallableUnit> queryResult = metadataRepository.query(latestQuery, monitor);
       if (queryResult.isEmpty()) {
         String messag = "Feature <{0}> not found"; //$NON-NLS-1$
         Object[] arguments = new Object[]{
-              rootIuId
-          };
+            rootIuId
+        };
         String fmtMessage = MessageFormat.format(messag, arguments);
         IStatus status = new Status(IStatus.ERROR, ScoutCompatibilityActivator.PLUGIN_ID, fmtMessage);
         throw new CoreException(status);

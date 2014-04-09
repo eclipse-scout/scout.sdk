@@ -7,6 +7,9 @@ public final class PlatformVersionUtility {
 
   private static Version platformVersion = null;
 
+  public static final String EMPTY_VERSION_STR = "0.0.0";
+  public static final String ORG_ECLIPSE_PLATFORM = "org.eclipse.platform";
+
   /**
    * points to the newest supported version.
    * 
@@ -82,7 +85,7 @@ public final class PlatformVersionUtility {
 
   public static Version getPlatformVersion() {
     if (platformVersion == null) {
-      Version v = Platform.getBundle("org.eclipse.platform").getVersion();
+      Version v = Platform.getBundle(ORG_ECLIPSE_PLATFORM).getVersion();
       if (v.getMajor() == 3 && v.getMinor() == 3) {
         // eclipse galileo (3.5) uses platform version 3.3. older versions are not supported.
         v = new Version(3, 5, 0);

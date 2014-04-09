@@ -31,12 +31,10 @@ public class Docx4jManifestTechnologyHandler extends AbstractScoutTechnologyHand
   public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
     m_newPluginsInstalled = false;
     if (selected) {
-      FeatureInstallResult result = ensureFeaturesInstalled(new String[]{LOGGING_BRIDGE_FEATURE, XML_GRAPHICS_FEATURE_NAME, DOCX4J_CORE_FEATURE, DOCX4J_CLIENT_FEATURE, DOCX4J_LIBS_FEATURE, DOCX4J_SDK_FEATURE},
-          new String[]{SCOUT_LOGGING_BRIDGE_FEATURE_URL, ORBIT_UPDATESITE_URL, SCOUT_DOCX4J_FEATURE_URL, SCOUT_DOCX4J_FEATURE_URL, SCOUT_DOCX4J_FEATURE_URL, SCOUT_DOCX4J_FEATURE_URL}, monitor,
-          new String[]{LOGGING_BRIDGE_LOG4J_FRAGMENT},
+      FeatureInstallResult result = ensureFeaturesInstalled(new String[]{XML_GRAPHICS_FEATURE_NAME, DOCX4J_CORE_FEATURE, DOCX4J_LIBS_FEATURE, DOCX4J_SDK_FEATURE},
+          new String[]{ORBIT_UPDATESITE_URL, SCOUT_DOCX4J_FEATURE_URL, SCOUT_DOCX4J_FEATURE_URL, SCOUT_DOCX4J_FEATURE_URL}, monitor,
           new String[]{XML_GRAPHICS_PLUGIN_NAME, APACHE_COMMONS_PLUGIN_NAME, APACHE_COMMONS_LOGGING_PLUGIN_NAME},
           new String[]{DOCX4J_SCOUT_PLUGIN},
-          new String[]{DOCX4J_SCOUT_CLIENT_PLUGIN},
           new String[]{DOCX4J_PLUGIN,},
           new String[]{DOCX4J_SDK_PLUGIN});
       if (FeatureInstallResult.LicenseNotAccepted.equals(result)) {

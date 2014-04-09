@@ -13,13 +13,10 @@ package org.eclipse.scout.sdk.ui.internal.extensions.project.template;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
 import org.eclipse.scout.sdk.ui.extensions.project.template.IProjectTemplate;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
-import org.eclipse.scout.sdk.util.pde.LazyPluginModel;
 
 public class DesktopFormTemplate implements IProjectTemplate {
   @Override
@@ -44,9 +41,6 @@ public class DesktopFormTemplate implements IProjectTemplate {
 
   @Override
   public IStatus getStatus() {
-    if (LazyPluginModel.getBundles(IRuntimeClasses.ScoutClientBundleId).length < 1) {
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("TemplateNotPossibleTargetPlatform"));
-    }
     return Status.OK_STATUS;
   }
 }

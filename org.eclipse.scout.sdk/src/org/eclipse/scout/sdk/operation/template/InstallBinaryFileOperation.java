@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.operation.template;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.net.URL;
 
 import org.eclipse.core.resources.IProject;
@@ -23,6 +24,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -35,12 +37,12 @@ public class InstallBinaryFileOperation implements IOperation {
   private final IProject m_destinationProject;
   private final String m_destinationPath;
 
-  public InstallBinaryFileOperation(String srcPath, IProject destinationProject, String destinationPath) throws MalformedURLException {
-    this(new URL("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/" + srcPath.replaceAll("^[\\\\\\/]*", "")), destinationProject, destinationPath);
+  public InstallBinaryFileOperation(String srcPath, IProject destinationProject, String destinationPath) throws MalformedURLException, URISyntaxException {
+    this(URIUtil.toURL(URIUtil.fromString("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/" + srcPath.replaceAll("^[\\\\\\/]*", ""))), destinationProject, destinationPath);
   }
 
-  public InstallBinaryFileOperation(String sourceBundleId, String srcPath, IProject destinationProject, String destinationPath) throws MalformedURLException {
-    this(new URL("platform:/plugin/" + sourceBundleId + "/" + srcPath.replaceAll("^[\\\\\\/]*", "")), destinationProject, destinationPath);
+  public InstallBinaryFileOperation(String sourceBundleId, String srcPath, IProject destinationProject, String destinationPath) throws MalformedURLException, URISyntaxException {
+    this(URIUtil.toURL(URIUtil.fromString("platform:/plugin/" + sourceBundleId + "/" + srcPath.replaceAll("^[\\\\\\/]*", ""))), destinationProject, destinationPath);
   }
 
   public InstallBinaryFileOperation(URL sourceUrl, IProject destinationProject, String destinationPath) {

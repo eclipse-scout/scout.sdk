@@ -7,9 +7,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.Deque;
-import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.TreeMap;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -27,11 +28,11 @@ import org.eclipse.jdt.launching.JavaRuntime;
 import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.pde.internal.core.ICoreConstants;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -46,6 +47,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   private static final String EXT_ATTR_REF_TYPE_NAME = "execAfterReference";
   private static final String EXEC_ENV_PREFIX = "JavaSE-";
   private static final String MIN_JVM_VERSION = "1.6";
+  public static final String DOCUMENTATION_SVC_SUFFIX = "Documentation";
 
   public ScoutProjectNewOperation() {
   }
@@ -67,7 +69,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     // collect all registered operations
-    HashMap<String, P_OperationElement> ops = new HashMap<String, P_OperationElement>();
+    TreeMap<String, P_OperationElement> ops = new TreeMap<String, P_OperationElement>();
     IExtensionRegistry reg = Platform.getExtensionRegistry();
     IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXT_NAME);
     IExtension[] extensions = xp.getExtensions();
@@ -123,14 +125,6 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
 
     // add all invalid nodes to the end assuming that no one depends on them but they may depend on others (which are not present)
     collector.addAll(invalidNodes);
-
-    /**
-     * Workaround: required because java files created with
-     * org.eclipse.scout.sdk.operation.template.InstallJavaFileOperation do not fire all events!
-     * Also used in org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation
-     * Can be removed when InstallJavaFileOperation has been removed.
-     */
-    ScoutSdkCore.getHierarchyCache().invalidateAll();
 
     // execute the operations
     execOperations(monitor, workingCopyManager, collector.toArray(new P_OperationElement[collector.size()]));
@@ -218,11 +212,13 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     getProperties().setProperty(PROP_LOCALHOST, getHostName());
     getProperties().setProperty(PROP_CURRENT_DATE, SimpleDateFormat.getDateInstance(SimpleDateFormat.DEFAULT).format(new Date()));
     getProperties().setProperty(PROP_USER_NAME, ScoutUtility.getUsername());
-    getProperties().setProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, "Default");
-    getProperties().setProperty(CreateSharedPluginOperation.PROP_DOC_TEXT_SERVICE_NAME, "DefaultDocumentation");
+    String txtSvcName = NamingUtility.toJavaCamelCase(getProjectAlias(), false);
+    getProperties().setProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, txtSvcName);
+    getProperties().setProperty(CreateSharedPluginOperation.PROP_DOC_TEXT_SERVICE_NAME, txtSvcName + DOCUMENTATION_SVC_SUFFIX);
   }
 
   private void execOperations(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, P_OperationElement[] ops) throws CoreException, IllegalArgumentException {
+    monitor.beginTask(getOperationName(), ops.length);
     putInitialProperties();
     for (P_OperationElement opElement : ops) {
       // execute the pipeline as defined in IScoutProjectNewOperation
@@ -231,10 +227,12 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
       if (o.isRelevant()) {
         o.init();
         o.validate();
-        o.run(monitor, workingCopyManager);
+        o.run(new SubProgressMonitor(monitor, 1), workingCopyManager);
       }
+      monitor.worked(1);
     }
     ResourcesPlugin.getWorkspace().checkpoint(false);
+    monitor.done();
   }
 
   private static String getHostName() {

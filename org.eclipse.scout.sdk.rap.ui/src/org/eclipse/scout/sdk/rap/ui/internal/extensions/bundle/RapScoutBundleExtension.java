@@ -15,7 +15,6 @@ import java.util.List;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
@@ -31,7 +30,6 @@ import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
-import org.osgi.framework.Version;
 
 public class RapScoutBundleExtension implements INewScoutBundleHandler {
   private boolean m_rapUiSelected;
@@ -64,10 +62,6 @@ public class RapScoutBundleExtension implements INewScoutBundleHandler {
       IStatus s = ScoutUtility.validateNewBundleName(clientMobileBundleName);
       if (!s.isOK()) {
         return s;
-      }
-
-      if (PlatformVersionUtility.getPlatformVersion().compareTo(new Version(3, 6, 0)) < 0) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoRapBeforeHelios"));
       }
     }
     return Status.OK_STATUS;

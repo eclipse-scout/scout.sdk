@@ -10,33 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.rap.ui.internal.extensions.technology;
 
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.holders.BooleanHolder;
-import org.eclipse.scout.sdk.compatibility.License;
-import org.eclipse.scout.sdk.compatibility.P2Utility;
-import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
 import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
-import org.eclipse.scout.sdk.rap.ScoutSdkRap;
-import org.eclipse.scout.sdk.rap.operations.project.InstallTargetPlatformFileOperation;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.extensions.technology.ScoutTechnologyResource;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.dialog.LicenseDialog;
-import org.eclipse.scout.sdk.util.log.ScoutStatus;
-import org.eclipse.scout.sdk.util.resources.ResourceFilters;
-import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -55,89 +37,25 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
   private static final Version RAP_INCUBATOR_FEATURE_VERSION = new Version(1, 5, 100, "20130107-1047"); // the supported version. must be present at the update site
 
   private static final String SCOUT_INCUBATOR_FEATURE_NAME = "org.eclipse.scout.rt.ui.rap.incubator.filechooser.source.feature.group";
-  private static final String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/3.9";
+  private static final String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/4.0";
 
   @Override
   public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
-    if (!selected) {
-      return true;
-    }
-    try {
-      final BooleanHolder licAccepted = new BooleanHolder(false);
-      final Map<String, License[]> lic = P2Utility.getLicenses(new String[]{RAP_INCUBATOR_FEATURE_NAME}, new URI[]{new URI(RAP_INCUBATOR_UPDATE_SITE_URL)}, monitor);
-      Map<String, License[]> licScout = P2Utility.getLicenses(new String[]{SCOUT_INCUBATOR_FEATURE_NAME}, new URI[]{new URI(SCOUT_INCUBATOR_UPDATE_SITE_URL)}, monitor);
-      lic.putAll(licScout);
-
-      ScoutSdkUi.getDisplay().syncExec(new Runnable() {
-        @Override
-        public void run() {
-          LicenseDialog licDialog = new LicenseDialog(ScoutSdkUi.getShell(), lic);
-          if (licDialog.open() == Dialog.OK) {
-            licAccepted.setValue(true);
-          }
-        }
-      });
-      return licAccepted.getValue();
-    }
-    catch (URISyntaxException e) {
-      throw new CoreException(new ScoutStatus(e));
-    }
+    return showLicenseDialog(selected, monitor, new String[]{RAP_INCUBATOR_FEATURE_NAME, SCOUT_INCUBATOR_FEATURE_NAME},
+        new String[]{RAP_INCUBATOR_UPDATE_SITE_URL, SCOUT_INCUBATOR_UPDATE_SITE_URL});
   }
 
   @Override
   public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    String scoutIncubVersion = "0.0.0";
-    if (selected) {
-      try {
-        scoutIncubVersion = P2Utility.getLatestVersion(SCOUT_INCUBATOR_FEATURE_NAME, new URI(SCOUT_INCUBATOR_UPDATE_SITE_URL), monitor);
-      }
-      catch (URISyntaxException e) {
-        ScoutSdkRap.logError(e);
-      }
-    }
-
-    for (IScoutTechnologyResource r : resources) {
-      if (selected) {
-        TargetPlatformUtility.addInstallableUnitsToTarget(r.getResource(),
-            new String[]{RAP_INCUBATOR_FEATURE_NAME, SCOUT_INCUBATOR_FEATURE_NAME},
-            new String[]{RAP_INCUBATOR_FEATURE_VERSION.toString(), scoutIncubVersion},
-            new String[]{RAP_INCUBATOR_UPDATE_SITE_URL, SCOUT_INCUBATOR_UPDATE_SITE_URL});
-      }
-      else {
-        TargetPlatformUtility.removeInstallableUnitsFromTarget(r.getResource(), new String[]{RAP_INCUBATOR_FEATURE_NAME, SCOUT_INCUBATOR_FEATURE_NAME});
-      }
-    }
-    if (resources.length == 1) {
-      TargetPlatformUtility.resolveTargetPlatform(resources[0].getResource(), true, monitor);
-    }
+    selectionChangedTargetFiles(resources, selected, monitor,
+        new String[]{RAP_INCUBATOR_FEATURE_NAME, SCOUT_INCUBATOR_FEATURE_NAME}, new String[]{RAP_INCUBATOR_FEATURE_VERSION.toString(), null},
+        new String[]{RAP_INCUBATOR_UPDATE_SITE_URL, SCOUT_INCUBATOR_UPDATE_SITE_URL});
   }
 
   @Override
-  public TriState getSelection(IScoutBundle project) {
-    ScoutTechnologyResource[] targetFiles = getTargetFiles(project);
-    if (targetFiles.length < 1) {
-      return TriState.FALSE;
-    }
-
-    TriState ret = TriState.parseTriState(containsIncubator(targetFiles[0].getResource()));
-    for (int i = 1; i < targetFiles.length; i++) {
-      TriState tmp = TriState.parseTriState(containsIncubator(targetFiles[i].getResource()));
-      if (ret != tmp) {
-        return TriState.UNDEFINED;
-      }
-    }
-    return ret;
-  }
-
-  private boolean containsIncubator(IFile targetFile) {
-    try {
-      String content = ResourceUtility.getContent(targetFile);
-      return content.contains(SCOUT_INCUBATOR_FEATURE_NAME) && content.contains(RAP_INCUBATOR_FEATURE_NAME);
-    }
-    catch (CoreException e) {
-      ScoutSdkRap.logError(e);
-      return false;
-    }
+  public TriState getSelection(IScoutBundle project) throws CoreException {
+    List<ScoutTechnologyResource> targetFiles = getTargetFiles();
+    return getSelectionTargetFileContainsFeature(targetFiles, SCOUT_INCUBATOR_FEATURE_NAME, RAP_INCUBATOR_FEATURE_NAME);
   }
 
   @Override
@@ -145,28 +63,8 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
     return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutSdkRapConstants.TYPE_UI_RAP), false) != null;
   }
 
-  private static ScoutTechnologyResource[] getTargetFiles(IScoutBundle project) {
-    final ArrayList<ScoutTechnologyResource> ret = new ArrayList<ScoutTechnologyResource>();
-    for (IScoutBundle b : project.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true)) {
-      try {
-        final IScoutBundle bundle = b;
-        IResource[] targetFiles = ResourceUtility.getAllResources(bundle.getProject(), ResourceFilters.getTargetFileFilter());
-        for (IResource r : targetFiles) {
-          boolean checked = InstallTargetPlatformFileOperation.TARGET_FILE_NAME.equals(r.getName());
-          ret.add(new ScoutTechnologyResource(bundle, (IFile) r, checked));
-        }
-      }
-      catch (CoreException e) {
-        ScoutSdkRap.logError(e);
-      }
-    }
-    return ret.toArray(new ScoutTechnologyResource[ret.size()]);
-  }
-
   @Override
-  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) {
-    for (ScoutTechnologyResource r : getTargetFiles(project)) {
-      list.add(r);
-    }
+  protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
+    list.addAll(getTargetFiles());
   }
 }

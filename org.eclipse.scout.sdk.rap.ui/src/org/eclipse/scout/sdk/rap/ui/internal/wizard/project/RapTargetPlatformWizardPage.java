@@ -12,26 +12,22 @@ package org.eclipse.scout.sdk.rap.ui.internal.wizard.project;
 
 import java.io.File;
 import java.io.FilenameFilter;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.compatibility.P2Utility;
-import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
+import org.eclipse.scout.sdk.operation.util.InstallTargetPlatformFileOperation;
 import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
+import org.eclipse.scout.sdk.rap.operations.project.AppendRapTargetOperation;
+import org.eclipse.scout.sdk.rap.operations.project.AppendRapTargetOperation.TARGET_STRATEGY;
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
-import org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation;
-import org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation.TARGET_STRATEGY;
-import org.eclipse.scout.sdk.rap.operations.project.InstallTargetPlatformFileOperation;
 import org.eclipse.scout.sdk.rap.ui.internal.ScoutSdkRapUI;
 import org.eclipse.scout.sdk.ui.fields.FileSelectionField;
 import org.eclipse.scout.sdk.ui.fields.IFileSelectionListener;
@@ -50,8 +46,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
-import org.eclipse.swt.widgets.MessageBox;
-import org.osgi.framework.Version;
 
 public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
@@ -61,11 +55,8 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   private static final String PROP_TARGET_STRATEGY = "propTargetStrategy";
   private static final String PROP_LOCAL_TARGET_FOLDER = "propLocalTargetFolder";
   private static final String PROP_EXTRACT_TARGET_FOLDER = "propExtractTargetFolder";
-  private static final String PROP_DOWNLOAD_ECLIPSE_PLATFORM = "propDownloadEclipsePlatform";
 
   private static final int LABEL_PERCENTAGE = 20;
-
-  private boolean m_messageShown;
 
   private Button m_extractButton;
   private Button m_remoteButton;
@@ -74,11 +65,9 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
   private Control m_extractTargetGroup;
   private Control m_localTargetGroup;
-  private Control m_remoteTargetGroup;
 
   private FileSelectionField m_extractTargetLocationField;
   private FileSelectionField m_localTargetLocationField;
-  private Button m_includeRemoteRequirementsButton;
 
   private TARGET_STRATEGY[] m_offeredTargetStrategies;
 
@@ -89,9 +78,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   public RapTargetPlatformWizardPage(TARGET_STRATEGY[] offeredTargetStrategies) {
     super(RapTargetPlatformWizardPage.class.getName());
     setTitle(Texts.get("RapTargetDownloadWizardPageTitle"));
-    setIsDownloadEclipsePlatformInternal(false);
     initOfferedTargetStrategies(offeredTargetStrategies);
-    m_messageShown = false;
 
     File defRap = getDefaultRapLocation();
     if (defRap != null && defRap.exists() && isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING)) {
@@ -173,15 +160,6 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
       m_localTargetGroup.setLayoutData(localGroupData);
     }
 
-    if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_REMOTE)) {
-      m_remoteTargetGroup = createRemoteGroup(parent);
-      m_remoteTargetGroup.setVisible(TARGET_STRATEGY.STRATEGY_REMOTE.equals(getTargetStrategy()));
-
-      GridData remoteGroupData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-      remoteGroupData.exclude = !TARGET_STRATEGY.STRATEGY_REMOTE.equals(getTargetStrategy());
-      m_remoteTargetGroup.setLayoutData(remoteGroupData);
-    }
-
     //layout
     parent.setLayout(new GridLayout(1, true));
   }
@@ -236,33 +214,6 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     // layout
     group.setLayout(new GridLayout(1, true));
     m_extractTargetLocationField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
-
-    return group;
-  }
-
-  private Control createRemoteGroup(Composite parent) {
-    Group group = new Group(parent, SWT.SHADOW_ETCHED_IN);
-    group.setText(Texts.get("DownloadRAPTarget"));
-    m_includeRemoteRequirementsButton = new Button(group, SWT.CHECK);
-    m_includeRemoteRequirementsButton.setSelection(isDownloadEclipsePlatform());
-    m_includeRemoteRequirementsButton.setText(Texts.get("DownloadEclipsePlatformAsWell"));
-    m_includeRemoteRequirementsButton.addSelectionListener(new SelectionAdapter() {
-      @Override
-      public void widgetSelected(SelectionEvent e) {
-        if (m_includeRemoteRequirementsButton.getSelection() && !m_messageShown && !PlatformVersionUtility.isLatest()) {
-          MessageBox msgBox = new MessageBox(m_includeRemoteRequirementsButton.getShell(), SWT.OK | SWT.ICON_WARNING);
-          msgBox.setMessage(Texts.get("RapTargetInfoMessage"));
-          msgBox.open();
-          m_messageShown = true;
-        }
-        setIsDownloadEclipsePlatformInternal(m_includeRemoteRequirementsButton.getSelection());
-        pingStateChanging();
-      }
-    });
-
-    // layout
-    group.setLayout(new GridLayout(1, true));
-    m_includeRemoteRequirementsButton.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
     return group;
   }
@@ -330,17 +281,9 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   public void putProperties(PropertyMap properties) {
     Set<String> checkedNodeIds = properties.getProperty(IScoutProjectNewOperation.PROP_PROJECT_CHECKED_NODES, Set.class);
     if (checkedNodeIds != null && checkedNodeIds.contains(CreateUiRapPluginOperation.BUNDLE_ID)) {
-      properties.setProperty(FillUiRapPluginOperation.PROP_LOCAL_TARGET_FOLDER, getLocalTargetFolder());
-      properties.setProperty(FillUiRapPluginOperation.PROP_EXTRACT_TARGET_FOLDER, getExtractTargetFolder());
-      properties.setProperty(FillUiRapPluginOperation.PROP_TARGET_STRATEGY, getTargetStrategy());
-      properties.setProperty(FillUiRapPluginOperation.PROP_DOWNLOAD_ECLIPSE_PLATFORM, isDownloadEclipsePlatform());
-
-      if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_REMOTE && isDownloadEclipsePlatform()) {
-        Version v = getRemotePlatformVersion();
-        if (v != null) {
-          properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, v);
-        }
-      }
+      properties.setProperty(AppendRapTargetOperation.PROP_LOCAL_TARGET_FOLDER, getLocalTargetFolder());
+      properties.setProperty(AppendRapTargetOperation.PROP_EXTRACT_TARGET_FOLDER, getExtractTargetFolder());
+      properties.setProperty(AppendRapTargetOperation.PROP_TARGET_STRATEGY, getTargetStrategy());
     }
   }
 
@@ -348,17 +291,6 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   public void performHelp() {
     //TODO: remove external link and use eclipse help instead
     ResourceUtility.showUrlInBrowser("http://wiki.eclipse.org/Scout/HowTo/3.9/Create_a_new_project#Step_3_.28Optional.29");
-  }
-
-  private Version getRemotePlatformVersion() {
-    try {
-      String version = P2Utility.getLatestVersion(FillUiRapPluginOperation.ECLIPSE_PLATFORM_FEATURE,
-          new URI(FillUiRapPluginOperation.UPDATE_SITE_URL), new NullProgressMonitor());
-      return new Version(version);
-    }
-    catch (Exception e) {
-      return null;
-    }
   }
 
   public void setTargetStrategy(TARGET_STRATEGY strategy) {
@@ -406,27 +338,6 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
   public TARGET_STRATEGY getTargetStrategy() {
     return (TARGET_STRATEGY) getProperty(PROP_TARGET_STRATEGY);
-  }
-
-  public Boolean isDownloadEclipsePlatform() {
-    return (Boolean) getProperty(PROP_DOWNLOAD_ECLIPSE_PLATFORM);
-  }
-
-  public void setIsDownloadEclipsePlatform(Boolean val) {
-    try {
-      setStateChanging(true);
-      setIsDownloadEclipsePlatformInternal(val);
-      if (isControlCreated() && m_includeRemoteRequirementsButton != null) {
-        m_includeRemoteRequirementsButton.setSelection(val);
-      }
-    }
-    finally {
-      setStateChanging(false);
-    }
-  }
-
-  private void setIsDownloadEclipsePlatformInternal(Boolean val) {
-    setProperty(PROP_DOWNLOAD_ECLIPSE_PLATFORM, val);
   }
 
   public String getExtractTargetFolder() {
@@ -545,16 +456,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
       }
     }
     else if (TARGET_STRATEGY.STRATEGY_REMOTE.equals(getTargetStrategy())) {
-      if (isDownloadEclipsePlatform()) {
-        int severity = IStatus.INFO;
-        if (!PlatformVersionUtility.isLatest()) {
-          severity = IStatus.WARNING;
-        }
-        return new Status(severity, ScoutSdkRapUI.PLUGIN_ID, Texts.get("RapTargetAndEclipseDownload"));
-      }
-      else {
-        return new Status(IStatus.INFO, ScoutSdkRapUI.PLUGIN_ID, Texts.get("TheRAPTargetWillBeDownloaded"));
-      }
+      return new Status(IStatus.INFO, ScoutSdkRapUI.PLUGIN_ID, Texts.get("TheRAPTargetWillBeDownloaded"));
     }
     else if (TARGET_STRATEGY.STRATEGY_LATER.equals(getTargetStrategy())) {
       return new Status(IStatus.INFO, ScoutSdkRapUI.PLUGIN_ID, Texts.get("NoRAPTargetWillBeSet"));
@@ -571,7 +473,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
     if (!isRapTargetPluginAvailable) {
       // the rap target plugin is not installed: filter the strategy out if it is in the list
-      ArrayList<TARGET_STRATEGY> strategies = new ArrayList<FillUiRapPluginOperation.TARGET_STRATEGY>(offeredTargetStrategies.length);
+      ArrayList<TARGET_STRATEGY> strategies = new ArrayList<TARGET_STRATEGY>(offeredTargetStrategies.length);
       for (TARGET_STRATEGY s : offeredTargetStrategies) {
         if (!TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT.equals(s)) {
           strategies.add(s);
@@ -597,12 +499,6 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
         ((GridData) m_localTargetGroup.getLayoutData()).exclude = !localVisible;
       }
 
-      if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_REMOTE)) {
-        boolean remoteVisible = m_remoteTargetGroup == toBeVisible;
-        m_remoteTargetGroup.setVisible(remoteVisible);
-        ((GridData) m_remoteTargetGroup.getLayoutData()).exclude = !remoteVisible;
-      }
-
       if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT)) {
         boolean extractVisible = m_extractTargetGroup == toBeVisible;
         m_extractTargetGroup.setVisible(extractVisible);
@@ -621,7 +517,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
           setGroupVisible(m_extractTargetGroup);
           break;
         case STRATEGY_REMOTE:
-          setGroupVisible(m_remoteTargetGroup);
+          setGroupVisible(null);
           break;
         case STRATEGY_LATER:
           setGroupVisible(null);

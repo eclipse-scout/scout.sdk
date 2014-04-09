@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.dialog;
 
+import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -24,6 +27,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.compatibility.License;
 import org.eclipse.swt.SWT;
@@ -62,7 +66,17 @@ public class LicenseDialog extends TitleAreaDialog {
     super(parentShell);
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setHelpAvailable(false);
-    m_iuToLicenses = iuToLicenses;
+    if (iuToLicenses == null) {
+      m_iuToLicenses = Collections.emptyMap();
+    }
+    else {
+      m_iuToLicenses = new LinkedHashMap<String, License[]>(iuToLicenses.size());
+      for (Entry<String, License[]> entry : iuToLicenses.entrySet()) {
+        if (StringUtility.hasText(entry.getKey()) && entry.getValue() != null && entry.getValue().length > 0) {
+          m_iuToLicenses.put(entry.getKey(), entry.getValue());
+        }
+      }
+    }
     m_complete = false;
   }
 

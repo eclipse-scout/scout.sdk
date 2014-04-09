@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
-import java.net.MalformedURLException;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -77,7 +76,7 @@ public class CreateUiSwingPluginOperation extends AbstractCreateScoutBundleOpera
       getProperties().setProperty(PROP_PRODUCT_FILE_PROD, prodProdInstallOp.getCreatedFile());
       addCreatedProductFile(prodProdInstallOp.getCreatedFile());
     }
-    catch (MalformedURLException e) {
+    catch (Exception e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));
     }
   }

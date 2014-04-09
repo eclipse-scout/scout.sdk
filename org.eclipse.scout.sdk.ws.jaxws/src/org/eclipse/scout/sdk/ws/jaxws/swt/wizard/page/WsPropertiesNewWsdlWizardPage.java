@@ -11,8 +11,6 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page;
 
 import java.beans.PropertyChangeListener;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -23,6 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
@@ -691,9 +690,9 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
     }
     else {
       try {
-        new URL(m_targetNamespaceField.getText());
+        URIUtil.toURL(URIUtil.fromString(m_targetNamespaceField.getText()));
       }
-      catch (MalformedURLException e) {
+      catch (Exception e) {
         multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("TargetNamespaceMustBeValudUrl")));
       }
 

@@ -42,6 +42,7 @@ import org.eclipse.jdt.internal.core.util.PublicScanner;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.State;
+import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.pde.LazyPluginModel;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -247,6 +248,14 @@ public final class JdtUtility {
     return null;
   }
 
+  public static Version getTargetPlatformVersion() {
+    BundleDescription platform = getNewestBundleInActiveTargetPlatform(PlatformVersionUtility.ORG_ECLIPSE_PLATFORM);
+    if (platform != null) {
+      return platform.getVersion();
+    }
+    return null;
+  }
+
   private static IJavaElement findJavaElement(IJavaElement element, int offset, int lenght) throws JavaModelException {
     if (element == null) {
       return null;
@@ -385,9 +394,13 @@ public final class JdtUtility {
    * 
    * @param pluginIds
    *          the plugin Ids to search
-   * @return true if every plugin passed exists in the given platform, false otherwise.
+   * @return true if every plugin passed exists in the given platform, false otherwise. If an empty or null list is
+   *         passed, this method returns true.
    */
   public static boolean areAllPluginsInstalled(String... pluginIds) {
+    if (pluginIds == null) {
+      return true;
+    }
     for (String pluginId : pluginIds) {
       Bundle b = Platform.getBundle(pluginId);
       if (b == null) {

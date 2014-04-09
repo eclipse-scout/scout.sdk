@@ -39,8 +39,7 @@ public class DerbyJdbcProdTechnologyHandler extends AbstractScoutTechnologyHandl
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    return getSelectionProductFiles(getServerBundlesBelow(project),
-        new String[]{IRuntimeClasses.ScoutServerBundleId},
+    return getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutServerBundleId},
         new String[]{DERBY_JDBC_FRAGMENT, DERBY_JDBC_PLUGIN});
   }
 
@@ -51,10 +50,6 @@ public class DerbyJdbcProdTechnologyHandler extends AbstractScoutTechnologyHandl
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getServerBundlesBelow(project), list, IRuntimeClasses.ScoutServerBundleId);
-  }
-
-  private IScoutBundle[] getServerBundlesBelow(IScoutBundle start) {
-    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
+    contributeProductFiles(list, IRuntimeClasses.ScoutServerBundleId);
   }
 }

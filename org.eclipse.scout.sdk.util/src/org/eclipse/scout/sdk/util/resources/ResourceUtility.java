@@ -41,6 +41,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jdt.core.IOpenable;
 import org.eclipse.jdt.core.JavaModelException;
@@ -49,6 +50,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.osgi.service.datalocation.Location;
 import org.eclipse.scout.commons.FileUtility;
 import org.eclipse.scout.commons.IOUtility;
+import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 
@@ -89,6 +91,25 @@ public final class ResourceUtility {
   }
 
   /**
+   * @return The {@link IFile} defining the currently active target platform or null if no such file exists in the
+   *         workspace.
+   * @throws CoreException
+   */
+  public static IFile getCurrentTargetFile() throws CoreException {
+    URI currentTargetFile = TargetPlatformUtility.getCurrentTargetFile();
+    if (currentTargetFile != null) {
+      File f = URIUtil.toFile(currentTargetFile);
+      Path p = new Path(f.getAbsolutePath());
+      IPath filePath = p.makeRelativeTo(ResourcesPlugin.getWorkspace().getRoot().getLocation());
+      IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(filePath);
+      if (exists(file)) {
+        return file;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Tries to open the given url in the system default browser.
    * 
    * @param url
@@ -99,7 +120,7 @@ public final class ResourceUtility {
       if (Desktop.isDesktopSupported()) {
         Desktop d = Desktop.getDesktop();
         if (d.isSupported(Desktop.Action.BROWSE)) {
-          d.browse(new URI(url));
+          d.browse(URIUtil.fromString(url));
         }
       }
     }

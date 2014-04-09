@@ -14,7 +14,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.security.SecureRandom;
@@ -43,6 +42,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.BooleanUtility;
 import org.eclipse.scout.commons.IOUtility;
@@ -611,9 +611,9 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
 
     URL url;
     try {
-      url = new URL(getUrl());
+      url = URIUtil.toURL(URIUtil.fromString(getUrl()));
     }
-    catch (MalformedURLException e) {
+    catch (Exception e) {
       multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("PleaseEnterValidUrl")));
       return;
     }

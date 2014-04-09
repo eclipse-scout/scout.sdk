@@ -103,7 +103,7 @@ public class PropertyViewExtensionPoint {
         try {
           clazz = (Class<? extends T>) bundle.loadClass(clazzName);
         }
-        catch (Throwable tt) {
+        catch (Exception tt) {
           ScoutSdkUi.logWarning("could not load class '" + clazzName + "' of bunlde '" + bundle.getSymbolicName() + "'.", tt);
         }
       }

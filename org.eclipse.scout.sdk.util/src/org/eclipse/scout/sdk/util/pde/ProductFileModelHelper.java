@@ -26,6 +26,7 @@ import org.eclipse.pde.internal.core.iproduct.IProductModel;
 import org.eclipse.pde.internal.core.iproduct.IProductPlugin;
 import org.eclipse.pde.internal.core.product.ProductFeature;
 import org.eclipse.pde.internal.core.product.ProductPlugin;
+import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.osgi.framework.Version;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -463,7 +464,7 @@ public final class ProductFileModelHelper {
     @Override
     public void write(String indent, PrintWriter writer) {
       writer.print(indent + "<plugin id=\"" + getId() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
-      if (getVersion() != null && getVersion().length() > 0 && !getVersion().equals("0.0.0")) { //$NON-NLS-1$
+      if (getVersion() != null && getVersion().length() > 0 && !PlatformVersionUtility.EMPTY_VERSION_STR.equals(getVersion())) {
         writer.print(" version=\"" + getVersion() + "\""); //$NON-NLS-1$ //$NON-NLS-2$
       }
 

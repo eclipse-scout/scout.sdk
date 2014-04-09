@@ -57,7 +57,6 @@ public class P2CompatService implements IP2CompatService {
 
   @Override
   public void installUnits(String[] rootIUs, URI[] p2RepositoryURIs, IProgressMonitor monitor) throws CoreException {
-
     ArrayList<IInstallableUnit> toInstall = new ArrayList<IInstallableUnit>(rootIUs.length);
     for (int i = 0; i < Math.min(rootIUs.length, p2RepositoryURIs.length); i++) {
       IInstallableUnit[] units = getInstallableUnits(new String[]{rootIUs[i]}, getMetadataRepository(p2RepositoryURIs[i], monitor), monitor);
@@ -127,7 +126,7 @@ public class P2CompatService implements IP2CompatService {
   private IProvisioningAgent getAgent() throws CoreException {
     IPath stateLocation = ScoutCompatibilityActivator.getDefault().getStateLocation();
     URI stateLocationURI = stateLocation.toFile().toURI();
-    IProvisioningAgentProvider agentProvider = (IProvisioningAgentProvider) ScoutCompatibilityActivator.getDefault().acquireService(IProvisioningAgentProvider.SERVICE_NAME);
+    IProvisioningAgentProvider agentProvider = ScoutCompatibilityActivator.getDefault().acquireService(IProvisioningAgentProvider.class);
     if (agentProvider == null) {
       IStatus status = new Status(IStatus.ERROR, ScoutCompatibilityActivator.PLUGIN_ID, "Agent provider service not available");
       throw new CoreException(status);

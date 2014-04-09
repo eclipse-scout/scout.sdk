@@ -1,12 +1,14 @@
 package org.eclipse.scout.sdk.compatibility;
 
 import java.io.File;
+import java.net.URI;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
 import org.eclipse.scout.sdk.compatibility.internal.ScoutCompatibilityActivator;
 import org.eclipse.scout.sdk.compatibility.internal.service.ITargetPlatformCompatService;
 
@@ -35,7 +37,16 @@ public final class TargetPlatformUtility {
   }
 
   /**
-   * Resolves (and optionaly loads) the target specified by the given .target file.<br>
+   * @return Gets the {@link URI} pointing to the file that defines the current target platform or null.
+   * @throws CoreException
+   */
+  public static URI getCurrentTargetFile() throws CoreException {
+    ITargetPlatformCompatService svc = getService();
+    return svc.getCurrentTargetFile();
+  }
+
+  /**
+   * Resolves (and optionally loads) the target specified by the given .target file.<br>
    * If the platform defined by the given file cannot be resolved, it will not be loaded even if loadPlatform is set to
    * true.
    * 
@@ -96,22 +107,41 @@ public final class TargetPlatformUtility {
   }
 
   /**
-   * Adds the given installable units to the given .target file.<br>
-   * Please note that unitIds, versions and repositories must be of equal size.
+   * Adds the given installable unit to the given .target file.
+   * 
+   * @param targetFile
+   *          The target file to which the given unit should be added.
+   * @param unitId
+   *          The id of the unit to add
+   * @param version
+   *          The version of the unit. Use a concrete version if desired or
+   *          {@link PlatformVersionUtility#EMPTY_VERSION_STR} if no special version is required. When passing
+   *          <code>null</code> the given repository is queried for the currently newest version and this version is
+   *          written into the target file.
+   * @param repository
+   *          The repository where to find the unit to install.
+   * @param monitor
+   *          The progress monitor used when <code>null</code> is given for the version parameter and the newest version
+   *          must be calculated from the given repository.
+   * @throws CoreException
+   */
+  public static void addInstallableUnitToTarget(IFile targetFile, final String unitId, final String version, final String repository, IProgressMonitor monitor) throws CoreException {
+    ITargetPlatformCompatService svc = getService();
+    svc.addInstallableUnitToTarget(targetFile, unitId, version, repository, monitor);
+  }
+
+  /**
+   * Adds the given directory entries to the given .target file.
    * 
    * @param targetFile
    *          The file that should be modified.
-   * @param unitIds
-   *          The Ids of the installable units to add.
-   * @param versions
-   *          The version constraints of the units.
-   * @param repositories
-   *          The URI where to find the corresponding installable unit.
+   * @param dirs
+   *          The directories to add
    * @throws CoreException
    */
-  public static void addInstallableUnitsToTarget(IFile targetFile, String[] unitIds, String[] versions, String[] repositories) throws CoreException {
+  public static void addDirectoryToTarget(IFile targetFile, String[] dirs) throws CoreException {
     ITargetPlatformCompatService svc = getService();
-    svc.addInstallableUnitsToTarget(targetFile, unitIds, versions, repositories);
+    svc.addDirectoryLocationToTarget(targetFile, dirs);
   }
 
   /**

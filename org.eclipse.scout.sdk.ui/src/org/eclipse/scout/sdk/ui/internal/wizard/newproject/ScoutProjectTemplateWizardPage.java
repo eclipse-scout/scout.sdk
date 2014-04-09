@@ -161,10 +161,13 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
 
   private void handleSelection(ProjectTemplateExtension selectedItem) {
     m_selectedTemplate = selectedItem;
-    if (isControlCreated()) {
-      String description = "";
+    if (m_descriptionLabel != null) {
+      String description = null;
       if (m_selectedTemplate != null) {
         description = m_selectedTemplate.getTemplate().getDescription();
+      }
+      if (description == null) {
+        description = "";
       }
       m_descriptionLabel.setText(description);
     }

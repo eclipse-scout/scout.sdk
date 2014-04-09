@@ -59,17 +59,16 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    TriState ret = getSelectionProductFiles(getSwingBundlesBelow(project),
-        new String[]{IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId},
+    TriState ret = getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId},
         new String[]{RAYO_LAF_PLUGIN, RAYO_LAF_FRAGMENT});
 
-    P_TechProductFile[] productFiles = getFilteredProductFiles(getSwingBundlesBelow(project), new String[]{IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId});
-    if (productFiles == null || productFiles.length == 0) {
+    List<P_TechProductFile> productFiles = getFilteredProductFiles(new String[]{IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId});
+    if (productFiles.size() == 0) {
       return null;
     }
 
-    for (int i = 0; i < productFiles.length; i++) {
-      TriState tmp = TriState.parseTriState(isRayoLafEnabledInConfigIni(productFiles[i].productFile));
+    for (int i = 0; i < productFiles.size(); i++) {
+      TriState tmp = TriState.parseTriState(isRayoLafEnabledInConfigIni(productFiles.get(i).productFile));
       if (ret != tmp) {
         return TriState.UNDEFINED;
       }
@@ -84,7 +83,7 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getSwingBundlesBelow(project), list, IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId);
+    contributeProductFiles(list, IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutUiSwingBundleId);
   }
 
   private boolean isRayoLafEnabledInConfigIni(IFile productFile) {
@@ -97,9 +96,5 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
       ScoutSdkUi.logError("cannot parse product file: " + productFile, e);
       return false;
     }
-  }
-
-  private IScoutBundle[] getSwingBundlesBelow(IScoutBundle start) {
-    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
   }
 }

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.extensions.technology;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
@@ -67,7 +69,7 @@ public interface IScoutTechnologyHandler {
    *          the corresponding scout project
    * @return The resources that can be modified
    */
-  IScoutTechnologyResource[] getModifactionResourceCandidates(IScoutBundle project) throws CoreException;
+  List<IScoutTechnologyResource> getModifactionResourceCandidates(IScoutBundle project) throws CoreException;
 
   /**
    * specifies if the handler is active. an inactive handler is never used. it cannot contribute resources and will not

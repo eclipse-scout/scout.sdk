@@ -39,9 +39,7 @@ public class Postgres9JdbcProdTechnologyHandler extends AbstractScoutTechnologyH
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    return getSelectionProductFiles(getServerBundlesBelow(project),
-        new String[]{IRuntimeClasses.ScoutServerBundleId},
-        new String[]{POSTGRES_JDBC_FRAGMENT, POSTGRES_JDBC_PLUGIN});
+    return getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutServerBundleId}, new String[]{POSTGRES_JDBC_FRAGMENT, POSTGRES_JDBC_PLUGIN});
   }
 
   @Override
@@ -51,10 +49,6 @@ public class Postgres9JdbcProdTechnologyHandler extends AbstractScoutTechnologyH
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getServerBundlesBelow(project), list, IRuntimeClasses.ScoutServerBundleId);
-  }
-
-  private IScoutBundle[] getServerBundlesBelow(IScoutBundle start) {
-    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
+    contributeProductFiles(list, IRuntimeClasses.ScoutServerBundleId);
   }
 }

@@ -4,6 +4,11 @@
    <extension
          point="org.eclipse.scout.sdk.newProjectOperation">
       <operation
+            class="org.eclipse.scout.sdk.rap.operations.project.AppendRapTargetOperation"
+            id="create.ui.rap.target"
+            referenceId="create.target">
+      </operation>
+      <operation
             class="org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation"
             id="create.ui.rap"
             referenceId="create.client">
@@ -37,11 +42,6 @@
             class="org.eclipse.scout.sdk.rap.operations.project.FillUiRapPluginOperation"
             id="fill.ui.rap"
             referenceId="create.ui.rap">
-      </operation>
-      <operation
-            class="org.eclipse.scout.sdk.rap.operations.project.LoadRapTargetPlatformOperation"
-            id="finalize.targetplatform.load"
-            referenceId="fill.ui.rap">
       </operation>
       <operation
             class="org.eclipse.scout.sdk.rap.operations.project.RapProductJettyUpgradeOperation"

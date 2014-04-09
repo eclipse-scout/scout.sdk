@@ -41,9 +41,7 @@ public class FileChooserRapProductTechnologyHandler extends AbstractScoutTechnol
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    return getSelectionProductFiles(getRapUiBundlesBelow(project),
-        new String[]{IRuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId},
-        RAP_FILE_CHOOSER_PLUGINS);
+    return getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId}, RAP_FILE_CHOOSER_PLUGINS);
   }
 
   @Override
@@ -53,10 +51,6 @@ public class FileChooserRapProductTechnologyHandler extends AbstractScoutTechnol
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(getRapUiBundlesBelow(project), list, IRuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId);
-  }
-
-  private IScoutBundle[] getRapUiBundlesBelow(IScoutBundle start) {
-    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutSdkRapConstants.TYPE_UI_RAP), true);
+    contributeProductFiles(list, IRuntimeClasses.ScoutClientBundleId, IScoutSdkRapConstants.ScoutUiRapBundleId);
   }
 }

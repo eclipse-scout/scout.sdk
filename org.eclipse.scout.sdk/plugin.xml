@@ -141,8 +141,18 @@
    <extension
          point="org.eclipse.scout.sdk.newProjectOperation">
       <operation
+            class="org.eclipse.scout.sdk.operation.project.CreateTargetProjectOperation"
+            id="create.target">
+      </operation>
+      <operation
+            class="org.eclipse.scout.sdk.operation.project.NewProjectLoadTargetOperation"
+            id="load.target"
+            referenceId="create.target">
+      </operation>
+      <operation
             class="org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation"
-            id="create.shared">
+            id="create.shared"
+            referenceId="load.target">
       </operation>
       <operation
             class="org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation"
