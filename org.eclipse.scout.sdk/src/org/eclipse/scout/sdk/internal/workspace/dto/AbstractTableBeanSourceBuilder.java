@@ -334,13 +334,19 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getRowTypeMethodBuilder), getRowTypeMethodBuilder);
   }
 
-  private String getTableRowDataSuperClassSignature(IType table) throws CoreException {
-    if (!SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTablePageData).equals(getSuperTypeSignature())) {
+  protected String getTableRowDataSuperClassSignature(IType table) throws CoreException {
+    if (!SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTablePageData).equals(getSuperTypeSignature()) &&
+        !SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableFieldBeanData).equals(getSuperTypeSignature())) {
       // use the row data in the super page data.
       IType superType = TypeUtility.getTypeBySignature(getSuperTypeSignature());
-      IType[] rowData = superType.getTypes(); // can only be a row data
-      if (rowData.length > 0) {
-        return SignatureCache.createTypeSignature(rowData[0].getFullyQualifiedName());
+      IType[] rowDatas = superType.getTypes();
+      IType abstractTableRowData = TypeUtility.getType(IRuntimeClasses.AbstractTableRowData);
+
+      // search the row data in the super type
+      for (IType t : rowDatas) {
+        if (TypeUtility.getSuperTypeHierarchy(t).contains(abstractTableRowData)) {
+          return SignatureCache.createTypeSignature(t.getFullyQualifiedName());
+        }
       }
     }
     return SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableRowData);
