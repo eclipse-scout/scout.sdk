@@ -14,7 +14,6 @@ import org.junit.runners.Suite.SuiteClasses;
  * @since 1.0.8 18.02.2011
  */
 @RunWith(Suite.class)
-//@SuiteClasses({FormWithTemplateTest.class, TemplateFormDataTest.class})
 @SuiteClasses({
     ExternalCheckboxFieldTest.class,
     ExternalGroupboxTest.class,
