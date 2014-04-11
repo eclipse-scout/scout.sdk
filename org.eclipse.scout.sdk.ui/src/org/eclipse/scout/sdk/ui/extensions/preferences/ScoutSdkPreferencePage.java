@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.extensions.preferences;
 
+import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
+import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -23,9 +26,9 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
  * plug-in class. That way, preferences can be accessed directly via the preference store.
  */
 
-public class ScoutSdkPreferencePage
-    extends FieldEditorPreferencePage
-    implements IWorkbenchPreferencePage {
+public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage {
+
+  private BooleanFieldEditor m_automaticallyCreateClassIdAnnotation;
 
   public ScoutSdkPreferencePage() {
     super(GRID);
@@ -41,6 +44,8 @@ public class ScoutSdkPreferencePage
    */
   @Override
   public void createFieldEditors() {
+	m_automaticallyCreateClassIdAnnotation = new BooleanFieldEditor(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION, Texts.get("AutomaticallyCreateClassIdAnnotation"), getFieldEditorParent());
+	addField(m_automaticallyCreateClassIdAnnotation);
   }
 
   @Override

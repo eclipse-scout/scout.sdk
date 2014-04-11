@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk;
 
 /**
  * <h3>{@link RuntimeClasses}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.01.2009
  */
@@ -132,6 +132,7 @@ public final class RuntimeClasses {
   public static final String FormData = "org.eclipse.scout.commons.annotations.FormData"; // NO_UCD
   public static final String Replace = "org.eclipse.scout.commons.annotations.Replace"; // NO_UCD
   public static final String FormData_UpdateOperation = "org.eclipse.scout.commons.annotations.FormData.UpdateOperation"; // NO_UCD
+  public static final String ClassId = "org.eclipse.scout.commons.annotations.ClassId"; // NO_UCD
   public static final String ClientProxyServiceFactory = "org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"; // NO_UCD
   public static final String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory"; // NO_UCD
   public static final String ConfigProperty = "org.eclipse.scout.commons.annotations.ConfigProperty"; // NO_UCD
@@ -215,6 +216,7 @@ public final class RuntimeClasses {
   public static final String ITreeBox = "org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox"; // NO_UCD
   public static final String ITreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField"; // NO_UCD
   public static final String ITreeNode = "org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode"; // NO_UCD
+  public static final String ITypeWithClassId = "org.eclipse.scout.commons.ITypeWithClassId"; // NO_UCD
   public static final String IValueField = "org.eclipse.scout.rt.client.ui.form.fields.IValueField"; // NO_UCD
   public static final String IViewButton = "org.eclipse.scout.rt.client.ui.action.view.IViewButton"; // NO_UCD
   public static final String IWizard = "org.eclipse.scout.rt.client.ui.wizard.IWizard"; // NO_UCD

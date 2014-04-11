@@ -2,6 +2,7 @@
 <?eclipse version="3.2"?>
 <plugin>
    <extension-point id="newProjectOperation" name="New Scout Project Operations" schema="schema/newProjectOperation.exsd"/>
+   <extension-point id="classIdGenerator" name="ClassId Generators" schema="schema/classIdGenerator.exsd"/>
    <extension
          id="org.eclipse.scout.sdk.ScoutNature"
          name="Scout Bundle"
@@ -211,5 +212,12 @@
       <requires-nature
             id="org.eclipse.pde.PluginNature">
       </requires-nature>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.classIdGenerator">
+      <generator
+            class="org.eclipse.scout.sdk.extensions.classidgenerators.DefaultUniversallyUniqueClassIdGenerator"
+            priority="-10000">
+      </generator>
    </extension>
 </plugin>

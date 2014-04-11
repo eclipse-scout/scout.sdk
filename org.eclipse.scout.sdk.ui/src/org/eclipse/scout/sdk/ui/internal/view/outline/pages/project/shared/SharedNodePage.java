@@ -16,6 +16,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformSharedBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.action.create.ClassIdNewAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.library.LibrariesTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -95,14 +96,19 @@ public class SharedNodePage extends AbstractPage {
 
   @Override
   public void prepareMenuAction(IScoutHandler menu) {
-    WellformAction action = (WellformAction) menu;
-    action.setLabel(Texts.get("WellformSharedBundle"));
-    action.setOperation(new WellformSharedBundleOperation(getScoutResource()));
+    if (menu instanceof WellformAction) {
+      WellformAction action = (WellformAction) menu;
+      action.setLabel(Texts.get("WellformSharedBundle"));
+      action.setOperation(new WellformSharedBundleOperation(getScoutResource()));
+    }
+    else if (menu instanceof ClassIdNewAction) {
+      ((ClassIdNewAction) menu).setScoutBundle(getScoutResource());
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class};
+    return new Class[]{WellformAction.class, ClassIdNewAction.class};
   }
 }

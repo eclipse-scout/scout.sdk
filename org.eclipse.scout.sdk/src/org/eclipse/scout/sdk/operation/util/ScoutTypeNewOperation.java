@@ -73,6 +73,11 @@ public class ScoutTypeNewOperation extends AbstractScoutTypeNewOperation {
   }
 
   @Override
+	public String getFullyQualifiedName() {
+	  return getImplementationPackageName()+"."+getTypeName();
+	}
+
+  @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IPackageFragment pck = getScoutBundle().getSpecificPackageFragment(getImplementationPackageName(), monitor, workingCopyManager);
     // needed to ensure jdt events getting fired at this point. Otherwise some events getting lost.

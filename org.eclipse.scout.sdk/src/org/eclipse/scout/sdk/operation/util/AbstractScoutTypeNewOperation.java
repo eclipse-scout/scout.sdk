@@ -17,11 +17,17 @@ import java.util.List;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.RuntimeClasses;
+import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerationContext;
+import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.annotation.AnnotationCreateOperation;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>AbstractBcTypeNewOperation</h3> ...
@@ -48,6 +54,23 @@ public abstract class AbstractScoutTypeNewOperation implements IOperation {
     }
   }
 
+  protected void createClassIdAnnotation(StringBuilder source, String lineDelimiter, IImportValidator validator) throws JavaModelException {
+    if (ClassIdGenerators.isAutomaticallyCreateClassIdAnnotation() && !StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
+      IType iTypeWithClassId = TypeUtility.getType(RuntimeClasses.ITypeWithClassId);
+      if (TypeUtility.exists(iTypeWithClassId)) {
+        IType superType = TypeUtility.getTypeBySignature(getSuperTypeSignature());
+        if (TypeUtility.exists(superType)) {
+          if (TypeUtility.getSuperTypeHierarchy(superType).contains(iTypeWithClassId)) {
+        	String classIdValue = ClassIdGenerators.generateNewId(new ClassIdGenerationContext(this));
+        	AnnotationCreateOperation createClassIdAnnotation = new AnnotationCreateOperation(null, Signature.createTypeSignature(RuntimeClasses.ClassId, true));
+        	createClassIdAnnotation.addParameter(JdtUtility.toStringLiteral(classIdValue));
+        	source.append(createClassIdAnnotation.createSource(validator, lineDelimiter)).append("\n");
+          }
+        }
+      }
+    }
+  }
+
   public String createSource(IImportValidator validator) throws JavaModelException {
     StringBuilder buf = new StringBuilder();
     // javadoc
@@ -61,6 +84,7 @@ public abstract class AbstractScoutTypeNewOperation implements IOperation {
         buf.append(annotationOps[i].createSource(validator, "\n") + "\n");
       }
     }
+    createClassIdAnnotation(buf, "\n", validator);
 
     buf.append(Flags.toString(getTypeModifiers()) + " ");
     buf.append(((getTypeModifiers() & Flags.AccInterface) != 0) ? ("interface ") : ("class "));
@@ -90,6 +114,8 @@ public abstract class AbstractScoutTypeNewOperation implements IOperation {
   protected void createContent(StringBuilder source, IImportValidator validator) {
 
   }
+
+  public abstract String getFullyQualifiedName();
 
   public abstract IType getCreatedType();
 
@@ -148,7 +174,7 @@ public abstract class AbstractScoutTypeNewOperation implements IOperation {
 
   /**
    * e.g. {@link Flags#AccAbstract} | {@link Flags#AccProtected}
-   * 
+   *
    * @return {@link Flags} Acc constants.
    */
   public int getTypeModifiers() {

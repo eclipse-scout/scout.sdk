@@ -23,6 +23,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.form.formdata.FormDataAutoUpdater;
 import org.eclipse.scout.sdk.operation.form.formdata.ICreateFormDataRequest;
@@ -98,6 +99,9 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     getPreferenceStore().setDefault(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE, true);
     ScoutSdk.getDefault().setFormDataAutoUpdate(getPreferenceStore().getBoolean(FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE));
     getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
+
+    getPreferenceStore().setDefault(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION, false);
+    ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(getPreferenceStore().getBoolean(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION));
   }
 
   @Override
@@ -230,7 +234,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   /**
    * Returns the shared instance
-   * 
+   *
    * @return the shared instance
    */
   public static ScoutSdkUi getDefault() {
@@ -324,7 +328,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   /**
    * To get a cached image with one of the extensions [gif | png | jpg]
-   * 
+   *
    * @param name
    *          the name without extension located under resources/icons e.g. "person"
    * @return the cached image
@@ -344,7 +348,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   /**
    * To get a cached image with one of the extensions [gif | png | jpg]
-   * 
+   *
    * @param name
    *          the name without extension located under resources/icons e.g. "person"
    * @return the cached image
@@ -458,6 +462,12 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
       if (FormDataAutoUpdater.PROP_FORMDATA_AUTO_UPDATE.equals(event.getProperty())) {
         Boolean autoUpdate = (Boolean) event.getNewValue();
         ScoutSdk.getDefault().setFormDataAutoUpdate(autoUpdate);
+      }
+      else if (ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION.equals(event.getProperty())) {
+        Boolean automaticallyCreate = (Boolean) event.getNewValue();
+        if (automaticallyCreate != null) {
+          ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(automaticallyCreate.booleanValue());
+        }
       }
     }
   }

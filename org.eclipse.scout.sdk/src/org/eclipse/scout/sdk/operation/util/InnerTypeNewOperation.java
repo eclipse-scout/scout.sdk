@@ -52,6 +52,11 @@ public class InnerTypeNewOperation extends AbstractScoutTypeNewOperation {
   }
 
   @Override
+	public String getFullyQualifiedName() {
+	  return getDeclaringtype().getFullyQualifiedName()+"."+getTypeName();
+	}
+
+  @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     workingCopyManager.register(getDeclaringtype().getCompilationUnit(), monitor);
     CompilationUnitImportValidator validator = new CompilationUnitImportValidator(getDeclaringtype().getCompilationUnit());
@@ -102,7 +107,7 @@ public class InnerTypeNewOperation extends AbstractScoutTypeNewOperation {
 
   /**
    * the type where the new created type will be inserted after in the java file.
-   * 
+   *
    * @param sibling
    */
   public void setSibling(IJavaElement sibling) {
