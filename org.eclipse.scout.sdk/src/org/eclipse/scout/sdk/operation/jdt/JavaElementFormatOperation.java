@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.ISourceReference;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.util.OrganizeImportOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -70,7 +71,12 @@ public class JavaElementFormatOperation extends SourceFormatOperation {
     }
     // range calculation
     setDocument(new Document(icu.getSource()));
-    setRange(getSourceReference().getSourceRange());
+    try {
+      setRange(getSourceReference().getSourceRange());
+    }
+    catch (Exception e) {
+      ScoutSdk.logWarning(e);
+    }
 
     super.run(monitor, workingCopyManager);
     // set source back to icu

@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jdt.core.CompletionContext;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
@@ -49,18 +50,21 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
     }
 
     JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-    IJavaElement element = javaContext.getCoreContext().getEnclosingElement();
-    if (TypeUtility.exists(element)) {
-      if (element.getElementType() == IJavaElement.TYPE) {
-        IType declaringType = (IType) element;
-        try {
-          ITypeHierarchy supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
-          if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
-            proposals.add(new CodeNewProposal(declaringType));
+    CompletionContext coreContext = javaContext.getCoreContext();
+    if (coreContext != null && coreContext.isExtended()) {
+      IJavaElement element = coreContext.getEnclosingElement();
+      if (TypeUtility.exists(element)) {
+        if (element.getElementType() == IJavaElement.TYPE) {
+          IType declaringType = (IType) element;
+          try {
+            ITypeHierarchy supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
+            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
+              proposals.add(new CodeNewProposal(declaringType));
+            }
           }
-        }
-        catch (JavaModelException e) {
-          ScoutSdkUi.logError("Could not calculate code completion proposals. ", e);
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError("Could not calculate code completion proposals. ", e);
+          }
         }
       }
     }
