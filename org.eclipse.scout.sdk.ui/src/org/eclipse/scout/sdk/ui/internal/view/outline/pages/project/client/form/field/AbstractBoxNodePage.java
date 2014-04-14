@@ -20,6 +20,7 @@ import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
 import org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
+import org.eclipse.scout.sdk.ui.action.dto.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.FormFieldExtensionPoint;
@@ -116,12 +117,15 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
       action.init(getScoutBundle(), getType());
       action.setOperation(new WellformScoutTypeOperation(getType(), true));
     }
+    else if (menu instanceof FormDataUpdateAction) {
+      ((FormDataUpdateAction) menu).setFormDataOwner(getType());
+    }
   }
 
   @SuppressWarnings("unchecked")
   @Override
   public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
     return new Class[]{FormFieldRenameAction.class, ShowJavaReferencesAction.class, FormFieldNewAction.class,
-        FormFieldDeleteAction.class, CreateTemplateAction.class, WellformAction.class};
+        FormFieldDeleteAction.class, CreateTemplateAction.class, WellformAction.class, FormDataUpdateAction.class};
   }
 }
