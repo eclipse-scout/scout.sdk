@@ -34,8 +34,8 @@ import org.eclipse.scout.sdk.ws.jaxws.util.GlobalBindingRegistrationHelper;
 import org.eclipse.scout.sdk.ws.jaxws.util.GlobalBindingRegistrationHelper.SchemaCandidate;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact.TypeEnum;
 import org.eclipse.swt.widgets.Shell;
 
 public class BindingFileNewAction extends AbstractLinkAction {
@@ -75,12 +75,12 @@ public class BindingFileNewAction extends AbstractLinkAction {
 
     BindingFileCreateOperation op = new BindingFileCreateOperation();
     if (schemaCandidate != null) {
-      WsdlArtefact<IFile> wsdlArtefact = schemaCandidate.getWsdlArtefact();
-      if (wsdlArtefact.getInlineSchemas().length > 1) {
+      WsdlArtifact<IFile> wsdlArtifact = schemaCandidate.getWsdlArtifact();
+      if (wsdlArtifact.getInlineSchemas().length > 1) {
         op.setSchemaTargetNamespace(SchemaUtility.getSchemaTargetNamespace(schemaCandidate.getSchema()));
       }
-      if (wsdlArtefact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
-        op.setWsdlLocation(wsdlArtefact.getFileHandle().getFile());
+      if (wsdlArtifact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
+        op.setWsdlLocation(wsdlArtifact.getFileHandle().getFile());
       }
     }
 

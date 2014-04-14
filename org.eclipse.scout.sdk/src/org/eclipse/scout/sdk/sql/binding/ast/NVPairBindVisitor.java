@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.sql.binding.ast;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.core.dom.StringLiteral;
@@ -31,14 +28,12 @@ public class NVPairBindVisitor extends DefaultAstVisitor {
   private boolean m_debug = false;
   private String m_indent = "";
   private boolean m_canceled;
-  List<String> m_segments;
   private final ASTNode m_rootNode;
   private String m_bindName;
   private ASTNode m_valueNode;
 
   public NVPairBindVisitor(ASTNode rootNode) {
     m_rootNode = rootNode;
-    m_segments = new ArrayList<String>();
   }
 
   @Override

@@ -24,8 +24,8 @@ import org.eclipse.scout.sdk.ws.jaxws.util.GlobalBindingRegistrationHelper;
 import org.eclipse.scout.sdk.ws.jaxws.util.GlobalBindingRegistrationHelper.SchemaCandidate;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact.TypeEnum;
 
 public class CorruptBindingFileCommand extends AbstractExecutableMarkerCommand {
 
@@ -67,12 +67,12 @@ public class CorruptBindingFileCommand extends AbstractExecutableMarkerCommand {
     op.setWsdlDestinationFolder(wsdlFolder);
 
     if (m_schemaCandidate != null) {
-      WsdlArtefact<IFile> wsdlArtefact = m_schemaCandidate.getWsdlArtefact();
-      if (wsdlArtefact.getInlineSchemas().length > 1) {
+      WsdlArtifact<IFile> wsdlArtifact = m_schemaCandidate.getWsdlArtifact();
+      if (wsdlArtifact.getInlineSchemas().length > 1) {
         op.setSchemaTargetNamespace(SchemaUtility.getSchemaTargetNamespace(m_schemaCandidate.getSchema()));
       }
-      if (wsdlArtefact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
-        op.setWsdlLocation(wsdlArtefact.getFileHandle().getFile());
+      if (wsdlArtifact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
+        op.setWsdlLocation(wsdlArtifact.getFileHandle().getFile());
       }
     }
     op.run(monitor, workingCopyManager);

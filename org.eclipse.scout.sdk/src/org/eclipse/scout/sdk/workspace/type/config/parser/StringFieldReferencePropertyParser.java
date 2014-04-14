@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
  * @author Andreas Hoegger
  * @since 3.8.0 01.03.2013
  */
-public class StringFieldReferencePropertyParser extends FieldReferencePropertyParser<String> {
+public class StringFieldReferencePropertyParser extends AbstractFieldReferencePropertyParser<String> {
 
   public StringFieldReferencePropertyParser(List<FieldProperty<String>> properties) {
     this(properties, false);

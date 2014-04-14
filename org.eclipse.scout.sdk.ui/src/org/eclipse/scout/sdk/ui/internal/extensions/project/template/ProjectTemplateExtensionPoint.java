@@ -62,7 +62,7 @@ public class ProjectTemplateExtensionPoint {
         extensionPoint.setIconPath(element.getAttribute(attributeIcon));
         String attOrderNr = element.getAttribute(attributeOrderNumber);
         try {
-          extensionPoint.setOrderNr(Long.valueOf(attOrderNr).longValue());
+          extensionPoint.setOrderNr(Long.parseLong(attOrderNr));
         }
         catch (NumberFormatException e) {
           ScoutSdkUi.logError("could not parse order number '" + attOrderNr + "' of extension '" + element.getNamespaceIdentifier() + "'.", e);

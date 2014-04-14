@@ -337,7 +337,7 @@ public class CheckableTree extends Composite {
       if (((ITreeNode) element).isBold()) {
         if (m_boldFont == null) {
           Font originalFont = m_tree.getFont();
-          FontData fontData[] = originalFont.getFontData();
+          FontData[] fontData = originalFont.getFontData();
           // Adding the bold attribute
           for (int i = 0; i < fontData.length; i++) {
             fontData[i].setStyle(fontData[i].getStyle() | SWT.BOLD);

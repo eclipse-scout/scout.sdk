@@ -70,12 +70,12 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.WsdlFolderPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.IFileHandle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtefactVisitor;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtifactVisitor;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact.TypeEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPageLoadedListener;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IPresenterValueChangedListener;
 import org.eclipse.swt.SWT;
@@ -437,13 +437,13 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
       JaxWsSdkUtility.disposeChildControls(getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS).getSectionClient());
 
       WsdlResource wsdlResource = getPage().getWsdlResource();
-      SchemaUtility.visitArtefacts(wsdlResource.getFile(), new SchemaArtefactVisitor<IFile>() {
+      SchemaUtility.visitArtifacts(wsdlResource.getFile(), new SchemaArtifactVisitor<IFile>() {
 
         @Override
-        public void onReferencedWsdlArtefact(WsdlArtefact<IFile> wsdlArtefact) {
-          if (wsdlArtefact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
+        public void onReferencedWsdlArtifact(WsdlArtifact<IFile> wsdlArtifact) {
+          if (wsdlArtifact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
             FileOpenAction action = new FileOpenAction();
-            IFileHandle<IFile> fileHandle = wsdlArtefact.getFileHandle();
+            IFileHandle<IFile> fileHandle = wsdlArtifact.getFileHandle();
             action.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
 
             ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient(), action, getFormToolkit());
@@ -453,8 +453,8 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
         }
 
         @Override
-        public void onSchemaIncludeArtefact(SchemaIncludeArtefact<IFile> schemaIncludeArtefact) {
-          IFileHandle<IFile> fileHandle = schemaIncludeArtefact.getFileHandle();
+        public void onSchemaIncludeArtifact(SchemaIncludeArtifact<IFile> schemaIncludeArtifact) {
+          IFileHandle<IFile> fileHandle = schemaIncludeArtifact.getFileHandle();
 
           FileOpenAction b = new FileOpenAction();
           b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
@@ -464,12 +464,12 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
         }
 
         @Override
-        public void onSchemaImportArtefact(SchemaImportArtefact<IFile> schemaImportArtefact) {
-          IFileHandle<IFile> fileHandle = schemaImportArtefact.getFileHandle();
+        public void onSchemaImportArtifact(SchemaImportArtifact<IFile> schemaImportArtifact) {
+          IFileHandle<IFile> fileHandle = schemaImportArtifact.getFileHandle();
 
           FileOpenAction b = new FileOpenAction();
           b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
-          b.setToolTip("namespace: " + StringUtility.nvl(schemaImportArtefact.getNamespaceUri(), "?"));
+          b.setToolTip("namespace: " + StringUtility.nvl(schemaImportArtifact.getNamespaceUri(), "?"));
           ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS).getSectionClient(), b, getFormToolkit());
           actionPresenter.setEnabled(fileHandle.exists());
           applyLayoutData(actionPresenter);

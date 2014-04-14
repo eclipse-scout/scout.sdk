@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
-import org.eclipse.scout.sdk.workspace.type.config.parser.FieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.AbstractFieldReferencePropertyParser;
 import org.eclipse.scout.sdk.workspace.type.config.parser.StringFieldReferencePropertyParser;
 import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 import org.eclipse.swt.graphics.Image;
@@ -59,7 +59,7 @@ public class BorderDecorationPresenter extends AbstractProposalPresenter<FieldPr
     PROPOSALS.add(BORDER_DECORATION_AUTO);
   }
 
-  private final FieldReferencePropertyParser<String> m_parser;
+  private final AbstractFieldReferencePropertyParser<String> m_parser;
 
   public BorderDecorationPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -86,7 +86,7 @@ public class BorderDecorationPresenter extends AbstractProposalPresenter<FieldPr
     getProposalField().setContentProvider(provider);
   }
 
-  public FieldReferencePropertyParser<String> getParser() {
+  public AbstractFieldReferencePropertyParser<String> getParser() {
     return m_parser;
   }
 

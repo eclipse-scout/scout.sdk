@@ -164,7 +164,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
 
       String[] sets = getAllWorkingSets();
       if (m_workingSetDownButton != null && !m_workingSetDownButton.isDisposed()) {
-        m_workingSetDownButton.setEnabled(set != null && sets.length > 0 && sets[sets.length - 1] != set);
+        m_workingSetDownButton.setEnabled(set != null && sets.length > 0 && !set.equals(sets[sets.length - 1]));
       }
       if (m_workingSetUpButton != null && !m_workingSetUpButton.isDisposed()) {
         m_workingSetUpButton.setEnabled(set != null && sets.length > 0 && sets[0] != set);
@@ -250,7 +250,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
         String[] sets = getAllWorkingSets();
         String[] newSet = new String[sets.length - 1];
         for (int i = 0; i < sets.length; i++) {
-          if (sets[i] == m_currentWorkingSet) {
+          if (CompareUtility.equals(sets[i], m_currentWorkingSet)) {
             System.arraycopy(sets, 0, newSet, 0, i);
             System.arraycopy(sets, i + 1, newSet, i, sets.length - i - 1);
             break;
@@ -284,7 +284,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
           String[] sets = getAllWorkingSets();
           boolean isChecked = m_workingSetsViewer.getChecked(m_currentWorkingSet);
           for (int i = 0; i < sets.length; i++) {
-            if (sets[i] == m_currentWorkingSet) {
+            if (CompareUtility.equals(sets[i], m_currentWorkingSet)) {
               sets[i] = d.getWorkingSetName();
               break;
             }
@@ -307,7 +307,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
         String[] newSet = new String[sets.length];
         if (sets.length > 0) {
           for (int i = sets.length - 1; i >= 0; i--) {
-            if (sets[i] == m_currentWorkingSet) {
+            if (CompareUtility.equals(sets[i], m_currentWorkingSet)) {
               System.arraycopy(sets, 0, newSet, 0, i - 1);
               newSet[i] = sets[i - 1];
               newSet[i - 1] = sets[i];
@@ -331,7 +331,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
         String[] newSet = new String[sets.length];
         if (sets.length > 0) {
           for (int i = 0; i < sets.length; i++) {
-            if (sets[i] == m_currentWorkingSet) {
+            if (CompareUtility.equals(sets[i], m_currentWorkingSet)) {
               System.arraycopy(sets, 0, newSet, 0, i);
               newSet[i] = sets[i + 1];
               newSet[i + 1] = sets[i];

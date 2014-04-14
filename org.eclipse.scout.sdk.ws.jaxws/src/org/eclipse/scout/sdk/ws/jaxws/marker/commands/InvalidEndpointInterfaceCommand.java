@@ -35,7 +35,7 @@ public class InvalidEndpointInterfaceCommand extends AbstractExecutableMarkerCom
     super(Texts.get("InvalidEndpointInterfaceSpecified", WebService.class.getSimpleName(), implType.getElementName()));
     m_implType = implType;
     m_annotationType = TypeUtility.getType(WebService.class.getName());
-    setSolutionDescription(String.format("By using this task, you can change the endpoint interface.", WebService.class.getSimpleName()));
+    setSolutionDescription("By using this task, you can change the endpoint interface.");
   }
 
   @Override

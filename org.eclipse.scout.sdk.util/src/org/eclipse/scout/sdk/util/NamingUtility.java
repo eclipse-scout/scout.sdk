@@ -143,9 +143,9 @@ public final class NamingUtility {
       return l1;
     }
 
-    int col0[] = new int[l1 + 1];
-    int col1[] = new int[l1 + 1];
-    int col[];
+    int[] col0 = new int[l1 + 1];
+    int[] col1 = new int[l1 + 1];
+    int[] col;
 
     // indexes into strings s1 and s2
     int i;

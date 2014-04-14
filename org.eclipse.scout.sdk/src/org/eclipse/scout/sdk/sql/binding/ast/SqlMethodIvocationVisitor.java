@@ -39,10 +39,10 @@ import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
  * @since 1.0.8 25.02.2011
  */
 public class SqlMethodIvocationVisitor extends DefaultAstVisitor {
-  final int MODE_QUALIFIER = 1;
-  final int MODE_METHOD_NAME = 2;
-  final int MODE_STATEMENT = 3;
-  final int MODE_BIND_VAR = 4;
+  private static final int MODE_QUALIFIER = 1;
+  private static final int MODE_METHOD_NAME = 2;
+  private static final int MODE_STATEMENT = 3;
+  private static final int MODE_BIND_VAR = 4;
 
   private List<SqlStatement> m_statements;
   private int m_unusedParametersAfterStatement;

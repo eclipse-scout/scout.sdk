@@ -42,9 +42,9 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class ProposalTextField extends TextField {
 
-  public static int STYLE_DEFAULT = 1 << 0;
-  public static int STYLE_INITIAL_SHOW_POPUP = 1 << 1;
-  public static int STYLE_NO_LABEL = 1 << 10;
+  public static final int STYLE_DEFAULT = 1 << 0;
+  public static final int STYLE_INITIAL_SHOW_POPUP = 1 << 1;
+  public static final int STYLE_NO_LABEL = 1 << 10;
 
   private IProposalSelectionHandler m_selectionHandler;
   private Button m_popupButton;

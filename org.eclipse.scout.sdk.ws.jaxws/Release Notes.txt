@@ -27,9 +27,9 @@ Migration:
 
 05.01.2013
 Bug-fixes:
-- fixed bug that resources (WSDL/schema artefacts) could not be loaded when working on custom Eclipse File System (e.g. when working with JAAZ team provider)
+- fixed bug that resources (WSDL/schema artifacts) could not be loaded when working on custom Eclipse File System (e.g. when working with JAAZ team provider)
 - changed code with file path handling to work with IPath class
-- visitor pattern to work with schema artefacts
+- visitor pattern to work with schema artifacts
 - visitor pattern to validate URL-pattern/servlet alias
 - removed unused code from JaxWsSdkUtility
 - consolidated WSDL file loading / file-copy-detection into JaxWsSdkUtility

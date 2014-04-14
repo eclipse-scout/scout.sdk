@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
  * @author Andreas Hoegger
  * @since 3.8.0 01.03.2013
  */
-public class IntegerFieldReferencePropertyParser extends FieldReferencePropertyParser<Integer> {
+public class IntegerFieldReferencePropertyParser extends AbstractFieldReferencePropertyParser<Integer> {
 
   public IntegerFieldReferencePropertyParser(List<FieldProperty<Integer>> properties) {
     this(properties, false);

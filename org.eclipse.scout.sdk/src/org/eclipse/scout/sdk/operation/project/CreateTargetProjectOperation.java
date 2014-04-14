@@ -95,6 +95,6 @@ public class CreateTargetProjectOperation extends AbstractCreateEclipseProjectOp
     op.run(monitor, workingCopyManager);
 
     getProperties().setProperty(PROP_TARGET_FILE, op.getCreatedFile());
-    getProperties().setProperty(NewProjectLoadTargetOperation.PROP_TARGET_PLATFORM_RELOAD_NECESSARY, Boolean.valueOf(true));
+    getProperties().setProperty(NewProjectLoadTargetOperation.PROP_TARGET_PLATFORM_RELOAD_NECESSARY, Boolean.TRUE);
   }
 }

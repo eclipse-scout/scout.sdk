@@ -72,7 +72,7 @@ public final class JdtUtility {
         if (name.equals(p.getMemberName())) {
           switch (p.getValueKind()) {
             case IMemberValuePair.K_DOUBLE:
-              return ((Double) p.getValue()).doubleValue();
+              return (Double) p.getValue();
             case IMemberValuePair.K_FLOAT:
               return ((Float) p.getValue()).doubleValue();
             case IMemberValuePair.K_INT:

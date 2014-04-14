@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
-public class CredentialValidationStrategyNewAction extends TypeNewAction {
+public class CredentialValidationStrategyNewAction extends AbstractTypeNewAction {
 
   public CredentialValidationStrategyNewAction() {
     super(Texts.get("CredentialValidationStrategy"));

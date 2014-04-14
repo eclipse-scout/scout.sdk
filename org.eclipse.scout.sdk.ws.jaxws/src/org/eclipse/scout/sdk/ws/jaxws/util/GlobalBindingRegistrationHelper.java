@@ -26,8 +26,8 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.SelectionDialog;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact.TypeEnum;
 import org.eclipse.swt.widgets.Shell;
 
 public class GlobalBindingRegistrationHelper {
@@ -57,12 +57,12 @@ public class GlobalBindingRegistrationHelper {
 
   public static SchemaCandidate[] getSchemaCandidates(IFile wsdlFile) {
     final List<SchemaCandidate> schemaCandidates = new ArrayList<SchemaCandidate>();
-    SchemaUtility.visitArtefacts(wsdlFile, new SchemaArtefactVisitor<IFile>() {
+    SchemaUtility.visitArtifacts(wsdlFile, new SchemaArtifactVisitor<IFile>() {
 
       @Override
-      protected void onWsdlArtefact(WsdlArtefact<IFile> wsdlArtefact) {
-        for (Schema inlineSchema : wsdlArtefact.getInlineSchemas()) {
-          schemaCandidates.add(new SchemaCandidate(inlineSchema, wsdlArtefact));
+      protected void onWsdlArtifact(WsdlArtifact<IFile> wsdlArtifact) {
+        for (Schema inlineSchema : wsdlArtifact.getInlineSchemas()) {
+          schemaCandidates.add(new SchemaCandidate(inlineSchema, wsdlArtifact));
         }
       }
     });
@@ -99,7 +99,7 @@ public class GlobalBindingRegistrationHelper {
       }
       else {
         String text;
-        IFileHandle<IFile> fileHandle = candidate.getWsdlArtefact().getFileHandle();
+        IFileHandle<IFile> fileHandle = candidate.getWsdlArtifact().getFileHandle();
         if (fileHandle != null) {
           text = fileHandle.getName();
         }
@@ -107,7 +107,7 @@ public class GlobalBindingRegistrationHelper {
           text = "?";
         }
 
-        if (candidate.getWsdlArtefact().getTypeEnum() == TypeEnum.RootWsdl) {
+        if (candidate.getWsdlArtifact().getTypeEnum() == TypeEnum.RootWsdl) {
           text += " (Root WSDL file)";
         }
         cell.setText(text);
@@ -117,11 +117,11 @@ public class GlobalBindingRegistrationHelper {
 
   public static class SchemaCandidate {
     private Schema m_schema;
-    private WsdlArtefact<IFile> m_wsdlArtefact;
+    private WsdlArtifact<IFile> m_wsdlArtifact;
 
-    public SchemaCandidate(Schema schema, WsdlArtefact<IFile> wsdlArtefact) {
+    public SchemaCandidate(Schema schema, WsdlArtifact<IFile> wsdlArtifact) {
       m_schema = schema;
-      m_wsdlArtefact = wsdlArtefact;
+      m_wsdlArtifact = wsdlArtifact;
     }
 
     public Schema getSchema() {
@@ -132,12 +132,12 @@ public class GlobalBindingRegistrationHelper {
       m_schema = schema;
     }
 
-    public WsdlArtefact<IFile> getWsdlArtefact() {
-      return m_wsdlArtefact;
+    public WsdlArtifact<IFile> getWsdlArtifact() {
+      return m_wsdlArtifact;
     }
 
-    public void setWsdlArtefact(WsdlArtefact<IFile> wsdlArtefact) {
-      m_wsdlArtefact = wsdlArtefact;
+    public void setWsdlArtifact(WsdlArtifact<IFile> wsdlArtifact) {
+      m_wsdlArtifact = wsdlArtifact;
     }
   }
 }

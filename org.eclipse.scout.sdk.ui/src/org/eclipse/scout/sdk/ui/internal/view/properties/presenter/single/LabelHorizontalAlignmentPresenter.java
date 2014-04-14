@@ -15,32 +15,32 @@ import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerSourcePropertyParser;
-import org.eclipse.scout.sdk.workspace.type.config.parser.SourcePropertyParser;
-import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
+import org.eclipse.scout.sdk.workspace.type.config.parser.AbstractSourcePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.property.AbstractSourceProperty;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
-public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter<SourceProperty<Integer>> {
+public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter<AbstractSourceProperty<Integer>> {
 
-  protected static final SourceProperty<Integer> LEFT;
-  protected static final SourceProperty<Integer> CENTER;
-  protected static final SourceProperty<Integer> RIGHT;
-  protected static final SourceProperty<Integer> DEFAULT;
+  protected static final AbstractSourceProperty<Integer> LEFT;
+  protected static final AbstractSourceProperty<Integer> CENTER;
+  protected static final AbstractSourceProperty<Integer> RIGHT;
+  protected static final AbstractSourceProperty<Integer> DEFAULT;
 
-  protected static final List<SourceProperty<Integer>> PROPOSALS;
+  protected static final List<AbstractSourceProperty<Integer>> PROPOSALS;
   static {
     LEFT = new UiSourceProperty<Integer>(Integer.valueOf(-1), "left");
     CENTER = new UiSourceProperty<Integer>(Integer.valueOf(0), "center");
     RIGHT = new UiSourceProperty<Integer>(Integer.valueOf(1), "right");
     DEFAULT = new UiSourceProperty<Integer>(Integer.valueOf(1000), "default");
-    PROPOSALS = new ArrayList<SourceProperty<Integer>>(4);
+    PROPOSALS = new ArrayList<AbstractSourceProperty<Integer>>(4);
     PROPOSALS.add(LEFT);
     PROPOSALS.add(CENTER);
     PROPOSALS.add(RIGHT);
     PROPOSALS.add(DEFAULT);
   }
 
-  private final SourcePropertyParser<Integer> m_parser;
+  private final AbstractSourcePropertyParser<Integer> m_parser;
 
   public LabelHorizontalAlignmentPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -75,23 +75,23 @@ public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter
     getProposalField().setContentProvider(provider);
   }
 
-  public SourcePropertyParser<Integer> getParser() {
+  public AbstractSourcePropertyParser<Integer> getParser() {
     return m_parser;
   }
 
   @Override
-  protected SourceProperty<Integer> parseInput(String input) throws CoreException {
+  protected AbstractSourceProperty<Integer> parseInput(String input) throws CoreException {
     return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
   }
 
   @Override
-  protected synchronized void storeValue(SourceProperty<Integer> value) throws CoreException {
+  protected synchronized void storeValue(AbstractSourceProperty<Integer> value) throws CoreException {
     if (value == null) {
       getProposalField().acceptProposal(getDefaultValue());
       value = getDefaultValue();
     }
     try {
-      ConfigPropertyUpdateOperation<SourceProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<SourceProperty<Integer>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<AbstractSourceProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<AbstractSourceProperty<Integer>>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

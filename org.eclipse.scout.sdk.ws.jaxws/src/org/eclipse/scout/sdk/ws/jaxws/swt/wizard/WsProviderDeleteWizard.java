@@ -35,11 +35,11 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ElementBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.ResourceSelectionWizardPage;
 import org.eclipse.scout.sdk.ws.jaxws.util.IFileHandle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtefactVisitor;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtifactVisitor;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact;
 
 public class WsProviderDeleteWizard extends AbstractWorkspaceWizard {
 
@@ -89,27 +89,27 @@ public class WsProviderDeleteWizard extends AbstractWorkspaceWizard {
       elements.add(new ElementBean(WsProviderDeleteOperation.ID_WSDL_FILE, "WSDL file '" + wsdlFile.getProjectRelativePath().toString() + "'", JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), wsdlFile, false));
     }
 
-    SchemaUtility.visitArtefacts(wsdlFile, new SchemaArtefactVisitor<IFile>() {
+    SchemaUtility.visitArtifacts(wsdlFile, new SchemaArtifactVisitor<IFile>() {
 
       @Override
-      public void onReferencedWsdlArtefact(WsdlArtefact<IFile> wsdlArtefact) {
-        IFileHandle<IFile> fileHandle = wsdlArtefact.getFileHandle();
+      public void onReferencedWsdlArtifact(WsdlArtifact<IFile> wsdlArtifact) {
+        IFileHandle<IFile> fileHandle = wsdlArtifact.getFileHandle();
         if (fileHandle != null && fileHandle.exists()) {
           elements.add(new ElementBean(WsProviderDeleteOperation.ID_REF_WSDL, String.format("Referenced WSDL file '%s'", fileHandle.getFullPath().toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), fileHandle.getFile(), false));
         }
       }
 
       @Override
-      public void onSchemaIncludeArtefact(SchemaIncludeArtefact<IFile> schemaIncludeArtefact) {
-        IFileHandle<IFile> fileHandle = schemaIncludeArtefact.getFileHandle();
+      public void onSchemaIncludeArtifact(SchemaIncludeArtifact<IFile> schemaIncludeArtifact) {
+        IFileHandle<IFile> fileHandle = schemaIncludeArtifact.getFileHandle();
         if (fileHandle != null && fileHandle.exists()) {
           elements.add(new ElementBean(WsProviderDeleteOperation.ID_REF_XSD, String.format("Included XSD schema '%s'", fileHandle.getFullPath().toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), fileHandle.getFile(), false));
         }
       }
 
       @Override
-      public void onSchemaImportArtefact(SchemaImportArtefact<IFile> schemaImportArtefact) {
-        IFileHandle<IFile> fileHandle = schemaImportArtefact.getFileHandle();
+      public void onSchemaImportArtifact(SchemaImportArtifact<IFile> schemaImportArtifact) {
+        IFileHandle<IFile> fileHandle = schemaImportArtifact.getFileHandle();
         if (fileHandle != null && fileHandle.exists()) {
           elements.add(new ElementBean(WsProviderDeleteOperation.ID_REF_XSD, String.format("Imported XSD schema '%s'", fileHandle.getFullPath().toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), fileHandle.getFile(), false));
         }

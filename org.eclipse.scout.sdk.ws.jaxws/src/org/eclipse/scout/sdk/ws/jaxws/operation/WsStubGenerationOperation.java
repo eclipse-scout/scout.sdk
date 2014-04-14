@@ -177,7 +177,7 @@ public class WsStubGenerationOperation implements IOperation {
       }
 
       if (exception == null) {
-        // check whether artefacts were created. This is necessary as not all failures are propagated
+        // check whether artifacts were created. This is necessary as not all failures are propagated
         jarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_properties, m_wsdlFileName);
         if (JaxWsSdkUtility.exists(jarFile)) {
           // register stub JAR
@@ -186,7 +186,7 @@ public class WsStubGenerationOperation implements IOperation {
           }
         }
         else {
-          exception = new CoreException(new ScoutStatus("Failed to generate webservice artefacts. Probably a corrupt WSDL file, non-standardized WSDL file or a binding file problem."));
+          exception = new CoreException(new ScoutStatus("Failed to generate webservice artifacts. Probably a corrupt WSDL file, non-standardized WSDL file or a binding file problem."));
         }
       }
 

@@ -58,9 +58,6 @@ public class SqlBindCompletionProposalProcessor {
     m_image = ScoutSdkUi.getImage(ScoutSdkUi.Default);
   }
 
-  /**
-   * {@inheritDoc}
-   */
   public ICompletionProposal[] computeCompletionProposals(JavaContentAssistInvocationContext context) {
     try {
       if (!isSqlStatementLocation(context.getViewer(), context.getInvocationOffset())) {

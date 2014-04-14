@@ -155,7 +155,7 @@ public class SmartField extends Composite {
   }
 
   protected void handleFocusLost() {
-    if (m_text.getText() == "") {
+    if (StringUtility.isNullOrEmpty(m_text.getText())) {
       fireInputChanged(null);
     }
     else {

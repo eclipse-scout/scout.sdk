@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
-import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
+import org.eclipse.scout.sdk.workspace.type.config.property.AbstractSourceProperty;
 
 /**
  * <h3>{@link IntegerSourcePropertyParser}</h3> ...
@@ -24,12 +24,12 @@ import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
  *  @author Andreas Hoegger
  * @since 3.8.0 06.03.2013
  */
-public class IntegerSourcePropertyParser extends SourcePropertyParser<Integer> {
+public class IntegerSourcePropertyParser extends AbstractSourcePropertyParser<Integer> {
 
   /**
    * @param properties
    */
-  public IntegerSourcePropertyParser(List<SourceProperty<Integer>> properties) {
+  public IntegerSourcePropertyParser(List<AbstractSourceProperty<Integer>> properties) {
     super(properties);
   }
 

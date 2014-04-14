@@ -80,8 +80,7 @@ public class ProductSelectionField extends TextField {
             try {
               if (m_inputLock.acquire()) {
                 String representationStr = "";
-                if (newFile != null)
-                {
+                if (newFile != null) {
                   representationStr = newFile.getProject().getName() + "/" + newFile.getProjectRelativePath();
                 }
                 getTextComponent().setText(representationStr);

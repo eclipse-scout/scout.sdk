@@ -42,7 +42,6 @@ import org.eclipse.scout.nls.sdk.ui.action.NlsEntryModifyAction;
 import org.eclipse.scout.nls.sdk.ui.action.NlsEntryNewAction;
 import org.eclipse.scout.nls.sdk.ui.action.NlsRefreshAction;
 import org.eclipse.scout.nls.sdk.ui.action.TranslationNewAction;
-import org.eclipse.scout.nls.sdk.util.concurrent.UiRunnable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeEvent;
 import org.eclipse.swt.events.DisposeListener;
@@ -201,12 +200,12 @@ public class NlsTablePage extends Composite {
 
   private class P_ProjectListener implements INlsProjectListener {
     @Override
-    public void notifyProjectChanged(NlsProjectEvent event) {
+    public void notifyProjectChanged(final NlsProjectEvent event) {
       if (m_table != null && !m_table.isDisposed()) {
-        m_table.getDisplay().asyncExec(new UiRunnable(new Object[]{event}) {
+        m_table.getDisplay().asyncExec(new Runnable() {
           @Override
           public void run() {
-            handleProjectChangedEvent((NlsProjectEvent) p_args[0]);
+            handleProjectChangedEvent(event);
           }
         });
       }

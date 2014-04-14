@@ -28,22 +28,22 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact.TypeEnum;
 
 public final class SchemaUtility {
 
   private SchemaUtility() {
   }
 
-  public static void visitArtefacts(IFile wsdlFile, ISchemaArtefactVisitor<IFile> visitor) {
+  public static void visitArtifacts(IFile wsdlFile, ISchemaArtifactVisitor<IFile> visitor) {
     visit(visitor, new EclipseFileHandle(wsdlFile));
   }
 
-  public static void visitArtefacts(File wsdlFile, ISchemaArtefactVisitor<File> visitor) {
+  public static void visitArtifacts(File wsdlFile, ISchemaArtifactVisitor<File> visitor) {
     visit(visitor, new JavaFileHandle(wsdlFile));
   }
 
-  private static <T> void visit(ISchemaArtefactVisitor<T> visitor, IFileHandle<T> wsdlFileHandle) {
+  private static <T> void visit(ISchemaArtifactVisitor<T> visitor, IFileHandle<T> wsdlFileHandle) {
     if (wsdlFileHandle == null || !wsdlFileHandle.exists()) {
       return;
     }
@@ -54,27 +54,27 @@ public final class SchemaUtility {
     }
 
     // root WSDL file
-    WsdlArtefact<T> rootWsdlArtefact = new WsdlArtefact<T>(wsdlFileHandle, TypeEnum.RootWsdl, wsdlDefinition);
-    visitor.onRootWsdlArtefact(rootWsdlArtefact);
+    WsdlArtifact<T> rootWsdlArtifact = new WsdlArtifact<T>(wsdlFileHandle, TypeEnum.RootWsdl, wsdlDefinition);
+    visitor.onRootWsdlArtifact(rootWsdlArtifact);
 
-    Set<WsdlArtefact<T>> wsdlArtefacts = new HashSet<WsdlArtefact<T>>();
-    wsdlArtefacts.add(rootWsdlArtefact);
+    Set<WsdlArtifact<T>> wsdlArtifacts = new HashSet<WsdlArtifact<T>>();
+    wsdlArtifacts.add(rootWsdlArtifact);
 
     // referenced WSDL files
-    Set<WsdlArtefact<T>> referencedWsdlArtefacts = getReferencedWsdlResourcesRec(wsdlFileHandle, wsdlDefinition);
-    wsdlArtefacts.addAll(referencedWsdlArtefacts);
-    for (WsdlArtefact<T> referencedWsdlArtefact : referencedWsdlArtefacts) {
-      visitor.onReferencedWsdlArtefact(referencedWsdlArtefact);
+    Set<WsdlArtifact<T>> referencedWsdlArtifacts = getReferencedWsdlResourcesRec(wsdlFileHandle, wsdlDefinition);
+    wsdlArtifacts.addAll(referencedWsdlArtifacts);
+    for (WsdlArtifact<T> referencedWsdlArtifact : referencedWsdlArtifacts) {
+      visitor.onReferencedWsdlArtifact(referencedWsdlArtifact);
     }
 
     // set inline schemas to WSDL resources and resolve referenced schema resources
-    for (WsdlArtefact<T> wsdlArtefact : wsdlArtefacts) {
-      if (wsdlArtefact.getWsdlDefinition() == null) {
-        JaxWsSdk.logWarning("Unexpected: WSDL definition should not be null '" + wsdlArtefact + "'");
+    for (WsdlArtifact<T> wsdlArtifact : wsdlArtifacts) {
+      if (wsdlArtifact.getWsdlDefinition() == null) {
+        JaxWsSdk.logWarning("Unexpected: WSDL definition should not be null '" + wsdlArtifact + "'");
         continue;
       }
 
-      Types types = wsdlArtefact.getWsdlDefinition().getTypes();
+      Types types = wsdlArtifact.getWsdlDefinition().getTypes();
       if (types != null) {
         Set<Schema> inlineSchemas = new HashSet<Schema>();
         for (Object type : types.getExtensibilityElements()) {
@@ -83,10 +83,10 @@ public final class SchemaUtility {
             // inline schema
             inlineSchemas.add(schema);
             // referenced schema resources
-            visitReferencedSchemaResources(visitor, wsdlArtefact.getFileHandle(), schema);
+            visitReferencedSchemaResources(visitor, wsdlArtifact.getFileHandle(), schema);
           }
         }
-        wsdlArtefact.setInlineSchemas(inlineSchemas.toArray(new Schema[inlineSchemas.size()]));
+        wsdlArtifact.setInlineSchemas(inlineSchemas.toArray(new Schema[inlineSchemas.size()]));
       }
     }
   }
@@ -101,14 +101,14 @@ public final class SchemaUtility {
     return null;
   }
 
-  private static <T> Set<WsdlArtefact<T>> getReferencedWsdlResourcesRec(IFileHandle<T> parentWsdlFileHandle, Definition parentWsdlDefinition) {
+  private static <T> Set<WsdlArtifact<T>> getReferencedWsdlResourcesRec(IFileHandle<T> parentWsdlFileHandle, Definition parentWsdlDefinition) {
     if (parentWsdlFileHandle == null || !parentWsdlFileHandle.exists()) {
       return Collections.emptySet();
     }
 
     IFileHandle<T> folder = parentWsdlFileHandle.getParent();
 
-    Set<WsdlArtefact<T>> wsdlArtefacts = new HashSet<WsdlArtefact<T>>();
+    Set<WsdlArtifact<T>> wsdlArtifacts = new HashSet<WsdlArtifact<T>>();
     Map<?, ?> importMap = parentWsdlDefinition.getImports();
 
     for (Object importValue : importMap.values()) {
@@ -122,20 +122,20 @@ public final class SchemaUtility {
             IFileHandle<T> wsdlFileHandle = folder.getChild(new Path(importDirective.getLocationURI()));
 
             if (wsdlFileHandle != null) {
-              wsdlArtefacts.add(new WsdlArtefact<T>(wsdlFileHandle, TypeEnum.ReferencedWsdl, wsdlDefinition));
+              wsdlArtifacts.add(new WsdlArtifact<T>(wsdlFileHandle, TypeEnum.ReferencedWsdl, wsdlDefinition));
 
               // recursion
-              wsdlArtefacts.addAll(getReferencedWsdlResourcesRec(wsdlFileHandle, wsdlDefinition));
+              wsdlArtifacts.addAll(getReferencedWsdlResourcesRec(wsdlFileHandle, wsdlDefinition));
             }
           }
         }
       }
     }
 
-    return wsdlArtefacts;
+    return wsdlArtifacts;
   }
 
-  private static <T> void visitReferencedSchemaResources(ISchemaArtefactVisitor<T> visitor, IFileHandle<T> fileHandle, Schema schema) {
+  private static <T> void visitReferencedSchemaResources(ISchemaArtifactVisitor<T> visitor, IFileHandle<T> fileHandle, Schema schema) {
     if (fileHandle == null || !fileHandle.exists() || schema == null) {
       return;
     }
@@ -157,8 +157,8 @@ public final class SchemaUtility {
         IFileHandle<T> referencedSchemaResource = parentResouce.getChild(new Path(schemaLocationURI));
         if (referencedSchemaResource != null) {
           Schema referencedSchema = schemaInclude.getReferencedSchema();
-          SchemaIncludeArtefact<T> artefact = new SchemaIncludeArtefact<T>(referencedSchemaResource, referencedSchema);
-          visitor.onSchemaIncludeArtefact(artefact);
+          SchemaIncludeArtifact<T> artifact = new SchemaIncludeArtifact<T>(referencedSchemaResource, referencedSchema);
+          visitor.onSchemaIncludeArtifact(artifact);
 
           // recursion
           visitReferencedSchemaResources(visitor, referencedSchemaResource, referencedSchema);
@@ -186,8 +186,8 @@ public final class SchemaUtility {
           IFileHandle<T> referencedSchemaResource = parentResouce.getChild(new Path(schemaLocationURI));
           if (referencedSchemaResource != null) {
             Schema referencedSchema = schemaImport.getReferencedSchema();
-            SchemaImportArtefact<T> artefact = new SchemaImportArtefact<T>(referencedSchemaResource, referencedSchema, schemaImport.getNamespaceURI());
-            visitor.onSchemaImportArtefact(artefact);
+            SchemaImportArtifact<T> artifact = new SchemaImportArtifact<T>(referencedSchemaResource, referencedSchema, schemaImport.getNamespaceURI());
+            visitor.onSchemaImportArtifact(artifact);
 
             // recursion
             visitReferencedSchemaResources(visitor, referencedSchemaResource, referencedSchema);
@@ -197,10 +197,10 @@ public final class SchemaUtility {
     }
   }
 
-  public static abstract class Artefact<T> {
+  public static abstract class AbstractArtifact<T> {
     private IFileHandle<T> m_fileHandle;
 
-    public Artefact(IFileHandle<T> fileHandle) {
+    public AbstractArtifact(IFileHandle<T> fileHandle) {
       m_fileHandle = fileHandle;
     }
 
@@ -228,16 +228,16 @@ public final class SchemaUtility {
       if (getClass() != obj.getClass()) {
         return false;
       }
-      return m_fileHandle.equals(((Artefact) obj).m_fileHandle);
+      return m_fileHandle.equals(((AbstractArtifact) obj).m_fileHandle);
     }
   }
 
-  public static class WsdlArtefact<T> extends Artefact<T> {
+  public static class WsdlArtifact<T> extends AbstractArtifact<T> {
     private TypeEnum m_typeEnum;
     private Definition m_wsdlDefintion;
     private Schema[] m_inlineSchemas = new Schema[0];
 
-    public WsdlArtefact(IFileHandle<T> wsdlFileHandle, TypeEnum typeEnum, Definition wsdlDefintion) {
+    public WsdlArtifact(IFileHandle<T> wsdlFileHandle, TypeEnum typeEnum, Definition wsdlDefintion) {
       super(wsdlFileHandle);
       m_typeEnum = typeEnum;
       m_wsdlDefintion = wsdlDefintion;
@@ -277,10 +277,10 @@ public final class SchemaUtility {
     }
   }
 
-  public static abstract class SchemaArtefact<T> extends Artefact<T> {
+  public static abstract class AbstractSchemaArtifact<T> extends AbstractArtifact<T> {
     private Schema m_schema;
 
-    public SchemaArtefact(IFileHandle<T> schemaResource, Schema schema) {
+    public AbstractSchemaArtifact(IFileHandle<T> schemaResource, Schema schema) {
       super(schemaResource);
       m_schema = schema;
     }
@@ -294,10 +294,10 @@ public final class SchemaUtility {
     }
   }
 
-  public static class SchemaImportArtefact<T> extends SchemaArtefact<T> {
+  public static class SchemaImportArtifact<T> extends AbstractSchemaArtifact<T> {
     private String m_namespaceUri;
 
-    public SchemaImportArtefact(IFileHandle<T> schemaFileHandle, Schema schema, String namespaceUri) {
+    public SchemaImportArtifact(IFileHandle<T> schemaFileHandle, Schema schema, String namespaceUri) {
       super(schemaFileHandle, schema);
       m_namespaceUri = namespaceUri;
     }
@@ -311,9 +311,9 @@ public final class SchemaUtility {
     }
   }
 
-  public static class SchemaIncludeArtefact<T> extends SchemaArtefact<T> {
+  public static class SchemaIncludeArtifact<T> extends AbstractSchemaArtifact<T> {
 
-    public SchemaIncludeArtefact(IFileHandle<T> schemaFileHandle, Schema schema) {
+    public SchemaIncludeArtifact(IFileHandle<T> schemaFileHandle, Schema schema) {
       super(schemaFileHandle, schema);
     }
   }

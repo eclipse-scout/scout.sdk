@@ -24,8 +24,9 @@ public class Language {
 
   public Language(Locale locale) {
     if (locale == null) {
-      NlsCore.logError("locale cannot be null! ", new Exception());
-      throw new NullPointerException();
+      IllegalArgumentException e = new IllegalArgumentException("locale cannot be null!");
+      NlsCore.logError(e.getMessage(), e);
+      throw e;
     }
     m_locale = locale;
   }

@@ -13,15 +13,15 @@ package org.eclipse.scout.sdk.workspace.type.config.property;
 import org.eclipse.scout.commons.CompareUtility;
 
 /**
- * <h3>{@link SourceProperty}</h3> ...
+ * <h3>{@link AbstractSourceProperty}</h3> ...
  * 
  *  @author Andreas Hoegger
  * @since 3.8.0 06.03.2013
  */
-public abstract class SourceProperty<T> {
+public abstract class AbstractSourceProperty<T> {
   private T m_value;
 
-  public SourceProperty(T value) {
+  public AbstractSourceProperty(T value) {
     m_value = value;
   }
 
@@ -31,8 +31,8 @@ public abstract class SourceProperty<T> {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj instanceof SourceProperty<?>) {
-      return CompareUtility.equals(((SourceProperty<?>) obj).getValue(), getValue());
+    if (obj instanceof AbstractSourceProperty<?>) {
+      return CompareUtility.equals(((AbstractSourceProperty<?>) obj).getValue(), getValue());
     }
     return false;
   }

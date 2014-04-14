@@ -36,8 +36,8 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 
 public class Technology implements Comparable<Technology> {
 
-  private final String TREE_TYPE_BUNDLE = "bundle";
-  private final String TREE_TYPE_RESOURCE = "resource";
+  private static final String TREE_TYPE_BUNDLE = "bundle";
+  private static final String TREE_TYPE_RESOURCE = "resource";
 
   private final String m_id, m_name, m_category;
   private final ArrayList<IScoutTechnologyHandler> m_handlers;

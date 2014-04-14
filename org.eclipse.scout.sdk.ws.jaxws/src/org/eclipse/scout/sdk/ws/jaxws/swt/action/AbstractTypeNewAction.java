@@ -41,7 +41,7 @@ import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.swt.widgets.Shell;
 
 @SuppressWarnings("restriction")
-public abstract class TypeNewAction extends AbstractLinkAction {
+public abstract class AbstractTypeNewAction extends AbstractLinkAction {
   private IScoutBundle m_bundle;
   private String m_packageFragment;
   private boolean m_allowModifyPackageFragment;
@@ -52,7 +52,7 @@ public abstract class TypeNewAction extends AbstractLinkAction {
   private String m_typeName;
   private IType m_createdType;
 
-  public TypeNewAction(String label) {
+  public AbstractTypeNewAction(String label) {
     super(Texts.get("Action_newTypeX", label), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolAdd));
     setLinkText(Texts.get("here"));
     setLeadingText(Texts.get("CreateNewXByClicking", label));

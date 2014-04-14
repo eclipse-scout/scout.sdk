@@ -96,9 +96,9 @@ import org.eclipse.jdt.core.dom.VariableDeclarationStatement;
 import org.eclipse.jdt.core.dom.WhileStatement;
 import org.eclipse.jdt.core.dom.WildcardType;
 
-public abstract class FineGrainedAstMatcher extends ASTMatcher {
+public abstract class AbstractFineGrainedAstMatcher extends ASTMatcher {
 
-  public FineGrainedAstMatcher() {
+  public AbstractFineGrainedAstMatcher() {
   }
 
   protected abstract boolean processDelta(boolean match, ASTNode node, Object other);

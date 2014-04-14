@@ -261,7 +261,12 @@ public class ConfigurationMethodSection {
         o = configMethod.getOrder();
       }
 
-      m_order = o == null ? Double.MAX_VALUE : o;
+      if (o == null) {
+        m_order = Double.MAX_VALUE;
+      }
+      else {
+        m_order = o;
+      }
       m_category = c == null ? PropertyViewConfig.DEFAULT_CONFIG_CATEGORY : c.getCategory();
       m_configType = c == null ? PropertyViewConfig.DEFAULT_CONFIG_TYPE : c.getType();
     }

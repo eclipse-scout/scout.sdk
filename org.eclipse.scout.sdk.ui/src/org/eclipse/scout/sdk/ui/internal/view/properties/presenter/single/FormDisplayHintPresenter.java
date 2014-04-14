@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractProposalPresenter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
-import org.eclipse.scout.sdk.workspace.type.config.parser.FieldReferencePropertyParser;
+import org.eclipse.scout.sdk.workspace.type.config.parser.AbstractFieldReferencePropertyParser;
 import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerFieldReferencePropertyParser;
 import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 import org.eclipse.swt.graphics.Image;
@@ -55,7 +55,7 @@ public class FormDisplayHintPresenter extends AbstractProposalPresenter<FieldPro
     PROPOSALS.add(DISPLAY_HINT_VIEW);
   }
 
-  private final FieldReferencePropertyParser<Integer> m_parser;
+  private final AbstractFieldReferencePropertyParser<Integer> m_parser;
 
   public FormDisplayHintPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -81,7 +81,7 @@ public class FormDisplayHintPresenter extends AbstractProposalPresenter<FieldPro
     getProposalField().setContentProvider(provider);
   }
 
-  public FieldReferencePropertyParser<Integer> getParser() {
+  public AbstractFieldReferencePropertyParser<Integer> getParser() {
     return m_parser;
   }
 

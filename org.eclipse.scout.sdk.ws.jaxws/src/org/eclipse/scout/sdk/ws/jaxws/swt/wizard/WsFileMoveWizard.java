@@ -38,11 +38,11 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.IFileHandle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.PathNormalizer;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtefactVisitor;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtifactVisitor;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -97,27 +97,27 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
     }
     elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_FILE, Texts.get("MoveXToY", "WSDL file", m_destination.getProjectRelativePath().append(wsdlFile.getName()).toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), wsdlFile, true));
 
-    SchemaUtility.visitArtefacts(wsdlFile, new SchemaArtefactVisitor<IFile>() {
+    SchemaUtility.visitArtifacts(wsdlFile, new SchemaArtifactVisitor<IFile>() {
 
       @Override
-      public void onReferencedWsdlArtefact(WsdlArtefact<IFile> wsdlArtefact) {
-        IFileHandle<IFile> fileHandle = wsdlArtefact.getFileHandle();
+      public void onReferencedWsdlArtifact(WsdlArtifact<IFile> wsdlArtifact) {
+        IFileHandle<IFile> fileHandle = wsdlArtifact.getFileHandle();
         if (fileHandle != null && fileHandle.exists()) {
           elements.add(new ElementBean(WsFilesMoveOperation.ID_REF_WSDL, Texts.get("MoveReferencedXToY", "WSDL file", m_destination.getProjectRelativePath().append(fileHandle.getName()).toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), fileHandle.getFile(), false));
         }
       }
 
       @Override
-      public void onSchemaIncludeArtefact(SchemaIncludeArtefact<IFile> schemaIncludeArtefact) {
-        IFileHandle<IFile> fileHandle = schemaIncludeArtefact.getFileHandle();
+      public void onSchemaIncludeArtifact(SchemaIncludeArtifact<IFile> schemaIncludeArtifact) {
+        IFileHandle<IFile> fileHandle = schemaIncludeArtifact.getFileHandle();
         if (fileHandle != null && fileHandle.exists()) {
           elements.add(new ElementBean(WsFilesMoveOperation.ID_REF_XSD, Texts.get("MoveReferencedXToY", "XSD schema (included)", m_destination.getProjectRelativePath().append(fileHandle.getName()).toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), fileHandle.getFile(), false));
         }
       }
 
       @Override
-      public void onSchemaImportArtefact(SchemaImportArtefact<IFile> schemaImportArtefact) {
-        IFileHandle<IFile> fileHandle = schemaImportArtefact.getFileHandle();
+      public void onSchemaImportArtifact(SchemaImportArtifact<IFile> schemaImportArtifact) {
+        IFileHandle<IFile> fileHandle = schemaImportArtifact.getFileHandle();
         if (fileHandle != null && fileHandle.exists()) {
           elements.add(new ElementBean(WsFilesMoveOperation.ID_REF_XSD, Texts.get("MoveReferencedXToY", "XSD schema (imported)", m_destination.getProjectRelativePath().append(fileHandle.getName()).toString()), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), fileHandle.getFile(), false));
         }

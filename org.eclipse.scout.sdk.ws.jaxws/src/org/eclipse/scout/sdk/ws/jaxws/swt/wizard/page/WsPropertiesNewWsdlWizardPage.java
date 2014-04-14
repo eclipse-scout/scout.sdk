@@ -381,7 +381,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
       }
       else {
         IStatus status = m_bundle.getProject().getWorkspace().validateName(getAlias(), IResource.FILE);
-        if (status.isOK() == false) {
+        if (!status.isOK()) {
           multiStatus.add(status);
         }
       }

@@ -31,7 +31,6 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.AbstractNlsProject;
 import org.eclipse.scout.nls.sdk.ui.INlsTableActionHanlder;
 import org.eclipse.scout.nls.sdk.ui.INlsTableCursorManangerListener;
 import org.eclipse.scout.nls.sdk.util.concurrent.AbstractJob;
-import org.eclipse.scout.nls.sdk.util.concurrent.UiRunnable;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.TableCursor;
 import org.eclipse.swt.events.KeyAdapter;
@@ -348,11 +347,11 @@ public class NlsTable extends Composite {
     }
   }
 
-  public void asyncRefresh(INlsEntry row) {
-    m_table.getDisplay().asyncExec(new UiRunnable(new Object[]{row}) {
+  public void asyncRefresh(final INlsEntry row) {
+    m_table.getDisplay().asyncExec(new Runnable() {
       @Override
       public void run() {
-        refresh((INlsEntry) p_args[0]);
+        refresh(row);
       }
     });
   }

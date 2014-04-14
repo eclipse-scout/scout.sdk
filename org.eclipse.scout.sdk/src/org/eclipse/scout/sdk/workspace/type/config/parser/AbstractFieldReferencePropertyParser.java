@@ -21,17 +21,17 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 
 /**
- * <h3>{@link FieldReferencePropertyParser}</h3> ...
+ * <h3>{@link AbstractFieldReferencePropertyParser}</h3> ...
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 27.02.2013
  */
-public abstract class FieldReferencePropertyParser<T> implements IPropertySourceParser<FieldProperty<T>> {
+public abstract class AbstractFieldReferencePropertyParser<T> implements IPropertySourceParser<FieldProperty<T>> {
 
   private final List<FieldProperty<T>> m_properties;
   private final boolean m_useTypeReference;
 
-  public FieldReferencePropertyParser(List<FieldProperty<T>> properties, boolean useTypeReference) {
+  public AbstractFieldReferencePropertyParser(List<FieldProperty<T>> properties, boolean useTypeReference) {
     m_properties = properties;
     m_useTypeReference = useTypeReference;
   }

@@ -421,7 +421,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("PleaseChooseATargetPlatform"));
     }
     SimpleProposal p = (SimpleProposal) m_eclipseTargetPlatform.getSelectedProposal();
-    boolean isCurrent = Boolean.valueOf((Boolean) p.getData(PROP_CURR_TARGET));
+    boolean isCurrent = ((Boolean) p.getData(PROP_CURR_TARGET)).booleanValue();
     if (!isCurrent) {
       return new Status(IStatus.INFO, ScoutSdkUi.PLUGIN_ID, Texts.get("ACompleteEclipsePlatformWillBeDownloaded"));
     }

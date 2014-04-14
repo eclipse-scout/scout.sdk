@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
-public class SessionFactoryNewAction extends TypeNewAction {
+public class SessionFactoryNewAction extends AbstractTypeNewAction {
 
   public SessionFactoryNewAction() {
     super(Texts.get("ServerSessionFactory"));

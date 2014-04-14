@@ -62,12 +62,12 @@ import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.AdditionalResourcesWizard;
 import org.eclipse.scout.sdk.ws.jaxws.util.JavaFileHandle;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtefactVisitor;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaArtifactVisitor;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.Artefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.AbstractArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -188,30 +188,30 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
           setPath(path);
 
           // help the user by determing the referenced files
-          final Set<WsdlArtefact<File>> referencedWsdlArtefacts = new HashSet<WsdlArtefact<File>>();
-          final Set<SchemaIncludeArtefact<File>> schemaIncludeArtefacts = new HashSet<SchemaIncludeArtefact<File>>();
-          final Set<SchemaImportArtefact<File>> schemaImportArtefacts = new HashSet<SchemaImportArtefact<File>>();
+          final Set<WsdlArtifact<File>> referencedWsdlArtifacts = new HashSet<WsdlArtifact<File>>();
+          final Set<SchemaIncludeArtifact<File>> schemaIncludeArtifacts = new HashSet<SchemaIncludeArtifact<File>>();
+          final Set<SchemaImportArtifact<File>> schemaImportArtifacts = new HashSet<SchemaImportArtifact<File>>();
 
-          SchemaUtility.visitArtefacts(new Path(path).toFile(), new SchemaArtefactVisitor<File>() {
+          SchemaUtility.visitArtifacts(new Path(path).toFile(), new SchemaArtifactVisitor<File>() {
 
             @Override
-            public void onReferencedWsdlArtefact(WsdlArtefact<File> wsdlArtefact) {
-              referencedWsdlArtefacts.add(wsdlArtefact);
+            public void onReferencedWsdlArtifact(WsdlArtifact<File> wsdlArtifact) {
+              referencedWsdlArtifacts.add(wsdlArtifact);
             }
 
             @Override
-            public void onSchemaIncludeArtefact(SchemaIncludeArtefact<File> schemaIncludeArtefact) {
-              schemaIncludeArtefacts.add(schemaIncludeArtefact);
+            public void onSchemaIncludeArtifact(SchemaIncludeArtifact<File> schemaIncludeArtifact) {
+              schemaIncludeArtifacts.add(schemaIncludeArtifact);
             }
 
             @Override
-            public void onSchemaImportArtefact(SchemaImportArtefact<File> schemaImportArtefact) {
-              schemaImportArtefacts.add(schemaImportArtefact);
+            public void onSchemaImportArtifact(SchemaImportArtifact<File> schemaImportArtifact) {
+              schemaImportArtifacts.add(schemaImportArtifact);
             }
           });
 
-          if (!referencedWsdlArtefacts.isEmpty() || !schemaIncludeArtefacts.isEmpty() || !schemaImportArtefacts.isEmpty()) {
-            P_ReferencedFilesFoundWizard wizard = new P_ReferencedFilesFoundWizard(referencedWsdlArtefacts, schemaIncludeArtefacts, schemaImportArtefacts);
+          if (!referencedWsdlArtifacts.isEmpty() || !schemaIncludeArtifacts.isEmpty() || !schemaImportArtifacts.isEmpty()) {
+            P_ReferencedFilesFoundWizard wizard = new P_ReferencedFilesFoundWizard(referencedWsdlArtifacts, schemaIncludeArtifacts, schemaImportArtifacts);
             ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
             wizardDialog.setPageSize(450, 350);
             wizardDialog.open();
@@ -743,15 +743,15 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
   private class P_ReferencedFilesFoundWizard extends AbstractWorkspaceWizard {
 
     private ResourceSelectionWizardPage m_wizardPage;
-    private Set<WsdlArtefact<File>> m_referencedWsdlArtefacts;
-    private Set<SchemaIncludeArtefact<File>> m_schemaIncludeArtefacts;
-    private Set<SchemaImportArtefact<File>> m_schemaImportArtefacts;
+    private Set<WsdlArtifact<File>> m_referencedWsdlArtifacts;
+    private Set<SchemaIncludeArtifact<File>> m_schemaIncludeArtifacts;
+    private Set<SchemaImportArtifact<File>> m_schemaImportArtifacts;
 
-    public P_ReferencedFilesFoundWizard(Set<WsdlArtefact<File>> referencedWsdlArtefacts, Set<SchemaIncludeArtefact<File>> schemaIncludeArtefacts, Set<SchemaImportArtefact<File>> schemaImportArtefacts) {
+    public P_ReferencedFilesFoundWizard(Set<WsdlArtifact<File>> referencedWsdlArtifacts, Set<SchemaIncludeArtifact<File>> schemaIncludeArtifacts, Set<SchemaImportArtifact<File>> schemaImportArtifacts) {
       setWindowTitle(Texts.get("ReferencedFilesFound"));
-      m_referencedWsdlArtefacts = referencedWsdlArtefacts;
-      m_schemaIncludeArtefacts = schemaIncludeArtefacts;
-      m_schemaImportArtefacts = schemaImportArtefacts;
+      m_referencedWsdlArtifacts = referencedWsdlArtifacts;
+      m_schemaIncludeArtifacts = schemaIncludeArtifacts;
+      m_schemaImportArtifacts = schemaImportArtifacts;
     }
 
     @Override
@@ -759,14 +759,14 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       m_wizardPage = new ResourceSelectionWizardPage(Texts.get("ReferencedFilesFound"), Texts.get("QuestionReferencedFilesFound"));
 
       List<ElementBean> elements = new ArrayList<ElementBean>();
-      for (WsdlArtefact<File> artefact : m_referencedWsdlArtefacts) {
-        elements.add(toElement(artefact, "referenced WSDL file", JaxWsIcons.WsdlFile));
+      for (WsdlArtifact<File> artifact : m_referencedWsdlArtifacts) {
+        elements.add(toElement(artifact, "referenced WSDL file", JaxWsIcons.WsdlFile));
       }
-      for (SchemaIncludeArtefact<File> artefact : m_schemaIncludeArtefacts) {
-        elements.add(toElement(artefact, "included XSD schema", JaxWsIcons.XsdSchema));
+      for (SchemaIncludeArtifact<File> artifact : m_schemaIncludeArtifacts) {
+        elements.add(toElement(artifact, "included XSD schema", JaxWsIcons.XsdSchema));
       }
-      for (SchemaImportArtefact<File> artefact : m_schemaImportArtefacts) {
-        elements.add(toElement(artefact, "imported XSD schema", JaxWsIcons.XsdSchema));
+      for (SchemaImportArtifact<File> artifact : m_schemaImportArtifacts) {
+        elements.add(toElement(artifact, "imported XSD schema", JaxWsIcons.XsdSchema));
       }
       m_wizardPage.setElements(elements);
       addPage(m_wizardPage);
@@ -789,10 +789,10 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
       return true;
     }
 
-    private ElementBean toElement(Artefact<File> artefact, String suffix, String image) {
-      String label = String.format("%s (%s)", artefact.getFileHandle().getName(), suffix);
+    private ElementBean toElement(AbstractArtifact<File> artifact, String suffix, String image) {
+      String label = String.format("%s (%s)", artifact.getFileHandle().getName(), suffix);
       ElementBean elementBean = new ElementBean(0, label, JaxWsSdk.getImageDescriptor(image), false);
-      elementBean.setData(artefact.getFileHandle().getFile());
+      elementBean.setData(artifact.getFileHandle().getFile());
       return elementBean;
     }
   }

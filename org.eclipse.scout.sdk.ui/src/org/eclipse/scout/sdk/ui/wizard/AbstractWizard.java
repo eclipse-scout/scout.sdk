@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 /**
  * <h3>AbstractWizard</h3> ...
  */
-public class AbstractWizard extends Wizard implements IWizard {
+public abstract class AbstractWizard extends Wizard implements IWizard {
 
   public AbstractWizard(AbstractScoutWizardPage... pages) {
     for (AbstractScoutWizardPage page : pages) {

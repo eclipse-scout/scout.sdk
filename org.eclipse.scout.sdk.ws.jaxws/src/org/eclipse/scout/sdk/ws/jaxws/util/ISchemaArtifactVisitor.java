@@ -10,17 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.util;
 
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtefact;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaImportArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.SchemaIncludeArtifact;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact;
 
-public interface ISchemaArtefactVisitor<T> {
+public interface ISchemaArtifactVisitor<T> {
 
-  void onRootWsdlArtefact(WsdlArtefact<T> wsdlArtefact);
+  void onRootWsdlArtifact(WsdlArtifact<T> wsdlArtifact);
 
-  void onReferencedWsdlArtefact(WsdlArtefact<T> wsdlArtefact);
+  void onReferencedWsdlArtifact(WsdlArtifact<T> wsdlArtifact);
 
-  void onSchemaImportArtefact(SchemaImportArtefact<T> schemaImportArtefact);
+  void onSchemaImportArtifact(SchemaImportArtifact<T> schemaImportArtifact);
 
-  void onSchemaIncludeArtefact(SchemaIncludeArtefact<T> schemaIncludeArtefact);
+  void onSchemaIncludeArtifact(SchemaIncludeArtifact<T> schemaIncludeArtifact);
 }

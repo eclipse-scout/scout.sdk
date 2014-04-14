@@ -27,7 +27,6 @@ public class TargetPackageModel implements Comparable<TargetPackageModel> {
   final String m_defaultVal;
   final IScoutBundle m_context;
   String m_curVal;
-  String m_group;
   String m_label;
 
   TargetPackageModel(String id, String defaultVal, IScoutBundle context) {
@@ -62,7 +61,6 @@ public class TargetPackageModel implements Comparable<TargetPackageModel> {
   public void load() {
     m_curVal = DefaultTargetPackage.get(m_context, m_id);
     String[] tokens = getTokens();
-    m_group = tokens[0];
     m_label = tokens[1];
   }
 

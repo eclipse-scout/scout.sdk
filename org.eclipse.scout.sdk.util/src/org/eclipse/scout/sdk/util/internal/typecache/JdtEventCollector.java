@@ -22,7 +22,7 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
-import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedAstMatcher;
+import org.eclipse.scout.sdk.util.jdt.finegraned.AbstractFineGrainedAstMatcher;
 import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDelta;
 
 /**
@@ -53,7 +53,7 @@ public class JdtEventCollector {
   public FineGrainedJavaElementDelta[] updateAst() {
     final CompilationUnit newAst = createAst();
     final HashSet<FineGrainedJavaElementDelta> set = new HashSet<FineGrainedJavaElementDelta>();
-    FineGrainedAstMatcher matcher = new FineGrainedAstMatcher() {
+    AbstractFineGrainedAstMatcher matcher = new AbstractFineGrainedAstMatcher() {
       @Override
       protected boolean processDelta(boolean match, ASTNode node, Object other) {
         if (!match) {

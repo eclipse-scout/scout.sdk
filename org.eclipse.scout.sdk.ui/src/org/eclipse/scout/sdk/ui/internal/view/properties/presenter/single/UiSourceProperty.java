@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
-import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
+import org.eclipse.scout.sdk.workspace.type.config.property.AbstractSourceProperty;
 
 /**
  * <h3>{@link UiSourceProperty}</h3> ...
@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.workspace.type.config.property.SourceProperty;
  *  @author Andreas Hoegger
  * @since 3.8.0 06.03.2013
  */
-public class UiSourceProperty<T> extends SourceProperty<T> {
+public class UiSourceProperty<T> extends AbstractSourceProperty<T> {
 
   private final String m_displayValue;
 

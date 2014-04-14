@@ -57,7 +57,7 @@ import org.eclipse.scout.sdk.ws.jaxws.util.GlobalBindingRegistrationHelper;
 import org.eclipse.scout.sdk.ws.jaxws.util.GlobalBindingRegistrationHelper.SchemaCandidate;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility;
-import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtefact.TypeEnum;
+import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact.TypeEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility.Registration;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IOperationFinishedListener;
@@ -349,8 +349,8 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
           op.setBundle(m_bundle);
           op.setWsdlDestinationFolder(m_wsdlLocationWizardPage.getWsdlFolder());
           op.setSchemaTargetNamespace(schemaTargetNamespace);
-          if (candidate.getWsdlArtefact().getTypeEnum() == TypeEnum.ReferencedWsdl) {
-            op.setWsdlLocation(candidate.getWsdlArtefact().getFileHandle().getFile());
+          if (candidate.getWsdlArtifact().getTypeEnum() == TypeEnum.ReferencedWsdl) {
+            op.setWsdlLocation(candidate.getWsdlArtifact().getFileHandle().getFile());
           }
           op.setProjectRelativePath(bindingFilePath);
           JaxWsSdkUtility.addBuildProperty(buildProperties, JaxWsConstants.OPTION_BINDING_FILE, bindingFilePath.toString());

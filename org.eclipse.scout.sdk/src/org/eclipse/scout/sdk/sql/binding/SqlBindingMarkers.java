@@ -25,10 +25,10 @@ import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.SQLStatement;
  * @since 1.0.8 28.02.2011
  */
 public class SqlBindingMarkers {
-  public static String MARKER_ID = "org.eclipse.scout.sdk.formdata.sql.binding";
-  public static String MAKRER_ID_SINGLE = "org.eclipse.scout.sdk.formdata.sql.binding.single";
-  public static String MARKER_ID_MULTI = "org.eclipse.scout.sdk.formdata.sql.binding.multi";
-  public static String BIND_VARIABLE = "bindVariable";
+  public static final String MARKER_ID = "org.eclipse.scout.sdk.formdata.sql.binding";
+  public static final String MAKRER_ID_SINGLE = "org.eclipse.scout.sdk.formdata.sql.binding.single";
+  public static final String MARKER_ID_MULTI = "org.eclipse.scout.sdk.formdata.sql.binding.multi";
+  public static final String BIND_VARIABLE = "bindVariable";
 
   public static void removeMarkers(IResource resource) {
     try {

@@ -36,6 +36,9 @@ public class NlsWorkingSet implements IWorkingSet {
     return null;
   }
 
+  /**
+   * @deprecated use {@link #getImageDescriptor()} instead
+   */
   @SuppressWarnings("deprecation")
   @Override
   @Deprecated

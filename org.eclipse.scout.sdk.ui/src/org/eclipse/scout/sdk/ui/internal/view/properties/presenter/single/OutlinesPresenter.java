@@ -103,7 +103,7 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
       ConfigPropertyUpdateOperation<IType[]> updateOp = new ConfigPropertyUpdateOperation<IType[]>(getMethod(), getParser()) {
         @Override
         protected void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          source.append(getParser().formatSourceValue(getValue(), lineDelimiter, validator));
+          source.append(super.getParser().formatSourceValue(super.getValue(), lineDelimiter, validator));
         }
       };
       updateOp.setValue(types);
@@ -116,12 +116,11 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
     }
   }
 
-  private class P_OutlineDialogPropertyListener implements PropertyChangeListener {
+  private static final class P_OutlineDialogPropertyListener implements PropertyChangeListener {
     private final JavaElementSelectionDialog m_dialog;
 
     private P_OutlineDialogPropertyListener(JavaElementSelectionDialog dialog) {
       m_dialog = dialog;
-
     }
 
     @Override

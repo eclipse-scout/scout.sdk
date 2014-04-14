@@ -93,7 +93,7 @@ public class AppendRapTargetOperation extends AbstractScoutProjectNewOperation {
       // new local extracted target
       TargetPlatformUtility.addDirectoryToTarget(targetFile, new String[]{RAP_TARGET_VARIABLE});
     }
-    getProperties().setProperty(NewProjectLoadTargetOperation.PROP_TARGET_PLATFORM_RELOAD_NECESSARY, Boolean.valueOf(true));
+    getProperties().setProperty(NewProjectLoadTargetOperation.PROP_TARGET_PLATFORM_RELOAD_NECESSARY, Boolean.TRUE);
   }
 
   protected String getLocalTargetFolder() {
