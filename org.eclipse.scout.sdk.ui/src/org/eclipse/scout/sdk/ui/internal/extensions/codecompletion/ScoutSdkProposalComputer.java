@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -44,16 +43,16 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
 
   @Override
   public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-    List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
-    if (!(context instanceof JavaContentAssistInvocationContext)
-        || Platform.getBundle(ScoutSdkUi.PLUGIN_ID).getState() != Bundle.ACTIVE) {
+    List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(1);
+    if (!(context instanceof JavaContentAssistInvocationContext) || Platform.getBundle(ScoutSdkUi.PLUGIN_ID).getState() != Bundle.ACTIVE) {
       return proposals;
     }
+
     try {
       JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
       ICompilationUnit icu = javaContext.getCompilationUnit();
       IJavaElement element = JdtUtility.findJavaElement(icu, context.getInvocationOffset(), 0);
-      if (element.getElementType() == IJavaElement.TYPE) {
+      if (TypeUtility.exists(element) && element.getElementType() == IJavaElement.TYPE) {
         IType declaringType = (IType) element;
         if (TypeUtility.isSubtype(TypeUtility.getType(IRuntimeClasses.ICodeType), declaringType, declaringType.newSupertypeHierarchy(monitor)) ||
             TypeUtility.isSubtype(TypeUtility.getType(IRuntimeClasses.ICode), declaringType, declaringType.newSupertypeHierarchy(monitor))) {
@@ -61,8 +60,8 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
         }
       }
     }
-    catch (CoreException e) {
-      e.printStackTrace();
+    catch (Exception e) {
+      ScoutSdkUi.logError("Unable to compute Scout code completion proposals.", e);
     }
 
     return proposals;
