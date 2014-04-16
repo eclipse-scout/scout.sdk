@@ -10,15 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.proposal.signature;
 
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
-import java.util.HashMap;
+import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.TreeSet;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,6 +38,7 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeDeclarationMatch;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
@@ -46,7 +49,7 @@ import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 
 public class SignatureProposalProvider extends ContentProposalProvider {
 
-  public static final String[] DEFAULT_PRIMITIV_SIGNATURES = new String[]{
+  public static final Set<String> DEFAULT_PRIMITIV_SIGNATURES = Collections.unmodifiableSet(CollectionUtility.hashSet(
       Signature.SIG_BOOLEAN,
       Signature.SIG_BYTE,
       Signature.SIG_CHAR,
@@ -54,39 +57,37 @@ public class SignatureProposalProvider extends ContentProposalProvider {
       Signature.SIG_FLOAT,
       Signature.SIG_INT,
       Signature.SIG_LONG,
-      Signature.SIG_SHORT};
+      Signature.SIG_SHORT));
 
-  public static final String[] DEFAULT_MOST_USED = new String[]{
-      SignatureCache.createTypeSignature(ArrayList.class.getName()),
+  public static final Set<String> DEFAULT_MOST_USED = Collections.unmodifiableSet(CollectionUtility.hashSet(
       SignatureCache.createTypeSignature(java.lang.Boolean.class.getName()),
-      SignatureCache.createTypeSignature(Collection.class.getName()),
-      SignatureCache.createTypeSignature(Date.class.getName()),
-      SignatureCache.createTypeSignature(Double.class.getName()),
-      SignatureCache.createTypeSignature(java.util.Enumeration.class.getName()),
-      SignatureCache.createTypeSignature(java.lang.Float.class.getName()),
-      SignatureCache.createTypeSignature(HashMap.class.getName()),
-      SignatureCache.createTypeSignature(Integer.class.getName()),
-      SignatureCache.createTypeSignature(List.class.getName()),
-      SignatureCache.createTypeSignature(Long.class.getName()),
-      SignatureCache.createTypeSignature(Map.class.getName()),
       SignatureCache.createTypeSignature(java.lang.Number.class.getName()),
+      SignatureCache.createTypeSignature(Integer.class.getName()),
+      SignatureCache.createTypeSignature(Long.class.getName()),
+      SignatureCache.createTypeSignature(Double.class.getName()),
+      SignatureCache.createTypeSignature(Date.class.getName()),
+      SignatureCache.createTypeSignature(String.class.getName()),
+      SignatureCache.createTypeSignature(BigDecimal.class.getName()),
+      SignatureCache.createTypeSignature(BigInteger.class.getName()),
       SignatureCache.createTypeSignature(Object.class.getName()),
       SignatureCache.createTypeSignature(java.lang.Runnable.class.getName()),
+      SignatureCache.createTypeSignature(Collection.class.getName()),
+      SignatureCache.createTypeSignature(List.class.getName()),
       SignatureCache.createTypeSignature(Set.class.getName()),
-      SignatureCache.createTypeSignature(String.class.getName()),
-      SignatureCache.createTypeSignature(TreeMap.class.getName()),
-      SignatureCache.createTypeSignature(TreeSet.class.getName())
-  };
+      SignatureCache.createTypeSignature(Map.class.getName()),
+      SignatureCache.createTypeSignature(Enumeration.class.getName()),
+      SignatureCache.createTypeSignature(Iterable.class.getName())
+      ));
 
   private SearchEngine m_searchEngine;
   private final boolean m_supportsGenerics;
-  private String[] m_primitivSignatures;
+  private Set<String> m_primitivSignatures;
   private final IJavaSearchScope m_searchScope;
-  private String[] m_mostUsedSignatures;
+  private Set<String> m_mostUsedSignatures;
   private final ILabelProvider m_labelProvider;
   private int m_maxProposalAmount = 100; // default
 
-  public SignatureProposalProvider(IJavaSearchScope searchScope, ILabelProvider labelProvider, String[] mostUsedSignatures, boolean supportsGenerics) {
+  public SignatureProposalProvider(IJavaSearchScope searchScope, ILabelProvider labelProvider, Set<String> mostUsedSignatures, boolean supportsGenerics) {
     m_searchScope = searchScope;
     m_labelProvider = labelProvider;
     m_mostUsedSignatures = mostUsedSignatures;
@@ -102,19 +103,19 @@ public class SignatureProposalProvider extends ContentProposalProvider {
     return m_labelProvider;
   }
 
-  public String[] getMostUsedSignatures() {
+  public Set<String> getMostUsedSignatures() {
     return m_mostUsedSignatures;
   }
 
-  public void setMostUsedSignatures(String[] mostUsedSignatures) {
+  public void setMostUsedSignatures(Set<String> mostUsedSignatures) {
     m_mostUsedSignatures = mostUsedSignatures;
   }
 
-  public String[] getPrimitivSignatures() {
+  public Set<String> getPrimitivSignatures() {
     return m_primitivSignatures;
   }
 
-  public void setPrimitivSignatures(String[] primitivSignatures) {
+  public void setPrimitivSignatures(Set<String> primitivSignatures) {
     m_primitivSignatures = primitivSignatures;
   }
 

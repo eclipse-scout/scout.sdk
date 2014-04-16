@@ -19,15 +19,6 @@ import org.eclipse.jdt.core.IMethod;
  * @since 3.10.0 30.09.2013
  */
 public interface IMethodReturnValueParser {
-
-  /**
-   * the predefined parsers that are queried in the defined order for results.
-   */
-  IMethodReturnValueParser[] INSTANCES = new IMethodReturnValueParser[]{
-      SimpleMethodReturnValueParser.INSTANCE,
-      AstMethodReturnValueParser.INSTANCE
-  };
-
   /**
    * parses the return expression of the given method
    * 

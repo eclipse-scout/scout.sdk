@@ -34,8 +34,8 @@ import org.eclipse.ui.services.IServiceLocator;
 @SuppressWarnings("restriction")
 public class ScoutMenuContributionItemFactory extends ExtensionContributionFactory {
 
-  private static HashMap<String, KeyBinding> m_usedBindings = new HashMap<String, KeyBinding>();
-  private static HashMap<String, IHandlerActivation> m_usedActivations = new HashMap<String, IHandlerActivation>();
+  private static final Map<String, KeyBinding> USED_BINDINGS = new HashMap<String, KeyBinding>();
+  private static final Map<String, IHandlerActivation> USED_ACTIVATIONS = new HashMap<String, IHandlerActivation>();
 
   @Override
   public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
@@ -87,7 +87,7 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
       try {
         BindingService bs = (BindingService) Workbench.getInstance().getService(IBindingService.class);
 
-        KeyBinding oldBinding = m_usedBindings.remove(keyStroke);
+        KeyBinding oldBinding = USED_BINDINGS.remove(keyStroke);
         if (oldBinding != null) {
           bs.removeBinding(oldBinding);
         }
@@ -97,7 +97,7 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
             "org.eclipse.ui.defaultAcceleratorConfiguration",
             "org.eclipse.scout.sdk.explorer.context", null, null, null, Binding.USER);
         bs.addBinding(kb);
-        m_usedBindings.put(keyStroke, kb);
+        USED_BINDINGS.put(keyStroke, kb);
       }
       catch (ParseException e) {
         ScoutSdkUi.logError(e);
@@ -108,12 +108,12 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
   public synchronized static void activateHandler(IServiceLocator serviceLocator, IScoutHandler h) {
     if (h != null) {
       IHandlerService hs = (IHandlerService) serviceLocator.getService(IHandlerService.class);
-      IHandlerActivation existingActivation = m_usedActivations.remove(h.getId());
+      IHandlerActivation existingActivation = USED_ACTIVATIONS.remove(h.getId());
       if (existingActivation != null) {
         hs.deactivateHandler(existingActivation);
       }
       IHandlerActivation ha = hs.activateHandler(h.getId(), h);
-      m_usedActivations.put(h.getId(), ha);
+      USED_ACTIVATIONS.put(h.getId(), ha);
     }
   }
 

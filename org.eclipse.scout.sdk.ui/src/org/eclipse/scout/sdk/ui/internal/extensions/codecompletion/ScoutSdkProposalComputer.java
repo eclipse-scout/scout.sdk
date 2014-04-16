@@ -49,24 +49,29 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
       return proposals;
     }
 
-    JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-    CompletionContext coreContext = javaContext.getCoreContext();
-    if (coreContext != null && coreContext.isExtended()) {
-      IJavaElement element = coreContext.getEnclosingElement();
-      if (TypeUtility.exists(element)) {
-        if (element.getElementType() == IJavaElement.TYPE) {
-          IType declaringType = (IType) element;
-          try {
-            ITypeHierarchy supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
-            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
-              proposals.add(new CodeNewProposal(declaringType));
+    try {
+      JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
+      CompletionContext coreContext = javaContext.getCoreContext();
+      if (coreContext != null && coreContext.isExtended()) {
+        IJavaElement element = coreContext.getEnclosingElement();
+        if (TypeUtility.exists(element)) {
+          if (element.getElementType() == IJavaElement.TYPE) {
+            IType declaringType = (IType) element;
+            try {
+              ITypeHierarchy supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
+              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
+                proposals.add(new CodeNewProposal(declaringType));
+              }
             }
-          }
-          catch (JavaModelException e) {
-            ScoutSdkUi.logError("Could not calculate code completion proposals. ", e);
+            catch (JavaModelException e) {
+              ScoutSdkUi.logError("Could not calculate code completion proposals. ", e);
+            }
           }
         }
       }
+    }
+    catch (Exception e) {
+      ScoutSdkUi.logError("Unable to compute Scout code completion proposals.", e);
     }
     return proposals;
   }

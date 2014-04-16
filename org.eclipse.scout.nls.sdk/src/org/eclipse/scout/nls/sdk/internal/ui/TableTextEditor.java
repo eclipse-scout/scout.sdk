@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Text;
 
 public class TableTextEditor {
   private static final int BORDER_WIDTH = 1;
-  private static Point MULTILINE_EDITOR_SIZE = new Point(594, 100);
+  private static final Point MULTILINE_EDITOR_SIZE = new Point(594, 100);
   private final Text m_text;
   private final Shell m_shell;
 

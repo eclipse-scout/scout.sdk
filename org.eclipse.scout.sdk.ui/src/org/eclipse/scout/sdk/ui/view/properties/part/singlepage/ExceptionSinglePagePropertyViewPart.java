@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
@@ -62,6 +63,7 @@ public class ExceptionSinglePagePropertyViewPart extends AbstractSinglePageSecti
         sb.append(sw.toString());
       }
       catch (Exception ex) {
+        ScoutSdkUi.logWarning(ex);
       }
       errorText.setText(sb.toString());
     }

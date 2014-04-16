@@ -46,7 +46,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.ws.jaxws";
   private static final String IMAGE_PATH = "resources/icons/";
 
-  private static JaxWsSdk m_plugin;
+  private static JaxWsSdk plugin;
   private static SdkLogManager logManager;
 
   private Map<String, IMarkerCommand> m_markerCommands;
@@ -63,7 +63,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
-    m_plugin = this;
+    plugin = this;
     logManager = new SdkLogManager(this);
     m_markerQueueManager = new MarkerQueueManager();
   }
@@ -79,7 +79,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
   }
 
   public static JaxWsSdk getDefault() {
-    return m_plugin;
+    return plugin;
   }
 
   public static void logInfo(Throwable t) {

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.fields;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
@@ -88,11 +89,11 @@ public class FieldToolkit {
     return createSignatureProposalField(parent, label, bundle, null);
   }
 
-  public ProposalTextField createSignatureProposalField(Composite parent, String label, IScoutBundle bundle, String[] mostlyUsed) {
+  public ProposalTextField createSignatureProposalField(Composite parent, String label, IScoutBundle bundle, Set<String> mostlyUsed) {
     return createSignatureProposalField(parent, label, bundle, mostlyUsed, TextField.DEFAULT_LABEL_PERCENTAGE);
   }
 
-  public ProposalTextField createSignatureProposalField(Composite parent, String label, IScoutBundle bundle, String[] mostlyUsed, int labelPercentage) {
+  public ProposalTextField createSignatureProposalField(Composite parent, String label, IScoutBundle bundle, Set<String> mostlyUsed, int labelPercentage) {
     ProposalTextField field = createProposalField(parent, label, ProposalTextField.STYLE_DEFAULT, labelPercentage);
     SignatureLabelProvider labelProvider = new SignatureLabelProvider();
     field.setLabelProvider(labelProvider);

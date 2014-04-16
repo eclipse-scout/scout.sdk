@@ -420,7 +420,7 @@ public final class JaxWsSdkUtility {
       declaringType.getCompilationUnit().createImport(typeForImportDirective.getFullyQualifiedName().replaceAll("\\$", "."), null, new NullProgressMonitor());
     }
     catch (Exception e) {
-      // nop
+      JaxWsSdk.logError("Unable to create import directive", e);
     }
   }
 

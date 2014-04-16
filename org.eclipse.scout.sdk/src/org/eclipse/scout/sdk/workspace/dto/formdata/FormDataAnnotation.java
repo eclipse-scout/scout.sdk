@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  *
  */
 public class FormDataAnnotation {
-  public static FormDataAnnotation IGNORE_ANNOTATION = new FormDataAnnotation(SdkCommand.IGNORE);
+  public static final FormDataAnnotation IGNORE_ANNOTATION = new FormDataAnnotation(SdkCommand.IGNORE);
 
   public static boolean isCreate(FormDataAnnotation anot) {
     if (anot == null) {

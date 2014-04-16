@@ -167,7 +167,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
         m_workingSetDownButton.setEnabled(set != null && sets.length > 0 && !set.equals(sets[sets.length - 1]));
       }
       if (m_workingSetUpButton != null && !m_workingSetUpButton.isDisposed()) {
-        m_workingSetUpButton.setEnabled(set != null && sets.length > 0 && sets[0] != set);
+        m_workingSetUpButton.setEnabled(set != null && sets.length > 0 && !sets[0].equals(set));
       }
       if (m_availableBundlesTree != null && !m_availableBundlesTree.isDisposed()) {
         m_availableBundlesTree.setVisible(!ScoutExplorerSettingsSupport.OTHER_PROJECTS_WORKING_SET_NAME.equals(set));

@@ -48,8 +48,10 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
+import org.eclipse.scout.sdk.util.method.AstMethodReturnValueParser;
 import org.eclipse.scout.sdk.util.method.IMethodReturnValueParser;
 import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
+import org.eclipse.scout.sdk.util.method.SimpleMethodReturnValueParser;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
@@ -81,6 +83,11 @@ public final class ScoutUtility {
   private static final Pattern REGEX_COMMENT_REMOVE_3 = Pattern.compile("(?s)\\/\\*.*?\\*\\/");
 
   private static final ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<String>();
+
+  private static final IMethodReturnValueParser[] METHOD_RETURN_VALUE_PARSERS = new IMethodReturnValueParser[]{
+      SimpleMethodReturnValueParser.INSTANCE,
+      AstMethodReturnValueParser.INSTANCE
+  };
 
   private ScoutUtility() {
   }
@@ -423,7 +430,7 @@ public final class ScoutUtility {
   }
 
   public static MethodReturnExpression getMethodReturnExpression(IMethod method) {
-    for (IMethodReturnValueParser parser : IMethodReturnValueParser.INSTANCES) {
+    for (IMethodReturnValueParser parser : METHOD_RETURN_VALUE_PARSERS) {
       MethodReturnExpression returnExpression = parser.parse(method);
       if (returnExpression != null) {
         return returnExpression;
