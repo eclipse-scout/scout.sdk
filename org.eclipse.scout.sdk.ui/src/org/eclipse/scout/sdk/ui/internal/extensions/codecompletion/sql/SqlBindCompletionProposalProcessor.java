@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion.sql;
 
+import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -26,8 +28,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
-import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.jface.text.contentassist.IContextInformationValidator;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.NamingUtility;
@@ -38,7 +39,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>SqlBindCompletionProposalProcessor</h3> ...
+ * <h3>SqlBindCompletionProposalProcessor</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2010
@@ -51,21 +52,19 @@ public class SqlBindCompletionProposalProcessor {
   private final Image m_image;
   private static final Pattern REGEX_QUOTES = Pattern.compile("\\\"");
   private static final Pattern REGEX_BIND = Pattern.compile(".*\\:[A-Za-z0-9\\._-]*$");
-  private static final ICompletionProposal[] NO_PROPOSALS = new ICompletionProposal[0];
-  private static final IContextInformation[] NO_CONTEXTS = new IContextInformation[0];
 
   public SqlBindCompletionProposalProcessor() {
     m_image = ScoutSdkUi.getImage(ScoutSdkUi.Default);
   }
 
-  public ICompletionProposal[] computeCompletionProposals(JavaContentAssistInvocationContext context) {
+  public List<ICompletionProposal> computeCompletionProposals(JavaContentAssistInvocationContext context) {
     try {
       if (!isSqlStatementLocation(context.getViewer(), context.getInvocationOffset())) {
-        return NO_PROPOSALS;
+        return Collections.emptyList();
       }
       IType formData = getFormDataParameterType(context);
       if (formData == null || !formData.exists()) {
-        return NO_PROPOSALS;
+        return Collections.emptyList();
       }
       String prefix = getPrefix(context.getViewer(), context.getInvocationOffset());
       HashSet<ICompletionProposal> collector = new HashSet<ICompletionProposal>();
@@ -90,12 +89,12 @@ public class SqlBindCompletionProposalProcessor {
         }
       }
 
-      return sorted.values().toArray(new ICompletionProposal[sorted.values().size()]);
+      return CollectionUtility.arrayList(sorted.values());
     }
     catch (Exception e) {
       ScoutSdkUi.logWarning("error during creating sql copletion.", e);
     }
-    return NO_PROPOSALS;
+    return Collections.emptyList();
   }
 
   private void addInnerTypesInSuperClasses(IType baseType, org.eclipse.jdt.core.ITypeHierarchy baseTypeSuperHierarchy, HashSet<ICompletionProposal> collector,
@@ -110,7 +109,7 @@ public class SqlBindCompletionProposalProcessor {
     }
   }
 
-  private boolean isSqlStatementLocation(ITextViewer viewer, int offset) throws BadLocationException {
+  private static boolean isSqlStatementLocation(ITextViewer viewer, int offset) throws BadLocationException {
     IDocument doc = viewer.getDocument();
     if (doc == null || offset > doc.getLength()) {
       return false;
@@ -146,7 +145,7 @@ public class SqlBindCompletionProposalProcessor {
     return null;
   }
 
-  private String getPrefix(ITextViewer viewer, int offset) throws BadLocationException {
+  private static String getPrefix(ITextViewer viewer, int offset) throws BadLocationException {
     IDocument doc = viewer.getDocument();
     if (doc == null || offset > doc.getLength()) {
       return null;
@@ -158,41 +157,5 @@ public class SqlBindCompletionProposalProcessor {
     }
     return doc.get(offset + 1, length);
 
-  }
-
-  /*
-   * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#computeContextInformation(org.eclipse.jface.text.ITextViewer, int)
-   */
-  public IContextInformation[] computeContextInformation(ITextViewer viewer, int offset) {
-    // no context informations for hippie completions
-    return NO_CONTEXTS;
-  }
-
-  /*
-   * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getCompletionProposalAutoActivationCharacters()
-   */
-  public char[] getCompletionProposalAutoActivationCharacters() {
-    return null;
-  }
-
-  /*
-   * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationAutoActivationCharacters()
-   */
-  public char[] getContextInformationAutoActivationCharacters() {
-    return null;
-  }
-
-  /*
-   * @see org.eclipse.jface.text.contentassist.IContentAssistProcessor#getContextInformationValidator()
-   */
-  public IContextInformationValidator getContextInformationValidator() {
-    return null;
-  }
-
-  /*
-   * @see org.eclipse.jface.text.contentassist.ICompletionProposalComputer#getErrorMessage()
-   */
-  public String getErrorMessage() {
-    return null; // no custom error message
   }
 }
