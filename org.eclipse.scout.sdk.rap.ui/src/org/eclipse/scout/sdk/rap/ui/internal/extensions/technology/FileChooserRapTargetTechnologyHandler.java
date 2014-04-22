@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.rap.ui.internal.extensions.technology;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -40,13 +41,16 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
   private static final String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/4.0";
 
   @Override
-  public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
+  public boolean preSelectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor) throws CoreException {
+    if (!closeTargetEditors(resources)) {
+      return false;
+    }
     return showLicenseDialog(selected, monitor, new String[]{RAP_INCUBATOR_FEATURE_NAME, SCOUT_INCUBATOR_FEATURE_NAME},
         new String[]{RAP_INCUBATOR_UPDATE_SITE_URL, SCOUT_INCUBATOR_UPDATE_SITE_URL});
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedTargetFiles(resources, selected, monitor,
         new String[]{RAP_INCUBATOR_FEATURE_NAME, SCOUT_INCUBATOR_FEATURE_NAME}, new String[]{RAP_INCUBATOR_FEATURE_VERSION.toString(), null},
         new String[]{RAP_INCUBATOR_UPDATE_SITE_URL, SCOUT_INCUBATOR_UPDATE_SITE_URL});

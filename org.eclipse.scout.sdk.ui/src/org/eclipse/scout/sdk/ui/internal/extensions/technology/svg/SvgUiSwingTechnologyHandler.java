@@ -1,6 +1,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.svg;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,7 +21,7 @@ public class SvgUiSwingTechnologyHandler extends AbstractScoutTechnologyHandler 
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedProductFiles(resources, selected, SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SvgClientTechnologyHandler.CORE_SVG_PLUGINS, SWING_SVG_PLUGIN,
         SvgClientTechnologyHandler.getAdditionalBatik17CorePlugins(), SvgClientTechnologyHandler.getAdditionalBatik17ScoutPlugins());
   }

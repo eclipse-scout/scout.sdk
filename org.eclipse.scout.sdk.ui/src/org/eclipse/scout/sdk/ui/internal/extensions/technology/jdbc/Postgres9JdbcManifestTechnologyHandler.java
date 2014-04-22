@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -34,7 +35,7 @@ public class Postgres9JdbcManifestTechnologyHandler extends AbstractScoutTechnol
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedManifest(resources, selected, POSTGRES_JDBC_PLUGIN);
   }
 

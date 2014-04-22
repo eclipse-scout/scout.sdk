@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.laf;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -40,7 +41,7 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
   private static final String RAYO_LAF_FRAME_NAME = "true";
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedProductFiles(resources, selected, new String[]{RAYO_LAF_PLUGIN, RAYO_LAF_FRAGMENT});
 
     for (IScoutTechnologyResource res : resources) {

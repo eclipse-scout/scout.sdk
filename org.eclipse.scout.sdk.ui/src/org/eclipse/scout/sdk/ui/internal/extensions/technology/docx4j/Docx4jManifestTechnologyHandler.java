@@ -1,6 +1,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.docx4j;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +29,7 @@ public class Docx4jManifestTechnologyHandler extends AbstractScoutTechnologyHand
   }
 
   @Override
-  public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
+  public boolean preSelectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor) throws CoreException {
     m_newPluginsInstalled = false;
     if (selected) {
       FeatureInstallResult result = ensureFeaturesInstalled(new String[]{XML_GRAPHICS_FEATURE_NAME, DOCX4J_CORE_FEATURE, DOCX4J_LIBS_FEATURE, DOCX4J_SDK_FEATURE},
@@ -48,7 +49,7 @@ public class Docx4jManifestTechnologyHandler extends AbstractScoutTechnologyHand
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
       if (IScoutBundle.TYPE_CLIENT.equals(r.getBundle().getType())) {
         selectionChangedManifest(r, selected, DOCX4J_PLUGIN, DOCX4J_SCOUT_PLUGIN, DOCX4J_SCOUT_CLIENT_PLUGIN);

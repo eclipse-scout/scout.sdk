@@ -1,6 +1,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.svg;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -23,7 +24,7 @@ public class SvgUiSwtTechnologyHandler extends AbstractScoutTechnologyHandler {
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutTechnologyResource resource : resources) {
       if (isE4Product(resource.getResource())) {
         selectionChangedProductFile(resource, selected, SvgClientTechnologyHandler.SCOUT_ONLY_SVG_PLUGINS, SWT_SVG_PLUGIN, SvgClientTechnologyHandler.getAdditionalBatik17ScoutPlugins());

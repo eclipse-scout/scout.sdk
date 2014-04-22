@@ -1,6 +1,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.docx4j;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -24,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 public class Docx4jProdTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants, IOrbitConstants {
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
       ProductFileModelHelper h = new ProductFileModelHelper(r.getResource());
       if (h.ProductFile.existsDependency(IRuntimeClasses.ScoutClientBundleId)) {

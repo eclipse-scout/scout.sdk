@@ -16,6 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.Texts;
@@ -294,7 +295,7 @@ public class Technology implements Comparable<Technology> {
         // fire pre-selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
         for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
           try {
-            if (!entry.getKey().preSelectionChanged(m_newSelection, new SubProgressMonitor(monitor, 1))) {
+            if (!entry.getKey().preSelectionChanged(CollectionUtility.unmodifiableSet(entry.getValue()), m_newSelection, new SubProgressMonitor(monitor, 1))) {
               return; // cancel the execution if a handler requests an abort
             }
           }
@@ -308,7 +309,7 @@ public class Technology implements Comparable<Technology> {
         // fire selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
         for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
           try {
-            entry.getKey().selectionChanged(entry.getValue().toArray(new IScoutTechnologyResource[entry.getValue().size()]), m_newSelection, new SubProgressMonitor(monitor, 1), workingCopyManager);
+            entry.getKey().selectionChanged(CollectionUtility.unmodifiableSet(entry.getValue()), m_newSelection, new SubProgressMonitor(monitor, 1), workingCopyManager);
           }
           catch (CoreException e) {
             ScoutSdkUi.logError("Error while applying technology changes.", e);
@@ -346,7 +347,7 @@ public class Technology implements Comparable<Technology> {
 
     @Override
     public String getOperationName() {
-      return "Changing Technology Selection...";
+      return "Changing Technology Selection '" + getName() + "'...";
     }
 
     @Override

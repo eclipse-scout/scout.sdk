@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.f2;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,12 +33,15 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 public class F2TargetTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {
 
   @Override
-  public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
+  public boolean preSelectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor) throws CoreException {
+    if (!closeTargetEditors(resources)) {
+      return false;
+    }
     return showLicenseDialog(selected, monitor, new String[]{F2_FEATURE}, new String[]{F2_FEATURE_URL});
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedTargetFiles(resources, selected, monitor,
         new String[]{F2_FEATURE}, new String[]{null},
         new String[]{F2_FEATURE_URL});

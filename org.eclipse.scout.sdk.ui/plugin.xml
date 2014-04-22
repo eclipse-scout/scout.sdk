@@ -1092,7 +1092,7 @@
       <technology
             category="Database Drivers"
             id="scout.technology.jdbc.derby"
-            name="Derby JDBC Driver for Eclipse Scout">
+            name="Derby 10 JDBC Driver for Eclipse Scout">
       </technology>
       <handler
             class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.DerbyJdbcManifestTechnologyHandler"

@@ -11,12 +11,14 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.docx4j;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
@@ -45,7 +47,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>{@link Docx4jDesktopTechnologyHandler}</h3> ...
+ * <h3>{@link Docx4jDesktopTechnologyHandler}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 03.05.2013
@@ -56,8 +58,8 @@ public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandl
   private static final String EXCEL_EXPORT_NLS_KEY = "ExportToExcelMenu";
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    DesktopTechnologyResource r = (DesktopTechnologyResource) resources[0];
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    DesktopTechnologyResource r = (DesktopTechnologyResource) CollectionUtility.firstElement(resources);
 
     if (selected) {
       IType menu = r.m_toolsMenuType.getType(EXCEL_EXPORT_MENU_TYPE_NAME);

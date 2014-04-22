@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.laf;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -31,7 +32,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 public class RayoUiSwingManifestTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedManifest(resources, selected, RAYO_LAF_PLUGIN);
   }
 

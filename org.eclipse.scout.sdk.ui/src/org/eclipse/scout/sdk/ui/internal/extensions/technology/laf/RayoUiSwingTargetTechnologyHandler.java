@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.laf;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,12 +33,15 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 public class RayoUiSwingTargetTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {
 
   @Override
-  public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
+  public boolean preSelectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor) throws CoreException {
+    if (!closeTargetEditors(resources)) {
+      return false;
+    }
     return showLicenseDialog(selected, monitor, new String[]{SCOUT_RAYO_LAF_FEATURE}, new String[]{SCOUT_RAYO_FEATURE_URL});
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedTargetFiles(resources, selected, monitor,
         new String[]{SCOUT_RAYO_LAF_FEATURE}, new String[]{null},
         new String[]{SCOUT_RAYO_FEATURE_URL});

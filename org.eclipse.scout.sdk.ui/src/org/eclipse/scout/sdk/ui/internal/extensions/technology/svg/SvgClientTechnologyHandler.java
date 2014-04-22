@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.extensions.technology.svg;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -76,7 +77,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedManifest(resources, selected, ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME);
     selectionChangedManifestImportPackage(resources, selected, new String[]{ScoutProjectAddOperation.W3C_DOM_SVG_PACKAGE}, new String[]{"[1.1.0,2.0.0)"});
   }

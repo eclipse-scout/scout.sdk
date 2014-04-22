@@ -13,8 +13,11 @@ package org.eclipse.scout.sdk.ui.extensions.technology;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -24,8 +27,8 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.pde.internal.core.ICoreConstants;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.compatibility.License;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
@@ -33,6 +36,7 @@ import org.eclipse.scout.sdk.compatibility.TargetPlatformUtility;
 import org.eclipse.scout.sdk.operation.project.CreateTargetProjectOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.dialog.LicenseDialog;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -45,7 +49,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link AbstractScoutTechnologyHandler}</h3> ...
+ * <h3>{@link AbstractScoutTechnologyHandler}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 11.02.2012
@@ -76,7 +80,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
       return true;
     }
     try {
-      final BooleanHolder licAccepted = new BooleanHolder(false);
+      final AtomicBoolean licAccepted = new AtomicBoolean(false);
       URI[] uris = new URI[featureUrls.length];
       for (int i = 0; i < uris.length; i++) {
         uris[i] = URIUtil.fromString(featureUrls[i]);
@@ -88,11 +92,11 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
         public void run() {
           LicenseDialog licDialog = new LicenseDialog(ScoutSdkUi.getShell(), lic);
           if (licDialog.open() == Dialog.OK) {
-            licAccepted.setValue(true);
+            licAccepted.set(true);
           }
         }
       });
-      return licAccepted.getValue();
+      return licAccepted.get();
     }
     catch (URISyntaxException e) {
       throw new CoreException(new ScoutStatus(e));
@@ -228,7 +232,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   }
 
   @Override
-  public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
+  public boolean preSelectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor) throws CoreException {
     return true;
   }
 
@@ -236,7 +240,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   public void postSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
   }
 
-  protected void selectionChangedProductFiles(IScoutTechnologyResource[] resources, boolean selected, String[]... pluginIds) throws CoreException {
+  protected void selectionChangedProductFiles(Set<IScoutTechnologyResource> resources, boolean selected, String[]... pluginIds) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
       selectionChangedProductFile(r, selected, pluginIds);
     }
@@ -261,7 +265,22 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     h.save();
   }
 
-  protected void selectionChangedTargetFiles(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, String[] featureIds, String[] featureVersions, String[] featureUrls) throws CoreException {
+  protected boolean closeTargetEditors(Set<IScoutTechnologyResource> resources) {
+    final AtomicBoolean success = new AtomicBoolean(false);
+    final Set<IFile> files = new HashSet<IFile>(resources.size());
+    for (IScoutTechnologyResource r : resources) {
+      files.add(r.getResource());
+    }
+    ScoutSdkUi.getDisplay().syncExec(new Runnable() {
+      @Override
+      public void run() {
+        success.set(UiUtility.closeEditors("org.eclipse.pde.ui.targetEditor", files));
+      }
+    });
+    return success.get();
+  }
+
+  protected void selectionChangedTargetFiles(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, String[] featureIds, String[] featureVersions, String[] featureUrls) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
       if (selected) {
         for (int i = 0; i < featureIds.length; i++) {
@@ -272,17 +291,18 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
         TargetPlatformUtility.removeInstallableUnitsFromTarget(r.getResource(), featureIds);
       }
     }
-    if (resources.length == 1) {
+    if (resources.size() == 1) {
+      IFile file = CollectionUtility.firstElement(resources).getResource();
       try {
-        TargetPlatformUtility.resolveTargetPlatform(resources[0].getResource(), true, monitor);
+        TargetPlatformUtility.resolveTargetPlatform(file, true, monitor);
       }
       catch (IllegalStateException e) {
-        ScoutSdkUi.logError("Unable to resolve target file '" + resources[0].getResource().getFullPath().toOSString() + "'.", e);
+        ScoutSdkUi.logError("Unable to resolve target file '" + file.getFullPath().toOSString() + "'.", e);
       }
     }
   }
 
-  protected void selectionChangedManifest(IScoutTechnologyResource[] resources, boolean selected, String... pluginsToHandle) throws CoreException {
+  protected void selectionChangedManifest(Set<IScoutTechnologyResource> resources, boolean selected, String... pluginsToHandle) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
       selectionChangedManifest(r, selected, pluginsToHandle);
     }
@@ -301,7 +321,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     pluginModel.save();
   }
 
-  protected void selectionChangedManifestImportPackage(IScoutTechnologyResource[] resources, boolean selected, String[] packages, String[] versions) throws CoreException {
+  protected void selectionChangedManifestImportPackage(Set<IScoutTechnologyResource> resources, boolean selected, String[] packages, String[] versions) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
       PluginModelHelper pluginModel = new PluginModelHelper(r.getBundle().getSymbolicName());
       for (int i = 0; i < Math.min(packages.length, versions.length); i++) {
@@ -444,7 +464,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
 
     final URI[] repoURIs = repos.toArray(new URI[repos.size()]);
     final String[] ius = featureIdsToInstall.toArray(new String[featureIdsToInstall.size()]);
-    final BooleanHolder licAccepted = new BooleanHolder(false);
+    final AtomicBoolean licAccepted = new AtomicBoolean(false);
     final Map<String, License[]> licenses = P2Utility.getLicenses(ius, repoURIs, monitor);
 
     // show license dialog
@@ -453,12 +473,12 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
       public void run() {
         LicenseDialog licDialog = new LicenseDialog(ScoutSdkUi.getShell(), licenses);
         if (licDialog.open() == Dialog.OK) {
-          licAccepted.setValue(true);
+          licAccepted.set(true);
         }
       }
     });
 
-    if (licAccepted.getValue()) {
+    if (licAccepted.get()) {
       P2Utility.installUnits(ius, repoURIs, monitor);
       return FeatureInstallResult.InstallationSuccessful;
     }
@@ -469,23 +489,28 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
       @Override
       public void run() {
-        IScoutExplorerPart explorer = ScoutSdkUi.getExplorer(false);
-        if (explorer != null) {
-          IPage root = explorer.getRootPage();
-          if (root != null) {
-            INodeVisitor visitor = new INodeVisitor() {
-              @Override
-              public int visit(IPage page) {
-                if (pageToRefresh.isAssignableFrom(page.getClass())) {
-                  page.markStructureDirty();
-                  return CANCEL_SUBTREE;
+        try {
+          IScoutExplorerPart explorer = ScoutSdkUi.getExplorer(false);
+          if (explorer != null) {
+            IPage root = explorer.getRootPage();
+            if (root != null) {
+              INodeVisitor visitor = new INodeVisitor() {
+                @Override
+                public int visit(IPage page) {
+                  if (pageToRefresh.isAssignableFrom(page.getClass())) {
+                    page.markStructureDirty();
+                    return CANCEL_SUBTREE;
+                  }
+                  return CONTINUE;
                 }
-                return CONTINUE;
-              }
-            };
-            JdtUtility.waitForSilentWorkspace();
-            root.accept(visitor);
+              };
+              JdtUtility.waitForSilentWorkspace();
+              root.accept(visitor);
+            }
           }
+        }
+        catch (Exception e) {
+          ScoutSdkUi.logWarning("Unable to refresh explorer page '" + pageToRefresh.getName() + "'.", e);
         }
       }
     });

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.laf;
 
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IFile;
@@ -58,7 +59,7 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
   private static final Pattern RAYO_ENV_REGEX = Pattern.compile("public.*class.*extends.*RayoSwingEnvironment.*", Pattern.DOTALL);
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, final boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, final boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutTechnologyResource res : resources) {
       IType swingEnv = getType(res.getBundle(), res.getResource());
       setSuperClass(swingEnv, selected, monitor, workingCopyManager);

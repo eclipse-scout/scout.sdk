@@ -10,9 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.util;
 
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IAdaptable;
+import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -41,7 +48,13 @@ import org.eclipse.swt.graphics.Drawable;
 import org.eclipse.swt.graphics.Font;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.swt.graphics.Point;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorReference;
+import org.eclipse.ui.IURIEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
+import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.texteditor.ITextEditor;
 
@@ -211,6 +224,57 @@ public class UiUtility {
       }
     }
     return null;
+  }
+
+  /**
+   * Closes all open instances of the given editor.<br>
+   * If the editors are dirty, the user is asked if they should be saved.
+   * 
+   * @param editorId
+   *          The editor id filter or null if all editors should be closed.
+   * @param files
+   *          The files filter or null. Only the editors of those files are closed.
+   * @return true if all editors have been closed. false otherwise (e.g. when the user presses cancel in the save dirty
+   *         editor confirmation message box).
+   */
+  public static boolean closeEditors(String editorId, Set<IFile> files) {
+    for (IWorkbenchWindow w : PlatformUI.getWorkbench().getWorkbenchWindows()) {
+      for (IWorkbenchPage p : w.getPages()) {
+        IEditorReference[] editorReferences = p.getEditorReferences();
+        List<IEditorReference> partsToSave = new ArrayList<IEditorReference>(editorReferences.length);
+        for (IEditorReference r : editorReferences) {
+          if (editorId == null || editorId.equals(r.getId())) {
+            if (files == null || files.isEmpty() || isEditorInputInFiles(r, files)) partsToSave.add(r);
+          }
+        }
+        if (!partsToSave.isEmpty()) {
+          boolean success = p.closeEditors(partsToSave.toArray(new IEditorReference[partsToSave.size()]), true);
+          if (!success) {
+            return false;
+          }
+        }
+      }
+    }
+    return true;
+  }
+
+  private static boolean isEditorInputInFiles(IEditorReference ref, Set<IFile> files) {
+    try {
+      IEditorInput editorInput = ref.getEditorInput();
+      if (editorInput instanceof IURIEditorInput) {
+        IURIEditorInput input = (IURIEditorInput) editorInput;
+        URI uriToSearch = input.getURI();
+        for (IFile f : files) {
+          if (URIUtil.sameURI(uriToSearch, f.getLocationURI())) {
+            return true;
+          }
+        }
+      }
+    }
+    catch (PartInitException e) {
+      ScoutSdkUi.logError("Unable to get file input of editor.", e);
+    }
+    return false;
   }
 
   /**

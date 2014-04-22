@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.rap.ui.internal.extensions.technology;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,7 +36,7 @@ public class FileChooserRapProductTechnologyHandler extends AbstractScoutTechnol
       "org.apache.commons.fileupload", "org.apache.commons.io", "org.eclipse.rap.rwt.supplemental.filedialog", "org.eclipse.rap.rwt.supplemental.fileupload"};
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedProductFiles(resources, selected, RAP_FILE_CHOOSER_PLUGINS);
   }
 

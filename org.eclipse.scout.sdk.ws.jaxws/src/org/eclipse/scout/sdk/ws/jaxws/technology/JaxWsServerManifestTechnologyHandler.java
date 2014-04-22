@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ws.jaxws.technology;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -28,7 +29,7 @@ public class JaxWsServerManifestTechnologyHandler extends AbstractScoutTechnolog
   public static final String JAXWS_RUNTIME_PLUGIN = ScoutProjectAddOperation.JAXWS_RUNTIME_PLUGIN;
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedManifest(resources, selected, JAXWS_RUNTIME_PLUGIN);
   }
 

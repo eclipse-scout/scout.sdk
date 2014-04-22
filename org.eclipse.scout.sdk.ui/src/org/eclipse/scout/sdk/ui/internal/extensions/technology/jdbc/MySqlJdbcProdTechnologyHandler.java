@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -32,7 +33,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 public class MySqlJdbcProdTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedProductFiles(resources, selected,
         new String[]{MY_SQL_JDBC_FRAGMENT, MY_SQL_JDBC_PLUGIN});
   }

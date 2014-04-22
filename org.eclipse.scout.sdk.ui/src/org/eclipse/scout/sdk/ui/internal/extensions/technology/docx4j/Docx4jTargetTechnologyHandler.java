@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.technology.docx4j;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,13 +34,16 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 public class Docx4jTargetTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants, IOrbitConstants {
 
   @Override
-  public boolean preSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
+  public boolean preSelectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor) throws CoreException {
+    if (!closeTargetEditors(resources)) {
+      return false;
+    }
     return showLicenseDialog(selected, monitor, new String[]{LOGGING_BRIDGE_FEATURE, XML_GRAPHICS_FEATURE_NAME, DOCX4J_CORE_FEATURE, DOCX4J_CLIENT_FEATURE},
         new String[]{SCOUT_LOGGING_BRIDGE_FEATURE_URL, ORBIT_UPDATESITE_URL, SCOUT_DOCX4J_FEATURE_URL, SCOUT_DOCX4J_FEATURE_URL});
   }
 
   @Override
-  public void selectionChanged(IScoutTechnologyResource[] resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     selectionChangedTargetFiles(resources, selected, monitor,
         new String[]{LOGGING_BRIDGE_FEATURE, XML_GRAPHICS_FEATURE_NAME, DOCX4J_CORE_FEATURE, DOCX4J_CLIENT_FEATURE, DOCX4J_LIBS_FEATURE},
         new String[]{null, null, null, null, null},
