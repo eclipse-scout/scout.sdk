@@ -11,6 +11,7 @@
 package org.eclipse.scout.nls.sdk.internal.ui.action;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -86,7 +87,7 @@ public abstract class AbstractNlsTextCompletionComputer implements IJavaCompleti
 
   @Override
   public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-    return new ArrayList<IContextInformation>();
+    return Collections.emptyList();
   }
 
   /*

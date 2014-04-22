@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -69,7 +70,7 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
 
   @Override
   public List<IContextInformation> computeContextInformation(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-    return null;
+    return Collections.emptyList();
   }
 
   @Override
