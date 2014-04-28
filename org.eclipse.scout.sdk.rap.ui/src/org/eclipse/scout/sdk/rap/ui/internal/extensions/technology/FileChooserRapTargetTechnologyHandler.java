@@ -26,16 +26,16 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.osgi.framework.Version;
 
 /**
- * <h3>{@link FileChooserRapTargetTechnologyHandler}</h3> ...
+ * <h3>{@link FileChooserRapTargetTechnologyHandler}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 10.04.2012
  */
 public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnologyHandler {
 
-  private static final String RAP_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/rt/rap/incubator/2.0/fileupload/";
+  private static final String RAP_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/rt/rap/incubator/2.3/fileupload/";
   private static final String RAP_INCUBATOR_FEATURE_NAME = "org.eclipse.rap.fileupload.feature.feature.group";
-  private static final Version RAP_INCUBATOR_FEATURE_VERSION = new Version(1, 5, 100, "20130107-1047"); // the supported version. must be present at the update site
+  private static final Version RAP_INCUBATOR_FEATURE_VERSION = new Version(2, 3, 0, "20140426-0831"); // the supported version. must be present at the update site
 
   private static final String SCOUT_INCUBATOR_FEATURE_NAME = "org.eclipse.scout.rt.ui.rap.incubator.filechooser.source.feature.group";
   private static final String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/4.0";
