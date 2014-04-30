@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.test.AbstractSdkTestWithSampleProject;
 import org.eclipse.scout.sdk.operation.service.LookupServiceNewOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.junit.Test;
 
 /**

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.operation.page.PageNewOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Test;

@@ -15,7 +15,7 @@ import java.util.HashSet;
 
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
-import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;

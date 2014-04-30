@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 

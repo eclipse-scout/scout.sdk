@@ -18,8 +18,8 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**

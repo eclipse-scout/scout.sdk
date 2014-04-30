@@ -31,7 +31,6 @@ import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
-import org.eclipse.scout.sdk.internal.workspace.dto.DtoAutoUpdateManager;
 import org.eclipse.scout.sdk.operation.util.IOrganizeImportService;
 import org.eclipse.scout.sdk.service.IMessageBoxService;
 import org.eclipse.scout.sdk.sourcebuilder.comment.IJavaElementCommentBuilderService;
@@ -602,10 +601,11 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     }
 
     @Override
+    @SuppressWarnings("restriction")
     protected IStatus run(IProgressMonitor monitor) {
       Job[] dtoUpdateJobs = null;
       while (!monitor.isCanceled()) {
-        dtoUpdateJobs = getJobManager().find(DtoAutoUpdateManager.AUTO_UPDATE_JOB_FAMILY);
+        dtoUpdateJobs = getJobManager().find(org.eclipse.scout.sdk.internal.workspace.dto.DtoAutoUpdateManager.AUTO_UPDATE_JOB_FAMILY);
         if (dtoUpdateJobs.length < 1) {
           // no job is running -> finish
           return Status.OK_STATUS;

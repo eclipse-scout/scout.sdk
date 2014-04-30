@@ -15,8 +15,8 @@ import java.util.TreeSet;
 
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.ImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.junit.Assert;
 import org.junit.Test;
 

@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.util.internal.sigcache;
+package org.eclipse.scout.sdk.util.signature;
 
 import java.util.HashMap;
 import java.util.Map;

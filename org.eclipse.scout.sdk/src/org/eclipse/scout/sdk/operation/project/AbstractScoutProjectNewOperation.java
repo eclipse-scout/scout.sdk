@@ -10,7 +10,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.util.PropertyMap;
 import org.osgi.framework.Version;
 

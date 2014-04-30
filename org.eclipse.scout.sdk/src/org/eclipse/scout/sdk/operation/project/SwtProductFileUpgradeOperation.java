@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.util.Batik17ProductFileUpgradeOperation;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;

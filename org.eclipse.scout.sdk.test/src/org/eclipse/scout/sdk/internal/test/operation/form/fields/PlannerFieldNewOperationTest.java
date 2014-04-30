@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.operation.form.field.FormFieldDeleteOperation;
 import org.eclipse.scout.sdk.operation.form.field.PlannerFieldNewOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;

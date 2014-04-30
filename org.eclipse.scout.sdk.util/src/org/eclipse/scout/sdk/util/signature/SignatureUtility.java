@@ -22,7 +22,6 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.internal.TypeGenericMapping;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 

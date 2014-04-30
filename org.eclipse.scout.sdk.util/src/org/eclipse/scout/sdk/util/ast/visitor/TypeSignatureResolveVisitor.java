@@ -27,8 +27,8 @@ import org.eclipse.jdt.core.dom.SimpleType;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.ast.VariableType;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**

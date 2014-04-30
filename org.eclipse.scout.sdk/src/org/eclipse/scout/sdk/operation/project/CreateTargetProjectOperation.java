@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.operation.project;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 import org.eclipse.scout.sdk.operation.util.InstallTargetPlatformFileOperation;

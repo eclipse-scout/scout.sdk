@@ -26,7 +26,7 @@ import org.eclipse.pde.internal.core.iproduct.IProductModel;
 import org.eclipse.pde.internal.core.iproduct.IProductPlugin;
 import org.eclipse.pde.internal.core.product.ProductFeature;
 import org.eclipse.pde.internal.core.product.ProductPlugin;
-import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.osgi.framework.Version;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;

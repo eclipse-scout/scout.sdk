@@ -1,4 +1,4 @@
-package org.eclipse.scout.sdk.compatibility.internal;
+package org.eclipse.scout.sdk.compatibility;
 
 import org.eclipse.core.runtime.Platform;
 import org.osgi.framework.Version;

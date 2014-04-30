@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.internal.test.AbstractSdkTestWithSampleProject;
 import org.eclipse.scout.sdk.operation.CodeTypeNewOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;

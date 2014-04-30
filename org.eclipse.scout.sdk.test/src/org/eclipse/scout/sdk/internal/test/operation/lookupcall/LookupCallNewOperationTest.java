@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.operation.lookupcall.LocalLookupCallNewOperation;
 import org.eclipse.scout.sdk.operation.lookupcall.LookupCallNewOperation;
 import org.eclipse.scout.sdk.operation.service.ServiceRegistrationDescription;
 import org.eclipse.scout.sdk.testing.SdkAssert;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.junit.Test;
 
 /**

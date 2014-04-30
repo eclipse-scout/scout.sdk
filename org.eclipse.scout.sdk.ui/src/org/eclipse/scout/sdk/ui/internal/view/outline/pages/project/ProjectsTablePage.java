@@ -19,7 +19,6 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -112,9 +111,10 @@ public class ProjectsTablePage extends AbstractPage {
   }
 
   @Override
+  @SuppressWarnings("restriction")
   public void refresh(boolean clearCache) {
     if (clearCache) {
-      ScoutWorkspace.getInstance().rebuildGraph();
+      org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace.getInstance().rebuildGraph();
       // here the graph is rebuilt asynchronously. on completion the table page is refreshed because m_workspaceListener is fired.
     }
     else {

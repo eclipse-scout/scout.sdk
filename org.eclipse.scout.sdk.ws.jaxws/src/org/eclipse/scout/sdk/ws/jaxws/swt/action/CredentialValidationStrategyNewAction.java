@@ -16,7 +16,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;

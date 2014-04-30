@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.operation.jdt.annotation;
 
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 
 /**
  *

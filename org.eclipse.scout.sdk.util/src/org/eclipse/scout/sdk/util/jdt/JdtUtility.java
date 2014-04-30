@@ -42,7 +42,7 @@ import org.eclipse.jdt.internal.core.util.PublicScanner;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.State;
-import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.pde.LazyPluginModel;
 import org.eclipse.scout.sdk.util.type.TypeUtility;

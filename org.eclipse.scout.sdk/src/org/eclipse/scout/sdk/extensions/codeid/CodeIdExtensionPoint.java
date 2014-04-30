@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.extensions.codeid.parsers.ICodeIdParser;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.util.internal.sigcache.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public final class CodeIdExtensionPoint {
