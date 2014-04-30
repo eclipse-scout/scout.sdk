@@ -35,7 +35,7 @@ import org.eclipse.pde.internal.core.target.provisional.ITargetPlatformService;
 import org.eclipse.pde.internal.core.target.provisional.NameVersionDescriptor;
 import org.eclipse.scout.sdk.compatibility.P2Utility;
 import org.eclipse.scout.sdk.compatibility.internal.FeatureDefinition;
-import org.eclipse.scout.sdk.compatibility.internal.PlatformVersionUtility;
+import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.compatibility.internal.ScoutCompatibilityActivator;
 import org.eclipse.scout.sdk.compatibility.internal.service.ITargetPlatformCompatService;
 import org.eclipse.scout.sdk.compatibility.v37v41.internal.provisional.LoadTargetDefinitionJobSync;
