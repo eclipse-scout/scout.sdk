@@ -295,7 +295,7 @@ public class Technology implements Comparable<Technology> {
         // fire pre-selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
         for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
           try {
-            if (!entry.getKey().preSelectionChanged(CollectionUtility.unmodifiableSet(entry.getValue()), m_newSelection, new SubProgressMonitor(monitor, 1))) {
+            if (!entry.getKey().preSelectionChanged(CollectionUtility.hashSet(entry.getValue()), m_newSelection, new SubProgressMonitor(monitor, 1))) {
               return; // cancel the execution if a handler requests an abort
             }
           }
@@ -309,7 +309,7 @@ public class Technology implements Comparable<Technology> {
         // fire selection changed for all checked resources (each handler only gets the resources that were contributed by itself)
         for (Entry<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> entry : resourcesToModify.entrySet()) {
           try {
-            entry.getKey().selectionChanged(CollectionUtility.unmodifiableSet(entry.getValue()), m_newSelection, new SubProgressMonitor(monitor, 1), workingCopyManager);
+            entry.getKey().selectionChanged(CollectionUtility.hashSet(entry.getValue()), m_newSelection, new SubProgressMonitor(monitor, 1), workingCopyManager);
           }
           catch (CoreException e) {
             ScoutSdkUi.logError("Error while applying technology changes.", e);
