@@ -31,7 +31,7 @@ public class NewProjectLoadTargetOperation extends AbstractScoutProjectNewOperat
   @Override
   public boolean isRelevant() {
     Boolean reloadNecessary = getProperties().getProperty(PROP_TARGET_PLATFORM_RELOAD_NECESSARY, Boolean.class);
-    return reloadNecessary != null && reloadNecessary.booleanValue();
+    return reloadNecessary != null && reloadNecessary.booleanValue() && !isKeepCurrentTarget();
   }
 
   @Override

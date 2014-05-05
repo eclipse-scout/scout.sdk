@@ -48,7 +48,7 @@ public class CreateTargetProjectOperation extends AbstractCreateEclipseProjectOp
 
   @Override
   public boolean isRelevant() {
-    return getProperties().getProperty(ScoutProjectAddOperation.PROP_EXISTING_BUNDLE) == null;
+    return getProperties().getProperty(ScoutProjectAddOperation.PROP_EXISTING_BUNDLE) == null && !isKeepCurrentTarget();
   }
 
   @Override

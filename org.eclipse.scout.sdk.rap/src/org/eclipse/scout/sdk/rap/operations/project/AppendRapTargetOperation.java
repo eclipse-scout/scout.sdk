@@ -48,7 +48,7 @@ public class AppendRapTargetOperation extends AbstractScoutProjectNewOperation {
 
   @Override
   public boolean isRelevant() {
-    return isNodeChecked(CreateUiRapPluginOperation.BUNDLE_ID);
+    return isNodeChecked(CreateUiRapPluginOperation.BUNDLE_ID) && !isKeepCurrentTarget();
   }
 
   @Override

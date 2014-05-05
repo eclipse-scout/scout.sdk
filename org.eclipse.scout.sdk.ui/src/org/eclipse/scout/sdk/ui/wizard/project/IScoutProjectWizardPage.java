@@ -22,6 +22,7 @@ public interface IScoutProjectWizardPage {
   String PROP_SELECTED_BUNDLES = "selectedBundles";
   String PROP_USE_DEFAULT_JDT_PREFS = "useDefaultJdtPrefs";
   String PROP_ECLIPSE_TARGET_PLATFORM = "eclipseTargetPlatform";
+  String PROP_KEEP_CURRENT_TARGET = "keepCurrentTarget";
 
   void addPropertyChangeListener(PropertyChangeListener listener);
 

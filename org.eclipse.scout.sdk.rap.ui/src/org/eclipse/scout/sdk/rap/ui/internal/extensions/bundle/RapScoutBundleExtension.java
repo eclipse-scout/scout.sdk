@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.rap.ui.internal.wizard.project.RapTargetPlatformWiz
 import org.eclipse.scout.sdk.ui.extensions.bundle.INewScoutBundleHandler;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.wizard.newproject.ScoutProjectNewWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractScoutWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizard;
 import org.eclipse.scout.sdk.util.PropertyMap;
@@ -64,6 +65,7 @@ public class RapScoutBundleExtension implements INewScoutBundleHandler {
         return s;
       }
     }
+    bundleSelectionChanged(wizard, m_rapUiSelected);
     return Status.OK_STATUS;
   }
 
@@ -75,7 +77,10 @@ public class RapScoutBundleExtension implements INewScoutBundleHandler {
       page = new RapTargetPlatformWizardPage();
       wizard.addPage(page);
     }
-    page.setExcludePage(!selected);
+    ScoutProjectNewWizardPage spnwp = (ScoutProjectNewWizardPage) wizard.getPage(ScoutProjectNewWizardPage.class.getName());
+    boolean isKeepCurrentTarget = spnwp.isKeepCurrentTarget();
+
+    page.setExcludePage(!selected || isKeepCurrentTarget);
   }
 
   @SuppressWarnings("unchecked")

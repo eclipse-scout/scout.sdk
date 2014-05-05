@@ -416,7 +416,8 @@ public final class JdtUtility {
    * 
    * @param symbolicName
    *          the symbolic name of the bundles to check.
-   * @return The newest bundle of all having the given symbolic name.
+   * @return The newest bundle having the given symbolic name or null if no bundle with the given name can be
+   *         found in the active target platform.
    */
   public static BundleDescription getNewestBundleInActiveTargetPlatform(String symbolicName) {
     State state = LazyPluginModel.getPdeState().getState();

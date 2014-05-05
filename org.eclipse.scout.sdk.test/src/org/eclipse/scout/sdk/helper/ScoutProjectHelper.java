@@ -15,7 +15,6 @@ import java.util.HashSet;
 
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
-import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
@@ -23,7 +22,6 @@ import org.eclipse.scout.sdk.operation.project.CreateUiSwingPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateUiSwtPluginOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
-import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
 import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
@@ -54,10 +52,10 @@ public final class ScoutProjectHelper {
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, projectName);
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME_POSTFIX, "");
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, "alias");
-    properties.setProperty(IScoutProjectNewOperation.PROP_USE_DEFAULT_JDT_PREFS, false);
-    properties.setProperty(ScoutProjectAddOperation.PROP_EXISTING_BUNDLE, new Object());
-    properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, PlatformVersionUtility.getPlatformVersion());
-    HashSet<String> nodesToCreate = new HashSet<String>();
+    properties.setProperty(IScoutProjectNewOperation.PROP_USE_DEFAULT_JDT_PREFS, Boolean.FALSE);
+    properties.setProperty(IScoutProjectNewOperation.PROP_KEEP_CURRENT_TARGET, Boolean.TRUE);
+    properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, JdtUtility.getTargetPlatformVersion());
+    HashSet<String> nodesToCreate = new HashSet<String>(5);
     if (client) {
       nodesToCreate.add(CreateClientPluginOperation.BUNDLE_ID);
     }

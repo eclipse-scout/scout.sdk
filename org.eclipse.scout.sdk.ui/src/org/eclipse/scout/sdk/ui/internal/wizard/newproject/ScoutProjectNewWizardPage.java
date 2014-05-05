@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.CreateTargetProjectOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
@@ -46,6 +47,7 @@ import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -76,6 +78,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   private static final String PROP_CURR_TARGET = "curr";
   private static final String PROP_RECOMMENDED_TARGET = "recomm";
+  private static final String PROP_KEEP_CURRENT = "keep";
   private static final String PROP_PLATFORM_VERSION = "vers";
 
   protected StyledTextField m_projectNameField;
@@ -207,8 +210,8 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       boolean isCurrent = isCurrentPlatform(ver);
       boolean isRecommended = Boolean.valueOf(RECOMMENDED_VERSION.equals(ver));
 
-      StringBuilder txt = new StringBuilder("Eclipse ");
-      txt.append(codeName).append(" (").append(ver);
+      StringBuilder txt = new StringBuilder("New Eclipse ");
+      txt.append(codeName).append(" Target (").append(ver);
       if (isCurrent) {
         txt.append(", ").append(Texts.get("currrent"));
       }
@@ -220,8 +223,31 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       prop.setData(PROP_CURR_TARGET, Boolean.valueOf(isCurrent));
       prop.setData(PROP_RECOMMENDED_TARGET, isRecommended);
       prop.setData(PROP_PLATFORM_VERSION, ver);
+      prop.setData(PROP_KEEP_CURRENT, Boolean.FALSE);
       ret.add(prop);
     }
+
+    // keep current target
+    if (JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutClientBundleId) != null && JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutServerBundleId) != null &&
+        JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutSharedBundleId) != null && JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutUiSwingBundleId) != null &&
+        JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutUiSwtBundleId) != null) {
+      String ver = null;
+      Version targetPlatformVersion = JdtUtility.getTargetPlatformVersion();
+      if (targetPlatformVersion == null) {
+        ver = RECOMMENDED_VERSION;
+      }
+      else {
+        ver = targetPlatformVersion.getMajor() + "." + targetPlatformVersion.getMinor();
+      }
+
+      SimpleProposal prop = new SimpleProposal(Texts.get("KeepCurrentTarget", ver), null);
+      prop.setData(PROP_CURR_TARGET, Boolean.FALSE);
+      prop.setData(PROP_RECOMMENDED_TARGET, Boolean.FALSE);
+      prop.setData(PROP_KEEP_CURRENT, Boolean.TRUE);
+      prop.setData(PROP_PLATFORM_VERSION, ver);
+      ret.add(prop);
+    }
+
     return ret.toArray(new SimpleProposal[ret.size()]);
   }
 
@@ -268,9 +294,17 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
         SimpleProposal proposal = (SimpleProposal) event.proposal;
         if (proposal != null) {
           setTargetPlatformVersionInternal((String) proposal.getData(PROP_PLATFORM_VERSION));
+          Object keepCurrent = proposal.getData(PROP_KEEP_CURRENT);
+          if (keepCurrent instanceof Boolean) {
+            setKeepCurrentTarget(((Boolean) keepCurrent).booleanValue());
+          }
+          else {
+            setKeepCurrentTarget(false);
+          }
         }
         else {
           setTargetPlatformVersionInternal(null);
+          setKeepCurrentTarget(false);
         }
         pingStateChanging();
       }
@@ -372,6 +406,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, getProjectAlias().trim());
     properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, new Version(getTargetPlatformVersion()));
     properties.setProperty(IScoutProjectNewOperation.PROP_USE_DEFAULT_JDT_PREFS, isUseDefaultJdtPrefs());
+    properties.setProperty(IScoutProjectNewOperation.PROP_KEEP_CURRENT_TARGET, isKeepCurrentTarget());
 
     // go through all node extensions and put properties which node has been checked
     ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getAcceptAll());
@@ -421,6 +456,10 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("PleaseChooseATargetPlatform"));
     }
     SimpleProposal p = (SimpleProposal) m_eclipseTargetPlatform.getSelectedProposal();
+    boolean keepCurrent = ((Boolean) p.getData(PROP_KEEP_CURRENT)).booleanValue();
+    if (keepCurrent) {
+      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("TheCurrentlyActiveTargetPlatformWillBeUsed"));
+    }
     boolean isCurrent = ((Boolean) p.getData(PROP_CURR_TARGET)).booleanValue();
     if (!isCurrent) {
       return new Status(IStatus.INFO, ScoutSdkUi.PLUGIN_ID, Texts.get("ACompleteEclipsePlatformWillBeDownloaded"));
@@ -524,6 +563,14 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   private void setTargetPlatformVersionInternal(String version) {
     setPropertyString(PROP_ECLIPSE_TARGET_PLATFORM, version);
+  }
+
+  public boolean isKeepCurrentTarget() {
+    return getPropertyBool(PROP_KEEP_CURRENT_TARGET);
+  }
+
+  private void setKeepCurrentTarget(boolean v) {
+    setPropertyBool(PROP_KEEP_CURRENT_TARGET, v);
   }
 
   @Override

@@ -19,6 +19,7 @@ public interface IScoutProjectNewOperation extends IOperation {
   String PROP_SELECTED_TEMPLATE_NAME = "TEMPLATE_NAME";
   String PROP_TARGET_PLATFORM_VERSION = "TARGET_PLATFORM_VERSION";
   String PROP_USE_DEFAULT_JDT_PREFS = "PROP_USE_DEFAULT_JDT_PREFS";
+  String PROP_KEEP_CURRENT_TARGET = "KEEP_CURRENT_TARGET";
 
   // system properties that are always present
   String PROP_OS = "OSGI_OS";

@@ -112,6 +112,10 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
     return getProperties().getProperty(PROP_USE_DEFAULT_JDT_PREFS, Boolean.class);
   }
 
+  protected final boolean isKeepCurrentTarget() {
+    return getProperties().getProperty(PROP_KEEP_CURRENT_TARGET, Boolean.class);
+  }
+
   protected final String getPluginName(String pluginSuffix) {
     return getPluginName(getProjectName(), getProjectNamePostfix(), pluginSuffix);
   }

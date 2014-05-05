@@ -108,16 +108,17 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
     getProperties().setProperty(PROP_EXISTING_BUNDLE, m_project);
     getProperties().setProperty(CreateTargetProjectOperation.PROP_TARGET_FILE, currentTargetFile);
     getProperties().setProperty(PROP_TARGET_PLATFORM_VERSION, JdtUtility.getTargetPlatformVersion());
-    getProperties().setProperty(FillClientPluginOperation.PROP_INSTALL_CLIENT_SESSION, false);
-    getProperties().setProperty(FillClientPluginOperation.PROP_INSTALL_DESKTOP_EXT, true);
-    getProperties().setProperty(CreateClientPluginOperation.PROP_INSTALL_ICONS, false);
+    getProperties().setProperty(PROP_KEEP_CURRENT_TARGET, Boolean.FALSE);
+    getProperties().setProperty(FillClientPluginOperation.PROP_INSTALL_CLIENT_SESSION, Boolean.FALSE);
+    getProperties().setProperty(FillClientPluginOperation.PROP_INSTALL_DESKTOP_EXT, Boolean.TRUE);
+    getProperties().setProperty(CreateClientPluginOperation.PROP_INSTALL_ICONS, Boolean.FALSE);
     getProperties().setProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, name);
     getProperties().setProperty(CreateSharedPluginOperation.PROP_DOC_TEXT_SERVICE_NAME, name + ScoutProjectNewOperation.DOCUMENTATION_SVC_SUFFIX);
-    getProperties().setProperty(CreateServerPluginOperation.PROP_INSTALL_HTML_RESOURCES, false);
-    getProperties().setProperty(CreateServerPluginOperation.PROP_INSTALL_PRODUCTS, false);
-    getProperties().setProperty(FillServerPluginOperation.PROP_INSTALL_ACCESS_CONTROL_SVC_CLASS, false);
-    getProperties().setProperty(FillServerPluginOperation.PROP_INSTALL_SERVER_APP_CLASS, false);
-    getProperties().setProperty(FillServerPluginOperation.PROP_INSTALL_SERVER_SESSION_CLASS, false);
+    getProperties().setProperty(CreateServerPluginOperation.PROP_INSTALL_HTML_RESOURCES, Boolean.FALSE);
+    getProperties().setProperty(CreateServerPluginOperation.PROP_INSTALL_PRODUCTS, Boolean.FALSE);
+    getProperties().setProperty(FillServerPluginOperation.PROP_INSTALL_ACCESS_CONTROL_SVC_CLASS, Boolean.FALSE);
+    getProperties().setProperty(FillServerPluginOperation.PROP_INSTALL_SERVER_APP_CLASS, Boolean.FALSE);
+    getProperties().setProperty(FillServerPluginOperation.PROP_INSTALL_SERVER_SESSION_CLASS, Boolean.FALSE);
   }
 
   @Override

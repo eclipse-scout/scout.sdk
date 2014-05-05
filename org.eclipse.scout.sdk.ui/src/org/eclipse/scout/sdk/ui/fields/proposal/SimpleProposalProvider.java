@@ -42,8 +42,11 @@ public class SimpleProposalProvider extends ContentProposalProvider {
 
     ArrayList<Object> props = new ArrayList<Object>();
     for (SimpleProposal prop : getProposals()) {
-      if (CharOperation.match(searchPattern.toCharArray(), prop.getText().toCharArray(), false)) {
-        props.add(prop);
+      String text = prop.getText();
+      if (text != null) {
+        if (CharOperation.match(searchPattern.toCharArray(), text.toCharArray(), false)) {
+          props.add(prop);
+        }
       }
     }
     return props.toArray(new Object[props.size()]);
