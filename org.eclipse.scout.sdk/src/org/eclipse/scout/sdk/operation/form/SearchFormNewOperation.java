@@ -22,6 +22,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.packageFragment.ExportPolicy;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
@@ -69,6 +70,7 @@ public class SearchFormNewOperation extends FormNewOperation {
       PrimaryTypeNewOperation formDataTypeNewOp = new PrimaryTypeNewOperation(formDataTypeName, getSearchFormDataPackageName(), ScoutUtility.getJavaProject(getSearchFormDataLocationBundle()));
       formDataTypeNewOp.addMethodSourceBuilder(MethodSourceBuilderFactory.createConstructorSourceBuilder(formDataTypeName));
       formDataTypeNewOp.setFlags(Flags.AccPublic);
+      formDataTypeNewOp.setPackageExportPolicy(ExportPolicy.AddPackage);
       formDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormData));
       formDataTypeNewOp.validate();
       formDataTypeNewOp.run(monitor, workingCopyManager);
@@ -132,6 +134,7 @@ public class SearchFormNewOperation extends FormNewOperation {
       delOp.addMember(getConfiguredSearchFormMethod);
       delOp.validate();
       delOp.run(monitor, workingCopyManager);
+      workingCopyManager.reconcile(getConfiguredSearchFormMethod.getCompilationUnit(), monitor);
     }
 
     MethodNewOperation getConfiguredSearchFormOp = new MethodNewOperation(MethodSourceBuilderFactory.createOverrideMethodSourceBuilder("getConfiguredSearchForm", getTablePage()), getTablePage(), true);
