@@ -13,6 +13,8 @@ package com.bsiag.miniapp.client.ui.forms;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,8 +33,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -46,6 +46,7 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
+import org.eclipse.scout.rt.client.ui.form.fields.IFormField;
 import org.eclipse.scout.rt.client.ui.form.fields.booleanfield.AbstractBooleanField;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
@@ -53,6 +54,7 @@ import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField;
+import org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField;
 import org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox;
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
@@ -95,7 +97,6 @@ import com.bsiag.miniapp.client.ui.forms.CompanyForm.MainBox.TabBox.NoteBox.Note
 
 @FormData(value = com.bsiag.miniapp.shared.services.process.CompanyFormData.class, sdkCommand = SdkCommand.CREATE)
 public class CompanyForm extends AbstractForm {
-  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CompanyForm.class);
   public static final String PROP_TEST = "abc";
 
   private Long m_companyNr;
@@ -419,11 +420,6 @@ public class CompanyForm extends AbstractForm {
         }
 
         @Override
-        protected boolean getConfiguredFocusVisible() {
-          return false;
-        }
-
-        @Override
         protected int getConfiguredDropType() {
           return IDNDSupport.TYPE_FILE_TRANSFER;
         }
@@ -558,11 +554,6 @@ public class CompanyForm extends AbstractForm {
           }
 
           @Override
-          protected void execPrepareAction() throws ProcessingException {
-            setVisible(getLogoField().isEnabled());
-          }
-
-          @Override
           protected void execAction() throws ProcessingException {
 
           }
@@ -576,7 +567,23 @@ public class CompanyForm extends AbstractForm {
           }
 
           @Override
-          protected void execPrepareAction() throws ProcessingException {
+          protected void execInitAction() throws ProcessingException {
+            getLogoField().addPropertyChangeListener(IFormField.PROP_ENABLED, new PropertyChangeListener() {
+              @Override
+              public void propertyChange(PropertyChangeEvent evt) {
+                updateVisibility();
+              }
+            });
+            getLogoField().addPropertyChangeListener(IImageField.PROP_IMAGE, new PropertyChangeListener() {
+              @Override
+              public void propertyChange(PropertyChangeEvent evt) {
+                updateVisibility();
+              }
+            });
+            updateVisibility();
+          }
+
+          private void updateVisibility() {
             setVisible(getLogoField().isEnabled() && getLogoField().getImage() != null);
           }
 
@@ -923,11 +930,6 @@ public class CompanyForm extends AbstractForm {
             @Override
             protected boolean getConfiguredMultiSelectionAction() {
               return true;
-            }
-
-            @Override
-            protected void execPrepareAction() throws ProcessingException {
-
             }
 
             @Override
