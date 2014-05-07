@@ -33,6 +33,8 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.dnd.FileListTransferObject;
 import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.logger.IScoutLogger;
+import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
@@ -97,6 +99,7 @@ import com.bsiag.miniapp.client.ui.forms.CompanyForm.MainBox.TabBox.NoteBox.Note
 
 @FormData(value = com.bsiag.miniapp.shared.services.process.CompanyFormData.class, sdkCommand = SdkCommand.CREATE)
 public class CompanyForm extends AbstractForm {
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(CompanyForm.class);
   public static final String PROP_TEST = "abc";
 
   private Long m_companyNr;
