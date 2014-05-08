@@ -14,7 +14,7 @@ import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link RuntimeClasses}</h3> ...
+ * <h3>{@link RuntimeClasses}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 24.01.2009
@@ -71,6 +71,7 @@ public interface IRuntimeClasses {
   String ColumnData = "org.eclipse.scout.commons.annotations.ColumnData"; // NO_UCD
   String Replace = "org.eclipse.scout.commons.annotations.Replace"; // NO_UCD
   String ClassId = "org.eclipse.scout.commons.annotations.ClassId"; // NO_UCD
+  String DtoRelevant = "org.eclipse.scout.commons.annotations.DtoRelevant"; // NO_UCD
   String InjectFieldTo = "org.eclipse.scout.commons.annotations.InjectFieldTo"; // NO_UCD
   String ClientProxyServiceFactory = "org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"; // NO_UCD
   String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory"; // NO_UCD

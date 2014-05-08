@@ -13,12 +13,17 @@ package org.eclipse.scout.sdk.internal.workspace.dto;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IAnnotatable;
+import org.eclipse.jdt.core.IAnnotation;
+import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
+import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
@@ -26,8 +31,11 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
@@ -102,12 +110,55 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
     // serial version uid
     IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
     addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
+
+    // copy annotations over to the DTO
+    copyAnnotations(getModelType(), getModelType(), this);
   }
 
   /**
    * @return
    */
   protected abstract String computeSuperTypeSignature() throws CoreException;
+
+  protected static void copyAnnotations(IAnnotatable annotationOwner, IType declaringType, ITypeSourceBuilder sourceBuilder) {
+    try {
+      for (IAnnotation annotation : annotationOwner.getAnnotations()) {
+        String elementName = annotation.getElementName();
+
+        if (!IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName) &&
+            !Signature.getSimpleName(IRuntimeClasses.FormData).equals(elementName) && !Signature.getSimpleName(IRuntimeClasses.Order).equals(elementName) &&
+            !Signature.getSimpleName(IRuntimeClasses.PageData).equals(elementName)) {
+          if (!NamingUtility.isFullyQualifiedName(elementName)) {
+            elementName = TypeUtility.getReferencedTypeFqn(declaringType, elementName, true);
+          }
+          final IType annotationDeclarationType = TypeUtility.getType(elementName);
+          if (isAnnotationDtoRelevant(annotationDeclarationType)) {
+            final String src = annotation.getSource();
+            AnnotationSourceBuilder asb = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(elementName)) {
+              @Override
+              public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+                if (TypeUtility.isOnClasspath(annotationDeclarationType, ownerProject)) {
+                  source.append(src);
+                }
+              }
+            };
+            sourceBuilder.addAnnotationSourceBuilder(asb);
+          }
+        }
+      }
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logError("Error copying the annotations to the form data.", e);
+    }
+  }
+
+  protected static boolean isAnnotationDtoRelevant(IType annotation) {
+    if (!TypeUtility.exists(annotation)) {
+      return false;
+    }
+    IAnnotation dtoReleventAnnotation = JdtUtility.getAnnotation(annotation, IRuntimeClasses.DtoRelevant);
+    return TypeUtility.exists(dtoReleventAnnotation);
+  }
 
   public IType getModelType() {
     return m_modelType;
@@ -149,6 +200,15 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
               IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(propName);
               propertyTypeBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
               addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormDataPropertyKey(propertyTypeBuilder), propertyTypeBuilder);
+
+              // copy annotations over to the DTO
+              IMethod propertyMethod = desc.getReadMethod();
+              if (!TypeUtility.exists(propertyMethod)) {
+                propertyMethod = desc.getWriteMethod();
+              }
+              if (TypeUtility.exists(propertyMethod)) {
+                copyAnnotations(propertyMethod, propertyMethod.getDeclaringType(), propertyTypeBuilder);
+              }
 
               // getter
               IMethodSourceBuilder propertyGetterBuilder = new MethodSourceBuilder("get" + propName);

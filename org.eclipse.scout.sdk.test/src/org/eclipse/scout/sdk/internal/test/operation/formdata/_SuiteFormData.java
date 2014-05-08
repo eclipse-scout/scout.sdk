@@ -15,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
+    AnnotationCopyTest.class,
     ExternalCheckboxFieldTest.class,
     ExternalGroupboxTest.class,
     ExternalTableFieldTest.class,

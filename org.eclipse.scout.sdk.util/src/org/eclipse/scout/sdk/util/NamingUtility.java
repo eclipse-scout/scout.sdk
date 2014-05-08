@@ -66,6 +66,10 @@ public final class NamingUtility {
     return getJavaKeyWords().contains(word.toLowerCase());
   }
 
+  public static boolean isFullyQualifiedName(String name) {
+    return name != null && (name.indexOf('.') > 0 || name.indexOf('$') > 0);
+  }
+
   /**
    * ensures the given java name starts with a lower case character.
    * 
