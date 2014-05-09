@@ -108,7 +108,6 @@ public class MethodReturnExpression {
         return m_returnClause;
       }
       else {
-
         return getReturnExpressionAsString(new DefaultRewrite(null, classPath, rewrite));
       }
     }
@@ -211,7 +210,7 @@ public class MethodReturnExpression {
       }
 
       if (Flags.isInterface(typeFlags) || (Flags.isStatic(fieldFlags) && Flags.isFinal(fieldFlags))) { // only constants
-        if (validator != null && (Flags.isInterface(typeFlags) || Flags.isPublic(fieldFlags)) && (classPath == null || TypeUtility.isOnClasspath(declaringType, classPath))) {
+        if ((Flags.isInterface(typeFlags) || Flags.isPublic(fieldFlags)) && (classPath == null || TypeUtility.isOnClasspath(declaringType, classPath))) {
           // reference to field possible
           buffer.append(f.getElementName());
           return true;
