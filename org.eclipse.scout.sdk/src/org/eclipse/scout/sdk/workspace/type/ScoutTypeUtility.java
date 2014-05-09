@@ -52,6 +52,7 @@ import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.ast.visitor.MethodBodyAstVisitor;
+import org.eclipse.scout.sdk.util.ast.visitor.TypeAnnotationAstVisitor;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -183,21 +184,41 @@ public class ScoutTypeUtility extends TypeUtility {
     return types.toArray(new IType[types.size()]);
   }
 
-  public static IType[] getTypeOccurenceInMethod(final IMethod member) throws JavaModelException {
-    final HashSet<IType> types = new HashSet<IType>();
-    AstUtility.visitMember(member, new MethodBodyAstVisitor(member, new ASTVisitor() {
+  private static ASTVisitor getTypeLiteralCollectorVisitor(final Set<IType> collector) {
+    return new ASTVisitor() {
       @Override
       public boolean visit(TypeLiteral node) {
         ITypeBinding b = node.getType().resolveBinding();
         if (b != null) {
           IJavaElement e = b.getJavaElement();
           if (TypeUtility.exists(e) && e.getElementType() == IJavaElement.TYPE) {
-            types.add((IType) e);
+            collector.add((IType) e);
           }
         }
         return false;
       }
-    }));
+    };
+  }
+
+  public static IType[] getTypeOccurenceInMethod(final IMethod member) throws JavaModelException {
+    final HashSet<IType> types = new HashSet<IType>();
+    AstUtility.visitMember(member, new MethodBodyAstVisitor(member, getTypeLiteralCollectorVisitor(types)));
+    return types.toArray(new IType[types.size()]);
+  }
+
+  /**
+   * Gets all {@link IType}s referenced as {@link TypeLiteral}s in the given {@link IAnnotation}.
+   * 
+   * @param annotation
+   *          The annotation for which the referenced types should be returned.
+   * @param declaringType
+   *          The declaring type of the given annotation.
+   * @return All {@link IType}s that are referenced within the given annotation.
+   * @throws JavaModelException
+   */
+  public static IType[] getTypeOccurenceInAnnotation(IAnnotation annotation, IType declaringType) throws JavaModelException {
+    final HashSet<IType> types = new HashSet<IType>();
+    AstUtility.visitMember(declaringType, new TypeAnnotationAstVisitor(annotation, declaringType, getTypeLiteralCollectorVisitor(types)));
     return types.toArray(new IType[types.size()]);
   }
 

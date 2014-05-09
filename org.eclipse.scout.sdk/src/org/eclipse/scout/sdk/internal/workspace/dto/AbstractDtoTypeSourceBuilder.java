@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
@@ -120,9 +121,19 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
    */
   protected abstract String computeSuperTypeSignature() throws CoreException;
 
-  protected static void copyAnnotations(IAnnotatable annotationOwner, IType declaringType, ITypeSourceBuilder sourceBuilder) {
+  protected static void copyAnnotations(IAnnotatable annotationOwner, final IType declaringType, ITypeSourceBuilder sourceBuilder) {
+    IAnnotation[] annotations;
     try {
-      for (IAnnotation annotation : annotationOwner.getAnnotations()) {
+      annotations = annotationOwner.getAnnotations();
+    }
+    catch (JavaModelException e1) {
+      ScoutSdk.logError("Unable to retrieve annotations of element '" + annotationOwner.toString() + "'.", e1);
+      return;
+    }
+
+    for (IAnnotation a : annotations) {
+      try {
+        final IAnnotation annotation = a;
         String elementName = annotation.getElementName();
 
         if (!IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName) &&
@@ -131,24 +142,55 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
           if (!NamingUtility.isFullyQualifiedName(elementName)) {
             elementName = TypeUtility.getReferencedTypeFqn(declaringType, elementName, true);
           }
+
           final IType annotationDeclarationType = TypeUtility.getType(elementName);
           if (isAnnotationDtoRelevant(annotationDeclarationType)) {
-            final String src = annotation.getSource();
             AnnotationSourceBuilder asb = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(elementName)) {
               @Override
               public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-                if (TypeUtility.isOnClasspath(annotationDeclarationType, ownerProject)) {
-                  source.append(src);
+                // check if annotation is accessible
+                if (!TypeUtility.isOnClasspath(annotationDeclarationType, ownerProject)) {
+                  ScoutSdk.logInfo("DTO relevant annotation '" + annotationDeclarationType.getFullyQualifiedName() + "' is not accessible from DTO project '" + ownerProject.getElementName() + "'. Annotation will be skipped.");
+                  return;
                 }
+
+                // check if there is source available
+                String copySrc = annotation.getSource();
+                if (!StringUtility.hasText(copySrc)) {
+                  ScoutSdk.logInfo("DTO relevant annotation '" + annotationDeclarationType.getFullyQualifiedName() + "' in type '" + declaringType.getFullyQualifiedName() + "' has no source code. Annotation will be skipped.");
+                  return;
+                }
+
+                // check if all referenced types are accessible
+                IType[] typeOccurenceInAnnotation = ScoutTypeUtility.getTypeOccurenceInAnnotation(annotation, declaringType);
+                for (IType t : typeOccurenceInAnnotation) {
+                  if (!TypeUtility.isOnClasspath(t, ownerProject)) {
+                    ScoutSdk.logInfo("Type '" + t.getFullyQualifiedName() + "' referenced in DTO relevant annotation '" + annotationDeclarationType.getFullyQualifiedName() + "' in type '" + declaringType.getFullyQualifiedName() + "' is not accessible from DTO project '" + ownerProject.getElementName() + "'. Annotation will be skipped.");
+                    return;
+                  }
+                }
+
+                // add imports to referenced types
+                for (IType t : typeOccurenceInAnnotation) {
+                  validator.addImport(t.getFullyQualifiedName());
+                  IType surroundingType = t.getDeclaringType();
+                  while (surroundingType != null) {
+                    validator.addImport(surroundingType.getFullyQualifiedName());
+                    surroundingType = surroundingType.getDeclaringType();
+                  }
+                }
+
+                // add annotation source
+                source.append(copySrc);
               }
             };
             sourceBuilder.addAnnotationSourceBuilder(asb);
           }
         }
       }
-    }
-    catch (JavaModelException e) {
-      ScoutSdk.logError("Error copying the annotations to the form data.", e);
+      catch (JavaModelException e) {
+        ScoutSdk.logError("Error copying the annotation '" + a.getElementName() + "' in type '" + declaringType.getFullyQualifiedName() + "' to the form data.", e);
+      }
     }
   }
 
