@@ -237,6 +237,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     ServiceMethod loadMethod = new ServiceMethod("load", serviceOp.getInterfacePackageName() + "." + serviceOp.getInterfaceName());
     String formDataSignature = SignatureCache.createTypeSignature(formData.getFullyQualifiedName());
     loadMethod.setReturnTypeSignature(formDataSignature);
+    loadMethod.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     loadMethod.addParameter(new MethodParameter("formData", formDataSignature));
     loadMethod.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
