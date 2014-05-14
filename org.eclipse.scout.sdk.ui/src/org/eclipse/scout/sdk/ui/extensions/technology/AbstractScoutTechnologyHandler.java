@@ -208,7 +208,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
 
   protected TriState getSelectionTargetFileContainsFeature(List<ScoutTechnologyResource> files, String... featureIds) throws CoreException {
     if (files.size() < 1) {
-      return TriState.FALSE;
+      return null;
     }
 
     TriState ret = TriState.parseTriState(isTargetContainingFeature(files.get(0).getResource(), featureIds));

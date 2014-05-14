@@ -28,7 +28,7 @@ public class F2ManifestTechnologyHandler extends AbstractScoutTechnologyHandler 
 
   @Override
   public TriState getSelection(IScoutBundle project) {
-    return getSelectionManifests(getSwingBundlesBelow(project), F2_PLUGIN);
+    return getSelectionManifests(getUiBundlesBelow(project), F2_PLUGIN);
   }
 
   @Override
@@ -38,10 +38,10 @@ public class F2ManifestTechnologyHandler extends AbstractScoutTechnologyHandler 
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) {
-    contributeManifestFiles(getSwingBundlesBelow(project), list);
+    contributeManifestFiles(getUiBundlesBelow(project), list);
   }
 
-  private IScoutBundle[] getSwingBundlesBelow(IScoutBundle start) {
+  private IScoutBundle[] getUiBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), true);
   }
 

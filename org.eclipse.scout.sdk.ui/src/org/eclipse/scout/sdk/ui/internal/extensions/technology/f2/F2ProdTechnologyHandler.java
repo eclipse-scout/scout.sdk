@@ -5,6 +5,7 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
@@ -35,7 +36,14 @@ public class F2ProdTechnologyHandler extends AbstractScoutTechnologyHandler impl
 
   @Override
   public TriState getSelection(IScoutBundle project) throws CoreException {
-    return getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutClientBundleId}, new String[]{F2_PLUGIN});
+    TriState swingSelection = getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutUiSwingBundleId}, new String[]{F2_PLUGIN});
+    TriState swtSelection = getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutUiSwtBundleId}, new String[]{F2_PLUGIN});
+    if (CompareUtility.equals(swingSelection, swtSelection)) {
+      return swingSelection;
+    }
+    else {
+      return TriState.UNDEFINED;
+    }
   }
 
   @Override
@@ -45,6 +53,7 @@ public class F2ProdTechnologyHandler extends AbstractScoutTechnologyHandler impl
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    contributeProductFiles(list, IRuntimeClasses.ScoutSharedBundleId);
+    contributeProductFiles(list, IRuntimeClasses.ScoutUiSwtBundleId);
+    contributeProductFiles(list, IRuntimeClasses.ScoutUiSwingBundleId);
   }
 }
