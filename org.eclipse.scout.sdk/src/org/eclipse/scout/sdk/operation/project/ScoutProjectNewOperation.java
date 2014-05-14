@@ -23,11 +23,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
-import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.JavaRuntime;
-import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.pde.internal.core.ICoreConstants;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -45,8 +41,6 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   private static final String EXT_ATTR_ID_NAME = "id";
   private static final String EXT_ATTR_REF_NAME = "referenceId";
   private static final String EXT_ATTR_REF_TYPE_NAME = "execAfterReference";
-  private static final String EXEC_ENV_PREFIX = "JavaSE-";
-  private static final String MIN_JVM_VERSION = "1.6";
   public static final String DOCUMENTATION_SVC_SUFFIX = "Documentation";
 
   public ScoutProjectNewOperation() {
@@ -160,45 +154,13 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   }
 
   protected String computeExecutionEnvironment() {
-    // defaults
-    String execEnv = EXEC_ENV_PREFIX + MIN_JVM_VERSION;
-    double execEnvVersion = getExecEnvVersion(execEnv);
-
-    IVMInstall defaultVm = JavaRuntime.getDefaultVMInstall();
-    if (defaultVm != null) {
-      for (IExecutionEnvironment env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
-        String executionEnvId = env.getId();
-        if (env.isStrictlyCompatible(defaultVm)) {
-          double envVersion = getExecEnvVersion(executionEnvId);
-          if (envVersion > execEnvVersion) {
-            execEnv = executionEnvId; // take the newest
-          }
-        }
-      }
-    }
-    return execEnv;
-  }
-
-  protected double getExecEnvVersion(String executionEnvId) {
-    if (executionEnvId != null && executionEnvId.startsWith(EXEC_ENV_PREFIX)) {
-      String numPart = executionEnvId.substring(EXEC_ENV_PREFIX.length());
-      if (StringUtility.hasText(numPart)) {
-        try {
-          double ret = Double.parseDouble(numPart);
-          return ret;
-        }
-        catch (NumberFormatException e) {
-          //nop
-        }
-      }
-    }
-    return 1.6;
+    return JdtUtility.getDefaultJvmExecutionEnvironment();
   }
 
   protected void putInitialProperties() {
     String javaExecEnvId = computeExecutionEnvironment();
     String maxPermSize = "";
-    double javaVersion = getExecEnvVersion(javaExecEnvId);
+    double javaVersion = JdtUtility.getExecEnvVersion(javaExecEnvId);
     if (javaVersion < 1.8) {
       maxPermSize = "-XX:MaxPermSize=256m";
     }

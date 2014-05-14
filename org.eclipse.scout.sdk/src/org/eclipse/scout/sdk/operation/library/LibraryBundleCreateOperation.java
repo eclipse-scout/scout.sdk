@@ -43,6 +43,7 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.ScoutResourceFilters;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper.ManifestPart;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
@@ -150,7 +151,7 @@ public class LibraryBundleCreateOperation implements IOperation {
     if (getFragmentHost() != null) {
       manifest.setEntryValue("Fragment-Host", getFragmentHost());
     }
-    manifest.setEntryValue("Bundle-RequiredExecutionEnvironment", "JavaSE-1.6");
+    manifest.setEntryValue("Bundle-RequiredExecutionEnvironment", JdtUtility.getDefaultJvmExecutionEnvironment());
   }
 
   private void collectPackages(IProject project, Collection<IPackageFragment> collector) throws JavaModelException {

@@ -39,9 +39,13 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.TypeNameRequestor;
 import org.eclipse.jdt.internal.core.util.PublicScanner;
+import org.eclipse.jdt.launching.IVMInstall;
+import org.eclipse.jdt.launching.JavaRuntime;
+import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.jface.text.ITextSelection;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.State;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.pde.LazyPluginModel;
@@ -51,6 +55,9 @@ import org.osgi.framework.Version;
 
 @SuppressWarnings("restriction")
 public final class JdtUtility {
+
+  private static final String EXEC_ENV_PREFIX = "JavaSE-";
+  private static final String MIN_JVM_VERSION = "1.6";
 
   private JdtUtility() {
   }
@@ -83,6 +90,42 @@ public final class JdtUtility {
       }
     }
     return null;
+  }
+
+  public static String getDefaultJvmExecutionEnvironment() {
+    // defaults
+    String execEnv = EXEC_ENV_PREFIX + MIN_JVM_VERSION;
+    double execEnvVersion = getExecEnvVersion(execEnv);
+
+    IVMInstall defaultVm = JavaRuntime.getDefaultVMInstall();
+    if (defaultVm != null) {
+      for (IExecutionEnvironment env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
+        String executionEnvId = env.getId();
+        if (env.isStrictlyCompatible(defaultVm)) {
+          double envVersion = getExecEnvVersion(executionEnvId);
+          if (envVersion > execEnvVersion) {
+            execEnv = executionEnvId; // take the newest
+          }
+        }
+      }
+    }
+    return execEnv;
+  }
+
+  public static double getExecEnvVersion(String executionEnvId) {
+    if (executionEnvId != null && executionEnvId.startsWith(EXEC_ENV_PREFIX)) {
+      String numPart = executionEnvId.substring(EXEC_ENV_PREFIX.length());
+      if (StringUtility.hasText(numPart)) {
+        try {
+          double ret = Double.parseDouble(numPart);
+          return ret;
+        }
+        catch (NumberFormatException e) {
+          //nop
+        }
+      }
+    }
+    return 1.6;
   }
 
   public static String getAnnotationValueString(IAnnotation annotation, String name) throws JavaModelException {
