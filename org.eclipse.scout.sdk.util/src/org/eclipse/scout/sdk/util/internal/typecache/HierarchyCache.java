@@ -125,6 +125,15 @@ public final class HierarchyCache implements IHierarchyCache {
     }
   }
 
+  private static boolean areTypesInHierarchy(CachedTypeHierarchy h, IType[] types) {
+    for (IType t : types) {
+      if (h.contains(t)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   private void handleTypeChange(IType t, ITypeHierarchy superTypeHierarchy) {
     try {
       ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>(m_cachedPrimaryTypeHierarchies.size());
@@ -135,12 +144,13 @@ public final class HierarchyCache implements IHierarchyCache {
       }
 
       if (hierarchies.size() > 0) {
+        IType[] superTypes = superTypeHierarchy.getSupertypes(t);
+
         for (CachedTypeHierarchy h : hierarchies) {
           if (h.isCreated()) {
-            IType[] superTypes = superTypeHierarchy.getSupertypes(t);
 
             if (h.contains(t)) {
-              if (!h.containsInSubHierarchy(h.getType(), superTypes)) {
+              if (!areTypesInHierarchy(h, superTypes)) {
                 // remove
                 h.invalidate();
               }
@@ -153,7 +163,7 @@ public final class HierarchyCache implements IHierarchyCache {
               }
             }
             else {
-              if (h.containsInSubHierarchy(h.getType(), superTypes)) {
+              if (areTypesInHierarchy(h, superTypes)) {
                 // add
                 h.invalidate();
               }

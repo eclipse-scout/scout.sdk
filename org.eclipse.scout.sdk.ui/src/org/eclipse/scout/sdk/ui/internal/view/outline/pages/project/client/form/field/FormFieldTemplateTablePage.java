@@ -66,8 +66,10 @@ public class FormFieldTemplateTablePage extends AbstractPage {
   protected void loadChildrenImpl() {
     for (IType fieldTemplate : resolveFormFieldTemplates()) {
       ITypePage nodePage = (ITypePage) FormFieldExtensionPoint.createNodePage(fieldTemplate, m_formFieldHierarchy);
-      nodePage.setParent(this);
-      nodePage.setType(fieldTemplate);
+      if (nodePage != null) {
+        nodePage.setParent(this);
+        nodePage.setType(fieldTemplate);
+      }
     }
   }
 
