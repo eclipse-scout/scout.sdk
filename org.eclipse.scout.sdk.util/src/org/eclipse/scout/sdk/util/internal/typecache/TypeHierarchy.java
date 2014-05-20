@@ -118,23 +118,6 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   }
 
   @Override
-  public boolean containsInSubHierarchy(IType type, IType[] potentialSubtypes) {
-    if (potentialSubtypes == null) {
-      return false;
-    }
-
-    revalidate(null);
-    HashSet<IType> allSubTypes = (HashSet<IType>) getTypesFilteredAndSortedImpl(m_hierarchy.getAllSubtypes(type), null, null);
-    allSubTypes.add(type);
-    for (IType pt : potentialSubtypes) {
-      if (allSubTypes.contains(pt)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
   public IType[] getAllSubtypes(IType type) {
     return getAllSubtypes(type, null);
   }

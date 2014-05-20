@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -98,13 +98,6 @@ public interface ITypeHierarchy {
    * @return true if the potentialSubtype is in the sub hierarchy of the given type.
    */
   boolean isSubtype(IType type, IType potentialSubtype);
-
-  /**
-   * @param type
-   * @param potentialSubtypes
-   * @return true if one of the potentialSubtypes is a subtype of the given type
-   */
-  boolean containsInSubHierarchy(IType type, IType[] potentialSubtypes);
 
   /**
    * @see ITypeHierarchy#getAllSuperclasses(IType, ITypeFilter, Comparator)
