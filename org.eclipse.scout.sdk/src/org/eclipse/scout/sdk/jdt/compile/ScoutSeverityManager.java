@@ -48,7 +48,7 @@ public final class ScoutSeverityManager {
       public void resourceChanged(IResourceChangeEvent e) {
         IMarkerDelta[] mdeltas = e.findMarkerDeltas(IMarker.PROBLEM, true);
         if (mdeltas != null && mdeltas.length > 0) {
-          HashSet<IResource> changedResorces = new HashSet<IResource>();
+          HashSet<IResource> changedResorces = new HashSet<IResource>(mdeltas.length);
           for (IMarkerDelta d : mdeltas) {
             IResource r = d.getMarker().getResource();
             if (r != null) {
@@ -132,6 +132,7 @@ public final class ScoutSeverityManager {
           case IJavaElement.INITIALIZER:
           case IJavaElement.METHOD:
           case IJavaElement.FIELD:
+          case IJavaElement.ANNOTATION:
           case IJavaElement.LOCAL_VARIABLE:
             ICompilationUnit cu = (ICompilationUnit) element.getAncestor(IJavaElement.COMPILATION_UNIT);
             if (cu != null) {

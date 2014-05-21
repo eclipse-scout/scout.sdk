@@ -35,8 +35,8 @@ public class InnerTypeOrderChangedPageDirtyListener implements IJavaResourceChan
 
   @Override
   public void handleEvent(JdtEvent event) {
-    if (TypeUtility.exists(event.getElement())) {
-      if (event.getElementType() == IJavaElement.ANNOTATION) {
+    if (event.getElementType() == IJavaElement.ANNOTATION) {
+      if (TypeUtility.exists(event.getElement())) {
         IAnnotation annotation = (IAnnotation) event.getElement();
         IJavaElement annotationOwner = annotation.getParent();
         ITypeHierarchy superTypeHierarchy = event.getSuperTypeHierarchy();

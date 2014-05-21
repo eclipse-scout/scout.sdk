@@ -1197,4 +1197,11 @@
             requiredSourceLevel="1.6">
       </quickAssistProcessor>
    </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.eclipse.scout.sdk.ui.classid.ClassIdDuplicateResolutionGenerator"
+            markerType="org.eclipse.scout.sdk.classid.duplicate">
+      </markerResolutionGenerator>
+   </extension>
 </plugin>

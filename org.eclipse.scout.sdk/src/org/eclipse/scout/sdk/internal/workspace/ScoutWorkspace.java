@@ -81,34 +81,9 @@ public final class ScoutWorkspace implements IScoutWorkspace {
       P_BundleGraphRebuildShutdownJob job = new P_BundleGraphRebuildShutdownJob();
       job.schedule();
       try {
-        job.join(3000);
+        job.join(20000);
       }
       catch (InterruptedException e) {
-      }
-      if (job.getResult() == null) {
-        // the job is still waiting for the shutdown -> enforce it
-        Job[] jobs = Job.getJobManager().find(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
-        if (jobs != null && jobs.length > 0) {
-          for (Job j : jobs) {
-            if (j != null) {
-              Thread t = j.getThread();
-              if (t != null) {
-                t.interrupt();
-                try {
-                  j.join();
-                }
-                catch (InterruptedException e) {
-                }
-              }
-            }
-          }
-        }
-
-        try {
-          job.join(3000);
-        }
-        catch (InterruptedException e1) {
-        }
       }
 
       m_bundleGraph.dispose();
@@ -201,7 +176,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
         l.workspaceChanged(e);
       }
       catch (Exception t) {
-        ScoutSdk.logError("error during listener notification.", t);
+        ScoutSdk.logError("error during listener notification '" + l.getClass().getName() + "'.", t);
       }
     }
   }
@@ -221,7 +196,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     }
   }
 
-  private final class P_BundleGraphRebuildJob extends Job {
+  private final class P_BundleGraphRebuildJob extends JobEx {
 
     private final ScoutWorkspaceEventList m_eventCollector;
 

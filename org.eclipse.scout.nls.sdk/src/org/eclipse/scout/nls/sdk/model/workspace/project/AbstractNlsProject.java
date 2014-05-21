@@ -234,7 +234,7 @@ public abstract class AbstractNlsProject implements INlsProject {
       StringBuilder ret = new StringBuilder(baseText.length());
 
       // remove not allowed characters
-      baseText = baseText.replaceAll("[^a-zA-Z0-9_.\\-\\s]*", "").trim();
+      baseText = baseText.replaceAll("[^a-zA-Z0-9_\\.\\- ]*", "").trim();
 
       // camel case multiple words
       String[] split = baseText.split(" ");

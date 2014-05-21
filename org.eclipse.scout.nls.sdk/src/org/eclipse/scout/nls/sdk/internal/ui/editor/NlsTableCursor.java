@@ -328,11 +328,10 @@ public class NlsTableCursor {
     }
     m_renaming = true;
     try {
-      INlsEntry row = (NlsEntry) m_cursor.getRow().getData();
+      INlsEntry row = (INlsEntry) m_cursor.getRow().getData();
       for (INlsTableCursorManangerListener listener : m_listeners) {
         listener.textChangend(row, m_cursor.getColumn(), m_editingText.getText());
       }
-      //m_cursor.getRow().setText(m_cursor.getColumn(), m_editingText.getText());
     }
     finally {
       disposeText();

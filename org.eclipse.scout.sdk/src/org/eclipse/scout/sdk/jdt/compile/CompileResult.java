@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.jdt.compile;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -22,7 +21,7 @@ import org.eclipse.scout.commons.CompositeObject;
 /**
  * <h3>{@link CompileResult}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.9.0 18.03.2013
  */
 public class CompileResult implements ICompileResult {
@@ -51,7 +50,7 @@ public class CompileResult implements ICompileResult {
         errorMarkers.add(m);
       }
     }
-    return Collections.unmodifiableList(errorMarkers);
+    return errorMarkers;
   }
 
   @Override

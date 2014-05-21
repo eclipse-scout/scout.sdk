@@ -32,6 +32,8 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceDelta;
+import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.IResourceProxyVisitor;
 import org.eclipse.core.resources.ProjectScope;
@@ -78,7 +80,7 @@ public final class ResourceUtility {
       @Override
       public boolean visit(IResourceProxy proxy) throws CoreException {
         if (proxy.isAccessible()) {
-          if (filter.accept(proxy)) {
+          if (filter == null || filter.accept(proxy)) {
             collector.add(proxy.requestResource());
           }
           return true;
@@ -88,6 +90,27 @@ public final class ResourceUtility {
     }, IResource.NONE);
 
     return collector.toArray(new IResource[collector.size()]);
+  }
+
+  public static List<IResource> getAllResources(IResourceDelta d, final IResourceFilter filter) throws CoreException {
+    final List<IResource> result = new LinkedList<IResource>();
+    if (d == null) {
+      return result;
+    }
+
+    d.accept(new IResourceDeltaVisitor() {
+      @Override
+      public boolean visit(IResourceDelta delta) throws CoreException {
+        IResource resource = delta.getResource();
+        if (resource.isAccessible()) {
+          if (filter == null || filter.accept(new ResourceProxy(resource))) {
+            result.add(resource);
+          }
+        }
+        return true;
+      }
+    });
+    return result;
   }
 
   /**

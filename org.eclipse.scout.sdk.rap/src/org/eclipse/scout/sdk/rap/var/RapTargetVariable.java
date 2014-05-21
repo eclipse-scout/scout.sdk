@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.rap.var;
 
-import java.util.HashSet;
+import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 import java.util.concurrent.ConcurrentLinkedQueue;
 
 import org.eclipse.core.resources.IFile;
@@ -20,7 +19,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -35,6 +34,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.rap.ScoutSdkRap;
+import org.eclipse.scout.sdk.util.resources.IResourceFilter;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
 /**
@@ -204,27 +204,13 @@ public final class RapTargetVariable {
       return RESOURCE_CHANGE_JOB_FAMILY.equals(family);
     }
 
-    private void collectTargetFiles(IResourceDelta d, final Set<IFile> res) throws CoreException {
-      if (d == null) {
-        return;
-      }
-
-      try {
-        d.accept(new IResourceDeltaVisitor() {
-          @Override
-          public boolean visit(IResourceDelta delta) throws CoreException {
-            IResource resource = delta.getResource();
-            if (ResourceUtility.exists(resource) && resource.getType() == IResource.FILE && resource.getName().toLowerCase().endsWith(".target")) {
-              res.add((IFile) resource);
-              return false;
-            }
-            return true;
-          }
-        });
-      }
-      catch (CoreException e) {
-        ScoutSdkRap.logError("Could not check for .target files that use the scout rap target variable.", e);
-      }
+    private List<IResource> collectTargetFiles(IResourceDelta d) throws CoreException {
+      return ResourceUtility.getAllResources(d, new IResourceFilter() {
+        @Override
+        public boolean accept(IResourceProxy resource) {
+          return resource.getType() == IResource.FILE && resource.getName().toLowerCase().endsWith(".target");
+        }
+      });
     }
 
     @Override
@@ -233,10 +219,10 @@ public final class RapTargetVariable {
       while ((event = m_resourceChangeEventsToHandle.poll()) != null) {
         if (!StringUtility.hasText(getValue())) {
           try {
-            HashSet<IFile> collector = new HashSet<IFile>();
-            collectTargetFiles(event.getDelta(), collector);
-            if (!collector.isEmpty()) {
-              for (IFile f : collector) {
+            List<IResource> files = collectTargetFiles(event.getDelta());
+            if (!files.isEmpty()) {
+              for (IResource r : files) {
+                IFile f = (IFile) r;
                 try {
                   if (isScoutRapTargetVarPresent(f)) {
                     fireEmptyVariableInUse(f);

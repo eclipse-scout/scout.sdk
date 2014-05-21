@@ -288,9 +288,11 @@ public final class HierarchyCache implements IHierarchyCache {
         }
         else if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
           try {
-            IType[] types = ((ICompilationUnit) e.getElement()).getTypes();
-            if (types.length > 0) {
-              handleTypeChange(types[0], e.getSuperTypeHierarchy());
+            if (TypeUtility.exists(e.getElement())) {
+              IType[] types = ((ICompilationUnit) e.getElement()).getTypes();
+              if (types.length > 0) {
+                handleTypeChange(types[0], e.getSuperTypeHierarchy());
+              }
             }
           }
           catch (JavaModelException ex) {

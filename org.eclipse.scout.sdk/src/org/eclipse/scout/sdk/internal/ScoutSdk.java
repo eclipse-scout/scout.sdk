@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.classid.ClassIdValidationJob;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoAutoUpdateManager;
 import org.eclipse.scout.sdk.internal.workspace.dto.formdata.FormDataDtoUpdateHandler;
@@ -37,16 +38,22 @@ public class ScoutSdk extends Plugin {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
+
     plugin = this;
     logManager = new SdkLogManager(this);
+
+    logInfo("Starting SCOUT SDK Plugin.");
 
     // ensure the caches and emitters are initialized.
     ScoutSdkCore.getHierarchyCache();
     ScoutSdkCore.getTypeCache();
     ScoutSdkCore.getJavaResourceChangedEmitter();
 
-    logInfo("Starting SCOUT SDK Plugin.");
+    // start class id validation
+    ClassIdValidationJob.install();
+    ClassIdValidationJob.execute(5000);
 
+    // DTO auto update
     m_autoUpdateManager = new DtoAutoUpdateManager();
     m_autoUpdateManager.addModelDataUpdateHandler(new FormDataDtoUpdateHandler());
     m_autoUpdateManager.addModelDataUpdateHandler(new PageDataAutoUpdateHandler());
@@ -56,6 +63,7 @@ public class ScoutSdk extends Plugin {
   public void stop(BundleContext context) throws Exception {
     TuningUtility.finishAll();
     m_autoUpdateManager.dispose();
+    ClassIdValidationJob.uninstall();
     ScoutWorkspace.getInstance().dispose();
     ScoutSdkCore.getHierarchyCache().dispose();
     ScoutSdkCore.getTypeCache().dispose();
