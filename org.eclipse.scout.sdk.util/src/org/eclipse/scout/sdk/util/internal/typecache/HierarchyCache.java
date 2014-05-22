@@ -237,7 +237,7 @@ public final class HierarchyCache implements IHierarchyCache {
     }
   }
 
-  private void handleCompilationUnitChagnedExternal(ICompilationUnit icu) {
+  private void handleCompilationUnitChangedExternal(ICompilationUnit icu) {
     IRegion region = JavaCore.newRegion();
     region.add(icu);
     try {
@@ -309,6 +309,12 @@ public final class HierarchyCache implements IHierarchyCache {
             handleJavaElementRemoved(e.getElement());
           }
         }
+        else if (e.getElementType() == IJavaElement.PACKAGE_FRAGMENT_ROOT) {
+          if ((e.getFlags() & (IJavaElementDelta.F_ADDED_TO_CLASSPATH | IJavaElementDelta.F_REMOVED_FROM_CLASSPATH | IJavaElementDelta.F_ARCHIVE_CONTENT_CHANGED | IJavaElementDelta.F_REORDER)) != 0 || e.getFlags() == 0) {
+            // the classpath has been changed
+            invalidateAll();
+          }
+        }
         break;
       }
       case IJavaElementDelta.REMOVED: {
@@ -319,7 +325,10 @@ public final class HierarchyCache implements IHierarchyCache {
       }
       case JavaResourceChangedEmitter.CHANGED_EXTERNAL:
         if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
-          handleCompilationUnitChagnedExternal((ICompilationUnit) e.getElement());
+          handleCompilationUnitChangedExternal((ICompilationUnit) e.getElement());
+        }
+        else if (e.getElementType() == IJavaElement.TYPE) {
+          handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());
         }
         break;
     }
