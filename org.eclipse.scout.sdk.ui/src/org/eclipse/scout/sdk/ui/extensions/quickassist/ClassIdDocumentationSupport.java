@@ -95,15 +95,18 @@ public class ClassIdDocumentationSupport {
    * @return The documentation entry or null if there is no entry for the type.
    */
   public INlsEntry getNlsEntry() {
-    try {
-      String classId = ScoutTypeUtility.getClassIdAnnotationValue(getType());
-      if (StringUtility.hasText(classId)) {
-        String key = generateNlsKey(classId);
-        return getNlsProject().getEntry(key);
+    INlsProject nlsProject = getNlsProject();
+    if (nlsProject != null) {
+      try {
+        String classId = ScoutTypeUtility.getClassIdAnnotationValue(getType());
+        if (StringUtility.hasText(classId)) {
+          String key = generateNlsKey(classId);
+          return nlsProject.getEntry(key);
+        }
       }
-    }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logError("Unable to get the documentation text for type '" + getType().getFullyQualifiedName() + "'.", e);
+      catch (JavaModelException e) {
+        ScoutSdkUi.logError("Unable to get the documentation text for type '" + getType().getFullyQualifiedName() + "'.", e);
+      }
     }
     return null;
   }
