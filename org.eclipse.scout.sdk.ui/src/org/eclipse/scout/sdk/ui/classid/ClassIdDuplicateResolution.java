@@ -21,7 +21,6 @@ import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.classid.ClassIdValidationJob;
@@ -97,12 +96,6 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
             }
             catch (CoreException e) {
               //nop
-            }
-            try {
-              JavaUI.openInEditor(parent);
-            }
-            catch (Exception e) {
-              e.printStackTrace();
             }
             ClassIdValidationJob.execute(0); // the modification of the annotation does not cause an annotation modify event to be triggered
           }
