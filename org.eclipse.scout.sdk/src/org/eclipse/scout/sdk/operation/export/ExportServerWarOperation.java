@@ -90,7 +90,7 @@ public class ExportServerWarOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     IStatus result = null;
-    final String SERVLET_BRIDGE_JAR_NAME = "org.eclipse.equinox.servletbridge_1.3.0.v20131217-1400.jar";
+    final String SERVLET_BRIDGE_JAR_NAME = "org.eclipse.equinox.servletbridge_1.3.0.v20140430-1556.jar";
     try {
       m_tempBuildDir = IOUtility.createTempDirectory("warExportBuildDir");
       buildClientProduct(monitor, workingCopyManager);
