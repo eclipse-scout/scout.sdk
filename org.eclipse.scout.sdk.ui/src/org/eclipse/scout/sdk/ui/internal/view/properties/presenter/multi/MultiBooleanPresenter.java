@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.multi;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -18,7 +19,6 @@ import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.multi.AbstractMultiMethodPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
@@ -76,19 +76,15 @@ public class MultiBooleanPresenter extends AbstractMultiMethodPresenter<Boolean>
   @Override
   protected void init(ConfigurationMethodSet methodSet) throws CoreException {
     super.init(methodSet);
-    MethodBean<Boolean>[] methodBeans = getMethodBeans();
-    boolean[] ar = new boolean[methodBeans.length];
-    for (int i = 0; i < methodBeans.length; i++) {
-      ar[i] = methodBeans[i].getCurrentSourceValue();
-    }
-    if (!allEqual(ar)) {
+    Collection<MethodBean<Boolean>> methodBeans = getMethodBeans();
+    if (!allEqual(methodBeans)) {
       m_checkbox.setText("###");
       m_checkbox.setForeground(m_checkbox.getDisplay().getSystemColor(SWT.COLOR_GRAY));
     }
     else {
       m_checkbox.setText("");
       m_checkbox.setForeground(null);
-      m_checkbox.setSelection(ar[0]);
+      m_checkbox.setSelection(methodBeans.iterator().next().getCurrentSourceValue());
     }
     m_checkbox.setEnabled(true);
   }
@@ -115,28 +111,14 @@ public class MultiBooleanPresenter extends AbstractMultiMethodPresenter<Boolean>
     return Boolean.toString(value);
   }
 
-  protected synchronized void storeMethods(MethodBean<Boolean>[] beans) {
-
-    ArrayList<IOperation> list = new ArrayList<IOperation>();
+  protected synchronized void storeMethods(Collection<MethodBean<Boolean>> beans) {
+    ArrayList<IOperation> list = new ArrayList<IOperation>(beans.size());
     for (MethodBean<Boolean> bean : beans) {
       ConfigurationMethod method = bean.getMethod();
-      ConfigPropertyUpdateOperation<Boolean> updateOp = new ConfigPropertyUpdateOperation<Boolean>(ScoutTypeUtility.getConfigurationMethod(method.getType(), method.getMethodName()), new BooleanPropertySourceParser());
+      ConfigPropertyUpdateOperation<Boolean> updateOp = new ConfigPropertyUpdateOperation<Boolean>(method, new BooleanPropertySourceParser());
       updateOp.setValue(m_checkbox.getSelection());
+      list.add(updateOp);
     }
     new OperationJob(list).schedule();
   }
-
-  private boolean allEqual(boolean[] ar) {
-    if (ar.length > 0) {
-      boolean equal = ar[0];
-      for (boolean b : ar) {
-        if (b != equal) {
-          return false;
-        }
-      }
-    }
-    return true;
-
-  }
-
 }

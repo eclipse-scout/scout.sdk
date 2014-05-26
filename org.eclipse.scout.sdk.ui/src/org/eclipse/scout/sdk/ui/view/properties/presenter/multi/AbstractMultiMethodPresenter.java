@@ -10,11 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.presenter.multi;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.ui.fields.tooltip.CustomTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
@@ -48,11 +51,25 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
   private Hyperlink m_labelLink;
   private Composite m_body;
   private MethodErrorPresenterContent m_errorContent;
-  private HashMap<String, MethodBean<T>> m_methodSources = new HashMap<String, MethodBean<T>>();
+  private final Map<String, MethodBean<T>> m_methodSources = new HashMap<String, MethodBean<T>>();
 
   public AbstractMultiMethodPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
     create(getContainer());
+  }
+
+  protected static <T> boolean allEqual(Collection<MethodBean<T>> ar) {
+    if (ar.size() > 1) {
+      Iterator<MethodBean<T>> it = ar.iterator();
+      T first = it.next().getCurrentSourceValue();
+      while (it.hasNext()) {
+        T cur = it.next().getCurrentSourceValue();
+        if (CompareUtility.notEquals(first, cur)) {
+          return false;
+        }
+      }
+    }
+    return true;
   }
 
   public final void setMethodSet(ConfigurationMethodSet methodSet) {
@@ -142,12 +159,10 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
     if (m_methodSources == null || m_methodSources.size() < 1) {
       return null;
     }
-    return new ArrayList<MethodBean<T>>(m_methodSources.values()).get(0).getMethod().peekMethod();
+    return m_methodSources.values().iterator().next().getMethod().peekMethod();
   }
 
-  @SuppressWarnings("unchecked")
-  protected MethodBean<T>[] getMethodBeans() {
-    return m_methodSources.values().toArray(new MethodBean[m_methodSources.size()]);
+  protected Collection<MethodBean<T>> getMethodBeans() {
+    return m_methodSources.values();
   }
-
 }
