@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.presenter.multi;
 
+import java.util.Collection;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
@@ -17,7 +18,6 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -33,11 +33,11 @@ import org.eclipse.swt.widgets.Text;
 public abstract class AbstractMultiValuePresenter<T> extends AbstractMultiMethodPresenter<T> {
 
   private Text m_textComponent;
-  private final String m_regexAllowedCharacters;
+  private final Pattern m_regexAllowedCharacters;
 
   public AbstractMultiValuePresenter(PropertyViewFormToolkit toolkit, Composite parent, String regexAllowedInput) {
     super(toolkit, parent);
-    m_regexAllowedCharacters = regexAllowedInput;
+    m_regexAllowedCharacters = Pattern.compile(regexAllowedInput);
   }
 
   @Override
@@ -66,15 +66,7 @@ public abstract class AbstractMultiValuePresenter<T> extends AbstractMultiMethod
     return false;
   }
 
-  @Override
-  protected void init(ConfigurationMethodSet methodSet) throws CoreException {
-    super.init(methodSet);
-//    if (methodSet.getMethods().length > 0) {
-//      m_textComponent.setEnabled(true);
-//    }
-  }
-
-  protected abstract void storeMethods(MethodBean<T>[] beans, T value);
+  protected abstract void storeMethods(Collection<MethodBean<T>> beans, T value);
 
   protected int getTextAlignment() {
     return SWT.LEFT;
@@ -95,7 +87,7 @@ public abstract class AbstractMultiValuePresenter<T> extends AbstractMultiMethod
             return;
           }
           if (string != null) {
-            event.doit = Pattern.matches(m_regexAllowedCharacters, string);
+            event.doit = m_regexAllowedCharacters.matcher(string).matches();
           }
           break;
         case SWT.FocusOut:

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.multi;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -20,7 +21,6 @@ import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.multi.AbstractMultiValuePresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
@@ -42,16 +42,12 @@ public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
   protected void init(ConfigurationMethodSet methodSet) throws CoreException {
     super.init(methodSet);
 
-    MethodBean<Long>[] methodBeans = getMethodBeans();
-    long[] ar = new long[methodBeans.length];
-    for (int i = 0; i < methodBeans.length; i++) {
-      ar[i] = methodBeans[i].getCurrentSourceValue();
-    }
-    if (!allEqual(ar)) {
+    Collection<MethodBean<Long>> methodBeans = getMethodBeans();
+    if (!allEqual(methodBeans)) {
       getTextComponent().setText(SdkProperties.INPUT_MULTI_UNDEFINED);
     }
     else {
-      getTextComponent().setText(formatDisplayValue(ar[0]));
+      getTextComponent().setText(formatDisplayValue(methodBeans.iterator().next().getCurrentSourceValue()));
     }
   }
 
@@ -95,26 +91,14 @@ public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
   }
 
   @Override
-  protected synchronized void storeMethods(MethodBean<Long>[] beans, Long value) {
-    ArrayList<IOperation> list = new ArrayList<IOperation>();
+  protected synchronized void storeMethods(Collection<MethodBean<Long>> beans, Long value) {
+    ArrayList<IOperation> list = new ArrayList<IOperation>(beans.size());
     for (MethodBean<Long> bean : beans) {
       ConfigurationMethod method = bean.getMethod();
-      ConfigPropertyUpdateOperation<Long> updateOp = new ConfigPropertyUpdateOperation<Long>(ScoutTypeUtility.getConfigurationMethod(method.getType(), method.getMethodName()), new LongPropertySourceParser());
+      ConfigPropertyUpdateOperation<Long> updateOp = new ConfigPropertyUpdateOperation<Long>(method, new LongPropertySourceParser());
       updateOp.setValue(value);
+      list.add(updateOp);
     }
     new OperationJob(list).schedule();
   }
-
-  private boolean allEqual(long[] ar) {
-    if (ar.length > 0) {
-      long ref = ar[0];
-      for (long b : ar) {
-        if (b != ref) {
-          return false;
-        }
-      }
-    }
-    return true;
-  }
-
 }

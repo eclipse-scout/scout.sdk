@@ -12,16 +12,15 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.multi;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.multi.AbstractMultiValuePresenter;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.util.MethodBean;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethodSet;
@@ -42,16 +41,12 @@ public class MultiIntegerPresenter extends AbstractMultiValuePresenter<Integer> 
   @Override
   protected void init(ConfigurationMethodSet methodSet) throws CoreException {
     super.init(methodSet);
-    MethodBean<Integer>[] methodBeans = getMethodBeans();
-    Integer[] ar = new Integer[methodBeans.length];
-    for (int i = 0; i < methodBeans.length; i++) {
-      ar[i] = methodBeans[i].getCurrentSourceValue();
-    }
-    if (!allEqual(ar)) {
+    Collection<MethodBean<Integer>> methodBeans = getMethodBeans();
+    if (!allEqual(methodBeans)) {
       getTextComponent().setText(SdkProperties.INPUT_MULTI_UNDEFINED);
     }
     else {
-      getTextComponent().setText(formatDisplayValue(ar[0]));
+      getTextComponent().setText(formatDisplayValue(methodBeans.iterator().next().getCurrentSourceValue()));
     }
   }
 
@@ -101,25 +96,14 @@ public class MultiIntegerPresenter extends AbstractMultiValuePresenter<Integer> 
   }
 
   @Override
-  protected synchronized void storeMethods(MethodBean<Integer>[] beans, Integer value) {
-    ArrayList<IOperation> list = new ArrayList<IOperation>();
+  protected synchronized void storeMethods(Collection<MethodBean<Integer>> beans, Integer value) {
+    ArrayList<IOperation> list = new ArrayList<IOperation>(beans.size());
     for (MethodBean<Integer> bean : beans) {
       ConfigurationMethod method = bean.getMethod();
-      ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(ScoutTypeUtility.getConfigurationMethod(method.getType(), method.getMethodName()), new IntegerPropertySourceParser());
+      ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(method, new IntegerPropertySourceParser());
       updateOp.setValue(value);
+      list.add(updateOp);
     }
     new OperationJob(list).schedule();
-  }
-
-  private boolean allEqual(Integer[] ar) {
-    if (ar.length > 0) {
-      Integer ref = ar[0];
-      for (Integer b : ar) {
-        if (CompareUtility.notEquals(b, ref)) {
-          return false;
-        }
-      }
-    }
-    return true;
   }
 }
