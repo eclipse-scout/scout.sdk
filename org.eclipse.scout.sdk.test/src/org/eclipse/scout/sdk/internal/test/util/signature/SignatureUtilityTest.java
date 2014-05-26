@@ -91,7 +91,8 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
     Assert.assertTrue(imports.contains("java.util.List"));
   }
 
-  @Test(timeout = 250L)
+  @Test
+  //TODO: re-enable timeout as soon as a dedicated performance testing infrastructure is available (timeout = 250L)
   public void testClassParameterized() throws Exception {
     String signature = "[Ljava.lang.Class<+[Lcom.bsiag.scout.client.ui.desktop.outline.IOutline;>;";
     ImportValidator validator = new ImportValidator(TEST_PACKAGE);
@@ -100,7 +101,8 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
     Assert.assertEquals("Class<? extends IOutline[]>[]", result);
   }
 
-  @Test(timeout = 8L)
+  @Test
+  //TODO: re-enable timeout as soon as a dedicated performance testing infrastructure is available (timeout = 8L)
   public void testComplexNestedArrayListHashMapArray() throws Exception {
     String signature = "[Ljava.util.HashMap<Ljava.util.ArrayList<[[Ljava.lang.String;>;Lorg.eclipse.scout.sdk.workspace.member.IScoutType;>;";
     ImportValidator validator = new ImportValidator(TEST_PACKAGE);
