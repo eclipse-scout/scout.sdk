@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 
 /**
@@ -20,5 +22,5 @@ import org.eclipse.jdt.core.IType;
  */
 public interface ITypeResolver {
 
-  IType[] getTypes();
+  Set<IType> getTypes();
 }

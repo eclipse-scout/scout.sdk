@@ -13,6 +13,8 @@ package org.eclipse.scout.nls.sdk.simple.ui.wizard;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
@@ -24,25 +26,23 @@ import org.eclipse.jface.fieldassist.IContentProposal;
 import org.eclipse.jface.fieldassist.IContentProposalProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
-import org.eclipse.scout.nls.sdk.internal.jdt.IResourceFilter;
+import org.eclipse.scout.sdk.util.resources.IResourceFilter;
+import org.eclipse.scout.sdk.util.resources.ResourceProxy;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 
 public class ResourceProposalModel extends LabelProvider implements IContentProposalProvider {
 
-  private TreeSet<String> m_proposalSorting = new TreeSet<String>();
-  private HashMap<String, P_ResourceProposal> m_proposals = new HashMap<String, P_ResourceProposal>();
+  private final Set<String> m_proposalSorting;
+  private final Map<String, P_ResourceProposal> m_proposals;
   private IProject[] m_projects;
-  private IResourceFilter m_filter = new IResourceFilter() {
-    @Override
-    public boolean accept(IProject project, IResource resource) {
-      return true;
-    }
-  };
+  private IResourceFilter m_filter;
 
   public ResourceProposalModel() {
-
+    m_proposalSorting = new TreeSet<String>();
+    m_proposals = new HashMap<String, P_ResourceProposal>();
+    m_filter = null;
   }
 
   public void setProjects(IProject[] projects) {
@@ -74,7 +74,7 @@ public class ResourceProposalModel extends LabelProvider implements IContentProp
 
   private List<P_ResourceProposal> getResources(IProject project, List<P_ResourceProposal> resources) throws CoreException {
     for (IResource resource : project.members()) {
-      if (m_filter.accept(project, resource)) {
+      if (m_filter == null || m_filter.accept(new ResourceProxy(resource))) {
         P_ResourceProposal p = new P_ResourceProposal(resource);
         resources.add(p);
         if (resource instanceof IFolder) {
@@ -87,7 +87,7 @@ public class ResourceProposalModel extends LabelProvider implements IContentProp
 
   private List<P_ResourceProposal> getResources(IProject project, IFolder parentResouce, List<P_ResourceProposal> resources) throws CoreException {
     for (IResource resource : parentResouce.members()) {
-      if (m_filter.accept(project, resource)) {
+      if (m_filter == null || m_filter.accept(new ResourceProxy(resource))) {
         P_ResourceProposal p = new P_ResourceProposal(resource);
         resources.add(p);
         if (resource instanceof IFolder) {

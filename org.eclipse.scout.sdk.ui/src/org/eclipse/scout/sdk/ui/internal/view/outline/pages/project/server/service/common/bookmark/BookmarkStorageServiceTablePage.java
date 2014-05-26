@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.bookmark;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
@@ -67,25 +70,20 @@ public class BookmarkStorageServiceTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     for (IType service : resolveServices()) {
-      IType serviceInterface = null;
-      IType[] interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
-      if (interfaces.length > 0) {
-        serviceInterface = interfaces[0];
-      }
-      new BookmarkStorageServiceNodePage(this, service, serviceInterface);
+      Set<IType> interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
+      new BookmarkStorageServiceNodePage(this, service, CollectionUtility.firstElement(interfaces));
     }
   }
 
-  protected IType[] resolveServices() {
+  protected Set<IType> resolveServices() {
     IType iBookmarkStorageService = TypeUtility.getType(IRuntimeClasses.IBookmarkStorageService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iBookmarkStorageService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
-    return services;
+    return m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
   @SuppressWarnings("unchecked")
@@ -99,7 +97,7 @@ public class BookmarkStorageServiceTablePage extends AbstractPage {
     if (menu instanceof FormDataSqlBindingValidateAction) {
       ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           return resolveServices();
         }
       });

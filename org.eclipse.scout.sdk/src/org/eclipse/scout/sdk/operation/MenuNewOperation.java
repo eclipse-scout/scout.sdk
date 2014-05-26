@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
@@ -113,7 +115,7 @@ public class MenuNewOperation implements IOperation {
           if (getFormHandler() != null) {
             IType table = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITable), hierarchy));
             if (!isNewFormHandler && TypeUtility.exists(table)) {
-              IType[] columns = ScoutTypeUtility.getPrimaryKeyColumns(table);
+              Set<IType> columns = ScoutTypeUtility.getPrimaryKeyColumns(table);
               for (IType col : columns) {
                 // find method on form
                 String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");

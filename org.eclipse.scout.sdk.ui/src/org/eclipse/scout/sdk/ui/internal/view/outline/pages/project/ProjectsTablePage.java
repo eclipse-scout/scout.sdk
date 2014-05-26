@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
@@ -123,10 +123,10 @@ public class ProjectsTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     if (ScoutExplorerSettingsSupport.BundlePresentation.Flat.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
       // flat display
-      IScoutBundle[] allBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutExplorerSettingsBundleFilter.get(), ScoutBundleComparators.getSymbolicNameAscComparator());
+      Set<IScoutBundle> allBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutExplorerSettingsBundleFilter.get(), ScoutBundleComparators.getSymbolicNameAscComparator());
       for (IScoutBundle b : allBundles) {
         createBundlePage(this, b);
       }
@@ -193,9 +193,9 @@ public class ProjectsTablePage extends AbstractPage {
     if (menu instanceof TypeResolverFormDataAction) {
       ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
-          IPrimaryTypeTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
+          ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
           return formHierarchy.getAllSubtypes(iForm);
         }
       }, null);
@@ -203,16 +203,16 @@ public class ProjectsTablePage extends AbstractPage {
     else if (menu instanceof TypeResolverPageDataAction) {
       ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
-          IPrimaryTypeTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
+          ICachedTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
           return pageWithTableHierarchy.getAllSubtypes(iPageWithTable);
         }
       }, getScoutBundle());
     }
     else if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      IScoutBundle[] clients = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+      Set<IScoutBundle> clients = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
       action.setOperation(new WellformClientBundleOperation(clients));
       action.init(getScoutBundle());
     }

@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link Oracle11g2JdbcManifestTechnologyHandler}</h3> ...
- *
+ * 
  * @author Matthias Villiger
  * @since 3.8.0 13.02.2012
  */
@@ -54,7 +54,7 @@ public class Oracle11g2JdbcManifestTechnologyHandler extends AbstractScoutTechno
     contributeManifestFiles(getServerBundlesBelow(project), list);
   }
 
-  private IScoutBundle[] getServerBundlesBelow(IScoutBundle start) {
+  private Set<IScoutBundle> getServerBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
   }
 }

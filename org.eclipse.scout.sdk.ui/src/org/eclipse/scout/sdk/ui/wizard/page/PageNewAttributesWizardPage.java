@@ -10,16 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.page;
 
-import java.util.Arrays;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -37,9 +37,9 @@ import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.swt.SWT;
@@ -58,7 +58,6 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
   public static final String PROP_TYPE_NAME = "typeName";
 
-  private IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
   private IType iPageWithNodes = TypeUtility.getType(IRuntimeClasses.IPageWithNodes);
   private IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
   private IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
@@ -162,17 +161,10 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     m_holderTypeField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("PageOutline"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
-        ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-            ScoutTypeFilters.getInScoutBundles(getClientBundle()),
-            TypeFilters.getClassFilter());
-
-        IType[] pages = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithNodes, filter);
-        IType[] outlines = TypeUtility.getPrimaryTypeHierarchy(iOutline).getAllSubtypes(iOutline, filter);
-        IType[] propTypes = new IType[pages.length + outlines.length];
-        System.arraycopy(pages, 0, propTypes, 0, pages.length);
-        System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
-        Arrays.sort(propTypes, TypeComparators.getTypeNameComparator());
-        return new Object[][]{propTypes};
+        ITypeFilter filter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutBundles(getClientBundle()), TypeFilters.getClassFilter());
+        Set<IType> holders = TypeUtility.getPrimaryTypeHierarchy(iPageWithNodes).getAllSubtypes(iPageWithNodes, filter);
+        holders.addAll(TypeUtility.getPrimaryTypeHierarchy(iOutline).getAllSubtypes(iOutline, filter));
+        return new Object[][]{holders.toArray(new IType[holders.size()])};
       }
     });
     m_holderTypeField.acceptProposal(getHolderType());
@@ -278,26 +270,20 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
       setStateChanging(true);
       m_superType = superType;
       if (TypeUtility.exists(superType)) {
-        try {
-          ITypeHierarchy superTypeHierarchy = superType.newSupertypeHierarchy(null);
-          if (superTypeHierarchy.contains(iPageWithNodes)) {
-            m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_NODE_PAGE;
-          }
-          else if (superTypeHierarchy.contains(iPageWithTable)) {
-            m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_TABLE_PAGE;
-          }
-          else {
-            m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_PAGE;
-          }
+        ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(superType);
+        if (superTypeHierarchy.contains(iPageWithNodes)) {
+          m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_NODE_PAGE;
         }
-        catch (JavaModelException e) {
-          ScoutSdkUi.logError("could not create superTypeHierarchy of '" + getSuperType().getFullyQualifiedName() + "'.");
+        else if (superTypeHierarchy.contains(iPageWithTable)) {
+          m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_TABLE_PAGE;
+        }
+        else {
+          m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_PAGE;
         }
       }
       if (isControlCreated()) {
         m_typeNameField.setReadOnlySuffix(m_nameSuffix);
       }
-
     }
     finally {
       setStateChanging(false);

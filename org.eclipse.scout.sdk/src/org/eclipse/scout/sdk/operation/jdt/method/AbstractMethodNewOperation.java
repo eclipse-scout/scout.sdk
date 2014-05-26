@@ -209,7 +209,7 @@ public abstract class AbstractMethodNewOperation implements IOperation {
    * @param parameters
    * @see org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder#setParameters(org.eclipse.scout.sdk.util.type.MethodParameter[])
    */
-  public void setParameters(MethodParameter[] parameters) {
+  public void setParameters(List<MethodParameter> parameters) {
     m_sourceBuilder.setParameters(parameters);
   }
 

@@ -17,6 +17,12 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 
+/**
+ * <h3>{@link IWorkingCopyManager}</h3>
+ * 
+ * @author Matthias Villiger
+ * @since 3.6.0 16.05.2014
+ */
 public interface IWorkingCopyManager {
 
   /**

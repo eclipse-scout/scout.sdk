@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.scout.sdk.Texts;
@@ -45,8 +46,8 @@ public class ProjectVersionPresenter extends AbstractPresenter {
 
   public ProjectVersionPresenter(PropertyViewFormToolkit toolkit, Composite parent, IScoutBundle scoutProject) {
     super(toolkit, parent);
-    IScoutBundle[] scoutBundles = scoutProject.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true);
-    m_bundles = new HashMap<IProject, PluginModelHelper>(scoutBundles.length);
+    Set<IScoutBundle> scoutBundles = scoutProject.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true);
+    m_bundles = new HashMap<IProject, PluginModelHelper>(scoutBundles.size());
     for (IScoutBundle sb : scoutBundles) {
       if (!sb.isBinary()) {
         m_bundles.put(sb.getProject(), new PluginModelHelper(sb.getProject()));

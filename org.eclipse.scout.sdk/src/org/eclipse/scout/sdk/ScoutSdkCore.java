@@ -2,6 +2,7 @@ package org.eclipse.scout.sdk;
 
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
+import org.eclipse.scout.sdk.util.ScoutSdkUtilCore;
 import org.eclipse.scout.sdk.util.typecache.IHierarchyCache;
 import org.eclipse.scout.sdk.util.typecache.IJavaResourceChangedEmitter;
 import org.eclipse.scout.sdk.util.typecache.ITypeCache;
@@ -33,47 +34,31 @@ public final class ScoutSdkCore {
   }
 
   /**
-   * Creates and returns a new working copy manager instance.
-   * 
-   * @return The newly created working copy manager.
-   * @see IWorkingCopyManager
+   * @see ScoutSdkUtilCore#createWorkingCopyManger()
    */
-  @SuppressWarnings("restriction")
   public static IWorkingCopyManager createWorkingCopyManger() {
-    return new org.eclipse.scout.sdk.util.internal.typecache.WorkingCopyManager();
+    return ScoutSdkUtilCore.createWorkingCopyManger();
   }
 
   /**
-   * Access to the type cache.
-   * 
-   * @return The type cache instance.
-   * @see ITypeCache
+   * @see ScoutSdkUtilCore#getTypeCache()
    */
-  @SuppressWarnings("restriction")
   public static ITypeCache getTypeCache() {
-    return org.eclipse.scout.sdk.util.internal.typecache.TypeCache.getInstance();
+    return ScoutSdkUtilCore.getTypeCache();
   }
 
   /**
-   * Access to the type hierarchy cache.
-   * 
-   * @return The type hierarchy cache instance.
-   * @see IHierarchyCache
+   * @see ScoutSdkUtilCore#getHierarchyCache()
    */
-  @SuppressWarnings("restriction")
   public static IHierarchyCache getHierarchyCache() {
-    return org.eclipse.scout.sdk.util.internal.typecache.HierarchyCache.getInstance();
+    return ScoutSdkUtilCore.getHierarchyCache();
   }
 
   /**
-   * Access to the java resource change emitter.
-   * 
-   * @return The emitter instance.
-   * @see IJavaResourceChangedEmitter
+   * @see ScoutSdkUtilCore#getJavaResourceChangedEmitter()
    */
-  @SuppressWarnings("restriction")
   public static IJavaResourceChangedEmitter getJavaResourceChangedEmitter() {
-    return org.eclipse.scout.sdk.util.internal.typecache.JavaResourceChangedEmitter.getInstance();
+    return ScoutSdkUtilCore.getJavaResourceChangedEmitter();
   }
 
   /**

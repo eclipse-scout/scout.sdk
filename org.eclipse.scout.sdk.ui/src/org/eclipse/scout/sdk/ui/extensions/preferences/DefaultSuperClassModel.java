@@ -17,10 +17,10 @@ import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link DefaultSuperClassModel}</h3> ...
@@ -88,8 +88,7 @@ public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel
     ret.add(defaultVal);
     IType base = TypeUtility.getType(interfaceFqn);
     for (IScoutBundle b : p.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true)) {
-      IType[] proposals = ScoutTypeUtility.getAbstractTypesOnClasspath(base, b.getJavaProject());
-      for (IType t : proposals) {
+      for (IType t : TypeUtility.getAbstractTypesOnClasspath(base, b.getJavaProject(), TypeFilters.getPrimaryTypeFilter())) {
         if (TypeUtility.exists(t)) {
           ret.add(t.getFullyQualifiedName());
         }

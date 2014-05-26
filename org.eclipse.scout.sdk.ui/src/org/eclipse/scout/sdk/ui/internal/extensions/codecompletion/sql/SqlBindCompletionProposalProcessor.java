@@ -29,6 +29,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.NamingUtility;
@@ -73,7 +74,7 @@ public class SqlBindCompletionProposalProcessor {
         String propName = NamingUtility.ensureStartWithLowerCase(t.getElementName());
         SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
-        addInnerTypesInSuperClasses(t, t.newSupertypeHierarchy(null), collector, prefix, propName + ".", context);
+        addInnerTypesInSuperClasses(t, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(t), collector, prefix, propName + ".", context);
       }
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractPropertyData, hierarchy))) {
         String propName = t.getElementName();
@@ -97,14 +98,14 @@ public class SqlBindCompletionProposalProcessor {
     return Collections.emptyList();
   }
 
-  private void addInnerTypesInSuperClasses(IType baseType, org.eclipse.jdt.core.ITypeHierarchy baseTypeSuperHierarchy, HashSet<ICompletionProposal> collector,
+  private void addInnerTypesInSuperClasses(IType baseType, ITypeHierarchy baseTypeSuperHierarchy, HashSet<ICompletionProposal> collector,
       String prefix, String namePrefix, JavaContentAssistInvocationContext context) throws JavaModelException {
     for (IType superClass : baseTypeSuperHierarchy.getAllSuperclasses(baseType)) {
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(superClass);
       for (IType innerType : TypeUtility.getInnerTypes(superClass, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
         SqlBindProposal prop = new SqlBindProposal(namePrefix + NamingUtility.ensureStartWithLowerCase(innerType.getElementName()), prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
-        addInnerTypesInSuperClasses(innerType, innerType.newSupertypeHierarchy(null), collector, prefix, prop.getDisplayString() + ".", context);
+        addInnerTypesInSuperClasses(innerType, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(innerType), collector, prefix, prop.getDisplayString() + ".", context);
       }
     }
   }
@@ -136,7 +137,7 @@ public class SqlBindCompletionProposalProcessor {
         if (SignatureUtility.getTypeSignatureKind(fqs) == Signature.CLASS_TYPE_SIGNATURE) {
           String fqn = Signature.getSignatureQualifier(fqs) + "." + Signature.getSignatureSimpleName(fqs);
           IType candidate = TypeUtility.getType(fqn);
-          if (candidate.newSupertypeHierarchy(null).contains(AbstractFormData)) {
+          if (ScoutSdkCore.getHierarchyCache().getSuperHierarchy(candidate).contains(AbstractFormData)) {
             return candidate;
           }
         }

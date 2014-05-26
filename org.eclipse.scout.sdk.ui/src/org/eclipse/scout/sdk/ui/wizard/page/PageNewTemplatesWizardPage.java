@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.page;
 
-import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -32,9 +32,9 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -124,12 +124,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
 
   protected void updateUi() {
     if (getClientBundle() != null) {
-      HashSet<IType> templates = new HashSet<IType>();
-      for (IType t : ScoutTypeUtility.getAbstractTypesOnClasspath(iPage, getClientBundle().getJavaProject())) {
-        if (!templates.contains(t)) {
-          templates.add(t);
-        }
-      }
+      Set<IType> templates = TypeUtility.getAbstractTypesOnClasspath(iPage, getClientBundle().getJavaProject(), TypeFilters.getPrimaryTypeFilter());
       P_TableContentProvider provider = new P_TableContentProvider(templates.toArray(new IType[templates.size()]));
       m_filteredTable.getViewer().setLabelProvider(provider);
       m_filteredTable.getViewer().setContentProvider(provider);

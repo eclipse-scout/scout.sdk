@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.calendar;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
@@ -64,7 +66,7 @@ public class CalendarItemProviderTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iCalendarItemProvider = TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider);
 
     if (m_innerTypeListener == null) {
@@ -76,7 +78,7 @@ public class CalendarItemProviderTablePage extends AbstractPage {
       ScoutSdkCore.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_orderChangedListener);
     }
 
-    IType[] innerTypes = ScoutTypeUtility.getCalendarItemProviders(getCalendarType());
+    Set<IType> innerTypes = ScoutTypeUtility.getCalendarItemProviders(getCalendarType());
     for (IType provider : innerTypes) {
       CalendarItemProviderNodePage childPage = new CalendarItemProviderNodePage();
       childPage.setParent(this);

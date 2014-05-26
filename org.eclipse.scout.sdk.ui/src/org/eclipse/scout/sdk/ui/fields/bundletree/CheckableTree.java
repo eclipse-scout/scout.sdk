@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.fields.bundletree;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -31,6 +30,7 @@ import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerDropAdapter;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -237,7 +237,7 @@ public class CheckableTree extends Composite {
   }
 
   public void setChecked(ITreeNode[] nodes) {
-    ArrayList<ITreeNode> nodesToCheck = new ArrayList<ITreeNode>(Arrays.asList(nodes));
+    ArrayList<ITreeNode> nodesToCheck = CollectionUtility.arrayList(nodes);
     ArrayList<ITreeNode> checkedNodes = new ArrayList<ITreeNode>(m_checkedNodes);
     // remove already checked
     for (Iterator<ITreeNode> it = checkedNodes.iterator(); it.hasNext();) {

@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 /**
  * <h3>{@link IMethodSourceBuilder}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public interface IMethodSourceBuilder extends IAnnotatableSourceBuilder {
@@ -30,7 +30,6 @@ public interface IMethodSourceBuilder extends IAnnotatableSourceBuilder {
    * @return
    */
   String getReturnTypeSignature();
-
 
   /**
    * @return
@@ -87,7 +86,7 @@ public interface IMethodSourceBuilder extends IAnnotatableSourceBuilder {
   /**
    * @param parameters
    */
-  void setParameters(MethodParameter[] parameters);
+  void setParameters(List<MethodParameter> parameters);
 
   /**
    * @param parameter

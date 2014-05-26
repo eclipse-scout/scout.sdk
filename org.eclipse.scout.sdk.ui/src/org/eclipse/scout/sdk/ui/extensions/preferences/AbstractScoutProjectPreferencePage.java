@@ -14,6 +14,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -64,9 +65,9 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
     IScoutBundleFilter projectFilter = ScoutBundleFilters.getMultiFilterAnd(
         ScoutBundleFilters.getWorkspaceBundlesFilter(),
         ScoutBundleFilters.getBundlesOfTypeFilter(scoutBundleTypes));
-    IScoutBundle[] rootProjects = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(projectFilter);
+    Set<IScoutBundle> rootProjects = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(projectFilter);
 
-    m_projectSettings = new HashMap<IScoutBundle, T>(rootProjects.length);
+    m_projectSettings = new HashMap<IScoutBundle, T>(rootProjects.size());
     for (IScoutBundle p : rootProjects) {
       try {
         m_projectSettings.put(p, contentClass.newInstance());

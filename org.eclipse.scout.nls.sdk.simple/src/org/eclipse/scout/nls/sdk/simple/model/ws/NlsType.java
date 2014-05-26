@@ -11,6 +11,8 @@
 package org.eclipse.scout.nls.sdk.simple.model.ws;
 
 import java.beans.PropertyChangeListener;
+import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,19 +20,20 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
+import org.eclipse.scout.sdk.util.ScoutSdkUtilCore;
+import org.eclipse.scout.sdk.util.resources.IResourceFilter;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.resources.WeakResourceChangeListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -48,7 +51,7 @@ public class NlsType implements INlsType {
 
   private static final Pattern REGEX_RESOURCE_BUNDLE_FIELD = Pattern.compile(RESOURCE_BUNDLE_FIELD_NAME + "\\s*=\\s*\\\"([^\\\"]*)\\\"\\s*\\;", Pattern.DOTALL);
 
-  protected IType[] m_superTypes;
+  protected Set<IType> m_superTypes;
   protected IResourceChangeListener m_nlsResourceChangeListener;
   protected final IType m_type;
   protected final BasicPropertySupport m_propertySupport;
@@ -83,12 +86,13 @@ public class NlsType implements INlsType {
   }
 
   protected void loadSuperTypeHierarchy() throws JavaModelException {
-    ITypeHierarchy typeHierarchy = m_type.newSupertypeHierarchy(new NullProgressMonitor());
+    org.eclipse.scout.sdk.util.typecache.ITypeHierarchy typeHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(m_type);
     m_superTypes = typeHierarchy.getAllSuperclasses(m_type);
-    if (m_superTypes.length > 0 && TypeUtility.exists(m_superTypes[0]) &&
-        !m_superTypes[0].getFullyQualifiedName().equals(DynamicNls.class.getName()) &&
-        !m_superTypes[0].getFullyQualifiedName().equals(Object.class.getName())) {
-      m_propertySupport.setProperty(PROP_SUPER_TYPE, m_superTypes[0]);
+    IType firstType = CollectionUtility.firstElement(m_superTypes);
+    if (TypeUtility.exists(firstType)) {
+      if (!DynamicNls.class.getName().equals(firstType.getFullyQualifiedName()) && !Object.class.getName().equals(firstType.getFullyQualifiedName())) {
+        m_propertySupport.setProperty(PROP_SUPER_TYPE, firstType);
+      }
     }
   }
 
@@ -140,11 +144,6 @@ public class NlsType implements INlsType {
     return (IType) m_propertySupport.getProperty(PROP_SUPER_TYPE);
   }
 
-  @Override
-  public IType[] getAllSuperclasses() {
-    return m_superTypes;
-  }
-
   /**
    * commodity
    * 
@@ -165,23 +164,26 @@ public class NlsType implements INlsType {
   private class P_NlsResourceChangeListener implements IResourceChangeListener {
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
-      IResourceDelta delta = event.getDelta();
-      try {
-        if (delta != null) {
-          delta.accept(new IResourceDeltaVisitor() {
-            @Override
-            public boolean visit(IResourceDelta d) {
-              IResource resource = d.getResource();
-              if (ResourceUtility.exists(resource) && TypeUtility.exists(m_type) && resource.equals(m_type.getResource())) {
-                reload();
+      if (TypeUtility.exists(m_type)) {
+        final IResource resourceToFind = m_type.getResource();
+        if (ResourceUtility.exists(resourceToFind)) {
+          IResourceDelta delta = event.getDelta();
+          try {
+            List<IResource> allResources = ResourceUtility.getAllResources(delta, new IResourceFilter() {
+              @Override
+              public boolean accept(IResourceProxy resource) {
+                return resourceToFind.equals(resource.requestResource());
               }
-              return true;
+            });
+
+            if (!allResources.isEmpty()) {
+              reload();
             }
-          });
+          }
+          catch (CoreException e) {
+            NlsCore.logWarning(e);
+          }
         }
-      }
-      catch (CoreException e) {
-        NlsCore.logWarning(e);
       }
     }
   } // end class P_NlsFileChangeListener

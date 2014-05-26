@@ -29,33 +29,6 @@ public class ResourceFilters {
   private static final IResourceFilter TARGET_FILE_FILTER = getFileExtensionFilter("target");
 
   /**
-   * @param fileName
-   *          The filename to search.
-   * @param ignoreCase
-   *          true if the search should ignore the case of the filename, false if a case-sensitive search should be
-   *          performed.
-   * @return A new filter that only accepts files with the given name.
-   */
-  public static IResourceFilter getFileNameFilter(final String fileName, boolean ignoreCase) {
-    if (ignoreCase) {
-      return new IResourceFilter() {
-        @Override
-        public boolean accept(IResourceProxy resource) {
-          return resource.getType() == IResource.FILE && resource.getName().equalsIgnoreCase(fileName);
-        }
-      };
-    }
-    else {
-      return new IResourceFilter() {
-        @Override
-        public boolean accept(IResourceProxy resource) {
-          return resource.getType() == IResource.FILE && resource.getName().equals(fileName);
-        }
-      };
-    }
-  }
-
-  /**
    * @param fileExtension
    *          The file extension that must be available (without dot).
    * @return creates and returns a filter that only accepts files with the given extension. Consider using one of the

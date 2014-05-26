@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -108,7 +109,7 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
       HashMap<String, Integer> aliasList = new HashMap<String, Integer>();
 
       // all product files that contain the selected project
-      IResource[] prodFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(false, getProject().getSymbolicName()));
+      List<IResource> prodFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(false, getProject().getSymbolicName()));
       for (IResource f : prodFiles) {
         String alias = getAliasFromProductFile((IFile) f);
         if (alias != null) {

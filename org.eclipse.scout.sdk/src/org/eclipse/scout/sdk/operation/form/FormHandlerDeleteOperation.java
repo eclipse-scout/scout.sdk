@@ -58,7 +58,7 @@ public class FormHandlerDeleteOperation extends JavaElementDeleteOperation {
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getFormHandler().getCompilationUnit());
     IType form = TypeUtility.getAncestor(getFormHandler(), TypeFilters.getMultiTypeFilterOr(
         TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
-        TypeFilters.getTopLevelTypeFilter()));
+        TypeFilters.getPrimaryTypeFilter()));
     if (TypeUtility.exists(form) && TypeUtility.exists(getFormHandler())) {
       String startMethodName = getFormHandler().getElementName().replaceFirst(SdkProperties.SUFFIX_FORM_HANDLER + "\\b", "");
       if (startMethodName.length() > 1) {

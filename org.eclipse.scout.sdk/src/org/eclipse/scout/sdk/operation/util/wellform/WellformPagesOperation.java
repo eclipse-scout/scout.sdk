@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.util.wellform;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
@@ -27,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 public class WellformPagesOperation implements IOperation {
 
   private final IScoutBundle m_clientBundle;
-  private IType[] m_pages;
+  private Set<IType> m_pages;
 
   public WellformPagesOperation(IScoutBundle clientBundle) {
     m_clientBundle = clientBundle;
@@ -64,7 +66,7 @@ public class WellformPagesOperation implements IOperation {
     return m_clientBundle;
   }
 
-  public IType[] getPages() {
+  public Set<IType> getPages() {
     return m_pages;
   }
 }

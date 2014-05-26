@@ -13,10 +13,17 @@ package org.eclipse.scout.sdk.util.typecache;
 import java.util.EventListener;
 
 /**
- *
+ * Listener to be invoked when a cached hierarchy has been invalidated.
+ * 
+ * @see ICachedTypeHierarchyResult
  */
 public interface ITypeHierarchyChangedListener extends EventListener {
 
+  /**
+   * Called after the {@link ICachedTypeHierarchyResult} has been invalidated.<br>
+   * Note: At the time this method is called the {@link ICachedTypeHierarchyResult} may already have been revalidated
+   * again.
+   */
   void hierarchyInvalidated();
 
 }

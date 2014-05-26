@@ -1,5 +1,6 @@
 package org.eclipse.scout.sdk.ui.internal.wizard.export;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -45,7 +46,7 @@ public class ExportServerWizardPage extends AbstractExportProductWizardPage {
 
   private String findServerWarName() {
     try {
-      IResource[] swingOrSwtProductFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(true, IRuntimeClasses.ScoutUiSwingBundleId, IRuntimeClasses.ScoutUiSwtBundleId));
+      List<IResource> swingOrSwtProductFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(true, IRuntimeClasses.ScoutUiSwingBundleId, IRuntimeClasses.ScoutUiSwtBundleId));
       for (IResource r : swingOrSwtProductFiles) {
         ProductFileModelHelper pfmh = new ProductFileModelHelper((IFile) r);
         String serverUrl = pfmh.ConfigurationFile.getEntry("server.url");

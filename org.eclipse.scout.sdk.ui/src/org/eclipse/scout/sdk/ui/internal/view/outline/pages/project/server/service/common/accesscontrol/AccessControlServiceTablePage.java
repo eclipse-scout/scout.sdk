@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.accesscontrol;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -64,25 +67,20 @@ public class AccessControlServiceTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     for (IType service : resolveServices()) {
-      IType serviceInterface = null;
-      IType[] interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
-      if (interfaces.length > 0) {
-        serviceInterface = interfaces[0];
-      }
-      new AccessControlServiceNodePage(this, service, serviceInterface);
+      Set<IType> interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
+      new AccessControlServiceNodePage(this, service, CollectionUtility.firstElement(interfaces));
     }
   }
 
-  protected IType[] resolveServices() {
+  protected Set<IType> resolveServices() {
     IType iAccessControlService = TypeUtility.getType(IRuntimeClasses.IAccessControlService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iAccessControlService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iAccessControlService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
-    return services;
+    return m_serviceHierarchy.getAllSubtypes(iAccessControlService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
   @SuppressWarnings("unchecked")

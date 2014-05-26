@@ -36,7 +36,7 @@ public class WebServicesTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     new ProviderTablePage(this);
     new ConsumerTablePage(this);
     new HandlerTablePage(this);

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
@@ -90,14 +91,13 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
   }
 
   protected void visitTable(IType table, IProgressMonitor monitor) throws CoreException {
-    final IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), getLocalTypeHierarchy()), ScoutTypeComparators.getOrderAnnotationComparator());
-    final String[] colunmSignatures = new String[columns.length];
+    final Set<IType> columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), getLocalTypeHierarchy()), ScoutTypeComparators.getOrderAnnotationComparator());
+    final String[] colunmSignatures = new String[columns.size()];
     final Map<Integer, String> columnIdMap = new HashMap<Integer, String>();
 
-    if (columns.length > 0) {
-      for (int i = 0; i < columns.length; i++) {
-        IType column = columns[i];
-
+    if (columns.size() > 0) {
+      int i = 0;
+      for (IType column : columns) {
         String constantColName = getConstantName(ScoutUtility.removeFieldSuffix(column.getElementName())) + COLUMN_ID_SUFFIX;
         IFieldSourceBuilder fieldBuilder = new FieldSourceBuilder(constantColName);
         fieldBuilder.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
@@ -109,11 +109,13 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
         if (monitor.isCanceled()) {
           return;
         }
+        i++;
       }
     }
-    for (int i = 0; i < columns.length; i++) {
+
+    int i = 0;
+    for (IType column : columns) {
       try {
-        IType column = columns[i];
         String upperColName = NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
         String lowerColName = NamingUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
         String methodParameterName = NamingUtility.ensureValidParameterName(lowerColName);
@@ -148,34 +150,38 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
         addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormDataColumnAccessKey(columnGetterBuilder), columnGetterBuilder);
       }
       catch (JavaModelException e) {
-        ScoutSdk.logWarning("could not add column '" + columns[i].getFullyQualifiedName() + "' to form data.", e);
+        ScoutSdk.logWarning("could not add column '" + column.getFullyQualifiedName() + "' to form data.", e);
       }
 
       if (monitor.isCanceled()) {
         return;
       }
+      i++;
     }
+
     // getColumnCount method
     IMethodSourceBuilder getColumnCountBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getColumnCount");
-    getColumnCountBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return " + columns.length + ";"));
+    getColumnCountBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return " + columns.size() + ";"));
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getColumnCountBuilder), getColumnCountBuilder);
 
-    if (columns.length > 0) {
+    if (columns.size() > 0) {
       // setValueAt method
       IMethodSourceBuilder setValueAtBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "setValueAt");
       setValueAtBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           source.append("  switch(column){").append(lineDelimiter);
-          for (int i = 0; i < columns.length; i++) {
-            source.append("    case " + getColumnConstantName(i, columnIdMap) + ":").append(lineDelimiter);
-            source.append("set").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(columns[i].getElementName())));
+          int j = 0;
+          for (IType column : columns) {
+            source.append("    case " + getColumnConstantName(j, columnIdMap) + ":").append(lineDelimiter);
+            source.append("set").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName())));
             source.append("(row,");
-            if (!OBJECT_SIG.equals(colunmSignatures[i])) {
-              source.append("(").append(SignatureUtility.getTypeReference(colunmSignatures[i], validator)).append(") ");
+            if (!OBJECT_SIG.equals(colunmSignatures[j])) {
+              source.append("(").append(SignatureUtility.getTypeReference(colunmSignatures[j], validator)).append(") ");
             }
             source.append("value);").append(lineDelimiter);
             source.append("break;").append(lineDelimiter);
+            j++;
           }
           source.append("  }");
         }
@@ -188,9 +194,11 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
           source.append("  switch(column){").append(lineDelimiter);
-          for (int i = 0; i < columns.length; i++) {
-            source.append("    case " + getColumnConstantName(i, columnIdMap) + ":").append(lineDelimiter);
-            source.append("return get").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(columns[i].getElementName()))).append("(row);").append(lineDelimiter);
+          int j = 0;
+          for (IType column : columns) {
+            source.append("    case " + getColumnConstantName(j, columnIdMap) + ":").append(lineDelimiter);
+            source.append("return get").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName()))).append("(row);").append(lineDelimiter);
+            j++;
           }
           source.append("    default: return null;").append(lineDelimiter);
           source.append("  }");

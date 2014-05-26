@@ -32,7 +32,7 @@ public class CalendarNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     new CalendarItemProviderTablePage(this, getType());
   }
 

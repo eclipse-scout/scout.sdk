@@ -18,6 +18,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.operation.library.LibraryBundleCreateOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
@@ -54,8 +55,7 @@ public class LibraryNewWizard extends AbstractWorkspaceWizard {
           }
           Set<File> jarFiles = m_jarSelectionWizardPage.getJarFiles();
           if (jarFiles != null && jarFiles.size() > 0) {
-
-            String jarFileName = jarFiles.iterator().next().getName();
+            String jarFileName = CollectionUtility.firstElement(jarFiles).getName();
             int dotIndex = jarFileName.lastIndexOf(".");
             if (dotIndex > 0) {
               nameBuilder.append(jarFileName.substring(0, dotIndex));

@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.common.calendar;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
@@ -67,25 +70,20 @@ public class CalendarServiceTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     for (IType service : resolveServices()) {
-      IType serviceInterface = null;
-      IType[] interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
-      if (interfaces.length > 0) {
-        serviceInterface = interfaces[0];
-      }
-      new CalendarServiceNodePage(this, service, serviceInterface);
+      Set<IType> interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
+      new CalendarServiceNodePage(this, service, CollectionUtility.firstElement(interfaces));
     }
   }
 
-  protected IType[] resolveServices() {
+  protected Set<IType> resolveServices() {
     IType iCalendarService = TypeUtility.getType(IRuntimeClasses.ICalendarService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCalendarService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iCalendarService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
-    return services;
+    return m_serviceHierarchy.getAllSubtypes(iCalendarService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
   @SuppressWarnings("unchecked")
@@ -99,7 +97,7 @@ public class CalendarServiceTablePage extends AbstractPage {
     if (menu instanceof FormDataSqlBindingValidateAction) {
       ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           return resolveServices();
         }
       });

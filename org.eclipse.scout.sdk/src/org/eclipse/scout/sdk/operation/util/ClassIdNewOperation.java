@@ -76,8 +76,8 @@ public class ClassIdNewOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     try {
       monitor.beginTask("Search for classes...", 10);
-      IScoutBundle[] allBundlesToProcess = m_bundle.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
-      HashSet<String> bundleSymbolicNames = new HashSet<String>(allBundlesToProcess.length);
+      Set<IScoutBundle> allBundlesToProcess = m_bundle.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
+      HashSet<String> bundleSymbolicNames = new HashSet<String>(allBundlesToProcess.size());
       for (IScoutBundle b : allBundlesToProcess) {
         bundleSymbolicNames.add(b.getSymbolicName());
       }

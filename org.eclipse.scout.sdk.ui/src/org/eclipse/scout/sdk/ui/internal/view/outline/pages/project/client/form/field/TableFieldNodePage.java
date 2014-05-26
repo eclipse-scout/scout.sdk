@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
@@ -36,13 +39,13 @@ public class TableFieldNodePage extends AbstractFormFieldNodePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     new KeyStrokeTablePage(this, getType());
-    IType[] tables = ScoutTypeUtility.getTables(getType());
-    if (tables.length > 0) {
+    Set<IType> tables = ScoutTypeUtility.getTables(getType());
+    if (tables.size() > 0) {
       TableNodePage tableNodePage = new TableNodePage();
       tableNodePage.setParent(this);
-      tableNodePage.setType(tables[0]);
+      tableNodePage.setType(CollectionUtility.firstElement(tables));
     }
   }
 

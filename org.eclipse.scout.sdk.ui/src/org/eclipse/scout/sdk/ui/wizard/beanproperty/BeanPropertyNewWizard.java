@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.beanproperty;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.IJavaElement;
@@ -35,7 +36,7 @@ public class BeanPropertyNewWizard extends AbstractWorkspaceWizard {
     beanPropertyWizardPage.setOperation(op);
     // find all used method names
     HashSet<String> notAllowedMethodNames = new HashSet<String>();
-    IMethod[] methods = TypeUtility.getMethods(declaringType, MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is).*")));
+    Set<IMethod> methods = TypeUtility.getMethods(declaringType, MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is).*")));
     for (IMethod m : methods) {
       notAllowedMethodNames.add(m.getElementName());
     }

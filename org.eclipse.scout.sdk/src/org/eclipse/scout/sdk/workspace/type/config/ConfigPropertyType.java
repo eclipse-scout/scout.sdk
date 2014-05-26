@@ -14,8 +14,10 @@ import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -24,15 +26,16 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.ConfigProperty;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
  *
@@ -51,12 +54,12 @@ public class ConfigPropertyType {
     // visit methods
     try {
       TreeMap<String, ConfigurationMethod> configurationMethods = new TreeMap<String, ConfigurationMethod>(new P_MethodNameComparator());
-      ArrayList<IType> typesToVisit = new ArrayList<IType>();
-      m_superTypeHierarchy = getType().newSupertypeHierarchy(null);
-      IType[] superClasses = m_superTypeHierarchy.getAllSuperclasses(getType());
+      LinkedList<IType> typesToVisit = new LinkedList<IType>();
+      m_superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getType());
+      Set<IType> superClasses = m_superTypeHierarchy.getAllSuperclasses(getType());
       for (IType t : superClasses) {
         if (TypeUtility.exists(t) && !t.getFullyQualifiedName().equals(Object.class.getName())) {
-          typesToVisit.add(0, t);
+          typesToVisit.addFirst(t);
         }
       }
       typesToVisit.add(getType());

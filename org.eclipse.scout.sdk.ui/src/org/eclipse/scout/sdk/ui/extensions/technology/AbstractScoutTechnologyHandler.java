@@ -113,7 +113,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     }
   }
 
-  protected void contributeManifestFiles(IScoutBundle[] bundles, List<IScoutTechnologyResource> list) {
+  protected void contributeManifestFiles(Set<IScoutBundle> bundles, List<IScoutTechnologyResource> list) {
     for (IScoutBundle bundle : bundles) {
       contributeManifestFile(bundle, list);
     }
@@ -128,15 +128,18 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     }
   }
 
-  protected TriState getSelectionManifestsImportPackage(IScoutBundle[] projects, String... importPackages) {
-    if (projects == null || projects.length == 0) {
-      return TriState.FALSE;
+  protected TriState getSelectionManifestsImportPackage(Set<IScoutBundle> projects, String... importPackages) {
+    if (projects == null || projects.size() == 0) {
+      return null;
     }
 
-    TriState ret = getSelectionManifestsImportPackage(projects[0], importPackages);
-    for (int i = 1; i < projects.length; i++) {
-      TriState tmp = getSelectionManifestsImportPackage(projects[i], importPackages);
-      if (tmp != ret) {
+    TriState ret = null;
+    for (IScoutBundle b : projects) {
+      TriState tmp = getSelectionManifestsImportPackage(b, importPackages);
+      if (ret == null) {
+        ret = tmp;
+      }
+      else if (tmp != ret) {
         return TriState.UNDEFINED;
       }
     }
@@ -159,15 +162,18 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     return ret;
   }
 
-  protected TriState getSelectionManifests(IScoutBundle[] projects, String... pluginIds) {
-    if (projects == null || projects.length == 0) {
+  protected TriState getSelectionManifests(Set<IScoutBundle> projects, String... pluginIds) {
+    if (projects == null || projects.size() == 0) {
       return TriState.FALSE;
     }
 
-    TriState ret = getSelectionManifest(projects[0], pluginIds);
-    for (int i = 1; i < projects.length; i++) {
-      TriState tmp = getSelectionManifest(projects[i], pluginIds);
-      if (tmp != ret) {
+    TriState ret = null;
+    for (IScoutBundle b : projects) {
+      TriState tmp = getSelectionManifest(b, pluginIds);
+      if (ret == null) {
+        ret = tmp;
+      }
+      else if (tmp != ret) {
         return TriState.UNDEFINED;
       }
     }

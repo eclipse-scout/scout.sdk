@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.form;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -218,7 +219,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard implements INew
         if (formDataNode != null) {
           ITreeNode oldFomDataParent = formDataNode.getParent();
           IScoutBundle formBundle = (IScoutBundle) dndEvent.node.getParent().getData();
-          IScoutBundle[] sharedBundles = formBundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+          Set<IScoutBundle> sharedBundles = formBundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
           for (IScoutBundle formDataBundle : sharedBundles) {
             ITreeNode sharedNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByData(formDataBundle));
             if (sharedNode != null) {

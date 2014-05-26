@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.workspace.type;
 import java.io.PrintStream;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -31,6 +30,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -257,13 +257,13 @@ public class ScoutStructuredType implements IStructuredType {
   protected final void cache(CATEGORIES category) {
     if (m_enabledCategories.contains(category) && !m_visitedCategories.contains(category)) {
       try {
-        ArrayList<IJavaElement> unknownMethods = new ArrayList<IJavaElement>(Arrays.asList(m_elements.get(CATEGORIES.METHOD_UNCATEGORIZED)));
-        ArrayList<IJavaElement> unknownTypes = new ArrayList<IJavaElement>(Arrays.asList(m_elements.get(CATEGORIES.TYPE_UNCATEGORIZED)));
+        ArrayList<IJavaElement> unknownMethods = CollectionUtility.arrayList(m_elements.get(CATEGORIES.METHOD_UNCATEGORIZED));
+        ArrayList<IJavaElement> unknownTypes = CollectionUtility.arrayList(m_elements.get(CATEGORIES.TYPE_UNCATEGORIZED));
         switch (category) {
           case FIELD_LOGGER:
           case FIELD_STATIC:
           case FIELD_MEMBER:
-            visitFields(new ArrayList<IJavaElement>(Arrays.asList(m_elements.get(CATEGORIES.FIELD_UNKNOWN))));
+            visitFields(CollectionUtility.arrayList(m_elements.get(CATEGORIES.FIELD_UNKNOWN)));
             m_visitedCategories.add(CATEGORIES.FIELD_LOGGER);
             m_visitedCategories.add(CATEGORIES.FIELD_STATIC);
             m_visitedCategories.add(CATEGORIES.FIELD_MEMBER);
@@ -489,7 +489,7 @@ public class ScoutStructuredType implements IStructuredType {
           it.remove();
           break;
         }
-        visitedmethod = TypeUtility.getOverwrittenMethod(visitedmethod, superTypeHierarchy.getJdtHierarchy());
+        visitedmethod = TypeUtility.getOverwrittenMethod(visitedmethod, superTypeHierarchy);
 
       }
 
@@ -510,7 +510,7 @@ public class ScoutStructuredType implements IStructuredType {
           it.remove();
           break;
         }
-        visitedmethod = TypeUtility.getOverwrittenMethod(visitedmethod, superTypeHierarchy.getJdtHierarchy());
+        visitedmethod = TypeUtility.getOverwrittenMethod(visitedmethod, superTypeHierarchy);
 
       }
     }
@@ -539,7 +539,7 @@ public class ScoutStructuredType implements IStructuredType {
     TreeMap<CompositeObject, IMethod> overriddenMethods = new TreeMap<CompositeObject, IMethod>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
-      if (TypeUtility.getOverwrittenMethod(method, superTypeHierarchy.getJdtHierarchy()) != null) {
+      if (TypeUtility.getOverwrittenMethod(method, superTypeHierarchy) != null) {
         CompositeObject key = new CompositeObject(method.getElementName(), method.getParameterNames().length, method);
         overriddenMethods.put(key, method);
         it.remove();

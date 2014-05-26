@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.dto.formdata;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -49,7 +51,7 @@ public class ScoutBundlesUpdateFormDataOperation implements IOperation {
   }
 
   private void processProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    IScoutBundle[] childClientBundles = getProject().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true);
+    Set<IScoutBundle> childClientBundles = getProject().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true);
     for (IScoutBundle client : childClientBundles) {
       ClientBundleUpdateFormDataOperation updateOp = new ClientBundleUpdateFormDataOperation(client);
       updateOp.validate();

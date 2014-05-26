@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
@@ -24,10 +26,9 @@ import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 
@@ -85,7 +86,7 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
     }
 
     @Override
-    protected Object[] computeProposals() {
+    protected Set<?> computeProposals() {
       IType iLookupCall = TypeUtility.getType(IRuntimeClasses.ILookupCall);
 
       String genericSignature = null;
@@ -99,19 +100,15 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
             paramName = Signature.getSignatureSimpleName(typeParameters[0]);
           }
         }
-        ITypeHierarchy supertypeHierarchy = getType().newSupertypeHierarchy(null);
+        ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getType());
         genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, defaultMethod.getDeclaringType().getFullyQualifiedName(), paramName);
       }
       catch (CoreException e) {
         ScoutSdkUi.logError(e);
       }
 
-      ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupCall);
-      ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(),
-          TypeFilters.getNoGenericTypesFilter(),
-          TypeFilters.getTypesOnClasspath(getType().getJavaProject()),
-          TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
-      return typeHierarchy.getAllSubtypes(iLookupCall, filter, TypeComparators.getTypeNameComparator());
+      ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
+      return TypeUtility.getClassesOnClasspath(iLookupCall, getType().getJavaProject(), filter);
     }
   }
 }

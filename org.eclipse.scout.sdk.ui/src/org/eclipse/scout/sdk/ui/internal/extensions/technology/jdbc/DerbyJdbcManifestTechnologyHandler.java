@@ -16,11 +16,9 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.IMarketplaceConstants;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -42,11 +40,6 @@ public class DerbyJdbcManifestTechnologyHandler extends AbstractScoutTechnologyH
   }
 
   @Override
-  public void postSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
-    TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.ISqlService)).invalidate();
-  }
-
-  @Override
   public TriState getSelection(IScoutBundle project) {
     return getSelectionManifests(getServerBundlesBelow(project), DERBY_JDBC_PLUGIN);
   }
@@ -61,7 +54,7 @@ public class DerbyJdbcManifestTechnologyHandler extends AbstractScoutTechnologyH
     contributeManifestFiles(getServerBundlesBelow(project), list);
   }
 
-  private IScoutBundle[] getServerBundlesBelow(IScoutBundle start) {
+  private Set<IScoutBundle> getServerBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
   }
 }

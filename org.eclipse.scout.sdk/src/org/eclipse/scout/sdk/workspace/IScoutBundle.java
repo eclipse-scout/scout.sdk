@@ -85,13 +85,13 @@ public interface IScoutBundle extends IAdaptable {
    *          The filter to decide which of the parent bundles will be returned.
    * @param includeThis
    *          specifies if the current instance should be visited as well. if true, this may be part of the resulting
-   *          array.
-   * @return an array holding all parent bundles (recursive) matching the given filter ordered by level (closest level
-   *         first).
+   *          {@link Set}.
+   * @return a {@link Set} holding all parent bundles (recursive) matching the given filter ordered by level (closest
+   *         level first).
    * @see <a
    *      href="http://en.wikipedia.org/wiki/Breadth-first_search">http://en.wikipedia.org/wiki/Breadth-first_search</a>
    */
-  IScoutBundle[] getParentBundles(IScoutBundleFilter filter, boolean includeThis);
+  Set<IScoutBundle> getParentBundles(IScoutBundleFilter filter, boolean includeThis);
 
   /**
    * Performs a breadth first (aka level order) traversal going up the tree visiting all parents (=dependencies) and
@@ -176,13 +176,13 @@ public interface IScoutBundle extends IAdaptable {
    *          The filter to decide which of the child bundles will be returned.
    * @param includeThis
    *          specifies if the current instance should be visited as well. if true, this may be part of the resulting
-   *          array.
-   * @return an array holding all child bundles (recursive) matching the given filter ordered by level (closest level
-   *         first).
+   *          {@link Set}.
+   * @return a {@link Set} holding all child bundles (recursive) matching the given filter ordered by level (closest
+   *         level first).
    * @see <a
    *      href="http://en.wikipedia.org/wiki/Breadth-first_search">http://en.wikipedia.org/wiki/Breadth-first_search</a>
    */
-  IScoutBundle[] getChildBundles(IScoutBundleFilter filter, boolean includeThis);
+  Set<IScoutBundle> getChildBundles(IScoutBundleFilter filter, boolean includeThis);
 
   /**
    * Performs a breadth first (aka level order) traversal going down the tree visiting all children (=dependents) and

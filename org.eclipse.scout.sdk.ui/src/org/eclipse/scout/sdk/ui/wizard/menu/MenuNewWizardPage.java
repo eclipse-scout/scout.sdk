@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.menu;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -37,11 +39,7 @@ import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -168,12 +166,8 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       protected Object[][] computeProposals() {
         IType iFormType = TypeUtility.getType(IRuntimeClasses.IForm);
-        ITypeHierarchy cachedFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormType);
-        ITypeFilter formsFilter = TypeFilters.getMultiTypeFilter(
-            TypeFilters.getTypesOnClasspath(getDeclaringType().getJavaProject()),
-            TypeFilters.getClassFilter());
-        IType[] formCandidates = cachedFormHierarchy.getAllSubtypes(iFormType, formsFilter, TypeComparators.getTypeNameComparator());
-        return new Object[][]{formCandidates};
+        Set<IType> forms = TypeUtility.getClassesOnClasspath(iFormType, getDeclaringType().getJavaProject(), null);
+        return new Object[][]{forms.toArray(new IType[forms.size()])};
       }
     });
     m_formToOpenField.acceptProposal(getFormToOpen());
@@ -187,11 +181,11 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
           AbstractJavaElementContentProvider formHandlerProvider = null;
           IType formHandlerSelection = (IType) m_formHandlerField.getSelectedProposal();
           if (getFormToOpen() != null) {
-            IType[] formHandlers = ScoutTypeUtility.getFormHandlers(getFormToOpen());
+            Set<IType> formHandlers = ScoutTypeUtility.getFormHandlers(getFormToOpen());
             if (formHandlers != null) {
-              formHandlerProvider = new SimpleJavaElementContentProvider(formHandlers);
+              formHandlerProvider = new SimpleJavaElementContentProvider(formHandlers.toArray(new IType[formHandlers.size()]));
             }
-            // assign null selection if the current selected form is not the declaring type of the form hanlder selection.
+            // assign null selection if the current selected form is not the declaring type of the form handler selection.
             if (formHandlerSelection != null && !getFormToOpen().equals(formHandlerSelection.getDeclaringType())) {
               formHandlerSelection = null;
             }

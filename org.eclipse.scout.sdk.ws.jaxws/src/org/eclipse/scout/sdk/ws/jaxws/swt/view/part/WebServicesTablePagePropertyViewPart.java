@@ -65,7 +65,7 @@ public class WebServicesTablePagePropertyViewPart extends AbstractSinglePageSect
       applyLayoutData(presenter);
 
       // JAX-WS library conflict
-      if (TypeUtility.getTypes(javax.xml.ws.Service.class.getName()).length > 1) {
+      if (TypeUtility.getTypes(javax.xml.ws.Service.class.getName()).size() > 1) {
         ISection section = createSection(SECTION_ID_INFORMATION, Texts.get("Information"), null, false);
         presenter = new InformationPresenter(section.getSectionClient(), "Multiple JAX-WS RI implementations detected which might cause problems at design and runtime. Please consider that the installed Scout JAX-WS integration supports JAX-WS RI 2.1.6 bundled with Java SE 6.", JaxWsSdk.getImageDescriptor(JaxWsIcons.LibraryConflict), new Point(48, 100), getFormToolkit());
         applyLayoutData(presenter);

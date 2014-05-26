@@ -48,7 +48,7 @@ public class WizardNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     new BeanPropertyTablePage(this, getType());
     new WizardStepTablePage(this, getType());
   }

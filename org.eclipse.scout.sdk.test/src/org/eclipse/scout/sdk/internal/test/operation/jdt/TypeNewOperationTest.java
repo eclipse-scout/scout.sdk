@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.test.AbstractSdkTestWithJdtTestProject;
 import org.eclipse.scout.sdk.operation.form.field.FormFieldDeleteOperation;
@@ -42,7 +43,7 @@ import org.junit.Test;
 /**
  * <h3>{@link TypeNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 08.02.2013
  */
 public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
@@ -219,7 +220,7 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     Assert.assertTrue(TypeUtility.exists(createdType));
     SdkAssert.assertMethodExist(createdType, "aMethod");
 
-    SdkAssert.assertExist(TypeUtility.getMethod(createdType, "aMethod", new String[]{Signature.createTypeSignature(List.class.getName() + "<" + String.class.getName() + ">", true)}));
+    SdkAssert.assertExist(TypeUtility.getMethod(createdType, "aMethod", CollectionUtility.arrayList(Signature.createTypeSignature(List.class.getName() + "<" + String.class.getName() + ">", true))));
     SdkAssert.assertExist(createdType.getDeclaringType());
   }
 

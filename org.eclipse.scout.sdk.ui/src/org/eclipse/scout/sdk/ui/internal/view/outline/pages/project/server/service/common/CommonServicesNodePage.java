@@ -40,7 +40,7 @@ public class CommonServicesNodePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     try {
       new SqlServiceTablePage(this);
     }

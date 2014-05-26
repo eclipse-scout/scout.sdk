@@ -86,7 +86,7 @@ public abstract class AbstractJavaElementContentProvider extends ContentProposal
     if (proposals == null) {
       return new ArrayList<Object>(0);
     }
-    List<Object> result = new ArrayList<Object>();
+    List<Object> result = new ArrayList<Object>(proposals.length);
     for (Object proposal : proposals) {
       int[] matchingRegions = getMatchingRegions(proposal, getLabelProvider().getText(proposal), pattern);
       if (matchingRegions != null) {

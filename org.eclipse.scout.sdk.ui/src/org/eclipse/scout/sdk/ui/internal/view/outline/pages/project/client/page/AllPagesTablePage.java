@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -26,7 +28,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -68,14 +69,14 @@ public class AllPagesTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
-    IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
-
+  protected void loadChildrenImpl() {
     if (m_cachedTypeHierarchy == null) {
+      IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
       m_cachedTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
       m_cachedTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] allPages = m_cachedTypeHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    Set<IType> allPages = m_cachedTypeHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+
     PageNodePageHelper.createRepresentationFor(this, allPages, m_cachedTypeHierarchy);
   }
 
@@ -91,7 +92,6 @@ public class AllPagesTablePage extends AbstractPage {
       WellformAction action = (WellformAction) menu;
       action.init(getScoutBundle());
       action.setOperation(new WellformPagesOperation(getScoutBundle()));
-      action.setLabel(Texts.get("Wellform all Pages..."));
     }
     else if (menu instanceof PageNewAction) {
       ((PageNewAction) menu).init(getScoutBundle());
@@ -99,9 +99,9 @@ public class AllPagesTablePage extends AbstractPage {
     else if (menu instanceof TypeResolverPageDataAction) {
       ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
-          IPrimaryTypeTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
+          ICachedTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
           return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
         }
       }, getScoutBundle());

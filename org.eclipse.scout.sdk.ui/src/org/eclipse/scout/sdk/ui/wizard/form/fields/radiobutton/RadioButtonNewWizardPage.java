@@ -16,11 +16,11 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -112,7 +113,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 
     ITypeFilter filter = null;
     try {
-      ITypeHierarchy radioGroupSuperTypeHierarchy = m_declaringType.newSupertypeHierarchy(null);
+      ITypeHierarchy radioGroupSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(m_declaringType);
       m_radioButtonGroupValueTypeSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(m_declaringType, radioGroupSuperTypeHierarchy, IRuntimeClasses.IRadioButtonGroup, IRuntimeClasses.TYPE_PARAM_RADIOBUTTONGROUP__VALUE_TYPE);
       if (m_radioButtonGroupValueTypeSig != null) {
         m_radioButtonGroupValueType = TypeUtility.getTypeBySignature(m_radioButtonGroupValueTypeSig);
@@ -163,8 +164,25 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 
         IType gtosc = getGenericTypeOfSuperClass();
         try {
-          if (TypeUtility.exists(gtosc) && (getGenericSignature() == null || !TypeUtility.getTypeBySignature(getGenericSignature()).newSupertypeHierarchy(null).contains(gtosc))) {
-            m_genericTypeField.acceptProposal(SignatureCache.createTypeSignature(gtosc.getFullyQualifiedName()));
+          if (TypeUtility.exists(gtosc)) {
+            boolean acceptProp = false;
+
+            if (getGenericSignature() == null) {
+              acceptProp = true;
+            }
+            else {
+              IType t = TypeUtility.getTypeBySignature(getGenericSignature());
+              if (TypeUtility.exists(t)) {
+                acceptProp = !ScoutSdkCore.getHierarchyCache().getSuperHierarchy(t).contains(gtosc);
+              }
+              else {
+                acceptProp = true;
+              }
+            }
+
+            if (acceptProp) {
+              m_genericTypeField.acceptProposal(SignatureCache.createTypeSignature(gtosc.getFullyQualifiedName()));
+            }
           }
           genericProposalProvider.setBaseType(TypeUtility.getMoreSpecificType(gtosc, m_radioButtonGroupValueType));
         }
@@ -285,7 +303,8 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getSuperType())) {
       try {
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), getSuperType().newSupertypeHierarchy(null), IRuntimeClasses.IRadioButton, IRuntimeClasses.TYPE_PARAM_RADIOBUTTON__VALUE_TYPE);
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getSuperType());
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.IRadioButton, IRuntimeClasses.TYPE_PARAM_RADIOBUTTON__VALUE_TYPE);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }

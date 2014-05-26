@@ -58,7 +58,7 @@ public class KeyStrokeTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     if (m_keystrokeChangedListener == null) {
       IType iKeyStrokeType = TypeUtility.getType(IRuntimeClasses.IKeyStroke);
       m_keystrokeChangedListener = new InnerTypePageDirtyListener(this, iKeyStrokeType);

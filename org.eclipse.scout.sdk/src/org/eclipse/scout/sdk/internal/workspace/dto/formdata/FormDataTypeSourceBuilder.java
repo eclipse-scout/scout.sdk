@@ -129,7 +129,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
       superTypeHasNoFormFieldData = DtoUtility.getFormDataType(superType, hierarchy) == null;
     }
 
-    final List<ValidationRuleMethod> list = DtoUtility.getValidationRuleMethods(getModelType(), hierarchy.getJdtHierarchy(), monitor);
+    final List<ValidationRuleMethod> list = DtoUtility.getValidationRuleMethods(getModelType(), hierarchy, monitor);
     if (monitor.isCanceled()) {
       return;
     }

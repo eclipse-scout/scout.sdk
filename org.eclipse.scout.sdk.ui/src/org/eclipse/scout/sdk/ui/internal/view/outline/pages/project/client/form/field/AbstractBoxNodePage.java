@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -82,7 +84,7 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
     new KeyStrokeTablePage(this, getType());
 
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType());
-    IType[] allSubtypes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iFormField, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
+    Set<IType> allSubtypes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iFormField, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType t : allSubtypes) {
       ITypePage nodePage = (ITypePage) FormFieldExtensionPoint.createNodePage(t, hierarchy);
       if (nodePage != null) {

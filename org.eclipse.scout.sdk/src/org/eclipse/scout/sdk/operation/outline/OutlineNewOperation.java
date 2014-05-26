@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -137,7 +138,7 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
       overrideBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          source.append(getOutlinesMethodBody(new IType[]{outlineType}, validator, lineDelimiter));
+          source.append(getOutlinesMethodBody(CollectionUtility.arrayList(outlineType), validator, lineDelimiter));
         }
       });
       MethodNewOperation overrideOp = new MethodNewOperation(overrideBuilder, getDesktopType());
@@ -150,7 +151,7 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
     }
   }
 
-  public static String getOutlinesMethodBody(IType[] outlineTypes, IImportValidator validator, String lineDelimiter) {
+  public static String getOutlinesMethodBody(List<IType> outlineTypes, IImportValidator validator, String lineDelimiter) {
     StringBuilder source = new StringBuilder();
     String listRef = validator.getTypeName(SignatureCache.createTypeSignature(List.class.getName()));
     String arrayListRef = validator.getTypeName(SignatureCache.createTypeSignature(ArrayList.class.getName()));
@@ -160,7 +161,7 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
     StringBuilder genericPart = new StringBuilder().append('<').append(classRef).append("<? extends ").append(iOutlineRef).append(">>");
 
     source.append(listRef).append(genericPart).append(" outlines = ").append("new ").append(arrayListRef).append(genericPart).append("();").append(lineDelimiter);
-    if (outlineTypes != null && outlineTypes.length > 0) {
+    if (outlineTypes != null && outlineTypes.size() > 0) {
       for (IType t : outlineTypes) {
         if (TypeUtility.exists(t)) {
           String outlineRef = validator.getTypeName(SignatureCache.createTypeSignature(t.getFullyQualifiedName()));

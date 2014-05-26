@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.sql.binding;
 import java.lang.reflect.InvocationTargetException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -24,7 +24,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
@@ -35,6 +34,7 @@ import org.eclipse.scout.commons.parsers.BindModel;
 import org.eclipse.scout.commons.parsers.BindParser;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.SQLStatement;
 import org.eclipse.scout.sdk.sql.binding.ast.SqlMethodIvocationVisitor;
@@ -51,6 +51,7 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -61,11 +62,11 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class FormDataSqlBindingValidator {
 
-  private final IType[] m_processServices;
+  private final Set<IType> m_processServices;
 
   private HashMap<ICompilationUnit, CompilationUnit> m_astCache;
 
-  public FormDataSqlBindingValidator(IType... processServices) {
+  public FormDataSqlBindingValidator(Set<IType> processServices) {
     m_processServices = processServices;
     m_astCache = new HashMap<ICompilationUnit, CompilationUnit>();
   }
@@ -196,12 +197,7 @@ public class FormDataSqlBindingValidator {
     // server sessions
     for (IType serverSession : ScoutTypeUtility.getServerSessionTypes(context)) {
       HashSet<String> binds = new HashSet<String>();
-      try {
-        collectPropertyBinds(binds, serverSession, serverSession.newSupertypeHierarchy(new NullProgressMonitor()));
-      }
-      catch (JavaModelException e) {
-        ScoutSdk.logError("could not parse server session bind vars '" + serverSession.getFullyQualifiedName() + "'", e);
-      }
+      collectPropertyBinds(binds, serverSession, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(serverSession));
       for (String s : binds) {
         bindBases.put(s, new ServerSessionBindBase(s, serverSession));
       }
@@ -299,12 +295,7 @@ public class FormDataSqlBindingValidator {
     HashSet<String> bindVars = new HashSet<String>();
     if (TypeUtility.exists(type)) {
       ITypeHierarchy supertypeHierarchy = null;
-      try {
-        supertypeHierarchy = type.newSupertypeHierarchy(new NullProgressMonitor());
-      }
-      catch (JavaModelException e) {
-        ScoutSdk.logWarning("could not create supertype hierarchy of '" + type.getFullyQualifiedName() + "'.");
-      }
+      supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type);
       collectPropertyBinds(bindVars, type, supertypeHierarchy);
     }
     return bindVars;
@@ -350,7 +341,7 @@ public class FormDataSqlBindingValidator {
   /**
    * @return the processServices
    */
-  public IType[] getProcessServices() {
+  public Set<IType> getProcessServices() {
     return m_processServices;
   }
 

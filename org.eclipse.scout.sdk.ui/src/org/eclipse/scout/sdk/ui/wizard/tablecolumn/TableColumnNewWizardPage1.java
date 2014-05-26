@@ -12,13 +12,13 @@ package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -32,6 +32,7 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -141,13 +142,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       m_nextPage = null;
     }
     else {
-      org.eclipse.jdt.core.ITypeHierarchy selectedSuperTypeHierarchy = null;
-      try {
-        selectedSuperTypeHierarchy = m_selectedTemplate.newSupertypeHierarchy(null);
-      }
-      catch (JavaModelException e) {
-        ScoutSdkUi.logError("could not build type hierarchy of '" + m_selectedTemplate.getFullyQualifiedName() + "'.", e);
-      }
+      ITypeHierarchy selectedSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(m_selectedTemplate);
       if (selectedSuperTypeHierarchy != null && selectedSuperTypeHierarchy.contains(iSmartColumn)) {
         SmartTableColumnNewWizard wizard = new SmartTableColumnNewWizard(m_nextOperation);
         wizard.initWizard(m_declaringType);
@@ -228,8 +223,8 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       templates.add(new ISeparator() {
       });
 
-      ITypeHierarchy columnHierarchy = TypeUtility.getPrimaryTypeHierarchy(iColumn);
-      for (IType t : columnHierarchy.getAllClasses(TypeFilters.getAbstractOnClasspath(javaProject))) {
+      Set<IType> abstractColumnsOnClasspath = TypeUtility.getAbstractTypesOnClasspath(iColumn, javaProject, TypeFilters.getPrimaryTypeFilter());
+      for (IType t : abstractColumnsOnClasspath) {
         if (!m_shortList.contains(t.getFullyQualifiedName())) {
           templates.add(t);
         }

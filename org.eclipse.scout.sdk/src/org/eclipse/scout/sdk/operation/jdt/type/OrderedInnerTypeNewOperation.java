@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.jdt.type;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
@@ -60,7 +62,7 @@ public class OrderedInnerTypeNewOperation extends InnerTypeNewOperation {
     m_orderNr = -1.0;
     if (getOrderDefinitionType() != null) {
       ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType());
-      IType[] innerTypes = TypeUtility.getInnerTypes(getDeclaringType(), TypeFilters.getSubtypeFilter(getOrderDefinitionType(), typeHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
+      Set<IType> innerTypes = TypeUtility.getInnerTypes(getDeclaringType(), TypeFilters.getSubtypeFilter(getOrderDefinitionType(), typeHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
       OrderAnnotationsUpdateOperation orderAnnotationOp = new OrderAnnotationsUpdateOperation(getDeclaringType());
       double tempOrderNr = 10.0;
       for (IType innerType : innerTypes) {

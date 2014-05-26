@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.validation;
 
+import java.util.Set;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -17,6 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.sql.binding.FormDataSqlBindingValidator;
@@ -33,7 +36,6 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class FormDataSqlBindingValidateAction extends AbstractScoutHandler {
 
-  private IType[] m_services;
   private ITypeResolver m_typeresolver;
 
   public FormDataSqlBindingValidateAction() {
@@ -46,10 +48,6 @@ public class FormDataSqlBindingValidateAction extends AbstractScoutHandler {
 
   public void setTyperesolver(ITypeResolver typeresolver) {
     m_typeresolver = typeresolver;
-  }
-
-  public void setServices(IType... services) {
-    m_services = services;
   }
 
   @Override
@@ -73,13 +71,10 @@ public class FormDataSqlBindingValidateAction extends AbstractScoutHandler {
   /**
    * @return the services
    */
-  public IType[] getServices() {
-    if (m_services != null) {
-      return m_services;
-    }
-    else if (m_typeresolver != null) {
+  public Set<IType> getServices() {
+    if (m_typeresolver != null) {
       return m_typeresolver.getTypes();
     }
-    return new IType[0];
+    return CollectionUtility.hashSet();
   }
 }

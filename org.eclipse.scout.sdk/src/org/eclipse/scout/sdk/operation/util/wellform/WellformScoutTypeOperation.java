@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.util.wellform;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IBuffer;
@@ -22,6 +24,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jface.text.Document;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
@@ -36,34 +39,37 @@ import org.eclipse.text.edits.ReplaceEdit;
  */
 public class WellformScoutTypeOperation implements IOperation {
 
-  private final IType[] m_types;
+  private final Set<IType> m_types;
   private final boolean m_recursive;
   private String m_lineDelimiter;
 
   public WellformScoutTypeOperation(IType type, boolean recursive) {
-    this(new IType[]{type}, recursive);
+    this(CollectionUtility.hashSet(type), recursive);
   }
 
-  public WellformScoutTypeOperation(IType[] types, boolean recursive) {
-    m_types = types;
+  public WellformScoutTypeOperation(Set<IType> types, boolean recursive) {
+    m_types = CollectionUtility.hashSet(types);
     m_recursive = recursive;
   }
 
   @Override
   public String getOperationName() {
     StringBuilder builder = new StringBuilder();
-    builder.append("Wellform");
-    IType[] types = getScoutTypes();
-    if (types.length <= 3) {
+    builder.append("Wellform ");
+    int i = 0;
+    if (m_types.size() > 0) {
       builder.append("'");
-      for (int i = 0; i < types.length; i++) {
-        builder.append(types[i].getElementName());
-        if (i < types.length - 1) {
+      for (IType t : m_types) {
+        builder.append(t.getElementName());
+        if (i < 2) {
           builder.append(", ");
         }
+        else if (i == 2) {
+          break;
+        }
+        i++;
       }
       builder.append("'");
-
     }
     builder.append("...");
     return builder.toString();
@@ -75,7 +81,7 @@ public class WellformScoutTypeOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    for (IType t : getScoutTypes()) {
+    for (IType t : m_types) {
       if (monitor.isCanceled()) {
         return;
       }
@@ -201,12 +207,7 @@ public class WellformScoutTypeOperation implements IOperation {
     }
   }
 
-  public IType[] getScoutTypes() {
-    return m_types;
-  }
-
   public boolean isRecursive() {
     return m_recursive;
   }
-
 }

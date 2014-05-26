@@ -109,7 +109,7 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(declaringType.getCompilationUnit());
     IType form = TypeUtility.getAncestor(declaringType, TypeFilters.getMultiTypeFilterOr(
         TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
-        TypeFilters.getTopLevelTypeFilter()));
+        TypeFilters.getPrimaryTypeFilter()));
 
     if (TypeUtility.exists(form)) {
       String formFieldSimpleName = Signature.getSignatureSimpleName(formFieldSignature);

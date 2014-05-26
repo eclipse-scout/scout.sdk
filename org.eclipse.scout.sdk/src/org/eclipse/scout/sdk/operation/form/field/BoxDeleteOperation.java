@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -72,13 +71,12 @@ public class BoxDeleteOperation implements IOperation {
   }
 
   protected void deleteGetterMethodsAndImportsRec(IType type, JavaElementDeleteOperation deleteOperation, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    IPrimaryTypeTypeHierarchy columnHierarchy = TypeUtility.getPrimaryTypeHierarchy(iColumn);
-    ITypeHierarchy localHierarchy = columnHierarchy.combinedTypeHierarchy(type.getCompilationUnit());
     for (IType innerType : type.getTypes()) {
       deleteGetterMethodsAndImportsRec(innerType, deleteOperation, monitor, manager);
     }
     IMethod getter = null;
-    if (localHierarchy.isSubtype(iColumn, type)) {
+    ITypeHierarchy columnHierarchy = TypeUtility.getLocalTypeHierarchy(type);
+    if (columnHierarchy.isSubtype(iColumn, type)) {
       getter = ScoutTypeUtility.getColumnGetterMethod(type);
     }
     else {

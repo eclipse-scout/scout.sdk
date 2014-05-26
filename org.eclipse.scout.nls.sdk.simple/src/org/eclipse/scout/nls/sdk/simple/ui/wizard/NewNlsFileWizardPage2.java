@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
@@ -50,7 +51,6 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
-import org.eclipse.scout.nls.sdk.internal.jdt.IResourceFilter;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
 import org.eclipse.scout.nls.sdk.internal.ui.FieldValidator;
 import org.eclipse.scout.nls.sdk.internal.ui.NlsUi;
@@ -62,6 +62,7 @@ import org.eclipse.scout.nls.sdk.internal.ui.fields.TextProposalField;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputValidator;
 import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.operations.NewNlsFileOperationDesc;
+import org.eclipse.scout.sdk.util.resources.IResourceFilter;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -207,10 +208,11 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
 
     model.setResourceFilter(new IResourceFilter() {
       @Override
-      public boolean accept(IProject project, IResource resource) {
+      public boolean accept(IResourceProxy proxy) {
+        IResource resource = proxy.requestResource();
         if (resource instanceof IFolder) {
           IFolder folder = (IFolder) resource;
-          IJavaProject jp = JavaCore.create(project);
+          IJavaProject jp = JavaCore.create(resource.getProject());
           try {
             if (jp.getOutputLocation().toOSString().equals(folder.getFullPath().toOSString())) {
               return false;

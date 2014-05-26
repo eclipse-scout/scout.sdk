@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.operation.template;
 
 import java.util.HashMap;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -77,8 +78,6 @@ import org.eclipse.text.edits.TextEdit;
  *
  */
 public class CreateTemplateOperation implements IOperation {
-  private final IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
-  private final IType iCompositeField = TypeUtility.getType(IRuntimeClasses.ICompositeField);
   private static final Pattern SUPER_CLASS_PATTERN = Pattern.compile("\\sextends\\s*(" + IRegEx.JAVAFIELD + "(\\<[^{]*\\>)?)", Pattern.MULTILINE);
 
   private String m_templateName;
@@ -316,6 +315,7 @@ public class CreateTemplateOperation implements IOperation {
 
   protected void createFormFieldGetter(IType type, IType formType, TreeMap<CompositeObject, IJavaElement> siblings, HashMap<String, P_FormField> getterMethods, org.eclipse.scout.sdk.util.typecache.ITypeHierarchy hierarchy, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     if (TypeUtility.exists(type)) {
+      IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
       if (hierarchy.isSubtype(iFormField, type)) {
         InnerTypeGetterCreateOperation op = new InnerTypeGetterCreateOperation(type, formType, true);
         CompositeObject key = new CompositeObject(1, op.getElementName());
@@ -331,8 +331,9 @@ public class CreateTemplateOperation implements IOperation {
         getterMethods.put(type.getElementName(), new P_FormField(type, op.getCreatedMethod()));
       }
       // visit children
+      IType iCompositeField = TypeUtility.getType(IRuntimeClasses.ICompositeField);
       if (hierarchy.isSubtype(iCompositeField, type)) {
-        IType[] innerFields = TypeUtility.getInnerTypes(type, TypeFilters.getSubtypeFilter(iFormField, hierarchy));
+        Set<IType> innerFields = TypeUtility.getInnerTypes(type, TypeFilters.getSubtypeFilter(iFormField, hierarchy));
         for (IType t : innerFields) {
           createFormFieldGetter(t, formType, siblings, getterMethods, hierarchy, monitor, manager);
         }

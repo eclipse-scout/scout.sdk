@@ -52,8 +52,6 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
-  private final IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
-
   private INlsEntry m_nlsName;
   private String m_typeName;
   private IType m_superType;
@@ -116,6 +114,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
 
+    IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
         new JavaElementAbstractTypeContentProvider(iFormField, m_declaringType.getJavaProject(), m_abstractFormField));
     m_superTypeField.acceptProposal(m_superType);

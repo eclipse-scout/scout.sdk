@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -26,8 +28,8 @@ public class PageNodePageHelper {
   private PageNodePageHelper() {
   }
 
-  public static AbstractPage[] createRepresentationFor(AbstractPage parentPage, IType[] types, ITypeHierarchy pageTypeHierarchy) {
-    ArrayList<AbstractPage> pages = new ArrayList<AbstractPage>();
+  public static List<AbstractPage> createRepresentationFor(AbstractPage parentPage, Set<IType> types, ITypeHierarchy pageTypeHierarchy) {
+    ArrayList<AbstractPage> pages = new ArrayList<AbstractPage>(types.size());
     for (IType type : types) {
       if (TypeUtility.exists(type)) {
         if (pageTypeHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IPageWithNodes), type)) {
@@ -43,6 +45,6 @@ public class PageNodePageHelper {
         }
       }
     }
-    return pages.toArray(new AbstractPage[pages.size()]);
+    return pages;
   }
 }

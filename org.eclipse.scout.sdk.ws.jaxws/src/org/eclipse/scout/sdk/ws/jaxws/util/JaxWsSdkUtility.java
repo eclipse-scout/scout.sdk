@@ -66,7 +66,6 @@ import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -94,6 +93,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
@@ -105,6 +105,7 @@ import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -923,7 +924,7 @@ public final class JaxWsSdkUtility {
       }
 
       if (recursively) {
-        IType superType = declaringType.newSupertypeHierarchy(new NullProgressMonitor()).getSuperclass(declaringType);
+        IType superType = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(declaringType).getSuperclass(declaringType);
         return getAnnotation(superType, fqnAnnotationName, recursively);
       }
     }
@@ -1099,10 +1100,10 @@ public final class JaxWsSdkUtility {
   public static IType[] getJdtSubTypes(IScoutBundle bundle, String fqnSuperType, boolean includeInterfaces, boolean includeAbstractTypes, boolean includeFinalTypes, boolean sameProject) {
     List<IType> types = new LinkedList<IType>();
     try {
-      IType[] superTypes = TypeUtility.getTypes(fqnSuperType);
+      Set<IType> superTypes = TypeUtility.getTypes(fqnSuperType);
       for (IType superType : superTypes) {
-        ITypeHierarchy hierarchy = superType.newTypeHierarchy(new NullProgressMonitor());
-        IType[] candidates = hierarchy.getAllSubtypes(superType);
+        ITypeHierarchy hierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(superType);
+        Set<IType> candidates = hierarchy.getAllSubtypes(superType);
         for (IType candidate : candidates) {
           if (TypeUtility.exists(candidate)) {
             if (!includeInterfaces && Flags.isInterface(candidate.getFlags())) {
@@ -1145,17 +1146,12 @@ public final class JaxWsSdkUtility {
     if (candidateToCheck == null) {
       return false;
     }
-    IType[] superTypes = TypeUtility.getTypes(fqnSuperType);
-    try {
-      ITypeHierarchy superTypeHierarchy = candidateToCheck.newSupertypeHierarchy(new NullProgressMonitor());
-      for (IType superType : superTypes) {
-        if (superTypeHierarchy.contains(superType)) {
-          return true;
-        }
+    Set<IType> superTypes = TypeUtility.getTypes(fqnSuperType);
+    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(candidateToCheck);
+    for (IType superType : superTypes) {
+      if (superTypeHierarchy.contains(superType)) {
+        return true;
       }
-    }
-    catch (JavaModelException e) {
-      JaxWsSdk.logError(e);
     }
     return false;
   }

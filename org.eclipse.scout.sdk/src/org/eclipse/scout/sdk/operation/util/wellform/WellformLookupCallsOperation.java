@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.util.wellform;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
@@ -27,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 public class WellformLookupCallsOperation implements IOperation {
 
   private final IScoutBundle m_bundle;
-  private IType[] m_lookupCalls;
+  private Set<IType> m_lookupCalls;
 
   public WellformLookupCallsOperation(IScoutBundle bundle) {
     m_bundle = bundle;
@@ -65,7 +67,7 @@ public class WellformLookupCallsOperation implements IOperation {
     return m_bundle;
   }
 
-  public IType[] getLookupCalls() {
+  public Set<IType> getLookupCalls() {
     return m_lookupCalls;
   }
 }

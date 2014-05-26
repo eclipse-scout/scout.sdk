@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.toolbutton;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -76,7 +78,8 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
       @Override
       protected Object[][] computeProposals() {
         IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
-        return new Object[][]{ScoutTypeUtility.getClassesOnClasspath(iOutline, m_declaringType.getJavaProject())};
+        Set<IType> outlines = TypeUtility.getClassesOnClasspath(iOutline, m_declaringType.getJavaProject(), null);
+        return new Object[][]{outlines.toArray(new IType[outlines.size()])};
       }
     });
     m_outlineField.acceptProposal(getOutline());

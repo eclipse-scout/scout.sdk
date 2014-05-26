@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.sdk.util.ScoutSdkUtilCore;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -96,14 +97,8 @@ public class TypeFilters {
     return new ITypeFilter() {
       @Override
       public boolean accept(IType candidate) {
-        try {
-          org.eclipse.jdt.core.ITypeHierarchy hierarchy = candidate.newSupertypeHierarchy(null);
-          return hierarchy.contains(type);
-        }
-        catch (JavaModelException e) {
-          SdkUtilActivator.logWarning("could not create super hierarchy of '" + candidate.getElementName() + "'.", e);
-          return false;
-        }
+        ITypeHierarchy hierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(candidate);
+        return hierarchy != null && hierarchy.contains(type);
       }
     };
   }
@@ -160,23 +155,6 @@ public class TypeFilters {
     return getRegexSimpleNameFilter(regex, Pattern.CASE_INSENSITIVE);
   }
 
-  public static ITypeFilter getInnerTypeFilter(final IType type) {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType t) {
-        if (t != null) {
-          if (t.equals(type)) {
-            return true;
-          }
-          else {
-            return accept(t.getDeclaringType());
-          }
-        }
-        return false;
-      }
-    };
-  }
-
   public static ITypeFilter getTypesInProject(final IJavaProject project) {
     return new ITypeFilter() {
 
@@ -206,7 +184,7 @@ public class TypeFilters {
     return IN_WORKSPACE_FILTER;
   }
 
-  public static ITypeFilter getTopLevelTypeFilter() {
+  public static ITypeFilter getPrimaryTypeFilter() {
     return TOP_LEVEL_FILTER;
   }
 
@@ -228,22 +206,6 @@ public class TypeFilters {
       @Override
       public boolean accept(IType type) {
         return hierarchy.contains(type);
-      }
-    };
-  }
-
-  public static ITypeFilter getAbstractOnClasspath(final IJavaProject project) {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType type) {
-        try {
-          int flags = type.getFlags();
-          return !Flags.isInterface(flags) && Flags.isAbstract(flags) && !Flags.isDeprecated(flags) && TypeUtility.isOnClasspath(type, project);
-        }
-        catch (JavaModelException e) {
-          SdkUtilActivator.logError("could not filter type '" + type.getFullyQualifiedName() + "'.", e);
-          return false;
-        }
       }
     };
   }
@@ -277,18 +239,6 @@ public class TypeFilters {
 
   public static ITypeFilter getExistingFilter() {
     return EXISTS_FILTER;
-  }
-
-  public static ITypeFilter getNotInTypes(IType[]... excludedTypes) {
-    HashSet<IType> excludedSet = new HashSet<IType>();
-    if (excludedTypes != null) {
-      for (IType[] list : excludedTypes) {
-        for (IType t : list) {
-          excludedSet.add(t);
-        }
-      }
-    }
-    return getNotInTypes(excludedSet);
   }
 
   public static ITypeFilter getNotInTypes(IType... excludedTypes) {
@@ -343,6 +293,9 @@ public class TypeFilters {
     }
   }
 
+  /**
+   * @return An {@link ITypeFilter} that only accepts {@link IType}s that are not parameterized (have not generics).
+   */
   public static ITypeFilter getNoGenericTypesFilter() {
     return NO_GENERIC_FILTER;
   }
@@ -421,7 +374,8 @@ public class TypeFilters {
       @Override
       public boolean accept(IType type) {
         try {
-          String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, type.newSupertypeHierarchy(null), paramDefiningSuperTypeFqn, paramName);
+          ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(type);
+          String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, superHierarchy, paramDefiningSuperTypeFqn, paramName);
           if (typeParamSig != null) {
             if (objectSig.equals(typeParamSig)) {
               return true;

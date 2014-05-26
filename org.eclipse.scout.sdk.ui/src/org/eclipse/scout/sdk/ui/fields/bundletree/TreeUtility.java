@@ -176,7 +176,7 @@ public final class TreeUtility {
     return node;
   }
 
-  private static boolean isProductFileContainingBundles(IFile productFile, IScoutBundle[] filter) {
+  private static boolean isProductFileContainingBundles(IFile productFile, Set<IScoutBundle> filter) {
     try {
       ProductFileModelHelper pfmh = new ProductFileModelHelper(productFile);
       for (IScoutBundle b : filter) {
@@ -240,9 +240,9 @@ public final class TreeUtility {
         visibleFilter = NodeFilters.getAcceptAll();
       }
 
-      IScoutBundle[] containingScoutBundles = project.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true);
+      Set<IScoutBundle> containingScoutBundles = project.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true);
 
-      IResource[] productFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileFilter());
+      List<IResource> productFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileFilter());
       ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
       rootNode.setVisible(false);
 

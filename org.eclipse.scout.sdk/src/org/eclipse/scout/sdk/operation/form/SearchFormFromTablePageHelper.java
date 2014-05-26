@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
@@ -101,15 +103,17 @@ public final class SearchFormFromTablePageHelper {
     // fields
     double fieldOrder = 10;
     ITypeHierarchy tablePageHierarchy = TypeUtility.getLocalTypeHierarchy(tablePage);
-    IType[] tables = TypeUtility.getInnerTypes(tablePage, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITable), tablePageHierarchy));
-    if (tables.length > 0) {
-      IType table = tables[0];
-      int i = 1;
-      while (!TypeUtility.exists(table) && (i < tables.length)) {
-        table = tables[i];
+    Set<IType> tables = TypeUtility.getInnerTypes(tablePage, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITable), tablePageHierarchy));
+    if (tables.size() > 0) {
+      IType table = null;
+      for (IType tab : tables) {
+        if (TypeUtility.exists(tab)) {
+          table = tab;
+          break;
+        }
       }
       if (TypeUtility.exists(table)) {
-        IType[] columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), tablePageHierarchy));
+        Set<IType> columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), tablePageHierarchy));
         for (IType column : columns) {
           ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(column, "getConfiguredDisplayable");
           String retVal = ScoutUtility.getMethodReturnValue(configurationMethod.peekMethod());

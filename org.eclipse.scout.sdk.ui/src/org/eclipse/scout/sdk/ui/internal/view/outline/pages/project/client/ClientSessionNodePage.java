@@ -33,7 +33,7 @@ public class ClientSessionNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
   }
 
   @Override

@@ -319,7 +319,7 @@ public class UiUtility {
     }
 
     // nothing in the selection. just choose one
-    IScoutBundle[] bundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getFilteredRootBundlesFilter(ScoutBundleFilters.getWorkspaceBundlesFilter()));
+    Set<IScoutBundle> bundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getFilteredRootBundlesFilter(ScoutBundleFilters.getWorkspaceBundlesFilter()));
     for (IScoutBundle root : bundles) {
       IScoutBundle candidate = root.getChildBundle(filter, true);
       if (candidate != null) {

@@ -21,7 +21,7 @@ import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 
 /**
  * <h3>{@link SignatureSubTypeProposalProvider}</h3> Proposal provider that returns all signature proposals that are
@@ -60,7 +60,7 @@ public class SignatureSubTypeProposalProvider extends SignatureProposalProvider 
         signatures.add(parentTypeSig);
       }
 
-      IPrimaryTypeTypeHierarchy hier = TypeUtility.getPrimaryTypeHierarchy(getBaseType());
+      ICachedTypeHierarchy hier = TypeUtility.getPrimaryTypeHierarchy(getBaseType());
       for (IType t : hier.getAllSubtypes(getBaseType(), null, TypeComparators.getTypeNameComparator())) {
         String curSig = SignatureCache.createTypeSignature(t.getFullyQualifiedName());
         matchRegions = getMatchingRegions(curSig, getLabelProvider().getText(curSig), normalizedPattern);

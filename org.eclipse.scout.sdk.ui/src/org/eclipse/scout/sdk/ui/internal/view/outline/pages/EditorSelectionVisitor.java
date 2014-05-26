@@ -14,14 +14,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.outline.OutlineNewOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -106,6 +107,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.Abstra
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -221,12 +223,9 @@ public class EditorSelectionVisitor implements INodeVisitor {
     ITypeHierarchy hierarchy = m_typeHierarchyCache.get(element);
     if (hierarchy == null && element.getElementType() == IJavaElement.TYPE) {
       IType type = (IType) element;
-      try {
-        hierarchy = type.newSupertypeHierarchy(null);
+      hierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type);
+      if (hierarchy != null) {
         m_typeHierarchyCache.put(element, hierarchy);
-      }
-      catch (JavaModelException e) {
-        ScoutSdkUi.logError("could not build supertype hierarchy of '" + type.getFullyQualifiedName() + "'.", e);
       }
     }
     return hierarchy;
@@ -499,7 +498,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
       IType desktopType = page.getDesktopType();
       IMethod outlineMethods = TypeUtility.getMethod(desktopType, OutlineNewOperation.GET_CONFIGURED_OUTLINES);
       try {
-        IType[] allNewOccurences = ScoutTypeUtility.getTypeOccurenceInMethod(outlineMethods);
+        List<IType> allNewOccurences = ScoutTypeUtility.getTypeOccurenceInMethod(outlineMethods);
         for (IType typeOccurence : allNewOccurences) {
           if (typeOccurence.equals(desktopType)) {
             return CONTINUE_BRANCH;

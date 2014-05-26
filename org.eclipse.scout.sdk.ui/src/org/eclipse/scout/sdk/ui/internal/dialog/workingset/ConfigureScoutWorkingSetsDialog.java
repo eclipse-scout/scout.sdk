@@ -382,7 +382,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
   private ITreeNode createTree() {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
-    IScoutBundle[] allBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getAllBundlesFilter(), ScoutBundleComparators.getSymbolicNameAscComparator());
+    Set<IScoutBundle> allBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getAllBundlesFilter(), ScoutBundleComparators.getSymbolicNameAscComparator());
 
     for (IScoutBundle b : allBundles) {
       ITreeNode bundleNode = TreeUtility.createBundleTreeNode(rootNode, b);

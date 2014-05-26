@@ -59,7 +59,7 @@ public abstract class AbstractBundleNodeTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     for (ScoutBundleNode b : m_bundle.getChildBundles()) {
       b.createBundlePage(this);
     }

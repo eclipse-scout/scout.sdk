@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.util;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
 
@@ -36,6 +38,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
@@ -291,9 +294,9 @@ public final class ScoutUtility {
     return null;
   }
 
-  public static String[] getEntities(IScoutBundle p) throws JavaModelException {
-    TreeSet<String> ret = new TreeSet<String>();
-    IScoutBundle[] roots = p.getParentBundles(ScoutBundleFilters.getRootBundlesFilter(), true);
+  public static Set<String> getEntities(IScoutBundle p) throws JavaModelException {
+    Set<String> ret = new TreeSet<String>();
+    Set<IScoutBundle> roots = p.getParentBundles(ScoutBundleFilters.getRootBundlesFilter(), true);
     IScoutBundleFilter workspaceClientSharedServerFilter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(),
         ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
     for (IScoutBundle root : roots) {
@@ -329,7 +332,7 @@ public final class ScoutUtility {
         }
       }
     }
-    return ret.toArray(new String[ret.size()]);
+    return ret;
   }
 
   public static String removeFieldSuffix(String fieldName) {
@@ -494,11 +497,12 @@ public final class ScoutUtility {
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    if (ScoutTypeUtility.getAllTypes(declaringType.getCompilationUnit(), TypeFilters.getElementNameFilter(name)).length > 0) {
+    if (ScoutTypeUtility.getAllTypes(declaringType.getCompilationUnit(), TypeFilters.getElementNameFilter(name)).size() > 0) {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     try {
-      if (TypeUtility.exists(TypeUtility.getMethod(TypeUtility.getPrimaryType(declaringType), "get" + name, new String[]{}))) {
+      List<String> resolvedParamSigs = CollectionUtility.arrayList();
+      if (TypeUtility.exists(TypeUtility.getMethod(TypeUtility.getToplevelType(declaringType), "get" + name, resolvedParamSigs))) {
         return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }
     }
@@ -580,8 +584,8 @@ public final class ScoutUtility {
    *         bundle. Or null if the candidates do not contain any types or all of them cannot be found in the
    *         dependencies of the reference bundle.
    */
-  public static IType getNearestType(IType[] candidates, IScoutBundle reference) {
-    if (candidates == null || candidates.length < 1) {
+  public static IType getNearestType(Set<IType> candidates, IScoutBundle reference) {
+    if (candidates == null || candidates.size() < 1) {
       return null;
     }
     final Holder<IType> result = new Holder<IType>(IType.class, null);

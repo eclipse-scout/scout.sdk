@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
@@ -33,7 +35,7 @@ import org.eclipse.swt.graphics.Point;
 /**
  * <h3>{@link AbstractSdkProposal}</h3>
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.10.0 25.10.2013
  */
 public abstract class AbstractSdkProposal implements IJavaCompletionProposal, ICompletionProposalExtension, ICompletionProposalExtension2, ICompletionProposalExtension3, ICompletionProposalExtension4 {
@@ -137,7 +139,7 @@ public abstract class AbstractSdkProposal implements IJavaCompletionProposal, IC
    * @throws JavaModelException
    */
   protected IJavaElement findSibling(IType declaringType, int offset, ITypeFilter subtypeFilter) throws JavaModelException {
-    IType[] innerTypes = TypeUtility.getInnerTypes(declaringType, subtypeFilter, TypeComparators.getSourceRangeComparator());
+    Set<IType> innerTypes = TypeUtility.getInnerTypes(declaringType, subtypeFilter, TypeComparators.getSourceRangeComparator());
     IType sibling = null;
     for (IType t : innerTypes) {
       ISourceRange sourceRange = t.getSourceRange();

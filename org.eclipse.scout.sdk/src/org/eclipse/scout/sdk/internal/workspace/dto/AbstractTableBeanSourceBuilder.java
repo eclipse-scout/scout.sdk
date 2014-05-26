@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.internal.workspace.dto;
 
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.runtime.CoreException;
@@ -100,7 +101,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     });
     IType curTableType = table;
     do {
-      IType[] columns = TypeUtility.getInnerTypes(curTableType, filter);
+      Set<IType> columns = TypeUtility.getInnerTypes(curTableType, filter);
       for (IType column : columns) {
         allColumnsUpTheHierarchy.add(column);
       }
@@ -117,7 +118,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     ITypeHierarchy rowDataHierarchy = TypeUtility.getSuperTypeHierarchy(rowDataSuperType);
     if (!IRuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getFullyQualifiedName())) {
       do {
-        IField[] columnFields = TypeUtility.getFields(currentRowDataSuperType, FieldFilters.getFlagsFilter(ROW_DATA_FIELD_FLAGS));
+        Set<IField> columnFields = TypeUtility.getFields(currentRowDataSuperType, FieldFilters.getFlagsFilter(ROW_DATA_FIELD_FLAGS));
         for (IField column : columnFields) {
           Object val = TypeUtility.getFieldConstant(column);
           if (val instanceof String) {

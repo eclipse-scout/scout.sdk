@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.form.handler;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -32,8 +33,6 @@ import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -88,7 +87,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
     templates.add(new HandlerTemplate(Texts.get("FormHandlerMODIFY"), formHandler, HandlerTemplate.ID_MODIFY));
     templates.add(new HandlerTemplate(Texts.get("FormHandler"), formHandler, HandlerTemplate.ID_CUSTOM));
 
-    IType[] abstractFormHandlers = TypeUtility.getPrimaryTypeHierarchy(iFormHandler).getAllSubtypes(iFormHandler, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()), TypeComparators.getTypeNameComparator());
+    Set<IType> abstractFormHandlers = TypeUtility.getAbstractTypesOnClasspath(iFormHandler, m_declaringType.getJavaProject(), null);
     for (IType t : abstractFormHandlers) {
       templates.add(new HandlerTemplate(t.getElementName(), t, HandlerTemplate.ID_DEFAULT));
     }

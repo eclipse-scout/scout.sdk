@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ws.jaxws.marker.commands;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.StringReader;
-import java.util.Arrays;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -25,13 +25,14 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.window.Window;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -72,22 +73,22 @@ public class ErrorProneWsdlLocatorCommand extends AbstractExecutableMarkerComman
 
   @Override
   public boolean prepareForUi() throws CoreException {
-    IType[] activators = findActivator();
+    Set<IType> activators = findActivator();
 
-    if (activators.length == 0) {
+    if (activators.size() == 0) {
       MessageBox messageBox = new MessageBox(ScoutSdkUi.getShell(), SWT.ICON_QUESTION | SWT.OK);
       messageBox.setText(Texts.get("Error"));
       messageBox.setMessage("Unable to find bundle's activator class");
       messageBox.open();
       return false;
     }
-    else if (activators.length == 1) {
-      m_activator = activators[0];
+    else if (activators.size() == 1) {
+      m_activator = CollectionUtility.firstElement(activators);
       return true;
     }
     else {
       TypeSelectionDialog dialog = new TypeSelectionDialog(ScoutSdkUi.getShell(), "Activator selection", "Which Activator should be used to search for resources with it's bundle's classloader?");
-      dialog.setElements(Arrays.asList(activators));
+      dialog.setElements(activators);
       if (dialog.open() == Window.OK) {
         m_activator = dialog.getElement();
         return TypeUtility.exists(m_activator);
@@ -105,7 +106,7 @@ public class ErrorProneWsdlLocatorCommand extends AbstractExecutableMarkerComman
     String resolvedActivatorName = JaxWsSdkUtility.resolveTypeName(declaringType, m_activator);
 
     // prepare new content of static initializer
-    StringBuffer buf = new StringBuffer();
+    StringBuilder buf = new StringBuilder();
 
     try {
       String oldCode = m_initializer.getSource();
@@ -175,11 +176,11 @@ public class ErrorProneWsdlLocatorCommand extends AbstractExecutableMarkerComman
     }
   }
 
-  public IType[] findActivator() {
+  public Set<IType> findActivator() {
     // try to find Activator to use it's bundle to load resources
     IType bundleActivator = TypeUtility.getType(BundleActivator.class.getName());
-    IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(bundleActivator);
-    IType[] types = hierarchy.getAllSubtypes(bundleActivator, new ITypeFilter() {
+    ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(bundleActivator);
+    Set<IType> types = hierarchy.getAllSubtypes(bundleActivator, new ITypeFilter() {
 
       @Override
       public boolean accept(IType type) {

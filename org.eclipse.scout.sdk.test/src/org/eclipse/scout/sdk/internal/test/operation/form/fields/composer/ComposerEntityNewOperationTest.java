@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.operation.form.fields.composer;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
@@ -25,7 +27,7 @@ import org.junit.Test;
 /**
  * <h3>{@link ComposerEntityNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class ComposerEntityNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -45,8 +47,8 @@ public class ComposerEntityNewOperationTest extends AbstractSdkTestWithSamplePro
     JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
     delOp.addMember(entity);
     executeBuildAssertNoCompileErrors(delOp);
-    IType[] entities = TypeUtility.getInnerTypesOrdered(composerField, TypeUtility.getType(RuntimeClasses.IDataModelEntity), ScoutTypeComparators.getTypeNameComparator());
-    SdkAssert.assertEquals(1, entities.length);
+    Set<IType> entities = TypeUtility.getInnerTypesOrdered(composerField, TypeUtility.getType(RuntimeClasses.IDataModelEntity), ScoutTypeComparators.getTypeNameComparator());
+    SdkAssert.assertEquals(1, entities.size());
   }
 
   /**

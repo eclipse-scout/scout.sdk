@@ -13,10 +13,12 @@ package org.eclipse.scout.nls.sdk.services.ui.wizard;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
@@ -28,7 +30,6 @@ import org.eclipse.jface.bindings.keys.KeyStroke;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
-import org.eclipse.scout.nls.sdk.internal.jdt.IResourceFilter;
 import org.eclipse.scout.nls.sdk.internal.ui.NlsUi;
 import org.eclipse.scout.nls.sdk.internal.ui.TextField;
 import org.eclipse.scout.nls.sdk.internal.ui.fields.IInputChangedListener;
@@ -55,6 +56,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.resources.IResourceFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
@@ -87,8 +89,8 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
 
   // process members
   private final IScoutBundle m_bundle;
-  private final HashSet<String> m_languagesToCreate;
-  private final NlsServiceType[] m_existingServicesInPlugin;
+  private final Set<String> m_languagesToCreate;
+  private final List<NlsServiceType> m_existingServicesInPlugin;
   private final IType m_defaultProposal;
 
   public NewTextProviderServiceWizardPage(IScoutBundle bundle) {
@@ -102,12 +104,10 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     m_defaultProposal = RuntimeClasses.getSuperType(IRuntimeClasses.ITextProviderService, ScoutUtility.getJavaProject(bundle));
   }
 
-  private NlsServiceType[] getTextProviderServicesInSamePlugin() {
-    IType[] candidates;
+  private List<NlsServiceType> getTextProviderServicesInSamePlugin() {
     try {
-      candidates = ServiceNlsProjectProvider.getRegisteredTextProviderTypes();
-      ArrayList<NlsServiceType> ret = new ArrayList<NlsServiceType>(candidates.length);
-
+      Set<IType> candidates = ServiceNlsProjectProvider.getRegisteredTextProviderTypes();
+      ArrayList<NlsServiceType> ret = new ArrayList<NlsServiceType>(candidates.size());
       for (IType t : candidates) {
         if (m_bundle.getProject().equals(t.getJavaProject().getProject())) {
           NlsServiceType type = new NlsServiceType(t);
@@ -116,7 +116,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
           }
         }
       }
-      return ret.toArray(new NlsServiceType[ret.size()]);
+      return ret;
     }
     catch (JavaModelException e) {
       NlsCore.logWarning(e);
@@ -195,10 +195,11 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     ResourceProposalModel model = new ResourceProposalModel();
     model.setResourceFilter(new IResourceFilter() {
       @Override
-      public boolean accept(IProject project, IResource resource) {
+      public boolean accept(IResourceProxy proxy) {
+        IResource resource = proxy.requestResource();
         if (resource instanceof IFolder) {
           IFolder folder = (IFolder) resource;
-          IJavaProject jp = JavaCore.create(project);
+          IJavaProject jp = JavaCore.create(folder.getProject());
           try {
             if (jp.getOutputLocation().toOSString().equals(folder.getFullPath().toOSString())) {
               return false;

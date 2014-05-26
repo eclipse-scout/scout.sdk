@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.util.wellform;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
@@ -27,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 public class WellformCodeTypesOperation implements IOperation {
 
   private final IScoutBundle m_sharedBundle;
-  private IType[] m_codeTypes;
+  private Set<IType> m_codeTypes;
 
   public WellformCodeTypesOperation(IScoutBundle sharedBundle) {
     m_sharedBundle = sharedBundle;
@@ -64,7 +66,7 @@ public class WellformCodeTypesOperation implements IOperation {
     return m_sharedBundle;
   }
 
-  public IType[] getCodeTypes() {
+  public Set<IType> getCodeTypes() {
     return m_codeTypes;
   }
 }

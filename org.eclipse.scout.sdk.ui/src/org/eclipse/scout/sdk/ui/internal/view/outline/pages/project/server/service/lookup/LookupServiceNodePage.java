@@ -36,7 +36,7 @@ public class LookupServiceNodePage extends AbstractServiceNodePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     // XXX add LookupCallTablePage / LookupCallNodePage
     // XXX add ServiceOperationTablePage / ServiceOperationNodePage
   }

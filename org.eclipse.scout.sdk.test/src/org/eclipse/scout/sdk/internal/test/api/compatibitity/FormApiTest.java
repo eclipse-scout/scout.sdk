@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.internal.test.api.compatibitity;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.Flags;
@@ -40,7 +41,7 @@ public class FormApiTest extends AbstractApiTest {
     IType type = TypeUtility.getType(RuntimeClasses.IForm);
     IFieldFilter labelPositionFIlter = FieldFilters.getCompositeFilter(FieldFilters.getFlagsFilter(Flags.AccFinal | Flags.AccStatic),
         FieldFilters.getNameRegexFilter(Pattern.compile("^DISPLAY\\_HINT.*$")));
-    IField[] fields = TypeUtility.getFields(type, labelPositionFIlter);
+    Set<IField> fields = TypeUtility.getFields(type, labelPositionFIlter);
     HashMap<String, IField> fieldMap = new HashMap<String, IField>();
     for (IField f : fields) {
       fieldMap.put(f.getElementName(), f);
@@ -70,7 +71,7 @@ public class FormApiTest extends AbstractApiTest {
     IType type = TypeUtility.getType(RuntimeClasses.IForm);
     IFieldFilter labelPositionFIlter = FieldFilters.getCompositeFilter(FieldFilters.getFlagsFilter(Flags.AccFinal | Flags.AccStatic),
         FieldFilters.getNameRegexFilter(Pattern.compile("^VIEW\\_ID.*$")));
-    IField[] fields = TypeUtility.getFields(type, labelPositionFIlter);
+    Set<IField> fields = TypeUtility.getFields(type, labelPositionFIlter);
     HashMap<String, IField> fieldMap = new HashMap<String, IField>();
     for (IField f : fields) {
       fieldMap.put(f.getElementName(), f);

@@ -301,7 +301,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
             if (resource != null && resource.getType() == IResource.FILE) {
               if ((delta.getFlags() & IResourceDelta.CONTENT) != 0 && resource.getName().endsWith(".java")) {
                 IJavaElement javaElement = JavaCore.create((IFile) resource);
-                if (TypeUtility.exists(javaElement) && javaElement.getElementType() == IJavaElement.COMPILATION_UNIT) {
+                if (javaElement != null && javaElement.getElementType() == IJavaElement.COMPILATION_UNIT && javaElement.exists()) {
                   ICompilationUnit icu = (ICompilationUnit) javaElement;
                   collector.add(icu);
                 }

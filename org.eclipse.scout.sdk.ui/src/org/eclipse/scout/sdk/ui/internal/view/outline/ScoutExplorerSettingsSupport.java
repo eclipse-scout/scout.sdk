@@ -338,8 +338,8 @@ public final class ScoutExplorerSettingsSupport {
     }
 
     // others working set
-    IScoutBundle[] unAssignedBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getNotInListFilter(bundlesThatBelongToASet));
-    IWorkingSet others = new WorkingSet(OTHER_PROJECTS_WORKING_SET_NAME, OTHER_PROJECTS_WORKING_SET_NAME, unAssignedBundles);
+    Set<IScoutBundle> unAssignedBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getNotInListFilter(bundlesThatBelongToASet));
+    IWorkingSet others = new WorkingSet(OTHER_PROJECTS_WORKING_SET_NAME, OTHER_PROJECTS_WORKING_SET_NAME, unAssignedBundles.toArray(new IScoutBundle[unAssignedBundles.size()]));
     others.setId(SCOUT_WOKRING_SET_ID);
     others = filterWorkingSet(others, includeHidden);
     if (others != null) {

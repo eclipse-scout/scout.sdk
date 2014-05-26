@@ -39,7 +39,7 @@ public class LookupCallNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     new BeanPropertyTablePage(this, getType());
   }
 

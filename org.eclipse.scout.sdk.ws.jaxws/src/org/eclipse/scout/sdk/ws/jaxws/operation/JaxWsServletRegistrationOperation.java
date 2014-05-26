@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ws.jaxws.operation;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -133,7 +134,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     // update sun-jaxws entries
     try {
       // iterate through all dependent bundles to find JAX-WS dependent bundles
-      IScoutBundle[] candidateBundles = m_registrationBundle.getParentBundles(new IScoutBundleFilter() {
+      Set<IScoutBundle> candidateBundles = m_registrationBundle.getParentBundles(new IScoutBundleFilter() {
         @Override
         public boolean accept(IScoutBundle bundle) {
           return IScoutBundle.TYPE_SERVER.equals(bundle.getType()) && TypeUtility.isOnClasspath(TypeUtility.getType(JaxWsRuntimeClasses.JaxWsActivator), bundle.getJavaProject()); // ensure JAX-WS installed on bundle

@@ -68,7 +68,7 @@ public class ToolButtonTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iToolButton = TypeUtility.getType(IRuntimeClasses.IToolButton);
 
     if (m_toolButtonChangedListener == null) {

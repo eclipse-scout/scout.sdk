@@ -10,15 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.simple.model.ws.nlsfile;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
 import org.eclipse.core.resources.IResourceDelta;
-import org.eclipse.core.resources.IResourceDeltaVisitor;
+import org.eclipse.core.resources.IResourceProxy;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
+import org.eclipse.scout.sdk.util.resources.IResourceFilter;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.resources.WeakResourceChangeListener;
 
 public class WorkspaceNlsFile extends AbstractNlsFile {
@@ -45,21 +49,19 @@ public class WorkspaceNlsFile extends AbstractNlsFile {
   private class P_NlsFileChangeListener implements IResourceChangeListener {
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
-      IResourceDelta delta = event.getDelta();
       try {
-        if (delta != null) {
-          delta.accept(new IResourceDeltaVisitor() {
-            @Override
-            public boolean visit(IResourceDelta d) {
-              IResource resource = d.getResource();
-              if (resource != null && resource.equals(m_file)) {
-                if (m_file.exists()) {
-                  parseInput(m_file);
-                }
-              }
-              return true;
-            }
-          });
+        // check if our file is part of the delta
+        IResourceDelta delta = event.getDelta();
+        List<IResource> matches = ResourceUtility.getAllResources(delta, new IResourceFilter() {
+          @Override
+          public boolean accept(IResourceProxy resource) {
+            return m_file.equals(resource.requestResource());
+          }
+        });
+
+        if (!matches.isEmpty()) {
+          // it is part of the delta: parse again
+          parseInput(m_file);
         }
       }
       catch (CoreException e) {

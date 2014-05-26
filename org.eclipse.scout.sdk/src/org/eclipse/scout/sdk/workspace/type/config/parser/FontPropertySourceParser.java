@@ -14,8 +14,8 @@ import java.util.StringTokenizer;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.scout.sdk.workspace.type.config.property.FontSpec;
 import org.eclipse.swt.SWT;
@@ -23,7 +23,7 @@ import org.eclipse.swt.SWT;
 /**
  * <h3>{@link FontPropertySourceParser}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 12.03.2013
  */
 public class FontPropertySourceParser implements IPropertySourceParser<FontSpec> {

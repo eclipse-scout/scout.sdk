@@ -31,6 +31,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -412,7 +413,7 @@ public class FormatPreservingProperties implements Serializable {
       }
       else if (keySet.size() == 1) {
         // a single key-value-pair was found
-        return (String) keySet.iterator().next();
+        return (String) CollectionUtility.firstElement(keySet);
       }
       else {
         throw new IllegalArgumentException("Invalid properties file format");

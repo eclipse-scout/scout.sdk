@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -36,7 +36,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSuppo
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.dto.formdata.ScoutBundlesUpdateFormDataOperation;
@@ -107,7 +107,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
     else if (menu instanceof FormDataSqlBindingValidateAction) {
       ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           return resolveServices();
         }
       });
@@ -124,25 +124,25 @@ public class BundleNodeGroupTablePage extends AbstractPage {
     else if (menu instanceof TypeResolverPageDataAction) {
       ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
-          IPrimaryTypeTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
-          ArrayList<IScoutBundle> bundles = new ArrayList<IScoutBundle>();
+          ICachedTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
+          Set<IScoutBundle> bundles = new HashSet<IScoutBundle>();
           collectBundlesRec(m_group, bundles);
-          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(bundles.toArray(new IScoutBundle[bundles.size()])));
+          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(bundles));
         }
       }, getScoutBundle());
     }
     else if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      ArrayList<IScoutBundle> bundles = new ArrayList<IScoutBundle>();
+      Set<IScoutBundle> bundles = new HashSet<IScoutBundle>();
       collectBundlesRec(m_group, bundles);
-      action.setOperation(new WellformClientBundleOperation(bundles.toArray(new IScoutBundle[bundles.size()])));
+      action.setOperation(new WellformClientBundleOperation(bundles));
       action.init(getScoutBundle());
     }
   }
 
-  private void collectBundlesRec(ScoutBundleNodeGroup group, List<IScoutBundle> collector) {
+  private void collectBundlesRec(ScoutBundleNodeGroup group, Set<IScoutBundle> collector) {
     for (ScoutBundleNode b : m_group.getChildBundles()) {
       collector.add(b.getScoutBundle());
     }
@@ -151,17 +151,15 @@ public class BundleNodeGroupTablePage extends AbstractPage {
     }
   }
 
-  protected IType[] resolveServices() {
+  protected Set<IType> resolveServices() {
     IType iService = TypeUtility.getType(IRuntimeClasses.IService);
-    IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
-    IScoutBundle[] serverBundles = getScoutBundle().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
-
-    IType[] services = serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(serverBundles));
-    return services;
+    ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
+    Set<IScoutBundle> serverBundles = getScoutBundle().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
+    return serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(serverBundles));
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     for (ScoutBundleNode b : m_group.getChildBundles()) {
       b.createBundlePage(this);
     }

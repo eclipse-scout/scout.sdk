@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -66,14 +68,14 @@ public class WizardTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iWizard = TypeUtility.getType(IRuntimeClasses.IWizard);
 
     if (m_wizardHierarchy == null) {
       m_wizardHierarchy = TypeUtility.getPrimaryTypeHierarchy(iWizard);
       m_wizardHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    Set<IType> searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType searchForm : searchForms) {
       new WizardNodePage(this, searchForm);
     }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -21,6 +22,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.table.SmartTableColumnNewOperation;
@@ -43,10 +45,9 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -152,23 +153,17 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       protected Object[][] computeProposals() {
         IType iCodeType = TypeUtility.getType(IRuntimeClasses.ICodeType);
-
-        ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
-        ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getSharedBundle().getJavaProject()), TypeFilters.getClassFilter(),
-            TypeFilters.getTypeParamSubTypeFilter(getGenericSignature(), IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
-        IType[] classes = typeHierarchy.getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator());
-        return new Object[][]{classes};
+        Set<IType> codeTypes = TypeUtility.getClassesOnClasspath(iCodeType, getSharedBundle().getJavaProject(), TypeFilters.getTypeParamSubTypeFilter(getGenericSignature(), IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
+        return new Object[][]{codeTypes.toArray(new IType[codeTypes.size()])};
       }
     };
     final AbstractJavaElementContentProvider lookupCallContentProvider = new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
         IType iLookupCall = TypeUtility.getType(IRuntimeClasses.ILookupCall);
-        ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupCall);
-        ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(getSharedBundle().getJavaProject()),
-            TypeFilters.getTypeParamSubTypeFilter(getGenericSignature(), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
-        IType[] classes = typeHierarchy.getAllSubtypes(iLookupCall, filter, TypeComparators.getTypeNameComparator());
-        return new Object[][]{classes};
+        ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(getGenericSignature(), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
+        Set<IType> lookupCalls = TypeUtility.getClassesOnClasspath(iLookupCall, getSharedBundle().getJavaProject(), filter);
+        return new Object[][]{lookupCalls.toArray(new IType[lookupCalls.size()])};
       }
     };
 
@@ -360,7 +355,8 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericType(IType t, String genericDefiningType, String paramName) {
     if (TypeUtility.exists(t)) {
       try {
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, t.newSupertypeHierarchy(null), genericDefiningType, paramName);
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(t);
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, superHierarchy, genericDefiningType, paramName);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }

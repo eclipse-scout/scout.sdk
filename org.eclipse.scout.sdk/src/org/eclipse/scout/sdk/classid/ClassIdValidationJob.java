@@ -67,20 +67,21 @@ public final class ClassIdValidationJob extends JobEx {
   public static final String CLASS_ID_ATTR_ANNOTATION = "SCOUT_CLASS_ID_ATTR_ANNOTATION";
 
   private static IJavaResourceChangedListener listener;
+  private final IType m_classIdType;
 
-  private ClassIdValidationJob() {
+  private ClassIdValidationJob(IType classIdType) {
     super(ClassIdValidationJob.class.getName());
     setSystem(true);
     setUser(false);
     setRule(new P_SchedulingRule());
+    m_classIdType = classIdType;
   }
 
   private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(IProgressMonitor monitor) {
-    SearchEngine e = new SearchEngine();
-    IType classId = TypeUtility.getType(IRuntimeClasses.ClassId);
     final HashSet<IAnnotation> result = new HashSet<IAnnotation>();
     try {
-      e.search(SearchPattern.createPattern(classId, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH),
+      SearchEngine e = new SearchEngine();
+      e.search(SearchPattern.createPattern(m_classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH),
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
           SearchEngine.createWorkspaceScope(), new SearchRequestor() {
             @Override
@@ -243,8 +244,13 @@ public final class ClassIdValidationJob extends JobEx {
   }
 
   public static synchronized void execute(long startDelay) {
-    Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
-    new ClassIdValidationJob().schedule(startDelay);
+    // get the class id type outside of the job
+    // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
+    IType classId = TypeUtility.getType(IRuntimeClasses.ClassId);
+    if (TypeUtility.exists(classId)) {
+      Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
+      new ClassIdValidationJob(classId).schedule(startDelay);
+    }
   }
 
   private static final class P_SchedulingRule implements ISchedulingRule {

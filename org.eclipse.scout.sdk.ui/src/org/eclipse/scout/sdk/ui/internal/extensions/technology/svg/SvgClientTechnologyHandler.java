@@ -17,12 +17,10 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.TriState;
-import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 import org.eclipse.scout.sdk.ui.extensions.technology.AbstractScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyResource;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -83,18 +81,13 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
   }
 
   @Override
-  public void postSelectionChanged(boolean selected, IProgressMonitor monitor) throws CoreException {
-    TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.IFormField)).invalidate();
-  }
-
-  @Override
   public boolean isActive(IScoutBundle project) {
     return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false) != null;
   }
 
   @Override
   public TriState getSelection(IScoutBundle project) {
-    IScoutBundle[] clientBundlesBelow = getClientBundlesBelow(project);
+    Set<IScoutBundle> clientBundlesBelow = getClientBundlesBelow(project);
     TriState t1 = getSelectionManifests(clientBundlesBelow, ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME);
     TriState t2 = getSelectionManifestsImportPackage(clientBundlesBelow, ScoutProjectAddOperation.W3C_DOM_SVG_PACKAGE);
     if (t1.equals(t2)) {
@@ -110,7 +103,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
     contributeManifestFiles(getClientBundlesBelow(project), list);
   }
 
-  private IScoutBundle[] getClientBundlesBelow(IScoutBundle start) {
+  private Set<IScoutBundle> getClientBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true);
   }
 }

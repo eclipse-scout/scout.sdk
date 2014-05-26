@@ -39,7 +39,7 @@ public class PermissionNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     // XXX addChild(new PermissionLevelTablePage()); //better solved in attributes view
   }
 

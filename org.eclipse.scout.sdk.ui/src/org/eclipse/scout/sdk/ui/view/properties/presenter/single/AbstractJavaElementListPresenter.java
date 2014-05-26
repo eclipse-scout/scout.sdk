@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.view.properties.presenter.single;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
@@ -42,7 +43,7 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
 
   private TableViewer m_viewer;
   private Table m_table;
-  private IJavaElement[] m_sourceElements;
+  private List<? extends IJavaElement> m_sourceElements;
   private JavaElementTableContentProvider m_tableModel;
   private Button m_removeButton;
   private Button m_addButton;
@@ -121,7 +122,12 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
   protected void init(ConfigurationMethod method) throws CoreException {
     super.init(method);
     m_sourceElements = readSource();
-    m_tableModel.setElements(m_sourceElements);
+    if (m_sourceElements == null) {
+      m_tableModel.setElements(null);
+    }
+    else {
+      m_tableModel.setElements(m_sourceElements.toArray(new IJavaElement[m_sourceElements.size()]));
+    }
     m_viewer.refresh();
     m_removeButton.setEnabled(!m_viewer.getSelection().isEmpty());
     m_addButton.setEnabled(true);
@@ -169,22 +175,22 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
 
   private void handleRemoveComponent() {
     IJavaElement toRemove = (IJavaElement) ((StructuredSelection) m_viewer.getSelection()).getFirstElement();
-    ArrayList<IJavaElement> props = new ArrayList<IJavaElement>();
+    List<IJavaElement> props = new ArrayList<IJavaElement>();
     for (IJavaElement prop : getSourceProps()) {
       if (!prop.equals(toRemove)) {
         props.add(prop);
       }
     }
-    store(props.toArray(new IJavaElement[props.size()]));
+    store(props);
   }
 
   protected abstract void handleAddComponent();
 
-  public abstract IJavaElement[] readSource() throws CoreException;
+  public abstract List<? extends IJavaElement> readSource() throws CoreException;
 
-  public abstract void store(IJavaElement[] proposals);
+  public abstract void store(List<? extends IJavaElement> proposals);
 
-  public IJavaElement[] getSourceProps() {
+  public List<? extends IJavaElement> getSourceProps() {
     return m_sourceElements;
   }
 

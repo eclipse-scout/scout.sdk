@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.beanproperty;
 
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Pattern;
 
@@ -64,7 +65,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
 
   private final IJavaSearchScope m_searchScope;
   private final IType m_declaringType;
-  private IType[] m_allValueFields;
+  private List<IType> m_allValueFields;
 
   public BeanPropertyNewWizardPage(IJavaSearchScope searchScope, IType declaringType) {
     super(BeanPropertyNewWizardPage.class.getName());
@@ -145,7 +146,7 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     }
 
-    if (TypeUtility.getMethods(m_declaringType, MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is)" + name))).length > 0) {
+    if (TypeUtility.getMethods(m_declaringType, MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is)" + name))).size() > 0) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
 

@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformSharedBundleOperation;
@@ -42,15 +45,15 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     super.loadChildrenImpl();
 
     if (getScoutBundle().getIconProvider() != null) {
       IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
       ICachedTypeHierarchy iconHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
-      IType[] iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), null);
-      if (iconTypes.length > 0) {
-        new IconNodePage(this, iconTypes[0]);
+      Set<IType> iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), null);
+      if (iconTypes.size() > 0) {
+        new IconNodePage(this, CollectionUtility.firstElement(iconTypes));
       }
     }
 

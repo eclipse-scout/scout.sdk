@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.action.delete;
 
 import java.security.Permission;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -28,6 +27,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.dialogs.IMessageProvider;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -40,9 +40,9 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -59,12 +59,13 @@ public class FormDeleteAction extends AbstractScoutHandler {
 
   private IType m_formType;
   private IType m_formData;
-  private IType m_processServiceInterface;
-  private IType m_processServiceImplementation;
+  private Set<IType> m_processServiceInterface;
+  private Set<IType> m_processServiceImplementation;
   private MemberSelectionDialog m_confirmDialog;
 
   public FormDeleteAction() {
     super(Texts.get("DeleteForm"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormRemove), "Delete", false, Category.DELETE);
+    m_processServiceImplementation = new HashSet<IType>();
   }
 
   @Override
@@ -76,20 +77,22 @@ public class FormDeleteAction extends AbstractScoutHandler {
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     m_confirmDialog = new MemberSelectionDialog(shell, Texts.get("Action_deleteTypeX", getFormType().getElementName()));
     m_confirmDialog.addMemberSelectionListener(new P_SelectionValidationListener());
+
     List<IMember> members = new ArrayList<IMember>();
     List<IMember> selectedMembers = new ArrayList<IMember>();
     collectAffectedMembers(members, selectedMembers);
     m_confirmDialog.setMembers(members.toArray(new IMember[members.size()]));
     m_confirmDialog.setSelectedMembers(selectedMembers.toArray(new IMember[selectedMembers.size()]));
+
     if (m_confirmDialog.open() == Dialog.OK) {
       JavaElementDeleteOperation op = new JavaElementDeleteOperation() {
         @Override
         protected void deleteMember(IJavaElement member, Set<ICompilationUnit> icuForOrganizeImports, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-          if (m_processServiceInterface != null && member.equals(m_processServiceInterface)) {
-            ScoutUtility.unregisterServiceProxy(m_processServiceInterface);
+          if (m_processServiceInterface.contains(member)) {
+            ScoutUtility.unregisterServiceProxy((IType) member);
           }
-          if (m_processServiceImplementation != null && member.equals(m_processServiceImplementation)) {
-            ScoutUtility.unregisterServiceImplementation(m_processServiceImplementation);
+          if (m_processServiceImplementation.contains(member)) {
+            ScoutUtility.unregisterServiceImplementation((IType) member);
           }
           super.deleteMember(member, icuForOrganizeImports, monitor, manager);
         }
@@ -103,8 +106,10 @@ public class FormDeleteAction extends AbstractScoutHandler {
   }
 
   protected void collectAffectedMembers(List<IMember> members, List<IMember> selectedMembers) {
+    // form
     members.add(m_formType);
     selectedMembers.add(m_formType);
+
     // form data
     if (m_formData == null) {
       try {
@@ -118,47 +123,29 @@ public class FormDeleteAction extends AbstractScoutHandler {
       members.add(m_formData);
       selectedMembers.add(m_formData);
     }
-    // find process service
-    String formName = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "$1");
-    IType iService = TypeUtility.getType(IRuntimeClasses.IService);
-    ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
-    if (m_processServiceInterface == null) {
-      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getFormType().getJavaProject()), TypeFilters.getInterfaceFilter());
-      for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
-        if (candidate.getElementName().matches("I" + formName + "(Process)?" + SdkProperties.SUFFIX_SERVICE)) {
-          m_processServiceInterface = candidate;
-          break;
-        }
-      }
-    }
 
-    if (m_processServiceInterface != null && m_processServiceImplementation == null) {
-      IScoutBundle sharedBundle = ScoutTypeUtility.getScoutBundle(m_processServiceInterface);
-      IScoutBundle[] visibleServers = sharedBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false);
+    // find process service interfaces
+    final String formName = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "$1");
+    IType iService = TypeUtility.getType(IRuntimeClasses.IService);
+    m_processServiceInterface = TypeUtility.getInterfacesOnClasspath(iService, getFormType().getJavaProject(),
+        TypeFilters.getRegexSimpleNameFilter("I" + formName + "(Process)?" + SdkProperties.SUFFIX_SERVICE, 0));
+    members.addAll(m_processServiceInterface);
+
+    // process service implementations
+    for (IType serviceInterface : m_processServiceInterface) {
+      IScoutBundle sharedBundle = ScoutTypeUtility.getScoutBundle(serviceInterface);
+      Set<IScoutBundle> visibleServers = sharedBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false);
       ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutBundles(visibleServers), TypeFilters.getClassFilter());
-      for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
-        if (candidate.getElementName().matches(formName + "(Process)?" + SdkProperties.SUFFIX_SERVICE)) {
-          m_processServiceImplementation = candidate;
-          break;
-        }
-      }
+      Set<IType> implementations = TypeUtility.getPrimaryTypeHierarchy(serviceInterface).getAllSubtypes(serviceInterface, serviceFilter, TypeComparators.getTypeNameComparator());
+      m_processServiceImplementation.addAll(implementations);
     }
-    if (m_processServiceInterface != null) {
-      members.add(m_processServiceInterface);
-    }
-    if (m_processServiceImplementation != null) {
-      members.add(m_processServiceImplementation);
-    }
+    members.addAll(m_processServiceImplementation);
+
     // find Permissions
     String permissionRegex = getFormType().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_FORM + "$", "(Create|Read|Update)$1" + SdkProperties.SUFFIX_PERMISSION);
     IType permission = TypeUtility.getType(Permission.class.getName());
-    ICachedTypeHierarchy permissionHierarchy = TypeUtility.getPrimaryTypeHierarchy(permission);
-    ITypeFilter permissionFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getFormType().getJavaProject()), TypeFilters.getClassFilter());
-    for (IType candidate : permissionHierarchy.getAllSubtypes(permission, permissionFilter, null)) {
-      if (candidate.getElementName().matches(permissionRegex)) {
-        members.add(candidate);
-      }
-    }
+    Set<IType> permissions = TypeUtility.getClassesOnClasspath(permission, getFormType().getJavaProject(), TypeFilters.getRegexSimpleNameFilter(permissionRegex, 0));
+    members.addAll(permissions);
   }
 
   public IType getFormType() {
@@ -178,11 +165,7 @@ public class FormDeleteAction extends AbstractScoutHandler {
         canOk = false;
       }
       else {
-        HashSet<IMember> members = new HashSet<IMember>(Arrays.asList(selection));
-        if (m_processServiceImplementation != null && m_processServiceInterface != null && (members.contains(m_processServiceInterface) != members.contains(m_processServiceImplementation))) {
-          m_confirmDialog.setMessage(Texts.get("ProcessServiceSelection"), IMessageProvider.ERROR);
-          canOk = false;
-        }
+        Set<IMember> members = CollectionUtility.hashSet(selection);
         if (m_formType != null && m_formData != null && (members.contains(m_formType) != members.contains(m_formData))) {
           m_confirmDialog.setMessage(Texts.get("FormDataDeleteWithForm", m_formData.getElementName()), IMessageProvider.WARNING);
         }

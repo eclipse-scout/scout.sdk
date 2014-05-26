@@ -11,13 +11,13 @@
 package org.eclipse.scout.sdk.operation.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -30,7 +30,7 @@ public class ResourceDeleteOperation implements IOperation {
   }
 
   public void setMembers(IResource[] resources) {
-    m_resourcesToDelete = new ArrayList<IResource>(Arrays.asList(resources));
+    m_resourcesToDelete = CollectionUtility.arrayList(resources);
   }
 
   public void addResource(IResource resource) {

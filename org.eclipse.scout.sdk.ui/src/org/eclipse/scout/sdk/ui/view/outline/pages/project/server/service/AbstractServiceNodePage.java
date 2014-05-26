@@ -10,13 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service;
 
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
@@ -61,7 +64,7 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     if (m_interfaceType == null) {
       return;
     }
@@ -69,7 +72,7 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
       m_serviceMethodListener = new P_ServiceMethodsListener();
       ScoutSdkCore.getJavaResourceChangedEmitter().addMethodChangedListener(getType(), m_serviceMethodListener);
     }
-    IMethod[] serviceMethods = TypeUtility.getMethods(getType(), MethodFilters.getFlagsFilter(Flags.AccPublic), MethodComparators.getNameComparator());
+    Set<IMethod> serviceMethods = TypeUtility.getMethods(getType(), MethodFilters.getFlagsFilter(Flags.AccPublic), MethodComparators.getNameComparator());
 
     try {
       TreeMap<String, IMethod> interfaceMethodsMap = new TreeMap<String, IMethod>();
@@ -106,7 +109,12 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
       sra.setOldName(getType().getElementName());
     }
     else if (menu instanceof FormDataSqlBindingValidateAction) {
-      ((FormDataSqlBindingValidateAction) menu).setServices(getType());
+      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
+        @Override
+        public Set<IType> getTypes() {
+          return CollectionUtility.hashSet(getType());
+        }
+      });
     }
     else if (menu instanceof ServiceOperationNewAction) {
       ((ServiceOperationNewAction) menu).init(getInterfaceType(), getType());

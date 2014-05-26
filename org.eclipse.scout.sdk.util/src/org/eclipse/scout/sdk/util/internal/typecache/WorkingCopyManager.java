@@ -30,12 +30,11 @@ import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>WorkingCopyManager</h3> ...
+ * <h3>WorkingCopyManager</h3>
  */
 @SuppressWarnings("restriction")
 public class WorkingCopyManager implements IWorkingCopyManager {
 
-  private final Object LOCK = new Object();
   private List<ICompilationUnit> m_workingCopies = new ArrayList<ICompilationUnit>();
 
   public WorkingCopyManager() {
@@ -46,7 +45,7 @@ public class WorkingCopyManager implements IWorkingCopyManager {
     if (icu.isReadOnly()) {
       throw new IllegalArgumentException("try to get a working copy of the read only icu '" + icu.getElementName() + "'.");
     }
-    synchronized (LOCK) {
+    synchronized (this) {
       if (!m_workingCopies.contains(icu)) {
         icu.becomeWorkingCopy(monitor);
         m_workingCopies.add(icu);
@@ -57,21 +56,17 @@ public class WorkingCopyManager implements IWorkingCopyManager {
   }
 
   @Override
-  public void unregisterAll(IProgressMonitor monitor) {
-    synchronized (LOCK) {
-      for (Iterator<ICompilationUnit> it = m_workingCopies.iterator(); it.hasNext();) {
-        releaseCompilationUnit(it.next(), monitor);
-      }
-      m_workingCopies.clear();
+  public synchronized void unregisterAll(IProgressMonitor monitor) {
+    for (Iterator<ICompilationUnit> it = m_workingCopies.iterator(); it.hasNext();) {
+      releaseCompilationUnit(it.next(), monitor);
     }
+    m_workingCopies.clear();
   }
 
   @Override
-  public void unregister(ICompilationUnit icu, IProgressMonitor monitor) {
-    synchronized (LOCK) {
-      if (m_workingCopies.remove(icu)) {
-        releaseCompilationUnit(icu, monitor);
-      }
+  public synchronized void unregister(ICompilationUnit icu, IProgressMonitor monitor) {
+    if (m_workingCopies.remove(icu)) {
+      releaseCompilationUnit(icu, monitor);
     }
   }
 
@@ -109,12 +104,10 @@ public class WorkingCopyManager implements IWorkingCopyManager {
   }
 
   @Override
-  public void reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException {
-    synchronized (LOCK) {
-      if (!m_workingCopies.contains(icu)) {
-        throw new CoreException(new ScoutStatus("compilation unit " + icu.getElementName() + " has not been registered"));
-      }
-      icu.reconcile(ICompilationUnit.NO_AST, true, icu.getOwner(), monitor);
+  public synchronized void reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException {
+    if (!m_workingCopies.contains(icu)) {
+      throw new CoreException(new ScoutStatus("compilation unit " + icu.getElementName() + " has not been registered"));
     }
+    icu.reconcile(ICompilationUnit.NO_AST, true, icu.getOwner(), monitor);
   }
 }

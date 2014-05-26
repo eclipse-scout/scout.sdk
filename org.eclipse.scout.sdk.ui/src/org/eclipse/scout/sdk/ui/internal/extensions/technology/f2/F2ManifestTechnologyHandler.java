@@ -41,7 +41,7 @@ public class F2ManifestTechnologyHandler extends AbstractScoutTechnologyHandler 
     contributeManifestFiles(getUiBundlesBelow(project), list);
   }
 
-  private IScoutBundle[] getUiBundlesBelow(IScoutBundle start) {
+  private Set<IScoutBundle> getUiBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), true);
   }
 

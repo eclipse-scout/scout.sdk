@@ -61,7 +61,7 @@ public class ColumnTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       IType iColumn = TypeUtility.getType(IRuntimeClasses.IColumn);
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iColumn);

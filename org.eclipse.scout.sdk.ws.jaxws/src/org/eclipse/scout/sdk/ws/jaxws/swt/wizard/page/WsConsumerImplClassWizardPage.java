@@ -18,7 +18,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -35,6 +34,7 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -341,7 +341,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
       String fqn = StringUtility.join(".", packageName, className);
       if (TypeUtility.existsType(fqn)) {
         IType type = TypeUtility.getType(fqn);
-        if (!type.newSupertypeHierarchy(new NullProgressMonitor()).contains(interfaceType)) {
+        if (!ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type).contains(interfaceType)) {
           type.getJavadocRange().getOffset();
           type.getJavadocRange().getLength();
           multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustBeOfTheTypeY", label, interfaceType.getFullyQualifiedName())));
@@ -446,7 +446,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
       if (TypeUtility.existsType(authenticationHandler)) {
         IType type = TypeUtility.getType(authenticationHandler);
         try {
-          if (type.newSupertypeHierarchy(new NullProgressMonitor()).contains(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer))) {
+          if (ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer))) {
             m_tooltipAuthenticationFactory.setMember(type);
           }
         }

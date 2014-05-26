@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
+import java.util.List;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
@@ -47,7 +49,7 @@ public class ProductLaunchPropertyPart extends AbstractSinglePageSectionBasedVie
     IScoutBundle bundle = getPage().getScoutBundle();
     if (bundle != null && !bundle.isBinary()) {
       try {
-        IResource[] productFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(false, bundle.getSymbolicName()));
+        List<IResource> productFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(false, bundle.getSymbolicName()));
         for (IResource productFile : productFiles) {
           ProductLaunchPresenter p = new ProductLaunchPresenter(getFormToolkit(), parent, (IFile) productFile);
           GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);

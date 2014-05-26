@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -18,6 +19,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -67,7 +69,7 @@ public class MasterFieldPresenter extends AbstractTypeProposalPresenter {
    */
   private class P_ContentProvider extends ContentProposalProvider {
 
-    private IType[] m_proposals;
+    private Set<IType> m_proposals;
     private final ILabelProvider m_labelProvider;
 
     private P_ContentProvider(ILabelProvider labelProvider) {
@@ -84,7 +86,7 @@ public class MasterFieldPresenter extends AbstractTypeProposalPresenter {
         searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
       }
       char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
-      ArrayList<Object> collector = new ArrayList<Object>();
+      ArrayList<Object> collector = new ArrayList<Object>(m_proposals.size());
       for (Object proposal : m_proposals) {
         if (CharOperation.match(pattern, m_labelProvider.getText(proposal).toCharArray(), false)) {
           collector.add(proposal);
@@ -95,9 +97,7 @@ public class MasterFieldPresenter extends AbstractTypeProposalPresenter {
 
     @Override
     public void inputChanged(Viewer viewer, Object oldInput, Object newInput) {
-      if (m_proposals != null) {
-        m_proposals = null;
-      }
+      m_proposals = null;
     }
 
     private void ensureCache() {
@@ -106,7 +106,7 @@ public class MasterFieldPresenter extends AbstractTypeProposalPresenter {
           m_proposals = ScoutTypeUtility.getPotentialMasterFields(getMethod().getType());
         }
         else {
-          m_proposals = new IType[0];
+          m_proposals = CollectionUtility.hashSet();
         }
       }
     }

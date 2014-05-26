@@ -51,7 +51,7 @@ public class MySqlJdbcManifestTechnologyHandler extends AbstractScoutTechnologyH
     contributeManifestFiles(getServerBundlesBelow(project), list);
   }
 
-  private IScoutBundle[] getServerBundlesBelow(IScoutBundle start) {
+  private Set<IScoutBundle> getServerBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
   }
 }

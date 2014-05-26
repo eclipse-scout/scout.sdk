@@ -5,10 +5,12 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
@@ -154,9 +156,9 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
     }
     else if (page instanceof PageWithTableNodePage) {
       // it's a abstract page with table
-      IType[] tables = ScoutTypeUtility.getTables(((PageWithTableNodePage) page).getType());
-      if (tables.length > 0) {
-        m_type = tables[0];
+      Set<IType> tables = ScoutTypeUtility.getTables(((PageWithTableNodePage) page).getType());
+      if (tables.size() > 0) {
+        m_type = CollectionUtility.firstElement(tables);
       }
     }
     else {
@@ -164,9 +166,9 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
       if (page instanceof TableFieldNodePage) {
         // table field node page
-        IType[] tables = ScoutTypeUtility.getTables(((TableFieldNodePage) page).getType());
-        if (tables.length > 0) {
-          m_type = tables[0];
+        Set<IType> tables = ScoutTypeUtility.getTables(((TableFieldNodePage) page).getType());
+        if (tables.size() > 0) {
+          m_type = CollectionUtility.firstElement(tables);
         }
       }
       else if (page instanceof TableNodePage) {

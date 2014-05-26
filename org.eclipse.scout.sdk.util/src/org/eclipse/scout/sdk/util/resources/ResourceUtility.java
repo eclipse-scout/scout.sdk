@@ -57,7 +57,7 @@ import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 
 /**
- * <h3>{@link ResourceUtility}</h3> ...
+ * <h3>{@link ResourceUtility}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2012
@@ -70,47 +70,24 @@ public final class ResourceUtility {
   private ResourceUtility() {
   }
 
-  public static IResource[] getAllResources(IResourceFilter filter) throws CoreException {
+  public static List<IResource> getAllResources(IResourceFilter filter) throws CoreException {
     return getAllResources(ResourcesPlugin.getWorkspace().getRoot(), filter);
   }
 
-  public static IResource[] getAllResources(IResource startResource, final IResourceFilter filter) throws CoreException {
-    final List<IResource> collector = new LinkedList<IResource>();
-    startResource.accept(new IResourceProxyVisitor() {
-      @Override
-      public boolean visit(IResourceProxy proxy) throws CoreException {
-        if (proxy.isAccessible()) {
-          if (filter == null || filter.accept(proxy)) {
-            collector.add(proxy.requestResource());
-          }
-          return true;
-        }
-        return false;
-      }
-    }, IResource.NONE);
-
-    return collector.toArray(new IResource[collector.size()]);
+  public static List<IResource> getAllResources(IResource startResource, final IResourceFilter filter) throws CoreException {
+    P_ResourceTreeVisitor visitor = new P_ResourceTreeVisitor(filter);
+    if (startResource != null) {
+      startResource.accept(visitor, IResource.NONE);
+    }
+    return visitor.getResult();
   }
 
   public static List<IResource> getAllResources(IResourceDelta d, final IResourceFilter filter) throws CoreException {
-    final List<IResource> result = new LinkedList<IResource>();
-    if (d == null) {
-      return result;
+    P_ResourceTreeVisitor visitor = new P_ResourceTreeVisitor(filter);
+    if (d != null) {
+      d.accept(visitor, IResource.NONE);
     }
-
-    d.accept(new IResourceDeltaVisitor() {
-      @Override
-      public boolean visit(IResourceDelta delta) throws CoreException {
-        IResource resource = delta.getResource();
-        if (resource.isAccessible()) {
-          if (filter == null || filter.accept(new ResourceProxy(resource))) {
-            result.add(resource);
-          }
-        }
-        return true;
-      }
-    });
-    return result;
+    return visitor.getResult();
   }
 
   /**
@@ -488,5 +465,40 @@ public final class ResourceUtility {
       to.write(b, 0, len);
     }
     to.flush();
+  }
+
+  private static final class P_ResourceTreeVisitor implements IResourceProxyVisitor, IResourceDeltaVisitor {
+
+    private final IResourceFilter m_filter;
+    private final List<IResource> m_collector;
+
+    private P_ResourceTreeVisitor(IResourceFilter filter) {
+      m_filter = filter;
+      m_collector = new LinkedList<IResource>();
+    }
+
+    private List<IResource> getResult() {
+      return m_collector;
+    }
+
+    @Override
+    public boolean visit(IResourceProxy proxy) throws CoreException {
+      if (proxy.isAccessible()) {
+        if (m_filter == null || m_filter.accept(proxy)) {
+          m_collector.add(proxy.requestResource());
+        }
+        return true;
+      }
+      return false;
+    }
+
+    @Override
+    public boolean visit(IResourceDelta delta) throws CoreException {
+      IResource resource = delta.getResource();
+      if (resource.isAccessible()) {
+        return visit(new ResourceProxy(resource));
+      }
+      return false;
+    }
   }
 }

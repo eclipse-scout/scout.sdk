@@ -12,8 +12,10 @@ package org.eclipse.scout.sdk.helper;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
@@ -86,9 +88,9 @@ public final class ScoutProjectHelper {
     bundleGraph.waitFor();
     JdtUtility.waitForIndexesReady();
 
-    IScoutBundle[] rootProjects = bundleGraph.getBundles(ScoutBundleFilters.getRootBundlesFilter());
-    Assert.assertEquals(1, rootProjects.length);
-    IScoutBundle scoutProject = rootProjects[0];
+    Set<IScoutBundle> rootProjects = bundleGraph.getBundles(ScoutBundleFilters.getRootBundlesFilter());
+    Assert.assertEquals(1, rootProjects.size());
+    IScoutBundle scoutProject = CollectionUtility.firstElement(rootProjects);
     return scoutProject;
   }
 }

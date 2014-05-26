@@ -27,16 +27,16 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
@@ -117,7 +117,7 @@ public final class MarkerRebuildUtility {
       // validate port type interface types
       Set<IType> interfacePortTypes = new HashSet<IType>();
 
-      ITypeHierarchy hierarchy = portType.newSupertypeHierarchy(new NullProgressMonitor());
+      ITypeHierarchy hierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(portType);
 
       for (IType superInterface : hierarchy.getAllSuperInterfaces(portType)) {
         IAnnotation annotation = JaxWsSdkUtility.getAnnotation(superInterface, WebService.class.getName(), false);

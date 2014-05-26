@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -128,25 +129,18 @@ public class FormPropertyPart extends JdtTypePropertyPart {
           }
 
           IScoutBundle client = getPage().getScoutBundle();
-          IScoutBundle[] shareds = client.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
-          IScoutBundle[] serversAndShareds = null;
-          if (shareds != null) {
-            HashSet<IScoutBundle> serversAndSharedsSet = new HashSet<IScoutBundle>();
-            for (IScoutBundle shared : shareds) {
-              serversAndSharedsSet.add(shared);
-              for (IScoutBundle server : shared.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false)) {
-                serversAndSharedsSet.add(server);
-              }
+          Set<IScoutBundle> shareds = client.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+          HashSet<IScoutBundle> serversAndSharedsSet = new HashSet<IScoutBundle>();
+          for (IScoutBundle shared : shareds) {
+            serversAndSharedsSet.add(shared);
+            for (IScoutBundle server : shared.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false)) {
+              serversAndSharedsSet.add(server);
             }
-            serversAndShareds = serversAndSharedsSet.toArray(new IScoutBundle[serversAndSharedsSet.size()]);
           }
 
           // service
           String formRegex = "(I)?" + entityName + "(Process)?" + SdkProperties.SUFFIX_SERVICE;
-          ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
-              TypeFilters.getRegexSimpleNameFilter(formRegex),
-              ScoutTypeFilters.getInScoutBundles(serversAndShareds)
-              );
+          ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getRegexSimpleNameFilter(formRegex), ScoutTypeFilters.getInScoutBundles(serversAndSharedsSet));
           LinkGroup serviceGroup = model.getOrCreateGroup(Texts.get("Service"), 10);
           for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(iService).getAllSubtypes(iService, formFilter, TypeComparators.getTypeNameComparator())) {
             serviceGroup.addLink(new TypeOpenLink(candidate));

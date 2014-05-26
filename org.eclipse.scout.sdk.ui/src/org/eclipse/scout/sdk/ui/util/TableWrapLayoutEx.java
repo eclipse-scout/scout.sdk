@@ -11,12 +11,12 @@
 package org.eclipse.scout.sdk.ui.util;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.Vector;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
@@ -857,7 +857,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
   }
 
   protected Control[] getOrderdVisibleChildren(Composite parent) {
-    ArrayList<Control> children = new ArrayList<Control>(Arrays.asList(parent.getChildren()));
+    ArrayList<Control> children = CollectionUtility.arrayList(parent.getChildren());
     for (Iterator<Control> it = children.iterator(); it.hasNext();) {
       Control c = it.next();
       Object layoutData = c.getLayoutData();

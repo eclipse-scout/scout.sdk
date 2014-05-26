@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type.config.parser;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.operation.outline.OutlineNewOperation;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -24,15 +26,15 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * @author Andreas Hoegger
  * @since 3.10.0 30.08.2013
  */
-public class OutlinesParser implements IPropertySourceParser<IType[]> {
+public class OutlinesParser implements IPropertySourceParser<List<IType>> {
 
   @Override
-  public String formatSourceValue(IType[] value, String lineDelimiter, IImportValidator importValidator) throws CoreException {
+  public String formatSourceValue(List<IType> value, String lineDelimiter, IImportValidator importValidator) throws CoreException {
     return OutlineNewOperation.getOutlinesMethodBody(value, importValidator, lineDelimiter);
   }
 
   @Override
-  public IType[] parseSourceValue(String source, IMethod context, ITypeHierarchy superTypeHierarchy) throws CoreException {
+  public List<IType> parseSourceValue(String source, IMethod context, ITypeHierarchy superTypeHierarchy) throws CoreException {
     return ScoutTypeUtility.getTypeOccurenceInMethod(context);
   }
 }

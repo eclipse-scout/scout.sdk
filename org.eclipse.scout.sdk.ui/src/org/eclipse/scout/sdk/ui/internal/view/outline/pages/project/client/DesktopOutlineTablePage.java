@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
+import java.util.List;
+
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
@@ -75,7 +77,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
 
     if (m_outlineTypeHierarchy == null) {
@@ -89,7 +91,7 @@ public class DesktopOutlineTablePage extends AbstractPage {
     try {
       IMethod outlinesMethod = TypeUtility.getMethod(getDesktopType(), OutlineNewOperation.GET_CONFIGURED_OUTLINES);
       if (outlinesMethod != null) {
-        IType[] outlineCandidates = ScoutTypeUtility.getTypeOccurenceInMethod(outlinesMethod);
+        List<IType> outlineCandidates = ScoutTypeUtility.getTypeOccurenceInMethod(outlinesMethod);
         for (IType candidate : outlineCandidates) {
           if (m_outlineTypeHierarchy.isSubtype(iOutline, candidate)) {
             new OutlineNodePage(this, candidate);

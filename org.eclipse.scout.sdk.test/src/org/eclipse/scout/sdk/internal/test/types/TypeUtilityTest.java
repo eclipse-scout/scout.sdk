@@ -14,10 +14,12 @@
 package org.eclipse.scout.sdk.internal.test.types;
 
 import java.io.File;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.PropertyBeanComparators;
@@ -35,7 +37,7 @@ import org.junit.Test;
 public class TypeUtilityTest extends AbstractScoutSdkTest {
 
   private IType m_type;
-  private IPropertyBean[] m_propertyBeans;
+  private Set<? extends IPropertyBean> m_propertyBeans;
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
@@ -177,6 +179,6 @@ public class TypeUtilityTest extends AbstractScoutSdkTest {
   @Test
   public void testMethodFinder() throws Exception {
     IType methodTestType = TypeUtility.getType("a.MethodTestType");
-    TypeUtility.getMethod(methodTestType, "setFile", new String[]{Signature.createTypeSignature(File.class.getName(), true)});
+    TypeUtility.getMethod(methodTestType, "setFile", CollectionUtility.arrayList(Signature.createTypeSignature(File.class.getName(), true)));
   }
 }

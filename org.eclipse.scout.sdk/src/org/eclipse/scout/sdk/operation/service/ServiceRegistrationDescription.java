@@ -11,9 +11,11 @@
 package org.eclipse.scout.sdk.operation.service;
 
 import java.security.InvalidParameterException;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -62,8 +64,8 @@ public class ServiceRegistrationDescription {
   }
 
   private static String calcDefaultSession(IJavaProject targetProj) {
-    IType[] sessionTypes = ScoutTypeUtility.getSessionTypes(targetProj);
-    if (sessionTypes != null && sessionTypes.length > 0) {
+    Set<IType> sessionTypes = ScoutTypeUtility.getSessionTypes(targetProj);
+    if (CollectionUtility.hasElements(sessionTypes)) {
       IScoutBundle scoutBundle = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(targetProj);
       if (scoutBundle != null) {
         IType ret = ScoutUtility.getNearestType(sessionTypes, scoutBundle);
@@ -71,7 +73,7 @@ public class ServiceRegistrationDescription {
           return ret.getFullyQualifiedName();
         }
       }
-      return sessionTypes[0].getFullyQualifiedName();
+      return CollectionUtility.firstElement(sessionTypes).getFullyQualifiedName();
     }
     return null;
   }

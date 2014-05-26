@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.types;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
@@ -24,7 +26,7 @@ import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -42,9 +44,9 @@ import org.junit.Test;
  */
 public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
 
-  private static String BUNDLE_NAME_CLIENT = "test.client";
-  private static String BUNDLE_NAME_SHARED = "test.shared";
-  private static String BUNDLE_NAME_SERVER = "test.server";
+  private static final String BUNDLE_NAME_CLIENT = "test.client";
+  private static final String BUNDLE_NAME_SHARED = "test.shared";
+  private static final String BUNDLE_NAME_SERVER = "test.server";
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
@@ -55,12 +57,11 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
   public void testPrimaryTypeHierarchy() {
     IType companyForm = SdkAssert.assertTypeExists("test.client.ui.forms.CompanyForm");
     IType iformField = TypeUtility.getType(RuntimeClasses.IFormField);
-    IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iformField);
-    ITypeHierarchy companyFormHierarchy = primaryFormFieldHierarchy.combinedTypeHierarchy(companyForm);
-    Assert.assertTrue(primaryFormFieldHierarchy.isCreated());
+    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(companyForm);
 
     IType mainBox = SdkAssert.assertTypeExists(companyForm, "MainBox");
-    IType[] formFields = TypeUtility.getInnerTypes(mainBox, TypeFilters.getSubtypeFilter(iformField, companyFormHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
+    Set<IType> ff = TypeUtility.getInnerTypes(mainBox, TypeFilters.getSubtypeFilter(iformField, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
+    IType[] formFields = ff.toArray(new IType[ff.size()]);
     Assert.assertTrue(formFields.length == 3);
     Assert.assertEquals(formFields[0].getElementName(), "NameField");
     Assert.assertEquals(formFields[1].getElementName(), "SinceField");
@@ -72,14 +73,14 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     final IJavaProject project = JavaCore.create(getProject(BUNDLE_NAME_CLIENT));
     final IScoutBundle sb = ScoutTypeUtility.getScoutBundle(project);
     final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
-    final IPrimaryTypeTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-    IType[] subtypes = formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getTypesInScoutBundles(sb));
-    Assert.assertEquals(1, subtypes.length);
+    final ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
+    Set<IType> subtypes = formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getTypesInScoutBundles(sb));
+    Assert.assertEquals(1, subtypes.size());
     final IntegerHolder formCountHolder = new IntegerHolder(-1);
     formHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
       public void hierarchyInvalidated() {
-        formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getTypesInScoutBundles(sb)).length);
+        formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getTypesInScoutBundles(sb)).size());
         synchronized (formCountHolder) {
           formCountHolder.notifyAll();
         }
@@ -102,14 +103,14 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
   @Test
   public void testCreateNewService() throws Exception {
     final IType iService = TypeUtility.getType(RuntimeClasses.IService);
-    final IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
-    IType[] subtypes = serviceHierarchy.getAllSubtypes(iService, TypeFilters.getInWorkspaceFilter());
-    Assert.assertEquals(2, subtypes.length);
+    final ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
+    Set<IType> subtypes = serviceHierarchy.getAllSubtypes(iService, TypeFilters.getInWorkspaceFilter());
+    Assert.assertEquals(2, subtypes.size());
     final IntegerHolder serviceCountHolder = new IntegerHolder(-1);
     serviceHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
       public void hierarchyInvalidated() {
-        serviceCountHolder.setValue(serviceHierarchy.getAllSubtypes(iService, TypeFilters.getInWorkspaceFilter()).length);
+        serviceCountHolder.setValue(serviceHierarchy.getAllSubtypes(iService, TypeFilters.getInWorkspaceFilter()).size());
         synchronized (serviceCountHolder) {
           serviceCountHolder.notifyAll();
         }

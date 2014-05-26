@@ -49,7 +49,7 @@ public class OutlineNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     new OutlinePageChildPageTablePage(this, getType());
   }
 

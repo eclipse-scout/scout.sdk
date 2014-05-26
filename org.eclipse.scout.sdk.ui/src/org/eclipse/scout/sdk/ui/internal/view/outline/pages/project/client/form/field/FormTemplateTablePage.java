@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
@@ -68,7 +70,7 @@ public class FormTemplateTablePage extends AbstractPage {
     }
   }
 
-  protected IType[] resolveFormTemplates() {
+  protected Set<IType> resolveFormTemplates() {
     IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
 
     if (m_formHierarchy == null) {
@@ -79,8 +81,7 @@ public class FormTemplateTablePage extends AbstractPage {
         ScoutTypeFilters.getInScoutBundles(getScoutBundle()),
         TypeFilters.getFlagsFilter(Flags.AccAbstract | Flags.AccPublic)
         );
-    IType[] allSubtypes = m_formHierarchy.getAllSubtypes(iForm, filter, TypeComparators.getTypeNameComparator());
-    return allSubtypes;
+    return m_formHierarchy.getAllSubtypes(iForm, filter, TypeComparators.getTypeNameComparator());
   }
 
   @Override
@@ -88,7 +89,7 @@ public class FormTemplateTablePage extends AbstractPage {
     if (menu instanceof TypeResolverFormDataAction) {
       ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           return resolveFormTemplates();
         }
       }, getScoutBundle());

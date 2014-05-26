@@ -233,6 +233,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     serviceOp.setImplementationPackageName(server.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES));
     serviceOp.setInterfaceProject(shared.getJavaProject());
     serviceOp.setInterfacePackageName(shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES));
+
     // load method
     ServiceMethod loadMethod = new ServiceMethod("load", serviceOp.getInterfacePackageName() + "." + serviceOp.getInterfaceName());
     String formDataSignature = SignatureCache.createTypeSignature(formData.getFullyQualifiedName());

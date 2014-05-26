@@ -11,9 +11,9 @@
 package org.eclipse.scout.sdk.ui.internal.extensions;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -22,10 +22,10 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.osgi.framework.Bundle;
 
 public final class FormFieldExtensionPoint {
@@ -73,16 +74,11 @@ public final class FormFieldExtensionPoint {
   }
 
   private AbstractWorkspaceWizard createNewWizardImpl(IType modelType) {
-    try {
-      ITypeHierarchy superTypeHierarchy = modelType.newSupertypeHierarchy(null);
-      for (IFormFieldExtension ext : getSortedExtensions(modelType, superTypeHierarchy, -1)) {
-        if (ext.getNewWizardClazz() != null) {
-          return ext.createNewWizard();
-        }
+    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(modelType);
+    for (IFormFieldExtension ext : getSortedExtensions(modelType, superTypeHierarchy, -1)) {
+      if (ext.getNewWizardClazz() != null) {
+        return ext.createNewWizard();
       }
-    }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logWarning("could not find form field extension for model type '" + modelType.getFullyQualifiedName() + "'.", e);
     }
     return null;
   }
@@ -96,15 +92,10 @@ public final class FormFieldExtensionPoint {
    * @return
    */
   private IFormFieldExtension findExtensionImpl(IType modelType, int maxDistance) {
-    try {
-      ITypeHierarchy superTypeHierarchy = modelType.newSupertypeHierarchy(null);
-      IFormFieldExtension[] sortedExtensions = getSortedExtensions(modelType, superTypeHierarchy, maxDistance);
-      if (sortedExtensions.length > 0) {
-        return sortedExtensions[0];
-      }
-    }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logWarning("could not find form field extension for model type '" + modelType.getFullyQualifiedName() + "'.", e);
+    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(modelType);
+    IFormFieldExtension[] sortedExtensions = getSortedExtensions(modelType, superTypeHierarchy, maxDistance);
+    if (sortedExtensions.length > 0) {
+      return sortedExtensions[0];
     }
     return null;
   }
@@ -124,12 +115,12 @@ public final class FormFieldExtensionPoint {
    * @param modelType
    * @return the best match extensions node page.
    */
-  public static IPage createNodePage(IType modelType, org.eclipse.scout.sdk.util.typecache.ITypeHierarchy formFieldHierarchy) {
+  public static IPage createNodePage(IType modelType, ITypeHierarchy formFieldHierarchy) {
     return instance.createNodePageImpl(modelType, formFieldHierarchy);
   }
 
-  private IPage createNodePageImpl(IType modelType, org.eclipse.scout.sdk.util.typecache.ITypeHierarchy formFieldHierarchy) {
-    for (IFormFieldExtension ext : getSortedExtensions(modelType, formFieldHierarchy.getJdtHierarchy(), -1)) {
+  private IPage createNodePageImpl(IType modelType, ITypeHierarchy formFieldHierarchy) {
+    for (IFormFieldExtension ext : getSortedExtensions(modelType, formFieldHierarchy, -1)) {
       if (ext.getNodePage() != null) {
         return ext.createNodePage();
       }
@@ -141,7 +132,7 @@ public final class FormFieldExtensionPoint {
     ArrayList<IFormFieldExtension> extensions = new ArrayList<IFormFieldExtension>();
     for (IFormFieldExtension ext : m_extensions) {
       if (maxDistance < 0) {
-        HashSet<IType> allSubTypes = new HashSet<IType>(Arrays.asList(formFieldHierarchy.getAllSubtypes(ext.getModelType())));
+        HashSet<IType> allSubTypes = CollectionUtility.hashSet(formFieldHierarchy.getAllSubtypes(ext.getModelType()));
         allSubTypes.add(ext.getModelType());
         if (allSubTypes.contains(modelType)) {
           extensions.add(ext);
@@ -177,11 +168,9 @@ public final class FormFieldExtensionPoint {
             break;
           }
           ITypeHierarchy superTypeHierarchy = null;
-          try {
-            superTypeHierarchy = modelType.newSupertypeHierarchy(null);
-          }
-          catch (JavaModelException e) {
-            ScoutSdkUi.logWarning("could not create super type hierarchy of '" + modelType.getFullyQualifiedName() + "'.", e);
+          superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(modelType);
+          if (superTypeHierarchy == null) {
+            ScoutSdkUi.logWarning("could not create super type hierarchy of '" + modelType.getFullyQualifiedName() + "'.");
             continue;
           }
           int distance = -distanceToIFormField(modelType, TypeUtility.getType(IRuntimeClasses.IFormField), 0, superTypeHierarchy);
@@ -273,11 +262,9 @@ public final class FormFieldExtensionPoint {
       if (superclass != null) {
         locDist = distanceToIFormField(superclass, superType, (dist + 1), superTypeHierarchy, maxDistance);
       }
-      IType[] interfaces = superTypeHierarchy.getSuperInterfaces(visitee);
-      if (interfaces != null) {
-        for (IType i : interfaces) {
-          locDist = Math.min(locDist, distanceToIFormField(i, superType, (dist + 1), superTypeHierarchy, maxDistance));
-        }
+      Set<IType> interfaces = superTypeHierarchy.getSuperInterfaces(visitee);
+      for (IType i : interfaces) {
+        locDist = Math.min(locDist, distanceToIFormField(i, superType, (dist + 1), superTypeHierarchy, maxDistance));
       }
       dist = locDist;
       return dist;

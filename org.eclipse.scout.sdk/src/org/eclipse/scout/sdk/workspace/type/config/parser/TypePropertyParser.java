@@ -13,15 +13,15 @@ package org.eclipse.scout.sdk.workspace.type.config.parser;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
  * <h3>{@link TypePropertyParser}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.9.0 22.05.2013
  */
 public class TypePropertyParser implements IPropertySourceParser<IType> {

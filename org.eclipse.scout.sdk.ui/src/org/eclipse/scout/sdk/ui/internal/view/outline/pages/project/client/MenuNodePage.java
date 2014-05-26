@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -58,7 +60,7 @@ public class MenuNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iMenuType = TypeUtility.getType(IRuntimeClasses.IMenu);
 
     if (m_menuChangedListener == null) {
@@ -66,7 +68,7 @@ public class MenuNodePage extends AbstractScoutTypePage {
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_menuChangedListener);
     }
     // recursively add children
-    IType[] menus = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iMenuType), ScoutTypeComparators.getOrderAnnotationComparator());
+    Set<IType> menus = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iMenuType), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType menu : menus) {
       new MenuNodePage(this, menu);
     }

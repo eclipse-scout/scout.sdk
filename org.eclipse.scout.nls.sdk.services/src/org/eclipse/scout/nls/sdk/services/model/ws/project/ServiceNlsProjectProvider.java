@@ -1,9 +1,11 @@
 package org.eclipse.scout.nls.sdk.services.model.ws.project;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -22,11 +24,11 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.util.internal.typecache.TypeHierarchy;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -41,7 +43,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
    * @return All text provider services in the workspace.
    * @throws JavaModelException
    */
-  public static IType[] getRegisteredTextProviderTypes() throws JavaModelException {
+  public static Set<IType> getRegisteredTextProviderTypes() throws JavaModelException {
     return getRegisteredTextProviderTypes(null, null);
   }
 
@@ -59,7 +61,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
    * @return
    * @throws JavaModelException
    */
-  private static IType[] getRegisteredTextProviderTypes(Boolean returnDocServices, final String[] projectFilter) throws JavaModelException {
+  private static Set<IType> getRegisteredTextProviderTypes(Boolean returnDocServices, final Set<String> projectFilter) throws JavaModelException {
 
     class TextProviderService {
       private final IType textProvider;
@@ -105,7 +107,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     IType superType = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
     if (superType == null) return null;
 
-    IType[] serviceImpls = ScoutSdkCore.getHierarchyCache().getPrimaryTypeHierarchy(superType).getAllSubtypes(superType, new ITypeFilter() {
+    Set<IType> serviceImpls = ScoutSdkCore.getHierarchyCache().getPrimaryTypeHierarchy(superType).getAllSubtypes(superType, new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
         try {
@@ -121,12 +123,12 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         }
       }
     });
-    HashMap<String, IType> typeMap = new HashMap<String, IType>(serviceImpls.length);
+    HashMap<String, IType> typeMap = new HashMap<String, IType>(serviceImpls.size());
     for (IType t : serviceImpls) {
       typeMap.put(t.getFullyQualifiedName(), t);
     }
 
-    HashMap<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<TextProviderService, TextProviderServiceDeclaration>(serviceImpls.length);
+    HashMap<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<TextProviderService, TextProviderServiceDeclaration>(serviceImpls.size());
     IExtension[] allServiceExtensions = PDECore.getDefault().getExtensionsRegistry().findExtensions(IRuntimeClasses.EXTENSION_POINT_SERVICES, true);
     for (IExtension e : allServiceExtensions) {
       for (IConfigurationElement c : e.getConfigurationElements()) {
@@ -175,25 +177,27 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     });
 
     // return the types of the services ordered by priority
-    IType[] returnValueSorted = new IType[sortedArrayHighestPrioFirst.length];
-    for (int i = 0; i < returnValueSorted.length; i++) {
-      returnValueSorted[i] = sortedArrayHighestPrioFirst[i].svc.textProvider;
+    Set<IType> returnValueSorted = new LinkedHashSet<IType>(sortedArrayHighestPrioFirst.length);
+    for (int i = 0; i < sortedArrayHighestPrioFirst.length; i++) {
+      returnValueSorted.add(sortedArrayHighestPrioFirst[i].svc.textProvider);
     }
     return returnValueSorted;
   }
 
-  private static int getIndexOf(String searchEleemnt, String[] list) {
-    if (list != null && list.length > 0) {
-      for (int i = 0; i < list.length; i++) {
-        if (CompareUtility.equals(searchEleemnt, list[i])) {
+  private static int getIndexOf(String searchEleemnt, Set<String> list) {
+    if (list != null && list.size() > 0) {
+      int i = 0;
+      for (String name : list) {
+        if (CompareUtility.equals(searchEleemnt, name)) {
           return i;
         }
+        i++;
       }
     }
     return -1;
   }
 
-  private static boolean acceptsFilter(Boolean returnDocServices, String[] projects, IType candidate) throws JavaModelException {
+  private static boolean acceptsFilter(Boolean returnDocServices, Set<String> projects, IType candidate) throws JavaModelException {
     if (candidate == null) return false;
     boolean acceptsDocPart = returnDocServices == null || returnDocServices == isDocsService(candidate);
     if (acceptsDocPart) {
@@ -201,15 +205,13 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       if (projects == null) return true; // no project filter and doc filter is valid -> filter matches
 
       // check project filter
-      for (String p : projects) {
-        if (candidate.getJavaProject().getProject().getName().equals(p)) return true;
-      }
+      return projects.contains(candidate.getJavaProject().getProject().getName());
     }
     return false;
   }
 
   private static boolean isDocsService(IType service) throws JavaModelException {
-    TypeHierarchy th = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(service);
+    ITypeHierarchy th = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(service);
     for (IType ifs : th.getAllSuperInterfaces(service)) {
       if (IRuntimeClasses.IDocumentationTextProviderService.equals(ifs.getFullyQualifiedName())) {
         return true;
@@ -262,11 +264,11 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return new ServiceNlsProject(type);
   }
 
-  private INlsProject getNlsProjectTree(boolean returnDocServices, String[] projectFilter) throws CoreException {
+  private INlsProject getNlsProjectTree(boolean returnDocServices, Set<String> projectFilter) throws CoreException {
     return getNlsProjectTree(getRegisteredTextProviderTypes(returnDocServices, projectFilter));
   }
 
-  private INlsProject getNlsProjectTree(IType[] textProviderServices) throws CoreException {
+  private INlsProject getNlsProjectTree(Set<IType> textProviderServices) throws CoreException {
     ServiceNlsProject previous = null;
     ServiceNlsProject root = null;
     for (IType type : textProviderServices) {
@@ -295,22 +297,22 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return root;
   }
 
-  private static String[] getProjectNames(IScoutBundle[] scoutBundles) {
-    if (scoutBundles == null || scoutBundles.length < 1) return null;
+  private static Set<String> getProjectNames(Set<IScoutBundle> scoutBundles) {
+    if (scoutBundles == null || scoutBundles.size() < 1) return null;
 
-    String[] ret = new String[scoutBundles.length];
-    for (int i = 0; i < scoutBundles.length; i++) {
-      ret[i] = scoutBundles[i].getSymbolicName();
+    Set<String> names = new HashSet<String>(scoutBundles.size());
+    for (IScoutBundle b : scoutBundles) {
+      names.add(b.getSymbolicName());
     }
-    return ret;
+    return names;
   }
 
-  private static IScoutBundle[] getScoutBundlesForType(IType type) {
+  private static Set<IScoutBundle> getScoutBundlesForType(IType type) {
     IScoutBundle b = ScoutTypeUtility.getScoutBundle(type.getJavaProject());
     return getParentSharedBundlesFor(b);
   }
 
-  private static IScoutBundle[] getParentSharedBundlesFor(IScoutBundle b) {
+  private static Set<IScoutBundle> getParentSharedBundlesFor(IScoutBundle b) {
     if (b != null) {
       return b.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
     }
@@ -320,11 +322,11 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private INlsProject getNlsProjectTree(IType type) throws CoreException {
-    IType[] nlsProviders = getRegisteredTextProviderTypes(isDocsService(type), getProjectNames(getScoutBundlesForType(type)));
+    Set<IType> nlsProviders = getRegisteredTextProviderTypes(isDocsService(type), getProjectNames(getScoutBundlesForType(type)));
     if (nlsProviders == null) return null;
 
     String searchString = getTypeIdentifyer(type);
-    ArrayList<IType> filtered = new ArrayList<IType>(nlsProviders.length);
+    Set<IType> filtered = new LinkedHashSet<IType>(nlsProviders.size());
     boolean minFound = false;
     for (IType t : nlsProviders) {
       if (getTypeIdentifyer(t).equals(searchString) && !minFound) {
@@ -336,7 +338,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
     }
 
-    return getNlsProjectTree(filtered.toArray(new IType[filtered.size()]));
+    return getNlsProjectTree(filtered);
   }
 
   private static String getTypeIdentifyer(IType t) {
@@ -373,7 +375,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return null;
   }
 
-  private INlsProject getAllProjects(boolean returnDocServices, IScoutBundle[] wsBundles) {
+  private INlsProject getAllProjects(boolean returnDocServices, Set<IScoutBundle> wsBundles) {
     try {
       return getNlsProjectTree(returnDocServices, getProjectNames(wsBundles));
     }

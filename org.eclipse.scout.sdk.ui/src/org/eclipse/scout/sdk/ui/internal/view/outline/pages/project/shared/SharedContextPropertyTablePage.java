@@ -68,7 +68,7 @@ public class SharedContextPropertyTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     if (m_methodChangedListener == null) {
       m_methodChangedListener = new P_MethodChangedListener();
       JavaCore.addElementChangedListener(m_methodChangedListener);

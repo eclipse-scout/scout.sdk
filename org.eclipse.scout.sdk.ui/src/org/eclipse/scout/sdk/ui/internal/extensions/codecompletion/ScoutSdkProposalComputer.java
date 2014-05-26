@@ -19,16 +19,16 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.CompletionContext;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.osgi.framework.Bundle;
 
 /**
@@ -58,14 +58,9 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
         if (TypeUtility.exists(element)) {
           if (element.getElementType() == IJavaElement.TYPE) {
             IType declaringType = (IType) element;
-            try {
-              ITypeHierarchy supertypeHierarchy = declaringType.newSupertypeHierarchy(null);
-              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
-                proposals.add(new CodeNewProposal(declaringType));
-              }
-            }
-            catch (JavaModelException e) {
-              ScoutSdkUi.logError("Could not calculate code completion proposals. ", e);
+            ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(declaringType);
+            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
+              proposals.add(new CodeNewProposal(declaringType));
             }
           }
         }

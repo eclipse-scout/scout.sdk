@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.services;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
@@ -31,10 +33,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -112,9 +111,8 @@ public class ProcessServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       protected Object[][] computeProposals() {
         IType abstractFormData = TypeUtility.getType(IRuntimeClasses.AbstractFormData);
-        ICachedTypeHierarchy formDataHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractFormData);
-        IType[] formDataTypes = formDataHierarchy.getAllSubtypes(abstractFormData, TypeFilters.getTypesOnClasspath(getServerBundle().getJavaProject()), TypeComparators.getTypeNameComparator());
-        return new Object[][]{formDataTypes};
+        Set<IType> formDatas = TypeUtility.getClassesOnClasspath(abstractFormData, getServerBundle().getJavaProject(), null);
+        return new Object[][]{formDatas.toArray(new IType[formDatas.size()])};
       }
     }, labelColWidthPercent);
     m_formDataTypeField.acceptProposal(getFormDataType());

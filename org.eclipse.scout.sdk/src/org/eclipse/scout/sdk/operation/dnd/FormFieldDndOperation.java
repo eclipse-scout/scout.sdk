@@ -11,20 +11,22 @@
 package org.eclipse.scout.sdk.operation.dnd;
 
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.BoxDeleteOperation;
 import org.eclipse.scout.sdk.operation.form.field.FormFieldDeleteOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -35,7 +37,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class FormFieldDndOperation extends AbstractTypeDndOperation {
 
-  private final IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
   private final IType iCompositeField = TypeUtility.getType(IRuntimeClasses.ICompositeField);
 
   /**
@@ -51,10 +52,10 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
   protected IType createNewType(IType declaringType, String simpleName, String source, String[] fqImports, IJavaElement sibling, IStructuredType structuredType, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     IType newFormField = super.createNewType(declaringType, simpleName, source, fqImports, sibling, structuredType, monitor, manager);
     // getter
-    org.eclipse.scout.sdk.util.typecache.ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(newFormField.getCompilationUnit());
+    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(newFormField.getCompilationUnit());
     IType form = TypeUtility.getAncestor(newFormField, TypeFilters.getMultiTypeFilterOr(
         TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
-        TypeFilters.getTopLevelTypeFilter()));
+        TypeFilters.getPrimaryTypeFilter()));
 
     if (TypeUtility.exists(form)) {
       IStructuredType structuredForm = ScoutTypeUtility.createStructuredForm(form);
@@ -71,7 +72,7 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
 
   @Override
   protected void deleteType(IType type, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ITypeHierarchy superTypeHierarchy = getType().newSupertypeHierarchy(monitor);
+    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getType());
     if (superTypeHierarchy.contains(iCompositeField)) {
       BoxDeleteOperation deleteOp = new BoxDeleteOperation(getType());
       deleteOp.validate();
@@ -100,12 +101,12 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
 
       // visit children
       if (hierarchy.isSubtype(iCompositeField, type)) {
-        IType[] innerFields = TypeUtility.getInnerTypes(type, TypeFilters.getSubtypeFilter(iFormField, hierarchy));
+        IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
+        Set<IType> innerFields = TypeUtility.getInnerTypes(type, TypeFilters.getSubtypeFilter(iFormField, hierarchy));
         for (IType t : innerFields) {
           createFormFieldGetter(t, formType, siblings, hierarchy, monitor, manager);
         }
       }
     }
   }
-
 }

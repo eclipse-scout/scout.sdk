@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
-import org.eclipse.jdt.core.Flags;
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -27,7 +28,10 @@ import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchyResult;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
@@ -37,7 +41,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  * @since 1.0.8 11.09.2010
  */
 public class FormFieldTemplateTablePage extends AbstractPage {
-  private ICachedTypeHierarchy m_formFieldHierarchy;
+  private ICachedTypeHierarchyResult m_formFieldHierarchy;
 
   public FormFieldTemplateTablePage(IPage parent) {
     setParent(parent);
@@ -64,8 +68,10 @@ public class FormFieldTemplateTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    for (IType fieldTemplate : resolveFormFieldTemplates()) {
-      ITypePage nodePage = (ITypePage) FormFieldExtensionPoint.createNodePage(fieldTemplate, m_formFieldHierarchy);
+    Set<IType> resolveFormFieldTemplates = resolveFormFieldTemplates();
+    ITypeHierarchy localTypeHierarchy = TypeUtility.getLocalTypeHierarchy(resolveFormFieldTemplates);
+    for (IType fieldTemplate : resolveFormFieldTemplates) {
+      ITypePage nodePage = (ITypePage) FormFieldExtensionPoint.createNodePage(fieldTemplate, localTypeHierarchy);
       if (nodePage != null) {
         nodePage.setParent(this);
         nodePage.setType(fieldTemplate);
@@ -73,19 +79,15 @@ public class FormFieldTemplateTablePage extends AbstractPage {
     }
   }
 
-  protected IType[] resolveFormFieldTemplates() {
-    IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
-
+  protected Set<IType> resolveFormFieldTemplates() {
     if (m_formFieldHierarchy == null) {
-      m_formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
+      IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
+      IScoutBundle workspaceBundle = getScoutBundle().getParentBundle(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
+      m_formFieldHierarchy = TypeUtility.getAbstractTypesOnClasspathHierarchy(iFormField, workspaceBundle.getJavaProject());
       m_formFieldHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
-        ScoutTypeFilters.getInScoutBundles(getScoutBundle()),
-        TypeFilters.getFlagsFilter(Flags.AccAbstract | Flags.AccPublic)
-        );
-    IType[] allSubtypes = m_formFieldHierarchy.getAllSubtypes(iFormField, filter, TypeComparators.getTypeNameComparator());
-    return allSubtypes;
+    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getPrimaryTypeFilter(), ScoutTypeFilters.getInScoutBundles(getScoutBundle()));
+    return m_formFieldHierarchy.getAllTypes(filter, TypeComparators.getTypeNameComparator());
   }
 
   @Override
@@ -93,7 +95,7 @@ public class FormFieldTemplateTablePage extends AbstractPage {
     if (menu instanceof TypeResolverFormDataAction) {
       ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           return resolveFormFieldTemplates();
         }
       }, getScoutBundle());

@@ -12,16 +12,16 @@ package org.eclipse.scout.sdk.workspace.type.config.parser;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.graphics.RGB;
 
 /**
  * <h3>{@link ColorPropertySourceParser}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 27.02.2013
  */
 public class ColorPropertySourceParser implements IPropertySourceParser<RGB> {

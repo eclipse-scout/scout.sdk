@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.dto.formdata;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
@@ -48,12 +50,12 @@ public class MultipleFormDataUpdateOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
     validate();
-    IType[] types = m_resolver.getTypes();
-    monitor.beginTask("Updating Form Datas", types.length);
+    Set<IType> types = m_resolver.getTypes();
+    monitor.beginTask("Updating Form Datas", types.size());
     int i = 0;
     for (IType t : types) {
       i++;
-      monitor.setTaskName("Updating Form Data " + i + " of " + types.length + " (" + t.getElementName() + ")");
+      monitor.setTaskName("Updating Form Data " + i + " of " + types.size() + " (" + t.getElementName() + ")");
       FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(t, TypeUtility.getSuperTypeHierarchy(t));
       if (FormDataAnnotation.isCreate(annotation)) {
         IType formDataType = annotation.getFormDataType();

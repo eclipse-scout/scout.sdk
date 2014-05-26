@@ -13,11 +13,13 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
@@ -68,7 +70,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
   private StyledTextField m_urlPatternField;
 
   private IScoutBundle m_bundle;
-  private IScoutBundle[] m_candidateBundles;
+  private Set<IScoutBundle> m_candidateBundles;
   private Map<IScoutBundle, String> m_servletRegistrationAliasMap;
 
   private boolean m_urlPatternVisible;
@@ -92,9 +94,10 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
     // registration bundle
     m_registrationBundleField = getFieldToolkit().createProposalField(parent, Texts.get("ServletRegistrationBundle"));
     m_registrationBundleField.setLabelProvider(new SimpleLabelProvider());
-    SimpleProposal[] proposals = new SimpleProposal[m_candidateBundles.length];
-    for (int i = 0; i < proposals.length; i++) {
-      proposals[i] = new P_BundleProposal(m_candidateBundles[i]);
+    SimpleProposal[] proposals = new SimpleProposal[m_candidateBundles.size()];
+    int index = 0;
+    for (IScoutBundle b : m_candidateBundles) {
+      proposals[index++] = new P_BundleProposal(b);
     }
     m_registrationBundleField.setContentProvider(new SimpleProposalProvider(proposals));
     m_registrationBundleField.addProposalAdapterListener(new IProposalAdapterListener() {
@@ -167,7 +170,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
     parent.setLayout(new GridLayout(1, true));
 
     // servlet
-    boolean excludeBundleRegistration = m_candidateBundles.length <= 1;
+    boolean excludeBundleRegistration = m_candidateBundles.size() <= 1;
     GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
     gd.exclude = excludeBundleRegistration;
     m_registrationBundleField.setVisible(!excludeBundleRegistration); // due to focus bug if only excluding from layout
@@ -196,14 +199,14 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
     Registration registration = ServletRegistrationUtility.getServletRegistration(m_bundle);
     if (registration == null || StringUtility.isNullOrEmpty(registration.getAlias())) {
       Registration[] candidateRegistrations = ServletRegistrationUtility.getJaxWsServletRegistrationsOnClasspath(m_bundle);
-      IScoutBundle[] candidateBundles = ServletRegistrationUtility.getJaxWsBundlesOnClasspath(m_bundle);
+      Set<IScoutBundle> candidateBundles = ServletRegistrationUtility.getJaxWsBundlesOnClasspath(m_bundle);
       if (candidateRegistrations.length > 0) {
         Registration candidateRegistration = candidateRegistrations[0];
         setRegistrationBundle(candidateRegistration.getBundle());
         setAlias(candidateRegistration.getAlias());
       }
-      else if (candidateBundles.length > 0) {
-        setRegistrationBundle(candidateBundles[0]);
+      else if (candidateBundles.size() > 0) {
+        setRegistrationBundle(CollectionUtility.firstElement(candidateBundles));
         setAlias(JaxWsConstants.JAX_WS_ALIAS);
       }
       else {

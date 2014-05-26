@@ -76,7 +76,7 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formHandler.getCompilationUnit());
     IType form = TypeUtility.getAncestor(formHandler, TypeFilters.getMultiTypeFilterOr(
         TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
-        TypeFilters.getTopLevelTypeFilter()));
+        TypeFilters.getPrimaryTypeFilter()));
 
     String handlerName = getElementName();
 

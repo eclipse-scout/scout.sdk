@@ -23,11 +23,11 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.NoSourceException;
@@ -35,6 +35,7 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public final class PropertyMethodSourceUtility {
@@ -94,19 +95,14 @@ public final class PropertyMethodSourceUtility {
     if (TypeUtility.exists(method)) {
       return method;
     }
-    try {
-      ITypeHierarchy superTypeHierarchy = type.newSupertypeHierarchy(null);
-      IType declaringType = superTypeHierarchy.getSuperclass(type);
-      while (declaringType != null) {
-        method = TypeUtility.getMethod(declaringType, methodName);
-        if (TypeUtility.exists(method)) {
-          return method;
-        }
-        declaringType = superTypeHierarchy.getSuperclass(declaringType);
+    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type);
+    IType declaringType = superTypeHierarchy.getSuperclass(type);
+    while (declaringType != null) {
+      method = TypeUtility.getMethod(declaringType, methodName);
+      if (TypeUtility.exists(method)) {
+        return method;
       }
-    }
-    catch (JavaModelException e) {
-      ScoutSdk.logWarning("could not find method '" + methodName + "' on super type hierarchy of '" + type.getFullyQualifiedName() + "'.", e);
+      declaringType = superTypeHierarchy.getSuperclass(declaringType);
     }
     return null;
   }
@@ -507,13 +503,7 @@ public final class PropertyMethodSourceUtility {
         typeName = typeName.substring(0, typeName.length() - 1);
         referencedType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName, true);
         if (!TypeUtility.exists(referencedType)) {
-          IType[] possibleMatches = TypeUtility.getTypes(typeName);
-          if (possibleMatches.length == 1) {
-            referencedType = possibleMatches[0];
-          }
-          else {
-            throw new CoreException(new ScoutStatus(Status.WARNING, "Reference '" + parameter + "' could not be found.", null));
-          }
+          throw new CoreException(new ScoutStatus(Status.WARNING, "Reference '" + parameter + "' could not be found.", null));
         }
       }
       else {
@@ -594,7 +584,7 @@ public final class PropertyMethodSourceUtility {
         typeName = typeName.substring(0, typeName.length() - 1);
         IType iconsType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName, true);
         if (TypeUtility.exists(iconsType)) {
-          ITypeHierarchy iconsSuperTypeHierarchy = iconsType.newSupertypeHierarchy(null);
+          ITypeHierarchy iconsSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(iconsType);
           while (TypeUtility.exists(iconsType)) {
             IField field = iconsType.getField(fieldName);
             if (TypeUtility.exists(field)) {

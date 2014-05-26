@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
@@ -70,12 +72,12 @@ public class BeanPropertyTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     if (m_methodChangedListener == null) {
       m_methodChangedListener = new P_MethodChangedListener();
       ScoutSdkCore.getJavaResourceChangedEmitter().addMethodChangedListener(getDeclaringType(), m_methodChangedListener);
     }
-    IPropertyBean[] beans = TypeUtility.getPropertyBeans(getDeclaringType(), ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
+    Set<? extends IPropertyBean> beans = TypeUtility.getPropertyBeans(getDeclaringType(), ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
     for (IPropertyBean bean : beans) {
       new BeanPropertyNodePage(this, bean);
     }

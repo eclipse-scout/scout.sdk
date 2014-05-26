@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction;
@@ -73,11 +76,11 @@ public class PageWithTableNodePage extends AbstractScoutTypePage {
       m_methodChangedListener = new P_MethodChangedListener();
       JavaCore.addElementChangedListener(m_methodChangedListener);
     }
-    IType[] allSubtypes = ScoutTypeUtility.getTables(getType());
-    if (allSubtypes.length > 0) {
+    Set<IType> allSubtypes = ScoutTypeUtility.getTables(getType());
+    if (allSubtypes.size() > 0) {
       TableNodePage tableNodePage = new TableNodePage();
       tableNodePage.setParent(this);
-      tableNodePage.setType(allSubtypes[0]);
+      tableNodePage.setType(CollectionUtility.firstElement(allSubtypes));
     }
 
     new BeanPropertyTablePage(this, getType());

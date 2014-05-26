@@ -58,7 +58,7 @@ public class FormHandlerTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iFormHandler = TypeUtility.getType(IRuntimeClasses.IFormHandler);
 
     if (m_innerTypeListener == null) {

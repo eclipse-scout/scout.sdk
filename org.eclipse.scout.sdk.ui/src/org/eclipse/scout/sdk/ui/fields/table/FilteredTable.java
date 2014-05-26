@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.fields.table;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 
 import org.eclipse.jdt.core.search.SearchPattern;
@@ -30,6 +29,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.viewers.ViewerSorter;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.SWT;
@@ -348,7 +348,7 @@ public class FilteredTable extends Composite {
     @Override
     protected Object[] getSortedChildren(Object parentNode) {
       // ensure no separator at beginning/end or siblings
-      ArrayList<Object> cleanedElements = new ArrayList<Object>(Arrays.asList(super.getSortedChildren(parentNode)));
+      ArrayList<Object> cleanedElements = CollectionUtility.arrayList(super.getSortedChildren(parentNode));
       boolean removeNextSeperator = true;
       for (Iterator<Object> it = cleanedElements.iterator(); it.hasNext();) {
         Object cur = it.next();

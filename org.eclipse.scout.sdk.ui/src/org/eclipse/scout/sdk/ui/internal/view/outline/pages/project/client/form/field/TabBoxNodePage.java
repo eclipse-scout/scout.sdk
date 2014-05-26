@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -33,14 +35,11 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 public class TabBoxNodePage extends AbstractFormFieldNodePage {
-  IType igroupBox = TypeUtility.getType(IRuntimeClasses.IGroupBox);
-  IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
 
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public TabBoxNodePage() {
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Tabbox));
-
   }
 
   @Override
@@ -60,12 +59,14 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
   @Override
   protected void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
+      IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iFormField);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
     new KeyStrokeTablePage(this, getType());
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType());
-    IType[] allGroupboxes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(igroupBox, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
+    IType iGroupBox = TypeUtility.getType(IRuntimeClasses.IGroupBox);
+    Set<IType> allGroupboxes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iGroupBox, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType groupBox : allGroupboxes) {
       ITypePage nodePage = (ITypePage) FormFieldExtensionPoint.createNodePage(groupBox, hierarchy);
       if (nodePage != null) {

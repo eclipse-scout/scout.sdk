@@ -1,5 +1,7 @@
 package org.eclipse.scout.nls.sdk.services.ui.page;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
@@ -59,14 +61,14 @@ public class TextServiceTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     if (m_serviceHierarchy == null) {
       IType abstractDynamicNlsTextProviderService = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     try {
-      IType[] services = ServiceNlsProjectProvider.getRegisteredTextProviderTypes();
+      Set<IType> services = ServiceNlsProjectProvider.getRegisteredTextProviderTypes();
       ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
       for (IType type : services) {
         if (filter.accept(type)) {

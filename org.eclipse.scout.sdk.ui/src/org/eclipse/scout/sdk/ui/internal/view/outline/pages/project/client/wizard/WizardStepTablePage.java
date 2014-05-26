@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
@@ -60,14 +62,14 @@ public class WizardStepTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iWizardStep = TypeUtility.getType(IRuntimeClasses.IWizardStep);
 
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iWizardStep);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getWizardType(), m_innerTypeListener);
     }
-    IType[] wizardSteps = TypeUtility.getInnerTypes(getWizardType(), TypeFilters.getSubtypeFilter(iWizardStep), ScoutTypeComparators.getOrderAnnotationComparator());
+    Set<IType> wizardSteps = TypeUtility.getInnerTypes(getWizardType(), TypeFilters.getSubtypeFilter(iWizardStep), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType wizardStep : wizardSteps) {
       WizardStepNodePage childPage = new WizardStepNodePage();
       childPage.setParent(this);

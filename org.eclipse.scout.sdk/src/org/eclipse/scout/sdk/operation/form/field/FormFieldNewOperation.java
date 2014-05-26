@@ -57,7 +57,7 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType().getCompilationUnit());
     IType form = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getMultiTypeFilterOr(
         TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
-        TypeFilters.getTopLevelTypeFilter()));
+        TypeFilters.getPrimaryTypeFilter()));
 
     if (TypeUtility.exists(form)) {
       InnerTypeGetterCreateOperation getterMethodOp = new InnerTypeGetterCreateOperation(getCreatedType(), form, false /* do not pass the formatting in -> performance */);

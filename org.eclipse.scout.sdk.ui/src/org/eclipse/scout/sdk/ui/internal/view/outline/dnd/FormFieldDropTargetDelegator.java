@@ -134,7 +134,7 @@ public class FormFieldDropTargetDelegator implements IDropTargetDelegator {
   private boolean isCopyAndSourceComplexAndTargetSameIcu(OutlineDropTargetEvent event, IType targetType, IType selectedType) {
     if (event.getOperation() == DND.DROP_COPY) {
       if (selectedType.getCompilationUnit().equals(targetType.getCompilationUnit())) {
-        if (ScoutTypeUtility.getFormFields(selectedType).length > 0) {
+        if (ScoutTypeUtility.getFormFields(selectedType).size() > 0) {
           return true;
         }
       }

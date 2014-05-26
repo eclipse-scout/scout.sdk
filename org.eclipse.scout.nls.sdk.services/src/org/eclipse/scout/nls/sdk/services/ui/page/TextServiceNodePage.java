@@ -60,7 +60,7 @@ public class TextServiceNodePage extends AbstractServiceNodePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     // void
   }
 

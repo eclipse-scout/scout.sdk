@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.form.fields;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -44,7 +45,6 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -58,8 +58,6 @@ import org.eclipse.swt.widgets.Composite;
  * @since 1.0.8 02.03.2010
  */
 public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
-
-  private final IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
 
   private final IType m_declaringType;
   private AbstractScoutWizardPage m_nextPage;
@@ -82,12 +80,12 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     m_modelTypeShortList = new HashSet<IType>();
-    ArrayList<Object> elements = new ArrayList<Object>();
+    IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
+    Set<IType> abstractFormFields = TypeUtility.getAbstractTypesOnClasspath(iFormField, m_declaringType.getJavaProject(), TypeFilters.getPrimaryTypeFilter());
+    ArrayList<Object> elements = new ArrayList<Object>(abstractFormFields.size() + 1);
     elements.add(new ISeparator() {
     });
-    // entries
-    IPrimaryTypeTypeHierarchy formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
-    IType[] abstractFormFields = formFieldHierarchy.getAllSubtypes(iFormField, TypeFilters.getAbstractOnClasspath(m_declaringType.getJavaProject()));
+
     for (IType formField : abstractFormFields) {
       if (!TypeUtility.exists(JdtUtility.getAnnotation(formField, ScoutSdkIgnore.class.getName()))) {
         IFormFieldExtension formFieldExtension = FormFieldExtensionPoint.findExtension(formField, 1);
@@ -97,6 +95,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
         elements.add(formField);
       }
     }
+
     // ui
     m_table = new FilteredTable(parent, SWT.SINGLE | SWT.BORDER | SWT.FULL_SELECTION | SWT.V_SCROLL);
     m_table.getViewer().addSelectionChangedListener(new ISelectionChangedListener() {

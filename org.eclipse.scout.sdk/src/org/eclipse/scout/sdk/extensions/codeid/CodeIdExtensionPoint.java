@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.extensions.codeid.parsers.ICodeIdParser;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -128,8 +129,8 @@ public final class CodeIdExtensionPoint {
 
   public static ICodeIdParser getCodeIdParser(String genericType) {
     TreeMap<CompositeObject, ICodeIdParser> parsers = getCodeIdParsers().get(genericType);
-    if (parsers != null && parsers.size() > 0) {
-      return parsers.values().iterator().next();
+    if (parsers != null) {
+      return CollectionUtility.firstElement(parsers.values());
     }
     return null;
   }

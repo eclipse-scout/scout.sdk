@@ -25,8 +25,8 @@ import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.ProgressMonitorWrapper;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
-import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.pde.internal.core.PDECore;
+import org.eclipse.pde.internal.core.PluginModelManager;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
@@ -173,12 +173,12 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
   }
 
   @Override
-  public IScoutBundle[] getBundles(IScoutBundleFilter filter) {
+  public Set<IScoutBundle> getBundles(IScoutBundleFilter filter) {
     return getBundles(filter, null);
   }
 
   @Override
-  public IScoutBundle[] getBundles(IScoutBundleFilter filter, IScoutBundleComparator comparator) {
+  public Set<IScoutBundle> getBundles(IScoutBundleFilter filter, IScoutBundleComparator comparator) {
     ensureGraphCreated();
 
     try {
@@ -202,7 +202,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
           }
         }
       }
-      return ret.toArray(new IScoutBundle[ret.size()]);
+      return ret;
     }
     finally {
       m_lock.readLock().unlock();
@@ -313,7 +313,15 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
     HashSet<String> messageCollector = new HashSet<String>();
 
     monitor.beginTask(Texts.get("WaitingForEclipsePDE") + "...", 1);
-    IPluginModelBase[] workspaceModels = PluginRegistry.getWorkspaceModels();
+    PDECore pdeCore = PDECore.getDefault();
+    if (pdeCore == null) {
+      return allScoutBundles; // PDE is shutting down
+    }
+    PluginModelManager pmm = pdeCore.getModelManager();
+    if (pmm == null) {
+      return allScoutBundles; // PDE is shutting down
+    }
+    IPluginModelBase[] workspaceModels = pmm.getWorkspaceModels();
     monitor.worked(1);
 
     monitor.beginTask(Texts.get("CalculatingScoutBundleGraph"), workspaceModels.length);

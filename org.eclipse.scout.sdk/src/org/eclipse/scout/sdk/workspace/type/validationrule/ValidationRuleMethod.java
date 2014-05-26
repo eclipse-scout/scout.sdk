@@ -13,8 +13,8 @@ package org.eclipse.scout.sdk.workspace.type.validationrule;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 public class ValidationRuleMethod {
   private final IAnnotation m_annotation;

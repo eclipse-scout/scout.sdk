@@ -12,12 +12,14 @@ package org.eclipse.scout.sdk.ui.wizard.lookupcall;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -37,10 +39,9 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.ModifyEvent;
@@ -195,9 +196,8 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
           }
           proposals.add(MoreElementsProposal.INSTANCE);
 
-          ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.ILookupService));
-          ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getAbstractOnClasspath(getServerBundle().getJavaProject()), TypeFilters.getTypeParamSubTypeFilter(getGenericTypeSignature(), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE));
-          IType[] abstractLookupServices = lookupServiceHierarchy.getAllClasses(filter, TypeComparators.getTypeNameComparator());
+          ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getTypeParamSubTypeFilter(getGenericTypeSignature(), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE));
+          Set<IType> abstractLookupServices = TypeUtility.getAbstractTypesOnClasspath(TypeUtility.getType(IRuntimeClasses.ILookupService), getServerBundle().getJavaProject(), filter);
           for (IType t : abstractLookupServices) {
             if (!proposals.contains(t)) {
               proposals.add(t);
@@ -233,7 +233,8 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         m_genericTypeField.setEnabled(TypeUtility.isGenericType(t));
         if (getGenericTypeSignature() == null && TypeUtility.exists(t)) {
           try {
-            String lookupSvcKeyTypeSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, t.newSupertypeHierarchy(null), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
+            ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(t);
+            String lookupSvcKeyTypeSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, superHierarchy, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
             if (lookupSvcKeyTypeSig != null) {
               setGenericTypeSignature(lookupSvcKeyTypeSig);
             }
@@ -252,10 +253,8 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         @Override
         protected Object[][] computeProposals() {
           IType iLookupService = TypeUtility.getType(IRuntimeClasses.ILookupService);
-          ICachedTypeHierarchy lookupServiceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
-          ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getSharedBundle().getJavaProject()), TypeFilters.getTypeParamSubTypeFilter(getGenericTypeSignature(), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE));
-          IType[] lookupServices = lookupServiceHierarchy.getAllInterfaces(filter, TypeComparators.getTypeNameComparator());
-          return new Object[][]{lookupServices};
+          Set<IType> lookupServiceInterfaces = TypeUtility.getInterfacesOnClasspath(iLookupService, getSharedBundle().getJavaProject(), TypeFilters.getTypeParamSubTypeFilter(getGenericTypeSignature(), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE));
+          return new Object[][]{lookupServiceInterfaces.toArray(new IType[lookupServiceInterfaces.size()])};
         }
       };
       m_lookupServiceTypeField.setContentProvider(contentProvider);
@@ -342,7 +341,8 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOf(IType lookupType) {
     if (TypeUtility.exists(lookupType)) {
       try {
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(lookupType, lookupType.newSupertypeHierarchy(null), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(lookupType);
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(lookupType, superHierarchy, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }

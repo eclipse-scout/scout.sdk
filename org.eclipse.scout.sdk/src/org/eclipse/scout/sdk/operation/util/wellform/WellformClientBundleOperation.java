@@ -35,9 +35,9 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class WellformClientBundleOperation implements IOperation {
 
-  private final IScoutBundle[] m_bundles;
+  private final Set<IScoutBundle> m_bundles;
 
-  public WellformClientBundleOperation(IScoutBundle... bundles) {
+  public WellformClientBundleOperation(Set<IScoutBundle> bundles) {
     m_bundles = bundles;
   }
 
@@ -101,7 +101,7 @@ public class WellformClientBundleOperation implements IOperation {
   }
 
   protected void wellformClientSession(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    IType[] clientSessions = ScoutTypeUtility.getClientSessionTypes(bundle.getJavaProject());
+    Set<IType> clientSessions = ScoutTypeUtility.getClientSessionTypes(bundle.getJavaProject());
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(clientSessions, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -116,7 +116,7 @@ public class WellformClientBundleOperation implements IOperation {
 
   protected void wellformDesktop(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     IType idesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
-    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getTypesInScoutBundles(bundle));
+    Set<IType> desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getTypesInScoutBundles(bundle));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -130,8 +130,8 @@ public class WellformClientBundleOperation implements IOperation {
   }
 
   protected void wellformDesktopExtension(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    IType idesktop = TypeUtility.getType(IRuntimeClasses.IDesktopExtension);
-    IType[] desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getTypesInScoutBundles(bundle));
+    IType iDesktop = TypeUtility.getType(IRuntimeClasses.IDesktopExtension);
+    Set<IType> desktops = TypeUtility.getPrimaryTypeHierarchy(iDesktop).getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(bundle));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
       op.run(monitor, workingCopyManager);

@@ -10,8 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.util.wellform;
 
-import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -33,7 +32,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 public class WellformFormsOperation implements IOperation {
 
   private final IScoutBundle m_clientBundle;
-  private IType[] m_forms;
+  private Set<IType> m_forms;
 
   public WellformFormsOperation(IScoutBundle clientBundle) {
     m_clientBundle = clientBundle;
@@ -58,10 +57,10 @@ public class WellformFormsOperation implements IOperation {
 
     // find all forms
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-    IType[] searchForms = formHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()));
+    Set<IType> searchForms = formHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()));
     ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
         ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()),
-        TypeFilters.getNotInTypes(new HashSet<IType>(Arrays.asList(searchForms)))
+        TypeFilters.getNotInTypes(searchForms)
         );
     m_forms = formHierarchy.getAllSubtypes(iForm, formFilter, TypeComparators.getTypeNameComparator());
     // format forms
@@ -77,7 +76,7 @@ public class WellformFormsOperation implements IOperation {
     return m_clientBundle;
   }
 
-  public IType[] getForms() {
+  public Set<IType> getForms() {
     return m_forms;
   }
 }

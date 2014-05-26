@@ -11,9 +11,9 @@
 package org.eclipse.scout.sdk.ui.view.outline.pages;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
  * <h3>{@link InnerTypePageDirtyListener}</h3> This listener marks the given page dirty (what means all child pages will

@@ -45,11 +45,11 @@ import org.eclipse.scout.sdk.jdt.compile.ICompileResult;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.internal.typecache.HierarchyCache;
+import org.eclipse.scout.sdk.util.internal.typecache.ICacheableTypeHierarchyResult;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.junit.Assert;
@@ -353,10 +353,10 @@ public final class TestWorkspaceUtility {
       }
     }
     out.println("Hierarchies:");
-    for (IPrimaryTypeTypeHierarchy h : TypeUtility.getAllCachedPrimaryTypeHierarchies()) {
-      out.println(" - " + h.getType().getFullyQualifiedName());
+    for (ICacheableTypeHierarchyResult h : HierarchyCache.getInstance().getAllCachedHierarchies()) {
+      out.println(" - " + h.getBaseType().getFullyQualifiedName());
     }
-    out.println("TypeCache: (size='" + TypeCache.getInstance().getAllCachedTypes().length + "')");
+    out.println("TypeCache: (size='" + TypeCache.getInstance().getAllCachedTypes().size() + "')");
 
     out.println("--- END [" + title + "] ----");
   }

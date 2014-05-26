@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.lookup;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
@@ -62,26 +65,21 @@ public class LookupServiceTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     for (IType service : resolveAllLookupServices()) {
-      IType serviceInterface = null;
-      IType[] interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
-      if (interfaces != null && interfaces.length > 0) {
-        serviceInterface = interfaces[0];
-      }
-      new LookupServiceNodePage(this, service, serviceInterface);
+      Set<IType> interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
+      new LookupServiceNodePage(this, service, CollectionUtility.firstElement(interfaces));
     }
   }
 
-  protected IType[] resolveAllLookupServices() {
+  protected Set<IType> resolveAllLookupServices() {
     IType iLookupService = TypeUtility.getType(IRuntimeClasses.ILookupService);
 
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] services = m_serviceHierarchy.getAllSubtypes(iLookupService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
-    return services;
+    return m_serviceHierarchy.getAllSubtypes(iLookupService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
   @SuppressWarnings("unchecked")
@@ -95,7 +93,7 @@ public class LookupServiceTablePage extends AbstractPage {
     if (menu instanceof FormDataSqlBindingValidateAction) {
       ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           return resolveAllLookupServices();
         }
       });

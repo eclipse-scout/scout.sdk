@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.page;
 
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -18,9 +19,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -34,6 +36,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -52,7 +55,7 @@ public abstract class AbstractPageOperation implements IOperation {
       IType iPageWithNodes = TypeUtility.getType(IRuntimeClasses.IPageWithNodes);
       IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
 
-      ITypeHierarchy superTypeHierarchy = getHolderType().newSupertypeHierarchy(monitor);
+      ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getHolderType());
       if (superTypeHierarchy.contains(iOutline)) {
         addToOutline(page, getHolderType(), monitor, workingCopyManager);
       }
@@ -200,20 +203,23 @@ public abstract class AbstractPageOperation implements IOperation {
 
   private void createPageParameterSource(IType page, IType pageWithTable, IImportValidator validator, StringBuilder builder) {
     if (TypeUtility.exists(page) && TypeUtility.exists(pageWithTable)) {
-      IType[] tables = ScoutTypeUtility.getTables(pageWithTable);
-      if (tables != null && tables.length > 0 && TypeUtility.exists(tables[0])) {
-        IType[] columns = ScoutTypeUtility.getPrimaryKeyColumns(tables[0]);
-        for (IType col : columns) {
-          // find method on form
-          String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");
-          IMethod writeMethodOnChildPage = TypeUtility.getMethod(page, "set" + colPropName);
-          if (TypeUtility.exists(writeMethodOnChildPage)) {
-            builder.append(CHILD_PAGE_VAR_NAME);
-            builder.append(".");
-            builder.append(writeMethodOnChildPage.getElementName());
-            builder.append("(getTable().get");
-            builder.append(col.getElementName());
-            builder.append("().getValue(row));\n");
+      Set<IType> tables = ScoutTypeUtility.getTables(pageWithTable);
+      if (tables.size() > 0) {
+        IType firstTable = CollectionUtility.firstElement(tables);
+        if (TypeUtility.exists(firstTable)) {
+          Set<IType> columns = ScoutTypeUtility.getPrimaryKeyColumns(firstTable);
+          for (IType col : columns) {
+            // find method on form
+            String colPropName = col.getElementName().replaceAll("^(.*)Column$", "$1");
+            IMethod writeMethodOnChildPage = TypeUtility.getMethod(page, "set" + colPropName);
+            if (TypeUtility.exists(writeMethodOnChildPage)) {
+              builder.append(CHILD_PAGE_VAR_NAME);
+              builder.append(".");
+              builder.append(writeMethodOnChildPage.getElementName());
+              builder.append("(getTable().get");
+              builder.append(col.getElementName());
+              builder.append("().getValue(row));\n");
+            }
           }
         }
       }

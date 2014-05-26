@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
@@ -66,13 +68,13 @@ public class MenuTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     if (m_menuChangedListener == null) {
       IType iMenuType = TypeUtility.getType(IRuntimeClasses.IMenu);
       m_menuChangedListener = new InnerTypePageDirtyListener(this, iMenuType);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_menuChangedListener);
     }
-    IType[] menues = ScoutTypeUtility.getMenus(getDeclaringType());
+    Set<IType> menues = ScoutTypeUtility.getMenus(getDeclaringType());
     for (IType menu : menues) {
       new MenuNodePage(this, menu);
     }

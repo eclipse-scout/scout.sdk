@@ -1,29 +1,29 @@
 package org.eclipse.scout.sdk.util.signature;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.IRegEx;
+import org.eclipse.scout.sdk.util.ScoutSdkUtilCore;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.signature.internal.TypeGenericMapping;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 public final class SignatureUtility {
 
@@ -134,7 +134,8 @@ public final class SignatureUtility {
     Map<String, String> genericParameters = null;
     if (TypeUtility.exists(contextType) && TypeUtility.exists(signatureOwner)) {
       LinkedHashMap<String, ITypeGenericMapping> collector = new LinkedHashMap<String, ITypeGenericMapping>();
-      resolveGenericParametersInSuperHierarchy(contextType, new String[0], contextType.newSupertypeHierarchy(new NullProgressMonitor()), collector);
+      ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(contextType);
+      resolveGenericParametersInSuperHierarchy(contextType, new String[0], superHierarchy, collector);
       ITypeGenericMapping mapping = collector.get(signatureOwner.getFullyQualifiedName());
       if (mapping != null) {
         genericParameters = mapping.getParameters();
@@ -296,7 +297,7 @@ public final class SignatureUtility {
    * @return an array of the parameter signatures
    * @throws CoreException
    */
-  public static String[] getMethodParameterSignatureResolved(IMethod method) throws CoreException {
+  public static List<String> getMethodParameterSignatureResolved(IMethod method) throws CoreException {
     return getMethodParameterSignatureResolved(method, method.getDeclaringType());
   }
 
@@ -310,9 +311,10 @@ public final class SignatureUtility {
    * @return an array of the parameter signatures
    * @throws CoreException
    */
-  public static String[] getMethodParameterSignatureResolved(IMethod jdtMethod, IType contextType) throws CoreException {
+  public static List<String> getMethodParameterSignatureResolved(IMethod jdtMethod, IType contextType) throws CoreException {
     LinkedHashMap<String, ITypeGenericMapping> genericMapperCollector = new LinkedHashMap<String, ITypeGenericMapping>();
-    resolveGenericParametersInSuperHierarchy(contextType, new String[0], contextType.newSupertypeHierarchy(new NullProgressMonitor()), genericMapperCollector);
+    ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(contextType);
+    resolveGenericParametersInSuperHierarchy(contextType, new String[0], superHierarchy, genericMapperCollector);
     ITypeGenericMapping mapping = genericMapperCollector.get(jdtMethod.getDeclaringType().getFullyQualifiedName());
     Map<String, String> parameters = null;
     if (mapping != null) {
@@ -324,11 +326,11 @@ public final class SignatureUtility {
     return getMethodParameterSignatureResolved(jdtMethod, parameters);
   }
 
-  public static String[] getMethodParameterSignatureResolved(IMethod jdtMethod, Map<String, String> generics) throws CoreException {
-    String[] methodParameterSignature = getMethodParameterSignature(jdtMethod);
+  public static List<String> getMethodParameterSignatureResolved(IMethod jdtMethod, Map<String, String> generics) throws CoreException {
+    List<String> methodParameterSignature = getMethodParameterSignature(jdtMethod);
     IType methodOwnerType = jdtMethod.getDeclaringType();
-    for (int i = 0; i < methodParameterSignature.length; i++) {
-      methodParameterSignature[i] = getResolvedSignature(methodOwnerType, generics, methodParameterSignature[i]); // TODOmethodParameterSignature[i], methodOwnerType, contextType);
+    for (int i = 0; i < methodParameterSignature.size(); i++) {
+      methodParameterSignature.set(i, getResolvedSignature(methodOwnerType, generics, methodParameterSignature.get(i)));
     }
     return methodParameterSignature;
   }
@@ -344,19 +346,20 @@ public final class SignatureUtility {
    * @return
    * @throws JavaModelException
    */
-  public static String[] getMethodParameterSignature(IMethod method) throws JavaModelException {
+  public static List<String> getMethodParameterSignature(IMethod method) throws JavaModelException {
     String[] paramNames = method.getParameterNames();
-    String[] paramSignatures = Arrays.copyOf(method.getParameterTypes(), method.getParameterTypes().length);
+    List<String> paramSignatures = CollectionUtility.arrayList(method.getParameterTypes());
+
     // check for ... array on last parameter
-    if (paramSignatures != null && paramSignatures.length > 0) {
-      String lastSig = paramSignatures[paramSignatures.length - 1];
+    if (paramSignatures.size() > 0) {
+      String lastSig = paramSignatures.get(paramSignatures.size() - 1);
       String lastParamName = paramNames[paramNames.length - 1];
       if (Signature.getTypeSignatureKind(lastSig) == Signature.ARRAY_TYPE_SIGNATURE) {
         String source = method.getSource();
         if (source != null) {
           String regex = method.getElementName() + "\\s*\\(.*([\\.]{3})\\s*" + lastParamName + "\\s*\\)";
           if (Pattern.compile(regex, Pattern.MULTILINE).matcher(source).find()) {
-            paramSignatures[paramSignatures.length - 1] = lastSig.replaceFirst("^\\[", "|");
+            paramSignatures.set(paramSignatures.size() - 1, lastSig.replaceFirst("^\\[", "|"));
           }
         }
       }
@@ -385,11 +388,9 @@ public final class SignatureUtility {
     }
     else {
       ITypeParameter[] typeParameters = signatureOwner.getTypeParameters();
-      if (typeParameters != null && typeParameters.length > 0) {
-        for (ITypeParameter tp : typeParameters) {
-          if (CompareUtility.equals(tp.getElementName(), Signature.getSignatureSimpleName(signature))) {
-            return new StringBuilder().append(Signature.C_TYPE_VARIABLE).append(tp.getElementName()).append(Signature.C_SEMICOLON).toString();
-          }
+      for (ITypeParameter tp : typeParameters) {
+        if (CompareUtility.equals(tp.getElementName(), Signature.getSignatureSimpleName(signature))) {
+          return new StringBuilder().append(Signature.C_TYPE_VARIABLE).append(tp.getElementName()).append(Signature.C_SEMICOLON).toString();
         }
       }
       return signature;
@@ -408,10 +409,10 @@ public final class SignatureUtility {
     StringBuilder methodIdBuilder = new StringBuilder();
     methodIdBuilder.append(method.getElementName());
     methodIdBuilder.append("(");
-    String[] resolvedParamSignatures = getMethodParameterSignatureResolved(method, method.getDeclaringType());
-    for (int i = 0; i < resolvedParamSignatures.length; i++) {
-      methodIdBuilder.append(resolvedParamSignatures[i]);
-      if (i + 1 < resolvedParamSignatures.length) {
+    List<String> resolvedParamSignatures = getMethodParameterSignatureResolved(method, method.getDeclaringType());
+    for (int i = 0; i < resolvedParamSignatures.size(); i++) {
+      methodIdBuilder.append(resolvedParamSignatures.get(i));
+      if (i + 1 < resolvedParamSignatures.size()) {
         methodIdBuilder.append(",");
       }
     }
@@ -425,13 +426,13 @@ public final class SignatureUtility {
     }
     String paramTypeName = Signature.getSignatureSimpleName(typeParameterSignature);
 
-    List<IType> hierarchyList = new ArrayList<IType>();
+    LinkedList<IType> hierarchyList = new LinkedList<IType>();
     if (contextType != null) {
-      ITypeHierarchy superTypeHierarchy = contextType.newSupertypeHierarchy(null);
+      ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(contextType);
       IType visitorType = contextType;
       while (visitorType != null && !visitorType.equals(signatureOwner)) {
-        hierarchyList.add(0, visitorType);
-        visitorType = superTypeHierarchy.getSuperclass(visitorType);
+        hierarchyList.addFirst(visitorType);
+        visitorType = superHierarchy.getSuperclass(visitorType);
       }
     }
 
@@ -531,16 +532,17 @@ public final class SignatureUtility {
     }
   }
 
-  public static void resolveGenericParametersInSuperHierarchy(String signature, String superTypeSignature, String[] interfaceSignatures, LinkedHashMap<String/*fullyQualifiedName*/, ITypeGenericMapping> collector) throws CoreException {
-    resolveGenericParametersInSuperHierarchy(signature, new String[0], superTypeSignature, interfaceSignatures, collector);
+  public static void resolveGenericParametersInSuperHierarchy(String signature, String superTypeSignature, List<String> interfaceSignatures, LinkedHashMap<String/*fullyQualifiedName*/, ITypeGenericMapping> collector) throws CoreException {
+    List<String> arrayList = CollectionUtility.arrayList();
+    resolveGenericParametersInSuperHierarchy(signature, arrayList, superTypeSignature, interfaceSignatures, collector);
   }
 
-  private static void resolveGenericParametersInSuperHierarchy(String signature, String[] parameterSignatures, String superTypeSignature, String[] interfaceSignatures, LinkedHashMap<String/*fullyQualifiedName*/, ITypeGenericMapping> collector) throws CoreException {
+  private static void resolveGenericParametersInSuperHierarchy(String signature, List<String> parameterSignatures, String superTypeSignature, List<String> interfaceSignatures, LinkedHashMap<String/*fullyQualifiedName*/, ITypeGenericMapping> collector) throws CoreException {
     TypeGenericMapping typeDesc = new TypeGenericMapping(Signature.getSignatureQualifier(signature) + "." + Signature.getSignatureSimpleName(signature));
     String[] localParameterSignatures = Signature.getTypeParameters(signature);
     if (localParameterSignatures.length > 0) {
       for (int i = 0; i < localParameterSignatures.length; i++) {
-        typeDesc.addParameter(Signature.getSignatureSimpleName(localParameterSignatures[i]), parameterSignatures[i]);
+        typeDesc.addParameter(Signature.getSignatureSimpleName(localParameterSignatures[i]), parameterSignatures.get(i));
       }
     }
     collector.put(typeDesc.getFullyQualifiedName(), typeDesc);
@@ -560,7 +562,8 @@ public final class SignatureUtility {
             superTypeParameterSignatures[i] = typeParameters[i];
           }
         }
-        resolveGenericParametersInSuperHierarchy(superType, superTypeParameterSignatures, superType.newSupertypeHierarchy(new NullProgressMonitor()), collector);
+        ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(superType);
+        resolveGenericParametersInSuperHierarchy(superType, superTypeParameterSignatures, superHierarchy, collector);
       }
     }
     // interfaces
@@ -575,7 +578,8 @@ public final class SignatureUtility {
               intefaceTypeParameterSignatures[i] = typeDesc.getParameterSignature(Signature.getSignatureSimpleName(typeParameters[i]));
             }
           }
-          resolveGenericParametersInSuperHierarchy(interfaceType, intefaceTypeParameterSignatures, interfaceType.newSupertypeHierarchy(new NullProgressMonitor()), collector);
+          ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(interfaceType);
+          resolveGenericParametersInSuperHierarchy(interfaceType, intefaceTypeParameterSignatures, superHierarchy, collector);
         }
       }
     }

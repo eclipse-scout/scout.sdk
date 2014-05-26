@@ -11,14 +11,13 @@
 package org.eclipse.scout.sdk.ui.fields.proposal.javaelement;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 
 /**
  * <h3>{@link JavaElementAbstractTypeContentProvider}</h3> ...
@@ -46,19 +45,19 @@ public class JavaElementAbstractTypeContentProvider extends AbstractJavaElementC
 
   @Override
   protected Object[][] computeProposals() {
-    ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(m_superType);
+
     ITypeFilter filter = null;
     IType[] mostlyUsed = null;
     if (getFilter() == null) {
-      filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNotInTypes(m_mostlyUsed), TypeFilters.getAbstractOnClasspath(m_project));
+      filter = TypeFilters.getMultiTypeFilter(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getNotInTypes(m_mostlyUsed));
       mostlyUsed = m_mostlyUsed;
     }
     else {
-      filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNotInTypes(m_mostlyUsed), TypeFilters.getAbstractOnClasspath(m_project), getFilter());
+      filter = TypeFilters.getMultiTypeFilter(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getNotInTypes(m_mostlyUsed), getFilter());
 
       // filter the mostly used
       if (m_mostlyUsed != null) {
-        ArrayList<Object> mu = new ArrayList<Object>(m_mostlyUsed.length);
+        ArrayList<IType> mu = new ArrayList<IType>(m_mostlyUsed.length);
         for (IType o : m_mostlyUsed) {
           if (TypeUtility.exists(o) && getFilter().accept(o)) {
             mu.add(o);
@@ -67,9 +66,10 @@ public class JavaElementAbstractTypeContentProvider extends AbstractJavaElementC
         mostlyUsed = mu.toArray(new IType[mu.size()]);
       }
     }
-    IType[] abstractTypes = typeHierarchy.getAllSubtypes(m_superType, filter, TypeComparators.getTypeNameComparator());
 
-    return new Object[][]{mostlyUsed, abstractTypes};
+    Set<IType> types = TypeUtility.getAbstractTypesOnClasspath(m_superType, m_project, filter);
+
+    return new Object[][]{mostlyUsed, types.toArray(new IType[types.size()])};
   }
 
   public ITypeFilter getFilter() {

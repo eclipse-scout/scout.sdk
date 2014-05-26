@@ -57,7 +57,7 @@ import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleComparator;
@@ -218,7 +218,7 @@ public class ScoutBundle implements IScoutBundle {
   }
 
   @Override
-  public IScoutBundle[] getChildBundles(IScoutBundleFilter filter, boolean includeThis) {
+  public Set<IScoutBundle> getChildBundles(IScoutBundleFilter filter, boolean includeThis) {
     P_BundleCollector bundleCollector = new P_BundleCollector(filter);
     visit(bundleCollector, includeThis, false);
     return bundleCollector.getElements();
@@ -243,7 +243,7 @@ public class ScoutBundle implements IScoutBundle {
   }
 
   @Override
-  public IScoutBundle[] getParentBundles(IScoutBundleFilter filter, boolean includeThis) {
+  public Set<IScoutBundle> getParentBundles(IScoutBundleFilter filter, boolean includeThis) {
     P_BundleCollector bundleCollector = new P_BundleCollector(filter);
     visit(bundleCollector, includeThis, true);
     return bundleCollector.getElements();
@@ -441,7 +441,7 @@ public class ScoutBundle implements IScoutBundle {
     if (m_textProvidersChangedListener == null) {
       IType abstractDynamicNlsTextProviderService = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
       if (TypeUtility.exists(abstractDynamicNlsTextProviderService)) {
-        IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
+        ICachedTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
         m_textProvidersChangedListener = new P_TextProviderServiceHierarchyChangedListener(this);
         pth.addHierarchyListener(m_textProvidersChangedListener);
       }
@@ -561,7 +561,7 @@ public class ScoutBundle implements IScoutBundle {
     if (m_textProvidersChangedListener != null) {
       IType abstractDynamicNlsTextProviderService = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
       if (TypeUtility.exists(abstractDynamicNlsTextProviderService)) {
-        IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
+        ICachedTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(abstractDynamicNlsTextProviderService);
         pth.removeHierarchyListener(m_textProvidersChangedListener);
       }
       m_textProvidersChangedListener = null; // weak listener. will be collected when this instance holds no reference anymore.
@@ -670,8 +670,8 @@ public class ScoutBundle implements IScoutBundle {
       return true;
     }
 
-    public IScoutBundle[] getElements() {
-      return m_collector.toArray(new IScoutBundle[m_collector.size()]);
+    public Set<IScoutBundle> getElements() {
+      return m_collector;
     }
   }
 

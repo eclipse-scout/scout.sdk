@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.operation.jdt;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -25,6 +24,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ManifestExportPackageOperation;
@@ -51,7 +51,7 @@ public class JavaElementDeleteOperation implements IOperation {
   }
 
   public void setMembers(IJavaElement[] members) {
-    m_typesToDelete = new ArrayList<IJavaElement>(Arrays.asList(members));
+    m_typesToDelete = CollectionUtility.arrayList(members);
   }
 
   public void addMember(IJavaElement element) {

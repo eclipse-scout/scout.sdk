@@ -42,7 +42,7 @@ public abstract class AbstractTableSourceBuilder extends AbstractDtoTypeSourceBu
     }
 
     // try IColumn first
-    String sig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, columnHierarchy.getJdtHierarchy(), IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
+    String sig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, columnHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
     if (sig != null) {
       return sig;
     }

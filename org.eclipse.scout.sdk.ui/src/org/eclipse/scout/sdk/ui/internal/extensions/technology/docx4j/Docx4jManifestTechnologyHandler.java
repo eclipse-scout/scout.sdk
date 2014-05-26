@@ -80,7 +80,7 @@ public class Docx4jManifestTechnologyHandler extends AbstractScoutTechnologyHand
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
-    IScoutBundle[] childBundles = project.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED, IScoutBundle.TYPE_CLIENT), true);
+    Set<IScoutBundle> childBundles = project.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED, IScoutBundle.TYPE_CLIENT), true);
     contributeManifestFiles(childBundles, list);
   }
 }

@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 /**
  * <h3>{@link ServiceMethod}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.9.0 09.04.2013
  */
 public class ServiceMethod {
@@ -98,7 +98,7 @@ public class ServiceMethod {
     m_interfaceSourceBuilder.setCommentSourceBuilder(commentSourceBuilder);
   }
 
-  public void setParameters(MethodParameter[] parameters) {
+  public void setParameters(List<MethodParameter> parameters) {
     m_interfaceSourceBuilder.setParameters(parameters);
     m_implementationSourceBuilder.setParameters(parameters);
   }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
@@ -37,7 +38,7 @@ public abstract class AbstractCachedTypeContentProposalProvider extends ContentP
   private final ILabelProvider m_labelProvider;
 
   private IType m_type;
-  private Object[] m_proposals;
+  private Set<?> m_proposals;
   private AbstractElementChangedListener m_listener;
 
   protected AbstractCachedTypeContentProposalProvider(ILabelProvider labelProvider) {
@@ -70,8 +71,9 @@ public abstract class AbstractCachedTypeContentProposalProvider extends ContentP
       searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
     }
     char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
-    ArrayList<Object> collector = new ArrayList<Object>();
-    for (Object proposal : getElements()) {
+    Set<?> elements = getElements();
+    ArrayList<Object> collector = new ArrayList<Object>(elements.size());
+    for (Object proposal : elements) {
       if (CharOperation.match(pattern, m_labelProvider.getText(proposal).toCharArray(), false)) {
         collector.add(proposal);
       }
@@ -85,7 +87,7 @@ public abstract class AbstractCachedTypeContentProposalProvider extends ContentP
     super.dispose();
   }
 
-  private synchronized Object[] getElements() {
+  private synchronized Set<?> getElements() {
     if (m_proposals == null) {
       boolean typeExists = TypeUtility.exists(m_type);
       if (m_listener == null && typeExists && !m_type.isBinary()) {
@@ -99,7 +101,7 @@ public abstract class AbstractCachedTypeContentProposalProvider extends ContentP
     return m_proposals;
   }
 
-  protected abstract Object[] computeProposals();
+  protected abstract Set<?> computeProposals();
 
   private static final class P_ElementListener extends AbstractElementChangedListener {
 

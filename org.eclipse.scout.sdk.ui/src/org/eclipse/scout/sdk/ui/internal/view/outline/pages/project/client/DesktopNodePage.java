@@ -39,7 +39,7 @@ public class DesktopNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     new DesktopMenuTablePage(this, getType());
     new DesktopOutlineTablePage(this, getType());
     new ToolButtonTablePage(this, getType());

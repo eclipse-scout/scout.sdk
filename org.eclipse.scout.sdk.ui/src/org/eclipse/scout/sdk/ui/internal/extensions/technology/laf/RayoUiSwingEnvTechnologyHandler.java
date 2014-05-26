@@ -28,6 +28,7 @@ import org.eclipse.jdt.core.dom.Type;
 import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.TriState;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -39,7 +40,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -130,9 +131,10 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
 
   @Override
   public TriState getSelection(IScoutBundle project) {
-    IType[] swingEnvs = getSwingEnvironments(project);
+    Set<IType> swingEnvironments = getSwingEnvironments(project);
+    IType[] swingEnvs = swingEnvironments.toArray(new IType[swingEnvironments.size()]);
     if (swingEnvs == null || swingEnvs.length == 0) {
-      return TriState.FALSE;
+      return null;
     }
 
     TriState ret = TriState.parseTriState(isRayoEnvironment(swingEnvs[0]));
@@ -165,14 +167,14 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
     return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), false) != null;
   }
 
-  private IType[] getSwingEnvironments(IScoutBundle bundle) {
-    IScoutBundle[] swingBundles = bundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
+  private Set<IType> getSwingEnvironments(IScoutBundle bundle) {
+    Set<IScoutBundle> swingBundles = bundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
     IType baseType = TypeUtility.getType(IRuntimeClasses.ISwingEnvironment);
     if (TypeUtility.exists(baseType)) {
-      IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(baseType);
+      ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(baseType);
       return hierarchy.getAllSubtypes(baseType, ScoutTypeFilters.getTypesInScoutBundles(swingBundles));
     }
-    return new IType[]{};
+    return CollectionUtility.hashSet();
   }
 
   @Override

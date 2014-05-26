@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.code.type;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -21,6 +23,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.codeid.CodeIdExtensionPoint;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -45,6 +48,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
@@ -69,7 +73,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   private IType m_defaultCodeType;
   private String m_genericSignature;
   private String m_genericCodeIdSignature;
-  private ITypeParameter[] m_superTypeParameters;
+  private List<ITypeParameter> m_superTypeParameters;
 
   private CodeIdField m_nextCodeIdField;
   private ProposalTextField m_nlsNameField;
@@ -249,8 +253,8 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected void handleGenericFieldEnableState() {
-    m_genericTypeField.setEnabled(m_superTypeParameters.length > 0 && getSharedBundle() != null);
-    m_genericCodeIdField.setEnabled(m_superTypeParameters.length > 1 && getSharedBundle() != null);
+    m_genericTypeField.setEnabled(m_superTypeParameters.size() > 0 && getSharedBundle() != null);
+    m_genericCodeIdField.setEnabled(m_superTypeParameters.size() > 1 && getSharedBundle() != null);
   }
 
   @Override
@@ -262,13 +266,13 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     String sig = null;
     if (getGenericSignature() != null) {
       StringBuilder fqn = new StringBuilder(getSuperType().getFullyQualifiedName());
-      if (m_superTypeParameters.length > 0) {
+      if (m_superTypeParameters.size() > 0) {
         fqn.append('<');
         fqn.append(Signature.toString(getGenericSignature()));
-        if (m_superTypeParameters.length > 1) {
+        if (m_superTypeParameters.size() > 1) {
           fqn.append(", ");
           fqn.append(Signature.toString(getGenericCodeIdSignature()));
-          if (m_superTypeParameters.length > 2) {
+          if (m_superTypeParameters.size() > 2) {
             fqn.append(", ");
             fqn.append(IRuntimeClasses.ICode);
             fqn.append('<');
@@ -360,7 +364,8 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IType getGenericTypeOfSuperClass(String typeArgName) {
     try {
-      String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), getSuperType().newSupertypeHierarchy(null), IRuntimeClasses.ICodeType, typeArgName);
+      ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getSuperType());
+      String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.ICodeType, typeArgName);
       if (typeParamSig != null) {
         return TypeUtility.getTypeBySignature(typeParamSig);
       }

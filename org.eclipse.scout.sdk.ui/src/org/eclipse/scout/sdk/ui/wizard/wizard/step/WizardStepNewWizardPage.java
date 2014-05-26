@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.wizard.step;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -37,11 +39,7 @@ import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
@@ -175,10 +173,8 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
     AbstractJavaElementContentProvider contentProvider = new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
-        ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.IForm));
-        ITypeFilter formsFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(m_declaringType.getJavaProject()));
-        IType[] forms = formHierarchy.getAllSubtypes(TypeUtility.getType(IRuntimeClasses.IForm), formsFilter, TypeComparators.getTypeNameComparator());
-        return new Object[][]{forms};
+        Set<IType> forms = TypeUtility.getClassesOnClasspath(TypeUtility.getType(IRuntimeClasses.IForm), m_declaringType.getJavaProject(), null);
+        return new Object[][]{forms.toArray(new IType[forms.size()])};
       }
     };
     m_stepFormField.setContentProvider(contentProvider);
@@ -193,9 +189,9 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
           AbstractJavaElementContentProvider formHandlerProvider = null;
           IType formHandlerSelection = (IType) m_formHandlerField.getSelectedProposal();
           if (getFormType() != null) {
-            IType[] formHandlers = ScoutTypeUtility.getFormHandlers(getFormType());
+            Set<IType> formHandlers = ScoutTypeUtility.getFormHandlers(getFormType());
             if (formHandlers != null) {
-              formHandlerProvider = new SimpleJavaElementContentProvider(formHandlers);
+              formHandlerProvider = new SimpleJavaElementContentProvider(formHandlers.toArray(new IType[formHandlers.size()]));
             }
             // assign null selection if the current selected form is not the declaring type of the form hanlder selection.
             if (formHandlerSelection != null && !getFormType().equals(formHandlerSelection.getDeclaringType())) {

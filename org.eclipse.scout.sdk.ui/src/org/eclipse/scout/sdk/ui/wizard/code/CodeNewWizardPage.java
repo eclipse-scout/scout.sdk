@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.codeid.CodeIdExtensionPoint;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -43,6 +44,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -144,10 +146,10 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
     ITypeFilter filter = null;
     String codeIdSignatureFromCodeType = null;
     try {
-      IType codeType = TypeUtility.getPrimaryType(m_declaringType);
+      IType codeType = TypeUtility.getToplevelType(m_declaringType);
       codeIdSignatureFromCodeType = ScoutTypeUtility.getCodeIdGenericTypeSignature(codeType);
 
-      String codeSignature = ScoutTypeUtility.getCodeSignature(codeType, codeType.newSupertypeHierarchy(null));
+      String codeSignature = ScoutTypeUtility.getCodeSignature(codeType, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(codeType));
       if (codeSignature != null) {
         if (codeIdSignatureFromCodeType != null) {
           filter = TypeFilters.getMultiTypeFilter(TypeFilters.getSubtypeFilter(TypeUtility.getTypeBySignature(codeSignature)), TypeFilters.getTypeParamSubTypeFilter(codeIdSignatureFromCodeType, IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID));
@@ -189,15 +191,26 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
           }
 
           IType genericTypeOfSuperClass = getGenericTypeOfSuperClass();
-          try {
-            if (TypeUtility.exists(genericTypeOfSuperClass) && (getGenericSignature() == null || !TypeUtility.getTypeBySignature(getGenericSignature()).newSupertypeHierarchy(null).contains(genericTypeOfSuperClass))) {
+          if (TypeUtility.exists(genericTypeOfSuperClass)) {
+            boolean acceptProp = false;
+            if (getGenericSignature() == null) {
+              acceptProp = true;
+            }
+            else {
+              IType t = TypeUtility.getTypeBySignature(getGenericSignature());
+              if (TypeUtility.exists(t)) {
+                acceptProp = !ScoutSdkCore.getHierarchyCache().getSuperHierarchy(t).contains(genericTypeOfSuperClass);
+              }
+              else {
+                acceptProp = true;
+              }
+            }
+
+            if (acceptProp) {
               m_genericTypeField.acceptProposal(SignatureCache.createTypeSignature(genericTypeOfSuperClass.getFullyQualifiedName()));
             }
-            proposalProvider.setBaseType(genericTypeOfSuperClass);
           }
-          catch (JavaModelException e) {
-            ScoutSdkUi.logError(e);
-          }
+          proposalProvider.setBaseType(genericTypeOfSuperClass);
         }
         finally {
           setStateChanging(false);
@@ -311,7 +324,8 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getSuperType())) {
       try {
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), getSuperType().newSupertypeHierarchy(null), IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID);
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getSuperType());
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -18,6 +19,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.Viewer;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
@@ -65,7 +67,7 @@ public class GroupBoxBodyGridPresenter extends AbstractTypeProposalPresenter {
 
   private class P_ContentProvider extends ContentProposalProvider {
 
-    private IType[] m_proposals;
+    private Set<IType> m_proposals;
     private final ILabelProvider m_labelProvider;
 
     private P_ContentProvider(ILabelProvider labelProvider) {
@@ -108,7 +110,7 @@ public class GroupBoxBodyGridPresenter extends AbstractTypeProposalPresenter {
             return;
           }
         }
-        m_proposals = new IType[0];
+        m_proposals = CollectionUtility.hashSet();
       }
     }
   }

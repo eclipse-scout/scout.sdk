@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
@@ -21,10 +24,9 @@ import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractTypeProposalPresenter;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 
@@ -82,22 +84,20 @@ public class LookupServiceProposalPresenter extends AbstractTypeProposalPresente
     }
 
     @Override
-    protected Object[] computeProposals() {
+    protected Set<?> computeProposals() {
       IType iLookupService = TypeUtility.getType(IRuntimeClasses.ILookupService);
 
       String genericSignature = null;
       try {
-        genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), getType().newSupertypeHierarchy(null), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getType());
+        genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), superHierarchy, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
       }
       catch (CoreException e) {
         ScoutSdkUi.logError(e);
       }
 
-      ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
-      ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNoGenericTypesFilter(),
-          TypeFilters.getTypesOnClasspath(getType().getJavaProject()),
-          TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE));
-      return typeHierarchy.getAllSubtypes(iLookupService, filter, TypeComparators.getTypeNameComparator());
+      ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE));
+      return TypeUtility.getClassesOnClasspath(iLookupService, getType().getJavaProject(), filter);
     }
   }
 }

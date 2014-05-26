@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace;
 
+import java.util.Set;
+
 import org.eclipse.core.resources.IProject;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.scout.sdk.ScoutSdkCore;
@@ -43,7 +45,7 @@ public interface IScoutBundleGraph {
    * @see ScoutBundleFilters
    * @see ScoutBundleComparators
    */
-  IScoutBundle[] getBundles(IScoutBundleFilter filter, IScoutBundleComparator comparator);
+  Set<IScoutBundle> getBundles(IScoutBundleFilter filter, IScoutBundleComparator comparator);
 
   /**
    * Gets all scout bundles of the graph matching the given filter.<br>
@@ -60,7 +62,7 @@ public interface IScoutBundleGraph {
    * @see IScoutBundleFilter
    * @see ScoutBundleFilters
    */
-  IScoutBundle[] getBundles(IScoutBundleFilter filter);
+  Set<IScoutBundle> getBundles(IScoutBundleFilter filter);
 
   /**
    * Gets the scout bundle that contains the given java element or null if no scout bundle exists for the given element.<br>

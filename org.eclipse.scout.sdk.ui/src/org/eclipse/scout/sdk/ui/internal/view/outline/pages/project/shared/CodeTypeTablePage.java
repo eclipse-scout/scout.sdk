@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -62,7 +64,7 @@ public class CodeTypeTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iCodeType = TypeUtility.getType(IRuntimeClasses.ICodeType);
 
     if (m_codeTypeHierarchy == null) {
@@ -70,7 +72,7 @@ public class CodeTypeTablePage extends AbstractPage {
       m_codeTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
-    IType[] codeTypes = m_codeTypeHierarchy.getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator());
+    Set<IType> codeTypes = m_codeTypeHierarchy.getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator());
     for (IType codeType : codeTypes) {
       new CodeTypeNodePage(this, codeType);
     }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.action;
 
 import java.util.HashMap;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
@@ -39,8 +40,8 @@ public class InstallClientSessionAction extends AbstractOperationAction {
 
   public void init(ICachedTypeHierarchy clientSessionHierarchy, IScoutBundle scoutResource) {
     if (clientSessionHierarchy != null && !scoutResource.isBinary()) {
-      IType[] clientSessions = clientSessionHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(scoutResource), null);
-      if (clientSessions.length == 0) {
+      Set<IType> clientSessions = clientSessionHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(scoutResource), null);
+      if (clientSessions.size() == 0) {
         IScoutBundle shared = scoutResource.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
         if (shared != null) {
           String pck = scoutResource.getPackageName("ui.desktop");

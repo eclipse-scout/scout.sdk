@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -67,22 +69,21 @@ public class SearchFormTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     for (IType searchForm : resolveSearchForms()) {
       FormNodePage form = new FormNodePage(this, searchForm);
       form.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchForm));
     }
   }
 
-  protected IType[] resolveSearchForms() {
+  protected Set<IType> resolveSearchForms() {
     IType iSearchForm = TypeUtility.getType(IRuntimeClasses.ISearchForm);
 
     if (m_searchFormHierarchy == null) {
       m_searchFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSearchForm);
       m_searchFormHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] searchForms = m_searchFormHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
-    return searchForms;
+    return m_searchFormHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
   @SuppressWarnings("unchecked")
@@ -105,7 +106,7 @@ public class SearchFormTablePage extends AbstractPage {
     else if (menu instanceof TypeResolverFormDataAction) {
       ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           return resolveSearchForms();
         }
       }, getScoutBundle());

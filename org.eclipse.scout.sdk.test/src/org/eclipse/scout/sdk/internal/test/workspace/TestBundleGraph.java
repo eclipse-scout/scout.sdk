@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.workspace;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
@@ -42,8 +44,8 @@ public class TestBundleGraph extends AbstractScoutSdkTest {
     // will trigger the bundle-graph creation
     IScoutBundleGraph bundleGraph = ScoutSdkCore.getScoutWorkspace().getBundleGraph();
     bundleGraph.waitFor();
-    IScoutBundle[] bundles = bundleGraph.getBundles(ScoutBundleFilters.getRootBundlesFilter());
-    Assert.assertEquals(5, bundles.length); // all bundles are root bundles because the cycles are broken by the graph
+    Set<IScoutBundle> bundles = bundleGraph.getBundles(ScoutBundleFilters.getRootBundlesFilter());
+    Assert.assertEquals(5, bundles.size()); // all bundles are root bundles because the cycles are broken by the graph
 
     ScoutBundleGraph g = (ScoutBundleGraph) ScoutSdkCore.getScoutWorkspace().getBundleGraph();
     Assert.assertEquals(5, g.getDependencyIssues().length);

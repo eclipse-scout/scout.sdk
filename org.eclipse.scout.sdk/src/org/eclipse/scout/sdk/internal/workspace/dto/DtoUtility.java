@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -27,7 +28,9 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.formdata.CompositeFormDataTypeSourceBuilder;
@@ -110,17 +113,16 @@ public final class DtoUtility {
   }
 
   public static IType findTable(IType tableOwner, ITypeHierarchy hierarchy) {
-
     if (TypeUtility.exists(tableOwner)) {
       if (hierarchy == null) {
         hierarchy = TypeUtility.getLocalTypeHierarchy(tableOwner);
       }
-      IType[] tables = TypeUtility.getInnerTypes(tableOwner, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITable), hierarchy), null);
-      if (tables.length > 0) {
-        if (tables.length > 1) {
+      Set<IType> tables = TypeUtility.getInnerTypes(tableOwner, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITable), hierarchy), null);
+      if (tables.size() > 0) {
+        if (tables.size() > 1) {
           ScoutSdk.logWarning("table field '" + tableOwner.getFullyQualifiedName() + "' contains more than one table! Taking first for dto creation.");
         }
-        return tables[0];
+        return CollectionUtility.firstElement(tables);
       }
       else {
         IType superclass = hierarchy.getSuperclass(tableOwner);
@@ -150,22 +152,20 @@ public final class DtoUtility {
     return superTypeSignature;
   }
 
-  public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType, org.eclipse.jdt.core.ITypeHierarchy superTypeHierarchy, IProgressMonitor monitor) throws JavaModelException {
+  public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType, ITypeHierarchy superTypeHierarchy, IProgressMonitor monitor) throws JavaModelException {
     IType validationRuleType = TypeUtility.getType(IRuntimeClasses.ValidationRule);
     TreeMap<String, ValidationRuleMethod> ruleMap = new TreeMap<String, ValidationRuleMethod>();
     if (superTypeHierarchy == null) {
-      try {
-        superTypeHierarchy = declaringType.newSupertypeHierarchy(null);
-      }
-      catch (JavaModelException e) {
-        ScoutSdk.logWarning("could not build super type hierarchy for '" + declaringType.getFullyQualifiedName() + "'.", e);
+      superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(declaringType);
+      if (superTypeHierarchy == null) {
+        ScoutSdk.logWarning("could not build super type hierarchy for '" + declaringType.getFullyQualifiedName() + "'.");
         return Collections.emptyList();
       }
     }
 
     ArrayList<IType> targetTypeList = new ArrayList<IType>(5);
     targetTypeList.add(0, declaringType);
-    IType[] superClasses = superTypeHierarchy.getAllSuperclasses(declaringType);
+    Set<IType> superClasses = superTypeHierarchy.getAllSuperclasses(declaringType);
     for (IType t : superClasses) {
       if (TypeUtility.exists(t) && !t.getFullyQualifiedName().equals(Object.class.getName())) {
         targetTypeList.add(t);

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -61,7 +63,7 @@ public class LookupCallTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iLookupCall = TypeUtility.getType(IRuntimeClasses.ILookupCall);
 
     if (m_lookupCallHierarchy == null) {
@@ -69,7 +71,7 @@ public class LookupCallTablePage extends AbstractPage {
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
-    IType[] lookupCallTypes = m_lookupCallHierarchy.getAllSubtypes(iLookupCall, filter, TypeComparators.getTypeNameComparator());
+    Set<IType> lookupCallTypes = m_lookupCallHierarchy.getAllSubtypes(iLookupCall, filter, TypeComparators.getTypeNameComparator());
     for (IType type : lookupCallTypes) {
       new LookupCallNodePage(this, type);
     }

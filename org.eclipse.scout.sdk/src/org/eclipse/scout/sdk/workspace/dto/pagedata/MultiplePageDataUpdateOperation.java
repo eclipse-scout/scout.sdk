@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.dto.pagedata;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -47,13 +49,13 @@ public class MultiplePageDataUpdateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    IType[] pages = m_resolver.getTypes();
-    monitor.beginTask("Updating Page Datas", pages.length);
+    Set<IType> pages = m_resolver.getTypes();
+    monitor.beginTask("Updating Page Datas", pages.size());
     int i = 0;
     IProgressMonitor innerMonitor = new NullProgressMonitor();
     for (IType t : pages) {
       i++;
-      monitor.setTaskName("Updating Page Data " + i + " of " + pages.length + " (" + t.getElementName() + ")");
+      monitor.setTaskName("Updating Page Data " + i + " of " + pages.size() + " (" + t.getElementName() + ")");
       PageDataAnnotation annotation = ScoutTypeUtility.findPageDataAnnotation(t, TypeUtility.getSuperTypeHierarchy(t));
       if (annotation != null) {
         IType pageDataType = TypeUtility.getTypeBySignature(annotation.getPageDataTypeSignature());

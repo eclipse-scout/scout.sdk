@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.form;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
@@ -34,8 +36,6 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
@@ -182,10 +182,9 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     m_tablePageField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("TablePage"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
-        IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
         IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
-        IType[] list = TypeUtility.getPrimaryTypeHierarchy(iPage).getAllSubtypes(iPageWithTable, TypeFilters.getTypesOnClasspath(ScoutUtility.getJavaProject(getClientBundle())), TypeComparators.getTypeNameComparator());
-        return new Object[][]{list};
+        Set<IType> types = TypeUtility.getClassesOnClasspath(iPageWithTable, ScoutUtility.getJavaProject(getClientBundle()), null);
+        return new Object[][]{types.toArray(new IType[types.size()])};
       }
     }, labelColWidthPercent);
     m_tablePageField.acceptProposal(getTablePageType());

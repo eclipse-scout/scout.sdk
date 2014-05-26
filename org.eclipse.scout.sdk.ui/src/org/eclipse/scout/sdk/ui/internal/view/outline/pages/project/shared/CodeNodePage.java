@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -57,14 +59,14 @@ public class CodeNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       IType iCode = TypeUtility.getType(IRuntimeClasses.ICode);
       m_innerTypeListener = new InnerTypePageDirtyListener(this, iCode);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
 
-    IType[] codes = ScoutTypeUtility.getCodes(getType());
+    Set<IType> codes = ScoutTypeUtility.getCodes(getType());
     for (IType code : codes) {
       new CodeNodePage(this, code);
     }

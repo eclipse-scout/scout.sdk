@@ -13,6 +13,8 @@
  */
 package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 
+import java.util.Set;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.core.IType;
@@ -107,10 +109,9 @@ public class AuthenticationHandlerNewWizardAction extends AbstractLinkAction {
       else {
         type = TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer);
       }
-      IType[] subTypes;
+      Set<IType> subTypes;
       if (m_onlyInterfaceTypes) {
-        IType[] candidates = TypeUtility.getPrimaryTypeHierarchy(type).getAllSubtypes(type, new ITypeFilter() {
-
+        subTypes = TypeUtility.getPrimaryTypeHierarchy(type).getAllSubtypes(type, new ITypeFilter() {
           @Override
           public boolean accept(IType candidate) {
             try {
@@ -126,14 +127,12 @@ public class AuthenticationHandlerNewWizardAction extends AbstractLinkAction {
           }
         });
         // add interface type itself
-        subTypes = new IType[candidates.length + 1];
-        System.arraycopy(candidates, 0, subTypes, 1, candidates.length);
-        subTypes[0] = type;
+        subTypes.add(type);
       }
       else {
         subTypes = TypeUtility.getPrimaryTypeHierarchy(type).getAllSubtypes(type, TypeFilters.getTypesOnClasspath(type.getJavaProject()));
       }
-      return SearchEngine.createJavaSearchScope(subTypes);
+      return SearchEngine.createJavaSearchScope(subTypes.toArray(new IType[subTypes.size()]));
     }
   }
 }

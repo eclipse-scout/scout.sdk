@@ -38,7 +38,13 @@ public class F2ProdTechnologyHandler extends AbstractScoutTechnologyHandler impl
   public TriState getSelection(IScoutBundle project) throws CoreException {
     TriState swingSelection = getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutUiSwingBundleId}, new String[]{F2_PLUGIN});
     TriState swtSelection = getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutUiSwtBundleId}, new String[]{F2_PLUGIN});
-    if (CompareUtility.equals(swingSelection, swtSelection)) {
+    if (swingSelection == null) {
+      return swtSelection;
+    }
+    else if (swtSelection == null) {
+      return swingSelection;
+    }
+    else if (CompareUtility.equals(swingSelection, swtSelection)) {
       return swingSelection;
     }
     else {

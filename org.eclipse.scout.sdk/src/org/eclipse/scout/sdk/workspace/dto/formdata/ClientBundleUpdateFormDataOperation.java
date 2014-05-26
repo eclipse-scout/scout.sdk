@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.dto.formdata;
 
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
@@ -53,20 +53,28 @@ public class ClientBundleUpdateFormDataOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    // collect types
-    final ArrayList<IType> types = new ArrayList<IType>();
-    IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
-    IPrimaryTypeTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-    types.addAll(Arrays.asList(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getInScoutBundles(getClientBundle()))));
 
+    if (getClientBundle().isBinary()) {
+      return;
+    }
+
+    // collect types
+    final Set<IType> types = new HashSet<IType>();
+
+    // forms
+    IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
+    ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
+    types.addAll(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getInScoutBundles(getClientBundle())));
+
+    // form field templates
     IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
-    IPrimaryTypeTypeHierarchy formFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iFormField);
-    types.addAll(Arrays.asList(formFieldHierarchy.getAllSubtypes(iFormField, ScoutTypeFilters.getInScoutBundles(getClientBundle()))));
+    Set<IType> formFields = TypeUtility.getAbstractTypesOnClasspath(iFormField, getClientBundle().getJavaProject(), ScoutTypeFilters.getInScoutBundles(getClientBundle()));
+    types.addAll(formFields);
 
     MultipleFormDataUpdateOperation updateOp = new MultipleFormDataUpdateOperation(new ITypeResolver() {
       @Override
-      public IType[] getTypes() {
-        return types.toArray(new IType[types.size()]);
+      public Set<IType> getTypes() {
+        return types;
       }
     });
     updateOp.validate();

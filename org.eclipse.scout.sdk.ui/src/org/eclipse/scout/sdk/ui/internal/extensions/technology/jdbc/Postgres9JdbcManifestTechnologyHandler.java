@@ -54,7 +54,7 @@ public class Postgres9JdbcManifestTechnologyHandler extends AbstractScoutTechnol
     contributeManifestFiles(getServerBundlesBelow(project), list);
   }
 
-  private IScoutBundle[] getServerBundlesBelow(IScoutBundle start) {
+  private Set<IScoutBundle> getServerBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
   }
 }

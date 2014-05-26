@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace.dto;
 
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
@@ -162,7 +165,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
                 }
 
                 // check if all referenced types are accessible
-                IType[] typeOccurenceInAnnotation = ScoutTypeUtility.getTypeOccurenceInAnnotation(annotation, declaringType);
+                List<IType> typeOccurenceInAnnotation = ScoutTypeUtility.getTypeOccurenceInAnnotation(annotation, declaringType);
                 for (IType t : typeOccurenceInAnnotation) {
                   if (!TypeUtility.isOnClasspath(t, ownerProject)) {
                     ScoutSdk.logInfo("Type '" + t.getFullyQualifiedName() + "' referenced in DTO relevant annotation '" + annotationDeclarationType.getFullyQualifiedName() + "' in type '" + declaringType.getFullyQualifiedName() + "' is not accessible from DTO project '" + ownerProject.getElementName() + "'. Annotation will be skipped.");
@@ -211,7 +214,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
   }
 
   protected void collectProperties(IProgressMonitor monitor) {
-    IPropertyBean[] beanPropertyDescriptors = TypeUtility.getPropertyBeans(getModelType(), ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
+    Set<? extends IPropertyBean> beanPropertyDescriptors = TypeUtility.getPropertyBeans(getModelType(), ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
     if (beanPropertyDescriptors != null) {
       for (IPropertyBean desc : beanPropertyDescriptors) {
         try {

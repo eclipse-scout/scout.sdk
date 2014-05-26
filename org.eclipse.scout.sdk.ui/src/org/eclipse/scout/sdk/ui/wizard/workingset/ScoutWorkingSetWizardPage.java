@@ -1,6 +1,7 @@
 package org.eclipse.scout.sdk.ui.wizard.workingset;
 
 import java.util.ArrayList;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.wizard.WizardPage;
@@ -100,7 +101,7 @@ public class ScoutWorkingSetWizardPage extends WizardPage implements IWorkingSet
   private ITreeNode createTree() {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
-    IScoutBundle[] allBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getAllBundlesFilter(), ScoutBundleComparators.getSymbolicNameAscComparator());
+    Set<IScoutBundle> allBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getAllBundlesFilter(), ScoutBundleComparators.getSymbolicNameAscComparator());
 
     for (IScoutBundle b : allBundles) {
       ITreeNode bundleNode = TreeUtility.createBundleTreeNode(rootNode, b);

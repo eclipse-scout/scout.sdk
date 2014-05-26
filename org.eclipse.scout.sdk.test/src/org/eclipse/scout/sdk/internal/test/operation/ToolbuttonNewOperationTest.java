@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.test.operation;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
@@ -29,7 +31,7 @@ import org.junit.Test;
 /**
  * <h3>{@link ToolbuttonNewOperationTest}</h3> ...
  * 
- *  @author Andreas Hoegger
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class ToolbuttonNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -44,16 +46,16 @@ public class ToolbuttonNewOperationTest extends AbstractSdkTestWithSampleProject
     IType createdToolbutton = toolbuttonOp.getCreatedType();
     SdkAssert.assertExist(createdToolbutton);
     SdkAssert.assertPublic(createdToolbutton).assertNoMoreFlags();
-    IType[] toolButtons = TypeUtility.getInnerTypesOrdered(desktop, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
+    Set<IType> tb = TypeUtility.getInnerTypesOrdered(desktop, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
+    IType[] toolButtons = tb.toArray(new IType[tb.size()]);
     SdkAssert.assertEquals(4, toolButtons.length);
     SdkAssert.assertEquals(toolbuttonOp.getElementName(), toolButtons[3].getElementName());
     // clean up
     JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
     delOp.addMember(createdToolbutton);
     executeBuildAssertNoCompileErrors(delOp);
-    toolButtons = TypeUtility.getInnerTypesOrdered(desktop, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
-    SdkAssert.assertEquals(3, toolButtons.length);
-
+    tb = TypeUtility.getInnerTypesOrdered(desktop, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
+    SdkAssert.assertEquals(3, tb.size());
   }
 
   @Test
@@ -73,14 +75,15 @@ public class ToolbuttonNewOperationTest extends AbstractSdkTestWithSampleProject
     SdkAssert.assertPublic(createdToolbutton).assertNoMoreFlags();
     IMethod getTextMethod = SdkAssert.assertMethodExist(createdToolbutton, SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
     SdkAssert.assertPublic(getTextMethod).assertNoMoreFlags();
-    IType[] toolButtons = TypeUtility.getInnerTypesOrdered(desktop, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
+    Set<IType> tb = TypeUtility.getInnerTypesOrdered(desktop, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
+    IType[] toolButtons = tb.toArray(new IType[tb.size()]);
     SdkAssert.assertEquals(4, toolButtons.length);
     SdkAssert.assertEquals(toolbuttonOp.getElementName(), toolButtons[1].getElementName());
     // clean up
     JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
     delOp.addMember(createdToolbutton);
     executeBuildAssertNoCompileErrors(delOp);
-    toolButtons = TypeUtility.getInnerTypesOrdered(desktop, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
-    SdkAssert.assertEquals(3, toolButtons.length);
+    tb = TypeUtility.getInnerTypesOrdered(desktop, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
+    SdkAssert.assertEquals(3, tb.size());
   }
 }

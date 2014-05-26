@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.page;
 
-import java.util.Arrays;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -27,11 +27,9 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
@@ -71,8 +69,8 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
     m_pageTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("Page"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
-        IType[] pages = ScoutTypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject());
-        return new Object[][]{pages};
+        Set<IType> pages = TypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject(), null);
+        return new Object[][]{pages.toArray(new IType[pages.size()])};
       }
     });
     m_pageTypeField.acceptProposal(getPageType());
@@ -88,13 +86,9 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
     m_holderTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("HolderPageOutline"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
-        IType[] pages = ScoutTypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject());
-        IType[] outlines = ScoutTypeUtility.getClassesOnClasspath(iOutline, getClientBundle().getJavaProject());
-        IType[] propTypes = new IType[pages.length + outlines.length];
-        System.arraycopy(pages, 0, propTypes, 0, pages.length);
-        System.arraycopy(outlines, 0, propTypes, pages.length, outlines.length);
-        Arrays.sort(propTypes, TypeComparators.getTypeNameComparator());
-        return new Object[][]{propTypes};
+        Set<IType> types = TypeUtility.getClassesOnClasspath(iPage, getClientBundle().getJavaProject(), null);
+        types.addAll(TypeUtility.getClassesOnClasspath(iOutline, getClientBundle().getJavaProject(), null));
+        return new Object[][]{types.toArray(new IType[types.size()])};
       }
     });
     m_holderTypeField.acceptProposal(getHolderType());

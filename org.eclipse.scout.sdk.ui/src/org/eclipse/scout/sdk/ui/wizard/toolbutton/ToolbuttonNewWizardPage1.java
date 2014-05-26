@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.toolbutton;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -24,13 +24,15 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -73,7 +75,8 @@ public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
       }
     });
 
-    P_TableContentProvider provider = new P_TableContentProvider(ScoutTypeUtility.getAbstractTypesOnClasspath(iToolbutton, m_declaringType.getJavaProject()));
+    Set<IType> abstractToolButtonsOnClasspath = TypeUtility.getAbstractTypesOnClasspath(iToolbutton, m_declaringType.getJavaProject(), TypeFilters.getPrimaryTypeFilter());
+    P_TableContentProvider provider = new P_TableContentProvider(abstractToolButtonsOnClasspath.toArray(new IType[abstractToolButtonsOnClasspath.size()]));
     m_filteredTable.getViewer().setLabelProvider(provider);
     m_filteredTable.getViewer().setContentProvider(provider);
     m_filteredTable.getViewer().setInput(provider);
@@ -85,13 +88,7 @@ public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
   protected void validateNextPage() {
     if (TypeUtility.exists(getSuperType())) {
-      ITypeHierarchy superTypeHierarchy = null;
-      try {
-        superTypeHierarchy = getSuperType().newSupertypeHierarchy(null);
-      }
-      catch (JavaModelException e) {
-        ScoutSdkUi.logError("could not build super type hierarchy of '" + getSuperType().getFullyQualifiedName() + "'.", e);
-      }
+      ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getSuperType());
       if (superTypeHierarchy != null && superTypeHierarchy.contains(abstractOutlineViewButton)) {
         m_nextPage = getWizard().getPage(OutlineToolbuttonNewWizardPage.class.getName());
       }

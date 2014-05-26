@@ -36,7 +36,7 @@ public class TableNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     new MenuTablePage(this, getType());
     new ColumnTablePage(this, getType());
   }

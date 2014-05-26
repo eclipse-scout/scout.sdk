@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -61,7 +63,7 @@ public class PermissionTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType basicPermission = TypeUtility.getType(IRuntimeClasses.BasicPermission);
 
     if (m_basicPermissionHierarchy == null) {
@@ -69,7 +71,7 @@ public class PermissionTablePage extends AbstractPage {
       m_basicPermissionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
-    IType[] permissions = m_basicPermissionHierarchy.getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator());
+    Set<IType> permissions = m_basicPermissionHierarchy.getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator());
     for (IType type : permissions) {
       new PermissionNodePage(this, type);
     }

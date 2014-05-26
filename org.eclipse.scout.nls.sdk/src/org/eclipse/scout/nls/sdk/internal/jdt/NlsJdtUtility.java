@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IClasspathEntry;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
@@ -28,6 +29,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public final class NlsJdtUtility {
 
@@ -57,29 +59,18 @@ public final class NlsJdtUtility {
 
   public static IType getITypeForFile(IFile file) {
     try {
-      IProject project = file.getProject();
-      if (project.hasNature(JavaCore.NATURE_ID)) {
-        IJavaProject jp = JavaCore.create(project);
-        List<IClasspathEntry> sourceLocs = getSourceLocations(jp);
-        String filePath = file.getProjectRelativePath().toString();
-        for (IClasspathEntry entry : sourceLocs) {
-          String pref = entry.getPath().lastSegment();
-          if (filePath.startsWith(pref)) {
-            filePath = filePath.substring(pref.length() + 1);
-            continue;
+      IJavaElement create = JavaCore.create(file);
+      if (TypeUtility.exists(create)) {
+        if (create.getElementType() == IJavaElement.COMPILATION_UNIT) {
+          ICompilationUnit icu = (ICompilationUnit) create;
+          IType[] types = icu.getTypes();
+          if (types.length > 0) {
+            return types[0];
           }
         }
-        String javaFileSuffix = ".java";
-        filePath = filePath.replace("/", ".");
-        if (filePath.toLowerCase().endsWith(javaFileSuffix)) {
-          filePath = filePath.substring(0, filePath.length() - javaFileSuffix.length());
+        else if (create.getElementType() == IJavaElement.TYPE) {
+          return (IType) create;
         }
-        IType type = jp.findType(filePath);
-
-        if (type == null) {
-          NlsCore.logWarning("could not find an IType for: " + file.getName());
-        }
-        return type;
       }
     }
     catch (Exception e) {
@@ -95,7 +86,7 @@ public final class NlsJdtUtility {
 
   /**
    * Returns all packages in any of the project's source folders.
-   *
+   * 
    * @param jProject
    * @return
    */

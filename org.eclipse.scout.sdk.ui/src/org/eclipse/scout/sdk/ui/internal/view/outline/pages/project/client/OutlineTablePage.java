@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -65,14 +67,14 @@ public class OutlineTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
 
     if (m_outlineHierarchy == null) {
       m_outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
       m_outlineHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] outlines = m_outlineHierarchy.getAllSubtypes(iOutline, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    Set<IType> outlines = m_outlineHierarchy.getAllSubtypes(iOutline, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType outline : outlines) {
       new OutlineNodePage(this, outline);
     }

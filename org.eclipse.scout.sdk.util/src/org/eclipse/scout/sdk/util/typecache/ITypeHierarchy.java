@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.util.typecache;
 
 import java.util.Comparator;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
@@ -18,83 +19,90 @@ import org.eclipse.scout.sdk.util.type.ITypeFilter;
 /**
  *
  */
-public interface ITypeHierarchy {
-
-  /**
-   * @return the type the hierarchy was created for (origin).
-   */
-  IType getType();
-
-  /**
-   * @param type
-   * @return true if the given type is part of the hierarchy false otherwise
-   */
-  boolean contains(IType type);
+public interface ITypeHierarchy extends ITypeHierarchyResult {
 
   /**
    * @see ITypeHierarchy#getAllSubtypes(IType, ITypeFilter, Comparator)
    */
-  IType[] getAllSubtypes(IType type);
+  Set<IType> getAllSubtypes(IType type);
 
   /**
    * @see ITypeHierarchy#getAllSubtypes(IType, ITypeFilter, Comparator)
    */
-  IType[] getAllSubtypes(IType type, ITypeFilter typeFilter);
+  Set<IType> getAllSubtypes(IType type, ITypeFilter typeFilter);
 
   /**
+   * Returns all resolved subtypes (direct and indirect) of the given type, ordered according to the given comparator
+   * limited to the types in this type hierarchy's graph that accept the given {@link ITypeFilter}. An empty {@link Set}
+   * is returned if there are no resolved subtypes for the given type and filter.
+   * 
    * @param type
-   *          the context type to get sub types.
+   *          the base type for which to get the subtypes
    * @param typeFilter
-   *          a type filter to reduce the result types or null.
+   *          a type filter to reduce the result or null.
    * @param typeComparator
-   *          a comparator to order the result types or null.
+   *          a comparator to order the result or null.
    * @return all subtypes of the given type accepted by the type filter ordered according the type comparator.
    */
-  IType[] getAllSubtypes(IType type, ITypeFilter typeFilter, Comparator<IType> typeComparator);
+  Set<IType> getAllSubtypes(IType type, ITypeFilter typeFilter, Comparator<IType> typeComparator);
 
   /**
    * @see ITypeHierarchy#getAllClasses(ITypeFilter, Comparator)
    */
-  IType[] getAllClasses();
+  Set<IType> getAllClasses();
 
   /**
    * @see ITypeHierarchy#getAllClasses(ITypeFilter, Comparator)
    */
-  IType[] getAllClasses(ITypeFilter filter);
+  Set<IType> getAllClasses(ITypeFilter filter);
 
   /**
+   * Returns all resolved classes, ordered according to the given comparator limited to the types in this type
+   * hierarchy's graph that accept the given {@link ITypeFilter}. An empty {@link Set} is returned if there are no
+   * classes in this hierarchy that fulfill the given filter.<br>
+   * All {@link IType}s that are no interface are considered to be a class.
+   * 
    * @param typeFilter
-   *          a type filter to reduce the result types or null.
+   *          a type filter to reduce the result or null.
    * @param comparator
-   *          a comparator to order the result types or null.
+   *          a comparator to order the result or null.
    * @return all classes in the hierarchy graph accepted by the type filter ordered according the type comparator.
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getAllClasses()
    */
-  IType[] getAllClasses(ITypeFilter filter, Comparator<IType> comparator);
+  Set<IType> getAllClasses(ITypeFilter filter, Comparator<IType> comparator);
 
   /**
    * @see ITypeHierarchy#getAllInterfaces(ITypeFilter, Comparator)
    */
-  IType[] getAllInterfaces();
+  Set<IType> getAllInterfaces();
 
   /**
    * @see ITypeHierarchy#getAllInterfaces(ITypeFilter, Comparator)
    */
-  IType[] getAllInterfaces(ITypeFilter filter);
+  Set<IType> getAllInterfaces(ITypeFilter filter);
 
   /**
+   * Returns all interfaces in this type hierarchy's graph, ordered according to the given comparator limited to the
+   * interfaces in this type hierarchy's graph that accept the given {@link ITypeFilter}.<br>
+   * An empty {@link Set} is returned if there are no interfaces in this hierarchy that fulfill the given filter.<br>
+   * Any interfaces in the creation region which were not resolved to have any subtypes or supertypes are not included
+   * in the result.
+   * 
    * @param typeFilter
-   *          a type filter to reduce the result types or null.
+   *          a type filter to reduce the result or null.
    * @param comparator
-   *          a comparator to order the result types or null.
+   *          a comparator to order the result or null.
    * @return all interfaces in the hierarchy graph accepted by the type filter ordered according the type comparator.
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getAllInterfaces()
    */
-  IType[] getAllInterfaces(ITypeFilter filter, Comparator<IType> comparator);
+  Set<IType> getAllInterfaces(ITypeFilter filter, Comparator<IType> comparator);
 
   /**
+   * Checks if the given potentialSubtype is a sub type of type.<br>
+   * In other words: returns true, if type is a super type of potentialSubtype.
+   * 
    * @param type
+   *          The base type.
    * @param potentialSubtype
+   *          The type that should be checked if it is a subtype of type.
    * @return true if the potentialSubtype is in the sub hierarchy of the given type.
    */
   boolean isSubtype(IType type, IType potentialSubtype);
@@ -102,178 +110,206 @@ public interface ITypeHierarchy {
   /**
    * @see ITypeHierarchy#getAllSuperclasses(IType, ITypeFilter, Comparator)
    */
-  IType[] getAllSuperclasses(IType type);
+  Set<IType> getAllSuperclasses(IType type);
 
   /**
    * @see ITypeHierarchy#getAllSuperclasses(IType, ITypeFilter, Comparator)
    */
-  IType[] getAllSuperclasses(IType type, ITypeFilter filter);
+  Set<IType> getAllSuperclasses(IType type, ITypeFilter filter);
 
   /**
+   * Returns all resolved superclasses of the given type, ordered according to the given comparator. An empty
+   * {@link Set} is returned if there are no resolved superclasses for the given class that fulfill the given
+   * {@link ITypeFilter}.<br>
+   * NOTE: once a type hierarchy has been created, it is more efficient to query the hierarchy for superclasses than to
+   * query a class recursively up the superclass chain. Querying an element performs a dynamic resolution, whereas the
+   * hierarchy returns a pre-computed result.<br>
+   * All {@link IType}s that are no interface are considered to be a class.
+   * 
    * @param type
-   *          the context type.
+   *          the base for which to get the superclasses.
    * @param typeFilter
-   *          a type filter to reduce the result types or null.
+   *          a type filter to reduce the result or null.
    * @param comparator
-   *          a comparator to order the result types or null.
+   *          a comparator to order the result or null.
    * @return all subclasses of the given type accepted by the type filter ordered according the type comparator.
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getAllSuperclasses(org.eclipse.jdt.core.IType)
    */
-  IType[] getAllSuperclasses(IType type, ITypeFilter filter, Comparator<IType> comparator);
+  Set<IType> getAllSuperclasses(IType type, ITypeFilter filter, Comparator<IType> comparator);
 
   /**
    * @see ITypeHierarchy#getAllSuperInterfaces(IType, ITypeFilter, Comparator)
    */
-  IType[] getAllSuperInterfaces(IType type);
+  Set<IType> getAllSuperInterfaces(IType type);
 
   /**
    * @see ITypeHierarchy#getAllSuperInterfaces(IType, ITypeFilter, Comparator)
    */
-  IType[] getAllSuperInterfaces(IType type, ITypeFilter filter);
+  Set<IType> getAllSuperInterfaces(IType type, ITypeFilter filter);
 
   /**
+   * Returns all resolved superinterfaces (direct and indirect) of the given type ordered by the given comparator. If
+   * the given type is a class, this includes all superinterfaces of all superclasses. An empty {@link Set} is returned
+   * if there are no resolved superinterfaces for the given type that fulfill the given {@link ITypeFilter}.<br>
+   * NOTE: once a type hierarchy has been created, it is more efficient to query the hierarchy for superinterfaces than
+   * to query a type recursively. Querying an element performs a dynamic resolution, whereas the hierarchy returns a
+   * pre-computed result.
+   * 
    * @param type
-   *          the context type.
+   *          the base type for which to get the superinterfaces.
    * @param typeFilter
-   *          a type filter to reduce the result types or null.
+   *          a type filter to reduce the result or null.
    * @param comparator
-   *          a comparator to order the result types or null.
-   * @return all interfaces of the given type accepted by the type filter ordered according the type comparator.
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getAllSuperInterfaces(IType)
+   *          a comparator to order the result or null.
+   * @return all super interfaces of the given type accepted by the type filter ordered according the type comparator.
    */
-  IType[] getAllSuperInterfaces(IType type, ITypeFilter filter, Comparator<IType> comparator);
+  Set<IType> getAllSuperInterfaces(IType type, ITypeFilter filter, Comparator<IType> comparator);
 
   /**
    * @see ITypeHierarchy#getAllSupertypes(IType, ITypeFilter, Comparator)
    */
-  IType[] getAllSupertypes(IType type);
+  Set<IType> getAllSupertypes(IType type);
 
   /**
    * @see ITypeHierarchy#getAllSupertypes(IType, ITypeFilter, Comparator)
    */
-  IType[] getAllSupertypes(IType type, ITypeFilter filter);
+  Set<IType> getAllSupertypes(IType type, ITypeFilter filter);
 
   /**
+   * Returns all resolved supertypes of the given type, ordered according to the given comparator. An empty {@link Set}
+   * is returned if there are no resolved supertypes for the given type and {@link ITypeFilter}<br>
+   * Note that java.lang.Object is NOT considered to be a supertype of any interface type.<br>
+   * NOTE: once a type hierarchy has been created, it is more efficient to query the hierarchy for supertypes than to
+   * query a type recursively up the supertype chain. Querying an element performs a dynamic resolution, whereas the
+   * hierarchy returns a pre-computed result.
+   * 
    * @param type
-   *          the context type.
+   *          the base type for which to get the super types.
    * @param typeFilter
-   *          a type filter to reduce the result types or null.
+   *          a type filter to reduce the result or null.
    * @param comparator
-   *          a comparator to order the result types or null.
+   *          a comparator to order the result or null.
    * @return all super types of the given type accepted by the type filter ordered according the type comparator.
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getAllSupertypes(IType)
    */
-  IType[] getAllSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator);
-
-  /**
-   * @see ITypeHierarchy#getAllTypes(ITypeFilter, Comparator)
-   */
-  IType[] getAllTypes();
-
-  /**
-   * @see ITypeHierarchy#getAllTypes(ITypeFilter, Comparator)
-   */
-  IType[] getAllTypes(ITypeFilter filter);
-
-  /**
-   * @param typeFilter
-   *          a type filter to reduce the result types or null.
-   * @param comparator
-   *          a comparator to order the result types or null.
-   * @return all types in the hierarchy graph accepted by the type filter ordered according the type comparator.
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getAllTypes()
-   */
-  IType[] getAllTypes(ITypeFilter filter, Comparator<IType> comparator);
+  Set<IType> getAllSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator);
 
   /**
    * @see ITypeHierarchy#getSubclasses(IType, ITypeFilter, Comparator)
    */
-  IType[] getSubclasses(IType type);
+  Set<IType> getSubclasses(IType type);
 
   /**
    * @see ITypeHierarchy#getSubclasses(IType, ITypeFilter, Comparator)
    */
-  IType[] getSubclasses(IType type, ITypeFilter filter);
+  Set<IType> getSubclasses(IType type, ITypeFilter filter);
 
   /**
+   * Returns the direct resolved subclasses of the given class, ordered according to the given comparator, limited to
+   * the classes in this type hierarchy's graph and the given {@link ITypeFilter}. Returns an empty {@link Set} if the
+   * given type is an interface, or if no classes were resolved to be subclasses of the given class according to the
+   * given {@link ITypeFilter}.<br>
+   * All {@link IType}s that are no interface are considered to be a class.
+   * 
    * @param type
-   *          the context type.
+   *          the base type for which to get the sub classes
    * @param typeFilter
-   *          a type filter to reduce the result types or null.
+   *          a type filter to reduce the result or null.
    * @param comparator
-   *          a comparator to order the result types or null.
+   *          a comparator to order the result or null.
    * @return all <b>direct</b> sub classes of the given type accepted by the type filter ordered according the type
    *         comparator.
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getSubclasses(IType)
    */
-  IType[] getSubclasses(IType type, ITypeFilter filter, Comparator<IType> comparator);
+  Set<IType> getSubclasses(IType type, ITypeFilter filter, Comparator<IType> comparator);
 
   /**
    * @see ITypeHierarchy#getSubtypes(IType, ITypeFilter, Comparator)
    */
-  IType[] getSubtypes(IType type);
+  Set<IType> getSubtypes(IType type);
 
   /**
    * @see ITypeHierarchy#getSubtypes(IType, ITypeFilter, Comparator)
    */
-  IType[] getSubtypes(IType type, ITypeFilter filter);
+  Set<IType> getSubtypes(IType type, ITypeFilter filter);
 
   /**
+   * Returns the direct resolved subtypes of the given type, ordered according to the given comparator, limited to the
+   * types in this type hierarchy's graph that are accepted by the given {@link ITypeFilter}.<br>
+   * If the type is a class, this returns the resolved subclasses. If the type is an interface, this returns both the
+   * classes which implement the interface and the interfaces which extend it.
+   * 
    * @param type
    *          the context type.
    * @param typeFilter
-   *          a type filter to reduce the result types or null.
+   *          a type filter to reduce the result or null.
    * @param comparator
-   *          a comparator to order the result types or null.
+   *          a comparator to order the result or null.
    * @return all <b>direct</b> sub types of the given type accepted by the type filter ordered according the type
    *         comparator.
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getSubtypes(IType)
    */
-  IType[] getSubtypes(IType type, ITypeFilter filter, Comparator<IType> comparator);
+  Set<IType> getSubtypes(IType type, ITypeFilter filter, Comparator<IType> comparator);
 
   /**
+   * Returns the resolved superclass of the given class, or null if the given class has no existing superclass, the
+   * superclass could not be resolved, or if the given type is an interface.
+   * 
    * @param type
-   * @return
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getSuperclass(org.eclipse.jdt.core.IType)
+   *          The type for which to get the super class.
+   * @return The resolved super class or null.
    */
   IType getSuperclass(IType type);
 
   /**
-   * @param type
-   * @return
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getSuperInterfaces(org.eclipse.jdt.core.IType)
+   * @see #getSuperInterfaces(IType, ITypeFilter, Comparator)
    */
-  IType[] getSuperInterfaces(IType type);
-
-  IType[] getSuperInterfaces(IType type, ITypeFilter filter);
-
-  IType[] getSuperInterfaces(IType type, ITypeFilter filter, Comparator<IType> comparator);
+  Set<IType> getSuperInterfaces(IType type);
 
   /**
-   * @return
+   * @see #getSuperInterfaces(IType, ITypeFilter, Comparator)
    */
-  org.eclipse.jdt.core.ITypeHierarchy getJdtHierarchy();
+  Set<IType> getSuperInterfaces(IType type, ITypeFilter filter);
 
   /**
+   * Returns the direct resolved interfaces that the given type implements or extends, ordered by the given comparator,
+   * limited to the interfaces in this type hierarchy's graph that accept the given {@link ITypeFilter}.<br>
+   * For classes, this gives the interfaces that the class implements. For interfaces, this gives the interfaces that
+   * the interface extends.
+   * 
    * @param type
-   * @return
-   * @see org.eclipse.jdt.core.ITypeHierarchy#getSupertypes(org.eclipse.jdt.core.IType)
-   */
-  IType[] getSupertypes(IType type);
-
-  /**
-   * @param type
+   *          The type for which to get the super interfaces.
    * @param filter
-   * @return
-   */
-  IType[] getSupertypes(IType type, ITypeFilter filter);
-
-  /**
-   * @param type
-   * @param filter
+   *          a type filter to reduce the result or null.
    * @param comparator
-   * @return
+   *          a comparator to order the result or null.
+   * @return all <b>direct</b> super interfaces of the given type accepted by the type filter ordered according the type
+   *         comparator.
    */
-  IType[] getSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator);
+  Set<IType> getSuperInterfaces(IType type, ITypeFilter filter, Comparator<IType> comparator);
+
+  /**
+   * @see #getSupertypes(IType, ITypeFilter, Comparator)
+   */
+  Set<IType> getSupertypes(IType type);
+
+  /**
+   * @see #getSupertypes(IType, ITypeFilter, Comparator)
+   */
+  Set<IType> getSupertypes(IType type, ITypeFilter filter);
+
+  /**
+   * Returns the resolved supertypes of the given type, ordered by the given comparator, limited to the types in this
+   * type hierarchy's graph that accept the given {@link ITypeFilter}.<br>
+   * For classes, this returns its superclass and the interfaces that the class implements. For interfaces, this returns
+   * the interfaces that the interface extends.<br>
+   * As a consequence {@link Object} is NOT considered to be a supertype of any interface type.
+   * 
+   * @param type
+   *          The type for which to get the super types.
+   * @param filter
+   *          a type filter to reduce the result or null.
+   * @param comparator
+   *          a comparator to order the result or null.
+   * @return all <b>direct</b> super types of the given type accepted by the type filter ordered according the type
+   *         comparator.
+   */
+  Set<IType> getSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator);
 
 }

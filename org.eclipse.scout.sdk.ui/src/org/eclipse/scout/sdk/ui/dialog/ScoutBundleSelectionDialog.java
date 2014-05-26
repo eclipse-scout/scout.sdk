@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.dialog;
 
 import java.util.Comparator;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -36,7 +37,7 @@ import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
  */
 public class ScoutBundleSelectionDialog extends FilteredItemsSelectionDialog {
   private static final String DIALOG_SETTINGS = ScoutBundleSelectionDialog.class.getName();
-  private IScoutBundle[] m_bundles;
+  private Set<IScoutBundle> m_bundles;
 
   /**
    * @param shell
@@ -45,7 +46,7 @@ public class ScoutBundleSelectionDialog extends FilteredItemsSelectionDialog {
     this(shell, ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getAllBundlesFilter()), multiSelect);
   }
 
-  public ScoutBundleSelectionDialog(Shell shell, IScoutBundle[] bundles, boolean multiSelect) {
+  public ScoutBundleSelectionDialog(Shell shell, Set<IScoutBundle> bundles, boolean multiSelect) {
     super(shell, multiSelect);
     setListLabelProvider(new ScoutBundleLableProvider());
     setDetailsLabelProvider(new ScoutBundleLableProvider());

@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -210,7 +211,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     IMethodSourceBuilder setterBuilder = new MethodSourceBuilder("set" + NamingUtility.ensureStartWithUpperCase(propertyName));
     setterBuilder.setFlags(Flags.AccPublic);
     setterBuilder.setReturnTypeSignature(Signature.SIG_VOID);
-    setterBuilder.setParameters(new MethodParameter[]{new MethodParameter(NamingUtility.ensureStartWithLowerCase(propertyName), getFormIdSignature())});
+    setterBuilder.setParameters(CollectionUtility.arrayList(new MethodParameter(NamingUtility.ensureStartWithLowerCase(propertyName), getFormIdSignature())));
     setterBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation());
     setterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodSetterCommentBuilder());
     setterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(fieldBuilder.getElementName() + " = " + NamingUtility.ensureStartWithLowerCase(propertyName) + ";"));

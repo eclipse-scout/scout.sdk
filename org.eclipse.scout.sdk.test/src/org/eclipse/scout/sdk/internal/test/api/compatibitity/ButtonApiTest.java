@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.internal.test.api.compatibitity;
 
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.jdt.core.Flags;
@@ -41,7 +42,7 @@ public class ButtonApiTest extends AbstractApiTest {
     IType type = TypeUtility.getType(RuntimeClasses.IButton);
     IFieldFilter filter = FieldFilters.getCompositeFilter(FieldFilters.getFlagsFilter(Flags.AccStatic | Flags.AccFinal),
         FieldFilters.getNameRegexFilter(Pattern.compile("^DISPLAY\\_STYLE.*$")));
-    IField[] fields = TypeUtility.getFields(type, filter);
+    Set<IField> fields = TypeUtility.getFields(type, filter);
     HashMap<String, IField> fieldMap = new HashMap<String, IField>();
     for (IField f : fields) {
       fieldMap.put(f.getElementName(), f);
@@ -71,7 +72,7 @@ public class ButtonApiTest extends AbstractApiTest {
     IType type = TypeUtility.getType(RuntimeClasses.IButton);
     IFieldFilter filter = FieldFilters.getCompositeFilter(FieldFilters.getFlagsFilter(Flags.AccStatic | Flags.AccFinal),
         FieldFilters.getNameRegexFilter(Pattern.compile("^SYSTEM\\_TYPE.*$")));
-    IField[] fields = TypeUtility.getFields(type, filter);
+    Set<IField> fields = TypeUtility.getFields(type, filter);
     HashMap<String, IField> fieldMap = new HashMap<String, IField>();
     for (IField f : fields) {
       fieldMap.put(f.getElementName(), f);

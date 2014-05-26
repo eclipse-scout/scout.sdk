@@ -30,7 +30,6 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class CreateServiceNlsProjectOperation implements IOperation {
@@ -131,9 +130,6 @@ public class CreateServiceNlsProjectOperation implements IOperation {
     serviceOp.validate();
     serviceOp.run(monitor, workingCopyManager);
     m_createdServiceType = serviceOp.getCreatedServiceImplementation();
-
-    // we have changed the NLS service hierarchy: clear the cache so that it will be re-created next time including our just created service.
-    TypeUtility.getPrimaryTypeHierarchy(getSuperType()).invalidate();
 
     // wait until all events have been fired and handled
     ResourcesPlugin.getWorkspace().checkpoint(false);

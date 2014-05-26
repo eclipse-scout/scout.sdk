@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
@@ -63,22 +66,17 @@ public class ClientServiceTablePage extends AbstractPage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iService = TypeUtility.getType(IRuntimeClasses.IService);
 
     if (m_servieHierarchy == null) {
       m_servieHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
       m_servieHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    IType[] serviceTypes = m_servieHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    Set<IType> serviceTypes = m_servieHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType type : serviceTypes) {
-      IType serviceInterface = null;
-      IType[] interfaces = m_servieHierarchy.getSuperInterfaces(type, TypeFilters.getElementNameFilter("I" + type.getElementName()));
-      if (interfaces.length > 0) {
-        serviceInterface = interfaces[0];
-      }
-
-      new ClientServiceNodePage(this, type, serviceInterface);
+      Set<IType> interfaces = m_servieHierarchy.getSuperInterfaces(type, TypeFilters.getElementNameFilter("I" + type.getElementName()));
+      new ClientServiceNodePage(this, type, CollectionUtility.firstElement(interfaces));
     }
   }
 

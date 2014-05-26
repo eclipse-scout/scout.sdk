@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.library;
 
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -306,14 +304,9 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
       public void run() {
         // find all available bundles
         Set<IScoutBundle> alreadyAddedBundles = getLibraryUserBundles();
-        IScoutBundle[] workspaceBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getWorkspaceBundlesFilter());
-        List<IScoutBundle> plugins = new ArrayList<IScoutBundle>(workspaceBundles.length);
-        for (IScoutBundle bundle : workspaceBundles) {
-          if (!alreadyAddedBundles.contains(bundle)) {
-            plugins.add(bundle);
-          }
-        }
-        ScoutBundleSelectionDialog dialog = new ScoutBundleSelectionDialog(getControl().getShell(), plugins.toArray(new IScoutBundle[plugins.size()]), true);
+        Set<IScoutBundle> workspaceBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getWorkspaceBundlesFilter());
+        workspaceBundles.removeAll(alreadyAddedBundles);
+        ScoutBundleSelectionDialog dialog = new ScoutBundleSelectionDialog(getControl().getShell(), workspaceBundles, true);
         dialog.create();
         if (dialog.open() == Window.OK) {
           Set<IScoutBundle> userBundles = alreadyAddedBundles;

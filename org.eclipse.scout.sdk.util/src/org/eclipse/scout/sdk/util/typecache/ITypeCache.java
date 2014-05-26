@@ -1,5 +1,7 @@
 package org.eclipse.scout.sdk.util.typecache;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -13,7 +15,6 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  * @since 3.4
  * @see TypeUtility
  * @see IType
- * @see IJavaProject
  */
 public interface ITypeCache {
   /**
@@ -34,33 +35,9 @@ public interface ITypeCache {
    * @param typeName
    *          The fully qualified or simple name of the {@link IType}s to return.
    * @return All {@link IType}s with the given name that are on all classpaths in the
-   *         workspace (all {@link IJavaProject}s).
+   *         workspace (all {@link IJavaProject}s). Never returns null.
    */
-  IType[] getTypes(String typeName);
-
-  /**
-   * Returns all {@link IType}s with the given name that are on the classpath of the given reference
-   * project.
-   * 
-   * @param typeName
-   *          The fully qualified or simple name to search.
-   * @param classpath
-   *          The {@link IJavaProject} defining the classpath the returned {@link IType}s must be in
-   * @return an array holding all {@link IType}s with the given name that are on the classpath of the
-   *         given reference project. Never returns null.
-   */
-  IType[] getTypes(String typeName, IJavaProject classpath);
-
-  /**
-   * Returns the first {@link IType} found on the classpath of the given {@link IJavaProject} that has the given name.
-   * 
-   * @param typeName
-   *          The fully qualified or simple name of the type to search.d
-   * @param classpath
-   *          The {@link IJavaProject} defining the classpath the returned {@link IType} must be in
-   * @return The first {@link IType} found on the classpath of the given {@link IJavaProject} that has the given name.
-   */
-  IType getType(String typeName, IJavaProject classpath);
+  Set<IType> getTypes(String typeName);
 
   /**
    * Disposes the cache. Releases all cached instances and stops listening for workspace changes.

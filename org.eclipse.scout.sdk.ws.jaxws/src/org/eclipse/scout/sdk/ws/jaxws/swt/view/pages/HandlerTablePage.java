@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,7 +27,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
@@ -39,7 +38,7 @@ import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public class HandlerTablePage extends AbstractPage {
 
-  private Map<IPrimaryTypeTypeHierarchy, IType> m_handlerHierarchyMap;
+  private Map<ICachedTypeHierarchy, IType> m_handlerHierarchyMap;
 
   private ITypeHierarchyChangedListener m_hierarchyChangedListener;
 
@@ -48,10 +47,10 @@ public class HandlerTablePage extends AbstractPage {
     setName(Texts.get("Handlers"));
     setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsIcons.HandlerFolder));
     m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
-    m_handlerHierarchyMap = new HashMap<IPrimaryTypeTypeHierarchy, IType>();
+    m_handlerHierarchyMap = new HashMap<ICachedTypeHierarchy, IType>();
 
     for (IType type : TypeUtility.getTypes(Handler.class.getName())) {
-      IPrimaryTypeTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(type);
+      ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(type);
       hierarchy.addHierarchyListener(m_hierarchyChangedListener);
       m_handlerHierarchyMap.put(hierarchy, type);
     }
@@ -65,7 +64,7 @@ public class HandlerTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_hierarchyChangedListener != null) {
-      for (IPrimaryTypeTypeHierarchy hierarchy : m_handlerHierarchyMap.keySet()) {
+      for (ICachedTypeHierarchy hierarchy : m_handlerHierarchyMap.keySet()) {
         hierarchy.removeHierarchyListener(m_hierarchyChangedListener);
       }
     }
@@ -79,7 +78,7 @@ public class HandlerTablePage extends AbstractPage {
   @Override
   public void refresh(boolean clearCache) {
     if (clearCache) {
-      for (IPrimaryTypeTypeHierarchy hierarchy : m_handlerHierarchyMap.keySet()) {
+      for (ICachedTypeHierarchy hierarchy : m_handlerHierarchyMap.keySet()) {
         hierarchy.invalidate();
       }
     }
@@ -125,10 +124,10 @@ public class HandlerTablePage extends AbstractPage {
       }
     };
 
-    for (Entry<IPrimaryTypeTypeHierarchy, IType> entry : m_handlerHierarchyMap.entrySet()) {
-      IPrimaryTypeTypeHierarchy hierarchy = entry.getKey();
+    for (Entry<ICachedTypeHierarchy, IType> entry : m_handlerHierarchyMap.entrySet()) {
+      ICachedTypeHierarchy hierarchy = entry.getKey();
       IType type = entry.getValue();
-      types.addAll(Arrays.asList(hierarchy.getAllSubtypes(type, filter)));
+      types.addAll(hierarchy.getAllSubtypes(type, filter));
     }
     JaxWsSdkUtility.sortTypesByName(types, true);
 

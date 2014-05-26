@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -32,11 +35,11 @@ public class TreeFieldNodePage extends AbstractFormFieldNodePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     new KeyStrokeTablePage(this, getType());
-    IType[] trees = ScoutTypeUtility.getTrees(getType());
-    if (trees.length > 0) {
-      new TreeNodePage(this, trees[0]);
+    Set<IType> trees = ScoutTypeUtility.getTrees(getType());
+    if (trees.size() > 0) {
+      new TreeNodePage(this, CollectionUtility.firstElement(trees));
     }
   }
 

@@ -13,8 +13,8 @@ import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.internal.typecache.PrimaryTypeHierarchy;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.AfterClass;
@@ -43,7 +43,7 @@ public class RecreateTypeTest extends AbstractScoutSdkTest {
   @Test
   public void testRecreateType() throws Exception {
     IType iformField = TypeUtility.getType(RuntimeClasses.IFormField);
-    IPrimaryTypeTypeHierarchy primaryFormFieldHierarchy = TypeUtility.getPrimaryTypeHierarchy(iformField);
+    PrimaryTypeHierarchy primaryFormFieldHierarchy = (PrimaryTypeHierarchy) TypeUtility.getPrimaryTypeHierarchy(iformField);
     Assert.assertFalse(primaryFormFieldHierarchy.isCreated());
     IProject clientProject = getProject("test.client");
     IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(clientProject);

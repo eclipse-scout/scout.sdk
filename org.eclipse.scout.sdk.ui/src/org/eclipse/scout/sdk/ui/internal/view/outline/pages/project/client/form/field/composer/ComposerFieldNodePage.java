@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -49,7 +52,7 @@ public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     if (m_innerTypeListener == null) {
       m_innerTypeListener = new InnerTypePageDirtyListener(this, abstractComposerField_tree);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
@@ -58,9 +61,9 @@ public class ComposerFieldNodePage extends AbstractFormFieldNodePage {
     // find tree
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType(), abstractComposerField_tree);
     if (hierarchy != null) {
-      IType[] trees = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(abstractComposerField_tree, hierarchy));
-      if (trees.length > 0) {
-        new TreeNodePage(this, trees[0], true);
+      Set<IType> trees = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(abstractComposerField_tree, hierarchy));
+      if (trees.size() > 0) {
+        new TreeNodePage(this, CollectionUtility.firstElement(trees), true);
       }
     }
     // entities

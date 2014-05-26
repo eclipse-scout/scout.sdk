@@ -18,6 +18,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IField;
@@ -31,7 +32,7 @@ import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -47,7 +48,7 @@ public class ScoutProjectIcons implements IIconProvider {
   private final Object cacheLock = new Object();
   private final IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
   private final IScoutBundle m_bundle;
-  private final IPrimaryTypeTypeHierarchy m_iconsHierarchy;
+  private final ICachedTypeHierarchy m_iconsHierarchy;
 
   private HashMap<String, ScoutIconDesc> m_cachedIcons;
   private String[] m_baseUrls;
@@ -111,18 +112,15 @@ public class ScoutProjectIcons implements IIconProvider {
   }
 
   protected void collectIconNames(Map<String, ScoutIconDesc> collector) {
-    IScoutBundle[] parentSharedBundles = m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
+    Set<IScoutBundle> parentSharedBundles = m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
     for (IScoutBundle parentShared : parentSharedBundles) {
-      IType[] iconTypes = m_iconsHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getInScoutBundles(parentShared));
-      if (iconTypes != null && iconTypes.length > 0) {
-        for (IType iconType : iconTypes) {
-          if (TypeUtility.exists(iconType)) {
-            try {
-              collectIconNamesOfType(iconType, collector);
-            }
-            catch (Exception e) {
-              ScoutSdk.logWarning("Unable to collect icon names for class '" + iconType.getFullyQualifiedName() + "'.", e);
-            }
+      for (IType iconType : m_iconsHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getInScoutBundles(parentShared))) {
+        if (TypeUtility.exists(iconType)) {
+          try {
+            collectIconNamesOfType(iconType, collector);
+          }
+          catch (Exception e) {
+            ScoutSdk.logWarning("Unable to collect icon names for class '" + iconType.getFullyQualifiedName() + "'.", e);
           }
         }
       }

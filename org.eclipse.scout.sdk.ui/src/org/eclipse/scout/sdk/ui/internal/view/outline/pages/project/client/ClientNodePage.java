@@ -10,7 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
@@ -33,7 +36,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.formdata.ClientBundleUpdateFormDataOperation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -70,7 +72,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     super.loadChildrenImpl();
     IType iDesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
     IType iDesktopExtension = TypeUtility.getType(IRuntimeClasses.IDesktopExtension);
@@ -89,20 +91,20 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       m_desktopExtensionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     // client sessions
-    IType[] clientSessions = ScoutTypeUtility.getClientSessionTypes(getScoutBundle());
+    Set<IType> clientSessions = ScoutTypeUtility.getClientSessionTypes(getScoutBundle());
     for (IType clientSession : clientSessions) {
       new ClientSessionNodePage(this, clientSession);
     }
     // desktop
-    IType[] desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
-    if (desktops.length > 1) {
+    Set<IType> desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
+    if (desktops.size() > 1) {
       ScoutSdkUi.logWarning("more than one desktop found.");
     }
     for (IType desktop : desktops) {
       new DesktopNodePage(this, desktop);
     }
     // desktop extension
-    IType[] desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
+    Set<IType> desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
     for (IType desktopExtension : desktopExtensions) {
       new DesktopExtensionNodePage(this, desktopExtension);
     }
@@ -139,7 +141,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
   public void prepareMenuAction(IScoutHandler menu) {
     if (menu instanceof WellformAction) {
       WellformAction action = (WellformAction) menu;
-      action.setOperation(new WellformClientBundleOperation(getScoutBundle()));
+      action.setOperation(new WellformClientBundleOperation(CollectionUtility.hashSet(getScoutBundle())));
       action.init(getScoutBundle());
     }
     else if (menu instanceof MultipleUpdateFormDataAction) {
@@ -157,9 +159,9 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
     else if (menu instanceof TypeResolverPageDataAction) {
       ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
-          IPrimaryTypeTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
+          ICachedTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
           return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
         }
       }, getScoutBundle());

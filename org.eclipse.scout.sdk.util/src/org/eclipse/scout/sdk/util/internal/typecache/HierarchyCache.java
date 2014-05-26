@@ -12,22 +12,26 @@ package org.eclipse.scout.sdk.util.internal.typecache;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
-import org.eclipse.scout.sdk.util.type.ITypeFilter;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchyResult;
 import org.eclipse.scout.sdk.util.typecache.IHierarchyCache;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.TypeHierarchyConstraints;
 
 /**
  *
@@ -36,54 +40,67 @@ public final class HierarchyCache implements IHierarchyCache {
 
   private static final HierarchyCache INSTANCE = new HierarchyCache();
 
-  private final Object m_cacheLock;
-  private final HashMap<IType, PrimaryTypeHierarchy> m_cachedPrimaryTypeHierarchies;
+  private final Map<Object, ICacheableTypeHierarchyResult> m_cachedHierarchyResults;
 
   public static HierarchyCache getInstance() {
     return INSTANCE;
   }
 
   private HierarchyCache() {
-    m_cachedPrimaryTypeHierarchies = new HashMap<IType, PrimaryTypeHierarchy>();
-    m_cacheLock = new Object();
+    m_cachedHierarchyResults = new HashMap<Object, ICacheableTypeHierarchyResult>();
   }
 
   @Override
-  public void dispose() {
-    synchronized (m_cacheLock) {
-      m_cachedPrimaryTypeHierarchies.clear();
+  public synchronized void dispose() {
+    invalidateAll(); // to ensure the resources are released.
+    m_cachedHierarchyResults.clear();
+  }
+
+  public synchronized List<ICacheableTypeHierarchyResult> getAllCachedHierarchies() {
+    return CollectionUtility.arrayList(m_cachedHierarchyResults.values());
+  }
+
+  @Override
+  public ICachedTypeHierarchyResult getProjectContextTypeHierarchy(TypeHierarchyConstraints constraints) {
+    ICacheableTypeHierarchyResult h = null;
+    synchronized (this) {
+      h = m_cachedHierarchyResults.get(constraints);
+      if (h != null && !TypeUtility.exists(h.getBaseType())) {
+        h.invalidate();
+        m_cachedHierarchyResults.remove(constraints);
+        h = null;
+      }
+      if (h == null) {
+        h = new ProjectContextTypeHierarchyResult(constraints);
+        m_cachedHierarchyResults.put(constraints, h);
+      }
     }
+    return h;
   }
 
   @Override
-  public IPrimaryTypeTypeHierarchy[] getAllCachedHierarchies() {
-    synchronized (m_cacheLock) {
-      return m_cachedPrimaryTypeHierarchies.values().toArray(new IPrimaryTypeTypeHierarchy[m_cachedPrimaryTypeHierarchies.size()]);
-    }
-  }
-
-  @Override
-  public IPrimaryTypeTypeHierarchy getPrimaryTypeHierarchy(IType type) throws IllegalArgumentException {
+  public ICachedTypeHierarchy getPrimaryTypeHierarchy(IType type) {
     if (!TypeUtility.exists(type) || !type.getJavaProject().exists()) {
       throw new IllegalArgumentException("type does not exist!");
     }
     else if (TypeUtility.exists(type.getDeclaringType())) {
       throw new IllegalArgumentException("type '" + type.getElementName() + "' must be a primary type.");
     }
-    PrimaryTypeHierarchy hierarchy = null;
-    synchronized (m_cacheLock) {
-      hierarchy = m_cachedPrimaryTypeHierarchies.get(type);
-      if (hierarchy != null && (!TypeUtility.exists(hierarchy.getType()) || !TypeUtility.exists(hierarchy.getType().getJavaProject()))) {
+    ICacheableTypeHierarchyResult hierarchy = null;
+    synchronized (this) {
+      hierarchy = m_cachedHierarchyResults.get(type);
+      if (hierarchy != null && (!TypeUtility.exists(hierarchy.getBaseType()) || !TypeUtility.exists(hierarchy.getBaseType().getJavaProject()))) {
         // discard old create new
-        m_cachedPrimaryTypeHierarchies.remove(type);
+        hierarchy.invalidate();
+        m_cachedHierarchyResults.remove(type);
         hierarchy = null;
       }
       if (hierarchy == null) {
         hierarchy = new PrimaryTypeHierarchy(type);
-        m_cachedPrimaryTypeHierarchies.put(type, hierarchy);
+        m_cachedHierarchyResults.put(type, hierarchy);
       }
     }
-    return hierarchy;
+    return (ICachedTypeHierarchy) hierarchy;
   }
 
   /**
@@ -91,10 +108,9 @@ public final class HierarchyCache implements IHierarchyCache {
    * @return
    */
   @Override
-  public TypeHierarchy getLocalHierarchy(IRegion region) {
+  public org.eclipse.scout.sdk.util.typecache.ITypeHierarchy getLocalHierarchy(IRegion region) {
     try {
-      ITypeHierarchy hierarchy = JavaCore.newTypeHierarchy(region, null, null);
-      return new TypeHierarchy(null, hierarchy);
+      return new TypeHierarchy(null, JavaCore.newTypeHierarchy(region, null, null));
     }
     catch (JavaModelException e) {
       SdkUtilActivator.logWarning("could not build hierarchy of region '" + region + "'.", e);
@@ -103,10 +119,9 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   @Override
-  public TypeHierarchy getSuperHierarchy(IType type) {
+  public org.eclipse.scout.sdk.util.typecache.ITypeHierarchy getSuperHierarchy(IType type) {
     try {
-      ITypeHierarchy hierarchy = type.newSupertypeHierarchy(null);
-      return new TypeHierarchy(type, hierarchy);
+      return new TypeHierarchy(type, type.newSupertypeHierarchy(null));
     }
     catch (JavaModelException e) {
       SdkUtilActivator.logWarning("could not build super hierarchy '" + type.getFullyQualifiedName() + "'.", e);
@@ -115,65 +130,29 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   @Override
-  public void invalidateAll() {
-    synchronized (m_cacheLock) {
-      for (IPrimaryTypeTypeHierarchy h : m_cachedPrimaryTypeHierarchies.values()) {
-        if (h.isCreated()) {
-          h.invalidate();
-        }
+  public synchronized void invalidateAll() {
+    for (ICacheableTypeHierarchyResult h : m_cachedHierarchyResults.values()) {
+      if (h.isCreated()) {
+        h.invalidate();
       }
     }
   }
 
-  private static boolean areTypesInHierarchy(CachedTypeHierarchy h, IType[] types) {
-    for (IType t : types) {
-      if (h.contains(t)) {
-        return true;
-      }
-    }
-    return false;
+  private synchronized List<ICacheableTypeHierarchyResult> getHierarchiesSafe() {
+    return new ArrayList<ICacheableTypeHierarchyResult>(m_cachedHierarchyResults.values());
   }
 
   private void handleTypeChange(IType t, ITypeHierarchy superTypeHierarchy) {
-    try {
-      ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>(m_cachedPrimaryTypeHierarchies.size());
-      if (!TypeUtility.exists(t.getDeclaringType())) {
-        synchronized (m_cacheLock) {
-          hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
-        }
-      }
-
-      if (hierarchies.size() > 0) {
-        IType[] superTypes = superTypeHierarchy.getSupertypes(t);
-
-        for (CachedTypeHierarchy h : hierarchies) {
-          if (h.isCreated()) {
-
-            if (h.contains(t)) {
-              if (!areTypesInHierarchy(h, superTypes)) {
-                // remove
-                h.invalidate();
-              }
-              else {
-                IType[] hierarchySuperTypes = h.getSubtypes(t);
-                if (!TypeUtility.equalTypes(hierarchySuperTypes, superTypes)) {
-                  // changed
-                  h.invalidate();
-                }
-              }
-            }
-            else {
-              if (areTypesInHierarchy(h, superTypes)) {
-                // add
-                h.invalidate();
-              }
-            }
+    if (superTypeHierarchy != null) {
+      List<ICacheableTypeHierarchyResult> hierarchies = getHierarchiesSafe();
+      Set<IType> superTypes = superTypeHierarchy.getAllSupertypes(t);
+      for (ICacheableTypeHierarchyResult h : hierarchies) {
+        if (h.isCreated()) {
+          if (h.contains(t) != h.isTypeAccepted(t, superTypes)) {
+            h.invalidate();
           }
         }
       }
-    }
-    catch (Exception e) {
-      SdkUtilActivator.logError("could not handle type('" + t.getFullyQualifiedName() + "') change in hierarchies.", e);
     }
   }
 
@@ -181,55 +160,31 @@ public final class HierarchyCache implements IHierarchyCache {
    * @param type
    */
   private void handleTypeRemoved(IType type) {
-    try {
-      ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>(m_cachedPrimaryTypeHierarchies.size());
-      synchronized (m_cacheLock) {
-        hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
+    List<ICacheableTypeHierarchyResult> hierarchies = getHierarchiesSafe();
+    for (ICacheableTypeHierarchyResult h : hierarchies) {
+      if (h.isCreated() && h.contains(type)) {
+        h.invalidate();
       }
-      ITypeFilter compilationUnitFilter = TypeFilters.getInnerTypeFilter(type);
-      for (CachedTypeHierarchy h : hierarchies) {
-        if (h.isCreated()) {
-          IType[] allTypes = h.getJdtHierarchy().getAllTypes();
-          for (IType candidate : allTypes) {
-            if (compilationUnitFilter.accept(candidate)) {
-              // remove
-              h.invalidate();
-              break;
-            }
-          }
-        }
-      }
-    }
-    catch (Exception e) {
-      SdkUtilActivator.logError("could not handle type removed ('" + type.getElementName() + "') change in hierarchies.");
     }
   }
 
   private void handleJavaElementRemoved(IJavaElement element) {
     if (element.getElementType() < IJavaElement.TYPE) {
-      try {
-        ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>(m_cachedPrimaryTypeHierarchies.size());
-        synchronized (m_cacheLock) {
-          hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
-        }
-        for (CachedTypeHierarchy h : hierarchies) {
-          if (TypeUtility.isAncestor(element, h.getType())) {
-            synchronized (m_cacheLock) {
-              m_cachedPrimaryTypeHierarchies.remove(h.getType());
-            }
+      List<ICacheableTypeHierarchyResult> hierarchies = getHierarchiesSafe();
+      for (ICacheableTypeHierarchyResult h : hierarchies) {
+        if (h.isCreated()) {
+          if (TypeUtility.isAncestor(element, h.getBaseType())) {
+            h.invalidate();
           }
-          else if (h.isCreated()) {
-            IType[] allTypes = h.getJdtHierarchy().getAllTypes();
-            for (IType candidate : allTypes) {
+          else {
+            for (IType candidate : h) {
               if (TypeUtility.isAncestor(element, candidate)) {
                 h.invalidate();
+                break;
               }
             }
           }
         }
-      }
-      catch (Exception e) {
-        SdkUtilActivator.logError("could not handle element removed event ('" + element.getElementName() + "') in hierarchies.");
       }
     }
     else if (element.getElementType() == IJavaElement.TYPE) {
@@ -237,11 +192,15 @@ public final class HierarchyCache implements IHierarchyCache {
     }
   }
 
-  private void handleCompilationUnitChagnedExternal(ICompilationUnit icu) {
+  private void handleCompilationUnitChangedExternal(ICompilationUnit icu) {
+    if (!TypeUtility.exists(icu)) {
+      return;
+    }
+
     IRegion region = JavaCore.newRegion();
     region.add(icu);
     try {
-      ITypeHierarchy hierarchy = JavaCore.newTypeHierarchy(region, null, null);
+      ITypeHierarchy hierarchy = getLocalHierarchy(region);
       for (IType t : icu.getTypes()) {
         reqTypeChangedFromExternal(t, hierarchy);
       }
@@ -263,17 +222,6 @@ public final class HierarchyCache implements IHierarchyCache {
     }
   }
 
-  public void clearCache() {
-    ArrayList<CachedTypeHierarchy> hierarchies = new ArrayList<CachedTypeHierarchy>(m_cachedPrimaryTypeHierarchies.size());
-    synchronized (m_cacheLock) {
-      hierarchies.addAll(m_cachedPrimaryTypeHierarchies.values());
-      m_cachedPrimaryTypeHierarchies.clear();
-    }
-    for (CachedTypeHierarchy hierarchy : hierarchies) {
-      hierarchy.invalidate();
-    }
-  }
-
   /**
    * will be notified before events are passed through the event listener list from {@link JavaResourceChangedEmitter}
    * 
@@ -287,16 +235,16 @@ public final class HierarchyCache implements IHierarchyCache {
           handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());
         }
         else if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
-          try {
-            if (TypeUtility.exists(e.getElement())) {
-              IType[] types = ((ICompilationUnit) e.getElement()).getTypes();
-              if (types.length > 0) {
-                handleTypeChange(types[0], e.getSuperTypeHierarchy());
+          ICompilationUnit icu = (ICompilationUnit) e.getElement();
+          if (TypeUtility.exists(icu)) {
+            try {
+              for (IType t : icu.getTypes()) {
+                handleTypeChange(t, e.getSuperTypeHierarchy());
               }
             }
-          }
-          catch (JavaModelException ex) {
-            SdkUtilActivator.logError(ex);
+            catch (JavaModelException ex) {
+              SdkUtilActivator.logError(ex);
+            }
           }
         }
         else if (e.getElementType() == IJavaElement.JAVA_PROJECT) {
@@ -309,6 +257,12 @@ public final class HierarchyCache implements IHierarchyCache {
             handleJavaElementRemoved(e.getElement());
           }
         }
+        else if (e.getElementType() == IJavaElement.PACKAGE_FRAGMENT_ROOT) {
+          if ((e.getFlags() & (IJavaElementDelta.F_ADDED_TO_CLASSPATH | IJavaElementDelta.F_REMOVED_FROM_CLASSPATH | IJavaElementDelta.F_ARCHIVE_CONTENT_CHANGED | IJavaElementDelta.F_REORDER)) != 0 || e.getFlags() == 0) {
+            // the classpath has been changed
+            invalidateAll();
+          }
+        }
         break;
       }
       case IJavaElementDelta.REMOVED: {
@@ -319,7 +273,10 @@ public final class HierarchyCache implements IHierarchyCache {
       }
       case JavaResourceChangedEmitter.CHANGED_EXTERNAL:
         if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
-          handleCompilationUnitChagnedExternal((ICompilationUnit) e.getElement());
+          handleCompilationUnitChangedExternal((ICompilationUnit) e.getElement());
+        }
+        else if (e.getElementType() == IJavaElement.TYPE) {
+          handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());
         }
         break;
     }

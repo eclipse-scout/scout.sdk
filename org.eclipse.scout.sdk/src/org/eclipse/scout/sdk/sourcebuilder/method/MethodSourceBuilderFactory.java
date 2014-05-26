@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
@@ -37,7 +38,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
- * <h3>{@link MethodSourceBuilderFactory}</h3> ...
+ * <h3>{@link MethodSourceBuilderFactory}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
@@ -47,14 +48,14 @@ public final class MethodSourceBuilderFactory {
   }
 
   public static IMethodSourceBuilder createConstructorSourceBuilder(String typeName) {
-    return createConstructorSourceBuilder(typeName, Flags.AccPublic, new MethodParameter[0]);
+    return createConstructorSourceBuilder(typeName, Flags.AccPublic);
   }
 
   public static IMethodSourceBuilder createConstructorSourceBuilder(String typeName, int flags, MethodParameter... parameters) {
     MethodSourceBuilder constructorSourceBuilder = new MethodSourceBuilder(typeName);
     constructorSourceBuilder.setFlags(flags);
     if (parameters != null) {
-      constructorSourceBuilder.setParameters(parameters);
+      constructorSourceBuilder.setParameters(CollectionUtility.arrayList(parameters));
     }
     return constructorSourceBuilder;
   }
@@ -146,7 +147,7 @@ public final class MethodSourceBuilderFactory {
     else {
       LinkedHashMap<String, ITypeGenericMapping> genericMapping = new LinkedHashMap<String, ITypeGenericMapping>();
       SignatureUtility.resolveGenericParametersInSuperHierarchy(SignatureCache.createTypeSignature(typeSourceBuilder.getElementName()), typeSourceBuilder.getSuperTypeSignature(),
-          typeSourceBuilder.getInterfaceSignatures().toArray(new String[typeSourceBuilder.getInterfaceSignatures().size()]), genericMapping);
+          typeSourceBuilder.getInterfaceSignatures(), genericMapping);
 
       MethodSourceBuilder builder = new MethodSourceBuilder(methodName);
 

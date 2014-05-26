@@ -153,19 +153,22 @@ public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandl
     }
   }
 
-  private IScoutBundle[] getClientBundlesBelow(IScoutBundle startBundle) {
+  private Set<IScoutBundle> getClientBundlesBelow(IScoutBundle startBundle) {
     IScoutBundleFilter filter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT),
         ScoutBundleFilters.getWorkspaceBundlesFilter());
     return startBundle.getChildBundles(filter, true);
   }
 
   private IType getDesktopToolsMenu(IScoutBundle startBundle) {
-    IScoutBundle[] clients = getClientBundlesBelow(startBundle);
+    Set<IScoutBundle> clients = getClientBundlesBelow(startBundle);
     IType iDesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
     ICachedTypeHierarchy desktopHierarchy = TypeUtility.getPrimaryTypeHierarchy(iDesktop);
-    IType[] desktops = desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(clients));
-    if (desktops != null && desktops.length == 1) {
-      return desktops[0].getType("ToolsMenu");
+    Set<IType> desktops = desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(clients));
+    for (IType desktop : desktops) {
+      IType toolsMenu = desktop.getType("ToolsMenu");
+      if (TypeUtility.exists(toolsMenu)) {
+        return toolsMenu;
+      }
     }
     return null;
   }

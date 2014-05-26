@@ -16,6 +16,7 @@ import java.util.Set;
 
 import org.eclipse.pde.core.plugin.IPluginAttribute;
 import org.eclipse.pde.core.plugin.IPluginElement;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
@@ -75,10 +76,10 @@ public final class ServletRegistrationUtility {
     return null;
   }
 
-  public static IScoutBundle[] getJaxWsBundlesOnClasspath(IScoutBundle bundle) {
+  public static Set<IScoutBundle> getJaxWsBundlesOnClasspath(IScoutBundle bundle) {
     // get bundles on classpath with JAX-WS dependency installed
     if (bundle == null) {
-      return new IScoutBundle[0];
+      return CollectionUtility.hashSet();
     }
 
     // find required bundles with JAX-WS on classpath

@@ -64,7 +64,7 @@ public class FormNodePage extends AbstractScoutTypePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     IType iGroupBox = TypeUtility.getType(IRuntimeClasses.IGroupBox);
 
     if (m_mainBoxListener == null) {

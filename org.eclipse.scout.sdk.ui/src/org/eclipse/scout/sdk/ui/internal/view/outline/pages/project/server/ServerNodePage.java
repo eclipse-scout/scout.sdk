@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
@@ -30,7 +32,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -58,7 +59,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
     super.loadChildrenImpl();
 
     if (m_serverSessionHierarchy == null) {
@@ -101,11 +102,10 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
     }
   }
 
-  protected IType[] resolveServices() {
+  protected Set<IType> resolveServices() {
     IType iService = TypeUtility.getType(IRuntimeClasses.IService);
-    IPrimaryTypeTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
-    IType[] services = serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
-    return services;
+    ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
+    return serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
   }
 
   @SuppressWarnings("unchecked")
@@ -124,7 +124,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
     else if (menu instanceof FormDataSqlBindingValidateAction) {
       ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
         @Override
-        public IType[] getTypes() {
+        public Set<IType> getTypes() {
           return resolveServices();
         }
       });

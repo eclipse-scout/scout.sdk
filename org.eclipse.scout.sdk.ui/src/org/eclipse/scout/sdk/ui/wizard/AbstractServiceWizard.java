@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -93,8 +96,6 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
     if (bundle == null) {
       return;
     }
-    IType[] sessions = ScoutTypeUtility.getSessionTypes(bundle.getJavaProject());
-    ITreeNode[] createdNodes = new ITreeNode[sessions.length];
     IType defaultSelection = null;
     // calculate which session should be selected by default
     if (locationPage != null) {
@@ -114,9 +115,11 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
     // rebuild nodes
     serviceRegistrationNode.clearChildren();
     boolean defaultFound = false;
-    for (int i = 0; i < sessions.length; i++) {
-
-      boolean isServerSession = TypeUtility.getSuperTypeHierarchy(sessions[i]).contains(TypeUtility.getType(IRuntimeClasses.IServerSession));
+    Set<IType> sessions = ScoutTypeUtility.getSessionTypes(bundle.getJavaProject());
+    ArrayList<ITreeNode> createdNodes = new ArrayList<ITreeNode>(sessions.size());
+    int pos = 0;
+    for (IType session : sessions) {
+      boolean isServerSession = TypeUtility.getSuperTypeHierarchy(session).contains(TypeUtility.getType(IRuntimeClasses.IServerSession));
       ImageDescriptor icon = null;
       if (isServerSession) {
         icon = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerSession);
@@ -125,11 +128,11 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
         icon = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientSession);
       }
 
-      createdNodes[i] = TreeUtility.createNode(serviceRegistrationNode, TYPE_SERVICE_REG_SESSION,
-          Texts.get("UseSessionInRegistration", sessions[i].getElementName()), icon, i, sessions[i]);
+      createdNodes.add(TreeUtility.createNode(serviceRegistrationNode, TYPE_SERVICE_REG_SESSION,
+          Texts.get("UseSessionInRegistration", session.getElementName()), icon, pos++, session));
 
       // remember if the current default session could be found amongst all available sessions
-      if (defaultSelection != null && CompareUtility.equals(sessions[i], defaultSelection)) {
+      if (defaultSelection != null && CompareUtility.equals(session, defaultSelection)) {
         defaultFound = true;
       }
     }
@@ -147,8 +150,10 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
       }
 
       // activate the default session.
-      for (int i = 0; i < sessions.length; i++) {
-        locationPage.setNodeChecked(createdNodes[i], CompareUtility.equals(sessions[i], defaultSelection));
+      int i = 0;
+      for (IType session : sessions) {
+        locationPage.setNodeChecked(createdNodes.get(i), CompareUtility.equals(session, defaultSelection));
+        i++;
       }
 
       // reload
@@ -184,10 +189,11 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
         ITreeNode[] siblings = node.getParent().getChildren(NodeFilters.getVisible());
         IType defaultSession = getLastUsedDefaultSession(b);
         boolean defaultSessionFound = false;
-        IType[] sessions = new IType[siblings.length];
+        Set<IType> sessions = new LinkedHashSet<IType>(siblings.length);
         for (int i = 0; i < siblings.length; i++) {
-          sessions[i] = (IType) siblings[i].getData();
-          if (!defaultSessionFound && sessions[i].equals(defaultSession)) {
+          IType session = (IType) siblings[i].getData();
+          sessions.add(session);
+          if (!defaultSessionFound && session.equals(defaultSession)) {
             defaultSessionFound = true;
           }
         }

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.operation.outline;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -34,7 +35,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.IPrimaryTypeTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
@@ -48,19 +49,19 @@ import org.eclipse.text.edits.ReplaceEdit;
  */
 public class OutlineDeleteOperation extends JavaElementDeleteOperation {
 
-  private final IType[] m_desktops;
+  private final Set<IType> m_desktops;
   private final IType m_outline;
 
   public OutlineDeleteOperation(IType outlineType) {
     IType iDesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
     IType iDesktopExtension = TypeUtility.getType(IRuntimeClasses.IDesktopExtension);
 
-    IPrimaryTypeTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(iDesktop);
-    IPrimaryTypeTypeHierarchy pthExt = TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension);
+    ICachedTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(iDesktop);
+    ICachedTypeHierarchy pthExt = TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension);
 
     ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(outlineType.getJavaProject()), TypeFilters.getInWorkspaceFilter());
 
-    HashSet<IType> desktopsAndDesktopExtensions = new HashSet<IType>();
+    Set<IType> desktopsAndDesktopExtensions = new HashSet<IType>();
     for (IType desktop : pth.getAllSubtypes(iDesktop, filter)) {
       desktopsAndDesktopExtensions.add(desktop);
     }
@@ -68,7 +69,7 @@ public class OutlineDeleteOperation extends JavaElementDeleteOperation {
       desktopsAndDesktopExtensions.add(desktopExtension);
     }
 
-    m_desktops = desktopsAndDesktopExtensions.toArray(new IType[desktopsAndDesktopExtensions.size()]);
+    m_desktops = desktopsAndDesktopExtensions;
     m_outline = outlineType;
     setMembers(new IJavaElement[]{m_outline});
   }
@@ -96,7 +97,7 @@ public class OutlineDeleteOperation extends JavaElementDeleteOperation {
   private void removeOutlineViewButton(IType desktop, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IType iViewButton = TypeUtility.getType(IRuntimeClasses.IViewButton);
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(desktop);
-    IType[] allViewButtons = TypeUtility.getInnerTypes(desktop, TypeFilters.getSubtypeFilter(iViewButton, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
+    Set<IType> allViewButtons = TypeUtility.getInnerTypes(desktop, TypeFilters.getSubtypeFilter(iViewButton, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
 
     for (IType viewButton : allViewButtons) {
       if (TypeUtility.exists(viewButton) && viewButton.getElementName().equals(m_outline.getElementName() + SdkProperties.SUFFIX_VIEW_BUTTON)) {
