@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.util.ScoutSdkUtilCore;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
@@ -44,12 +43,6 @@ public class TypeFilters {
       }
     }
   };
-  private static final ITypeFilter EXISTS_FILTER = new ITypeFilter() {
-    @Override
-    public boolean accept(IType type) {
-      return TypeUtility.exists(type);
-    }
-  };
   private static final ITypeFilter CLASS_FILTER = new ITypeFilter() {
     @Override
     public boolean accept(IType candidate) {
@@ -59,7 +52,7 @@ public class TypeFilters {
   private static final ITypeFilter TOP_LEVEL_FILTER = new ITypeFilter() {
     @Override
     public boolean accept(IType type) {
-      return TypeUtility.exists(type) && !TypeUtility.exists(type.getDeclaringType());
+      return type != null && type.getDeclaringType() == null;
     }
   };
   private static final ITypeFilter IN_WORKSPACE_FILTER = new ITypeFilter() {
@@ -112,6 +105,14 @@ public class TypeFilters {
     };
   }
 
+  /**
+   * Creates a new {@link ITypeFilter} that only returns {@link IType}s where the simple name exactly matches the given
+   * typeName.
+   * 
+   * @param typeName
+   *          The simple name the types must have.
+   * @return The newly created {@link ITypeFilter}
+   */
   public static ITypeFilter getElementNameFilter(final String typeName) {
     return new ITypeFilter() {
       @Override
@@ -127,14 +128,14 @@ public class TypeFilters {
    * 
    * @param regex
    *          The expression to use
-   * @param flags
+   * @param regexFlags
    *          The regex flags to use. A bit mask that may include {@link Pattern#CASE_INSENSITIVE},
    *          {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ},
    *          {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL} and {@link Pattern#COMMENTS}
    * @return the created filter
    */
-  public static ITypeFilter getRegexSimpleNameFilter(final String regex, int flags) {
-    final Pattern pat = Pattern.compile(regex, flags);
+  public static ITypeFilter getRegexSimpleNameFilter(final String regex, int regexFlags) {
+    final Pattern pat = Pattern.compile(regex, regexFlags);
     return new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
@@ -153,19 +154,6 @@ public class TypeFilters {
    */
   public static ITypeFilter getRegexSimpleNameFilter(final String regex) {
     return getRegexSimpleNameFilter(regex, Pattern.CASE_INSENSITIVE);
-  }
-
-  public static ITypeFilter getTypesInProject(final IJavaProject project) {
-    return new ITypeFilter() {
-
-      @Override
-      public boolean accept(IType type) {
-        if (!TypeUtility.exists(type)) {
-          return false;
-        }
-        return CompareUtility.equals(type.getJavaProject(), project);
-      }
-    };
   }
 
   public static ITypeFilter getTypesOnClasspath(final IJavaProject project) {
@@ -201,15 +189,13 @@ public class TypeFilters {
     };
   }
 
-  public static ITypeFilter getInHierarchyFilter(final ITypeHierarchy hierarchy) {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType type) {
-        return hierarchy.contains(type);
-      }
-    };
-  }
-
+  /**
+   * Creates a new {@link ITypeFilter} that accepts all {@link IType}s that have at least all of the given flags set.
+   * 
+   * @param flags
+   *          The flags of the types.
+   * @return The newly created {@link ITypeFilter}.
+   */
   public static ITypeFilter getFlagsFilter(final int flags) {
     return new ITypeFilter() {
       @Override
@@ -237,31 +223,27 @@ public class TypeFilters {
     return CLASS_FILTER;
   }
 
-  public static ITypeFilter getExistingFilter() {
-    return EXISTS_FILTER;
-  }
-
   public static ITypeFilter getNotInTypes(IType... excludedTypes) {
-    HashSet<IType> excludedSet = null;
+    Set<IType> excludedSet = null;
     if (excludedTypes != null) {
       excludedSet = new HashSet<IType>(excludedTypes.length);
       for (IType t : excludedTypes) {
-        excludedSet.add(t);
+        if (t != null) {
+          excludedSet.add(t);
+        }
       }
-    }
-    else {
-      excludedSet = new HashSet<IType>(0);
     }
     return getNotInTypes(excludedSet);
   }
 
   public static ITypeFilter getNotInTypes(final Set<IType> excludedTypes) {
+    if (excludedTypes == null || excludedTypes.size() < 1) {
+      return null; // no filter required
+    }
+
     return new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
-        if (excludedTypes == null) {
-          return true;
-        }
         return !excludedTypes.contains(type);
       }
     };
@@ -273,7 +255,7 @@ public class TypeFilters {
 
   /**
    * Gets if the given type is a class.<br>
-   * A class is defined as a type that is neither abstract, an interface or deprecated.
+   * A class is defined as a type that is neither an anonymous, abstract, interface or deprecated type.
    * 
    * @param type
    *          The type to check
@@ -281,9 +263,13 @@ public class TypeFilters {
    * @see Flags#isAbstract(int)
    * @see Flags#isInterface(int)
    * @see Flags#isDeprecated(int)
+   * @see IType#isAnonymous()
    */
   protected static boolean isClass(IType type) {
     try {
+      if (type.isAnonymous()) {
+        return false;
+      }
       int flags = type.getFlags();
       return !Flags.isAbstract(flags) && !Flags.isInterface(flags) && !Flags.isDeprecated(flags);
     }
@@ -300,41 +286,36 @@ public class TypeFilters {
     return NO_GENERIC_FILTER;
   }
 
-  public static ITypeFilter getMultiTypeFilterOr(final ITypeFilter... filters) {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType candidate) {
-        if (filters == null) {
-          return true;
-        }
-        else {
-          for (ITypeFilter f : filters) {
-            if (f.accept(candidate)) {
-              return true;
-            }
-          }
-          return false;
-        }
-      }
-    };
-  }
-
-  public static ITypeFilter getMultiTypeFilter(final ITypeFilter... filters) {
-    if (filters == null) {
+  private static ITypeFilter getMultiTypeFilter(final boolean or, final ITypeFilter... filters) {
+    if (filters == null || filters.length < 1) {
       return null;
+    }
+    if (filters.length == 1) {
+      return filters[0];
     }
 
     return new ITypeFilter() {
       @Override
       public boolean accept(IType candidate) {
         for (ITypeFilter f : filters) {
-          if (!f.accept(candidate)) {
-            return false;
+          if (f != null) {
+            boolean accepted = f.accept(candidate);
+            if (or == accepted) {
+              return accepted;
+            }
           }
         }
-        return true;
+        return !or;
       }
     };
+  }
+
+  public static ITypeFilter getMultiTypeFilterOr(final ITypeFilter... filters) {
+    return getMultiTypeFilter(true, filters);
+  }
+
+  public static ITypeFilter getMultiTypeFilterAnd(final ITypeFilter... filters) {
+    return getMultiTypeFilter(false, filters);
   }
 
   public static ITypeFilter getTypeParamSuperTypeFilter(final String baseSig, final String paramDefiningSuperTypeFqn, final String paramName) {

@@ -77,7 +77,7 @@ public class FormTemplateTablePage extends AbstractPage {
       m_formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       m_formHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(
+    ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(
         ScoutTypeFilters.getInScoutBundles(getScoutBundle()),
         TypeFilters.getFlagsFilter(Flags.AccAbstract | Flags.AccPublic)
         );

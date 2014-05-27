@@ -52,7 +52,7 @@ public class WellformOutlinesOperation implements IOperation {
     // find types
     IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
-    m_outlines = formHierarchy.getAllSubtypes(iOutline, ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()));
+    m_outlines = formHierarchy.getAllSubtypes(iOutline, ScoutTypeFilters.getClassesInScoutBundles(getClientBundle()));
     // format types
     if (monitor.isCanceled()) {
       return;

@@ -83,7 +83,7 @@ public class BookmarkStorageServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iBookmarkStorageService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    return m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    return m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
   @SuppressWarnings("unchecked")

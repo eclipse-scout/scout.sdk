@@ -75,7 +75,7 @@ public class WizardTablePage extends AbstractPage {
       m_wizardHierarchy = TypeUtility.getPrimaryTypeHierarchy(iWizard);
       m_wizardHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    Set<IType> searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    Set<IType> searchForms = m_wizardHierarchy.getAllSubtypes(iWizard, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType searchForm : searchForms) {
       new WizardNodePage(this, searchForm);
     }

@@ -74,7 +74,7 @@ public class OutlineTablePage extends AbstractPage {
       m_outlineHierarchy = TypeUtility.getPrimaryTypeHierarchy(iOutline);
       m_outlineHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    Set<IType> outlines = m_outlineHierarchy.getAllSubtypes(iOutline, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    Set<IType> outlines = m_outlineHierarchy.getAllSubtypes(iOutline, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType outline : outlines) {
       new OutlineNodePage(this, outline);
     }

@@ -49,11 +49,11 @@ public class JavaElementAbstractTypeContentProvider extends AbstractJavaElementC
     ITypeFilter filter = null;
     IType[] mostlyUsed = null;
     if (getFilter() == null) {
-      filter = TypeFilters.getMultiTypeFilter(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getNotInTypes(m_mostlyUsed));
+      filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getNotInTypes(m_mostlyUsed));
       mostlyUsed = m_mostlyUsed;
     }
     else {
-      filter = TypeFilters.getMultiTypeFilter(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getNotInTypes(m_mostlyUsed), getFilter());
+      filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getNotInTypes(m_mostlyUsed), getFilter());
 
       // filter the mostly used
       if (m_mostlyUsed != null) {

@@ -92,7 +92,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
   protected IType[] getColumns(IType table, IType rowDataSuperType, final ITypeHierarchy fieldHierarchy, IProgressMonitor monitor) throws JavaModelException {
     // collect all columns that exist in the table and all of its super classes
     TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<IType>(ScoutTypeComparators.getOrderAnnotationComparator());
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn)), new ITypeFilter() {
+    ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn)), new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
         SdkColumnCommand command = ScoutTypeUtility.findColumnDataSdkColumnCommand(type, fieldHierarchy);

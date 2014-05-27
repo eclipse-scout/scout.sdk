@@ -105,7 +105,7 @@ public class GroupBoxBodyGridPresenter extends AbstractTypeProposalPresenter {
         if (getMethod() != null) {
           IType iGroupBoxBodyGrid = TypeUtility.getType(IRuntimeClasses.IGroupBoxBodyGrid);
           if (TypeUtility.exists(iGroupBoxBodyGrid)) {
-            ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()));
+            ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(getMethod().getType().getJavaProject()));
             m_proposals = TypeUtility.getPrimaryTypeHierarchy(iGroupBoxBodyGrid).getAllSubtypes(iGroupBoxBodyGrid, filter, TypeComparators.getTypeNameComparator());
             return;
           }

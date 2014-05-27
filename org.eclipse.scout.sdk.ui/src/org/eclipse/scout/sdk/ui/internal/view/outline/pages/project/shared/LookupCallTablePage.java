@@ -70,7 +70,7 @@ public class LookupCallTablePage extends AbstractPage {
       m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupCall);
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
+    ITypeFilter filter = ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle());
     Set<IType> lookupCallTypes = m_lookupCallHierarchy.getAllSubtypes(iLookupCall, filter, TypeComparators.getTypeNameComparator());
     for (IType type : lookupCallTypes) {
       new LookupCallNodePage(this, type);

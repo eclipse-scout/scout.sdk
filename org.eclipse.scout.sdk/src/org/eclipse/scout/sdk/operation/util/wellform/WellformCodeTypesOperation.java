@@ -52,7 +52,7 @@ public class WellformCodeTypesOperation implements IOperation {
     // find all forms
     IType iCodeType = TypeUtility.getType(IRuntimeClasses.ICodeType);
     ICachedTypeHierarchy codeTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
-    m_codeTypes = codeTypeHierarchy.getAllSubtypes(iCodeType, ScoutTypeFilters.getTypesInScoutBundles(getSharedBundle()));
+    m_codeTypes = codeTypeHierarchy.getAllSubtypes(iCodeType, ScoutTypeFilters.getClassesInScoutBundles(getSharedBundle()));
     // format forms
     if (monitor.isCanceled()) {
       return;

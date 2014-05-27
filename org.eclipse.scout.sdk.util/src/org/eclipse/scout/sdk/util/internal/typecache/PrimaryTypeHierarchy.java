@@ -62,7 +62,7 @@ public final class PrimaryTypeHierarchy extends AbstractCachedTypeHierarchy {
       filter = TypeFilters.getPrimaryTypeFilter();
     }
     else {
-      filter = TypeFilters.getMultiTypeFilter(TypeFilters.getPrimaryTypeFilter(), filter);
+      filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getPrimaryTypeFilter(), filter);
     }
     return super.getTypesFilteredAndSorted(types, filter, comparator);
   }

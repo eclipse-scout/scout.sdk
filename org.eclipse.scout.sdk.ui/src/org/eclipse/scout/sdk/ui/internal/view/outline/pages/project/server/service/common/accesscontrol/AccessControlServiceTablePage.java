@@ -80,7 +80,7 @@ public class AccessControlServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iAccessControlService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    return m_serviceHierarchy.getAllSubtypes(iAccessControlService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    return m_serviceHierarchy.getAllSubtypes(iAccessControlService, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
   @SuppressWarnings("unchecked")

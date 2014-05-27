@@ -83,7 +83,7 @@ public class CalendarServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCalendarService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    return m_serviceHierarchy.getAllSubtypes(iCalendarService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    return m_serviceHierarchy.getAllSubtypes(iCalendarService, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
   @SuppressWarnings("unchecked")

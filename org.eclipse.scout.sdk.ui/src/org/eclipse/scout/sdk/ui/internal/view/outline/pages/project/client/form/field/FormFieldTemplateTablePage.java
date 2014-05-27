@@ -86,7 +86,7 @@ public class FormFieldTemplateTablePage extends AbstractPage {
       m_formFieldHierarchy = TypeUtility.getAbstractTypesOnClasspathHierarchy(iFormField, workspaceBundle.getJavaProject());
       m_formFieldHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getPrimaryTypeFilter(), ScoutTypeFilters.getInScoutBundles(getScoutBundle()));
+    ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getPrimaryTypeFilter(), ScoutTypeFilters.getInScoutBundles(getScoutBundle()));
     return m_formFieldHierarchy.getAllTypes(filter, TypeComparators.getTypeNameComparator());
   }
 

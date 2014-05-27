@@ -71,7 +71,7 @@ public class CodeTypeTablePage extends AbstractPage {
       m_codeTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);
       m_codeTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
+    ITypeFilter filter = ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle());
     Set<IType> codeTypes = m_codeTypeHierarchy.getAllSubtypes(iCodeType, filter, TypeComparators.getTypeNameComparator());
     for (IType codeType : codeTypes) {
       new CodeTypeNodePage(this, codeType);

@@ -76,7 +76,7 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
         String formRegex = entityName + SdkProperties.SUFFIX_FORM;
         IScoutBundle interfaceBundle = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(getPage().getInterfaceType());
 
-        ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(
+        ITypeFilter formFilter = TypeFilters.getMultiTypeFilterAnd(
             TypeFilters.getRegexSimpleNameFilter(formRegex),
             TypeFilters.getClassFilter(),
             ScoutTypeFilters.getInScoutBundles(interfaceBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false))
@@ -89,7 +89,7 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
 
       // permissions
       String permissionRegex = "(Create|Read|Update)" + entityName + SdkProperties.SUFFIX_PERMISSION;
-      ITypeFilter filter = TypeFilters.getMultiTypeFilter(
+      ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(
           TypeFilters.getRegexSimpleNameFilter(permissionRegex),
           TypeFilters.getClassFilter(),
           ScoutTypeFilters.getInScoutBundles(getPage().getScoutBundle().getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false))

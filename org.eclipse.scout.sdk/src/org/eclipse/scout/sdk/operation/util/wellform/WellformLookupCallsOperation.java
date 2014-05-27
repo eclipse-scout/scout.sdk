@@ -53,7 +53,7 @@ public class WellformLookupCallsOperation implements IOperation {
     // find types
     IType iLookupCall = TypeUtility.getType(IRuntimeClasses.ILookupCall);
     ICachedTypeHierarchy lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupCall);
-    m_lookupCalls = lookupCallHierarchy.getAllSubtypes(iLookupCall, ScoutTypeFilters.getTypesInScoutBundles(getBundle()));
+    m_lookupCalls = lookupCallHierarchy.getAllSubtypes(iLookupCall, ScoutTypeFilters.getClassesInScoutBundles(getBundle()));
     // format types
     if (monitor.isCanceled()) {
       return;

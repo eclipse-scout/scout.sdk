@@ -172,7 +172,7 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
     IType baseType = TypeUtility.getType(IRuntimeClasses.ISwingEnvironment);
     if (TypeUtility.exists(baseType)) {
       ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(baseType);
-      return hierarchy.getAllSubtypes(baseType, ScoutTypeFilters.getTypesInScoutBundles(swingBundles));
+      return hierarchy.getAllSubtypes(baseType, ScoutTypeFilters.getClassesInScoutBundles(swingBundles));
     }
     return CollectionUtility.hashSet();
   }

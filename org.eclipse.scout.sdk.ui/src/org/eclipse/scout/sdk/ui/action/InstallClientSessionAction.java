@@ -40,7 +40,7 @@ public class InstallClientSessionAction extends AbstractOperationAction {
 
   public void init(ICachedTypeHierarchy clientSessionHierarchy, IScoutBundle scoutResource) {
     if (clientSessionHierarchy != null && !scoutResource.isBinary()) {
-      Set<IType> clientSessions = clientSessionHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(scoutResource), null);
+      Set<IType> clientSessions = clientSessionHierarchy.getAllClasses(ScoutTypeFilters.getClassesInScoutBundles(scoutResource), null);
       if (clientSessions.size() == 0) {
         IScoutBundle shared = scoutResource.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
         if (shared != null) {

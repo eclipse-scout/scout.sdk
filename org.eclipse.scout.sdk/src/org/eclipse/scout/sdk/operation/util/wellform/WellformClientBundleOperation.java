@@ -116,7 +116,7 @@ public class WellformClientBundleOperation implements IOperation {
 
   protected void wellformDesktop(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     IType idesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
-    Set<IType> desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getTypesInScoutBundles(bundle));
+    Set<IType> desktops = TypeUtility.getPrimaryTypeHierarchy(idesktop).getAllSubtypes(idesktop, ScoutTypeFilters.getClassesInScoutBundles(bundle));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
       op.run(monitor, workingCopyManager);
@@ -131,7 +131,7 @@ public class WellformClientBundleOperation implements IOperation {
 
   protected void wellformDesktopExtension(Set<IType> types, IScoutBundle bundle, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     IType iDesktop = TypeUtility.getType(IRuntimeClasses.IDesktopExtension);
-    Set<IType> desktops = TypeUtility.getPrimaryTypeHierarchy(iDesktop).getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(bundle));
+    Set<IType> desktops = TypeUtility.getPrimaryTypeHierarchy(iDesktop).getAllSubtypes(iDesktop, ScoutTypeFilters.getClassesInScoutBundles(bundle));
     WellformScoutTypeOperation op = new WellformScoutTypeOperation(desktops, true);
     try {
       op.run(monitor, workingCopyManager);

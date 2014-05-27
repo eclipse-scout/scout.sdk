@@ -83,7 +83,7 @@ public class SmtpServiceTablePage extends AbstractPage {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSMTPService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    return m_serviceHierarchy.getAllSubtypes(iSMTPService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    return m_serviceHierarchy.getAllSubtypes(iSMTPService, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
   @SuppressWarnings("unchecked")

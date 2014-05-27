@@ -129,7 +129,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
           ICachedTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
           Set<IScoutBundle> bundles = new HashSet<IScoutBundle>();
           collectBundlesRec(m_group, bundles);
-          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(bundles));
+          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getClassesInScoutBundles(bundles));
         }
       }, getScoutBundle());
     }
@@ -155,7 +155,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
     IType iService = TypeUtility.getType(IRuntimeClasses.IService);
     ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     Set<IScoutBundle> serverBundles = getScoutBundle().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
-    return serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(serverBundles));
+    return serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getClassesInScoutBundles(serverBundles));
   }
 
   @Override

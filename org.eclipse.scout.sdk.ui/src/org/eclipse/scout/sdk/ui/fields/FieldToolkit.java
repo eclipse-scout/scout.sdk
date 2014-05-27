@@ -126,7 +126,7 @@ public class FieldToolkit {
   }
 
   public ProposalTextField createSiblingProposalField(Composite parent, IType declaringType, IType siblingDeclaringType, ITypeHierarchy hierarchy, int labelPercentage) {
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(siblingDeclaringType, hierarchy));
+    ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(siblingDeclaringType, hierarchy));
     Set<IType> innerTypes = TypeUtility.getInnerTypes(declaringType, filter, ScoutTypeComparators.getOrderAnnotationComparator());
     ArrayList<SiblingProposal> siblingList = new ArrayList<SiblingProposal>();
     for (IJavaElement t : innerTypes) {

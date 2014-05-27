@@ -84,9 +84,9 @@ public class FormTablePage extends AbstractPage {
       m_formHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     IScoutBundle sb = getScoutBundle();
-    Set<IType> searchForms = m_formHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(sb));
+    Set<IType> searchForms = m_formHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getClassesInScoutBundles(sb));
     Set<IType> allForms = m_formHierarchy.getAllSubtypes(iForm,
-        TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getTypesInScoutBundles(sb), TypeFilters.getNotInTypes(searchForms)),
+        TypeFilters.getMultiTypeFilterAnd(ScoutTypeFilters.getClassesInScoutBundles(sb), TypeFilters.getNotInTypes(searchForms)),
         TypeComparators.getTypeNameComparator());
     return allForms;
   }

@@ -52,7 +52,7 @@ public class WellformPagesOperation implements IOperation {
     // find types
     IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
     ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
-    m_pages = hierarchy.getAllSubtypes(iPage, ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()));
+    m_pages = hierarchy.getAllSubtypes(iPage, ScoutTypeFilters.getClassesInScoutBundles(getClientBundle()));
     // format types
     if (monitor.isCanceled()) {
       return;

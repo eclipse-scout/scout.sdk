@@ -107,7 +107,7 @@ public class LookupCallProposalPresenter extends AbstractTypeProposalPresenter {
         ScoutSdkUi.logError(e);
       }
 
-      ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
+      ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
       return TypeUtility.getClassesOnClasspath(iLookupCall, getType().getJavaProject(), filter);
     }
   }

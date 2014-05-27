@@ -96,7 +96,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       new ClientSessionNodePage(this, clientSession);
     }
     // desktop
-    Set<IType> desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
+    Set<IType> desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
     if (desktops.size() > 1) {
       ScoutSdkUi.logWarning("more than one desktop found.");
     }
@@ -104,7 +104,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       new DesktopNodePage(this, desktop);
     }
     // desktop extension
-    Set<IType> desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
+    Set<IType> desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
     for (IType desktopExtension : desktopExtensions) {
       new DesktopExtensionNodePage(this, desktopExtension);
     }
@@ -162,7 +162,7 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
         public Set<IType> getTypes() {
           IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
           ICachedTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
-          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
+          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
         }
       }, getScoutBundle());
     }

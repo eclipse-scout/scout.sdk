@@ -59,7 +59,7 @@ public class OutlineDeleteOperation extends JavaElementDeleteOperation {
     ICachedTypeHierarchy pth = TypeUtility.getPrimaryTypeHierarchy(iDesktop);
     ICachedTypeHierarchy pthExt = TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension);
 
-    ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(outlineType.getJavaProject()), TypeFilters.getInWorkspaceFilter());
+    ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getTypesOnClasspath(outlineType.getJavaProject()), TypeFilters.getInWorkspaceFilter());
 
     Set<IType> desktopsAndDesktopExtensions = new HashSet<IType>();
     for (IType desktop : pth.getAllSubtypes(iDesktop, filter)) {

@@ -83,7 +83,7 @@ public class SearchFormTablePage extends AbstractPage {
       m_searchFormHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSearchForm);
       m_searchFormHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    return m_searchFormHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    return m_searchFormHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
   @SuppressWarnings("unchecked")

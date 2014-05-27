@@ -139,7 +139,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       protected Object[][] computeProposals() {
         IType iLookupCall = TypeUtility.getType(IRuntimeClasses.ILookupCall);
-        ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(getGenericSignature(), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
+        ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(getGenericSignature(), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
         Set<IType> codeTypes = TypeUtility.getClassesOnClasspath(iLookupCall, m_declaringType.getJavaProject(), filter);
         return new Object[][]{codeTypes.toArray(new IType[codeTypes.size()])};
       }

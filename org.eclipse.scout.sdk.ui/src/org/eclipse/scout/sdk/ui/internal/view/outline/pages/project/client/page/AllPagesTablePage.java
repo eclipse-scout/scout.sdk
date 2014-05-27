@@ -75,7 +75,7 @@ public class AllPagesTablePage extends AbstractPage {
       m_cachedTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
       m_cachedTypeHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    Set<IType> allPages = m_cachedTypeHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    Set<IType> allPages = m_cachedTypeHierarchy.getAllClasses(ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
 
     PageNodePageHelper.createRepresentationFor(this, allPages, m_cachedTypeHierarchy);
   }
@@ -102,7 +102,7 @@ public class AllPagesTablePage extends AbstractPage {
         public Set<IType> getTypes() {
           IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
           ICachedTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
-          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
+          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
         }
       }, getScoutBundle());
     }

@@ -161,7 +161,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       @Override
       protected Object[][] computeProposals() {
         IType iLookupCall = TypeUtility.getType(IRuntimeClasses.ILookupCall);
-        ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(getGenericSignature(), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
+        ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(getGenericSignature(), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE));
         Set<IType> lookupCalls = TypeUtility.getClassesOnClasspath(iLookupCall, getSharedBundle().getJavaProject(), filter);
         return new Object[][]{lookupCalls.toArray(new IType[lookupCalls.size()])};
       }

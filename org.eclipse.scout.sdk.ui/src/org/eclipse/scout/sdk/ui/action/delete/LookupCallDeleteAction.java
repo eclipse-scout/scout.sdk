@@ -108,7 +108,7 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
     ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
     if (m_lookupServiceInterface == null) {
       String serviceName = getLookupCall().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_LOOKUP_CALL + "$", "I$1" + SdkProperties.SUFFIX_LOOKUP_SERVICE);
-      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getTypesOnClasspath(getLookupCall().getJavaProject()), TypeFilters.getInterfaceFilter());
+      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getTypesOnClasspath(getLookupCall().getJavaProject()), TypeFilters.getInterfaceFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
         if (candidate.getElementName().equals(serviceName)) {
           m_lookupServiceInterface = candidate;
@@ -120,7 +120,7 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
       String serviceName = getLookupCall().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_LOOKUP_CALL + "$", "$1" + SdkProperties.SUFFIX_LOOKUP_SERVICE);
       IScoutBundle sharedBundle = ScoutTypeUtility.getScoutBundle(getLookupCall());
       Set<IScoutBundle> visibleServers = sharedBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false);
-      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutBundles(visibleServers), TypeFilters.getClassFilter());
+      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilterAnd(ScoutTypeFilters.getInScoutBundles(visibleServers), TypeFilters.getClassFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
         if (candidate.getElementName().equals(serviceName)) {
           m_lookupService = candidate;

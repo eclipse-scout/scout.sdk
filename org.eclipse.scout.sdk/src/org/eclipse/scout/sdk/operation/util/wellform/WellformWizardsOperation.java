@@ -52,7 +52,7 @@ public class WellformWizardsOperation implements IOperation {
     // find types
     IType iWizard = TypeUtility.getType(IRuntimeClasses.IWizard);
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iWizard);
-    m_wizards = formHierarchy.getAllSubtypes(iWizard, ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()));
+    m_wizards = formHierarchy.getAllSubtypes(iWizard, ScoutTypeFilters.getClassesInScoutBundles(getClientBundle()));
     // format types
     if (monitor.isCanceled()) {
       return;

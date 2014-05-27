@@ -54,7 +54,7 @@ public class WellformSearchFormsOperation implements IOperation {
 
     // find all forms
     ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-    m_searchForms = formHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(getClientBundle()));
+    m_searchForms = formHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getClassesInScoutBundles(getClientBundle()));
     // format forms
     if (monitor.isCanceled()) {
       return;

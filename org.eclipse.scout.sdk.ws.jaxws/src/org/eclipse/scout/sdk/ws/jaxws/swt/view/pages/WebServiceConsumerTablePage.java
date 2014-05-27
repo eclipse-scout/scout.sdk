@@ -99,7 +99,7 @@ public class WebServiceConsumerTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    Set<IType> wsConsumerTypes = m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    Set<IType> wsConsumerTypes = m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType consumerType : wsConsumerTypes) {
       new WebServiceConsumerNodePage(this, consumerType);
     }

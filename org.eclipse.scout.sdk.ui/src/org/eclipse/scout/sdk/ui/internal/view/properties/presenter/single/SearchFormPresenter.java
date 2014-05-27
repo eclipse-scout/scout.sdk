@@ -112,7 +112,7 @@ public class SearchFormPresenter extends AbstractTypeProposalPresenter {
         if (getMethod() != null) {
           IScoutBundle sb = ScoutTypeUtility.getScoutBundle(getMethod().getType());
           IType iSearchForm = TypeUtility.getType(IRuntimeClasses.ISearchForm);
-          m_proposals = TypeUtility.getPrimaryTypeHierarchy(iSearchForm).getAllSubtypes(iSearchForm, ScoutTypeFilters.getTypesInScoutBundles(sb),
+          m_proposals = TypeUtility.getPrimaryTypeHierarchy(iSearchForm).getAllSubtypes(iSearchForm, ScoutTypeFilters.getClassesInScoutBundles(sb),
               TypeComparators.getTypeNameComparator());
         }
         else {

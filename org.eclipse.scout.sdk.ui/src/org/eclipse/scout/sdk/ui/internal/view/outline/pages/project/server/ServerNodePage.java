@@ -105,7 +105,7 @@ public class ServerNodePage extends AbstractBundleNodeTablePage {
   protected Set<IType> resolveServices() {
     IType iService = TypeUtility.getType(IRuntimeClasses.IService);
     ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
-    return serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()));
+    return serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
   }
 
   @SuppressWarnings("unchecked")

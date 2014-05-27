@@ -109,7 +109,7 @@ public class CodeTypeProposalPresenter extends AbstractTypeProposalPresenter {
         ScoutSdkUi.logError(e);
       }
 
-      ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
+      ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
       return TypeUtility.getClassesOnClasspath(iCodeType, getType().getJavaProject(), filter);
     }
   }

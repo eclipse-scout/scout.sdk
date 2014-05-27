@@ -72,7 +72,7 @@ public class ClientLookupCallTablePage extends AbstractPage {
       m_lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(localLookupCall);
       m_lookupCallHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    Set<IType> lookupCalls = m_lookupCallHierarchy.getAllClasses(ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    Set<IType> lookupCalls = m_lookupCallHierarchy.getAllClasses(ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType lookupcall : lookupCalls) {
       new LookupCallNodePage(this, lookupcall);
     }

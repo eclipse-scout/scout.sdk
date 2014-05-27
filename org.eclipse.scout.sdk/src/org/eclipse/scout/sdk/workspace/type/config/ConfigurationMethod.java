@@ -10,14 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type.config;
 
-import java.util.Stack;
+import java.util.Deque;
+import java.util.Iterator;
+import java.util.LinkedList;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -32,14 +34,14 @@ public class ConfigurationMethod {
 
   private final IType m_type;
   private final ITypeHierarchy m_superTypeHierarchy;
-  private final Stack<IMethod> m_methodStack;
+  private final Deque<IMethod> m_methodStack;
   private final String m_methodName;
   private final int m_methodType;
   private String m_configAnnotationType;
   private String m_source;
 
   public ConfigurationMethod(IType type, ITypeHierarchy superTypeHierarchy, String methodName, int methodType) {
-    m_methodStack = new Stack<IMethod>();
+    m_methodStack = new LinkedList<IMethod>();
     m_type = type;
     m_superTypeHierarchy = superTypeHierarchy;
     m_methodName = methodName;
@@ -56,6 +58,10 @@ public class ConfigurationMethod {
 
   public String getMethodName() {
     return m_methodName;
+  }
+
+  public Deque<IMethod> getMethodStack() {
+    return new LinkedList<IMethod>(m_methodStack);
   }
 
   public void setConfigAnnotationType(String configAnnotationType) {
@@ -103,14 +109,12 @@ public class ConfigurationMethod {
   }
 
   /**
-   * @return Gets the value of the first (bottom-up) @Order annotation in the method stack or null if no @Order
-   *         annotation can
-   *         be found.
+   * @return Gets the value of the first (most precise) {@link Order} annotation in the method stack or null if no
+   *         {@link Order} annotation can be found.
    */
   public Double getOrder() {
     try {
-      for (int i = m_methodStack.size() - 1; i > -1; i--) {
-        IMethod m = m_methodStack.get(i);
+      for (IMethod m : m_methodStack) {
         if (TypeUtility.exists(m)) {
           Double order = ScoutTypeUtility.getOrderAnnotationValue(m);
           if (order != null) {
@@ -143,7 +147,6 @@ public class ConfigurationMethod {
         m_methodStack.pop();
       }
       return m_methodStack.peek();
-
     }
     return null;
   }
@@ -153,9 +156,13 @@ public class ConfigurationMethod {
   }
 
   public IMethod getDefaultMethod() {
-    if (m_methodStack.size() == 1) return m_methodStack.get(0);
-    for (int i = m_methodStack.size() - 1; i > -1; i--) {
-      IMethod m = m_methodStack.get(i);
+    if (m_methodStack.size() == 1) {
+      return m_methodStack.getFirst();
+    }
+
+    Iterator<IMethod> reverseIterator = m_methodStack.descendingIterator();
+    while (reverseIterator.hasNext()) {
+      IMethod m = reverseIterator.next();
       if (!m.getDeclaringType().equals(getType())) {
         return m;
       }
@@ -163,29 +170,51 @@ public class ConfigurationMethod {
     return null;
   }
 
-  @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof ConfigurationMethod)) {
-      return false;
-    }
-    ConfigurationMethod cm = (ConfigurationMethod) obj;
-    return cm.hashCode() == hashCode();
+  public ITypeHierarchy getSuperTypeHierarchy() {
+    return m_superTypeHierarchy;
   }
 
   @Override
   public int hashCode() {
-    int hashCode = 0;
-    for (IMethod m : m_methodStack) {
-      hashCode = hashCode ^ m.hashCode();
-    }
-    hashCode = hashCode ^ m_type.hashCode();
-    if (!StringUtility.isNullOrEmpty(getSource())) {
-      hashCode = hashCode ^ getSource().hashCode();
-    }
-    return hashCode;
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + m_methodStack.hashCode();
+    result = prime * result + ((m_source == null) ? 0 : m_source.hashCode());
+    result = prime * result + ((m_type == null) ? 0 : m_type.hashCode());
+    return result;
   }
 
-  public ITypeHierarchy getSuperTypeHierarchy() {
-    return m_superTypeHierarchy;
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
+      return false;
+    }
+    if (!(obj instanceof ConfigurationMethod)) {
+      return false;
+    }
+    ConfigurationMethod other = (ConfigurationMethod) obj;
+    if (!m_methodStack.equals(other.m_methodStack)) {
+      return false;
+    }
+    if (m_source == null) {
+      if (other.m_source != null) {
+        return false;
+      }
+    }
+    else if (!m_source.equals(other.m_source)) {
+      return false;
+    }
+    if (m_type == null) {
+      if (other.m_type != null) {
+        return false;
+      }
+    }
+    else if (!m_type.equals(other.m_type)) {
+      return false;
+    }
+    return true;
   }
 }

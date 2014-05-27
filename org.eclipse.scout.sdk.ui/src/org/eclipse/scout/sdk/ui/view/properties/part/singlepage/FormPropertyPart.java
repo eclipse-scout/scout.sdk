@@ -140,7 +140,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
 
           // service
           String formRegex = "(I)?" + entityName + "(Process)?" + SdkProperties.SUFFIX_SERVICE;
-          ITypeFilter formFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getRegexSimpleNameFilter(formRegex), ScoutTypeFilters.getInScoutBundles(serversAndSharedsSet));
+          ITypeFilter formFilter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getRegexSimpleNameFilter(formRegex), ScoutTypeFilters.getInScoutBundles(serversAndSharedsSet));
           LinkGroup serviceGroup = model.getOrCreateGroup(Texts.get("Service"), 10);
           for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(iService).getAllSubtypes(iService, formFilter, TypeComparators.getTypeNameComparator())) {
             serviceGroup.addLink(new TypeOpenLink(candidate));
@@ -148,7 +148,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
 
           // permissions
           String permissionRegex = "(Create|Read|Update)" + entityName + SdkProperties.SUFFIX_PERMISSION;
-          ITypeFilter filter = TypeFilters.getMultiTypeFilter(
+          ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(
               TypeFilters.getRegexSimpleNameFilter(permissionRegex),
               TypeFilters.getClassFilter(),
               ScoutTypeFilters.getInScoutBundles(shareds)

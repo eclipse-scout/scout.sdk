@@ -163,7 +163,7 @@ public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandl
     Set<IScoutBundle> clients = getClientBundlesBelow(startBundle);
     IType iDesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
     ICachedTypeHierarchy desktopHierarchy = TypeUtility.getPrimaryTypeHierarchy(iDesktop);
-    Set<IType> desktops = desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getTypesInScoutBundles(clients));
+    Set<IType> desktops = desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getClassesInScoutBundles(clients));
     for (IType desktop : desktops) {
       IType toolsMenu = desktop.getType("ToolsMenu");
       if (TypeUtility.exists(toolsMenu)) {

@@ -1716,11 +1716,11 @@ public class ScoutTypeUtility extends TypeUtility {
         sessionFilter = TypeFilters.getClassFilter();
       }
       else {
-        sessionFilter = TypeFilters.getMultiTypeFilter(TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(context));
+        sessionFilter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getTypesOnClasspath(context));
       }
     }
     else {
-      sessionFilter = ScoutTypeFilters.getTypesInScoutBundles(containerBundle);
+      sessionFilter = ScoutTypeFilters.getClassesInScoutBundles(containerBundle);
     }
     ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(sessionBaseType);
     return clientSessionHierarchy.getAllSubtypes(sessionBaseType, sessionFilter, TypeComparators.getTypeNameComparator());

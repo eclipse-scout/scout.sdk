@@ -196,7 +196,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
           }
           proposals.add(MoreElementsProposal.INSTANCE);
 
-          ITypeFilter filter = TypeFilters.getMultiTypeFilter(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getTypeParamSubTypeFilter(getGenericTypeSignature(), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE));
+          ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getTypeParamSubTypeFilter(getGenericTypeSignature(), IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE));
           Set<IType> abstractLookupServices = TypeUtility.getAbstractTypesOnClasspath(TypeUtility.getType(IRuntimeClasses.ILookupService), getServerBundle().getJavaProject(), filter);
           for (IType t : abstractLookupServices) {
             if (!proposals.contains(t)) {

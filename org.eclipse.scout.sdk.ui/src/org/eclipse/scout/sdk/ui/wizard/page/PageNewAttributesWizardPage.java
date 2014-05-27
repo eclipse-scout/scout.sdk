@@ -161,7 +161,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     m_holderTypeField = getFieldToolkit().createJavaElementProposalField(group, Texts.get("PageOutline"), new AbstractJavaElementContentProvider() {
       @Override
       protected Object[][] computeProposals() {
-        ITypeFilter filter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutBundles(getClientBundle()), TypeFilters.getClassFilter());
+        ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(ScoutTypeFilters.getInScoutBundles(getClientBundle()), TypeFilters.getClassFilter());
         Set<IType> holders = TypeUtility.getPrimaryTypeHierarchy(iPageWithNodes).getAllSubtypes(iPageWithNodes, filter);
         holders.addAll(TypeUtility.getPrimaryTypeHierarchy(iOutline).getAllSubtypes(iOutline, filter));
         return new Object[][]{holders.toArray(new IType[holders.size()])};

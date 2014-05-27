@@ -135,7 +135,7 @@ public class FormDeleteAction extends AbstractScoutHandler {
     for (IType serviceInterface : m_processServiceInterface) {
       IScoutBundle sharedBundle = ScoutTypeUtility.getScoutBundle(serviceInterface);
       Set<IScoutBundle> visibleServers = sharedBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false);
-      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getInScoutBundles(visibleServers), TypeFilters.getClassFilter());
+      ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilterAnd(ScoutTypeFilters.getInScoutBundles(visibleServers), TypeFilters.getClassFilter());
       Set<IType> implementations = TypeUtility.getPrimaryTypeHierarchy(serviceInterface).getAllSubtypes(serviceInterface, serviceFilter, TypeComparators.getTypeNameComparator());
       m_processServiceImplementation.addAll(implementations);
     }

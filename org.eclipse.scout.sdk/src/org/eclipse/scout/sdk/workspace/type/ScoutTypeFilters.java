@@ -51,7 +51,7 @@ public class ScoutTypeFilters extends TypeFilters {
    * @see TypeFilters#isClass(IType)
    * @see TypeFilters#getClassFilter()
    */
-  public static ITypeFilter getTypesInScoutBundles(final Collection<IScoutBundle> bundles) {
+  public static ITypeFilter getClassesInScoutBundles(final Collection<IScoutBundle> bundles) {
     return new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
@@ -70,7 +70,7 @@ public class ScoutTypeFilters extends TypeFilters {
    * @see TypeFilters#isClass(IType)
    * @see TypeFilters#getClassFilter()
    */
-  public static ITypeFilter getTypesInScoutBundles(final IScoutBundle b) {
+  public static ITypeFilter getClassesInScoutBundles(final IScoutBundle b) {
     return new ITypeFilter() {
       @Override
       public boolean accept(IType type) {

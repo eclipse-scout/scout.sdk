@@ -70,7 +70,7 @@ public class PermissionTablePage extends AbstractPage {
       m_basicPermissionHierarchy = TypeUtility.getPrimaryTypeHierarchy(basicPermission);
       m_basicPermissionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle());
+    ITypeFilter filter = ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle());
     Set<IType> permissions = m_basicPermissionHierarchy.getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator());
     for (IType type : permissions) {
       new PermissionNodePage(this, type);

@@ -73,7 +73,7 @@ public class ClientServiceTablePage extends AbstractPage {
       m_servieHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
       m_servieHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    Set<IType> serviceTypes = m_servieHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getTypesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
+    Set<IType> serviceTypes = m_servieHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
     for (IType type : serviceTypes) {
       Set<IType> interfaces = m_servieHierarchy.getSuperInterfaces(type, TypeFilters.getElementNameFilter("I" + type.getElementName()));
       new ClientServiceNodePage(this, type, CollectionUtility.firstElement(interfaces));

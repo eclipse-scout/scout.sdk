@@ -74,13 +74,13 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     final IScoutBundle sb = ScoutTypeUtility.getScoutBundle(project);
     final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
     final ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-    Set<IType> subtypes = formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getTypesInScoutBundles(sb));
+    Set<IType> subtypes = formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getClassesInScoutBundles(sb));
     Assert.assertEquals(1, subtypes.size());
     final IntegerHolder formCountHolder = new IntegerHolder(-1);
     formHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
       public void hierarchyInvalidated() {
-        formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getTypesInScoutBundles(sb)).size());
+        formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getClassesInScoutBundles(sb)).size());
         synchronized (formCountHolder) {
           formCountHolder.notifyAll();
         }

@@ -91,15 +91,15 @@ public class ServerServicesTablePage extends AbstractPage {
     }
 
     IScoutBundle sb = getScoutBundle();
-    Set<IType> excluded = m_serviceHierarchy.getAllSubtypes(iSqlService, ScoutTypeFilters.getTypesInScoutBundles(sb));
-    excluded.addAll(m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getTypesInScoutBundles(sb)));
-    excluded.addAll(m_serviceHierarchy.getAllSubtypes(iCalendarService, ScoutTypeFilters.getTypesInScoutBundles(sb)));
-    excluded.addAll(m_serviceHierarchy.getAllSubtypes(iSMTPService, ScoutTypeFilters.getTypesInScoutBundles(sb)));
-    excluded.addAll(m_serviceHierarchy.getAllSubtypes(iAccessControlService, ScoutTypeFilters.getTypesInScoutBundles(sb)));
-    excluded.addAll(m_serviceHierarchy.getAllSubtypes(iLookupService, ScoutTypeFilters.getTypesInScoutBundles(sb)));
+    Set<IType> excluded = m_serviceHierarchy.getAllSubtypes(iSqlService, ScoutTypeFilters.getClassesInScoutBundles(sb));
+    excluded.addAll(m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getClassesInScoutBundles(sb)));
+    excluded.addAll(m_serviceHierarchy.getAllSubtypes(iCalendarService, ScoutTypeFilters.getClassesInScoutBundles(sb)));
+    excluded.addAll(m_serviceHierarchy.getAllSubtypes(iSMTPService, ScoutTypeFilters.getClassesInScoutBundles(sb)));
+    excluded.addAll(m_serviceHierarchy.getAllSubtypes(iAccessControlService, ScoutTypeFilters.getClassesInScoutBundles(sb)));
+    excluded.addAll(m_serviceHierarchy.getAllSubtypes(iLookupService, ScoutTypeFilters.getClassesInScoutBundles(sb)));
 
     return m_serviceHierarchy.getAllSubtypes(iService,
-        TypeFilters.getMultiTypeFilter(ScoutTypeFilters.getTypesInScoutBundles(sb), TypeFilters.getNotInTypes(excluded)),
+        TypeFilters.getMultiTypeFilterAnd(ScoutTypeFilters.getClassesInScoutBundles(sb), TypeFilters.getNotInTypes(excluded)),
         TypeComparators.getTypeNameComparator());
 
   }
