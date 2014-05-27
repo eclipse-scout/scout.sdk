@@ -334,6 +334,9 @@ public class TypeFilters {
    */
   protected static boolean isClass(IType type) {
     try {
+      if (type.isAnonymous()) {
+        return false;
+      }
       int flags = type.getFlags();
       return !Flags.isAbstract(flags) && !Flags.isInterface(flags) && !Flags.isDeprecated(flags);
     }
