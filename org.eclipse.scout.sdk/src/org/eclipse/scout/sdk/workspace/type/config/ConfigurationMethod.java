@@ -152,6 +152,15 @@ public class ConfigurationMethod {
     return m_methodStack.size();
   }
 
+  /**
+   * @return a copy of this ConfigurationMethod's internal method stack (stack elements are not copied)
+   */
+  public Stack<IMethod> getMethodStack() {
+    Stack<IMethod> s = new Stack<IMethod>();
+    s.addAll(m_methodStack);
+    return s;
+  }
+
   public IMethod getDefaultMethod() {
     if (m_methodStack.size() == 1) return m_methodStack.get(0);
     for (int i = m_methodStack.size() - 1; i > -1; i--) {
