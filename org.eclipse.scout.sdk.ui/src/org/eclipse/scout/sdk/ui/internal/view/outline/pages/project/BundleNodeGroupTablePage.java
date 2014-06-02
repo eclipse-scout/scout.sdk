@@ -17,6 +17,7 @@ import java.util.List;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
 import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
@@ -173,5 +174,24 @@ public class BundleNodeGroupTablePage extends AbstractPage {
         new BundleNodeGroupTablePage(this, childGroup);
       }
     }
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = super.hashCode();
+    hash += (31 * hash) + m_group.hashCode();
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    boolean equals = super.equals(obj);
+    if (!equals) {
+      return false;
+    }
+    if (!(obj instanceof BundleNodeGroupTablePage)) {
+      return false;
+    }
+    return CompareUtility.equals(m_group, ((BundleNodeGroupTablePage) obj).m_group);
   }
 }

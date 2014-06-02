@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.util.jdt;
 
 import java.util.EventObject;
 
+import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
@@ -113,10 +114,10 @@ public class JdtEvent extends EventObject {
     if (m_superTypeHierarchy == null) {
       if (TypeUtility.exists(getElement())) {
         IType type = null;
-        if (getElement().getElementType() == IJavaElement.TYPE) {
+        if (getElementType() == IJavaElement.TYPE) {
           type = (IType) getElement();
         }
-        else if (getElement().getElementType() == IJavaElement.COMPILATION_UNIT) {
+        else if (getElementType() == IJavaElement.COMPILATION_UNIT) {
           try {
             IType[] types = ((ICompilationUnit) getElement()).getTypes();
             if (types.length > 0) {
@@ -125,6 +126,13 @@ public class JdtEvent extends EventObject {
           }
           catch (JavaModelException ex) {
             SdkUtilActivator.logError(ex);
+          }
+        }
+        else if (getElementType() == IJavaElement.ANNOTATION) {
+          IAnnotation annotation = (IAnnotation) getElement();
+          IJavaElement annotationOwner = annotation.getParent();
+          if (TypeUtility.exists(annotationOwner) && annotationOwner.getElementType() == IJavaElement.TYPE) {
+            type = (IType) annotationOwner;
           }
         }
         if (TypeUtility.exists(type)) {

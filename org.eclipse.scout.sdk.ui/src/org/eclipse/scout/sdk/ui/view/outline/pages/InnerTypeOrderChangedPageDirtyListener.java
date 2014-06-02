@@ -17,6 +17,7 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  *
@@ -44,6 +45,31 @@ public class InnerTypeOrderChangedPageDirtyListener implements IJavaResourceChan
           if (TypeUtility.exists(annotationOwner) && annotationOwner.getParent().equals(getDeclaringType())) {
             getPage().markStructureDirty();
           }
+        }
+      }
+    }
+    else if (event.getElementType() == IJavaElement.TYPE) {
+      IType eventType = (IType) event.getElement();
+      int i = -1;
+      for (IPage p : getPage().getChildren()) {
+        if (p instanceof ITypePage) {
+          i++;
+          ITypePage tp = (ITypePage) p;
+          if (eventType.equals(tp.getType())) {
+            break;
+          }
+        }
+      }
+
+      if (i >= 0) {
+        IType[] innerTypesOrdered = ScoutTypeUtility.getInnerTypesOrdered(getDeclaringType(), getInnerTypeSuperType());
+        if (innerTypesOrdered.length > i) {
+          if (!innerTypesOrdered[i].equals(eventType)) {
+            getPage().markStructureDirty();
+          }
+        }
+        else {
+          getPage().markStructureDirty();
         }
       }
     }

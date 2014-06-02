@@ -129,6 +129,7 @@ public final class ClassIdValidationJob extends JobEx {
     if (listener != null) {
       ScoutSdkCore.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(listener);
     }
+    Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
   }
 
   private Map<String /*classid*/, List<IAnnotation>> getClassIdOccurrences(IProgressMonitor monitor) throws CoreException {
@@ -224,7 +225,6 @@ public final class ClassIdValidationJob extends JobEx {
       return Status.OK_STATUS;
     }
     catch (Exception e) {
-      ScoutSdk.logError("", e);
       return new ScoutStatus("Error while updating class id duplicate markers.", e);
     }
   }

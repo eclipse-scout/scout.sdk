@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
 import org.eclipse.pde.internal.ui.editor.plugin.ManifestEditor;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -73,5 +74,24 @@ public abstract class AbstractBundleNodeTablePage extends AbstractPage {
   @Override
   public final IScoutBundle getScoutBundle() {
     return m_bundle.getScoutBundle();
+  }
+
+  @Override
+  public int hashCode() {
+    int hash = super.hashCode();
+    hash += (31 * hash) + m_bundle.hashCode();
+    return hash;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    boolean equals = super.equals(obj);
+    if (!equals) {
+      return false;
+    }
+    if (!(obj instanceof AbstractBundleNodeTablePage)) {
+      return false;
+    }
+    return CompareUtility.equals(m_bundle, ((AbstractBundleNodeTablePage) obj).m_bundle);
   }
 }

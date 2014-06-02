@@ -15,6 +15,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -43,6 +44,7 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.LRUCache;
 import org.eclipse.scout.commons.OptimisticLock;
+import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
@@ -101,10 +103,9 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
 
   private TreeViewer m_viewer;
   private ViewContentProvider m_viewContentProvider;
-  private IScoutWorkspaceListener m_workspaceListener;
 
   private final DirtyUpdateManager m_dirtyManager;
-  private final HashSet<IContributionItem> m_debugMenus;
+  private final Set<IContributionItem> m_debugMenus;
   private final P_ReloadNodeJob m_reloadJob;
   private final LRUCache<String/* path */, IPageFilter> m_pageFilterCache;
 
@@ -168,19 +169,27 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     IContextService serivce = (IContextService) getSite().getService(IContextService.class);
     serivce.activateContext("org.eclipse.scout.sdk.explorer.context");
 
-    m_workspaceListener = new IScoutWorkspaceListener() {
+    final BooleanHolder alreadyNotified = new BooleanHolder(false);
+    IScoutWorkspaceListener l = new IScoutWorkspaceListener() {
       @Override
       public void workspaceChanged(ScoutWorkspaceEvent event) {
         switch (event.getType()) {
           case ScoutWorkspaceEvent.TYPE_WORKSPACE_INITIALIZED: {
+            alreadyNotified.setValue(true);
+            ScoutSdkCore.getScoutWorkspace().removeWorkspaceListener(this);
             new LoadInitialOutlineJob(ScoutExplorerPart.this).schedule();
             break;
           }
         }
       }
     };
+    ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(l);
 
-    ScoutSdkCore.getScoutWorkspace().addWorkspaceListener(m_workspaceListener);
+    if (ScoutSdkCore.getScoutWorkspace().isInitialized() && !alreadyNotified.getValue().booleanValue()) {
+      // workspace has already been initialized but the listener never fired (it has been initialized before we attached the listener) -> it will not fire again -> remove
+      ScoutSdkCore.getScoutWorkspace().removeWorkspaceListener(l);
+      new LoadInitialOutlineJob(ScoutExplorerPart.this).schedule();
+    }
   }
 
   @Override
@@ -275,7 +284,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     if (m_linkWithEditorAction != null) {
       m_linkWithEditorAction.dispose();
     }
-    ScoutSdkCore.getScoutWorkspace().removeWorkspaceListener(m_workspaceListener);
     super.dispose();
   }
 
