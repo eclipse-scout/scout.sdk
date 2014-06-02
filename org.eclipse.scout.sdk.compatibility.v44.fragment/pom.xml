@@ -25,8 +25,6 @@
   <packaging>eclipse-plugin</packaging>
 
   <properties>
-    <!-- Change to 3.10I as soon as the first Luna target is available -->
-    <target-platform>eclipse-3.9</target-platform>
-    <platform-version>[3.9,3.10)</platform-version>
+    <target-platform>eclipse-luna</target-platform>
   </properties>
 </project>

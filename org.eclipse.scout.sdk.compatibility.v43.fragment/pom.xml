@@ -25,7 +25,6 @@
   <packaging>eclipse-plugin</packaging>
 
   <properties>
-    <target-platform>eclipse-3.9</target-platform>
-    <platform-version>[3.9,3.10)</platform-version>
+    <target-platform>eclipse-kepler</target-platform>
   </properties>
 </project>
