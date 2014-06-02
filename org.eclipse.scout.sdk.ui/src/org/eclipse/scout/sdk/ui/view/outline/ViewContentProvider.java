@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.view.outline;
 
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.jobs.IJobChangeEvent;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITreeContentProvider;
@@ -100,18 +99,17 @@ public class ViewContentProvider implements IStructuredContentProvider, ITreeCon
             job.run(new NullProgressMonitor());
           }
           else {
-            Job.getJobManager().addJobChangeListener(new JobChangeAdapter() {
+
+            job.addJobChangeListener(new JobChangeAdapter() {
               @Override
               public void done(IJobChangeEvent event) {
-                if (event.getJob() == job) {
-                  Job.getJobManager().removeJobChangeListener(this);
-                  ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
-                    @Override
-                    public void run() {
-                      fireChildrenLoaded(node);
-                    }
-                  });
-                }
+                job.removeJobChangeListener(this);
+                ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
+                  @Override
+                  public void run() {
+                    fireChildrenLoaded(node);
+                  }
+                });
               }
             });
             job.schedule();

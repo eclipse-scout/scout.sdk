@@ -22,6 +22,8 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
  * no gui actions are performed
  */
 public class LoadOutlineChildrenJob extends JobEx {
+  public static final String LOAD_OUTLINE_CHILDREN_JOB_FAMILY = "LOAD_OUTLINE_CHILDREN_JOB_FAMILY";
+
   private IPage m_page;
   private boolean m_isDone;
 
@@ -29,6 +31,11 @@ public class LoadOutlineChildrenJob extends JobEx {
     super("Updating " + page.getName());
     m_page = page;
     setDone(false);
+  }
+
+  @Override
+  public boolean belongsTo(Object family) {
+    return LOAD_OUTLINE_CHILDREN_JOB_FAMILY.equals(family);
   }
 
   @Override

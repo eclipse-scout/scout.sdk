@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.job;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -20,6 +21,7 @@ import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.AbstractWorkspaceBlockingJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectsTablePage;
@@ -32,6 +34,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.TreeItem;
 
 public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
   public static final String SELECTION_PREVENTER = "selectionPreventer";
@@ -144,30 +147,109 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
 
   private void restoreSelectionInUiThread() {
     TreePath[] paths = m_backupedSelection.getPaths();
-    ArrayList<TreePath> newPaths = new ArrayList<TreePath>(paths.length);
-    for (TreePath p : paths) {
-      ArrayList<Object> newSegments = new ArrayList<Object>(p.getSegmentCount());
-      for (int i = 0; i < p.getSegmentCount(); i++) {
-        Object segment = p.getSegment(i);
-        if (segment instanceof ITypePage) {
-          if (((ITypePage) segment).getType().exists()) {
-            newSegments.add(segment);
-          }
-          else {
-            break;
-          }
-        }
-        else {
-          newSegments.add(segment);
-        }
-      }
-      newPaths.add(new TreePath(newSegments.toArray()));
-    }
+    List<TreePath> newPaths = new ArrayList<TreePath>(paths.length);
 
+    for (TreePath p : paths) {
+      TreePath newPath = getNewPath(p);
+      if (newPath.getSegmentCount() > 0) {
+        newPaths.add(newPath);
+      }
+    }
+    TreeSelection newTreeSelection = new TreeSelection(newPaths.toArray(new TreePath[newPaths.size()]));
     TreeViewer treeViewer = m_view.getTreeViewer();
     if (!treeViewer.getControl().isDisposed() && !treeViewer.getTree().isDisposed()) {
-      treeViewer.setSelection(new TreeSelection(newPaths.toArray(new TreePath[newPaths.size()])));
+      treeViewer.setSelection(newTreeSelection);
     }
+  }
+
+  /**
+   * Creates a new {@link TreePath} containing the new {@link IPage}s created after the reload of the children. The new
+   * path points to the same location (where possible) as the old one but containing the new {@link IPage} instances.
+   * 
+   * @param oldPath
+   *          The old path to convert
+   * @return The new path
+   */
+  private TreePath getNewPath(TreePath oldPath) {
+    TreeItem item = null;
+    ArrayList<Object> newSegments = new ArrayList<Object>(oldPath.getSegmentCount());
+    for (int i = 0; i < oldPath.getSegmentCount(); i++) {
+      TreeItem[] curItems = null;
+      if (item == null) {
+        curItems = m_view.getTreeViewer().getTree().getItems();
+      }
+      else {
+        curItems = item.getItems();
+      }
+
+      item = findItemWithData(curItems, oldPath.getSegment(i));
+      if (item == null) {
+        break;
+      }
+
+      Object page = item.getData();
+      if (page instanceof ITypePage) {
+        if (((ITypePage) page).getType().exists()) {
+          newSegments.add(page);
+        }
+        else {
+          break;
+        }
+      }
+      else {
+        newSegments.add(page);
+      }
+    }
+
+    return new TreePath(newSegments.toArray());
+  }
+
+  private TreeItem findItemWithData(TreeItem[] candidates, Object data) {
+    if (data instanceof IPage) {
+      IPage search = (IPage) data;
+      for (TreeItem ti : candidates) {
+        Object data2 = ti.getData();
+        if (data2 instanceof IPage) {
+          IPage p = (IPage) data2;
+
+          // don't use equals() here because this includes the parent page which is already removed for the old page instances
+          if (isSame(search, p)) {
+            return ti;
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  private boolean isSame(IPage a, IPage b) {
+    if (a == b) {
+      return true;
+    }
+    if (a == null || b == null) {
+      return false;
+    }
+
+    // parents are available -> we can use the equals() method
+    if (a.getParent() != null && b.getParent() != null) {
+      return CompareUtility.equals(a, b);
+    }
+
+    // parents are not both available -> one has already been detached from the tree
+    if (!a.getClass().equals(b.getClass())) {
+      return false;
+    }
+    if (!CompareUtility.equals(a.getPageId(), b.getPageId())) {
+      return false;
+    }
+    if (!CompareUtility.equals(a.getName(), b.getName())) {
+      return false;
+    }
+
+    if (a instanceof ITypePage && b instanceof ITypePage) {
+      return CompareUtility.equals(((ITypePage) a).getType(), (((ITypePage) b).getType()));
+    }
+    return true;
   }
 
   private class P_BackupNode {

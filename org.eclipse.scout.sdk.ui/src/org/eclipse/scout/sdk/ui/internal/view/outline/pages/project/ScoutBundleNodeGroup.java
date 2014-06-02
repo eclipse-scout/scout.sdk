@@ -124,7 +124,10 @@ public class ScoutBundleNodeGroup implements Comparable<ScoutBundleNodeGroup> {
 
   @Override
   public boolean equals(Object obj) {
-    return m_definingBundle.equals(obj);
+    if (!(obj instanceof ScoutBundleNodeGroup)) {
+      return false;
+    }
+    return m_definingBundle.equals(((ScoutBundleNodeGroup) obj).getDefiningBundle());
   }
 
   @Override

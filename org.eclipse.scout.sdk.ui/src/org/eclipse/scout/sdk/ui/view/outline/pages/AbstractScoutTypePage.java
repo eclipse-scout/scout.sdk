@@ -108,13 +108,8 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
 
   @Override
   public int hashCode() {
-    int hash = 0;
-    IPage parent = getParent();
+    int hash = super.hashCode();
     IType type = getType();
-
-    if (parent != null) {
-      hash += parent.hashCode();
-    }
     if (type != null) {
       hash += (31 * hash) + type.hashCode();
     }
@@ -123,10 +118,13 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
 
   @Override
   public boolean equals(Object obj) {
+    boolean equals = super.equals(obj);
+    if (!equals) {
+      return false;
+    }
     if (!(obj instanceof AbstractScoutTypePage)) {
       return false;
     }
-    AbstractScoutTypePage page = (AbstractScoutTypePage) obj;
-    return getType().equals(page.getType()) && CompareUtility.equals(page.getParent(), getParent());
+    return CompareUtility.equals(getType(), ((AbstractScoutTypePage) obj).getType());
   }
 }

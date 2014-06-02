@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.view.outline.pages;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -22,6 +21,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IPageFactory;
@@ -150,7 +150,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   @Override
   public IPage[] getChildArray(IPageFilter filter) {
-    ArrayList<IPage> children = new ArrayList<IPage>();
+    ArrayList<IPage> children = new ArrayList<IPage>(m_children.size());
     synchronized (m_children) {
       for (IPage p : m_children.values()) {
         if (filter == null || filter.accept(p)) {
@@ -164,7 +164,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   @Override
   public List<IPage> getChildren() {
     synchronized (m_children) {
-      return Collections.unmodifiableList(new ArrayList<IPage>(m_children.values()));
+      return new ArrayList<IPage>(m_children.values());
     }
   }
 
@@ -373,5 +373,25 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
    * @param debugActions
    */
   public void addDebugMenus(List<Action> debugActions) {
+  }
+
+  @Override
+  public int hashCode() {
+    int result = 1;
+    result = 31 * result + ((m_name == null) ? 0 : m_name.hashCode());
+    result = 31 * result + ((m_parent == null) ? 0 : m_parent.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!(obj instanceof AbstractPage)) {
+      return false;
+    }
+    AbstractPage other = (AbstractPage) obj;
+    return CompareUtility.equals(getName(), other.getName()) && CompareUtility.equals(getParent(), other.getParent());
   }
 }

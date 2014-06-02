@@ -41,4 +41,12 @@ public interface IScoutWorkspace {
    * @see IScoutBundleGraph
    */
   IScoutBundleGraph getBundleGraph();
+
+  /**
+   * specifies if the {@link IScoutWorkspace} is initialized. This is true after the
+   * {@link ScoutWorkspaceEvent#TYPE_WORKSPACE_INITIALIZED} has been fired until the workspace is disposed.
+   * 
+   * @return true if the workspace is currently initialized, false otherwise.
+   */
+  boolean isInitialized();
 }

@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.sourcebuilder.type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -242,10 +241,10 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
 
   @Override
   public List<IFieldSourceBuilder> getFieldSourceBuilders() {
-    List<IFieldSourceBuilder> ops = new ArrayList<IFieldSourceBuilder>();
+    List<IFieldSourceBuilder> ops = new ArrayList<IFieldSourceBuilder>(m_fieldSourceBuilders.size() + m_sortedFieldSourceBuilders.size());
     ops.addAll(m_fieldSourceBuilders);
     ops.addAll(m_sortedFieldSourceBuilders.values());
-    return Collections.unmodifiableList(ops);
+    return ops;
   }
 
   @Override
@@ -288,10 +287,10 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
 
   @Override
   public List<IMethodSourceBuilder> getMethodSourceBuilders() {
-    List<IMethodSourceBuilder> builders = new ArrayList<IMethodSourceBuilder>();
+    List<IMethodSourceBuilder> builders = new ArrayList<IMethodSourceBuilder>(m_methodSourceBuilders.size() + m_sortedMethodSourceBuilders.size());
     builders.addAll(m_methodSourceBuilders);
     builders.addAll(m_sortedMethodSourceBuilders.values());
-    return Collections.unmodifiableList(builders);
+    return builders;
   }
 
   @Override
@@ -336,10 +335,10 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
 
   @Override
   public List<ITypeSourceBuilder> getTypeSourceBuilder() {
-    List<ITypeSourceBuilder> typeBuilders = new ArrayList<ITypeSourceBuilder>();
+    List<ITypeSourceBuilder> typeBuilders = new ArrayList<ITypeSourceBuilder>(m_typeSourceBuilders.size() + m_sortedTypeSourceBuilders.size());
     typeBuilders.addAll(m_typeSourceBuilders);
     typeBuilders.addAll(m_sortedTypeSourceBuilders.values());
-    return Collections.unmodifiableList(typeBuilders);
+    return typeBuilders;
   }
 
   @Override

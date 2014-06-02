@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.fields.buttongroup;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
@@ -178,13 +177,13 @@ public class ButtonGroup<T> extends Composite {
    */
   @SuppressWarnings("unchecked")
   public List<T> getValues() {
-    ArrayList<T> selectedValues = new ArrayList<T>();
+    ArrayList<T> selectedValues = new ArrayList<T>(m_buttons.size());
     for (Button b : m_buttons) {
       if (b.getSelection()) {
         selectedValues.add((T) b.getData(VALUE));
       }
     }
-    return Collections.unmodifiableList(selectedValues);
+    return selectedValues;
   }
 
   /**

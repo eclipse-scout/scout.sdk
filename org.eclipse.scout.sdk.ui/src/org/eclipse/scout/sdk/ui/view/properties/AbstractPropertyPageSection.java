@@ -11,20 +11,21 @@
 package org.eclipse.scout.sdk.ui.view.properties;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public abstract class AbstractPropertyPageSection implements IPropertyPageSection {
-  private String m_name;
-  private String m_desc;
-  private int m_logicalHeight = 1;
-  private boolean m_expanded = true;
-  private ArrayList<Object> m_properties = new ArrayList<Object>();
+  private final String m_name;
+  private final String m_desc;
+  private final int m_logicalHeight;
+  private final List<Object> m_properties;
+  private boolean m_expanded;
 
   public AbstractPropertyPageSection(String name, String description, int logicalHeight) {
     m_name = name;
     m_desc = description;
     m_logicalHeight = logicalHeight;
+    m_expanded = true;
+    m_properties = new ArrayList<Object>();
   }
 
   @Override
@@ -43,11 +44,11 @@ public abstract class AbstractPropertyPageSection implements IPropertyPageSectio
   }
 
   /**
-   * @return read only list of attributes, list may be modified by caller
+   * @return copy of attributes, list may be modified by caller
    */
   @Override
   public List<Object> getProperties() {
-    return Collections.unmodifiableList(m_properties);
+    return new ArrayList<Object>(m_properties);
   }
 
   @Override

@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.sourcebuilder.compilationunit;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -136,10 +135,9 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
 
   @Override
   public List<ITypeSourceBuilder> getTypeSourceBuilder() {
-    List<ITypeSourceBuilder> builders = new ArrayList<ITypeSourceBuilder>();
+    List<ITypeSourceBuilder> builders = new ArrayList<ITypeSourceBuilder>(m_typeSourceBuilders.size() + m_sortedTypeSourceBuilders.size());
     builders.addAll(m_typeSourceBuilders);
     builders.addAll(m_sortedTypeSourceBuilders.values());
-    return Collections.unmodifiableList(builders);
+    return builders;
   }
-
 }

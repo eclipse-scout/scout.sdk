@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.sourcebuilder;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -108,9 +107,9 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
 
   @Override
   public List<IAnnotationSourceBuilder> getAnnotationSourceBuilders() {
-    List<IAnnotationSourceBuilder> ops = new ArrayList<IAnnotationSourceBuilder>();
+    List<IAnnotationSourceBuilder> ops = new ArrayList<IAnnotationSourceBuilder>(m_annotationSourceBuilders.size() + m_sortedAnnotationSourceBuilders.size());
     ops.addAll(m_annotationSourceBuilders);
     ops.addAll(m_sortedAnnotationSourceBuilders.values());
-    return Collections.unmodifiableList(ops);
+    return ops;
   }
 }

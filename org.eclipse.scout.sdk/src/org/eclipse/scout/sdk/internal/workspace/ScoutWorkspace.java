@@ -40,16 +40,17 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   static final String BUNDLE_GRAPH_REBUILD_JOB_FAMILY = "rebuildScoutBundleGraphJobFamily";
   private static final ScoutWorkspace INSTANCE = new ScoutWorkspace();
 
-  private EventListenerList m_eventListeners;
   private final ScoutBundleGraph m_bundleGraph;
   private final P_PluginModelListener m_pluginModelListener;
-  private final Object m_lock;
+
+  private EventListenerList m_eventListeners;
+  private boolean m_isInitialized;
 
   private ScoutWorkspace() {
+    m_isInitialized = false;
     m_eventListeners = new EventListenerList();
     m_bundleGraph = new ScoutBundleGraph();
     m_pluginModelListener = new P_PluginModelListener();
-    m_lock = new Object();
 
     // bundle graph rebuild listener
     PDECore pdeCore = PDECore.getDefault();
@@ -64,31 +65,31 @@ public final class ScoutWorkspace implements IScoutWorkspace {
       @Override
       public void done(IJobChangeEvent event) {
         fireWorkspaceEvent(new ScoutWorkspaceEvent(ScoutWorkspace.this, ScoutWorkspaceEvent.TYPE_WORKSPACE_INITIALIZED, null));
+        m_isInitialized = true;
       }
     });
     j.schedule();
   }
 
-  public void dispose() {
-    synchronized (m_lock) {
-      PDECore pdeCore = PDECore.getDefault();
-      if (m_pluginModelListener != null && pdeCore != null) {
-        pdeCore.getModelManager().removePluginModelListener(m_pluginModelListener);
-        pdeCore.getModelManager().removeStateDeltaListener(m_pluginModelListener);
-      }
-
-      Job.getJobManager().cancel(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
-      P_BundleGraphRebuildShutdownJob job = new P_BundleGraphRebuildShutdownJob();
-      job.schedule();
-      try {
-        job.join(20000);
-      }
-      catch (InterruptedException e) {
-      }
-
-      m_bundleGraph.dispose();
-      m_eventListeners = new EventListenerList(); // loose all old listeners
+  public synchronized void dispose() {
+    m_isInitialized = false;
+    PDECore pdeCore = PDECore.getDefault();
+    if (m_pluginModelListener != null && pdeCore != null) {
+      pdeCore.getModelManager().removePluginModelListener(m_pluginModelListener);
+      pdeCore.getModelManager().removeStateDeltaListener(m_pluginModelListener);
     }
+
+    Job.getJobManager().cancel(BUNDLE_GRAPH_REBUILD_JOB_FAMILY);
+    P_BundleGraphRebuildShutdownJob job = new P_BundleGraphRebuildShutdownJob();
+    job.schedule();
+    try {
+      job.join(20000);
+    }
+    catch (InterruptedException e) {
+    }
+
+    m_bundleGraph.dispose();
+    m_eventListeners = new EventListenerList(); // loose all old listeners
   }
 
   public static ScoutWorkspace getInstance() {
@@ -96,17 +97,13 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   }
 
   @Override
-  public void addWorkspaceListener(IScoutWorkspaceListener listener) {
-    synchronized (m_lock) {
-      m_eventListeners.add(IScoutWorkspaceListener.class, listener);
-    }
+  public synchronized void addWorkspaceListener(IScoutWorkspaceListener listener) {
+    m_eventListeners.add(IScoutWorkspaceListener.class, listener);
   }
 
   @Override
-  public void removeWorkspaceListener(IScoutWorkspaceListener listener) {
-    synchronized (m_lock) {
-      m_eventListeners.remove(IScoutWorkspaceListener.class, listener);
-    }
+  public synchronized void removeWorkspaceListener(IScoutWorkspaceListener listener) {
+    m_eventListeners.remove(IScoutWorkspaceListener.class, listener);
   }
 
   @Override
@@ -167,11 +164,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   }
 
   private void fireWorkspaceEvent(ScoutWorkspaceEvent e) {
-    IScoutWorkspaceListener[] listeners = null;
-    synchronized (m_lock) {
-      listeners = m_eventListeners.getListeners(IScoutWorkspaceListener.class);
-    }
-    for (IScoutWorkspaceListener l : listeners) {
+    for (IScoutWorkspaceListener l : m_eventListeners.getListeners(IScoutWorkspaceListener.class)) {
       try {
         l.workspaceChanged(e);
       }
@@ -263,5 +256,10 @@ public final class ScoutWorkspace implements IScoutWorkspace {
     public void stateChanged(State newState) {
       rebuildGraph();
     }
+  }
+
+  @Override
+  public boolean isInitialized() {
+    return m_isInitialized;
   }
 }
