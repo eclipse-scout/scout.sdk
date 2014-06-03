@@ -90,7 +90,6 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
   public boolean handleDoubleClickedDelegate() {
     try {
       IEditorPart editor = JavaUI.openInEditor(getType());
-      // JavaUI.revealInEditor(editor, (IJavaElement)jdtMember);
       if (editor instanceof ITextEditor) {
         ITextEditor textEditor = (ITextEditor) editor;
         IRegion reg = textEditor.getHighlightRange();

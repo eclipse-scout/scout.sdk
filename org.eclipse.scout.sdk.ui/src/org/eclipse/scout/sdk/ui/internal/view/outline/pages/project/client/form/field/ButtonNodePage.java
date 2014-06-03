@@ -36,8 +36,8 @@ public class ButtonNodePage extends AbstractFormFieldNodePage {
 
   @Override
   protected void loadChildrenImpl() {
-    new KeyStrokeTablePage(this, getType());
     new MenuTablePage(this, getType());
+    new KeyStrokeTablePage(this, getType());
   }
 
   @Override

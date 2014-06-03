@@ -103,6 +103,10 @@ public final class HierarchyCache implements IHierarchyCache {
     return (ICachedTypeHierarchy) hierarchy;
   }
 
+  synchronized void removeCachedHierarchy(IType type) {
+    m_cachedHierarchyResults.remove(type);
+  }
+
   /**
    * @param region
    * @return

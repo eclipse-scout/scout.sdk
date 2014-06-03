@@ -134,12 +134,15 @@ public abstract class AbstractCachedTypeHierarchy extends TypeHierarchy implemen
       synchronized (this) {
         if (!isCreated()) {
           if (getBaseType() == null) {
+            HierarchyCache.getInstance().removeCachedHierarchy(getBaseType());
             throw new IllegalArgumentException("type 'null' does not exist");
           }
           if (!getBaseType().exists()) {
+            HierarchyCache.getInstance().removeCachedHierarchy(getBaseType());
             throw new IllegalArgumentException("type '" + getBaseType().getFullyQualifiedName() + "' does not exist");
           }
           if (!TypeUtility.exists(getBaseType().getJavaProject())) {
+            HierarchyCache.getInstance().removeCachedHierarchy(getBaseType());
             throw new IllegalArgumentException("project of type '" + getBaseType().getFullyQualifiedName() + "' does not exist");
           }
           revalidate();

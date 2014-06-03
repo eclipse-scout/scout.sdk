@@ -61,6 +61,7 @@ import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.Lookup
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.LookupServiceProposalPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.MasterFieldPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.MenuProposalPresenter;
+import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.MenuTypePresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.MultiLineStringPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.NlsTextPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single.OutlineRootPagePresenter;
@@ -486,6 +487,10 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     }
     else if ("GROUP_BOX_BODY_GRID".equals(propertyType)) {
       presenter = new GroupBoxBodyGridPresenter(getFormToolkit(), parent);
+      presenter.setMethod(method);
+    }
+    else if ("MENU_TYPE".equals(propertyType)) {
+      presenter = new MenuTypePresenter(getFormToolkit(), parent);
       presenter.setMethod(method);
     }
     else {

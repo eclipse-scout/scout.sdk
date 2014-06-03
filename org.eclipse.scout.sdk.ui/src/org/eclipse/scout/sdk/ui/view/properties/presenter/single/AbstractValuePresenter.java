@@ -90,7 +90,6 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
     String initialText = formatDisplayValue(getCurrentSourceValue());
     m_textComponent.setText(initialText);
     m_textComponent.setEnabled(true);
-
   }
 
   /**
