@@ -24,6 +24,20 @@
 		<config name="getConfiguredPercent" type="Advanced" category="Appearance" />
 		<config name="getConfiguredMultiplier" type="Advanced" category="Appearance" />
 	</type>
+	<type name="org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu">
+		<config name="getConfiguredMenuTypes" type="Normal" category="Behavior" />
+	</type>
+	<type name="org.eclipse.scout.rt.client.ui.action.AbstractAction">
+		<config name="getConfiguredText" type="Normal" category="Appearance" />
+		<config name="getConfiguredKeyStroke" type="Normal" category="Behavior" />
+		<config name="getConfiguredTooltipText" type="Advanced" category="Appearance" />
+		<config name="getConfiguredEnabled" type="Advanced" category="Behavior" />
+		<config name="getConfiguredVisible" type="Advanced" category="Appearance" />
+		<config name="getConfiguredInheritAccessibility" type="Normal" category="Behavior" />
+		<config name="getConfiguredToggleAction" type="Advanced" category="Behavior" />
+		<config name="getConfiguredSeparator" type="Normal" category="Behavior" />
+		<config name="getConfiguredIconId" type="Advanced" category="Appearance" />
+	</type>
 	<type name="org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.AbstractBookmarkMenu">
 		<config name="getConfiguredText" type="Advanced" category="Appearance" />
 		<config name="getConfiguredBookmarkForm" type="Advanced" category="Data" />
@@ -245,6 +259,7 @@
 		<config name="getConfiguredCacheBounds" type="Advanced" category="Behavior" />
 		<config name="getConfiguredAskIfNeedSave" type="Normal" category="Behavior" />
 		<config name="getConfiguredIconId" type="Advanced" category="Appearance" />
+		<config name="getConfiguredToolbarLocation" type="Advanced" category="Appearance" />
 		<config name="execInitForm" type="Normal" category="BusinessLogic" />
 		<config name="execFormActivated" type="Advanced" category="BusinessLogic" />
 		<config name="execDataChanged" type="Advanced" category="BusinessLogic" />
@@ -259,6 +274,7 @@
 		<config name="execTimer" type="Advanced" category="BusinessLogic" />
 		<config name="execAddSearchTerms" type="Advanced" category="BusinessLogic" />
 		<config name="execResetSearchFilter" type="Advanced" category="BusinessLogic" />
+		<config name="execCreateFormData" type="Advanced" category="BusinessLogic" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField">
 		<config name="getConfiguredLabel" type="Normal" category="Appearance" />
@@ -685,6 +701,7 @@
 		<config name="execResolveVirtualChildNode" type="Advanced" category="BusinessLogic" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.AbstractValueField">
+		<config name="getConfiguredAutoAddDefaultMenus" type="Advanced" category="Behavior" />
 		<config name="getConfiguredAutoDisplayText" type="Advanced" category="Behavior" />
 		<config name="execValidateValue" type="Normal" category="BusinessLogic" />
 		<config name="execChangedValue" type="Normal" category="BusinessLogic" />

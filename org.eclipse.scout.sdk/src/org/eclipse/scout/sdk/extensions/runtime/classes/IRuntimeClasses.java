@@ -94,6 +94,9 @@ public interface IRuntimeClasses {
   String ResourceServlet = "org.eclipse.scout.rt.server.ResourceServlet"; // NO_UCD
   String UserAgentUtility = "org.eclipse.scout.rt.shared.ui.UserAgentUtility"; // NO_UCD
   String CollectionUtility = "org.eclipse.scout.commons.CollectionUtility"; // NO_UCD
+  String TableMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TableMenuType"; // NO_UCD
+  String TreeMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType"; // NO_UCD
+  String ValueFieldMenuType = "org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType"; // NO_UCD
 
   String AbstractFormData = "org.eclipse.scout.rt.shared.data.form.AbstractFormData"; // NO_UCD
   String AbstractFormFieldData = "org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData"; // NO_UCD
@@ -186,6 +189,7 @@ public interface IRuntimeClasses {
   String ITextProviderService = "org.eclipse.scout.rt.shared.services.common.text.ITextProviderService"; // NO_UCD
   String IDocumentationTextProviderService = "org.eclipse.scout.rt.shared.services.common.text.IDocumentationTextProviderService"; // NO_UCD
   String IMenu = "org.eclipse.scout.rt.client.ui.action.menu.IMenu"; // NO_UCD
+  String IMenuType = "org.eclipse.scout.rt.client.ui.action.menu.IMenuType"; // NO_UCD
   String IOutline = "org.eclipse.scout.rt.client.ui.desktop.outline.IOutline"; // NO_UCD
   String IPage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"; // NO_UCD
   String IPageWithNodes = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes"; // NO_UCD

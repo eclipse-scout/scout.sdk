@@ -126,8 +126,11 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
     linkCompData.widthHint = 180;
     m_linkComposite.setLayoutData(linkCompData);
 
-    GridData contentData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
     if (content != null) {
+      GridData contentData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
+      if (isMultiLine()) {
+        contentData.heightHint = 100;
+      }
       content.setLayoutData(contentData);
     }
 

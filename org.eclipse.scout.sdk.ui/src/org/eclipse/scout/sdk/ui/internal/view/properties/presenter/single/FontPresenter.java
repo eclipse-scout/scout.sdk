@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
-import java.util.StringTokenizer;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -21,7 +19,6 @@ import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractValuePresenter;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
-import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.scout.sdk.workspace.type.config.parser.FontPropertySourceParser;
 import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
 import org.eclipse.scout.sdk.workspace.type.config.property.FontSpec;
@@ -37,8 +34,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
- * <h3>StringPresenter</h3> Representing a plain text property method. References like 'm_value' or
- * 'IConstants.ASTRING' are handled.
+ * <h3>FontPresenter</h3>
  */
 public class FontPresenter extends AbstractValuePresenter<FontSpec> {
 
@@ -147,46 +143,17 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
 
   @Override
   protected FontSpec parseSourceInput(String input) throws CoreException {
-    String value = PropertyMethodSourceUtility.parseReturnParameterString(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
-    if (value == null) {
-      value = "";
+    if (input.equals("")) {
+      return getDefaultValue();
     }
-    return parseDisplayInput(value);
+    else {
+      return getParser().parseSourceValue(input, getMethod().peekMethod(), getMethod().getSuperTypeHierarchy());
+    }
   }
 
   @Override
   protected FontSpec parseDisplayInput(String input) throws CoreException {
-    FontSpec fontSpec = new FontSpec();
-    StringTokenizer tok = new StringTokenizer(input, "-_,/.;");
-    while (tok.hasMoreTokens()) {
-      String nextToken = tok.nextToken();
-      String s = nextToken.toUpperCase();
-      // styles
-      if (s.equals("PLAIN")) {
-        fontSpec.addStyle(SWT.NORMAL);
-        // nop
-      }
-      else if (s.equals("BOLD")) {
-        fontSpec.addStyle(SWT.BOLD);
-      }
-      else if (s.equals("ITALIC")) {
-        fontSpec.addStyle(SWT.ITALIC);
-      }
-      else {
-        // size or name
-        try {
-
-          // size
-          int size = Integer.parseInt(s);
-          fontSpec.setHeight(size);
-        }
-        catch (NumberFormatException nfe) {
-          // name
-          fontSpec.setName(nextToken);
-        }
-      }
-    }
-    return fontSpec;
+    return parseSourceInput(input);
   }
 
   @Override
@@ -211,8 +178,7 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
       job.schedule();
     }
     catch (Exception e) {
-      ScoutSdkUi.logError("could not parse default value of method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
+      ScoutSdkUi.logError("could not update method '" + getMethod().getMethodName() + "' in type '" + getMethod().getType().getFullyQualifiedName() + "'.", e);
     }
   }
-
 }

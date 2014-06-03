@@ -14,9 +14,12 @@ import java.util.ArrayList;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
@@ -110,7 +113,18 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
     m_viewer.addDoubleClickListener(new IDoubleClickListener() {
       @Override
       public void doubleClick(DoubleClickEvent event) {
-        // TODO select the current oultine in the outline view
+        if (event.getSelection() instanceof IStructuredSelection) {
+          IStructuredSelection s = (IStructuredSelection) event.getSelection();
+          if (s.getFirstElement() instanceof IType) {
+            IType outline = (IType) s.getFirstElement();
+            try {
+              JavaUI.openInEditor(outline);
+            }
+            catch (Exception ex) {
+              ScoutSdkUi.logWarning("could not open java element '" + outline.getFullyQualifiedName() + "' in editor.", ex);
+            }
+          }
+        }
       }
     });
 

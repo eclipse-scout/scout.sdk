@@ -67,7 +67,7 @@ public class MenuNewOperation implements IOperation {
   @Override
   public void validate() throws IllegalArgumentException {
     if (getDeclaringType() == null) {
-      throw new IllegalArgumentException("declaring type can not be null.");
+      throw new IllegalArgumentException("declaring type cannot be null.");
     }
     if (StringUtility.isNullOrEmpty(getTypeName())) {
       throw new IllegalArgumentException("type name is null or empty.");
@@ -88,17 +88,33 @@ public class MenuNewOperation implements IOperation {
       menuNewOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
     final boolean isNewFormHandler = getFormHandler() != null && getFormHandler().getElementName().matches("^New.*");
+    final ITypeHierarchy superTypeHierarchy = ScoutTypeUtility.getSuperTypeHierarchy(getDeclaringType());
     if (isNewFormHandler) {
-      // getConfiguredEmptySpaceAction method
-      IMethodSourceBuilder getConfiguredEmptySpaceActionBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(menuNewOp.getSourceBuilder(), "getConfiguredEmptySpaceAction");
-      getConfiguredEmptySpaceActionBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return true;"));
-      menuNewOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredEmptySpaceActionBuilder), getConfiguredEmptySpaceActionBuilder);
+      // getConfiguredMenuTypes
+      IMethodSourceBuilder getConfiguredMenuTypes = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(menuNewOp.getSourceBuilder(), "getConfiguredMenuTypes");
+      getConfiguredMenuTypes.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          String collUtilityName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.CollectionUtility));
+          String iMenuTypeName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.IMenuType));
+          String tableMenuTypeName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.TableMenuType));
+          String treeMenuTypeName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.TreeMenuType));
+          String valueFieldMenuTypeName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.ValueFieldMenuType));
 
-      // getConfiguredSingleSelectionAction method
-      IMethodSourceBuilder getConfiguredSingleSelectionActionBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(menuNewOp.getSourceBuilder(), "getConfiguredSingleSelectionAction");
-      getConfiguredSingleSelectionActionBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return false;"));
-      menuNewOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredSingleSelectionActionBuilder), getConfiguredSingleSelectionActionBuilder);
-
+          source.append("return ").append(collUtilityName).append(".<").append(iMenuTypeName).append("> hashSet(");
+          if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))) {
+            source.append(tableMenuTypeName).append(".EmptySpace");
+          }
+          else if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITree))) {
+            source.append(treeMenuTypeName).append(".EmptySpace");
+          }
+          else if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField))) {
+            source.append(valueFieldMenuTypeName).append(".NotNull");
+          }
+          source.append(");");
+        }
+      });
+      menuNewOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredMenuTypes), getConfiguredMenuTypes);
     }
     if (getFormToOpen() != null) {
       //     execAction method

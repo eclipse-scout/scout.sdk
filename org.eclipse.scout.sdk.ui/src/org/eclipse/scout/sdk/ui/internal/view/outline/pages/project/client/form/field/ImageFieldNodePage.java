@@ -30,9 +30,9 @@ public class ImageFieldNodePage extends AbstractFormFieldNodePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
-    new KeyStrokeTablePage(this, getType());
+  protected void loadChildrenImpl() {
     new MenuTablePage(this, getType());
+    new KeyStrokeTablePage(this, getType());
   }
 
   @Override

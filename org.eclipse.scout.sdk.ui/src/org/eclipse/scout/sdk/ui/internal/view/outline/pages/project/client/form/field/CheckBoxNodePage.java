@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
 
@@ -20,6 +21,11 @@ public class CheckBoxNodePage extends AbstractFormFieldNodePage {
 
   public CheckBoxNodePage() {
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CheckboxField));
+  }
+
+  @Override
+  protected void loadChildrenImpl() {
+    new MenuTablePage(this, getType());
   }
 
   @Override

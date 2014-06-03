@@ -73,6 +73,19 @@ public class TypeFilters {
       return !TypeUtility.isGenericType(type);
     }
   };
+  private static final ITypeFilter ENUM_TYPE_FILTER = new ITypeFilter() {
+    @Override
+    public boolean accept(IType type) {
+      try {
+        int flags = type.getFlags();
+        return Flags.isEnum(flags) && !Flags.isDeprecated(flags) && !Flags.isAbstract(flags);
+      }
+      catch (JavaModelException e) {
+        SdkUtilActivator.logWarning("could not evalutate flags of type '" + type.getFullyQualifiedName() + "'.", e);
+        return false;
+      }
+    }
+  };
 
   protected TypeFilters() {
   }
@@ -350,6 +363,13 @@ public class TypeFilters {
     return NO_GENERIC_FILTER;
   }
 
+  /**
+   * @return An {@link ITypeFilter} that accepts all non-abstract and non-deprecated {@link Enum}s.
+   */
+  public static ITypeFilter getEnumTypesFilter() {
+    return ENUM_TYPE_FILTER;
+  }
+  
   public static ITypeFilter getMultiTypeFilterOr(final ITypeFilter... filters) {
     return new ITypeFilter() {
       @Override

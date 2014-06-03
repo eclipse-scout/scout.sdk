@@ -17,6 +17,7 @@ import org.eclipse.scout.sdk.ui.action.create.RadioButtonNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 
 /**
@@ -38,7 +39,7 @@ public class RadioButtonGroupNodePage extends AbstractBoxNodePage {
 
   @Override
   protected void loadChildrenImpl() {
-    // TODO check only subtypes of IRadioButton
+    new MenuTablePage(this, getType());
     super.loadChildrenImpl();
   }
 

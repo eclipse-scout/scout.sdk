@@ -15,6 +15,7 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table.TableNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
@@ -32,7 +33,8 @@ public class ListBoxNodePage extends AbstractFormFieldNodePage {
   }
 
   @Override
-  public void loadChildrenImpl() {
+  protected void loadChildrenImpl() {
+    new MenuTablePage(this, getType());
     new KeyStrokeTablePage(this, getType());
     IType[] tables = ScoutTypeUtility.getTables(getType());
     if (tables.length > 0) {
