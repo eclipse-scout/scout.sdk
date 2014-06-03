@@ -31,7 +31,7 @@
 
   <properties>
     <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</tycho.scmUrl>
-    <target-platform>eclipse-indigo-build</target-platform>
+    <target-platform>eclipse-indigo</target-platform>
     
     <!-- exclude the unit tests from sonar -->
     <sonar.exclusions>
@@ -97,4 +97,35 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>useBuildSdkTarget</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>target-platform-configuration</artifactId>
+            <configuration>
+              <target>
+                <artifact>
+                  <groupId>org.eclipse.scout</groupId>
+                  <artifactId>org.eclipse.scout.target</artifactId>
+                  <version>${scout.version}</version>
+                  <classifier>${target-platform}</classifier>
+                </artifact>
+                <artifact>
+                  <groupId>org.eclipse.scout</groupId>
+                  <artifactId>org.eclipse.scout.target</artifactId>
+                  <version>${scout.version}</version>
+                  <classifier>build-sdk</classifier>
+                </artifact>
+              </target>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
