@@ -203,7 +203,7 @@ public final class SearchFormFromTablePageHelper {
         if (TypeUtility.exists(lookupCallMethod)) {
           final IType lookupCall = PropertyMethodSourceUtility.parseReturnParameterClass(PropertyMethodSourceUtility.getMethodReturnValue(lookupCallMethod), lookupCallMethod);
           // smartfield
-          ITypeSourceBuilder smartFieldBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ISmartField, searchFormProject) + "<" + Long.class.getName() + ">"), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+          ITypeSourceBuilder smartFieldBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.ISmartField, searchFormProject) + "<" + Long.class.getName() + ">"), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
           if (TypeUtility.exists(lookupCall)) {
             // getConfiguredLookupCall method
             IMethodSourceBuilder getConfiguredCodeTypeBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(smartFieldBuilder, "getConfiguredLookupCall");
