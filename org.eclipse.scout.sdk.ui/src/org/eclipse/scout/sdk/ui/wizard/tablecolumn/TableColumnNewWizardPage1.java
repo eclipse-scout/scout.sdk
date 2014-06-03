@@ -142,7 +142,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       m_nextPage = null;
     }
     else {
-      ITypeHierarchy selectedSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(m_selectedTemplate);
+      ITypeHierarchy selectedSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(m_selectedTemplate);
       if (selectedSuperTypeHierarchy != null && selectedSuperTypeHierarchy.contains(iSmartColumn)) {
         SmartTableColumnNewWizard wizard = new SmartTableColumnNewWizard(m_nextOperation);
         wizard.initWizard(m_declaringType);

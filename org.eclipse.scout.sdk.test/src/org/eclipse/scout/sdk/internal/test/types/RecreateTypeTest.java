@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.jdt.type.PrimaryTypeNewOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.util.ScoutUtility;
-import org.eclipse.scout.sdk.util.internal.typecache.PrimaryTypeHierarchy;
+import org.eclipse.scout.sdk.util.internal.typecache.CachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -50,26 +50,27 @@ public class RecreateTypeTest extends AbstractScoutSdkTest {
   @Test
   public void testRecreateType() throws Exception {
     IType iformField = TypeUtility.getType(RuntimeClasses.IFormField);
-    PrimaryTypeHierarchy primaryFormFieldHierarchy = (PrimaryTypeHierarchy) TypeUtility.getPrimaryTypeHierarchy(iformField);
-    Assert.assertFalse(primaryFormFieldHierarchy.isCreated());
+    CachedTypeHierarchy formFieldHierarchy = (CachedTypeHierarchy) TypeUtility.getTypeHierarchy(iformField);
+    Assert.assertFalse(formFieldHierarchy.isCreated());
+
     IProject clientProject = getProject("test.client");
     IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(clientProject);
     // ensure created
     // create new MyAbstractFormField
     IType abstractMyStringField = createType(clientBundle, "AbstractMyStringField", "test.client.ui.custom.field");
-    Assert.assertTrue(primaryFormFieldHierarchy.contains(abstractMyStringField));
+    Assert.assertTrue(formFieldHierarchy.contains(abstractMyStringField));
 
     // delete MyAbstractFormField
     deleteType(abstractMyStringField);
-    Assert.assertFalse(primaryFormFieldHierarchy.contains(abstractMyStringField));
+    Assert.assertFalse(formFieldHierarchy.contains(abstractMyStringField));
 
     // recreate
     abstractMyStringField = createType(clientBundle, "AbstractMyStringField", "test.client.ui.custom.field");
-    Assert.assertTrue(primaryFormFieldHierarchy.contains(abstractMyStringField));
+    Assert.assertTrue(formFieldHierarchy.contains(abstractMyStringField));
 
     // delete MyAbstractFormField
     deleteType(abstractMyStringField);
-    Assert.assertFalse(primaryFormFieldHierarchy.contains(abstractMyStringField));
+    Assert.assertFalse(formFieldHierarchy.contains(abstractMyStringField));
 
   }
 

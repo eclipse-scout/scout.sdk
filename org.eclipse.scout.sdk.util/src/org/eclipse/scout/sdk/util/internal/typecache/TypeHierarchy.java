@@ -49,6 +49,18 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
     m_hierarchy = hierarchy;
   }
 
+  /**
+   * Throws an exception stating that the given {@code type} is unknown to this hierarchy.
+   * 
+   * @param type
+   *          which is unknown (used for the exception message only, may be {@code null})
+   * @throws IllegalArgumentException
+   *           in any case (by definition)
+   */
+  static void throwTypeUnknown(IType type) throws IllegalArgumentException {
+    throw new IllegalArgumentException("type '" + (type == null ? null : type.getFullyQualifiedName()) + "' is unknown to this hierarchy.");
+  }
+
   @Override
   public boolean contains(IType type) {
     return m_hierarchy.contains(type);
@@ -118,7 +130,11 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   }
 
   @Override
-  public boolean isSubtype(IType type, IType potentialSubtype) {
+  public boolean isSubtype(IType type, IType potentialSubtype) throws IllegalArgumentException {
+    if (!contains(type)) {
+      throwTypeUnknown(type);
+    }
+
     if (CompareUtility.equals(type, potentialSubtype)) {
       return true;
     }

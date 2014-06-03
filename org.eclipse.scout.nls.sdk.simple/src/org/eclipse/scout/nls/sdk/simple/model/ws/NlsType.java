@@ -84,7 +84,7 @@ public class NlsType implements INlsType {
   }
 
   protected void loadSuperTypeHierarchy() throws JavaModelException {
-    ITypeHierarchy typeHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(m_type);
+    ITypeHierarchy typeHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(m_type);
     IType firstType = typeHierarchy.getSuperclass(m_type);
     if (TypeUtility.exists(firstType)) {
       if (!DynamicNls.class.getName().equals(firstType.getFullyQualifiedName())) {

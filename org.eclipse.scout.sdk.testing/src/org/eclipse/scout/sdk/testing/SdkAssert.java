@@ -330,7 +330,7 @@ public class SdkAssert extends Assert {
    *         in no particular order.
    */
   public static IMethod assertMethodExistInSuperTypeHierarchy(String message, IType type, String methodName) {
-    IMethod method = TypeUtility.findMethodInSuperHierarchy(methodName, type, TypeUtility.getSuperTypeHierarchy(type));
+    IMethod method = TypeUtility.findMethodInSupertypeHierarchy(methodName, type, TypeUtility.getSupertypeHierarchy(type));
     if (!TypeUtility.exists(method)) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Method '").append(methodName).append("'");
@@ -511,7 +511,7 @@ public class SdkAssert extends Assert {
    * @param superTypeFqn
    */
   public static void assertHasSuperType(String message, IType type, String superTypeFqn) {
-    if (!TypeUtility.getSuperTypeHierarchy(type).contains(TypeUtility.getType(superTypeFqn))) {
+    if (!TypeUtility.getSupertypeHierarchy(type).contains(TypeUtility.getType(superTypeFqn))) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Type '").append(type.getFullyQualifiedName()).append("' does not have '").append(superTypeFqn).append("' as supertype!");
         message = messageBuilder.toString();

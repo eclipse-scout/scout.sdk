@@ -221,7 +221,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static boolean isDocsService(IType service) throws JavaModelException {
-    ITypeHierarchy th = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(service);
+    ITypeHierarchy th = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(service);
     for (IType ifs : th.getAllSuperInterfaces(service)) {
       if (IRuntimeClasses.IDocumentationTextProviderService.equals(ifs.getFullyQualifiedName())) {
         return true;

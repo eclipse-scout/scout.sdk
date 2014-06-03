@@ -76,7 +76,7 @@ public final class DtoUtility {
     if (StringUtility.hasText(superTypeSignature)) {
       IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
       String typeErasure = Signature.getTypeErasure(superTypeSignature);
-      ITypeHierarchy superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(superType);
+      ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(superType);
       String formDataTypeSignature = formDataAnnotation.getFormDataTypeSignature();
       String formDataTypeName = Signature.getSignatureSimpleName(formDataTypeSignature);
       ITypeSourceBuilder formDataSourceBuilder = null;
@@ -157,7 +157,7 @@ public final class DtoUtility {
     IType validationRuleType = TypeUtility.getType(IRuntimeClasses.ValidationRule);
     TreeMap<String, ValidationRuleMethod> ruleMap = new TreeMap<String, ValidationRuleMethod>();
     if (superTypeHierarchy == null) {
-      superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(declaringType);
+      superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(declaringType);
       if (superTypeHierarchy == null) {
         ScoutSdk.logWarning("could not build super type hierarchy for '" + declaringType.getFullyQualifiedName() + "'.");
         return Collections.emptyList();

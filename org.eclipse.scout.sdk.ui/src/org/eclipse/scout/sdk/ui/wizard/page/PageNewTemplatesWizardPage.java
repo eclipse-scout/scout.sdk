@@ -156,7 +156,7 @@ public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
 
   private void setSelectedTypeInternal(IType type) {
     m_selectedType = type;
-    boolean showLocationPage = TypeUtility.getSuperTypeHierarchy(type).contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable));
+    boolean showLocationPage = TypeUtility.getSupertypeHierarchy(type).contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable));
     ((PageNewWizard) getWizard()).setLocationWizardPageVisible(showLocationPage);
   }
 

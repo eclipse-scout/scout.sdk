@@ -179,7 +179,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     if (TypeUtility.exists(getSuperType())) {
       List<ITypeParameter> typeParameters = TypeUtility.getTypeParameters(m_definitionType);
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getSuperType());
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
         String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, m_definitionType.getFullyQualifiedName(), typeParameters.get(0).getElementName());
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
@@ -212,12 +212,12 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
       if (TypeUtility.exists(getSuperType())) {
         try {
-          ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getSuperType());
+          ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
           String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, m_definitionType.getFullyQualifiedName(), getTypeParamName());
           if (typeParamSig != null) {
             IType generic = TypeUtility.getTypeBySignature(getGenericTypeSignature());
             IType superType = TypeUtility.getTypeBySignature(typeParamSig);
-            if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(superType)) {
+            if (TypeUtility.exists(generic) && !TypeUtility.getSupertypeHierarchy(generic).contains(superType)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
             }
           }

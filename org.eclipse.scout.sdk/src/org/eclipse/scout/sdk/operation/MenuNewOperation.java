@@ -90,7 +90,7 @@ public class MenuNewOperation implements IOperation {
       menuNewOp.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsMethodBuilder), nlsMethodBuilder);
     }
     final boolean isNewFormHandler = getFormHandler() != null && getFormHandler().getElementName().matches("^New.*");
-    final ITypeHierarchy superTypeHierarchy = ScoutTypeUtility.getSuperTypeHierarchy(getDeclaringType());
+    final ITypeHierarchy superTypeHierarchy = ScoutTypeUtility.getSupertypeHierarchy(getDeclaringType());
     if (isNewFormHandler) {
       // getConfiguredMenuTypes
       IMethodSourceBuilder getConfiguredMenuTypes = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(menuNewOp.getSourceBuilder(), "getConfiguredMenuTypes");

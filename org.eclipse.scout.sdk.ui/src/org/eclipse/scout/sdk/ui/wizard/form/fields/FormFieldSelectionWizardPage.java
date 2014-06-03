@@ -96,7 +96,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     for (IType formField : abstractFormFields) {
       newRegion.add(formField);
     }
-    ITypeHierarchy abstractFormFieldHierarchy = ScoutSdkCore.getHierarchyCache().getLocalHierarchy(newRegion);
+    ITypeHierarchy abstractFormFieldHierarchy = ScoutSdkCore.getHierarchyCache().getLocalTypeHierarchy(newRegion);
 
     for (IType formField : abstractFormFields) {
       if (!TypeUtility.exists(JdtUtility.getAnnotation(formField, ScoutSdkIgnore.class.getName()))) {

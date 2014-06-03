@@ -5,17 +5,18 @@ Bundle-SymbolicName: test.client;singleton:=true
 Bundle-Version: 1.0.0.qualifier
 Bundle-Activator: test.client.Activator
 Bundle-Vendor: Eclipse Scout Project
-Bundle-ActivationPolicy: lazy
+Export-Package: test.client,
+ test.client.ui.desktop,
+ test.client.ui.forms,
+ test.client.ui.template.formfield
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.client;visibility:=reexport,
  test.shared
-Export-Package: test.client,
- test.client.ui.desktop,
- test.client.ui.forms
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Import-Package: javax.activation;resolution:=optional,
  javax.mail;resolution:=optional,
  javax.mail.event;resolution:=optional,
  javax.mail.internet;resolution:=optional,
  javax.mail.search;resolution:=optional,
  javax.mail.util;resolution:=optional
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy

@@ -85,7 +85,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           String formDataSuperTypeSignature = fieldAnnotation.getSuperTypeSignature();
           IType superType = TypeUtility.getTypeBySignature(formDataSuperTypeSignature);
           String typeErasure = Signature.getTypeErasure(formDataSuperTypeSignature);
-          ITypeHierarchy superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(superType);
+          ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(superType);
           ITypeSourceBuilder fieldSourceBuilder = null;
           if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableFieldData))) {
             fieldSourceBuilder = new TableFieldFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);

@@ -14,10 +14,8 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.helper.ScoutProjectHelper;
@@ -31,6 +29,7 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -88,7 +87,7 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
       ScoutProjectHelper.setupNewProject(projectName, true, true, true, properties);
 
       final IType iForm = TypeUtility.getType(RuntimeClasses.IForm);
-      ITypeHierarchy hierarchy = iForm.newTypeHierarchy(new NullProgressMonitor());
+      ITypeHierarchy hierarchy = TypeUtility.getTypeHierarchy(iForm);
       for (IType tx : hierarchy.getAllSubtypes(iForm)) {
         if (tx.getElementName().equals("DesktopForm")) {
           System.out.println("EEKEKEKKEKEKEKKEKEKKEKEKEKKEKEKKEKE ");

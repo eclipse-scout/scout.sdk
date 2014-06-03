@@ -197,7 +197,7 @@ public class FormDataSqlBindingValidator {
     // server sessions
     for (IType serverSession : ScoutTypeUtility.getServerSessionTypes(context)) {
       HashSet<String> binds = new HashSet<String>();
-      collectPropertyBinds(binds, serverSession, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(serverSession));
+      collectPropertyBinds(binds, serverSession, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(serverSession));
       for (String s : binds) {
         bindBases.put(s, new ServerSessionBindBase(s, serverSession));
       }
@@ -295,7 +295,7 @@ public class FormDataSqlBindingValidator {
     HashSet<String> bindVars = new HashSet<String>();
     if (TypeUtility.exists(type)) {
       ITypeHierarchy supertypeHierarchy = null;
-      supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type);
+      supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type);
       collectPropertyBinds(bindVars, type, supertypeHierarchy);
     }
     return bindVars;

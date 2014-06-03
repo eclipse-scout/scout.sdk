@@ -270,7 +270,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
       setStateChanging(true);
       m_superType = superType;
       if (TypeUtility.exists(superType)) {
-        ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(superType);
+        ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(superType);
         if (superTypeHierarchy.contains(iPageWithNodes)) {
           m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_NODE_PAGE;
         }

@@ -58,7 +58,7 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
         if (TypeUtility.exists(element)) {
           if (element.getElementType() == IJavaElement.TYPE) {
             IType declaringType = (IType) element;
-            ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(declaringType);
+            ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(declaringType);
             if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
               proposals.add(new CodeNewProposal(declaringType));
             }

@@ -100,7 +100,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
         if (!StringUtility.isNullOrEmpty(entityName)) {
           // super form class
           try {
-            ITypeHierarchy formSuperTypeHierarchy = ScoutTypeUtility.getSuperTypeHierarchy(form);
+            ITypeHierarchy formSuperTypeHierarchy = ScoutTypeUtility.getSupertypeHierarchy(form);
             IType formSuperClass = formSuperTypeHierarchy.getSuperclass(form);
 
             if (TypeUtility.exists(formSuperClass)) {

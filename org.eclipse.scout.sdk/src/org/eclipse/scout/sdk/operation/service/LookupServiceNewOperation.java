@@ -55,7 +55,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     TypeSourceBuilder serviceSourceBuilder = getImplementationSourceBuilder();
     IType serviceSuperType = TypeUtility.getTypeBySignature(serviceSourceBuilder.getSuperTypeSignature());
-    if (TypeUtility.getSuperTypeHierarchy(serviceSuperType).contains(TypeUtility.getType(IRuntimeClasses.AbstractSqlLookupService))) {
+    if (TypeUtility.getSupertypeHierarchy(serviceSuperType).contains(TypeUtility.getType(IRuntimeClasses.AbstractSqlLookupService))) {
       IMethodSourceBuilder getConfiguredSqlSelectMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(serviceSourceBuilder, "getConfiguredSqlSelect");
       getConfiguredSqlSelectMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override

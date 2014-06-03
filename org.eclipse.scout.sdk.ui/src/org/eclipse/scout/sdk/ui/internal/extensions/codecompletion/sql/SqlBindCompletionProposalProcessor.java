@@ -74,7 +74,7 @@ public class SqlBindCompletionProposalProcessor {
         String propName = NamingUtility.ensureStartWithLowerCase(t.getElementName());
         SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
-        addInnerTypesInSuperClasses(t, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(t), collector, prefix, propName + ".", context);
+        addInnerTypesInSuperClasses(t, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t), collector, prefix, propName + ".", context);
       }
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractPropertyData, hierarchy))) {
         String propName = t.getElementName();
@@ -104,7 +104,7 @@ public class SqlBindCompletionProposalProcessor {
       for (IType innerType : TypeUtility.getInnerTypes(superClass, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
         SqlBindProposal prop = new SqlBindProposal(namePrefix + NamingUtility.ensureStartWithLowerCase(innerType.getElementName()), prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
-        addInnerTypesInSuperClasses(innerType, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(innerType), collector, prefix, prop.getDisplayString() + ".", context);
+        addInnerTypesInSuperClasses(innerType, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(innerType), collector, prefix, prop.getDisplayString() + ".", context);
       }
     }
   }
@@ -136,7 +136,7 @@ public class SqlBindCompletionProposalProcessor {
         if (SignatureUtility.getTypeSignatureKind(fqs) == Signature.CLASS_TYPE_SIGNATURE) {
           String fqn = Signature.getSignatureQualifier(fqs) + "." + Signature.getSignatureSimpleName(fqs);
           IType candidate = TypeUtility.getType(fqn);
-          if (ScoutSdkCore.getHierarchyCache().getSuperHierarchy(candidate).contains(AbstractFormData)) {
+          if (ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(candidate).contains(AbstractFormData)) {
             return candidate;
           }
         }

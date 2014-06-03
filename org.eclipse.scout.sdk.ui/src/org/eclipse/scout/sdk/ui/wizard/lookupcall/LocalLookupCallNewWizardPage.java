@@ -162,7 +162,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getLookupCallSuperType())) {
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getLookupCallSuperType());
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getLookupCallSuperType());
         String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getLookupCallSuperType(), superHierarchy, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
@@ -194,7 +194,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       IType superType = getGenericTypeOfSuperClass();
       if (TypeUtility.exists(superType)) {
         IType generic = TypeUtility.getTypeBySignature(getGenericTypeSignature());
-        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(superType)) {
+        if (TypeUtility.exists(generic) && !TypeUtility.getSupertypeHierarchy(generic).contains(superType)) {
           return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
         }
       }

@@ -119,7 +119,7 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
     ArrayList<ITreeNode> createdNodes = new ArrayList<ITreeNode>(sessions.size());
     int pos = 0;
     for (IType session : sessions) {
-      boolean isServerSession = TypeUtility.getSuperTypeHierarchy(session).contains(TypeUtility.getType(IRuntimeClasses.IServerSession));
+      boolean isServerSession = TypeUtility.getSupertypeHierarchy(session).contains(TypeUtility.getType(IRuntimeClasses.IServerSession));
       ImageDescriptor icon = null;
       if (isServerSession) {
         icon = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerSession);

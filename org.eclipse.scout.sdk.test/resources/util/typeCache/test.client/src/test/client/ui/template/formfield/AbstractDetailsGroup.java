@@ -8,27 +8,16 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.internal.test.types;
+package test.client.ui.template.formfield;
 
-import org.junit.runner.RunWith;
-import org.junit.runners.Suite;
-import org.junit.runners.Suite.SuiteClasses;
+import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.shared.ScoutTexts;
 
-/**
- * <h3>{@link _SuiteTypes}</h3> ...
- * 
- * @author Andreas Hoegger
- * @since 1.0.8 22.04.2010
- */
-@RunWith(Suite.class)
-@SuiteClasses({
-    RecreateTypeTest.class,
-    TypeCacheTest.class,
-    TypeHierarchyTest1.class,
-    TypeHierarchyTest2.class,
-    PrimaryTypeHierarchyTest.class,
-    TypeUtilityTest.class
-})
-public class _SuiteTypes {
+public abstract class AbstractDetailsGroup extends AbstractGroupBox {
+
+  @Override
+  protected String getConfiguredLabel() {
+    return ScoutTexts.get("Details");
+  }
 
 }

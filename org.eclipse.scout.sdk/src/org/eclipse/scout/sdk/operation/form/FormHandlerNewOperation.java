@@ -102,7 +102,7 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
         sibling = getCreatedType();
       }
 
-      IMethod methodToOverride = TypeUtility.findMethodInSuperClassHierarchy(form, MethodFilters.getNameFilter(startMethodName));
+      IMethod methodToOverride = TypeUtility.findMethodInSuperclassHierarchy(form, MethodFilters.getNameFilter(startMethodName));
       if (TypeUtility.exists(methodToOverride)) {
         MethodOverrideOperation startMethodOp = new MethodOverrideOperation(methodToOverride, form);
         startMethodOp.setMethodBodySourceBuilder(bodyBuilder);

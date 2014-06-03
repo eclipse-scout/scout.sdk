@@ -113,7 +113,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 
     ITypeFilter filter = null;
     try {
-      ITypeHierarchy radioGroupSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(m_declaringType);
+      ITypeHierarchy radioGroupSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(m_declaringType);
       m_radioButtonGroupValueTypeSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(m_declaringType, radioGroupSuperTypeHierarchy, IRuntimeClasses.IRadioButtonGroup, IRuntimeClasses.TYPE_PARAM_RADIOBUTTONGROUP__VALUE_TYPE);
       if (m_radioButtonGroupValueTypeSig != null) {
         m_radioButtonGroupValueType = TypeUtility.getTypeBySignature(m_radioButtonGroupValueTypeSig);
@@ -173,7 +173,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
             else {
               IType t = TypeUtility.getTypeBySignature(getGenericSignature());
               if (TypeUtility.exists(t)) {
-                acceptProp = !ScoutSdkCore.getHierarchyCache().getSuperHierarchy(t).contains(gtosc);
+                acceptProp = !ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t).contains(gtosc);
               }
               else {
                 acceptProp = true;
@@ -292,7 +292,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
       IType superType = getGenericTypeOfSuperClass();
       if (TypeUtility.exists(superType)) {
         IType generic = TypeUtility.getTypeBySignature(getGenericSignature());
-        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(superType)) {
+        if (TypeUtility.exists(generic) && !TypeUtility.getSupertypeHierarchy(generic).contains(superType)) {
           return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
         }
       }
@@ -303,7 +303,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getSuperType())) {
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getSuperType());
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
         String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.IRadioButton, IRuntimeClasses.TYPE_PARAM_RADIOBUTTON__VALUE_TYPE);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);

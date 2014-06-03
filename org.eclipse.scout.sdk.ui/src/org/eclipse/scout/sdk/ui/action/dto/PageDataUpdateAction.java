@@ -44,7 +44,7 @@ public class PageDataUpdateAction extends AbstractScoutHandler {
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     try {
-      PageDataAnnotation pageDataAnnotation = ScoutTypeUtility.findPageDataAnnotation(getPageDataOwner(), TypeUtility.getSuperTypeHierarchy(getPageDataOwner()));
+      PageDataAnnotation pageDataAnnotation = ScoutTypeUtility.findPageDataAnnotation(getPageDataOwner(), TypeUtility.getSupertypeHierarchy(getPageDataOwner()));
       if (pageDataAnnotation != null && !StringUtility.isNullOrEmpty(pageDataAnnotation.getPageDataTypeSignature())) {
         OperationJob job = new OperationJob(new PageDataDtoUpdateOperation(getPageDataOwner(), pageDataAnnotation));
         job.schedule();

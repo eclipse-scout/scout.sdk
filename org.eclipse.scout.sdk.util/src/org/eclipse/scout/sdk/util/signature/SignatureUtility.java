@@ -144,7 +144,7 @@ public final class SignatureUtility {
     Map<String, String> genericParameters = null;
     if (TypeUtility.exists(contextType) && TypeUtility.exists(signatureOwner)) {
       LinkedHashMap<String, ITypeGenericMapping> collector = new LinkedHashMap<String, ITypeGenericMapping>();
-      ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(contextType);
+      ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(contextType);
       resolveGenericParametersInSuperHierarchy(contextType, new String[0], superHierarchy, collector);
       ITypeGenericMapping mapping = collector.get(signatureOwner.getFullyQualifiedName());
       if (mapping != null) {
@@ -323,7 +323,7 @@ public final class SignatureUtility {
    */
   public static List<String> getMethodParameterSignatureResolved(IMethod jdtMethod, IType contextType) throws CoreException {
     LinkedHashMap<String, ITypeGenericMapping> genericMapperCollector = new LinkedHashMap<String, ITypeGenericMapping>();
-    ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(contextType);
+    ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(contextType);
     resolveGenericParametersInSuperHierarchy(contextType, new String[0], superHierarchy, genericMapperCollector);
     ITypeGenericMapping mapping = genericMapperCollector.get(jdtMethod.getDeclaringType().getFullyQualifiedName());
     Map<String, String> parameters = null;
@@ -438,7 +438,7 @@ public final class SignatureUtility {
 
     LinkedList<IType> hierarchyList = new LinkedList<IType>();
     if (contextType != null) {
-      ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(contextType);
+      ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(contextType);
       IType visitorType = contextType;
       while (visitorType != null && !visitorType.equals(signatureOwner)) {
         hierarchyList.addFirst(visitorType);
@@ -572,7 +572,7 @@ public final class SignatureUtility {
             superTypeParameterSignatures[i] = typeParameters[i];
           }
         }
-        ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(superType);
+        ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(superType);
         resolveGenericParametersInSuperHierarchy(superType, superTypeParameterSignatures, superHierarchy, collector);
       }
     }
@@ -588,7 +588,7 @@ public final class SignatureUtility {
               intefaceTypeParameterSignatures[i] = typeDesc.getParameterSignature(Signature.getSignatureSimpleName(typeParameters[i]));
             }
           }
-          ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(interfaceType);
+          ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(interfaceType);
           resolveGenericParametersInSuperHierarchy(interfaceType, intefaceTypeParameterSignatures, superHierarchy, collector);
         }
       }

@@ -103,7 +103,7 @@ public class TypeFilters {
     return new ITypeFilter() {
       @Override
       public boolean accept(IType candidate) {
-        ITypeHierarchy hierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(candidate);
+        ITypeHierarchy hierarchy = ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(candidate);
         return hierarchy != null && hierarchy.contains(type);
       }
     };
@@ -375,7 +375,7 @@ public class TypeFilters {
       @Override
       public boolean accept(IType type) {
         try {
-          ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(type);
+          ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(type);
           String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, superHierarchy, paramDefiningSuperTypeFqn, paramName);
           if (typeParamSig != null) {
             if (objectSig.equals(typeParamSig)) {
@@ -384,10 +384,10 @@ public class TypeFilters {
             IType typeParam = TypeUtility.getTypeBySignature(typeParamSig);
             if (TypeUtility.exists(typeParam)) {
               if (sub) {
-                return TypeUtility.getSuperTypeHierarchy(typeParam).contains(baseType);
+                return TypeUtility.getSupertypeHierarchy(typeParam).contains(baseType);
               }
               else {
-                return TypeUtility.getSuperTypeHierarchy(baseType).contains(typeParam);
+                return TypeUtility.getSupertypeHierarchy(baseType).contains(typeParam);
               }
             }
           }

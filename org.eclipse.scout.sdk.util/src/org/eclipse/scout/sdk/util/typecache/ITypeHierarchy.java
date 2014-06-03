@@ -30,7 +30,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
   /**
    * @see ITypeHierarchy#getAllSubtypes(IType, ITypeFilter, Comparator)
    */
-  Set<IType> getAllSubtypes(IType type, ITypeFilter typeFilter);
+  Set<IType> getAllSubtypes(IType type, ITypeFilter filter);
 
   /**
    * Returns all resolved subtypes (direct and indirect) of the given type, ordered according to the given comparator
@@ -39,13 +39,13 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * 
    * @param type
    *          the base type for which to get the subtypes
-   * @param typeFilter
+   * @param filter
    *          a type filter to reduce the result or null.
    * @param typeComparator
    *          a comparator to order the result or null.
    * @return all subtypes of the given type accepted by the type filter ordered according the type comparator.
    */
-  Set<IType> getAllSubtypes(IType type, ITypeFilter typeFilter, Comparator<IType> typeComparator);
+  Set<IType> getAllSubtypes(IType type, ITypeFilter filter, Comparator<IType> typeComparator);
 
   /**
    * @see ITypeHierarchy#getAllClasses(ITypeFilter, Comparator)
@@ -63,7 +63,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * classes in this hierarchy that fulfill the given filter.<br>
    * All {@link IType}s that are no interface are considered to be a class.
    * 
-   * @param typeFilter
+   * @param filter
    *          a type filter to reduce the result or null.
    * @param comparator
    *          a comparator to order the result or null.
@@ -88,7 +88,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * Any interfaces in the creation region which were not resolved to have any subtypes or supertypes are not included
    * in the result.
    * 
-   * @param typeFilter
+   * @param filter
    *          a type filter to reduce the result or null.
    * @param comparator
    *          a comparator to order the result or null.
@@ -97,14 +97,16 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
   Set<IType> getAllInterfaces(ITypeFilter filter, Comparator<IType> comparator);
 
   /**
-   * Checks if the given potentialSubtype is a sub type of type.<br>
-   * In other words: returns true, if type is a super type of potentialSubtype.
+   * Checks if the given potentialSubtype is a subtype of type.<br>
+   * In other words: returns true, if type is a supertype of potentialSubtype.
    * 
    * @param type
    *          The base type.
    * @param potentialSubtype
    *          The type that should be checked if it is a subtype of type.
-   * @return true if the potentialSubtype is in the sub hierarchy of the given type.
+   * @return true if the potentialSubtype is in the subtype hierarchy of the given type.
+   * @throws IllegalArgumentException
+   *           if the given type is unknown to this hierarchy.
    */
   boolean isSubtype(IType type, IType potentialSubtype);
 
@@ -161,7 +163,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * 
    * @param type
    *          the base for which to get the superclasses.
-   * @param typeFilter
+   * @param filter
    *          a type filter to reduce the result or null.
    * @param comparator
    *          a comparator to order the result or null.
@@ -189,7 +191,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * 
    * @param type
    *          the base type for which to get the superinterfaces.
-   * @param typeFilter
+   * @param filter
    *          a type filter to reduce the result or null.
    * @param comparator
    *          a comparator to order the result or null.
@@ -216,12 +218,12 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * hierarchy returns a pre-computed result.
    * 
    * @param type
-   *          the base type for which to get the super types.
-   * @param typeFilter
+   *          the base type for which to get the supertypes.
+   * @param filter
    *          a type filter to reduce the result or null.
    * @param comparator
    *          a comparator to order the result or null.
-   * @return all super types of the given type accepted by the type filter ordered according the type comparator.
+   * @return all supertypes of the given type accepted by the type filter ordered according the type comparator.
    */
   Set<IType> getAllSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator);
 
@@ -243,12 +245,12 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * All {@link IType}s that are no interface are considered to be a class.
    * 
    * @param type
-   *          the base type for which to get the sub classes
-   * @param typeFilter
+   *          the base type for which to get the subclasses
+   * @param filter
    *          a type filter to reduce the result or null.
    * @param comparator
    *          a comparator to order the result or null.
-   * @return all <b>direct</b> sub classes of the given type accepted by the type filter ordered according the type
+   * @return all <b>direct</b> subclasses of the given type accepted by the type filter ordered according the type
    *         comparator.
    */
   Set<IType> getSubclasses(IType type, ITypeFilter filter, Comparator<IType> comparator);
@@ -271,11 +273,11 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * 
    * @param type
    *          the context type.
-   * @param typeFilter
+   * @param filter
    *          a type filter to reduce the result or null.
    * @param comparator
    *          a comparator to order the result or null.
-   * @return all <b>direct</b> sub types of the given type accepted by the type filter ordered according the type
+   * @return all <b>direct</b> subtypes of the given type accepted by the type filter ordered according the type
    *         comparator.
    */
   Set<IType> getSubtypes(IType type, ITypeFilter filter, Comparator<IType> comparator);
@@ -285,8 +287,8 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * superclass could not be resolved, or if the given type is an interface.
    * 
    * @param type
-   *          The type for which to get the super class.
-   * @return The resolved super class or null.
+   *          The type for which to get the superclass.
+   * @return The resolved superclass or null.
    */
   IType getSuperclass(IType type);
 
@@ -335,12 +337,12 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * As a consequence {@link Object} is NOT considered to be a supertype of any interface type.
    * 
    * @param type
-   *          The type for which to get the super types.
+   *          The type for which to get the supertypes.
    * @param filter
    *          a type filter to reduce the result or null.
    * @param comparator
    *          a comparator to order the result or null.
-   * @return all <b>direct</b> super types of the given type accepted by the type filter ordered according the type
+   * @return all <b>direct</b> supertypes of the given type accepted by the type filter ordered according the type
    *         comparator.
    */
   Set<IType> getSupertypes(IType type, ITypeFilter filter, Comparator<IType> comparator);

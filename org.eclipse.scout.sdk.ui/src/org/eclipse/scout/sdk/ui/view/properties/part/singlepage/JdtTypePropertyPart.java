@@ -261,7 +261,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       if (docsNlsProject != null) {
         IType iTypeWithClassId = TypeUtility.getType(IRuntimeClasses.ITypeWithClassId);
         if (TypeUtility.exists(iTypeWithClassId) && TypeUtility.exists(getPage().getType())) {
-          if (TypeUtility.getSuperTypeHierarchy(getPage().getType()).contains(iTypeWithClassId)) {
+          if (TypeUtility.getSupertypeHierarchy(getPage().getType()).contains(iTypeWithClassId)) {
             // documentation is supported
             final ISection docSection = createSection(SECTION_ID_DOCUMENTATION, Texts.get("Documentation"));
             docSection.setExpanded(wasSectionExpanded(SECTION_ID_DOCUMENTATION, false));

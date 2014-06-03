@@ -223,7 +223,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
     ITypeHierarchy hierarchy = m_typeHierarchyCache.get(element);
     if (hierarchy == null && element.getElementType() == IJavaElement.TYPE) {
       IType type = (IType) element;
-      hierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type);
+      hierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type);
       if (hierarchy != null) {
         m_typeHierarchyCache.put(element, hierarchy);
       }

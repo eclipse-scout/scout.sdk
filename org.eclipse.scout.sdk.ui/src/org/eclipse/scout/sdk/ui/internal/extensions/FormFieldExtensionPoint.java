@@ -61,7 +61,7 @@ public final class FormFieldExtensionPoint {
    * @return the best match extensions new wizard.
    */
   public static AbstractWorkspaceWizard createNewWizard(IType modelType) {
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(modelType);
+    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(modelType);
     for (IFormFieldExtension ext : getSortedExtensions(modelType, superTypeHierarchy, -1)) {
       if (ext.getNewWizardClazz() != null) {
         return ext.createNewWizard();
@@ -146,7 +146,7 @@ public final class FormFieldExtensionPoint {
                   break;
                 }
                 ITypeHierarchy superTypeHierarchy = null;
-                superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(modelType);
+                superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(modelType);
                 if (superTypeHierarchy == null) {
                   ScoutSdkUi.logWarning("could not create super type hierarchy of '" + modelType.getFullyQualifiedName() + "'.");
                   continue;

@@ -228,7 +228,7 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       return null;
     }
     try {
-      return ScoutTypeUtility.computeFormFieldGenericType(m_lookupCall, TypeUtility.getSuperTypeHierarchy(m_lookupCall));
+      return ScoutTypeUtility.computeFormFieldGenericType(m_lookupCall, TypeUtility.getSupertypeHierarchy(m_lookupCall));
     }
     catch (CoreException e) {
       ScoutSdkUi.logError("Could not compute generic type of lookup call '" + m_lookupCall.getFullyQualifiedName() + "'.", e);
@@ -294,7 +294,7 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericType(IType t, String genericDefiningType, String paramName) {
     if (TypeUtility.exists(t)) {
       try {
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(t), genericDefiningType, paramName);
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t), genericDefiningType, paramName);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }
@@ -311,7 +311,7 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       IType lookupCallKeyType = getGenericType(getLookupCall(), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
       if (TypeUtility.exists(lookupCallKeyType)) {
         IType generic = TypeUtility.getTypeBySignature(getGenericSignature());
-        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(lookupCallKeyType)) {
+        if (TypeUtility.exists(generic) && !TypeUtility.getSupertypeHierarchy(generic).contains(lookupCallKeyType)) {
           return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("LookupCallDoesNotMatchGeneric"));
         }
       }
@@ -324,7 +324,7 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       IType codeTypeKeyType = getGenericType(getCodeType(), IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID);
       if (TypeUtility.exists(codeTypeKeyType)) {
         IType generic = TypeUtility.getTypeBySignature(getGenericSignature());
-        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(codeTypeKeyType)) {
+        if (TypeUtility.exists(generic) && !TypeUtility.getSupertypeHierarchy(generic).contains(codeTypeKeyType)) {
           return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("CodeTypeDoesNotMatchGeneric"));
         }
       }

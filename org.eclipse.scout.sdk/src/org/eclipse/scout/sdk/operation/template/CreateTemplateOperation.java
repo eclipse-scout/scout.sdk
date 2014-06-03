@@ -150,7 +150,7 @@ public class CreateTemplateOperation implements IOperation {
     String superclassTypeSignature = SignatureUtility.getResolvedSignature(getFormField().getSuperclassTypeSignature(), getFormField());
     typeSourceBuilder.setSuperTypeSignature(superclassTypeSignature);
 
-    ITypeHierarchy formFieldSuperTypeHierarchy = TypeUtility.getSuperTypeHierarchy(getFormField());
+    ITypeHierarchy formFieldSuperTypeHierarchy = TypeUtility.getSupertypeHierarchy(getFormField());
     boolean needsWrappingBox = formFieldSuperTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeField)) &&
         formFieldSuperTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField));
     // if a template is a composite and a value field it cannot be handled correctly in the form data generation. therefore it must be wrapped within a surrounding group box which is no value field.

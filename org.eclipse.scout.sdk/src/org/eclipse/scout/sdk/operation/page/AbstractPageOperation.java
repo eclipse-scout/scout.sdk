@@ -55,7 +55,7 @@ public abstract class AbstractPageOperation implements IOperation {
       IType iPageWithNodes = TypeUtility.getType(IRuntimeClasses.IPageWithNodes);
       IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
 
-      ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getHolderType());
+      ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getHolderType());
       if (superTypeHierarchy.contains(iOutline)) {
         addToOutline(page, getHolderType(), monitor, workingCopyManager);
       }

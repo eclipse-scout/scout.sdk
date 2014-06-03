@@ -88,7 +88,7 @@ public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
   protected void validateNextPage() {
     if (TypeUtility.exists(getSuperType())) {
-      ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getSuperType());
+      ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
       if (superTypeHierarchy != null && superTypeHierarchy.contains(abstractOutlineViewButton)) {
         m_nextPage = getWizard().getPage(OutlineToolbuttonNewWizardPage.class.getName());
       }

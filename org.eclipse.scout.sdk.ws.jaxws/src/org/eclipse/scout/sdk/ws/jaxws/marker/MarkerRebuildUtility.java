@@ -117,7 +117,7 @@ public final class MarkerRebuildUtility {
       // validate port type interface types
       Set<IType> interfacePortTypes = new HashSet<IType>();
 
-      ITypeHierarchy hierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(portType);
+      ITypeHierarchy hierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(portType);
 
       for (IType superInterface : hierarchy.getAllSuperInterfaces(portType)) {
         IAnnotation annotation = JaxWsSdkUtility.getAnnotation(superInterface, WebService.class.getName(), false);

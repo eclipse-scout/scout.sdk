@@ -33,9 +33,6 @@ import org.eclipse.scout.sdk.util.typecache.IHierarchyCache;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.TypeHierarchyConstraints;
 
-/**
- *
- */
 public final class HierarchyCache implements IHierarchyCache {
 
   private static final HierarchyCache INSTANCE = new HierarchyCache();
@@ -79,12 +76,9 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   @Override
-  public ICachedTypeHierarchy getPrimaryTypeHierarchy(IType type) {
+  public ICachedTypeHierarchy getTypeHierarchy(IType type) {
     if (!TypeUtility.exists(type) || !type.getJavaProject().exists()) {
       throw new IllegalArgumentException("type does not exist!");
-    }
-    else if (TypeUtility.exists(type.getDeclaringType())) {
-      throw new IllegalArgumentException("type '" + type.getElementName() + "' must be a primary type.");
     }
     ICacheableTypeHierarchyResult hierarchy = null;
     synchronized (this) {
@@ -96,23 +90,27 @@ public final class HierarchyCache implements IHierarchyCache {
         hierarchy = null;
       }
       if (hierarchy == null) {
-        hierarchy = new PrimaryTypeHierarchy(type);
+        hierarchy = new CachedTypeHierarchy(type);
         m_cachedHierarchyResults.put(type, hierarchy);
       }
     }
     return (ICachedTypeHierarchy) hierarchy;
   }
 
+  @Override
+  public ICachedTypeHierarchy getPrimaryTypeHierarchy(IType type) throws IllegalArgumentException {
+    if (type != null && TypeUtility.exists(type.getDeclaringType())) {
+      throw new IllegalArgumentException("type '" + type.getFullyQualifiedName() + "' must be a primary type.");
+    }
+    return new CachedPrimaryTypeHierarchy(getTypeHierarchy(type));
+  }
+
   synchronized void removeCachedHierarchy(IType type) {
     m_cachedHierarchyResults.remove(type);
   }
 
-  /**
-   * @param region
-   * @return
-   */
   @Override
-  public ITypeHierarchy getLocalHierarchy(IRegion region) {
+  public ITypeHierarchy getLocalTypeHierarchy(IRegion region) {
     try {
       return new TypeHierarchy(null, JavaCore.newTypeHierarchy(region, null, null));
     }
@@ -123,7 +121,7 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   @Override
-  public ITypeHierarchy getSuperHierarchy(IType type) {
+  public ITypeHierarchy getSupertypeHierarchy(IType type) {
     try {
       return new TypeHierarchy(type, type.newSupertypeHierarchy(null));
     }
@@ -160,9 +158,6 @@ public final class HierarchyCache implements IHierarchyCache {
     }
   }
 
-  /**
-   * @param type
-   */
   private void handleTypeRemoved(IType type) {
     List<ICacheableTypeHierarchyResult> hierarchies = getHierarchiesSafe();
     for (ICacheableTypeHierarchyResult h : hierarchies) {
@@ -204,7 +199,7 @@ public final class HierarchyCache implements IHierarchyCache {
     IRegion region = JavaCore.newRegion();
     region.add(icu);
     try {
-      ITypeHierarchy hierarchy = getLocalHierarchy(region);
+      ITypeHierarchy hierarchy = getLocalTypeHierarchy(region);
       for (IType t : icu.getTypes()) {
         reqTypeChangedFromExternal(t, hierarchy);
       }
@@ -228,8 +223,6 @@ public final class HierarchyCache implements IHierarchyCache {
 
   /**
    * will be notified before events are passed through the event listener list from {@link JavaResourceChangedEmitter}
-   * 
-   * @param e
    */
   public void elementChanged(JdtEvent e) {
     switch (e.getEventType()) {

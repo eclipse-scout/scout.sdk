@@ -61,7 +61,10 @@ public abstract class AbstractCachedTypeHierarchy extends TypeHierarchy implemen
   }
 
   @Override
-  public boolean isSubtype(IType type, IType potentialSubtype) {
+  public boolean isSubtype(IType type, IType potentialSubtype) throws IllegalArgumentException {
+    if (!contains(type)) {
+      TypeHierarchy.throwTypeUnknown(type);
+    }
     if (CompareUtility.equals(type, potentialSubtype)) {
       return true;
     }

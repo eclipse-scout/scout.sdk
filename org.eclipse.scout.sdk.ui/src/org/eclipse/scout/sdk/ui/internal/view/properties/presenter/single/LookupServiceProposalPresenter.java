@@ -89,7 +89,7 @@ public class LookupServiceProposalPresenter extends AbstractTypeProposalPresente
 
       String genericSignature = null;
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getType());
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getType());
         genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), superHierarchy, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
       }
       catch (CoreException e) {

@@ -61,7 +61,7 @@ public final class MethodSourceBuilderFactory {
   }
 
   public static IMethodSourceBuilder createOverrideMethodSourceBuilder(String methodName, IType declaringType) throws CoreException {
-    IMethod method = TypeUtility.findMethodInSuperHierarchy(methodName, declaringType, TypeUtility.getSuperTypeHierarchy(declaringType));
+    IMethod method = TypeUtility.findMethodInSupertypeHierarchy(methodName, declaringType, TypeUtility.getSupertypeHierarchy(declaringType));
     return createOverrideMethodSourceBuilder(method, declaringType);
   }
 
@@ -129,7 +129,7 @@ public final class MethodSourceBuilderFactory {
             }
           }
 
-          IMethod methodToOverride = TypeUtility.findMethodInSuperTypeHierarchy(superType, TypeUtility.getSuperTypeHierarchy(superType), filter);
+          IMethod methodToOverride = TypeUtility.findMethodInSupertypeHierarchy(superType, TypeUtility.getSupertypeHierarchy(superType), filter);
           if (TypeUtility.exists(methodToOverride)) {
             return methodToOverride;
           }

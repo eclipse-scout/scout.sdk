@@ -155,7 +155,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
       Integer columnWidth = map.get(className);
       // there is a corresponding entry in the clipboard for the current column?
       if (columnWidth != null && columnWidth >= 0) {
-        ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(innerType, COLUMN_WIDTH_METHOD_NAME, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(innerType), ConfigurationMethod.PROPERTY_METHOD, "INTEGER");
+        ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(innerType, COLUMN_WIDTH_METHOD_NAME, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(innerType), ConfigurationMethod.PROPERTY_METHOD, "INTEGER");
         ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(configurationMethod, new IntegerPropertySourceParser());
         updateOp.setValue(columnWidth);
         updateOps.add(updateOp);

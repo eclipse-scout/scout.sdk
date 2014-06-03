@@ -36,7 +36,7 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
   private final FormDataAnnotation m_formDataAnnotation;
 
   public FormDataDtoUpdateOperation(IType modelType) throws JavaModelException {
-    this(modelType, ScoutTypeUtility.findFormDataAnnotation(modelType, TypeUtility.getSuperTypeHierarchy(modelType)));
+    this(modelType, ScoutTypeUtility.findFormDataAnnotation(modelType, TypeUtility.getSupertypeHierarchy(modelType)));
   }
 
   /**

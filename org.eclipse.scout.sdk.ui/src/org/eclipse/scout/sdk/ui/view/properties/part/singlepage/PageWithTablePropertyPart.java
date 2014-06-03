@@ -83,7 +83,7 @@ public class PageWithTablePropertyPart extends JdtTypePropertyPart {
 
             // super pages
             try {
-              ITypeHierarchy pageSuperTypeHierarchy = ScoutTypeUtility.getSuperTypeHierarchy(pageWithTable);
+              ITypeHierarchy pageSuperTypeHierarchy = ScoutTypeUtility.getSupertypeHierarchy(pageWithTable);
               IType pageSuperClass = pageSuperTypeHierarchy.getSuperclass(pageWithTable);
 
               if (TypeUtility.exists(pageSuperClass)) {

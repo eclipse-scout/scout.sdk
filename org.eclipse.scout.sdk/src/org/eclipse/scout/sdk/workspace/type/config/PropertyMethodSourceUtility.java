@@ -95,7 +95,7 @@ public final class PropertyMethodSourceUtility {
     if (TypeUtility.exists(method)) {
       return method;
     }
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type);
+    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type);
     IType declaringType = superTypeHierarchy.getSuperclass(type);
     while (declaringType != null) {
       method = TypeUtility.getMethod(declaringType, methodName);
@@ -584,7 +584,7 @@ public final class PropertyMethodSourceUtility {
         typeName = typeName.substring(0, typeName.length() - 1);
         IType iconsType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName, true);
         if (TypeUtility.exists(iconsType)) {
-          ITypeHierarchy iconsSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(iconsType);
+          ITypeHierarchy iconsSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(iconsType);
           while (TypeUtility.exists(iconsType)) {
             IField field = iconsType.getField(fieldName);
             if (TypeUtility.exists(field)) {

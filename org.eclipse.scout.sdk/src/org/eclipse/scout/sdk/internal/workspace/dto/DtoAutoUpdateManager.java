@@ -272,7 +272,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
       for (IType type : types) {
         DtoUpdateProperties properties = new DtoUpdateProperties();
         properties.setType(type);
-        properties.setSuperTypeHierarchy(TypeUtility.getSuperTypeHierarchy(type));
+        properties.setSuperTypeHierarchy(TypeUtility.getSupertypeHierarchy(type));
         for (IDtoAutoUpdateHandler handler : m_handlers) {
           try {
             IDtoAutoUpdateOperation operation = handler.createUpdateOperation(properties);

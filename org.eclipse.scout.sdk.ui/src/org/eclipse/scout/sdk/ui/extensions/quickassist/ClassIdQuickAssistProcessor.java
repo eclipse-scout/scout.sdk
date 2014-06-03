@@ -213,7 +213,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
               if (!t.isBinary() && !t.isAnonymous()) {
                 IType filterType = TypeUtility.getType(IRuntimeClasses.ITypeWithClassId);
                 if (TypeUtility.exists(filterType)) {
-                  ITypeHierarchy superTypeHierarchy = TypeUtility.getSuperTypeHierarchy(t);
+                  ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(t);
                   if (superTypeHierarchy.contains(filterType)) {
                     IAnnotation annotation = JdtUtility.getAnnotation(t, IRuntimeClasses.ClassId);
                     return new ClassIdTarget(typeDecl, t, annotation);

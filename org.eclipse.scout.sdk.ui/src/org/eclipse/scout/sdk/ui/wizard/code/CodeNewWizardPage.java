@@ -149,7 +149,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       IType codeType = TypeUtility.getToplevelType(m_declaringType);
       codeIdSignatureFromCodeType = ScoutTypeUtility.getCodeIdGenericTypeSignature(codeType);
 
-      String codeSignature = ScoutTypeUtility.getCodeSignature(codeType, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(codeType));
+      String codeSignature = ScoutTypeUtility.getCodeSignature(codeType, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(codeType));
       if (codeSignature != null) {
         if (codeIdSignatureFromCodeType != null) {
           filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getSubtypeFilter(TypeUtility.getTypeBySignature(codeSignature)), TypeFilters.getTypeParamSubTypeFilter(codeIdSignatureFromCodeType, IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID));
@@ -199,7 +199,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
             else {
               IType t = TypeUtility.getTypeBySignature(getGenericSignature());
               if (TypeUtility.exists(t)) {
-                acceptProp = !ScoutSdkCore.getHierarchyCache().getSuperHierarchy(t).contains(genericTypeOfSuperClass);
+                acceptProp = !ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t).contains(genericTypeOfSuperClass);
               }
               else {
                 acceptProp = true;
@@ -313,7 +313,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       IType superType = getGenericTypeOfSuperClass();
       if (TypeUtility.exists(superType)) {
         IType generic = TypeUtility.getTypeBySignature(getGenericSignature());
-        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(superType)) {
+        if (TypeUtility.exists(generic) && !TypeUtility.getSupertypeHierarchy(generic).contains(superType)) {
           return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
         }
       }
@@ -324,7 +324,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getSuperType())) {
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getSuperType());
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
         String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);

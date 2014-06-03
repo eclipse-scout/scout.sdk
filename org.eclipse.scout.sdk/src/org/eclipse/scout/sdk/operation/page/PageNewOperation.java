@@ -94,7 +94,7 @@ public class PageNewOperation extends AbstractPageOperation {
     newOp.setSuperTypeSignature(getSuperTypeSignature());
 
     // page data
-    ITypeHierarchy pageSuperTypeHierarchy = TypeUtility.getSuperTypeHierarchy(TypeUtility.getType(superTypeFqn));
+    ITypeHierarchy pageSuperTypeHierarchy = TypeUtility.getSupertypeHierarchy(TypeUtility.getType(superTypeFqn));
     if (getPageDataJavaProject() != null && pageSuperTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable))) {
       String pageDataTypeName = getTypeName() + "Data";
       PrimaryTypeNewOperation pageDataTypeNewOp = new PrimaryTypeNewOperation(pageDataTypeName, getPackageNamePageData(), getPageDataJavaProject());

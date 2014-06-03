@@ -48,7 +48,7 @@ public abstract class AbstractDtoUpdateHandler implements IDtoAutoUpdateHandler 
   protected ITypeHierarchy ensurePropertySuperTypeHierarchy(DtoUpdateProperties properties) throws CoreException {
     ITypeHierarchy hierarchy = properties.getSuperTypeHierarchy();
     if (hierarchy == null && !properties.contains(DtoUpdateProperties.PROP_SUPER_TYPE_HIERARCHY)) {
-      hierarchy = TypeUtility.getSuperTypeHierarchy(properties.getType());
+      hierarchy = TypeUtility.getSupertypeHierarchy(properties.getType());
       properties.put(DtoUpdateProperties.PROP_SUPER_TYPE_HIERARCHY, hierarchy);
     }
     return hierarchy;

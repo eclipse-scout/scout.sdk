@@ -115,7 +115,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
     ITypeHierarchy hierarchy = getLocalTypeHierarchy();
     if (hierarchy == null) {
-      hierarchy = TypeUtility.getSuperTypeHierarchy(getModelType());
+      hierarchy = TypeUtility.getSupertypeHierarchy(getModelType());
       if (hierarchy == null) {
         ScoutSdk.logError("Cannot collect validation rules for form data. Unable to create super type hierarchy for type '" + getModelType().getFullyQualifiedName() + "'.");
         return;
@@ -258,7 +258,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
                   }
 
                   IType type = (IType) element;
-                  ITypeHierarchy h = TypeUtility.getSuperTypeHierarchy(type);
+                  ITypeHierarchy h = TypeUtility.getSupertypeHierarchy(type);
                   if (h.contains(iValueField)) {
                     String formDataFieldName = NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(type.getElementName()));
                     buffer.append(formDataFieldName);

@@ -13,17 +13,16 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.jdt.core.ITypeHierarchyChangedListener;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
@@ -33,7 +32,7 @@ import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public class CredentialValidationStrategyTablePage extends AbstractPage {
 
-  private ITypeHierarchy m_hierarchy;
+  private ICachedTypeHierarchy m_hierarchy;
 
   private ITypeHierarchyChangedListener m_hierarchyChangedListener;
 
@@ -42,14 +41,9 @@ public class CredentialValidationStrategyTablePage extends AbstractPage {
     setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsIcons.CredentialValidationStrategyFolder));
     setName(Texts.get("CredentialValidation1"));
 
-    try {
-      m_hierarchy = TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy).newTypeHierarchy(new NullProgressMonitor());
-      m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
-      m_hierarchy.addTypeHierarchyChangedListener(m_hierarchyChangedListener);
-    }
-    catch (JavaModelException e) {
-      JaxWsSdk.logError(e);
-    }
+    m_hierarchy = TypeUtility.getTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy));
+    m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
+    m_hierarchy.addHierarchyListener(m_hierarchyChangedListener);
   }
 
   @Override
@@ -60,7 +54,7 @@ public class CredentialValidationStrategyTablePage extends AbstractPage {
   @Override
   public void unloadPage() {
     if (m_hierarchy != null && m_hierarchyChangedListener != null) {
-      m_hierarchy.removeTypeHierarchyChangedListener(m_hierarchyChangedListener);
+      m_hierarchy.removeHierarchyListener(m_hierarchyChangedListener);
     }
   }
 
@@ -72,18 +66,13 @@ public class CredentialValidationStrategyTablePage extends AbstractPage {
   @Override
   public void refresh(boolean clearCache) {
     if (clearCache) {
-      try {
-        if (m_hierarchy == null) {
-          m_hierarchy = TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy).newTypeHierarchy(new NullProgressMonitor());
-          m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
-          m_hierarchy.addTypeHierarchyChangedListener(m_hierarchyChangedListener);
-        }
-        else {
-          m_hierarchy.refresh(new NullProgressMonitor());
-        }
+      if (m_hierarchy == null) {
+        m_hierarchy = TypeUtility.getTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy));
+        m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
+        m_hierarchy.addHierarchyListener(m_hierarchyChangedListener);
       }
-      catch (JavaModelException e) {
-        JaxWsSdk.logError(e);
+      else {
+        m_hierarchy.invalidate();
       }
     }
     super.refresh(clearCache);
@@ -129,16 +118,9 @@ public class CredentialValidationStrategyTablePage extends AbstractPage {
   }
 
   private class P_TypeHierarchyChangedListener implements ITypeHierarchyChangedListener {
-
     @Override
-    public void typeHierarchyChanged(ITypeHierarchy typeHierarchy) {
-      try {
-        m_hierarchy.refresh(new NullProgressMonitor());
-        markStructureDirty();
-      }
-      catch (JavaModelException e) {
-        JaxWsSdk.logError(e);
-      }
+    public void hierarchyInvalidated() {
+      markStructureDirty();
     }
   }
 }

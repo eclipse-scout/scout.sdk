@@ -137,7 +137,7 @@ public class JdtEvent extends EventObject {
           }
         }
         if (TypeUtility.exists(type)) {
-          m_superTypeHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(type);
+          m_superTypeHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(type);
         }
       }
     }

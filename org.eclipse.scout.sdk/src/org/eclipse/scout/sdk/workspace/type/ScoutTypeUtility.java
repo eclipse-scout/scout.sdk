@@ -248,7 +248,7 @@ public class ScoutTypeUtility extends TypeUtility {
    */
   public static IType findFormDataForForm(IType form) throws JavaModelException {
     if (TypeUtility.exists(form)) {
-      FormDataAnnotation a = findFormDataAnnotation(form, TypeUtility.getSuperTypeHierarchy(form));
+      FormDataAnnotation a = findFormDataAnnotation(form, TypeUtility.getSupertypeHierarchy(form));
       if (a != null) {
         return a.getFormDataType();
       }
@@ -267,7 +267,7 @@ public class ScoutTypeUtility extends TypeUtility {
    */
   public static IType findPageDataForPage(IType page) throws JavaModelException {
     if (TypeUtility.exists(page)) {
-      PageDataAnnotation anot = findPageDataAnnotation(page, TypeUtility.getSuperTypeHierarchy(page));
+      PageDataAnnotation anot = findPageDataAnnotation(page, TypeUtility.getSupertypeHierarchy(page));
       if (anot != null && !StringUtility.isNullOrEmpty(anot.getPageDataTypeSignature())) {
         IType result = TypeUtility.getTypeBySignature(anot.getPageDataTypeSignature());
         if (TypeUtility.exists(result)) {
@@ -700,7 +700,7 @@ public class ScoutTypeUtility extends TypeUtility {
     if (!TypeUtility.exists(codeType)) {
       return null;
     }
-    return getCodeIdGenericTypeSignature(codeType, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(codeType));
+    return getCodeIdGenericTypeSignature(codeType, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(codeType));
   }
 
   /**
@@ -847,7 +847,7 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName) {
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(declaringType);
+    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(declaringType);
     return getConfigurationMethod(declaringType, methodName, superTypeHierarchy);
   }
 
@@ -1021,7 +1021,7 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IStructuredType createStructuredType(IType type) {
-    ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type);
+    ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type);
     if (supertypeHierarchy == null) {
       return null;
     }

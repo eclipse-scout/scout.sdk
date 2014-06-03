@@ -233,7 +233,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         m_genericTypeField.setEnabled(TypeUtility.isGenericType(t));
         if (getGenericTypeSignature() == null && TypeUtility.exists(t)) {
           try {
-            ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(t);
+            ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t);
             String lookupSvcKeyTypeSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, superHierarchy, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
             if (lookupSvcKeyTypeSig != null) {
               setGenericTypeSignature(lookupSvcKeyTypeSig);
@@ -317,7 +317,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       IType superType = getGenericTypeOf(getLookupServiceType());
       if (TypeUtility.exists(superType)) {
         IType generic = TypeUtility.getTypeBySignature(getGenericTypeSignature());
-        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(superType)) {
+        if (TypeUtility.exists(generic) && !TypeUtility.getSupertypeHierarchy(generic).contains(superType)) {
           return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
         }
       }
@@ -330,7 +330,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       IType superType = getGenericTypeOf(getServiceSuperType());
       if (TypeUtility.exists(superType)) {
         IType generic = TypeUtility.getTypeBySignature(getGenericTypeSignature());
-        if (TypeUtility.exists(generic) && !TypeUtility.getSuperTypeHierarchy(generic).contains(superType)) {
+        if (TypeUtility.exists(generic) && !TypeUtility.getSupertypeHierarchy(generic).contains(superType)) {
           return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
         }
       }
@@ -341,7 +341,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOf(IType lookupType) {
     if (TypeUtility.exists(lookupType)) {
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(lookupType);
+        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(lookupType);
         String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(lookupType, superHierarchy, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);

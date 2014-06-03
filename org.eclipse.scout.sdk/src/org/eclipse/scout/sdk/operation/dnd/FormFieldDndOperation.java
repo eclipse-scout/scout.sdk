@@ -72,7 +72,7 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
 
   @Override
   protected void deleteType(IType type, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getType());
+    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getType());
     if (superTypeHierarchy.contains(iCompositeField)) {
       BoxDeleteOperation deleteOp = new BoxDeleteOperation(getType());
       deleteOp.validate();

@@ -25,7 +25,6 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -39,6 +38,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -87,15 +87,16 @@ public class ClassIdNewOperation implements IOperation {
 
       IType startType = TypeUtility.getType(IRuntimeClasses.ITypeWithClassId);
       if (TypeUtility.exists(startType)) {
-        ITypeHierarchy hierarchy = startType.newTypeHierarchy(new SubProgressMonitor(monitor, 2));
+        ITypeHierarchy hierarchy = TypeUtility.getTypeHierarchy(startType);
+        monitor.worked(1);
         if (monitor.isCanceled()) {
           return;
         }
 
-        IType[] allSubtypes = hierarchy.getAllSubtypes(startType);
+        Set<IType> allSubtypes = hierarchy.getAllSubtypes(startType);
         hierarchy = null;
         SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
-        subMonitor.beginTask(null, allSubtypes.length);
+        subMonitor.beginTask(null, allSubtypes.size());
         HashMap<ICompilationUnit, HashSet<IType>> typesWithClassId = new HashMap<ICompilationUnit, HashSet<IType>>(1000);
         int numTypes = 0;
         for (IType t : allSubtypes) {
@@ -123,7 +124,7 @@ public class ClassIdNewOperation implements IOperation {
         }
         allSubtypes = null;
 
-        subMonitor = new SubProgressMonitor(monitor, 7);
+        subMonitor = new SubProgressMonitor(monitor, 8);
         subMonitor.beginTask(null, numTypes);
         monitor.setTaskName("Create new annotations...");
         for (Entry<ICompilationUnit, HashSet<IType>> e : typesWithClassId.entrySet()) {

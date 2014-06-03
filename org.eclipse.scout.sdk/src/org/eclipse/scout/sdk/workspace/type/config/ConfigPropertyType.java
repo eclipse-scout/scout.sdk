@@ -38,7 +38,7 @@ public class ConfigPropertyType {
 
   public ConfigPropertyType(IType type) throws JavaModelException {
     m_type = type;
-    m_superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getType());
+    m_superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getType());
     m_affectedTypes = m_superTypeHierarchy.getSuperClassStack(m_type);
 
     TreeMap<String, ConfigurationMethod> configurationMethods = new TreeMap<String, ConfigurationMethod>(new P_MethodNameComparator());

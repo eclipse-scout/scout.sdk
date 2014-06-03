@@ -101,7 +101,7 @@ public class CodeTypeProposalPresenter extends AbstractTypeProposalPresenter {
             paramName = Signature.getSignatureSimpleName(typeParameters[0]);
           }
         }
-        ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(getType());
+        ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getType());
         genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, defaultMethod.getDeclaringType().getFullyQualifiedName(), paramName);
 
       }

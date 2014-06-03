@@ -117,7 +117,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
       if (TypeUtility.exists(iTypeWithClassId)) {
         IType superType = TypeUtility.getTypeBySignature(getSuperTypeSignature());
         if (TypeUtility.exists(superType)) {
-          if (TypeUtility.getSuperTypeHierarchy(superType).contains(iTypeWithClassId)) {
+          if (TypeUtility.getSupertypeHierarchy(superType).contains(iTypeWithClassId)) {
             IAnnotationSourceBuilder createClassIdAnnotation = AnnotationSourceBuilderFactory.createClassIdAnnotation(this);
             createClassIdAnnotation.createSource(source, lineDelimiter, ownerProject, validator);
             source.append(lineDelimiter);

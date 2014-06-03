@@ -115,7 +115,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     // collect all columns that exist in the row data and all of its super classes
     HashSet<String> usedColumnBeanNames = new HashSet<String>();
     IType currentRowDataSuperType = rowDataSuperType;
-    ITypeHierarchy rowDataHierarchy = TypeUtility.getSuperTypeHierarchy(rowDataSuperType);
+    ITypeHierarchy rowDataHierarchy = TypeUtility.getSupertypeHierarchy(rowDataSuperType);
     if (!IRuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getFullyQualifiedName())) {
       do {
         Set<IField> columnFields = TypeUtility.getFields(currentRowDataSuperType, FieldFilters.getFlagsFilter(ROW_DATA_FIELD_FLAGS));
@@ -207,7 +207,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
       // member
       IFieldSourceBuilder memberFieldBuilder = new FieldSourceBuilder("m_" + columnBeanName);
       memberFieldBuilder.setFlags(Flags.AccPrivate);
-      memberFieldBuilder.setSignature(getColumnSignature(column, TypeUtility.getSuperTypeHierarchy(column)));
+      memberFieldBuilder.setSignature(getColumnSignature(column, TypeUtility.getSupertypeHierarchy(column)));
       tableRowDataBuilder.addSortedFieldSourceBuilder(new CompositeObject(SortedMemberKeyFactory.FIELD_MEMBER + 1, i, columnBeanName), memberFieldBuilder);
 
       // getter
@@ -345,7 +345,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
 
       // search the row data in the super type
       for (IType t : rowDatas) {
-        if (TypeUtility.getSuperTypeHierarchy(t).contains(abstractTableRowData)) {
+        if (TypeUtility.getSupertypeHierarchy(t).contains(abstractTableRowData)) {
           return SignatureCache.createTypeSignature(t.getFullyQualifiedName());
         }
       }

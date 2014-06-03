@@ -477,7 +477,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
       String fqn = StringUtility.join(".", packageName, className);
       if (TypeUtility.existsType(fqn)) {
         IType type = TypeUtility.getType(fqn);
-        if (!ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type).contains(interfaceType)) {
+        if (!ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type).contains(interfaceType)) {
           type.getJavadocRange().getOffset();
           type.getJavadocRange().getLength();
           multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustBeOfTheTypeY", label, interfaceType.getFullyQualifiedName())));
@@ -583,7 +583,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
 
         if (TypeUtility.existsType(sessionFactory)) {
           IType type = TypeUtility.getType(sessionFactory);
-          if (ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory))) {
+          if (ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory))) {
             m_tooltipSessionFactory.setMember(type);
           }
         }
@@ -626,7 +626,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
       if (TypeUtility.existsType(authenticationHandler)) {
         IType type = TypeUtility.getType(authenticationHandler);
         try {
-          if (ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider))) {
+          if (ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider))) {
             m_tooltipAuthenticationHandler.setMember(type);
           }
         }
@@ -663,7 +663,7 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
       if (TypeUtility.existsType(credentialValidationStrategy)) {
         IType type = TypeUtility.getType(credentialValidationStrategy);
         try {
-          if (ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy))) {
+          if (ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy))) {
             m_tooltipCredentialValidationStrategy.setMember(type);
           }
         }

@@ -46,7 +46,7 @@ public class FormDataUpdateAction extends AbstractScoutHandler {
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     try {
-      FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(getFormDataOwner(), TypeUtility.getSuperTypeHierarchy(getFormDataOwner()));
+      FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(getFormDataOwner(), TypeUtility.getSupertypeHierarchy(getFormDataOwner()));
       if (FormDataAnnotation.isCreate(formDataAnnotation) && TypeUtility.exists(formDataAnnotation.getFormDataType())) {
         OperationJob job = new OperationJob(new FormDataDtoUpdateOperation(getFormDataOwner(), formDataAnnotation));
         job.schedule();

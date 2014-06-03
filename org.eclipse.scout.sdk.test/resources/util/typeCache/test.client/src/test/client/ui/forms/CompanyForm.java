@@ -28,6 +28,7 @@ import test.client.ui.forms.CompanyForm.MainBox.DetailsGroup;
 import test.client.ui.forms.CompanyForm.MainBox.DetailsGroup.AnzahlField;
 import test.client.ui.forms.CompanyForm.MainBox.NameField;
 import test.client.ui.forms.CompanyForm.MainBox.SinceField;
+import test.client.ui.template.formfield.AbstractDetailsGroup;
 import test.shared.security.UpdateCompanyPermission;
 import test.shared.services.process.CompanyFormData;
 import test.shared.services.process.ICompanyProcessService;
@@ -106,12 +107,7 @@ public class CompanyForm extends AbstractForm {
     }
 
     @Order(30.0)
-    public class DetailsGroup extends AbstractGroupBox {
-
-      @Override
-      protected String getConfiguredLabel() {
-        return ScoutTexts.get("Details");
-      }
+    public class DetailsGroup extends AbstractDetailsGroup {
 
       @Order(10.0)
       public class AnzahlField extends AbstractIntegerField {

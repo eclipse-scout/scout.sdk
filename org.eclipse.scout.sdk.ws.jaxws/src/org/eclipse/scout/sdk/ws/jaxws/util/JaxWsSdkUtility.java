@@ -924,7 +924,7 @@ public final class JaxWsSdkUtility {
       }
 
       if (recursively) {
-        IType superType = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(declaringType).getSuperclass(declaringType);
+        IType superType = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(declaringType).getSuperclass(declaringType);
         return getAnnotation(superType, fqnAnnotationName, recursively);
       }
     }
@@ -1102,7 +1102,7 @@ public final class JaxWsSdkUtility {
     try {
       Set<IType> superTypes = TypeUtility.getTypes(fqnSuperType);
       for (IType superType : superTypes) {
-        ITypeHierarchy hierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(superType);
+        ITypeHierarchy hierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(superType);
         Set<IType> candidates = hierarchy.getAllSubtypes(superType);
         for (IType candidate : candidates) {
           if (TypeUtility.exists(candidate)) {
@@ -1147,7 +1147,7 @@ public final class JaxWsSdkUtility {
       return false;
     }
     Set<IType> superTypes = TypeUtility.getTypes(fqnSuperType);
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(candidateToCheck);
+    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(candidateToCheck);
     for (IType superType : superTypes) {
       if (superTypeHierarchy.contains(superType)) {
         return true;

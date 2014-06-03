@@ -143,29 +143,29 @@ public class TypeUtility {
       result = new TreeSet<IType>(comparator);
     }
 
-    for (IType subType : types) {
-      if (filter == null || filter.accept(subType)) {
-        result.add(subType);
+    for (IType subtype : types) {
+      if (filter == null || filter.accept(subtype)) {
+        result.add(subtype);
       }
     }
     return result;
   }
 
   /**
-   * Returns the immediate member types declared by the given type which are sub-types of the given super-type. The
+   * Returns the immediate member types declared by the given type which are subtypes of the given supertype. The
    * results is sorted using the given comparator.
    * 
    * @param declaringType
    *          The type whose immediate inner types should be returned.
-   * @param superType
-   *          The super-type for which all returned types must be a sub-type.
+   * @param supertype
+   *          The supertype for which all returned types must be a subtype.
    * @param comparator
    *          the comparator to sort the result.
-   * @return the immediate member types declared by the given type which are sub-types of the given super-type.
+   * @return the immediate member types declared by the given type which are subtypes of the given supertype.
    */
-  public static Set<IType> getInnerTypesOrdered(IType declaringType, IType superType, Comparator<IType> comparator) {
+  public static Set<IType> getInnerTypesOrdered(IType declaringType, IType supertype, Comparator<IType> comparator) {
     ITypeHierarchy localTypeHierarchy = getLocalTypeHierarchy(declaringType);
-    Set<IType> allSubtypes = getInnerTypes(declaringType, TypeFilters.getSubtypeFilter(superType, localTypeHierarchy), comparator);
+    Set<IType> allSubtypes = getInnerTypes(declaringType, TypeFilters.getSubtypeFilter(supertype, localTypeHierarchy), comparator);
     return allSubtypes;
   }
 
@@ -198,7 +198,7 @@ public class TypeUtility {
         region.add(e);
       }
     }
-    return HierarchyCache.getInstance().getLocalHierarchy(region);
+    return HierarchyCache.getInstance().getLocalTypeHierarchy(region);
   }
 
   /**
@@ -225,22 +225,33 @@ public class TypeUtility {
   }
 
   public static ITypeHierarchy getLocalTypeHierarchy(IRegion region) {
-    return HierarchyCache.getInstance().getLocalHierarchy(region);
+    return HierarchyCache.getInstance().getLocalTypeHierarchy(region);
   }
 
-  public static ITypeHierarchy getSuperTypeHierarchy(IType type) {
-    return HierarchyCache.getInstance().getSuperHierarchy(type);
+  public static ITypeHierarchy getSupertypeHierarchy(IType type) {
+    return HierarchyCache.getInstance().getSupertypeHierarchy(type);
   }
 
   /**
-   * To get a type hierarchy containing no inner types and tracking changes of all primary types in the hierarchy. <br>
-   * <br>
-   * <b> Note: </b> the listener reference is a weak reference. If users do not keep the reference the type hierarchy
-   * will be removed from cache and released.
+   * To get a type hierarchy containing this type, all of its supertypes, and all its subtypes.<br>
    * 
    * @param type
-   *          the type to get the primary type hierarchy for must be a primary type
+   *          the type to get the hierarchy for
    * @return the cached type hierarchy or null if type does not exist or hierarchy could not be created.
+   */
+  public static ICachedTypeHierarchy getTypeHierarchy(IType type) {
+    return HierarchyCache.getInstance().getTypeHierarchy(type);
+  }
+
+  /**
+   * Creates a primary type hierarchy only containing primary {@link IType}s.<br>
+   * Primary types are all except nested types. Or more formally: {@link IType}s for which
+   * <code>{@link IType#getDeclaringType()} == null</code>.
+   * 
+   * @param type
+   *          The base type of the primary type hierarchy.
+   * @return The primary type hierarchy. The hierarchy will only be initialized with values on first use and will be
+   *         cached for later re-use.
    * @throws IllegalArgumentException
    *           if the given type is not a primary type.
    */
@@ -275,18 +286,18 @@ public class TypeUtility {
     return null;
   }
 
-  public static IMethod findMethodInSuperClassHierarchy(IType type, IMethodFilter filter) {
-    return findMethodInSuperClassHierarchy(type, ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(type), filter);
+  public static IMethod findMethodInSuperclassHierarchy(IType type, IMethodFilter filter) {
+    return findMethodInSuperclassHierarchy(type, ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(type), filter);
   }
 
-  public static IMethod findMethodInSuperClassHierarchy(IType type, ITypeHierarchy hierarchy, IMethodFilter filter) {
+  public static IMethod findMethodInSuperclassHierarchy(IType type, ITypeHierarchy hierarchy, IMethodFilter filter) {
     if (exists(type)) {
       IMethod method = getFirstMethod(type, filter);
       if (exists(method)) {
         return method;
       }
       else {
-        return findMethodInSuperClassHierarchy(hierarchy.getSuperclass(type), hierarchy, filter);
+        return findMethodInSuperclassHierarchy(hierarchy.getSuperclass(type), hierarchy, filter);
       }
     }
     return null;
@@ -530,15 +541,15 @@ public class TypeUtility {
     }
   }
 
-  public static IMethod getOverwrittenMethod(IMethod method, ITypeHierarchy superTypeHierarchy) {
-    IType superType = superTypeHierarchy.getSuperclass(method.getDeclaringType());
+  public static IMethod getOverwrittenMethod(IMethod method, ITypeHierarchy supertypeHierarchy) {
+    IType supertype = supertypeHierarchy.getSuperclass(method.getDeclaringType());
     IMethodFilter overrideFilter = MethodFilters.getSuperMethodFilter(method);
-    while (superType != null) {
-      IMethod superMethod = getFirstMethod(superType, overrideFilter);
+    while (supertype != null) {
+      IMethod superMethod = getFirstMethod(supertype, overrideFilter);
       if (superMethod != null) {
         return superMethod;
       }
-      superType = superTypeHierarchy.getSuperclass(superType);
+      supertype = supertypeHierarchy.getSuperclass(supertype);
     }
     return null;
   }
@@ -689,9 +700,9 @@ public class TypeUtility {
 
   /**
    * Gets the type that is more specific. This means:<br>
-   * If a is a sub-type of b or b is null: a is returned.<br>
-   * If b is a sub-type of a or a is null: b is returned.<br>
-   * If both are null or they have no common super-type: null is returned.
+   * If a is a subtype of b or b is null: a is returned.<br>
+   * If b is a subtype of a or a is null: b is returned.<br>
+   * If both are null or they have no common supertype: null is returned.
    * 
    * @param a
    *          The first {@link IType}
@@ -699,7 +710,7 @@ public class TypeUtility {
    *          The second {@link IType}
    * @return The more specific type or null according to the rule described above.
    * @throws JavaModelException
-   *           Occurred during super-type creation.
+   *           Occurred during supertype creation.
    */
   public static IType getMoreSpecificType(IType a, IType b) throws JavaModelException {
     if (!exists(a) && !exists(b)) {
@@ -711,10 +722,10 @@ public class TypeUtility {
     if (!exists(b)) {
       return a;
     }
-    if (ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(a).contains(b)) {
+    if (ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(a).contains(b)) {
       return a;
     }
-    else if (ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(b).contains(a)) {
+    else if (ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(b).contains(a)) {
       return b;
     }
     else {
@@ -746,15 +757,15 @@ public class TypeUtility {
     return h.getAllTypes(filter, TypeComparators.getTypeNameComparator());
   }
 
-  public static Set<IType> getClassesOnClasspath(IType superType, IJavaProject project, ITypeFilter filter) {
-    TypeHierarchyConstraints constraints = new TypeHierarchyConstraints(superType, project);
+  public static Set<IType> getClassesOnClasspath(IType supertype, IJavaProject project, ITypeFilter filter) {
+    TypeHierarchyConstraints constraints = new TypeHierarchyConstraints(supertype, project);
     constraints.modifiersNotSet(Flags.AccAbstract, Flags.AccDeprecated, Flags.AccInterface);
     ICachedTypeHierarchyResult h = HierarchyCache.getInstance().getProjectContextTypeHierarchy(constraints);
     return h.getAllTypes(filter, TypeComparators.getTypeNameComparator());
   }
 
-  public static Set<IType> getInterfacesOnClasspath(IType superType, IJavaProject project, ITypeFilter filter) {
-    TypeHierarchyConstraints constraints = new TypeHierarchyConstraints(superType, project);
+  public static Set<IType> getInterfacesOnClasspath(IType supertype, IJavaProject project, ITypeFilter filter) {
+    TypeHierarchyConstraints constraints = new TypeHierarchyConstraints(supertype, project);
     constraints.modifiersSet(Flags.AccInterface);
     ICachedTypeHierarchyResult h = HierarchyCache.getInstance().getProjectContextTypeHierarchy(constraints);
     return h.getAllTypes(filter, TypeComparators.getTypeNameComparator());
@@ -952,26 +963,26 @@ public class TypeUtility {
   }
 
   /**
-   * Tries to find a method in the given type and all super types and super interfaces.<br>
+   * Tries to find a method in the given type and all supertypes and super interfaces.<br>
    * If multiple methods with the same name exist in a type (overloads), the first is returned as they appear in the
    * source or class file.
    * 
    * @param methodName
    *          the name of the method
    * @param type
-   *          The start type in which (together with its super types and super interfaces) the given method should be
+   *          The start type in which (together with its supertypes and super interfaces) the given method should be
    *          searched.
-   * @param superTypeHierarchy
-   *          The super type hierarchy of the given type.
-   * @return The first method found in the type itself, its super types or super interfaces (searched in this order). If
+   * @param supertypeHierarchy
+   *          The supertype hierarchy of the given type.
+   * @return The first method found in the type itself, its supertypes or super interfaces (searched in this order). If
    *         multiple methods with the same name exist in a type (overloads), the first is returned as they appear in
    *         the source or class file.
    */
-  public static IMethod findMethodInSuperHierarchy(String methodName, IType type, ITypeHierarchy superTypeHierarchy) {
-    return findMethodInSuperTypeHierarchy(type, superTypeHierarchy, MethodFilters.getNameFilter(methodName));
+  public static IMethod findMethodInSupertypeHierarchy(String methodName, IType type, ITypeHierarchy supertypeHierarchy) {
+    return findMethodInSupertypeHierarchy(type, supertypeHierarchy, MethodFilters.getNameFilter(methodName));
   }
 
-  public static IMethod findMethodInSuperTypeHierarchy(IType type, ITypeHierarchy superTypeHierarchy, IMethodFilter filter) {
+  public static IMethod findMethodInSupertypeHierarchy(IType type, ITypeHierarchy supertypeHierarchy, IMethodFilter filter) {
     Set<IMethod> methods = getMethods(type, filter);
     IMethod method = null;
     IMethod first = CollectionUtility.firstElement(methods);
@@ -991,18 +1002,18 @@ public class TypeUtility {
       return first;
     }
     else {
-      // super types
-      IType superType = superTypeHierarchy.getSuperclass(type);
-      if (exists(superType) && !superType.getElementName().equals(Object.class.getName())) {
-        method = findMethodInSuperTypeHierarchy(superType, superTypeHierarchy, filter);
+      // supertypes
+      IType supertype = supertypeHierarchy.getSuperclass(type);
+      if (exists(supertype) && !supertype.getElementName().equals(Object.class.getName())) {
+        method = findMethodInSupertypeHierarchy(supertype, supertypeHierarchy, filter);
       }
       if (exists(method)) {
         return method;
       }
       // interfaces
-      for (IType intType : superTypeHierarchy.getSuperInterfaces(type)) {
+      for (IType intType : supertypeHierarchy.getSuperInterfaces(type)) {
         if (exists(intType) && !intType.getElementName().equals(Object.class.getName())) {
-          method = findMethodInSuperTypeHierarchy(intType, superTypeHierarchy, filter);
+          method = findMethodInSupertypeHierarchy(intType, supertypeHierarchy, filter);
         }
         if (exists(method)) {
           return method;

@@ -29,6 +29,16 @@ import org.eclipse.jdt.core.JavaCore;
 public interface IHierarchyCache {
 
   /**
+   * Creates a type hierarchy containing this type, all of its supertypes, and all its subtypes.
+   * 
+   * @param type
+   *          The base type of the type hierarchy.
+   * @return The type hierarchy. The hierarchy will only be initialized with values on first use and will be cached for
+   *         later re-use.
+   */
+  ICachedTypeHierarchy getTypeHierarchy(IType type);
+
+  /**
    * Creates a primary type hierarchy only containing primary {@link IType}s.<br>
    * Primary types are all except nested types. Or more formally: {@link IType}s for which
    * <code>{@link IType#getDeclaringType()} == null</code>.
@@ -37,17 +47,19 @@ public interface IHierarchyCache {
    *          The base type of the primary type hierarchy.
    * @return The primary type hierarchy. The hierarchy will only be initialized with values on first use and will be
    *         cached for later re-use.
+   * @throws IllegalArgumentException
+   *           if the given type is not a primary type.
    */
   ICachedTypeHierarchy getPrimaryTypeHierarchy(IType type);
 
   /**
-   * Creates a new super type hierarchy for the given {@link IType}.
+   * Creates a new supertype hierarchy for the given {@link IType}.
    * 
    * @param type
-   *          The base type of the super type hierarchy.
-   * @return The new super type hierarchy of the given type or null if there was an error creating the hierarchy.
+   *          The base type of the supertype hierarchy.
+   * @return The new supertype hierarchy of the given type or null if there was an error creating the hierarchy.
    */
-  ITypeHierarchy getSuperHierarchy(IType type);
+  ITypeHierarchy getSupertypeHierarchy(IType type);
 
   /**
    * Creates a new type hierarchy for the {@link IJavaElement}s in the given {@link IRegion}.<br>
@@ -58,12 +70,11 @@ public interface IHierarchyCache {
    *          The {@link IRegion} to create a type hierarchy for.
    * @return The new type hierarchy or null if there was an error creating the hierarchy.
    */
-  ITypeHierarchy getLocalHierarchy(IRegion region);
+  ITypeHierarchy getLocalTypeHierarchy(IRegion region);
 
   /**
    * Creates a project context hierarchy for the given search constraints.<br>
-   * This is defined as a {@link ITypeHierarchyResult} limited to the given
-   * {@link TypeHierarchyConstraints}.<br>
+   * This is defined as a {@link ITypeHierarchyResult} limited to the given {@link TypeHierarchyConstraints}.<br>
    * Unlike {@link ITypeHierarchy}s {@link ITypeHierarchyResult}s have no level information anymore.<br>
    * This hierarchy result should be preferred over creating an entire primary type hierarchy if the resulting
    * {@link IType}s should be limited to the classpath of a given {@link IJavaProject}.

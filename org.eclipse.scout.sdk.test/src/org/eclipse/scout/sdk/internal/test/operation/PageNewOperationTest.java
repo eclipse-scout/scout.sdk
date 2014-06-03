@@ -38,7 +38,7 @@ public class PageNewOperationTest extends AbstractSdkTestWithSampleProject {
     newOp.setFormatSource(true);
 
     TestWorkspaceUtility.executeAndBuildWorkspace(newOp);
-    PageDataDtoUpdateOperation updateDto = new PageDataDtoUpdateOperation(newOp.getCreatedPage(), ScoutTypeUtility.findPageDataAnnotation(newOp.getCreatedPage(), ScoutTypeUtility.getSuperTypeHierarchy(newOp.getCreatedPage())));
+    PageDataDtoUpdateOperation updateDto = new PageDataDtoUpdateOperation(newOp.getCreatedPage(), ScoutTypeUtility.findPageDataAnnotation(newOp.getCreatedPage(), ScoutTypeUtility.getSupertypeHierarchy(newOp.getCreatedPage())));
     executeBuildAssertNoCompileErrors(updateDto);
 
     IType page = newOp.getCreatedPage();
@@ -56,7 +56,7 @@ public class PageNewOperationTest extends AbstractSdkTestWithSampleProject {
     newOp.setFormatSource(true);
 
     TestWorkspaceUtility.executeAndBuildWorkspace(newOp);
-    PageDataDtoUpdateOperation updateDto = new PageDataDtoUpdateOperation(newOp.getCreatedPage(), ScoutTypeUtility.findPageDataAnnotation(newOp.getCreatedPage(), ScoutTypeUtility.getSuperTypeHierarchy(newOp.getCreatedPage())));
+    PageDataDtoUpdateOperation updateDto = new PageDataDtoUpdateOperation(newOp.getCreatedPage(), ScoutTypeUtility.findPageDataAnnotation(newOp.getCreatedPage(), ScoutTypeUtility.getSupertypeHierarchy(newOp.getCreatedPage())));
     executeBuildAssertNoCompileErrors(updateDto);
 
     IType page = newOp.getCreatedPage();

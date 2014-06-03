@@ -129,6 +129,7 @@ public interface IRuntimeClasses {
   String AbstractTabBox = "org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox";// NO_UCD
   String AbstractTreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.AbstractTreeField"; // NO_UCD
   String AbstractTreeBox = "org.eclipse.scout.rt.client.ui.form.fields.treebox.AbstractTreeBox"; // NO_UCD
+  String AbstractGroupBox = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox"; // NO_UCD
 
   String IAccessControlService = "org.eclipse.scout.rt.shared.services.common.security.IAccessControlService";
   String IValidationStrategy = "org.eclipse.scout.rt.shared.validate.IValidationStrategy"; // NO_UCD

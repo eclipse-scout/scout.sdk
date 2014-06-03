@@ -341,7 +341,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
       String fqn = StringUtility.join(".", packageName, className);
       if (TypeUtility.existsType(fqn)) {
         IType type = TypeUtility.getType(fqn);
-        if (!ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type).contains(interfaceType)) {
+        if (!ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type).contains(interfaceType)) {
           type.getJavadocRange().getOffset();
           type.getJavadocRange().getLength();
           multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustBeOfTheTypeY", label, interfaceType.getFullyQualifiedName())));
@@ -446,7 +446,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
       if (TypeUtility.existsType(authenticationHandler)) {
         IType type = TypeUtility.getType(authenticationHandler);
         try {
-          if (ScoutSdkCore.getHierarchyCache().getSuperHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer))) {
+          if (ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer))) {
             m_tooltipAuthenticationFactory.setMember(type);
           }
         }
