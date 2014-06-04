@@ -17,7 +17,9 @@ import java.util.Set;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -32,6 +34,7 @@ import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
@@ -45,6 +48,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
@@ -80,15 +84,23 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     m_modelTypeShortList = new HashSet<IType>();
+
     IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
     Set<IType> abstractFormFields = TypeUtility.getAbstractTypesOnClasspath(iFormField, m_declaringType.getJavaProject(), TypeFilters.getPrimaryTypeFilter());
+
     ArrayList<Object> elements = new ArrayList<Object>(abstractFormFields.size() + 1);
     elements.add(new ISeparator() {
     });
 
+    IRegion newRegion = JavaCore.newRegion();
+    for (IType formField : abstractFormFields) {
+      newRegion.add(formField);
+    }
+    ITypeHierarchy abstractFormFieldHierarchy = ScoutSdkCore.getHierarchyCache().getLocalHierarchy(newRegion);
+
     for (IType formField : abstractFormFields) {
       if (!TypeUtility.exists(JdtUtility.getAnnotation(formField, ScoutSdkIgnore.class.getName()))) {
-        IFormFieldExtension formFieldExtension = FormFieldExtensionPoint.findExtension(formField, 1);
+        IFormFieldExtension formFieldExtension = FormFieldExtensionPoint.findExtension(formField, 1, abstractFormFieldHierarchy);
         if (formFieldExtension != null && formFieldExtension.isInShortList()) {
           m_modelTypeShortList.add(formField);
         }
@@ -137,11 +149,12 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
         }
       }
     });
+
     P_ContentProvider provider = new P_ContentProvider(elements.toArray());
     m_table.getViewer().setLabelProvider(provider);
     m_table.getViewer().setContentProvider(provider);
-    m_table.getViewer().setInput(provider);
     m_table.getViewer().setSorter(new P_TableSorter());
+    m_table.getViewer().setInput(provider);
 
     // layout
     parent.setLayout(new GridLayout(1, true));

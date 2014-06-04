@@ -282,13 +282,15 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
       if (view == null && createIfNotOpen) {
         try {
           view = activePage.showView(IScoutConstants.SCOUT_EXPLORER_VIEW);
-          part = (IScoutExplorerPart) view;
+          if (view instanceof IScoutExplorerPart) {
+            part = (IScoutExplorerPart) view;
+          }
         }
         catch (PartInitException e) {
           logWarning("could not open view '" + IScoutConstants.SCOUT_EXPLORER_VIEW + "'.", e);
         }
       }
-      else {
+      else if (view instanceof IScoutExplorerPart) {
         part = (IScoutExplorerPart) view;
       }
     }

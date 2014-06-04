@@ -97,7 +97,7 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
             catch (CoreException e) {
               //nop
             }
-            ClassIdValidationJob.execute(0); // the modification of the annotation does not cause an annotation modify event to be triggered
+            ClassIdValidationJob.executeAsync(0); // the modification of the annotation does not cause an annotation modify event to be triggered
           }
         });
         j.schedule();

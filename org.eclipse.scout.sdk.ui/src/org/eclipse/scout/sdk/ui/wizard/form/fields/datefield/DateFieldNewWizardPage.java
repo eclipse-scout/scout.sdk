@@ -68,9 +68,8 @@ public class DateFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    setTitle(Texts.get("New DateField"));
+    setTitle(Texts.get("NewDateField"));
     setDescription(Texts.get("CreateANewDateField"));
-
     m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {

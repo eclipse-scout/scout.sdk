@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
@@ -31,34 +31,32 @@ import org.eclipse.swt.widgets.Shell;
  */
 public abstract class AbstractOperationAction extends AbstractScoutHandler {
 
-  private OperationJob m_job;
+  private final List<IOperation> m_ops;
 
   public AbstractOperationAction(String label, ImageDescriptor image, String keyStroke, boolean multiSelectSupported, Category cat) {
     super(label, image, keyStroke, multiSelectSupported, cat);
-    m_job = new OperationJob();
+    m_ops = new LinkedList<IOperation>();
   }
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    if (m_job.getOperationCount() > 0) {
-      m_job.schedule();
+    if (getOperationCount() > 0) {
+      OperationJob job = new OperationJob(m_ops);
+      job.schedule();
     }
     return null;
   }
 
-  public OperationJob getJob() {
-    return m_job;
-  }
-
   public void setOperation(IOperation operation) {
-    setOperations(Arrays.asList(new IOperation[]{operation}));
+    m_ops.clear();
+    m_ops.add(operation);
   }
 
-  public void setOperations(Collection<IOperation> operations) {
-    m_job.setOperations(operations);
+  public void addOperation(IOperation operation) {
+    m_ops.add(operation);
   }
 
   public int getOperationCount() {
-    return m_job.getOperationCount();
+    return m_ops.size();
   }
 }

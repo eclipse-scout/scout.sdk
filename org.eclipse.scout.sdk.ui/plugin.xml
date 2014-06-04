@@ -509,18 +509,6 @@
          </nodePage>
       </FormField>
       <FormField
-            active="false"
-            model="org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField"
-            name="Mail Field">
-         <newWizard
-               inShortList="false"
-               wizard="org.eclipse.scout.sdk.ui.wizard.form.fields.mailfield.MailFieldNewWizard">
-         </newWizard>
-         <nodePage
-               nodePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.MailFieldNodePage">
-         </nodePage>
-      </FormField>
-      <FormField
             active="true"
             model="org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField"
             name="Planner Field">

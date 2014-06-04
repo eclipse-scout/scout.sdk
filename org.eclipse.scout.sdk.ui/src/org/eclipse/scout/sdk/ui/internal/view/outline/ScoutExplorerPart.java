@@ -17,7 +17,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -48,6 +47,7 @@ import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.jobs.OptionalWorkspaceBlockingRule;
 import org.eclipse.scout.sdk.ui.action.AbstractFilterMenuContributionItem;
 import org.eclipse.scout.sdk.ui.action.LinkWithEditorAction;
 import org.eclipse.scout.sdk.ui.action.ScoutBundlePresentationActionGroup;
@@ -616,7 +616,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
      */
     public P_ReloadNodeJob() {
       super("reload node");
-      setRule(ResourcesPlugin.getWorkspace().getRoot());
+      setRule(new OptionalWorkspaceBlockingRule(false));
     }
 
     public void reloadDelayed(IPage page) {

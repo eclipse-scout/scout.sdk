@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.jobs;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -19,6 +18,7 @@ import java.util.List;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -32,11 +32,11 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
   private List<IOperation> m_operations;
 
   public OperationJob() {
-    this(Arrays.asList(new IOperation[0]));
+    this((Collection<IOperation>) null);
   }
 
   public OperationJob(IOperation... operations) {
-    this(operations == null ? null : Arrays.asList(operations));
+    this(CollectionUtility.arrayList(operations));
   }
 
   public OperationJob(Collection<IOperation> operations) {

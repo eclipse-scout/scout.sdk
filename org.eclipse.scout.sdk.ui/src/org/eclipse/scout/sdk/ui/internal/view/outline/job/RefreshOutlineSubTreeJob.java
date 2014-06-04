@@ -14,29 +14,29 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.viewers.ITreeSelection;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.jobs.AbstractWorkspaceBlockingJob;
+import org.eclipse.scout.sdk.jobs.OptionalWorkspaceBlockingRule;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ProjectsTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.DirtyUpdateManager;
 import org.eclipse.scout.sdk.ui.view.outline.IDirtyManageable;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.TreeItem;
 
-public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
+public class RefreshOutlineSubTreeJob extends Job {
   public static final String SELECTION_PREVENTER = "selectionPreventer";
   private final IDirtyManageable m_view;
   private final DirtyUpdateManager m_manager;
@@ -47,17 +47,17 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
     super(name);
     m_manager = manager;
     m_view = view;
-    setRule(ResourcesPlugin.getWorkspace().getRoot());
+    setRule(new OptionalWorkspaceBlockingRule(false));
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected IStatus run(IProgressMonitor monitor) {
     if (monitor.isCanceled()) {
-      return;
+      return Status.CANCEL_STATUS;
     }
     final IPage[] dirtyStructureRoots = m_manager.fetchDirtyStructurePages();
     if (dirtyStructureRoots.length == 0) {
-      return;
+      return Status.OK_STATUS;
     }
     //
     Display display = ScoutSdkUi.getDisplay();
@@ -68,7 +68,7 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
       m_backupTree = new P_BackupNode[dirtyStructureRoots.length];
       if (dirtyStructureRoots.length > 0) {
         if (treeControl == null || treeControl.isDisposed()) {
-          return;
+          return Status.OK_STATUS;
         }
         // gui thread
         display.syncExec(new Runnable() {
@@ -141,8 +141,11 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
       }
       finally {
         waitCursor.dispose();
+        m_backupTree = null;
+        m_backupedSelection = null;
       }
     }
+    return Status.OK_STATUS;
   }
 
   private void restoreSelectionInUiThread() {
@@ -304,5 +307,4 @@ public class RefreshOutlineSubTreeJob extends AbstractWorkspaceBlockingJob {
     }
 
   } // end class P_BackupNode
-
 }

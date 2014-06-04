@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.jobs;
 
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -28,7 +27,7 @@ public abstract class AbstractWorkspaceBlockingJob extends JobEx {
 
   public AbstractWorkspaceBlockingJob(String name) {
     super(name);
-    setRule(ResourcesPlugin.getWorkspace().getRoot());
+    setRule(new OptionalWorkspaceBlockingRule(true));
   }
 
   @Override

@@ -38,20 +38,11 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.osgi.framework.Bundle;
 
 public final class FormFieldExtensionPoint {
-  private static final FormFieldExtensionPoint instance = new FormFieldExtensionPoint();
 
-  private List<IFormFieldExtension> m_extensions;
+  private static volatile List<? extends IFormFieldExtension> extensions;
+  private static final Object LOCK = new Object();
 
   private FormFieldExtensionPoint() {
-    init();
-  }
-
-  public static IFormFieldExtension[] getAllFormFieldExtensions() {
-    return instance.getAllFormFieldExtensionsImpl();
-  }
-
-  private IFormFieldExtension[] getAllFormFieldExtensionsImpl() {
-    return m_extensions.toArray(new IFormFieldExtension[m_extensions.size()]);
   }
 
   /**
@@ -70,10 +61,6 @@ public final class FormFieldExtensionPoint {
    * @return the best match extensions new wizard.
    */
   public static AbstractWorkspaceWizard createNewWizard(IType modelType) {
-    return instance.createNewWizardImpl(modelType);
-  }
-
-  private AbstractWorkspaceWizard createNewWizardImpl(IType modelType) {
     ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(modelType);
     for (IFormFieldExtension ext : getSortedExtensions(modelType, superTypeHierarchy, -1)) {
       if (ext.getNewWizardClazz() != null) {
@@ -83,19 +70,10 @@ public final class FormFieldExtensionPoint {
     return null;
   }
 
-  public static IFormFieldExtension findExtension(IType modelType, int maxDistance) {
-    return instance.findExtensionImpl(modelType, maxDistance);
-  }
-
-  /**
-   * @param modelType
-   * @return
-   */
-  private IFormFieldExtension findExtensionImpl(IType modelType, int maxDistance) {
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(modelType);
-    IFormFieldExtension[] sortedExtensions = getSortedExtensions(modelType, superTypeHierarchy, maxDistance);
-    if (sortedExtensions.length > 0) {
-      return sortedExtensions[0];
+  public static IFormFieldExtension findExtension(IType modelType, int maxDistance, ITypeHierarchy hierarchy) {
+    List<IFormFieldExtension> sortedExtensions = getSortedExtensions(modelType, hierarchy, maxDistance);
+    if (sortedExtensions.size() > 0) {
+      return CollectionUtility.firstElement(sortedExtensions);
     }
     return null;
   }
@@ -116,10 +94,6 @@ public final class FormFieldExtensionPoint {
    * @return the best match extensions node page.
    */
   public static IPage createNodePage(IType modelType, ITypeHierarchy formFieldHierarchy) {
-    return instance.createNodePageImpl(modelType, formFieldHierarchy);
-  }
-
-  private IPage createNodePageImpl(IType modelType, ITypeHierarchy formFieldHierarchy) {
     for (IFormFieldExtension ext : getSortedExtensions(modelType, formFieldHierarchy, -1)) {
       if (ext.getNodePage() != null) {
         return ext.createNodePage();
@@ -128,91 +102,98 @@ public final class FormFieldExtensionPoint {
     return null;
   }
 
-  private IFormFieldExtension[] getSortedExtensions(IType modelType, ITypeHierarchy formFieldHierarchy, int maxDistance) {
-    ArrayList<IFormFieldExtension> extensions = new ArrayList<IFormFieldExtension>();
-    for (IFormFieldExtension ext : m_extensions) {
+  private static List<IFormFieldExtension> getSortedExtensions(IType modelType, ITypeHierarchy formFieldHierarchy, int maxDistance) {
+    List<? extends IFormFieldExtension> allExtensions = getExtensions();
+    List<IFormFieldExtension> ret = new ArrayList<IFormFieldExtension>(allExtensions.size());
+    for (IFormFieldExtension ext : allExtensions) {
       if (maxDistance < 0) {
         HashSet<IType> allSubTypes = CollectionUtility.hashSet(formFieldHierarchy.getAllSubtypes(ext.getModelType()));
         allSubTypes.add(ext.getModelType());
         if (allSubTypes.contains(modelType)) {
-          extensions.add(ext);
+          ret.add(ext);
         }
       }
       else {
         if (distanceToIFormField(modelType, ext.getModelType(), 0, formFieldHierarchy, maxDistance) <= maxDistance) {
-          extensions.add(ext);
+          ret.add(ext);
         }
       }
     }
-    return extensions.toArray(new IFormFieldExtension[extensions.size()]);
+    return ret;
   }
 
-  private void init() {
-    TreeMap<CompositeObject, FormFieldExtension> formFieldExtensions = new TreeMap<CompositeObject, FormFieldExtension>();
-    IExtensionRegistry reg = Platform.getExtensionRegistry();
-    IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, "formField");
-    IExtension[] extensions = xp.getExtensions();
-    for (IExtension extension : extensions) {
-      IConfigurationElement[] elements = extension.getConfigurationElements();
-      for (IConfigurationElement element : elements) {
-        if ("true".equalsIgnoreCase(element.getAttribute("active"))) {
-          String name = element.getAttribute("name");
-          String modClassName = element.getAttribute("model");
-          if (!StringUtility.hasText(modClassName)) {
-            ScoutSdkUi.logWarning("Could not find model in '" + extension.getUniqueIdentifier() + "'. Skiping this extension.");
-            continue;
-          }
-          IType modelType = TypeUtility.getType(modClassName);
-          if (!TypeUtility.exists(modelType)) {
-            ScoutSdkUi.logError("FormFieldExtension: the model type '" + modClassName + "' can not be found.");
-            break;
-          }
-          ITypeHierarchy superTypeHierarchy = null;
-          superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(modelType);
-          if (superTypeHierarchy == null) {
-            ScoutSdkUi.logWarning("could not create super type hierarchy of '" + modelType.getFullyQualifiedName() + "'.");
-            continue;
-          }
-          int distance = -distanceToIFormField(modelType, TypeUtility.getType(IRuntimeClasses.IFormField), 0, superTypeHierarchy);
-          CompositeObject key = new CompositeObject(distance, modelType.getFullyQualifiedName());
-          FormFieldExtension formFieldExtension = formFieldExtensions.get(key);
-          if (formFieldExtension == null) {
-            formFieldExtension = new FormFieldExtension(name, modelType);
-            formFieldExtensions.put(key, formFieldExtension);
-          }
-          Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
-          Class<? extends AbstractFormFieldWizard> wizardClazz = getClassOfContribution(contributerBundle, element.getChildren("newWizard"), "wizard", AbstractFormFieldWizard.class);
-          if (wizardClazz != null) {
-            if (formFieldExtension.getNewWizardClazz() != null) {
-              ScoutSdkUi.logWarning("double defined new wizard class.");
-            }
-            else {
-              formFieldExtension.setNewWizardClazz(wizardClazz);
-            }
-          }
-          String isInShortList = getAttributeOfContribution(contributerBundle, element.getChildren("newWizard"), "inShortList");
-          formFieldExtension.setInShortList("true".equalsIgnoreCase(isInShortList));
+  private static List<? extends IFormFieldExtension> getExtensions() {
+    if (extensions == null) {
+      synchronized (LOCK) {
+        if (extensions == null) {
+          TreeMap<CompositeObject, FormFieldExtension> formFieldExtensions = new TreeMap<CompositeObject, FormFieldExtension>();
+          IExtensionRegistry reg = Platform.getExtensionRegistry();
+          IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, "formField");
+          IExtension[] ex = xp.getExtensions();
+          for (IExtension extension : ex) {
+            IConfigurationElement[] elements = extension.getConfigurationElements();
+            for (IConfigurationElement element : elements) {
+              if ("true".equalsIgnoreCase(element.getAttribute("active"))) {
+                String name = element.getAttribute("name");
+                String modClassName = element.getAttribute("model");
+                if (!StringUtility.hasText(modClassName)) {
+                  ScoutSdkUi.logWarning("Could not find model in '" + extension.getUniqueIdentifier() + "'. Skiping this extension.");
+                  continue;
+                }
+                IType modelType = TypeUtility.getType(modClassName);
+                if (!TypeUtility.exists(modelType)) {
+                  ScoutSdkUi.logError("FormFieldExtension: the model type '" + modClassName + "' can not be found.");
+                  break;
+                }
+                ITypeHierarchy superTypeHierarchy = null;
+                superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSuperHierarchy(modelType);
+                if (superTypeHierarchy == null) {
+                  ScoutSdkUi.logWarning("could not create super type hierarchy of '" + modelType.getFullyQualifiedName() + "'.");
+                  continue;
+                }
+                int distance = -distanceToIFormField(modelType, TypeUtility.getType(IRuntimeClasses.IFormField), 0, superTypeHierarchy);
+                CompositeObject key = new CompositeObject(distance, modelType.getFullyQualifiedName());
+                FormFieldExtension formFieldExtension = formFieldExtensions.get(key);
+                if (formFieldExtension == null) {
+                  formFieldExtension = new FormFieldExtension(name, modelType);
+                  formFieldExtensions.put(key, formFieldExtension);
+                }
+                Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
+                Class<? extends AbstractFormFieldWizard> wizardClazz = getClassOfContribution(contributerBundle, element.getChildren("newWizard"), "wizard", AbstractFormFieldWizard.class);
+                if (wizardClazz != null) {
+                  if (formFieldExtension.getNewWizardClazz() != null) {
+                    ScoutSdkUi.logWarning("double defined new wizard class.");
+                  }
+                  else {
+                    formFieldExtension.setNewWizardClazz(wizardClazz);
+                  }
+                }
+                String isInShortList = getAttributeOfContribution(contributerBundle, element.getChildren("newWizard"), "inShortList");
+                formFieldExtension.setInShortList("true".equalsIgnoreCase(isInShortList));
 
-          Class<? extends AbstractScoutTypePage> nodePageClazz = getClassOfContribution(contributerBundle, element.getChildren("nodePage"), "nodePage", AbstractScoutTypePage.class);
-          if (nodePageClazz != null) {
-            if (formFieldExtension.getNodePage() != null) {
-              ScoutSdkUi.logWarning("double defined node page class.");
-            }
-            else {
-              formFieldExtension.setNodePage(nodePageClazz);
+                Class<? extends AbstractScoutTypePage> nodePageClazz = getClassOfContribution(contributerBundle, element.getChildren("nodePage"), "nodePage", AbstractScoutTypePage.class);
+                if (nodePageClazz != null) {
+                  if (formFieldExtension.getNodePage() != null) {
+                    ScoutSdkUi.logWarning("double defined node page class.");
+                  }
+                  else {
+                    formFieldExtension.setNodePage(nodePageClazz);
+                  }
+                }
+              }
             }
           }
+
+          List<? extends IFormFieldExtension> result = CollectionUtility.arrayList(formFieldExtensions.values());
+          extensions = result;
         }
       }
     }
-    m_extensions = new ArrayList<IFormFieldExtension>();
-    for (IFormFieldExtension ext : formFieldExtensions.values()) {
-      m_extensions.add(ext);
-    }
+    return extensions;
   }
 
   @SuppressWarnings("unchecked")
-  private <T> Class<? extends T> getClassOfContribution(Bundle bundle, IConfigurationElement[] elements, String attribute, Class<T> t) {
+  private static <T> Class<? extends T> getClassOfContribution(Bundle bundle, IConfigurationElement[] elements, String attribute, Class<T> t) {
     Class<? extends T> clazz = null;
     if (bundle != null) {
       // wizard
@@ -231,7 +212,7 @@ public final class FormFieldExtensionPoint {
     return clazz;
   }
 
-  private String getAttributeOfContribution(Bundle bundle, IConfigurationElement[] elements, String attribute) {
+  private static String getAttributeOfContribution(Bundle bundle, IConfigurationElement[] elements, String attribute) {
     String value = null;
     if (bundle != null) {
       // wizard
@@ -242,11 +223,11 @@ public final class FormFieldExtensionPoint {
     return value;
   }
 
-  private int distanceToIFormField(IType visitee, IType superType, int dist, ITypeHierarchy superTypeHierarchy) throws IllegalArgumentException {
+  private static int distanceToIFormField(IType visitee, IType superType, int dist, ITypeHierarchy superTypeHierarchy) throws IllegalArgumentException {
     return distanceToIFormField(visitee, superType, dist, superTypeHierarchy, Integer.MAX_VALUE);
   }
 
-  private int distanceToIFormField(IType visitee, IType superType, int dist, ITypeHierarchy superTypeHierarchy, int maxDistance) throws IllegalArgumentException {
+  private static int distanceToIFormField(IType visitee, IType superType, int dist, ITypeHierarchy superTypeHierarchy, int maxDistance) throws IllegalArgumentException {
     if (visitee == null) {
       throw new IllegalArgumentException("try to determ the distance to IFormField of a instance not in subhierarchy of IFormField.");
     }
