@@ -244,11 +244,12 @@ public final class ClassIdValidationJob extends JobEx {
   }
 
   public static synchronized void executeAsync(final long startDelay) {
-    new Job("schedule classid validation") {
+    Job j = new Job("schedule classid validation") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         // get the class id type outside of the validation job
         // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
+        ScoutSdkCore.getScoutWorkspace().getBundleGraph().waitFor();
         IType classId = TypeUtility.getType(IRuntimeClasses.ClassId);
         if (TypeUtility.exists(classId)) {
           Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
@@ -256,7 +257,10 @@ public final class ClassIdValidationJob extends JobEx {
         }
         return Status.OK_STATUS;
       }
-    }.schedule();
+    };
+    j.setSystem(true);
+    j.setUser(false);
+    j.schedule();
   }
 
   private static final class P_SchedulingRule implements ISchedulingRule {
