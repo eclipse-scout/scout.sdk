@@ -8,9 +8,6 @@
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
-/**
- *
- */
 package org.eclipse.scout.sdk.ws.jaxws.util.listener;
 
 public interface IOperationFinishedListener {

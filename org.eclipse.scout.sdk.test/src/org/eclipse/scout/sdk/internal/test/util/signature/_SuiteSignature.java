@@ -8,9 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/**
- *
- */
 package org.eclipse.scout.sdk.internal.test.util.signature;
 
 import org.junit.runner.RunWith;

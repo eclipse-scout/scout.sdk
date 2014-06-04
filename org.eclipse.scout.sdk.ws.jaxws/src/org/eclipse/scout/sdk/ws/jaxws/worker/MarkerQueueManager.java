@@ -8,9 +8,6 @@
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
-/**
- *
- */
 package org.eclipse.scout.sdk.ws.jaxws.worker;
 
 import org.eclipse.core.runtime.IProgressMonitor;

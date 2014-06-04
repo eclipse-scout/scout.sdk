@@ -8,9 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/**
- *
- */
 package org.eclipse.scout.sdk.internal.test.operation;
 
 import org.eclipse.scout.sdk.internal.test.operation.form._SuiteForm;

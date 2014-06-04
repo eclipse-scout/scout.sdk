@@ -8,9 +8,6 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-/**
- *
- */
 package org.eclipse.scout.sdk.operation.service;
 
 import org.eclipse.core.runtime.CoreException;
