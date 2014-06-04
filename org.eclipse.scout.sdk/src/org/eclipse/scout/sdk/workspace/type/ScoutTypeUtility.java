@@ -1359,6 +1359,7 @@ public class ScoutTypeUtility extends TypeUtility {
         CATEGORIES.METHOD_CONFIG_EXEC,
         CATEGORIES.METHOD_OVERRIDDEN,
         CATEGORIES.METHOD_LOCAL_BEAN,
+        CATEGORIES.TYPE_MENU,
         CATEGORIES.METHOD_UNCATEGORIZED
         );
     return new ScoutStructuredType(type, enabled);
