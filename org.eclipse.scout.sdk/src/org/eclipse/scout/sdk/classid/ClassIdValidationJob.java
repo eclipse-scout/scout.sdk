@@ -236,21 +236,27 @@ public final class ClassIdValidationJob extends JobEx {
         IAnnotation annotation = (IAnnotation) event.getElement();
         if (annotation != null && annotation.getElementName().endsWith(Signature.getSimpleName(IRuntimeClasses.ClassId))) {
           if (TypeUtility.exists(event.getElement())) {
-            execute(0);
+            executeAsync(1000);
           }
         }
       }
     }
   }
 
-  public static synchronized void execute(long startDelay) {
-    // get the class id type outside of the job
-    // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
-    IType classId = TypeUtility.getType(IRuntimeClasses.ClassId);
-    if (TypeUtility.exists(classId)) {
-      Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
-      new ClassIdValidationJob(classId).schedule(startDelay);
-    }
+  public static synchronized void executeAsync(final long startDelay) {
+    new Job("schedule classid validation") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        // get the class id type outside of the validation job
+        // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
+        IType classId = TypeUtility.getType(IRuntimeClasses.ClassId);
+        if (TypeUtility.exists(classId)) {
+          Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
+          new ClassIdValidationJob(classId).schedule(startDelay);
+        }
+        return Status.OK_STATUS;
+      }
+    }.schedule();
   }
 
   private static final class P_SchedulingRule implements ISchedulingRule {

@@ -51,7 +51,7 @@ public class ScoutSdk extends Plugin {
 
     // start class id validation
     ClassIdValidationJob.install();
-    ClassIdValidationJob.execute(5000);
+    ClassIdValidationJob.executeAsync(5000);
 
     // DTO auto update
     m_autoUpdateManager = new DtoAutoUpdateManager();
