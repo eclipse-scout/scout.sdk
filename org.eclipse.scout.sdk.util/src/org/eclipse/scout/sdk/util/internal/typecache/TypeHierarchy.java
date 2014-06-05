@@ -51,7 +51,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
 
   @Override
   public boolean contains(IType type) {
-    return TypeUtility.exists(type) && m_hierarchy.contains(type);
+    return m_hierarchy.contains(type);
   }
 
   @Override
