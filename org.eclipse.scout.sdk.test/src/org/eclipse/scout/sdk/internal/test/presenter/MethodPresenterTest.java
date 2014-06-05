@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 import org.eclipse.core.runtime.FileLocator;
@@ -120,11 +121,11 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
     Assert.assertTrue(TypeUtility.exists(testType));
 
     ConfigPropertyType configPropertyType = new ConfigPropertyType(testType);
-    ConfigurationMethod[] configPropertyMethods = configPropertyType.getConfigurationMethods(ConfigurationMethod.PROPERTY_METHOD);
+    List<ConfigurationMethod> configPropertyMethods = configPropertyType.getConfigurationMethods(ConfigurationMethod.PROPERTY_METHOD);
     Assert.assertNotNull(configPropertyMethods);
-    Assert.assertTrue(configPropertyMethods.length > 0);
+    Assert.assertTrue(configPropertyMethods.size() > 0);
 
-    ArrayList<ConfigurationMethod> implementedMethods = new ArrayList<ConfigurationMethod>(configPropertyMethods.length);
+    ArrayList<ConfigurationMethod> implementedMethods = new ArrayList<ConfigurationMethod>(configPropertyMethods.size());
     for (ConfigurationMethod method : configPropertyMethods) {
       if (method != null) {
         if (method.isImplemented()) {

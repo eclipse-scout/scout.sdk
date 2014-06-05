@@ -12,7 +12,6 @@ package org.eclipse.scout.nls.sdk.simple.model.ws;
 
 import java.beans.PropertyChangeListener;
 import java.util.List;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,7 +27,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.pde.core.plugin.PluginRegistry;
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.commons.nls.DynamicNls;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
@@ -37,6 +35,7 @@ import org.eclipse.scout.sdk.util.resources.IResourceFilter;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.resources.WeakResourceChangeListener;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
  * <h4>NlsType</h4>
@@ -51,7 +50,6 @@ public class NlsType implements INlsType {
 
   private static final Pattern REGEX_RESOURCE_BUNDLE_FIELD = Pattern.compile(RESOURCE_BUNDLE_FIELD_NAME + "\\s*=\\s*\\\"([^\\\"]*)\\\"\\s*\\;", Pattern.DOTALL);
 
-  protected Set<IType> m_superTypes;
   protected IResourceChangeListener m_nlsResourceChangeListener;
   protected final IType m_type;
   protected final BasicPropertySupport m_propertySupport;
@@ -86,11 +84,10 @@ public class NlsType implements INlsType {
   }
 
   protected void loadSuperTypeHierarchy() throws JavaModelException {
-    org.eclipse.scout.sdk.util.typecache.ITypeHierarchy typeHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(m_type);
-    m_superTypes = typeHierarchy.getAllSuperclasses(m_type);
-    IType firstType = CollectionUtility.firstElement(m_superTypes);
+    ITypeHierarchy typeHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(m_type);
+    IType firstType = typeHierarchy.getSuperclass(m_type);
     if (TypeUtility.exists(firstType)) {
-      if (!DynamicNls.class.getName().equals(firstType.getFullyQualifiedName()) && !Object.class.getName().equals(firstType.getFullyQualifiedName())) {
+      if (!DynamicNls.class.getName().equals(firstType.getFullyQualifiedName())) {
         m_propertySupport.setProperty(PROP_SUPER_TYPE, firstType);
       }
     }

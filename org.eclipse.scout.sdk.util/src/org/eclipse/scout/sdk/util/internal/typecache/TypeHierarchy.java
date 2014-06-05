@@ -11,8 +11,10 @@
 package org.eclipse.scout.sdk.util.internal.typecache;
 
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -91,6 +93,28 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public Set<IType> getAllInterfaces(ITypeFilter filter, Comparator<IType> comparator) {
     IType[] types = m_hierarchy.getAllInterfaces();
     return getTypesFilteredAndSorted(types, filter, comparator);
+  }
+
+  @Override
+  public Deque<IType> getSuperClassStack(IType startType, boolean includeStartType) {
+    LinkedList<IType> result = new LinkedList<IType>();
+    IType cur = null;
+    if (includeStartType) {
+      cur = startType;
+    }
+    else {
+      cur = getSuperclass(startType);
+    }
+    while (TypeUtility.exists(cur) && !Object.class.getName().equals(cur.getFullyQualifiedName())) {
+      result.add(cur);
+      cur = getSuperclass(cur);
+    }
+    return result;
+  }
+
+  @Override
+  public Deque<IType> getSuperClassStack(IType startType) {
+    return getSuperClassStack(startType, true);
   }
 
   @Override
@@ -239,7 +263,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   public IType getSuperclass(IType type) {
     IType superclass = m_hierarchy.getSuperclass(type);
     if (!TypeUtility.exists(superclass)) {
-      superclass = null;
+      return null;
     }
     return superclass;
   }

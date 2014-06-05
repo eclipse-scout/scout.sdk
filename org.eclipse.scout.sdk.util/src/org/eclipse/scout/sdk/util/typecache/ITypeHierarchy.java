@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.util.typecache;
 
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
@@ -106,6 +107,38 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * @return true if the potentialSubtype is in the sub hierarchy of the given type.
    */
   boolean isSubtype(IType type, IType potentialSubtype);
+
+  /**
+   * Builds the super classes stack for the given {@link IType} in bottom-up order.<br>
+   * The given {@link IType} is always part of the {@link Deque} and can therefore be found at the first position.<br>
+   * You can use {@link Deque#descendingIterator()} to loop through the classes in top-down order.<br>
+   * Note: {@link java.lang.Object} is never part of the super classes stack.
+   * 
+   * @param startType
+   *          The start {@link IType}. Will always be part of the resulting {@link Deque}.
+   * @return The super classes stack in bottom-up order.
+   * @see Deque
+   * @see Deque#descendingIterator()
+   */
+  Deque<IType> getSuperClassStack(IType startType);
+
+  /**
+   * Builds the super classes stack for the given {@link IType} in bottom-up order.<br>
+   * The given {@link IType} itself is only part of the {@link Deque} if includeStartType is set to <code>true</code>.
+   * Then it can therefore be found at the first position.<br>
+   * You can use {@link Deque#descendingIterator()} to loop through the classes in top-down order.<br>
+   * Note: {@link java.lang.Object} is never part of the super classes stack.
+   * 
+   * @param startType
+   *          The start {@link IType}.
+   * @param includeStartType
+   *          Specifies if the given startType should be part of the {@link Deque} (<code>true</code>) or not (
+   *          <code>false</code>).
+   * @return The super classes stack in bottom-up order.
+   * @see Deque
+   * @see Deque#descendingIterator()
+   */
+  Deque<IType> getSuperClassStack(IType startType, boolean includeStartType);
 
   /**
    * @see ITypeHierarchy#getAllSuperclasses(IType, ITypeFilter, Comparator)

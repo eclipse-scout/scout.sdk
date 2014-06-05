@@ -74,7 +74,7 @@ public class ConfigPropertyUpdateOperation<T> implements IOperation {
           deleteOp.validate();
           deleteOp.run(monitor, workingCopyManager);
           workingCopyManager.reconcile(getMethod().getType().getCompilationUnit(), monitor);
-          m_method = ScoutTypeUtility.getConfigurationMethod(getMethod().getType(), getMethod().getMethodName());
+          m_method = ScoutTypeUtility.getConfigurationMethod(getMethod().getType(), getMethod().getMethodName(), getMethod().getSuperTypeHierarchy());
         }
         IMethodBodySourceBuilder bodyBuilder = new IMethodBodySourceBuilder() {
 

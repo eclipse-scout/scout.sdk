@@ -15,6 +15,8 @@ import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.DataFlavor;
 import java.io.Reader;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -23,9 +25,11 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
+import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.TableFieldNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithTableNodePage;
@@ -35,6 +39,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.parser.IntegerPropertySourceParser;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -144,18 +149,23 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
 
   private void changeColumnWidths(IType tableType, HashMap<String, Integer> map, Shell shell) {
     // for all columns within the table
+    List<IOperation> updateOps = new LinkedList<IOperation>();
     for (IType innerType : ScoutTypeUtility.getColumns(tableType)) {
       String className = innerType.getFullyQualifiedName();
       Integer columnWidth = map.get(className);
       // there is a corresponding entry in the clipboard for the current column?
       if (columnWidth != null && columnWidth >= 0) {
-        ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(ScoutTypeUtility.getConfigurationMethod(innerType, COLUMN_WIDTH_METHOD_NAME), new IntegerPropertySourceParser());
+        ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(innerType, COLUMN_WIDTH_METHOD_NAME, ScoutSdkCore.getHierarchyCache().getSuperHierarchy(innerType), ConfigurationMethod.PROPERTY_METHOD, "INTEGER");
+        ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(configurationMethod, new IntegerPropertySourceParser());
         updateOp.setValue(columnWidth);
-        new OperationJob(updateOp).schedule();
+        updateOps.add(updateOp);
       }
       else if (columnWidth != null) {
         showInfoMessageBox(shell, Texts.get("ColumnWidthPasteInvalidWidth", columnWidth.toString()));
       }
+    }
+    if (updateOps.size() > 0) {
+      new OperationJob(updateOps).schedule();
     }
   }
 

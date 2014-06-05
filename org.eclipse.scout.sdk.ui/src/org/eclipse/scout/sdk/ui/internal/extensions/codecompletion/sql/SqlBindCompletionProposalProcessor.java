@@ -98,9 +98,8 @@ public class SqlBindCompletionProposalProcessor {
     return Collections.emptyList();
   }
 
-  private void addInnerTypesInSuperClasses(IType baseType, ITypeHierarchy baseTypeSuperHierarchy, HashSet<ICompletionProposal> collector,
-      String prefix, String namePrefix, JavaContentAssistInvocationContext context) throws JavaModelException {
-    for (IType superClass : baseTypeSuperHierarchy.getAllSuperclasses(baseType)) {
+  private void addInnerTypesInSuperClasses(IType baseType, ITypeHierarchy baseTypeSuperHierarchy, HashSet<ICompletionProposal> collector, String prefix, String namePrefix, JavaContentAssistInvocationContext context) throws JavaModelException {
+    for (IType superClass : baseTypeSuperHierarchy.getSuperClassStack(baseType, false)) {
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(superClass);
       for (IType innerType : TypeUtility.getInnerTypes(superClass, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
         SqlBindProposal prop = new SqlBindProposal(namePrefix + NamingUtility.ensureStartWithLowerCase(innerType.getElementName()), prefix, context.getInvocationOffset(), m_image);

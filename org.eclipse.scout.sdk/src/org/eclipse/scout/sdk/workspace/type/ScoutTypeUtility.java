@@ -13,9 +13,10 @@ package org.eclipse.scout.sdk.workspace.type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -851,45 +852,48 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName, ITypeHierarchy superTypeHierarchy) {
-    LinkedList<IType> affectedTypes = new LinkedList<IType>();
-    Set<IType> superClasses = superTypeHierarchy.getAllSuperclasses(declaringType);
-    for (IType t : superClasses) {
-      if (TypeUtility.exists(t) && !t.getFullyQualifiedName().equals(Object.class.getName())) {
-        affectedTypes.addFirst(t);
-      }
-    }
-    affectedTypes.add(declaringType);
-    return getConfigurationMethod(declaringType, methodName, superTypeHierarchy, affectedTypes);
+    return getConfigurationMethod(declaringType, methodName, superTypeHierarchy, 0, null);
   }
 
-  public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName, ITypeHierarchy superTypeHierarchy, List<IType> topDownAffectedTypes) {
+  public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName, ITypeHierarchy superTypeHierarchy, int methodType, String configPropertyType) {
+    return getConfigurationMethod(declaringType, methodName, superTypeHierarchy, superTypeHierarchy.getSuperClassStack(declaringType), methodType, configPropertyType);
+  }
+
+  private static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName, ITypeHierarchy superTypeHierarchy, Deque<IType> bottomUpAffectedTypes, int methodType, String configPropertyType) {
     ConfigurationMethod newMethod = null;
     try {
-      for (IType t : topDownAffectedTypes) {
+      Iterator<IType> topDownIterator = bottomUpAffectedTypes.descendingIterator();
+      while (topDownIterator.hasNext()) {
+        IType t = topDownIterator.next();
         IMethod m = TypeUtility.getMethod(t, methodName);
         if (TypeUtility.exists(m)) {
           if (newMethod != null) {
             newMethod.pushMethod(m);
           }
           else {
-            IAnnotation configOpAnnotation = JdtUtility.getAnnotation(m, IRuntimeClasses.ConfigOperation);
-            if (TypeUtility.exists(configOpAnnotation)) {
-              newMethod = new ConfigurationMethod(declaringType, superTypeHierarchy, methodName, ConfigurationMethod.OPERATION_METHOD);
-              newMethod.pushMethod(m);
-            }
-            IAnnotation configPropAnnotation = JdtUtility.getAnnotation(m, IRuntimeClasses.ConfigProperty);
-            if (TypeUtility.exists(configPropAnnotation)) {
-              String configPropertyType = null;
-              for (IMemberValuePair p : configPropAnnotation.getMemberValuePairs()) {
-                if ("value".equals(p.getMemberName())) {
-                  configPropertyType = (String) p.getValue();
-                  break;
+            if (methodType == 0) {
+              IAnnotation configPropAnnotation = JdtUtility.getAnnotation(m, IRuntimeClasses.ConfigProperty);
+              if (TypeUtility.exists(configPropAnnotation)) {
+                methodType = ConfigurationMethod.PROPERTY_METHOD;
+
+                if (!StringUtility.hasText(configPropertyType)) {
+                  configPropertyType = JdtUtility.getAnnotationValueString(configPropAnnotation, "value");
                 }
               }
-              if (!StringUtility.isNullOrEmpty(configPropertyType)) {
-                newMethod = new ConfigurationMethod(declaringType, superTypeHierarchy, methodName, ConfigurationMethod.PROPERTY_METHOD);
+              else {
+                IAnnotation configOpAnnotation = JdtUtility.getAnnotation(m, IRuntimeClasses.ConfigOperation);
+                if (TypeUtility.exists(configOpAnnotation)) {
+                  methodType = ConfigurationMethod.OPERATION_METHOD;
+                }
+              }
+            }
+
+            if (methodType != 0) {
+              newMethod = new ConfigurationMethod(declaringType, superTypeHierarchy, methodName, methodType);
+              newMethod.pushMethod(m);
+
+              if (methodType == ConfigurationMethod.PROPERTY_METHOD && StringUtility.hasText(configPropertyType)) {
                 newMethod.setConfigAnnotationType(configPropertyType);
-                newMethod.pushMethod(m);
               }
             }
           }

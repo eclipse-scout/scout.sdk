@@ -4,32 +4,36 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type.config;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.commons.CollectionUtility;
 
 /**
  *
  */
 public class ConfigPropertyTypeSet {
-  private HashMap<IType, ConfigPropertyType> m_propertyTypes;
-  private TreeMap<String, ConfigurationMethodSet> m_commonConfigPropertyMethodSets;
+  private final Map<IType, ConfigPropertyType> m_propertyTypes;
+  private final Map<String, ConfigurationMethodSet> m_commonConfigPropertyMethodSets;
 
-  public ConfigPropertyTypeSet(IType[] types) {
+  public ConfigPropertyTypeSet(List<IType> types) throws JavaModelException {
     m_propertyTypes = new HashMap<IType, ConfigPropertyType>();
     m_commonConfigPropertyMethodSets = new TreeMap<String, ConfigurationMethodSet>();
     init(types);
   }
 
-  private void init(IType[] types) {
+  private void init(List<IType> types) throws JavaModelException {
     ConfigPropertyType reference = null;
     for (IType t : types) {
       ConfigPropertyType value = new ConfigPropertyType(t);
@@ -63,8 +67,8 @@ public class ConfigPropertyTypeSet {
     }
   }
 
-  public ConfigurationMethodSet[] getCommonConfigPropertyMethodSets() {
-    return m_commonConfigPropertyMethodSets.values().toArray(new ConfigurationMethodSet[m_commonConfigPropertyMethodSets.size()]);
+  public List<ConfigurationMethodSet> getCommonConfigPropertyMethodSets() {
+    return CollectionUtility.arrayList(m_commonConfigPropertyMethodSets.values());
   }
 
   public boolean hasConfigPropertyMethods() {

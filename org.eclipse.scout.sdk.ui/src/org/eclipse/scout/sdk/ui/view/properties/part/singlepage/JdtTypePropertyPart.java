@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -23,6 +25,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -118,22 +121,26 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   protected static final String SECTION_ID_OPS_IMPORTANT = "section.operations.important";
   protected static final String SECTION_ID_OPS_ADVANCED = "section.operations.advanced";
 
+  private final Map<String, AbstractMethodPresenter> m_methodPresenters;
+  private final Map<String, ConfigurationMethod> m_methodsToUpdate;
+
+  private P_UpdateMethodsJob m_updateJob;
+  private final Object m_methodUpdateLock;
+
+  private final P_MarkDirtyJob m_markDirtyJob;
+  private final Object m_markDirtyLock;
+
   private IJavaResourceChangedListener m_methodChangedListener;
   private ConfigPropertyType m_configPropertyType;
-  private HashMap<String, AbstractMethodPresenter> m_methodPresenters;
-
-  private HashMap<String, ConfigurationMethod> m_methodsToUpdate;
-  private Object m_methodUpdateLock = new Object();
-  private P_UpdateMethodsJob m_updateJob;
   private Button m_saveButton;
-
   private IStatus m_icuNotSyncStatus;
-  private P_MarkDirtyJob m_markDirtyJob = new P_MarkDirtyJob();
-  private Object m_markDirtyLock = new Object();
 
   public JdtTypePropertyPart() {
     m_methodsToUpdate = new HashMap<String, ConfigurationMethod>();
     m_methodPresenters = new HashMap<String, AbstractMethodPresenter>();
+    m_methodUpdateLock = new Object();
+    m_markDirtyJob = new P_MarkDirtyJob();
+    m_markDirtyLock = new Object();
   }
 
   @Override
@@ -277,33 +284,33 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       }
     }
 
-    m_configPropertyType = new ConfigPropertyType(getPage().getType());
+    try {
+      m_configPropertyType = new ConfigPropertyType(getPage().getType());
 
-    // ensure consistent order
-    boolean noImpProps = !createImportantProperties();
-    if (noImpProps) {
-      createAdvancedProperties(false);
-      boolean created = createImportantOperations();
-      createAdvancedOperations(created);
-    }
-    else {
-      boolean noImpOps = !createImportantOperations();
-      if (noImpOps) {
-        createAdvancedOperations(false);
-        createAdvancedProperties(true);
+      // ensure consistent order
+      boolean noImpProps = !createImportantProperties();
+      if (noImpProps) {
+        createAdvancedProperties(false);
+        boolean created = createImportantOperations();
+        createAdvancedOperations(created);
       }
       else {
-        createAdvancedProperties(true);
-        createAdvancedOperations(true);
+        boolean noImpOps = !createImportantOperations();
+        if (noImpOps) {
+          createAdvancedOperations(false);
+          createAdvancedProperties(true);
+        }
+        else {
+          createAdvancedProperties(true);
+          createAdvancedOperations(true);
+        }
       }
-    }
 
-    if (m_methodChangedListener == null) {
-      m_methodChangedListener = new P_MethodChangedListener();
-      ScoutSdkCore.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_methodChangedListener);
-    }
+      if (m_methodChangedListener == null) {
+        m_methodChangedListener = new P_MethodChangedListener();
+        ScoutSdkCore.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_methodChangedListener);
+      }
 
-    try {
       if (getPage().getType().getCompilationUnit() == null) {
         setCompilationUnitDirty(false);
       }
@@ -312,7 +319,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       }
     }
     catch (JavaModelException e) {
-      ScoutSdkUi.logWarning("could not determ working copy '" + getPage().getType().getElementName() + "'.");
+      ScoutSdkUi.logWarning("could not create config property page for '" + getPage().getType().getFullyQualifiedName() + "'.");
     }
   }
 
@@ -634,9 +641,9 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       if (monitor.isCanceled()) {
         return Status.CANCEL_STATUS;
       }
-      ConfigurationMethod[] methods = new ConfigurationMethod[0];
+      List<ConfigurationMethod> methods = null;
       synchronized (m_methodUpdateLock) {
-        if (m_methodsToUpdate.size() > 0) methods = m_methodsToUpdate.values().toArray(new ConfigurationMethod[m_methodsToUpdate.size()]);
+        methods = CollectionUtility.arrayList(m_methodsToUpdate.values());
         m_methodsToUpdate.clear();
       }
       for (ConfigurationMethod cm : methods) {
@@ -646,7 +653,6 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
             @Override
             public void run() {
               ((AbstractMethodPresenter) getData("presenter")).setMethod((ConfigurationMethod) getData("configMethod"));
-
             }
           };
           runnable.setData("presenter", presenter);

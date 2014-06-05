@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.ui.view.properties.part.multipage;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -22,6 +24,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -49,10 +52,10 @@ import org.eclipse.swt.widgets.Display;
 public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewPart {
   private static final String SECTION_ID_PROPERTIES = "section.properties";
 
+  private final Map<String, AbstractMultiMethodPresenter<?>> m_methodPresenters;
+
   private IElementChangedListener m_methodChangedListener;
   private ConfigPropertyTypeSet m_configPropertyTypeSet;
-
-  private HashMap<String, AbstractMultiMethodPresenter<?>> m_methodPresenters;
   private P_DelayedUpdateJob m_updateJob;
 
   public JdtTypeMultiPropertyPart() {
@@ -61,7 +64,7 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
 
   @Override
   protected void createSections() {
-    ArrayList<IType> types = new ArrayList<IType>();
+    List<IType> types = new ArrayList<IType>(getPages().length);
     for (IPage p : getPages()) {
       if (p instanceof AbstractScoutTypePage) {
         types.add(((AbstractScoutTypePage) p).getType());
@@ -70,20 +73,25 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
         return;
       }
     }
-    m_configPropertyTypeSet = new ConfigPropertyTypeSet(types.toArray(new IType[types.size()]));
-    if (m_configPropertyTypeSet.hasConfigPropertyMethods()) {
-      ISection propertySection = createSection(SECTION_ID_PROPERTIES, "Properties");
-      for (ConfigurationMethodSet set : m_configPropertyTypeSet.getCommonConfigPropertyMethodSets()) {
-        createConfigMethodPresenter(propertySection.getSectionClient(), set);
+    try {
+      m_configPropertyTypeSet = new ConfigPropertyTypeSet(types);
+      if (m_configPropertyTypeSet.hasConfigPropertyMethods()) {
+        ISection propertySection = createSection(SECTION_ID_PROPERTIES, "Properties");
+        for (ConfigurationMethodSet set : m_configPropertyTypeSet.getCommonConfigPropertyMethodSets()) {
+          createConfigMethodPresenter(propertySection.getSectionClient(), set);
+        }
+      }
+      super.createSections();
+      if (m_updateJob == null) {
+        m_updateJob = new P_DelayedUpdateJob(getForm().getDisplay());
+      }
+      if (m_methodChangedListener == null) {
+        m_methodChangedListener = new P_MethodChangedListener2();
+        JavaCore.addElementChangedListener(m_methodChangedListener);
       }
     }
-    super.createSections();
-    if (m_updateJob == null) {
-      m_updateJob = new P_DelayedUpdateJob(getForm().getDisplay());
-    }
-    if (m_methodChangedListener == null) {
-      m_methodChangedListener = new P_MethodChangedListener2();
-      JavaCore.addElementChangedListener(m_methodChangedListener);
+    catch (JavaModelException e) {
+      ScoutSdkUi.logError("Unable to create multi property part.", e);
     }
   }
 
@@ -238,7 +246,6 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
         AbstractMultiMethodPresenter presenter = m_methodPresenters.get(updatedMethod.getMethodName());
         if (presenter != null) {
           m_updateJob.update(presenter, m_configPropertyTypeSet.getConfigurationMethodSet(updatedMethod.getMethodName()));
-
         }
       }
     }

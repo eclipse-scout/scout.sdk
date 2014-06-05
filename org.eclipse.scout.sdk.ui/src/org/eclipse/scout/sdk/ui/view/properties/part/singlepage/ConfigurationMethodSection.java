@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
+import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.PropertyViewConfig.Config;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.PropertyViewConfig.ConfigCategory;
@@ -36,7 +39,7 @@ public class ConfigurationMethodSection {
   private static final PropertyViewConfig CONFIG = new PropertyViewConfig();
   private static final FormToolkit TOOLKIT = new FormToolkit(Display.getDefault());
 
-  private final ConfigurationMethodEx[] m_methods;
+  private final Set<ConfigurationMethodEx> m_methods;
 
   private ISection m_section;
   private int m_numCategories;
@@ -72,7 +75,7 @@ public class ConfigurationMethodSection {
    *          the section is created on demand when the section is expanded for the first time.
    */
   public ISection createContent(JdtTypePropertyPart parent, String id, String label, boolean expanded) {
-    if (m_methods != null && m_methods.length > 0) {
+    if (m_methods != null && m_methods.size() > 0) {
       m_numCategories = getCategoryCount();
       m_section = createSection(parent, id, label, expanded);
     }
@@ -215,8 +218,8 @@ public class ConfigurationMethodSection {
    * gets all configuration methods that match the given type filters ordered by category and order annotation of the
    * method.
    */
-  private ConfigurationMethodEx[] getConfigMethods(ConfigPropertyType source, int methodType, ConfigTypes configurationType) {
-    ConfigurationMethod[] allMethods = source.getConfigurationMethods(methodType);
+  private Set<ConfigurationMethodEx> getConfigMethods(ConfigPropertyType source, int methodType, ConfigTypes configurationType) {
+    List<ConfigurationMethod> allMethods = source.getConfigurationMethods(methodType);
     TreeSet<ConfigurationMethodEx> result = new TreeSet<ConfigurationMethodEx>();
     for (ConfigurationMethod m : allMethods) {
       ConfigurationMethodEx cme = new ConfigurationMethodEx(m);
@@ -224,11 +227,11 @@ public class ConfigurationMethodSection {
         result.add(cme);
       }
     }
-    return result.toArray(new ConfigurationMethodEx[result.size()]);
+    return result;
   }
 
   private int getCategoryCount() {
-    ConfigCategory cat = m_methods[0].m_category;
+    ConfigCategory cat = CollectionUtility.firstElement(m_methods).m_category;
     int ret = 1;
     for (ConfigurationMethodEx m : m_methods) {
       if (!m.m_category.equals(cat)) {

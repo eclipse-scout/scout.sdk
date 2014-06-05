@@ -115,7 +115,7 @@ public final class SearchFormFromTablePageHelper {
       if (TypeUtility.exists(table)) {
         Set<IType> columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), tablePageHierarchy));
         for (IType column : columns) {
-          ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(column, "getConfiguredDisplayable");
+          ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(column, "getConfiguredDisplayable", tablePageHierarchy, ConfigurationMethod.PROPERTY_METHOD, "BOOLEAN");
           String retVal = ScoutUtility.getMethodReturnValue(configurationMethod.peekMethod());
           if ("true".equals(retVal)) {
             addSearchField(column, tablePageHierarchy, fieldOrder, fieldBoxFqn, fieldBoxBuilder, searchFormBuilder, searchFormProject, nlsProvider);

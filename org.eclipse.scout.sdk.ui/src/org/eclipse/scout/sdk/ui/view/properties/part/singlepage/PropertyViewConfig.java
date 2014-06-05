@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.ui.view.properties.part.singlepage;
 
 import java.io.InputStream;
 import java.net.URL;
+import java.util.Deque;
 import java.util.HashMap;
-import java.util.Set;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -203,7 +203,7 @@ public class PropertyViewConfig {
    * @return
    */
   public Config getConfiguration(ConfigurationMethod m) {
-    Set<IType> superTypes = m.getSuperTypeHierarchy().getAllSupertypes(m.getType());
+    Deque<IType> superTypes = m.getSuperTypeHierarchy().getSuperClassStack(m.getType());
     for (IType superType : superTypes) {
       HashMap<String, Config> tc = m_typeConfigs.get(superType.getFullyQualifiedName());
       if (tc != null) {

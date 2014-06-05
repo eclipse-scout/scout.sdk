@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.internal.workspace.dto;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -163,15 +164,8 @@ public final class DtoUtility {
       }
     }
 
-    ArrayList<IType> targetTypeList = new ArrayList<IType>(5);
-    targetTypeList.add(0, declaringType);
-    Set<IType> superClasses = superTypeHierarchy.getAllSuperclasses(declaringType);
-    for (IType t : superClasses) {
-      if (TypeUtility.exists(t) && !t.getFullyQualifiedName().equals(Object.class.getName())) {
-        targetTypeList.add(t);
-      }
-    }
-    IType[] targetTypes = targetTypeList.toArray(new IType[targetTypeList.size()]);
+    Deque<IType> superClassStack = superTypeHierarchy.getSuperClassStack(declaringType);
+    IType[] targetTypes = superClassStack.toArray(new IType[superClassStack.size()]);
     IMethod[][] targetMethods = new IMethod[targetTypes.length][];
     for (int i = 0; i < targetTypes.length; i++) {
       targetMethods[i] = targetTypes[i].getMethods();
