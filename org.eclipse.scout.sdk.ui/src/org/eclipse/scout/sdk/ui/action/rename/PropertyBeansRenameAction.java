@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.rename;
 
+import java.util.List;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
@@ -18,14 +19,20 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
+import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.NamingUtility;
-import org.eclipse.scout.sdk.util.type.FieldFilters;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 import org.eclipse.scout.sdk.util.type.MethodFilters;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class PropertyBeansRenameAction extends AbstractRenameAction {
 
@@ -71,25 +78,38 @@ public class PropertyBeansRenameAction extends AbstractRenameAction {
 
   @Override
   protected IStatus validate(String newName) {
-    IStatus inheritedStatus = getJavaNameStatus(newName);
+    IStatus inheritedStatus = ScoutUtility.validateJavaName(newName, getReadOnlySuffix());
     if (inheritedStatus.matches(IStatus.ERROR)) {
       return inheritedStatus;
     }
-    for (IPropertyBean bean : getPropertyBeanDescriptors()) {
-      if (TypeUtility.getFirstMethod(bean.getDeclaringType(), MethodFilters.getNameRegexFilter(Pattern.compile("(get|set|is)" + newName))) != null) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
-      StringBuilder fieldName = new StringBuilder();
-      fieldName.append("m_").append(Character.toLowerCase(newName.charAt(0)));
-      if (bean.getBeanName().length() > 1) {
-        fieldName.append(newName.substring(1));
-        if (TypeUtility.getFirstField(bean.getDeclaringType(), FieldFilters.getNameRegexFilter(Pattern.compile(fieldName.toString()))) != null) {
+
+    String name = NamingUtility.ensureStartWithUpperCase(newName);
+
+    for (IPropertyBean bean : m_propertyBeanDescriptors) {
+      // check that no value field has the same name. this could lead to errors in form data generation (duplicate methods).
+      ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(bean.getDeclaringType());
+      List<IType> allValueFields = ScoutTypeUtility.getAllTypes(bean.getDeclaringType().getCompilationUnit(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IValueField), typeHierarchy));
+      for (IType valueField : allValueFields) {
+        String fieldName = ScoutUtility.removeFieldSuffix(valueField.getElementName());
+        if (name.equals(fieldName)) {
           return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
         }
       }
+
+      if (TypeUtility.getMethods(bean.getDeclaringType(), MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is)" + name))).size() > 0) {
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      }
     }
 
-    return inheritedStatus;
+    if (IRegEx.WELLFORMED_PROPERTY.matcher(newName).matches()) {
+      return Status.OK_STATUS;
+    }
+
+    if (IRegEx.JAVAFIELD.matcher(newName).matches()) {
+      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Warning_notWellformedJavaName"));
+    }
+
+    return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_invalidFieldX", newName));
   }
 
   /**

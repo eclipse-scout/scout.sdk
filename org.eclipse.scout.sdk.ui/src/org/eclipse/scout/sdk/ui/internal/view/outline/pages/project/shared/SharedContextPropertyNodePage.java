@@ -69,7 +69,7 @@ public class SharedContextPropertyNodePage extends AbstractPage {
       action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableRemove));
     }
     else if (menu instanceof PropertyBeansRenameAction) {
-      ArrayList<IPropertyBean> descs = new ArrayList<IPropertyBean>();
+      ArrayList<IPropertyBean> descs = new ArrayList<IPropertyBean>(2);
       if (getClientDesc() != null) {
         descs.add(getClientDesc());
       }

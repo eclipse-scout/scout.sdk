@@ -112,7 +112,7 @@ public final class HierarchyCache implements IHierarchyCache {
    * @return
    */
   @Override
-  public org.eclipse.scout.sdk.util.typecache.ITypeHierarchy getLocalHierarchy(IRegion region) {
+  public ITypeHierarchy getLocalHierarchy(IRegion region) {
     try {
       return new TypeHierarchy(null, JavaCore.newTypeHierarchy(region, null, null));
     }
@@ -123,7 +123,7 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   @Override
-  public org.eclipse.scout.sdk.util.typecache.ITypeHierarchy getSuperHierarchy(IType type) {
+  public ITypeHierarchy getSuperHierarchy(IType type) {
     try {
       return new TypeHierarchy(type, type.newSupertypeHierarchy(null));
     }

@@ -29,24 +29,23 @@ import org.eclipse.swt.widgets.Shell;
 
 public class RenameDialog extends TitleAreaDialog {
   public static final String PROP_NEW_NAME = "newName";
+
   private final FieldToolkit m_fieldToolkit;
-  private final String m_title;
   private final String m_oldName;
   private final String m_readOnlySuffix;
   private final String m_readOnlyPrefix;
-  private BasicPropertySupport m_propertySupport;
+  private final BasicPropertySupport m_propertySupport;
 
   // ui fields
   private StyledTextField m_typeNameField;
 
-  public RenameDialog(Shell parentShell, String title, String oldName, String readOnlySuffix) {
-    this(parentShell, title, oldName, readOnlySuffix, null);
+  public RenameDialog(Shell parentShell, String oldName, String readOnlySuffix) {
+    this(parentShell, oldName, readOnlySuffix, null);
   }
 
-  public RenameDialog(Shell parentShell, String title, String oldName, String readOnlySuffix, String readOnlyPrefix) {
+  public RenameDialog(Shell parentShell, String oldName, String readOnlySuffix, String readOnlyPrefix) {
     super(parentShell);
     m_propertySupport = new BasicPropertySupport(this);
-    m_title = title;
     m_oldName = oldName;
     setNewName(m_oldName);
     m_readOnlySuffix = readOnlySuffix;
@@ -57,15 +56,10 @@ public class RenameDialog extends TitleAreaDialog {
   }
 
   @Override
-  protected void configureShell(Shell newShell) {
-    super.configureShell(newShell);
-    if (m_title != null) {
-      newShell.setText(m_title);
-    }
-  }
-
-  @Override
   protected Control createDialogArea(Composite parent) {
+    String title = Texts.get("RenameX", getOldName());
+    setTitle(title);
+    getShell().setText(title);
     Composite rootPane = new Composite(parent, SWT.NONE);
     m_typeNameField = m_fieldToolkit.createStyledTextField(rootPane, Texts.get("Dialog_rename_oldNameLabel"));
     m_typeNameField.setReadOnlySuffix(getReadOnlySuffix());

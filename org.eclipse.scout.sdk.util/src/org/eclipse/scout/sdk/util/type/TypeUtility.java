@@ -309,8 +309,7 @@ public class TypeUtility {
 
   /**
    * Searches and returns the first method with the given name in the given type.<br>
-   * If multiple methods with the same name exist (overloads), the first is returned as they appear in the source or
-   * class file.
+   * If multiple methods with the same name exist (overloads), the returned method is undefined.
    * 
    * @param type
    *          The type in which the method should be searched.
@@ -328,11 +327,11 @@ public class TypeUtility {
 
   /**
    * Gets all methods in the given type.<br>
-   * The methods are in the order in which they appear in the source or class file.
+   * The methods are in no particular order.
    * 
    * @param type
    *          The type to get all methods of.
-   * @return an array of all methods of the given type. never returns null.
+   * @return A {@link Set} of all methods of the given type. Never returns null.
    */
   public static Set<IMethod> getMethods(IType type) {
     return getMethods(type, null);
@@ -340,30 +339,30 @@ public class TypeUtility {
 
   /**
    * Gets all methods in the given type that match the given filter.<br>
-   * The methods are in the order in which they appear in the source or class file.
+   * The methods are in no particular order.
    * 
    * @param type
    *          The type to get all methods of.
    * @param filter
    *          The filter.
-   * @return an array of all methods of the given type matching the given filter. never returns null.
+   * @return A {@link Set} of all methods of the given type matching the given filter. Never returns null.
    */
   public static Set<IMethod> getMethods(IType type, IMethodFilter filter) {
     return getMethods(type, filter, null);
   }
 
   /**
-   * Gets all methods in the given type that match the given filter ordered by the given comparator.<br>
-   * If the given comparator is null, the methods are in the order in which they appear in the source or class file.
+   * Gets all methods in the given type (no methods of inner types) that match the given filter ordered by the given
+   * comparator.<br>
+   * If the given comparator is null, the order of the methods is undefined.
    * 
    * @param type
    *          The type to get all methods of.
    * @param filter
    *          The filter to use or null for no filtering.
    * @param comparator
-   *          The comparator to use or null to get the methods in the order in which they appear in the source or class
-   *          file.
-   * @return an array of all methods of the given type matching the given filter. never returns null.
+   *          The comparator to use or null to get the methods in undefined order.
+   * @return an {@link Set} of all methods of the given type matching the given filter. Never returns null.
    */
   public static Set<IMethod> getMethods(IType type, IMethodFilter filter, Comparator<IMethod> comparator) {
     try {
@@ -839,7 +838,7 @@ public class TypeUtility {
           //
           String[] parameterTypes = m.getParameterTypes();
           String returnType = m.getReturnType();
-          if (kind.equals("get") && parameterTypes.length == 0 && !returnType.equals(Signature.SIG_VOID)) {
+          if ("get".equals(kind) && parameterTypes.length == 0 && !returnType.equals(Signature.SIG_VOID)) {
             PropertyBean desc = beans.get(name);
             if (desc == null) {
               desc = new PropertyBean(type, name);
@@ -849,7 +848,7 @@ public class TypeUtility {
               desc.setReadMethod(m);
             }
           }
-          else if (kind.equals("is") && parameterTypes.length == 0 && returnType.equals(Signature.SIG_BOOLEAN)) {
+          else if ("is".equals(kind) && parameterTypes.length == 0 && returnType.equals(Signature.SIG_BOOLEAN)) {
             PropertyBean desc = beans.get(name);
             if (desc == null) {
               desc = new PropertyBean(type, name);
@@ -859,7 +858,7 @@ public class TypeUtility {
               desc.setReadMethod(m);
             }
           }
-          else if (kind.equals("set") && parameterTypes.length == 1 && returnType.equals(Signature.SIG_VOID)) {
+          else if ("set".equals(kind) && parameterTypes.length == 1 && returnType.equals(Signature.SIG_VOID)) {
             PropertyBean desc = beans.get(name);
             if (desc == null) {
               desc = new PropertyBean(type, name);

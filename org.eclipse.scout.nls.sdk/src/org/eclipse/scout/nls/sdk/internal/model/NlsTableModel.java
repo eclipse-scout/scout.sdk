@@ -16,6 +16,7 @@ import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.model.workspace.InheritedNlsEntry;
 import org.eclipse.scout.nls.sdk.internal.ui.editor.NlsTable;
@@ -109,15 +110,6 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
 
   @Override
   public Color getBackground(Object element, int columnIndex) {
-    // if(columnIndex < 2){
-    // return null;
-    // }
-    // if(m_languageOrder.get(columnIndex - (NlsTable.AMOUNT_UTILITY_COLS +1)).isLocal()){
-    // return null;
-    // }
-    // else{
-    // return Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_LIGHT_SHADOW);
-    // }
     return null;
   }
 
@@ -128,32 +120,37 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
       c = NlsCore.getColor(NlsCore.COLOR_NLS_ROW_INACTIVE_FOREGROUND);
     }
     return c;
-    // NlsTableRow row = (NlsTableRow) element;
-    // if(columnIndex < 2){
-    // return null;
-    // }
-    // if(m_languageOrder.get(columnIndex - (NlsTable.AMOUNT_UTILITY_COLS +1)).isLocal()){
-    // return null;
-    // }
-    // else{
-    // return Display.getDefault().getSystemColor(SWT.COLOR_WIDGET_NORMAL_SHADOW);
-    // }
   }
 
   @Override
   public int compare(Viewer viewer, Object e1, Object e2) {
     int index = m_sortIndex;
-//    if (index < NlsTable.AMOUNT_UTILITY_COLS) {
-//      index = NlsTable.AMOUNT_UTILITY_COLS;
-//    }
+    Object first = null, second = null;
     if (m_ascSorting) {
-      return getColumnText(e2, index).toLowerCase().compareTo(getColumnText(e1, index).toLowerCase());
-
+      first = e2;
+      second = e1;
     }
     else {
-      return getColumnText(e1, index).toLowerCase().compareTo(getColumnText(e2, index).toLowerCase());
+      first = e1;
+      second = e2;
     }
 
+    String a = getColumnText(first, index);
+    String b = getColumnText(second, index);
+
+    if (index == 0 && StringUtility.hasText(a) && StringUtility.hasText(b)) {
+      // sort by NLS entry usage (numeric)
+      try {
+        Integer numA = Integer.parseInt(a);
+        Integer numB = Integer.parseInt(b);
+        return numA.compareTo(numB);
+      }
+      catch (NumberFormatException e) {
+        NlsCore.logInfo("no valid number '" + a + "' or '" + b + "'", e);
+      }
+    }
+
+    return a.compareToIgnoreCase(b);
   }
 
   public boolean isAscSorting() {

@@ -25,7 +25,6 @@ import org.eclipse.scout.sdk.ui.dialog.RenameDialog;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.swt.widgets.Shell;
 
 public abstract class AbstractRenameAction extends AbstractScoutHandler {
@@ -39,7 +38,7 @@ public abstract class AbstractRenameAction extends AbstractScoutHandler {
 
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    m_dialog = new RenameDialog(shell, Texts.get("RenameWithPopup"), getOldName(), getReadOnlySuffix());
+    m_dialog = new RenameDialog(shell, getOldName(), getReadOnlySuffix());
     m_dialog.addPropertyChangeListener(new P_PropertyListener());
     getDialog().create();
     validateInternal(getDialog().getNewName());
@@ -82,10 +81,6 @@ public abstract class AbstractRenameAction extends AbstractScoutHandler {
         getDialog().setMessage("", IMessageProvider.NONE);
         break;
     }
-  }
-
-  protected IStatus getJavaNameStatus(String newName) {
-    return ScoutUtility.validateJavaName(newName, getReadOnlySuffix());
   }
 
   private class P_PropertyListener implements PropertyChangeListener {

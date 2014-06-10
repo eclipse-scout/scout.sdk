@@ -132,11 +132,11 @@ public class JdtEvent extends EventObject {
         else if (getElementType() == IJavaElement.ANNOTATION) {
           IAnnotation annotation = (IAnnotation) getElement();
           IJavaElement annotationOwner = annotation.getParent();
-          if (TypeUtility.exists(annotationOwner) && annotationOwner.getElementType() == IJavaElement.TYPE) {
+          if (annotationOwner != null && annotationOwner.getElementType() == IJavaElement.TYPE) {
             type = (IType) annotationOwner;
           }
         }
-        if (type != null) {
+        if (TypeUtility.exists(type)) {
           m_superTypeHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSuperHierarchy(type);
         }
       }

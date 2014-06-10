@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -38,7 +39,7 @@ public class ServiceRenameAction extends AbstractRenameAction {
 
   @Override
   protected IStatus validate(String newName) {
-    IStatus inheritedStatus = getJavaNameStatus(newName);
+    IStatus inheritedStatus = ScoutUtility.validateJavaName(newName, getReadOnlySuffix());
     if (inheritedStatus.matches(IStatus.ERROR)) {
       return inheritedStatus;
     }

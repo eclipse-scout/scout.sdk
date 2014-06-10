@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.util;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -38,7 +37,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.BooleanHolder;
 import org.eclipse.scout.commons.holders.Holder;
@@ -59,6 +57,7 @@ import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.MethodFilters;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -97,7 +96,7 @@ public final class ScoutUtility {
 
   public static String getCommentBlock(String content) {
     StringBuilder builder = new StringBuilder();
-    builder.append("//TODO ");
+    builder.append("// TODO ");
     String username = getUsername();
     if (!StringUtility.isNullOrEmpty(username)) {
       builder.append("[" + username + "] ");
@@ -500,15 +499,12 @@ public final class ScoutUtility {
     if (ScoutTypeUtility.getAllTypes(declaringType.getCompilationUnit(), TypeFilters.getElementNameFilter(name)).size() > 0) {
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
-    try {
-      List<String> resolvedParamSigs = CollectionUtility.arrayList();
-      if (TypeUtility.exists(TypeUtility.getMethod(TypeUtility.getToplevelType(declaringType), "get" + name, resolvedParamSigs))) {
-        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
-    }
-    catch (CoreException e) {
-      ScoutSdk.logError(e);
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Unknown Error. See Error Log View for details.");
+    IType formType = TypeUtility.getToplevelType(declaringType);
+    String plainName = removeFieldSuffix(name);
+    String pat = "(?:get|is)(?:" + name + "|" + plainName + ")";
+    Set<IMethod> existingMethods = TypeUtility.getMethods(formType, MethodFilters.getNameRegexFilter(Pattern.compile(pat)));
+    if (existingMethods.size() > 0) {
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
     }
     return javaFieldNameStatus;
   }

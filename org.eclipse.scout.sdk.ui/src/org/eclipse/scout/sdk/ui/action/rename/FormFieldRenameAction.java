@@ -12,14 +12,13 @@ package org.eclipse.scout.sdk.ui.action.rename;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.jdt.JdtRenameTransaction;
 import org.eclipse.scout.sdk.util.NamingUtility;
+import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -44,20 +43,7 @@ public class FormFieldRenameAction extends AbstractRenameAction {
 
   @Override
   protected IStatus validate(String newName) {
-    IStatus inheritedStatus = getJavaNameStatus(newName);
-    if (inheritedStatus.matches(IStatus.ERROR)) {
-      return inheritedStatus;
-    }
-    try {
-      if (findInnerType(getFormField().getCompilationUnit().getAllTypes()[0], newName, true) != null) {
-        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
-      }
-    }
-    catch (CoreException e) {
-      ScoutSdkUi.logError("error during finding already existing types in form.", e);
-      return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Exception in validation (see logfile).");
-    }
-    return inheritedStatus;
+    return ScoutUtility.validateFormFieldName(newName, SdkProperties.SUFFIX_FORM_FIELD, m_formField);
   }
 
   public IType getFormField() {

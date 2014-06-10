@@ -61,6 +61,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
 
   private IType m_modelType;
   private ITypeHierarchy m_localTypeHierarchy;
+  protected static final String SIG_FOR_IS_METHOD_NAME = Signature.SIG_BOOLEAN;
 
   public AbstractDtoTypeSourceBuilder(IType modelType, String elementName, IProgressMonitor monitor) {
     this(modelType, elementName, true, monitor);
@@ -215,76 +216,74 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
 
   protected void collectProperties(IProgressMonitor monitor) {
     Set<? extends IPropertyBean> beanPropertyDescriptors = TypeUtility.getPropertyBeans(getModelType(), ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
-    if (beanPropertyDescriptors != null) {
-      for (IPropertyBean desc : beanPropertyDescriptors) {
-        try {
+    for (IPropertyBean desc : beanPropertyDescriptors) {
+      try {
 
-          if (monitor.isCanceled()) {
-            return;
-          }
+        if (monitor.isCanceled()) {
+          return;
+        }
 
-          if (desc.getReadMethod() != null || desc.getWriteMethod() != null) {
-            if (FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getReadMethod())) &&
-                FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getWriteMethod()))) {
-              String beanName = NamingUtility.ensureValidParameterName(desc.getBeanName());
-              String lowerCaseBeanName = NamingUtility.ensureStartWithLowerCase(beanName);
-              final String upperCaseBeanName = NamingUtility.ensureStartWithUpperCase(beanName);
+        if (desc.getReadMethod() != null || desc.getWriteMethod() != null) {
+          if (FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getReadMethod())) &&
+              FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getWriteMethod()))) {
+            String beanName = NamingUtility.ensureValidParameterName(desc.getBeanName());
+            String lowerCaseBeanName = NamingUtility.ensureStartWithLowerCase(beanName);
+            final String upperCaseBeanName = NamingUtility.ensureStartWithUpperCase(beanName);
 
-              String propName = upperCaseBeanName + "Property";
-              String resolvedSignature = SignatureUtility.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());
-              String unboxedSignature = SignatureUtility.unboxPrimitiveSignature(resolvedSignature);
+            String propName = upperCaseBeanName + "Property";
+            String resolvedSignature = SignatureUtility.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());
+            String unboxedSignature = SignatureUtility.unboxPrimitiveSignature(resolvedSignature);
 
-              // property class
-              TypeSourceBuilder propertyTypeBuilder = new TypeSourceBuilder(propName);
-              propertyTypeBuilder.setFlags(Flags.AccPublic | Flags.AccStatic);
-              String superTypeSig = SignatureCache.createTypeSignature(IRuntimeClasses.AbstractPropertyData);
-              superTypeSig = superTypeSig.replaceAll("\\;$", "<" + unboxedSignature + ">;");
-              propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
-              IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
-              propertyTypeBuilder.addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
-              IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(propName);
-              propertyTypeBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
-              addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormDataPropertyKey(propertyTypeBuilder), propertyTypeBuilder);
+            // property class
+            TypeSourceBuilder propertyTypeBuilder = new TypeSourceBuilder(propName);
+            propertyTypeBuilder.setFlags(Flags.AccPublic | Flags.AccStatic);
+            String superTypeSig = SignatureCache.createTypeSignature(IRuntimeClasses.AbstractPropertyData);
+            superTypeSig = superTypeSig.replaceAll("\\;$", "<" + unboxedSignature + ">;");
+            propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
+            IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
+            propertyTypeBuilder.addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
+            IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(propName);
+            propertyTypeBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+            addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormDataPropertyKey(propertyTypeBuilder), propertyTypeBuilder);
 
-              // copy annotations over to the DTO
-              IMethod propertyMethod = desc.getReadMethod();
-              if (!TypeUtility.exists(propertyMethod)) {
-                propertyMethod = desc.getWriteMethod();
-              }
-              if (TypeUtility.exists(propertyMethod)) {
-                copyAnnotations(propertyMethod, propertyMethod.getDeclaringType(), propertyTypeBuilder);
-              }
-
-              // getter
-              IMethodSourceBuilder propertyGetterBuilder = new MethodSourceBuilder("get" + propName);
-              propertyGetterBuilder.setFlags(Flags.AccPublic);
-              propertyGetterBuilder.setReturnTypeSignature(Signature.createTypeSignature(propName, false));
-              propertyGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return getPropertyByClass(" + propName + ".class);"));
-              addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(propertyGetterBuilder), propertyGetterBuilder);
-
-              // legacy getter
-              IMethodSourceBuilder legacyPropertyGetterBuilder = new MethodSourceBuilder((Signature.SIG_BOOLEAN.equals(resolvedSignature) ? "is" : "get") + upperCaseBeanName);
-              legacyPropertyGetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
-              legacyPropertyGetterBuilder.setFlags(Flags.AccPublic);
-              legacyPropertyGetterBuilder.setReturnTypeSignature(resolvedSignature);
-              legacyPropertyGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(getLegacyGetterMethodBody(resolvedSignature, propName)));
-              addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertyGetterBuilder), legacyPropertyGetterBuilder);
-
-              // legacy setter
-              IMethodSourceBuilder legacyPropertySetterBuilder = new MethodSourceBuilder("set" + upperCaseBeanName);
-              legacyPropertySetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
-              legacyPropertySetterBuilder.setFlags(Flags.AccPublic);
-              legacyPropertySetterBuilder.setReturnTypeSignature(Signature.SIG_VOID);
-              legacyPropertySetterBuilder.addParameter(new MethodParameter(lowerCaseBeanName, resolvedSignature));
-              legacyPropertySetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("get" + propName + "().setValue(" + lowerCaseBeanName + ");"));
-              addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertySetterBuilder), legacyPropertySetterBuilder);
-
+            // copy annotations over to the DTO
+            IMethod propertyMethod = desc.getReadMethod();
+            if (!TypeUtility.exists(propertyMethod)) {
+              propertyMethod = desc.getWriteMethod();
             }
+            if (TypeUtility.exists(propertyMethod)) {
+              copyAnnotations(propertyMethod, propertyMethod.getDeclaringType(), propertyTypeBuilder);
+            }
+
+            // getter
+            IMethodSourceBuilder propertyGetterBuilder = new MethodSourceBuilder("get" + propName);
+            propertyGetterBuilder.setFlags(Flags.AccPublic);
+            propertyGetterBuilder.setReturnTypeSignature(Signature.createTypeSignature(propName, false));
+            propertyGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return getPropertyByClass(" + propName + ".class);"));
+            addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(propertyGetterBuilder), propertyGetterBuilder);
+
+            // legacy getter
+            IMethodSourceBuilder legacyPropertyGetterBuilder = new MethodSourceBuilder((SIG_FOR_IS_METHOD_NAME.equals(resolvedSignature) ? "is" : "get") + upperCaseBeanName);
+            legacyPropertyGetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
+            legacyPropertyGetterBuilder.setFlags(Flags.AccPublic);
+            legacyPropertyGetterBuilder.setReturnTypeSignature(resolvedSignature);
+            legacyPropertyGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(getLegacyGetterMethodBody(resolvedSignature, propName)));
+            addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertyGetterBuilder), legacyPropertyGetterBuilder);
+
+            // legacy setter
+            IMethodSourceBuilder legacyPropertySetterBuilder = new MethodSourceBuilder("set" + upperCaseBeanName);
+            legacyPropertySetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
+            legacyPropertySetterBuilder.setFlags(Flags.AccPublic);
+            legacyPropertySetterBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+            legacyPropertySetterBuilder.addParameter(new MethodParameter(lowerCaseBeanName, resolvedSignature));
+            legacyPropertySetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("get" + propName + "().setValue(" + lowerCaseBeanName + ");"));
+            addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertySetterBuilder), legacyPropertySetterBuilder);
+
           }
         }
-        catch (CoreException e) {
-          ScoutSdk.logError("could append property to form data '" + getElementName() + "'.", e);
-        }
+      }
+      catch (CoreException e) {
+        ScoutSdk.logError("could append property to form data '" + getElementName() + "'.", e);
       }
     }
   }
