@@ -16,6 +16,7 @@ import java.util.Iterator;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
@@ -51,11 +52,11 @@ public final class CachedPrimaryTypeHierarchy implements ICachedTypeHierarchy {
   }
 
   @Override
-  public boolean isSubtype(IType type, IType potentialSubtype) throws IllegalArgumentException {
-    if (!contains(type)) {
-      TypeHierarchy.throwTypeUnknown(type);
+  public boolean isSubtype(IType type, IType potentialSubtype) {
+    if (CompareUtility.equals(type, potentialSubtype)) {
+      return true;
     }
-    if (!isPrimary(potentialSubtype)) {
+    if (!isPrimary(type) || !isPrimary(potentialSubtype)) {
       return false;
     }
     return m_cachedTypeHierarchy.isSubtype(type, potentialSubtype);

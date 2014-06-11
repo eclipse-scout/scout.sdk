@@ -98,15 +98,18 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
 
   /**
    * Checks if the given potentialSubtype is a subtype of type.<br>
-   * In other words: returns true, if type is a supertype of potentialSubtype.
+   * <br>
+   * If type and potentialSubtype are equal, this method returns always {@code true}. <br>
+   * Otherwise it checks if potentialSubtype is a subtype of type according to this hierarchy. This means that if type
+   * or potentialSubtype are not part of the hierarchy, this method returns {@code false}, as long as the types are not
+   * equal.
    * 
    * @param type
    *          The base type.
    * @param potentialSubtype
    *          The type that should be checked if it is a subtype of type.
-   * @return true if the potentialSubtype is in the subtype hierarchy of the given type.
-   * @throws IllegalArgumentException
-   *           if the given type is unknown to this hierarchy.
+   * @return {@code true} if type and potentialSubtype are equal or potentialSubtype is a subtype of type according to
+   *         this hierarchy. {@code false} otherwise.
    */
   boolean isSubtype(IType type, IType potentialSubtype);
 
