@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>{@link AstUtility}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 27.02.2011
  */
@@ -62,7 +62,7 @@ public final class AstUtility {
 
   /**
    * Visits the given member using the given ast visitor.
-   * 
+   *
    * @param member
    * @param visitor
    */
@@ -72,7 +72,7 @@ public final class AstUtility {
 
   /**
    * Visits the given member using the given ast visitor.
-   * 
+   *
    * @param member
    * @param visitor
    * @param monitor
@@ -115,6 +115,7 @@ public final class AstUtility {
     return ASTParser.newParser(getLatestAstApiLevel());
   }
 
+  @SuppressWarnings("deprecation")
   public static int getLatestAstApiLevel() {
     int result = AST.JLS4; // min support Java 7 Level
     try {
