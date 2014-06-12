@@ -53,6 +53,7 @@ import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 
 /**
  * <h3>{@link ClassIdValidationJob}</h3>
@@ -68,16 +69,23 @@ public final class ClassIdValidationJob extends JobEx {
 
   private static IJavaResourceChangedListener listener;
   private final IType m_classIdType;
+  private final IType m_formDataBaseType;
+  private final IType m_formFieldDataBaseType; // does also include page datas
 
-  private ClassIdValidationJob(IType classIdType) {
+  private ClassIdValidationJob(IType classIdType, IType formDataBaseType, IType formFieldDataBaseType) {
     super(ClassIdValidationJob.class.getName());
     setSystem(true);
     setUser(false);
     setRule(new P_SchedulingRule());
     m_classIdType = classIdType;
+    m_formDataBaseType = formDataBaseType;
+    m_formFieldDataBaseType = formFieldDataBaseType;
   }
 
   private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(IProgressMonitor monitor) {
+    final ICachedTypeHierarchy formDataHierarchy = TypeUtility.getTypeHierarchy(m_formDataBaseType);
+    final ICachedTypeHierarchy formFieldDataHierarchy = TypeUtility.getTypeHierarchy(m_formFieldDataBaseType);
+
     final HashSet<IAnnotation> result = new HashSet<IAnnotation>();
     try {
       SearchEngine e = new SearchEngine();
@@ -86,20 +94,22 @@ public final class ClassIdValidationJob extends JobEx {
           SearchEngine.createWorkspaceScope(), new SearchRequestor() {
             @Override
             public void acceptSearchMatch(SearchMatch match) throws CoreException {
-              IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
-              if (element == null) {
-                // e.g. when the annotation is fully qualified. try reading from owner
-                Object owner = match.getElement();
-                if (owner instanceof IType) {
-                  IType ownerType = (IType) owner;
-                  if (!ownerType.isBinary() && TypeUtility.exists(ownerType)) {
-                    element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
+              Object owner = match.getElement();
+              if (owner instanceof IType) {
+                IType ownerType = (IType) owner;
+                if (TypeUtility.exists(ownerType)) {
+                  // do not check for annotation duplicates within DTOs.
+                  if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType)) {
+                    IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
+                    if (element == null) {
+                      // e.g. when the annotation is fully qualified. try reading from owner
+                      element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
+                    }
+                    if (element instanceof IAnnotation && TypeUtility.exists(element)) {
+                      result.add((IAnnotation) element);
+                    }
                   }
                 }
-              }
-
-              if (element instanceof IAnnotation && !element.isReadOnly() && TypeUtility.exists(element)) {
-                result.add((IAnnotation) element);
               }
             }
           }, monitor);
@@ -249,11 +259,12 @@ public final class ClassIdValidationJob extends JobEx {
       protected IStatus run(IProgressMonitor monitor) {
         // get the class id type outside of the validation job
         // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
-        ScoutSdkCore.getScoutWorkspace().getBundleGraph().waitFor();
         IType classId = TypeUtility.getType(IRuntimeClasses.ClassId);
-        if (TypeUtility.exists(classId)) {
+        IType abstractFormData = TypeUtility.getType(IRuntimeClasses.AbstractFormData);
+        IType abstractFormFieldData = TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData);
+        if (TypeUtility.exists(classId) && TypeUtility.exists(abstractFormData) && TypeUtility.exists(abstractFormFieldData)) {
           Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
-          new ClassIdValidationJob(classId).schedule(startDelay);
+          new ClassIdValidationJob(classId, abstractFormData, abstractFormFieldData).schedule(startDelay);
         }
         return Status.OK_STATUS;
       }
