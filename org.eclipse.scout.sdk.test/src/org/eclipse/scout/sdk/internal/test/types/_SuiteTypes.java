@@ -16,7 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * <h3>{@link _SuiteTypes}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 22.04.2010
  */
@@ -27,7 +27,8 @@ import org.junit.runners.Suite.SuiteClasses;
     TypeHierarchyTest1.class,
     TypeHierarchyTest2.class,
     PrimaryTypeHierarchyTest.class,
-    TypeUtilityTest.class
+    TypeUtilityTest.class,
+    ProjectContextTypeHierarchyResultTest.class
 })
 public class _SuiteTypes {
 
