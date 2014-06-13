@@ -53,7 +53,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link AbstractDtoTypeSourceBuilder}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
@@ -232,13 +232,16 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
 
             String propName = upperCaseBeanName + "Property";
             String resolvedSignature = SignatureUtility.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());
+            if (!StringUtility.hasText(resolvedSignature)) {
+              resolvedSignature = SignatureCache.createTypeSignature(Object.class.getName());
+            }
             String unboxedSignature = SignatureUtility.unboxPrimitiveSignature(resolvedSignature);
 
             // property class
             TypeSourceBuilder propertyTypeBuilder = new TypeSourceBuilder(propName);
             propertyTypeBuilder.setFlags(Flags.AccPublic | Flags.AccStatic);
             String superTypeSig = SignatureCache.createTypeSignature(IRuntimeClasses.AbstractPropertyData);
-            superTypeSig = superTypeSig.replaceAll("\\;$", "<" + unboxedSignature + ">;");
+            superTypeSig = DtoUtility.ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll("<" + unboxedSignature + ">;");
             propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
             IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
             propertyTypeBuilder.addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
