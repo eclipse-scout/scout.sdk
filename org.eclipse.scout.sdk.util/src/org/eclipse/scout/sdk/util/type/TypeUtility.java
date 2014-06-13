@@ -88,6 +88,34 @@ public class TypeUtility {
     return TypeCache.getInstance().getTypes(typeName);
   }
 
+  /**
+   * Gets all types of the given {@link ICompilationUnit} that match the given filter recursively.
+   *
+   * @param icu
+   *          The {@link ICompilationUnit} for which all types should be returned.
+   * @param filter
+   *          The filter or null if not filtering is desired.
+   * @return A {@link List} containing all types recursively within the given {@link ICompilationUnit}.
+   * @throws JavaModelException
+   */
+  public static List<IType> getAllTypes(ICompilationUnit icu, ITypeFilter filter) throws JavaModelException {
+    List<IType> result = new ArrayList<IType>();
+    for (IType t : icu.getTypes()) {
+      collectTypesInType(t, result, filter);
+    }
+    return result;
+  }
+
+  private static void collectTypesInType(IType type, Collection<IType> result, ITypeFilter filter) throws JavaModelException {
+    if (filter == null || filter.accept(type)) {
+      result.add(type);
+    }
+
+    for (IType t : type.getTypes()) {
+      collectTypesInType(t, result, filter);
+    }
+  }
+
   public static boolean existsType(String typeName) {
     return exists(getType(typeName));
   }
@@ -116,7 +144,7 @@ public class TypeUtility {
   /**
    * Returns the immediate member types declared by the given type. The results is filtered using the given filter and
    * sorted using the given comparator.
-   * 
+   *
    * @param type
    *          The type whose immediate inner types should be returned.
    * @param filter
@@ -154,7 +182,7 @@ public class TypeUtility {
   /**
    * Returns the immediate member types declared by the given type which are subtypes of the given supertype. The
    * results is sorted using the given comparator.
-   * 
+   *
    * @param declaringType
    *          The type whose immediate inner types should be returned.
    * @param supertype
@@ -178,7 +206,7 @@ public class TypeUtility {
 
   /**
    * To get a type hierarchy with the given elements as scope.
-   * 
+   *
    * @param elements
    * @return
    * @throws JavaModelException
@@ -203,7 +231,7 @@ public class TypeUtility {
 
   /**
    * To get a type hierarchy with the given elements as scope.
-   * 
+   *
    * @param elements
    * @return
    * @throws JavaModelException
@@ -234,7 +262,7 @@ public class TypeUtility {
 
   /**
    * To get a type hierarchy containing this type, all of its supertypes, and all its subtypes.<br>
-   * 
+   *
    * @param type
    *          the type to get the hierarchy for
    * @return the cached type hierarchy or null if type does not exist or hierarchy could not be created.
@@ -247,7 +275,7 @@ public class TypeUtility {
    * Creates a primary type hierarchy only containing primary {@link IType}s.<br>
    * Primary types are all except nested types. Or more formally: {@link IType}s for which
    * <code>{@link IType#getDeclaringType()} == null</code>.
-   * 
+   *
    * @param type
    *          The base type of the primary type hierarchy.
    * @return The primary type hierarchy. The hierarchy will only be initialized with values on first use and will be
@@ -321,7 +349,7 @@ public class TypeUtility {
   /**
    * Searches and returns the first method with the given name in the given type.<br>
    * If multiple methods with the same name exist (overloads), the returned method is undefined.
-   * 
+   *
    * @param type
    *          The type in which the method should be searched.
    * @param methodName
@@ -339,7 +367,7 @@ public class TypeUtility {
   /**
    * Gets all methods in the given type.<br>
    * The methods are in no particular order.
-   * 
+   *
    * @param type
    *          The type to get all methods of.
    * @return A {@link Set} of all methods of the given type. Never returns null.
@@ -351,7 +379,7 @@ public class TypeUtility {
   /**
    * Gets all methods in the given type that match the given filter.<br>
    * The methods are in no particular order.
-   * 
+   *
    * @param type
    *          The type to get all methods of.
    * @param filter
@@ -366,7 +394,7 @@ public class TypeUtility {
    * Gets all methods in the given type (no methods of inner types) that match the given filter ordered by the given
    * comparator.<br>
    * If the given comparator is null, the order of the methods is undefined.
-   * 
+   *
    * @param type
    *          The type to get all methods of.
    * @param filter
@@ -567,7 +595,7 @@ public class TypeUtility {
    * // A.getTopLevelType() returns A<br>
    * // D.getTopLevelType() returns A
    * </code>
-   * 
+   *
    * @return the primary type of the compilation unit this type is declared in.
    */
   public static IType getToplevelType(IJavaElement e) {
@@ -618,7 +646,7 @@ public class TypeUtility {
 
   /**
    * Tries to find the fully qualified class name of the given simple name based on the context of the given type.
-   * 
+   *
    * @param declaringType
    *          The context type for which the simple name should be resolved.
    * @param typeName
@@ -703,7 +731,7 @@ public class TypeUtility {
    * If a is a subtype of b or b is null: a is returned.<br>
    * If b is a subtype of a or a is null: b is returned.<br>
    * If both are null or they have no common supertype: null is returned.
-   * 
+   *
    * @param a
    *          The first {@link IType}
    * @param b
@@ -773,7 +801,7 @@ public class TypeUtility {
 
   /**
    * checks whether element is on the classpath of the given project
-   * 
+   *
    * @param element
    *          the element to search
    * @param project
@@ -810,14 +838,14 @@ public class TypeUtility {
   /**
    * Collects all property beans declared directly in the given type by search methods with the following naming
    * convention:
-   * 
+   *
    * <pre>
    * public <em>&lt;PropertyType&gt;</em> get<em>&lt;PropertyName&gt;</em>();
    * public void set<em>&lt;PropertyName&gt;</em>(<em>&lt;PropertyType&gt;</em> a);
    * </pre>
-   * 
+   *
    * If <code>PropertyType</code> is a boolean property, the following getter is expected
-   * 
+   *
    * <pre>
    * public boolean is<em>&lt;PropertyName&gt;</em>();
    * </pre>
@@ -825,7 +853,7 @@ public class TypeUtility {
    * This implementation tries to determine the field by using the JDT code style settings stored in the Eclipse
    * preferences. Prefixes and suffixes used for fields must be declared. The default prefix Scout uses for fields (
    * <code>m_</code>) is added by default.
-   * 
+   *
    * @param type
    *          the type within properties are searched
    * @param propertyFilter
@@ -932,7 +960,7 @@ public class TypeUtility {
   /**
    * To find out if the given child element is an ancestor of the given parent element. If parent and child is the same
    * element true is returned.
-   * 
+   *
    * @param parent
    * @param child
    * @return
@@ -966,7 +994,7 @@ public class TypeUtility {
    * Tries to find a method in the given type and all supertypes and super interfaces.<br>
    * If multiple methods with the same name exist in a type (overloads), the first is returned as they appear in the
    * source or class file.
-   * 
+   *
    * @param methodName
    *          the name of the method
    * @param type
@@ -1026,7 +1054,7 @@ public class TypeUtility {
   /**
    * Tries to determine the field the given property is based on. All combinations of the given pre- and suffixes are
    * used to find the field. If none of them matches with a method <code>null</code> is returned.
-   * 
+   *
    * @param beanName
    * @param fields
    * @param fieldPrefixes
@@ -1047,7 +1075,7 @@ public class TypeUtility {
 
   /**
    * Converts the given two-dimensional array of chars into an array of strings and adds the given additional values.
-   * 
+   *
    * @param arrayOfChars
    * @param additionalValues
    * @return

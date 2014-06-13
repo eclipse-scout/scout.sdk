@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.util;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.regex.Pattern;
@@ -109,7 +110,7 @@ public final class ScoutUtility {
    * Returns the user name of the current thread. If the current thread has no user name set, the system property is
    * returned.<br>
    * Use {@link ScoutUtility#setUsernameForThread(String)} to define the user name for the current thread.
-   * 
+   *
    * @return The user name of the thread or the system if no user name is defined on the thread.
    */
   public static String getUsername() {
@@ -122,7 +123,7 @@ public final class ScoutUtility {
 
   /**
    * Sets the user name that should be returned by {@link ScoutUtility#getUsername()} for the current thread.
-   * 
+   *
    * @param newUsernameForCurrentThread
    *          the new user name
    */
@@ -138,7 +139,7 @@ public final class ScoutUtility {
    * strips a (IMethod) method body from its comments
    * this is needed in order to avoid wrong method property
    * assignments.
-   * 
+   *
    * @param methodBody
    * @return
    */
@@ -249,7 +250,7 @@ public final class ScoutUtility {
 
   /**
    * Returns true if the package fragment has class files in it.
-   * 
+   *
    * @param packageFragment
    * @param includeSubpackages
    *          to include all sub packages
@@ -271,7 +272,7 @@ public final class ScoutUtility {
   /**
    * Gets the bundle type for the given product file. This is the type of first type-defining-bundle that is found in
    * the dependencies of the given project.
-   * 
+   *
    * @param productFile
    *          The product file.
    * @return The type of the type-defining bundle with the lowest (first) order number. If no type-defining-bundle is in
@@ -458,7 +459,7 @@ public final class ScoutUtility {
   /**
    * Gets the status of the given java name. Checks if a name that differs from the suffix is entered and that the name
    * is a valid java name.
-   * 
+   *
    * @param name
    *          The name to check
    * @param suffix
@@ -482,7 +483,7 @@ public final class ScoutUtility {
 
   /**
    * Gets the status of a form field to be created.
-   * 
+   *
    * @param name
    *          The name of the field
    * @param suffix
@@ -496,8 +497,16 @@ public final class ScoutUtility {
     if (javaFieldNameStatus.getSeverity() > IStatus.WARNING) {
       return javaFieldNameStatus;
     }
-    if (ScoutTypeUtility.getAllTypes(declaringType.getCompilationUnit(), TypeFilters.getElementNameFilter(name)).size() > 0) {
-      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+
+    try {
+      List<IType> allTypesWithSameSimpleName = TypeUtility.getAllTypes(declaringType.getCompilationUnit(), TypeFilters.getElementNameFilter(name));
+      if (allTypesWithSameSimpleName.size() > 0) {
+        return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      }
+    }
+    catch (JavaModelException e) {
+      ScoutSdk.logError("unable to get all types in '" + declaringType.getCompilationUnit().getElementName() + "'.", e);
+      return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Fatal: " + e.getMessage());
     }
     IType formType = TypeUtility.getToplevelType(declaringType);
     String plainName = removeFieldSuffix(name);
@@ -513,7 +522,7 @@ public final class ScoutUtility {
    * Gets the validation status for a potential new class in the given bundle, below the given package suffix with given
    * name.<br>
    * The method does no check for java classes, but checks if there exists a resource with the target name already.
-   * 
+   *
    * @param container
    *          The bundle in which the type would be created.
    * @param packageSuffix
@@ -571,7 +580,7 @@ public final class ScoutUtility {
    * (=dependencies) of the given reference bundle.<br>
    * <br>
    * Types that are not found in any of the parent bundles (=dependencies) are ignored.
-   * 
+   *
    * @param candidates
    *          The list of types.
    * @param reference

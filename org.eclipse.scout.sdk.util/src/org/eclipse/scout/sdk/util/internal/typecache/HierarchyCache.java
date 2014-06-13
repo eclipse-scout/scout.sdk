@@ -191,7 +191,7 @@ public final class HierarchyCache implements IHierarchyCache {
     }
   }
 
-  private void handleCompilationUnitChangedExternal(ICompilationUnit icu) {
+  private void handleCompilationUnitChanged(ICompilationUnit icu) {
     if (!TypeUtility.exists(icu)) {
       return;
     }
@@ -232,17 +232,7 @@ public final class HierarchyCache implements IHierarchyCache {
           handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());
         }
         else if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
-          ICompilationUnit icu = (ICompilationUnit) e.getElement();
-          if (TypeUtility.exists(icu)) {
-            try {
-              for (IType t : icu.getTypes()) {
-                handleTypeChange(t, e.getSuperTypeHierarchy());
-              }
-            }
-            catch (JavaModelException ex) {
-              SdkUtilActivator.logError(ex);
-            }
-          }
+          handleCompilationUnitChanged((ICompilationUnit) e.getElement());
         }
         else if (e.getElementType() == IJavaElement.JAVA_PROJECT) {
           if ((e.getFlags() & IJavaElementDelta.F_OPENED) != 0 || e.getFlags() == 0) {
@@ -270,7 +260,7 @@ public final class HierarchyCache implements IHierarchyCache {
       }
       case JavaResourceChangedEmitter.CHANGED_EXTERNAL:
         if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
-          handleCompilationUnitChangedExternal((ICompilationUnit) e.getElement());
+          handleCompilationUnitChanged((ICompilationUnit) e.getElement());
         }
         else if (e.getElementType() == IJavaElement.TYPE) {
           handleTypeChange((IType) e.getElement(), e.getSuperTypeHierarchy());

@@ -48,16 +48,18 @@ import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link ClassIdValidationJob}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 20.05.2014
  */
@@ -99,7 +101,8 @@ public final class ClassIdValidationJob extends JobEx {
                 IType ownerType = (IType) owner;
                 if (TypeUtility.exists(ownerType)) {
                   // do not check for annotation duplicates within DTOs.
-                  if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType)) {
+                  IType toplevelType = ScoutTypeUtility.getToplevelType(ownerType);
+                  if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType) && !formDataHierarchy.contains(toplevelType) && !formFieldDataHierarchy.contains(toplevelType)) {
                     IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
                     if (element == null) {
                       // e.g. when the annotation is fully qualified. try reading from owner
@@ -254,6 +257,12 @@ public final class ClassIdValidationJob extends JobEx {
   }
 
   public static synchronized void executeAsync(final long startDelay) {
+    Job currentJob = Job.getJobManager().currentJob();
+    if (currentJob instanceof OperationJob) {
+      // do not schedule a check run if the event comes from the scout sdk itself. we assume it does a correct job.
+      return;
+    }
+
     Job j = new Job("schedule classid validation") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {

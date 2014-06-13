@@ -21,8 +21,10 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jface.viewers.ILabelProvider;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IBeanPropertyNewOperation;
@@ -42,7 +44,6 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.GridData;
@@ -75,7 +76,13 @@ public class BeanPropertyNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("NewPropertyBeanDesc"));
 
     ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(m_declaringType);
-    m_allValueFields = ScoutTypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IValueField), typeHierarchy));
+    try {
+      m_allValueFields = TypeUtility.getAllTypes(m_declaringType.getCompilationUnit(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IValueField), typeHierarchy));
+    }
+    catch (JavaModelException e) {
+      ScoutSdkUi.logError("unable to get value fields in '" + m_declaringType.getCompilationUnit().getElementName() + "'.", e);
+      m_allValueFields = CollectionUtility.arrayList();
+    }
   }
 
   @Override

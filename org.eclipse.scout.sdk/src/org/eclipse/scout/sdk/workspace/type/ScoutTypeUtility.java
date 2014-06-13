@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.workspace.type;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.Deque;
 import java.util.EnumSet;
@@ -27,7 +26,6 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
-import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
@@ -86,7 +84,7 @@ public class ScoutTypeUtility extends TypeUtility {
   /**
    * Returns the immediate member types declared by the given type which are sub-types of the given super-type. The
    * results is sorted using the order annotation of the types.
-   * 
+   *
    * @param declaringType
    *          The type whose immediate inner types should be returned.
    * @param superType
@@ -107,7 +105,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   /**
    * checks whether element is on the classpath of the given bundle
-   * 
+   *
    * @param element
    *          the element to search
    * @param bundle
@@ -120,7 +118,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   /**
    * checks whether element is on the classpath of the given bundle
-   * 
+   *
    * @param element
    *          the element to search
    * @param bundle
@@ -141,7 +139,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * }
    * // execCreateChildPages.getAllNewTypeOccurrences() returns Set<IType>[A,B}]
    * </xmp>
-   * 
+   *
    * @return
    * @throws JavaModelException
    */
@@ -207,7 +205,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   /**
    * Gets all {@link IType}s referenced as {@link TypeLiteral}s in the given {@link IAnnotation}.
-   * 
+   *
    * @param annotation
    *          The annotation for which the referenced types should be returned.
    * @param declaringType
@@ -240,7 +238,7 @@ public class ScoutTypeUtility extends TypeUtility {
   /**
    * Gets the form data type that is referenced in the form data annotation of the given form.<br>
    * If the annotation does not exist or points to an inexistent form data type, null is returned.
-   * 
+   *
    * @param form
    *          the form for which the form data should be returned.
    * @return the form data type or null if it could not be found.
@@ -259,7 +257,7 @@ public class ScoutTypeUtility extends TypeUtility {
   /**
    * Gets the page data type that is referenced in the page data annotation of the given page type.<br>
    * If the annotation does not exist or points to an inexistent page data type, null is returned.
-   * 
+   *
    * @param page
    *          the page for which the page data should be returned.
    * @return the page data class or null.
@@ -460,7 +458,7 @@ public class ScoutTypeUtility extends TypeUtility {
   /**
    * Parses the possible available {@link IRuntimeClasses#PageData} annotation on the given type. If the type is not
    * annotated, <code>null</code> is returned.
-   * 
+   *
    * @since 3.10.0-M1
    */
   public static PageDataAnnotation findPageDataAnnotation(IType type, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
@@ -497,7 +495,7 @@ public class ScoutTypeUtility extends TypeUtility {
   /**
    * Checks whether the given type is annotated with a {@link IRuntimeClasses#PageData} annotation and if so, this
    * method returns its <code>value()</code> as resolved type signature. Otherwise <code>null</code>.
-   * 
+   *
    * @since 3.10.0-M1
    */
   private static String getPageDataAnnotationValue(IType type) throws JavaModelException {
@@ -524,7 +522,7 @@ public class ScoutTypeUtility extends TypeUtility {
   /**
    * Parses the possible available {@link IRuntimeClasses#ColumnData} annotation on the given type. If the type is not
    * annotated, <code>null</code> is returned.
-   * 
+   *
    * @since 3.10.0-M5
    */
   public static SdkColumnCommand findColumnDataSdkColumnCommand(IType type, ITypeHierarchy superTypeHierarchy) {
@@ -550,7 +548,7 @@ public class ScoutTypeUtility extends TypeUtility {
   /**
    * Checks whether the given type is annotated with a {@link IRuntimeClasses#ColumnData} annotation and if so, this
    * method returns its <code>value()</code> as resolved type signature. Otherwise <code>null</code>.
-   * 
+   *
    * @since 3.10.0-M5
    */
   private static SdkColumnCommand getColumnDataAnnotationValue(IType type) {
@@ -624,29 +622,6 @@ public class ScoutTypeUtility extends TypeUtility {
     return CollectionUtility.hashSet();
   }
 
-  public static List<IType> getAllTypes(ICompilationUnit icu, ITypeFilter filter) {
-    List<IType> result = new ArrayList<IType>();
-    try {
-      for (IType t : icu.getTypes()) {
-        collectTypesTypes(t, result, filter);
-      }
-    }
-    catch (JavaModelException e) {
-      ScoutSdk.logError("could not get types of '" + icu.getElementName() + "'.", e);
-    }
-    return result;
-  }
-
-  private static void collectTypesTypes(IType type, Collection<IType> result, ITypeFilter filter) throws JavaModelException {
-    if (filter.accept(type)) {
-      result.add(type);
-    }
-
-    for (IType t : type.getTypes()) {
-      collectTypesTypes(t, result, filter);
-    }
-  }
-
   public static Set<IType> getFormFields(IType declaringType) {
     return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.IFormField), ScoutTypeComparators.getOrderAnnotationComparator());
   }
@@ -705,7 +680,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   /**
    * Gets the signature of the generic describing the data type of nested code types.
-   * 
+   *
    * @param codeType
    *          The code type whose generic attribute should be parsed
    * @param superTypeHierarchy
@@ -1117,7 +1092,7 @@ public class ScoutTypeUtility extends TypeUtility {
 
   /**
    * don not hang on this object.
-   * 
+   *
    * @param type
    * @return
    */
@@ -1631,7 +1606,7 @@ public class ScoutTypeUtility extends TypeUtility {
   /**
    * Gets all server session classes (not abstract, not an interface, not deprecated) that are in the given scout
    * bundle.
-   * 
+   *
    * @param bundle
    *          The scout bundle in which the session classes must be found.
    * @return All server session classes in the given scout bundle ordered by name.
@@ -1644,7 +1619,7 @@ public class ScoutTypeUtility extends TypeUtility {
   /**
    * Gets all client session classes (not abstract, not an interface, not deprecated) that are in the given scout
    * bundle.
-   * 
+   *
    * @param bundle
    *          The scout bundle in which the session classes must be found.
    * @return All client session classes in the given scout bundle ordered by name.
@@ -1659,7 +1634,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * given java project.<br>
    * The session must not be within the given project. It is sufficient if the session class is on the classpath of the
    * project to be part of the result!
-   * 
+   *
    * @param context
    *          The java project whose classpath should be evaluated.
    * @return All server sessions that are on the classpath of the given java project ordered by name.
@@ -1674,7 +1649,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * given java project.<br>
    * The session must not be within the given project. It is sufficient if the session class is on the classpath of the
    * project to be part of the result!
-   * 
+   *
    * @param context
    *          The java project whose classpath should be evaluated.
    * @return All client sessions that are on the classpath of the given java project ordered by name.
@@ -1695,7 +1670,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * {@link NullPointerException} is thrown.<br>
    * If the scout bundle that belongs to the given java project is of type client, client sessions are searched. If it
    * is of type server, server sessions are returned. Otherwise null is returned.
-   * 
+   *
    * @param context
    * @return The session classes based on the project type ordered by name or null.
    * @throws NullPointerException

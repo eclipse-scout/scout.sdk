@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -32,7 +33,6 @@ import org.eclipse.scout.sdk.util.type.MethodFilters;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 public class PropertyBeansRenameAction extends AbstractRenameAction {
 
@@ -88,12 +88,18 @@ public class PropertyBeansRenameAction extends AbstractRenameAction {
     for (IPropertyBean bean : m_propertyBeanDescriptors) {
       // check that no value field has the same name. this could lead to errors in form data generation (duplicate methods).
       ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(bean.getDeclaringType());
-      List<IType> allValueFields = ScoutTypeUtility.getAllTypes(bean.getDeclaringType().getCompilationUnit(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IValueField), typeHierarchy));
-      for (IType valueField : allValueFields) {
-        String fieldName = ScoutUtility.removeFieldSuffix(valueField.getElementName());
-        if (name.equals(fieldName)) {
-          return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+      try {
+        List<IType> allValueFields = TypeUtility.getAllTypes(bean.getDeclaringType().getCompilationUnit(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IValueField), typeHierarchy));
+        for (IType valueField : allValueFields) {
+          String fieldName = ScoutUtility.removeFieldSuffix(valueField.getElementName());
+          if (name.equals(fieldName)) {
+            return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
+          }
         }
+      }
+      catch (JavaModelException e) {
+        ScoutSdkUi.logError("unable to validate property rename", e);
+        return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, "Fatal: " + e.getMessage());
       }
 
       if (TypeUtility.getMethods(bean.getDeclaringType(), MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is)" + name))).size() > 0) {
