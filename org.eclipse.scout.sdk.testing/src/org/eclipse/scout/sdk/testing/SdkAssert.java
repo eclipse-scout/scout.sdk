@@ -48,7 +48,7 @@ import org.junit.Assert;
 
 /**
  * <h3>{@link SdkAssert}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 05.04.2013
  */
@@ -63,7 +63,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the <code>element</code> does not exist.
-   * 
+   *
    * @param message
    * @param element
    */
@@ -91,7 +91,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the <code>element</code> does exist.
-   * 
+   *
    * @param message
    * @param element
    */
@@ -119,7 +119,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if no type with the <code>fullyQualifiedTypeName</code> exists.
-   * 
+   *
    * @param message
    * @param fullyQualifiedTypeName
    * @return the type if found.
@@ -146,7 +146,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if no type with the <code>signature</code> exists.
-   * 
+   *
    * @param message
    * @param signature
    * @return the type if found.
@@ -173,7 +173,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the <code>icu</code> does not contain an inner type named <code>typeName</code>.
-   * 
+   *
    * @param message
    * @param icu
    * @param typeName
@@ -204,7 +204,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the <code>declaringType</code> does not contains an inner type named <code>typeName</code>.
-   * 
+   *
    * @param message
    * @param declaringType
    * @param typeName
@@ -235,7 +235,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the <code>type</code> does not contain a method named <code>methodName</code>.
-   * 
+   *
    * @param message
    * @param type
    * @param methodName
@@ -263,7 +263,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the <code>type</code> does not contain a method named <code>methodName</code>.
-   * 
+   *
    * @param message
    * @param type
    * @param methodName
@@ -322,7 +322,7 @@ public class SdkAssert extends Assert {
   /**
    * fails if the <code>type</code> or any super type (interface or superclass) does not contain a method named
    * <code>methodName</code>.
-   * 
+   *
    * @param message
    * @param type
    * @param methodName
@@ -457,7 +457,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the type does not have a field named <code>fieldName</code>.
-   * 
+   *
    * @param message
    * @param type
    * @param fieldName
@@ -505,7 +505,7 @@ public class SdkAssert extends Assert {
   /**
    * fails if the type does not have a supertype (superclass or interface) with the <code>superTypeFqn</code> (fully
    * qualified name).
-   * 
+   *
    * @param message
    * @param type
    * @param superTypeFqn
@@ -583,7 +583,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the type does not have a field called <code> serialVersionUID</code>.
-   * 
+   *
    * @param message
    * @param type
    * @return
@@ -621,7 +621,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the <code> annotatable</code> does not have an order annotation with the <code>orderNr</code>.
-   * 
+   *
    * @param message
    * @param annotatable
    * @param orderNr
@@ -653,7 +653,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the elements does not have the same parent element.
-   * 
+   *
    * @param message
    * @param elements
    */
@@ -680,7 +680,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the elements does not appear in the arrays sequence in the source code.
-   * 
+   *
    * @param message
    * @param elements
    * @throws JavaModelException
@@ -719,7 +719,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the service interface is not registered as a proxy service in the projects plugin.xml.
-   * 
+   *
    * @param project
    * @param serviceInterface
    */
@@ -736,7 +736,7 @@ public class SdkAssert extends Assert {
 
   /**
    * fails if the given service interface is not registered as a service extension in the projects plugin.xml.
-   * 
+   *
    * @param project
    * @param serviceInterface
    */
@@ -754,11 +754,11 @@ public class SdkAssert extends Assert {
   /**
    * fails if the member does not have the private flag. <br>
    * The following example for a private static member.
-   * 
+   *
    * <pre>
    * SdkAssert.assertPrivate(aMember).assertStatic().assertNoMoreFlags();
    * </pre>
-   * 
+   *
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
    * @throws JavaModelException
@@ -774,11 +774,11 @@ public class SdkAssert extends Assert {
   /**
    * fails if the member does not have the <b><code>private</code></b> flag. <br>
    * The following example for a private static member.
-   * 
+   *
    * <pre>
    * SdkAssert.assertPrivate(aMember).assertStatic().assertNoMoreFlags();
    * </pre>
-   * 
+   *
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
@@ -798,11 +798,11 @@ public class SdkAssert extends Assert {
   /**
    * fails if the member does not have the <b><code>protected</code></b> flag. <br>
    * The following example for a private static member.
-   * 
+   *
    * <pre>
    * SdkAssert.assertPrivate(aMember).assertStatic().assertNoMoreFlags();
    * </pre>
-   * 
+   *
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
@@ -822,11 +822,11 @@ public class SdkAssert extends Assert {
   /**
    * fails if the member does not have the <b><code>public</code></b> flag. <br>
    * The following example for a private static member.
-   * 
+   *
    * <pre>
    * SdkAssert.assertPrivate(aMember).assertStatic().assertNoMoreFlags();
    * </pre>
-   * 
+   *
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
@@ -846,11 +846,11 @@ public class SdkAssert extends Assert {
   /**
    * fails if the member does not have the <b><code>abstract</code></b> flag. <br>
    * The following example for a private static member.
-   * 
+   *
    * <pre>
    * SdkAssert.assertPrivate(aMember).assertStatic().assertNoMoreFlags();
    * </pre>
-   * 
+   *
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
@@ -870,11 +870,11 @@ public class SdkAssert extends Assert {
   /**
    * fails if the member does not have the <b><code>final</code></b> flag. <br>
    * The following example for a private static member.
-   * 
+   *
    * <pre>
    * SdkAssert.assertPrivate(aMember).assertStatic().assertNoMoreFlags();
    * </pre>
-   * 
+   *
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
@@ -894,11 +894,11 @@ public class SdkAssert extends Assert {
   /**
    * fails if the member does not have the <b><code>interface</code></b> flag. <br>
    * The following example for a private static member.
-   * 
+   *
    * <pre>
    * SdkAssert.assertPrivate(aMember).assertStatic().assertNoMoreFlags();
    * </pre>
-   * 
+   *
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
@@ -918,11 +918,11 @@ public class SdkAssert extends Assert {
   /**
    * fails if the member does not have the <b><code>static</code></b> flag. <br>
    * The following example for a private static member.
-   * 
+   *
    * <pre>
    * SdkAssert.assertPrivate(aMember).assertStatic().assertNoMoreFlags();
    * </pre>
-   * 
+   *
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
@@ -1032,6 +1032,7 @@ public class SdkAssert extends Assert {
           message.append(" '").append(m_member.getElementName()).append("'");
         }
         message.append(" is not ").append(flagName).append("!");
+        fail(message.toString());
       }
       else {
         fail(m_message);
