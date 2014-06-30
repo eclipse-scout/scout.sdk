@@ -27,7 +27,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link ServiceNewOperationTest}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
@@ -108,7 +108,6 @@ public class ServiceNewOperationTest extends AbstractSdkTestWithSampleProject {
 
     // method interface
     IMethod interfaceMethod = SdkAssert.assertMethodExist(serviceInterface, methodName);
-    SdkAssert.assertPublic(interfaceMethod).assertNoMoreFlags();
     SdkAssert.assertEquals(2, interfaceMethod.getParameterTypes().length);
     SdkAssert.assertEquals("QString;", interfaceMethod.getParameterTypes()[0]);
     SdkAssert.assertEquals("QLong;", interfaceMethod.getParameterTypes()[1]);

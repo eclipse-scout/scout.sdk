@@ -72,7 +72,7 @@ public class ToolbuttonNewOperationTest extends AbstractSdkTestWithSampleProject
     SdkAssert.assertExist(createdToolbutton);
     SdkAssert.assertPublic(createdToolbutton).assertNoMoreFlags();
     IMethod getTextMethod = SdkAssert.assertMethodExist(createdToolbutton, SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
-    SdkAssert.assertPublic(getTextMethod).assertNoMoreFlags();
+    SdkAssert.assertProtected(getTextMethod).assertNoMoreFlags();
     IType[] toolButtons = TypeUtility.getInnerTypesOrdered(desktop, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
     SdkAssert.assertEquals(4, toolButtons.length);
     SdkAssert.assertEquals(toolbuttonOp.getElementName(), toolButtons[1].getElementName());

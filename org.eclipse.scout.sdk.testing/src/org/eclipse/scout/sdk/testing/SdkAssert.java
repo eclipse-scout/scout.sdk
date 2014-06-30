@@ -358,7 +358,6 @@ public class SdkAssert extends Assert {
         message = messageBuilder.toString();
       }
       fail(message);
-
     }
   }
 
@@ -534,7 +533,6 @@ public class SdkAssert extends Assert {
         message = messageBuilder.toString();
       }
       fail(message);
-
     }
   }
 
@@ -1017,6 +1015,7 @@ public class SdkAssert extends Assert {
             message.append(" '").append(m_member.getElementName()).append("'");
           }
           message.append(" has still flags [").append(Flags.toString(m_flags)).append("]!");
+          fail(message.toString());
         }
         else {
           fail(m_message);
