@@ -46,7 +46,7 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
  * <h3>{@link AbstractScoutProjectPreferencePage}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 17.12.2012
  */
@@ -56,6 +56,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
   private Text m_searchFilter;
   private T m_currentProjectSetting;
   private Composite m_container;
+  private Job m_curJob;
 
   private final Map<IScoutBundle, T> m_projectSettings;
 
@@ -87,6 +88,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
 
   @Override
   public boolean performOk() {
+    cancelLoad();
     save();
     return super.performOk();
   }
@@ -95,6 +97,19 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
   protected void performApply() {
     save();
     super.performApply();
+  }
+
+  @Override
+  public boolean performCancel() {
+    cancelLoad();
+    return super.performCancel();
+  }
+
+  private void cancelLoad() {
+    Job j = m_curJob;
+    if (j != null) {
+      j.cancel();
+    }
   }
 
   @Override
@@ -157,9 +172,10 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
                   });
                 }
               }
-            });
+            }, monitor);
           }
           finally {
+            m_curJob = null;
             if (!parent.isDisposed()) {
               parent.getDisplay().asyncExec(new Runnable() {
                 @Override
@@ -188,6 +204,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
       }
     };
     j.setSystem(true);
+    m_curJob = j;
     j.schedule();
 
     return m_container;
@@ -258,7 +275,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
     }
   }
 
-  protected abstract void loadAllModels(IModelLoadProgressObserver<U> observer);
+  protected abstract void loadAllModels(IModelLoadProgressObserver<U> observer, IProgressMonitor monitor);
 
   protected abstract int getTotalWork();
 

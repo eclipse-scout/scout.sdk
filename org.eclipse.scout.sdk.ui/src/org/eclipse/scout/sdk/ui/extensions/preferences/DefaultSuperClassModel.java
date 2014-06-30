@@ -12,19 +12,21 @@ package org.eclipse.scout.sdk.ui.extensions.preferences;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link DefaultSuperClassModel}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 24.11.2012
  */
@@ -87,11 +89,11 @@ public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel
     HashSet<String> ret = new HashSet<String>();
     ret.add(defaultVal);
     IType base = TypeUtility.getType(interfaceFqn);
-    for (IScoutBundle b : p.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true)) {
-      for (IType t : TypeUtility.getAbstractTypesOnClasspath(base, b.getJavaProject(), TypeFilters.getPrimaryTypeFilter())) {
-        if (TypeUtility.exists(t)) {
-          ret.add(t.getFullyQualifiedName());
-        }
+    ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(base);
+    Set<IType> allSubtypes = typeHierarchy.getAllSubtypes(base, TypeFilters.getMultiTypeFilterAnd(TypeFilters.getTypesOnClasspath(p.getJavaProject()), TypeFilters.getFlagsFilter(Flags.AccAbstract)), null);
+    for (IType t : allSubtypes) {
+      if (TypeUtility.exists(t)) {
+        ret.add(t.getFullyQualifiedName());
       }
     }
     String[] arr = ret.toArray(new String[ret.size()]);

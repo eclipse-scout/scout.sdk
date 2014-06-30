@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.ui.fields.SimpleScrolledComposite;
@@ -28,7 +29,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * <h3>{@link TargetPackagePreferenceScrolledContent}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 24.11.2012
  */
@@ -43,7 +44,7 @@ public class TargetPackagePreferenceScrolledContent implements IScoutProjectScro
   }
 
   @Override
-  public void loadModel(List<TargetPackageModel> entries, IModelLoadProgressObserver<TargetPackageModel> observer) {
+  public void loadModel(List<TargetPackageModel> entries, IModelLoadProgressObserver<TargetPackageModel> observer, IProgressMonitor monitor) {
     m_entries = new ArrayList<TargetPackageModel>(entries);
     for (TargetPackageModel model : m_entries) {
       model.load();

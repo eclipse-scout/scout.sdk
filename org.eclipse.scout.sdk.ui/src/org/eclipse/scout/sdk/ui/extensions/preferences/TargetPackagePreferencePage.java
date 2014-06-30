@@ -16,6 +16,7 @@ import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.extensions.targetpackage.TargetPackageEntry;
@@ -24,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link TargetPackagePreferencePage}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 17.12.2012
  */
@@ -36,9 +37,13 @@ public class TargetPackagePreferencePage extends AbstractScoutProjectPreferenceP
   }
 
   @Override
-  protected void loadAllModels(IModelLoadProgressObserver<TargetPackageModel> observer) {
+  protected void loadAllModels(IModelLoadProgressObserver<TargetPackageModel> observer, IProgressMonitor monitor) {
     Set<TargetPackageEntry> defaultPackages = DefaultTargetPackage.getAllDefaults();
     for (Entry<IScoutBundle, TargetPackagePreferenceScrolledContent> e : getProjectModelMap().entrySet()) {
+      if (monitor.isCanceled()) {
+        return;
+      }
+
       List<TargetPackageModel> list = new ArrayList<TargetPackageModel>();
       for (TargetPackageEntry entry : defaultPackages) {
         if (e.getKey().getType().equals(entry.getBundleType())) {
@@ -47,7 +52,7 @@ public class TargetPackagePreferencePage extends AbstractScoutProjectPreferenceP
       }
       Collections.sort(list);
 
-      e.getValue().loadModel(list, observer);
+      e.getValue().loadModel(list, observer, monitor);
     }
   }
 

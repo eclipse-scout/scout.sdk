@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.SimpleScrolledComposite;
@@ -31,7 +32,7 @@ import org.osgi.service.prefs.BackingStoreException;
 
 /**
  * <h3>{@link SuperTypePreferenceScrolledContent}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 24.11.2012
  */
@@ -49,9 +50,12 @@ public class SuperTypePreferenceScrolledContent implements IScoutProjectScrolled
   }
 
   @Override
-  public void loadModel(List<DefaultSuperClassModel> entries, IModelLoadProgressObserver<DefaultSuperClassModel> observer) {
+  public void loadModel(List<DefaultSuperClassModel> entries, IModelLoadProgressObserver<DefaultSuperClassModel> observer, IProgressMonitor monitor) {
     m_entries = new ArrayList<DefaultSuperClassModel>(entries);
     for (DefaultSuperClassModel model : m_entries) {
+      if (monitor.isCanceled()) {
+        return;
+      }
       model.load();
       if (observer != null) {
         observer.loaded(model);
@@ -142,11 +146,16 @@ public class SuperTypePreferenceScrolledContent implements IScoutProjectScrolled
   }
 
   private void visitCombos(ISuperTypeComboVisitor visitor) {
+    if (m_entries == null || m_allSuperTypeCombos == null) {
+      return;
+    }
     for (int i = 0; i < m_entries.size(); i++) {
-      Combo combo = m_allSuperTypeCombos.get(i);
-      DefaultSuperClassModel model = m_entries.get(i);
-      String curVal = model.getProposals()[combo.getSelectionIndex()];
-      visitor.visit(combo, curVal, model);
+      if (i < m_allSuperTypeCombos.size()) {
+        Combo combo = m_allSuperTypeCombos.get(i);
+        DefaultSuperClassModel model = m_entries.get(i);
+        String curVal = model.getProposals()[combo.getSelectionIndex()];
+        visitor.visit(combo, curVal, model);
+      }
     }
   }
 

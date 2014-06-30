@@ -266,14 +266,21 @@ public final class ClassIdValidationJob extends JobEx {
     Job j = new Job("schedule classid validation") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        // get the class id type outside of the validation job
-        // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
-        IType classId = TypeUtility.getType(IRuntimeClasses.ClassId);
-        IType abstractFormData = TypeUtility.getType(IRuntimeClasses.AbstractFormData);
-        IType abstractFormFieldData = TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData);
-        if (TypeUtility.exists(classId) && TypeUtility.exists(abstractFormData) && TypeUtility.exists(abstractFormFieldData)) {
-          Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
-          new ClassIdValidationJob(classId, abstractFormData, abstractFormFieldData).schedule(startDelay);
+        try {
+          // get the class id type outside of the validation job
+          // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
+          IType classId = TypeUtility.getType(IRuntimeClasses.ClassId);
+          IType abstractFormData = TypeUtility.getType(IRuntimeClasses.AbstractFormData);
+          IType abstractFormFieldData = TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData);
+          if (TypeUtility.exists(classId) && TypeUtility.exists(abstractFormData) && TypeUtility.exists(abstractFormFieldData)) {
+            Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
+            new ClassIdValidationJob(classId, abstractFormData, abstractFormFieldData).schedule(startDelay);
+          }
+        }
+        catch (IllegalStateException e) {
+          // can happen e.g. when the preference nodes are changed: "java.lang.IllegalStateException: Preference node "org.eclipse.jdt.core" has been removed."
+          // in that case we just ignore the event and check back later.
+          ScoutSdk.logInfo("Could not schedule class id validation. ", e);
         }
         return Status.OK_STATUS;
       }

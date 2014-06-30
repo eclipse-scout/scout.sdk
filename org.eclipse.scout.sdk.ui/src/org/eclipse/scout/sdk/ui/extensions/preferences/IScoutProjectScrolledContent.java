@@ -12,11 +12,12 @@ package org.eclipse.scout.sdk.ui.extensions.preferences;
 
 import java.util.List;
 
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>{@link IScoutProjectScrolledContent}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 17.12.2012
  */
@@ -33,7 +34,7 @@ public interface IScoutProjectScrolledContent<T> {
 
   void reflow();
 
-  void loadModel(List<T> entries, IModelLoadProgressObserver<T> observer);
+  void loadModel(List<T> entries, IModelLoadProgressObserver<T> observer, IProgressMonitor monitor);
 
   public interface IModelLoadProgressObserver<U> {
     void loaded(U justLoadedModel);
