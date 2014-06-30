@@ -30,7 +30,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link ToolbuttonNewOperationTest}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
@@ -74,7 +74,7 @@ public class ToolbuttonNewOperationTest extends AbstractSdkTestWithSampleProject
     SdkAssert.assertExist(createdToolbutton);
     SdkAssert.assertPublic(createdToolbutton).assertNoMoreFlags();
     IMethod getTextMethod = SdkAssert.assertMethodExist(createdToolbutton, SdkProperties.METHOD_NAME_GET_CONFIGURED_TEXT);
-    SdkAssert.assertPublic(getTextMethod).assertNoMoreFlags();
+    SdkAssert.assertProtected(getTextMethod).assertNoMoreFlags();
     Set<IType> tb = TypeUtility.getInnerTypesOrdered(desktop, TypeUtility.getType(RuntimeClasses.IToolButton), ScoutTypeComparators.getOrderAnnotationComparator());
     IType[] toolButtons = tb.toArray(new IType[tb.size()]);
     SdkAssert.assertEquals(4, toolButtons.length);
