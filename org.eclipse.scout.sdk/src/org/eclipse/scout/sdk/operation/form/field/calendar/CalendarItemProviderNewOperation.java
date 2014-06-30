@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.field.calendar;
 
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
@@ -26,6 +27,8 @@ public class CalendarItemProviderNewOperation extends OrderedInnerTypeNewOperati
 
   public CalendarItemProviderNewOperation(String typeName, IType declaringType, boolean formatSource) {
     super(typeName, declaringType, formatSource);
+
+    setFlags(Flags.AccPublic);
     setOrderDefinitionType(TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider));
   }
 }

@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Group;
 
 /**
  * <h3>FormNewWizardPage</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 03.08.2009
  */
@@ -222,7 +222,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   void fillOperation(FormStackNewOperation operation) {
-    if (StringUtility.hasText(getFormId())) {
+    if (isCreateFormId() && StringUtility.hasText(getFormId())) {
       operation.setFormIdSignature(SignatureCache.createTypeSignature(Long.class.getName()));
       operation.setFormIdName(getFormId());
     }
