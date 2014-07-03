@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 
 /**
  * <h3>{@link MethodSourceBuilder}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
@@ -129,6 +129,26 @@ public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implem
   @Override
   public List<MethodParameter> getParameters() {
     return Collections.unmodifiableList(m_parameters);
+  }
+
+  @Override
+  public String getMethodIdentifier() {
+    StringBuilder methodIdBuilder = new StringBuilder();
+    methodIdBuilder.append(getElementName());
+    methodIdBuilder.append("(");
+    for (int i = 0; i < m_parameters.size(); i++) {
+      methodIdBuilder.append(m_parameters.get(i).getSignature());
+      if (i + 1 < m_parameters.size()) {
+        methodIdBuilder.append(",");
+      }
+    }
+    methodIdBuilder.append(")");
+    return methodIdBuilder.toString();
+  }
+
+  @Override
+  public String toString() {
+    return getMethodIdentifier();
   }
 
   @Override

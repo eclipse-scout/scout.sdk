@@ -15,17 +15,23 @@ import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerFi
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
+import formdata.client.IFormDataInterface01;
 import formdata.client.ui.forms.SimpleForm.MainBox.CancelButton;
 import formdata.client.ui.forms.SimpleForm.MainBox.DateField;
 import formdata.client.ui.forms.SimpleForm.MainBox.DoubleField;
+import formdata.client.ui.forms.SimpleForm.MainBox.MultiTypeArgsBox;
 import formdata.client.ui.forms.SimpleForm.MainBox.OkButton;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleComposerField;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleDateField;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleSmartField;
 import formdata.client.ui.forms.SimpleForm.MainBox.SampleStringField;
+import formdata.client.ui.template.formfield.AbstractGroupBoxWithMultipleTypeArgs;
+import formdata.shared.IFormDataInterface02;
+import formdata.shared.IFormDataInterface03;
+import formdata.shared.TestRunnable;
 import formdata.shared.services.process.SimpleFormData;
 
-@FormData(value = SimpleFormData.class, sdkCommand = SdkCommand.CREATE)
+@FormData(value = SimpleFormData.class, sdkCommand = SdkCommand.CREATE, interfaces = {IFormDataInterface01.class, IFormDataInterface02.class, IFormDataInterface03.class})
 public class SimpleForm extends AbstractForm {
 
   private Long simpleNr;
@@ -54,6 +60,10 @@ public class SimpleForm extends AbstractForm {
 
   public MainBox getMainBox() {
     return getFieldByClass(MainBox.class);
+  }
+
+  public MultiTypeArgsBox getMultiTypeArgsBox() {
+    return getFieldByClass(MultiTypeArgsBox.class);
   }
 
   public OkButton getOkButton() {
@@ -124,10 +134,14 @@ public class SimpleForm extends AbstractForm {
     }
 
     @Order(70.0)
-    public class OkButton extends AbstractOkButton {
+    public class MultiTypeArgsBox extends AbstractGroupBoxWithMultipleTypeArgs<Long, TestRunnable> {
     }
 
     @Order(80.0)
+    public class OkButton extends AbstractOkButton {
+    }
+
+    @Order(90.0)
     public class CancelButton extends AbstractCancelButton {
     }
   }

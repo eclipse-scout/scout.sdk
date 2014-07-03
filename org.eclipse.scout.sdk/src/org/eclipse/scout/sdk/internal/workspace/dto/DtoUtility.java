@@ -14,7 +14,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
@@ -24,12 +26,14 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IField;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -40,15 +44,19 @@ import org.eclipse.scout.sdk.internal.workspace.dto.formdata.TableFieldFormDataS
 import org.eclipse.scout.sdk.internal.workspace.dto.pagedata.PageDataSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
+import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
+import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
@@ -96,6 +104,37 @@ public final class DtoUtility {
 
       // @Generated annotation
       formDataSourceBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createGeneratedAnnotation(FormDataDtoUpdateOperation.class.getName(), GENERATED_MSG));
+
+      // add interfaces and @Override annotation for all methods that exist in the given interfaces
+      Set<IType> allSuperInterfaces = new HashSet<IType>();
+      IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(modelType.getJavaProject());
+      IScoutBundle sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+
+      for (String ifcSig : formDataAnnotation.getInterfaceSignatures()) {
+        IType ifcType = TypeUtility.getTypeBySignature(ifcSig);
+
+        if (TypeUtility.isOnClasspath(ifcType, sharedBundle.getJavaProject())) {
+          formDataSourceBuilder.addInterfaceSignature(ifcSig);
+          allSuperInterfaces.addAll(TypeUtility.getSupertypeHierarchy(ifcType).getAllInterfaces());
+        }
+      }
+      Set<String> allSuperInterfaceMethods = new HashSet<String>();
+      try {
+        for (IType t : allSuperInterfaces) {
+          for (IMethod m : t.getMethods()) {
+            allSuperInterfaceMethods.add(SignatureUtility.getMethodIdentifier(m));
+          }
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdk.logError("Unable to read existing methods from super interfaces of formdata for '" + modelType.getFullyQualifiedName() + "'. The resulting formdata may miss some @Override annotations.", e);
+      }
+      for (IMethodSourceBuilder msb : formDataSourceBuilder.getMethodSourceBuilders()) {
+        if (allSuperInterfaceMethods.contains(msb.getMethodIdentifier())) {
+          msb.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
+        }
+      }
+
       return formDataSourceBuilder;
     }
     return null;
@@ -134,19 +173,47 @@ public final class DtoUtility {
     return null;
   }
 
+  private static String computeDtoGenericType(IType contextType, IType annotationOwnerType, int genericOrdinal, ITypeHierarchy formFieldHierarchy) throws CoreException {
+    if (!TypeUtility.exists(contextType) || contextType.getFullyQualifiedName().equals(Object.class.getName()) || !TypeUtility.exists(annotationOwnerType)) {
+      return null;
+    }
+
+    LinkedHashMap<String, ITypeGenericMapping> collector = new LinkedHashMap<String, ITypeGenericMapping>();
+    SignatureUtility.resolveGenericParametersInSuperHierarchy(contextType, formFieldHierarchy, collector);
+
+    boolean annotOwnerPassed = false;
+    for (Entry<String, ITypeGenericMapping> entry : collector.entrySet()) {
+      if (!annotOwnerPassed && CompareUtility.equals(annotationOwnerType.getFullyQualifiedName(), entry.getKey())) {
+        annotOwnerPassed = true;
+      }
+
+      if (annotOwnerPassed) {
+        ITypeGenericMapping genericMapping = entry.getValue();
+        if (genericMapping.getParameterCount() > genericOrdinal) {
+          return genericMapping.getParameter(genericOrdinal)[1];
+        }
+      }
+    }
+    return null;
+  }
+
   public static String computeSuperTypeSignatureForFormData(IType formField, FormDataAnnotation formDataAnnotation, ITypeHierarchy localHierarchy) {
     String superTypeSignature = formDataAnnotation.getSuperTypeSignature();
     if (formDataAnnotation.getGenericOrdinal() >= 0) {
-      IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
-      if (TypeUtility.isGenericType(superType)) {
-        try {
-          String genericTypeSig = ScoutTypeUtility.computeFormFieldGenericType(formField, localHierarchy);
-          if (genericTypeSig != null) {
-            superTypeSignature = ENDING_SEMICOLON_PATTERN.matcher(superTypeSignature).replaceAll("<" + genericTypeSig + ">;");
+      IJavaElement annotationOwner = formDataAnnotation.getAnnotationOwner();
+      if (TypeUtility.exists(annotationOwner) && annotationOwner.getElementType() == IJavaElement.TYPE) {
+        IType annotationType = (IType) annotationOwner;
+        IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
+        if (TypeUtility.isGenericType(superType)) {
+          try {
+            String genericTypeSig = computeDtoGenericType(formField, annotationType, formDataAnnotation.getGenericOrdinal(), localHierarchy);
+            if (genericTypeSig != null) {
+              superTypeSignature = ENDING_SEMICOLON_PATTERN.matcher(superTypeSignature).replaceAll(Signature.C_GENERIC_START + genericTypeSig + Signature.C_GENERIC_END + Signature.C_SEMICOLON);
+            }
           }
-        }
-        catch (CoreException e) {
-          ScoutSdk.logError("could not find generic type for form data of type '" + formField.getFullyQualifiedName() + "'.");
+          catch (CoreException e) {
+            ScoutSdk.logError("could not find generic type for form data of type '" + formField.getFullyQualifiedName() + "'.");
+          }
         }
       }
     }

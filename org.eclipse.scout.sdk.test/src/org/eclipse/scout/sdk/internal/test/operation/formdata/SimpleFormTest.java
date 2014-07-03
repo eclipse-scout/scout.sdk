@@ -43,6 +43,7 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     IType simpleFormData = SdkAssert.assertTypeExists("formdata.shared.services.process.SimpleFormData");
     SdkAssert.assertHasFlags(simpleFormData, 1);
     SdkAssert.assertHasSuperTypeSignature(simpleFormData, "QAbstractFormData;");
+    SdkAssert.assertHasSuperIntefaceSignatures(simpleFormData, new String[]{"QIFormDataInterface02;", "QIFormDataInterface03;"});
     SdkAssert.assertAnnotation(simpleFormData, "javax.annotation.Generated");
 
     // fields of SimpleFormData
@@ -51,7 +52,7 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'SimpleFormData'", 10, simpleFormData.getMethods().length);
+    SdkAssert.assertEquals("method count of 'SimpleFormData'", 11, simpleFormData.getMethods().length);
     IMethod simpleFormData1 = SdkAssert.assertMethodExist(simpleFormData, "SimpleFormData", new String[]{});
     SdkAssert.assertTrue(simpleFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(simpleFormData1, "V");
@@ -59,8 +60,11 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(getDate, "QDate;");
     IMethod getDouble = SdkAssert.assertMethodExist(simpleFormData, "getDouble", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getDouble, "QDouble;");
+    IMethod getMultiTypeArgsBox = SdkAssert.assertMethodExist(simpleFormData, "getMultiTypeArgsBox", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getMultiTypeArgsBox, "QMultiTypeArgsBox;");
     IMethod getSampleComposer = SdkAssert.assertMethodExist(simpleFormData, "getSampleComposer", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getSampleComposer, "QSampleComposer;");
+    SdkAssert.assertAnnotation(getSampleComposer, "java.lang.Override");
     IMethod getSampleDate = SdkAssert.assertMethodExist(simpleFormData, "getSampleDate", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getSampleDate, "QSampleDate;");
     IMethod getSampleSmart = SdkAssert.assertMethodExist(simpleFormData, "getSampleSmart", new String[]{});
@@ -74,7 +78,7 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     IMethod getSimpleNrProperty = SdkAssert.assertMethodExist(simpleFormData, "getSimpleNrProperty", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getSimpleNrProperty, "QSimpleNrProperty;");
 
-    SdkAssert.assertEquals("inner types count of 'SimpleFormData'", 7, simpleFormData.getTypes().length);
+    SdkAssert.assertEquals("inner types count of 'SimpleFormData'", 8, simpleFormData.getTypes().length);
     // type Date
     IType date = SdkAssert.assertTypeExists(simpleFormData, "Date");
     SdkAssert.assertHasFlags(date, 9);
@@ -117,6 +121,23 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodValidationRules(initValidationRules1, new String[]{"ruleMap.put(ValidationRule.MAX_VALUE, -java.lang.Double.MAX_VALUE);", "ruleMap.put(ValidationRule.MIN_VALUE, 0.0);"}, true);
 
     SdkAssert.assertEquals("inner types count of 'Double'", 0, doubleT.getTypes().length);
+    // type MultiTypeArgsBox
+    IType multiTypeArgsBox = SdkAssert.assertTypeExists(simpleFormData, "MultiTypeArgsBox");
+    SdkAssert.assertHasFlags(multiTypeArgsBox, 9);
+    SdkAssert.assertHasSuperTypeSignature(multiTypeArgsBox, "QAbstractValueFieldData<QTestRunnable;>;");
+
+    // fields of MultiTypeArgsBox
+    SdkAssert.assertEquals("field count of 'MultiTypeArgsBox'", 1, multiTypeArgsBox.getFields().length);
+    IField serialVersionUID3 = SdkAssert.assertFieldExist(multiTypeArgsBox, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID3, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID3, "J");
+
+    SdkAssert.assertEquals("method count of 'MultiTypeArgsBox'", 1, multiTypeArgsBox.getMethods().length);
+    IMethod multiTypeArgsBox1 = SdkAssert.assertMethodExist(multiTypeArgsBox, "MultiTypeArgsBox", new String[]{});
+    SdkAssert.assertTrue(multiTypeArgsBox1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(multiTypeArgsBox1, "V");
+
+    SdkAssert.assertEquals("inner types count of 'MultiTypeArgsBox'", 0, multiTypeArgsBox.getTypes().length);
     // type SampleComposer
     IType sampleComposer = SdkAssert.assertTypeExists(simpleFormData, "SampleComposer");
     SdkAssert.assertHasFlags(sampleComposer, 9);
@@ -124,9 +145,9 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
 
     // fields of SampleComposer
     SdkAssert.assertEquals("field count of 'SampleComposer'", 1, sampleComposer.getFields().length);
-    IField serialVersionUID3 = SdkAssert.assertFieldExist(sampleComposer, "serialVersionUID");
-    SdkAssert.assertHasFlags(serialVersionUID3, 26);
-    SdkAssert.assertFieldSignature(serialVersionUID3, "J");
+    IField serialVersionUID4 = SdkAssert.assertFieldExist(sampleComposer, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID4, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
     SdkAssert.assertEquals("method count of 'SampleComposer'", 1, sampleComposer.getMethods().length);
     IMethod sampleComposer1 = SdkAssert.assertMethodExist(sampleComposer, "SampleComposer", new String[]{});
@@ -141,9 +162,9 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
 
     // fields of SampleDate
     SdkAssert.assertEquals("field count of 'SampleDate'", 1, sampleDate.getFields().length);
-    IField serialVersionUID4 = SdkAssert.assertFieldExist(sampleDate, "serialVersionUID");
-    SdkAssert.assertHasFlags(serialVersionUID4, 26);
-    SdkAssert.assertFieldSignature(serialVersionUID4, "J");
+    IField serialVersionUID5 = SdkAssert.assertFieldExist(sampleDate, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID5, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
     SdkAssert.assertEquals("method count of 'SampleDate'", 1, sampleDate.getMethods().length);
     IMethod sampleDate1 = SdkAssert.assertMethodExist(sampleDate, "SampleDate", new String[]{});
@@ -158,9 +179,9 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
 
     // fields of SampleSmart
     SdkAssert.assertEquals("field count of 'SampleSmart'", 1, sampleSmart.getFields().length);
-    IField serialVersionUID5 = SdkAssert.assertFieldExist(sampleSmart, "serialVersionUID");
-    SdkAssert.assertHasFlags(serialVersionUID5, 26);
-    SdkAssert.assertFieldSignature(serialVersionUID5, "J");
+    IField serialVersionUID6 = SdkAssert.assertFieldExist(sampleSmart, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID6, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID6, "J");
 
     SdkAssert.assertEquals("method count of 'SampleSmart'", 2, sampleSmart.getMethods().length);
     IMethod sampleSmart1 = SdkAssert.assertMethodExist(sampleSmart, "SampleSmart", new String[]{});
@@ -179,9 +200,9 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
 
     // fields of SampleString
     SdkAssert.assertEquals("field count of 'SampleString'", 1, sampleString.getFields().length);
-    IField serialVersionUID6 = SdkAssert.assertFieldExist(sampleString, "serialVersionUID");
-    SdkAssert.assertHasFlags(serialVersionUID6, 26);
-    SdkAssert.assertFieldSignature(serialVersionUID6, "J");
+    IField serialVersionUID7 = SdkAssert.assertFieldExist(sampleString, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID7, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID7, "J");
 
     SdkAssert.assertEquals("method count of 'SampleString'", 2, sampleString.getMethods().length);
     IMethod sampleString1 = SdkAssert.assertMethodExist(sampleString, "SampleString", new String[]{});
@@ -200,9 +221,9 @@ public class SimpleFormTest extends AbstractSdkTestWithFormDataProject {
 
     // fields of SimpleNrProperty
     SdkAssert.assertEquals("field count of 'SimpleNrProperty'", 1, simpleNrProperty.getFields().length);
-    IField serialVersionUID7 = SdkAssert.assertFieldExist(simpleNrProperty, "serialVersionUID");
-    SdkAssert.assertHasFlags(serialVersionUID7, 26);
-    SdkAssert.assertFieldSignature(serialVersionUID7, "J");
+    IField serialVersionUID8 = SdkAssert.assertFieldExist(simpleNrProperty, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID8, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID8, "J");
 
     SdkAssert.assertEquals("method count of 'SimpleNrProperty'", 1, simpleNrProperty.getMethods().length);
     IMethod simpleNrProperty1 = SdkAssert.assertMethodExist(simpleNrProperty, "SimpleNrProperty", new String[]{});

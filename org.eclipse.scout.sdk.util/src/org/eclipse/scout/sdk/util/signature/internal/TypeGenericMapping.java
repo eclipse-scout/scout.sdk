@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
 
 /**
  * <h3>{@link TypeGenericMapping}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 20.03.2013
  */
@@ -46,6 +46,23 @@ public class TypeGenericMapping implements ITypeGenericMapping {
   @Override
   public String getParameterSignature(String paramName) {
     return m_parameters.get(paramName);
+  }
+
+  @Override
+  public int getParameterCount() {
+    return m_parameters.size();
+  }
+
+  @Override
+  public String[] getParameter(int index) {
+    int curIndex = 0;
+    for (Entry<String, String> entry : m_parameters.entrySet()) {
+      if (index == curIndex) {
+        return new String[]{entry.getKey(), entry.getValue()};
+      }
+      curIndex++;
+    }
+    return null;
   }
 
   @Override

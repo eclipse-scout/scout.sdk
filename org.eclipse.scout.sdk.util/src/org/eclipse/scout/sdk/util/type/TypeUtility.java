@@ -215,18 +215,20 @@ public class TypeUtility {
     IRegion region = JavaCore.newRegion();
     if (elements != null) {
       for (IJavaElement e : elements) {
-        if (e.getElementType() == IJavaElement.TYPE) {
-          IType t = (IType) e;
-          if (t.isBinary()) {
-            // binary types do not include their inner types because these inner types belong to their own class file
-            // solution: add them manually
-            addBinaryInnerTypesToRegionRec(t, region);
+        if (exists(e)) {
+          if (e.getElementType() == IJavaElement.TYPE) {
+            IType t = (IType) e;
+            if (t.isBinary()) {
+              // binary types do not include their inner types because these inner types belong to their own class file
+              // solution: add them manually
+              addBinaryInnerTypesToRegionRec(t, region);
+            }
           }
+          region.add(e);
         }
-        region.add(e);
       }
     }
-    return HierarchyCache.getInstance().getLocalTypeHierarchy(region);
+    return getLocalTypeHierarchy(region);
   }
 
   /**

@@ -115,7 +115,9 @@ public final class HierarchyCache implements IHierarchyCache {
       return new TypeHierarchy(null, JavaCore.newTypeHierarchy(region, null, null));
     }
     catch (JavaModelException e) {
-      SdkUtilActivator.logWarning("could not build hierarchy of region '" + region + "'.", e);
+      if (!e.isDoesNotExist()) {
+        SdkUtilActivator.logWarning("could not build hierarchy of region '" + region + "'.", e);
+      }
     }
     return null;
   }
@@ -200,12 +202,14 @@ public final class HierarchyCache implements IHierarchyCache {
     region.add(icu);
     try {
       ITypeHierarchy hierarchy = getLocalTypeHierarchy(region);
-      for (IType t : icu.getTypes()) {
-        reqTypeChangedFromExternal(t, hierarchy);
+      if (hierarchy != null) {
+        for (IType t : icu.getTypes()) {
+          reqTypeChangedFromExternal(t, hierarchy);
+        }
       }
     }
     catch (JavaModelException e) {
-      SdkUtilActivator.logWarning("could not find types in compilation unti '" + icu.getElementName() + "'.", e);
+      SdkUtilActivator.logWarning("could not find types in compilation unit '" + icu.getElementName() + "'.", e);
     }
   }
 

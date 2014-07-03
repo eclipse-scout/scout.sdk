@@ -231,7 +231,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       return null;
     }
     try {
-      return ScoutTypeUtility.computeFormFieldGenericType(m_lookupCall, TypeUtility.getSupertypeHierarchy(m_lookupCall));
+      return SignatureUtility.resolveGenericParameterInSuperHierarchy(m_lookupCall, TypeUtility.getSupertypeHierarchy(m_lookupCall), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
     }
     catch (CoreException e) {
       ScoutSdkUi.logError("Could not compute generic type of lookup call '" + m_lookupCall.getFullyQualifiedName() + "'.", e);

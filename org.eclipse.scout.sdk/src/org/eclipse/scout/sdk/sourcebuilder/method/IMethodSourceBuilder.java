@@ -16,11 +16,12 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.sourcebuilder.IAnnotatableSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.ICommentSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.IAnnotationSourceBuilder;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
 
 /**
  * <h3>{@link IMethodSourceBuilder}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
@@ -120,5 +121,15 @@ public interface IMethodSourceBuilder extends IAnnotatableSourceBuilder {
    * @param methodBodySourceBuilder
    */
   void setMethodBodySourceBuilder(IMethodBodySourceBuilder methodBodySourceBuilder);
+
+  /**
+   * Returns a unique identifier of this method. The identifier looks like
+   * 'methodname(param1Signature,param2Signature)'.<br>
+   * The result of this method can be used to compare methods together with the
+   * {@link SignatureUtility#getMethodIdentifier(org.eclipse.jdt.core.IMethod)}.
+   *
+   * @return
+   */
+  String getMethodIdentifier();
 
 }

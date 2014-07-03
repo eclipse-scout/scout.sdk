@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.dto.formdata;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
@@ -19,8 +23,6 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  *
  */
 public class FormDataAnnotation {
-  public static final FormDataAnnotation IGNORE_ANNOTATION = new FormDataAnnotation(SdkCommand.IGNORE);
-
   public static boolean isCreate(FormDataAnnotation anot) {
     if (anot == null) {
       return false;
@@ -68,13 +70,11 @@ public class FormDataAnnotation {
   private int m_genericOrdinal = -1;
   private String m_formDataTypeSignature;
   private String m_superTypeSignature;
+  private IJavaElement annotationOwner;
+  private final Set<String> m_interfaceSignatures;
 
   public FormDataAnnotation() {
-    this(null);
-  }
-
-  public FormDataAnnotation(SdkCommand command) {
-    setSdkCommand(command);
+    m_interfaceSignatures = new LinkedHashSet<String>();
   }
 
   /**
@@ -94,7 +94,7 @@ public class FormDataAnnotation {
 
   /**
    * Gets the form data type that is referenced in the receiver annotation.
-   * 
+   *
    * @return The form data type or null if it could not be found.
    */
   public IType getFormDataType() {
@@ -165,5 +165,21 @@ public class FormDataAnnotation {
    */
   public String getSuperTypeSignature() {
     return m_superTypeSignature;
+  }
+
+  public IJavaElement getAnnotationOwner() {
+    return annotationOwner;
+  }
+
+  public void setAnnotationOwner(IJavaElement annotationOwner) {
+    this.annotationOwner = annotationOwner;
+  }
+
+  public void addInterfaceSignature(String sig) {
+    m_interfaceSignatures.add(sig);
+  }
+
+  public Set<String> getInterfaceSignatures() {
+    return new LinkedHashSet<String>(m_interfaceSignatures);
   }
 }

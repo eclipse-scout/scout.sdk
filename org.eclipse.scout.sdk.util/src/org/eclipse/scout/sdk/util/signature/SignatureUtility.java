@@ -408,8 +408,7 @@ public final class SignatureUtility {
   }
 
   /**
-   * returns a unique identifier of a scout method. The identifier looks like
-   * 'methodname(param1Signature,param2Signature)'.
+   * Returns a unique identifier of a method. The identifier looks like 'methodname(param1Signature,param2Signature)'.
    *
    * @param method
    * @return

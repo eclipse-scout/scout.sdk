@@ -17,9 +17,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -34,7 +32,6 @@ import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
@@ -57,7 +54,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>FormFieldSelectionWizardPage</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 02.03.2010
  */
@@ -92,12 +89,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     elements.add(new ISeparator() {
     });
 
-    IRegion newRegion = JavaCore.newRegion();
-    for (IType formField : abstractFormFields) {
-      newRegion.add(formField);
-    }
-    ITypeHierarchy abstractFormFieldHierarchy = ScoutSdkCore.getHierarchyCache().getLocalTypeHierarchy(newRegion);
-
+    ITypeHierarchy abstractFormFieldHierarchy = TypeUtility.getLocalTypeHierarchy(abstractFormFields);
     for (IType formField : abstractFormFields) {
       if (!TypeUtility.exists(JdtUtility.getAnnotation(formField, ScoutSdkIgnore.class.getName()))) {
         IFormFieldExtension formFieldExtension = FormFieldExtensionPoint.findExtension(formField, 1, abstractFormFieldHierarchy);

@@ -73,9 +73,6 @@ public class ScoutTypeUtility extends TypeUtility {
 
   private static final Pattern PATTERN = Pattern.compile("[^\\.]*$");
   private static final Pattern RETURN_TRUE_PATTERN = Pattern.compile("return\\s*true", Pattern.MULTILINE);
-  private static final Pattern PREF_REGEX = Pattern.compile("^([\\+\\[]+)(.*)$");
-  private static final Pattern SUFF_REGEX = Pattern.compile("(^.*)\\;$");
-
   private static final Pattern SUFF_CLASS_REGEX = Pattern.compile("\\.class$");
 
   private ScoutTypeUtility() {
@@ -375,6 +372,7 @@ public class ScoutTypeUtility extends TypeUtility {
       SdkCommand sdkCommand = null;
       DefaultSubtypeSdkCommand subTypeCommand = null;
       int genericOrdinal = -1;
+      List<String> interfaceSignatures = null;
 
       for (IMemberValuePair p : annotation.getMemberValuePairs()) {
         String memberName = p.getMemberName();
@@ -413,7 +411,6 @@ public class ScoutTypeUtility extends TypeUtility {
             ScoutSdk.logError("could not parse formdata annotation defaultSubtypeCommand '" + value + "'.", e);
           }
         }
-
         else if ("genericOrdinal".equals(memberName)) {
           try {
             genericOrdinal = ((Integer) value).intValue();
@@ -422,9 +419,31 @@ public class ScoutTypeUtility extends TypeUtility {
             ScoutSdk.logError("could not parse formdata annotation genericOrdinal '" + value + "'.", e);
           }
         }
+        else if ("interfaces".equals(memberName)) {
+          if (value instanceof Object[]) {
+            Object[] interfaces = (Object[]) value;
+            if (interfaces.length > 0) {
+              interfaceSignatures = new ArrayList<String>(interfaces.length);
+              for (Object o : interfaces) {
+                if (o instanceof String && StringUtility.hasText(o.toString())) {
+                  String referencedTypeSignature = SignatureUtility.getReferencedTypeSignature(contextType, o.toString(), true);
+                  if (StringUtility.hasText(referencedTypeSignature)) {
+                    interfaceSignatures.add(referencedTypeSignature);
+                  }
+                }
+              }
+            }
+          }
+        }
       }
 
       // default setup
+      formDataAnnotation.setAnnotationOwner(element);
+      if (interfaceSignatures != null && !interfaceSignatures.isEmpty()) {
+        for (String sig : interfaceSignatures) {
+          formDataAnnotation.addInterfaceSignature(sig);
+        }
+      }
       if (!StringUtility.isNullOrEmpty(valueSignature)) {
         if (isOwner) {
           formDataAnnotation.setFormDataTypeSignature(valueSignature);
@@ -800,11 +819,12 @@ public class ScoutTypeUtility extends TypeUtility {
   public static IMethod getWizardStepGetterMethod(IType wizardStep) {
     IType wizard = wizardStep.getDeclaringType();
     final String formFieldSignature = SignatureCache.createTypeSignature(wizardStep.getFullyQualifiedName());
-    final String regex = "^get" + wizardStep.getElementName();
+    String regex = "^get" + wizardStep.getElementName();
+    final Pattern pat = Pattern.compile(regex);
     IMethod method = TypeUtility.getFirstMethod(wizard, new IMethodFilter() {
       @Override
       public boolean accept(IMethod candidate) {
-        if (candidate.getElementName().matches(regex)) {
+        if (pat.matcher(candidate.getElementName()).matches()) {
           try {
             String returnTypeSignature = Signature.getReturnType(candidate.getSignature());
             returnTypeSignature = SignatureUtility.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
@@ -903,96 +923,6 @@ public class ScoutTypeUtility extends TypeUtility {
       }
     }
     return null;
-  }
-
-  public static String computeFormFieldGenericType(IType type, ITypeHierarchy formFieldHierarchy) throws CoreException {
-    if (!TypeUtility.exists(type) || type.getFullyQualifiedName().equals(Object.class.getName())) {
-      return null;
-    }
-
-    // try value fields
-    String sig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, formFieldHierarchy, IRuntimeClasses.IValueField, IRuntimeClasses.TYPE_PARAM_VALUEFIELD__VALUE_TYPE);
-    if (sig != null) {
-      return sig;
-    }
-
-    // for own models
-    IType superType = formFieldHierarchy.getSuperclass(type);
-    if (TypeUtility.exists(superType)) {
-      if (TypeUtility.isGenericType(superType)) {
-        // compute generic parameter type by merging all super type generic parameter declarations
-        List<GenericSignatureMapping> signatureMapping = new ArrayList<GenericSignatureMapping>();
-        IType currentType = type;
-        IType currentSuperType = superType;
-        while (currentSuperType != null) {
-          if (TypeUtility.isGenericType(currentSuperType)) {
-            String superTypeGenericParameterName = currentSuperType.getTypeParameters()[0].getElementName();
-            String currentSuperTypeSig = currentType.getSuperclassTypeSignature();
-            String[] typeArgs = Signature.getTypeArguments(currentSuperTypeSig);
-            if (typeArgs.length < 1) {
-              // if the class has no generic type defined, use java.lang.Object as type for the formdata
-              typeArgs = new String[]{Signature.C_RESOLVED + Object.class.getName() + Signature.C_SEMICOLON};
-            }
-            String superTypeGenericParameterSignature = getResolvedGenericTypeSignature(typeArgs[0], currentType);
-            signatureMapping.add(0, new GenericSignatureMapping(superTypeGenericParameterName, superTypeGenericParameterSignature));
-            currentType = currentSuperType;
-            currentSuperType = formFieldHierarchy.getSuperclass(currentSuperType);
-          }
-          else {
-            break;
-          }
-        }
-        String signature = signatureMapping.get(0).getSuperTypeGenericParameterSignature();
-        for (int i = 1; i < signatureMapping.size(); i++) {
-          String replacement = signatureMapping.get(i).getSuperTypeGenericParameterSignature();
-          replacement = Matcher.quoteReplacement(replacement.substring(0, replacement.length() - 1));
-          signature = signature.replaceAll("[T,L,Q]" + signatureMapping.get(i).getSuperTypeGenericParameterName(), replacement);
-        }
-        return SignatureUtility.getResolvedSignature(signature, type, type);
-      }
-      else {
-        return computeFormFieldGenericType(superType, formFieldHierarchy);
-      }
-    }
-    else {
-      return null;
-    }
-  }
-
-  private static String getResolvedGenericTypeSignature(String signature, IType type) throws JavaModelException {
-    String workingSig = signature.replace('/', '.');
-    workingSig = Signature.getTypeErasure(workingSig);
-    StringBuilder signatureBuilder = new StringBuilder();
-    Matcher prefMatcher = PREF_REGEX.matcher(workingSig);
-    if (prefMatcher.find()) {
-      signatureBuilder.append(prefMatcher.group(1));
-      workingSig = prefMatcher.group(2);
-    }
-    if (Signature.getTypeSignatureKind(workingSig) == Signature.BASE_TYPE_SIGNATURE) {
-      signatureBuilder.append(workingSig);
-      return signatureBuilder.toString();
-    }
-    else {
-      if (workingSig.length() > 0 && workingSig.charAt(0) == Signature.C_UNRESOLVED) {
-        String simpleName = Signature.getSignatureSimpleName(workingSig);
-        String sig = SignatureUtility.getReferencedTypeSignature(type, simpleName, false);
-        if (sig != null) {
-          workingSig = sig;
-        }
-      }
-      workingSig = SUFF_REGEX.matcher(workingSig).replaceAll("$1");
-      signatureBuilder.append(workingSig);
-      String[] typeArguments = Signature.getTypeArguments(signature);
-      if (typeArguments.length > 0) {
-        signatureBuilder.append("<");
-        for (int i = 0; i < typeArguments.length; i++) {
-          signatureBuilder.append(getResolvedGenericTypeSignature(typeArguments[i], type));
-        }
-        signatureBuilder.append(">");
-      }
-      signatureBuilder.append(";");
-    }
-    return signatureBuilder.toString();
   }
 
   public static IStructuredType createStructuredType(IType type) {
