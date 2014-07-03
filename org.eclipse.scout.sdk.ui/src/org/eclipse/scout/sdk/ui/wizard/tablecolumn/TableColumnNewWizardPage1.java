@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
@@ -192,7 +193,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
     private final HashSet<String> m_shortList;
 
     private P_TableContentProvider() {
-      ArrayList<Object> templates = new ArrayList<Object>();
+      List<Object> templates = new ArrayList<Object>();
       IJavaProject javaProject = m_declaringType.getJavaProject();
 
       IType stringCol = RuntimeClasses.getSuperType(IRuntimeClasses.IStringColumn, javaProject);
@@ -202,6 +203,8 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       IType intCol = RuntimeClasses.getSuperType(IRuntimeClasses.IIntegerColumn, javaProject);
       IType longCol = RuntimeClasses.getSuperType(IRuntimeClasses.ILongColumn, javaProject);
       IType smartCol = RuntimeClasses.getSuperType(IRuntimeClasses.ISmartColumn, javaProject);
+      IType bigDecCol = RuntimeClasses.getSuperType(IRuntimeClasses.IBigDecimalColumn, javaProject);
+      IType bigIntCol = RuntimeClasses.getSuperType(IRuntimeClasses.IBigIntegerColumn, javaProject);
 
       templates.add(stringCol);
       templates.add(boolCol);
@@ -210,8 +213,10 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       templates.add(intCol);
       templates.add(longCol);
       templates.add(smartCol);
+      templates.add(bigDecCol);
+      templates.add(bigIntCol);
 
-      m_shortList = new HashSet<String>(7);
+      m_shortList = new HashSet<String>(9);
       m_shortList.add(stringCol.getFullyQualifiedName());
       m_shortList.add(boolCol.getFullyQualifiedName());
       m_shortList.add(dateCol.getFullyQualifiedName());
@@ -219,6 +224,8 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       m_shortList.add(intCol.getFullyQualifiedName());
       m_shortList.add(longCol.getFullyQualifiedName());
       m_shortList.add(smartCol.getFullyQualifiedName());
+      m_shortList.add(bigDecCol.getFullyQualifiedName());
+      m_shortList.add(bigIntCol.getFullyQualifiedName());
 
       templates.add(new ISeparator() {
       });

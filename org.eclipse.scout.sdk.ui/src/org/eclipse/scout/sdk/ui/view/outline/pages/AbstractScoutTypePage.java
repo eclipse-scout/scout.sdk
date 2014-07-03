@@ -20,6 +20,9 @@ import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyProvider;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
@@ -47,6 +50,17 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
   @Override
   public IType getType() {
     return m_type;
+  }
+
+  protected ITypeHierarchy getLocalHierarchy() {
+    IPage p = this;
+    while (p != null) {
+      if (p instanceof ITypeHierarchyProvider) {
+        return ((ITypeHierarchyProvider) p).getTypeHierarchy();
+      }
+      p = p.getParent();
+    }
+    return TypeUtility.getLocalTypeHierarchy(getType()); // fall back if no parent has a type hierarchy created yet (e.g. for templates).
   }
 
   protected String getMethodNameForTranslatedText() {

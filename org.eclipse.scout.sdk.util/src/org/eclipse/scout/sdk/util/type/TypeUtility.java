@@ -193,6 +193,24 @@ public class TypeUtility {
    */
   public static Set<IType> getInnerTypesOrdered(IType declaringType, IType supertype, Comparator<IType> comparator) {
     ITypeHierarchy localTypeHierarchy = getLocalTypeHierarchy(declaringType);
+    return getInnerTypesOrdered(declaringType, supertype, comparator, localTypeHierarchy);
+  }
+
+  /**
+   * Returns the immediate member types declared by the given type which are subtypes of the given supertype. The
+   * results is sorted using the given comparator.
+   *
+   * @param declaringType
+   *          The type whose immediate inner types should be returned.
+   * @param supertype
+   *          The supertype for which all returned types must be a subtype.
+   * @param comparator
+   *          the comparator to sort the result.
+   * @param localTypeHierarchy
+   *          The local type hierarchy to use.
+   * @return the immediate member types declared by the given type which are subtypes of the given supertype.
+   */
+  public static Set<IType> getInnerTypesOrdered(IType declaringType, IType supertype, Comparator<IType> comparator, ITypeHierarchy localTypeHierarchy) {
     Set<IType> allSubtypes = getInnerTypes(declaringType, TypeFilters.getSubtypeFilter(supertype, localTypeHierarchy), comparator);
     return allSubtypes;
   }

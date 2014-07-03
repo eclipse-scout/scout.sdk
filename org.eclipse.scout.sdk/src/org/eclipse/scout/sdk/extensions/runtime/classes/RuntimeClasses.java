@@ -38,7 +38,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link RuntimeClassExtensionPoint}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 22.11.2012
  */
@@ -209,11 +209,13 @@ public final class RuntimeClasses implements IRuntimeClasses {
 
   private static String getDefaultSuperType(String interfaceFqn, IScoutBundle context) {
     TreeMap<Double, String> defaults = getDefaults().get(interfaceFqn);
-    for (String fqn : defaults.values()) {
-      IType t = TypeUtility.getType(fqn);
-      if (TypeUtility.exists(t)) {
-        if (TypeUtility.isOnClasspath(t, ScoutUtility.getJavaProject(context))) {
-          return fqn;
+    if (defaults != null) {
+      for (String fqn : defaults.values()) {
+        IType t = TypeUtility.getType(fqn);
+        if (TypeUtility.exists(t)) {
+          if (TypeUtility.isOnClasspath(t, ScoutUtility.getJavaProject(context))) {
+            return fqn;
+          }
         }
       }
     }

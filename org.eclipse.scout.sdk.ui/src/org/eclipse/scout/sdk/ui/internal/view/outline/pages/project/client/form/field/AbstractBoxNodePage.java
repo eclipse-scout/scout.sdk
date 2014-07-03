@@ -83,7 +83,7 @@ public abstract class AbstractBoxNodePage extends AbstractScoutTypePage {
 
     new KeyStrokeTablePage(this, getType());
 
-    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType());
+    ITypeHierarchy hierarchy = getLocalHierarchy();
     Set<IType> allSubtypes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iFormField, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType t : allSubtypes) {
       ITypePage nodePage = (ITypePage) FormFieldExtensionPoint.createNodePage(t, hierarchy);

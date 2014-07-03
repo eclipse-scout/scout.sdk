@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link RuntimeClasses}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.01.2009
  */
@@ -226,6 +226,7 @@ public interface IRuntimeClasses {
   String IWizard = "org.eclipse.scout.rt.client.ui.wizard.IWizard"; // NO_UCD
   String IWizardStep = "org.eclipse.scout.rt.client.ui.wizard.IWizardStep"; // NO_UCD
   String IBigDecimalColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IBigDecimalColumn"; // NO_UCD
+  String IBigIntegerColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IBigIntegerColumn"; // NO_UCD
   String IBooleanColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IBooleanColumn"; // NO_UCD
   String IDateColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn"; // NO_UCD
   String IDoubleColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IDoubleColumn"; // NO_UCD

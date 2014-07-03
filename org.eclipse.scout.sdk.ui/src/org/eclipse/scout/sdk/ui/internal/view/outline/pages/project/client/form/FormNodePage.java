@@ -29,14 +29,17 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyProvider;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>FormNodePage</h3> ...
  */
-public class FormNodePage extends AbstractScoutTypePage {
+public class FormNodePage extends AbstractScoutTypePage implements ITypeHierarchyProvider {
 
   private InnerTypePageDirtyListener m_mainBoxListener;
+  private ITypeHierarchy m_localHierarchy;
 
   public FormNodePage(AbstractPage parent, IType type) {
     super(SdkProperties.SUFFIX_FORM);
@@ -73,7 +76,7 @@ public class FormNodePage extends AbstractScoutTypePage {
     }
     new BeanPropertyTablePage(this, getType());
 
-    for (IType mainBoxType : ScoutTypeUtility.getInnerTypesOrdered(getType(), iGroupBox)) {
+    for (IType mainBoxType : ScoutTypeUtility.getInnerTypesOrdered(getType(), iGroupBox, getTypeHierarchy())) {
       MainBoxNodePage mainBoxNodePage = new MainBoxNodePage();
       mainBoxNodePage.setParent(this);
       mainBoxNodePage.setType(mainBoxType);
@@ -109,4 +112,12 @@ public class FormNodePage extends AbstractScoutTypePage {
     return false;
   }
 
+  @Override
+  public ITypeHierarchy getTypeHierarchy() {
+    // no sync required
+    if (m_localHierarchy == null) {
+      m_localHierarchy = TypeUtility.getLocalTypeHierarchy(getType());
+    }
+    return m_localHierarchy;
+  }
 }

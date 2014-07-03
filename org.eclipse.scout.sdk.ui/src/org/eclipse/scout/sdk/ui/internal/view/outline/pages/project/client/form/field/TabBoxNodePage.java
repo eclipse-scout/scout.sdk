@@ -64,7 +64,7 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_innerTypeListener);
     }
     new KeyStrokeTablePage(this, getType());
-    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getType());
+    ITypeHierarchy hierarchy = getLocalHierarchy();
     IType iGroupBox = TypeUtility.getType(IRuntimeClasses.IGroupBox);
     Set<IType> allGroupboxes = TypeUtility.getInnerTypes(getType(), TypeFilters.getSubtypeFilter(iGroupBox, hierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
     for (IType groupBox : allGroupboxes) {

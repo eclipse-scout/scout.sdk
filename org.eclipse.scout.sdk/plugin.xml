@@ -412,6 +412,12 @@
          </default>
       </element>
       <element
+            interface="org.eclipse.scout.rt.client.ui.basic.table.columns.IBigIntegerColumn">
+         <default
+               class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractBigIntegerColumn">
+         </default>
+      </element>
+      <element
             interface="org.eclipse.scout.rt.client.ui.basic.table.columns.IDateColumn">
          <default
                class="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn">

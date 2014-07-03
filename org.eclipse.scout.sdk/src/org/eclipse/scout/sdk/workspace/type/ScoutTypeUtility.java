@@ -92,6 +92,22 @@ public class ScoutTypeUtility extends TypeUtility {
     return getInnerTypesOrdered(declaringType, superType, ScoutTypeComparators.getOrderAnnotationComparator());
   }
 
+  /**
+   * Returns the immediate member types declared by the given type which are sub-types of the given super-type. The
+   * results is sorted using the order annotation of the types.
+   *
+   * @param declaringType
+   *          The type whose immediate inner types should be returned.
+   * @param superType
+   *          The super-type for which all returned types must be a sub-type.
+   * @param localHierarchy
+   *          The local type hierarchy to use.
+   * @return the immediate member types declared by the given type which are sub-types of the given super-type.
+   */
+  public static Set<IType> getInnerTypesOrdered(IType declaringType, IType superType, ITypeHierarchy localHierarchy) {
+    return getInnerTypesOrdered(declaringType, superType, ScoutTypeComparators.getOrderAnnotationComparator(), localHierarchy);
+  }
+
   public static IScoutBundle getScoutBundle(IProject p) {
     return ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(p);
   }
