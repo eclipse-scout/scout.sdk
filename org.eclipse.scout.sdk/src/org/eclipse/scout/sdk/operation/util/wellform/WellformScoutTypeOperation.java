@@ -10,7 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.util.wellform;
 
+import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -39,6 +41,9 @@ import org.eclipse.text.edits.ReplaceEdit;
  */
 public class WellformScoutTypeOperation implements IOperation {
 
+  private static final Pattern LEADING_SPACES_REGEX = Pattern.compile("\\s*$");
+  private static final Pattern TRAILING_SPACES_REGEX = Pattern.compile("^\\s*");
+
   private final Set<IType> m_types;
   private final boolean m_recursive;
   private String m_lineDelimiter;
@@ -56,9 +61,9 @@ public class WellformScoutTypeOperation implements IOperation {
   public String getOperationName() {
     StringBuilder builder = new StringBuilder();
     builder.append("Wellform ");
-    int i = 0;
     if (m_types.size() > 0) {
-      builder.append("'");
+      int i = 0;
+      builder.append('\'');
       for (IType t : m_types) {
         builder.append(t.getElementName());
         if (i < 2) {
@@ -69,7 +74,7 @@ public class WellformScoutTypeOperation implements IOperation {
         }
         i++;
       }
-      builder.append("'");
+      builder.append('\'');
     }
     builder.append("...");
     return builder.toString();
@@ -114,7 +119,6 @@ public class WellformScoutTypeOperation implements IOperation {
   }
 
   protected void buildSource(IType type, StringBuilder builder) throws JavaModelException {
-
     IJavaElement[] children = type.getChildren();
     String typeSource = type.getSource();
     if (children == null || children.length == 0) {
@@ -138,64 +142,65 @@ public class WellformScoutTypeOperation implements IOperation {
 
         String classHeader = typeSource.substring(0, start);
         // remove leading spaces
-        classHeader = classHeader.replaceAll("\\s*$", "");
+        classHeader = LEADING_SPACES_REGEX.matcher(classHeader).replaceAll("");
         builder.append(classHeader + m_lineDelimiter);
+
         IStructuredType structureHelper = ScoutTypeUtility.createStructuredType(type);
-        append(structureHelper.getElements(CATEGORIES.FIELD_LOGGER, IField.class), builder);
-        append(structureHelper.getElements(CATEGORIES.FIELD_STATIC, IField.class), builder);
-        append(structureHelper.getElements(CATEGORIES.FIELD_MEMBER, IField.class), builder);
-        append(structureHelper.getElements(CATEGORIES.FIELD_UNKNOWN, IField.class), builder);
-        append(structureHelper.getElements(CATEGORIES.ENUM, IType.class), builder, false);
+        appendFields(structureHelper.getElements(CATEGORIES.FIELD_LOGGER, IField.class), builder);
+        appendFields(structureHelper.getElements(CATEGORIES.FIELD_STATIC, IField.class), builder);
+        appendFields(structureHelper.getElements(CATEGORIES.FIELD_MEMBER, IField.class), builder);
+        appendFields(structureHelper.getElements(CATEGORIES.FIELD_UNKNOWN, IField.class), builder);
+        appendTypes(structureHelper.getElements(CATEGORIES.ENUM, IType.class), builder, false);
         // methods
-        append(structureHelper.getElements(CATEGORIES.METHOD_CONSTRUCTOR, IMethod.class), builder);
-        append(structureHelper.getElements(CATEGORIES.METHOD_CONFIG_PROPERTY, IMethod.class), builder);
-        append(structureHelper.getElements(CATEGORIES.METHOD_CONFIG_EXEC, IMethod.class), builder);
-        append(structureHelper.getElements(CATEGORIES.METHOD_FORM_DATA_BEAN, IMethod.class), builder);
-        append(structureHelper.getElements(CATEGORIES.METHOD_OVERRIDDEN, IMethod.class), builder);
-        append(structureHelper.getElements(CATEGORIES.METHOD_START_HANDLER, IMethod.class), builder);
-        append(structureHelper.getElements(CATEGORIES.METHOD_INNER_TYPE_GETTER, IMethod.class), builder);
-        append(structureHelper.getElements(CATEGORIES.METHOD_LOCAL_BEAN, IMethod.class), builder);
-        append(structureHelper.getElements(CATEGORIES.METHOD_UNCATEGORIZED, IMethod.class), builder);
+        appendMethods(structureHelper.getElements(CATEGORIES.METHOD_CONSTRUCTOR, IMethod.class), builder);
+        appendMethods(structureHelper.getElements(CATEGORIES.METHOD_CONFIG_PROPERTY, IMethod.class), builder);
+        appendMethods(structureHelper.getElements(CATEGORIES.METHOD_CONFIG_EXEC, IMethod.class), builder);
+        appendMethods(structureHelper.getElements(CATEGORIES.METHOD_FORM_DATA_BEAN, IMethod.class), builder);
+        appendMethods(structureHelper.getElements(CATEGORIES.METHOD_OVERRIDDEN, IMethod.class), builder);
+        appendMethods(structureHelper.getElements(CATEGORIES.METHOD_START_HANDLER, IMethod.class), builder);
+        appendMethods(structureHelper.getElements(CATEGORIES.METHOD_INNER_TYPE_GETTER, IMethod.class), builder);
+        appendMethods(structureHelper.getElements(CATEGORIES.METHOD_LOCAL_BEAN, IMethod.class), builder);
+        appendMethods(structureHelper.getElements(CATEGORIES.METHOD_UNCATEGORIZED, IMethod.class), builder);
         // types
-        append(structureHelper.getElements(CATEGORIES.TYPE_FORM_FIELD, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_COLUMN, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_CODE, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_FORM, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_TABLE, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_ACTIVITY_MAP, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_TREE, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_CALENDAR, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_CALENDAR_ITEM_PROVIDER, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_WIZARD, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_WIZARD_STEP, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_MENU, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_VIEW_BUTTON, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_TOOL_BUTTON, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_KEYSTROKE, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_FORM_HANDLER, IType.class), builder, isRecursive());
-        append(structureHelper.getElements(CATEGORIES.TYPE_UNCATEGORIZED, IType.class), builder, false);
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_FORM_FIELD, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_COLUMN, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_CODE, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_FORM, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_TABLE, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_ACTIVITY_MAP, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_TREE, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_CALENDAR, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_CALENDAR_ITEM_PROVIDER, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_WIZARD, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_WIZARD_STEP, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_MENU, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_VIEW_BUTTON, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_TOOL_BUTTON, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_KEYSTROKE, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_FORM_HANDLER, IType.class), builder, isRecursive());
+        appendTypes(structureHelper.getElements(CATEGORIES.TYPE_UNCATEGORIZED, IType.class), builder, false);
 
         String classTail = typeSource.substring(end);
-        // remove tailing spaces
-        classTail = classTail.replaceAll("^\\s*", "");
+        // remove trailing spaces
+        classTail = TRAILING_SPACES_REGEX.matcher(classTail).replaceAll("");
         builder.append(classTail);
       }
     }
   }
 
-  protected void append(IField[] fields, StringBuilder builder) throws JavaModelException {
+  protected void appendFields(List<IField> fields, StringBuilder builder) throws JavaModelException {
     for (IField f : fields) {
       builder.append(m_lineDelimiter + f.getSource());
     }
   }
 
-  protected void append(IMethod[] methods, StringBuilder builder) throws JavaModelException {
+  protected void appendMethods(List<IMethod> methods, StringBuilder builder) throws JavaModelException {
     for (IMethod m : methods) {
       builder.append(m_lineDelimiter + m.getSource());
     }
   }
 
-  protected void append(IType[] types, StringBuilder builder, boolean recursive) throws JavaModelException {
+  protected void appendTypes(List<IType> types, StringBuilder builder, boolean recursive) throws JavaModelException {
     for (IType t : types) {
       if (recursive) {
         builder.append(m_lineDelimiter + m_lineDelimiter);

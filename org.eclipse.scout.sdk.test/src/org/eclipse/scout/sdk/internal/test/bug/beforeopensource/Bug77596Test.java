@@ -24,7 +24,6 @@ import org.junit.Test;
 
 /**
  * <h1>Bug 77'596</h1>
- * <p>
  */
 public class Bug77596Test extends AbstractScoutSdkTest {
 
@@ -41,18 +40,18 @@ public class Bug77596Test extends AbstractScoutSdkTest {
   @Test
   public void testStructure() throws Exception {
     IStructuredType helper = getCompanyFormHelper();
-    Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_LOGGER).length == 1);
-    Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_STATIC).length == 1);
-    Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_MEMBER).length == 3);
-    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONSTRUCTOR).length == 1);
-    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONFIG_EXEC).length == 0);
-    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONFIG_PROPERTY).length == 1);
-    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_FORM_DATA_BEAN).length == 4);
-    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_OVERRIDDEN).length == 0);
-    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_START_HANDLER).length == 2);
-    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_INNER_TYPE_GETTER).length == 32);
-    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_LOCAL_BEAN).length == 2);
-    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_UNCATEGORIZED).length == 1);
+    Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_LOGGER).size() == 1);
+    Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_STATIC).size() == 1);
+    Assert.assertTrue(helper.getElements(CATEGORIES.FIELD_MEMBER).size() == 3);
+    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONSTRUCTOR).size() == 1);
+    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONFIG_EXEC).size() == 0);
+    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_CONFIG_PROPERTY).size() == 1);
+    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_FORM_DATA_BEAN).size() == 4);
+    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_OVERRIDDEN).size() == 0);
+    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_START_HANDLER).size() == 2);
+    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_INNER_TYPE_GETTER).size() == 32);
+    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_LOCAL_BEAN).size() == 2);
+    Assert.assertTrue(helper.getElements(CATEGORIES.METHOD_UNCATEGORIZED).size() == 1);
   }
 
   @Test

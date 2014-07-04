@@ -112,7 +112,7 @@ public class PlannerFieldNewOperation implements IOperation {
     tableBuilder.setFlags(Flags.AccPublic);
     tableBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITable, getDeclaringType().getJavaProject()));
     // order annotation
-    tableBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
+    tableBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
     // getConfiguredAutoResizeColumns method
     IMethodSourceBuilder getConfiguredAutoResizeColumnsBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(tableBuilder, "getConfiguredAutoResizeColumns");
     getConfiguredAutoResizeColumnsBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return true;"));
@@ -145,8 +145,9 @@ public class PlannerFieldNewOperation implements IOperation {
       activityMapSuperTypeSig = SignatureCache.createTypeSignature(superTypeSigBuilder.toString());
     }
     activityMapBuilder.setSuperTypeSignature(activityMapSuperTypeSig);
+
     // order annotation
-    activityMapBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
+    activityMapBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
 
     sourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeActivityMapKey(activityMapBuilder), activityMapBuilder);
   }

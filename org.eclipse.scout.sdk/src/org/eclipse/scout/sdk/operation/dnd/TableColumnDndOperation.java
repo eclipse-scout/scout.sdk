@@ -10,12 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.dnd;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.method.InnerTypeGetterCreateOperation;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
@@ -25,7 +28,6 @@ import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -39,20 +41,22 @@ public class TableColumnDndOperation extends AbstractTypeDndOperation {
    * @param typeCategory
    */
   public TableColumnDndOperation(IType type, IType targetDeclaringType, String newName, int mode) {
-    super(type, targetDeclaringType, newName, CATEGORIES.TYPE_COLUMN, mode);
+    super(type, targetDeclaringType, newName, TypeUtility.getType(IRuntimeClasses.IColumn), mode);
   }
 
   @Override
-  protected IType createNewType(IType declaringType, String simpleName, String source, String[] fqImports, IJavaElement sibling, IStructuredType structuredType, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    final IType newColumn = super.createNewType(declaringType, simpleName, source, fqImports, sibling, structuredType, monitor, manager);
+  protected IType createNewType(String source, List<String> fqImports, IJavaElement sibling, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+    final IType newColumn = super.createNewType(source, fqImports, sibling, monitor, manager);
 
-    InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(newColumn, declaringType, false);
+    InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(newColumn, getTargetDeclaringType(), false);
     getterOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder sourceBuilder, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         sourceBuilder.append("return getColumnSet().getColumnByClass(").append(validator.getTypeName(SignatureCache.createTypeSignature(newColumn.getFullyQualifiedName()))).append(".class);");
       }
     });
+
+    IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getTargetDeclaringType());
     getterOp.setSibling(structuredType.getSiblingMethodFieldGetter(getterOp.getElementName()));
     getterOp.validate();
     getterOp.run(monitor, manager);
@@ -70,5 +74,4 @@ public class TableColumnDndOperation extends AbstractTypeDndOperation {
     }
     delOp.run(monitor, workingCopyManager);
   }
-
 }

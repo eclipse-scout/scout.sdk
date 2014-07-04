@@ -46,7 +46,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 
 /**
  * <h3>{@link OutlineTemplateHomeFormCreateOperation}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 08.03.2013
  */
@@ -125,7 +125,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
 
     // main box
     ITypeSourceBuilder mainBoxBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_MAIN_BOX);
-    mainBoxBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
+    mainBoxBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
     mainBoxBuilder.setFlags(Flags.AccPublic);
     mainBoxBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, mobileClient.getJavaProject()));
     // fill main box
@@ -242,7 +242,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     // LogoutButton type
     ITypeSourceBuilder logoutButtonBuilder = new TypeSourceBuilder("LogoutButton");
     logoutButtonBuilder.setFlags(Flags.AccPublic);
-    logoutButtonBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(20));
+    logoutButtonBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(2 * SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
     logoutButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IButton, mobileClient));
     // getConfiguredLabel method
     IMethodSourceBuilder getConfiguredLabelBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(logoutButtonBuilder, "getConfiguredLabel");
@@ -277,7 +277,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     // Table type
     ITypeSourceBuilder tableBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_TABLEFIELD_TABLE);
     tableBuilder.setFlags(Flags.AccPublic);
-    tableBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
+    tableBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
     tableBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.mobile.ui.basic.table.AbstractMobileTable"));
 
     // OutlinesTableField type
@@ -285,7 +285,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     String genericTableFqn = new StringBuilder(mainBoxFqn).append('.').append(outlinesTableFieldBuilder.getElementName()).append('.').append(tableBuilder.getElementName()).toString();
     outlinesTableFieldBuilder.setFlags(Flags.AccPublic);
     outlinesTableFieldBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.ITableField, mobileClient) + "<" + genericTableFqn.toString() + ">"));
-    outlinesTableFieldBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
+    outlinesTableFieldBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
 
     // method getConfiguredLabelVisible
     IMethodSourceBuilder getConfiguredLabelVisible = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(outlinesTableFieldBuilder, "getConfiguredLabelVisible");
@@ -366,7 +366,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     else {
       outlineColumnBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));
     }
-    outlineColumnBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
+    outlineColumnBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
     // getConfiguredDisplayable method
     IMethodSourceBuilder getConfiguredDisplayableBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(outlineColumnBuilder, "getConfiguredDisplayable");
     getConfiguredDisplayableBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return false;"));
@@ -378,7 +378,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     ITypeSourceBuilder labelColumnBuilder = new TypeSourceBuilder("LabelColumn");
     labelColumnBuilder.setFlags(Flags.AccPublic);
     labelColumnBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IStringColumn, mobileClient));
-    labelColumnBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(20));
+    labelColumnBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(2 * SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
 
     tableBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTableColumnKey(labelColumnBuilder, 20), labelColumnBuilder);
 

@@ -48,6 +48,7 @@ import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.IRegEx;
 import org.eclipse.scout.sdk.util.ScoutUtility;
+import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.ast.visitor.MethodBodyAstVisitor;
 import org.eclipse.scout.sdk.util.ast.visitor.TypeAnnotationAstVisitor;
@@ -1650,5 +1651,99 @@ public class ScoutTypeUtility extends TypeUtility {
     }
     ICachedTypeHierarchy clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(sessionBaseType);
     return clientSessionHierarchy.getAllSubtypes(sessionBaseType, sessionFilter, TypeComparators.getTypeNameComparator());
+  }
+
+  public static double getOrderNr(IType declaringType, IType orderDefinitionType, IJavaElement sibling) throws JavaModelException {
+    ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(declaringType);
+    return getOrderNr(declaringType, orderDefinitionType, sibling, typeHierarchy);
+  }
+
+  public static double getOrderNr(IType declaringType, IType orderDefinitionType, IJavaElement sibling, ITypeHierarchy typeHierarchy) throws JavaModelException {
+    if (!TypeUtility.exists(orderDefinitionType) || !TypeUtility.exists(declaringType)) {
+      return -1.0;
+    }
+
+    // get all siblings
+    Set<IType> innerTypes = TypeUtility.getInnerTypes(declaringType, TypeFilters.getSubtypeFilter(orderDefinitionType, typeHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
+
+    // find direct neighbors
+    IType typeBefore = null;
+    IType typeAfter = null;
+    IType lastType = null;
+    for (IType innerType : innerTypes) {
+      if (innerType.equals(sibling)) {
+        typeAfter = innerType;
+        typeBefore = lastType;
+        break;
+      }
+      lastType = innerType;
+    }
+    if (sibling == null) {
+      typeBefore = lastType;
+    }
+
+    // parse order value for neighbors
+    Double orderValueBefore = null;
+    Double orderValueAfter = null;
+    if (typeBefore != null) {
+      orderValueBefore = ScoutTypeUtility.getOrderAnnotationValue(typeBefore);
+    }
+    if (typeAfter != null) {
+      orderValueAfter = ScoutTypeUtility.getOrderAnnotationValue(typeAfter);
+    }
+
+    // calculate next values
+    if (orderValueBefore != null && orderValueAfter == null) {
+      // insert at last position
+      double v = Math.ceil(orderValueBefore.doubleValue() / SdkProperties.ORDER_ANNOTATION_VALUE_STEP) * SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
+      return v + SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
+    }
+    else if (orderValueBefore == null && orderValueAfter != null) {
+      // insert at first position
+      double v = Math.floor(orderValueAfter.doubleValue() / SdkProperties.ORDER_ANNOTATION_VALUE_STEP) * SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
+      if (v > SdkProperties.ORDER_ANNOTATION_VALUE_STEP) {
+        return SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
+      }
+      return v - SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
+    }
+    else if (orderValueBefore != null && orderValueAfter != null) {
+      // insert between two types
+      double a = orderValueBefore.doubleValue();
+      double b = orderValueAfter.doubleValue();
+      return getOrderValueInBetween(a, b);
+    }
+
+    // other cases. e.g. first item in a container
+    return SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
+  }
+
+  public static double getOrderValueInBetween(double a, double b) {
+    double low = Math.min(a, b);
+    double high = Math.max(a, b);
+    double dif = high - low;
+    double lowFloor = Math.floor(low);
+    double lowCeil = Math.ceil(low);
+    double highFloor = Math.floor(high);
+    double nextIntLow = Math.min(lowCeil, highFloor);
+    double prevIntHigh = Math.max(lowCeil, highFloor);
+
+    // special case for stepwise increase
+    if (low % SdkProperties.ORDER_ANNOTATION_VALUE_STEP == 0 && low + SdkProperties.ORDER_ANNOTATION_VALUE_STEP < high) {
+      return low + SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
+    }
+
+    if (lowFloor != highFloor && ((lowFloor != low && highFloor != high) || dif > 1.0)) {
+      // integer value possible
+      double intDif = prevIntHigh - nextIntLow;
+      if (intDif == 1.0) {
+        return prevIntHigh;
+      }
+      else {
+        return nextIntLow + Math.floor(intDif / 2.0);
+      }
+    }
+    else {
+      return low + (dif / 2);
+    }
   }
 }

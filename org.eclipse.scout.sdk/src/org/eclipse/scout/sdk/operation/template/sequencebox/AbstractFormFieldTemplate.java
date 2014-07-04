@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link AbstractFormFieldTemplate}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 12.04.2013
  */
@@ -52,7 +52,7 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
       parentName = parentName.substring(0, lastBoxIndex);
     }
     String sequenceBoxFqn = IRegEx.DOLLAR_REPLACEMENT.matcher(declaringType.getFullyQualifiedName() + "." + sourceBuilder.getElementName()).replaceAll(".");
-    double order = 10;
+    double order = SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
 
     // from
     String fromFieldName = parentName + SdkProperties.SUFFIX_FROM;
@@ -64,7 +64,7 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
     sourceBuilder.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(fromFieldBuilder, order), fromFieldBuilder);
     // create from getter
     createFormFieldGetter(SignatureCache.createTypeSignature(sequenceBoxFqn + "." + fromFieldBuilder.getElementName()), declaringType, monitor, manager);
-    order += 10;
+    order += SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
 
     // to
     String toFieldName = parentName + SdkProperties.SUFFIX_TO;

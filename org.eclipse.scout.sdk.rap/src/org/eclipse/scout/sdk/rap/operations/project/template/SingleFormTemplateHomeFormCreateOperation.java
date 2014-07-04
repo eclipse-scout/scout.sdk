@@ -43,7 +43,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 
 /**
  * <h3>{@link SingleFormTemplateHomeFormCreateOperation}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 08.03.2013
  */
@@ -92,8 +92,8 @@ public class SingleFormTemplateHomeFormCreateOperation extends AbstractScoutProj
     ITypeSourceBuilder logoutButtonBuilder = new TypeSourceBuilder("LogoutButton");
     logoutButtonBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IButton, mobileClient.getJavaProject()));
     logoutButtonBuilder.setFlags(Flags.AccPublic);
-    logoutButtonBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10));
-    homeFormOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(logoutButtonBuilder, 10), logoutButtonBuilder);
+    logoutButtonBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
+    homeFormOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(logoutButtonBuilder, SdkProperties.ORDER_ANNOTATION_VALUE_STEP), logoutButtonBuilder);
 
     // getConfiguredLabel method
     IMethodSourceBuilder getConfiguredLabelBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(logoutButtonBuilder, SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);

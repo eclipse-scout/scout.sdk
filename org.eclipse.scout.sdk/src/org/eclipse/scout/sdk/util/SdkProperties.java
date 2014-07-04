@@ -17,7 +17,7 @@ import org.eclipse.jdt.core.IMethod;
 
 /**
  * <h3>{@link SdkProperties}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.10.2008
  */
@@ -96,6 +96,8 @@ public final class SdkProperties {
   public static final String NUMBER_MAX = "inf";
   public static final String NUMBER_MIN = "-inf";
   public static final String INPUT_MULTI_UNDEFINED = "###";
+
+  public static final int ORDER_ANNOTATION_VALUE_STEP = 1000;
 
   private static final Pattern REGEX_METHOD_PRESENTER_NAME = Pattern.compile("([A-Z])");
 

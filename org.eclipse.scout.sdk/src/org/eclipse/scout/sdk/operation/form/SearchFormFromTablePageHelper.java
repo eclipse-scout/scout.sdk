@@ -45,7 +45,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
  * <h3>{@link SearchFormFromTablePageHelper}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 21.05.2013
  */
@@ -73,13 +73,13 @@ public final class SearchFormFromTablePageHelper {
       searchFormBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execResetSearchFilterBuilder), execResetSearchFilterBuilder);
     }
     // main box
-    ITypeSourceBuilder mainBoxBuilder = addFormField(SdkProperties.TYPE_NAME_MAIN_BOX, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, searchFormProject), 10, searchFormFqn, searchFormBuilder, searchFormBuilder);
+    ITypeSourceBuilder mainBoxBuilder = addFormField(SdkProperties.TYPE_NAME_MAIN_BOX, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, searchFormProject), SdkProperties.ORDER_ANNOTATION_VALUE_STEP, searchFormFqn, searchFormBuilder, searchFormBuilder);
     String mainBoxFqn = searchFormFqn + "." + mainBoxBuilder.getElementName();
     // tabbox
-    ITypeSourceBuilder tabBoxBuilder = addFormField("TabBox", RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITabBox, searchFormProject), 10, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
+    ITypeSourceBuilder tabBoxBuilder = addFormField("TabBox", RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITabBox, searchFormProject), SdkProperties.ORDER_ANNOTATION_VALUE_STEP, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
     String tabBoxFqn = mainBoxFqn + "." + tabBoxBuilder.getElementName();
     // field box (group box)
-    ITypeSourceBuilder fieldBoxBuilder = addFormField("Field" + SdkProperties.SUFFIX_GROUP_BOX, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, searchFormProject), 10, tabBoxFqn, tabBoxBuilder, searchFormBuilder);
+    ITypeSourceBuilder fieldBoxBuilder = addFormField("Field" + SdkProperties.SUFFIX_GROUP_BOX, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, searchFormProject), SdkProperties.ORDER_ANNOTATION_VALUE_STEP, tabBoxFqn, tabBoxBuilder, searchFormBuilder);
     String fieldBoxFqn = tabBoxFqn + "." + fieldBoxBuilder.getElementName();
     INlsEntry searchCriteriaEntry = null;
     if (nlsProvider != null) {
@@ -101,7 +101,7 @@ public final class SearchFormFromTablePageHelper {
     }
     fieldBoxBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(getConfiguredLabelBuilder), getConfiguredLabelBuilder);
     // fields
-    double fieldOrder = 10;
+    double fieldOrder = SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
     ITypeHierarchy tablePageHierarchy = TypeUtility.getLocalTypeHierarchy(tablePage);
     Set<IType> tables = TypeUtility.getInnerTypes(tablePage, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITable), tablePageHierarchy));
     if (tables.size() > 0) {
@@ -119,7 +119,7 @@ public final class SearchFormFromTablePageHelper {
           String retVal = ScoutUtility.getMethodReturnValue(configurationMethod.peekMethod());
           if ("true".equals(retVal)) {
             addSearchField(column, tablePageHierarchy, fieldOrder, fieldBoxFqn, fieldBoxBuilder, searchFormBuilder, searchFormProject, nlsProvider);
-            fieldOrder += 10;
+            fieldOrder += SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
           }
         }
       }
@@ -128,7 +128,7 @@ public final class SearchFormFromTablePageHelper {
     // button reset
     addFormField("Reset" + SdkProperties.SUFFIX_BUTTON, SignatureCache.createTypeSignature(IRuntimeClasses.AbstractResetButton), fieldOrder, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
     // button search
-    addFormField("Search" + SdkProperties.SUFFIX_BUTTON, SignatureCache.createTypeSignature(IRuntimeClasses.AbstractSearchButton), fieldOrder + 10, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
+    addFormField("Search" + SdkProperties.SUFFIX_BUTTON, SignatureCache.createTypeSignature(IRuntimeClasses.AbstractSearchButton), fieldOrder + SdkProperties.ORDER_ANNOTATION_VALUE_STEP, mainBoxFqn, mainBoxBuilder, searchFormBuilder);
   }
 
   private static ITypeSourceBuilder addFormField(String fieldName, String superTypeSignature, double orderNr, String fieldOwnerFqn, ITypeSourceBuilder fieldOwnerBuilder, ITypeSourceBuilder fieldGetterOwnerBuilder) throws CoreException {
@@ -225,7 +225,6 @@ public final class SearchFormFromTablePageHelper {
   }
 
   private static void fillSequenceBox(ITypeSourceBuilder sequenceBoxBuilder, String sequenceBoxFqn, String fromToSuperTypeSignature, ITypeSourceBuilder fieldGetterOwnerBuilder, INlsProject nlsProject) throws CoreException {
-
     String parentName = sequenceBoxBuilder.getElementName();
     int lastBoxIndex = parentName.lastIndexOf(SdkProperties.SUFFIX_BOX);
     if (lastBoxIndex > 0) {
@@ -233,11 +232,11 @@ public final class SearchFormFromTablePageHelper {
     }
     // from
     String fromFieldName = parentName + SdkProperties.SUFFIX_FROM;
-    ITypeSourceBuilder fromFieldBuilder = addFormField(fromFieldName, fromToSuperTypeSignature, 10, sequenceBoxFqn, sequenceBoxBuilder, fieldGetterOwnerBuilder);
+    ITypeSourceBuilder fromFieldBuilder = addFormField(fromFieldName, fromToSuperTypeSignature, SdkProperties.ORDER_ANNOTATION_VALUE_STEP, sequenceBoxFqn, sequenceBoxBuilder, fieldGetterOwnerBuilder);
 
     // to
     String toFieldName = parentName + SdkProperties.SUFFIX_TO;
-    ITypeSourceBuilder toFieldBuilder = addFormField(toFieldName, fromToSuperTypeSignature, 20, sequenceBoxFqn, sequenceBoxBuilder, fieldGetterOwnerBuilder);
+    ITypeSourceBuilder toFieldBuilder = addFormField(toFieldName, fromToSuperTypeSignature, 2 * SdkProperties.ORDER_ANNOTATION_VALUE_STEP, sequenceBoxFqn, sequenceBoxBuilder, fieldGetterOwnerBuilder);
 
     // nls text methods
     if (nlsProject != null) {

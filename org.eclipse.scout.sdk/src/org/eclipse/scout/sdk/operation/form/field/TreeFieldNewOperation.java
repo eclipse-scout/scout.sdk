@@ -90,7 +90,7 @@ public class TreeFieldNewOperation implements IOperation {
       ITypeSourceBuilder treeBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_TREEBOX_TREE);
       treeBuilder.setFlags(Flags.AccPublic);
       treeBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITree, getDeclaringType().getJavaProject()));
-      treeBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
+      treeBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
       newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTeeKey(treeBuilder), treeBuilder);
     }
 

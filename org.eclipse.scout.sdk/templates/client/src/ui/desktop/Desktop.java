@@ -26,7 +26,7 @@ public class Desktop extends AbstractExtensibleDesktop implements IDesktop {
     return TEXTS.get("ApplicationTitle");
   }
 
-  @Order(10.0)
+  @Order(1000.0)
   public class FileMenu extends AbstractMenu {
 
     @Override
@@ -34,7 +34,7 @@ public class Desktop extends AbstractExtensibleDesktop implements IDesktop {
       return TEXTS.get("FileMenu");
     }
 
-    @Order(100.0)
+    @Order(1000.0)
     public class ExitMenu extends AbstractMenu {
 
       @Override
@@ -49,7 +49,7 @@ public class Desktop extends AbstractExtensibleDesktop implements IDesktop {
     }
   }
 
-  @Order(20.0)
+  @Order(2000.0)
   public class ToolsMenu extends AbstractMenu {
 
     @Override
@@ -58,14 +58,14 @@ public class Desktop extends AbstractExtensibleDesktop implements IDesktop {
     }
   }
 
-  @Order(25)
+  @Order(3000.0)
   public class BookmarkMenu extends AbstractBookmarkMenu {
     public BookmarkMenu() {
       super(Desktop.this);
     }
   }
 
-  @Order(30.0)
+  @Order(4000.0)
   public class HelpMenu extends AbstractMenu {
 
     @Override
@@ -73,7 +73,7 @@ public class Desktop extends AbstractExtensibleDesktop implements IDesktop {
       return TEXTS.get("HelpMenu");
     }
 
-    @Order(10.0)
+    @Order(1000.0)
     public class AboutMenu extends AbstractMenu {
 
       @Override
@@ -89,7 +89,7 @@ public class Desktop extends AbstractExtensibleDesktop implements IDesktop {
     }
   }
 
-  @Order(10.0)
+  @Order(1000.0)
   public class RefreshOutlineKeyStroke extends AbstractKeyStroke {
 
     @Override

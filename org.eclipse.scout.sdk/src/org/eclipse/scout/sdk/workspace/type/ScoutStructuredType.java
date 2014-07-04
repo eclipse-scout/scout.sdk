@@ -11,12 +11,12 @@
 package org.eclipse.scout.sdk.workspace.type;
 
 import java.io.PrintStream;
-import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -32,7 +32,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -49,20 +48,23 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 public class ScoutStructuredType implements IStructuredType {
 
   private static final Pattern PROPERTY_BEAN_REGEX = Pattern.compile("^(get|set|is|add|remove|clear|delete)(.*)$");
+  private static final Pattern START_HANDLER_REGEX = Pattern.compile("^start(.*)$");
+  private static final Pattern METHOD_INNER_TYPE_GETTER_REGEX = Pattern.compile("^get(.*)$");
 
   private final IType m_type;
   private final EnumSet<CATEGORIES> m_enabledCategories;
-  private EnumSet<CATEGORIES> m_visitedCategories;
-  private HashMap<CATEGORIES, IJavaElement[]> m_elements;
-  private ITypeHierarchy m_typeHierarchy;
+  private final Map<CATEGORIES, List<? extends IJavaElement>> m_elements;
+  private final EnumSet<CATEGORIES> m_visitedCategories;
+  private final ITypeHierarchy m_typeHierarchy;
 
   public ScoutStructuredType(IType type, EnumSet<CATEGORIES> enabledCategories) {
     m_type = type;
     m_enabledCategories = enabledCategories;
     m_visitedCategories = EnumSet.noneOf(CATEGORIES.class);
-    m_elements = new HashMap<CATEGORIES, IJavaElement[]>();
-    // initialy put all into unknown categories
+    m_elements = new HashMap<CATEGORIES, List<? extends IJavaElement>>();
     m_typeHierarchy = TypeUtility.getLocalTypeHierarchy(type);
+
+    // initially put all into unknown categories
     List<IJavaElement> fields = new ArrayList<IJavaElement>();
     List<IJavaElement> enums = new ArrayList<IJavaElement>();
     List<IJavaElement> methods = new ArrayList<IJavaElement>();
@@ -89,44 +91,49 @@ public class ScoutStructuredType implements IStructuredType {
             break;
         }
       }
-      m_elements.put(CATEGORIES.FIELD_UNKNOWN, fields.toArray(new IJavaElement[fields.size()]));
-      m_elements.put(CATEGORIES.ENUM, enums.toArray(new IJavaElement[enums.size()]));
-      m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, methods.toArray(new IJavaElement[methods.size()]));
-      m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, types.toArray(new IJavaElement[types.size()]));
     }
     catch (JavaModelException e) {
       ScoutSdk.logError("could not build structured type of '" + type.getFullyQualifiedName() + "'.", e);
     }
+
+    m_elements.put(CATEGORIES.FIELD_UNKNOWN, fields);
+    m_elements.put(CATEGORIES.ENUM, enums);
+    m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, methods);
+    m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, types);
   }
 
   public IType getType() {
     return m_type;
   }
 
-  @Override
-  public IJavaElement[] getElements(CATEGORIES category) {
+  protected List<? extends IJavaElement> getElementsInternal(CATEGORIES category) {
     cache(category);
-    IJavaElement[] iJavaElements = m_elements.get(category);
-    if (iJavaElements == null) {
-      iJavaElements = new IJavaElement[0];
-    }
-    return iJavaElements;
+    return m_elements.get(category);
+  }
+
+  @Override
+  public List<IJavaElement> getElements(CATEGORIES category) {
+    return CollectionUtility.arrayList(getElementsInternal(category));
   }
 
   @SuppressWarnings("unchecked")
   @Override
-  public <T extends IJavaElement> T[] getElements(CATEGORIES category, Class<T> clazz) {
-    IJavaElement[] elements = getElements(category);
-    T[] result = (T[]) Array.newInstance(clazz, elements.length);
-    for (int i = 0; i < elements.length; i++) {
-      result[i] = (T) elements[i];
+  public <T extends IJavaElement> List<T> getElements(CATEGORIES category, Class<T> clazz) {
+    List<? extends IJavaElement> elements = getElementsInternal(category);
+    if (elements == null) {
+      return CollectionUtility.arrayList();
+    }
+
+    List<T> result = new ArrayList<T>(elements.size());
+    for (IJavaElement e : elements) {
+      result.add((T) e);
     }
     return result;
   }
 
   @Override
   public IJavaElement getSiblingMethodConfigGetConfigured(String methodName) {
-    IJavaElement[] configProperties = getElements(CATEGORIES.METHOD_CONFIG_PROPERTY);
+    List<? extends IJavaElement> configProperties = getElementsInternal(CATEGORIES.METHOD_CONFIG_PROPERTY);
     if (configProperties != null) {
       for (IJavaElement reference : configProperties) {
         if (reference.getElementName().compareTo(methodName) > 0) {
@@ -139,8 +146,7 @@ public class ScoutStructuredType implements IStructuredType {
 
   @Override
   public IJavaElement getSiblingMethodConfigExec(String methodName) {
-    cache(CATEGORIES.METHOD_CONFIG_EXEC);
-    IJavaElement[] references = getElements(CATEGORIES.METHOD_CONFIG_EXEC);
+    List<? extends IJavaElement> references = getElementsInternal(CATEGORIES.METHOD_CONFIG_EXEC);
     if (references != null) {
       for (IJavaElement reference : references) {
         if (reference.getElementName().compareTo(methodName) > 0) {
@@ -153,8 +159,7 @@ public class ScoutStructuredType implements IStructuredType {
 
   @Override
   public IJavaElement getSiblingMethodFieldGetter(String methodName) {
-    cache(CATEGORIES.METHOD_INNER_TYPE_GETTER);
-    IJavaElement[] references = getElements(CATEGORIES.METHOD_INNER_TYPE_GETTER);
+    List<? extends IJavaElement> references = getElementsInternal(CATEGORIES.METHOD_INNER_TYPE_GETTER);
     if (references != null) {
       for (IJavaElement reference : references) {
         if (reference.getElementName().compareTo(methodName) > 0) {
@@ -167,8 +172,7 @@ public class ScoutStructuredType implements IStructuredType {
 
   @Override
   public IJavaElement getSiblingMethodStartHandler(String methodName) {
-    cache(CATEGORIES.METHOD_START_HANDLER);
-    IJavaElement[] references = getElements(CATEGORIES.METHOD_START_HANDLER);
+    List<? extends IJavaElement> references = getElementsInternal(CATEGORIES.METHOD_START_HANDLER);
     if (references != null) {
       for (IJavaElement reference : references) {
         if (reference.getElementName().compareTo(methodName) > 0) {
@@ -181,8 +185,7 @@ public class ScoutStructuredType implements IStructuredType {
 
   @Override
   public IJavaElement getSiblingTypeKeyStroke(String keyStrokeName) {
-    cache(CATEGORIES.TYPE_KEYSTROKE);
-    IJavaElement[] types = getElements(CATEGORIES.TYPE_KEYSTROKE);
+    List<? extends IJavaElement> types = getElementsInternal(CATEGORIES.TYPE_KEYSTROKE);
     if (types != null) {
       for (IJavaElement fh : types) {
         if (fh.getElementName().compareTo(keyStrokeName) > 0) {
@@ -195,8 +198,7 @@ public class ScoutStructuredType implements IStructuredType {
 
   @Override
   public IJavaElement getSiblingComposerAttribute(String attributeName) {
-    cache(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE);
-    IJavaElement[] attributes = getElements(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE);
+    List<? extends IJavaElement> attributes = getElementsInternal(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE);
     if (attributes != null) {
       for (IJavaElement element : attributes) {
         if (element.getElementName().compareTo(attributeName) > 0) {
@@ -209,8 +211,7 @@ public class ScoutStructuredType implements IStructuredType {
 
   @Override
   public IJavaElement getSiblingComposerEntity(String entityName) {
-    cache(CATEGORIES.TYPE_COMPOSER_ENTRY);
-    IJavaElement[] entities = getElements(CATEGORIES.TYPE_COMPOSER_ENTRY);
+    List<? extends IJavaElement> entities = getElementsInternal(CATEGORIES.TYPE_COMPOSER_ENTRY);
     if (entities != null) {
       for (IJavaElement element : entities) {
         if (element.getElementName().compareTo(entityName) > 0) {
@@ -223,8 +224,7 @@ public class ScoutStructuredType implements IStructuredType {
 
   @Override
   public IJavaElement getSiblingTypeFormHandler(String formHandlerName) {
-    cache(CATEGORIES.TYPE_FORM_HANDLER);
-    IJavaElement[] formHandlers = getElements(CATEGORIES.TYPE_FORM_HANDLER);
+    List<? extends IJavaElement> formHandlers = getElementsInternal(CATEGORIES.TYPE_FORM_HANDLER);
     if (formHandlers != null) {
       for (IJavaElement fh : formHandlers) {
         if (fh.getElementName().compareTo(formHandlerName) > 0) {
@@ -242,9 +242,9 @@ public class ScoutStructuredType implements IStructuredType {
     for (int i = 0; i < methodCategories.length; i++) {
       cache(methodCategories[i]);
       if (search) {
-        IJavaElement[] elements = m_elements.get(methodCategories[i]);
-        if (elements != null && elements.length > 0) {
-          return elements[0];
+        List<? extends IJavaElement> elements = getElementsInternal(methodCategories[i]);
+        if (CollectionUtility.hasElements(elements)) {
+          return CollectionUtility.firstElement(elements);
         }
       }
       if (methodCategories[i].equals(category)) {
@@ -271,132 +271,132 @@ public class ScoutStructuredType implements IStructuredType {
           case METHOD_CONSTRUCTOR:
             visitMethodConstructors(unknownMethods);
             m_visitedCategories.add(CATEGORIES.METHOD_CONSTRUCTOR);
-            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
+            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods);
             break;
           case METHOD_CONFIG_PROPERTY:
             visitMethodConfigProperty(unknownMethods, m_typeHierarchy);
             m_visitedCategories.add(CATEGORIES.METHOD_CONFIG_PROPERTY);
-            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
+            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods);
             break;
           case METHOD_CONFIG_EXEC:
             visitMethodConfigExec(unknownMethods, m_typeHierarchy);
             m_visitedCategories.add(CATEGORIES.METHOD_CONFIG_EXEC);
-            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
+            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods);
             break;
           case METHOD_FORM_DATA_BEAN:
             m_visitedCategories.add(CATEGORIES.METHOD_FORM_DATA_BEAN);
             visitMethodFormDataBean(unknownMethods);
-            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
+            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods);
             break;
           case METHOD_OVERRIDDEN:
             visitMethodOverridden(unknownMethods, m_typeHierarchy);
             m_visitedCategories.add(CATEGORIES.METHOD_OVERRIDDEN);
-            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
+            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods);
             break;
           case METHOD_START_HANDLER:
             visitMethodStartHandler(unknownMethods);
             m_visitedCategories.add(CATEGORIES.METHOD_START_HANDLER);
-            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
+            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods);
             break;
           case METHOD_INNER_TYPE_GETTER:
             visitMethodInnerTypeGetter(unknownMethods);
             m_visitedCategories.add(CATEGORIES.METHOD_INNER_TYPE_GETTER);
-            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
+            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods);
             break;
           case METHOD_LOCAL_BEAN:
             visitMethodLocalBean(unknownMethods);
             m_visitedCategories.add(CATEGORIES.METHOD_LOCAL_BEAN);
-            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods.toArray(new IJavaElement[unknownMethods.size()]));
+            m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, unknownMethods);
             break;
           case TYPE_FORM_FIELD:
             visitTypeFormFields(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_FORM_FIELD);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_COLUMN:
             visitTypeColumns(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_COLUMN);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_CODE:
             visitTypeCodes(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_CODE);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_FORM:
             visitTypeForms(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_FORM);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_TABLE:
             visitTypeTables(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_TABLE);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_ACTIVITY_MAP:
             visitTypeActivityMaps(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_ACTIVITY_MAP);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_TREE:
             visitTypeTrees(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_TREE);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_CALENDAR:
             visitTypeCalendar(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_CALENDAR);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_CALENDAR_ITEM_PROVIDER:
             visitTypeCalendarItemProvider(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_CALENDAR_ITEM_PROVIDER);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_WIZARD:
             visitTypeWizards(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_WIZARD);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_WIZARD_STEP:
             visitTypeWizardSteps(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_WIZARD_STEP);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_MENU:
             visitTypeMenus(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_MENU);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_VIEW_BUTTON:
             visitTypeViewbuttons(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_VIEW_BUTTON);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_TOOL_BUTTON:
             visitTypeToolbuttons(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_TOOL_BUTTON);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_KEYSTROKE:
             visitTypeKeystrokes(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_KEYSTROKE);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_COMPOSER_ATTRIBUTE:
             visitTypeComposerAttribute(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_COMPOSER_ENTRY:
             visitTypeDataModelEntry(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_COMPOSER_ENTRY);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case TYPE_FORM_HANDLER:
             visitTypeFormHandlers(unknownTypes);
             m_visitedCategories.add(CATEGORIES.TYPE_FORM_HANDLER);
-            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes.toArray(new IJavaElement[unknownTypes.size()]));
+            m_elements.put(CATEGORIES.TYPE_UNCATEGORIZED, unknownTypes);
             break;
           case FIELD_UNKNOWN:
             break;
@@ -416,14 +416,15 @@ public class ScoutStructuredType implements IStructuredType {
 
   /**
    * can be overwritten. Overwrites must ensure to super call after processing the working set.
-   * 
+   *
    * @param workingSet
    * @throws JavaModelException
    */
   protected void visitFields(ArrayList<IJavaElement> workingSet) throws JavaModelException {
-    ArrayList<IField> loggers = new ArrayList<IField>(2);
-    ArrayList<IField> statics = new ArrayList<IField>();
-    ArrayList<IField> members = new ArrayList<IField>();
+    List<IJavaElement> loggers = new ArrayList<IJavaElement>(2);
+    List<IJavaElement> statics = new ArrayList<IJavaElement>();
+    List<IJavaElement> members = new ArrayList<IJavaElement>();
+
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IField f = (IField) it.next();
       // static
@@ -443,10 +444,10 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.FIELD_LOGGER, loggers.toArray(new IField[loggers.size()]));
-    m_elements.put(CATEGORIES.FIELD_STATIC, statics.toArray(new IField[statics.size()]));
-    m_elements.put(CATEGORIES.FIELD_MEMBER, members.toArray(new IField[members.size()]));
-    m_elements.put(CATEGORIES.FIELD_UNKNOWN, workingSet.toArray(new IField[workingSet.size()]));
+    m_elements.put(CATEGORIES.FIELD_LOGGER, loggers);
+    m_elements.put(CATEGORIES.FIELD_STATIC, statics);
+    m_elements.put(CATEGORIES.FIELD_MEMBER, members);
+    m_elements.put(CATEGORIES.FIELD_UNKNOWN, workingSet);
   }
 
   private static String getFullyQualifiedTypeName(String signature, IType jdtType) throws JavaModelException {
@@ -464,7 +465,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitMethodConstructors(ArrayList<IJavaElement> workingSet) throws JavaModelException {
-    TreeMap<CompositeObject, IMethod> constructors = new TreeMap<CompositeObject, IMethod>();
+    TreeMap<CompositeObject, IJavaElement> constructors = new TreeMap<CompositeObject, IJavaElement>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
       if (method.isConstructor()) {
@@ -473,11 +474,11 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.METHOD_CONSTRUCTOR, constructors.values().toArray(new IMethod[constructors.size()]));
+    m_elements.put(CATEGORIES.METHOD_CONSTRUCTOR, CollectionUtility.arrayList(constructors.values()));
   }
 
   protected void visitMethodConfigExec(ArrayList<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    TreeMap<CompositeObject, IMethod> execMethods = new TreeMap<CompositeObject, IMethod>();
+    TreeMap<CompositeObject, IJavaElement> execMethods = new TreeMap<CompositeObject, IJavaElement>();
     IMethodFilter execMethodFilter = MethodFilters.getFilterWithAnnotation(TypeUtility.getType(IRuntimeClasses.ConfigOperation));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
@@ -492,13 +493,12 @@ public class ScoutStructuredType implements IStructuredType {
         visitedmethod = TypeUtility.getOverwrittenMethod(visitedmethod, superTypeHierarchy);
 
       }
-
     }
-    m_elements.put(CATEGORIES.METHOD_CONFIG_EXEC, execMethods.values().toArray(new IMethod[execMethods.size()]));
+    m_elements.put(CATEGORIES.METHOD_CONFIG_EXEC, CollectionUtility.arrayList(execMethods.values()));
   }
 
   protected void visitMethodConfigProperty(ArrayList<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    TreeMap<CompositeObject, IMethod> methods = new TreeMap<CompositeObject, IMethod>();
+    TreeMap<CompositeObject, IJavaElement> methods = new TreeMap<CompositeObject, IJavaElement>();
     IMethodFilter configPropertyMethodFilter = MethodFilters.getFilterWithAnnotation(TypeUtility.getType(IRuntimeClasses.ConfigProperty));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
@@ -511,14 +511,13 @@ public class ScoutStructuredType implements IStructuredType {
           break;
         }
         visitedmethod = TypeUtility.getOverwrittenMethod(visitedmethod, superTypeHierarchy);
-
       }
     }
-    m_elements.put(CATEGORIES.METHOD_CONFIG_PROPERTY, methods.values().toArray(new IMethod[methods.size()]));
+    m_elements.put(CATEGORIES.METHOD_CONFIG_PROPERTY, CollectionUtility.arrayList(methods.values()));
   }
 
   protected void visitMethodFormDataBean(ArrayList<IJavaElement> workingSet) throws JavaModelException {
-    TreeMap<CompositeObject, IMethod> methods = new TreeMap<CompositeObject, IMethod>();
+    TreeMap<CompositeObject, IJavaElement> methods = new TreeMap<CompositeObject, IJavaElement>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
       if (JdtUtility.hasAnnotation(method, IRuntimeClasses.FormData)) {
@@ -532,11 +531,11 @@ public class ScoutStructuredType implements IStructuredType {
         }
       }
     }
-    m_elements.put(CATEGORIES.METHOD_FORM_DATA_BEAN, methods.values().toArray(new IMethod[methods.size()]));
+    m_elements.put(CATEGORIES.METHOD_FORM_DATA_BEAN, CollectionUtility.arrayList(methods.values()));
   }
 
   protected void visitMethodOverridden(ArrayList<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
-    TreeMap<CompositeObject, IMethod> overriddenMethods = new TreeMap<CompositeObject, IMethod>();
+    TreeMap<CompositeObject, IJavaElement> overriddenMethods = new TreeMap<CompositeObject, IJavaElement>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
       if (TypeUtility.getOverwrittenMethod(method, superTypeHierarchy) != null) {
@@ -544,16 +543,15 @@ public class ScoutStructuredType implements IStructuredType {
         overriddenMethods.put(key, method);
         it.remove();
       }
-
     }
-    m_elements.put(CATEGORIES.METHOD_OVERRIDDEN, overriddenMethods.values().toArray(new IMethod[overriddenMethods.size()]));
+    m_elements.put(CATEGORIES.METHOD_OVERRIDDEN, CollectionUtility.arrayList(overriddenMethods.values()));
   }
 
   protected void visitMethodStartHandler(ArrayList<IJavaElement> workingSet) throws JavaModelException {
-    TreeMap<CompositeObject, IMethod> startHandlerMethods = new TreeMap<CompositeObject, IMethod>();
+    TreeMap<CompositeObject, IJavaElement> startHandlerMethods = new TreeMap<CompositeObject, IJavaElement>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
-      Matcher matcher = Pattern.compile("^start(.*)$").matcher(method.getElementName());
+      Matcher matcher = START_HANDLER_REGEX.matcher(method.getElementName());
       if (matcher.find()) {
         String fieldName = matcher.group(1);
         if (TypeUtility.findInnerType(getType(), fieldName + SdkProperties.SUFFIX_FORM_HANDLER) != null) {
@@ -563,14 +561,14 @@ public class ScoutStructuredType implements IStructuredType {
         }
       }
     }
-    m_elements.put(CATEGORIES.METHOD_START_HANDLER, startHandlerMethods.values().toArray(new IMethod[startHandlerMethods.size()]));
+    m_elements.put(CATEGORIES.METHOD_START_HANDLER, CollectionUtility.arrayList(startHandlerMethods.values()));
   }
 
   protected void visitMethodInnerTypeGetter(ArrayList<IJavaElement> workingSet) throws JavaModelException {
-    TreeMap<CompositeObject, IMethod> fieldGetterMethods = new TreeMap<CompositeObject, IMethod>();
+    TreeMap<CompositeObject, IJavaElement> fieldGetterMethods = new TreeMap<CompositeObject, IJavaElement>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
-      Matcher matcher = Pattern.compile("^get(.*)$").matcher(method.getElementName());
+      Matcher matcher = METHOD_INNER_TYPE_GETTER_REGEX.matcher(method.getElementName());
       if (matcher.find()) {
         String fieldName = matcher.group(1);
         if (TypeUtility.findInnerType(getType(), fieldName) != null) {
@@ -580,11 +578,11 @@ public class ScoutStructuredType implements IStructuredType {
         }
       }
     }
-    m_elements.put(CATEGORIES.METHOD_INNER_TYPE_GETTER, fieldGetterMethods.values().toArray(new IMethod[fieldGetterMethods.size()]));
+    m_elements.put(CATEGORIES.METHOD_INNER_TYPE_GETTER, CollectionUtility.arrayList(fieldGetterMethods.values()));
   }
 
   protected void visitMethodLocalBean(ArrayList<IJavaElement> workingSet) throws JavaModelException {
-    TreeMap<CompositeObject, IMethod> localPropertyMethods = new TreeMap<CompositeObject, IMethod>();
+    TreeMap<CompositeObject, IJavaElement> localPropertyMethods = new TreeMap<CompositeObject, IJavaElement>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
       CompositeObject key = createPropertyMethodKey(method);
@@ -594,18 +592,18 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.METHOD_LOCAL_BEAN, localPropertyMethods.values().toArray(new IMethod[localPropertyMethods.size()]));
+    m_elements.put(CATEGORIES.METHOD_LOCAL_BEAN, CollectionUtility.arrayList(localPropertyMethods.values()));
   }
 
   protected void visitMethodUncategorized(ArrayList<IMethod> workingSet) throws JavaModelException {
-    TreeMap<CompositeObject, IMethod> methods = new TreeMap<CompositeObject, IMethod>();
+    TreeMap<CompositeObject, IJavaElement> methods = new TreeMap<CompositeObject, IJavaElement>();
     for (Iterator<IMethod> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = it.next();
       CompositeObject key = new CompositeObject(method.getElementName(), method.getParameterNames().length, method);
       methods.put(key, method);
       it.remove();
     }
-    m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, methods.values().toArray(new IMethod[methods.size()]));
+    m_elements.put(CATEGORIES.METHOD_UNCATEGORIZED, CollectionUtility.arrayList(methods.values()));
 
   }
 
@@ -619,7 +617,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_FORM_FIELD, formFields.toArray(new IType[formFields.size()]));
+    m_elements.put(CATEGORIES.TYPE_FORM_FIELD, CollectionUtility.arrayList(formFields));
   }
 
   protected void visitTypeColumns(ArrayList<IJavaElement> workingSet) {
@@ -632,7 +630,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_COLUMN, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_COLUMN, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeCodes(ArrayList<IJavaElement> workingSet) {
@@ -645,7 +643,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_CODE, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_CODE, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeForms(ArrayList<IJavaElement> workingSet) {
@@ -658,7 +656,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_FORM, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_FORM, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeTables(ArrayList<IJavaElement> workingSet) {
@@ -671,7 +669,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_TABLE, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_TABLE, CollectionUtility.arrayList(types));
   }
 
   /**
@@ -687,7 +685,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_ACTIVITY_MAP, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_ACTIVITY_MAP, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeTrees(ArrayList<IJavaElement> workingSet) {
@@ -700,7 +698,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_TREE, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_TREE, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeCalendar(ArrayList<IJavaElement> workingSet) {
@@ -713,7 +711,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_CALENDAR, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_CALENDAR, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeCalendarItemProvider(ArrayList<IJavaElement> workingSet) {
@@ -726,7 +724,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_CALENDAR_ITEM_PROVIDER, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_CALENDAR_ITEM_PROVIDER, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeWizards(ArrayList<IJavaElement> workingSet) {
@@ -739,7 +737,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_WIZARD, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_WIZARD, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeWizardSteps(ArrayList<IJavaElement> workingSet) {
@@ -752,7 +750,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_WIZARD_STEP, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_WIZARD_STEP, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeMenus(ArrayList<IJavaElement> workingSet) {
@@ -765,7 +763,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_MENU, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_MENU, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeViewbuttons(ArrayList<IJavaElement> workingSet) {
@@ -778,7 +776,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_VIEW_BUTTON, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_VIEW_BUTTON, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeToolbuttons(ArrayList<IJavaElement> workingSet) {
@@ -791,7 +789,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_TOOL_BUTTON, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_TOOL_BUTTON, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeKeystrokes(ArrayList<IJavaElement> workingSet) {
@@ -804,7 +802,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_KEYSTROKE, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_KEYSTROKE, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeComposerAttribute(ArrayList<IJavaElement> workingSet) {
@@ -818,7 +816,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeDataModelEntry(ArrayList<IJavaElement> workingSet) {
@@ -831,7 +829,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_COMPOSER_ENTRY, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_COMPOSER_ENTRY, CollectionUtility.arrayList(types));
   }
 
   protected void visitTypeFormHandlers(ArrayList<IJavaElement> workingSet) {
@@ -844,7 +842,7 @@ public class ScoutStructuredType implements IStructuredType {
         it.remove();
       }
     }
-    m_elements.put(CATEGORIES.TYPE_FORM_HANDLER, types.toArray(new IType[types.size()]));
+    m_elements.put(CATEGORIES.TYPE_FORM_HANDLER, CollectionUtility.arrayList(types));
   }
 
   private static CompositeObject createPropertyMethodKey(IMethod method) {
@@ -852,25 +850,25 @@ public class ScoutStructuredType implements IStructuredType {
       Matcher matcher = PROPERTY_BEAN_REGEX.matcher(method.getElementName());
       if (matcher.find()) {
         int getSetOrder = 20;
-        if (StringUtility.equalsIgnoreCase("get", matcher.group(1))) {
+        if ("get".equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 1;
         }
-        else if (StringUtility.equalsIgnoreCase("is", matcher.group(1))) {
+        else if ("is".equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 2;
         }
-        else if (StringUtility.equalsIgnoreCase("set", matcher.group(1))) {
+        else if ("set".equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 3;
         }
-        else if (StringUtility.equalsIgnoreCase("add", matcher.group(1))) {
+        else if ("add".equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 4;
         }
-        else if (StringUtility.equalsIgnoreCase("remove", matcher.group(1))) {
+        else if ("remove".equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 5;
         }
-        else if (StringUtility.equalsIgnoreCase("clear", matcher.group(1))) {
+        else if ("clear".equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 6;
         }
-        else if (StringUtility.equalsIgnoreCase("delete", matcher.group(1))) {
+        else if ("delete".equalsIgnoreCase(matcher.group(1))) {
           getSetOrder = 7;
         }
         String propName = matcher.group(2);
@@ -883,17 +881,16 @@ public class ScoutStructuredType implements IStructuredType {
 
   protected CompositeObject createConstructorKey(String[] parameterSignatures) {
     if (parameterSignatures == null) {
-      parameterSignatures = new String[0];
+      return new CompositeObject(0, "");
     }
+
     StringBuilder b = new StringBuilder();
     for (String sig : parameterSignatures) {
       b.append(sig);
     }
     return new CompositeObject(parameterSignatures.length, b.toString());
-
   }
 
-  @Override
   public void print(PrintStream printer) {
     printer.println("------ Structured type of '" + getType().getFullyQualifiedName() + "' ------------");
     for (CATEGORIES c : CATEGORIES.values()) {
@@ -908,5 +905,4 @@ public class ScoutStructuredType implements IStructuredType {
       printer.println("  - " + e.getElementName());
     }
   }
-
 }

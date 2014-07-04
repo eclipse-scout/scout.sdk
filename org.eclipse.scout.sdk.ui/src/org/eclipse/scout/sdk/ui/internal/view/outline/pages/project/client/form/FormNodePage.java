@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -28,6 +29,8 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.InnerTypePageDirtyListener;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
+import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyProvider;
@@ -39,6 +42,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 public class FormNodePage extends AbstractScoutTypePage implements ITypeHierarchyProvider {
 
   private InnerTypePageDirtyListener m_mainBoxListener;
+  private IJavaResourceChangedListener m_hierarchyClearListener;
   private ITypeHierarchy m_localHierarchy;
 
   public FormNodePage(AbstractPage parent, IType type) {
@@ -63,6 +67,9 @@ public class FormNodePage extends AbstractScoutTypePage implements ITypeHierarch
     if (m_mainBoxListener != null) {
       ScoutSdkCore.getJavaResourceChangedEmitter().removeInnerTypeChangedListener(getType(), m_mainBoxListener);
     }
+    if (m_hierarchyClearListener != null) {
+      ScoutSdkCore.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(m_hierarchyClearListener);
+    }
     super.unloadPage();
   }
 
@@ -73,6 +80,19 @@ public class FormNodePage extends AbstractScoutTypePage implements ITypeHierarch
     if (m_mainBoxListener == null) {
       m_mainBoxListener = new InnerTypePageDirtyListener(this, iGroupBox);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getType(), m_mainBoxListener);
+    }
+    if (m_hierarchyClearListener == null) {
+      m_hierarchyClearListener = new IJavaResourceChangedListener() {
+        @Override
+        public void handleEvent(JdtEvent event) {
+          if (event.getElementType() == IJavaElement.TYPE) {
+            if (getType().getCompilationUnit().equals(event.getElement().getAncestor(IJavaElement.COMPILATION_UNIT))) {
+              clearTypeHierarchy();
+            }
+          }
+        }
+      };
+      ScoutSdkCore.getJavaResourceChangedEmitter().addJavaResourceChangedListener(m_hierarchyClearListener);
     }
     new BeanPropertyTablePage(this, getType());
 
@@ -112,9 +132,12 @@ public class FormNodePage extends AbstractScoutTypePage implements ITypeHierarch
     return false;
   }
 
+  protected synchronized void clearTypeHierarchy() {
+    m_localHierarchy = null;
+  }
+
   @Override
-  public ITypeHierarchy getTypeHierarchy() {
-    // no sync required
+  public synchronized ITypeHierarchy getTypeHierarchy() {
     if (m_localHierarchy == null) {
       m_localHierarchy = TypeUtility.getLocalTypeHierarchy(getType());
     }

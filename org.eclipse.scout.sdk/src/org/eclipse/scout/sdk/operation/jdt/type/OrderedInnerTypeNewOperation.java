@@ -10,18 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.jdt.type;
 
-import java.util.Set;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.operation.jdt.annotation.OrderAnnotationsUpdateOperation;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
-import org.eclipse.scout.sdk.util.type.TypeFilters;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  *
@@ -29,7 +24,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 public class OrderedInnerTypeNewOperation extends InnerTypeNewOperation {
 
   private IType m_orderDefinitionType;
-  private double m_orderNr = -1.0;
 
   /**
    * @param name
@@ -49,37 +43,15 @@ public class OrderedInnerTypeNewOperation extends InnerTypeNewOperation {
     setFormatSource(formatSource);
   }
 
-  @Override
-  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    if (getOrderNr() < 0) {
-      updateOrderNumbers(monitor, workingCopyManager);
-    }
-    addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(m_orderNr));
-    super.createType(monitor, workingCopyManager);
+  public OrderedInnerTypeNewOperation(ITypeSourceBuilder sourceBuilder, IType declaringType) {
+    super(sourceBuilder, declaringType);
   }
 
-  protected void updateOrderNumbers(IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
-    m_orderNr = -1.0;
-    if (getOrderDefinitionType() != null) {
-      ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType());
-      Set<IType> innerTypes = TypeUtility.getInnerTypes(getDeclaringType(), TypeFilters.getSubtypeFilter(getOrderDefinitionType(), typeHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
-      OrderAnnotationsUpdateOperation orderAnnotationOp = new OrderAnnotationsUpdateOperation(getDeclaringType());
-      double tempOrderNr = 10.0;
-      for (IType innerType : innerTypes) {
-        if (innerType.equals(getSibling())) {
-          m_orderNr = tempOrderNr;
-          tempOrderNr += 10.0;
-        }
-        orderAnnotationOp.addOrderAnnotation(innerType, tempOrderNr);
-        tempOrderNr += 10.0;
-      }
-      if (m_orderNr < 0) {
-        m_orderNr = tempOrderNr;
-      }
-      orderAnnotationOp.validate();
-      orderAnnotationOp.run(monitor, manager);
-      manager.reconcile(getDeclaringType().getCompilationUnit(), monitor);
-    }
+  @Override
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    Double orderNr = ScoutTypeUtility.getOrderNr(getDeclaringType(), getOrderDefinitionType(), getSibling());
+    addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(orderNr));
+    super.createType(monitor, workingCopyManager);
   }
 
   public void setOrderDefinitionType(IType orderDefinitionType) {
@@ -89,13 +61,4 @@ public class OrderedInnerTypeNewOperation extends InnerTypeNewOperation {
   public IType getOrderDefinitionType() {
     return m_orderDefinitionType;
   }
-
-  public void setOrderNr(double orderNr) {
-    m_orderNr = orderNr;
-  }
-
-  public double getOrderNr() {
-    return m_orderNr;
-  }
-
 }

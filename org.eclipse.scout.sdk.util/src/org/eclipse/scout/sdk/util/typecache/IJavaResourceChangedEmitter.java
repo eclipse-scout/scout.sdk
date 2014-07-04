@@ -15,14 +15,14 @@ import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 
 /**
  * <h3>{@link IJavaResourceChangedEmitter}</h3>
- * 
+ *
  * @see IJavaResourceChangedListener
  */
 public interface IJavaResourceChangedEmitter {
   /**
-   * Adds a {@link IJavaResourceChangedListener} which will be notified when the inner types of the given {@link IType}
-   * change.
-   * 
+   * Adds a {@link IJavaResourceChangedListener} which will be notified when the direct inner types of the given
+   * {@link IType} change.
+   *
    * @param type
    *          The listener will be notified when the inner types of this type change.
    * @param listener
@@ -32,7 +32,7 @@ public interface IJavaResourceChangedEmitter {
 
   /**
    * Removes the given listener.
-   * 
+   *
    * @param type
    *          The type the given listener was registered with.
    * @param listener
@@ -42,7 +42,7 @@ public interface IJavaResourceChangedEmitter {
 
   /**
    * Adds the given {@link IJavaResourceChangedListener} which will be notified about any Java resource change.
-   * 
+   *
    * @param listener
    *          The listener to add.
    */
@@ -50,7 +50,7 @@ public interface IJavaResourceChangedEmitter {
 
   /**
    * Removes the given {@link IJavaResourceChangedListener} from the list.
-   * 
+   *
    * @param listener
    *          The {@link IJavaResourceChangedListener} to remove.
    */
@@ -59,7 +59,7 @@ public interface IJavaResourceChangedEmitter {
   /**
    * Adds a {@link IJavaResourceChangedListener} which will be notified when the methods of the given {@link IType}
    * change.
-   * 
+   *
    * @param type
    *          The listener will be notified when the methods of this type change.
    * @param listener
@@ -69,7 +69,7 @@ public interface IJavaResourceChangedEmitter {
 
   /**
    * Removes the given listener.
-   * 
+   *
    * @param type
    *          The type the given listener was registered with.
    * @param listener

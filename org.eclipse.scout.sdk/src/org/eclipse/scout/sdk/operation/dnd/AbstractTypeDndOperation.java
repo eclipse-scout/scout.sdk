@@ -11,7 +11,9 @@
 package org.eclipse.scout.sdk.operation.dnd;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,20 +23,23 @@ import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.operation.form.field.IFieldPosition;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementFormatOperation;
-import org.eclipse.scout.sdk.operation.jdt.annotation.OrderAnnotationsUpdateOperation;
-import org.eclipse.scout.sdk.operation.jdt.type.InnerTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType;
-import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.MultiTextEdit;
 import org.eclipse.text.edits.ReplaceEdit;
@@ -46,21 +51,24 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
 
   public static final int MODE_COPY = 1;
   public static final int MODE_MOVE = 2;
+
   private final IType m_type;
   private final IType m_targetDeclaringType;
-  private final CATEGORIES m_typeCategory;
+  private final IType m_orderDefinitionType;
+  private final int m_mode;
+
   private int m_position;
   private IType m_positionType;
-  private int m_mode;
   private String m_newTypeName;
+
   // out members
   private IType m_newType;
 
-  public AbstractTypeDndOperation(IType type, IType targetDeclaringType, String newTypeName, CATEGORIES typeCategory, int mode) {
+  public AbstractTypeDndOperation(IType type, IType targetDeclaringType, String newTypeName, IType orderDefinitionType, int mode) {
     m_type = type;
     m_targetDeclaringType = targetDeclaringType;
     m_newTypeName = newTypeName;
-    m_typeCategory = typeCategory;
+    m_orderDefinitionType = orderDefinitionType;
     m_mode = mode;
   }
 
@@ -82,16 +90,16 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
 
   @Override
   public String getOperationName() {
-    return "DND " + getType().getElementName() + "...";
+    return "DnD " + getType().getElementName() + "...";
   }
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
-    // find sibling
-    IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getTargetDeclaringType());
-    TypePosition position = updateOrderNumbers(structuredType, monitor, workingCopyManager);
-    String typeSimpleName = getNewTypeName();
 
+    ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(getTargetDeclaringType());
+    IJavaElement sibling = findSibling(typeHierarchy);
+
+    // collect new imports
     List<String> imports = new ArrayList<String>();
     String normalizedTypeElementName = null;
     String normalizedTargetTypeElementName = null;
@@ -102,7 +110,7 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
     for (IImportDeclaration imp : getType().getCompilationUnit().getImports()) {
       String normalizedImport = imp.getElementName().replace('$', '.');
       if (normalizedTypeElementName != null && normalizedImport.startsWith(normalizedTypeElementName)) {
-        imports.add(normalizedTargetTypeElementName + "." + typeSimpleName + normalizedImport.replaceAll("^" + normalizedTypeElementName, ""));
+        imports.add(normalizedTargetTypeElementName + "." + getNewTypeName() + normalizedImport.replaceAll("^" + normalizedTypeElementName, ""));
       }
       else {
         imports.add(normalizedImport);
@@ -111,6 +119,7 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
 
     Document fieldSourceDoc = new Document(getType().getSource());
     MultiTextEdit multiEdit = new MultiTextEdit();
+
     // type name
     if (!getType().getElementName().equals(getNewTypeName())) {
       Matcher renameMatcher = Pattern.compile("[\\s]{1}(" + getType().getElementName() + ")[\\s\\{]{1}", Pattern.MULTILINE).matcher(fieldSourceDoc.get());
@@ -120,10 +129,12 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
       }
     }
 
-    // order nr
-    Matcher orderMatcher = Pattern.compile("@Order\\(([0-9\\.]*)\\)").matcher(fieldSourceDoc.get());
+    // order
+    Pattern pat = Pattern.compile("@(?:" + Signature.getSimpleName(IRuntimeClasses.Order) + "|" + IRuntimeClasses.Order + ")\\(((?:[\\-]?)(?:[0-9\\.]{1,200}))(?:[dfDF]?)\\)");
+    Matcher orderMatcher = pat.matcher(fieldSourceDoc.get());
     if (orderMatcher.find()) {
-      ReplaceEdit edit = new ReplaceEdit(orderMatcher.start(1), orderMatcher.end(1) - orderMatcher.start(1), "" + position.orderNr);
+      double order = ScoutTypeUtility.getOrderNr(getTargetDeclaringType(), getOrderDefinitionType(), sibling, typeHierarchy);
+      ReplaceEdit edit = new ReplaceEdit(orderMatcher.start(1), orderMatcher.end(1) - orderMatcher.start(1), "" + order);
       multiEdit.addChild(edit);
     }
     try {
@@ -135,15 +146,15 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
     }
 
     // when the parent is unchanged and the sibling is the field itself: nothing changed -> do not move / copy
-    if (!(getType().equals(position.sibling) && getTargetDeclaringType().equals(getType().getDeclaringType()))) {
+    if (!(getType().equals(sibling) && getTargetDeclaringType().equals(getType().getDeclaringType()))) {
       if (getMode() == MODE_MOVE) {
         // delete old
         deleteType(getType(), monitor, workingCopyManager);
-        structuredType = ScoutTypeUtility.createStructuredType(getTargetDeclaringType());
       }
       // create new
-      m_newType = createNewType(getTargetDeclaringType(), typeSimpleName, fieldSourceDoc.get(), imports.toArray(new String[imports.size()]), position.sibling, structuredType, monitor, workingCopyManager);
+      m_newType = createNewType(fieldSourceDoc.get(), imports, sibling, monitor, workingCopyManager);
     }
+
     // format
     JavaElementFormatOperation formatOp = new JavaElementFormatOperation(TypeUtility.getToplevelType(getTargetDeclaringType()), true);
     formatOp.validate();
@@ -156,8 +167,8 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
     op.run(monitor, workingCopyManager);
   }
 
-  protected IType createNewType(IType declaringType, String simpleName, final String source, final String[] fqImports, IJavaElement sibling, IStructuredType structuredType, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    TypeSourceBuilder fieldSourceBuilder = new TypeSourceBuilder(simpleName) {
+  protected IType createNewType(final String source, final List<String> fqImports, IJavaElement sibling, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+    TypeSourceBuilder typeSourceBuilder = new TypeSourceBuilder(getNewTypeName()) {
       @Override
       public void createSource(StringBuilder sourcebuilder, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         for (String imp : fqImports) {
@@ -167,65 +178,47 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
       }
     };
 
-    InnerTypeNewOperation fieldCopyOp = new InnerTypeNewOperation(fieldSourceBuilder, getTargetDeclaringType());
+    OrderedInnerTypeNewOperation fieldCopyOp = new OrderedInnerTypeNewOperation(typeSourceBuilder, getTargetDeclaringType());
+    fieldCopyOp.setOrderDefinitionType(getOrderDefinitionType());
     fieldCopyOp.setSibling(sibling);
     fieldCopyOp.setFormatSource(false);
     fieldCopyOp.run(monitor, manager);
     return fieldCopyOp.getCreatedType();
   }
 
-  protected TypePosition updateOrderNumbers(IStructuredType targetStructuredType, IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
-    TypePosition position = new TypePosition();
-    OrderAnnotationsUpdateOperation orderAnnotationOp = new OrderAnnotationsUpdateOperation(getTargetDeclaringType());
-
-    IJavaElement[] orderedTypes = targetStructuredType.getElements(getTypeCategory());
-    double tempOrderNr = 10.0;
-    if (orderedTypes.length == 0) {
-      position.orderNr = tempOrderNr;
-      position.sibling = targetStructuredType.getSibling(getTypeCategory());
-      return position;
+  protected IJavaElement findSibling(ITypeHierarchy typeHierarchy) {
+    Set<IType> innerTypes = TypeUtility.getInnerTypes(getTargetDeclaringType(), TypeFilters.getSubtypeFilter(getOrderDefinitionType(), typeHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
+    if (innerTypes.size() < 1) {
+      return null;
     }
     else if (getPosition() == FIRST) {
-      position.orderNr = tempOrderNr;
-      tempOrderNr += 10.0;
-      position.sibling = orderedTypes[0];
+      return CollectionUtility.firstElement(innerTypes);
     }
-    for (int i = 0; i < orderedTypes.length; i++) {
-      if (getMode() == MODE_MOVE && getType().equals(orderedTypes[i])) {
+    else if (getPosition() == LAST) {
+      return null;
+    }
+
+    Iterator<IType> it = innerTypes.iterator();
+    while (it.hasNext()) {
+      IType t = it.next();
+      if (getMode() == MODE_MOVE && getType().equals(t)) {
         continue;
       }
-      if (orderedTypes[i].equals(getPositionType())) {
-        switch (getPosition()) {
-          case BEFORE:
-            position.orderNr = tempOrderNr;
-            tempOrderNr += 10.0;
-            orderAnnotationOp.addOrderAnnotation((IType) orderedTypes[i], tempOrderNr);
-            position.sibling = orderedTypes[i];
-            break;
-          case AFTER:
-            orderAnnotationOp.addOrderAnnotation((IType) orderedTypes[i], tempOrderNr);
-            tempOrderNr += 10.0;
-            position.orderNr = tempOrderNr;
-            if (orderedTypes.length > i + 1) {
-              position.sibling = orderedTypes[i + 1];
-            }
-            break;
+      if (t.equals(getPositionType())) {
+        if (getPosition() == BEFORE) {
+          return t;
+        }
+        else {
+          if (it.hasNext()) {
+            return it.next();
+          }
+          else {
+            return null;
+          }
         }
       }
-      else {
-        orderAnnotationOp.addOrderAnnotation((IType) orderedTypes[i], tempOrderNr);
-      }
-      tempOrderNr += 10.0;
     }
-    if (getPosition() == LAST) {
-      position.orderNr = tempOrderNr;
-    }
-    if (position.sibling == null) {
-      position.sibling = targetStructuredType.getSibling(getTypeCategory());
-    }
-    orderAnnotationOp.validate();
-    orderAnnotationOp.run(monitor, manager);
-    return position;
+    return null; // position type not found
   }
 
   public int getPosition() {
@@ -248,20 +241,12 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
     return m_newType;
   }
 
-  public void setNewType(IType newType) {
-    m_newType = newType;
-  }
-
   public IType getType() {
     return m_type;
   }
 
   public IType getTargetDeclaringType() {
     return m_targetDeclaringType;
-  }
-
-  public CATEGORIES getTypeCategory() {
-    return m_typeCategory;
   }
 
   public int getMode() {
@@ -272,8 +257,7 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
     return m_newTypeName;
   }
 
-  public class TypePosition {
-    public double orderNr = -1.0;
-    public IJavaElement sibling;
+  public IType getOrderDefinitionType() {
+    return m_orderDefinitionType;
   }
 }

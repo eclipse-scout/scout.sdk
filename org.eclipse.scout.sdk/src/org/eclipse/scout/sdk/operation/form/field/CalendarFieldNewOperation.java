@@ -91,7 +91,7 @@ public class CalendarFieldNewOperation implements IOperation {
       ITypeSourceBuilder calendarBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_CALENDARFIELD_CALENDAR);
       calendarBuilder.setFlags(Flags.AccPublic);
       calendarBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ICalendar, getDeclaringType().getJavaProject()));
-      calendarBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
+      calendarBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
       newOp.addTypeSourceBuilder(calendarBuilder);
       // update generic in super type signature
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);

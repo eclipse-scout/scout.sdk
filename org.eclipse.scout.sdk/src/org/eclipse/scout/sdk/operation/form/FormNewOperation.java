@@ -46,7 +46,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link FormNewOperation}</h3> To create a new form. A form is either a view, editor or a dialog.
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.0 2008
  */
@@ -137,10 +137,10 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
   protected void createMainBox(ITypeSourceBuilder formBuilder, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // main box
     ITypeSourceBuilder mainBoxBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_MAIN_BOX);
-    mainBoxBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(10.0));
+    mainBoxBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
     mainBoxBuilder.setFlags(Flags.AccPublic);
     mainBoxBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, getJavaProject()));
-    addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(mainBoxBuilder, 10.0), mainBoxBuilder);
+    addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormFieldKey(mainBoxBuilder, SdkProperties.ORDER_ANNOTATION_VALUE_STEP), mainBoxBuilder);
 
     // main box getter
     final String mainBoxSignature = SignatureCache.createTypeSignature(getPackageName() + "." + getElementName() + "." + SdkProperties.TYPE_NAME_MAIN_BOX);
@@ -156,13 +156,15 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
    * @param nextOrderNr
    */
   protected void fillMainBox(ITypeSourceBuilder formBuilder, ITypeSourceBuilder mainBoxBuilder) {
+    double order = 100 * SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
     if (isCreateButtonOk()) {
-      createOkButton(getSourceBuilder(), mainBoxBuilder, 10);
+      createOkButton(getSourceBuilder(), mainBoxBuilder, order);
+      order += SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
     }
 
     // cancel button
     if (isCreateButtonCancel()) {
-      createCancelButton(getSourceBuilder(), mainBoxBuilder, 20);
+      createCancelButton(getSourceBuilder(), mainBoxBuilder, order);
     }
   }
 

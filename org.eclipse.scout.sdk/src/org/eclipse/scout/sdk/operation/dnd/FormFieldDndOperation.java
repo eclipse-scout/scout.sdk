@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.dnd;
 
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -45,12 +46,12 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
    * @param typeCategory
    */
   public FormFieldDndOperation(IType typeToMove, IType targetDeclaringType, String newName, int mode) {
-    super(typeToMove, targetDeclaringType, newName, CATEGORIES.TYPE_FORM_FIELD, mode);
+    super(typeToMove, targetDeclaringType, newName, TypeUtility.getType(IRuntimeClasses.IFormField), mode);
   }
 
   @Override
-  protected IType createNewType(IType declaringType, String simpleName, String source, String[] fqImports, IJavaElement sibling, IStructuredType structuredType, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    IType newFormField = super.createNewType(declaringType, simpleName, source, fqImports, sibling, structuredType, monitor, manager);
+  protected IType createNewType(String source, List<String> fqImports, IJavaElement sibling, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+    IType newFormField = super.createNewType(source, fqImports, sibling, monitor, manager);
     // getter
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(newFormField.getCompilationUnit());
     IType form = TypeUtility.getAncestor(newFormField, TypeFilters.getMultiTypeFilterOr(
@@ -85,7 +86,7 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
     }
   }
 
-  protected void createFormFieldGetter(IType type, IType formType, TreeMap<CompositeObject, IJavaElement> siblings, org.eclipse.scout.sdk.util.typecache.ITypeHierarchy hierarchy, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+  protected void createFormFieldGetter(IType type, IType formType, TreeMap<CompositeObject, IJavaElement> siblings, ITypeHierarchy hierarchy, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     if (TypeUtility.exists(type)) {
       InnerTypeGetterCreateOperation op = new InnerTypeGetterCreateOperation(type, formType, true);
       CompositeObject key = new CompositeObject(1, op.getElementName());
@@ -101,8 +102,7 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
 
       // visit children
       if (hierarchy.isSubtype(iCompositeField, type)) {
-        IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
-        Set<IType> innerFields = TypeUtility.getInnerTypes(type, TypeFilters.getSubtypeFilter(iFormField, hierarchy));
+        Set<IType> innerFields = TypeUtility.getInnerTypes(type, TypeFilters.getSubtypeFilter(getOrderDefinitionType(), hierarchy));
         for (IType t : innerFields) {
           createFormFieldGetter(t, formType, siblings, hierarchy, monitor, manager);
         }

@@ -4,13 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type;
 
-import java.io.PrintStream;
+import java.util.List;
 
 import org.eclipse.jdt.core.IJavaElement;
 
@@ -19,7 +19,7 @@ import org.eclipse.jdt.core.IJavaElement;
  */
 public interface IStructuredType {
 
-  public static enum CATEGORIES {
+  enum CATEGORIES {
     FIELD_LOGGER,
     FIELD_STATIC,
     FIELD_MEMBER,
@@ -73,9 +73,9 @@ public interface IStructuredType {
    */
   IJavaElement getSibling(CATEGORIES category);
 
-  IJavaElement[] getElements(CATEGORIES category);
+  List<IJavaElement> getElements(CATEGORIES category);
 
-  <T extends IJavaElement> T[] getElements(CATEGORIES category, Class<T> clazz);
+  <T extends IJavaElement> List<T> getElements(CATEGORIES category, Class<T> clazz);
 
   /**
    * @param methodName
@@ -112,10 +112,4 @@ public interface IStructuredType {
    * @return
    */
   IJavaElement getSiblingTypeFormHandler(String formHandlerName);
-
-  /**
-   * @param printer
-   */
-  void print(PrintStream printer);
-
 }
