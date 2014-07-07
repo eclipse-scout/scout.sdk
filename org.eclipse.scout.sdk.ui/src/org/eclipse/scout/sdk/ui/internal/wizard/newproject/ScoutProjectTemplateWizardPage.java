@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -54,7 +55,7 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
   private Label m_descriptionLabel;
   private P_ContentProvider m_provider;
   private ProjectTemplateExtension m_selectedTemplate;
-  private ProjectTemplateExtension[] m_extensions;
+  private final List<ProjectTemplateExtension> m_extensions;
 
   /**
    * @param pageName
@@ -175,10 +176,10 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
 
   private final class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider {
 
-    private ArrayList<ProjectTemplateExtension> m_activeExtensions;
+    private final ArrayList<ProjectTemplateExtension> m_activeExtensions;
 
     private P_ContentProvider() {
-      m_activeExtensions = new ArrayList<ProjectTemplateExtension>();
+      m_activeExtensions = new ArrayList<ProjectTemplateExtension>(m_extensions.size());
     }
 
     public ProjectTemplateExtension revalidate() {

@@ -165,17 +165,17 @@ public class MethodTest extends AbstractScoutSdkTest {
 
     m = TypeUtility.getMethod(t, "methodWithException");
     bodySourceRange = TypeUtility.getContentSourceRange(m);
-    Assert.assertEquals(973, bodySourceRange.getOffset());
+    Assert.assertEquals(970, bodySourceRange.getOffset());
     Assert.assertEquals(15, bodySourceRange.getLength());
 
     m = TypeUtility.getMethod(t, "methodWithComment");
     bodySourceRange = TypeUtility.getContentSourceRange(m);
-    Assert.assertEquals(1041, bodySourceRange.getOffset());
+    Assert.assertEquals(1038, bodySourceRange.getOffset());
     Assert.assertEquals(4, bodySourceRange.getLength());
 
     m = TypeUtility.getMethod(t, "returnAnInteger");
     bodySourceRange = TypeUtility.getContentSourceRange(m);
-    Assert.assertEquals(1079, bodySourceRange.getOffset());
+    Assert.assertEquals(1076, bodySourceRange.getOffset());
     Assert.assertEquals(17, bodySourceRange.getLength());
   }
 
@@ -365,7 +365,7 @@ public class MethodTest extends AbstractScoutSdkTest {
     IMethod execFormatValue1 = SdkAssert.assertMethodExist(listboxField, "execFormatValue", new String[]{"QSet<QLong;>;"});
     SdkAssert.assertMethodReturnTypeSignature(execFormatValue1, "QString;");
     SdkAssert.assertAnnotation(execFormatValue1, "java.lang.Override");
-    
+
     SdkAssert.assertEquals("inner types count of 'ListboxField'", 0, listboxField.getTypes().length);
     // type TableField
     IType tableField = SdkAssert.assertTypeExists(mainBox, "TableField");

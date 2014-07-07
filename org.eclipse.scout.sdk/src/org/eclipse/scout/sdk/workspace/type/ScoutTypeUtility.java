@@ -1653,11 +1653,41 @@ public class ScoutTypeUtility extends TypeUtility {
     return clientSessionHierarchy.getAllSubtypes(sessionBaseType, sessionFilter, TypeComparators.getTypeNameComparator());
   }
 
+  /**
+   * Gets the order value for a type created in declaringType just before the item sibling.
+   *
+   * @param declaringType
+   *          The container in which the new ordered item should be created.
+   * @param orderDefinitionType
+   *          The {@link IType} that defines the siblings. E.g. {@link IRuntimeClasses#IFormField} when formfields
+   *          should be considered as siblings.
+   * @param sibling
+   *          The sibling item that will be after. the created item. Therefore the new item will be before this sibling.
+   *          If <code>null</code>, the order for the last position in declaringType will be calculated.
+   * @return The order to use for a new item at the given position.
+   * @throws JavaModelException
+   */
   public static double getOrderNr(IType declaringType, IType orderDefinitionType, IJavaElement sibling) throws JavaModelException {
     ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(declaringType);
     return getOrderNr(declaringType, orderDefinitionType, sibling, typeHierarchy);
   }
 
+  /**
+   * Gets the order value for a type created in declaringType just before the item sibling.
+   *
+   * @param declaringType
+   *          The container in which the new ordered item should be created.
+   * @param orderDefinitionType
+   *          The {@link IType} that defines the siblings. E.g. {@link IRuntimeClasses#IFormField} when formfields
+   *          should be considered as siblings.
+   * @param sibling
+   *          The sibling item that will be after. the created item. Therefore the new item will be before this sibling.
+   *          If <code>null</code>, the order for the last position in declaringType will be calculated.
+   * @param typeHierarchy
+   *          The local hierarchy of the declaringType to use.
+   * @return The order to use for a new item at the given position.
+   * @throws JavaModelException
+   */
   public static double getOrderNr(IType declaringType, IType orderDefinitionType, IJavaElement sibling, ITypeHierarchy typeHierarchy) throws JavaModelException {
     if (!TypeUtility.exists(orderDefinitionType) || !TypeUtility.exists(declaringType)) {
       return -1.0;
@@ -1717,6 +1747,18 @@ public class ScoutTypeUtility extends TypeUtility {
     return SdkProperties.ORDER_ANNOTATION_VALUE_STEP;
   }
 
+  /**
+   * Gets an order value that is between the two given values.<br>
+   * The algorithm tries to stick to numbers without decimal places as long as possible.<br>
+   * If a common pattern (like normal steps according to {@link SdkProperties#ORDER_ANNOTATION_VALUE_STEP}) are found,
+   * the corresponding pattern is followed.
+   *
+   * @param a
+   *          First value
+   * @param b
+   *          Second value
+   * @return A value in between a and b.
+   */
   public static double getOrderValueInBetween(double a, double b) {
     double low = Math.min(a, b);
     double high = Math.max(a, b);

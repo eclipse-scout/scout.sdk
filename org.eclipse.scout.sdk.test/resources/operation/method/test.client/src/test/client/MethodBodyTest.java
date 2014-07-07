@@ -46,7 +46,7 @@ public class MethodBodyTest {
     }
   }
 
-  public void methodWithException() {
+  public void methodWithException() throws NoSuchMethodException {
     // todo
   }
 
