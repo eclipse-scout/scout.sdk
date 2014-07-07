@@ -154,7 +154,7 @@ public final class SearchFormFromTablePageHelper {
     return fieldSourceBuilder;
   }
 
-  private static ITypeSourceBuilder addSearchField(IType column, ITypeHierarchy tablePageHierarchy, double orderNr, String fieldOwnerFqn, ITypeSourceBuilder fieldOwnerBuilder, ITypeSourceBuilder fieldGetterOwnerBuilder, IJavaProject searchFormProject, INlsProject nlsProject) throws IllegalArgumentException, CoreException {
+  private static ITypeSourceBuilder addSearchField(IType column, ITypeHierarchy tablePageHierarchy, double orderNr, String fieldOwnerFqn, ITypeSourceBuilder fieldOwnerBuilder, ITypeSourceBuilder fieldGetterOwnerBuilder, IJavaProject searchFormProject, INlsProject nlsProject) throws CoreException {
 
     // nls entry
     INlsEntry nlsEntry = null;

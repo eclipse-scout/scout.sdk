@@ -16,22 +16,22 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 
 /**
  * <h3>{@link ISourceBuilder}</h3> ...
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public interface ISourceBuilder {
 
   /**
    * validates the receiver source builder.
-   * 
-   * @throws IllegalArgumentException
+   *
+   * @throws
    */
-  void validate() throws IllegalArgumentException;
+  void validate();
 
   /**
    * appends the source to the given builder.
-   * 
+   *
    * @param source
    *          The builder to append the source to.
    * @param lineDelimiter

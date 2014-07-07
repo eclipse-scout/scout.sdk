@@ -41,14 +41,14 @@ public class MultiplePageDataUpdateOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_resolver == null) {
       throw new IllegalArgumentException("types can not be null.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Set<IType> pages = m_resolver.getTypes();
     monitor.beginTask("Updating Page Datas", pages.size());
     int i = 0;

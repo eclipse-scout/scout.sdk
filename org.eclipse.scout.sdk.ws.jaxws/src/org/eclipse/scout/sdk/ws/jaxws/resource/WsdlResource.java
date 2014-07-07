@@ -56,7 +56,7 @@ public class WsdlResource extends ManagedResource {
     IOperation op = new IOperation() {
 
       @Override
-      public void validate() throws IllegalArgumentException {
+      public void validate() {
       }
 
       @Override
@@ -65,7 +65,7 @@ public class WsdlResource extends ManagedResource {
       }
 
       @Override
-      public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+      public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
         storeWsdl(definition, notificationElement, notificationEvent, monitor);
       }
     };

@@ -67,7 +67,7 @@ public class SourceFormatOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getProject() == null) {
       throw new IllegalArgumentException("java project can not be null.");
     }

@@ -20,9 +20,12 @@ public final class PlatformVersionUtility {
   public static final String EMPTY_VERSION_STR = "0.0.0";
   public static final String ORG_ECLIPSE_PLATFORM = "org.eclipse.platform";
 
+  private PlatformVersionUtility() {
+  }
+
   /**
    * points to the newest supported version.
-   * 
+   *
    * @return
    */
   public static boolean isLatest() {

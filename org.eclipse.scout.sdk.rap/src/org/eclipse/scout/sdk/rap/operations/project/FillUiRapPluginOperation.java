@@ -39,7 +39,7 @@ public class FillUiRapPluginOperation extends AbstractScoutProjectNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (m_serverProject != null) {
       ResourcesPlugin.getWorkspace().checkpoint(false);
       CreateAjaxServletOperation createAjaxServletOperation = new CreateAjaxServletOperation(m_serverProject);

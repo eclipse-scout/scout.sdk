@@ -16,10 +16,13 @@ import org.osgi.framework.ServiceReference;
 
 /**
  * Factory for creating an {@link IMessageBoxService}.
- * 
+ *
  * @since 3.10.0-M1
  */
-public class MessageBoxServiceFactory {
+public final class MessageBoxServiceFactory {
+
+  private MessageBoxServiceFactory() {
+  }
 
   /**
    * Looks up the {@link IMessageBoxService} in the OSGi service registry and returns the one with the highest priority.
@@ -27,7 +30,7 @@ public class MessageBoxServiceFactory {
    * always the given default result, if available.
    * <p/>
    * <b>Note</b>: The OSGi service reference is released immediately. Hence do not store the service returned.
-   * 
+   *
    * @return Returns the {@link IMessageBoxService}
    */
   public static IMessageBoxService getMessageBoxService() {

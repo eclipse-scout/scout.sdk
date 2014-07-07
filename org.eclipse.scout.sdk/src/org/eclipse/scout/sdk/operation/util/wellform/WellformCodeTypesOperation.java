@@ -41,14 +41,14 @@ public class WellformCodeTypesOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!getSharedBundle().getType().equals(IScoutBundle.TYPE_SHARED)) {
       throw new IllegalArgumentException("bundle must be a shared bundle.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // find all forms
     IType iCodeType = TypeUtility.getType(IRuntimeClasses.ICodeType);
     ICachedTypeHierarchy codeTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iCodeType);

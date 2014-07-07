@@ -66,7 +66,7 @@ public class MobileDesktopExtensionInstallOperation extends AbstractScoutProject
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IScoutBundleGraph bundleGraph = ScoutSdkCore.getScoutWorkspace().getBundleGraph();
     IScoutBundle mobileClient = bundleGraph.getBundle(getProperties().getProperty(CreateMobileClientPluginOperation.PROP_MOBILE_BUNDLE_CLIENT_NAME, String.class));
 
@@ -144,7 +144,7 @@ public class MobileDesktopExtensionInstallOperation extends AbstractScoutProject
     registerDesktopExtension(desktopExtension, mobileClient, monitor, workingCopyManager);
   }
 
-  private void registerDesktopExtension(IType desktopExtension, IScoutBundle mobileClient, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  private void registerDesktopExtension(IType desktopExtension, IScoutBundle mobileClient, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     HashMap<String, String> properties = new HashMap<String, String>(2);
     properties.put("active", "true");
     properties.put("class", desktopExtension.getFullyQualifiedName());

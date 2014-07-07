@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.operation.export;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -44,7 +43,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link ExportServerWarOperation}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 04.02.2011
  */
@@ -73,7 +72,7 @@ public class ExportServerWarOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (StringUtility.isNullOrEmpty(getWarFileName())) {
       throw new IllegalArgumentException("WarFileName can not be null or empty!");
     }
@@ -88,7 +87,7 @@ public class ExportServerWarOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IStatus result = null;
     final String SERVLET_BRIDGE_JAR_NAME = "org.eclipse.equinox.servletbridge_1.3.0.v20140430-1556.jar";
     try {
@@ -120,13 +119,11 @@ public class ExportServerWarOperation implements IOperation {
         throw new CoreException(result);
       }
     }
+    catch (CoreException e) {
+      throw e;
+    }
     catch (Exception e) {
-      if (e instanceof CoreException) {
-        throw (CoreException) e;
-      }
-      else {
-        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not create '" + SERVLET_BRIDGE_JAR_NAME + "' in temp folder", e));
-      }
+      throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not create '" + SERVLET_BRIDGE_JAR_NAME + "' in temp folder", e));
     }
   }
 
@@ -188,7 +185,7 @@ public class ExportServerWarOperation implements IOperation {
 
   /**
    * Workaround for PDE bug 284732
-   * 
+   *
    * @param pfmh
    * @param targetDirectory
    * @throws CoreException
@@ -222,7 +219,7 @@ public class ExportServerWarOperation implements IOperation {
     }
   }
 
-  private File packWar() throws FileNotFoundException, IOException {
+  private File packWar() throws IOException {
     File destinationFile = new File(getWarFileName());
     if (!destinationFile.exists()) {
       destinationFile.getParentFile().mkdirs();

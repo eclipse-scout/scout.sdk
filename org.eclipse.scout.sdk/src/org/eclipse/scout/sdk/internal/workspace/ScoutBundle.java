@@ -67,7 +67,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
 
 /**
  * <h3>{@link ScoutBundle}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 30.01.2013
  */
@@ -142,7 +142,7 @@ public class ScoutBundle implements IScoutBundle {
    * returns a valid java project that can be edited or null if no editable java project can be found.<br>
    * An editable java project is a java project that exists, is not read-only and has at least one writable package
    * fragment root.
-   * 
+   *
    * @param bundle
    * @return
    */
@@ -464,7 +464,7 @@ public class ScoutBundle implements IScoutBundle {
 
   /**
    * level order traversal
-   * 
+   *
    * @param start
    * @param visitor
    * @param up
@@ -653,7 +653,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static class P_BundleCollector implements IScoutBundleGraphVisitor {
+  private static final class P_BundleCollector implements IScoutBundleGraphVisitor {
     private final LinkedHashSet<IScoutBundle> m_collector;
     private final IScoutBundleFilter m_filter;
 
@@ -675,7 +675,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static class P_SingleBundleByLevelCollector implements IScoutBundleGraphVisitor {
+  private static final class P_SingleBundleByLevelCollector implements IScoutBundleGraphVisitor {
     private final IScoutBundleFilter m_filter;
     private final TreeSet<IScoutBundle> m_collector;
     private int m_lastLevel;
@@ -718,7 +718,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static class P_TextProviderServiceHierarchyChangedListener implements ITypeHierarchyChangedListener, WeakEventListener {
+  private static final class P_TextProviderServiceHierarchyChangedListener implements ITypeHierarchyChangedListener, WeakEventListener {
     private ScoutBundle m_observer;
 
     private P_TextProviderServiceHierarchyChangedListener(ScoutBundle observer) {
@@ -731,7 +731,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static class P_TraverseComposite {
+  private static final class P_TraverseComposite {
     private final int m_level;
     private final ScoutBundle m_bundle;
 

@@ -179,7 +179,7 @@ public class FilteredTable extends Composite {
     return m_table.getEnabled() && m_filterField.getEnabled();
   }
 
-  private class P_TableFilter extends ViewerFilter {
+  private final class P_TableFilter extends ViewerFilter {
     private static final char END_SYMBOL = '<';
     private static final char ANY_STRING = '*';
     private static final char BLANK = ' ';
@@ -272,7 +272,7 @@ public class FilteredTable extends Composite {
 
   } // end class P_TableFilter
 
-  private class P_FilterResult {
+  private final class P_FilterResult {
     private final String m_text;
     private final int[] m_matchingRegions;
     private final String m_pattern;
@@ -299,11 +299,11 @@ public class FilteredTable extends Composite {
   /**
    * <h3>{@link P_TableSorter}</h3> ...
    * The default table sorter. Can be replaced by setting any other sorter or null afterwards.
-   * 
+   *
    * @author Andreas Hoegger
    * @since 3.8.0 27.01.2012
    */
-  private class P_TableSorter extends ViewerSorter {
+  private final class P_TableSorter extends ViewerSorter {
     @Override
     public void sort(Viewer viewer, Object[] elements) {
       super.sort(viewer, elements);
@@ -323,11 +323,11 @@ public class FilteredTable extends Composite {
 
   /**
    * <h3>{@link P_TableViewer}</h3> ...
-   * 
+   *
    * @author Andreas Hoegger
    * @since 3.8.0 17.02.2012
    */
-  private class P_TableViewer extends TableViewer {
+  private final class P_TableViewer extends TableViewer {
     /**
      * @param table
      */
@@ -366,7 +366,7 @@ public class FilteredTable extends Composite {
     }
   } // end class P_TableViewer
 
-  private class P_StyledLabelProvider extends StyledCellLabelProvider {
+  private final class P_StyledLabelProvider extends StyledCellLabelProvider {
     private final IBaseLabelProvider m_wrappedLabelProvider;
     private Font m_boldFont;
     private Styler m_boldStyler;

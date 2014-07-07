@@ -61,7 +61,7 @@ public interface IColumnProvider {
 
   void removeLayoutUpdateListener(LayoutUpdateListener listener);
 
-  public static interface LayoutUpdateListener extends EventListener {
+  interface LayoutUpdateListener extends EventListener {
     void updateLayout();
   }
 

@@ -71,7 +71,7 @@ public class XmlResource extends ManagedResource {
     IOperation op = new IOperation() {
 
       @Override
-      public void validate() throws IllegalArgumentException {
+      public void validate() {
       }
 
       @Override
@@ -80,7 +80,7 @@ public class XmlResource extends ManagedResource {
       }
 
       @Override
-      public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+      public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
         storeXml(xmlDocument, notificationEvent, monitor, notificationElements);
       }
     };

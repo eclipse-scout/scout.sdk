@@ -20,15 +20,18 @@ import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.SQLStatement;
 
 /**
  * <h3>{@link SqlBindingMarkers}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 28.02.2011
  */
-public class SqlBindingMarkers {
+public final class SqlBindingMarkers {
   public static final String MARKER_ID = "org.eclipse.scout.sdk.formdata.sql.binding";
   public static final String MAKRER_ID_SINGLE = "org.eclipse.scout.sdk.formdata.sql.binding.single";
   public static final String MARKER_ID_MULTI = "org.eclipse.scout.sdk.formdata.sql.binding.multi";
   public static final String BIND_VARIABLE = "bindVariable";
+
+  private SqlBindingMarkers() {
+  }
 
   public static void removeMarkers(IResource resource) {
     try {

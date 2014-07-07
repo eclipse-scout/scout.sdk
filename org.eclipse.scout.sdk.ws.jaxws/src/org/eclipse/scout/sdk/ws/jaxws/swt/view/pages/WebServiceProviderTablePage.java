@@ -108,7 +108,7 @@ public class WebServiceProviderTablePage extends AbstractPage {
     }
   }
 
-  private final XmlResource getSunJaxWsResource() {
+  private XmlResource getSunJaxWsResource() {
     return ResourceFactory.getSunJaxWsResource(m_bundle);
   }
 

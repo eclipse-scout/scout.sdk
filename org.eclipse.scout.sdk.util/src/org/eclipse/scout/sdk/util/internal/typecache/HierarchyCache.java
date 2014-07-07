@@ -98,7 +98,7 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   @Override
-  public ICachedTypeHierarchy getPrimaryTypeHierarchy(IType type) throws IllegalArgumentException {
+  public ICachedTypeHierarchy getPrimaryTypeHierarchy(IType type) {
     if (type != null && TypeUtility.exists(type.getDeclaringType())) {
       throw new IllegalArgumentException("type '" + type.getFullyQualifiedName() + "' must be a primary type.");
     }

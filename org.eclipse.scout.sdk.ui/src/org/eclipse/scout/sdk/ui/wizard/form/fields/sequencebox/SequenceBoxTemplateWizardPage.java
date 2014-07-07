@@ -76,7 +76,7 @@ public class SequenceBoxTemplateWizardPage extends AbstractWorkspaceWizardPage {
     return m_selectedTemplate;
   }
 
-  private class P_TableContentProvider implements IStructuredContentProvider, ITableLabelProvider {
+  private final class P_TableContentProvider implements IStructuredContentProvider, ITableLabelProvider {
     IContentTemplate[] m_templates;
 
     private P_TableContentProvider(IContentTemplate[] templates) {

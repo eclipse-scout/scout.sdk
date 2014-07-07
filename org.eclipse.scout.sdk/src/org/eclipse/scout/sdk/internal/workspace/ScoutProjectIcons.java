@@ -127,7 +127,7 @@ public class ScoutProjectIcons implements IIconProvider {
     }
   }
 
-  protected void collectIconNamesOfType(IType iconType, Map<String, ScoutIconDesc> collector) throws JavaModelException, IllegalArgumentException {
+  protected void collectIconNamesOfType(IType iconType, Map<String, ScoutIconDesc> collector) throws JavaModelException {
     if (TypeUtility.exists(iconType)) {
       boolean inherited = CompareUtility.notEquals(ScoutTypeUtility.getScoutBundle(iconType), m_bundle);
       for (IField field : iconType.getFields()) {

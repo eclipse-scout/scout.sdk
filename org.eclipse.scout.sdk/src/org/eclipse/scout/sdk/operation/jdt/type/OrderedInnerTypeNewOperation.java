@@ -48,7 +48,7 @@ public class OrderedInnerTypeNewOperation extends InnerTypeNewOperation {
   }
 
   @Override
-  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Double orderNr = ScoutTypeUtility.getOrderNr(getDeclaringType(), getOrderDefinitionType(), getSibling());
     addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(orderNr));
     super.createType(monitor, workingCopyManager);

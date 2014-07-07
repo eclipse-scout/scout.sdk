@@ -45,7 +45,7 @@ public class WellformSharedBundleOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getBundle() == null) {
       throw new IllegalArgumentException("Bundle can not be null.");
     }
@@ -55,7 +55,7 @@ public class WellformSharedBundleOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     HashSet<IType> allTypes = new HashSet<IType>();
     IPackageFragmentRoot[] packageFragmentRoots = getBundle().getJavaProject().getPackageFragmentRoots();
     for (IPackageFragmentRoot pr : packageFragmentRoots) {

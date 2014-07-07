@@ -56,7 +56,7 @@ public class CreateServiceNlsProjectOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_superType == null) {
       throw new IllegalArgumentException("super type not set.");
     }
@@ -107,7 +107,7 @@ public class CreateServiceNlsProjectOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // ensure sync
     getJavaProject().getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 

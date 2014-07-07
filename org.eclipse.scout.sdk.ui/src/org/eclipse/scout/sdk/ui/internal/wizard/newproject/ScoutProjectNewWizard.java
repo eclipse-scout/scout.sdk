@@ -15,13 +15,11 @@ import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IContributor;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.InvalidRegistryObjectException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jdt.core.IJavaProject;
@@ -181,7 +179,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
 
   private class P_ScoutPerspectiveConfigElement implements IConfigurationElement {
     @Override
-    public String getAttribute(String name) throws InvalidRegistryObjectException {
+    public String getAttribute(String name) {
       if (name.equals("finalPerspective")) {
         return IScoutConstants.SCOUT_PERSPECTIVE_ID;
       }
@@ -192,85 +190,82 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
     }
 
     @Override
-    public Object createExecutableExtension(String propertyName) throws CoreException {
+    public Object createExecutableExtension(String propertyName) {
       return null;
     }
 
     @SuppressWarnings("all")
     // do not add an override annotation here (backwards compatibility)
-    public String getAttribute(String attrName, String locale) throws InvalidRegistryObjectException {
+    public String getAttribute(String attrName, String locale) {
       return null;
     }
 
     @SuppressWarnings("all")
     // do not add an override annotation here (backwards compatibility)
-    public String getValue(String locale) throws InvalidRegistryObjectException {
+    public String getValue(String locale) {
       return null;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public String getAttributeAsIs(String name) throws InvalidRegistryObjectException {
+    public String getAttributeAsIs(String name) {
       return null;
     }
 
     @Override
-    public String[] getAttributeNames() throws InvalidRegistryObjectException {
+    public String[] getAttributeNames() {
       return null;
     }
 
     @Override
-    public IConfigurationElement[] getChildren() throws InvalidRegistryObjectException {
+    public IConfigurationElement[] getChildren() {
       return null;
     }
 
     @Override
-    public IConfigurationElement[] getChildren(String name) throws InvalidRegistryObjectException {
+    public IConfigurationElement[] getChildren(String name) {
       return null;
     }
 
     @Override
-    public IContributor getContributor() throws InvalidRegistryObjectException {
+    public IContributor getContributor() {
       return null;
     }
 
     @Override
-    public IExtension getDeclaringExtension() throws InvalidRegistryObjectException {
+    public IExtension getDeclaringExtension() {
       return null;
     }
 
     @Override
-    public String getName() throws InvalidRegistryObjectException {
-      return null;
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public String getNamespace() throws InvalidRegistryObjectException {
-      return null;
-    }
-
-    @Override
-    public String getNamespaceIdentifier() throws InvalidRegistryObjectException {
-      return null;
-    }
-
-    @Override
-    public Object getParent() throws InvalidRegistryObjectException {
-
-      return null;
-    }
-
-    @Override
-    public String getValue() throws InvalidRegistryObjectException {
-
+    public String getName() {
       return null;
     }
 
     @SuppressWarnings("deprecation")
     @Override
-    public String getValueAsIs() throws InvalidRegistryObjectException {
+    public String getNamespace() {
+      return null;
+    }
 
+    @Override
+    public String getNamespaceIdentifier() {
+      return null;
+    }
+
+    @Override
+    public Object getParent() {
+      return null;
+    }
+
+    @Override
+    public String getValue() {
+      return null;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public String getValueAsIs() {
       return null;
     }
 

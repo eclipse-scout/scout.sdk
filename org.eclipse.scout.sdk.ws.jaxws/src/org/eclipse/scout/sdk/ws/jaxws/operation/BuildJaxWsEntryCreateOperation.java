@@ -45,7 +45,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("bundle not set");
     }
@@ -56,7 +56,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     XmlResource buildJaxWsResource = ResourceFactory.getBuildJaxWsResource(m_bundle);
     if (buildJaxWsResource.getFile() == null || !buildJaxWsResource.getFile().exists()) {
       // create build-jaxws.xml file

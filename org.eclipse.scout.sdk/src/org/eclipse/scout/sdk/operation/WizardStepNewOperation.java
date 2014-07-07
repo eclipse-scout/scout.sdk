@@ -74,7 +74,7 @@ public class WizardStepNewOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!TypeUtility.exists(getDeclaringType())) {
       throw new IllegalArgumentException("declaring type can not be null.");
     }

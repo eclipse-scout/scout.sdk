@@ -69,14 +69,14 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IScoutBundleGraph bundleGraph = ScoutSdkCore.getScoutWorkspace().getBundleGraph();
     final IScoutBundle mobileClient = bundleGraph.getBundle(getProperties().getProperty(CreateMobileClientPluginOperation.PROP_MOBILE_BUNDLE_CLIENT_NAME, String.class));
 
     createHomeForm(mobileClient, monitor, workingCopyManager);
   }
 
-  private IType createHomeForm(IScoutBundle mobileClient, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  private IType createHomeForm(IScoutBundle mobileClient, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
 
     String packageName = mobileClient.getPackageName(".ui.forms");
     PrimaryTypeNewOperation homeFormOp = new PrimaryTypeNewOperation("MobileHomeForm", packageName, mobileClient.getJavaProject());

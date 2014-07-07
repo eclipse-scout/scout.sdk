@@ -26,11 +26,11 @@ public class CommandExecutionOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     JaxWsSdk.getDefault().getMarkerQueueManager().suspend();
     try {
       for (IMarkerCommand command : m_commands) {

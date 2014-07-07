@@ -30,11 +30,11 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h3>PropertyViewExtensionPoint</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 19.07.2010
  */
-public class PropertyViewExtensionPoint {
+public final class PropertyViewExtensionPoint {
   private static final String propertyViewExtensionId = "propertyViewPart";
   private static PropertyViewExtensionPoint instance = new PropertyViewExtensionPoint();
 
@@ -111,7 +111,7 @@ public class PropertyViewExtensionPoint {
     return clazz;
   }
 
-  private int distanceToIPage(Class<?> visitee, int dist) throws IllegalArgumentException {
+  private int distanceToIPage(Class<?> visitee, int dist) {
     if (visitee == null) {
       throw new IllegalArgumentException("try to determ the distance to IPage of a instance not in subhierarchy of IPage.");
     }

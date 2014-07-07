@@ -176,7 +176,7 @@ public class ProjectChooserDialog extends TitleAreaDialog {
     }
   }
 
-  private class P_ProjectModel implements IStructuredContentProvider, ITableLabelProvider {
+  private final class P_ProjectModel implements IStructuredContentProvider, ITableLabelProvider {
     private Collection<IProject> m_pluginProjects;
 
     private P_ProjectModel(Collection<IProject> workspaceProjects) {

@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateEventFilter;
 
 /**
  * <h3>{@link DtoUpdateEventFilter}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 07.10.2013
  */
@@ -36,6 +36,9 @@ public final class DtoUpdateEventFilter {
   private static final String FILTER_CLASS_ATTRIB = "class";
 
   private static IDtoAutoUpdateEventFilter[] filters = null;
+
+  private DtoUpdateEventFilter() {
+  }
 
   public static IDtoAutoUpdateEventFilter[] getFilters() {
     if (filters == null) {

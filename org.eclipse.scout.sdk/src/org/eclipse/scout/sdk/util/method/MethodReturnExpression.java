@@ -298,7 +298,7 @@ public class MethodReturnExpression {
     return false;
   }
 
-  private final static class NaiveAstFlattener implements IAstRewriteFlattener {
+  private static final class NaiveAstFlattener implements IAstRewriteFlattener {
 
     private final ISimpleNameAstFlattenerCallback m_callback;
 

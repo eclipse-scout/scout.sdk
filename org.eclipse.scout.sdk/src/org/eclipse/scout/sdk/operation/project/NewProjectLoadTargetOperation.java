@@ -40,7 +40,7 @@ public class NewProjectLoadTargetOperation extends AbstractScoutProjectNewOperat
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (m_targetFile == null) {
       throw new IllegalArgumentException("target file cannot be null.");
@@ -53,7 +53,7 @@ public class NewProjectLoadTargetOperation extends AbstractScoutProjectNewOperat
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     LoadTargetPlatformOperation o = new LoadTargetPlatformOperation(m_targetFile);
     o.validate();
     o.run(monitor, workingCopyManager);

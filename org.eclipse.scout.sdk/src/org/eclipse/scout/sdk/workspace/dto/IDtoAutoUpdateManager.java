@@ -16,17 +16,17 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 /**
  * <h3>{@link IDtoAutoUpdateManager}</h3> Manages the lifecycle of the Scout DTO auto update feature. <br>
  * An instance can be acquired using {@link ScoutSdkCore#getDtoAutoUpdateManager()}.
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 21.08.2013
  * @noinstantiate This class is not intended to be instantiated by clients.
  */
 public interface IDtoAutoUpdateManager {
-  public static final String PROP_AUTO_UPDATE = ScoutSdk.PLUGIN_ID + ".propAutoUpdate";
+  String PROP_AUTO_UPDATE = ScoutSdk.PLUGIN_ID + ".propAutoUpdate";
 
   /**
    * Gets if the DTO Auto update is enabled or not.
-   * 
+   *
    * @return true if the auto update is enabled, false otherwise.
    */
   boolean isEnabled();
@@ -39,7 +39,7 @@ public interface IDtoAutoUpdateManager {
    * If the DTO update job is already running and updating DTO classes, this job is not touched even if the manager is
    * disabled. This way no events are lost (which would lead in obsolete DTO classes). The user can cancel the job
    * manually anyway.
-   * 
+   *
    * @param enabled
    *          true if the manager should update DTO classes, false otherwise.
    */
@@ -47,7 +47,7 @@ public interface IDtoAutoUpdateManager {
 
   /**
    * Adds an update handler to resolve the necessary operations for a compilation unit candidate.
-   * 
+   *
    * @param factory
    */
   void addModelDataUpdateHandler(IDtoAutoUpdateHandler factory);

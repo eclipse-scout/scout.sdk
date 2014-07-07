@@ -58,13 +58,13 @@ public class PrimaryTypeNewOperation extends AbstractTypeNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     getCompilationUnitNewOp().validate();
     super.validate();
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // create ICU
     CompilationUnitNewOperation icuNewOp = getCompilationUnitNewOp();
     icuNewOp.addTypeSourceBuilder(getSourceBuilder());

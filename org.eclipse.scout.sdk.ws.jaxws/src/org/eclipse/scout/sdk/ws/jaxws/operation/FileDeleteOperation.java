@@ -21,7 +21,7 @@ public class FileDeleteOperation implements IOperation {
   private IFile m_file;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_file == null) {
       throw new IllegalArgumentException("no file set");
     }

@@ -75,7 +75,7 @@ public class JavaElementDeleteOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_typesToDelete == null) {
       throw new IllegalArgumentException("null argument for members not allowed.");
     }

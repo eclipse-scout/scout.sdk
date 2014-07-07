@@ -64,7 +64,7 @@ public class LibraryBundleUnlinkOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getBundle() == null) {
       throw new IllegalArgumentException("The bundle to mremove the library from can not be null");
     }
@@ -74,7 +74,7 @@ public class LibraryBundleUnlinkOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Set<IFile> productsToCheck = new HashSet<IFile>();
     Set<IScoutBundle> checkedScoutProjects = new HashSet<IScoutBundle>();
     List<IPluginModelBase> allUnlinkedLibraries = new LinkedList<IPluginModelBase>();

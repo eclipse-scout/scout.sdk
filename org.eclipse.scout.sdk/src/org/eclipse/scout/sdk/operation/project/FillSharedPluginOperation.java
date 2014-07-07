@@ -41,7 +41,7 @@ public class FillSharedPluginOperation extends AbstractScoutProjectNewOperation 
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (m_project == null) {
       throw new IllegalArgumentException("project can not be null.");

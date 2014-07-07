@@ -48,7 +48,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link Docx4jDesktopTechnologyHandler}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 03.05.2013
  */
@@ -173,7 +173,7 @@ public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandl
     return null;
   }
 
-  private static class DesktopTechnologyResource extends ScoutTechnologyResource {
+  private static final class DesktopTechnologyResource extends ScoutTechnologyResource {
     private final IType m_toolsMenuType;
 
     private DesktopTechnologyResource(IScoutBundle bundle, IFile resource, IType toolsMenuType) {

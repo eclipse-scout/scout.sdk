@@ -44,7 +44,7 @@ public abstract class AbstractWorkspaceBlockingJob extends JobEx {
     return doRun(monitor);
   }
 
-  private final IStatus debugDoRun(IProgressMonitor monitor) {
+  private IStatus debugDoRun(IProgressMonitor monitor) {
     try {
       TuningUtility.startTimer();
       return doRun(monitor);
@@ -55,7 +55,7 @@ public abstract class AbstractWorkspaceBlockingJob extends JobEx {
     }
   }
 
-  private final IStatus doRun(IProgressMonitor monitor) {
+  private IStatus doRun(IProgressMonitor monitor) {
     IWorkingCopyManager workingCopyManager = ScoutSdkCore.createWorkingCopyManger();
     try {
       try {
@@ -79,10 +79,10 @@ public abstract class AbstractWorkspaceBlockingJob extends JobEx {
     return Status.OK_STATUS;
   }
 
-  protected void validate() throws IllegalArgumentException {
+  protected void validate() {
   }
 
-  protected abstract void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException;
+  protected abstract void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException;
 
   public void setDebug(boolean debug) {
     m_debug = debug;

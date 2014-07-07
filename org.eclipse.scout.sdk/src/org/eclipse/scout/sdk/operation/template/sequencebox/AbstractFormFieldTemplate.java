@@ -104,7 +104,7 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
 
   }
 
-  protected void createFormFieldGetter(String formFieldSignature, IType declaringType, IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
+  protected void createFormFieldGetter(String formFieldSignature, IType declaringType, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     // find form
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(declaringType.getCompilationUnit());
     IType form = TypeUtility.getAncestor(declaringType, TypeFilters.getMultiTypeFilterOr(

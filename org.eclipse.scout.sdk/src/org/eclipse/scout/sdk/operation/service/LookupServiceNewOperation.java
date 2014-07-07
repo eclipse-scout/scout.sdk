@@ -46,7 +46,7 @@ public class LookupServiceNewOperation extends ServiceNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
 
   }

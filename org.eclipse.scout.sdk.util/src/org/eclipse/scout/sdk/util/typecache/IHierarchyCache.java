@@ -47,7 +47,7 @@ public interface IHierarchyCache {
    *          The base type of the primary type hierarchy.
    * @return The primary type hierarchy. The hierarchy will only be initialized with values on first use and will be
    *         cached for later re-use.
-   * @throws IllegalArgumentException
+   * @throws 
    *           if the given type is not a primary type.
    */
   ICachedTypeHierarchy getPrimaryTypeHierarchy(IType type);

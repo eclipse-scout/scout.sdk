@@ -197,7 +197,7 @@ public final class SchemaUtility {
     }
   }
 
-  public static abstract class AbstractArtifact<T> {
+  public abstract static class AbstractArtifact<T> {
     private IFileHandle<T> m_fileHandle;
 
     public AbstractArtifact(IFileHandle<T> fileHandle) {
@@ -277,7 +277,7 @@ public final class SchemaUtility {
     }
   }
 
-  public static abstract class AbstractSchemaArtifact<T> extends AbstractArtifact<T> {
+  public abstract static class AbstractSchemaArtifact<T> extends AbstractArtifact<T> {
     private Schema m_schema;
 
     public AbstractSchemaArtifact(IFileHandle<T> schemaResource, Schema schema) {

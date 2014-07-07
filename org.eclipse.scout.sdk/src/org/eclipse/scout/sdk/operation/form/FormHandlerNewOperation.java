@@ -64,13 +64,13 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
   }
 
   @Override
-  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.createType(monitor, workingCopyManager);
     // start method
     createStartMethod(getCreatedType(), monitor, workingCopyManager);
   }
 
-  protected void createStartMethod(final IType formHandler, IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
+  protected void createStartMethod(final IType formHandler, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
 
     // find form
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formHandler.getCompilationUnit());

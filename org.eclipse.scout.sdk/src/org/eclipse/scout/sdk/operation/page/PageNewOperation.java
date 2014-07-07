@@ -68,7 +68,7 @@ public class PageNewOperation extends AbstractPageOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (StringUtility.isNullOrEmpty(getSuperTypeSignature())) {
       throw new IllegalArgumentException("super type can not be null.");
     }
@@ -84,7 +84,7 @@ public class PageNewOperation extends AbstractPageOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
 
     PrimaryTypeNewOperation newOp = new PrimaryTypeNewOperation(getTypeName(), getPackageNamePage(), getPageJavaProject());

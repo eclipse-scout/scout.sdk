@@ -31,14 +31,14 @@ public class LoadTargetPlatformOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getTargetFile() == null) {
       throw new IllegalArgumentException("target file cannot be null.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     TargetPlatformUtility.resolveTargetPlatform(getTargetFile(), true, monitor);
   }
 

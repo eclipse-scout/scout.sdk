@@ -88,7 +88,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     createLanguageFile(null, folder, getDesc().getFileName(), monitor);
   }
 
-  private static final String getNlsClassFileHeader(String translationFileName, String nl) {
+  private static String getNlsClassFileHeader(String translationFileName, String nl) {
     StringBuilder builder = new StringBuilder();
     builder.append("/**" + nl);
     builder.append(" * This class provides the NLS support." + nl);
@@ -96,7 +96,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     return builder.toString();
   }
 
-  private static final String getNlsFileHeader(String nl) {
+  private static String getNlsFileHeader(String nl) {
     StringBuilder builder = new StringBuilder();
     builder.append("################################################" + nl);
     builder.append("# This file is maintained by the nls editor.   #" + nl);
@@ -106,7 +106,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     return builder.toString();
   }
 
-  private static final String getTranslationFileHeader(String nl) {
+  private static String getTranslationFileHeader(String nl) {
     StringBuilder builder = new StringBuilder();
     builder.append("##############################################################" + nl);
     builder.append("# This file is maintained by the NLS project and should not  #" + nl);
@@ -127,7 +127,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     }
   }
 
-  private final void createNlsFile(IProgressMonitor monitor) throws CoreException {
+  private void createNlsFile(IProgressMonitor monitor) throws CoreException {
     if (getDesc().getPlugin() != null) {
       IFile file = getDesc().getPlugin().getFile(getDesc().getFileName() + ".nls");
       if (!file.exists()) {
@@ -136,7 +136,7 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
     }
   }
 
-  private final void createJavaClass(IProgressMonitor monitor) throws CoreException {
+  private void createJavaClass(IProgressMonitor monitor) throws CoreException {
     createJavaClass(getDesc().getPlugin(),
         getDesc().getSourceContainer(),
         getDesc().getPackage(),

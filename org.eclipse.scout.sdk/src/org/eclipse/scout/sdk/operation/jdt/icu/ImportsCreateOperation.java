@@ -57,14 +57,14 @@ public class ImportsCreateOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!TypeUtility.exists(getCompilationUnit())) {
       throw new IllegalArgumentException("Compilation unit must exist to create imports!");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (String s : m_importsToCreate) {
       getCompilationUnit().createImport(s, null, monitor);
     }

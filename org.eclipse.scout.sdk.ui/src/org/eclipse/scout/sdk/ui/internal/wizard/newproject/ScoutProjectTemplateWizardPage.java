@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Label;
 
 /**
  * <h3>{@link ScoutProjectTemplateWizardPage}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011
  */
@@ -173,7 +173,7 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
     }
   }
 
-  private class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider {
+  private final class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider {
 
     private ArrayList<ProjectTemplateExtension> m_activeExtensions;
 

@@ -58,14 +58,14 @@ public class LibraryBundlesAddOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getLibraries() == null || getLibraries().isEmpty()) {
       throw new IllegalArgumentException("Libraries to add can not be null or empty.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // add to manifest
     PluginModelHelper ownerHelper = new PluginModelHelper(getBundle().getProject());
     Set<IPluginModelBase> libraries = getLibraries();

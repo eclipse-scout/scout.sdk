@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.extensions.export.IExportScoutProjectEntryHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
@@ -58,7 +59,7 @@ public final class ExportScoutProjectEntryExtensionPoint {
   }
 
   private static int getOrder(String order) {
-    if (order == null || order.trim().length() == 0) {
+    if (!StringUtility.hasText(order)) {
       return 0;
     }
     else if (order.matches("[0-9]*")) {

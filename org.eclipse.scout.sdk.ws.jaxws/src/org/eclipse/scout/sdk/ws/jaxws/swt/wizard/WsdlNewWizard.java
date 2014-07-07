@@ -97,7 +97,7 @@ public class WsdlNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     m_operation.validate();
     m_operation.run(monitor, workingCopyManager);
 

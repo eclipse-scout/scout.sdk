@@ -16,7 +16,7 @@ import org.eclipse.scout.commons.StringUtility;
 /**
  * Ensures leading and trailing file separators for the given file type.
  */
-public class PathNormalizer {
+public final class PathNormalizer {
   public static final String SLASH_SUFFIX = "/";
 
   private PathNormalizer() {
@@ -52,7 +52,7 @@ public class PathNormalizer {
 
   /**
    * Appends a "/" at the end of the given non-empty target namespace if it does not exist.
-   * 
+   *
    * @param targetNamespace
    *          name of the target namespace
    * @return target namespace with a "/" at the end.
@@ -69,7 +69,7 @@ public class PathNormalizer {
 
   /**
    * Removes the "/" at the end of a non-empty target namespace if one exists.
-   * 
+   *
    * @param targetNamespace
    *          name of the target namespace
    * @return target namespace without a trailing "/" at the end.

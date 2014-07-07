@@ -48,7 +48,7 @@ public class WsProviderImplNewOperation implements IOperation {
   private IType m_createdType;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("bundle not set");
     }
@@ -61,7 +61,7 @@ public class WsProviderImplNewOperation implements IOperation {
   }
 
   @Override
-  public void run(final IProgressMonitor monitor, final IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(final IProgressMonitor monitor, final IWorkingCopyManager workingCopyManager) throws CoreException {
     PrimaryTypeNewOperation implNewTypeOp = new PrimaryTypeNewOperation(m_typeName, m_packageName, m_bundle.getJavaProject());
     implNewTypeOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     implNewTypeOp.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());

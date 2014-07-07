@@ -469,14 +469,14 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
     revalidate();
   }
 
-  private class P_DescPropertyChangedListener implements PropertyChangeListener {
+  private final class P_DescPropertyChangedListener implements PropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       handlePropertyChanged(evt.getPropertyName(), evt.getOldValue(), evt.getNewValue());
     }
   }
 
-  private class P_RootContainerModifyListener implements ModifyListener {
+  private final class P_RootContainerModifyListener implements ModifyListener {
     private HashMap<String, IClasspathEntry> m_map = new HashMap<String, IClasspathEntry>();
 
     private P_RootContainerModifyListener() {

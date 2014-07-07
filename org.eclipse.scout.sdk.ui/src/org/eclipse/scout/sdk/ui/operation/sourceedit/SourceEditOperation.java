@@ -49,7 +49,7 @@ public class SourceEditOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getEdit() == null) {
       throw new IllegalArgumentException("Edit can not be null.");
     }
@@ -59,7 +59,7 @@ public class SourceEditOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     final Holder<CoreException> exceptionHolder = new Holder<CoreException>(CoreException.class);
     getDisplay().syncExec(new Runnable() {
       @Override

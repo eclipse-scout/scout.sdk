@@ -60,15 +60,19 @@ import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
  * <h3>{@link UiUtility}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 07.03.2011
  */
 @SuppressWarnings("restriction")
-public class UiUtility {
+public final class UiUtility {
+
+  private UiUtility() {
+  }
+
   /**
    * Shows the given java element in the java editor.
-   * 
+   *
    * @param e
    *          The element to focus
    * @param createNew
@@ -110,7 +114,7 @@ public class UiUtility {
    * The <em>extent</em> of a string is the width and height of the rectangular area it would cover if drawn in the
    * given font.
    * </p>
-   * 
+   *
    * @param text
    * @param f
    * @param context
@@ -124,7 +128,7 @@ public class UiUtility {
 
   /**
    * Gets the shortened text based on the given input so that the text returned is smaller than the given bounds.
-   * 
+   *
    * @param origText
    *          The original text that should be shortened to match into bounds.
    * @param f
@@ -142,7 +146,7 @@ public class UiUtility {
 
   /**
    * Gets the shortened text based on the given input so that the text returned is smaller than the given bounds.
-   * 
+   *
    * @param origText
    *          The original text that should be shortened to match into bounds.
    * @param f
@@ -191,7 +195,7 @@ public class UiUtility {
    * Gets the packages suffix of the given selection.<br>
    * This method calculates the java package that surrounds the current selection and returns the suffix (the package
    * part after the symbolic name of the containing bundle).
-   * 
+   *
    * @param selection
    *          The selection to evaluate
    * @return A string with the package suffix or null.
@@ -207,7 +211,7 @@ public class UiUtility {
    * Gets the packages suffix of the given element.<br>
    * This method calculates the java package that surrounds the given element and returns the suffix (the package
    * part after the symbolic name of the containing bundle).
-   * 
+   *
    * @param element
    *          The element
    * @return A string with the package suffix or null.
@@ -229,7 +233,7 @@ public class UiUtility {
   /**
    * Closes all open instances of the given editor.<br>
    * If the editors are dirty, the user is asked if they should be saved.
-   * 
+   *
    * @param editorId
    *          The editor id filter or null if all editors should be closed.
    * @param files
@@ -282,7 +286,7 @@ public class UiUtility {
    * The given filter is taken into account so that clients can influence which types of scout bundles around the
    * selected one that should be used.<br>
    * If the priorityBundle is not null, this bundle is directly returned and the selection is not evaluated.
-   * 
+   *
    * @param selection
    * @param priorityBundle
    * @param filter
@@ -333,7 +337,7 @@ public class UiUtility {
   /**
    * Tries to convert the given element into the given class.
    * This method respects scout IPage classes.
-   * 
+   *
    * @param element
    *          The element to convert.
    * @param targetClass
@@ -389,7 +393,7 @@ public class UiUtility {
    * Gets an image descriptor for classes.<br>
    * The image descriptor includes flags like abstract, final, static, deprecated. Furthermore it shows different icons
    * for interfaces and classes and includes the severity flags of the classes (e.g. error or warning).
-   * 
+   *
    * @param type
    *          The type for which the icon should be returned.
    * @return The image descriptor.

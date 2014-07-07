@@ -299,7 +299,7 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
 
   /**
    * Main input for wizard page
-   * 
+   *
    * @param wsdlDefinition
    */
   public void setWsdlDefinition(Definition wsdlDefinition) {
@@ -580,7 +580,7 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
     return new P_PortProposal[0];
   }
 
-  private class P_ServiceProposal extends SimpleProposal {
+  private final class P_ServiceProposal extends SimpleProposal {
 
     private static final String DATA_SERVICE = "dataService";
 
@@ -599,7 +599,7 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
     }
   }
 
-  private class P_PortProposal extends SimpleProposal {
+  private final class P_PortProposal extends SimpleProposal {
 
     private static final String DATA_PORT = "dataPort";
 

@@ -50,7 +50,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
   private String m_urlPattern;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("bundle must not be null");
     }
@@ -69,7 +69,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String oldServletRegBundleName = null;
 
     // build-jaxws.xml

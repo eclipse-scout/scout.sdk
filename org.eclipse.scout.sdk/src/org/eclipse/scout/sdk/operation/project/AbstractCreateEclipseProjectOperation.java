@@ -36,7 +36,7 @@ public abstract class AbstractCreateEclipseProjectOperation extends AbstractScou
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (StringUtility.isNullOrEmpty(getSymbolicName())) {
       throw new IllegalArgumentException("symbolic name can not be null.");

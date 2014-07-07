@@ -44,14 +44,14 @@ public class WellformFormsOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!getClientBundle().getType().equals(IScoutBundle.TYPE_CLIENT)) {
       throw new IllegalArgumentException("bundle must be a client bundle.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
     IType iSearchForm = TypeUtility.getType(IRuntimeClasses.ISearchForm);
 

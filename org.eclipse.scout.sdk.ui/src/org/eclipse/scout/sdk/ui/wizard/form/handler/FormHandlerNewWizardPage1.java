@@ -179,7 +179,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
     return m_selectedTemplate.getType();
   }
 
-  private class P_TableContentProvider implements IStructuredContentProvider, ITableLabelProvider {
+  private final class P_TableContentProvider implements IStructuredContentProvider, ITableLabelProvider {
     HandlerTemplate[] m_templates;
 
     private P_TableContentProvider(HandlerTemplate[] templates) {
@@ -226,7 +226,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
     }
   } // end class P_TableContentProvider
 
-  private class HandlerTemplate {
+  private final class HandlerTemplate {
     public static final int ID_NEW = 1;
     public static final int ID_MODIFY = 2;
     public static final int ID_CUSTOM = 3;
@@ -256,7 +256,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
   } // end class P_BCTypeTemplate
 
-  private class P_ModeFilter extends ViewerFilter {
+  private final class P_ModeFilter extends ViewerFilter {
     @Override
     public boolean select(Viewer viewer, Object parentElement, Object element) {
       if (m_showAllTemplates) {

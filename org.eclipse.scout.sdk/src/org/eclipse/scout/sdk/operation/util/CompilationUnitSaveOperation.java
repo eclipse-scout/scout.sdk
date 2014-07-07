@@ -34,14 +34,14 @@ public class CompilationUnitSaveOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!TypeUtility.exists(getCompilationUnit())) {
       throw new IllegalArgumentException("Compilation unit must exist and connot be null.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (getCompilationUnit().isWorkingCopy()) {
       getCompilationUnit().getBuffer().save(monitor, true);
     }

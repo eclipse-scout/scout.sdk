@@ -59,7 +59,7 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // create menu
     m_operation = new MenuNewOperation(m_page1.getTypeName(), getDeclaringType(), true);
     // write back members

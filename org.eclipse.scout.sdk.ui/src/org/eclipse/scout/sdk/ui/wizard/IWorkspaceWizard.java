@@ -14,15 +14,15 @@ import org.eclipse.scout.sdk.operation.IOperation;
 
 /**
  * <h3>{@link IWorkspaceWizard}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.10.0 28.10.2013
  */
 public interface IWorkspaceWizard {
 
-  public static final double ORDER_DEFAULT = 0;
-  public static final double ORDER_BEFORE_WIZARD = -10;
-  public static final double ORDER_AFTER_WIZARD = 10;
+  double ORDER_DEFAULT = 0;
+  double ORDER_BEFORE_WIZARD = -10;
+  double ORDER_AFTER_WIZARD = 10;
 
   IOperation addAdditionalPerformFinishOperation(IOperation op, double orderNr);
 

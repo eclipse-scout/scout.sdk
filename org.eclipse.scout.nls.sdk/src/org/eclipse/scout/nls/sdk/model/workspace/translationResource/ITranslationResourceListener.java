@@ -14,6 +14,5 @@ import java.util.EventListener;
 
 /** <h4>ITranslationResourceListener</h4> */
 public interface ITranslationResourceListener extends EventListener {
-
-  public void translationResourceChanged(TranslationResourceEvent event);
+  void translationResourceChanged(TranslationResourceEvent event);
 }

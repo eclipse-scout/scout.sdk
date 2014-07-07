@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link FormFieldNewOperation}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 06.03.2013
  */
@@ -47,12 +47,12 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
   }
 
   @Override
-  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.createType(monitor, workingCopyManager);
     createFormFieldGetter(monitor, workingCopyManager);
   }
 
-  protected void createFormFieldGetter(IProgressMonitor monitor, IWorkingCopyManager manager) throws IllegalArgumentException, CoreException {
+  protected void createFormFieldGetter(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     // find form
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType().getCompilationUnit());
     IType form = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getMultiTypeFilterOr(

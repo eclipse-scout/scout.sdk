@@ -30,11 +30,11 @@ public class SunJaxWsFileCreateOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Document document = JaxWsSdkUtility.createNewXmlDocument("jws:endpoints");
     document.getDocumentElement().setAttribute("xmlns:jws", SunJaxWsBean.NS_ENDPOINT);
     document.getDocumentElement().setAttribute("version", "2.0");

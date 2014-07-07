@@ -164,7 +164,7 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     m_operation.run(monitor, workingCopyManager);
     if (m_webserviceEnum == WebserviceEnum.Provider) {
       JaxWsSdk.getDefault().notifyPageReload(WebServiceProviderNodePage.class, m_markerGroupUUID, WebServiceProviderNodePage.DATA_WSDL_FILE | WebServiceProviderNodePage.DATA_SUN_JAXWS_ENTRY | WebServiceProviderNodePage.DATA_BINDING_FILE);

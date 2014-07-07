@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  */
 public interface IScoutProjectWizard {
 
-  public IScoutProjectWizardPage getProjectWizardPage();
+  IScoutProjectWizardPage getProjectWizardPage();
 
   /**
    * @param name

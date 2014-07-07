@@ -49,7 +49,7 @@ import org.osgi.framework.Version;
 
 /**
  * Helper class for basic plug-in model operations.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0
  */
@@ -76,11 +76,11 @@ public class PluginModelHelper {
    * <br>
    * If there is no project in the workspace with the given name, it is searched in the plug-in registry. Then the
    * resulting instance cannot be modified.
-   * 
+   *
    * @param pluginModelBase
    *          The model base that defines the project name.
-   * @throws IllegalArgumentException
-   *           when no project with the same name as denoted by the given model description can be found in the
+   * @throws when
+   *           no project with the same name as denoted by the given model description can be found in the
    *           workspace or is not a valid plug-in project.
    */
   public PluginModelHelper(IPluginModelBase pluginModelBase) {
@@ -92,11 +92,11 @@ public class PluginModelHelper {
    * <br>
    * If there is no project in the workspace with the given name, it is searched in the plug-in registry. Then the
    * resulting instance cannot be modified.
-   * 
+   *
    * @param projectName
    *          The name of the project.
-   * @throws IllegalArgumentException
-   *           when no project with the given name can be found in the workspace or is not a valid plugin project.
+   * @throws when
+   *           no project with the given name can be found in the workspace or is not a valid plugin project.
    */
   public PluginModelHelper(String projectName) {
     this(createPluginModel(projectName));
@@ -114,11 +114,11 @@ public class PluginModelHelper {
 
   /**
    * Creates a new helper that operates on the given project.
-   * 
+   *
    * @param project
    *          The project to modify.
-   * @throws IllegalArgumentException
-   *           when the project is null or is not a valid plug-in project.
+   * @throws when
+   *           the project is null or is not a valid plug-in project.
    */
   public PluginModelHelper(IProject project) {
     this(new LazyPluginModel(project));
@@ -132,7 +132,7 @@ public class PluginModelHelper {
 
   /**
    * Gets the project associated with this helper.
-   * 
+   *
    * @return The project this helper was created with.
    */
   public IProject getProject() {
@@ -150,7 +150,7 @@ public class PluginModelHelper {
     return entry;
   }
 
-  public static class ManifestPart {
+  public static final class ManifestPart {
 
     private final LazyPluginModel m_model;
 
@@ -164,7 +164,7 @@ public class PluginModelHelper {
      * If a dependency for the given plugin already exists (even if the existing dependency has different options), this
      * method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param pluginId
      *          The plugin ID
      * @throws CoreException
@@ -179,7 +179,7 @@ public class PluginModelHelper {
      * If a dependency for the given plugin already exists (even if the existing dependency has different options), this
      * method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param pluginId
      *          The plugin ID
      * @param reexport
@@ -195,7 +195,7 @@ public class PluginModelHelper {
      * If the given plugin is null, empty or a dependency for the given plugin already exists
      * (even if the existing dependency has different options), this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param pluginId
      *          The plugin ID
      * @param reexport
@@ -222,7 +222,7 @@ public class PluginModelHelper {
 
     /**
      * Removes the given plugin from the dependency list of the project associated with this helper.<br>
-     * 
+     *
      * @param pluginId
      *          The plugin id to remove.
      * @throws CoreException
@@ -256,7 +256,7 @@ public class PluginModelHelper {
 
     /**
      * Checks whether the given plugin id is already in the dependency list of the project associated with this helper.
-     * 
+     *
      * @param pluginId
      *          The plugin id to check
      * @return true if the given plugin is already in the dependency list, false otherwise.
@@ -268,7 +268,7 @@ public class PluginModelHelper {
 
     /**
      * Returns all dependencies defined in the plug-in project associated with this helper.
-     * 
+     *
      * @return an array of import objects
      */
     public IPluginImport[] getAllDependencies() {
@@ -287,7 +287,7 @@ public class PluginModelHelper {
 
     /**
      * Checks whether the given package is already exported.
-     * 
+     *
      * @param pck
      *          The package name to check.
      * @return true, if the given package is exported, false otherwise.
@@ -299,7 +299,7 @@ public class PluginModelHelper {
 
     /**
      * Checks whether the given package name is already exported.
-     * 
+     *
      * @param packageName
      *          The package name to check.
      * @return true, if the given package is exported, false otherwise.
@@ -317,7 +317,7 @@ public class PluginModelHelper {
 
     /**
      * Gets all exported packages defined in the plug-in project associated with this helper.
-     * 
+     *
      * @return an array of all exported packages (is never null).
      */
     public ExportPackageDescription[] getAllExportedPackages() {
@@ -327,7 +327,7 @@ public class PluginModelHelper {
     /**
      * Checks whether the given package name is already imported.<br>
      * Any version constraints are ignored when checking if the import exists.
-     * 
+     *
      * @param packageName
      *          The package name to check.
      * @return true, if the given package is exported, false otherwise.
@@ -345,7 +345,7 @@ public class PluginModelHelper {
 
     /**
      * Gets all imported packages defined in the plug-in project associated with this helper.
-     * 
+     *
      * @return an array of all imported packages (is never null).
      */
     public ImportPackageSpecification[] getAllImportedPackages() {
@@ -356,7 +356,7 @@ public class PluginModelHelper {
      * Adds the given fully qualified package to the imported packages of the bundle associated with this helper.<br>
      * If an import for the given package already exists, this method does nothing (only the package name is
      * considered).
-     * 
+     *
      * @param pck
      *          The package. E.g.: org.eclipse.scout.rt.client
      * @param version
@@ -383,7 +383,7 @@ public class PluginModelHelper {
      * Adds the given package to the exported packages of the project associated with this helper.<br>
      * If the given package is null, empty or already in the exported list, this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param packageName
      *          The fully qualified name of the package.
      */
@@ -401,7 +401,7 @@ public class PluginModelHelper {
     /**
      * Adds the given package to the exported packages of the project associated with this helper.<br>
      * If the given package is already in the exported list, this method does nothing.
-     * 
+     *
      * @param pck
      *          The package to add
      */
@@ -412,7 +412,7 @@ public class PluginModelHelper {
     /**
      * Removes the given package from the exported packages list of the project associated with this helper.<br>
      * This method does nothing if the give package is null.
-     * 
+     *
      * @param pck
      *          The package to remove
      */
@@ -424,7 +424,7 @@ public class PluginModelHelper {
     /**
      * Removes the given package from the exported packages list of the project associated with this helper.<br>
      * This method does nothing if the give package is null or empty.
-     * 
+     *
      * @param packageName
      *          The fully qualified name of the package
      */
@@ -438,7 +438,7 @@ public class PluginModelHelper {
     /**
      * Removes the given package from the imported packages list of the project associated with this helper.<br>
      * This method does nothing if the give package is null or empty.
-     * 
+     *
      * @param packageName
      *          The fully qualified name of the package
      */
@@ -467,7 +467,7 @@ public class PluginModelHelper {
     /**
      * Creates or updates the given manifest header key to the given value.<br>
      * This method does nothing if the given key is null or empty.
-     * 
+     *
      * @param key
      *          The key. Will be created if it does not exist.
      * @param value
@@ -481,7 +481,7 @@ public class PluginModelHelper {
     /**
      * Removes the given key from the manifest.<br>
      * This method does nothing if the given key is null or empty.
-     * 
+     *
      * @param key
      *          The key to remove.
      */
@@ -491,7 +491,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the value of the given manifest header key.
-     * 
+     *
      * @param key
      *          The property name.
      * @return The value (or null if it does not exist) of the given key.
@@ -502,7 +502,7 @@ public class PluginModelHelper {
 
     /**
      * Gets all classpath entries of the project associated with this helper.
-     * 
+     *
      * @return an array with all entries.
      */
     @SuppressWarnings("unchecked")
@@ -515,7 +515,7 @@ public class PluginModelHelper {
     /**
      * Removes the given entry from the classpath.<br>
      * If a null resource is passed, this method does nothing.
-     * 
+     *
      * @param resource
      *          The entry to remove.
      */
@@ -527,7 +527,7 @@ public class PluginModelHelper {
     /**
      * Removes the given entry from the classpath.<br>
      * If a null entry or empty entry is passed, this method does nothing.
-     * 
+     *
      * @param entry
      *          The entry to remove.
      */
@@ -549,7 +549,7 @@ public class PluginModelHelper {
 
     /**
      * Checks whether the given entry is already in the classpath entries of the project associated with this helper.
-     * 
+     *
      * @param resource
      *          The entry to search
      * @return false if the resource is null or does not exist, true otherwise.
@@ -561,7 +561,7 @@ public class PluginModelHelper {
 
     /**
      * Checks whether the given entry is already in the classpath entries of the project associated with this helper.
-     * 
+     *
      * @param entry
      *          The entry to search.
      * @return true if the given entry already exists, false otherwise.
@@ -578,7 +578,7 @@ public class PluginModelHelper {
      * Adds the given classpath entry to the classpath of the project associated with this helper.<br>
      * If the resource is null, does not exist in the project or is already in the classpath, this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param resource
      *          The classpath entry to add.
      */
@@ -592,7 +592,7 @@ public class PluginModelHelper {
      * Adds the given classpath entry to the classpath of the project associated with this helper.<br>
      * If the given entry is null, an empty string or already exists in the classpath, this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param entry
      *          The classpath entry to add.
      */
@@ -610,7 +610,7 @@ public class PluginModelHelper {
     /**
      * Sets the version of the plug-in to the given value.<br>
      * If the given value is null, this method does nothing.
-     * 
+     *
      * @param newVersion
      *          the new version
      */
@@ -622,7 +622,7 @@ public class PluginModelHelper {
     /**
      * Sets the version of the plug-in to the given value.<br>
      * If the given value is empty or null, this method does nothing.
-     * 
+     *
      * @param newVersion
      *          the new version
      */
@@ -633,7 +633,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the version of the plug-in.
-     * 
+     *
      * @return The version of this plug-in.
      */
     public Version getVersion() {
@@ -642,7 +642,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the version of the plug-in.
-     * 
+     *
      * @return The version of the plug-in.
      */
     public String getVersionAsString() {
@@ -651,7 +651,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the MANIFEST.MF file of the plug-in.
-     * 
+     *
      * @return
      */
     public IFile getFile() {
@@ -667,7 +667,7 @@ public class PluginModelHelper {
     Manifest.m_model.save();
   }
 
-  public static class PluginXmlPart {
+  public static final class PluginXmlPart {
     private final LazyPluginModel m_model;
 
     private PluginXmlPart(LazyPluginModel m) {
@@ -683,7 +683,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName attribute1="value1" attribute2="value2"&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full id of the extension point for which the extension should be added.
      * @param elementName
@@ -727,7 +727,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full id of the extension point for which the extension should be added.
      * @param elementName
@@ -747,7 +747,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName attribute1="value1" attribute2="value2"&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id.
      * @param elementName
@@ -774,7 +774,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id.
      * @param elementName
@@ -802,7 +802,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName attribute1="value1" attribute2="value2"&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id.
      * @param elementName
@@ -845,7 +845,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id.
      * @param elementName
@@ -887,7 +887,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName attribute1="value1" attribute2="value2"&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id
      * @param elementName
@@ -910,7 +910,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id
      * @param elementName
@@ -930,7 +930,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName attribute1="value1" attribute2="value2"&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id
      * @param elementName
@@ -953,7 +953,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id
      * @param elementName
@@ -966,7 +966,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the plugin.xml file of the plugin.
-     * 
+     *
      * @return
      */
     public IFile getFile() {
@@ -974,7 +974,7 @@ public class PluginModelHelper {
     }
   }
 
-  public static class BuildPropertiesPart {
+  public static final class BuildPropertiesPart {
     private static final String BINARY_BUILD_INCLUDES = "bin.includes";
 
     private final LazyPluginModel m_model;
@@ -986,7 +986,7 @@ public class PluginModelHelper {
     /**
      * Removes the given resource from the binary build includes list.<br>
      * If the resource is null, this method does nothing.
-     * 
+     *
      * @param resource
      *          The resource to remove.
      * @throws CoreException
@@ -999,7 +999,7 @@ public class PluginModelHelper {
     /**
      * Removes the given token from the binary build includes list.<br>
      * If the token is null or empty, this method does nothing.
-     * 
+     *
      * @param token
      *          The token to remove.
      * @throws CoreException
@@ -1014,7 +1014,7 @@ public class PluginModelHelper {
 
     /**
      * Gets all binary build includes.
-     * 
+     *
      * @return An array containing all binary build includes of the plugin.
      */
     public String[] getBinaryBuildEntries() {
@@ -1037,7 +1037,7 @@ public class PluginModelHelper {
     /**
      * Checks whether the given resource exists in the binary build includes list of the project associated with this
      * helper.
-     * 
+     *
      * @param resource
      *          The resource to search.
      * @return true if the given resource is already in the binary build includes list, false otherwise.
@@ -1051,7 +1051,7 @@ public class PluginModelHelper {
     /**
      * Checks whether the given token exists in the binary build includes list of the project associated with this
      * helper.
-     * 
+     *
      * @param token
      *          The token to search.
      * @return true if the given token is already in the binary build includes list, false otherwise.
@@ -1068,7 +1068,7 @@ public class PluginModelHelper {
      * If no "bin.includes" exists, it is created.<br>
      * If the token is null, does not exist or is already in the list, this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param resource
      *          The resource to add.
      * @throws CoreException
@@ -1084,7 +1084,7 @@ public class PluginModelHelper {
      * If no "bin.includes" exists, it is created.<br>
      * If the token is null, empty or is already in the list, this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param token
      *          The token to add.
      * @throws CoreException
@@ -1101,7 +1101,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the build.properties file of the plugin.
-     * 
+     *
      * @return
      */
     public IFile getFile() {

@@ -95,7 +95,7 @@ public class ExecResetSearchFilterMethodPresenter extends ExecMethodPresenter {
     }
 
     @Override
-    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
       if (m_formDataType != null && m_formType != null) {
         setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
           @Override

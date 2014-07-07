@@ -76,7 +76,7 @@ public class ScoutTypeUtility extends TypeUtility {
   private static final Pattern RETURN_TRUE_PATTERN = Pattern.compile("return\\s*true", Pattern.MULTILINE);
   private static final Pattern SUFF_CLASS_REGEX = Pattern.compile("\\.class$");
 
-  private ScoutTypeUtility() {
+  protected ScoutTypeUtility() {
   }
 
   /**

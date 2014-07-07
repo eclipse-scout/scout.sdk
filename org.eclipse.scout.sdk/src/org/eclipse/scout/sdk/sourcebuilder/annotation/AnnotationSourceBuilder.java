@@ -36,7 +36,7 @@ public class AnnotationSourceBuilder implements IAnnotationSourceBuilder {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (StringUtility.isNullOrEmpty(getSignature())) {
       throw new IllegalArgumentException("Signature required!");
     }

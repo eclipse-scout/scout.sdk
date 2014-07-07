@@ -86,7 +86,7 @@ public class ServiceNewOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getInterfaceProject() != null || getInterfacePackageName() != null) {
       if (getInterfaceProject() == null || getInterfacePackageName() == null) {
         throw new IllegalArgumentException("interface project and packagename must be both set or null. To avoid the interface creation set both members to null.");
@@ -102,7 +102,7 @@ public class ServiceNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (getInterfaceProject() != null) {
       // create interface
       List<String> interfaceSignatures = getInterfaceSourceBuilder().getInterfaceSignatures();

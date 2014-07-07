@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>{@link MenuProposalPresenter}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 04.12.2012
  */
@@ -47,7 +47,7 @@ public class MenuProposalPresenter extends AbstractTypeProposalPresenter {
     getProposalField().setContentProvider(new P_ContentProvider(labelProvider));
   }
 
-  private class P_ContentProvider extends ContentProposalProvider {
+  private final class P_ContentProvider extends ContentProposalProvider {
 
     private final ILabelProvider m_labelProvider;
     private IType[] m_proposals; // cached items

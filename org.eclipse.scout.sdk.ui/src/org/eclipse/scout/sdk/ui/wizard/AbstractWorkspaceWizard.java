@@ -90,14 +90,14 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
    * The default implementation iterates over the associated wizard pages and calls
    * {@link AbstractWorkspaceWizardPage#performFinish()} of each page. Overwrite this method to implement a specific
    * finish behavior.
-   * 
+   *
    * @param monitor
    * @param workingCopyManager
    * @return
    * @throws CoreException
-   * @throws IllegalArgumentException
+   * @throws
    */
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IWizardPage page : getPages()) {
       boolean validPage = false;
       AbstractWorkspaceWizardPage bcPage = (AbstractWorkspaceWizardPage) page;
@@ -121,7 +121,7 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
   /**
    * Is called before the wizard is finished and disposed. Typically, this method is overwritten to extract values from
    * within UI fields of the wizard pages to parameterize an associated operation.
-   * 
+   *
    * @return true to continue or false to cancel
    * @throws CoreException
    */
@@ -129,7 +129,7 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
     return true;
   }
 
-  private class P_PerformFinishOperation implements IOperation {
+  private final class P_PerformFinishOperation implements IOperation {
     private final Display m_display;
 
     private P_PerformFinishOperation(Display display) {
@@ -142,7 +142,7 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
     }
 
     @Override
-    public void validate() throws IllegalArgumentException {
+    public void validate() {
 
     }
 
@@ -158,11 +158,11 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
           }
         });
       }
+      catch (CoreException e) {
+        throw e;
+      }
       catch (Exception e) {
         ScoutSdkUi.logError("exception during perfoming finish on wizard page '" + AbstractWorkspaceWizard.this.getClass().getName() + "'.", e);
-        if (e instanceof CoreException) {
-          throw (CoreException) e;
-        }
       }
     }
   } // end class P_PerformFinishOperation

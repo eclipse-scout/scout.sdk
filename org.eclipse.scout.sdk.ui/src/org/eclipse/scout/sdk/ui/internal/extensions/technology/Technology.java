@@ -271,7 +271,7 @@ public class Technology implements Comparable<Technology> {
     }
   }
 
-  private class P_ChangeSelectionOperation implements IOperation {
+  private final class P_ChangeSelectionOperation implements IOperation {
     private final ITreeNode[] m_selectedNodes;
     private final boolean m_newSelection;
     private boolean success;
@@ -283,7 +283,7 @@ public class Technology implements Comparable<Technology> {
     }
 
     @Override
-    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
       try {
 
         // map the checked resources to the contributing handler
@@ -361,7 +361,7 @@ public class Technology implements Comparable<Technology> {
     }
 
     @Override
-    public void validate() throws IllegalArgumentException {
+    public void validate() {
     }
   }
 }

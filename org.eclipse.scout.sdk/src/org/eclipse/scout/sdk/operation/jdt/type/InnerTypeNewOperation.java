@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link InnerTypeNewOperation}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 08.03.2013
  */
@@ -46,7 +46,7 @@ public class InnerTypeNewOperation extends AbstractTypeNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!TypeUtility.exists(getDeclaringType())) {
       throw new IllegalArgumentException("Declaring type does not exist!");
     }
@@ -54,19 +54,19 @@ public class InnerTypeNewOperation extends AbstractTypeNewOperation {
   }
 
   @Override
-  public final void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public final void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     createType(monitor, workingCopyManager);
     formatSource(monitor, workingCopyManager);
   }
 
-  protected void formatSource(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void formatSource(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (isFormatSource()) {
       JavaElementFormatOperation formatOp = new JavaElementFormatOperation(getCreatedType(), true);
       formatOp.run(monitor, workingCopyManager);
     }
   }
 
-  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ICompilationUnit icu = getDeclaringType().getCompilationUnit();
     ImportValidator importValidator = new ImportValidator(icu);
     StringBuilder sourceBuilder = new StringBuilder();

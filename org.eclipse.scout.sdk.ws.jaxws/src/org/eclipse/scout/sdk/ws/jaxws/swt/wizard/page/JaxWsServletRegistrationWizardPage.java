@@ -372,7 +372,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
     return m_propertySupport.getPropertyString(PROP_URL_PATTERN);
   }
 
-  private class P_BundleProposal extends SimpleProposal {
+  private final class P_BundleProposal extends SimpleProposal {
 
     private static final String DATA_BUNDLE = "dataBundle";
 

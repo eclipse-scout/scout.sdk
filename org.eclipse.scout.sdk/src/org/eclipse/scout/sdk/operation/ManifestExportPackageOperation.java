@@ -63,7 +63,7 @@ public class ManifestExportPackageOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
 
   }
 

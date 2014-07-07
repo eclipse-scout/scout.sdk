@@ -49,14 +49,14 @@ public class WellformClientBundleOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundles == null) {
       throw new IllegalArgumentException("bundles can not be null.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutBundle bundle : m_bundles) {
       if (IScoutBundle.TYPE_CLIENT.equals(bundle.getType()) && !bundle.isBinary()) {
         HashSet<IType> allTypes = new HashSet<IType>();

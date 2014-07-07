@@ -13,6 +13,5 @@ package org.eclipse.scout.sdk.extensions.codeid;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public interface ICodeIdProvider {
-
-  public String getNextId(IScoutBundle projectGroup, String genericSignature);
+  String getNextId(IScoutBundle projectGroup, String genericSignature);
 }

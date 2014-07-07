@@ -65,7 +65,7 @@ public class WsdlCreateOperation implements IOperation {
   private WsdlStyleEnum m_wsdlStyle;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("bundle not set");
     }
@@ -99,7 +99,7 @@ public class WsdlCreateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     WSDLFactory factory;
     try {
       factory = WSDLFactory.newInstance();

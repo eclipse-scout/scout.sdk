@@ -99,7 +99,7 @@ public class CreateTemplateOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getTemplateBundle() == null) {
       throw new IllegalArgumentException("The bundle for the template is not set.");
     }
@@ -121,7 +121,7 @@ public class CreateTemplateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ITypeSourceBuilder typeSourceBuilder = new TypeSourceBuilder(getTemplateName()) {
       @Override
       protected void createTypeContent(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {

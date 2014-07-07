@@ -26,16 +26,19 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 
 /**
  * <h3>{@link ScoutFileLocator}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 21.12.2010
  */
-public class ScoutFileLocator {
+public final class ScoutFileLocator {
+
+  private ScoutFileLocator() {
+  }
 
   /**
    * Tries to resolve the given path in the given bundle in the workspace and (if not found in the workspace) in the
    * platform.
-   * 
+   *
    * @param bundleID
    *          the bundle to search
    * @param path

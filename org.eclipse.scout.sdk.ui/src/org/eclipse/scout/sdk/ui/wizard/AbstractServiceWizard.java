@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link AbstractServiceWizard}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 22.11.2013
  */
@@ -132,7 +132,7 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
           Texts.get("UseSessionInRegistration", session.getElementName()), icon, pos++, session));
 
       // remember if the current default session could be found amongst all available sessions
-      if (defaultSelection != null && CompareUtility.equals(session, defaultSelection)) {
+      if (defaultSelection != null && defaultSelection.equals(session)) {
         defaultFound = true;
       }
     }

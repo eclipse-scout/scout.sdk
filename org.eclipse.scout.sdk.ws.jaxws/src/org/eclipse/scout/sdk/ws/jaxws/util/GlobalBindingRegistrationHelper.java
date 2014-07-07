@@ -30,7 +30,10 @@ import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact;
 import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact.TypeEnum;
 import org.eclipse.swt.widgets.Shell;
 
-public class GlobalBindingRegistrationHelper {
+public final class GlobalBindingRegistrationHelper {
+
+  private GlobalBindingRegistrationHelper() {
+  }
 
   public static SchemaCandidate popupForSchema(IFile wsdlFile) throws CoreException {
     // determine schema to use for global binding registration

@@ -40,7 +40,7 @@ public class BindingFileCreateOperation implements IOperation {
   private IFolder m_wsdlDestinationFolder;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("no bundle set");
     }

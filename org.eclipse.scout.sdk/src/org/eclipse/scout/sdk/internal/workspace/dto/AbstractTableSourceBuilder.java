@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
  * <h3>{@link AbstractTableSourceBuilder}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
@@ -36,7 +36,7 @@ public abstract class AbstractTableSourceBuilder extends AbstractDtoTypeSourceBu
     super(modelType, elementName, setup, monitor);
   }
 
-  protected String getColumnSignature(IType type, ITypeHierarchy columnHierarchy) throws IllegalArgumentException, CoreException {
+  protected String getColumnSignature(IType type, ITypeHierarchy columnHierarchy) throws CoreException {
     if (!TypeUtility.exists(type) || Object.class.getName().equals(type.getFullyQualifiedName())) {
       return null;
     }

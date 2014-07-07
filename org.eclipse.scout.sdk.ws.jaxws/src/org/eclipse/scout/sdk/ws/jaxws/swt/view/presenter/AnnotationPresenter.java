@@ -181,11 +181,11 @@ public class AnnotationPresenter extends AbstractPropertyPresenter<IAnnotation> 
   private class P_AnnotationCreateOperation implements IOperation {
 
     @Override
-    public void validate() throws IllegalArgumentException {
+    public void validate() {
     }
 
     @Override
-    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
       AnnotationUpdateOperation op = new AnnotationUpdateOperation();
       op.setAnnotationType(m_annotationType);
       op.setDeclaringType(m_type);

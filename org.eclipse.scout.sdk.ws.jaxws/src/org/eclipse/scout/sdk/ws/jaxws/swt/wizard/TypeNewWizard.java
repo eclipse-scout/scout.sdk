@@ -83,7 +83,7 @@ public class TypeNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     m_op.run(monitor, workingCopyManager);
     return true;
   }

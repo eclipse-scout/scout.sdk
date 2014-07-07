@@ -11,8 +11,7 @@
 package org.eclipse.scout.nls.sdk.ui;
 
 public interface INlsTableActionHanlder {
+  void handleRefreshTable();
 
-  public void handleRefreshTable();
-
-  public void handleRefreshReferenceCount(String key);
+  void handleRefreshReferenceCount(String key);
 }

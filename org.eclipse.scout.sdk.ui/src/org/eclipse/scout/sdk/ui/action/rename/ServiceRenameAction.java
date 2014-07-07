@@ -77,11 +77,11 @@ public class ServiceRenameAction extends AbstractRenameAction {
       // rename the client proxies manually because they are are not renamed by JDT above!
       OperationJob j = new OperationJob(new IOperation() {
         @Override
-        public void validate() throws IllegalArgumentException {
+        public void validate() {
         }
 
         @Override
-        public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+        public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
           for (IScoutBundle clientBundle : interfaceBundle.getChildBundles(
               ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT)), true)) {
             String attribName = "class";

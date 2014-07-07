@@ -120,7 +120,7 @@ public final class ScoutBundleExtensionPoint {
     return allExtensions;
   }
 
-  public static final ScoutBundleUiExtension[] getExtensions() {
+  public static ScoutBundleUiExtension[] getExtensions() {
     Collection<ScoutBundleUiExtension> all = getAllExtensions().values();
     ScoutBundleUiExtension[] array = all.toArray(new ScoutBundleUiExtension[all.size()]);
     Arrays.sort(array, new Comparator<ScoutBundleUiExtension>() {
@@ -132,7 +132,7 @@ public final class ScoutBundleExtensionPoint {
     return array;
   }
 
-  public static final ScoutBundleUiExtension getExtension(String type) {
+  public static ScoutBundleUiExtension getExtension(String type) {
     return getAllExtensions().get(type);
   }
 }

@@ -71,7 +71,7 @@ public class MethodUpdateContentOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getMethod() == null || !getMethod().exists()) {
       throw new IllegalArgumentException("Update Content for method '" + getMethod().getElementName() + "' failed, method does not exit.");
     }

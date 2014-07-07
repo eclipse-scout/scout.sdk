@@ -42,11 +42,11 @@ public class DeleteServiceNlsProjectOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     final NlsServiceType t = new NlsServiceType(getServiceClass());
     if (t.getJavaProject() != null && t.getTranslationsFolderName() != null) {
       IProject p = t.getJavaProject().getProject();

@@ -21,7 +21,10 @@ import org.eclipse.scout.sdk.ui.view.outline.OutlineCopySourceEvent;
 import org.eclipse.scout.sdk.ui.view.outline.OutlinePasteTargetEvent;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
-public class ExplorerCopyAndPasteSupport {
+public final class ExplorerCopyAndPasteSupport {
+
+  private ExplorerCopyAndPasteSupport() {
+  }
 
   public static boolean performPaste(TreeViewer viewer, IPage page) {
     OutlinePasteTargetEvent event = new OutlinePasteTargetEvent(viewer);

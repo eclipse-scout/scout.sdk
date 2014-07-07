@@ -134,7 +134,7 @@ public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
     return m_superType;
   }
 
-  private class P_TableContentProvider implements IStructuredContentProvider, ITableLabelProvider {
+  private final class P_TableContentProvider implements IStructuredContentProvider, ITableLabelProvider {
     IType[] m_templates;
 
     private P_TableContentProvider(IType[] templates) {

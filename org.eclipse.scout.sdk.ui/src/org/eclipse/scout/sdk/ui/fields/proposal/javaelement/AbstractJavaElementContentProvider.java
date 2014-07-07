@@ -97,7 +97,7 @@ public abstract class AbstractJavaElementContentProvider extends ContentProposal
     return result;
   }
 
-  private final static class P_EmptySearchRangeSupport implements ISearchRangeConsumer {
+  private static final class P_EmptySearchRangeSupport implements ISearchRangeConsumer {
 
     @Override
     public int[] getMatchRanges(Object element) {

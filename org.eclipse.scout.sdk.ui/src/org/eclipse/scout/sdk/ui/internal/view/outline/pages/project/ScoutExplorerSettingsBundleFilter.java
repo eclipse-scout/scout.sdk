@@ -16,11 +16,11 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 
 /**
  * <h3>{@link ScoutExplorerSettingsBundleFilter}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 21.03.2013
  */
-public class ScoutExplorerSettingsBundleFilter implements IScoutBundleFilter {
+public final class ScoutExplorerSettingsBundleFilter implements IScoutBundleFilter {
 
   private static final IScoutBundleFilter INSTANCE = new ScoutExplorerSettingsBundleFilter();
 

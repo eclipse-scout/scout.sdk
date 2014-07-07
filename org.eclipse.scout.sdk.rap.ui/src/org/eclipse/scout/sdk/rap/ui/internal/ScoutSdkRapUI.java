@@ -132,7 +132,7 @@ public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
 
   /**
    * To get a cached image with one of the extensions [gif | png | jpg]
-   * 
+   *
    * @param name
    *          the name without extension located under resources/icons e.g. "person"
    * @return the cached image
@@ -152,7 +152,7 @@ public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
 
   /**
    * To get a cached image with one of the extensions [gif | png | jpg]
-   * 
+   *
    * @param name
    *          the name without extension located under resources/icons e.g. "person"
    * @return the cached image
@@ -199,7 +199,7 @@ public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
     }
   }
 
-  private static class P_ScoutTargetVariableListener extends RapTargetVariableListenerAdapter {
+  private static final class P_ScoutTargetVariableListener extends RapTargetVariableListenerAdapter {
 
     private final IPreferenceStore m_store;
 

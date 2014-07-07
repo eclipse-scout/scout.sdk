@@ -82,7 +82,7 @@ public class LibraryNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // super call to call perform finish on all pages.
     super.performFinish(monitor, workingCopyManager);
     LibraryBundleCreateOperation operation = new LibraryBundleCreateOperation();

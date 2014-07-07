@@ -38,7 +38,7 @@ public class MethodOverrideOperation extends MethodNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (TypeUtility.exists(TypeUtility.getMethod(getDeclaringType(), getElementName()))) {
       throw new IllegalArgumentException("Method '" + getElementName() + "' in type '" + getDeclaringType().getElementName() + "' already exists!");
     }

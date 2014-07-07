@@ -37,24 +37,24 @@ import org.eclipse.scout.sdk.util.NamingUtility;
  * new instances matching the new workspace situation. Ensure to listen for the corresponding scout workspace events
  * (see {@link IScoutWorkspace} and {@link IScoutWorkspaceListener} acquired from {@link ScoutSdkCore}) to replace your
  * instances when necessary.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 27.02.2013
  * @see IScoutBundleGraph
  */
 public interface IScoutBundle extends IAdaptable {
 
-  final String TYPE_CLIENT = "CLIENT";
-  final String TYPE_SHARED = "SHARED";
-  final String TYPE_SERVER = "SERVER";
-  final String TYPE_UI_SWING = "UI_SWING";
-  final String TYPE_UI_SWT = "UI_SWT";
+  String TYPE_CLIENT = "CLIENT";
+  String TYPE_SHARED = "SHARED";
+  String TYPE_SERVER = "SERVER";
+  String TYPE_UI_SWING = "UI_SWING";
+  String TYPE_UI_SWT = "UI_SWT";
 
   /**
    * Gets the type of the scout bundle. <br>
    * This string is always one of the types contributed by the
    * 'org.eclipse.scout.sdk.runtimeBundles' extension point.
-   * 
+   *
    * @return the
    * @see RuntimeBundles
    */
@@ -63,7 +63,7 @@ public interface IScoutBundle extends IAdaptable {
   /**
    * gets a live-list of the direct parent scout bundles (non-recursive). This is equal to the most specific
    * dependencies of this bundle to other scout bundles.
-   * 
+   *
    * @return a live-set containing all direct parents.
    */
   Set<? extends IScoutBundle> getDirectParentBundles();
@@ -71,7 +71,7 @@ public interface IScoutBundle extends IAdaptable {
   /**
    * gets a live-list of the direct child scout bundles (non-recursive). this is equal to the scout bundles having most
    * specific dependencies to this bundle (my dependents).
-   * 
+   *
    * @return a live-set containing all direct children.
    */
   Set<? extends IScoutBundle> getDirectChildBundles();
@@ -80,7 +80,7 @@ public interface IScoutBundle extends IAdaptable {
    * Performs a breadth first (aka level order) traversal going up the tree visiting all parents (=dependencies) and
    * maybe myself recursively. It returns all scout bundles matching the given filter (including maybe myself) ordered
    * by level (the closest level first). Within a level the order of the bundles is undefined.
-   * 
+   *
    * @param filter
    *          The filter to decide which of the parent bundles will be returned.
    * @param includeThis
@@ -98,7 +98,7 @@ public interface IScoutBundle extends IAdaptable {
    * maybe myself recursively. It returns the first parent bundle (or maybe myself) according to the given filter.<br>
    * If multiple bundles matching the filter are found on the nearest level, the one having the most similar name to
    * the symbolic name of this instance is returned according to the levenshtein distance.
-   * 
+   *
    * @param filter
    *          The filter to decide which of the parent bundles will be considered as candidates to be returned.
    * @param includeThis
@@ -122,7 +122,7 @@ public interface IScoutBundle extends IAdaptable {
    * maybe myself recursively. It returns the first parent bundle (or maybe myself) according to the given filter.<br>
    * If multiple bundles matching the filter are found on the nearest level, the one having the most similar name to
    * the symbolic name of the given reference bundle is returned according to the levenshtein distance.
-   * 
+   *
    * @param filter
    *          The filter to decide which of the parent bundles will be considered as candidates to be returned.
    * @param reference
@@ -147,7 +147,7 @@ public interface IScoutBundle extends IAdaptable {
    * Performs a breadth first (aka level order) traversal going up the tree visiting all parents (=dependencies) and
    * maybe myself recursively. It returns the first parent bundle (or maybe myself) according to the given filter and
    * comparator.
-   * 
+   *
    * @param filter
    *          The filter to decide which of the parent bundles will be considered as candidates to be returned.
    * @param comparator
@@ -171,7 +171,7 @@ public interface IScoutBundle extends IAdaptable {
    * Performs a breadth first (aka level order) traversal going down the tree visiting all children (=dependents) and
    * maybe myself recursively. It returns all scout bundles matching the given filter (including maybe myself) ordered
    * by level (closest level first). Within a level the order of the bundles is undefined.
-   * 
+   *
    * @param filter
    *          The filter to decide which of the child bundles will be returned.
    * @param includeThis
@@ -189,7 +189,7 @@ public interface IScoutBundle extends IAdaptable {
    * maybe myself recursively. It returns the first child bundle (or maybe myself) according to the given filter.<br>
    * If multiple bundles matching the filter are found on the nearest level, the one having the most similar name to
    * the symbolic name of this instance is returned according to the levenshtein distance.
-   * 
+   *
    * @param filter
    *          The filter to decide which of the child bundles will be considered as candidates to be returned.
    * @param includeThis
@@ -213,7 +213,7 @@ public interface IScoutBundle extends IAdaptable {
    * maybe myself recursively. It returns the first child bundle (or maybe myself) according to the given filter.<br>
    * If multiple bundles matching the filter are found on the nearest level, the one having the most similar name to
    * the symbolic name of the given reference bundle is returned according to the levenshtein distance.
-   * 
+   *
    * @param filter
    *          The filter to decide which of the child bundles will be considered as candidates to be returned.
    * @param reference
@@ -238,7 +238,7 @@ public interface IScoutBundle extends IAdaptable {
    * Performs a breadth first (aka level order) traversal going down the tree visiting all children (=dependents) and
    * maybe myself recursively. It returns the first child bundle (or maybe myself) according to the given filter and
    * comparator.
-   * 
+   *
    * @param filter
    *          The filter to decide which of the child bundles will be considered as candidates to be returned.
    * @param comparator
@@ -260,7 +260,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * gets the symbolic name of this bundle.
-   * 
+   *
    * @return the symbolic name
    */
   String getSymbolicName();
@@ -268,7 +268,7 @@ public interface IScoutBundle extends IAdaptable {
   /**
    * gets the eclipse preferences to store settings that only belong to this bundle. this method returns null if this
    * bundle is a binary bundle.
-   * 
+   *
    * @return the preferences or null
    * @see IScoutBundle#isBinary()
    */
@@ -276,7 +276,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * checks whether this bundle contains the given java element.
-   * 
+   *
    * @param e
    *          the java element that will be searched in this bundle
    * @return true if the element is in this bundle, false otherwise.
@@ -285,7 +285,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * gets the java project that belongs to this bundle or null if it is a binary bundle.
-   * 
+   *
    * @return the corresponding java project or null.
    * @see IScoutBundle#isBinary()
    */
@@ -293,7 +293,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * gets the project that belongs to this bundle or null if this is a binary bundle.
-   * 
+   *
    * @return the corresponding bundle or null.
    * @see IScoutBundle#isBinary()
    */
@@ -301,7 +301,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * gets the NLS project tree for this bundle
-   * 
+   *
    * @return the NLS project for this bundle.
    * @see INlsProject
    */
@@ -309,7 +309,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * gets the documentation NLS project tree for this bundle.
-   * 
+   *
    * @return the documentation NLS project
    * @see INlsProject
    */
@@ -317,7 +317,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * gets the icon provider for this bundle
-   * 
+   *
    * @return the icon provider for this bundle
    * @see IIconProvider
    */
@@ -325,7 +325,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * gets the fully qualified package name inside this bundle extended by the given appendix.
-   * 
+   *
    * @param appendix
    *          the suffix that should be added to the base package of this bundle.
    * @return the complete package name.
@@ -334,7 +334,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * gets the package fragment inside this bundle matching the given fully qualified name
-   * 
+   *
    * @param packageFqn
    *          the fully qualified name of the package
    * @return the package fragment (it may exist or not)
@@ -346,7 +346,7 @@ public interface IScoutBundle extends IAdaptable {
   /**
    * Gets the fully qualified default package inside this bundle.<br>
    * Any bundle configurations are considered when computing the default package for the given Id.
-   * 
+   *
    * @param packageId
    *          one of the constants defined in IDefaultTargetPackage
    * @return the fully qualified package name (symbolic name of this bundle extended by the suffix as configured for
@@ -357,14 +357,14 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * Gets if this bundle is in the workspace or on the target platform.
-   * 
+   *
    * @return true if it is on the target platform. false otherwise.
    */
   boolean isBinary();
 
   /**
    * Gets if this is a fragment bundle or not.
-   * 
+   *
    * @return true if it is a fragment
    */
   boolean isFragment();
@@ -374,7 +374,7 @@ public interface IScoutBundle extends IAdaptable {
    * <br>
    * The visit performs a breadth first (aka level order) traversal first visiting the nearest neighbors of the receiver
    * and then continuing with the next levels.
-   * 
+   *
    * @param visitor
    *          The visitor.
    * @param includeThis

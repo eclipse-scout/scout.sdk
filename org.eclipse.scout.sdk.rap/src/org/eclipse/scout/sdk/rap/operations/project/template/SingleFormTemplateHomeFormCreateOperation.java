@@ -64,7 +64,7 @@ public class SingleFormTemplateHomeFormCreateOperation extends AbstractScoutProj
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IScoutBundleGraph bundleGraph = ScoutSdkCore.getScoutWorkspace().getBundleGraph();
     IScoutBundle mobileClient = bundleGraph.getBundle(getProperties().getProperty(CreateMobileClientPluginOperation.PROP_MOBILE_BUNDLE_CLIENT_NAME, String.class));
     IScoutBundle client = bundleGraph.getBundle(getProperties().getProperty(CreateClientPluginOperation.PROP_BUNDLE_CLIENT_NAME, String.class));
@@ -73,7 +73,7 @@ public class SingleFormTemplateHomeFormCreateOperation extends AbstractScoutProj
     createHomeForm(mobileClient, TypeUtility.getType(desktopFormFqn), monitor, workingCopyManager);
   }
 
-  private void createHomeForm(IScoutBundle mobileClient, IType desktopForm, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  private void createHomeForm(IScoutBundle mobileClient, IType desktopForm, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String packageName = mobileClient.getPackageName(".ui.forms");
     PrimaryTypeNewOperation homeFormOp = new PrimaryTypeNewOperation("MobileHomeForm", packageName, mobileClient.getJavaProject());
     homeFormOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());

@@ -27,17 +27,17 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 public final class CodeIdExtensionPoint {
 
-  private final static String EXTENSION_POINT_NAME = "codeId";
-  private final static String CODE_ID_PROVIDER_EXT_NAME = "codeIdProvider";
-  private final static String CODE_ID_PARSER_EXT_NAME = "codeIdParser";
-  private final static String ATTRIB_CLASS = "class";
-  private final static String ATTRIB_GENERIC_TYPE = "genericType";
-  private final static String ATTRIB_PRIO = "priority";
+  private static final String EXTENSION_POINT_NAME = "codeId";
+  private static final String CODE_ID_PROVIDER_EXT_NAME = "codeIdProvider";
+  private static final String CODE_ID_PARSER_EXT_NAME = "codeIdParser";
+  private static final String ATTRIB_CLASS = "class";
+  private static final String ATTRIB_GENERIC_TYPE = "genericType";
+  private static final String ATTRIB_PRIO = "priority";
 
-  private final static Object codeIdProviderExtensionsCacheLock = new Object();
+  private static final Object codeIdProviderExtensionsCacheLock = new Object();
   private static volatile ICodeIdProvider[] codeIdProviderExtensions;
 
-  private final static Object codeIdParsersExtensionsCacheLock = new Object();
+  private static final Object codeIdParsersExtensionsCacheLock = new Object();
   private static HashMap<String, TreeMap<CompositeObject, ICodeIdParser>> codeIdParsers;
 
   private CodeIdExtensionPoint() {

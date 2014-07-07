@@ -37,7 +37,7 @@ public class NewHandlerCreateMethodsOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getFormHandler() == null) {
       throw new IllegalArgumentException("Form Hanlder can not be null.");
     }
@@ -60,7 +60,7 @@ public class NewHandlerCreateMethodsOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (getServiceInterface() == null) {
       return;
     }

@@ -52,12 +52,12 @@ public class ConfigPropertyUpdateOperation<T> implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
 
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       if (CompareUtility.equals(getParser().parseSourceValue(getMethod().computeDefaultValue(), getMethod().getDefaultMethod(), getMethod().getSuperTypeHierarchy()), getValue())) {
         if (getMethod().isImplemented()) {

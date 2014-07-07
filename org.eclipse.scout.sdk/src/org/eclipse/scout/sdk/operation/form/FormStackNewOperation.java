@@ -93,7 +93,7 @@ public class FormStackNewOperation extends FormNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // create empty form data
     if (getFormDataProject() != null) {
       String formDataTypeName = getElementName() + "Data";

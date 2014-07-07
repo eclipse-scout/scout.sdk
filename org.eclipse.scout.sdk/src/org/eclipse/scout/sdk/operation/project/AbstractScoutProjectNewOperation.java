@@ -36,7 +36,7 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getProperties() == null) {
       throw new IllegalArgumentException("Properties may not be null.");
     }

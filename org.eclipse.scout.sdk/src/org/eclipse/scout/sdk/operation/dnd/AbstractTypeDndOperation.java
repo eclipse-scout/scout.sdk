@@ -73,7 +73,7 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getTargetDeclaringType() == null) {
       throw new IllegalArgumentException("declaring field must not be null.");
     }
@@ -94,7 +94,7 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
 
     ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(getTargetDeclaringType());
     IJavaElement sibling = findSibling(typeHierarchy);

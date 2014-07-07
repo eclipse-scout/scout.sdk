@@ -52,7 +52,7 @@ public class RapProductMobileAddOperation extends AbstractScoutProjectNewOperati
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String mobileClientName = getProperties().getProperty(CreateMobileClientPluginOperation.PROP_MOBILE_BUNDLE_CLIENT_NAME, String.class);
     for (IFile f : m_productFiles) {
       ProductFileModelHelper pfmh = new ProductFileModelHelper(f);

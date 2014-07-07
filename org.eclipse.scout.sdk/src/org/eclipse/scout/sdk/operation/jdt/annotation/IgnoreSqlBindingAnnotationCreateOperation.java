@@ -45,7 +45,7 @@ public class IgnoreSqlBindingAnnotationCreateOperation extends AnnotationNewOper
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IAnnotation existingAnnotation = JdtUtility.getAnnotation((IAnnotatable) getDeclaringType(), SqlBindingIgnoreValidation.class.getName());
     if (TypeUtility.exists(existingAnnotation)) {
       if (existingAnnotation.getSource().startsWith("@")) {

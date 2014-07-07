@@ -42,7 +42,7 @@ public class FormFieldDeleteOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getFormFieldType() == null) {
       throw new IllegalArgumentException("type to delete is null.");
     }

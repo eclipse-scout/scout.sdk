@@ -38,11 +38,11 @@ public class CreateAjaxServletOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     PluginModelHelper h = new PluginModelHelper(getServerProject().getProject());
     HashMap<String, String> attributes = new HashMap<String, String>();
     attributes.put("alias", "/ajax");

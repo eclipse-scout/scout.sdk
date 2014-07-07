@@ -44,7 +44,7 @@ public class ScoutMethodDeleteOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getMethod() == null) {
       throw new IllegalArgumentException("method is null");
     }

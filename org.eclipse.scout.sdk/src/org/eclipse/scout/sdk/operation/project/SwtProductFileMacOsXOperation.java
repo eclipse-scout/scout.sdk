@@ -52,7 +52,7 @@ public class SwtProductFileMacOsXOperation extends AbstractScoutProjectNewOperat
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (m_swtProdFiles == null || m_swtProdFiles.length != 2) {
       throw new IllegalArgumentException("dev or prod swt product file not found.");
@@ -65,7 +65,7 @@ public class SwtProductFileMacOsXOperation extends AbstractScoutProjectNewOperat
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // in OS X the SWT fragment Name is without the ARCH suffix -> remove suffix when present
     final Pattern PLUGIN_PATTERN = Pattern.compile("org\\.eclipse\\.swt\\..*macosx.*x86.*");
     for (IFile f : m_swtProdFiles) {

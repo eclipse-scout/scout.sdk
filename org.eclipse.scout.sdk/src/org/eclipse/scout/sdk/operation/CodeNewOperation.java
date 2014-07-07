@@ -79,7 +79,7 @@ public class CodeNewOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getDeclaringType() == null) {
       throw new IllegalArgumentException("declaring type can not be null.");
     }

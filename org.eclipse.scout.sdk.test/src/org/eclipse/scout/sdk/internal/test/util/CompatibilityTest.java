@@ -28,7 +28,7 @@ import org.junit.Test;
  */
 public class CompatibilityTest extends AbstractScoutSdkTest {
 
-  private final static String PROJECT_NAME = "test.platformUtility";
+  private static final String PROJECT_NAME = "test.platformUtility";
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {

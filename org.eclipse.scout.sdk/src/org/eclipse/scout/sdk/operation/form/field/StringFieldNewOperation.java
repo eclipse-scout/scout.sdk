@@ -57,7 +57,7 @@ public class StringFieldNewOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (StringUtility.isNullOrEmpty(getTypeName())) {
       throw new IllegalArgumentException("typeName is null or empty.");
     }
@@ -67,7 +67,7 @@ public class StringFieldNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     FormFieldNewOperation formFieldOp = new FormFieldNewOperation(getTypeName(), getDeclaringType());
     formFieldOp.setFlags(Flags.AccPublic);
     formFieldOp.setSuperTypeSignature(getSuperTypeSignature());

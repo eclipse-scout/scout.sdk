@@ -49,7 +49,7 @@ public class PackageFragementNewOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!isNoErrorWhenPackageAlreadyExist()) {
       try {
         if (TypeUtility.exists(TypeUtility.getPackage(getJavaProject(), getPackageName()))) {
@@ -63,7 +63,7 @@ public class PackageFragementNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     boolean checkPoint = false;
     IPackageFragmentRoot root = TypeUtility.getSrcPackageFragmentRoot(getJavaProject());
     IPackageFragment packageFragment = root.getPackageFragment(getPackageName());

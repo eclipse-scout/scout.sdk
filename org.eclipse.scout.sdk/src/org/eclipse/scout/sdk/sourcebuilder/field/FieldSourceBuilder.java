@@ -38,7 +38,7 @@ public class FieldSourceBuilder extends AbstractAnnotatableSourceBuilder impleme
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (StringUtility.isNullOrEmpty(getSignature())) {
       throw new IllegalArgumentException("signature is null!");

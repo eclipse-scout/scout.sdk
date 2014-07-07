@@ -132,7 +132,7 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (ExternalFileCopyOperation op : m_copyOperations) {
       op.validate();
       op.run(monitor, workingCopyManager);

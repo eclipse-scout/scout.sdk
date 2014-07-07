@@ -77,7 +77,7 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
   }
 
   @Override
-  protected void validate() throws IllegalArgumentException {
+  protected void validate() {
     synchronized (m_operations) {
       for (IOperation op : m_operations) {
         op.validate();
@@ -86,7 +86,7 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
   }
 
   @Override
-  protected final void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected final void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IOperation[] allOps;
     synchronized (m_operations) {
       allOps = getAllOperations();
@@ -115,7 +115,7 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
     updateJobName();
   }
 
-  public void addOperation(IOperation operation) throws IllegalStateException {
+  public void addOperation(IOperation operation) {
     switch (getState()) {
       case RUNNING:
       case SLEEPING:

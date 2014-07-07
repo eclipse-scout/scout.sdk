@@ -50,7 +50,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     // empty package name is default package
     if (getPackageFragmentName() == null) {

@@ -19,7 +19,7 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 /**
  * <h4>INlsEntry</h4> The representation of a key with all available translations. Used for modifications and creation
  * of new entries. Use the copy constructor of NlsEntry to change values and modify the translations.
- * 
+ *
  * @see NlsEntry
  */
 public interface INlsEntry {
@@ -41,7 +41,7 @@ public interface INlsEntry {
 
   /**
    * The type of entry.
-   * 
+   *
    * @return One of {@link #TYPE_LOCAL} or {@link #TYPE_INHERITED}
    */
   int getType();
@@ -49,21 +49,21 @@ public interface INlsEntry {
   /**
    * @return the key of the entry
    */
-  public String getKey();
+  String getKey();
 
   /**
    * Gets the translation text for the given {@link Language}
-   * 
+   *
    * @param The
    *          {@link Language} for which the text should be returned.
    * @return the translation in the given {@link Language}
    */
-  public String getTranslation(Language language);
+  String getTranslation(Language language);
 
   /**
    * Gets the translation text for the given {@link Language} or the translation text of the default language if the
    * given {@link Language} cannot be found.
-   * 
+   *
    * @param language
    *          The {@link Language} for which the text should be returned.
    * @param defaultIfNotExist
@@ -71,7 +71,7 @@ public interface INlsEntry {
    *          for the given {@link Language} can be found. False otherwise.
    * @return The translation text or null.
    */
-  public String getTranslation(Language language, boolean defaultIfNotExist);
+  String getTranslation(Language language, boolean defaultIfNotExist);
 
   /**
    * @return A copy of all translation mappings for this entry.

@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 /**
  * <h3>PageNodePageHelper</h3> ...
  */
-public class PageNodePageHelper {
+public final class PageNodePageHelper {
 
   private PageNodePageHelper() {
   }

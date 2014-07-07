@@ -58,7 +58,7 @@ public abstract class AbstractPersonTableFieldData extends AbstractTableFieldBea
     super.setRows(rows);
   }
 
-  public static abstract class AbstractPersonTableRowData extends AbstractTableRowData {
+  public abstract static class AbstractPersonTableRowData extends AbstractTableRowData {
 
     private static final long serialVersionUID = 1L;
     public static final String personId = "personId";

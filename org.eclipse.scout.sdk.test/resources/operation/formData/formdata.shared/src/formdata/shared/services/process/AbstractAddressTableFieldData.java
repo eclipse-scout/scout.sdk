@@ -58,7 +58,7 @@ public abstract class AbstractAddressTableFieldData extends AbstractTableFieldBe
     super.setRows(rows);
   }
 
-  public static abstract class AbstractAddressTableRowData extends AbstractTableRowData {
+  public abstract static class AbstractAddressTableRowData extends AbstractTableRowData {
 
     private static final long serialVersionUID = 1L;
     public static final String addressId = "addressId";

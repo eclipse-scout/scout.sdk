@@ -42,7 +42,7 @@ public class SunJaxWsEntryCreateOperation implements IOperation {
   private SunJaxWsBean m_createdSunJaxWsBean;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("bundle not set");
     }
@@ -53,7 +53,7 @@ public class SunJaxWsEntryCreateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(m_bundle);
     if (sunJaxWsResource.getFile() == null || !sunJaxWsResource.getFile().exists()) {
       // create sun-jaxws.xml file

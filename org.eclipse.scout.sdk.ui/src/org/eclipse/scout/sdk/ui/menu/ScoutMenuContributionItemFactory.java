@@ -92,7 +92,7 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
     return cat;
   }
 
-  public synchronized static void registerKeyStroke(String keyStroke, Command cmd) {
+  public static synchronized void registerKeyStroke(String keyStroke, Command cmd) {
     if (keyStroke != null) {
       try {
         BindingService bs = (BindingService) Workbench.getInstance().getService(IBindingService.class);
@@ -115,7 +115,7 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
     }
   }
 
-  public synchronized static void activateHandler(IServiceLocator serviceLocator, IScoutHandler h) {
+  public static synchronized void activateHandler(IServiceLocator serviceLocator, IScoutHandler h) {
     if (h != null) {
       IHandlerService hs = (IHandlerService) serviceLocator.getService(IHandlerService.class);
       IHandlerActivation existingActivation = USED_ACTIVATIONS.remove(h.getId());

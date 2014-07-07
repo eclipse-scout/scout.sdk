@@ -31,7 +31,7 @@ public class SourceRangeRemoveOperation implements IOperation {
   private IAnnotation m_annotation;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_declaringType == null) {
       throw new IllegalArgumentException("declaring must not be null");
     }
@@ -41,7 +41,7 @@ public class SourceRangeRemoveOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ICompilationUnit icu = m_declaringType.getCompilationUnit();
     String source = m_declaringType.getCompilationUnit().getBuffer().getContents();
     ISourceRange sourceRange = m_annotation.getSourceRange();

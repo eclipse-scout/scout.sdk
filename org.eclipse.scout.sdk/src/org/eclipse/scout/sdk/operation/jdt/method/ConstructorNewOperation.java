@@ -44,7 +44,7 @@ public class ConstructorNewOperation extends AbstractMethodNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!CompareUtility.equals(getElementName(), getDeclaringType().getElementName())) {
       throw new IllegalArgumentException("Constuctor and declaring type must have the same name!");
     }

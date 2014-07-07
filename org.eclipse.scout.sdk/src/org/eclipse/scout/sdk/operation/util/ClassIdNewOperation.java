@@ -48,7 +48,7 @@ import org.eclipse.text.edits.TextEdit;
 
 /**
  * <h3>{@link ClassIdNewOperation}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 05.01.2014
  */
@@ -66,14 +66,14 @@ public class ClassIdNewOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("Bundle cannot be null.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       monitor.beginTask("Search for classes...", 10);
       Set<IScoutBundle> allBundlesToProcess = m_bundle.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
@@ -141,7 +141,7 @@ public class ClassIdNewOperation implements IOperation {
     }
   }
 
-  public static void createClassIdsForIcu(ICompilationUnit icu, Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public static void createClassIdsForIcu(ICompilationUnit icu, Set<IType> types, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     workingCopyManager.register(icu, null);
 
     IBuffer buffer = icu.getBuffer();

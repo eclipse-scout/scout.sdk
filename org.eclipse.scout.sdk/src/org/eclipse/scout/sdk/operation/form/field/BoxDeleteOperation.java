@@ -48,7 +48,7 @@ public class BoxDeleteOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getBoxType() == null) {
       throw new IllegalArgumentException("type to delete is null.");
     }

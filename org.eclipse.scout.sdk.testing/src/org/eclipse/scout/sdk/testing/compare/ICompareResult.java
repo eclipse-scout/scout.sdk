@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * <h3>{@link ICompareResult}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 15.03.2013
  */
@@ -26,11 +26,9 @@ public interface ICompareResult<T> {
 
   IDifference<T> getFirstDifference();
 
-  public static interface IDifference<T> {
+  interface IDifference<T> {
     T getValue01();
 
     T getValue02();
-
   }
-
 }

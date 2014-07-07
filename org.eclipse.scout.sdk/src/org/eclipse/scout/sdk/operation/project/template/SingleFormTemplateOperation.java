@@ -55,7 +55,7 @@ import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataDtoUpdateOperation;
 
 /**
  * <h3>{@link SingleFormTemplateOperation}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011
  */
@@ -80,7 +80,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IScoutBundleGraph bundleGraph = ScoutSdkCore.getScoutWorkspace().getBundleGraph();
     final IScoutBundle client = bundleGraph.getBundle(getProperties().getProperty(CreateClientPluginOperation.PROP_BUNDLE_CLIENT_NAME, String.class));
     final IScoutBundle server = bundleGraph.getBundle(getProperties().getProperty(CreateServerPluginOperation.PROP_BUNDLE_SERVER_NAME, String.class));
@@ -225,7 +225,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     }
   }
 
-  private IType createProcessService(IScoutBundle client, IScoutBundle shared, IScoutBundle server, IType formData, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws IllegalArgumentException, CoreException {
+  private IType createProcessService(IScoutBundle client, IScoutBundle shared, IScoutBundle server, IType formData, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation("DesktopService");
     serviceOp.addProxyRegistrationProject(client.getJavaProject());
     serviceOp.addServiceRegistration(new ServiceRegistrationDescription(server.getJavaProject()));

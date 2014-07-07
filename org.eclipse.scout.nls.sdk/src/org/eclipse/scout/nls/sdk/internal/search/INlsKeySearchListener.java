@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,10 +16,10 @@ import org.eclipse.search.ui.text.Match;
 
 /** <h4>INlsFindReferencesListener</h4> */
 public interface INlsKeySearchListener extends EventListener {
-  public void beginReporting();
+  void beginReporting();
 
-  public void endReporting();
+  void endReporting();
 
-  public void foundMatch(String key, Match match);
+  void foundMatch(String key, Match match);
 
 }

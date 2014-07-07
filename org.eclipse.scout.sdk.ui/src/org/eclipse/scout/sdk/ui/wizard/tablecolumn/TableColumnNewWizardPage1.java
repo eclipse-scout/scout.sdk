@@ -188,7 +188,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
     return m_selectedTemplate;
   }
 
-  private class P_TableContentProvider extends ViewerSorter implements IStructuredContentProvider, ITableLabelProvider {
+  private final class P_TableContentProvider extends ViewerSorter implements IStructuredContentProvider, ITableLabelProvider {
     private final Object[] m_templates;
     private final HashSet<String> m_shortList;
 

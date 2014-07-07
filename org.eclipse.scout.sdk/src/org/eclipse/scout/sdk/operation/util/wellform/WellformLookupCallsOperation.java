@@ -41,7 +41,7 @@ public class WellformLookupCallsOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     String bundleType = getBundle().getType();
     if (!bundleType.equals(IScoutBundle.TYPE_CLIENT) && !bundleType.equals(IScoutBundle.TYPE_SHARED)) {
       throw new IllegalArgumentException("bundle must be a client or shared bundle.");
@@ -49,7 +49,7 @@ public class WellformLookupCallsOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // find types
     IType iLookupCall = TypeUtility.getType(IRuntimeClasses.ILookupCall);
     ICachedTypeHierarchy lookupCallHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupCall);

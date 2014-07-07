@@ -38,7 +38,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link ExportClientZipOperation}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 01.03.2012
  */
@@ -63,7 +63,7 @@ public class ExportClientZipOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getClientProduct() == null) {
       throw new IllegalArgumentException("Client product can not be null!");
     }
@@ -73,7 +73,7 @@ public class ExportClientZipOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       m_tempBuildDir = IOUtility.createTempDirectory("clientZipExportBuildDir");
       IStatus result = buildClientProduct(monitor);
@@ -92,13 +92,11 @@ public class ExportClientZipOperation implements IOperation {
         throw new CoreException(result);
       }
     }
+    catch (CoreException e) {
+      throw e;
+    }
     catch (Exception e) {
-      if (e instanceof CoreException) {
-        throw (CoreException) e;
-      }
-      else {
-        throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Error during product export.", e));
-      }
+      throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Error during product export.", e));
     }
   }
 

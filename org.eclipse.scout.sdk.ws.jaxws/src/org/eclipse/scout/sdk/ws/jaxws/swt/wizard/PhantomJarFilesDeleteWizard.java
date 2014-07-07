@@ -70,7 +70,7 @@ public class PhantomJarFilesDeleteWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (final IFile jarFile : m_phantomJarFilesToBeDeleted) {
       try {
         jarFile.delete(true, true, monitor);

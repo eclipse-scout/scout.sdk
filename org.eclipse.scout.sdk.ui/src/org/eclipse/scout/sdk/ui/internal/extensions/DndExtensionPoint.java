@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ui.extensions.IDragSourceDelegator;
 import org.eclipse.scout.sdk.ui.extensions.IDropTargetDelegator;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
-public class DndExtensionPoint {
+public final class DndExtensionPoint {
 
   private static final String dropDelegatorAttName = "dropTargetDelegator";
   private static final String dragDelegatorAttName = "dragSourceDelegator";

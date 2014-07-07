@@ -49,11 +49,11 @@ public class WsConsumerImplNewOperation extends ServiceNewOperation {
   private String m_authenticationHandlerQName;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
   }
 
   @Override
-  public void run(final IProgressMonitor monitor, final IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(final IProgressMonitor monitor, final IWorkingCopyManager workingCopyManager) throws CoreException {
     // assemble supertype signature
     IType jaxWsPortType = null;
     if (TypeUtility.exists(getJaxWsPortType())) {

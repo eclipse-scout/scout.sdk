@@ -51,7 +51,7 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (m_swtProdFiles == null || m_swtProdFiles.length != 2) {
       throw new IllegalArgumentException("dev or prod swt product file not found.");
@@ -64,7 +64,7 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (PlatformVersionUtility.isE4(getTargetPlatformVersion())) {
       upgradeToE4(monitor, workingCopyManager);
     }

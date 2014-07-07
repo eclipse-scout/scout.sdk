@@ -71,7 +71,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // collect all registered operations
     TreeMap<String, P_OperationElement> ops = new TreeMap<String, P_OperationElement>();
     IExtensionRegistry reg = Platform.getExtensionRegistry();
@@ -189,7 +189,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     getProperties().setProperty(CreateSharedPluginOperation.PROP_DOC_TEXT_SERVICE_NAME, txtSvcName + DOCUMENTATION_SVC_SUFFIX);
   }
 
-  private void execOperations(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, P_OperationElement[] ops) throws CoreException, IllegalArgumentException {
+  private void execOperations(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager, P_OperationElement[] ops) throws CoreException {
     monitor.beginTask(getOperationName(), ops.length);
     putInitialProperties();
     for (P_OperationElement opElement : ops) {
@@ -217,7 +217,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     }
   }
 
-  private static class P_PostProcessOperation implements IOperation {
+  private static final class P_PostProcessOperation implements IOperation {
 
     private final List<IJavaProject> m_projectsToPostProcess;
 
@@ -231,11 +231,11 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     }
 
     @Override
-    public void validate() throws IllegalArgumentException {
+    public void validate() {
     }
 
     @Override
-    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
       try {
         JdtUtility.waitForIndexesReady();
         if (m_projectsToPostProcess != null && m_projectsToPostProcess.size() > 0) {
@@ -267,7 +267,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     }
   }
 
-  private static class P_OperationElement {
+  private static final class P_OperationElement {
     private final IScoutProjectNewOperation op;
     private final String id;
     private final String referenceId;

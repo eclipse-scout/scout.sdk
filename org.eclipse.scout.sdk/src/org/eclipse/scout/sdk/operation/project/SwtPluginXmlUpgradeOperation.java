@@ -31,7 +31,7 @@ public class SwtPluginXmlUpgradeOperation extends AbstractScoutProjectNewOperati
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (m_project == null) {
       throw new IllegalArgumentException("project can not be null.");
@@ -50,7 +50,7 @@ public class SwtPluginXmlUpgradeOperation extends AbstractScoutProjectNewOperati
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     final String[][] additionalE4Properties = new String[][]{
         {"applicationXMI", "org.eclipse.platform/LegacyIDE.e4xmi"},
         {"cssTheme", "org.eclipse.e4.ui.css.theme.e4_default"},

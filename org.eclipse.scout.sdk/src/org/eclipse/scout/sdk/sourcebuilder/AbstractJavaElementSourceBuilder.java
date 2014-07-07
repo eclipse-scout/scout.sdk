@@ -32,7 +32,7 @@ public abstract class AbstractJavaElementSourceBuilder implements IJavaElementSo
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (StringUtility.isNullOrEmpty(getElementName())) {
       throw new IllegalArgumentException("element name is null or empty!");
     }

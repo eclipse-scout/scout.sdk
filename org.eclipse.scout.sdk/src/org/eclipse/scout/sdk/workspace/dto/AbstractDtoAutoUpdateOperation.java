@@ -43,7 +43,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link AbstractDtoAutoUpdateOperation}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 16.08.2013
  */
@@ -75,14 +75,14 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!TypeUtility.exists(getModelType())) {
       throw new IllegalArgumentException("model type must exist: [" + getModelType() + "]");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String backup = ScoutUtility.getUsername();
     try {
       ScoutUtility.setUsernameForThread("Scout robot");
@@ -93,7 +93,7 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
     }
   }
 
-  protected void runImpl(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void runImpl(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IType derivedType = ensureDerivedType();
     if (getModelType().equals(derivedType)) {
       ScoutSdk.logError("DTO Auto Update cannot be performed when the DTO annotation points to itself.");
@@ -242,11 +242,11 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
     }
 
     @Override
-    public void validate() throws IllegalArgumentException {
+    public void validate() {
     }
 
     @Override
-    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
       ICompilationUnit icu = m_derivedType;
       try {
         icu.becomeWorkingCopy(monitor);

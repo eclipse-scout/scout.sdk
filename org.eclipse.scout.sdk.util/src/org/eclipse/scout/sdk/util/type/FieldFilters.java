@@ -21,7 +21,10 @@ import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 /**
  * Contains predefined field filters
  */
-public class FieldFilters {
+public final class FieldFilters {
+
+  private FieldFilters() {
+  }
 
   public static IFieldFilter getNameFilter(final String name) {
     return new IFieldFilter() {

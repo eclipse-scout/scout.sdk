@@ -39,7 +39,7 @@ public class ExternalFileCopyOperation implements IOperation {
   private IFile m_fileCopied;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("No bundle provided.");
     }
@@ -52,7 +52,7 @@ public class ExternalFileCopyOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IProject tempProject = null;
     try {
       IWorkspace workspace = ResourcesPlugin.getWorkspace();

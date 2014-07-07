@@ -210,7 +210,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
   /**
    * To set the super interface types. Fore interface signatures, use
    * {@link TypePresenter#setInterfaceSignatures(String[])}
-   * 
+   *
    * @param interfaceTypes
    */
   public void setInterfaceTypes(IType[] interfaceTypes) {
@@ -402,14 +402,14 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
     super.setEnabled(enabled);
   }
 
-  public static interface ISearchJavaSearchScopeFactory {
+  public interface ISearchJavaSearchScopeFactory {
 
     /**
      * For default search scope, use {@link SearchEngine#createWorkspaceScope()}
-     * 
+     *
      * @return
      */
-    public IJavaSearchScope create();
+    IJavaSearchScope create();
   }
 
   private class P_ScoutSeverityListener implements IScoutSeverityListener {
@@ -434,7 +434,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
               resource.getFileExtension() != null &&
               "java".equalsIgnoreCase(resource.getFileExtension()) &&
               (resource.getName().endsWith(simpleName + ".java") ||
-              resource.getName().endsWith(simpleName + ".class"))) {
+                  resource.getName().endsWith(simpleName + ".class"))) {
             IType type = TypeUtility.getType(getValue());
             ICompilationUnit cu = JavaCore.createCompilationUnitFrom((IFile) resource);
 

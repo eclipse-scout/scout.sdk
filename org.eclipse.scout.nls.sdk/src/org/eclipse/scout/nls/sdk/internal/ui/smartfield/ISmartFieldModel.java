@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -16,10 +16,10 @@ import org.eclipse.swt.graphics.Image;
 
 public interface ISmartFieldModel {
 
-  public List<Object> getProposals(String pattern);
+  List<Object> getProposals(String pattern);
 
-  public String getText(Object item);
+  String getText(Object item);
 
-  public Image getImage(Object item);
+  Image getImage(Object item);
 
 }

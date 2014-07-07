@@ -60,7 +60,7 @@ public class ExportEarOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_modules.size() == 0) {
       throw new IllegalArgumentException("At least one EAR module must be specified.");
     }
@@ -70,7 +70,7 @@ public class ExportEarOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       m_tempBuildDir = IOUtility.createTempDirectory("earPackagerBuildDir");
 
@@ -100,10 +100,10 @@ public class ExportEarOperation implements IOperation {
       // pack ear
       m_createdEarFile = packEar();
     }
+    catch (CoreException e) {
+      throw e;
+    }
     catch (Exception e) {
-      if (e instanceof CoreException) {
-        throw (CoreException) e;
-      }
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not ear file", e));
     }
     finally {

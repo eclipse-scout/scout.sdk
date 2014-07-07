@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.extensions.technology.IScoutTechnologyHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.technology.Technology;
@@ -89,7 +90,7 @@ public final class TechnologyExtensionPoint {
                 if (category != null && category.trim().length() < 1) {
                   category = null;
                 }
-                if (name != null && id != null && name.trim().length() > 0 && id.trim().length() > 0) {
+                if (StringUtility.hasText(name) && StringUtility.hasText(id)) {
                   Technology t = new Technology(id, name, category);
                   t.addAllHandlers(handlers.get(id));
                   techs.add(t);

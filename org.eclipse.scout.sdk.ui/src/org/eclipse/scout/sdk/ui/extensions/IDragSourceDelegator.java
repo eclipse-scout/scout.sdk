@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,7 +18,7 @@ import org.eclipse.swt.dnd.DND;
 import org.eclipse.swt.dnd.DragSourceEvent;
 
 /**
- * <h3>IDragSourceDelegator</h3> This class is registered by the extension //TODO
+ * <h3>IDragSourceDelegator</h3> This class is registered by the extension
  */
 public interface IDragSourceDelegator extends EventListener {
 
@@ -26,7 +26,7 @@ public interface IDragSourceDelegator extends EventListener {
    * will be called of the Outline. If returned true the {@link IDragSourceDelegator#dragSetData(DragSourceEvent)} and
    * {@link IDragSourceDelegator#dragFinished(DragSourceEvent)} method of this delegater will be called. If false
    * is returned this delegator will not be considered during the current drag and drop event.
-   * 
+   *
    * @param event
    * @return
    */
@@ -35,16 +35,16 @@ public interface IDragSourceDelegator extends EventListener {
   /**
    * the method sets the data of the event. {@link DragSourceEvent#data}. Aware the data is an instance of a
    * {@link LocalSelectionTransfer}.
-   * 
+   *
    * @param event
    */
-  public void dragSetData(DragSourceEvent event, TreeViewer outline);
+  void dragSetData(DragSourceEvent event, TreeViewer outline);
 
   /**
    * use this method to clean up some dragged items. The {@link DragSourceEvent#detail} gives information about the
    * drag type see {@link DND#DROP_COPY}...
-   * 
+   *
    * @param event
    */
-  public void dragFinished(DragSourceEvent event, TreeViewer outline);
+  void dragFinished(DragSourceEvent event, TreeViewer outline);
 }

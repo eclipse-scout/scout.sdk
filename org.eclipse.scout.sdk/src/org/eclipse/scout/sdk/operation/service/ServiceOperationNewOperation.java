@@ -44,7 +44,7 @@ public class ServiceOperationNewOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getServiceInterface() == null) {
       throw new IllegalArgumentException("service interface cannot be null.");
     }
@@ -61,7 +61,7 @@ public class ServiceOperationNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
 
     ServiceMethod createMethod = new ServiceMethod(getMethodName(), TypeUtility.exists(getServiceInterface()) ? getServiceInterface().getFullyQualifiedName() : null);
     for (ParameterArgument arg : getArguments()) {

@@ -60,7 +60,7 @@ public class FieldNewOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!TypeUtility.exists(getDeclaringType())) {
       throw new IllegalArgumentException("declaring type does not exist!");
     }
@@ -68,7 +68,7 @@ public class FieldNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     ICompilationUnit icu = getDeclaringType().getCompilationUnit();
     ImportValidator importValidator = new ImportValidator(icu);
     StringBuilder sourceBuilder = new StringBuilder();

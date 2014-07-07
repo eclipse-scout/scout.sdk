@@ -83,7 +83,7 @@ public class WsProviderCodeFirstDeleteWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     OperationJob job = new OperationJob(m_operation);
     job.schedule();
     return true;

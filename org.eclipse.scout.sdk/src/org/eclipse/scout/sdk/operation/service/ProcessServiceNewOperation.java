@@ -70,12 +70,12 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
 
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // permissions
     if (getPermissionCreateProject() != null) {
       PermissionNewOperation permissionOp = new PermissionNewOperation(getPermissionCreateName(), getPermissionCreatePackageName(), getPermissionCreateProject());

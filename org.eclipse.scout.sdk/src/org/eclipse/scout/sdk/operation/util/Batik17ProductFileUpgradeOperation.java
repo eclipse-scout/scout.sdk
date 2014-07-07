@@ -43,11 +43,11 @@ public class Batik17ProductFileUpgradeOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     final String[] additionalBatik17Plugins = new String[]{"org.w3c.dom.events", "org.eclipse.scout.org.w3c.dom.svg.fragment"};
     for (IFile f : m_prodFiles) {
       ProductFileModelHelper pfmh = new ProductFileModelHelper(f);

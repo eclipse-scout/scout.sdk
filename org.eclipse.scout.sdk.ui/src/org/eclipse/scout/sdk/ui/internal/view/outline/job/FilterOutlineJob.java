@@ -29,7 +29,7 @@ public class FilterOutlineJob extends AbstractWorkspaceBlockingJob {
   }
 
   @Override
-  protected void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Display display = m_view.getTreeViewer().getControl().getDisplay();
     if (!m_page.isChildrenLoaded()) {
       m_page.loadChildren();

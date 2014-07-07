@@ -67,11 +67,11 @@ public class SearchFormPresenter extends AbstractTypeProposalPresenter {
    * The local lazy content provider.
    * It is kept lazy to ensure the proposals are only loaded when used. So the creation of the property view is
    * performance optimized.
-   * 
+   *
    * @author Andreas Hoegger
    * @since 3.8.0 15.02.2012
    */
-  private class P_ContentProvider extends ContentProposalProvider {
+  private final class P_ContentProvider extends ContentProposalProvider {
 
     private Set<IType> m_proposals;
     private final ILabelProvider m_labelProvider;

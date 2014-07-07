@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.util.jdt.finegraned;
 
 import java.io.InputStreamReader;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.resources.IFile;
@@ -25,19 +26,22 @@ import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 /**
  * Caches the source of {@link ICompilationUnit}s that are not in sync with their buffer
  */
-public class FineGrainedJavaElementDeltaManager {
-  private static FineGrainedJavaElementDeltaManager instance = new FineGrainedJavaElementDeltaManager();
+public final class FineGrainedJavaElementDeltaManager {
+  private static final FineGrainedJavaElementDeltaManager INSTANCE = new FineGrainedJavaElementDeltaManager();
 
   public static FineGrainedJavaElementDeltaManager getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
-  private Object m_cacheLock = new Object();
-  private WeakHashMap<IJavaElementDelta, FineGrainedJavaElementDelta[]> m_deltaCache = new WeakHashMap<IJavaElementDelta, FineGrainedJavaElementDelta[]>();
-  private HashMap<String/* path */, String/* source */> m_sourceCache = new HashMap<String, String>();
-  private IBufferChangedListener m_bufferListener;
+  private final Object m_cacheLock;
+  private final WeakHashMap<IJavaElementDelta, FineGrainedJavaElementDelta[]> m_deltaCache;
+  private final Map<String/* path */, String/* source */> m_sourceCache;
+  private final IBufferChangedListener m_bufferListener;
 
   private FineGrainedJavaElementDeltaManager() {
+    m_cacheLock = new Object();
+    m_deltaCache = new WeakHashMap<IJavaElementDelta, FineGrainedJavaElementDelta[]>();
+    m_sourceCache = new HashMap<String, String>();
     m_bufferListener = new IBufferChangedListener() {
       @Override
       public void bufferChanged(BufferChangedEvent e) {

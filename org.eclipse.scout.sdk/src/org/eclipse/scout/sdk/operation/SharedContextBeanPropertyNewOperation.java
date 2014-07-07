@@ -62,7 +62,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (StringUtility.isNullOrEmpty(getBeanName())) {
       throw new IllegalArgumentException("bean name is null or empty.");
     }

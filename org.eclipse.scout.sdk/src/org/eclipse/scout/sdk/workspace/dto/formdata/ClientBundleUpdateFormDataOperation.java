@@ -45,14 +45,14 @@ public class ClientBundleUpdateFormDataOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getClientBundle() == null) {
       throw new IllegalArgumentException("client bundle can not be null.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
 
     if (getClientBundle().isBinary()) {
       return;

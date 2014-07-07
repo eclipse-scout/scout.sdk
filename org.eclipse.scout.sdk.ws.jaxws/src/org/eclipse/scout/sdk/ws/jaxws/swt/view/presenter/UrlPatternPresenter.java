@@ -79,7 +79,7 @@ public class UrlPatternPresenter extends AbstractStringActionPresenter {
     }
 
     @Override
-    protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+    protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
       JaxWsSdk.getDefault().getMarkerQueueManager().suspend();
       try {
         m_operation.run(monitor, workingCopyManager);

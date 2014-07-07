@@ -70,7 +70,7 @@ public class AnnotationNewOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!TypeUtility.exists(getDeclaringType())) {
       throw new IllegalArgumentException("Declaring member does not exist!");
     }
@@ -78,7 +78,7 @@ public class AnnotationNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     workingCopyManager.register(getDeclaringType().getCompilationUnit(), monitor);
     ImportValidator validator = new ImportValidator(getDeclaringType().getCompilationUnit());
     Document doc = new Document(getDeclaringType().getCompilationUnit().getSource());

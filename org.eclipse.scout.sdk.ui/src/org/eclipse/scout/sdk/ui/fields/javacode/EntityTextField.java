@@ -170,7 +170,7 @@ public class EntityTextField extends Composite {
     return m_labelPercentage;
   }
 
-  private static class P_EntityProposal implements IContentProposal, Comparable<P_EntityProposal> {
+  private static final class P_EntityProposal implements IContentProposal, Comparable<P_EntityProposal> {
 
     private P_EntityProposal(String c) {
       m_content = c;
@@ -217,7 +217,7 @@ public class EntityTextField extends Composite {
     }
   }
 
-  private class P_EntityContentProvider extends LabelProvider implements IContentProposalProvider, IControlContentAdapter {
+  private final class P_EntityContentProvider extends LabelProvider implements IContentProposalProvider, IControlContentAdapter {
     @Override
     public IContentProposal[] getProposals(String contents, int position) {
       String searchString = null;

@@ -93,7 +93,7 @@ public class HandlerChainFilterWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     JaxWsSdkUtility.removeAllChildElements(m_xmlHandlerChain, toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PROTOCOL));
     JaxWsSdkUtility.removeAllChildElements(m_xmlHandlerChain, toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_SERVICE));
     JaxWsSdkUtility.removeAllChildElements(m_xmlHandlerChain, toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PORT));

@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSuppo
 
 /**
  * <h3>{@link ScoutBundlePresentationActionGroup}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 20.03.2013
  */
@@ -55,7 +55,7 @@ public class ScoutBundlePresentationActionGroup extends MenuManager {
     add(m_workingSet);
   }
 
-  private class P_GroupedPresentationAction extends Action {
+  private final class P_GroupedPresentationAction extends Action {
     private P_GroupedPresentationAction() {
       super(Texts.get("Grouped"));
       setImageDescriptor(ScoutSdkUi.getImageDescriptor(SdkIcons.BundlePresentationGrouped));
@@ -72,7 +72,7 @@ public class ScoutBundlePresentationActionGroup extends MenuManager {
     }
   }
 
-  private class P_FlatGroupePresentationAction extends Action {
+  private final class P_FlatGroupePresentationAction extends Action {
     private P_FlatGroupePresentationAction() {
       super(Texts.get("FlatGroups"));
       setImageDescriptor(ScoutSdkUi.getImageDescriptor(SdkIcons.BundlePresentationFlatGrouped));
@@ -89,7 +89,7 @@ public class ScoutBundlePresentationActionGroup extends MenuManager {
     }
   }
 
-  private class P_HierarchicalPresentationAction extends Action {
+  private final class P_HierarchicalPresentationAction extends Action {
     private P_HierarchicalPresentationAction() {
       super(Texts.get("Hierarchical"));
       setImageDescriptor(ScoutSdkUi.getImageDescriptor(SdkIcons.BundlePresentationHierarchical));
@@ -106,7 +106,7 @@ public class ScoutBundlePresentationActionGroup extends MenuManager {
     }
   }
 
-  private class P_FlatPresentationAction extends Action {
+  private final class P_FlatPresentationAction extends Action {
     private P_FlatPresentationAction() {
       super(Texts.get("Flat"));
       setImageDescriptor(ScoutSdkUi.getImageDescriptor(SdkIcons.BundlePresentationFlat));
@@ -123,7 +123,7 @@ public class ScoutBundlePresentationActionGroup extends MenuManager {
     }
   }
 
-  private class P_WorkingSetPresentationAction extends Action {
+  private final class P_WorkingSetPresentationAction extends Action {
     private P_WorkingSetPresentationAction() {
       super(Texts.get("WorkingSets"));
       setImageDescriptor(ScoutSdkUi.getImageDescriptor(SdkIcons.ScoutWorkingSet));

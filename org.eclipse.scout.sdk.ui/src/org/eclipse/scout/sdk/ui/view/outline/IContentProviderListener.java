@@ -18,6 +18,5 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
  *
  */
 public interface IContentProviderListener extends EventListener {
-
-  public void handleChildrenLoaded(IPage page);
+  void handleChildrenLoaded(IPage page);
 }

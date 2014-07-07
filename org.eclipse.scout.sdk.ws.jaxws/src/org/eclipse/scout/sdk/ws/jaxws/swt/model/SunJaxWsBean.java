@@ -201,7 +201,7 @@ public class SunJaxWsBean {
 
   /**
    * Reloads the entry from disk
-   * 
+   *
    * @param bundle
    * @return true if successful, false otherwise
    */
@@ -253,8 +253,7 @@ public class SunJaxWsBean {
     return new SunJaxWsBean(xml.get(0));
   }
 
-  public static interface IHandlerVisitor {
-
-    public boolean visit(Element xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount);
+  public interface IHandlerVisitor {
+    boolean visit(Element xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount);
   }
 }

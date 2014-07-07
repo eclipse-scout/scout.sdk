@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 
 /**
  * <h3>{@link ResourceFilters}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2012
  */
@@ -27,6 +27,9 @@ public class ResourceFilters {
 
   private static final IResourceFilter PRODUCT_FILE_FILTER = getFileExtensionFilter("product");
   private static final IResourceFilter TARGET_FILE_FILTER = getFileExtensionFilter("target");
+
+  protected ResourceFilters() {
+  }
 
   /**
    * @param fileExtension
@@ -100,7 +103,7 @@ public class ResourceFilters {
 
   /**
    * Gets all product files that contain the given id as dependency.
-   * 
+   *
    * @param or
    *          if true, the list of ids is OR connected. Otherwise all of the given ids must be found in the product to
    *          be accepted by this filter (AND).

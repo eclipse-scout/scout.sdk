@@ -59,7 +59,7 @@ public class BuildPropertiesWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Map<String, List<String>> propertyMap = new HashMap<String, List<String>>();
     for (BuildProperty property : m_properties) {
       if (!propertyMap.containsKey(property.getName())) {

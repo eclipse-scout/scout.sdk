@@ -54,7 +54,7 @@ import org.osgi.framework.Version;
 
 /**
  * <h3>{@link LibraryBundleCreateOperation}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 02.03.2012
  */
@@ -74,7 +74,7 @@ public class LibraryBundleCreateOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     IStatus nameStatus = ScoutUtility.validateNewBundleName(getBundleName());
     if (nameStatus.matches(IStatus.ERROR)) {
       throw new IllegalArgumentException(nameStatus.getMessage());
@@ -88,13 +88,13 @@ public class LibraryBundleCreateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IProject libraryProject = createProject(monitor, workingCopyManager);
     processLibraryUserBundles(libraryProject);
 
   }
 
-  protected IProject createProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected IProject createProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(getBundleName());
     project.create(monitor);
     project.open(monitor);
@@ -164,7 +164,7 @@ public class LibraryBundleCreateOperation implements IOperation {
           IPackageFragment f = (IPackageFragment) children[k];
           String name = f.getElementName();
           if (name.equals("")) //$NON-NLS-1$
-          name = "."; //$NON-NLS-1$
+            name = "."; //$NON-NLS-1$
           if ((f.hasChildren() || f.getNonJavaResources().length > 0) && names.add(name)) collector.add(f);
         }
       }

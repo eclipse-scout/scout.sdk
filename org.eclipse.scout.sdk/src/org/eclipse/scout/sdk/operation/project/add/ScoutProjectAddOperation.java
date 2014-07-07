@@ -46,7 +46,7 @@ import org.osgi.framework.Constants;
 
 /**
  * <h3>{@link ScoutProjectAddOperation}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 02.03.2012
  */
@@ -67,7 +67,7 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (m_project == null) {
       throw new IllegalArgumentException("null project not allowed");
@@ -122,14 +122,14 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     super.run(monitor, workingCopyManager);
     postProcess(monitor, workingCopyManager);
   }
 
   /**
    * Adds the additionalSymbolicName to all product files that already have the existingSymbolicName dependency.
-   * 
+   *
    * @param existingSymbolicName
    * @param additionalSymbolicName
    * @throws CoreException
@@ -158,7 +158,7 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
     return false;
   }
 
-  private void postProcess(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  private void postProcess(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (isNodeChecked(CreateServerPluginOperation.BUNDLE_ID)) {
       // clear server plugin.xml
       String serverPluginName = getProperties().getProperty(CreateServerPluginOperation.PROP_BUNDLE_SERVER_NAME, String.class);

@@ -17,22 +17,22 @@ public interface INodeVisitor {
   /**
    * continues visiting the tree (load children if not loaded)
    */
-  public static final int CONTINUE = 1;
+  int CONTINUE = 1;
 
   /**
    * continues visiting the tree only on this branch (load children if not loaded)
    */
-  public static final int CONTINUE_BRANCH = 2;
+  int CONTINUE_BRANCH = 2;
 
   /**
    * stop visiting the tree; used when the mission is completed.
    */
-  public static final int CANCEL = 0;
+  int CANCEL = 0;
 
   /**
    * continues visiting with siblings of the parent node, abort subtree.
    */
-  public static final int CANCEL_SUBTREE = 3;
+  int CANCEL_SUBTREE = 3;
 
   /**
    * @param page

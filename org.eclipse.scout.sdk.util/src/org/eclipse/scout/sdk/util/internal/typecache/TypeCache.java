@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.internal.typecache;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -150,7 +151,7 @@ public final class TypeCache implements ITypeCache {
         SearchEngine.createWorkspaceScope(),
         new SearchRequestor() {
           @Override
-          public final void acceptSearchMatch(SearchMatch match) throws CoreException {
+          public void acceptSearchMatch(SearchMatch match) throws CoreException {
             Object element = match.getElement();
             if (element instanceof IType) {
               IType t = (IType) element;
@@ -165,7 +166,9 @@ public final class TypeCache implements ITypeCache {
     return matchList;
   }
 
-  private static final class P_TypeMatchComparator implements Comparator<IType> {
+  private static final class P_TypeMatchComparator implements Comparator<IType>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Override
     public int compare(IType o1, IType o2) {
       boolean b1 = o1.isBinary();

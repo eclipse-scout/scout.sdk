@@ -131,14 +131,14 @@ public final class ClassIdValidationJob extends JobEx {
     return CLASS_ID_VALIDATION_JOB_FAMILY.equals(family);
   }
 
-  public synchronized static void install() {
+  public static synchronized void install() {
     if (listener == null) {
       listener = new P_ResourceChangeListener();
       ScoutSdkCore.getJavaResourceChangedEmitter().addJavaResourceChangedListener(listener);
     }
   }
 
-  public synchronized static void uninstall() {
+  public static synchronized void uninstall() {
     if (listener != null) {
       ScoutSdkCore.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(listener);
     }

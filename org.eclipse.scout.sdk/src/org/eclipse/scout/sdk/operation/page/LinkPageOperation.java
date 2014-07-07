@@ -25,7 +25,7 @@ public class LinkPageOperation extends AbstractPageOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getPage() == null) {
       throw new IllegalArgumentException("page can not be null.");
     }
@@ -35,7 +35,7 @@ public class LinkPageOperation extends AbstractPageOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     addToHolder(getPage(), monitor, workingCopyManager);
   }
 

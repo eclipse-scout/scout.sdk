@@ -55,7 +55,7 @@ public class LocalLookupCallNewOperation extends PrimaryTypeNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
 
     // serial version uid
     addFieldSourceBuilder(FieldSourceBuilderFactory.createSerialVersionUidBuilder());

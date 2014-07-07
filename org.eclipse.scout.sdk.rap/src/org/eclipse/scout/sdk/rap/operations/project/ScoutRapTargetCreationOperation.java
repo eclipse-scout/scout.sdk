@@ -53,7 +53,7 @@ public class ScoutRapTargetCreationOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getDestinationDirectory() == null) {
       throw new IllegalArgumentException("the destination directory can not be null.");
     }
@@ -63,7 +63,7 @@ public class ScoutRapTargetCreationOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       final String suffix = ".jar";
       IOUtility.deleteDirectory(getDestinationDirectory());

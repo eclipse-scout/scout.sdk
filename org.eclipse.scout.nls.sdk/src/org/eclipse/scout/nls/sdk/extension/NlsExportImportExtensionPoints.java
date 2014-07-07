@@ -25,11 +25,11 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h4>ExportExtensionPojnts</h4>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.1.0 (11.11.2010)
  */
-public class NlsExportImportExtensionPoints {
+public final class NlsExportImportExtensionPoints {
 
   private static final NlsExportImportExtensionPoints instance = new NlsExportImportExtensionPoints();
   public static final String EXTENSION_POINT_ID_NLS_EXPORTER = "nlsExporter";

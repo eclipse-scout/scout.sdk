@@ -42,7 +42,7 @@ public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getPageDataAnnotation() == null) {
       throw new IllegalArgumentException("FormDataAnnotation can not be null.");
     }

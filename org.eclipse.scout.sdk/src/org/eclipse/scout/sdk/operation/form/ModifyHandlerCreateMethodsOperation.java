@@ -38,7 +38,7 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getFormHandler() == null) {
       throw new IllegalArgumentException("Form Handler can not be null.");
     }
@@ -51,7 +51,7 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String TAB = SdkProperties.TAB;
     ImportValidator validator = new ImportValidator(getFormHandler().getCompilationUnit());
     workingCopyManager.register(getFormHandler().getCompilationUnit(), monitor);

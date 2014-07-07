@@ -78,7 +78,7 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (StringUtility.isNullOrEmpty(getBeanName())) {
       throw new IllegalArgumentException("bean name can not be null.");
     }

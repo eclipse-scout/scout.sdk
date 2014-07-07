@@ -30,14 +30,14 @@ public class OverrideUnimplementedMethodsOperation implements IOperation {
   private IType m_type;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!TypeUtility.exists(m_type)) {
       throw new IllegalArgumentException("type must exsist");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     RefactoringASTParser parser = new RefactoringASTParser(AstUtility.getLatestAstApiLevel());
     CompilationUnit cu = parser.parse(m_type.getCompilationUnit(), true);
     ITypeBinding typeBinding = ASTNodes.getTypeBinding(cu, m_type);

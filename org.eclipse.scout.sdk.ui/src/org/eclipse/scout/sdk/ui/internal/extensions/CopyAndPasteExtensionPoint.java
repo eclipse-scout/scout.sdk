@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ui.extensions.ICopySourceDelegator;
 import org.eclipse.scout.sdk.ui.extensions.IPasteTargetDelegator;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
-public class CopyAndPasteExtensionPoint {
+public final class CopyAndPasteExtensionPoint {
 
   // name of extension point as defined in XL
   private static final String extensionPointName = "outlineCopyAndPaste";
@@ -35,7 +35,7 @@ public class CopyAndPasteExtensionPoint {
   // Singleton
   private static CopyAndPasteExtensionPoint instance = new CopyAndPasteExtensionPoint();
 
-  // list for delegators
+  // list for delegates
   private List<IPasteTargetDelegator> m_pasteTargetDelegators;
   private List<ICopySourceDelegator> m_copySourceDelegators;
 

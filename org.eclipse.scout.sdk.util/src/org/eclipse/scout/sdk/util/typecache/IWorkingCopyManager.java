@@ -38,7 +38,7 @@ public interface IWorkingCopyManager {
    * @return true if the given compilation unit was newly registered with this call, false if it was already registered
    * @throws JavaModelException
    *           if the compilation unit could not become a working copy
-   * @throws IllegalArgumentException
+   * @throws 
    *           if the given compilation unit is read only.
    */
   boolean register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException;

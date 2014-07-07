@@ -83,7 +83,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (StringUtility.hasText(getFormIdName()) && StringUtility.isNullOrEmpty(getFormIdSignature()) ||
         StringUtility.isNullOrEmpty(getFormIdName()) && StringUtility.hasText(getFormIdSignature())) {
       throw new IllegalArgumentException("Form id is not set properly. 'formIdName' and 'formIdSignature' must be set!");

@@ -45,7 +45,7 @@ public class WsProviderDeleteOperation implements IOperation {
   private List<ElementBean> m_elements;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("No bundle set");
     }
@@ -58,7 +58,7 @@ public class WsProviderDeleteOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (ElementBean element : m_elements) {
       switch (element.getId()) {
         case ID_REGISTRATION:

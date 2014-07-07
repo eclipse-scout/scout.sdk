@@ -58,7 +58,7 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // get all selected entries
     ExportScoutProjectEntry[] selectedEntries = m_page1.getSelectedEntries();
 

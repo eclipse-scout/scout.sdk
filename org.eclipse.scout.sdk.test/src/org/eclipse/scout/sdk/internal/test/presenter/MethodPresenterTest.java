@@ -62,9 +62,9 @@ import org.junit.Test;
 
 public class MethodPresenterTest extends AbstractScoutSdkTest {
 
-  private final static String SHARED_PROJECT = "presenter.test.shared";
-  private final static String SERVER_PROJECT = "presenter.test.server";
-  private final static String CLIENT_PROJECT = "presenter.test.client";
+  private static final String SHARED_PROJECT = "presenter.test.shared";
+  private static final String SERVER_PROJECT = "presenter.test.server";
+  private static final String CLIENT_PROJECT = "presenter.test.client";
 
   private static PropertyViewFormToolkit default_toolkit;
   private static Composite default_parent;

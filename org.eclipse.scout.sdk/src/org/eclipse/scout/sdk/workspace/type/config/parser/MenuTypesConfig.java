@@ -20,7 +20,7 @@ import org.eclipse.jdt.core.IType;
 
 /**
  * <h3>{@link MenuTypesConfig}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 03.06.2014
  */

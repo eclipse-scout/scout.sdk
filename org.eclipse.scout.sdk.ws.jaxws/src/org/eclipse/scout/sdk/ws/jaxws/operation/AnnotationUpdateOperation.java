@@ -57,7 +57,7 @@ public class AnnotationUpdateOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_declaringType == null) {
       throw new IllegalArgumentException("No declaring type set.");
     }
@@ -67,7 +67,7 @@ public class AnnotationUpdateOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     AnnotationNewOperation op = new AnnotationNewOperation(SignatureCache.createTypeSignature(m_annotationType.getFullyQualifiedName()), m_declaringType);
     IAnnotation annotation = JaxWsSdkUtility.getAnnotation(m_declaringType, m_annotationType.getFullyQualifiedName(), false);
 

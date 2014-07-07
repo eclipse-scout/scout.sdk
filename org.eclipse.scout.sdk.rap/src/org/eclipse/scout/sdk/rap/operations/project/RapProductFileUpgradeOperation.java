@@ -53,7 +53,7 @@ public class RapProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (m_prodFiles == null || m_prodFiles.length != 2) {
       throw new IllegalArgumentException("product file not found.");
@@ -61,7 +61,7 @@ public class RapProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (JdtUtility.isBatik17OrNewer()) {
       Batik17ProductFileUpgradeOperation op = new Batik17ProductFileUpgradeOperation();
       for (IFile f : m_prodFiles) {

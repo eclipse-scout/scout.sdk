@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 /**
  *
  */
-public class ProjectTemplateExtensionPoint {
+public final class ProjectTemplateExtensionPoint {
   private static String extensionId = "scoutProjectTemplate";
   private static String attributeId = "id";
   private static String attributeOrderNumber = "orderNumber";
@@ -78,7 +78,7 @@ public class ProjectTemplateExtensionPoint {
     return instance.getExtensionsImpl();
   }
 
-  private final ProjectTemplateExtension[] getExtensionsImpl() {
+  private ProjectTemplateExtension[] getExtensionsImpl() {
     return m_extensions.toArray(new ProjectTemplateExtension[m_extensions.size()]);
   }
 

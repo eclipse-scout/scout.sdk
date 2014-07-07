@@ -44,7 +44,7 @@ public abstract class AbstractTypeNewOperation implements ITypeNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     getSourceBuilder().validate();
   }
 

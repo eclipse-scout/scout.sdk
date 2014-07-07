@@ -59,7 +59,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   /**
    * Gets the registered (in plugin.xml) text provider service types ordered by priority.
-   * 
+   *
    * @param returnDocServices
    *          If true, only Docs text provider services (implementing marker interface
    *          <code>IDocumentationTextProviderService</code>) are returned. Otherwise only non-docs text provider
@@ -73,7 +73,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
    */
   private static Set<IType> getRegisteredTextProviderTypes(Boolean returnDocServices, final Set<String> projectFilter) throws JavaModelException {
 
-    class TextProviderService {
+    final class TextProviderService {
       private final IType textProvider;
       private final String contributingBundleName;
 
@@ -104,7 +104,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
     }
 
-    class TextProviderServiceDeclaration {
+    final class TextProviderServiceDeclaration {
       private final TextProviderService svc;
       private final double prio;
 

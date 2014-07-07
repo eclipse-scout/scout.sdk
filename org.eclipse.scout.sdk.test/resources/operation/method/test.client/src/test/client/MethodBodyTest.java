@@ -46,7 +46,7 @@ public class MethodBodyTest {
     }
   }
 
-  public void methodWithException() throws IllegalArgumentException {
+  public void methodWithException() {
     // todo
   }
 

@@ -37,7 +37,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>{@link GroupBoxBodyGridPresenter}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 05.03.2014
  */
@@ -65,7 +65,7 @@ public class GroupBoxBodyGridPresenter extends AbstractTypeProposalPresenter {
     }
   }
 
-  private class P_ContentProvider extends ContentProposalProvider {
+  private final class P_ContentProvider extends ContentProposalProvider {
 
     private Set<IType> m_proposals;
     private final ILabelProvider m_labelProvider;

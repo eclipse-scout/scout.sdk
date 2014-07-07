@@ -300,10 +300,10 @@ public class TypeUtility {
    *          The base type of the primary type hierarchy.
    * @return The primary type hierarchy. The hierarchy will only be initialized with values on first use and will be
    *         cached for later re-use.
-   * @throws IllegalArgumentException
+   * @throws 
    *           if the given type is not a primary type.
    */
-  public static ICachedTypeHierarchy getPrimaryTypeHierarchy(IType type) throws IllegalArgumentException {
+  public static ICachedTypeHierarchy getPrimaryTypeHierarchy(IType type) {
     return HierarchyCache.getInstance().getPrimaryTypeHierarchy(type);
   }
 
@@ -705,7 +705,7 @@ public class TypeUtility {
     if (searchOnClassPath) {
       // 3. try to find a matching type on the classpath
       // some types may not be part of the compilation unit (e.g. declaringType is binary, then there is no compilation unit) and cannot be resolved in the class file.
-      // this can happen when e.g. only a reference to a final static field is in the class file and there is no other reference to the class.
+      // this can happen when e.g. only a reference to a static final field is in the class file and there is no other reference to the class.
       // then the compiler removes this reference and directly puts the value of the field in the class file even though the reference remains in the source of the class.
       // the originating class can then not be found anymore. This happens e.g. with the AbstractIcons reference in AbstractSmartField.
       // to solve this, try to find a unique type in the workspace with the simple name. If there is only one match, we are happy.

@@ -29,11 +29,11 @@ public class BuildJaxWsFileCreateOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Document xmlDocument = JaxWsSdkUtility.createNewXmlDocument("webservices");
     ResourceFactory.getBuildJaxWsResource(m_bundle, true).storeXml(xmlDocument, IResourceListener.EVENT_BUILDJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
   }

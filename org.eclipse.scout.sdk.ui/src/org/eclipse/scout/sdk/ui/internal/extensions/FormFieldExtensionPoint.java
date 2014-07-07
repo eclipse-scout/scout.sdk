@@ -223,11 +223,11 @@ public final class FormFieldExtensionPoint {
     return value;
   }
 
-  private static int distanceToIFormField(IType visitee, IType superType, int dist, ITypeHierarchy superTypeHierarchy) throws IllegalArgumentException {
+  private static int distanceToIFormField(IType visitee, IType superType, int dist, ITypeHierarchy superTypeHierarchy) {
     return distanceToIFormField(visitee, superType, dist, superTypeHierarchy, Integer.MAX_VALUE);
   }
 
-  private static int distanceToIFormField(IType visitee, IType superType, int dist, ITypeHierarchy superTypeHierarchy, int maxDistance) throws IllegalArgumentException {
+  private static int distanceToIFormField(IType visitee, IType superType, int dist, ITypeHierarchy superTypeHierarchy, int maxDistance) {
     if (visitee == null) {
       throw new IllegalArgumentException("try to determ the distance to IFormField of a instance not in subhierarchy of IFormField.");
     }

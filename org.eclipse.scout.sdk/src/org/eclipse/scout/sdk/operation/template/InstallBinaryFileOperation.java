@@ -57,7 +57,7 @@ public class InstallBinaryFileOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getSourceUrl() == null) {
       throw new IllegalArgumentException("source URL can not be null!");
     }

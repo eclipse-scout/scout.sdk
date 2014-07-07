@@ -54,7 +54,7 @@ public class ResourceDeleteOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_resourcesToDelete == null) {
       throw new IllegalArgumentException("null argument for resources not allowed.");
     }

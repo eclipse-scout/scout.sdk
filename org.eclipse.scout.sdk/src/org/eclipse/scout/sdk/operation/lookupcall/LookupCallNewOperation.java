@@ -76,7 +76,7 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String namePrefix = getElementName();
     namePrefix = namePrefix.replaceAll(SdkProperties.SUFFIX_LOOKUP_CALL + "$", "");
     // service
@@ -126,7 +126,7 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
   }
 
   public void setServiceProxyRegistrationProject(IJavaProject serviceProxyRegistrationProject) {

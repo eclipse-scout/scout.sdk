@@ -38,14 +38,14 @@ public class ServiceDeleteOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getServiceImplementation() == null || !getServiceImplementation().exists()) {
       throw new IllegalArgumentException("service implementation can not be null.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     JavaElementDeleteOperation javaMemberDeleteOperation = new JavaElementDeleteOperation();
     ResourceDeleteOperation resourceDeleteOperation = new ResourceDeleteOperation();
     javaMemberDeleteOperation.addMember(getServiceImplementation());

@@ -45,7 +45,7 @@ public class OutlineToolbuttonNewOperation extends ToolbuttonNewOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (!TypeUtility.exists(getOutlineType())) {
       throw new IllegalArgumentException("Outline type does not exist!");
     }
@@ -59,7 +59,7 @@ public class OutlineToolbuttonNewOperation extends ToolbuttonNewOperation {
   }
 
   @Override
-  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected void createType(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (TypeUtility.exists(getOutlineType())) {
       IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
       constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());

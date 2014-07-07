@@ -71,7 +71,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (Flags.isInterface(getFlags()) && getSuperTypeSignature() != null) {
       throw new IllegalArgumentException("An interface can not have a superclass.");

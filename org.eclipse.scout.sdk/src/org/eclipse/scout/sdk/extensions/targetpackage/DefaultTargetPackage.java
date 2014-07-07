@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 
 /**
  * <h3>{@link DefaultTargetPackage}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 17.12.2012
  */
@@ -113,7 +113,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
 
   /**
    * Gets if users can specify the target package or if the legacy packages should be used.
-   * 
+   *
    * @return true if the new mode is enabled in the settings. false if the legacy mode is active.
    */
   public static boolean isPackageConfigurationEnabled() {
@@ -124,7 +124,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
 
   /**
    * Sets if users can specify the target package or if the legacy packages should be used.
-   * 
+   *
    * @param enabled
    *          true if the new mode should be used (package can be chosen). false if the legacy mode should be active.
    */
@@ -155,7 +155,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
    * exceptions for target packages: the new location differs from the packages used in older scout sdk versions.<br>
    * To keep backwards compatibility with old scout projects a legacy support can be enabled. in this case these old
    * packages are used.
-   * 
+   *
    * @param packageId
    * @return
    */
@@ -212,7 +212,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
     }
   }
 
-  private static class P_PreferenceChangeListener implements IPreferenceChangeListener {
+  private static final class P_PreferenceChangeListener implements IPreferenceChangeListener {
     private Map<String, StringHolder> m_projectConfig;
 
     private P_PreferenceChangeListener(Map<String, StringHolder> projectConfigs) {
@@ -228,7 +228,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
     }
   }
 
-  private static class P_ScoutWorkspaceListener implements IScoutWorkspaceListener {
+  private static final class P_ScoutWorkspaceListener implements IScoutWorkspaceListener {
     @Override
     public void workspaceChanged(ScoutWorkspaceEvent event) {
       if (event.getType() == ScoutWorkspaceEvent.TYPE_BUNDLE_REMOVED) {

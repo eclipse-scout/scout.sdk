@@ -48,7 +48,7 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getFormDataAnnotation() == null) {
       throw new IllegalArgumentException("FormDataAnnotation can not be null.");
     }

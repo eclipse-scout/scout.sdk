@@ -40,7 +40,7 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
 
   private final List<ITargetEntryContributor> m_entryList;
 
-  protected static interface ITargetEntryContributor {
+  protected interface ITargetEntryContributor {
     void contribute(IFile targetFile, IProgressMonitor monitor) throws CoreException;
   }
 

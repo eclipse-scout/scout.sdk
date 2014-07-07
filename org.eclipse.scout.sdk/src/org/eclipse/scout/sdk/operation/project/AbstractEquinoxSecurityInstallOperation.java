@@ -51,7 +51,7 @@ public abstract class AbstractEquinoxSecurityInstallOperation extends AbstractSc
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // equinox security fragments only exist for mac and windows platforms
     if (Platform.OS_MACOSX.equals(Platform.getOS()) || Platform.OS_WIN32.equals(Platform.getOS())) {
       for (IFile f : m_productFiles) {

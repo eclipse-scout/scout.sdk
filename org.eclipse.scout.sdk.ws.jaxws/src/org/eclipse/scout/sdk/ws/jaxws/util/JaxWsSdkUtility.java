@@ -403,7 +403,7 @@ public final class JaxWsSdkUtility {
   /**
    * Creates an import directive in the compilation unit for the given {@link IType}.
    * The directive is only created if necessary.
-   * 
+   *
    * @param declaringType
    *          the type the directive is to be created in
    * @param typeForImportDirective
@@ -448,7 +448,7 @@ public final class JaxWsSdkUtility {
   /**
    * Excludes the composite from the layout manager if it does not contain any children and triggers to relayout the
    * composite.
-   * 
+   *
    * @param composite
    */
   public static void doLayout(Composite composite) {
@@ -469,7 +469,7 @@ public final class JaxWsSdkUtility {
    * workaround for proper redraw of sections which contain composites to be excluded / included depending one some
    * conditions.
    * This must take place when getForm()#redraw=true!
-   * 
+   *
    * @param section
    */
   public static void doLayoutSection(ISection section) {
@@ -525,7 +525,7 @@ public final class JaxWsSdkUtility {
 
   /**
    * Resolves the requested PortType interface type located in the given jar file
-   * 
+   *
    * @param portTypeQName
    *          the PortType to be resolved or null to get all PortTypes
    * @param jarFile
@@ -548,7 +548,7 @@ public final class JaxWsSdkUtility {
 
   /**
    * Resolves PortType interface types located in the given jar file
-   * 
+   *
    * @param portTypeQName
    *          the PortType to be resolved or null to get all PortTypes
    * @param jarFile
@@ -566,9 +566,8 @@ public final class JaxWsSdkUtility {
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
           new JarFileSearchScope(jarFile), //SearchEngine.createWorkspaceScope(),
           new SearchRequestor() {
-
             @Override
-            public final void acceptSearchMatch(SearchMatch match) throws CoreException {
+            public void acceptSearchMatch(SearchMatch match) throws CoreException {
               if (!(match instanceof TypeDeclarationMatch)) {
                 return;
               }
@@ -607,7 +606,7 @@ public final class JaxWsSdkUtility {
 
   /**
    * Resolves the requested service type located in the given jar file
-   * 
+   *
    * @param serviceQName
    * @param jarFile
    * @return
@@ -628,7 +627,7 @@ public final class JaxWsSdkUtility {
 
   /**
    * Resolves service types located in the given jar file
-   * 
+   *
    * @param serviceQName
    *          the service to be resolved or null to get all service types
    * @param jarFile
@@ -643,9 +642,8 @@ public final class JaxWsSdkUtility {
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
           new JarFileSearchScope(jarFile), //SearchEngine.createWorkspaceScope(),
           new SearchRequestor() {
-
             @Override
-            public final void acceptSearchMatch(SearchMatch match) throws CoreException {
+            public void acceptSearchMatch(SearchMatch match) throws CoreException {
               if (!(match instanceof TypeDeclarationMatch)) {
                 return;
               }
@@ -898,7 +896,7 @@ public final class JaxWsSdkUtility {
   /**
    * To get an annotation on the given type. This is just a workaround as {@link IType#getAnnotation(String)} does not
    * work properly (changes are not reflected, e.g. after removing the annotation, it is still returned)
-   * 
+   *
    * @param declaringType
    * @param annotationName
    * @return
@@ -1004,7 +1002,7 @@ public final class JaxWsSdkUtility {
 
   /**
    * To append an index to the markerGroupUUI
-   * 
+   *
    * @param markerGroupUUID
    * @param index
    * @return
@@ -1015,7 +1013,7 @@ public final class JaxWsSdkUtility {
 
   /**
    * To get a unique binding file name path within the build path
-   * 
+   *
    * @param bundle
    * @param alias
    * @return
@@ -1092,7 +1090,7 @@ public final class JaxWsSdkUtility {
 
   /**
    * Supports SuperTypes to be at multiple locations
-   * 
+   *
    * @param bundle
    * @param superType
    * @return
@@ -1137,7 +1135,7 @@ public final class JaxWsSdkUtility {
    * Supports SuperTypes to be at multiple locations.
    * E.g. JAX-WS classes (i.e. javax.xml.ws.Service) which is defined in JRE but also might be defined in a WLS specific
    * library fragment.
-   * 
+   *
    * @param candidateToCheck
    * @param fqnSuperType
    * @return
@@ -1222,7 +1220,7 @@ public final class JaxWsSdkUtility {
    * <li>build properties are looked for a {@link JaxWsConstants#OPTION_JAR} entry</li>
    * <li>JAR file name is derived from WSDL file name</li>
    * </ol>
-   * 
+   *
    * @param bundle
    * @param buildProperties
    * @param wsdlFileName
@@ -1371,7 +1369,7 @@ public final class JaxWsSdkUtility {
 
   /**
    * Workaround to the bug that sometimes the property page is not closed on structure change from external files.
-   * 
+   *
    * @param parentPage
    */
   public static void markStructureDirtyAndFixSelection(final IPage parentPage) {
@@ -1404,7 +1402,7 @@ public final class JaxWsSdkUtility {
 
   /**
    * To obtain the fully qualified name
-   * 
+   *
    * @param declaringType
    *          the type which contains possible import directives
    * @param signature

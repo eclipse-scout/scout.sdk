@@ -15,7 +15,10 @@ import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Control;
 
-public class NlsUi {
+public final class NlsUi {
+
+  private NlsUi() {
+  }
 
   public static Control decorate(AbstractTextComposition textComp, boolean onFocus) {
     Control control = textComp.getTextControl();

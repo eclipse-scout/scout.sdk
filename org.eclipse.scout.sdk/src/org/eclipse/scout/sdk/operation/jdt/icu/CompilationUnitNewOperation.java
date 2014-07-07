@@ -68,7 +68,7 @@ public class CompilationUnitNewOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     getSourceBuilder().validate();
     if (!TypeUtility.exists(getJavaProject())) {
       throw new IllegalArgumentException("java project does not exist!");
@@ -76,7 +76,7 @@ public class CompilationUnitNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (getPackageFragment() == null) {
       PackageFragementNewOperation packageOp = new PackageFragementNewOperation(getPackageFragmentName(), getJavaProject());
       packageOp.setNoErrorWhenPackageAlreadyExist(true);

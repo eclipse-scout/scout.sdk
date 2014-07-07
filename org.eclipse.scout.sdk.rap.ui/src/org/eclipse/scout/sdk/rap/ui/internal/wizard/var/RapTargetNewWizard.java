@@ -52,7 +52,7 @@ public class RapTargetNewWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     if (TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING.equals(strategy)) {
       // existing local target
       File f = new File(localFolder);

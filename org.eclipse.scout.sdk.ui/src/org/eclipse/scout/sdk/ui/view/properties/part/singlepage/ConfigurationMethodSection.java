@@ -47,7 +47,7 @@ public class ConfigurationMethodSection {
   /**
    * Creates a section showing all presenters for methods that match the type parameters given to this constructor.<br>
    * The presenters are grouped by category as defined in the configuration xml file.
-   * 
+   *
    * @param t
    *          The configuration methods of this type are rendered.
    * @param methodType
@@ -63,7 +63,7 @@ public class ConfigurationMethodSection {
 
   /**
    * creates the content of the section.
-   * 
+   *
    * @param parent
    *          The section will be added to this PropertyPart
    * @param id
@@ -188,7 +188,7 @@ public class ConfigurationMethodSection {
 
   /**
    * creates a new category heading with a label and a horizontal line behind.
-   * 
+   *
    * @param parent
    * @param label
    *          The text of the heading
@@ -245,7 +245,7 @@ public class ConfigurationMethodSection {
   /**
    * Helper class to hold additional meta data to a configuration method as configured in the xml file.
    */
-  private static class ConfigurationMethodEx implements Comparable<ConfigurationMethodEx> {
+  private static final class ConfigurationMethodEx implements Comparable<ConfigurationMethodEx> {
     private final ConfigurationMethod m_configMethod;
     private final Double m_order; /* order annotation of the method in scout RT or as configured in the xml configuration */
     private final ConfigCategory m_category; /* category it belongs to according to the xml configuration */

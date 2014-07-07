@@ -40,7 +40,7 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (m_serverProdFiles == null) {
       throw new IllegalArgumentException("server development products cannot be null.");
@@ -53,7 +53,7 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     JettyProductFileUpgradeOperation op = new JettyProductFileUpgradeOperation(m_serverProdFiles);
     op.validate();
     op.run(monitor, workingCopyManager);

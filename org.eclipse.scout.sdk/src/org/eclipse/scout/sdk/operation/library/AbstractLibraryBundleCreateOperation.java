@@ -34,7 +34,7 @@ public abstract class AbstractLibraryBundleCreateOperation implements IOperation
   private Set<File> m_libraryFiles;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     IStatus nameStatus = ScoutUtility.validateNewBundleName(getBundleName());
     if (nameStatus.matches(IStatus.ERROR)) {
       throw new IllegalArgumentException(nameStatus.getMessage());
@@ -48,7 +48,7 @@ public abstract class AbstractLibraryBundleCreateOperation implements IOperation
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
   }
 
   public String getBundleName() {

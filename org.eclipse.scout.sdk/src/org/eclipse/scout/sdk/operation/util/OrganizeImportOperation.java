@@ -37,14 +37,14 @@ public class OrganizeImportOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getCompilationUnit() == null) {
       throw new IllegalArgumentException("no compilation unit set.");
     }
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     BundleContext context = ScoutSdk.getDefault().getBundle().getBundleContext();
     ServiceReference<IOrganizeImportService> reference = context.getServiceReference(IOrganizeImportService.class);
     try {

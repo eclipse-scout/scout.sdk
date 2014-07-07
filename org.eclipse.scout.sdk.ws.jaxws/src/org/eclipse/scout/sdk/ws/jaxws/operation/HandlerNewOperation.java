@@ -46,7 +46,7 @@ public class HandlerNewOperation implements IOperation {
   private IType m_createdType;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("bundle not set");
     }
@@ -65,7 +65,7 @@ public class HandlerNewOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     PrimaryTypeNewOperation opType = new PrimaryTypeNewOperation(m_typeName, m_packageName, m_bundle.getJavaProject());
     opType.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     opType.setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());

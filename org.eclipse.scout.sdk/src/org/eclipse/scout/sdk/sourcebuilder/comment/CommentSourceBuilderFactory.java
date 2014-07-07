@@ -26,8 +26,8 @@ import org.osgi.framework.ServiceReference;
 
 /**
  * <h3>{@link CommentSourceBuilderFactory}</h3> ...
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public final class CommentSourceBuilderFactory {
@@ -37,6 +37,9 @@ public final class CommentSourceBuilderFactory {
   private static final Pattern REGEX_COMMENT_PATTERN1 = Pattern.compile("^s*\\/\\*\\*s*$");
   private static final Pattern REGEX_COMMENT_PATTERN2 = Pattern.compile("^s*\\*\\*\\/s*$");
   private static final Pattern REGEX_COMMENT_PATTERN3 = Pattern.compile("^s*\\*.*$");
+
+  private CommentSourceBuilderFactory() {
+  }
 
   private static final ICommentSourceBuilder emptyCommentSourceBuilder = new ICommentSourceBuilder() {
     @Override
@@ -66,7 +69,7 @@ public final class CommentSourceBuilderFactory {
     }
   }
 
-  public static final ICommentSourceBuilder createPreferencesCompilationUnitCommentBuilder() {
+  public static ICommentSourceBuilder createPreferencesCompilationUnitCommentBuilder() {
     if (javaElementCommentBuilderService != null) {
       return javaElementCommentBuilderService.createPreferencesCompilationUnitCommentBuilder();
     }

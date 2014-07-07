@@ -13,12 +13,13 @@ package org.eclipse.scout.sdk.ui.view.outline.pages;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterExpressionPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterRegExPresenter;
 
 /**
  * filter the contents of a table page
- * 
+ *
  * @see PageFilterExpressionPresenter
  * @see PageFilterRegExPresenter
  */
@@ -38,7 +39,7 @@ public class PageFilter implements IPageFilter {
   }
 
   public void setFilterExpression(String s) {
-    if (s != null && s.trim().length() == 0) {
+    if (!StringUtility.hasText(s)) {
       s = null;
     }
     m_filterExpression = s;

@@ -101,7 +101,7 @@ public final class ServletRegistrationUtility {
 
   /**
    * All JAX-WS servlet registrations on the classpath of the given bundle
-   * 
+   *
    * @param bundle
    * @return
    */
@@ -135,7 +135,7 @@ public final class ServletRegistrationUtility {
     return registration.getAlias();
   }
 
-  public static class Registration {
+  public static final class Registration {
     private IScoutBundle m_bundle;
     private String m_alias;
 

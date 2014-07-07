@@ -41,7 +41,7 @@ public class RapProductJettyUpgradeOperation extends AbstractScoutProjectNewOper
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     super.validate();
     if (m_rapProdFiles == null || m_rapProdFiles.length != 1) {
       throw new IllegalArgumentException("rap dev product file not found.");
@@ -54,7 +54,7 @@ public class RapProductJettyUpgradeOperation extends AbstractScoutProjectNewOper
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     JettyProductFileUpgradeOperation op = new JettyProductFileUpgradeOperation(m_rapProdFiles);
     op.validate();
     op.run(monitor, workingCopyManager);

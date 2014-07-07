@@ -81,7 +81,7 @@ public class WsStubGenerationOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("bundle not set");
     }
@@ -97,7 +97,7 @@ public class WsStubGenerationOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     JaxWsSdk.getDefault().getMarkerQueueManager().suspend();
     try {
       // ensure stub folder created

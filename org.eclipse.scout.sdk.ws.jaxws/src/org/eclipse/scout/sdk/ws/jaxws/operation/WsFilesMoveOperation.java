@@ -49,7 +49,7 @@ public class WsFilesMoveOperation implements IOperation {
   private IFolder m_destination;
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (m_bundle == null) {
       throw new IllegalArgumentException("No bundle set");
     }
@@ -65,7 +65,7 @@ public class WsFilesMoveOperation implements IOperation {
   }
 
   @Override
-  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException, IllegalArgumentException {
+  public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     JaxWsSdk.getDefault().getMarkerQueueManager().suspend();
     try {
       String wsdlFileName = null;

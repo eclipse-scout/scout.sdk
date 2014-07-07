@@ -581,7 +581,7 @@ public class ProposalPopup extends Window {
     }
   }
 
-  private static class P_InputUpdateRunnable implements Runnable {
+  private static final class P_InputUpdateRunnable implements Runnable {
     private final IProgressMonitor m_monitor;
     private final SearchPatternInput m_input;
     private final ProposalPopup m_instance;
@@ -601,7 +601,7 @@ public class ProposalPopup extends Window {
     }
   }
 
-  private class P_LazyContentProvider implements IStructuredContentProvider {
+  private final class P_LazyContentProvider implements IStructuredContentProvider {
 
     private final ILazyProposalContentProvider m_wrappedProvider;
 
@@ -642,7 +642,7 @@ public class ProposalPopup extends Window {
     }
   }
 
-  private class P_LoadingProposalJob extends Job {
+  private final class P_LoadingProposalJob extends Job {
     private final P_LazyLoader m_parentJob;
     private final SearchPatternInput m_inputLoading;
 
@@ -671,7 +671,7 @@ public class ProposalPopup extends Window {
     }
   }// end class P_LoadingProposalJob
 
-  private class P_LazyLoader extends JobEx {
+  private final class P_LazyLoader extends JobEx {
 
     private SearchPatternInput m_input;
     private boolean m_loaded;
@@ -702,7 +702,7 @@ public class ProposalPopup extends Window {
     }
   }// end class P_LazyLoader
 
-  private class P_StyledLabelProvider extends StyledCellLabelProvider {
+  private final class P_StyledLabelProvider extends StyledCellLabelProvider {
     private final IBaseLabelProvider m_wrappedLabelProvider;
     private Font m_boldFont;
     private Styler m_boldStyler;
@@ -813,7 +813,7 @@ public class ProposalPopup extends Window {
     }
   } // end class P_StyledLabelProvider
 
-  public static class SearchPatternInput {
+  public static final class SearchPatternInput {
     private final String m_pattern;
     private final Object m_input;
     private Object[] m_proposals;

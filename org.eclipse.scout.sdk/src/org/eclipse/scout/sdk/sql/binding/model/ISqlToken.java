@@ -12,14 +12,13 @@ package org.eclipse.scout.sdk.sql.binding.model;
 
 /**
  * <h3>{@link ISqlToken}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 25.02.2011
  */
 public interface ISqlToken {
-  public static final int TYPE_PARAMETER = 1;
-  public static final int TYPE_STRING_FRAGMENT = 2;
+  int TYPE_PARAMETER = 1;
+  int TYPE_STRING_FRAGMENT = 2;
 
   int getType();
-
 }

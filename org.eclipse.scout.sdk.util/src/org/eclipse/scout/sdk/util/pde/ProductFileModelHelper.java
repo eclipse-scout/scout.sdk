@@ -43,7 +43,7 @@ import org.w3c.dom.Node;
 
 /**
  * Helper class for basic product file operations.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0
  */
@@ -63,14 +63,14 @@ public final class ProductFileModelHelper {
 
   /**
    * Creates a new helper that operates on the given product file.
-   * 
+   *
    * @param project
    *          The project in which the given path should be used.
    * @param projRelPathToProduct
    *          The path relative to the given project root pointing to the product file
    * @throws CoreException
-   * @throws IllegalArgumentException
-   *           when the given path is not valid or the file does not exist
+   * @throws when
+   *           the given path is not valid or the file does not exist
    */
   public ProductFileModelHelper(IProject project, IPath projRelPathToProduct) throws CoreException {
     this(project.getFile(projRelPathToProduct));
@@ -78,14 +78,14 @@ public final class ProductFileModelHelper {
 
   /**
    * Creates a new helper that operates on the given product file.
-   * 
+   *
    * @param project
    *          The project in which the given path should be used.
    * @param projRelPathToProduct
    *          The path relative to the given project root pointing to the product file
    * @throws CoreException
-   * @throws IllegalArgumentException
-   *           when the given path is not valid or the file does not exist
+   * @throws when
+   *           the given path is not valid or the file does not exist
    */
   public ProductFileModelHelper(IProject project, String projRelPathToProduct) throws CoreException {
     this(project.getFile(projRelPathToProduct));
@@ -93,12 +93,12 @@ public final class ProductFileModelHelper {
 
   /**
    * Creates a new helper that operates on the given product file.
-   * 
+   *
    * @param productFile
    *          The product file
    * @throws CoreException
-   * @throws IllegalArgumentException
-   *           when the given path is not valid or the file does not exist
+   * @throws when
+   *           the given path is not valid or the file does not exist
    */
   public ProductFileModelHelper(IFile productFile) throws CoreException {
     m_model = new LazyProductFileModel(productFile);
@@ -109,7 +109,7 @@ public final class ProductFileModelHelper {
 
   /**
    * <h3>{@link DependencyType}</h3>Specifies the type of dependency in a .product file.
-   * 
+   *
    * @author Matthias Villiger
    * @since 3.10.0 19.09.2013
    */
@@ -130,7 +130,7 @@ public final class ProductFileModelHelper {
     Feature
   }
 
-  public static class ProductFilePart {
+  public static final class ProductFilePart {
     private final LazyProductFileModel m_model;
 
     private ProductFilePart(LazyProductFileModel model) {
@@ -140,7 +140,7 @@ public final class ProductFileModelHelper {
     /**
      * Adds the given plug-in id to the dependencies of this product.<br>
      * If the given plug-in is already in the list, this method does nothing.
-     * 
+     *
      * @param pluginId
      *          The plug-in id.
      * @throws CoreException
@@ -152,7 +152,7 @@ public final class ProductFileModelHelper {
     /**
      * Adds the given id to the dependencies of this product.<br>
      * If the given dependency already exists, this method does nothing.
-     * 
+     *
      * @param id
      *          The id to add (feature id, fragment or plug-in symbolic name).
      * @param type
@@ -183,7 +183,7 @@ public final class ProductFileModelHelper {
      * TODO can be eliminated when Eclipse 3.8 is the oldest version that the SDK supports (the bug was solved for
      * Eclipse 3.8. Must be verified though).<br>
      * Then use m_model.getWorkspaceProductModel().getFactory().createPlugin() to create instances.
-     * 
+     *
      * @see <a href="http://bugs.eclipse.org/bugs/show_bug.cgi?id=362398">Bugzilla #362398</a>
      */
     private P_ProductPlugin createPlugin(String pluginId, boolean isFragment) throws CoreException {
@@ -194,7 +194,7 @@ public final class ProductFileModelHelper {
      * Checks if the given id is already in the dependencies of this product.<br>
      * The id can either be a feature id (for feature based products) or a bundle symbolic name (for plug-in based
      * products). If a plug-in id is given, this plug-in is also searched within the features of feature based products.
-     * 
+     *
      * @param pluginOrFeatureId
      *          The feature id or plug-in symbolic name
      * @return true if the given dependency is already in the product.
@@ -247,7 +247,7 @@ public final class ProductFileModelHelper {
 
     /**
      * Removes the given dependency (feature id or plug-in symbolic name) from the dependency list of this product.
-     * 
+     *
      * @param id
      *          The feature id or plug-in symbolic name.
      * @throws CoreException
@@ -259,7 +259,7 @@ public final class ProductFileModelHelper {
 
     /**
      * Checks if the product is valid or not.
-     * 
+     *
      * @return true if the product is valid, false otherwise.
      * @throws CoreException
      */
@@ -279,7 +279,7 @@ public final class ProductFileModelHelper {
      * constraints are returned.<br>
      * <br>
      * If the product is feature based, this method returns an empty array.
-     * 
+     *
      * @return the plug-in models of all plug-ins this product is dependent of.
      * @throws CoreException
      */
@@ -309,7 +309,7 @@ public final class ProductFileModelHelper {
     /**
      * Gets the symbolic names of all plug-ins of the product associated with this helper.<br>
      * If the product is feature based, this method returns an empty array.
-     * 
+     *
      * @return The symbolic names of all plug-ins in the product.
      * @throws CoreException
      */
@@ -324,7 +324,7 @@ public final class ProductFileModelHelper {
 
     /**
      * Gets the {@link IProduct} model for this product.
-     * 
+     *
      * @return the product model.
      * @throws CoreException
      */
@@ -335,14 +335,14 @@ public final class ProductFileModelHelper {
 
   /**
    * saves all changes of all underlying models that require saving.
-   * 
+   *
    * @throws CoreException
    */
   public void save() throws CoreException {
     m_model.save();
   }
 
-  public static class ConfigurationFilePart {
+  public static final class ConfigurationFilePart {
     private final LazyProductFileModel m_model;
 
     private ConfigurationFilePart(LazyProductFileModel model) {
@@ -351,7 +351,7 @@ public final class ProductFileModelHelper {
 
     /**
      * Gets the value of the config file entry with the given key.
-     * 
+     *
      * @param key
      *          The key to search.
      * @return The value of the given key in the config file (or null if it does not exist).
@@ -363,7 +363,7 @@ public final class ProductFileModelHelper {
 
     /**
      * Checks if the given key exists in the config file.
-     * 
+     *
      * @param key
      *          The key to search.
      * @return true if the key exists, false otherwise.
@@ -376,7 +376,7 @@ public final class ProductFileModelHelper {
     /**
      * Sets the value of the entry with the given key.<br>
      * If the key does not exist, it is created.
-     * 
+     *
      * @param key
      *          The key to create or update.
      * @param value
@@ -389,7 +389,7 @@ public final class ProductFileModelHelper {
 
     /**
      * Removes the given key from the configuration file.
-     * 
+     *
      * @param key
      *          The key to remove
      * @throws CoreException
@@ -400,7 +400,7 @@ public final class ProductFileModelHelper {
 
     /**
      * Gets the value of the "osgi.bundles" entry of the config file.
-     * 
+     *
      * @return The value of the "osgi.bundles" entry.
      * @throws CoreException
      */
@@ -410,7 +410,7 @@ public final class ProductFileModelHelper {
 
     /**
      * Sets the value of the "osgi.bundles" entry of the config file.
-     * 
+     *
      * @param value
      *          The new value of the entry.
      * @throws CoreException
@@ -421,7 +421,7 @@ public final class ProductFileModelHelper {
 
     /**
      * Gets the configuration file of this product.
-     * 
+     *
      * @return The config file or null if this product has no config file specified.
      * @throws CoreException
      */
@@ -432,7 +432,7 @@ public final class ProductFileModelHelper {
     /**
      * Gets a map of all key-value-pairs that exist in the config file.<br>
      * Changes to the map have no effect to the config file.
-     * 
+     *
      * @return A map with all key-value-pairs.
      * @throws CoreException
      */
@@ -445,10 +445,10 @@ public final class ProductFileModelHelper {
    * TODO can be eliminated when Eclipse 3.8 is the oldest version that the SDK supports (the bug was solved for Eclipse
    * 3.8. Must be verified though).<br>
    * Then use m_model.getWorkspaceProductModel().getFactory().createPlugin() to create instances.
-   * 
+   *
    * @see <a href="http://bugs.eclipse.org/bugs/show_bug.cgi?id=362398">Bugzilla #362398</a>
    */
-  private static class P_ProductPlugin extends ProductPlugin {
+  private static final class P_ProductPlugin extends ProductPlugin {
     private static final long serialVersionUID = 1L;
     private boolean m_fragment;
 

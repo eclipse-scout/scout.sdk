@@ -22,6 +22,9 @@ import org.eclipse.scout.commons.CompositeObject;
  */
 public class TypeComparators {
 
+  protected TypeComparators() {
+  }
+
   protected static final Comparator<IType> NAME_COMPARATOR = new Comparator<IType>() {
     @Override
     public int compare(IType t1, IType t2) {

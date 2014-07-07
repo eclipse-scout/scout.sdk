@@ -240,7 +240,7 @@ public final class RuntimeClasses implements IRuntimeClasses {
     return SignatureCache.createTypeSignature(superType);
   }
 
-  private static class P_PreferenceChangeListener implements IPreferenceChangeListener {
+  private static final class P_PreferenceChangeListener implements IPreferenceChangeListener {
     private Map<String, StringHolder> m_projectConfig;
 
     private P_PreferenceChangeListener(Map<String, StringHolder> projectConfigs) {
@@ -256,7 +256,7 @@ public final class RuntimeClasses implements IRuntimeClasses {
     }
   }
 
-  private static class P_ScoutWorkspaceListener implements IScoutWorkspaceListener {
+  private static final class P_ScoutWorkspaceListener implements IScoutWorkspaceListener {
     @Override
     public void workspaceChanged(ScoutWorkspaceEvent event) {
       if (event.getType() == ScoutWorkspaceEvent.TYPE_BUNDLE_REMOVED) {

@@ -61,7 +61,7 @@ public class InstallTextFileOperation implements IOperation {
   }
 
   @Override
-  public void validate() throws IllegalArgumentException {
+  public void validate() {
     if (getDstProject() == null) {
       throw new IllegalArgumentException("project can not be null.");
     }

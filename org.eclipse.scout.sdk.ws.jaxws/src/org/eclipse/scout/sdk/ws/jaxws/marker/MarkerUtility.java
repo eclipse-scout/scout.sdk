@@ -26,7 +26,10 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants.MarkerType;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.marker.commands.IMarkerCommand;
 
-public class MarkerUtility {
+public final class MarkerUtility {
+
+  private MarkerUtility() {
+  }
 
   public static int getQuality(IPage page, IScoutBundle bundle, String groupUUID) {
     int quality = IMarker.SEVERITY_INFO;

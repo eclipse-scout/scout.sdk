@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
@@ -155,7 +156,7 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
 
   @Override
   protected RGB parseDisplayInput(String input) throws CoreException {
-    if (input == null || input.trim().length() == 0) {
+    if (!StringUtility.hasText(input)) {
       return null;
     }
     if (!input.matches("(|[A-Fa-f0-9]{6})")) {
