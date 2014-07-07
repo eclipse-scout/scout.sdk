@@ -26,8 +26,8 @@ import org.junit.Test;
 
 /**
  * <h3>{@link TableColumnNewOperationTest}</h3> ...
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class TableColumnNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -41,7 +41,7 @@ public class TableColumnNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType column = colOp.getCreatedColumn();
     SdkAssert.assertExist(column);
     SdkAssert.assertPublic(column).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(column, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(column, Double.valueOf(1000));
     SdkAssert.assertHasSuperType(column, IRuntimeClasses.IStringColumn);
     SdkAssert.assertMethodExist(table, "getSampleColumn01");
     // clean up
@@ -62,7 +62,7 @@ public class TableColumnNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType column = colOp.getCreatedColumn();
     SdkAssert.assertExist(column);
     SdkAssert.assertPublic(column).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(column, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(column, Double.valueOf(1000));
     SdkAssert.assertHasSuperType(column, IRuntimeClasses.IDateColumn);
     SdkAssert.assertMethodExist(column, SdkProperties.METHOD_NAME_GET_CONFIGURED_HEADER_TEXT);
     SdkAssert.assertMethodExist(table, "getSampleColumn02");
@@ -86,10 +86,10 @@ public class TableColumnNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType column = colOp.getCreatedColumn();
     SdkAssert.assertExist(column);
     SdkAssert.assertPublic(column).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(column, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(firstColumn, Double.valueOf(20));
-    SdkAssert.assertOrderAnnotation(secondColumn, Double.valueOf(30));
-    SdkAssert.assertOrderAnnotation(thirdColumn, Double.valueOf(40));
+    SdkAssert.assertOrderAnnotation(column, Double.valueOf(0));
+    SdkAssert.assertOrderAnnotation(firstColumn, Double.valueOf(1000));
+    SdkAssert.assertOrderAnnotation(secondColumn, Double.valueOf(2000));
+    SdkAssert.assertOrderAnnotation(thirdColumn, Double.valueOf(3000));
     SdkAssert.assertElementSequenceInSource(new IMember[]{column, firstColumn, secondColumn, thirdColumn});
     SdkAssert.assertHasSuperType(column, IRuntimeClasses.ISmartColumn);
     SdkAssert.assertMethodExist(table, "getSampleColumn03");
@@ -113,10 +113,10 @@ public class TableColumnNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType column = colOp.getCreatedColumn();
     SdkAssert.assertExist(column);
     SdkAssert.assertPublic(column).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(firstColumn, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(column, Double.valueOf(20));
-    SdkAssert.assertOrderAnnotation(secondColumn, Double.valueOf(30));
-    SdkAssert.assertOrderAnnotation(thirdColumn, Double.valueOf(40));
+    SdkAssert.assertOrderAnnotation(firstColumn, Double.valueOf(1000));
+    SdkAssert.assertOrderAnnotation(column, Double.valueOf(1500));
+    SdkAssert.assertOrderAnnotation(secondColumn, Double.valueOf(2000));
+    SdkAssert.assertOrderAnnotation(thirdColumn, Double.valueOf(3000));
     SdkAssert.assertElementSequenceInSource(new IMember[]{firstColumn, column, secondColumn, thirdColumn});
     SdkAssert.assertHasSuperType(column, IRuntimeClasses.ISmartColumn);
     SdkAssert.assertMethodExist(table, "getSampleColumn04");
@@ -139,10 +139,10 @@ public class TableColumnNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType column = colOp.getCreatedColumn();
     SdkAssert.assertExist(column);
     SdkAssert.assertPublic(column).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(firstColumn, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(secondColumn, Double.valueOf(20));
-    SdkAssert.assertOrderAnnotation(thirdColumn, Double.valueOf(30));
-    SdkAssert.assertOrderAnnotation(column, Double.valueOf(40));
+    SdkAssert.assertOrderAnnotation(firstColumn, Double.valueOf(1000));
+    SdkAssert.assertOrderAnnotation(secondColumn, Double.valueOf(2000));
+    SdkAssert.assertOrderAnnotation(thirdColumn, Double.valueOf(3000));
+    SdkAssert.assertOrderAnnotation(column, Double.valueOf(4000));
     SdkAssert.assertElementSequenceInSource(new IMember[]{firstColumn, secondColumn, thirdColumn, column});
     SdkAssert.assertHasSuperType(column, IRuntimeClasses.ILongColumn);
     SdkAssert.assertMethodExist(table, "getSampleColumn05");

@@ -29,7 +29,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link ListBoxFieldNewOperationTest}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
@@ -53,8 +53,8 @@ public class ListBoxFieldNewOperationTest extends AbstractSdkTestWithSampleProje
     IType field = fieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.IListBox);
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(field, true);
@@ -65,7 +65,7 @@ public class ListBoxFieldNewOperationTest extends AbstractSdkTestWithSampleProje
   public void testNewFieldWithLookupCall() throws Exception {
     Assert.assertTrue(TypeUtility.exists(getSharedJavaProject()));
     IType mainBox = TypeUtility.getType("sample.client.empty.EmptyForm.MainBox");
-    ListBoxFieldNewOperation fieldNewOp = new ListBoxFieldNewOperation("TestField01", mainBox);
+    ListBoxFieldNewOperation fieldNewOp = new ListBoxFieldNewOperation("TestField02", mainBox);
     fieldNewOp.setSuperTypeSignature(Signature.createTypeSignature("org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox" + "<" + File.class.getName() + ">", true));
     fieldNewOp.setCodeType(TypeUtility.getType("sample.shared.services.code.EmptyCodeType"));
     IType okButton = TypeUtility.getType("sample.client.empty.EmptyForm.MainBox.OkButton");
@@ -74,8 +74,8 @@ public class ListBoxFieldNewOperationTest extends AbstractSdkTestWithSampleProje
     IType field = fieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.IListBox);
     SdkAssert.assertMethodExist(field, "getConfiguredCodeType");
     // clean up
@@ -87,7 +87,7 @@ public class ListBoxFieldNewOperationTest extends AbstractSdkTestWithSampleProje
   public void testNewFieldWithNlsText() throws Exception {
     Assert.assertTrue(TypeUtility.exists(getSharedJavaProject()));
     IType mainBox = TypeUtility.getType("sample.client.empty.EmptyForm.MainBox");
-    ListBoxFieldNewOperation fieldNewOp = new ListBoxFieldNewOperation("TestField01", mainBox);
+    ListBoxFieldNewOperation fieldNewOp = new ListBoxFieldNewOperation("TestField03", mainBox);
     fieldNewOp.setSuperTypeSignature(Signature.createTypeSignature("org.eclipse.scout.rt.client.ui.form.fields.listbox.AbstractListBox" + "<" + File.class.getName() + ">", true));
     //nls
     INlsProject nlsProject = ScoutTypeUtility.findNlsProject(getSharedJavaProject());
@@ -100,8 +100,8 @@ public class ListBoxFieldNewOperationTest extends AbstractSdkTestWithSampleProje
     IType field = fieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.IListBox);
     SdkAssert.assertMethodExist(field, SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
     // clean up

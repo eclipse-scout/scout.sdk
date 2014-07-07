@@ -28,8 +28,8 @@ import org.junit.Test;
 
 /**
  * <h3>{@link TreeBoxNewOperationTest}</h3> ...
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class TreeBoxNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -46,11 +46,12 @@ public class TreeBoxNewOperationTest extends AbstractSdkTestWithSampleProject {
     IType field = fieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.ITreeBox);
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     IType tree = SdkAssert.assertTypeExists(field, SdkProperties.TYPE_NAME_TREEBOX_TREE);
     SdkAssert.assertHasSuperType(tree, IRuntimeClasses.ITree);
+    SdkAssert.assertOrderAnnotation(tree, Double.valueOf(1000));
 
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(field, true);
@@ -74,12 +75,13 @@ public class TreeBoxNewOperationTest extends AbstractSdkTestWithSampleProject {
     IType field = fieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.ITreeBox);
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     SdkAssert.assertMethodExist(field, SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
     IType tree = SdkAssert.assertTypeExists(field, SdkProperties.TYPE_NAME_TREEBOX_TREE);
     SdkAssert.assertHasSuperType(tree, IRuntimeClasses.ITree);
+    SdkAssert.assertOrderAnnotation(tree, Double.valueOf(1000));
 
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(field, true);
@@ -98,9 +100,9 @@ public class TreeBoxNewOperationTest extends AbstractSdkTestWithSampleProject {
     IType field = fieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.ITreeBox);
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     SdkAssert.assertEquals(0, field.getTypes().length);
 
     // clean up

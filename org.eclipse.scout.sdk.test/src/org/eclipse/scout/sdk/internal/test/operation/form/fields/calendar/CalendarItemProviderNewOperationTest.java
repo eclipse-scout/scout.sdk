@@ -27,7 +27,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link CalendarItemProviderNewOperationTest}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
@@ -48,7 +48,7 @@ public class CalendarItemProviderNewOperationTest extends AbstractSdkTestWithSam
     Set<IType> itemProviders = TypeUtility.getInnerTypesOrdered(calendar, TypeUtility.getType(RuntimeClasses.ICalendarItemProvider), ScoutTypeComparators.getOrderAnnotationComparator());
     SdkAssert.assertEquals(2, itemProviders.size());
     SdkAssert.assertEquals(calendarItemProviderOp.getElementName(), CollectionUtility.firstElement(itemProviders).getElementName());
-    SdkAssert.assertOrderAnnotation(itemProvider, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(itemProvider, Double.valueOf(-1000));
 
     // clean up
     JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();
@@ -73,7 +73,7 @@ public class CalendarItemProviderNewOperationTest extends AbstractSdkTestWithSam
     IType[] itemProviders = ip.toArray(new IType[ip.size()]);
     SdkAssert.assertEquals(2, itemProviders.length);
     SdkAssert.assertEquals(calendarItemProviderOp.getElementName(), itemProviders[1].getElementName());
-    SdkAssert.assertOrderAnnotation(itemProvider, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(itemProvider, Double.valueOf(2000));
 
     // clean up
     JavaElementDeleteOperation delOp = new JavaElementDeleteOperation();

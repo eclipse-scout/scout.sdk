@@ -29,8 +29,8 @@ import org.junit.Test;
 
 /**
  * <h3>{@link FormNewOperationTest}</h3> ...
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class FormNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -72,7 +72,7 @@ public class FormNewOperationTest extends AbstractSdkTestWithSampleProject {
     // check cancel button
     IType cancelButton = SdkAssert.assertTypeExists(formOp.getCreatedMainBox(), SdkProperties.TYPE_NAME_CANCEL_BUTTON);
     SdkAssert.assertPublic(cancelButton).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(cancelButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(cancelButton, Double.valueOf(100000));
     IMethod cancelGetter = SdkAssert.assertMethodExist(formOp.getCreatedType(), "get" + SdkProperties.TYPE_NAME_CANCEL_BUTTON);
     SdkAssert.assertPublic(cancelGetter).assertNoMoreFlags();
 
@@ -103,14 +103,14 @@ public class FormNewOperationTest extends AbstractSdkTestWithSampleProject {
     // check ok button
     IType okButton = SdkAssert.assertTypeExists(formOp.getCreatedMainBox(), SdkProperties.TYPE_NAME_OK_BUTTON);
     SdkAssert.assertPublic(okButton).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(100000));
     IMethod okGetter = SdkAssert.assertMethodExist(formOp.getCreatedType(), "get" + SdkProperties.TYPE_NAME_OK_BUTTON);
     SdkAssert.assertPublic(okGetter).assertNoMoreFlags();
 
     // check cancel button
     IType cancelButton = SdkAssert.assertTypeExists(formOp.getCreatedMainBox(), SdkProperties.TYPE_NAME_CANCEL_BUTTON);
     SdkAssert.assertPublic(cancelButton).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(cancelButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(cancelButton, Double.valueOf(101000));
     IMethod cancelGetter = SdkAssert.assertMethodExist(formOp.getCreatedType(), "get" + SdkProperties.TYPE_NAME_CANCEL_BUTTON);
     SdkAssert.assertPublic(cancelGetter).assertNoMoreFlags();
 

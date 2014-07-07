@@ -83,7 +83,7 @@ public class TreeBoxNewOperation implements IOperation {
     }
     String superTypeFqn = SignatureUtility.getFullyQualifiedName(getSuperTypeSignature());
     if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractTreeBox)) {
-      // create inner type calendar
+      // create inner type tree
       ITypeSourceBuilder treeBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_TREEBOX_TREE);
       treeBuilder.setFlags(Flags.AccPublic);
       treeBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITree, getDeclaringType().getJavaProject()));

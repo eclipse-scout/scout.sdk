@@ -13,11 +13,9 @@ package org.eclipse.scout.sdk.internal.test.operation.jdt;
 import java.util.List;
 
 import org.eclipse.jdt.core.Flags;
-import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CollectionUtility;
@@ -42,7 +40,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link TypeNewOperationTest}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 08.02.2013
  */
@@ -74,7 +72,6 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     delOp.addMember(createdType);
     executeBuildAssertNoCompileErrors(delOp);
     SdkAssert.assertNotExist(createdCompilationUnit);
-
   }
 
   @Test
@@ -232,11 +229,8 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     innerTypeOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IFormField));
     innerTypeOp.setSibling(TypeUtility.getType("jdt.test.client.TestForm.MainBox.StringField"));
     executeBuildAssertNoCompileErrors(innerTypeOp);
-    IAnnotation annotation = innerTypeOp.getCreatedType().getAnnotation("Order");
-    Assert.assertTrue(TypeUtility.exists(annotation));
-    IMemberValuePair[] memberValuePairs = annotation.getMemberValuePairs();
-    Assert.assertEquals(1, memberValuePairs.length);
-    Assert.assertEquals(Double.valueOf(10), memberValuePairs[0].getValue());
+    SdkAssert.assertOrderAnnotation(innerTypeOp.getCreatedType(), -1000.0);
+
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(innerTypeOp.getCreatedType(), false);
     TestWorkspaceUtility.executeAndBuildWorkspace(delOp);
@@ -252,11 +246,8 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     innerTypeOp.setOrderDefinitionType(TypeUtility.getType(RuntimeClasses.IFormField));
     TestWorkspaceUtility.executeAndBuildWorkspace(innerTypeOp);
     TestWorkspaceUtility.assertNoCompileErrors();
-    IAnnotation annotation = innerTypeOp.getCreatedType().getAnnotation("Order");
-    Assert.assertTrue(TypeUtility.exists(annotation));
-    IMemberValuePair[] memberValuePairs = annotation.getMemberValuePairs();
-    Assert.assertEquals(1, memberValuePairs.length);
-    Assert.assertEquals(Double.valueOf(120), memberValuePairs[0].getValue());
+    SdkAssert.assertOrderAnnotation(innerTypeOp.getCreatedType(), 2000.0);
+
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(innerTypeOp.getCreatedType(), false);
     TestWorkspaceUtility.executeAndBuildWorkspace(delOp);
@@ -273,11 +264,8 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     innerTypeOp.setSibling(TypeUtility.getType("jdt.test.client.TestForm.MainBox.GroupBox"));
     TestWorkspaceUtility.executeAndBuildWorkspace(innerTypeOp);
     TestWorkspaceUtility.assertNoCompileErrors();
-    IAnnotation annotation = innerTypeOp.getCreatedType().getAnnotation("Order");
-    Assert.assertTrue(TypeUtility.exists(annotation));
-    IMemberValuePair[] memberValuePairs = annotation.getMemberValuePairs();
-    Assert.assertEquals(1, memberValuePairs.length);
-    Assert.assertEquals(Double.valueOf(40), memberValuePairs[0].getValue());
+    SdkAssert.assertOrderAnnotation(innerTypeOp.getCreatedType(), 35.0);
+
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(innerTypeOp.getCreatedType(), false);
     TestWorkspaceUtility.executeAndBuildWorkspace(delOp);
@@ -294,11 +282,8 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     innerTypeOp.setSibling(TypeUtility.getType("jdt.test.client.TestForm.MainBox.GroupBox"));
     TestWorkspaceUtility.executeAndBuildWorkspace(innerTypeOp);
     TestWorkspaceUtility.assertNoCompileErrors();
-    IAnnotation annotation = innerTypeOp.getCreatedType().getAnnotation("Order");
-    Assert.assertTrue(TypeUtility.exists(annotation));
-    IMemberValuePair[] memberValuePairs = annotation.getMemberValuePairs();
-    Assert.assertEquals(1, memberValuePairs.length);
-    Assert.assertEquals(Double.valueOf(40), memberValuePairs[0].getValue());
+    SdkAssert.assertOrderAnnotation(innerTypeOp.getCreatedType(), 35.0);
+
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(innerTypeOp.getCreatedType(), false);
     TestWorkspaceUtility.executeAndBuildWorkspace(delOp);
@@ -306,7 +291,6 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     Assert.assertFalse(TypeUtility.exists(innerTypeOp.getCreatedType()));
   }
 
-//
   private IType createTestType(String typeName) throws Exception {
     IJavaProject clientProject = getClientJavaProject();
     Assert.assertTrue(TypeUtility.exists(clientProject));
@@ -317,5 +301,4 @@ public class TypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
     TestWorkspaceUtility.assertNoCompileErrors();
     return typeOp.getCreatedType();
   }
-
 }

@@ -27,8 +27,8 @@ import org.junit.Test;
 
 /**
  * <h3>{@link StringFieldNewOperationTest}</h3> ...
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class StringFieldNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -45,9 +45,9 @@ public class StringFieldNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType field = booleanFieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.IStringField);
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
 
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(field, true);
@@ -71,9 +71,9 @@ public class StringFieldNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType field = booleanFieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.IStringField);
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     SdkAssert.assertMethodExist(field, SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
 
     // clean up

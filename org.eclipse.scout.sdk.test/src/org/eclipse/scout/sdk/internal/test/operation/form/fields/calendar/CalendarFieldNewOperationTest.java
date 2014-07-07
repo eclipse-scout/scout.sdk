@@ -23,7 +23,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link CalendarFieldNewOperationTest}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
@@ -42,11 +42,11 @@ public class CalendarFieldNewOperationTest extends AbstractSdkTestWithSampleProj
     testApiOfMainBox();
 
     IType field = fieldNewOp.getCreatedCalendarField();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     IType calendar = fieldNewOp.getCreatedCalendar();
     SdkAssert.assertExist(calendar);
-    SdkAssert.assertOrderAnnotation(calendar, Double.valueOf(10));
+    SdkAssert.assertOrderAnnotation(calendar, Double.valueOf(1000));
 
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(field, true);
@@ -66,8 +66,8 @@ public class CalendarFieldNewOperationTest extends AbstractSdkTestWithSampleProj
 
     testApiOfMainBox01();
     // additional asserts
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
 
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(field, true);

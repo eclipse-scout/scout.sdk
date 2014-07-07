@@ -27,8 +27,8 @@ import org.junit.Test;
 
 /**
  * <h3>{@link SmartFieldNewOperationTest}</h3> ...
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */
 public class SmartFieldNewOperationTest extends AbstractSdkTestWithSampleProject {
@@ -52,8 +52,8 @@ public class SmartFieldNewOperationTest extends AbstractSdkTestWithSampleProject
     IType field = fieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.ISmartField);
     // clean up
     FormFieldDeleteOperation delOp = new FormFieldDeleteOperation(field, true);
@@ -77,8 +77,8 @@ public class SmartFieldNewOperationTest extends AbstractSdkTestWithSampleProject
     IType field = fieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.ISmartField);
     SdkAssert.assertMethodExist(field, SdkProperties.METHOD_NAME_GET_CONFIGURED_LABEL);
 
@@ -100,8 +100,8 @@ public class SmartFieldNewOperationTest extends AbstractSdkTestWithSampleProject
     IType field = fieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.ISmartField);
     SdkAssert.assertMethodExist(field, "getConfiguredCodeType");
     // clean up
@@ -122,8 +122,8 @@ public class SmartFieldNewOperationTest extends AbstractSdkTestWithSampleProject
     IType field = fieldNewOp.getCreatedField();
     SdkAssert.assertExist(field);
     SdkAssert.assertPublic(field).assertNoMoreFlags();
-    SdkAssert.assertOrderAnnotation(field, Double.valueOf(10));
-    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(20));
+    SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
+    SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
     SdkAssert.assertHasSuperType(field, RuntimeClasses.ISmartField);
     SdkAssert.assertMethodExist(field, "getConfiguredLookupCall");
     // clean up

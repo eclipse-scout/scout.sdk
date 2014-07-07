@@ -169,15 +169,15 @@ public class PersonForm extends AbstractForm {
           return getColumnSet().getColumnByClass(DoubleColumn.class);
         }
 
-        @Order(10.0)
+        @Order(1000.0)
         public class DoubleColumn extends AbstractDoubleColumn {
         }
 
-        @Order(20.0)
+        @Order(2000.0)
         public class LongColumn extends AbstractLongColumn {
         }
 
-        @Order(30.0)
+        @Order(3000.0)
         public class StringColumn extends AbstractStringColumn {
         }
       }
