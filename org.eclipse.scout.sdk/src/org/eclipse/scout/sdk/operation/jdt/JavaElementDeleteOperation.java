@@ -166,7 +166,7 @@ public class JavaElementDeleteOperation implements IOperation {
   }
 
   private void deletePackageFragment(IPackageFragment packageFragment, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
-    ManifestExportPackageOperation exportOp = new ManifestExportPackageOperation(ExportPolicy.RemovePackage, packageFragment, false);
+    ManifestExportPackageOperation exportOp = new ManifestExportPackageOperation(ExportPolicy.REMOVE_PACKAGE, packageFragment, false);
     exportOp.validate();
     exportOp.run(monitor, manager);
     packageFragment.delete(true, monitor);

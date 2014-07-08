@@ -70,7 +70,7 @@ public class SearchFormNewOperation extends FormNewOperation {
       PrimaryTypeNewOperation formDataTypeNewOp = new PrimaryTypeNewOperation(formDataTypeName, getSearchFormDataPackageName(), ScoutUtility.getJavaProject(getSearchFormDataLocationBundle()));
       formDataTypeNewOp.addMethodSourceBuilder(MethodSourceBuilderFactory.createConstructorSourceBuilder(formDataTypeName));
       formDataTypeNewOp.setFlags(Flags.AccPublic);
-      formDataTypeNewOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+      formDataTypeNewOp.setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
       formDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormData));
       formDataTypeNewOp.validate();
       formDataTypeNewOp.run(monitor, workingCopyManager);

@@ -116,7 +116,7 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
 
   private class P_SearchRequestor extends org.eclipse.jdt.core.search.SearchRequestor {
     private TreeMap<CompositeObject, IContentProposal> m_foundTypes = new TreeMap<CompositeObject, IContentProposal>();
-    private int counter = 0;
+    private int m_counter = 0;
 
     public P_SearchRequestor(IProgressMonitor monitor) {
     }
@@ -137,17 +137,15 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
         else {
           m_foundTypes.put(new CompositeObject("A", type.getElementName(), type.getFullyQualifiedName()), new JavaTypeProposal(type));
         }
-        if (counter++ > 98) {
+        if (m_counter++ > 98) {
           throw new CoreException(new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, "stopped after 50"));
         }
-
       }
     }
 
     public Collection<IContentProposal> getResult() {
       return m_foundTypes.values();
     }
-
   }
 
 }

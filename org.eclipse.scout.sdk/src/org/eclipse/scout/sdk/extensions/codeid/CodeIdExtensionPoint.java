@@ -34,10 +34,10 @@ public final class CodeIdExtensionPoint {
   private static final String ATTRIB_GENERIC_TYPE = "genericType";
   private static final String ATTRIB_PRIO = "priority";
 
-  private static final Object codeIdProviderExtensionsCacheLock = new Object();
+  private static final Object CODE_ID_PROV_LOCK = new Object();
   private static volatile ICodeIdProvider[] codeIdProviderExtensions;
 
-  private static final Object codeIdParsersExtensionsCacheLock = new Object();
+  private static final Object CODE_ID_PARSER_LOCK = new Object();
   private static HashMap<String, TreeMap<CompositeObject, ICodeIdParser>> codeIdParsers;
 
   private CodeIdExtensionPoint() {
@@ -47,7 +47,7 @@ public final class CodeIdExtensionPoint {
    * @return all extensions in the prioritized order.
    */
   private static ICodeIdProvider[] getCodeIdProviderExtensions() {
-    synchronized (codeIdProviderExtensionsCacheLock) {
+    synchronized (CODE_ID_PROV_LOCK) {
       if (codeIdProviderExtensions == null) {
         TreeMap<CompositeObject, ICodeIdProvider> providers = new TreeMap<CompositeObject, ICodeIdProvider>();
         IExtensionRegistry reg = Platform.getExtensionRegistry();
@@ -90,7 +90,7 @@ public final class CodeIdExtensionPoint {
   }
 
   private static HashMap<String, TreeMap<CompositeObject, ICodeIdParser>> getCodeIdParsers() {
-    synchronized (codeIdParsersExtensionsCacheLock) {
+    synchronized (CODE_ID_PARSER_LOCK) {
       if (codeIdParsers == null) {
         HashMap<String, TreeMap<CompositeObject, ICodeIdParser>> parsers = new HashMap<String, TreeMap<CompositeObject, ICodeIdParser>>();
         IExtensionRegistry reg = Platform.getExtensionRegistry();

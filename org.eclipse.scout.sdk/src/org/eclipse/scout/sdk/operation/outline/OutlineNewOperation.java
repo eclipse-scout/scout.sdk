@@ -69,7 +69,7 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
     setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IOutline, getJavaProject()));
     getCompilationUnitNewOp().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
-    setPackageExportPolicy(ExportPolicy.AddPackage);
+    setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
     setFormatSource(true);
   }
 

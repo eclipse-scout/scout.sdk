@@ -142,7 +142,7 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
     m_portTypeField = getFieldToolkit().createStyledTextField(parent, Texts.get("PortType"));
     m_portTypeField.setEnabled(false);
 
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       m_deriveOtherNameButton = new Button(parent, SWT.CHECK);
       m_deriveOtherNameButton.setSelection(isDeriveOtherNames());
       m_deriveOtherNameButton.setText(Texts.get("DeriveOtherNamesFormPortTypeChosen"));
@@ -200,7 +200,7 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
     formData.right = new FormAttachment(100, 0);
     m_portTypeField.setLayoutData(formData);
 
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       formData = new FormData();
       formData.top = new FormAttachment(m_portTypeField, 5, SWT.BOTTOM);
       formData.left = new FormAttachment(40, 5);

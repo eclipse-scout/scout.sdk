@@ -18,7 +18,7 @@ import org.eclipse.swt.graphics.Color;
 
 /**
  * <h3>TreeNode</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 30.01.2010
  */
@@ -35,9 +35,9 @@ public class TreeNode implements ITreeNode {
   private int m_orderNr = 0;
   private Color m_foreground;
   private Color m_background;
-
   private ITreeNode m_parent;
-  private List<ITreeNode> m_children = new ArrayList<ITreeNode>();
+
+  private final List<ITreeNode> m_children = new ArrayList<ITreeNode>();
 
   public TreeNode(String type, String text) {
     this(type, text, null);

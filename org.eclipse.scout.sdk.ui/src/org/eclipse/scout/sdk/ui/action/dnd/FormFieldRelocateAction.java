@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.widgets.Shell;
 
 public class FormFieldRelocateAction extends Action {
-  private boolean createCopy;
+  private boolean m_createCopy;
   private int m_location;
   private IType m_formField;
   private IType m_targetDeclaringType;
@@ -100,11 +100,11 @@ public class FormFieldRelocateAction extends Action {
   }
 
   public void setCreateCopy(boolean createCopy) {
-    this.createCopy = createCopy;
+    this.m_createCopy = createCopy;
   }
 
   public boolean isCreateCopy() {
-    return createCopy;
+    return m_createCopy;
   }
 
   public void setLocation(int location) {

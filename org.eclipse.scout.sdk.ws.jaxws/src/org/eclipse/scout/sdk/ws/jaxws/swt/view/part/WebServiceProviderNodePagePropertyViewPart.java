@@ -197,7 +197,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       createSection(SECTION_ID_STUB_PROPERTIES, Texts.get("StubProperties"));
 
       StubRebuildAction b = new StubRebuildAction();
-      b.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource(), getPage().getMarkerGroupUUID(), WebserviceEnum.Provider);
+      b.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource(), getPage().getMarkerGroupUUID(), WebserviceEnum.PROVIDER);
       m_rebuildStubPresenter = new ActionPresenter(getSection(SECTION_ID_STUB_PROPERTIES).getSectionClient(), b, getFormToolkit());
       applyLayoutData(m_rebuildStubPresenter);
 
@@ -356,7 +356,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       applyLayoutData(m_stubJarFilePresenter);
 
       // wsdl folder
-      m_wsdlFolderPresenter = new WsdlFolderPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit(), WebserviceEnum.Provider);
+      m_wsdlFolderPresenter = new WsdlFolderPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit(), WebserviceEnum.PROVIDER);
       m_wsdlFolderPresenter.setLabel(Texts.get("WsdlFolder"));
       m_wsdlFolderPresenter.setBundle(m_bundle);
       m_wsdlFolderPresenter.setMarkerType(MarkerType.WsdlFolder);
@@ -521,14 +521,14 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
 
       // QuickLink 'Open sun-jaxws.xml'
       FileOpenAction a = new FileOpenAction();
-      a.init(ResourceFactory.getSunJaxWsResource(m_bundle).getFile(), ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.Xml);
+      a.init(ResourceFactory.getSunJaxWsResource(m_bundle).getFile(), ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.XML);
       a.setToolTip(Texts.get("JaxWsDeploymentDescriptor"));
       ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit());
       applyLayoutData(actionPresenter);
 
       // QuickLink 'Open build-jaxws.xml'
       FileOpenAction b = new FileOpenAction();
-      b.init(ResourceFactory.getBuildJaxWsResource(m_bundle).getFile(), ResourceFactory.getBuildJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), FileExtensionType.Xml);
+      b.init(ResourceFactory.getBuildJaxWsResource(m_bundle).getFile(), ResourceFactory.getBuildJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), FileExtensionType.XML);
       actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit());
       b.setToolTip(Texts.get("JaxWsBuildDescriptor"));
       applyLayoutData(actionPresenter);
@@ -541,7 +541,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
       IFile wsdlFile = getPage().getWsdlResource().getFile();
       if (wsdlFile != null) {
         FileOpenAction c = new FileOpenAction();
-        c.init(wsdlFile, wsdlFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
+        c.init(wsdlFile, wsdlFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.AUTO);
         c.setToolTip("Web Services Description Language");
         actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), c, getFormToolkit());
         actionPresenter.setEnabled(wsdlFile.exists());
@@ -569,7 +569,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
         public void onReferencedWsdlArtifact(WsdlArtifact<IFile> wsdlArtifact) {
           IFileHandle<IFile> fileHandle = wsdlArtifact.getFileHandle();
           FileOpenAction action = new FileOpenAction();
-          action.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
+          action.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.AUTO);
 
           ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient(), action, getFormToolkit());
           actionPresenter.setEnabled(fileHandle.exists());
@@ -581,7 +581,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
           IFileHandle<IFile> fileHandle = schemaIncludeArtifact.getFileHandle();
 
           FileOpenAction b = new FileOpenAction();
-          b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
+          b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.AUTO);
           ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS).getSectionClient(), b, getFormToolkit());
           actionPresenter.setEnabled(fileHandle.exists());
           applyLayoutData(actionPresenter);
@@ -592,7 +592,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
           IFileHandle<IFile> fileHandle = schemaImportArtifact.getFileHandle();
 
           FileOpenAction b = new FileOpenAction();
-          b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
+          b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.AUTO);
           b.setToolTip("namespace: " + StringUtility.nvl(schemaImportArtifact.getNamespaceUri(), "?"));
           ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS).getSectionClient(), b, getFormToolkit());
           actionPresenter.setEnabled(fileHandle.exists());
@@ -724,7 +724,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
 
     if (valid) {
       StubRebuildAction action = new StubRebuildAction();
-      action.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource(), getPage().getMarkerGroupUUID(), WebserviceEnum.Provider);
+      action.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource(), getPage().getMarkerGroupUUID(), WebserviceEnum.PROVIDER);
       m_rebuildStubPresenter.setAction(action);
     }
   }

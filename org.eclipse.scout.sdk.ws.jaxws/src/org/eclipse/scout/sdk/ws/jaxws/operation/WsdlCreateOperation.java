@@ -190,7 +190,7 @@ public class WsdlCreateOperation implements IOperation {
       messageRequest.setUndefined(false);
       messageRequest.setQName(new QName(definition.getNamespace("tns"), m_serviceOperationName + "Request"));
       Part messagePartRequest = definition.createPart();
-      if (getWsdlStyle() == WsdlStyleEnum.DocumentLiteralWrapped) {
+      if (getWsdlStyle() == WsdlStyleEnum.DOCUMENT_LITERAL_WRAPPED) {
         // naming of part name and element reference must follow document/literal WRAPPED convention
         messagePartRequest.setName("parameters");
         messagePartRequest.setElementName(new QName(definition.getNamespace("tns"), m_serviceOperationName));
@@ -208,7 +208,7 @@ public class WsdlCreateOperation implements IOperation {
       messageResponse.setUndefined(false);
       messageResponse.setQName(new QName(definition.getNamespace("tns"), m_serviceOperationName + "Response"));
       Part messagePartResponse = definition.createPart();
-      if (getWsdlStyle() == WsdlStyleEnum.DocumentLiteralWrapped) {
+      if (getWsdlStyle() == WsdlStyleEnum.DOCUMENT_LITERAL_WRAPPED) {
         // naming of part name and element reference must follow document/literal WRAPPED convention
         messagePartResponse.setName("parameters");
         messagePartResponse.setElementName(new QName(definition.getNamespace("tns"), m_serviceOperationName + "Response"));
@@ -250,7 +250,7 @@ public class WsdlCreateOperation implements IOperation {
 
       // definition of request
       Element schemaElementXml;
-      if (getWsdlStyle() == WsdlStyleEnum.DocumentLiteralWrapped) {
+      if (getWsdlStyle() == WsdlStyleEnum.DOCUMENT_LITERAL_WRAPPED) {
         schemaElementXml = createDocumentLiteralWrappedSchemaElement(document, messagePartRequest, "in", "xsd:string");
         schemaXml.appendChild(schemaElementXml);
       }
@@ -260,7 +260,7 @@ public class WsdlCreateOperation implements IOperation {
       schemaXml.appendChild(schemaElementXml);
 
       // definition of response
-      if (getWsdlStyle() == WsdlStyleEnum.DocumentLiteralWrapped) {
+      if (getWsdlStyle() == WsdlStyleEnum.DOCUMENT_LITERAL_WRAPPED) {
         schemaElementXml = createDocumentLiteralWrappedSchemaElement(document, messagePartResponse, "out", "xsd:string");
         schemaXml.appendChild(schemaElementXml);
       }

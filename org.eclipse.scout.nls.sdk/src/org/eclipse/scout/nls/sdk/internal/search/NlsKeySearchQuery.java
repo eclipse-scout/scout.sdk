@@ -12,7 +12,6 @@ package org.eclipse.scout.nls.sdk.internal.search;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.search.internal.ui.text.FileSearchQuery;
@@ -49,7 +48,7 @@ public class NlsKeySearchQuery extends FileSearchQuery {
   }
 
   @Override
-  public IStatus run(IProgressMonitor monitor) throws OperationCanceledException {
+  public IStatus run(IProgressMonitor monitor) {
     NlsFindKeysJob nlsFindReferencesJob = new NlsFindKeysJob(getNlsKey(), getLabel());
     nlsFindReferencesJob.run(monitor);
     Match[] matches = nlsFindReferencesJob.getMatches(getNlsKey());

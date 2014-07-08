@@ -18,7 +18,7 @@ public class JavaCodeRange {
   public static final int PRIMITIV_TYPE = 2;
   public static final int QUALIFIED_TYPE = 3;
 
-  private int type = UNKNOWN;
+  private int m_type = UNKNOWN;
   public int offset = -1;
   public int lenght = -1;
 
@@ -42,11 +42,11 @@ public class JavaCodeRange {
   }
 
   public int getType() {
-    return type;
+    return m_type;
   }
 
   public void setType(int type) {
-    this.type = type;
+    this.m_type = type;
   }
 
   @Override

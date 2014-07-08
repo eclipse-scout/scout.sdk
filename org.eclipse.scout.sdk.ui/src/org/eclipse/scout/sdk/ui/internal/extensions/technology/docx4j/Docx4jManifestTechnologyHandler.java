@@ -48,10 +48,10 @@ public class Docx4jManifestTechnologyHandler extends AbstractScoutTechnologyHand
           new String[]{DOCX4J_SCOUT_PLUGIN},
           new String[]{DOCX4J_PLUGIN,},
           new String[]{DOCX4J_SDK_PLUGIN});
-      if (FeatureInstallResult.LicenseNotAccepted.equals(result)) {
+      if (FeatureInstallResult.LICENSE_NOT_ACCEPTED.equals(result)) {
         return false; // abort processing if the installation would be necessary but the license was not accepted.
       }
-      else if (FeatureInstallResult.InstallationSuccessful.equals(result)) {
+      else if (FeatureInstallResult.INSTALLATION_SUCCESSFUL.equals(result)) {
         m_newPluginsInstalled = true; // remember if we have installed new plug-in so that we can ask for a restart later on.
       }
     }

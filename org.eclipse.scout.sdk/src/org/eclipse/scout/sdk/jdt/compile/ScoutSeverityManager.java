@@ -31,10 +31,10 @@ import org.eclipse.scout.sdk.util.IScoutSeverityListener;
 
 public final class ScoutSeverityManager {
 
-  private static final ScoutSeverityManager instance = new ScoutSeverityManager();
+  private static final ScoutSeverityManager INSTANCE = new ScoutSeverityManager();
 
   public static ScoutSeverityManager getInstance() {
-    return instance;
+    return INSTANCE;
   }
 
   private EventListenerList m_listenerList;

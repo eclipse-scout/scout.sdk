@@ -96,7 +96,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
     addPage(m_wsdlLocationWizardPage);
 
     // WS properties of existing WSDL Wizard Page
-    m_wsPropertiesExistingWsdlWizardPage = new WsPropertiesExistingWsdlWizardPage(m_bundle, WebserviceEnum.Consumer);
+    m_wsPropertiesExistingWsdlWizardPage = new WsPropertiesExistingWsdlWizardPage(m_bundle, WebserviceEnum.CONSUMER);
     m_wsPropertiesExistingWsdlWizardPage.setTitle(Texts.get("CreateWsConsumer"));
     m_wsPropertiesExistingWsdlWizardPage.addPropertyChangeListener(new P_WsPropertiesPropertyListener());
     addPage(m_wsPropertiesExistingWsdlWizardPage);
@@ -142,7 +142,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
     m_copyOperations = copyOperations.toArray(new ExternalFileCopyOperation[copyOperations.size()]);
 
     // prepare buildJaxWs.xml operation
-    m_buildJaxWsEntryCreateOperation = new BuildJaxWsEntryCreateOperation(WebserviceEnum.Consumer);
+    m_buildJaxWsEntryCreateOperation = new BuildJaxWsEntryCreateOperation(WebserviceEnum.CONSUMER);
     m_buildJaxWsEntryCreateOperation.setBundle(m_bundle);
     m_buildJaxWsEntryCreateOperation.setAlias(m_alias);
     m_buildJaxWsEntryCreateOperation.setWsdlProjectRelativePath(wsdlFolder.getProjectRelativePath().append(wsdlFile.getName()));
@@ -217,7 +217,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
           op.setBundle(m_bundle);
           op.setWsdlDestinationFolder(m_wsdlLocationWizardPage.getWsdlFolder());
           op.setSchemaTargetNamespace(schemaTargetNamespace);
-          if (candidate.getWsdlArtifact().getTypeEnum() == TypeEnum.ReferencedWsdl) {
+          if (candidate.getWsdlArtifact().getTypeEnum() == TypeEnum.REFERENCED_WSDL) {
             op.setWsdlLocation(candidate.getWsdlArtifact().getFileHandle().getFile());
           }
           op.setProjectRelativePath(bindingFilePath);
@@ -241,7 +241,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
       IFile stubJarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, m_buildJaxWsEntryCreateOperation.getBuildProperties(), m_wsdlFileName);
       IType portTypeInterfaceType = JaxWsSdkUtility.resolvePortTypeInterfaceType(m_portTypeQName, stubJarFile);
 
-      // wait for stub JAR to be part of classpth
+      // wait for stub JAR to be part of classpath
       int maxWaitLoops = 10;
       while (portTypeInterfaceType == null && maxWaitLoops > 0) {
         try {
@@ -278,10 +278,6 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
       m_buildJaxWsEntryCreateOperation.validate();
       m_buildJaxWsEntryCreateOperation.run(monitor, workingCopyManager);
       return true;
-    }
-    catch (Exception e) {
-      JaxWsSdk.logError(e);
-      return false;
     }
     finally {
       JaxWsSdk.getDefault().getMarkerQueueManager().resume();

@@ -136,7 +136,7 @@ public class BuildJaxWsBean {
     }
 
     String nodeName;
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       nodeName = BuildJaxWsBean.XML_PROVIDER;
     }
     else {
@@ -161,7 +161,7 @@ public class BuildJaxWsBean {
     }
 
     String nodeName;
-    if (webserviceEnum == WebserviceEnum.Provider) {
+    if (webserviceEnum == WebserviceEnum.PROVIDER) {
       nodeName = BuildJaxWsBean.XML_PROVIDER;
     }
     else {

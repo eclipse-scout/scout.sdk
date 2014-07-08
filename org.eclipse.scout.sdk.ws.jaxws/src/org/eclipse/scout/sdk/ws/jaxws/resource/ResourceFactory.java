@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -19,8 +19,8 @@ import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public final class ResourceFactory {
 
-  private static final Map<IScoutBundle, XmlResource> sm_sunJaxWsResourceMap = new HashMap<IScoutBundle, XmlResource>();
-  private static final Map<IScoutBundle, XmlResource> sm_buildJaxWsResourceMap = new HashMap<IScoutBundle, XmlResource>();
+  private static final Map<IScoutBundle, XmlResource> SM_SUN_JAX_WS_RESOURCE_MAP = new HashMap<IScoutBundle, XmlResource>();
+  private static final Map<IScoutBundle, XmlResource> SM_BUILD_JAXWS_RESOURCE_MAP = new HashMap<IScoutBundle, XmlResource>();
 
   private ResourceFactory() {
   }
@@ -30,12 +30,12 @@ public final class ResourceFactory {
   }
 
   public static synchronized XmlResource getSunJaxWsResource(IScoutBundle bundle, boolean autoCreate) {
-    if (!sm_sunJaxWsResourceMap.containsKey(bundle)) {
+    if (!SM_SUN_JAX_WS_RESOURCE_MAP.containsKey(bundle)) {
       XmlResource resource = new XmlResource(bundle);
       resource.setFile(JaxWsSdkUtility.getFile(bundle, JaxWsConstants.PATH_SUN_JAXWS, autoCreate));
-      sm_sunJaxWsResourceMap.put(bundle, resource);
+      SM_SUN_JAX_WS_RESOURCE_MAP.put(bundle, resource);
     }
-    XmlResource xmlResource = sm_sunJaxWsResourceMap.get(bundle);
+    XmlResource xmlResource = SM_SUN_JAX_WS_RESOURCE_MAP.get(bundle);
     if (autoCreate && (xmlResource.getFile() == null || !xmlResource.existsFile())) {
       xmlResource.setFile(JaxWsSdkUtility.getFile(bundle, JaxWsConstants.PATH_SUN_JAXWS, autoCreate));
     }
@@ -47,12 +47,12 @@ public final class ResourceFactory {
   }
 
   public static synchronized XmlResource getBuildJaxWsResource(IScoutBundle bundle, boolean autoCreate) {
-    if (!sm_buildJaxWsResourceMap.containsKey(bundle)) {
+    if (!SM_BUILD_JAXWS_RESOURCE_MAP.containsKey(bundle)) {
       XmlResource resource = new XmlResource(bundle);
       resource.setFile(JaxWsSdkUtility.getFile(bundle, JaxWsConstants.PATH_BUILD_JAXWS, autoCreate));
-      sm_buildJaxWsResourceMap.put(bundle, resource);
+      SM_BUILD_JAXWS_RESOURCE_MAP.put(bundle, resource);
     }
-    XmlResource xmlResource = sm_buildJaxWsResourceMap.get(bundle);
+    XmlResource xmlResource = SM_BUILD_JAXWS_RESOURCE_MAP.get(bundle);
     if (autoCreate && (xmlResource.getFile() == null || !xmlResource.existsFile())) {
       xmlResource.setFile(JaxWsSdkUtility.getFile(bundle, JaxWsConstants.PATH_BUILD_JAXWS, autoCreate));
     }

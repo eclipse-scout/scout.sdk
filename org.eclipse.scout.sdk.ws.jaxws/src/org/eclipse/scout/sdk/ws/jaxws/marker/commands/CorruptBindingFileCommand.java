@@ -71,7 +71,7 @@ public class CorruptBindingFileCommand extends AbstractExecutableMarkerCommand {
       if (wsdlArtifact.getInlineSchemas().length > 1) {
         op.setSchemaTargetNamespace(SchemaUtility.getSchemaTargetNamespace(m_schemaCandidate.getSchema()));
       }
-      if (wsdlArtifact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
+      if (wsdlArtifact.getTypeEnum() == TypeEnum.REFERENCED_WSDL) {
         op.setWsdlLocation(wsdlArtifact.getFileHandle().getFile());
       }
     }

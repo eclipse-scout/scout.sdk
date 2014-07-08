@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.viewer;
 
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.SearchRangeStyledLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.graphics.Image;
 

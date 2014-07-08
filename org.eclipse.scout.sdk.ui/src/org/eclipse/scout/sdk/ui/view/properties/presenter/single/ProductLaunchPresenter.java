@@ -30,9 +30,9 @@ import org.eclipse.pde.ui.launcher.EclipseLaunchShortcut;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.FileOpenLink;
 import org.eclipse.scout.sdk.ui.internal.view.properties.model.links.LinksPresenterModel;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.LinksPresenter;
@@ -76,7 +76,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   private P_LaunchListener m_launchListener;
   private P_RecomputeLaunchStateJob m_stateUpdateJob;
 
-  private static final Object m_lock = new Object();
+  private static final Object LOCK = new Object();
   private static final String MAC_OS_X_SWING_WARNING_MESSAGE_KEY = "scoutSwingMacOsXWarningKey";
   public static final String TERMINATED_MODE = "terminated";
 
@@ -374,7 +374,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
   }
 
   private void recomputeLaunchState() {
-    synchronized (m_lock) {
+    synchronized (LOCK) {
       if (getContainer() != null && !getContainer().isDisposed()) {
         getContainer().getDisplay().asyncExec(new Runnable() {
           @Override

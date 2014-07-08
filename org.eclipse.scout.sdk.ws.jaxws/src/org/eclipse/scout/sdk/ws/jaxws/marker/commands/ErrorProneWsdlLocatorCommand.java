@@ -168,7 +168,7 @@ public class ErrorProneWsdlLocatorCommand extends AbstractExecutableMarkerComman
     workingCopyManager.reconcile(declaringType.getCompilationUnit(), monitor);
     workingCopyManager.unregister(icu, monitor);
 
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       JaxWsSdk.getDefault().notifyPageReload(WebServiceProviderNodePage.class, m_markerGroupUUID, WebServiceProviderNodePage.DATA_STUB_FILES);
     }
     else {

@@ -140,7 +140,7 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
     List<Element> childElements = JaxWsSdkUtility.getChildElements(sunJaxWsXmlDocument.getDocumentElement().getChildNodes(), tagName);
     for (Element sunJaxWsXml : childElements) {
       SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
-      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.Provider);
+      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.PROVIDER);
       if (buildJaxWsBean == null) {
         // only consider by-contract providers
         continue;
@@ -164,7 +164,7 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
       if (!TypeUtility.exists(consumerType)) {
         continue;
       }
-      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, consumerType.getElementName(), WebserviceEnum.Consumer);
+      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, consumerType.getElementName(), WebserviceEnum.CONSUMER);
       if (buildJaxWsBean == null) {
         continue;
       }

@@ -50,7 +50,7 @@ public class ProviderTablePage extends AbstractPage {
   @Override
   protected void loadChildrenImpl() {
     new WebServiceProviderTablePage(this);
-    new AuthenticationHandlerTablePage(this, WebserviceEnum.Provider);
+    new AuthenticationHandlerTablePage(this, WebserviceEnum.PROVIDER);
     new CredentialValidationStrategyTablePage(this);
   }
 }

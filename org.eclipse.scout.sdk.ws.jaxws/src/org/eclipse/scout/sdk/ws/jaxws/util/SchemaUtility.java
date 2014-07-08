@@ -54,7 +54,7 @@ public final class SchemaUtility {
     }
 
     // root WSDL file
-    WsdlArtifact<T> rootWsdlArtifact = new WsdlArtifact<T>(wsdlFileHandle, TypeEnum.RootWsdl, wsdlDefinition);
+    WsdlArtifact<T> rootWsdlArtifact = new WsdlArtifact<T>(wsdlFileHandle, TypeEnum.ROOT_WSDL, wsdlDefinition);
     visitor.onRootWsdlArtifact(rootWsdlArtifact);
 
     Set<WsdlArtifact<T>> wsdlArtifacts = new HashSet<WsdlArtifact<T>>();
@@ -122,7 +122,7 @@ public final class SchemaUtility {
             IFileHandle<T> wsdlFileHandle = folder.getChild(new Path(importDirective.getLocationURI()));
 
             if (wsdlFileHandle != null) {
-              wsdlArtifacts.add(new WsdlArtifact<T>(wsdlFileHandle, TypeEnum.ReferencedWsdl, wsdlDefinition));
+              wsdlArtifacts.add(new WsdlArtifact<T>(wsdlFileHandle, TypeEnum.REFERENCED_WSDL, wsdlDefinition));
 
               // recursion
               wsdlArtifacts.addAll(getReferencedWsdlResourcesRec(wsdlFileHandle, wsdlDefinition));
@@ -273,7 +273,8 @@ public final class SchemaUtility {
     }
 
     public static enum TypeEnum {
-      RootWsdl, ReferencedWsdl;
+      ROOT_WSDL,
+      REFERENCED_WSDL;
     }
   }
 

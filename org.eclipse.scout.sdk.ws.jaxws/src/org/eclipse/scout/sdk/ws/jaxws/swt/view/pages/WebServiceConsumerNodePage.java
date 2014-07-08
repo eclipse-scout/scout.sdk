@@ -159,7 +159,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
       ((WsConsumerDeleteAction) menu).init(m_bundle, getType(), getBuildJaxWsBean());
     }
     else if (menu instanceof StubRebuildAction) {
-      ((StubRebuildAction) menu).init(m_bundle, getBuildJaxWsBean(), getWsdlResource(), m_markerGroupUUID, WebserviceEnum.Consumer);
+      ((StubRebuildAction) menu).init(m_bundle, getBuildJaxWsBean(), getWsdlResource(), m_markerGroupUUID, WebserviceEnum.CONSUMER);
     }
   }
 
@@ -168,7 +168,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
     try {
       if ((dataMask & DATA_BUILD_JAXWS_ENTRY) > 0) {
         if (getBuildJaxWsBean() == null) {
-          m_buildJaxWsBean = BuildJaxWsBean.load(m_bundle, getType().getElementName(), WebserviceEnum.Consumer);
+          m_buildJaxWsBean = BuildJaxWsBean.load(m_bundle, getType().getElementName(), WebserviceEnum.CONSUMER);
         }
         else {
           m_buildJaxWsBean.reload(m_bundle);
@@ -252,7 +252,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
         if (isPageUnloaded() || !TypeUtility.exists(getType())) {
           return;
         }
-        if (!MarkerRebuildUtility.rebuildBuildJaxWsMarkers(getBuildJaxWsResource().getFile(), m_buildJaxWsBean, getType().getElementName(), m_wsdlResource, m_markerGroupUUID, m_bundle, WebserviceEnum.Consumer)) {
+        if (!MarkerRebuildUtility.rebuildBuildJaxWsMarkers(getBuildJaxWsResource().getFile(), m_buildJaxWsBean, getType().getElementName(), m_wsdlResource, m_markerGroupUUID, m_bundle, WebserviceEnum.CONSUMER)) {
           return;
         }
         if (!MarkerRebuildUtility.rebuildBindingFileMarkers(getBuildJaxWsResource().getFile(), m_bindingFileResources, m_wsdlResource, m_markerGroupUUID, m_bundle)) {

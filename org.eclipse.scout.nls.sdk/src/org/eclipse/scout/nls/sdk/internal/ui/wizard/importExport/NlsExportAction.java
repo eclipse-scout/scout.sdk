@@ -21,6 +21,8 @@ package org.eclipse.scout.nls.sdk.internal.ui.wizard.importExport;
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 
+import java.util.List;
+
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.wizard.WizardDialog;
 import org.eclipse.scout.nls.sdk.extension.NlsExportImportExtensionPoints;
@@ -31,7 +33,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h4>NlsExportAction</h4>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.1.0 (12.11.2010)
  */
@@ -46,10 +48,8 @@ public class NlsExportAction extends Action {
     m_parentShell = shell;
     setImageDescriptor(NlsCore.getImageDescriptor(NlsCore.ICON_TOOL_EXPORT));
 
-    WizardExtension[] wizExts = NlsExportImportExtensionPoints.getExtensions(NlsExportImportExtensionPoints.EXTENSION_POINT_ID_NLS_EXPORTER);
-    boolean exportWizardsAvailable = wizExts != null && wizExts.length > 0;
-
-    setEnabled(nlsProject != null && exportWizardsAvailable);
+    List<WizardExtension> wizExts = NlsExportImportExtensionPoints.getExtensions(NlsExportImportExtensionPoints.EXTENSION_POINT_ID_NLS_EXPORTER);
+    setEnabled(nlsProject != null && wizExts.size() > 0);
   }
 
   @Override

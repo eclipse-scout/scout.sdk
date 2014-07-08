@@ -16,8 +16,8 @@ import java.util.TreeSet;
 
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
-import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;

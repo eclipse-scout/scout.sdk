@@ -35,6 +35,6 @@ public class ConsumerTablePage extends AbstractPage {
   @Override
   protected void loadChildrenImpl() {
     new WebServiceConsumerTablePage(this);
-    new AuthenticationHandlerTablePage(this, WebserviceEnum.Consumer);
+    new AuthenticationHandlerTablePage(this, WebserviceEnum.CONSUMER);
   }
 }

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.internal.ui.wizard.importExport;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ILabelProviderListener;
@@ -34,7 +36,7 @@ import org.eclipse.swt.widgets.Table;
 
 /**
  * <h4>SelectNlsExporterWizardPage</h4>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.1.0 (12.11.2010)
  */
@@ -122,7 +124,8 @@ public class ImportExportWizardPage extends WizardPage {
 
     @Override
     public Object[] getElements(Object inputElement) {
-      return NlsExportImportExtensionPoints.getExtensions(m_extensionPointId);
+      List<WizardExtension> exts = NlsExportImportExtensionPoints.getExtensions(m_extensionPointId);
+      return exts.toArray(new WizardExtension[exts.size()]);
     }
 
     @Override

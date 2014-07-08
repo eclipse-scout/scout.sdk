@@ -65,7 +65,7 @@ import org.eclipse.swt.widgets.Table;
 
 /**
  * <h3>{@link LibraryTypeWizardPage}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 06.03.2012
  */
@@ -78,9 +78,9 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
   protected static final String PROP_USER_BUNDLES = "userBundles";
 
   public static enum LibraryType {
-    Plugin,
-    Fragment,
-    SystemBundleFragment
+    PLUGIN,
+    FRAGMENT,
+    SYSTEM_BUNDLE_FRAGMENT
   }
 
   private StyledTextField m_bundleNameField;
@@ -105,7 +105,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewLibraryBundle"));
     setDescription(Texts.get("NewLibraryBundleDesc"));
     // defaults
-    setLibraryType(LibraryType.Plugin);
+    setLibraryType(LibraryType.PLUGIN);
     TreeSet<IScoutBundle> libraryUserBundles = new TreeSet<IScoutBundle>(new P_JavaProjectComparator());
     if (ownerBundle != null) {
       libraryUserBundles.add(ownerBundle);
@@ -150,9 +150,9 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     Group group = new Group(parent, SWT.NONE);
     final SelectionListener radioButtonListener = new P_RadioButtonSelectionListener();
     m_pluginRadioButton = new Button(group, SWT.RADIO);
-    m_pluginRadioButton.setSelection(getLibraryType() == LibraryType.Plugin);
+    m_pluginRadioButton.setSelection(getLibraryType() == LibraryType.PLUGIN);
     m_pluginRadioButton.addSelectionListener(radioButtonListener);
-    m_pluginRadioButton.setData(PROP_LIBRARY_TYPE, LibraryType.Plugin);
+    m_pluginRadioButton.setData(PROP_LIBRARY_TYPE, LibraryType.PLUGIN);
     m_pluginRadioButton.setText(Texts.get("CreatePluginForLib"));
     Control userPluginBox = createUserPluginBox(group);
 
@@ -160,9 +160,9 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     Label separator2 = new Label(group, SWT.SEPARATOR | SWT.HORIZONTAL);
 
     m_fragmentRadioButton = new Button(group, SWT.RADIO);
-    m_fragmentRadioButton.setSelection(getLibraryType() == LibraryType.Fragment);
+    m_fragmentRadioButton.setSelection(getLibraryType() == LibraryType.FRAGMENT);
     m_fragmentRadioButton.addSelectionListener(radioButtonListener);
-    m_fragmentRadioButton.setData(PROP_LIBRARY_TYPE, LibraryType.Fragment);
+    m_fragmentRadioButton.setData(PROP_LIBRARY_TYPE, LibraryType.FRAGMENT);
     m_fragmentRadioButton.setText(Texts.get("CreateFragmentForLib"));
 
     Control fragmentBox = createFragmentBox(group);
@@ -172,9 +172,9 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     separator2.setText("test");
 
     m_systemFragmentRadioButton = new Button(group, SWT.RADIO);
-    m_systemFragmentRadioButton.setSelection(getLibraryType() == LibraryType.SystemBundleFragment);
+    m_systemFragmentRadioButton.setSelection(getLibraryType() == LibraryType.SYSTEM_BUNDLE_FRAGMENT);
     m_systemFragmentRadioButton.addSelectionListener(radioButtonListener);
-    m_systemFragmentRadioButton.setData(PROP_LIBRARY_TYPE, LibraryType.SystemBundleFragment);
+    m_systemFragmentRadioButton.setData(PROP_LIBRARY_TYPE, LibraryType.SYSTEM_BUNDLE_FRAGMENT);
     m_systemFragmentRadioButton.setText(Texts.get("CreateSystemFragmentForLib"));
 
     //layout
@@ -195,7 +195,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     Composite box = new Composite(parent, SWT.NONE);
     Table pluginTable = new Table(box, SWT.FULL_SELECTION | SWT.BORDER);
     m_userBundleViewer = new TableViewer(pluginTable);
-    m_userBundleViewer.getTable().setEnabled(getLibraryType() == LibraryType.Plugin);
+    m_userBundleViewer.getTable().setEnabled(getLibraryType() == LibraryType.PLUGIN);
     m_userBundleViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
@@ -209,7 +209,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     Composite buttonGroup = new Composite(box, SWT.NONE);
     m_addUserBundleButton = new Button(buttonGroup, SWT.PUSH | SWT.FLAT);
     m_addUserBundleButton.setText(Texts.get("Add"));
-    m_addUserBundleButton.setEnabled(getLibraryType() == LibraryType.Plugin);
+    m_addUserBundleButton.setEnabled(getLibraryType() == LibraryType.PLUGIN);
     m_addUserBundleButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -254,10 +254,10 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    m_hostBundleIdField.setEnabled(getLibraryType() == LibraryType.Fragment);
+    m_hostBundleIdField.setEnabled(getLibraryType() == LibraryType.FRAGMENT);
     m_fragmentHostBundleSelectionButton = new Button(m_hostBundleIdField, SWT.PUSH | SWT.FLAT);
     m_fragmentHostBundleSelectionButton.setText(Texts.get("Bundle"));
-    m_fragmentHostBundleSelectionButton.setEnabled(getLibraryType() == LibraryType.Fragment);
+    m_fragmentHostBundleSelectionButton.setEnabled(getLibraryType() == LibraryType.FRAGMENT);
     m_fragmentHostBundleSelectionButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -374,13 +374,13 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
       setLibraryTypeInternal(libraryType);
       if (isControlCreated()) {
         switch (libraryType) {
-          case Plugin:
+          case PLUGIN:
             m_pluginRadioButton.setSelection(true);
             break;
-          case Fragment:
+          case FRAGMENT:
             m_fragmentRadioButton.setSelection(true);
             break;
-          case SystemBundleFragment:
+          case SYSTEM_BUNDLE_FRAGMENT:
             m_systemFragmentRadioButton.setSelection(true);
             break;
         }
@@ -455,7 +455,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected void validateStatusFragmentGroup(MultiStatus multiStatus) {
-    if (getLibraryType() == LibraryType.Fragment) {
+    if (getLibraryType() == LibraryType.FRAGMENT) {
       multiStatus.add(getStatusHostBundle());
     }
   }
@@ -482,21 +482,21 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
         try {
           setStateChanging(true);
           switch (libraryType) {
-            case Plugin:
+            case PLUGIN:
               m_hostBundleIdField.setEnabled(false);
               m_fragmentHostBundleSelectionButton.setEnabled(false);
               m_userBundleViewer.getTable().setEnabled(true);
               m_addUserBundleButton.setEnabled(true);
               m_removeUserBundleButton.setEnabled(!m_userBundleViewer.getSelection().isEmpty());
               break;
-            case Fragment:
+            case FRAGMENT:
               m_hostBundleIdField.setEnabled(true);
               m_fragmentHostBundleSelectionButton.setEnabled(true);
               m_userBundleViewer.getTable().setEnabled(false);
               m_addUserBundleButton.setEnabled(false);
               m_removeUserBundleButton.setEnabled(false);
               break;
-            case SystemBundleFragment:
+            case SYSTEM_BUNDLE_FRAGMENT:
               m_hostBundleIdField.setEnabled(false);
               m_fragmentHostBundleSelectionButton.setEnabled(false);
               m_userBundleViewer.getTable().setEnabled(false);

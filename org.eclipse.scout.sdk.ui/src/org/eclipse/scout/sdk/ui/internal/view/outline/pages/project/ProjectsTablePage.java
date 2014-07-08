@@ -26,9 +26,9 @@ import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutProjectNewAction;
 import org.eclipse.scout.sdk.ui.action.dto.TypeResolverFormDataAction;
 import org.eclipse.scout.sdk.ui.action.dto.TypeResolverPageDataAction;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSupport;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -69,7 +69,7 @@ public class ProjectsTablePage extends AbstractPage {
       }
       else if (ScoutExplorerSettingsSupport.PREF_HIDDEN_WORKING_SETS.equals(event.getProperty()) ||
           ScoutExplorerSettingsSupport.PREF_WORKING_SETS_ORDER.equals(event.getProperty())) {
-        if (ScoutExplorerSettingsSupport.BundlePresentation.WorkingSet.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+        if (ScoutExplorerSettingsSupport.BundlePresentation.WORKING_SET.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
           markStructureDirty();
         }
       }
@@ -79,7 +79,7 @@ public class ProjectsTablePage extends AbstractPage {
   private final IPropertyChangeListener m_workingSetConfigChangeListener = new IPropertyChangeListener() {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-      if (ScoutExplorerSettingsSupport.BundlePresentation.WorkingSet.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+      if (ScoutExplorerSettingsSupport.BundlePresentation.WORKING_SET.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
         markStructureDirty();
       }
     }
@@ -124,21 +124,21 @@ public class ProjectsTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    if (ScoutExplorerSettingsSupport.BundlePresentation.Flat.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+    if (ScoutExplorerSettingsSupport.BundlePresentation.FLAT.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
       // flat display
       Set<IScoutBundle> allBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutExplorerSettingsBundleFilter.get(), ScoutBundleComparators.getSymbolicNameAscComparator());
       for (IScoutBundle b : allBundles) {
         createBundlePage(this, b);
       }
     }
-    else if (ScoutExplorerSettingsSupport.BundlePresentation.Hierarchical.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+    else if (ScoutExplorerSettingsSupport.BundlePresentation.HIERARCHICAL.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
       // hierarchical display
       for (IScoutBundle root : ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(
           ScoutBundleFilters.getFilteredRootBundlesFilter(ScoutExplorerSettingsBundleFilter.get()), ScoutBundleComparators.getSymbolicNameAscComparator())) {
         createBundlePage(this, root);
       }
     }
-    else if (ScoutExplorerSettingsSupport.BundlePresentation.WorkingSet.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+    else if (ScoutExplorerSettingsSupport.BundlePresentation.WORKING_SET.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
       // show working sets
       for (IWorkingSet ws : ScoutExplorerSettingsSupport.get().getScoutWorkingSets(false)) {
         new ScoutWorkingSetTablePage(this, ws);
@@ -147,7 +147,7 @@ public class ProjectsTablePage extends AbstractPage {
     else {
       ScoutBundleTreeModel uiModel = new ScoutBundleTreeModel();
       uiModel.build();
-      if (ScoutExplorerSettingsSupport.BundlePresentation.FlatGroups.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+      if (ScoutExplorerSettingsSupport.BundlePresentation.FLAT_GROUPS.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
         // flat grouped
         HashSet<ScoutBundleNodeGroup> collector = new HashSet<ScoutBundleNodeGroup>();
         collectAllBundleGroupsRec(collector, uiModel.getRoots());

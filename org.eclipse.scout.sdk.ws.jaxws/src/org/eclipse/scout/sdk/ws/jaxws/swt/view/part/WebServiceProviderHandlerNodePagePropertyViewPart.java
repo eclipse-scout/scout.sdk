@@ -97,7 +97,7 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
 
       // QuickLink 'Open sun-jaxws.xml'
       FileOpenAction a = new FileOpenAction();
-      a.init(ResourceFactory.getSunJaxWsResource(m_bundle).getFile(), ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.Xml);
+      a.init(ResourceFactory.getSunJaxWsResource(m_bundle).getFile(), ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.XML);
       a.setToolTip(Texts.get("JaxWsDeploymentDescriptor"));
       ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit());
       applyLayoutData(actionPresenter);
@@ -163,7 +163,7 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
         // Edit Filter
         HandlerChainFilterEditAction filterAction = new HandlerChainFilterEditAction();
         FilterTypeEnum filterType = getFilterType(sunJaxWsBean, xmlHandlerChain);
-        if (filterType != FilterTypeEnum.NoFilter) {
+        if (filterType != FilterTypeEnum.NO_FILTER) {
           filterAction.setLinkText(Texts.get("EditFilterXActive", filterType.getLabel()));
         }
         filterAction.init(m_bundle, getPage().getSunJaxWsBean(), xmlHandlerChain);
@@ -223,15 +223,15 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
 
   private FilterTypeEnum getFilterType(SunJaxWsBean sunJaxWsBean, Element xmlHandlerChain) {
     if (JaxWsSdkUtility.getChildElement(xmlHandlerChain.getChildNodes(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PROTOCOL)) != null) {
-      return FilterTypeEnum.ProtocolFilter;
+      return FilterTypeEnum.PROTOCOL_FILTER;
     }
     else if (JaxWsSdkUtility.getChildElement(xmlHandlerChain.getChildNodes(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_SERVICE)) != null) {
-      return FilterTypeEnum.ServiceFilter;
+      return FilterTypeEnum.SERVICE_FILTER;
     }
     else if (JaxWsSdkUtility.getChildElement(xmlHandlerChain.getChildNodes(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PORT)) != null) {
-      return FilterTypeEnum.PortFilter;
+      return FilterTypeEnum.PORT_FILTER;
     }
-    return FilterTypeEnum.NoFilter;
+    return FilterTypeEnum.NO_FILTER;
   }
 
   private class P_ScoutSeverityListener implements IScoutSeverityListener {

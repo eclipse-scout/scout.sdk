@@ -43,7 +43,7 @@ public class LocalLookupCallNewOperation extends PrimaryTypeNewOperation {
 
     // defaults
     setFlags(Flags.AccPublic);
-    setPackageExportPolicy(ExportPolicy.AddPackage);
+    setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
     setFormatSource(true);
     getCompilationUnitNewOp().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());

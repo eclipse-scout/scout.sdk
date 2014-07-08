@@ -83,7 +83,7 @@ public class StubRebuildAction extends AbstractLinkAction {
 
     @Override
     public void operationFinished(final boolean success, final Throwable e) {
-      if (m_webserviceEnum == WebserviceEnum.Provider) {
+      if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
         JaxWsSdk.getDefault().notifyPageReload(WebServiceProviderNodePage.class, m_markerGroupUUID, WebServiceProviderNodePage.DATA_STUB_FILES);
       }
       else {

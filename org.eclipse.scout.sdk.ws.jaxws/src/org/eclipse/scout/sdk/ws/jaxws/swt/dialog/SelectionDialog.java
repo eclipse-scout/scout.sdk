@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -41,7 +41,6 @@ import org.eclipse.swt.widgets.Table;
 
 public class SelectionDialog<T> extends TitleAreaDialog {
 
-  protected static final String IStructuredSelection = null;
   private T m_element;
   private TableViewer m_viewer;
   private String m_dialogTitle;

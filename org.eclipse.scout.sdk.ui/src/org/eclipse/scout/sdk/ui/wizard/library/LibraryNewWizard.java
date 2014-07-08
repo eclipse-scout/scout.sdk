@@ -89,13 +89,13 @@ public class LibraryNewWizard extends AbstractWorkspaceWizard {
     operation.setBundleName(getLibraryWizardPage().getBundleName());
     operation.setLibraryFiles(getJarSelectionWizardPage().getJarFiles());
     switch (getLibraryWizardPage().getLibraryType()) {
-      case Plugin:
+      case PLUGIN:
         operation.setLibraryUserBundles(getLibraryWizardPage().getLibraryUserBundles());
         break;
-      case Fragment:
+      case FRAGMENT:
         operation.setFragmentHost(getLibraryWizardPage().getFragmentHost());
         break;
-      case SystemBundleFragment:
+      case SYSTEM_BUNDLE_FRAGMENT:
         operation.setFragmentHost("system.bundle");
         break;
     }

@@ -16,7 +16,7 @@ public class IntegerCodeIdParser extends AbstractNumberCodeIdParser {
   }
 
   @Override
-  protected void parseNum(String val) throws NumberFormatException {
+  protected void parseNum(String val) {
     Integer.parseInt(val);
   }
 }

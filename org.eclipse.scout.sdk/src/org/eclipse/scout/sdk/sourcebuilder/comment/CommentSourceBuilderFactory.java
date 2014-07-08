@@ -41,7 +41,7 @@ public final class CommentSourceBuilderFactory {
   private CommentSourceBuilderFactory() {
   }
 
-  private static final ICommentSourceBuilder emptyCommentSourceBuilder = new ICommentSourceBuilder() {
+  private static final ICommentSourceBuilder EMPTY_COMMENT_SOURCE_BUILDER = new ICommentSourceBuilder() {
     @Override
     public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
     }
@@ -74,7 +74,7 @@ public final class CommentSourceBuilderFactory {
       return javaElementCommentBuilderService.createPreferencesCompilationUnitCommentBuilder();
     }
     else {
-      return emptyCommentSourceBuilder;
+      return EMPTY_COMMENT_SOURCE_BUILDER;
     }
   }
 
@@ -83,7 +83,7 @@ public final class CommentSourceBuilderFactory {
       return javaElementCommentBuilderService.createPreferencesMethodOverrideComment(interfaceFqn);
     }
     else {
-      return emptyCommentSourceBuilder;
+      return EMPTY_COMMENT_SOURCE_BUILDER;
     }
   }
 
@@ -92,7 +92,7 @@ public final class CommentSourceBuilderFactory {
       return javaElementCommentBuilderService.createPreferencesTypeCommentBuilder();
     }
     else {
-      return emptyCommentSourceBuilder;
+      return EMPTY_COMMENT_SOURCE_BUILDER;
     }
   }
 
@@ -101,7 +101,7 @@ public final class CommentSourceBuilderFactory {
       return javaElementCommentBuilderService.createPreferencesMethodCommentBuilder();
     }
     else {
-      return emptyCommentSourceBuilder;
+      return EMPTY_COMMENT_SOURCE_BUILDER;
     }
   }
 
@@ -110,7 +110,7 @@ public final class CommentSourceBuilderFactory {
       return javaElementCommentBuilderService.createPreferencesMethodGetterCommentBuilder();
     }
     else {
-      return emptyCommentSourceBuilder;
+      return EMPTY_COMMENT_SOURCE_BUILDER;
     }
   }
 
@@ -119,7 +119,7 @@ public final class CommentSourceBuilderFactory {
       return javaElementCommentBuilderService.createPreferencesMethodSetterCommentBuilder();
     }
     else {
-      return emptyCommentSourceBuilder;
+      return EMPTY_COMMENT_SOURCE_BUILDER;
     }
   }
 
@@ -128,7 +128,7 @@ public final class CommentSourceBuilderFactory {
       return javaElementCommentBuilderService.createPreferencesFieldCommentBuilder();
     }
     else {
-      return emptyCommentSourceBuilder;
+      return EMPTY_COMMENT_SOURCE_BUILDER;
     }
   }
 

@@ -55,7 +55,7 @@ public class PermissionNewOperation extends PrimaryTypeNewOperation {
     constructorBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     constructorBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super(\"" + getElementName().replaceAll(SdkProperties.SUFFIX_PERMISSION + "$", "") + "\");"));
     addMethodSourceBuilder(constructorBuilder);
-    setPackageExportPolicy(ExportPolicy.AddPackage);
+    setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
     super.run(monitor, workingCopyManager);
   }
 

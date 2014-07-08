@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Label;
  */
 public abstract class AbstractSinglePageSectionBasedViewPart extends AbstractSectionBasedPart implements ISinglePropertyViewPart {
 
-  private static final HashMap<String, HashMap<String, Boolean>> expansionSettings = new HashMap<String, HashMap<String, Boolean>>();
+  private static final HashMap<String, HashMap<String, Boolean>> EXPANSION_SETTINGS = new HashMap<String, HashMap<String, Boolean>>();
 
   private IPage m_page;
 
@@ -67,10 +67,10 @@ public abstract class AbstractSinglePageSectionBasedViewPart extends AbstractSec
 
   private void cacheSectionExpansionState() {
     final Section[] sections = getSections();
-    HashMap<String, Boolean> pageCache = expansionSettings.get(getPartKey());
+    HashMap<String, Boolean> pageCache = EXPANSION_SETTINGS.get(getPartKey());
     if (pageCache == null) {
       pageCache = new HashMap<String, Boolean>(sections.length);
-      expansionSettings.put(getPartKey(), pageCache);
+      EXPANSION_SETTINGS.put(getPartKey(), pageCache);
     }
     for (Section s : sections) {
       pageCache.put(s.getSectionId(), s.isExpanded());
@@ -103,7 +103,7 @@ public abstract class AbstractSinglePageSectionBasedViewPart extends AbstractSec
    * @see TriState
    */
   protected TriState wasSectionExpanded(String sectionId) {
-    HashMap<String, Boolean> pageCache = expansionSettings.get(getPartKey());
+    HashMap<String, Boolean> pageCache = EXPANSION_SETTINGS.get(getPartKey());
     if (pageCache == null) return TriState.UNDEFINED;
 
     Boolean expanded = pageCache.get(sectionId);

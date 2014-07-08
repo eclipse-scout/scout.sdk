@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.project.template;
 
+import java.io.Serializable;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Set;
@@ -37,7 +38,7 @@ public final class ProjectTemplateExtensionPoint {
   public static final String ATTRIBUTE_ICON = "icon";
   private static final Object LOCK = new Object();
 
-  private static Set<ProjectTemplateExtension> templateExtensions;
+  private static volatile Set<ProjectTemplateExtension> templateExtensions;
 
   private ProjectTemplateExtensionPoint() {
   }
@@ -89,7 +90,9 @@ public final class ProjectTemplateExtensionPoint {
     return CollectionUtility.arrayList(getTemplates());
   }
 
-  private static final class P_ExtensionComparator implements Comparator<ProjectTemplateExtension> {
+  private static final class P_ExtensionComparator implements Comparator<ProjectTemplateExtension>, Serializable {
+    private static final long serialVersionUID = 1L;
+
     @Override
     public int compare(ProjectTemplateExtension o1, ProjectTemplateExtension o2) {
       if (o1.getOrderNr() != o2.getOrderNr()) {

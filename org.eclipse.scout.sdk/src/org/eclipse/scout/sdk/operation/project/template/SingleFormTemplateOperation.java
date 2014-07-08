@@ -96,7 +96,7 @@ public class SingleFormTemplateOperation extends AbstractScoutProjectNewOperatio
     PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(FORM_NAME + "Data", shared.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES), shared.getJavaProject());
     formDataOp.setFlags(Flags.AccPublic);
     formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormData));
-    formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+    formDataOp.setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
     formDataOp.validate();
     formDataOp.run(monitor, workingCopyManager);
     IType formData = formDataOp.getCreatedType();

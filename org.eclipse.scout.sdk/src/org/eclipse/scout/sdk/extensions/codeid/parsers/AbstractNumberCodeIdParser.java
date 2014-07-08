@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.extensions.codeid.parsers;
 
-
 public abstract class AbstractNumberCodeIdParser implements ICodeIdParser {
   private final String m_numTypeSuffixLo;
   private final String m_numTypeSuffixUp;
@@ -30,7 +29,7 @@ public abstract class AbstractNumberCodeIdParser implements ICodeIdParser {
     }
   }
 
-  protected abstract void parseNum(String val) throws NumberFormatException;
+  protected abstract void parseNum(String val);
 
   @Override
   public boolean isValid(String val) {

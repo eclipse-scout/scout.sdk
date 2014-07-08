@@ -19,15 +19,15 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
  * <h3>SiblingProposal</h3> ...
  */
 public class SiblingProposal extends SimpleProposal implements ITypeSibling {
-  public static final SiblingProposal SIBLING_BEGINNING = new SiblingProposal("first", SiblingType.Beginning);
-  public static final SiblingProposal SIBLING_END = new SiblingProposal("last", SiblingType.End);
+  public static final SiblingProposal SIBLING_BEGINNING = new SiblingProposal("first", SiblingType.BEGINNING);
+  public static final SiblingProposal SIBLING_END = new SiblingProposal("last", SiblingType.END);
 
   // local data names
   private static final String DATA_JAVA_ELEMENT = "javaElement";
   private static final String DATA_SIBLING_TYPE = "siblingType";
 
   public SiblingProposal(IJavaElement sibling) {
-    this(sibling.getElementName() + " [before]", SiblingType.Sibling);
+    this(sibling.getElementName() + " [before]", SiblingType.SIBLING);
     setData(DATA_JAVA_ELEMENT, sibling);
   }
 

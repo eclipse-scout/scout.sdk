@@ -50,7 +50,7 @@ import org.eclipse.ui.part.ViewPart;
 
 /**
  * <h3>{@link JdtEventLoggerView}</h3> A view can be used to debug all occuring jdt events.
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 11.02.2011
  */
@@ -61,7 +61,7 @@ public class JdtEventLoggerView extends ViewPart {
   private Button m_startButton;
   private Button m_stopButton;
   private Button m_resetButton;
-  private Object writeLock = new Object();
+  private final Object m_writeLock = new Object();
   private IElementChangedListener m_elementChangedListener;
   private IResourceChangeListener m_resourceChangeListener;
   private FormToolkit m_toolkit;
@@ -186,7 +186,7 @@ public class JdtEventLoggerView extends ViewPart {
   }
 
   protected void resetLog() {
-    synchronized (writeLock) {
+    synchronized (m_writeLock) {
       m_invisibleRoot = new Event();
       m_treeViewer.setInput(m_invisibleRoot);
     }
@@ -239,7 +239,7 @@ public class JdtEventLoggerView extends ViewPart {
       Event logEvent = new Event(getEventType(event), "", "");
       logEvent.setEventGroup(EventGroup.JDT_EVENT);
       visitDelta(event.getDelta(), event.getType(), logEvent);
-      synchronized (writeLock) {
+      synchronized (m_writeLock) {
         m_invisibleRoot.addChildEvent(logEvent);
       }
       updateView();
@@ -380,7 +380,7 @@ public class JdtEventLoggerView extends ViewPart {
       Event logEvent = new Event(getEventType(e), "", "");
       logEvent.setEventGroup(EventGroup.RESOURCE_EVENT);
       visitDelta(e.getDelta(), logEvent);
-      synchronized (writeLock) {
+      synchronized (m_writeLock) {
         m_invisibleRoot.addChildEvent(logEvent);
       }
       updateView();

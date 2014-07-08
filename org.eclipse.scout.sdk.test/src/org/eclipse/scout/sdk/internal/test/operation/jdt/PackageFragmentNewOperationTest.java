@@ -47,7 +47,7 @@ public class PackageFragmentNewOperationTest extends AbstractScoutSdkTest {
     IJavaProject javaProject = JavaCore.create(clientProject);
     String packageName = "abc.def";
     PackageFragementNewOperation packageOp = new PackageFragementNewOperation(packageName, javaProject);
-    packageOp.setExportPackagePolicy(ExportPolicy.AddPackageWhenNotEmpty);
+    packageOp.setExportPackagePolicy(ExportPolicy.ADD_PACKAGE_WHEN_NOT_EMPTY);
 
     executeBuildAssertNoCompileErrors(packageOp);
 
@@ -68,7 +68,7 @@ public class PackageFragmentNewOperationTest extends AbstractScoutSdkTest {
     Assert.assertTrue(TypeUtility.exists(TypeUtility.getPackage(javaProject, packageName)));
 
     PackageFragementNewOperation packageOp = new PackageFragementNewOperation(packageName, javaProject);
-    packageOp.setExportPackagePolicy(ExportPolicy.AddPackageWhenNotEmpty);
+    packageOp.setExportPackagePolicy(ExportPolicy.ADD_PACKAGE_WHEN_NOT_EMPTY);
     packageOp.setNoErrorWhenPackageAlreadyExist(true);
     executeBuildAssertNoCompileErrors(packageOp);
 
@@ -82,7 +82,7 @@ public class PackageFragmentNewOperationTest extends AbstractScoutSdkTest {
     IJavaProject javaProject = JavaCore.create(clientProject);
     String packageName = "abc.def01";
     PackageFragementNewOperation packageOp = new PackageFragementNewOperation(packageName, javaProject);
-    packageOp.setExportPackagePolicy(ExportPolicy.AddPackage);
+    packageOp.setExportPackagePolicy(ExportPolicy.ADD_PACKAGE);
 
     TestWorkspaceUtility.executeAndBuildWorkspace(packageOp);
 

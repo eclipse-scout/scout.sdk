@@ -28,12 +28,11 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 public class ContextMenuContributorExtensionPoint {
 
-  private static final Object contextMenuExtensionsCacheLock = new Object();
-  private static List<IScoutHandler> contextMenuExtensions;
+  private static final Object LOCK = new Object();
 
-  private static final Object contextMenuContributorExtensionsCacheLock = new Object();
-  private static MenuContributionInfo[] contextMenuContributorExtensions;
-  private static Map<IScoutHandler.Category, ArrayList<IScoutHandler>> contextMenuByCat;
+  private static volatile List<IScoutHandler> contextMenuExtensions;
+  private static volatile MenuContributionInfo[] contextMenuContributorExtensions;
+  private static volatile Map<IScoutHandler.Category, ArrayList<IScoutHandler>> contextMenuByCat;
 
   private static class MenuContributionInfo {
     private IContextMenuContributor contributor;
@@ -45,7 +44,7 @@ public class ContextMenuContributorExtensionPoint {
     }
   }
 
-  interface IExtensionVisitor {
+  private interface IExtensionVisitor {
     boolean visit(IConfigurationElement element);
   }
 
@@ -61,7 +60,7 @@ public class ContextMenuContributorExtensionPoint {
 
   private static MenuContributionInfo[] getContributors() {
     if (contextMenuContributorExtensions == null) {
-      synchronized (contextMenuContributorExtensionsCacheLock) {
+      synchronized (LOCK) {
         if (contextMenuContributorExtensions == null) {
           final ArrayList<MenuContributionInfo> list = new ArrayList<MenuContributionInfo>();
           visitExtensions("contextMenuContributor", "contributor", new IExtensionVisitor() {
@@ -110,7 +109,7 @@ public class ContextMenuContributorExtensionPoint {
 
   public static IScoutHandler[] getAllRegisteredContextMenus() {
     if (contextMenuExtensions == null) {
-      synchronized (contextMenuExtensionsCacheLock) {
+      synchronized (LOCK) {
         if (contextMenuExtensions == null) {
           final ArrayList<IScoutHandler> list = new ArrayList<IScoutHandler>();
           visitExtensions("contextMenu", "contextMenu", new IExtensionVisitor() {
@@ -135,7 +134,7 @@ public class ContextMenuContributorExtensionPoint {
 
   public static Map<IScoutHandler.Category, ArrayList<IScoutHandler>> getAllRegisteredContextMenusByCategory() {
     if (contextMenuByCat == null) {
-      synchronized (contextMenuExtensionsCacheLock) {
+      synchronized (LOCK) {
         if (contextMenuByCat == null) {
           TreeMap<IScoutHandler.Category, ArrayList<IScoutHandler>> sorted =
               new TreeMap<IScoutHandler.Category, ArrayList<IScoutHandler>>(new Comparator<IScoutHandler.Category>() {

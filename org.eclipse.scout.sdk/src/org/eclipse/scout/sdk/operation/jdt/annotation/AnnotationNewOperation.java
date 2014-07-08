@@ -41,7 +41,7 @@ import org.eclipse.text.edits.TextEdit;
 
 /**
  * <h3>{@link AnnotationNewOperation}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 06.12.2012
  */
@@ -92,7 +92,7 @@ public class AnnotationNewOperation implements IOperation {
       new ImportsCreateOperation(getDeclaringType().getCompilationUnit(), validator).run(monitor, workingCopyManager);
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not add annotation to '" + getDeclaringType().getElementName() + "'.");
+      ScoutSdk.logWarning("could not add annotation to '" + getDeclaringType().getElementName() + "'.", e);
     }
   }
 

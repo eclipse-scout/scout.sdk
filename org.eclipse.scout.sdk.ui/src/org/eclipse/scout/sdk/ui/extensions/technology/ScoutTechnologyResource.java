@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.ui.extensions.technology;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
-import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 

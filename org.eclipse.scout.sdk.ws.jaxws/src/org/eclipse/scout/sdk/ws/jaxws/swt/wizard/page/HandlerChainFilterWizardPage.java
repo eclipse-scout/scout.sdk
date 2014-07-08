@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -83,11 +83,11 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    m_filterTypeNoneButton = createRadioButton(parent, FilterTypeEnum.NoFilter);
+    m_filterTypeNoneButton = createRadioButton(parent, FilterTypeEnum.NO_FILTER);
     m_radioButtonMap.put(m_filterTypeNoneButton, null);
 
     // protocol filter
-    m_filterTypeProtocolButton = createRadioButton(parent, FilterTypeEnum.ProtocolFilter);
+    m_filterTypeProtocolButton = createRadioButton(parent, FilterTypeEnum.PROTOCOL_FILTER);
     m_filterTypeProtocolComposite = new Composite(parent, SWT.NONE);
     m_radioButtonMap.put(m_filterTypeProtocolButton, m_filterTypeProtocolComposite);
 
@@ -101,12 +101,12 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    if (getFilterType() == FilterTypeEnum.ProtocolFilter) {
+    if (getFilterType() == FilterTypeEnum.PROTOCOL_FILTER) {
       m_protocolBindings.setText(getPattern());
     }
 
     // service filter
-    m_filterTypeServiceButton = createRadioButton(parent, FilterTypeEnum.ServiceFilter);
+    m_filterTypeServiceButton = createRadioButton(parent, FilterTypeEnum.SERVICE_FILTER);
     m_filterTypeServiceComposite = new Composite(parent, SWT.NONE);
     m_radioButtonMap.put(m_filterTypeServiceButton, m_filterTypeServiceComposite);
     // namespace prefix
@@ -142,14 +142,14 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    if (getFilterType() == FilterTypeEnum.ServiceFilter) {
+    if (getFilterType() == FilterTypeEnum.SERVICE_FILTER) {
       m_serviceNamespacePrefix.setText(getNamespacePrefix());
       m_serviceNamespace.setText(getNamespace());
       m_servicePattern.setText(getPattern());
     }
 
     // port filter
-    m_filterTypePortButton = createRadioButton(parent, FilterTypeEnum.PortFilter);
+    m_filterTypePortButton = createRadioButton(parent, FilterTypeEnum.PORT_FILTER);
     m_filterTypePortComposite = new Composite(parent, SWT.NONE);
     m_radioButtonMap.put(m_filterTypePortButton, m_filterTypePortComposite);
     // namespace prefix
@@ -185,7 +185,7 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    if (getFilterType() == FilterTypeEnum.PortFilter) {
+    if (getFilterType() == FilterTypeEnum.PORT_FILTER) {
       m_portNamespacePrefix.setText(getNamespacePrefix());
       m_portNamespace.setText(getNamespace());
       m_portPattern.setText(getPattern());
@@ -280,8 +280,8 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void validatePage(MultiStatus multiStatus) {
     switch (getFilterType()) {
-      case ServiceFilter:
-      case PortFilter:
+      case SERVICE_FILTER:
+      case PORT_FILTER:
         if (!StringUtility.hasText(getNamespacePrefix())) {
           multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", Texts.get("NamespacePrefix"))));
         }
@@ -292,7 +292,7 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
           multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", Texts.get("RestrictionPattern"))));
         }
         break;
-      case ProtocolFilter:
+      case PROTOCOL_FILTER:
         if (!StringUtility.hasText(getPattern())) {
           multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustNotBeEmpty", Texts.get("ProtocolBindings"))));
         }
@@ -310,13 +310,13 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
         m_portPattern.setText("");
 
         switch (getFilterType()) {
-          case ProtocolFilter:
+          case PROTOCOL_FILTER:
             m_protocolBindings.setText(pattern);
             break;
-          case ServiceFilter:
+          case SERVICE_FILTER:
             m_servicePattern.setText(pattern);
             break;
-          case PortFilter:
+          case PORT_FILTER:
             m_portPattern.setText(pattern);
             break;
         }
@@ -341,10 +341,10 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
       setNamespacePrefixInternal(namespacePrefix);
       if (isControlCreated()) {
         switch (getFilterType()) {
-          case ServiceFilter:
+          case SERVICE_FILTER:
             m_serviceNamespacePrefix.setText(namespacePrefix);
             break;
-          case PortFilter:
+          case PORT_FILTER:
             m_portNamespacePrefix.setText(namespacePrefix);
             break;
         }
@@ -368,11 +368,11 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
     else {
       prefix += ":";
       switch (getFilterType()) {
-        case ServiceFilter:
+        case SERVICE_FILTER:
           m_portPattern.setReadOnlyPrefix(null);
           m_servicePattern.setReadOnlyPrefix(prefix);
           break;
-        case PortFilter:
+        case PORT_FILTER:
           m_servicePattern.setReadOnlyPrefix(null);
           m_portPattern.setReadOnlyPrefix(prefix);
           break;
@@ -395,10 +395,10 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
       setNamespaceInternal(namespace);
       if (isControlCreated()) {
         switch (getFilterType()) {
-          case ServiceFilter:
+          case SERVICE_FILTER:
             m_serviceNamespace.setText(namespace);
             break;
-          case PortFilter:
+          case PORT_FILTER:
             m_portNamespace.setText(namespace);
             break;
         }
@@ -432,7 +432,7 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
           }
 
           switch (filterType) {
-            case NoFilter:
+            case NO_FILTER:
               m_protocolBindings.setText("");
               m_portNamespacePrefix.setText("");
               m_portNamespace.setText("");
@@ -443,7 +443,7 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
               setNamespace(null);
               setNamespacePrefix(null);
               break;
-            case ServiceFilter:
+            case SERVICE_FILTER:
               m_protocolBindings.setText("");
               m_portNamespacePrefix.setText("");
               m_portNamespace.setText("");
@@ -451,7 +451,7 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
               setNamespace("urn:namespace");
               setNamespacePrefix("ns1");
               break;
-            case PortFilter:
+            case PORT_FILTER:
               m_protocolBindings.setText("");
               m_serviceNamespacePrefix.setText("");
               m_serviceNamespace.setText("");
@@ -459,7 +459,7 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
               setNamespace("urn:namespace");
               setNamespacePrefix("ns1");
               break;
-            case ProtocolFilter:
+            case PROTOCOL_FILTER:
               m_serviceNamespacePrefix.setText("");
               m_serviceNamespace.setText("");
               m_servicePattern.setText("");
@@ -504,9 +504,12 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   public static enum FilterTypeEnum {
-    NoFilter(Texts.get("NoFilter")), ProtocolFilter(Texts.get("ProtocolFilter")), ServiceFilter(Texts.get("ServiceFilter")), PortFilter(Texts.get("PortFilter"));
+    NO_FILTER(Texts.get("NoFilter")),
+    PROTOCOL_FILTER(Texts.get("ProtocolFilter")),
+    SERVICE_FILTER(Texts.get("ServiceFilter")),
+    PORT_FILTER(Texts.get("PortFilter"));
 
-    private String m_label;
+    private final String m_label;
 
     private FilterTypeEnum(String label) {
       m_label = label;

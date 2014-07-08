@@ -16,7 +16,7 @@ public class DoubleCodeIdParser extends AbstractNumberCodeIdParser {
   }
 
   @Override
-  protected void parseNum(String val) throws NumberFormatException {
+  protected void parseNum(String val) {
     Double.parseDouble(val);
   }
 }

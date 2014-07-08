@@ -45,7 +45,6 @@ public class ScoutProjectIcons implements IIconProvider {
   private static final String[] PREDEFINED_EXTENSIONS = new String[]{"png", "ico", "gif"};
   private static final String[] PREDEFINED_SUB_FOLDERS = new String[]{"resources/icons/internal/", "resources/icons/"};
 
-  private final Object cacheLock = new Object();
   private final IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
   private final IScoutBundle m_bundle;
   private final ICachedTypeHierarchy m_iconsHierarchy;
@@ -82,17 +81,15 @@ public class ScoutProjectIcons implements IIconProvider {
     m_cachedIcons = null;
   }
 
-  protected void cache() {
-    synchronized (cacheLock) {
-      if (m_cachedIcons == null) {
-        m_baseUrls = buildBaseUrls();
-        Map<String, ScoutIconDesc> collector = new HashMap<String, ScoutIconDesc>();
-        collectIconNames(collector);
-        for (ScoutIconDesc desc : collector.values()) {
-          findIconInProject(desc);
-        }
-        m_cachedIcons = new HashMap<String, ScoutIconDesc>(collector);
+  protected synchronized void cache() {
+    if (m_cachedIcons == null) {
+      m_baseUrls = buildBaseUrls();
+      Map<String, ScoutIconDesc> collector = new HashMap<String, ScoutIconDesc>();
+      collectIconNames(collector);
+      for (ScoutIconDesc desc : collector.values()) {
+        findIconInProject(desc);
       }
+      m_cachedIcons = new HashMap<String, ScoutIconDesc>(collector);
     }
   }
 

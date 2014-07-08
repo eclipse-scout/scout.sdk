@@ -16,7 +16,7 @@ public class FloatCodeIdParser extends AbstractNumberCodeIdParser {
   }
 
   @Override
-  protected void parseNum(String val) throws NumberFormatException {
+  protected void parseNum(String val) {
     Float.parseFloat(val);
   }
 }

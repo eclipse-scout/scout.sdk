@@ -165,7 +165,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
       b.createBundlePage(this);
     }
 
-    if (BundlePresentation.Grouped.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+    if (BundlePresentation.GROUPED.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
       ScoutBundleNodeGroup[] childGroups = m_group.getChildGroups().toArray(new ScoutBundleNodeGroup[m_group.getChildGroups().size()]);
       Arrays.sort(childGroups);
       for (ScoutBundleNodeGroup childGroup : childGroups) {

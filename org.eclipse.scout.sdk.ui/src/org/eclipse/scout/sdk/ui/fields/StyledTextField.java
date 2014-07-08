@@ -108,7 +108,7 @@ public class StyledTextField extends TextField {
   /**
    * A regex may contain several placeholders marked as #0# ... #xx#. This method is used to replace
    * the placeholders.
-   * 
+   *
    * @param regex
    *          the regex containing the exactly same amount of placeholders as the replacements conatins items.
    * @param replacements
@@ -150,10 +150,11 @@ public class StyledTextField extends TextField {
   }
 
   private class P_SuffixListener implements Listener, VerifyKeyListener {
+    private static final String PRE_POST_FIX_REGEX = "^(#0#).*(#1#)$";
+
     private Pattern m_preSuffixPattern;
     private StyleRange m_suffixStyleRange;
     private StyleRange m_prefixStyleRange;
-    private static final String prePostFixRegex = "^(#0#).*(#1#)$";
     private String m_suffixString = "";
     private String m_prefixString = "";
 
@@ -171,7 +172,7 @@ public class StyledTextField extends TextField {
       }
       m_suffixStyleRange = new StyleRange(-1, -1, style.foreground, style.background, style.fontStyle);
       m_prefixStyleRange = new StyleRange(-1, -1, style.foreground, style.background, style.fontStyle);
-      m_preSuffixPattern = Pattern.compile(replace(prePostFixRegex, m_prefixString, m_suffixString));
+      m_preSuffixPattern = Pattern.compile(replace(PRE_POST_FIX_REGEX, m_prefixString, m_suffixString));
       setSuffix(postfix);
     }
 
@@ -271,7 +272,7 @@ public class StyledTextField extends TextField {
             }
           }
           m_suffixString = postfix;
-          m_preSuffixPattern = Pattern.compile(replace(prePostFixRegex, m_prefixString, m_suffixString));
+          m_preSuffixPattern = Pattern.compile(replace(PRE_POST_FIX_REGEX, m_prefixString, m_suffixString));
           if (!text.getText().endsWith(m_suffixString)) {
             text.setText(text.getText() + m_suffixString);
           }
@@ -300,7 +301,7 @@ public class StyledTextField extends TextField {
             }
           }
           m_prefixString = prefix;
-          m_preSuffixPattern = Pattern.compile(replace(prePostFixRegex, m_prefixString, m_suffixString));
+          m_preSuffixPattern = Pattern.compile(replace(PRE_POST_FIX_REGEX, m_prefixString, m_suffixString));
           if (!text.getText().startsWith(m_prefixString)) {
             text.setText(m_prefixString + text.getText());
           }

@@ -190,7 +190,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
       createSection(SECTION_ID_STUB_PROPERTIES, Texts.get("StubProperties"));
 
       StubRebuildAction b = new StubRebuildAction();
-      b.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource(), getPage().getMarkerGroupUUID(), WebserviceEnum.Consumer);
+      b.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource(), getPage().getMarkerGroupUUID(), WebserviceEnum.CONSUMER);
       m_rebuildStubPresenter = new ActionPresenter(getSection(SECTION_ID_STUB_PROPERTIES).getSectionClient(), b, getFormToolkit());
       applyLayoutData(m_rebuildStubPresenter);
 
@@ -292,7 +292,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
       applyLayoutData(m_stubJarFilePresenter);
 
       // wsdl folder
-      m_wsdlFolderPresenter = new WsdlFolderPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit(), WebserviceEnum.Consumer);
+      m_wsdlFolderPresenter = new WsdlFolderPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit(), WebserviceEnum.CONSUMER);
       m_wsdlFolderPresenter.setLabel(Texts.get("WsdlFolder"));
       m_wsdlFolderPresenter.setBundle(m_bundle);
       m_wsdlFolderPresenter.setMarkerType(MarkerType.WsdlFolder);
@@ -402,7 +402,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
 
       // QuickLink 'Open build-jaxws.xml'
       FileOpenAction a = new FileOpenAction();
-      a.init(ResourceFactory.getBuildJaxWsResource(m_bundle).getFile(), ResourceFactory.getBuildJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), FileExtensionType.Xml);
+      a.init(ResourceFactory.getBuildJaxWsResource(m_bundle).getFile(), ResourceFactory.getBuildJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), FileExtensionType.XML);
       a.setToolTip(Texts.get("JaxWsBuildDescriptor"));
       ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit());
       applyLayoutData(actionPresenter);
@@ -415,7 +415,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
       IFile wsdlFile = getPage().getWsdlResource().getFile();
       if (wsdlFile != null) {
         FileOpenAction b = new FileOpenAction();
-        b.init(wsdlFile, wsdlFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
+        b.init(wsdlFile, wsdlFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.AUTO);
         b.setToolTip("Web Services Description Language");
         actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit());
         actionPresenter.setEnabled(wsdlFile.exists());
@@ -441,10 +441,10 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
 
         @Override
         public void onReferencedWsdlArtifact(WsdlArtifact<IFile> wsdlArtifact) {
-          if (wsdlArtifact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
+          if (wsdlArtifact.getTypeEnum() == TypeEnum.REFERENCED_WSDL) {
             FileOpenAction action = new FileOpenAction();
             IFileHandle<IFile> fileHandle = wsdlArtifact.getFileHandle();
-            action.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.Auto);
+            action.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.WsdlFile), FileExtensionType.AUTO);
 
             ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_REF_WSDLS).getSectionClient(), action, getFormToolkit());
             actionPresenter.setEnabled(fileHandle.exists());
@@ -457,7 +457,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
           IFileHandle<IFile> fileHandle = schemaIncludeArtifact.getFileHandle();
 
           FileOpenAction b = new FileOpenAction();
-          b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
+          b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.AUTO);
           ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_INCLUDED_SCHEMAS).getSectionClient(), b, getFormToolkit());
           actionPresenter.setEnabled(fileHandle.exists());
           applyLayoutData(actionPresenter);
@@ -468,7 +468,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
           IFileHandle<IFile> fileHandle = schemaImportArtifact.getFileHandle();
 
           FileOpenAction b = new FileOpenAction();
-          b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.Auto);
+          b.init(fileHandle.getFile(), fileHandle.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.XsdSchema), FileExtensionType.AUTO);
           b.setToolTip("namespace: " + StringUtility.nvl(schemaImportArtifact.getNamespaceUri(), "?"));
           ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS_IMPORTED_SCHEMAS).getSectionClient(), b, getFormToolkit());
           actionPresenter.setEnabled(fileHandle.exists());
@@ -575,7 +575,7 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
 
     if (valid) {
       StubRebuildAction action = new StubRebuildAction();
-      action.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource(), getPage().getMarkerGroupUUID(), WebserviceEnum.Consumer);
+      action.init(m_bundle, getPage().getBuildJaxWsBean(), getPage().getWsdlResource(), getPage().getMarkerGroupUUID(), WebserviceEnum.CONSUMER);
       m_rebuildStubPresenter.setAction(action);
     }
   }

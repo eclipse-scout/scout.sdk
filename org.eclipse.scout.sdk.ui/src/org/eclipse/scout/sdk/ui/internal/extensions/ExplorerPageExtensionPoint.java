@@ -36,7 +36,7 @@ public final class ExplorerPageExtensionPoint {
 
   private final HashMap<String /* parentId */, List<ExplorerPageExtension> /* extensions */> m_pages = new HashMap<String, List<ExplorerPageExtension>>();
 
-  private static final ExplorerPageExtensionPoint instance = new ExplorerPageExtensionPoint();
+  private static final ExplorerPageExtensionPoint INSTANCE = new ExplorerPageExtensionPoint();
 
   private ExplorerPageExtensionPoint() {
     init();
@@ -97,7 +97,7 @@ public final class ExplorerPageExtensionPoint {
   }
 
   public static ExplorerPageExtension[] getExtensions(IPage parentPage) {
-    return instance.getExtensionsImpl(parentPage);
+    return INSTANCE.getExtensionsImpl(parentPage);
   }
 
   private ExplorerPageExtension[] getExtensionsImpl(IPage parentPage) {

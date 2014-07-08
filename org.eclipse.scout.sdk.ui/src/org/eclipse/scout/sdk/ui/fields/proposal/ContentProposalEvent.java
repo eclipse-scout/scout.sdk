@@ -14,12 +14,10 @@ import java.util.EventObject;
 
 public class ContentProposalEvent extends EventObject {
   private static final long serialVersionUID = 1L;
-//  public String text;
-//  public int cursorPosition;
+
   public Object proposal;
 
   public ContentProposalEvent(Object source) {
     super(source);
   }
-
 }

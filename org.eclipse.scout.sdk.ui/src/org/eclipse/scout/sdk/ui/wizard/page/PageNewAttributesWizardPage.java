@@ -58,9 +58,9 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 
   public static final String PROP_TYPE_NAME = "typeName";
 
-  private IType iPageWithNodes = TypeUtility.getType(IRuntimeClasses.IPageWithNodes);
-  private IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
-  private IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
+  private final IType iPageWithNodes = TypeUtility.getType(IRuntimeClasses.IPageWithNodes);
+  private final IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
+  private final IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
 
   private INlsEntry m_nlsName;
   private IType m_superType;

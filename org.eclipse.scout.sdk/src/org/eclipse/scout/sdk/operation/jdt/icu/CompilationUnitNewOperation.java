@@ -81,8 +81,8 @@ public class CompilationUnitNewOperation implements IOperation {
       PackageFragementNewOperation packageOp = new PackageFragementNewOperation(getPackageFragmentName(), getJavaProject());
       packageOp.setNoErrorWhenPackageAlreadyExist(true);
       ExportPolicy packageExportPolicy = getPackageExportPolicy();
-      if (ExportPolicy.AddPackageWhenNotEmpty.equals(packageExportPolicy)) {
-        packageExportPolicy = ExportPolicy.AddPackage;
+      if (ExportPolicy.ADD_PACKAGE_WHEN_NOT_EMPTY.equals(packageExportPolicy)) {
+        packageExportPolicy = ExportPolicy.ADD_PACKAGE;
       }
       packageOp.setExportPackagePolicy(packageExportPolicy);
       packageOp.validate();

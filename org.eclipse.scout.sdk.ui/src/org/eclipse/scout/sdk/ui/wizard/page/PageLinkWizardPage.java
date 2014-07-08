@@ -39,8 +39,8 @@ import org.eclipse.swt.widgets.Composite;
  */
 public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
 
-  private IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
-  private IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
+  private final IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
+  private final IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
 
   private IType m_holderType;
   private IType m_pageType;

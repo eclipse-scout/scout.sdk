@@ -41,7 +41,7 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * <h3>SqlBindCompletionProposalProcessor</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2010
  */
@@ -92,7 +92,10 @@ public class SqlBindCompletionProposalProcessor {
 
       return CollectionUtility.arrayList(sorted.values());
     }
-    catch (Exception e) {
+    catch (BadLocationException e) {
+      ScoutSdkUi.logWarning("error during creating sql copletion.", e);
+    }
+    catch (JavaModelException e) {
       ScoutSdkUi.logWarning("error during creating sql copletion.", e);
     }
     return Collections.emptyList();

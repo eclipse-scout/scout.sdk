@@ -49,7 +49,7 @@ public class DiscouragedWsdlFolderCommand extends AbstractExecutableMarkerComman
     m_markerGroupUUID = markerGroupUUID;
     m_buildJaxWsBean = buildJaxWsBean;
     m_sunJaxWsBean = sunJaxWsBean;
-    m_webserviceEnum = WebserviceEnum.Provider;
+    m_webserviceEnum = WebserviceEnum.PROVIDER;
     setSolutionDescription(Texts.get("DescriptionTaskMoveFiles", m_newFolder.getProjectRelativePath().toString()));
   }
 
@@ -66,7 +66,7 @@ public class DiscouragedWsdlFolderCommand extends AbstractExecutableMarkerComman
     m_newFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_CONSUMER, false);
     m_markerGroupUUID = markerGroupUUID;
     m_buildJaxWsBean = buildJaxWsBean;
-    m_webserviceEnum = WebserviceEnum.Consumer;
+    m_webserviceEnum = WebserviceEnum.CONSUMER;
     setSolutionDescription("By using this task, a new WSDL file is created.");
   }
 

@@ -52,17 +52,17 @@ public final class RuntimeClasses implements IRuntimeClasses {
   private static final String ATTRIB_DEFAULT_PRIO = "priority";
   private static final String ATTRIB_DEFAULT_CLASS = "class";
 
-  private static final Object lock = new Object();
-  private static final Map<IScoutBundle, Map<String /* interfaceFqn */, StringHolder /* configured value */>> configuredValues = new HashMap<IScoutBundle, Map<String, StringHolder>>();
-  private static final Map<IScoutBundle, IPreferenceChangeListener> registeredListeners = new HashMap<IScoutBundle, IPreferenceChangeListener>();
-  private static Map<String /* interfaceFqn */, TreeMap<Double, String> /* default values */> defaultValues = null;
+  private static final Object LOCK = new Object();
+  private static final Map<IScoutBundle, Map<String /* interfaceFqn */, StringHolder /* configured value */>> CONFIGURED_VALUES = new HashMap<IScoutBundle, Map<String, StringHolder>>();
+  private static final Map<IScoutBundle, IPreferenceChangeListener> REGISTERED_LISTENERS = new HashMap<IScoutBundle, IPreferenceChangeListener>();
+  private static volatile Map<String /* interfaceFqn */, TreeMap<Double, String> /* default values */> defaultValues = null;
 
   private RuntimeClasses() {
   }
 
   private static Map<String, TreeMap<Double, String>> getDefaults() {
     if (defaultValues == null) {
-      synchronized (lock) {
+      synchronized (LOCK) {
         if (defaultValues == null) {
           Map<String, TreeMap<Double, String>> tmp = new HashMap<String, TreeMap<Double, String>>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
@@ -113,16 +113,16 @@ public final class RuntimeClasses implements IRuntimeClasses {
   }
 
   private static String getConfiguredSuperTypeNameCached(IScoutBundle context, String interfaceFqn) {
-    synchronized (lock) {
-      Map<String, StringHolder> projectConfigs = configuredValues.get(context);
+    synchronized (LOCK) {
+      Map<String, StringHolder> projectConfigs = CONFIGURED_VALUES.get(context);
       if (projectConfigs == null) {
         projectConfigs = new HashMap<String, StringHolder>();
-        configuredValues.put(context, projectConfigs);
+        CONFIGURED_VALUES.put(context, projectConfigs);
 
         // first time we are reading properties for the given project -> we are starting to cache for that project
         // add listener to get informed when the settings change so that we can clear our cache for the project.
         P_PreferenceChangeListener listener = new P_PreferenceChangeListener(projectConfigs);
-        registeredListeners.put(context, listener); // remember in case we must remove it again later on
+        REGISTERED_LISTENERS.put(context, listener); // remember in case we must remove it again later on
         context.getPreferences().addPreferenceChangeListener(listener);
       }
       StringHolder ret = projectConfigs.get(interfaceFqn);
@@ -262,10 +262,10 @@ public final class RuntimeClasses implements IRuntimeClasses {
       if (event.getType() == ScoutWorkspaceEvent.TYPE_BUNDLE_REMOVED) {
         IScoutBundle removed = event.getScoutElement();
         // A scout project is removed from the workspace: also remove all caches of this project
-        configuredValues.remove(removed);
+        CONFIGURED_VALUES.remove(removed);
 
         // there is still a listener attached to the project preferences -> remove and deregister
-        IPreferenceChangeListener existingListener = registeredListeners.remove(removed);
+        IPreferenceChangeListener existingListener = REGISTERED_LISTENERS.remove(removed);
         if (existingListener != null) {
           try {
             removed.getPreferences().removePreferenceChangeListener(existingListener);

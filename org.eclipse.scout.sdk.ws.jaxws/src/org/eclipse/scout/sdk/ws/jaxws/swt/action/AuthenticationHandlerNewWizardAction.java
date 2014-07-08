@@ -60,7 +60,7 @@ public class AuthenticationHandlerNewWizardAction extends AbstractLinkAction {
     wizard.setInterfaceTypeSearchScopeFactory(new P_JavaSearchScopeFactory(m_webserviceEnum, m_bundle, true));
     wizard.setSuperTypeSearchScopeFactory(new P_JavaSearchScopeFactory(m_webserviceEnum, m_bundle, false));
 
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       wizard.setInterfaceType(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider));
       wizard.setRecommendedPackageFragment(JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(m_bundle));
     }
@@ -100,7 +100,7 @@ public class AuthenticationHandlerNewWizardAction extends AbstractLinkAction {
     @Override
     public IJavaSearchScope create() {
       IType type;
-      if (m_webserviceEnum == WebserviceEnum.Provider) {
+      if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
         type = TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider);
       }
       else {

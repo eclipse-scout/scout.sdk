@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -13,10 +13,10 @@ package org.eclipse.scout.sdk.ws.jaxws.operation;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 
 public enum WsdlStyleEnum {
-  DocumentLiteralWrapped(Texts.get("DocumentLiteralWrapped")),
-  DocumentLiteral(Texts.get("DocumentLiteral"));
+  DOCUMENT_LITERAL_WRAPPED(Texts.get("DocumentLiteralWrapped")),
+  DOCUMENT_LITERAL(Texts.get("DocumentLiteral"));
 
-  private String m_label;
+  private final String m_label;
 
   private WsdlStyleEnum(String label) {
     m_label = label;

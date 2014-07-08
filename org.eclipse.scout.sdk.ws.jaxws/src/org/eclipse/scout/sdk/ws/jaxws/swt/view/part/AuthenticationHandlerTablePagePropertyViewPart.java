@@ -41,7 +41,7 @@ public class AuthenticationHandlerTablePagePropertyViewPart extends AbstractSing
       getSection(SECTION_ID_FILTER).setExpanded(false);
 
       String description;
-      if (getPage().getWebserviceEnum() == WebserviceEnum.Provider) {
+      if (getPage().getWebserviceEnum() == WebserviceEnum.PROVIDER) {
         description = Texts.get("DescriptionAuthenticationHandlerProvider");
       }
       else {

@@ -112,7 +112,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
 
   private void applyDefaults() {
     setDeriveOtherNames(true);
-    setWsdlStyle(WsdlStyleEnum.DocumentLiteralWrapped);
+    setWsdlStyle(WsdlStyleEnum.DOCUMENT_LITERAL_WRAPPED);
   }
 
   @Override

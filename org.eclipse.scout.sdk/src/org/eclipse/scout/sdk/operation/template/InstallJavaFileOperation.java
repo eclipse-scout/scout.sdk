@@ -57,7 +57,7 @@ public class InstallJavaFileOperation extends InstallTextFileOperation {
         // add package to exported packages
         IPackageFragment frag = (IPackageFragment) pck;
         ResourcesPlugin.getWorkspace().checkpoint(false);
-        ManifestExportPackageOperation op = new ManifestExportPackageOperation(ExportPolicy.AddPackage, new IPackageFragment[]{frag}, true);
+        ManifestExportPackageOperation op = new ManifestExportPackageOperation(ExportPolicy.ADD_PACKAGE, new IPackageFragment[]{frag}, true);
         op.validate();
         op.run(monitor, workingCopyManager);
       }

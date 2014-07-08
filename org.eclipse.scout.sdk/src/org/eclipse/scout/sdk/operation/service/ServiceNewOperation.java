@@ -112,7 +112,7 @@ public class ServiceNewOperation implements IOperation {
       }
       PrimaryTypeNewOperation interfaceOp = new PrimaryTypeNewOperation(getInterfaceSourceBuilder(), getInterfacePackageName(), getInterfaceProject());
       interfaceOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
-      interfaceOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+      interfaceOp.setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
 
       interfaceOp.setFormatSource(isFormatSource());
       interfaceOp.validate();
@@ -135,7 +135,7 @@ public class ServiceNewOperation implements IOperation {
       PrimaryTypeNewOperation implementationOp = new PrimaryTypeNewOperation(getImplementationSourceBuilder(), getImplementationPackageName(), getImplementationProject());
       implementationOp.setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
       implementationOp.setFormatSource(isFormatSource());
-      implementationOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+      implementationOp.setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
       implementationOp.validate();
       implementationOp.run(monitor, workingCopyManager);
       m_createdServiceImplementation = implementationOp.getCreatedType();

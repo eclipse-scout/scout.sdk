@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -45,7 +45,7 @@ public class FileOpenAction extends AbstractLinkAction {
   @Override
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     try {
-      if (m_extensionType == FileExtensionType.Auto) {
+      if (m_extensionType == FileExtensionType.AUTO) {
         IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), getFile(), true);
       }
       else {
@@ -69,10 +69,14 @@ public class FileOpenAction extends AbstractLinkAction {
   }
 
   public static enum FileExtensionType {
-    Auto, Xml("*.xml"), Txt("*.txt");
-    private String m_extension;
+    AUTO,
+    XML("*.xml"),
+    TXT("*.txt");
+
+    private final String m_extension;
 
     private FileExtensionType() {
+      this(null);
     }
 
     private FileExtensionType(String extension) {
@@ -82,6 +86,5 @@ public class FileOpenAction extends AbstractLinkAction {
     public String getExtension() {
       return m_extension;
     }
-
   }
 }

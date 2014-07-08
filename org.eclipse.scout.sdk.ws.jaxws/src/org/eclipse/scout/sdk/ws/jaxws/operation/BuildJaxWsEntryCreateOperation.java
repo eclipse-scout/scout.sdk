@@ -66,7 +66,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
     Document xmlDocument = buildJaxWsResource.loadXml();
 
     Element xml;
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       xml = xmlDocument.createElement(BuildJaxWsBean.XML_PROVIDER);
       xmlDocument.getDocumentElement().appendChild(xml);
     }
@@ -77,7 +77,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
 
     BuildJaxWsBean bean = new BuildJaxWsBean(xml, m_webserviceEnum);
     bean.setAlias(m_alias);
-    if (m_webserviceEnum == WebserviceEnum.Consumer) {
+    if (m_webserviceEnum == WebserviceEnum.CONSUMER) {
       bean.setWsdl(PathNormalizer.toWsdlPath(m_wsdlProjectRelativePath.toString())); // if provider, this is stored in sun-jaxws.xml
     }
     bean.setProperties(m_buildProperties);

@@ -189,7 +189,7 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
           PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(simpleName, packageName, sharedBundle.getJavaProject());
           formDataOp.setFlags(Flags.AccPublic);
           formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormData));
-          formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+          formDataOp.setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
           OperationJob job = new OperationJob(formDataOp);
           job.schedule();
           try {

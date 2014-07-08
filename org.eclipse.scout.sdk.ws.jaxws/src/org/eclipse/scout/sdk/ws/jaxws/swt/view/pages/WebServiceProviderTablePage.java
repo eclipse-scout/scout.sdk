@@ -97,7 +97,7 @@ public class WebServiceProviderTablePage extends AbstractPage {
     }
     for (Element sunJaxWsXml : getEndpoints()) {
       SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
-      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.Provider);
+      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.PROVIDER);
 
       if (buildJaxWsBean != null) {
         new WebServiceProviderNodePage(this, sunJaxWsBean.getAlias());

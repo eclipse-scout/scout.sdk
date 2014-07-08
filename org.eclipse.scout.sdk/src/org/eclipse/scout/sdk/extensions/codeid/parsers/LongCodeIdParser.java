@@ -16,7 +16,7 @@ public class LongCodeIdParser extends AbstractNumberCodeIdParser {
   }
 
   @Override
-  protected void parseNum(String val) throws NumberFormatException {
+  protected void parseNum(String val) {
     Long.parseLong(val);
   }
 }

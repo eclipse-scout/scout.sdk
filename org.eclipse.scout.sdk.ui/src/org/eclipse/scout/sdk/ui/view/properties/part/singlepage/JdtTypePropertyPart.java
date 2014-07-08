@@ -324,25 +324,25 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   }
 
   private boolean createImportantProperties() {
-    ConfigurationMethodSection impConfigPropsSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.PROPERTY_METHOD, ConfigTypes.Normal);
+    ConfigurationMethodSection impConfigPropsSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.PROPERTY_METHOD, ConfigTypes.NORMAL);
     ISection impPropsSection = impConfigPropsSection.createContent(this, SECTION_ID_PROPS_IMPORTANT, Texts.get("Properties"), wasSectionExpanded(SECTION_ID_PROPS_IMPORTANT, true));
     return impPropsSection != null;
   }
 
   private boolean createImportantOperations() {
-    ConfigurationMethodSection importantExecSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.OPERATION_METHOD, ConfigTypes.Normal);
+    ConfigurationMethodSection importantExecSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.OPERATION_METHOD, ConfigTypes.NORMAL);
     ISection impOpsSection = importantExecSection.createContent(this, SECTION_ID_OPS_IMPORTANT, Texts.get("Operations"), wasSectionExpanded(SECTION_ID_OPS_IMPORTANT, true));
     return impOpsSection != null;
   }
 
   private boolean createAdvancedProperties(boolean importantCreated) {
-    ConfigurationMethodSection advancedConfigPropsSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.PROPERTY_METHOD, ConfigTypes.Advanced);
+    ConfigurationMethodSection advancedConfigPropsSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.PROPERTY_METHOD, ConfigTypes.ADVANCED);
     ISection advPropsSection = advancedConfigPropsSection.createContent(this, SECTION_ID_PROPS_ADVANCED, Texts.get(importantCreated ? "AdvancedProperties" : "Properties"), wasSectionExpanded(SECTION_ID_PROPS_ADVANCED, !importantCreated));
     return advPropsSection != null;
   }
 
   private boolean createAdvancedOperations(boolean importantCreated) {
-    ConfigurationMethodSection advancedExecSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.OPERATION_METHOD, ConfigTypes.Advanced);
+    ConfigurationMethodSection advancedExecSection = new ConfigurationMethodSection(m_configPropertyType, ConfigurationMethod.OPERATION_METHOD, ConfigTypes.ADVANCED);
     ISection advOpsSection = advancedExecSection.createContent(this, SECTION_ID_OPS_ADVANCED, Texts.get(importantCreated ? "AdvancedOperations" : "Operations"), wasSectionExpanded(SECTION_ID_OPS_ADVANCED, !importantCreated));
     return advOpsSection != null;
   }

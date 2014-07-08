@@ -131,7 +131,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     addPage(m_wsPropertiesNewWsdlWizardPage);
 
     // WS properties of existing WSDL Wizard Page
-    m_wsPropertiesExistingWsdlWizardPage = new WsPropertiesExistingWsdlWizardPage(m_bundle, WebserviceEnum.Provider);
+    m_wsPropertiesExistingWsdlWizardPage = new WsPropertiesExistingWsdlWizardPage(m_bundle, WebserviceEnum.PROVIDER);
     m_wsPropertiesExistingWsdlWizardPage.setTitle(Texts.get("CreateWsProvider"));
     m_wsPropertiesExistingWsdlWizardPage.setJaxWsServletAlias(m_servletRegistrationWizardPage.getAlias());
     m_wsPropertiesExistingWsdlWizardPage.addPropertyChangeListener(new P_WsPropertiesExistingWsdlPropertyListener());
@@ -197,7 +197,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
     m_servletRegistrationOperation.setJaxWsAlias(m_servletRegistrationWizardPage.getAlias());
 
     // prepare buildJaxWs.xml operation
-    m_buildJaxWsEntryCreateOperation = new BuildJaxWsEntryCreateOperation(WebserviceEnum.Provider);
+    m_buildJaxWsEntryCreateOperation = new BuildJaxWsEntryCreateOperation(WebserviceEnum.PROVIDER);
     m_buildJaxWsEntryCreateOperation.setBundle(m_bundle);
     if (m_wsdlSelectionWizardPage.isNewWsdl()) {
       m_alias = m_wsPropertiesNewWsdlWizardPage.getAlias();
@@ -349,7 +349,7 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
           op.setBundle(m_bundle);
           op.setWsdlDestinationFolder(m_wsdlLocationWizardPage.getWsdlFolder());
           op.setSchemaTargetNamespace(schemaTargetNamespace);
-          if (candidate.getWsdlArtifact().getTypeEnum() == TypeEnum.ReferencedWsdl) {
+          if (candidate.getWsdlArtifact().getTypeEnum() == TypeEnum.REFERENCED_WSDL) {
             op.setWsdlLocation(candidate.getWsdlArtifact().getFileHandle().getFile());
           }
           op.setProjectRelativePath(bindingFilePath);
@@ -416,10 +416,6 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
       m_sunJaxWsEntryCreateOperation.run(monitor, workingCopyManager);
 
       return true;
-    }
-    catch (Exception e) {
-      JaxWsSdk.logError(e);
-      return false;
     }
     finally {
       JaxWsSdk.getDefault().getMarkerQueueManager().resume();

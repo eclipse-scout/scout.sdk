@@ -50,7 +50,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link AbstractScoutTechnologyHandler}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 11.02.2012
  */
@@ -58,9 +58,9 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public abstract class AbstractScoutTechnologyHandler implements IScoutTechnologyHandler {
 
   protected enum FeatureInstallResult {
-    InstallationNotNecessary,
-    InstallationSuccessful,
-    LicenseNotAccepted
+    INSTALLATION_NOT_NECESSARY,
+    INSTALLATION_SUCCESSFUL,
+    LICENSE_NOT_ACCEPTED
   }
 
   protected AbstractScoutTechnologyHandler() {
@@ -410,7 +410,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
    * if yes, this method does nothing. if at least one of the given plugins are missing, the complete feature is
    * installed from the given p2 repository URL. Before the installation a license agreement dialog is presented and the
    * feature is only installed if all licenses are accepted.
-   * 
+   *
    * @param featureId
    *          The feature Id that will be installed if the definingPlugins are not found on the platform
    * @param featureUrl
@@ -433,7 +433,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
    * if yes, this method does nothing. if at least one of the given plugins are missing, the complete feature is
    * installed from the given p2 repository URL. Before the installation a license agreement dialog is presented and the
    * feature is only installed if all licenses are accepted.
-   * 
+   *
    * @param featureIds
    *          the features that will be installed if the corresponding definingPlugins are not found on the platform.
    * @param featureUrls
@@ -465,7 +465,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     }
 
     if (featureIdsToInstall.size() == 0) {
-      return FeatureInstallResult.InstallationNotNecessary;
+      return FeatureInstallResult.INSTALLATION_NOT_NECESSARY;
     }
 
     final URI[] repoURIs = repos.toArray(new URI[repos.size()]);
@@ -486,9 +486,9 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
 
     if (licAccepted.get()) {
       P2Utility.installUnits(ius, repoURIs, monitor);
-      return FeatureInstallResult.InstallationSuccessful;
+      return FeatureInstallResult.INSTALLATION_SUCCESSFUL;
     }
-    return FeatureInstallResult.LicenseNotAccepted;
+    return FeatureInstallResult.LICENSE_NOT_ACCEPTED;
   }
 
   protected void refreshScoutExplorerPageAsync(final Class<? extends IPage> pageToRefresh) {

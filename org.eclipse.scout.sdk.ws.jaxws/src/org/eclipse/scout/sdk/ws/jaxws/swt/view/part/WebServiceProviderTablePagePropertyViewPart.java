@@ -58,7 +58,7 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
       IFile sunJaxWsFile = ResourceFactory.getSunJaxWsResource(m_bundle).getFile();
       if (JaxWsSdkUtility.exists(sunJaxWsFile)) {
         FileOpenAction b = new FileOpenAction();
-        b.init(sunJaxWsFile, sunJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.Xml);
+        b.init(sunJaxWsFile, sunJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.XML);
         b.setToolTip(Texts.get("JaxWsDeploymentDescriptor"));
         ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit());
         applyLayoutData(actionPresenter);
@@ -69,7 +69,7 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
       IFile buildJaxWsFile = ResourceFactory.getBuildJaxWsResource(m_bundle).getFile();
       if (JaxWsSdkUtility.exists(buildJaxWsFile)) {
         FileOpenAction c = new FileOpenAction();
-        c.init(buildJaxWsFile, buildJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), FileExtensionType.Xml);
+        c.init(buildJaxWsFile, buildJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), FileExtensionType.XML);
         c.setToolTip(Texts.get("JaxWsBuildDescriptor"));
         ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), c, getFormToolkit());
         applyLayoutData(actionPresenter);

@@ -44,7 +44,6 @@ import org.eclipse.ui.dialogs.SelectionDialog;
 
 public class TypeBrowseDialog extends TitleAreaDialog {
 
-  protected static final String IStructuredSelection = null;
   private IType m_type;
   private StyledTextField m_typeField;
   private Button m_typeBrowseButton;

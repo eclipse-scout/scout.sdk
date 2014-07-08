@@ -23,21 +23,22 @@ import org.eclipse.swt.widgets.Listener;
 
 /**
  * <h3>{@link StyledTextEx}</h3> provides paste handling.
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 08.11.2013
  */
 public class StyledTextEx extends StyledText {
 
-  public static final int Paste = 229;
-  private Clipboard m_clipboard;
+  public static final int PASTE = 229;
+
+  private final Clipboard m_clipboard;
 
   public void addPasteListener(Listener pasteListener) {
-    addListener(Paste, pasteListener);
+    addListener(PASTE, pasteListener);
   }
 
   public void removePasteListener(Listener pasteListener) {
-    removeListener(Paste, pasteListener);
+    removeListener(PASTE, pasteListener);
   }
 
   /**
@@ -73,7 +74,7 @@ public class StyledTextEx extends StyledText {
       e.text = clipboardContent;
       e.widget = this;
       e.display = getDisplay();
-      for (Listener l : getListeners(Paste)) {
+      for (Listener l : getListeners(PASTE)) {
         l.handleEvent(e);
         if (!e.doit) {
           break;
@@ -84,5 +85,4 @@ public class StyledTextEx extends StyledText {
       }
     }
   }
-
 }

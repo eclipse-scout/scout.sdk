@@ -68,7 +68,7 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
     super(typeName, packageName, clientProject);
 
     // defaults
-    setPackageExportPolicy(ExportPolicy.AddPackage);
+    setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
     setFlags(Flags.AccPublic);
     setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IForm, getJavaProject()));
     getSourceBuilder().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());

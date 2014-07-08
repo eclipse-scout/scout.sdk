@@ -79,7 +79,7 @@ public class BindingFileNewAction extends AbstractLinkAction {
       if (wsdlArtifact.getInlineSchemas().length > 1) {
         op.setSchemaTargetNamespace(SchemaUtility.getSchemaTargetNamespace(schemaCandidate.getSchema()));
       }
-      if (wsdlArtifact.getTypeEnum() == TypeEnum.ReferencedWsdl) {
+      if (wsdlArtifact.getTypeEnum() == TypeEnum.REFERENCED_WSDL) {
         op.setWsdlLocation(wsdlArtifact.getFileHandle().getFile());
       }
     }

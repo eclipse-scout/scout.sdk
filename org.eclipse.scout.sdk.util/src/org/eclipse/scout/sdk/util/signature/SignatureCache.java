@@ -23,16 +23,16 @@ import org.eclipse.jdt.core.Signature;
  */
 public final class SignatureCache {
 
-  private static final Map<String, String> m_sigMap = new HashMap<String, String>(256);
+  private static final Map<String, String> SIG_CACHE = new HashMap<String, String>(256);
 
   private SignatureCache() {
   }
 
   public static String createTypeSignature(String fqn) { // no need to make synchronized
-    String existing = m_sigMap.get(fqn);
+    String existing = SIG_CACHE.get(fqn);
     if (existing == null) {
       existing = Signature.createTypeSignature(fqn, true);
-      m_sigMap.put(fqn, existing);
+      SIG_CACHE.put(fqn, existing);
     }
     return existing;
   }

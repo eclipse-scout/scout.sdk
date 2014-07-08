@@ -70,7 +70,7 @@ public class FormDataAnnotation {
   private int m_genericOrdinal = -1;
   private String m_formDataTypeSignature;
   private String m_superTypeSignature;
-  private IJavaElement annotationOwner;
+  private IJavaElement m_annotationOwner;
   private final Set<String> m_interfaceSignatures;
 
   public FormDataAnnotation() {
@@ -168,11 +168,11 @@ public class FormDataAnnotation {
   }
 
   public IJavaElement getAnnotationOwner() {
-    return annotationOwner;
+    return m_annotationOwner;
   }
 
   public void setAnnotationOwner(IJavaElement annotationOwner) {
-    this.annotationOwner = annotationOwner;
+    this.m_annotationOwner = annotationOwner;
   }
 
   public void addInterfaceSignature(String sig) {

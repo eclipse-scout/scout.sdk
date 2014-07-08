@@ -42,7 +42,7 @@ public class MissingBuildJaxWsEntryCommand extends AbstractExecutableMarkerComma
     Document xmlDocument = ResourceFactory.getBuildJaxWsResource(m_bundle).loadXml();
 
     Element xml;
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       xml = JaxWsSdkUtility.getChildElement(xmlDocument.getDocumentElement().getChildNodes(), BuildJaxWsBean.XML_PROVIDER);
     }
     else {

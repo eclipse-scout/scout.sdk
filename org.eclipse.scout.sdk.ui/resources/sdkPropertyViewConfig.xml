@@ -656,6 +656,8 @@
 		<config name="getConfiguredRootNodeVisible" type="Advanced" category="Appearance" />
 		<config name="getConfiguredRootHandlesVisible" type="Normal" category="Appearance" />
 		<config name="getConfiguredScrollToSelection" type="Normal" category="Behavior" />
+		<config name="getConfiguredNodeHeightHint" type="Advanced" category="Layout" />
+		<config name="getConfiguredSaveAndRestoreScrollbars" type="Advanced" category="Behavior" />
 		<config name="execInitTree" type="Advanced" category="BusinessLogic" />
 		<config name="execDisposeTree" type="Advanced" category="BusinessLogic" />
 		<config name="execHyperlinkAction" type="Advanced" category="BusinessLogic" />

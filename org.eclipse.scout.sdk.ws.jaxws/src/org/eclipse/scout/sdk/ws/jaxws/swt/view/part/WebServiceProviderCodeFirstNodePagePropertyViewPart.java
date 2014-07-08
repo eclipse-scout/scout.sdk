@@ -254,7 +254,7 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
 
       // QuickLink 'Open sun-jaxws.xml'
       FileOpenAction a = new FileOpenAction();
-      a.init(ResourceFactory.getSunJaxWsResource(m_bundle).getFile(), ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.Xml);
+      a.init(ResourceFactory.getSunJaxWsResource(m_bundle).getFile(), ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.XML);
       a.setToolTip(Texts.get("JaxWsDeploymentDescriptor"));
       ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit());
       applyLayoutData(actionPresenter);

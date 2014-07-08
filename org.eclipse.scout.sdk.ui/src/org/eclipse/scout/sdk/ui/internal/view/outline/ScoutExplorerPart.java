@@ -51,11 +51,11 @@ import org.eclipse.scout.sdk.jobs.OptionalWorkspaceBlockingRule;
 import org.eclipse.scout.sdk.ui.action.AbstractFilterMenuContributionItem;
 import org.eclipse.scout.sdk.ui.action.LinkWithEditorAction;
 import org.eclipse.scout.sdk.ui.action.ScoutBundlePresentationActionGroup;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.internal.dialog.workingset.ConfigureScoutWorkingSetsDialog;
-import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSupport.BundlePresentation;
 import org.eclipse.scout.sdk.ui.internal.view.outline.clipboard.ExplorerCopyAndPasteSupport;
 import org.eclipse.scout.sdk.ui.internal.view.outline.dnd.ExplorerDndSupport;
@@ -99,7 +99,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
    * </p>
    */
   public static final int IS_LINKING_ENABLED_PROPERTY = 1;
-  private String LINKING_ENABLED = "OutlineView.LINKING_ENABLED"; //$NON-NLS-1$
+  private static final String LINKING_ENABLED = "OutlineView.LINKING_ENABLED"; //$NON-NLS-1$
 
   private TreeViewer m_viewer;
   private ViewContentProvider m_viewContentProvider;
@@ -223,8 +223,8 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
           }
           else if (page instanceof AbstractBundleNodeTablePage) {
             if (page.getScoutBundle() != null) {
-              if ((!page.getScoutBundle().isBinary() && !BundlePresentation.Flat.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation()) && !BundlePresentation.FlatGroups.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) ||
-                  (page.getScoutBundle().isBinary() && BundlePresentation.Hierarchical.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation()))) {
+              if ((!page.getScoutBundle().isBinary() && !BundlePresentation.FLAT.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation()) && !BundlePresentation.FLAT_GROUPS.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) ||
+                  (page.getScoutBundle().isBinary() && BundlePresentation.HIERARCHICAL.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation()))) {
                 expandedPages.add(page);
               }
               if (page.getScoutBundle().isBinary()) {
@@ -608,7 +608,6 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   } // end class P_OutlineSelectionProvider
 
   private class P_ReloadNodeJob extends Job {
-    private Object lock = new Object();
     private IPage m_page;
 
     /**
@@ -619,26 +618,22 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       setRule(new OptionalWorkspaceBlockingRule(false));
     }
 
-    public void reloadDelayed(IPage page) {
-      synchronized (lock) {
-        cancel();
-        m_page = page;
-        schedule(300);
-      }
+    public synchronized void reloadDelayed(IPage page) {
+      cancel();
+      m_page = page;
+      schedule(300);
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      synchronized (lock) {
-        getTreeViewer().getTree().getDisplay().asyncExec(new Runnable() {
-          @Override
-          public void run() {
-            if (m_page != null) {
-              getTreeViewer().refresh(m_page);
-            }
+    protected synchronized IStatus run(IProgressMonitor monitor) {
+      getTreeViewer().getTree().getDisplay().asyncExec(new Runnable() {
+        @Override
+        public void run() {
+          if (m_page != null) {
+            getTreeViewer().refresh(m_page);
           }
-        });
-      }
+        }
+      });
       return Status.OK_STATUS;
     }
   } // end class P_ReloadNodeJob

@@ -30,7 +30,7 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
   private T m_currentSourceValue;
   private T m_defaultValue;
   private boolean m_defaultValueInitialized;
-  private OptimisticLock storeValueLock = new OptimisticLock();
+  private final OptimisticLock m_storeValueLock = new OptimisticLock();
 
   public AbstractProposalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -73,7 +73,7 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
     super.init(method);
     setCurrentSourceValue(parseInput(getMethod().computeValue()));
     try {
-      storeValueLock.acquire();
+      m_storeValueLock.acquire();
       if (getCurrentSourceValue() != null) {
         m_proposalField.acceptProposal(getCurrentSourceValue());
       }
@@ -83,7 +83,7 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
       m_proposalField.setEnabled(true);
     }
     finally {
-      storeValueLock.release();
+      m_storeValueLock.release();
     }
   }
 
@@ -98,7 +98,7 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
 
   /**
    * to store the value in the source file.
-   * 
+   *
    * @param value
    *          can be null
    */
@@ -130,7 +130,7 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
     public void proposalAccepted(ContentProposalEvent event) {
       setCurrentSourceValue((T) event.proposal);
       try {
-        if (storeValueLock.acquire()) {
+        if (m_storeValueLock.acquire()) {
           try {
             storeValue(getCurrentSourceValue());
           }
@@ -140,7 +140,7 @@ public abstract class AbstractProposalPresenter<T extends Object> extends Abstra
         }
       }
       finally {
-        storeValueLock.release();
+        m_storeValueLock.release();
       }
     }
   } // end class P_ProposalFieldListener

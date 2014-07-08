@@ -51,11 +51,11 @@ public class ManifestExportPackageOperation implements IOperation {
   public String getOperationName() {
 
     switch (getExportPolicy()) {
-      case RemovePackage:
-      case RemovePackageWhenEmpty:
+      case REMOVE_PACKAGE:
+      case REMOVE_PACKAGE_WHEN_EMPTY:
         return Texts.get("Operation_removeExportedPackage");
-      case AddPackage:
-      case AddPackageWhenNotEmpty:
+      case ADD_PACKAGE:
+      case ADD_PACKAGE_WHEN_NOT_EMPTY:
         return Texts.get("Operation_addExportedPackage");
       default:
         return "";
@@ -70,16 +70,16 @@ public class ManifestExportPackageOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     switch (getExportPolicy()) {
-      case RemovePackageWhenEmpty:
+      case REMOVE_PACKAGE_WHEN_EMPTY:
         runRemoveWhenEmpty(monitor);
         break;
-      case RemovePackage:
+      case REMOVE_PACKAGE:
         runRemove(monitor);
         break;
-      case AddPackageWhenNotEmpty:
+      case ADD_PACKAGE_WHEN_NOT_EMPTY:
         runAddWhenNotEmpty(monitor);
         break;
-      case AddPackage:
+      case ADD_PACKAGE:
         runAdd(monitor);
         break;
     }

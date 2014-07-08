@@ -44,7 +44,7 @@ public class WsdlFolderPresenter extends FolderPresenter {
   @Override
   protected IFolder execBrowseAction() {
     IFolder rootFolder = null;
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       rootFolder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.PATH_WSDL_PROVIDER, true);
     }
     else {
@@ -97,7 +97,7 @@ public class WsdlFolderPresenter extends FolderPresenter {
       setEnabled(false);
       return;
     }
-    if (m_webserviceEnum == WebserviceEnum.Provider && m_sunJaxWsBean == null) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER && m_sunJaxWsBean == null) {
       setEnabled(false);
       return;
     }

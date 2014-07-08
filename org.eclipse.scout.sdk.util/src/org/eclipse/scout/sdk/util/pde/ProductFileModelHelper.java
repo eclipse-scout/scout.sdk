@@ -117,17 +117,17 @@ public final class ProductFileModelHelper {
     /**
      * Specifies a normal plug-in dependency.
      */
-    Plugin,
+    PLUGIN,
 
     /**
      * Specifies a fragment dependency.
      */
-    Fragment,
+    FRAGMENT,
 
     /**
      * Specifies a dependency to a feature.
      */
-    Feature
+    FEATURE
   }
 
   public static final class ProductFilePart {
@@ -146,7 +146,7 @@ public final class ProductFileModelHelper {
      * @throws CoreException
      */
     public void addDependency(String pluginId) throws CoreException {
-      addDependency(pluginId, DependencyType.Plugin);
+      addDependency(pluginId, DependencyType.PLUGIN);
     }
 
     /**
@@ -162,12 +162,12 @@ public final class ProductFileModelHelper {
      */
     public synchronized void addDependency(String id, DependencyType type) throws CoreException {
       if (!existsDependency(id)) {
-        if (DependencyType.Feature.equals(type)) {
+        if (DependencyType.FEATURE.equals(type)) {
           ProductFeature pf = createFeature(id);
           m_model.getWorkspaceProductModel().getProduct().addFeatures(new IProductFeature[]{pf});
         }
         else {
-          P_ProductPlugin newPlugin = createPlugin(id, DependencyType.Fragment.equals(type));
+          P_ProductPlugin newPlugin = createPlugin(id, DependencyType.FRAGMENT.equals(type));
           m_model.getWorkspaceProductModel().getProduct().addPlugins(new IProductPlugin[]{newPlugin});
         }
       }

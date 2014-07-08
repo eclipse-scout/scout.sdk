@@ -35,7 +35,7 @@ import org.eclipse.ui.internal.WorkingSet;
 
 /**
  * <h3>{@link ScoutExplorerSettingsSupport}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 20.03.2013
  */
@@ -45,11 +45,11 @@ public final class ScoutExplorerSettingsSupport {
   private static final ScoutExplorerSettingsSupport INSTANCE = new ScoutExplorerSettingsSupport();
 
   public static enum BundlePresentation {
-    Grouped,
-    Hierarchical,
-    Flat,
-    WorkingSet,
-    FlatGroups,
+    GROUPED,
+    HIERARCHICAL,
+    FLAT,
+    WORKING_SET,
+    FLAT_GROUPS
   }
 
   public static final String SCOUT_WOKRING_SET_ID = "org.eclipse.scout.sdk.ui.workingSet";
@@ -172,31 +172,31 @@ public final class ScoutExplorerSettingsSupport {
 
   private static BundlePresentation parseBundlePresentation(String input) {
     if (DISPLAY_STYLE_FLAT.equals(input)) {
-      return BundlePresentation.Flat;
+      return BundlePresentation.FLAT;
     }
     else if (DISPLAY_STYLE_HIERARCHICAL.equals(input)) {
-      return BundlePresentation.Hierarchical;
+      return BundlePresentation.HIERARCHICAL;
     }
     else if (DISPLAY_STYLE_WORKING_SET.equals(input)) {
-      return BundlePresentation.WorkingSet;
+      return BundlePresentation.WORKING_SET;
     }
     else if (DISPLAY_STYLE_FLAT_GROUPS.equals(input)) {
-      return BundlePresentation.FlatGroups;
+      return BundlePresentation.FLAT_GROUPS;
     }
-    return BundlePresentation.Grouped;
+    return BundlePresentation.GROUPED;
   }
 
   private static String getBundlePresentationString(BundlePresentation input) {
-    if (BundlePresentation.Flat.equals(input)) {
+    if (BundlePresentation.FLAT.equals(input)) {
       return DISPLAY_STYLE_FLAT;
     }
-    else if (BundlePresentation.Hierarchical.equals(input)) {
+    else if (BundlePresentation.HIERARCHICAL.equals(input)) {
       return DISPLAY_STYLE_HIERARCHICAL;
     }
-    else if (BundlePresentation.WorkingSet.equals(input)) {
+    else if (BundlePresentation.WORKING_SET.equals(input)) {
       return DISPLAY_STYLE_WORKING_SET;
     }
-    else if (BundlePresentation.FlatGroups.equals(input)) {
+    else if (BundlePresentation.FLAT_GROUPS.equals(input)) {
       return DISPLAY_STYLE_FLAT_GROUPS;
     }
     return DISPLAY_STYLE_GROUPED;

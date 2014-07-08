@@ -11,14 +11,14 @@
 package org.eclipse.scout.sdk.operation.jdt.packageFragment;
 
 /**
- * <h3>{@link ExportPolicy}</h3> ...
- * 
- *  @author Andreas Hoegger
+ * <h3>{@link ExportPolicy}</h3>
+ *
+ * @author Andreas Hoegger
  * @since 3.10.0 13.03.2013
  */
 public enum ExportPolicy {
-  RemovePackage,
-  RemovePackageWhenEmpty,
-  AddPackage,
-  AddPackageWhenNotEmpty
+  REMOVE_PACKAGE,
+  REMOVE_PACKAGE_WHEN_EMPTY,
+  ADD_PACKAGE,
+  ADD_PACKAGE_WHEN_NOT_EMPTY
 }

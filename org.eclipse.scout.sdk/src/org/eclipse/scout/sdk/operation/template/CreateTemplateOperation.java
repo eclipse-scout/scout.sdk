@@ -185,13 +185,13 @@ public class CreateTemplateOperation implements IOperation {
       PrimaryTypeNewOperation formDataOp = new PrimaryTypeNewOperation(getTemplateName() + "Data", sharedBundle.getPackageName(getFormDataPackageSuffix()), sharedBundle.getJavaProject());
       formDataOp.setFlags(Flags.AccAbstract | Flags.AccPublic);
       formDataOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormData));
-      formDataOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+      formDataOp.setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
       formDataOp.validate();
       formDataOp.run(monitor, workingCopyManager);
       op.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createFormDataAnnotation(SignatureCache.createTypeSignature(formDataOp.getCreatedType().getFullyQualifiedName()), SdkCommand.CREATE, DefaultSubtypeSdkCommand.CREATE));
       formDataType = op.getCreatedType();
     }
-    op.setPackageExportPolicy(ExportPolicy.AddPackage);
+    op.setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
     op.setFormatSource(true);
     op.validate();
     op.run(monitor, workingCopyManager);

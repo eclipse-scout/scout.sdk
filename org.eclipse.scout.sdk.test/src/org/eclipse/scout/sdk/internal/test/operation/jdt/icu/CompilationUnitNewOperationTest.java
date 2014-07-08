@@ -67,7 +67,7 @@ public class CompilationUnitNewOperationTest extends AbstractScoutSdkTest {
 
     CompilationUnitNewOperation icuNewOp = new CompilationUnitNewOperation("SimpleIcu.java", "jdt.test.client.icu.output02", clientProject);
     icuNewOp.addTypeSourceBuilder(new TypeSourceBuilder("SimpleIcu"));
-    icuNewOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+    icuNewOp.setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
     TestWorkspaceUtility.executeAndBuildWorkspace(icuNewOp);
     TestWorkspaceUtility.assertNoCompileErrors();
     Assert.assertTrue(TypeUtility.exists(icuNewOp.getCreatedCompilationUnit()));

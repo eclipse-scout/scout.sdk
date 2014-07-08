@@ -44,7 +44,7 @@ public class AuthenticationHandlerTablePage extends AbstractPage {
     setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsIcons.AuthenticationHandlerFolder));
     setName(Texts.get("Authentication"));
     m_webserviceEnum = webserviceEnum;
-    if (webserviceEnum == WebserviceEnum.Provider) {
+    if (webserviceEnum == WebserviceEnum.PROVIDER) {
       m_superInterfaceType = TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerProvider);
     }
     else {

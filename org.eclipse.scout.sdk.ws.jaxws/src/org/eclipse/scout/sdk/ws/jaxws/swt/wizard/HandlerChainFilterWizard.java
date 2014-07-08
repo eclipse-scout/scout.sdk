@@ -53,23 +53,23 @@ public class HandlerChainFilterWizard extends AbstractWorkspaceWizard {
     Element xmlFilterPort = JaxWsSdkUtility.getChildElement(m_xmlHandlerChain.getChildNodes(), toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PORT));
 
     if (xmlFilterProtocol != null) {
-      m_filterTypeEnum = FilterTypeEnum.ProtocolFilter;
+      m_filterTypeEnum = FilterTypeEnum.PROTOCOL_FILTER;
       m_pattern = xmlFilterProtocol.getTextContent();
     }
     else if (xmlFilterService != null || xmlFilterPort != null) {
       Element xmlFilter;
       if (xmlFilterService != null) {
         xmlFilter = xmlFilterService;
-        m_filterTypeEnum = FilterTypeEnum.ServiceFilter;
+        m_filterTypeEnum = FilterTypeEnum.SERVICE_FILTER;
       }
       else {
         xmlFilter = xmlFilterPort;
-        m_filterTypeEnum = FilterTypeEnum.PortFilter;
+        m_filterTypeEnum = FilterTypeEnum.PORT_FILTER;
       }
       m_pattern = xmlFilter.getTextContent();
     }
     else {
-      m_filterTypeEnum = FilterTypeEnum.NoFilter;
+      m_filterTypeEnum = FilterTypeEnum.NO_FILTER;
     }
   }
 
@@ -100,7 +100,7 @@ public class HandlerChainFilterWizard extends AbstractWorkspaceWizard {
 
     Node firstChild = null;
     switch (m_filterTypeEnum) {
-      case ProtocolFilter:
+      case PROTOCOL_FILTER:
         Element protocolFilter = m_xmlHandlerChain.getOwnerDocument().createElement(toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PROTOCOL));
         firstChild = m_xmlHandlerChain.getFirstChild();
         if (firstChild == null) {
@@ -111,7 +111,7 @@ public class HandlerChainFilterWizard extends AbstractWorkspaceWizard {
         }
         protocolFilter.setTextContent(m_pattern);
         break;
-      case ServiceFilter:
+      case SERVICE_FILTER:
         Element serviceFilter = m_xmlHandlerChain.getOwnerDocument().createElement(toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_SERVICE));
         firstChild = m_xmlHandlerChain.getFirstChild();
         if (firstChild == null) {
@@ -123,7 +123,7 @@ public class HandlerChainFilterWizard extends AbstractWorkspaceWizard {
         serviceFilter.setTextContent(m_pattern);
         serviceFilter.setPrefix(m_namespacePrefix);
         break;
-      case PortFilter:
+      case PORT_FILTER:
         Element portFilter = m_xmlHandlerChain.getOwnerDocument().createElement(toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PORT));
         firstChild = m_xmlHandlerChain.getFirstChild();
         if (firstChild == null) {

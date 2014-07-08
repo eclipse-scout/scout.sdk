@@ -52,7 +52,7 @@ public class WebServicesTablePagePropertyViewPart extends AbstractSinglePageSect
       IFile buildJaxWsFile = ResourceFactory.getBuildJaxWsResource(m_bundle).getFile();
       if (JaxWsSdkUtility.exists(buildJaxWsFile)) {
         FileOpenAction a = new FileOpenAction();
-        a.init(buildJaxWsFile, buildJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsSdk.BuildJaxWsXmlFile), FileExtensionType.Xml);
+        a.init(buildJaxWsFile, buildJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsSdk.BuildJaxWsXmlFile), FileExtensionType.XML);
         a.setToolTip(Texts.get("JaxWsBuildDescriptor"));
         ActionPresenter presenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit());
         applyLayoutData(presenter);

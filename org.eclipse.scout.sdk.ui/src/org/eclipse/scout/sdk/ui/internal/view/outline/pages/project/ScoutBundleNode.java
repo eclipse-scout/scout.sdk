@@ -15,9 +15,9 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSupport;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -42,7 +42,7 @@ public class ScoutBundleNode {
     m_type = bundle.getType();
     m_childNodes = new HashSet<ScoutBundleNode>();
     m_uiExtension = uiExtension;
-    if (!ScoutExplorerSettingsSupport.BundlePresentation.Flat.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
+    if (!ScoutExplorerSettingsSupport.BundlePresentation.FLAT.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
       for (IScoutBundle child : bundle.getDirectChildBundles()) {
         if (ScoutExplorerSettingsBundleFilter.get().accept(child)) {
           ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(child.getType());

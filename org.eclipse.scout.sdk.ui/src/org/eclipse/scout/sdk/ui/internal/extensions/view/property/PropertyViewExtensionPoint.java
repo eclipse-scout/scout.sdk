@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.extensions.view.property;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -19,6 +20,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -35,68 +37,75 @@ import org.osgi.framework.Bundle;
  * @since 1.0.8 19.07.2010
  */
 public final class PropertyViewExtensionPoint {
-  private static final String propertyViewExtensionId = "propertyViewPart";
-  private static PropertyViewExtensionPoint instance = new PropertyViewExtensionPoint();
+  private static final String PROPERTY_VIEW_EXTENSION_ID = "propertyViewPart";
+  private static final Object LOCK = new Object();
 
-  private ArrayList<PropertyViewExtension> m_extensions;
+  private static List<PropertyViewExtension> viewExtensions = null;
 
   private PropertyViewExtensionPoint() {
-    init();
   }
 
-  private void init() {
-    try {
-      HashMap<Class<? extends IPage>, PropertyViewExtension> extendsions = new HashMap<Class<? extends IPage>, PropertyViewExtension>();
-      IExtensionRegistry reg = Platform.getExtensionRegistry();
-      IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, propertyViewExtensionId);
-      IExtension[] extensions = xp.getExtensions();
-      for (IExtension extension : extensions) {
-        Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
-        for (IConfigurationElement partExtension : extension.getConfigurationElements()) {
-          if (partExtension.getName().equals("part")) {
-            long ranking = -1;
-            String rankingAttribute = partExtension.getAttribute(IRuntimeClasses.EXTENSION_SERVICE_RANKING);
-            if (!StringUtility.isNullOrEmpty(rankingAttribute)) {
-              ranking = Long.parseLong(rankingAttribute);
-            }
-            Class<? extends IPage> pageClass = getClassOfElement(contributerBundle, partExtension.getAttribute("page"), IPage.class);
-            PropertyViewExtension pageExt = extendsions.get(pageClass);
-            if (pageExt == null) {
-              pageExt = new PropertyViewExtension();
-              pageExt.setPageClass(pageClass);
-              extendsions.put(pageClass, pageExt);
-            }
-            for (IConfigurationElement part : partExtension.getChildren()) {
-              if (part.getName().equals("singlePart")) {
-                pageExt.setSingleViewPartClazz(getClassOfElement(contributerBundle, part.getAttribute("viewPart"), ISinglePropertyViewPart.class), ranking);
+  private static List<PropertyViewExtension> getExtensions() {
+    if (viewExtensions == null) {
+      synchronized (LOCK) {
+        if (viewExtensions == null) {
+          try {
+            HashMap<Class<? extends IPage>, PropertyViewExtension> tmp = new HashMap<Class<? extends IPage>, PropertyViewExtension>();
+            IExtensionRegistry reg = Platform.getExtensionRegistry();
+            IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, PROPERTY_VIEW_EXTENSION_ID);
+            IExtension[] extensions = xp.getExtensions();
+            for (IExtension extension : extensions) {
+              Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
+              for (IConfigurationElement partExtension : extension.getConfigurationElements()) {
+                if (partExtension.getName().equals("part")) {
+                  long ranking = -1;
+                  String rankingAttribute = partExtension.getAttribute(IRuntimeClasses.EXTENSION_SERVICE_RANKING);
+                  if (!StringUtility.isNullOrEmpty(rankingAttribute)) {
+                    ranking = Long.parseLong(rankingAttribute);
+                  }
+                  Class<? extends IPage> pageClass = getClassOfElement(contributerBundle, partExtension.getAttribute("page"), IPage.class);
+                  PropertyViewExtension pageExt = tmp.get(pageClass);
+                  if (pageExt == null) {
+                    pageExt = new PropertyViewExtension();
+                    pageExt.setPageClass(pageClass);
+                    tmp.put(pageClass, pageExt);
+                  }
+                  for (IConfigurationElement part : partExtension.getChildren()) {
+                    if (part.getName().equals("singlePart")) {
+                      pageExt.setSingleViewPartClazz(getClassOfElement(contributerBundle, part.getAttribute("viewPart"), ISinglePropertyViewPart.class), ranking);
+                    }
+                    else if (part.getName().equals("multiPart")) {
+                      pageExt.setMultiViewPartClazz(getClassOfElement(contributerBundle, part.getAttribute("viewPart"), IMultiPropertyViewPart.class), ranking);
+                    }
+                  }
+                }
               }
-              else if (part.getName().equals("multiPart")) {
-                pageExt.setMultiViewPartClazz(getClassOfElement(contributerBundle, part.getAttribute("viewPart"), IMultiPropertyViewPart.class), ranking);
+            }
+
+            // order extensions
+            TreeMap<CompositeObject, PropertyViewExtension> orderedExtensions = new TreeMap<CompositeObject, PropertyViewExtension>();
+            for (PropertyViewExtension ext : tmp.values()) {
+              try {
+                int distanceToIPage = distanceToIPage(ext.getPageClass(), 0);
+                orderedExtensions.put(new CompositeObject(-distanceToIPage, ext), ext);
+              }
+              catch (Exception t) {
+                ScoutSdkUi.logError("Could not determ load extension '" + ext.toString() + "'!");
               }
             }
+            viewExtensions = CollectionUtility.arrayList(orderedExtensions.values());
+          }
+          catch (Exception e) {
+            ScoutSdkUi.logError("Error during reading property view extensions.", e);
           }
         }
       }
-      // order extensions
-      TreeMap<CompositeObject, PropertyViewExtension> orderedExtensions = new TreeMap<CompositeObject, PropertyViewExtension>();
-      for (PropertyViewExtension ext : extendsions.values()) {
-        try {
-          int distanceToIPage = distanceToIPage(ext.getPageClass(), 0);
-          orderedExtensions.put(new CompositeObject(-distanceToIPage, ext), ext);
-        }
-        catch (Exception t) {
-          ScoutSdkUi.logError("Could not determ load extension '" + ext.toString() + "'!");
-        }
-      }
-      m_extensions = new ArrayList<PropertyViewExtension>(orderedExtensions.values());
     }
-    catch (Exception e) {
-      ScoutSdkUi.logError("Error during reading property view extensions.", e);
-    }
+    return viewExtensions;
   }
 
   @SuppressWarnings("unchecked")
-  private <T> Class<? extends T> getClassOfElement(Bundle bundle, String clazzName, Class<T> t) {
+  private static <T> Class<? extends T> getClassOfElement(Bundle bundle, String clazzName, Class<T> t) {
     Class<? extends T> clazz = null;
     if (bundle != null) {
       if (!StringUtility.isNullOrEmpty(clazzName)) {
@@ -111,7 +120,7 @@ public final class PropertyViewExtensionPoint {
     return clazz;
   }
 
-  private int distanceToIPage(Class<?> visitee, int dist) {
+  private static int distanceToIPage(Class<?> visitee, int dist) {
     if (visitee == null) {
       throw new IllegalArgumentException("try to determ the distance to IPage of a instance not in subhierarchy of IPage.");
     }
@@ -136,11 +145,11 @@ public final class PropertyViewExtensionPoint {
   }
 
   public static ISinglePropertyViewPart createSinglePageViewPart(IPage page) {
-    return instance.createSinglePageViewPartImpl(page);
+    return createSinglePageViewPartImpl(page);
   }
 
-  private ISinglePropertyViewPart createSinglePageViewPartImpl(IPage page) {
-    for (PropertyViewExtension ext : m_extensions) {
+  private static ISinglePropertyViewPart createSinglePageViewPartImpl(IPage page) {
+    for (PropertyViewExtension ext : getExtensions()) {
       if (ext.getPageClass().isAssignableFrom(page.getClass())) {
         if (ext.getSingleViewPartClazz() != null) {
           return ext.createSingleViewPart();
@@ -151,12 +160,12 @@ public final class PropertyViewExtensionPoint {
   }
 
   public static IMultiPropertyViewPart createMultiPageViewPart(IPage[] pages) {
-    return instance.createMultiPageViewPartImpl(pages);
+    return createMultiPageViewPartImpl(pages);
   }
 
-  private IMultiPropertyViewPart createMultiPageViewPartImpl(IPage[] pages) {
+  private static IMultiPropertyViewPart createMultiPageViewPartImpl(IPage[] pages) {
     Class<? extends IPage> commonClazz = findCommonPage(pages);
-    for (PropertyViewExtension ext : m_extensions) {
+    for (PropertyViewExtension ext : getExtensions()) {
       if (ext.getPageClass().isAssignableFrom(commonClazz)) {
         if (ext.getMultiViewPartClazz() != null) {
           return ext.createMultiViewPart();
@@ -167,7 +176,7 @@ public final class PropertyViewExtensionPoint {
   }
 
   @SuppressWarnings("unchecked")
-  private Class<? extends IPage> findCommonPage(IPage[] pages) {
+  private static Class<? extends IPage> findCommonPage(IPage[] pages) {
     if (pages == null || pages.length == 0) {
       return null;
     }

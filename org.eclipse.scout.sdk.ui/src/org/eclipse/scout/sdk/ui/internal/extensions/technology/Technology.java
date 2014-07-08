@@ -274,12 +274,12 @@ public class Technology implements Comparable<Technology> {
   private final class P_ChangeSelectionOperation implements IOperation {
     private final ITreeNode[] m_selectedNodes;
     private final boolean m_newSelection;
-    private boolean success;
+    private boolean m_success;
 
     private P_ChangeSelectionOperation(ITreeNode[] selectedNodes, boolean newSelection) {
       m_selectedNodes = selectedNodes;
       m_newSelection = newSelection;
-      success = false; // nothing done yet
+      m_success = false; // nothing done yet
     }
 
     @Override
@@ -340,10 +340,10 @@ public class Technology implements Comparable<Technology> {
           monitor.worked(1);
         }
 
-        success = true;
+        m_success = true;
       }
       finally {
-        final boolean wasSuccessful = success;
+        final boolean wasSuccessful = m_success;
         ScoutSdkUi.getDisplay().asyncExec(new Runnable() {
           @Override
           public void run() {

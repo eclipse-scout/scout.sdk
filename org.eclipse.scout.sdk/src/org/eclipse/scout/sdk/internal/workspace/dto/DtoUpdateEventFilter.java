@@ -30,19 +30,19 @@ import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateEventFilter;
  */
 public final class DtoUpdateEventFilter {
 
-  private static final Object lock = new Object();
+  private static final Object LOCK = new Object();
   private static final String EXTENSION_POINT_NAME = "dtoUpdateEventFilter";
   private static final String TAG_NAME = "filter";
   private static final String FILTER_CLASS_ATTRIB = "class";
 
-  private static IDtoAutoUpdateEventFilter[] filters = null;
+  private static volatile IDtoAutoUpdateEventFilter[] filters = null;
 
   private DtoUpdateEventFilter() {
   }
 
   public static IDtoAutoUpdateEventFilter[] getFilters() {
     if (filters == null) {
-      synchronized (lock) {
+      synchronized (LOCK) {
         if (filters == null) {
           List<IDtoAutoUpdateEventFilter> tmp = new ArrayList<IDtoAutoUpdateEventFilter>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();

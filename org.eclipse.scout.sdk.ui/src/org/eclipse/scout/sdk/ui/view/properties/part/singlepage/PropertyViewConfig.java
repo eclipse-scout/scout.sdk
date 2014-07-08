@@ -43,8 +43,8 @@ public class PropertyViewConfig {
 
   private final HashMap<String, HashMap<String, Config>> m_typeConfigs;
 
-  public static final ConfigTypes DEFAULT_CONFIG_TYPE = ConfigTypes.Advanced;
-  public static final ConfigCategory DEFAULT_CONFIG_CATEGORY = ConfigCategory.Misc;
+  public static final ConfigTypes DEFAULT_CONFIG_TYPE = ConfigTypes.ADVANCED;
+  public static final ConfigCategory DEFAULT_CONFIG_CATEGORY = ConfigCategory.MISC;
 
   /**
    * Method priority.
@@ -53,12 +53,12 @@ public class PropertyViewConfig {
     /**
      * Important method. Shown by default.
      */
-    Normal,
+    NORMAL,
 
     /**
      * Advanced method. Collapsed by default.
      */
-    Advanced
+    ADVANCED
   }
 
   /**
@@ -70,21 +70,21 @@ public class PropertyViewConfig {
      * Examples:<br>
      * Label text, icons, titles, colors, fonts, numeric fraction-digits, ...
      */
-    Appearance(100 /* defines in which order the categories appear in a section */),
+    APPEARANCE(100 /* defines in which order the categories appear in a section */, "Appearance"),
 
     /**
      * Used for properties that influence how the item is positioned.<br>
      * Examples:<br>
      * alignments, widths, heights, label-visibilities, positions (x,y), display view hints, ...
      */
-    Layout(200),
+    LAYOUT(200, "Layout"),
 
     /**
      * Used for properties that influence how the item behaves at runtime.<br>
      * Examples:<br>
      * type of buttons, column displayable, editable, sortings, modality of dialogs, enabled, ...
      */
-    Behavior(300),
+    BEHAVIOR(300, "Behavior"),
 
     /**
      * Used for properties that influence how the item behaves at runtime.<br>
@@ -92,24 +92,24 @@ public class PropertyViewConfig {
      * min/max values, lookup calls, code types, master fields, max lengths, most service properties, data filters, load
      * table data, ...
      */
-    Data(400),
+    DATA(400, "Data"),
 
     /**
      * Used for most operations that have no influence on the appearance of an item.
      */
-    BusinessLogic(500),
+    BUSINESS_LOGIC(500, "BusinessLogic"),
 
     /**
      * Undefined or various other operations and properties. Default for methods that have nothing configured.
      */
-    Misc(Integer.MAX_VALUE);
+    MISC(Integer.MAX_VALUE, "Misc");
 
     private final int m_order;
     private final String m_name;
 
-    private ConfigCategory(int order) {
+    private ConfigCategory(int order, String textNameSuffix) {
       m_order = order;
-      m_name = Texts.get("PropertyViewConfig.Categories." + toString());
+      m_name = Texts.get("PropertyViewConfig.Categories." + textNameSuffix);
     }
 
     public int getOrder() {
@@ -132,7 +132,7 @@ public class PropertyViewConfig {
     /**
      * The order is defined by the {@link Order} annotation of the method in the Scout Runtime.<br>
      * It can be overridden by the xml configuration file using the optional "order" attribute on the "config" tag.
-     * 
+     *
      * @return Gets the order of the method inside a category.
      */
     public Double getOrder() {
@@ -141,7 +141,7 @@ public class PropertyViewConfig {
 
     /**
      * If not defined in the config file, {@link PropertyViewConfig}<code>.DEFAULT_CONFIG_TYPE</code> is returned.
-     * 
+     *
      * @return gets the type of the method (normal or advanced)
      */
     public ConfigTypes getType() {
@@ -150,7 +150,7 @@ public class PropertyViewConfig {
 
     /**
      * If not defined in the config file, {@link PropertyViewConfig}<code>.DEFAULT_CONFIG_CATEGORY</code> is returned.
-     * 
+     *
      * @return Gets the category the method belongs to.
      */
     public ConfigCategory getCategory() {
@@ -198,7 +198,7 @@ public class PropertyViewConfig {
   /**
    * Gets the complete meta data for the given {@link ConfigurationMethod} as defined in the xml config file or null if
    * nothing is configured.
-   * 
+   *
    * @param m
    * @return
    */
@@ -235,7 +235,7 @@ public class PropertyViewConfig {
 
   private ConfigTypes parseConfigType(String type) {
     try {
-      return ConfigTypes.valueOf(type);
+      return ConfigTypes.valueOf(type.toUpperCase());
     }
     catch (Exception e) {
       return DEFAULT_CONFIG_TYPE;
@@ -244,7 +244,7 @@ public class PropertyViewConfig {
 
   private ConfigCategory parseConfigCategory(String cat) {
     try {
-      return ConfigCategory.valueOf(cat);
+      return ConfigCategory.valueOf(cat.toUpperCase());
     }
     catch (Exception e) {
       return DEFAULT_CONFIG_CATEGORY;
@@ -267,11 +267,11 @@ public class PropertyViewConfig {
     if (StringUtility.hasText(name)) {
       String type = config.getAttribute(PROP_CONFIG_TYPE);
       if (!StringUtility.hasText(type)) {
-        type = ConfigTypes.Advanced.toString();
+        type = ConfigTypes.ADVANCED.toString();
       }
       String category = config.getAttribute(PROP_CONFIG_CATEGORY);
       if (!StringUtility.hasText(category)) {
-        category = ConfigCategory.Misc.toString();
+        category = ConfigCategory.MISC.toString();
       }
       String order = config.getAttribute(PROP_CONFIG_ORDER);
       if (!StringUtility.hasText(order)) {

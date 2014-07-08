@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
 
 /**
  * <h3>{@link ConfigPropertyUpdateOperation}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 26.02.2013
  */
@@ -38,12 +38,11 @@ public class ConfigPropertyUpdateOperation<T> implements IOperation {
 
   private final IPropertySourceParser<T> m_parser;
   private ConfigurationMethod m_method;
-  private T value;
+  private T m_value;
 
   public ConfigPropertyUpdateOperation(ConfigurationMethod method, IPropertySourceParser<T> parser) {
     m_method = method;
     m_parser = parser;
-
   }
 
   @Override
@@ -53,7 +52,6 @@ public class ConfigPropertyUpdateOperation<T> implements IOperation {
 
   @Override
   public void validate() {
-
   }
 
   @Override
@@ -105,11 +103,10 @@ public class ConfigPropertyUpdateOperation<T> implements IOperation {
 
   /**
    * to modify the method source builder by subclasses
-   * 
+   *
    * @param sourceBuilder
    */
   protected void appendToMethodSourceBuilder(IMethodSourceBuilder sourceBuilder) {
-
   }
 
   public IPropertySourceParser<T> getParser() {
@@ -121,11 +118,11 @@ public class ConfigPropertyUpdateOperation<T> implements IOperation {
   }
 
   public T getValue() {
-    return value;
+    return m_value;
   }
 
   public void setValue(T value) {
-    this.value = value;
+    this.m_value = value;
   }
 
 }

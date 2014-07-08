@@ -38,7 +38,7 @@ public final class TechnologyExtensionPoint {
   public static final String ATTR_CATEGORY = "category";
 
   private static volatile HashSet<Technology> technologies;
-  private static final Object lock = new Object();
+  private static final Object LOCK = new Object();
 
   private TechnologyExtensionPoint() {
   }
@@ -73,7 +73,7 @@ public final class TechnologyExtensionPoint {
 
   public static Technology[] getTechnologyExtensions() {
     if (technologies == null) {
-      synchronized (lock) {
+      synchronized (LOCK) {
         if (technologies == null) {
           Map<String, ArrayList<IScoutTechnologyHandler>> handlers = getHandlers();
           HashSet<Technology> techs = new HashSet<Technology>();

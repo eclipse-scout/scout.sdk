@@ -15,9 +15,9 @@ import org.eclipse.jdt.core.IJavaElement;
 public interface ITypeSibling {
 
   public static enum SiblingType {
-    Beginning,
-    Sibling,
-    End
+    BEGINNING,
+    SIBLING,
+    END
   }
 
   SiblingType getSiblingType();

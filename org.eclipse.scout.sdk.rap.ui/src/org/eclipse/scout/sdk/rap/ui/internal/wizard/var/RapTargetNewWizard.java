@@ -31,9 +31,9 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class RapTargetNewWizard extends AbstractWorkspaceWizard {
   private RapTargetPlatformWizardPage m_page1;
 
-  private TARGET_STRATEGY strategy;
-  private String localFolder;
-  private String extractFolder;
+  private TARGET_STRATEGY m_strategy;
+  private String m_localFolder;
+  private String m_extractFolder;
 
   public RapTargetNewWizard() {
     setWindowTitle(Texts.get("SpecifyTheRAPTargetLocation"));
@@ -44,23 +44,23 @@ public class RapTargetNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
-    strategy = m_page1.getTargetStrategy();
-    localFolder = m_page1.getLocalTargetFolder();
-    extractFolder = m_page1.getExtractTargetFolder();
+    m_strategy = m_page1.getTargetStrategy();
+    m_localFolder = m_page1.getLocalTargetFolder();
+    m_extractFolder = m_page1.getExtractTargetFolder();
 
     return super.beforeFinish();
   }
 
   @Override
   protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    if (TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING.equals(strategy)) {
+    if (TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING.equals(m_strategy)) {
       // existing local target
-      File f = new File(localFolder);
+      File f = new File(m_localFolder);
       RapTargetVariable.get().setValue(f.getAbsolutePath());
     }
     else {
       // locally extracted, new target from rap.target plug-in
-      File f = new File(extractFolder);
+      File f = new File(m_extractFolder);
 
       ScoutRapTargetCreationOperation scoutRapTargetExtractOp = new ScoutRapTargetCreationOperation();
       scoutRapTargetExtractOp.setDestinationDirectory(f);

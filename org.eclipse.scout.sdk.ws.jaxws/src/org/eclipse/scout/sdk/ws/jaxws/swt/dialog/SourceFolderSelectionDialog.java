@@ -44,8 +44,7 @@ import org.eclipse.swt.widgets.Table;
 
 public class SourceFolderSelectionDialog extends TitleAreaDialog {
 
-  protected static final String IStructuredSelection = null;
-  private IScoutBundle m_bundle;
+  private final IScoutBundle m_bundle;
   private IPath m_sourceFolderPath;
   private TableViewer m_viewer;
 

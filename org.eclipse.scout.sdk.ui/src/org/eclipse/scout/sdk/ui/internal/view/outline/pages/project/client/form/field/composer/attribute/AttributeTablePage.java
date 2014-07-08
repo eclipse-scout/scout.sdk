@@ -26,13 +26,12 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link AttributeTablePage}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 01.09.2010
  */
 public class AttributeTablePage extends AbstractPage {
 
-  protected IType iDataModelAttribute = TypeUtility.getType(IRuntimeClasses.IDataModelAttribute);
   private final IType m_declaringType;
 
   private InnerTypePageDirtyListener m_attributeChangedListener;
@@ -67,6 +66,7 @@ public class AttributeTablePage extends AbstractPage {
   @Override
   protected void loadChildrenImpl() {
     if (m_attributeChangedListener == null) {
+      IType iDataModelAttribute = TypeUtility.getType(IRuntimeClasses.IDataModelAttribute);
       m_attributeChangedListener = new InnerTypePageDirtyListener(this, iDataModelAttribute);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_attributeChangedListener);
     }

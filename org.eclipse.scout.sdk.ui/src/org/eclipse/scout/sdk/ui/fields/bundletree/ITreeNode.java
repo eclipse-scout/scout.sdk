@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Color;
 
 /**
  * <h3>ITreeNode</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 30.01.2010
  */
@@ -30,14 +30,14 @@ public interface ITreeNode {
 
   /**
    * a node type id used to find a set of nodes in the tree.
-   * 
+   *
    * @return
    */
   String getType();
 
   /**
    * the display text for the current node.
-   * 
+   *
    * @param text
    */
   void setText(String text);

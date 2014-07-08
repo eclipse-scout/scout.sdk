@@ -19,14 +19,14 @@ import org.eclipse.scout.commons.StringUtility;
 
 /**
  * <h3>{@link NamingUtility}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.11.2010
  */
 public final class NamingUtility {
 
   private static final Object LOCK = new Object();
-  private static Set<String> javaKeyWords = null;
+  private static volatile Set<String> javaKeyWords = null;
 
   private NamingUtility() {
   }
@@ -72,7 +72,7 @@ public final class NamingUtility {
 
   /**
    * ensures the given java name starts with a lower case character.
-   * 
+   *
    * @param name
    *          The name to handle.
    * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
@@ -97,7 +97,7 @@ public final class NamingUtility {
 
   /**
    * ensures the given java name starts with an upper case character.
-   * 
+   *
    * @param name
    *          The name to handle.
    * @return null if the input is null, an empty string if the given string is empty or only contains white spaces.
@@ -125,7 +125,7 @@ public final class NamingUtility {
 
   /**
    * Method calculates the levenshtein distance, also known as string edit distance.
-   * 
+   *
    * @param s1
    *          The first string.
    * @param s2
@@ -180,7 +180,7 @@ public final class NamingUtility {
 
   /**
    * converts the given input string into a valid java camel case name.<br>
-   * 
+   *
    * @param input
    * @param lowerCaseFirstToken
    *          if true, the first token uses lower case as e.g. used for method names.

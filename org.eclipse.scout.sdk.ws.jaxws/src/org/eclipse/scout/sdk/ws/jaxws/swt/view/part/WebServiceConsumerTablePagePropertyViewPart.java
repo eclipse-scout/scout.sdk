@@ -59,7 +59,7 @@ public class WebServiceConsumerTablePagePropertyViewPart extends AbstractSingleP
       IFile buildJaxWsFile = ResourceFactory.getBuildJaxWsResource(m_bundle).getFile();
       if (JaxWsSdkUtility.exists(buildJaxWsFile)) {
         FileOpenAction b = new FileOpenAction();
-        b.init(buildJaxWsFile, buildJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), FileExtensionType.Xml);
+        b.init(buildJaxWsFile, buildJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), FileExtensionType.XML);
         b.setToolTip(Texts.get("JaxWsBuildDescriptor"));
         ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit());
         applyLayoutData(actionPresenter);

@@ -36,7 +36,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link RuntimeBundles}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 31.01.2013
  */
@@ -47,17 +47,17 @@ public final class RuntimeBundles {
   private static final String ATTRIB_TYPE = "type";
   private static final String ATTRIB_ORDER = "order";
 
-  private static final Object lock = new Object();
-  private static Set<String /* symbolic name */> allScoutRtBundles = null;
-  private static Map<String /* symbolic name */, String /* type */> bundleToTypeMap = null;
-  private static Map<String /* type */, String /* symbolic name */> typeToBundleMap = null;
+  private static final Object LOCK = new Object();
+  private static volatile Set<String /* symbolic name */> allScoutRtBundles = null;
+  private static volatile Map<String /* symbolic name */, String /* type */> bundleToTypeMap = null;
+  private static volatile Map<String /* type */, String /* symbolic name */> typeToBundleMap = null;
 
   private RuntimeBundles() {
   }
 
   private static void ensureCached() {
     if (allScoutRtBundles == null || bundleToTypeMap == null || typeToBundleMap == null) {
-      synchronized (lock) {
+      synchronized (LOCK) {
         if (allScoutRtBundles == null || bundleToTypeMap == null || typeToBundleMap == null) {
           Set<String> all = new HashSet<String>();
           TreeMap<Integer, String[]> typeDefOrdered = new TreeMap<Integer, String[]>();
@@ -115,7 +115,7 @@ public final class RuntimeBundles {
 
   /**
    * Gets the bundle symbolic name that defines the given bundle type.
-   * 
+   *
    * @param bundleType
    *          one of the bundle types. Bundle types can be defined using the
    *          <code>org.eclipse.scout.sdk.runtimeBundles</code> extension point. The predefined types are available in
@@ -130,7 +130,7 @@ public final class RuntimeBundles {
   /**
    * Gets the bundle type for the given plug-in. This is the type of first type-defining-bundle that is found in the
    * dependencies of the given project.
-   * 
+   *
    * @param symbolicName
    *          The bundle symbolic name. There must be a plug-in with the given name in the registry.
    * @return The type of the type-defining bundle with the lowest (first) order number. If no type-defining-bundle is in
@@ -146,7 +146,7 @@ public final class RuntimeBundles {
   /**
    * Gets the bundle type for the given plug-in project. This is the type of first type-defining-bundle that is found
    * in the dependencies of the given project.
-   * 
+   *
    * @param p
    *          The project to get the bundle type for. Must be a plug-in project.
    * @return The type of the type-defining bundle with the lowest (first) order number. If no type-defining-bundle is in
@@ -165,7 +165,7 @@ public final class RuntimeBundles {
   /**
    * Gets the bundle type for the given bundle. This is the type of first type-defining-bundle that is found in the
    * dependencies of the given bundle.
-   * 
+   *
    * @param bundle
    *          The bundle to get the type for.
    * @return The type of the type-defining bundle with the lowest (first) order number. If no type-defining-bundle is in
@@ -184,7 +184,7 @@ public final class RuntimeBundles {
   /**
    * Gets the bundle type for the given scout bundle. This is the type of first type-defining-bundle that is found
    * in the dependencies of the given bundle.
-   * 
+   *
    * @param bundle
    *          The bundle to get the type for.
    * @return The type of the type-defining bundle with the lowest (first) order number. If no type-defining-bundle is in
@@ -209,7 +209,7 @@ public final class RuntimeBundles {
   /**
    * Gets the bundle type for the given symbolic name list. This is the type of first type-defining-bundle that is found
    * in the given list
-   * 
+   *
    * @param symbolicNames
    *          The list of bundle symbolic names for which the type should be evaluated.
    * @return The type of the type-defining bundle with the lowest (first) order number. if no type-defining-bundle is in
@@ -242,7 +242,7 @@ public final class RuntimeBundles {
 
   /**
    * Checks if the given bundle is a type defining bundle.
-   * 
+   *
    * @param symbolicName
    * @return true if it is a type-defining-bundle. false otherwise.
    */
@@ -253,7 +253,7 @@ public final class RuntimeBundles {
 
   /**
    * Checks if the given bundle is a type defining bundle.
-   * 
+   *
    * @param b
    * @return true if it is a type-defining-bundle. false otherwise.
    */

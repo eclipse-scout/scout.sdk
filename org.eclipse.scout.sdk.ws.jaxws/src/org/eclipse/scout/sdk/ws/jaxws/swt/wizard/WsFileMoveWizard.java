@@ -74,7 +74,7 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
     final List<ElementBean> elements = new LinkedList<ElementBean>();
     // WSDL file
     IFile wsdlFile = null;
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       if (m_sunJaxWsBean != null && StringUtility.hasText(m_sunJaxWsBean.getWsdl())) {
         wsdlFile = JaxWsSdkUtility.getFile(m_bundle, new Path(m_sunJaxWsBean.getWsdl()), false);
       }
@@ -89,7 +89,7 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
     }
 
     // registration in sun-jaxws.xml (provider) / build-jaxws.xml (consumer)
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       elements.add(new ElementBean(WsFilesMoveOperation.ID_WSDL_SUNJAXWS_REGISTRATION, String.format("Change WSDL file registration in sun-jaxws.xml to '%s'", m_destination.getProjectRelativePath().append(wsdlFile.getName())), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), true));
     }
     else {
@@ -166,7 +166,7 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
   @Override
   protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     m_operation.run(monitor, workingCopyManager);
-    if (m_webserviceEnum == WebserviceEnum.Provider) {
+    if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
       JaxWsSdk.getDefault().notifyPageReload(WebServiceProviderNodePage.class, m_markerGroupUUID, WebServiceProviderNodePage.DATA_WSDL_FILE | WebServiceProviderNodePage.DATA_SUN_JAXWS_ENTRY | WebServiceProviderNodePage.DATA_BINDING_FILE);
     }
     else {

@@ -64,7 +64,7 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
     // defaults
     setFlags(Flags.AccPublic);
     setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ILookupCall, project));
-    setPackageExportPolicy(ExportPolicy.AddPackage);
+    setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
     setFormatSource(true);
     getCompilationUnitNewOp().setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());

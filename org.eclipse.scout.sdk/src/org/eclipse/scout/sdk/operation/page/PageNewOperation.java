@@ -101,7 +101,7 @@ public class PageNewOperation extends AbstractPageOperation {
       pageDataTypeNewOp.addMethodSourceBuilder(MethodSourceBuilderFactory.createConstructorSourceBuilder(pageDataTypeName));
       pageDataTypeNewOp.setFlags(Flags.AccPublic);
       pageDataTypeNewOp.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTablePageData));
-      pageDataTypeNewOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+      pageDataTypeNewOp.setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
       pageDataTypeNewOp.setFormatSource(false);
       pageDataTypeNewOp.validate();
       pageDataTypeNewOp.run(monitor, workingCopyManager);
@@ -134,7 +134,7 @@ public class PageNewOperation extends AbstractPageOperation {
       newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
     }
 
-    newOp.setPackageExportPolicy(ExportPolicy.AddPackage);
+    newOp.setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
     newOp.setFormatSource(isFormatSource());
 
     newOp.validate();

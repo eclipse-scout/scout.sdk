@@ -110,7 +110,7 @@ public final class GlobalBindingRegistrationHelper {
           text = "?";
         }
 
-        if (candidate.getWsdlArtifact().getTypeEnum() == TypeEnum.RootWsdl) {
+        if (candidate.getWsdlArtifact().getTypeEnum() == TypeEnum.ROOT_WSDL) {
           text += " (Root WSDL file)";
         }
         cell.setText(text);

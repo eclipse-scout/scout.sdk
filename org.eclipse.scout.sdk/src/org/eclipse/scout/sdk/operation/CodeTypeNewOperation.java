@@ -48,7 +48,7 @@ public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
     super(typeName, packageName, project);
     // defaults
     setFlags(Flags.AccPublic);
-    setPackageExportPolicy(ExportPolicy.AddPackage);
+    setPackageExportPolicy(ExportPolicy.ADD_PACKAGE);
     setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
     setIcuCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
     setFormatSource(true);
