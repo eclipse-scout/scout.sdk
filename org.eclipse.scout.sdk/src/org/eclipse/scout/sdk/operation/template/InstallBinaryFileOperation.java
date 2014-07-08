@@ -29,6 +29,7 @@ import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class InstallBinaryFileOperation implements IOperation {
@@ -77,7 +78,9 @@ public class InstallBinaryFileOperation implements IOperation {
       byte[] data = IOUtility.getContent(absSourceUrl.openStream(), true);
       IPath destPath = getDestinationProject().getLocation().append(getDestinationPath());
       File f = new File(destPath.toOSString());
-      f.getParentFile().mkdirs();
+      if (!f.getParentFile().mkdirs()) {
+        throw new CoreException(new ScoutStatus("Unable to create file directory '" + f.getParentFile().getAbsolutePath() + "'."));
+      }
       IOUtility.writeContent(new FileOutputStream(f), data, true);
       getDestinationProject().getFile(getDestinationPath()).refreshLocal(IResource.DEPTH_ZERO, monitor);
     }

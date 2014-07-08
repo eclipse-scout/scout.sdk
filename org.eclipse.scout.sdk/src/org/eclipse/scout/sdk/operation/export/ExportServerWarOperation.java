@@ -37,6 +37,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -145,7 +146,7 @@ public class ExportServerWarOperation implements IOperation {
     IOUtility.deleteDirectory(new File(m_tempBuildDir.getAbsolutePath() + "/client"));
   }
 
-  private IStatus buildServerProduct(IProgressMonitor monitor) throws Exception {
+  private IStatus buildServerProduct(IProgressMonitor monitor) throws CoreException {
     ProductFileModelHelper pfmh = new ProductFileModelHelper(getServerProduct());
 
     FeatureExportInfo featureInfo = new FeatureExportInfo();
@@ -161,7 +162,12 @@ public class ExportServerWarOperation implements IOperation {
     IProduct prod = pfmh.ProductFile.getProduct();
     ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + prod.getName() + "'...", prod, ".");
     productExportOp.schedule();
-    productExportOp.join();
+    try {
+      productExportOp.join();
+    }
+    catch (InterruptedException e) {
+      throw new CoreException(new ScoutStatus("Interrupted while waiting for server product export.", e));
+    }
     IStatus result = productExportOp.getResult();
     if (!result.isOK()) {
       return result;
@@ -222,7 +228,9 @@ public class ExportServerWarOperation implements IOperation {
   private File packWar() throws IOException {
     File destinationFile = new File(getWarFileName());
     if (!destinationFile.exists()) {
-      destinationFile.getParentFile().mkdirs();
+      if (!destinationFile.getParentFile().mkdirs()) {
+        throw new IOException("unable to create destination directory '" + destinationFile.getParentFile().getAbsolutePath() + "'");
+      }
     }
     ZipOutputStream zipOut = new ZipOutputStream(new FileOutputStream(destinationFile));
     ResourceUtility.addFolderToZip(m_tempBuildDir, zipOut);
@@ -237,7 +245,9 @@ public class ExportServerWarOperation implements IOperation {
     byte[] content = IOUtility.getContent(absSourceUrl.openStream());
     File destFile = new File(m_tempBuildDir + File.separator + filePath.replaceAll("\\\\\\/$", ""));
     if (!destFile.exists()) {
-      destFile.getParentFile().mkdirs();
+      if (!destFile.getParentFile().mkdirs()) {
+        throw new IOException("unable to create destination directory '" + destFile.getParentFile().getAbsolutePath() + "'");
+      }
     }
     IOUtility.writeContent(new FileOutputStream(destFile), content, true);
     return destFile;

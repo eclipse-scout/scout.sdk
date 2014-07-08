@@ -207,7 +207,7 @@ public class WsStubGenerationOperation implements IOperation {
     return WsStubGenerationOperation.class.getName();
   }
 
-  private void launchJavaApplicationSync(String launchName, String projectName, String javaMainTypeName, String argumentList, IProgressMonitor monitor) throws Exception {
+  private void launchJavaApplicationSync(String launchName, String projectName, String javaMainTypeName, String argumentList, IProgressMonitor monitor) throws CoreException {
     ILaunchManager launchManager = DebugPlugin.getDefault().getLaunchManager();
     ILaunchConfigurationType type = launchManager.getLaunchConfigurationType(IJavaLaunchConfigurationConstants.ID_JAVA_APPLICATION);
     ILaunchConfigurationWorkingCopy wc = type.newInstance(null, launchName);
@@ -248,7 +248,11 @@ public class WsStubGenerationOperation implements IOperation {
           launch.terminate();
           break;
         }
-        Thread.sleep(1000);
+        try {
+          Thread.sleep(1000);
+        }
+        catch (InterruptedException e) {
+        }
       }
 
       boolean keepLaunchConfiguration = JaxWsSdk.getDefault().getPreferenceStore().getBoolean(IPreferenceConstants.PREF_STUB_GENERATION_KEEP_LAUNCH_CONFIG);
@@ -281,7 +285,7 @@ public class WsStubGenerationOperation implements IOperation {
     }
   }
 
-  private List<String> getClasspathEntries() throws Exception {
+  private List<String> getClasspathEntries() throws CoreException {
     List<String> mementoList = new LinkedList<String>();
 
     // add runtime classes to the classpath
@@ -310,7 +314,7 @@ public class WsStubGenerationOperation implements IOperation {
    * <li>default VM</li>
    * <li>Eclipse IDE VM</li>
    * </ol>
-   * 
+   *
    * @return the 'tools.jar' or <code>null</code> if not found.
    */
   private File findToolsJarInVm() {

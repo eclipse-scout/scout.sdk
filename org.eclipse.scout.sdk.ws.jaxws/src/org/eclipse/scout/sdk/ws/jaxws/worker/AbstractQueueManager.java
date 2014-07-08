@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -171,5 +171,5 @@ public abstract class AbstractQueueManager<T> {
     return Job.getJobManager().find(AbstractQueueManager.this).length > 0;
   }
 
-  protected abstract void handleRequest(T request, IProgressMonitor monitor) throws Exception;
+  protected abstract void handleRequest(T request, IProgressMonitor monitor);
 }

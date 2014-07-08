@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.ISourceReference;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.testing.compare.internal.LineCompareResult;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -28,7 +29,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h3>{@link CompareUtility}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 15.03.2013
  */
@@ -36,7 +37,7 @@ public final class CompareUtility {
   private CompareUtility() {
   }
 
-  public static ICompareResult<String> compareSource(ICompilationUnit icu01, ICompilationUnit icu02, boolean stopWithFirstDiff) throws Exception {
+  public static ICompareResult<String> compareSource(ICompilationUnit icu01, ICompilationUnit icu02, boolean stopWithFirstDiff) throws JavaModelException, IOException {
     if (!TypeUtility.exists(icu01)) {
       throw new IllegalArgumentException("Compilation unit 1: " + ((icu01 == null) ? ("is null!") : ("'" + icu01.getElementName() + "' does not exist!")));
     }
@@ -54,7 +55,7 @@ public final class CompareUtility {
     return compareLines(new ByteArrayInputStream(icu01.getSource().getBytes()), new ByteArrayInputStream(icu02.getSource().getBytes()), stopWithFirstDiff);
   }
 
-  public static ICompareResult<String> compareSource(ISourceReference sourceRef, Bundle bundle, String resourcePath, boolean stopWithFirstDiff) throws Exception {
+  public static ICompareResult<String> compareSource(ISourceReference sourceRef, Bundle bundle, String resourcePath, boolean stopWithFirstDiff) throws JavaModelException, IOException {
     if (sourceRef == null || !sourceRef.exists()) {
       throw new IllegalArgumentException("Source reference does not exist!");
     }
@@ -65,7 +66,7 @@ public final class CompareUtility {
     return compareLines(new ByteArrayInputStream(sourceRef.getSource().getBytes()), getInputStream(bundle, resourcePath), stopWithFirstDiff);
   }
 
-  public static ICompareResult<String> compareSource(ISourceReference sourceRef, InputStream stream02, boolean stopWithFirstDiff) throws Exception {
+  public static ICompareResult<String> compareSource(ISourceReference sourceRef, InputStream stream02, boolean stopWithFirstDiff) throws JavaModelException, IOException {
     if (sourceRef == null || !sourceRef.exists()) {
       throw new IllegalArgumentException("Source reference does not exist!");
     }
@@ -76,8 +77,7 @@ public final class CompareUtility {
     return compareLines(new ByteArrayInputStream(sourceRef.getSource().getBytes()), stream02, stopWithFirstDiff);
   }
 
-  public static ICompareResult<String> compareLines(InputStream stream01, InputStream stream02, boolean stopWithFirstDiff) throws Exception {
-
+  public static ICompareResult<String> compareLines(InputStream stream01, InputStream stream02, boolean stopWithFirstDiff) throws IOException {
     BufferedReader readerA = null;
     BufferedReader readerB = null;
     try {

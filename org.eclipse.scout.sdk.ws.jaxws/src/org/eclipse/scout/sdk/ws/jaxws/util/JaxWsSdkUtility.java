@@ -334,8 +334,8 @@ public final class JaxWsSdkUtility {
   public static void ensureFileAccessibleAndRegistered(IFile file, boolean autoCreate) {
     refreshLocal(file, IResource.DEPTH_ZERO);
 
-    if (!exists(file) && autoCreate) {
-      try {
+    try {
+      if (!exists(file) && autoCreate) {
         // create the folders if they do not exist yet
         if (file.getParent() instanceof IFolder) {
           ResourceUtility.mkdirs(file.getParent(), new NullProgressMonitor());
@@ -344,24 +344,19 @@ public final class JaxWsSdkUtility {
         InputStream inputStream = new ByteArrayInputStream(new byte[0]);
         file.create(inputStream, true, new NullProgressMonitor());
       }
-      catch (CoreException e) {
-        throw new RuntimeException("An unexpected error occured while creating empty file", e);
-      }
-    }
 
-    // register folder in build properties
-    if (autoCreate && file.getParent() instanceof IFolder) {
-      IFolder folder = (IFolder) file.getParent();
-      if (!folder.getProjectRelativePath().toString().contains("build")) {
-        try {
+      // register folder in build properties
+      if (autoCreate && file.getParent() instanceof IFolder) {
+        IFolder folder = (IFolder) file.getParent();
+        if (!folder.getProjectRelativePath().toString().contains("build")) {
           PluginModelHelper h = new PluginModelHelper(file.getProject());
           h.BuildProperties.addBinaryBuildEntry(folder);
           h.save();
         }
-        catch (CoreException e) {
-          JaxWsSdk.logError("failed to register folder in build.properties", e);
-        }
       }
+    }
+    catch (CoreException e) {
+      JaxWsSdk.logError("Unable to create file '" + file.getFullPath().toOSString() + "'.", e);
     }
   }
 
@@ -377,26 +372,21 @@ public final class JaxWsSdkUtility {
   public static void ensureFolderAccessibleAndRegistered(IFolder folder, boolean autoCreate) {
     refreshLocal(folder, IResource.DEPTH_INFINITE);
 
-    if (!folder.exists() && autoCreate) {
-      try {
+    try {
+      if (!folder.exists() && autoCreate) {
         // create the folders if they do not exist yet
         ResourceUtility.mkdirs(folder, new NullProgressMonitor());
       }
-      catch (CoreException e) {
-        throw new RuntimeException("An unexpected error occured while creating the report design file", e);
-      }
-    }
 
-    // register folder in build properties
-    if (autoCreate && !folder.getProjectRelativePath().toString().contains("build")) {
-      try {
+      // register folder in build properties
+      if (autoCreate && !folder.getProjectRelativePath().toString().contains("build")) {
         PluginModelHelper h = new PluginModelHelper(folder.getProject());
         h.BuildProperties.addBinaryBuildEntry(folder);
         h.save();
       }
-      catch (CoreException e) {
-        JaxWsSdk.logError("failed to register folder in build.properties", e);
-      }
+    }
+    catch (CoreException e) {
+      JaxWsSdk.logError("Unable to create folder '" + folder.getFullPath().toOSString() + "'", e);
     }
   }
 

@@ -32,6 +32,7 @@ import org.eclipse.pde.internal.core.exports.ProductExportOperation;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -100,7 +101,7 @@ public class ExportClientZipOperation implements IOperation {
     }
   }
 
-  private IStatus buildClientProduct(IProgressMonitor monitor) throws Exception {
+  private IStatus buildClientProduct(IProgressMonitor monitor) throws CoreException, IOException {
     ProductFileModelHelper pfmh = new ProductFileModelHelper(getClientProduct());
     m_zipName = getZipName(getHtmlFolder(), pfmh) + ".zip";
 
@@ -115,7 +116,12 @@ public class ExportClientZipOperation implements IOperation {
 
     ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + getZipName() + "'...", pfmh.ProductFile.getProduct(), ".");
     productExportOp.schedule();
-    productExportOp.join();
+    try {
+      productExportOp.join();
+    }
+    catch (InterruptedException e) {
+      throw new CoreException(new ScoutStatus("Interrupted while waiting for product export to finish.", e));
+    }
 
     IStatus result = productExportOp.getResult();
     if (!result.isOK()) {
@@ -131,7 +137,9 @@ public class ExportClientZipOperation implements IOperation {
     // create zip file
     m_clientZipFile = new File(getTargetDirectory(), getZipName());
     if (!m_clientZipFile.exists()) {
-      m_clientZipFile.getParentFile().mkdirs();
+      if (!m_clientZipFile.getParentFile().mkdirs()) {
+        throw new IOException("Unable to create file directory '" + m_clientZipFile.getParentFile().getAbsolutePath() + "'.");
+      }
     }
 
     ZipOutputStream zipOut = null;

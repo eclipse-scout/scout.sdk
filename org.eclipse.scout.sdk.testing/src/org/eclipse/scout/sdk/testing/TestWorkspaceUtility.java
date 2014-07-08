@@ -49,6 +49,7 @@ import org.eclipse.scout.sdk.util.internal.typecache.HierarchyCache;
 import org.eclipse.scout.sdk.util.internal.typecache.ICacheableTypeHierarchyResult;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeCache;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
+import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -57,7 +58,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h3>{@link TestWorkspaceUtility}</h3>Contains helper methods that affect the running workspace.
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 15.03.2013
  */
@@ -68,16 +69,17 @@ public final class TestWorkspaceUtility {
 
   /**
    * Copies and creates the given Eclipse projects in the current workspace.
-   * 
+   *
    * @param resourceBundle
    *          The bundle that contains the project resources.
    * @param baseFolder
    *          The folder (inside the bundle) that contains the project folders
    * @param projects
    *          Array of project names (folder names inside the base folder that contain a .project file).
-   * @throws Exception
+   * @throws CoreException
+   * @throws IOException
    */
-  public static void setupWorkspace(Bundle resourceBundle, String baseFolder, String... projects) throws Exception {
+  public static void setupWorkspace(Bundle resourceBundle, String baseFolder, String... projects) throws CoreException, IOException {
     Assert.assertNotNull("baseFolder must not be null", baseFolder);
     if (projects == null || projects.length == 0) {
       projects = new String[]{null};
@@ -93,10 +95,11 @@ public final class TestWorkspaceUtility {
 
   /**
    * deletes all workspace projects and waits for a silent workspace
-   * 
+   *
+   * @throws CoreException
    * @throws Exception
    */
-  public static void clearWorkspace() throws Exception {
+  public static void clearWorkspace() throws CoreException {
     Job delJob = new Job("") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
@@ -114,7 +117,12 @@ public final class TestWorkspaceUtility {
     };
     delJob.setRule(ResourcesPlugin.getWorkspace().getRoot());
     delJob.schedule();
-    delJob.join();
+    try {
+      delJob.join();
+    }
+    catch (InterruptedException e) {
+      throw new CoreException(new ScoutStatus(e));
+    }
 
     IProgressMonitor monitor = new NullProgressMonitor();
     ResourcesPlugin.getWorkspace().getRoot().refreshLocal(IResource.DEPTH_INFINITE, monitor);
@@ -127,15 +135,20 @@ public final class TestWorkspaceUtility {
   /**
    * Executes the given operations and builds the workspace afterwards. This method blocks until the workspace build has
    * completed.
-   * 
+   *
    * @param ops
    *          The operations to execute.
-   * @throws Exception
+   * @throws CoreException
    */
-  public static void executeAndBuildWorkspace(IOperation... ops) throws Exception {
+  public static void executeAndBuildWorkspace(IOperation... ops) throws CoreException {
     OperationJob job = new OperationJob(ops);
     job.schedule();
-    job.join();
+    try {
+      job.join();
+    }
+    catch (InterruptedException e) {
+      throw new CoreException(new ScoutStatus(e));
+    }
     if (!job.getResult().isOK()) {
       StringBuilder statusBuilder = new StringBuilder();
       createStatusLog(job.getResult(), statusBuilder, 0);
@@ -176,7 +189,7 @@ public final class TestWorkspaceUtility {
 
   /**
    * Recompiles the entire workspace. This method blocks until the build has been completed.
-   * 
+   *
    * @throws CoreException
    */
   public static void buildWorkspace() throws CoreException {
@@ -251,7 +264,7 @@ public final class TestWorkspaceUtility {
 
   /**
    * Imports and opens the given project in the workspace.
-   * 
+   *
    * @param projectName
    *          The name of the project
    * @return The created project.
@@ -287,7 +300,9 @@ public final class TestWorkspaceUtility {
       }
       File subDir = new File(toDir, fromFile.getName());
       if (!subDir.exists()) {
-        subDir.mkdir();
+        if (!subDir.mkdir()) {
+          throw new IOException("Unable to create file directory '" + subDir.getAbsolutePath() + "'.");
+        }
       }
       toDir = toDir + "/" + fromFile.getName();
     }
@@ -363,7 +378,7 @@ public final class TestWorkspaceUtility {
 
   /**
    * Appends the content of a file in the workspace to a {@link StringBuilder}.
-   * 
+   *
    * @param project
    *          The project that contains the file.
    * @param ressourcePath

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -18,12 +18,12 @@ public class JavaCodeRange {
   public static final int PRIMITIV_TYPE = 2;
   public static final int QUALIFIED_TYPE = 3;
 
-  private int m_type = UNKNOWN;
   public int offset = -1;
-  public int lenght = -1;
-
-  private final String m_text;
+  public int length = -1;
   public String m_fullyQualifiedName;
+
+  private int m_type = UNKNOWN;
+  private final String m_text;
 
   public JavaCodeRange(String text) {
     m_text = text;
@@ -63,7 +63,10 @@ public class JavaCodeRange {
     if (m_fullyQualifiedName != null) {
       hashCode = hashCode ^ m_fullyQualifiedName.hashCode();
     }
-    return hashCode ^ m_text.hashCode() ^ getType() ^ offset ^ lenght;
+    if (m_text != null) {
+      hashCode = hashCode ^ m_text.hashCode();
+    }
+    return hashCode ^ m_type ^ offset ^ length;
   }
 
 }

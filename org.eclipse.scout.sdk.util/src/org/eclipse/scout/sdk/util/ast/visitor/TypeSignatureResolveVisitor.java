@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
  * <h3>{@link TypeSignatureResolveVisitor}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 27.02.2011
  */
@@ -41,7 +41,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
 
   private boolean m_debug = false;
   private boolean m_canceled;
-  public String m_indent = "";
+  private String m_indent = "";
 
   private final IJavaElement m_containerElement;
   private final ASTNode m_rootNode;

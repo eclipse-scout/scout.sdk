@@ -33,7 +33,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h3>{@link ScoutRapTargetCreationOperation}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 20.03.2012
  */
@@ -111,7 +111,9 @@ public class ScoutRapTargetCreationOperation implements IOperation {
           destRelPath = destRelPath.substring(prefix.length());
         }
         File dest = new File(getDestinationDirectory(), destRelPath);
-        dest.getParentFile().mkdirs();
+        if (!dest.getParentFile().mkdirs()) {
+          throw new IOException("Unable to create file directory '" + dest.getParentFile().getAbsolutePath() + "'.");
+        }
         out = new BufferedOutputStream(new FileOutputStream(dest), ResourceUtility.BUF_SIZE);
         in = source.openStream();
         ResourceUtility.copy(in, out);

@@ -189,8 +189,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
   }
 
   protected IPluginModel choosePlugin() {
-    PluginSelectionDialog dialog = new PluginSelectionDialog(getShell(), PDECore.getDefault().getModelManager()
-        .getWorkspaceModels(), false);
+    PluginSelectionDialog dialog = new PluginSelectionDialog(getShell(), PDECore.getDefault().getModelManager().getWorkspaceModels(), false);
     dialog.create();
     if (dialog.open() == Window.OK) {
       Object[] models = dialog.getResult();

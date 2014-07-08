@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.util.ast.visitor;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
@@ -28,25 +29,23 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
- * <h3>{@link VariableResolveVisitor}</h3> ...
- * 
+ * <h3>{@link VariableResolveVisitor}</h3>
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 27.02.2011
  */
 public class VariableResolveVisitor extends DefaultAstVisitor {
-
-  private boolean m_debug = false;
-  private boolean m_canceled;
-  public String m_indent = "";
-
-  public String m_variableTypeSignature;
-  private HashSet<String /*signatures*/> m_assignedTypes;
-
-  private P_Variable m_currentVariable;
+  private final Set<String /*signatures*/> m_assignedTypes;
   private final String m_variableName;
   private final ASTNode m_rootNode;
   private final ASTNode m_stopNode;
   private final IJavaElement m_containerElement;
+
+  private boolean m_debug = false;
+  private boolean m_canceled;
+  private String m_indent = "";
+  private String m_variableTypeSignature;
+  private P_Variable m_currentVariable;
   private int m_mode = -1;
 
   public VariableResolveVisitor(String variableName, IJavaElement containerElement, ASTNode rootNode, ASTNode stopNode) {
@@ -55,7 +54,6 @@ public class VariableResolveVisitor extends DefaultAstVisitor {
     m_rootNode = rootNode;
     m_stopNode = stopNode;
     m_assignedTypes = new HashSet<String>();
-
   }
 
   @Override

@@ -58,7 +58,7 @@ import org.eclipse.scout.sdk.util.log.ScoutStatus;
 
 /**
  * <h3>{@link ResourceUtility}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2012
  */
@@ -111,7 +111,7 @@ public final class ResourceUtility {
 
   /**
    * Tries to open the given url in the system default browser.
-   * 
+   *
    * @param url
    *          the url to show
    */
@@ -135,7 +135,7 @@ public final class ResourceUtility {
 
   /**
    * Builds a Path containing the given elements.
-   * 
+   *
    * @param segments
    * @return
    */
@@ -157,7 +157,7 @@ public final class ResourceUtility {
    * <p>
    * This default line delimiter should be used by clients who want unique delimiters (e.g. 'CR's) in the document.
    * </p>
-   * 
+   *
    * @return the default line delimiter or <code>null</code> if none.
    */
   public static String getLineSeparator(Document doc) {
@@ -172,7 +172,7 @@ public final class ResourceUtility {
 
   /**
    * Gets the content of the given file as string.
-   * 
+   *
    * @param f
    *          the file to get the content from
    * @return a string containing the content of the given file
@@ -207,7 +207,7 @@ public final class ResourceUtility {
 
   /**
    * gets the install location of the running eclipse.
-   * 
+   *
    * @return the location or null if no location could be found.
    */
   public static File getEclipseInstallLocation() {
@@ -221,7 +221,7 @@ public final class ResourceUtility {
 
   /**
    * Adds all files below the given baseDir into the zip stream.
-   * 
+   *
    * @param baseDir
    *          The base dir. All files (recursively) in this folder will be added to the zip.
    * @param zOut
@@ -262,7 +262,7 @@ public final class ResourceUtility {
    * returns the line separator defined in preference {@link org.eclipse.core.runtime.Platform#PREF_LINE_SEPARATOR} on
    * the workspace.
    * If this is null, returns the system line separator.
-   * 
+   *
    * @return The line separator to use.
    */
   public static String getLineSeparator() {
@@ -273,7 +273,7 @@ public final class ResourceUtility {
    * returns the line separator defined in preference {@link org.eclipse.core.runtime.Platform#PREF_LINE_SEPARATOR} on
    * the project or workspace of the given resource.
    * If this is null, returns the platform separator.
-   * 
+   *
    * @return The line separator to use.
    */
   public static String getLineSeparator(IResource r) {
@@ -291,7 +291,7 @@ public final class ResourceUtility {
    * Otherwise the preference {@link org.eclipse.core.runtime.Platform#PREF_LINE_SEPARATOR} on this element's project or
    * workspace is returned.
    * Finally if no such preference is set, the system line separator is returned.
-   * 
+   *
    * @return the recommended line separator for this element
    */
   public static String getLineSeparator(IOpenable o) {
@@ -305,7 +305,7 @@ public final class ResourceUtility {
 
   /**
    * copies all data from the given file to the output stream
-   * 
+   *
    * @param from
    *          source file
    * @param to
@@ -331,7 +331,7 @@ public final class ResourceUtility {
 
   /**
    * recursively creates all parent directories of the given file
-   * 
+   *
    * @param toCreate
    *          The file for which the parent directories should be created.
    * @param monitor
@@ -346,7 +346,7 @@ public final class ResourceUtility {
 
   /**
    * create the given directory and all of its parents.
-   * 
+   *
    * @param toCreate
    *          the directory to create.
    * @param monitor
@@ -369,7 +369,7 @@ public final class ResourceUtility {
 
   /**
    * move the given file into the given folder.
-   * 
+   *
    * @param from
    *          the file to move
    * @param destFolder
@@ -383,7 +383,9 @@ public final class ResourceUtility {
     if (destFolder == null) {
       throw new IOException("destination folder is not valid");
     }
-    destFolder.mkdirs();
+    if (!destFolder.mkdirs()) {
+      throw new IOException("unable to create destination folders");
+    }
     boolean success = from.renameTo(destFolder);
     if (!success) {
       // fallback: copy file
@@ -403,7 +405,9 @@ public final class ResourceUtility {
           String entryName = zipEntry.getName();
 
           File destFile = new File(destinationFolder, entryName);
-          destFile.getParentFile().mkdirs();
+          if (!destFile.getParentFile().mkdirs()) {
+            throw new IOException("Unable to create file directory '" + destFile.getParentFile().getAbsolutePath() + "'.");
+          }
           OutputStream fos = null;
           try {
             fos = new BufferedOutputStream(new FileOutputStream(destFile));
@@ -436,7 +440,7 @@ public final class ResourceUtility {
 
   /**
    * copies all data from the input stream to the output stream.
-   * 
+   *
    * @param from
    *          data source
    * @param to
@@ -449,7 +453,7 @@ public final class ResourceUtility {
 
   /**
    * copies all data from the input stream to the output stream.
-   * 
+   *
    * @param from
    *          data source
    * @param to

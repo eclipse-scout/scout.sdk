@@ -114,7 +114,9 @@ public class ExportEarOperation implements IOperation {
   private File packEar() throws IOException {
     File destinationFile = new File(getEarFileName());
     if (!destinationFile.exists()) {
-      destinationFile.getParentFile().mkdirs();
+      if (!destinationFile.getParentFile().mkdirs()) {
+        throw new IOException("Unable to create file directory '" + destinationFile.getParentFile().getAbsolutePath() + "'.");
+      }
     }
     ZipOutputStream zipOut = null;
     try {
@@ -131,16 +133,12 @@ public class ExportEarOperation implements IOperation {
   }
 
   private void cleanUp() {
-    try {
-      for (File module : m_modules) {
-        if (module.exists()) {
-          module.delete();
-        }
+    for (File module : m_modules) {
+      if (module.exists()) {
+        module.delete();
       }
-      IOUtility.deleteDirectory(m_tempBuildDir);
     }
-    catch (Exception t) {
-    }
+    IOUtility.deleteDirectory(m_tempBuildDir);
   }
 
   private String cutExtension(String fileName) {
@@ -171,7 +169,9 @@ public class ExportEarOperation implements IOperation {
 
     File destFile = getDestinationFile(filePath);
     if (!destFile.exists()) {
-      destFile.getParentFile().mkdirs();
+      if (!destFile.getParentFile().mkdirs()) {
+        throw new IOException("Unable to create file directory '" + destFile.getParentFile().getAbsolutePath() + "'.");
+      }
     }
 
     IOUtility.writeContent(new FileWriter(destFile), s, true);
@@ -186,7 +186,9 @@ public class ExportEarOperation implements IOperation {
       in = absSourceUrl.openStream();
       File destFile = getDestinationFile(filePath);
       if (!destFile.exists()) {
-        destFile.getParentFile().mkdirs();
+        if (!destFile.getParentFile().mkdirs()) {
+          throw new IOException("Unable to create file directory '" + destFile.getParentFile().getAbsolutePath() + "'.");
+        }
       }
       out = new FileOutputStream(destFile);
       ResourceUtility.copy(in, out);

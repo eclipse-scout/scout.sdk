@@ -40,7 +40,7 @@ public final class PropertyViewExtensionPoint {
   private static final String PROPERTY_VIEW_EXTENSION_ID = "propertyViewPart";
   private static final Object LOCK = new Object();
 
-  private static List<PropertyViewExtension> viewExtensions = null;
+  private static volatile List<PropertyViewExtension> viewExtensions = null;
 
   private PropertyViewExtensionPoint() {
   }

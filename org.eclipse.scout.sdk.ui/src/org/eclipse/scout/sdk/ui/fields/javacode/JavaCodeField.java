@@ -143,12 +143,12 @@ public class JavaCodeField extends Composite {
         if (range != null) {
           // update range
           range.offset = offset;
-          range.lenght = length;
+          range.length = length;
         }
         else {
           range = new JavaCodeRange(word);
           range.offset = offset;
-          range.lenght = length;
+          range.length = length;
           IContentProposal[] pros = m_contentProvider.findExactMatch(word);
           if (pros.length == 1) {
             // accept
@@ -180,18 +180,18 @@ public class JavaCodeField extends Composite {
       StyleRange stRange = null;
       switch (range.getType()) {
         case JavaCodeRange.UNKNOWN:
-          stRange = new StyleRange(range.offset, range.lenght, null, null);
+          stRange = new StyleRange(range.offset, range.length, null, null);
           stRange.underlineColor = m_text.getDisplay().getSystemColor(SWT.COLOR_RED);
           stRange.underlineStyle = SWT.UNDERLINE_SQUIGGLE;
           stRange.underline = true;
           break;
         case JavaCodeRange.PRIMITIV_TYPE:
         case JavaCodeRange.QUALIFIED_TYPE:
-          stRange = new StyleRange(range.offset, range.lenght, null, null);
+          stRange = new StyleRange(range.offset, range.length, null, null);
           stRange.fontStyle = SWT.BOLD;
           break;
       }
-      ranges.put(new CompositeObject(range.offset, range.offset + range.lenght, range.getText()), stRange);
+      ranges.put(new CompositeObject(range.offset, range.offset + range.length, range.getText()), stRange);
     }
     m_text.setStyleRanges(ranges.values().toArray(new StyleRange[ranges.size()]));
   }

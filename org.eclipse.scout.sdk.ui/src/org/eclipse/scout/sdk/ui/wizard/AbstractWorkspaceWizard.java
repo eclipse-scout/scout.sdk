@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Display;
  */
 public abstract class AbstractWorkspaceWizard extends AbstractWizard implements IWorkspaceWizard {
 
-  public Map<CompositeObject, IOperation> m_performFinishOperations;
+  private final Map<CompositeObject, IOperation> m_performFinishOperations;
 
   public AbstractWorkspaceWizard() {
     m_performFinishOperations = new TreeMap<CompositeObject, IOperation>();

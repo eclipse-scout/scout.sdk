@@ -123,8 +123,7 @@ public class SmartDialog {
     m_viewer.addDoubleClickListener(new IDoubleClickListener() {
       @Override
       public void doubleClick(DoubleClickEvent event) {
-        handleItemSelection(((StructuredSelection) event
-            .getSelection()).getFirstElement());
+        handleItemSelection(((StructuredSelection) event.getSelection()).getFirstElement());
       }
     });
 
@@ -211,7 +210,7 @@ public class SmartDialog {
 
   /**
    * opens the dialog if more than one proposal
-   * 
+   *
    * @param location
    * @param text
    *          the filter to get some proposals
@@ -273,7 +272,7 @@ public class SmartDialog {
   }
 
   private class P_SmartFieldTableModel implements IStructuredContentProvider,
-      ITableLabelProvider {
+  ITableLabelProvider {
     private TreeSet<P_CompareableSmartItem> m_items = new TreeSet<P_CompareableSmartItem>();
 
     public void setItems(List<Object> items) {

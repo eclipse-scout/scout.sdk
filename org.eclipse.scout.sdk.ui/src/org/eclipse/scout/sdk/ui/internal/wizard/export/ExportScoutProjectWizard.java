@@ -23,6 +23,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.export.ExportEarOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -93,7 +94,7 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
       }
 
       for (File artifact : artifacts) {
-        artifact.getParentFile().delete();
+        IOUtility.deleteDirectory(artifact.getParentFile());
       }
     }
     return true;
