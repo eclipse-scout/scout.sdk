@@ -36,7 +36,7 @@ public class InstallJavaFileOperation extends InstallTextFileOperation {
   public InstallJavaFileOperation(String srcPath, String rootPackageRelativeDestPath, IScoutBundle scoutBundle, Map<String, String> properties) {
     this(srcPath, TypeUtility.DEFAULT_SOURCE_FOLDER_NAME + "/" + scoutBundle.getSymbolicName().replace('.', '/') + "/" + rootPackageRelativeDestPath, scoutBundle.getProject(), properties);
   }
-  
+
   public InstallJavaFileOperation(String srcPath, String destPath, IProject project, Map<String, String> properties) {
     this(srcPath, destPath, Platform.getBundle(ScoutSdk.PLUGIN_ID), project, properties);
   }

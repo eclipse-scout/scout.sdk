@@ -383,12 +383,12 @@ public final class ResourceUtility {
     if (destFolder == null) {
       throw new IOException("destination folder is not valid");
     }
-    if (!destFolder.mkdirs()) {
+    if (!destFolder.exists() && !destFolder.mkdirs()) {
       throw new IOException("unable to create destination folders");
     }
     boolean success = from.renameTo(destFolder);
     if (!success) {
-      // fallback: copy file
+      // fall back: copy file
       FileUtility.copyFile(from, new File(destFolder, from.getName()));
       IOUtility.deleteFile(from.getAbsolutePath());
     }
@@ -405,7 +405,8 @@ public final class ResourceUtility {
           String entryName = zipEntry.getName();
 
           File destFile = new File(destinationFolder, entryName);
-          if (!destFile.getParentFile().mkdirs()) {
+          File destFolder = destFile.getParentFile();
+          if (!destFolder.exists() && !destFolder.mkdirs()) {
             throw new IOException("Unable to create file directory '" + destFile.getParentFile().getAbsolutePath() + "'.");
           }
           OutputStream fos = null;

@@ -111,7 +111,8 @@ public class ScoutRapTargetCreationOperation implements IOperation {
           destRelPath = destRelPath.substring(prefix.length());
         }
         File dest = new File(getDestinationDirectory(), destRelPath);
-        if (!dest.getParentFile().mkdirs()) {
+        File destFolder = dest.getParentFile();
+        if (!destFolder.exists() && !destFolder.mkdirs()) {
           throw new IOException("Unable to create file directory '" + dest.getParentFile().getAbsolutePath() + "'.");
         }
         out = new BufferedOutputStream(new FileOutputStream(dest), ResourceUtility.BUF_SIZE);

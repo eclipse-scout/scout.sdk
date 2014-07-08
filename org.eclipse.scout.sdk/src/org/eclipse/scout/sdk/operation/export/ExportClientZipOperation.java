@@ -136,8 +136,12 @@ public class ExportClientZipOperation implements IOperation {
 
     // create zip file
     m_clientZipFile = new File(getTargetDirectory(), getZipName());
-    if (!m_clientZipFile.exists()) {
-      if (!m_clientZipFile.getParentFile().mkdirs()) {
+    if (m_clientZipFile.exists()) {
+      m_clientZipFile.delete();
+    }
+    else {
+      File folder = m_clientZipFile.getParentFile();
+      if (!folder.exists() && !folder.mkdirs()) {
         throw new IOException("Unable to create file directory '" + m_clientZipFile.getParentFile().getAbsolutePath() + "'.");
       }
     }

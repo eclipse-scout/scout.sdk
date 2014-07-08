@@ -227,8 +227,12 @@ public class ExportServerWarOperation implements IOperation {
 
   private File packWar() throws IOException {
     File destinationFile = new File(getWarFileName());
-    if (!destinationFile.exists()) {
-      if (!destinationFile.getParentFile().mkdirs()) {
+    if (destinationFile.exists()) {
+      destinationFile.delete();
+    }
+    else {
+      File folder = destinationFile.getParentFile();
+      if (!folder.exists() && !folder.mkdirs()) {
         throw new IOException("unable to create destination directory '" + destinationFile.getParentFile().getAbsolutePath() + "'");
       }
     }
@@ -244,8 +248,12 @@ public class ExportServerWarOperation implements IOperation {
     URL absSourceUrl = FileLocator.resolve(URIUtil.toURL(URIUtil.fromString(platformUrl)));
     byte[] content = IOUtility.getContent(absSourceUrl.openStream());
     File destFile = new File(m_tempBuildDir + File.separator + filePath.replaceAll("\\\\\\/$", ""));
-    if (!destFile.exists()) {
-      if (!destFile.getParentFile().mkdirs()) {
+    if (destFile.exists()) {
+      destFile.delete();
+    }
+    else {
+      File folder = destFile.getParentFile();
+      if (!folder.exists() && !folder.mkdirs()) {
         throw new IOException("unable to create destination directory '" + destFile.getParentFile().getAbsolutePath() + "'");
       }
     }

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.operation.template;
 
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -22,11 +23,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -78,14 +78,18 @@ public class InstallBinaryFileOperation implements IOperation {
       byte[] data = IOUtility.getContent(absSourceUrl.openStream(), true);
       IPath destPath = getDestinationProject().getLocation().append(getDestinationPath());
       File f = new File(destPath.toOSString());
-      if (!f.getParentFile().mkdirs()) {
+      File parentFolder = f.getParentFile();
+      if (!parentFolder.exists() && !parentFolder.mkdirs()) {
         throw new CoreException(new ScoutStatus("Unable to create file directory '" + f.getParentFile().getAbsolutePath() + "'."));
       }
       IOUtility.writeContent(new FileOutputStream(f), data, true);
       getDestinationProject().getFile(getDestinationPath()).refreshLocal(IResource.DEPTH_ZERO, monitor);
     }
-    catch (Exception e) {
-      throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "", e));
+    catch (IOException e) {
+      throw new CoreException(new ScoutStatus("Could not resolve url '" + getSourceUrl() + "'.", e));
+    }
+    catch (ProcessingException e) {
+      throw new CoreException(new ScoutStatus("Could not ", e));
     }
   }
 

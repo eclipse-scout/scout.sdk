@@ -10,6 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.menu;
 
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.ui.IStartup;
 
 /**
@@ -18,7 +23,7 @@ import org.eclipse.ui.IStartup;
  * This is important to e.g. ensure that the automatic formdata update
  * is executed even if the scout perspective (or any other scout sdk classes)
  * would never be loaded (e.g. when only working in the java perspective).
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 24.01.2012
  */
@@ -26,5 +31,15 @@ public class ScoutSdkStartupExtension implements IStartup {
 
   @Override
   public void earlyStartup() {
+    Job j = new Job("init PDE") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        JdtUtility.getNewestBundleInActiveTargetPlatform("org.eclipse.core.runtime"); // init PDE
+        return Status.OK_STATUS;
+      }
+    };
+    j.setUser(false);
+    j.setSystem(true);
+    j.schedule();
   }
 }

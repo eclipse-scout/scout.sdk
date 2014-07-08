@@ -20,11 +20,12 @@ import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.CreateTargetProjectOperation;
 import org.eclipse.scout.sdk.operation.project.NewProjectLoadTargetOperation;
 import org.eclipse.scout.sdk.rap.var.RapTargetVariable;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link AppendRapTargetOperation}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 07.04.2014
  */
@@ -68,6 +69,11 @@ public class AppendRapTargetOperation extends AbstractScoutProjectNewOperation {
     }
 
     IFile targetFile = getProperties().getProperty(CreateTargetProjectOperation.PROP_TARGET_FILE, IFile.class);
+    if (!ResourceUtility.exists(targetFile)) {
+      // no target file available
+      return;
+    }
+
     if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING) {
       // set the environment variable
       RapTargetVariable.get().setValue(getLocalTargetFolder());

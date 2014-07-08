@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.Map;
 
 import org.eclipse.core.resources.IProject;
@@ -65,7 +67,10 @@ public class CreateClientPluginOperation extends AbstractCreateScoutBundleOperat
         new InstallBinaryFileOperation("templates/client/resources/icons/eclipse_scout.gif", project, "resources/icons/eclipse_scout.gif").run(monitor, workingCopyManager);
       }
     }
-    catch (Exception e) {
+    catch (MalformedURLException e) {
+      throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));
+    }
+    catch (URISyntaxException e) {
       throw new CoreException(new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "could not install files in '" + project.getName() + "'.", e));
     }
   }
