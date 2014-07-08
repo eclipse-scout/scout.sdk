@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -35,7 +36,7 @@ public class DoublePresenter extends AbstractValuePresenter<Double> {
   public DoublePresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent, "[\\-\\+0-9\\.\\'eEinfdFD]*");
     m_parser = new DoublePropertySourceParser();
-    m_formatter = DecimalFormat.getInstance();
+    m_formatter = DecimalFormat.getInstance(Locale.ENGLISH);
     m_formatter.setMaximumFractionDigits(20);
   }
 
