@@ -15,6 +15,7 @@ import java.math.BigInteger;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.text.ParseException;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -73,7 +74,7 @@ public final class PropertyMethodSourceUtility {
    * return Integer.MAX_VALUE;
    * } // result: Integer.MAX_VALUE;
    * </xmp>
-   * 
+   *
    * @param method
    * @return
    * @throws CoreException
@@ -157,7 +158,7 @@ public final class PropertyMethodSourceUtility {
    * input: IConstants.A output: the value of A
    * input: null output: null
    * </xmp>
-   * 
+   *
    * @param parameter
    * @param method
    * @return
@@ -188,7 +189,7 @@ public final class PropertyMethodSourceUtility {
    * input: "AString" output: AString
    * input: IConstants.A output: the value of A
    * </xmp>
-   * 
+   *
    * @param parameter
    * @param method
    * @return
@@ -217,7 +218,7 @@ public final class PropertyMethodSourceUtility {
       parameter = parameter.replace('e', 'E');
       parameter = parameter.replace("E+", "E");
       try {
-        return DecimalFormat.getInstance().parse(parameter).doubleValue();
+        return DecimalFormat.getInstance(Locale.ENGLISH).parse(parameter).doubleValue();
       }
       catch (ParseException e) {
         throw new CoreException(new ScoutStatus("Error parsing parameter '" + parameter + "' to a decimal.", e));
@@ -235,7 +236,7 @@ public final class PropertyMethodSourceUtility {
         referencedValue = referencedValue.replace('e', 'E');
         referencedValue = referencedValue.replace("E+", "E");
         try {
-          return DecimalFormat.getInstance().parse(prefix + referencedValue).doubleValue();
+          return DecimalFormat.getInstance(Locale.ENGLISH).parse(prefix + referencedValue).doubleValue();
         }
         catch (ParseException e) {
           throw new CoreException(new ScoutStatus("Error parsing parameter '" + prefix + referencedValue + "' to a decimal.", e));
@@ -270,7 +271,7 @@ public final class PropertyMethodSourceUtility {
         referencedValue = referencedValue.replace('e', 'E');
         referencedValue = referencedValue.replace("E+", "E");
         try {
-          return DecimalFormat.getInstance().parse(prefix + referencedValue).intValue();
+          return DecimalFormat.getInstance(Locale.ENGLISH).parse(prefix + referencedValue).intValue();
         }
         catch (ParseException e) {
           throw new CoreException(new ScoutStatus("Error parsing parameter '" + prefix + referencedValue + "' to a decimal.", e));
@@ -358,7 +359,7 @@ public final class PropertyMethodSourceUtility {
    * <br>
    * Input: 2358.2357<br>
    * Output: 2358.2357
-   * 
+   *
    * @param parameter
    * @return
    * @throws CoreException
@@ -376,7 +377,7 @@ public final class PropertyMethodSourceUtility {
 
   /**
    * parses the given return clause input string into the corresponding rounding mode enum value.
-   * 
+   *
    * @param parameter
    *          The return clause
    * @return The bigdecimal value of the return clause.
@@ -409,7 +410,7 @@ public final class PropertyMethodSourceUtility {
    * <br>
    * Input: 2358<br>
    * Output: 2358
-   * 
+   *
    * @param parameter
    * @return
    * @throws CoreException
@@ -624,7 +625,7 @@ public final class PropertyMethodSourceUtility {
    * Input: TEXTS.get("abc")<br>
    * Output: abc
    * </code>
-   * 
+   *
    * @param input
    *          The String to parse.
    * @return
