@@ -74,6 +74,14 @@ public class FormNodePage extends AbstractScoutTypePage implements ITypeHierarch
   }
 
   @Override
+  public void refresh(boolean clearCache) {
+    if (clearCache) {
+      clearTypeHierarchy();
+    }
+    super.refresh(clearCache);
+  }
+
+  @Override
   protected void loadChildrenImpl() {
     IType iGroupBox = TypeUtility.getType(IRuntimeClasses.IGroupBox);
 

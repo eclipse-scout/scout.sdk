@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.math.BigInteger;
 import java.text.DecimalFormat;
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -26,7 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>{@link BigIntegerPresenter}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 02.12.2013
  */
@@ -35,7 +37,7 @@ public class BigIntegerPresenter extends AbstractValuePresenter<BigInteger> {
   private final IPropertySourceParser<BigInteger> m_parser;
 
   public BigIntegerPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
-    super(toolkit, parent, "[\\-\\+0-9']*");
+    super(toolkit, parent, "[\\-\\+0-9]*");
     m_parser = new BigIntegerPropertySourceParser();
   }
 
@@ -48,7 +50,9 @@ public class BigIntegerPresenter extends AbstractValuePresenter<BigInteger> {
     if (value == null) {
       return "";
     }
-    return DecimalFormat.getNumberInstance().format(value);
+    NumberFormat formatter = DecimalFormat.getNumberInstance(Locale.ENGLISH);
+    formatter.setGroupingUsed(false);
+    return formatter.format(value);
   }
 
   @Override

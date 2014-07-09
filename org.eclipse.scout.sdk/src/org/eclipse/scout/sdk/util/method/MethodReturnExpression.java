@@ -39,7 +39,7 @@ import org.osgi.framework.ServiceReference;
 
 /**
  * <h3>{@link MethodReturnExpression}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 30.09.2013
  */
@@ -236,6 +236,9 @@ public class MethodReturnExpression {
             }
 
             if (value != null) {
+              if (node.getParent() instanceof QualifiedName) {
+                buffer.delete(0, buffer.length());
+              }
               buffer.append(value);
               return true;
             }

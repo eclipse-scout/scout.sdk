@@ -16,12 +16,13 @@ import java.util.regex.Pattern;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.util.ScoutUtility;
 
 /**
  * <h3>{@link SimpleMethodReturnValueParser}</h3> Simple and fast method return clause parser that will only handle
  * simple (e.g. literal) clauses (without references to other types). Furthermore it is capable to handle the
  * TEXTS.get(...) methods of the nls methods.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 30.09.2013
  */
@@ -40,9 +41,12 @@ public final class SimpleMethodReturnValueParser implements IMethodReturnValuePa
     try {
       String src = method.getSource();
       if (src != null) {
-        Matcher m = REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(src);
+        Matcher m = REGEX_PROPERTY_METHOD_REPRESENTER_VALUE.matcher(ScoutUtility.removeComments(src));
         if (m.find()) {
           String returnClause = m.group(1).trim();
+          if (returnClause.indexOf('(') >= 0) {
+            return null; // the return clause contains a function or constructor call -> no simple parsing possible
+          }
           if (returnClause.indexOf('.') < 0) {
             // fast pre-check: no dot in the return clause -> literal
             return createExpression(returnClause);

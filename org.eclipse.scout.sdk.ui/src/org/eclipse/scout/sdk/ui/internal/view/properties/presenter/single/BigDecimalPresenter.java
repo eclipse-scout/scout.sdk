@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
-import java.text.NumberFormat;
 import java.util.Locale;
 
 import org.eclipse.core.runtime.CoreException;
@@ -35,13 +34,14 @@ import org.eclipse.swt.widgets.Composite;
 public class BigDecimalPresenter extends AbstractValuePresenter<BigDecimal> {
 
   private final IPropertySourceParser<BigDecimal> m_parser;
-  private final NumberFormat m_formatter;
+  private final DecimalFormat m_formatter;
 
   public BigDecimalPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
-    super(toolkit, parent, "[\\-\\+0-9eE\\.']*");
+    super(toolkit, parent, "[\\-\\+0-9eE\\.]*");
     m_parser = new BigDecimalPropertySourceParser();
-    m_formatter = DecimalFormat.getInstance(Locale.ENGLISH);
+    m_formatter = (DecimalFormat) DecimalFormat.getInstance(Locale.ENGLISH);
     m_formatter.setMaximumFractionDigits(20);
+    m_formatter.setGroupingUsed(false);
   }
 
   public IPropertySourceParser<BigDecimal> getParser() {
