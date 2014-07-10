@@ -150,7 +150,7 @@ public class LibraryBundleCreateOperation implements IOperation {
     if (getFragmentHost() != null) {
       manifest.setEntryValue("Fragment-Host", getFragmentHost());
     }
-    manifest.setEntryValue("Bundle-RequiredExecutionEnvironment", JdtUtility.getDefaultJvmExecutionEnvironment());
+    manifest.setEntryValue("Bundle-RequiredExecutionEnvironment", JdtUtility.getDefaultJvmExecutionEnvironment(JdtUtility.getTargetPlatformVersion()));
   }
 
   private void collectPackages(IProject project, Collection<IPackageFragment> collector) throws JavaModelException {
@@ -164,7 +164,7 @@ public class LibraryBundleCreateOperation implements IOperation {
           IPackageFragment f = (IPackageFragment) children[k];
           String name = f.getElementName();
           if (name.equals("")) //$NON-NLS-1$
-            name = "."; //$NON-NLS-1$
+          name = "."; //$NON-NLS-1$
           if ((f.hasChildren() || f.getNonJavaResources().length > 0) && names.add(name)) collector.add(f);
         }
       }

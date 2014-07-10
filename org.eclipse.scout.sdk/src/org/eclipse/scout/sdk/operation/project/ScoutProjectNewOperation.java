@@ -164,7 +164,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   }
 
   protected String computeExecutionEnvironment() {
-    return JdtUtility.getDefaultJvmExecutionEnvironment();
+    return JdtUtility.getDefaultJvmExecutionEnvironment(getTargetPlatformVersion());
   }
 
   protected void putInitialProperties() {

@@ -92,7 +92,18 @@ public final class JdtUtility {
     return null;
   }
 
-  public static String getDefaultJvmExecutionEnvironment() {
+  /**
+   * Gets the default execution environment (e.g. "JavaSE-1.8") supported in the current default JVMs and the given
+   * target platform.<br>
+   * Use {@link #getExecEnvVersion(String)} to parse the execution environment to a double.
+   *
+   * @param targetPlatformVersion
+   *          The target platform to which the execution environment must be compatible.
+   * @return A string like "JavaSE-1.8" with the latest version supported in the current default JVMs and the given
+   *         target platform.
+   * @see #getExecEnvVersion(String)
+   */
+  public static String getDefaultJvmExecutionEnvironment(Version targetPlatformVersion) {
     // defaults
     String execEnv = EXEC_ENV_PREFIX + MIN_JVM_VERSION;
     double execEnvVersion = getExecEnvVersion(execEnv);
@@ -104,7 +115,19 @@ public final class JdtUtility {
         if (env.isStrictlyCompatible(defaultVm)) {
           double envVersion = getExecEnvVersion(executionEnvId);
           if (envVersion > execEnvVersion) {
-            execEnv = executionEnvId; // take the newest
+            if (envVersion < 1.8) {
+              execEnv = executionEnvId; // take the newest supported (1.6 and 1.7 are supported on all platforms)
+            }
+            else if (envVersion == 1.8) {
+              // 1.8 is only supported on Luna or later platforms
+              if (PlatformVersionUtility.isLunaOrLater(targetPlatformVersion)) {
+                execEnv = executionEnvId; // take the newest
+              }
+              else {
+                // it is a JRE 1.8 but an eclipse older than Luna: reduce to 1.7 level
+                execEnv = EXEC_ENV_PREFIX + "1.7";
+              }
+            }
           }
         }
       }
@@ -112,6 +135,14 @@ public final class JdtUtility {
     return execEnv;
   }
 
+  /**
+   * Takes an java execution environment (e.g. "JavaSE-1.8") and parses the version as double (in this example 1.8).<br>
+   * If an invalid value is passed, always 1.6 is returned as minimal version.
+   *
+   * @param executionEnvId
+   *          The execution environment to parse.
+   * @return The version as double.
+   */
   public static double getExecEnvVersion(String executionEnvId) {
     if (executionEnvId != null && executionEnvId.startsWith(EXEC_ENV_PREFIX)) {
       String numPart = executionEnvId.substring(EXEC_ENV_PREFIX.length());
@@ -183,7 +214,7 @@ public final class JdtUtility {
    * converts the given string into a string literal with leading and ending double-quotes including escaping of the
    * given string.<br>
    * this is the inverse function of {@link JdtUtility#fromStringLiteral(String)}
-   * 
+   *
    * @param s
    *          the string to convert.
    * @return the literal string ready to be directly inserted into java source or null if the input string is null.
@@ -254,7 +285,7 @@ public final class JdtUtility {
   /**
    * converts the given input string literal into the representing original string.<br>
    * this is the inverse function of {@link JdtUtility#toStringLiteral(String)}
-   * 
+   *
    * @param l
    *          the literal with leading and ending double-quotes
    * @return the original (un-escaped) string. if it is no valid literal string, null is returned.
@@ -434,7 +465,7 @@ public final class JdtUtility {
 
   /**
    * checks whether all of the given plugins are installed in the current platform
-   * 
+   *
    * @param pluginIds
    *          the plugin Ids to search
    * @return true if every plugin passed exists in the given platform, false otherwise. If an empty or null list is
@@ -456,7 +487,7 @@ public final class JdtUtility {
   /**
    * Gets the newest (highest version) bundle with the given symbolic name that can be found in the active target
    * platform.
-   * 
+   *
    * @param symbolicName
    *          the symbolic name of the bundles to check.
    * @return The newest bundle having the given symbolic name or null if no bundle with the given name can be
