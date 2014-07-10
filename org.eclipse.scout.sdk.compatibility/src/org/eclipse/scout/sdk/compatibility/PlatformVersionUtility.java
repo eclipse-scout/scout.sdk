@@ -43,6 +43,10 @@ public final class PlatformVersionUtility {
     return (v.getMajor() == 3 && v.getMinor() == 8) || (v.getMajor() == 4 && v.getMinor() >= 2);
   }
 
+  public static boolean isLunaOrLater(Version v) {
+    return (v.getMajor() == 4 && v.getMinor() >= 4) || v.getMajor() > 4;
+  }
+
   public static boolean isJuno() {
     return isJuno(getPlatformVersion());
   }
