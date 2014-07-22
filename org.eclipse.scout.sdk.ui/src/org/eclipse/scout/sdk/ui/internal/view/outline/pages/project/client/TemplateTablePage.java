@@ -14,13 +14,14 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.FormFieldTemplateTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.FormTemplateTablePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageTemplateTablePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 
 /**
  * <h3>{@link TemplateTablePage}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 11.09.2010
  */
@@ -40,6 +41,7 @@ public class TemplateTablePage extends AbstractPage {
   @Override
   protected void loadChildrenImpl() {
     new FormTemplateTablePage(this);
+    new PageTemplateTablePage(this);
     new FormFieldTemplateTablePage(this);
   }
 

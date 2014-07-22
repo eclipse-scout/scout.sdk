@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal;
 
 /**
  * <h3>{@link SdkIcons}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 28.11.2010
  */
@@ -262,6 +262,7 @@ public interface SdkIcons {
   String CalendarItemProviderRemove = ToolRemove; // TODO
   String CalendarItemProviders = FolderOpen; // TODO
   String FormTemplate = Default; // TODO
+  String PageTemplate = Default; // TODO
   String FormFieldTemplate = Default; // TODO
   String FormFieldTemplateAdd = ToolAdd; // TODO
   String FormFieldTemplateRemove = ToolRemove; // TODO
