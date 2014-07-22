@@ -15,7 +15,6 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
@@ -89,7 +88,7 @@ public class LookupServiceProposalPresenter extends AbstractTypeProposalPresente
 
       String genericSignature = null;
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getType());
+        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getType());
         genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), superHierarchy, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
       }
       catch (CoreException e) {

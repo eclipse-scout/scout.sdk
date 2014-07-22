@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
@@ -32,7 +31,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
  * <h3>{@link MenuTypeParsers}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 03.06.2014
  */
@@ -40,7 +39,7 @@ public class MenuTypeParsers implements IPropertySourceParser<MenuTypesConfig> {
 
   @Override
   public MenuTypesConfig parseSourceValue(String source, IMethod context, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    ICachedTypeHierarchy menuTypeHierarchy = ScoutSdkCore.getHierarchyCache().getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.IMenuType));
+    ICachedTypeHierarchy menuTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.IMenuType));
     Set<IType> menuTypeEnums = menuTypeHierarchy.getAllTypes(TypeFilters.getEnumTypesFilter(), TypeComparators.getTypeNameComparator());
     MenuTypesConfig ret = new MenuTypesConfig();
     for (IType menuType : menuTypeEnums) {

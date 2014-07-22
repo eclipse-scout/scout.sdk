@@ -20,7 +20,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.codeid.CodeIdExtensionPoint;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -149,7 +148,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       IType codeType = TypeUtility.getToplevelType(m_declaringType);
       codeIdSignatureFromCodeType = ScoutTypeUtility.getCodeIdGenericTypeSignature(codeType);
 
-      String codeSignature = ScoutTypeUtility.getCodeSignature(codeType, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(codeType));
+      String codeSignature = ScoutTypeUtility.getCodeSignature(codeType, TypeUtility.getSupertypeHierarchy(codeType));
       if (codeSignature != null) {
         if (codeIdSignatureFromCodeType != null) {
           filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getSubtypeFilter(TypeUtility.getTypeBySignature(codeSignature)), TypeFilters.getTypeParamSubTypeFilter(codeIdSignatureFromCodeType, IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID));
@@ -200,7 +199,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
             else {
               IType t = TypeUtility.getTypeBySignature(getGenericSignature());
               if (TypeUtility.exists(t)) {
-                acceptProp = !ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t).contains(genericTypeOfSuperClass);
+                acceptProp = !TypeUtility.getSupertypeHierarchy(t).contains(genericTypeOfSuperClass);
               }
               else {
                 acceptProp = true;
@@ -325,7 +324,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getSuperType())) {
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
+        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
         String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);

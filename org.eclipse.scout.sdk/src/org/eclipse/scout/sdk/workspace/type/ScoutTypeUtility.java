@@ -711,7 +711,7 @@ public class ScoutTypeUtility extends TypeUtility {
     if (!TypeUtility.exists(codeType)) {
       return null;
     }
-    return getCodeIdGenericTypeSignature(codeType, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(codeType));
+    return getCodeIdGenericTypeSignature(codeType, TypeUtility.getSupertypeHierarchy(codeType));
   }
 
   /**
@@ -859,7 +859,7 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName) {
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(declaringType);
+    ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
     return getConfigurationMethod(declaringType, methodName, superTypeHierarchy);
   }
 
@@ -943,7 +943,7 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IStructuredType createStructuredType(IType type) {
-    ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type);
+    ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(type);
     if (supertypeHierarchy == null) {
       return null;
     }

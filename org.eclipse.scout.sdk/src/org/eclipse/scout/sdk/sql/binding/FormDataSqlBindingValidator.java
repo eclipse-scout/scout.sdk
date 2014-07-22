@@ -34,7 +34,6 @@ import org.eclipse.scout.commons.parsers.BindModel;
 import org.eclipse.scout.commons.parsers.BindParser;
 import org.eclipse.scout.commons.parsers.token.IToken;
 import org.eclipse.scout.commons.parsers.token.ValueInputToken;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.SQLStatement;
 import org.eclipse.scout.sdk.sql.binding.ast.SqlMethodIvocationVisitor;
@@ -56,7 +55,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link FormDataSqlBindingValidator}</h3> ...
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.02.2011
  */
@@ -197,7 +196,7 @@ public class FormDataSqlBindingValidator {
     // server sessions
     for (IType serverSession : ScoutTypeUtility.getServerSessionTypes(context)) {
       HashSet<String> binds = new HashSet<String>();
-      collectPropertyBinds(binds, serverSession, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(serverSession));
+      collectPropertyBinds(binds, serverSession, TypeUtility.getSupertypeHierarchy(serverSession));
       for (String s : binds) {
         bindBases.put(s, new ServerSessionBindBase(s, serverSession));
       }
@@ -295,7 +294,7 @@ public class FormDataSqlBindingValidator {
     HashSet<String> bindVars = new HashSet<String>();
     if (TypeUtility.exists(type)) {
       ITypeHierarchy supertypeHierarchy = null;
-      supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type);
+      supertypeHierarchy = TypeUtility.getSupertypeHierarchy(type);
       collectPropertyBinds(bindVars, type, supertypeHierarchy);
     }
     return bindVars;

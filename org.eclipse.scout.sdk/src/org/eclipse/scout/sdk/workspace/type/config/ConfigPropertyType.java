@@ -22,7 +22,6 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -38,7 +37,7 @@ public class ConfigPropertyType {
 
   public ConfigPropertyType(IType type) throws JavaModelException {
     m_type = type;
-    m_superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getType());
+    m_superTypeHierarchy = TypeUtility.getSupertypeHierarchy(getType());
     m_affectedTypes = m_superTypeHierarchy.getSuperClassStack(m_type);
 
     TreeMap<String, ConfigurationMethod> configurationMethods = new TreeMap<String, ConfigurationMethod>(new P_MethodNameComparator());

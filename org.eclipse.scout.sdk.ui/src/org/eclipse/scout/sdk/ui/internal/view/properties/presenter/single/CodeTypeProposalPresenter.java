@@ -17,7 +17,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.viewers.ILabelProvider;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementLabelProvider;
@@ -101,7 +100,7 @@ public class CodeTypeProposalPresenter extends AbstractTypeProposalPresenter {
             paramName = Signature.getSignatureSimpleName(typeParameters[0]);
           }
         }
-        ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getType());
+        ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(getType());
         genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, defaultMethod.getDeclaringType().getFullyQualifiedName(), paramName);
 
       }

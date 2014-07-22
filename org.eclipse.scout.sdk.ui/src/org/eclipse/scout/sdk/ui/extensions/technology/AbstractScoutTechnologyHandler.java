@@ -152,9 +152,9 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     }
 
     PluginModelHelper pluginModel = new PluginModelHelper(project.getSymbolicName());
-    TriState ret = TriState.parseTriState(pluginModel.Manifest.existsImportPackage(importPackages[0]));
+    TriState ret = TriState.parse(pluginModel.Manifest.existsImportPackage(importPackages[0]));
     for (int i = 1; i < importPackages.length; i++) {
-      TriState tmp = TriState.parseTriState(pluginModel.Manifest.existsImportPackage(importPackages[i]));
+      TriState tmp = TriState.parse(pluginModel.Manifest.existsImportPackage(importPackages[i]));
       if (tmp != ret) {
         return TriState.UNDEFINED;
       }
@@ -186,9 +186,9 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     }
 
     PluginModelHelper pluginModel = new PluginModelHelper(project.getSymbolicName());
-    TriState ret = TriState.parseTriState(pluginModel.Manifest.existsDependency(pluginIds[0]));
+    TriState ret = TriState.parse(pluginModel.Manifest.existsDependency(pluginIds[0]));
     for (int i = 1; i < pluginIds.length; i++) {
-      TriState tmp = TriState.parseTriState(pluginModel.Manifest.existsDependency(pluginIds[i]));
+      TriState tmp = TriState.parse(pluginModel.Manifest.existsDependency(pluginIds[i]));
       if (tmp != ret) {
         return TriState.UNDEFINED;
       }
@@ -202,9 +202,9 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
       return null;
     }
 
-    TriState ret = TriState.parseTriState(containsProductDependencies(productFiles.get(0).productFile, pluginIds));
+    TriState ret = TriState.parse(containsProductDependencies(productFiles.get(0).productFile, pluginIds));
     for (int i = 1; i < productFiles.size(); i++) {
-      TriState tmp = TriState.parseTriState(containsProductDependencies(productFiles.get(i).productFile, pluginIds));
+      TriState tmp = TriState.parse(containsProductDependencies(productFiles.get(i).productFile, pluginIds));
       if (ret != tmp) {
         return TriState.UNDEFINED;
       }
@@ -217,9 +217,9 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
       return null;
     }
 
-    TriState ret = TriState.parseTriState(isTargetContainingFeature(files.get(0).getResource(), featureIds));
+    TriState ret = TriState.parse(isTargetContainingFeature(files.get(0).getResource(), featureIds));
     for (int i = 1; i < files.size(); i++) {
-      TriState tmp = TriState.parseTriState(isTargetContainingFeature(files.get(i).getResource(), featureIds));
+      TriState tmp = TriState.parse(isTargetContainingFeature(files.get(i).getResource(), featureIds));
       if (ret != tmp) {
         return TriState.UNDEFINED;
       }

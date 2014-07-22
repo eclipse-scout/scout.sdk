@@ -25,7 +25,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -113,7 +112,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
    * Format of content:
    * for each column: [class name]\t[width]\n
    * The first line contains the identifier, which will be ignored here
-   * 
+   *
    * @param content
    *          Clipboard content
    * @return List of column names and their width
@@ -155,7 +154,7 @@ public class TableColumnWidthsPasteAction extends AbstractScoutHandler {
       Integer columnWidth = map.get(className);
       // there is a corresponding entry in the clipboard for the current column?
       if (columnWidth != null && columnWidth >= 0) {
-        ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(innerType, COLUMN_WIDTH_METHOD_NAME, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(innerType), ConfigurationMethod.PROPERTY_METHOD, "INTEGER");
+        ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(innerType, COLUMN_WIDTH_METHOD_NAME, TypeUtility.getSupertypeHierarchy(innerType), ConfigurationMethod.PROPERTY_METHOD, "INTEGER");
         ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(configurationMethod, new IntegerPropertySourceParser());
         updateOp.setValue(columnWidth);
         updateOps.add(updateOp);

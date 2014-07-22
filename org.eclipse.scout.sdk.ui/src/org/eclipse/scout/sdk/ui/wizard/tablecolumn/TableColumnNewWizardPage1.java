@@ -33,7 +33,6 @@ import org.eclipse.jface.viewers.ViewerSorter;
 import org.eclipse.jface.wizard.IWizardContainer;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -145,7 +144,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       m_nextPage = null;
     }
     else {
-      ITypeHierarchy selectedSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(m_selectedTemplate);
+      ITypeHierarchy selectedSuperTypeHierarchy = TypeUtility.getSupertypeHierarchy(m_selectedTemplate);
       if (selectedSuperTypeHierarchy != null && selectedSuperTypeHierarchy.contains(iSmartColumn)) {
         SmartTableColumnNewWizard wizard = new SmartTableColumnNewWizard(m_nextOperation);
         wizard.initWizard(m_declaringType);

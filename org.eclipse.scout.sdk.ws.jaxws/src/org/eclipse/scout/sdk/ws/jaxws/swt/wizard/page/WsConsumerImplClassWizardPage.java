@@ -34,7 +34,6 @@ import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -341,7 +340,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
       String fqn = StringUtility.join(".", packageName, className);
       if (TypeUtility.existsType(fqn)) {
         IType type = TypeUtility.getType(fqn);
-        if (!ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type).contains(interfaceType)) {
+        if (!TypeUtility.getSupertypeHierarchy(type).contains(interfaceType)) {
           type.getJavadocRange().getOffset();
           type.getJavadocRange().getLength();
           multiStatus.add(new Status(IStatus.ERROR, JaxWsSdk.PLUGIN_ID, Texts.get("XMustBeOfTheTypeY", label, interfaceType.getFullyQualifiedName())));
@@ -446,7 +445,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
       if (TypeUtility.existsType(authenticationHandler)) {
         IType type = TypeUtility.getType(authenticationHandler);
         try {
-          if (ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer))) {
+          if (TypeUtility.getSupertypeHierarchy(type).contains(TypeUtility.getType(JaxWsRuntimeClasses.IAuthenticationHandlerConsumer))) {
             m_tooltipAuthenticationFactory.setMember(type);
           }
         }

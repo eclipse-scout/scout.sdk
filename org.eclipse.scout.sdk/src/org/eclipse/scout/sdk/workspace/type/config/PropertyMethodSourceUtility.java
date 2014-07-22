@@ -28,7 +28,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.NoSourceException;
@@ -96,7 +95,7 @@ public final class PropertyMethodSourceUtility {
     if (TypeUtility.exists(method)) {
       return method;
     }
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type);
+    ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(type);
     IType declaringType = superTypeHierarchy.getSuperclass(type);
     while (declaringType != null) {
       method = TypeUtility.getMethod(declaringType, methodName);
@@ -585,7 +584,7 @@ public final class PropertyMethodSourceUtility {
         typeName = typeName.substring(0, typeName.length() - 1);
         IType iconsType = TypeUtility.getReferencedType(method.getDeclaringType(), typeName, true);
         if (TypeUtility.exists(iconsType)) {
-          ITypeHierarchy iconsSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(iconsType);
+          ITypeHierarchy iconsSuperTypeHierarchy = TypeUtility.getSupertypeHierarchy(iconsType);
           while (TypeUtility.exists(iconsType)) {
             IField field = iconsType.getField(fieldName);
             if (TypeUtility.exists(field)) {

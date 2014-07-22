@@ -19,7 +19,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -270,7 +269,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
       setStateChanging(true);
       m_superType = superType;
       if (TypeUtility.exists(superType)) {
-        ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(superType);
+        ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(superType);
         if (superTypeHierarchy.contains(iPageWithNodes)) {
           m_nameSuffix = SdkProperties.SUFFIX_OUTLINE_NODE_PAGE;
         }

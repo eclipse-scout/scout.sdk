@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link RayoUiSwingProdTechnologyHandler}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 19.02.2012
  */
@@ -69,7 +69,7 @@ public class RayoUiSwingProdTechnologyHandler extends AbstractScoutTechnologyHan
     }
 
     for (int i = 0; i < productFiles.size(); i++) {
-      TriState tmp = TriState.parseTriState(isRayoLafEnabledInConfigIni(productFiles.get(i).productFile));
+      TriState tmp = TriState.parse(isRayoLafEnabledInConfigIni(productFiles.get(i).productFile));
       if (ret != tmp) {
         return TriState.UNDEFINED;
       }

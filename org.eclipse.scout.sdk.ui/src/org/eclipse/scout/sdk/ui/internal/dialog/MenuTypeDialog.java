@@ -18,7 +18,6 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementImageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
@@ -113,7 +112,7 @@ public class MenuTypeDialog extends TitleAreaDialog {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
 
-    ICachedTypeHierarchy menuTypeHierarchy = ScoutSdkCore.getHierarchyCache().getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.IMenuType));
+    ICachedTypeHierarchy menuTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(IRuntimeClasses.IMenuType));
     Set<IType> menuTypeEnums = menuTypeHierarchy.getAllTypes(TypeFilters.getEnumTypesFilter(), TypeComparators.getTypeNameComparator());
     int i = 0;
     for (IType m : menuTypeEnums) {

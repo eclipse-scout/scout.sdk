@@ -33,7 +33,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -117,7 +116,7 @@ public final class MarkerRebuildUtility {
       // validate port type interface types
       Set<IType> interfacePortTypes = new HashSet<IType>();
 
-      ITypeHierarchy hierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(portType);
+      ITypeHierarchy hierarchy = TypeUtility.getSupertypeHierarchy(portType);
 
       for (IType superInterface : hierarchy.getAllSuperInterfaces(portType)) {
         IAnnotation annotation = JaxWsSdkUtility.getAnnotation(superInterface, WebService.class.getName(), false);

@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
@@ -179,7 +178,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     if (TypeUtility.exists(getSuperType())) {
       List<ITypeParameter> typeParameters = TypeUtility.getTypeParameters(m_definitionType);
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
+        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
         String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, m_definitionType.getFullyQualifiedName(), typeParameters.get(0).getElementName());
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
@@ -212,7 +211,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
       if (TypeUtility.exists(getSuperType())) {
         try {
-          ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
+          ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
           String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, m_definitionType.getFullyQualifiedName(), getTypeParamName());
           if (typeParamSig != null) {
             IType generic = TypeUtility.getTypeBySignature(getGenericTypeSignature());

@@ -22,7 +22,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.table.SmartTableColumnNewOperation;
@@ -355,7 +354,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericType(IType t, String genericDefiningType, String paramName) {
     if (TypeUtility.exists(t)) {
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t);
+        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(t);
         String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, superHierarchy, genericDefiningType, paramName);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);

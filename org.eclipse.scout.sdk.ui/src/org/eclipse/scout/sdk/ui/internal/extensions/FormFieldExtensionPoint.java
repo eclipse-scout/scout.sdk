@@ -25,7 +25,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
@@ -61,7 +60,7 @@ public final class FormFieldExtensionPoint {
    * @return the best match extensions new wizard.
    */
   public static AbstractWorkspaceWizard createNewWizard(IType modelType) {
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(modelType);
+    ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(modelType);
     for (IFormFieldExtension ext : getSortedExtensions(modelType, superTypeHierarchy, -1)) {
       if (ext.getNewWizardClazz() != null) {
         return ext.createNewWizard();
@@ -146,7 +145,7 @@ public final class FormFieldExtensionPoint {
                   break;
                 }
                 ITypeHierarchy superTypeHierarchy = null;
-                superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(modelType);
+                superTypeHierarchy = TypeUtility.getSupertypeHierarchy(modelType);
                 if (superTypeHierarchy == null) {
                   ScoutSdkUi.logWarning("could not create super type hierarchy of '" + modelType.getFullyQualifiedName() + "'.");
                   continue;

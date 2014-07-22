@@ -35,7 +35,6 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.internal.workspace.dto.formdata.CompositeFormDataTypeSourceBuilder;
@@ -224,7 +223,7 @@ public final class DtoUtility {
     IType validationRuleType = TypeUtility.getType(IRuntimeClasses.ValidationRule);
     TreeMap<String, ValidationRuleMethod> ruleMap = new TreeMap<String, ValidationRuleMethod>();
     if (superTypeHierarchy == null) {
-      superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(declaringType);
+      superTypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
       if (superTypeHierarchy == null) {
         ScoutSdk.logWarning("could not build super type hierarchy for '" + declaringType.getFullyQualifiedName() + "'.");
         return Collections.emptyList();

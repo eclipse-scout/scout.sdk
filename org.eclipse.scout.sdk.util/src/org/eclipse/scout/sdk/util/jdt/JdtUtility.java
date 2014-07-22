@@ -98,7 +98,8 @@ public final class JdtUtility {
    * Use {@link #getExecEnvVersion(String)} to parse the execution environment to a double.
    *
    * @param targetPlatformVersion
-   *          The target platform to which the execution environment must be compatible.
+   *          The target platform to which the execution environment must be compatible or <code>null</code> if no
+   *          compatibility should be ensured.
    * @return A string like "JavaSE-1.8" with the latest version supported in the current default JVMs and the given
    *         target platform.
    * @see #getExecEnvVersion(String)
@@ -120,7 +121,7 @@ public final class JdtUtility {
             }
             else if (envVersion == 1.8) {
               // 1.8 is only supported on Luna or later platforms
-              if (PlatformVersionUtility.isLunaOrLater(targetPlatformVersion)) {
+              if (targetPlatformVersion == null || PlatformVersionUtility.isLunaOrLater(targetPlatformVersion)) {
                 execEnv = executionEnvId; // take the newest
               }
               else {
@@ -137,7 +138,9 @@ public final class JdtUtility {
 
   /**
    * Takes an java execution environment (e.g. "JavaSE-1.8") and parses the version as double (in this example 1.8).<br>
-   * If an invalid value is passed, always 1.6 is returned as minimal version.
+   * If an invalid value is passed, always 1.6 is returned as minimal version.<br>
+   * Use {@link #getDefaultJvmExecutionEnvironment(Version)} to get the default execution environment in the current
+   * workspace.
    *
    * @param executionEnvId
    *          The execution environment to parse.
@@ -322,6 +325,13 @@ public final class JdtUtility {
     return null;
   }
 
+  /**
+   * Gets the version of the currently set target platform.<br>
+   * Use {@link PlatformVersionUtility#getPlatformVersion()} to get the version of the currently running platform.
+   *
+   * @return The version of the currently set target platform.
+   * @see PlatformVersionUtility#getPlatformVersion()
+   */
   public static Version getTargetPlatformVersion() {
     BundleDescription platform = getNewestBundleInActiveTargetPlatform(PlatformVersionUtility.ORG_ECLIPSE_PLATFORM);
     if (platform != null) {

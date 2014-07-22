@@ -93,7 +93,6 @@ import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
@@ -912,7 +911,7 @@ public final class JaxWsSdkUtility {
       }
 
       if (recursively) {
-        IType superType = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(declaringType).getSuperclass(declaringType);
+        IType superType = TypeUtility.getSupertypeHierarchy(declaringType).getSuperclass(declaringType);
         return getAnnotation(superType, fqnAnnotationName, recursively);
       }
     }
@@ -1090,7 +1089,7 @@ public final class JaxWsSdkUtility {
     try {
       Set<IType> superTypes = TypeUtility.getTypes(fqnSuperType);
       for (IType superType : superTypes) {
-        ITypeHierarchy hierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(superType);
+        ITypeHierarchy hierarchy = TypeUtility.getSupertypeHierarchy(superType);
         Set<IType> candidates = hierarchy.getAllSubtypes(superType);
         for (IType candidate : candidates) {
           if (TypeUtility.exists(candidate)) {
@@ -1135,7 +1134,7 @@ public final class JaxWsSdkUtility {
       return false;
     }
     Set<IType> superTypes = TypeUtility.getTypes(fqnSuperType);
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(candidateToCheck);
+    ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(candidateToCheck);
     for (IType superType : superTypes) {
       if (superTypeHierarchy.contains(superType)) {
         return true;

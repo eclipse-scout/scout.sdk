@@ -21,7 +21,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -299,7 +298,7 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericType(IType t, String genericDefiningType, String paramName) {
     if (TypeUtility.exists(t)) {
       try {
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t), genericDefiningType, paramName);
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, TypeUtility.getSupertypeHierarchy(t), genericDefiningType, paramName);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }

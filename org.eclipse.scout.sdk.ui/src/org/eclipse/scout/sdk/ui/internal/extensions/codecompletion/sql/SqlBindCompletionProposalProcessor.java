@@ -29,7 +29,6 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.NamingUtility;
@@ -74,7 +73,7 @@ public class SqlBindCompletionProposalProcessor {
         String propName = NamingUtility.ensureStartWithLowerCase(t.getElementName());
         SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
-        addInnerTypesInSuperClasses(t, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t), collector, prefix, propName + ".", context);
+        addInnerTypesInSuperClasses(t, TypeUtility.getSupertypeHierarchy(t), collector, prefix, propName + ".", context);
       }
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractPropertyData, hierarchy))) {
         String propName = t.getElementName();
@@ -107,7 +106,7 @@ public class SqlBindCompletionProposalProcessor {
       for (IType innerType : TypeUtility.getInnerTypes(superClass, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
         SqlBindProposal prop = new SqlBindProposal(namePrefix + NamingUtility.ensureStartWithLowerCase(innerType.getElementName()), prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
-        addInnerTypesInSuperClasses(innerType, ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(innerType), collector, prefix, prop.getDisplayString() + ".", context);
+        addInnerTypesInSuperClasses(innerType, TypeUtility.getSupertypeHierarchy(innerType), collector, prefix, prop.getDisplayString() + ".", context);
       }
     }
   }
@@ -139,7 +138,7 @@ public class SqlBindCompletionProposalProcessor {
         if (SignatureUtility.getTypeSignatureKind(fqs) == Signature.CLASS_TYPE_SIGNATURE) {
           String fqn = Signature.getSignatureQualifier(fqs) + "." + Signature.getSignatureSimpleName(fqs);
           IType candidate = TypeUtility.getType(fqn);
-          if (ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(candidate).contains(AbstractFormData)) {
+          if (TypeUtility.getSupertypeHierarchy(candidate).contains(AbstractFormData)) {
             return candidate;
           }
         }

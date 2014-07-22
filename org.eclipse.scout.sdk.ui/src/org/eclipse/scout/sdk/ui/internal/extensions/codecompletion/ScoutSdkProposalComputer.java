@@ -26,7 +26,6 @@ import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -62,9 +61,9 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
           IJavaElement element = coreContext.getEnclosingElement();
           if (TypeUtility.exists(element)) {
             if (element.getElementType() == IJavaElement.TYPE) {
-              IType declaringType = (IType) element;
-              declaringType = TypeUtility.getType(declaringType.getFullyQualifiedName());
-              ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(declaringType);
+              // don't directly use the element (AssistSourceType) because it has invalid source ranges!
+              IType declaringType = TypeUtility.getType(((IType) element).getFullyQualifiedName());
+              ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
               if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) ||
                   supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
                 proposals.add(new CodeNewProposal(declaringType));

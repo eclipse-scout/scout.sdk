@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -233,7 +232,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         m_genericTypeField.setEnabled(TypeUtility.isGenericType(t));
         if (getGenericTypeSignature() == null && TypeUtility.exists(t)) {
           try {
-            ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t);
+            ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(t);
             String lookupSvcKeyTypeSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, superHierarchy, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
             if (lookupSvcKeyTypeSig != null) {
               setGenericTypeSignature(lookupSvcKeyTypeSig);
@@ -341,7 +340,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOf(IType lookupType) {
     if (TypeUtility.exists(lookupType)) {
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(lookupType);
+        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(lookupType);
         String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(lookupType, superHierarchy, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);

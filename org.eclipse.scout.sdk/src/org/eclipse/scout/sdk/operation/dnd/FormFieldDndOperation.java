@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompositeObject;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.BoxDeleteOperation;
 import org.eclipse.scout.sdk.operation.form.field.FormFieldDeleteOperation;
@@ -73,7 +72,7 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
 
   @Override
   protected void deleteType(IType type, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getType());
+    ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(getType());
     if (superTypeHierarchy.contains(iCompositeField)) {
       BoxDeleteOperation deleteOp = new BoxDeleteOperation(getType());
       deleteOp.validate();

@@ -22,7 +22,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -55,7 +54,7 @@ public abstract class AbstractPageOperation implements IOperation {
       IType iPageWithNodes = TypeUtility.getType(IRuntimeClasses.IPageWithNodes);
       IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
 
-      ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getHolderType());
+      ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(getHolderType());
       if (superTypeHierarchy.contains(iOutline)) {
         addToOutline(page, getHolderType(), monitor, workingCopyManager);
       }

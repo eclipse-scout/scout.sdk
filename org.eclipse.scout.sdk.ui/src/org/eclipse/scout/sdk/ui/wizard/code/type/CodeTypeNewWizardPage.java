@@ -23,7 +23,6 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.codeid.CodeIdExtensionPoint;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -364,7 +363,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IType getGenericTypeOfSuperClass(String typeArgName) {
     try {
-      ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
+      ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
       String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.ICodeType, typeArgName);
       if (typeParamSig != null) {
         return TypeUtility.getTypeBySignature(typeParamSig);

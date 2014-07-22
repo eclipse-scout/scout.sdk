@@ -22,7 +22,6 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.outline.OutlineNewOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -223,7 +222,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
     ITypeHierarchy hierarchy = m_typeHierarchyCache.get(element);
     if (hierarchy == null && element.getElementType() == IJavaElement.TYPE) {
       IType type = (IType) element;
-      hierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(type);
+      hierarchy = TypeUtility.getSupertypeHierarchy(type);
       if (hierarchy != null) {
         m_typeHierarchyCache.put(element, hierarchy);
       }

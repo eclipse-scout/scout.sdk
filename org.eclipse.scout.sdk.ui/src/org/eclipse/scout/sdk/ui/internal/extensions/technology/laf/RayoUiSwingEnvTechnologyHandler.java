@@ -51,7 +51,7 @@ import org.eclipse.text.edits.TextEdit;
 
 /**
  * <h3>{@link RayoUiSwingEnvTechnologyHandler}</h3> ...
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 19.02.2012
  */
@@ -137,9 +137,9 @@ public class RayoUiSwingEnvTechnologyHandler extends AbstractScoutTechnologyHand
       return null;
     }
 
-    TriState ret = TriState.parseTriState(isRayoEnvironment(swingEnvs[0]));
+    TriState ret = TriState.parse(isRayoEnvironment(swingEnvs[0]));
     for (int i = 1; i < swingEnvs.length; i++) {
-      TriState tmp = TriState.parseTriState(isRayoEnvironment(swingEnvs[i]));
+      TriState tmp = TriState.parse(isRayoEnvironment(swingEnvs[i]));
       if (ret != tmp) {
         return TriState.UNDEFINED;
       }

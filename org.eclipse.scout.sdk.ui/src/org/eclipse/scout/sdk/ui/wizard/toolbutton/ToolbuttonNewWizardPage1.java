@@ -24,7 +24,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.wizard.IWizardPage;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
@@ -88,7 +87,7 @@ public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
   protected void validateNextPage() {
     if (TypeUtility.exists(getSuperType())) {
-      ITypeHierarchy superTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
+      ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
       if (superTypeHierarchy != null && superTypeHierarchy.contains(abstractOutlineViewButton)) {
         m_nextPage = getWizard().getPage(OutlineToolbuttonNewWizardPage.class.getName());
       }

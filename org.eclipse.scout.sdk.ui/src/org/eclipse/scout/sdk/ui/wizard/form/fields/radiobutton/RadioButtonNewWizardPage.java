@@ -16,11 +16,9 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -113,7 +111,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 
     ITypeFilter filter = null;
     try {
-      ITypeHierarchy radioGroupSuperTypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(m_declaringType);
+      ITypeHierarchy radioGroupSuperTypeHierarchy = TypeUtility.getSupertypeHierarchy(m_declaringType);
       m_radioButtonGroupValueTypeSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(m_declaringType, radioGroupSuperTypeHierarchy, IRuntimeClasses.IRadioButtonGroup, IRuntimeClasses.TYPE_PARAM_RADIOBUTTONGROUP__VALUE_TYPE);
       if (m_radioButtonGroupValueTypeSig != null) {
         m_radioButtonGroupValueType = TypeUtility.getTypeBySignature(m_radioButtonGroupValueTypeSig);
@@ -167,7 +165,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
           else {
             IType t = TypeUtility.getTypeBySignature(getGenericSignature());
             if (TypeUtility.exists(t)) {
-              acceptProp = !ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t).contains(gtosc);
+              acceptProp = !TypeUtility.getSupertypeHierarchy(t).contains(gtosc);
             }
             else {
               acceptProp = true;
@@ -298,7 +296,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getSuperType())) {
       try {
-        ITypeHierarchy superHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(getSuperType());
+        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
         String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.IRadioButton, IRuntimeClasses.TYPE_PARAM_RADIOBUTTON__VALUE_TYPE);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);

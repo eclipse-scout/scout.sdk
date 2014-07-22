@@ -100,6 +100,13 @@ public final class PlatformVersionUtility {
     return v.getMajor() == 3 && v.getMinor() == 5;
   }
 
+  /**
+   * Gets the version of the currently running platform.<br>
+   * To get the version of the currently set target platform use
+   * <code>org.eclipse.scout.sdk.util.jdt.JdtUtility.getTargetPlatformVersion()</code>
+   *
+   * @return The version of the currently running platform.
+   */
   public static Version getPlatformVersion() {
     if (platformVersion == null) {
       Version v = Platform.getBundle(ORG_ECLIPSE_PLATFORM).getVersion();

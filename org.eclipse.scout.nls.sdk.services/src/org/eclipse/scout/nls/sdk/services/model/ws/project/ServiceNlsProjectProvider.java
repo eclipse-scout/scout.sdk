@@ -117,7 +117,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     IType superType = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
     if (superType == null) return null;
 
-    Set<IType> serviceImpls = ScoutSdkCore.getHierarchyCache().getPrimaryTypeHierarchy(superType).getAllSubtypes(superType, new ITypeFilter() {
+    Set<IType> serviceImpls = TypeUtility.getPrimaryTypeHierarchy(superType).getAllSubtypes(superType, new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
         try {
@@ -221,7 +221,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static boolean isDocsService(IType service) throws JavaModelException {
-    ITypeHierarchy th = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(service);
+    ITypeHierarchy th = TypeUtility.getSupertypeHierarchy(service);
     for (IType ifs : th.getAllSuperInterfaces(service)) {
       if (IRuntimeClasses.IDocumentationTextProviderService.equals(ifs.getFullyQualifiedName())) {
         return true;
