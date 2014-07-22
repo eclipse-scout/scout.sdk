@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link DefaultSuperClassModel}</h3> ...
+ * <h3>{@link DefaultSuperClassModel}</h3>
  *
  * @author Matthias Villiger
  * @since 3.8.0 24.11.2012

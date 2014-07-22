@@ -27,7 +27,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>DoublePresenter</h3> ...
+ * <h3>DoublePresenter</h3>
  */
 public class DoublePresenter extends AbstractValuePresenter<Double> {
   private final IPropertySourceParser<Double> m_parser;

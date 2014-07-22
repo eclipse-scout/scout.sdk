@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.ui.extensions.preferences.IScoutProjectScrolledCont
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link TargetPackagePreferencePage}</h3> ...
+ * <h3>{@link TargetPackagePreferencePage}</h3>
  *
  * @author Matthias Villiger
  * @since 3.9.0 17.12.2012

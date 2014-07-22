@@ -55,7 +55,7 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 /**
- * <h3>{@link ProductLaunchPresenter}</h3> ...
+ * <h3>{@link ProductLaunchPresenter}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 31.08.2010

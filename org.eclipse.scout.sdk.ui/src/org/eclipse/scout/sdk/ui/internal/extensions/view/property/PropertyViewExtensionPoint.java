@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.osgi.framework.Bundle;
 
 /**
- * <h3>PropertyViewExtensionPoint</h3> ...
+ * <h3>PropertyViewExtensionPoint</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 19.07.2010

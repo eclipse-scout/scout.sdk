@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 
 /**
- * <h3>{@link SortedMemberKeyFactory}</h3> ...
+ * <h3>{@link SortedMemberKeyFactory}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.9.0 10.04.2013

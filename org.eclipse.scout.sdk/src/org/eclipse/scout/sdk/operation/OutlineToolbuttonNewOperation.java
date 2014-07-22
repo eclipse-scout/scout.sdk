@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>{@link OutlineToolbuttonNewOperation}</h3> ...
+ * <h3>{@link OutlineToolbuttonNewOperation}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.9.0 05.04.2013

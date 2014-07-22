@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuT
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 
 /**
- * <h3>{@link RadioButtonGroupNodePage}</h3> ...
+ * <h3>{@link RadioButtonGroupNodePage}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 28.11.2010

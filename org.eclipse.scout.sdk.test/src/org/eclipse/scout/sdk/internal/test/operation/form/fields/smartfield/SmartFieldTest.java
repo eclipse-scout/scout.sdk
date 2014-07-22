@@ -28,7 +28,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
- * <h3>{@link SmartFieldTest}</h3> ...
+ * <h3>{@link SmartFieldTest}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.8.0 13.02.2013

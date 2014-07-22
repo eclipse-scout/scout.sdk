@@ -45,7 +45,7 @@ import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
 /**
- * <h3>{@link AbstractScoutProjectPreferencePage}</h3> ...
+ * <h3>{@link AbstractScoutProjectPreferencePage}</h3>
  *
  * @author Matthias Villiger
  * @since 3.9.0 17.12.2012

@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>{@link SwtProductFileUpgradeOperation}</h3> ...
+ * <h3>{@link SwtProductFileUpgradeOperation}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 19.01.2012

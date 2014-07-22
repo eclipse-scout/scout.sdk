@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 
 /**
- * <h3>PageNewWizardPage2</h3> ...
+ * <h3>PageNewWizardPage2</h3>
  */
 public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
 

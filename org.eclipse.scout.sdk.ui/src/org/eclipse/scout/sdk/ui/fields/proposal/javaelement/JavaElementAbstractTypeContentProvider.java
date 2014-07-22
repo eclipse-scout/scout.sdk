@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
- * <h3>{@link JavaElementAbstractTypeContentProvider}</h3> ...
+ * <h3>{@link JavaElementAbstractTypeContentProvider}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 20.04.2012

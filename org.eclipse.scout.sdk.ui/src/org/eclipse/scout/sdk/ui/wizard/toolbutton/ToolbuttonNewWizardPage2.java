@@ -43,7 +43,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>CalendarItemProviderNewWizardPage</h3> ...
+ * <h3>CalendarItemProviderNewWizardPage</h3>
  */
 public class ToolbuttonNewWizardPage2 extends AbstractWorkspaceWizardPage {
 

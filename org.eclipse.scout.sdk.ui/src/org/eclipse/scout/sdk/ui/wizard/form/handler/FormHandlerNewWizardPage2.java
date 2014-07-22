@@ -36,7 +36,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3> {@link FormHandlerNewWizardPage2}</h3> ...
+ * <h3> {@link FormHandlerNewWizardPage2}</h3>
  */
 public class FormHandlerNewWizardPage2 extends AbstractWorkspaceWizardPage {
 

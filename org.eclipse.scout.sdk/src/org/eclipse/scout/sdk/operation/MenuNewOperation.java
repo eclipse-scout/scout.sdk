@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>MenuNewOperation</h3> ...
+ * <h3>MenuNewOperation</h3>
  */
 public class MenuNewOperation implements IOperation {
   static final String FORM_NAME = "form";

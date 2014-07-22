@@ -16,7 +16,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Resource;
 
 /**
- * <h3>ILink</h3> ...
+ * <h3>ILink</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2010

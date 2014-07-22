@@ -593,8 +593,14 @@ public class SdkAssert extends Assert {
     return field;
   }
 
+  /**
+   * Asserts that the given annotation exists on the given object.
+   * 
+   * @param annotatable
+   * @param fqAnnotationTypeName
+   * @return
+   */
   public static IAnnotation assertAnnotation(IAnnotatable annotatable, String fqAnnotationTypeName) {
-
     IAnnotation annotation = JdtUtility.getAnnotation(annotatable, fqAnnotationTypeName);
     if (annotation == null || !annotation.exists()) {
       StringBuilder message = new StringBuilder("Element '");

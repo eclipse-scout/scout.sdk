@@ -33,7 +33,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>FormViewIdPresenter</h3> ...
+ * <h3>FormViewIdPresenter</h3>
  */
 public class FormViewIdPresenter extends AbstractProposalPresenter<FieldProperty<String>> {
   protected static final UiFieldProperty<String> VIEW_ID_N;

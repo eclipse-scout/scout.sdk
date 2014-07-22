@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 /**
- * <h3>PropertyViewExtension</h3> ...
+ * <h3>PropertyViewExtension</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 19.07.2010

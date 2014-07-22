@@ -5,7 +5,7 @@ import signature.tests.SignatureRefType.InnerType02;
 
 
 /**
- * <h3>{@link SignatureTest}</h3> ...
+ * <h3>{@link SignatureTest}</h3>
  *
  *  @author Andreas Hoegger
  * @since 3.8.0 12.02.2013

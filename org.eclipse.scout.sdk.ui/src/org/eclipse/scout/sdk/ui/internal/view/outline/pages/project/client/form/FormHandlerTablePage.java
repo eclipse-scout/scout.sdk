@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
- * <h3>FormHandlersTablePage</h3> ...
+ * <h3>FormHandlersTablePage</h3>
  */
 public class FormHandlerTablePage extends AbstractPage {
 

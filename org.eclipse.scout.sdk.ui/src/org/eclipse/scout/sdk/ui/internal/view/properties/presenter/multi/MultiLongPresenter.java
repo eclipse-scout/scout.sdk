@@ -30,7 +30,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>MultiLongPresenter</h3> ...
+ * <h3>MultiLongPresenter</h3>
  */
 public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
 

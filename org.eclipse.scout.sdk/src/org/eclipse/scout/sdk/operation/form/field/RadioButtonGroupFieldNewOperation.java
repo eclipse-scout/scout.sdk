@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>RadioButtonGroupFieldNewOperation</h3> ...
+ * <h3>RadioButtonGroupFieldNewOperation</h3>
  */
 public class RadioButtonGroupFieldNewOperation implements IOperation {
 

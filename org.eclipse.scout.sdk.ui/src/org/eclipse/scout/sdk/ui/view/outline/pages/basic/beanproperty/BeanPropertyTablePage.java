@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutPropertyBeanFilters;
 
 /**
- * <h3>BeanPropertyTablePage</h3> ...
+ * <h3>BeanPropertyTablePage</h3>
  */
 public class BeanPropertyTablePage extends AbstractPage {
 

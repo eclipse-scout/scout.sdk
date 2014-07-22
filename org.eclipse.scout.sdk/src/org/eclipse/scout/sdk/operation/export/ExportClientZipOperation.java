@@ -38,7 +38,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>{@link ExportClientZipOperation}</h3> ...
+ * <h3>{@link ExportClientZipOperation}</h3>
  *
  * @author Matthias Villiger
  * @since 3.8.0 01.03.2012

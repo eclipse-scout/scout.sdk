@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.fields.proposal;
 import org.eclipse.jface.viewers.ILabelProvider;
 
 /**
- * <h3>{@link IContentProposalLabelProvider}</h3> ...
+ * <h3>{@link IContentProposalLabelProvider}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 05.02.2012

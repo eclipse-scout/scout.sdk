@@ -67,7 +67,7 @@ import org.eclipse.swt.widgets.Label;
 import org.osgi.framework.Version;
 
 /**
- * <h3>ScoutProjectNewWizardPage</h3> ...
+ * <h3>ScoutProjectNewWizardPage</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 06.03.2010

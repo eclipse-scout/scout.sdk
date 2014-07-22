@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 
 /**
- * <h3>{@link NoSourceException}</h3> ...
+ * <h3>{@link NoSourceException}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 26.11.2012

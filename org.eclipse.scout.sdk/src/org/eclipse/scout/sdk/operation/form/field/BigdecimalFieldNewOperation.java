@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>BigdecimalFieldNewOperation</h3> ...
+ * <h3>BigdecimalFieldNewOperation</h3>
  */
 public class BigdecimalFieldNewOperation implements IOperation {
 

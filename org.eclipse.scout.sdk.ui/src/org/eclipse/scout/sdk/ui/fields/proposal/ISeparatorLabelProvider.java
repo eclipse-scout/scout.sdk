@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.fields.proposal;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>{@link ISeparatorLabelProvider}</h3> ...
+ * <h3>{@link ISeparatorLabelProvider}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 20.04.2012

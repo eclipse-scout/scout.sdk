@@ -54,7 +54,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Group;
 
 /**
- * <h3>BooleanFieldNewWizardPage</h3> ...
+ * <h3>BooleanFieldNewWizardPage</h3>
  */
 public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
 

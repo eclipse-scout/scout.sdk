@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
- * <h3>BooleanPresenter</h3> ...
+ * <h3>BooleanPresenter</h3>
  */
 public class BooleanPresenter extends AbstractMethodPresenter {
 

@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 
 /**
- * <h3>WizardStepNodePage</h3> ...
+ * <h3>WizardStepNodePage</h3>
  */
 public class WizardStepNodePage extends AbstractScoutTypePage {
 

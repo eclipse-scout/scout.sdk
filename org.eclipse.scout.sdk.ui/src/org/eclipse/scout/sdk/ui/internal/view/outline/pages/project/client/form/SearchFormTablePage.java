@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
- * <h3>SearchFormTablePage</h3> ...
+ * <h3>SearchFormTablePage</h3>
  */
 public class SearchFormTablePage extends AbstractPage {
   private ICachedTypeHierarchy m_searchFormHierarchy;

@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.extensions.view.property;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 /**
- * <h3>IMultiPropertyViewPart</h3> ...
+ * <h3>IMultiPropertyViewPart</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 19.07.2010

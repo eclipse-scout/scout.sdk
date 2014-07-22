@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>ImageFieldNewOperation</h3> ...
+ * <h3>ImageFieldNewOperation</h3>
  */
 public class ImageFieldNewOperation implements IOperation {
 

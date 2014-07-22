@@ -15,7 +15,7 @@ import java.util.Set;
 import org.eclipse.jdt.core.IType;
 
 /**
- * <h3>{@link ITypeResolver}</h3> ...
+ * <h3>{@link ITypeResolver}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 28.02.2011

@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.fields.bundletree;
 import java.util.EventListener;
 
 /**
- * <h3>ICheckSelectionListener</h3> ...
+ * <h3>ICheckSelectionListener</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 10.02.2010

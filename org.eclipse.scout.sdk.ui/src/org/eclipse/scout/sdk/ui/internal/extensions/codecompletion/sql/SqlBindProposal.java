@@ -27,7 +27,7 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.text.edits.ReplaceEdit;
 
 /**
- * <h3>SqlBindProposal</h3> ...
+ * <h3>SqlBindProposal</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2010

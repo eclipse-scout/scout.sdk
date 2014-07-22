@@ -52,7 +52,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>WizardStepNewWizardPage</h3> ...
+ * <h3>WizardStepNewWizardPage</h3>
  */
 public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 

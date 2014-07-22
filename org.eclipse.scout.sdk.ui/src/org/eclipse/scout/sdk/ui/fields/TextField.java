@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Menu;
 
 /**
- * <h3>TextField</h3> ...
+ * <h3>TextField</h3>
  */
 public class TextField extends Composite {
 

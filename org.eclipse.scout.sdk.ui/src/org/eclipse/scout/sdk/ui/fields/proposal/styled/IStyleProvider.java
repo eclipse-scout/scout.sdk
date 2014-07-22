@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.fields.proposal.styled;
 import org.eclipse.jface.viewers.StyledString;
 
 /**
- * <h3>{@link IStyleProvider}</h3> ...
+ * <h3>{@link IStyleProvider}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 17.02.2012

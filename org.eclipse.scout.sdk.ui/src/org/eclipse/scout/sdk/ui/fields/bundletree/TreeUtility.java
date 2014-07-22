@@ -37,7 +37,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
- * <h3>TreeUtility</h3> ...
+ * <h3>TreeUtility</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 04.02.2010

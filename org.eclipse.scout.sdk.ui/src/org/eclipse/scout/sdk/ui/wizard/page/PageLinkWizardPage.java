@@ -35,7 +35,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>PageNewWizardPage2</h3> ...
+ * <h3>PageNewWizardPage2</h3>
  */
 public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
 

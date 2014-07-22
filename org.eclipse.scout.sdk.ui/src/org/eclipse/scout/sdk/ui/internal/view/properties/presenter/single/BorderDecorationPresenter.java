@@ -33,7 +33,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>{@link BorderDecorationPresenter}</h3> ...
+ * <h3>{@link BorderDecorationPresenter}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 04.12.2012

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 
 /**
- * <h3>{@link ResourceFilters}</h3> ...
+ * <h3>{@link ResourceFilters}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2012

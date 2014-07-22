@@ -35,7 +35,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>SequenceBoxNewWizardPage</h3> ...
+ * <h3>SequenceBoxNewWizardPage</h3>
  */
 public class SequenceBoxNewWizardPage extends AbstractWorkspaceWizardPage {
 

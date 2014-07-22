@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link LibrariesTablePage}</h3> ...
+ * <h3>{@link LibrariesTablePage}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 28.02.2012

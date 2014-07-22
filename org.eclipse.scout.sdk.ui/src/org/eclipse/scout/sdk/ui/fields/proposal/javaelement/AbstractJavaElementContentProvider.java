@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.MoreElementsProposal;
 import org.eclipse.scout.sdk.ui.fields.proposal.styled.ISearchRangeConsumer;
 
 /**
- * <h3>{@link AbstractJavaElementContentProvider}</h3> ...
+ * <h3>{@link AbstractJavaElementContentProvider}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 09.02.2012

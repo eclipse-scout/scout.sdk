@@ -43,7 +43,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>CodeTypeWizardPage</h3> ...
+ * <h3>CodeTypeWizardPage</h3>
  */
 public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
   private final IType basicPermission = TypeUtility.getType(IRuntimeClasses.BasicPermission);

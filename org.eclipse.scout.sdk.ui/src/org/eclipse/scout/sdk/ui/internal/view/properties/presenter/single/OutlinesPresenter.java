@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.workspace.type.config.parser.OutlinesParser;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>OutlinesPresenter</h3> ...
+ * <h3>OutlinesPresenter</h3>
  */
 public class OutlinesPresenter extends AbstractJavaElementListPresenter {
 

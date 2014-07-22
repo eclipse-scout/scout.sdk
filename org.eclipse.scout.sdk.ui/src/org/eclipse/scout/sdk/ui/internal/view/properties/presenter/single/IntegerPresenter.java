@@ -25,7 +25,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>IntegerPresenter</h3> ...
+ * <h3>IntegerPresenter</h3>
  */
 public class IntegerPresenter extends AbstractValuePresenter<Integer> {
 

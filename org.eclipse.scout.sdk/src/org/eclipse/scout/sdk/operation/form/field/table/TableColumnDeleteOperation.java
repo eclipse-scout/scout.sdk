@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>{@link TableColumnDeleteOperation}</h3> ...
+ * <h3>{@link TableColumnDeleteOperation}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.9.0 02.05.2013

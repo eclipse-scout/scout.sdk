@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>WizardStepNewOperation</h3> ...
+ * <h3>WizardStepNewOperation</h3>
  */
 public class WizardStepNewOperation implements IOperation {
 

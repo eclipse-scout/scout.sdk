@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <h3>{@link LicenseDialog}</h3> ...
+ * <h3>{@link LicenseDialog}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 16.02.2012

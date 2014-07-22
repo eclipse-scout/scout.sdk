@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * <h3>CodeField</h3> ...
+ * <h3>CodeField</h3>
  */
 public class JavaCodeField extends Composite {
 

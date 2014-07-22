@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>{@link MenuProposalPresenter}</h3> ...
+ * <h3>{@link MenuProposalPresenter}</h3>
  *
  * @author Matthias Villiger
  * @since 3.8.0 04.12.2012

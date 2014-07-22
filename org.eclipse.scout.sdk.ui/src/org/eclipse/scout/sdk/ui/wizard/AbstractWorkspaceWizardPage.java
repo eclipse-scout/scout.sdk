@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>AbstractProcessWizardPage</h3> ...
+ * <h3>AbstractProcessWizardPage</h3>
  */
 public abstract class AbstractWorkspaceWizardPage extends AbstractScoutWizardPage {
 

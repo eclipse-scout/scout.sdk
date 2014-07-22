@@ -45,7 +45,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.osgi.framework.Constants;
 
 /**
- * <h3>{@link ScoutProjectAddOperation}</h3> ...
+ * <h3>{@link ScoutProjectAddOperation}</h3>
  *
  * @author Matthias Villiger
  * @since 3.8.0 02.03.2012

@@ -63,7 +63,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 
 /**
- * <h3> {@link SmartTableColumnNewWizardPage}</h3> ...
+ * <h3> {@link SmartTableColumnNewWizardPage}</h3>
  */
 public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   private INlsEntry m_nlsName;

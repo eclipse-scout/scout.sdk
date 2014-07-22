@@ -49,7 +49,7 @@ import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
 /**
- * <h3>CodeNewOperation</h3> ...
+ * <h3>CodeNewOperation</h3>
  */
 public class CodeNewOperation implements IOperation {
 

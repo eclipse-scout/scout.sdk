@@ -32,6 +32,11 @@ import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
+/**
+ * <h3>{@link CreateServiceNlsProjectOperation}</h3>
+ *
+ * @author Matthias Villiger
+ */
 public class CreateServiceNlsProjectOperation implements IOperation {
 
   private final String m_serviceName;

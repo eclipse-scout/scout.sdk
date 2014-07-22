@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
- * <h3>SqlServiceTablePage</h3> ...
+ * <h3>SqlServiceTablePage</h3>
  */
 public class BookmarkStorageServiceTablePage extends AbstractPage {
 

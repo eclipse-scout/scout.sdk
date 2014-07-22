@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
 
 /**
- * <h3>IntegerFieldNodePage</h3> ...
+ * <h3>IntegerFieldNodePage</h3>
  */
 public class IntegerFieldNodePage extends AbstractFormFieldNodePage {
 

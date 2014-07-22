@@ -31,7 +31,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>HorizontalAglinmentPresenter</h3> ...
+ * <h3>HorizontalAglinmentPresenter</h3>
  */
 public class HorizontalAlignmentPresenter extends AbstractProposalPresenter<AbstractSourceProperty<Integer>> {
 

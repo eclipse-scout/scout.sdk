@@ -47,7 +47,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>RadioButtonGroupFieldNewWizardPage</h3> ...
+ * <h3>RadioButtonGroupFieldNewWizardPage</h3>
  */
 public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 

@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>WizardStepNewOperation</h3> ...
+ * <h3>WizardStepNewOperation</h3>
  */
 public class ComposerAttributeNewOperation extends InnerTypeNewOperation {
 

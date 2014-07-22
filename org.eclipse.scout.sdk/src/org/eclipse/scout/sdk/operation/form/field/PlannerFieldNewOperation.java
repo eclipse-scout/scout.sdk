@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>PlannerFieldNewOperation</h3> ...
+ * <h3>PlannerFieldNewOperation</h3>
  */
 public class PlannerFieldNewOperation implements IOperation {
 

@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.operation.jdt.exception;
 
 /**
- * <h3>{@link JavaElementNotExistException}</h3> ...
+ * <h3>{@link JavaElementNotExistException}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.10.0 26.02.2013

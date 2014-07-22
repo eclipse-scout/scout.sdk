@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.util.signature;
 
 /**
- * <h3>{@link GenericTypeDefinition}</h3> ...
+ * <h3>{@link GenericTypeDefinition}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.9.0 19.03.2013

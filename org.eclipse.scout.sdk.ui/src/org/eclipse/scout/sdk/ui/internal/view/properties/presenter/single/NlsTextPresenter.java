@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Menu;
 
 /**
- * <h3>NlsTextPresenter</h3> ...
+ * <h3>NlsTextPresenter</h3>
  */
 public class NlsTextPresenter extends AbstractMethodPresenter {
 

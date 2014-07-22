@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>{@link IScoutProjectScrolledContent}</h3> ...
+ * <h3>{@link IScoutProjectScrolledContent}</h3>
  *
  * @author Matthias Villiger
  * @since 3.9.0 17.12.2012

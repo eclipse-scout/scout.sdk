@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>OutlineNewWizardPage</h3> ...
+ * <h3>OutlineNewWizardPage</h3>
  */
 public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
   private final IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);

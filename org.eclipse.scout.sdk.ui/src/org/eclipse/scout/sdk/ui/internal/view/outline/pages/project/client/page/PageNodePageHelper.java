@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
- * <h3>PageNodePageHelper</h3> ...
+ * <h3>PageNodePageHelper</h3>
  */
 public final class PageNodePageHelper {
 

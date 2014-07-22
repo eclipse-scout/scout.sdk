@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
- * <h3>AbstractProposalPresenter</h3> ...
+ * <h3>AbstractProposalPresenter</h3>
  */
 public abstract class AbstractProposalPresenter<T extends Object> extends AbstractMethodPresenter {
 

@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.swt.graphics.RGB;
 
 /**
- * <h3>{@link ColorPropertySourceParser}</h3> ...
+ * <h3>{@link ColorPropertySourceParser}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 27.02.2013

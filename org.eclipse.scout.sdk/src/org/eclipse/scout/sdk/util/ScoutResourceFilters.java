@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
- * <h3>{@link ScoutResourceFilters}</h3> ...
+ * <h3>{@link ScoutResourceFilters}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.8.0 14.03.2012

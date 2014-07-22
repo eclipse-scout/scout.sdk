@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>TableFieldNewOperation</h3> ...
+ * <h3>TableFieldNewOperation</h3>
  */
 public class TableFieldNewOperation implements IOperation {
 

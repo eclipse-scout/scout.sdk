@@ -108,7 +108,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 /**
  * *
- * h3>JdtTypePropertyPart</h3> ...
+ * h3>JdtTypePropertyPart</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 19.07.2010

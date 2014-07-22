@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link LocalLookupCallNewWizard}</h3> ...
+ * <h3>{@link LocalLookupCallNewWizard}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 31.08.2010

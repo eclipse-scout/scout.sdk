@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.fields.proposal;
 import org.eclipse.jface.dialogs.IDialogSettings;
 
 /**
- * <h3>{@link IDialogSettingsProvider}</h3> ...
+ * <h3>{@link IDialogSettingsProvider}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 22.02.2012

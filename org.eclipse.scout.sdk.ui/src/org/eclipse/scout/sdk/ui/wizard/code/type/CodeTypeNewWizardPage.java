@@ -57,7 +57,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3> {@link CodeTypeNewWizardPage}</h3> ...
+ * <h3> {@link CodeTypeNewWizardPage}</h3>
  */
 public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 

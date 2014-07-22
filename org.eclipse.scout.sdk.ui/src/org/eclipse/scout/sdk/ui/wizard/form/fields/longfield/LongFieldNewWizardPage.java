@@ -42,7 +42,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>LongFieldNewWizardPage</h3> ...
+ * <h3>LongFieldNewWizardPage</h3>
  */
 public class LongFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 

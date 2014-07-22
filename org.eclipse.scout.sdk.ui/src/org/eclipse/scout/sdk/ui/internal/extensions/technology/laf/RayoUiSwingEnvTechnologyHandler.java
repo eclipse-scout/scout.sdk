@@ -50,7 +50,7 @@ import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
 /**
- * <h3>{@link RayoUiSwingEnvTechnologyHandler}</h3> ...
+ * <h3>{@link RayoUiSwingEnvTechnologyHandler}</h3>
  *
  * @author Matthias Villiger
  * @since 3.8.0 19.02.2012

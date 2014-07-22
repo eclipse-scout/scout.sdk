@@ -31,7 +31,7 @@ import org.eclipse.swt.widgets.Label;
 import org.osgi.service.prefs.BackingStoreException;
 
 /**
- * <h3>{@link SuperTypePreferenceScrolledContent}</h3> ...
+ * <h3>{@link SuperTypePreferenceScrolledContent}</h3>
  *
  * @author Matthias Villiger
  * @since 3.8.0 24.11.2012

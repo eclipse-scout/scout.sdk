@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
 
 /**
- * <h3>{@link AbstractFilterMenuContributionItem}</h3> ...
+ * <h3>{@link AbstractFilterMenuContributionItem}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 20.03.2013

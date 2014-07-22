@@ -31,7 +31,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>VerticalAglinmentPresenter</h3> ...
+ * <h3>VerticalAglinmentPresenter</h3>
  */
 public class VerticalAglinmentPresenter extends AbstractProposalPresenter<AbstractSourceProperty<Integer>> {
   protected static final AbstractSourceProperty<Integer> TOP;

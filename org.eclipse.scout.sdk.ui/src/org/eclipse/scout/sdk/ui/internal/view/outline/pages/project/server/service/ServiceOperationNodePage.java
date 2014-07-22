@@ -26,7 +26,7 @@ import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.texteditor.ITextEditor;
 
 /**
- * <h3>ServiceOperationNodePage</h3> ...
+ * <h3>ServiceOperationNodePage</h3>
  */
 public class ServiceOperationNodePage extends AbstractPage {
 

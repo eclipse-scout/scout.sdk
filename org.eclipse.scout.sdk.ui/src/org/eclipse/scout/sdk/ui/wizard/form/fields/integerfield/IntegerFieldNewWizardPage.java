@@ -42,7 +42,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>IntegerFieldNewWizardPage</h3> ...
+ * <h3>IntegerFieldNewWizardPage</h3>
  */
 public class IntegerFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 

@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <h3>AbstractMultiValuePresenter</h3> ...
+ * <h3>AbstractMultiValuePresenter</h3>
  * 
  * @param <T>
  */

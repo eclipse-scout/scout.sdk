@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
- * <h3>{@link FormFieldTemplateTablePage}</h3> ...
+ * <h3>{@link FormFieldTemplateTablePage}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 11.09.2010

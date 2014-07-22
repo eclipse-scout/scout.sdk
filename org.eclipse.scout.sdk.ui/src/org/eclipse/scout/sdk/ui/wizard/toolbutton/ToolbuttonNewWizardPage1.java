@@ -39,7 +39,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>TableColumnNewWizardPage</h3> ...
+ * <h3>TableColumnNewWizardPage</h3>
  */
 public class ToolbuttonNewWizardPage1 extends AbstractWorkspaceWizardPage {
 

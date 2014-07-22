@@ -36,7 +36,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>ServerNodePage</h3> ...
+ * <h3>ServerNodePage</h3>
  */
 public class ServerNodePage extends AbstractBundleNodeTablePage {
   private ICachedTypeHierarchy m_serverSessionHierarchy;

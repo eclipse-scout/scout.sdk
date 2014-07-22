@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.Signature;
 
 /**
- * <h3>{@link FieldSourceBuilderFactory}</h3> ...
+ * <h3>{@link FieldSourceBuilderFactory}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.10.0 07.03.2013

@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.sql.binding.model;
 
 /**
- * <h3>{@link IgnoredBindBase}</h3> ...
+ * <h3>{@link IgnoredBindBase}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 02.03.2011

@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>{@link RapTargetNewWizard}</h3> ...
+ * <h3>{@link RapTargetNewWizard}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 16.01.2013

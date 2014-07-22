@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
- * <h3>SmtpServiceTablePage</h3> ...
+ * <h3>SmtpServiceTablePage</h3>
  */
 public class AccessControlServiceTablePage extends AbstractPage {
 

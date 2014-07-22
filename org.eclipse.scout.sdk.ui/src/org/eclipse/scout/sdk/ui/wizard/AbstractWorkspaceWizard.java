@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * <h3>AbstractProcessWizard</h3> ...
+ * <h3>AbstractProcessWizard</h3>
  */
 public abstract class AbstractWorkspaceWizard extends AbstractWizard implements IWorkspaceWizard {
 

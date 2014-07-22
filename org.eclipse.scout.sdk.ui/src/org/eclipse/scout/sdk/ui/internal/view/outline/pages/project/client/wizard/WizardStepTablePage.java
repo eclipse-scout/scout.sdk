@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 /**
- * <h3>WizardStepTablePage</h3> ...
+ * <h3>WizardStepTablePage</h3>
  */
 public class WizardStepTablePage extends AbstractPage {
 

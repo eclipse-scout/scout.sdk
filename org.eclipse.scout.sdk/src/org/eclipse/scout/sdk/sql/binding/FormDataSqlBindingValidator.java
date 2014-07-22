@@ -54,7 +54,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>{@link FormDataSqlBindingValidator}</h3> ...
+ * <h3>{@link FormDataSqlBindingValidator}</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 24.02.2011

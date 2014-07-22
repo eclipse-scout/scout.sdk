@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.ui.IMarkerResolution;
 
 /**
- * <h3>{@link SqlBindMarkerResolution}</h3> ...
+ * <h3>{@link SqlBindMarkerResolution}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 15.03.2011

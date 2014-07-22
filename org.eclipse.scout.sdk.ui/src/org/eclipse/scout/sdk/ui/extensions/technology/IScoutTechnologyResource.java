@@ -15,7 +15,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link IScoutTechnologyResource}</h3> ...
+ * <h3>{@link IScoutTechnologyResource}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 10.02.2012

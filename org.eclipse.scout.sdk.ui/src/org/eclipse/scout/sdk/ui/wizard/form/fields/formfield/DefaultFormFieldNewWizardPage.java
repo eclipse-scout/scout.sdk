@@ -48,7 +48,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>DefaultFormFieldNewWizardPage</h3> ...
+ * <h3>DefaultFormFieldNewWizardPage</h3>
  */
 public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 

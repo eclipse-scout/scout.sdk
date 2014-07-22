@@ -44,7 +44,7 @@ import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
- * <h3>{@link SearchFormFromTablePageHelper}</h3> ...
+ * <h3>{@link SearchFormFromTablePageHelper}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.9.0 21.05.2013

@@ -51,7 +51,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.text.edits.InsertEdit;
 
 /**
- * <h3>{@link OutlineNewOperation}</h3> ...
+ * <h3>{@link OutlineNewOperation}</h3>
  */
 public class OutlineNewOperation extends PrimaryTypeNewOperation {
 

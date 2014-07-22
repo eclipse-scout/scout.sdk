@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.forms.events.IExpansionListener;
 
 /**
- * <h3>{@link ISection}</h3> ...
+ * <h3>{@link ISection}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 31.08.2010

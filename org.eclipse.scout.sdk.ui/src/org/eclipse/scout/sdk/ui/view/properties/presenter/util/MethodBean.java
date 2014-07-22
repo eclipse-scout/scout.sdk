@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.view.properties.presenter.util;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 
 /**
- * <h3>MethodBean</h3> ...
+ * <h3>MethodBean</h3>
  * 
  * @param <T>
  */

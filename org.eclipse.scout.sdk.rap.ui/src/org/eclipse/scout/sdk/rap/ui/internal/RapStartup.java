@@ -14,7 +14,7 @@ import org.eclipse.scout.sdk.rap.var.RapTargetVariable;
 import org.eclipse.ui.IStartup;
 
 /**
- * <h3>{@link RapStartup}</h3> ...
+ * <h3>{@link RapStartup}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 14.01.2013

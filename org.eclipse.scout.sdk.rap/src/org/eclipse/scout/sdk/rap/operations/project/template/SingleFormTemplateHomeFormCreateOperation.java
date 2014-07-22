@@ -42,7 +42,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 
 /**
- * <h3>{@link SingleFormTemplateHomeFormCreateOperation}</h3> ...
+ * <h3>{@link SingleFormTemplateHomeFormCreateOperation}</h3>
  *
  * @author Matthias Villiger
  * @since 3.9.0 08.03.2013

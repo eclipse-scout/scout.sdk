@@ -15,7 +15,7 @@ import java.util.EventListener;
 import org.eclipse.jdt.core.IMethod;
 
 /**
- * <h3>{@link ISqlFormDataBindingValidationListener}</h3> ...
+ * <h3>{@link ISqlFormDataBindingValidationListener}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 28.02.2011

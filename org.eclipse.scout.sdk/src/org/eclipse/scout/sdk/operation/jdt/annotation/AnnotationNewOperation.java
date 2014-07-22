@@ -40,7 +40,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
 /**
- * <h3>{@link AnnotationNewOperation}</h3> ...
+ * <h3>{@link AnnotationNewOperation}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.10.0 06.12.2012

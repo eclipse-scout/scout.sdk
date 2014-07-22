@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.sourcebuilder;
 
 /**
- * <h3>{@link IJavaElementSourceBuilder}</h3> ...
+ * <h3>{@link IJavaElementSourceBuilder}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.10.0 07.03.2013

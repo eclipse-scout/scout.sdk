@@ -38,8 +38,8 @@ import org.eclipse.scout.sdk.util.resources.IResourceFilter;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 
 /**
- * <h3>{@link RapTargetVariable}</h3> ...
- * 
+ * <h3>{@link RapTargetVariable}</h3>
+ *
  * @author Matthias Villiger
  * @since 3.9.0 14.01.2013
  */
@@ -135,7 +135,7 @@ public final class RapTargetVariable {
   /**
    * Sets a new value for the scout_rap_target variable.<br>
    * The new value is directly propagated to the environment variable.
-   * 
+   *
    * @param val
    *          The new value
    */
@@ -158,7 +158,7 @@ public final class RapTargetVariable {
 
   /**
    * gets the current value of the scout_rap_target variable
-   * 
+   *
    * @return
    */
   public synchronized String getValue() {

@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.view.outline.pages;
 
 /**
- * <h3>IScoutPageConstants</h3> ...
+ * <h3>IScoutPageConstants</h3>
  */
 public interface IScoutPageConstants {
   String ACCESS_CONTROL_SERVICE_NODE_PAGE = "org.eclipse.scout.sdk.page.AccessControlServiceNodePage";

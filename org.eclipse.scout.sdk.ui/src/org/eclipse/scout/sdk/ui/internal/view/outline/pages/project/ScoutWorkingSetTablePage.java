@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.ui.IWorkingSet;
 
 /**
- * <h3>{@link ScoutWorkingSetTablePage}</h3> ...
+ * <h3>{@link ScoutWorkingSetTablePage}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 05.04.2013

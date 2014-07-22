@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>EntityTextField</h3> ...
+ * <h3>EntityTextField</h3>
  */
 public class EntityTextField extends Composite {
 

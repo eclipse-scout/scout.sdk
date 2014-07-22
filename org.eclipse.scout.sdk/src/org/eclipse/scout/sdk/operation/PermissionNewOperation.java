@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>PermissionNewOperation</h3> ...
+ * <h3>PermissionNewOperation</h3>
  */
 public class PermissionNewOperation extends PrimaryTypeNewOperation {
 

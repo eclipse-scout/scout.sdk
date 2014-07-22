@@ -15,7 +15,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * <h3>{@link _SuiteLookupCall}</h3> ...
+ * <h3>{@link _SuiteLookupCall}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 22.04.2010

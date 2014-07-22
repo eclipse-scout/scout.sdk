@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>{@link ISelectionStateLabelProvider}</h3> ...
+ * <h3>{@link ISelectionStateLabelProvider}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 07.02.2012

@@ -17,7 +17,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 /**
- * <h3>{@link PropertyViewFormToolkit}</h3> ...
+ * <h3>{@link PropertyViewFormToolkit}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 12.02.2012

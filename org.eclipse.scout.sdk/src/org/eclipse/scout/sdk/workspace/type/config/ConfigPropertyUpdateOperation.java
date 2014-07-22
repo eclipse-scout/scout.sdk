@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.parser.IPropertySourceParser;
 
 /**
- * <h3>{@link ConfigPropertyUpdateOperation}</h3> ...
+ * <h3>{@link ConfigPropertyUpdateOperation}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.8.0 26.02.2013

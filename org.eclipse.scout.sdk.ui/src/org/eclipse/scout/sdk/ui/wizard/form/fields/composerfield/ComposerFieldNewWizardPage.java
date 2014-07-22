@@ -42,7 +42,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>ComposerFieldNewWizardPage</h3> ...
+ * <h3>ComposerFieldNewWizardPage</h3>
  */
 public class ComposerFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 

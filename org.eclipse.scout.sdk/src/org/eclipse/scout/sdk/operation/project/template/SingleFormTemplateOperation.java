@@ -54,7 +54,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataDtoUpdateOperation;
 
 /**
- * <h3>{@link SingleFormTemplateOperation}</h3> ...
+ * <h3>{@link SingleFormTemplateOperation}</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011

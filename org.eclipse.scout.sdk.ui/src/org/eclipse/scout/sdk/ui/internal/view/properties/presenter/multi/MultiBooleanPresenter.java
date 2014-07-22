@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
 /**
- * <h3>MultiBooleanPresenter</h3> ...
+ * <h3>MultiBooleanPresenter</h3>
  */
 public class MultiBooleanPresenter extends AbstractMultiMethodPresenter<Boolean> {
 

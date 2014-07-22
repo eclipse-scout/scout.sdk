@@ -24,6 +24,11 @@ import org.eclipse.scout.sdk.ui.internal.wizard.export.ExportServerWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.widgets.Composite;
 
+/**
+ * <h3>{@link ExportRapWizardPage}</h3>
+ *
+ * @author Matthias Villiger
+ */
 public class ExportRapWizardPage extends AbstractExportProductWizardPage {
 
   private static final String SETTINGS_PRODUCT_FILE = "productFileRapSetting";

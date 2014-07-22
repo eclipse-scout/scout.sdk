@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.MoreElementsProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 /**
- * <h3>{@link NlsTextContentProvider}</h3> ...
+ * <h3>{@link NlsTextContentProvider}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 07.02.2012

@@ -33,7 +33,7 @@ import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 /**
- * <h3>PageFilterPresenter</h3> ...
+ * <h3>PageFilterPresenter</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 23.07.2010

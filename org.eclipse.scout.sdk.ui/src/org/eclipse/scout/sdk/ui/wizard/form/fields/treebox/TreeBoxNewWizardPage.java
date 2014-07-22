@@ -43,7 +43,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>TreeBoxNewWizardPage</h3> ...
+ * <h3>TreeBoxNewWizardPage</h3>
  */
 public class TreeBoxNewWizardPage extends AbstractWorkspaceWizardPage {
 

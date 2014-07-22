@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.extensions;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 /**
- * <h3>IPageFactory</h3> ...
+ * <h3>IPageFactory</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 09.07.2010

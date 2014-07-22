@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.operation.ITypeSibling;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 /**
- * <h3>SiblingProposal</h3> ...
+ * <h3>SiblingProposal</h3>
  */
 public class SiblingProposal extends SimpleProposal implements ITypeSibling {
   public static final SiblingProposal SIBLING_BEGINNING = new SiblingProposal("first", SiblingType.BEGINNING);

@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>{@link InnerTypeNewOperation}</h3> ...
+ * <h3>{@link InnerTypeNewOperation}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.10.0 08.03.2013

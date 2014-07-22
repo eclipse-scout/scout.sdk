@@ -53,7 +53,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.osgi.framework.Version;
 
 /**
- * <h3>{@link LibraryBundleCreateOperation}</h3> ...
+ * <h3>{@link LibraryBundleCreateOperation}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.8.0 02.03.2012

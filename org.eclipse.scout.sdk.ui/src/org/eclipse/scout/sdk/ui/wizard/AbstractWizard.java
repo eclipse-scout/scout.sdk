@@ -19,7 +19,7 @@ import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 /**
- * <h3>AbstractWizard</h3> ...
+ * <h3>AbstractWizard</h3>
  */
 public abstract class AbstractWizard extends Wizard implements IWizard {
 

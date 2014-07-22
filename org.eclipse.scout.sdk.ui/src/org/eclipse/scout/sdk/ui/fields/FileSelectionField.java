@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>ProposalTextField</h3> ...
+ * <h3>ProposalTextField</h3>
  */
 public class FileSelectionField extends TextField {
 

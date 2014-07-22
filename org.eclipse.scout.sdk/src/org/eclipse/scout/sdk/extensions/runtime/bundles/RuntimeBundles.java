@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.internal.workspace.ScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link RuntimeBundles}</h3> ...
+ * <h3>{@link RuntimeBundles}</h3>
  *
  * @author Matthias Villiger
  * @since 3.9.0 31.01.2013

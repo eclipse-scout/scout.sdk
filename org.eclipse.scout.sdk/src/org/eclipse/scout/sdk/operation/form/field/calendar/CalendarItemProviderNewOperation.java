@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
- * <h3>CalendarItemProviderNewOperation</h3> ...
+ * <h3>CalendarItemProviderNewOperation</h3>
  */
 public class CalendarItemProviderNewOperation extends OrderedInnerTypeNewOperation {
 

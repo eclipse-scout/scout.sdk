@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.view.outline.pages;
 
 /**
- * <h3>IPageFilter</h3> ...
+ * <h3>IPageFilter</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 23.07.2010

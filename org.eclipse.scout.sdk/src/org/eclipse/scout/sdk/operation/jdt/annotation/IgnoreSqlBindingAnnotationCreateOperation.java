@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>{@link IgnoreSqlBindingAnnotationCreateOperation}</h3> ...
+ * <h3>{@link IgnoreSqlBindingAnnotationCreateOperation}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 02.03.2011

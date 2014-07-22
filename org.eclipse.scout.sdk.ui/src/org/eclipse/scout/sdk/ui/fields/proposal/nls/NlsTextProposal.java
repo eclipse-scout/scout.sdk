@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider.NormalizedPattern;
 
 /**
- * <h3>{@link NlsTextProposal}</h3> ...
+ * <h3>{@link NlsTextProposal}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 27.11.2012

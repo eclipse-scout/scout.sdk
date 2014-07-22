@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.
 import org.eclipse.scout.sdk.util.SdkProperties;
 
 /**
- * <h3>ButtonNodePage</h3> ...
+ * <h3>ButtonNodePage</h3>
  */
 public class ButtonNodePage extends AbstractFormFieldNodePage {
 

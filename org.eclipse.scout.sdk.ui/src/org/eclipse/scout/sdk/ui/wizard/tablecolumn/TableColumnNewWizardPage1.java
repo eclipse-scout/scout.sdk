@@ -52,7 +52,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3> {@link TableColumnNewWizardPage1}</h3> ...
+ * <h3> {@link TableColumnNewWizardPage1}</h3>
  */
 public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
   private final IType iSmartColumn = TypeUtility.getType(IRuntimeClasses.ISmartColumn);

@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * <h3>{@link OutlineDeleteAction}</h3> ...
+ * <h3>{@link OutlineDeleteAction}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 09.03.2012

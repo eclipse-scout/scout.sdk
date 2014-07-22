@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.core.resources.IMarker;
 
 /**
- * <h3>{@link ICompileResult}</h3> ...
+ * <h3>{@link ICompileResult}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.9.0 18.03.2013

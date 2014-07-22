@@ -38,7 +38,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3> {@link PageNewOperation}</h3> ...
+ * <h3> {@link PageNewOperation}</h3>
  */
 public class PageNewOperation extends AbstractPageOperation {
 

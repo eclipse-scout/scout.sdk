@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
- * <h3>{@link TypeSignatureResolveVisitor}</h3> ...
+ * <h3>{@link TypeSignatureResolveVisitor}</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 27.02.2011

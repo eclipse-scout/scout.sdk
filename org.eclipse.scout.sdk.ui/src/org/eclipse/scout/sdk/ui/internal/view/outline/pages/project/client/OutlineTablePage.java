@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
- * <h3>OutlineTablePage</h3> ...
+ * <h3>OutlineTablePage</h3>
  */
 public class OutlineTablePage extends AbstractPage {
   private ICachedTypeHierarchy m_outlineHierarchy;

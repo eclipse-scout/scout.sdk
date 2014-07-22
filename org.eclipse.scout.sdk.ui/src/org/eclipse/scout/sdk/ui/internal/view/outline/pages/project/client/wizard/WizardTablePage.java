@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
- * <h3>WizardTablePage</h3> ...
+ * <h3>WizardTablePage</h3>
  */
 public class WizardTablePage extends AbstractPage {
 

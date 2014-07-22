@@ -46,7 +46,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>ServicePropertyPart</h3> ...
+ * <h3>ServicePropertyPart</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 22.07.2010

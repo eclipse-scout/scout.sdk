@@ -19,7 +19,7 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link ScoutBundleNodeGroup}</h3> ...
+ * <h3>{@link ScoutBundleNodeGroup}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 11.02.2013

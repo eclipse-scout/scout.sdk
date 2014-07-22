@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.workspace.type.config.property;
 import org.eclipse.scout.commons.CompareUtility;
 
 /**
- * <h3>{@link FontSpec}</h3> ...
+ * <h3>{@link FontSpec}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 17.11.2010

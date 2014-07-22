@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.workspace.type.config.property.FontSpec;
 import org.eclipse.swt.SWT;
 
 /**
- * <h3>{@link FontPropertySourceParser}</h3> ...
+ * <h3>{@link FontPropertySourceParser}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 12.03.2013

@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>CustomTooltip</h3> ...
+ * <h3>CustomTooltip</h3>
  */
 public class CustomTooltip extends AbstractTooltip {
 

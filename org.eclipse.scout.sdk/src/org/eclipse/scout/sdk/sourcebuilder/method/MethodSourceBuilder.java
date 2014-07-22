@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
 
 /**
- * <h3>{@link MethodSourceBuilder}</h3> ...
+ * <h3>{@link MethodSourceBuilder}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013

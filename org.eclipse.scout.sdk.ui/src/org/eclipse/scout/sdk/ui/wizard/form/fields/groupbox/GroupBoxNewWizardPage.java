@@ -42,7 +42,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>GroupBoxNewWizardPage</h3> ...
+ * <h3>GroupBoxNewWizardPage</h3>
  */
 public class GroupBoxNewWizardPage extends AbstractWorkspaceWizardPage {
 

@@ -38,7 +38,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * <h3>ProposalTextField</h3> ...
+ * <h3>ProposalTextField</h3>
  */
 public class ProposalTextField extends TextField {
 

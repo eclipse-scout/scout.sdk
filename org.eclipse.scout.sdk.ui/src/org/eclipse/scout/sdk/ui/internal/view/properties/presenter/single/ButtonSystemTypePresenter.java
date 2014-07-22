@@ -33,7 +33,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>ButtonSystemTypePresenter</h3> ...
+ * <h3>ButtonSystemTypePresenter</h3>
  */
 public class ButtonSystemTypePresenter extends AbstractProposalPresenter<FieldProperty<Integer>> {
 

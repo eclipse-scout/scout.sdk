@@ -42,7 +42,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>ProcessServiceNewWizardPage</h3> ...
+ * <h3>ProcessServiceNewWizardPage</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 31.07.2009

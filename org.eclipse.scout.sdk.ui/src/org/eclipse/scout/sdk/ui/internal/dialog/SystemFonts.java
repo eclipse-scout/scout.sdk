@@ -18,7 +18,7 @@ import java.util.TreeSet;
 import org.eclipse.swt.graphics.FontData;
 
 /**
- * <h3>{@link SystemFonts}</h3> ...
+ * <h3>{@link SystemFonts}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 17.11.2010

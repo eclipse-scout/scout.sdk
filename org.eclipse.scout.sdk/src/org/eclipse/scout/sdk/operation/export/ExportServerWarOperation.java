@@ -43,7 +43,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>{@link ExportServerWarOperation}</h3> ...
+ * <h3>{@link ExportServerWarOperation}</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 04.02.2011

@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSuppo
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSupport.BundlePresentation;
 
 /**
- * <h3>{@link ScoutBundlePresentationActionGroup}</h3> ...
+ * <h3>{@link ScoutBundlePresentationActionGroup}</h3>
  *
  * @author Matthias Villiger
  * @since 3.9.0 20.03.2013

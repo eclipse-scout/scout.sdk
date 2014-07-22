@@ -42,7 +42,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>PageNewWizardPage1</h3> ...
+ * <h3>PageNewWizardPage1</h3>
  */
 public class PageNewTemplatesWizardPage extends AbstractWorkspaceWizardPage {
   private final IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);

@@ -25,7 +25,7 @@ import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <h3>AbstractValuePresenter</h3> ...
+ * <h3>AbstractValuePresenter</h3>
  */
 public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter {
 

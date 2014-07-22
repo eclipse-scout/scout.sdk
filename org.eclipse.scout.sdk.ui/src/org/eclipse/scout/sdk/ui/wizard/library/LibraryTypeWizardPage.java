@@ -64,7 +64,7 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Table;
 
 /**
- * <h3>{@link LibraryTypeWizardPage}</h3> ...
+ * <h3>{@link LibraryTypeWizardPage}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.8.0 06.03.2012

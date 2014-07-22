@@ -33,7 +33,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>ButtonDisplayTypePresenter</h3> ...
+ * <h3>ButtonDisplayTypePresenter</h3>
  */
 public class ButtonDisplayStylePresenter extends AbstractProposalPresenter<FieldProperty<Integer>> {
   protected static final UiFieldProperty<Integer> DISPLAY_STYLE_DEFAULT;

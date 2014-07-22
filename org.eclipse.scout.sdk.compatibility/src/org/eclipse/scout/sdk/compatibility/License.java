@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.compatibility;
 
 /**
- * <h3>{@link License}</h3> ...
+ * <h3>{@link License}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 16.02.2012

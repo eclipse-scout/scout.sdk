@@ -44,7 +44,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>BigintegerFieldNewWizardPage</h3> ...
+ * <h3>BigintegerFieldNewWizardPage</h3>
  */
 public class BigintegerFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 

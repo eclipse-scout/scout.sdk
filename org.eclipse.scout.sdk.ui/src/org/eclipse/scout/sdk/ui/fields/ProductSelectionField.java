@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>ProposalTextField</h3> ...
+ * <h3>ProposalTextField</h3>
  */
 public class ProductSelectionField extends TextField {
 

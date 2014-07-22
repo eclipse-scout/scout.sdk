@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>{@link ScoutProjectTemplateWizardPage}</h3> ...
+ * <h3>{@link ScoutProjectTemplateWizardPage}</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011

@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ui.extensions.preferences.IScoutProjectScrolledCont
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link SuperTypesPreferencePage}</h3> ...
+ * <h3>{@link SuperTypesPreferencePage}</h3>
  *
  * @author Matthias Villiger
  * @since 3.8.0 22.11.2012

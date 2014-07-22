@@ -33,7 +33,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>FormDisplayHintPresenter</h3> ...
+ * <h3>FormDisplayHintPresenter</h3>
  */
 public class FormDisplayHintPresenter extends AbstractProposalPresenter<FieldProperty<Integer>> {
   protected static final UiFieldProperty<Integer> DISPLAY_HINT_DIALOG;

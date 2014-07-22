@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link ScoutBundleNode}</h3> ...
+ * <h3>{@link ScoutBundleNode}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 12.02.2013

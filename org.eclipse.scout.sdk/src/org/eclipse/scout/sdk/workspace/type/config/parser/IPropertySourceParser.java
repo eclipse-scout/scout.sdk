@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
- * <h3>{@link IPropertySourceParser}</h3> ...
+ * <h3>{@link IPropertySourceParser}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 25.02.2013

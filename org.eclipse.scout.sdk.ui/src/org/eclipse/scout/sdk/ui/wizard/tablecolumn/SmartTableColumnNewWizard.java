@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
- * <h3>SmartTableColumnNewWizard</h3> ...
+ * <h3>SmartTableColumnNewWizard</h3>
  */
 public class SmartTableColumnNewWizard extends AbstractFormFieldWizard {
 

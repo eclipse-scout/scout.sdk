@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>SmartFieldNewOperation</h3> ...
+ * <h3>SmartFieldNewOperation</h3>
  */
 public class SmartFieldNewOperation implements IOperation {
 

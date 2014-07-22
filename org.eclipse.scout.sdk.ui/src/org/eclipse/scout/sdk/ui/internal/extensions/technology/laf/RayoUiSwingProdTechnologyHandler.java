@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
- * <h3>{@link RayoUiSwingProdTechnologyHandler}</h3> ...
+ * <h3>{@link RayoUiSwingProdTechnologyHandler}</h3>
  *
  * @author Matthias Villiger
  * @since 3.8.0 19.02.2012

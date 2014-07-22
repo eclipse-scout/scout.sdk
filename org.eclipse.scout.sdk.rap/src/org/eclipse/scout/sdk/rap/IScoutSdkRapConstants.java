@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.rap;
 
 /**
- * <h3>{@link IScoutSdkRapConstants}</h3> ...
+ * <h3>{@link IScoutSdkRapConstants}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 11.02.2012

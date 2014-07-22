@@ -44,7 +44,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>ButtonFieldNewWizardPage</h3> ...
+ * <h3>ButtonFieldNewWizardPage</h3>
  */
 public class CalendarFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 

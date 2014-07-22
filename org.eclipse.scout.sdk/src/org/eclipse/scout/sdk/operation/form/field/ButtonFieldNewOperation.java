@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>ButtonFieldNewOperation</h3> ...
+ * <h3>ButtonFieldNewOperation</h3>
  */
 public class ButtonFieldNewOperation implements IOperation {
 

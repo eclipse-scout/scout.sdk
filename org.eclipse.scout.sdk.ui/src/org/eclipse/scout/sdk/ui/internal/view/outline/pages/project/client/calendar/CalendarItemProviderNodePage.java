@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.SdkProperties;
 
 /**
- * <h3>CalendarItemProviderNodePage</h3> ...
+ * <h3>CalendarItemProviderNodePage</h3>
  */
 public class CalendarItemProviderNodePage extends AbstractScoutTypePage {
 

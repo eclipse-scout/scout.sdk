@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalProvider;
 import org.eclipse.scout.sdk.util.IRegEx;
 
 /**
- * <h3>{@link ResourcesContentProvider}</h3> ...
+ * <h3>{@link ResourcesContentProvider}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 15.02.2012

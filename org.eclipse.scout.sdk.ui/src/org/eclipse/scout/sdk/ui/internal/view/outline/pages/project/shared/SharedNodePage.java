@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
- * <h3>SharedNodePage</h3> ...
+ * <h3>SharedNodePage</h3>
  */
 public class SharedNodePage extends AbstractBundleNodeTablePage {
 

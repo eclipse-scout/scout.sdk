@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.extensions.targetpackage;
 
 /**
- * <h3>{@link TargetPackageEntry}</h3> ...
+ * <h3>{@link TargetPackageEntry}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 25.02.2013

@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.scout.sdk.operation.project.AbstractEquinoxSecurityInstallOperation;
 
 /**
- * <h3>{@link RapProductEquinoxSecurityInstallOperation}</h3> ...
+ * <h3>{@link RapProductEquinoxSecurityInstallOperation}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 10.12.2012

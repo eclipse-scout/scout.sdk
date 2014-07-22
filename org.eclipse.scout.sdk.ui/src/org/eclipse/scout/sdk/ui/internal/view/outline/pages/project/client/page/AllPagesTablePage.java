@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
- * <h3>AllPagesTablePage</h3> ...
+ * <h3>AllPagesTablePage</h3>
  */
 public class AllPagesTablePage extends AbstractPage {
   private ICachedTypeHierarchy m_cachedTypeHierarchy;

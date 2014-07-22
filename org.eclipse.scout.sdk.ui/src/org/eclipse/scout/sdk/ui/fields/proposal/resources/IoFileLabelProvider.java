@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>{@link IoFileLabelProvider}</h3> ...
+ * <h3>{@link IoFileLabelProvider}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 01.03.2012

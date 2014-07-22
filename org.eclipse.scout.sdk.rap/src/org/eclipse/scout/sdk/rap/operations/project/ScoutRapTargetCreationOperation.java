@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.osgi.framework.Bundle;
 
 /**
- * <h3>{@link ScoutRapTargetCreationOperation}</h3> ...
+ * <h3>{@link ScoutRapTargetCreationOperation}</h3>
  *
  * @author Matthias Villiger
  * @since 3.8.0 20.03.2012

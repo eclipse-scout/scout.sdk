@@ -16,7 +16,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Color;
 
 /**
- * <h3>ITreeNode</h3> ...
+ * <h3>ITreeNode</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 30.01.2010

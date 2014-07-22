@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>{@link RapProductMobileAddOperation}</h3> ...
+ * <h3>{@link RapProductMobileAddOperation}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 07.03.2013

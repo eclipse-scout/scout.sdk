@@ -58,7 +58,7 @@ import org.eclipse.ui.IWorkingSetManager;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <h3>{@link ConfigureScoutWorkingSetsDialog}</h3> ...
+ * <h3>{@link ConfigureScoutWorkingSetsDialog}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 04.04.2013

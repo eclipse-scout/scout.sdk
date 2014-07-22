@@ -30,7 +30,7 @@ import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 
 /**
- * <h3>UnknownPropertyViewPart</h3> ...
+ * <h3>UnknownPropertyViewPart</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 21.07.2010

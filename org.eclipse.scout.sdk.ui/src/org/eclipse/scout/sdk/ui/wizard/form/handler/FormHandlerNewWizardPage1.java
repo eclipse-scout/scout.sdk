@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3> {@link FormHandlerNewWizardPage1}</h3> ...
+ * <h3> {@link FormHandlerNewWizardPage1}</h3>
  */
 public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
 

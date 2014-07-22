@@ -37,7 +37,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 import org.eclipse.ui.forms.widgets.TableWrapData;
 
 /**
- * <h3>{@link Section}</h3> ...
+ * <h3>{@link Section}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 31.08.2010

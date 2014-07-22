@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
- * <h3>{@link DerbyJdbcProdTechnologyHandler}</h3> ...
+ * <h3>{@link DerbyJdbcProdTechnologyHandler}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 15.02.2012

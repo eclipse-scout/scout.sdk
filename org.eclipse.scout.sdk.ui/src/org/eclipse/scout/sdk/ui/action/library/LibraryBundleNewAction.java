@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.ui.wizard.library.LibraryNewWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link LibraryBundleNewAction}</h3> ...
+ * <h3>{@link LibraryBundleNewAction}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 29.02.2012

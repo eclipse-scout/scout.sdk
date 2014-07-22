@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanProper
 import org.eclipse.scout.sdk.util.SdkProperties;
 
 /**
- * <h3>WizardNodePage</h3> ...
+ * <h3>WizardNodePage</h3>
  */
 public class WizardNodePage extends AbstractScoutTypePage {
 

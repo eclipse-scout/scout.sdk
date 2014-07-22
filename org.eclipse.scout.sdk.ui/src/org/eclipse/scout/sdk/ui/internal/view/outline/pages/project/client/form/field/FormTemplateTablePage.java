@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
- * <h3>{@link FormTemplateTablePage}</h3> ...
+ * <h3>{@link FormTemplateTablePage}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 11.09.2010

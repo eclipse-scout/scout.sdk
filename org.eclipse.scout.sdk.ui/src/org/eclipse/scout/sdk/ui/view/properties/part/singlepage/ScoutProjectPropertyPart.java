@@ -49,7 +49,7 @@ import org.eclipse.ui.IMemento;
 import org.osgi.service.prefs.BackingStoreException;
 
 /**
- * <h3>{@link ScoutProjectPropertyPart}</h3> ...
+ * <h3>{@link ScoutProjectPropertyPart}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 09.09.2010

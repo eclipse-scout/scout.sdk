@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>TypeOpenLink</h3> ...
+ * <h3>TypeOpenLink</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2010

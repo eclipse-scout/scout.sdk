@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>{@link SignatureLabelProvider}</h3> ...
+ * <h3>{@link SignatureLabelProvider}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 09.02.2012

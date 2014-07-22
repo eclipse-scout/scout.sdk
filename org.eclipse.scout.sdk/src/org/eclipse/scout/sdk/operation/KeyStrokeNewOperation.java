@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>KeyStrokeNewOperation</h3> ...
+ * <h3>KeyStrokeNewOperation</h3>
  */
 public class KeyStrokeNewOperation implements IOperation {
 

@@ -49,7 +49,7 @@ import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>SearchFormNewWizardPage</h3> ...
+ * <h3>SearchFormNewWizardPage</h3>
  */
 public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
 

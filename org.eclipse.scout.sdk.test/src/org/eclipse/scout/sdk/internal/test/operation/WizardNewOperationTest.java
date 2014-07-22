@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Test;
 
 /**
- * <h3>{@link WizardNewOperationTest}</h3> ...
+ * <h3>{@link WizardNewOperationTest}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 15.04.2013

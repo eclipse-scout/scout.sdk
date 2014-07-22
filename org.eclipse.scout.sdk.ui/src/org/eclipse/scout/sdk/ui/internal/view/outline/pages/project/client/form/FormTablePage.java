@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
- * <h3>FormTablePage</h3> ...
+ * <h3>FormTablePage</h3>
  */
 public class FormTablePage extends AbstractPage {
   private ICachedTypeHierarchy m_formHierarchy;

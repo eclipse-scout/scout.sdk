@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.ui.IWorkbench;
 
 /**
- * <h3>{@link ScoutBundleAddWizard}</h3> ...
+ * <h3>{@link ScoutBundleAddWizard}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 02.03.2012

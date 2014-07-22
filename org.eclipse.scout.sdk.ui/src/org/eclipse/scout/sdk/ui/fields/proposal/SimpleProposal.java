@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>{@link SimpleProposal}</h3> ...
+ * <h3>{@link SimpleProposal}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 07.02.2012

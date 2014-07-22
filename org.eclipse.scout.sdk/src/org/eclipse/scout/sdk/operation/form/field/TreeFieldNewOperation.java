@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3> {@link TreeFieldNewOperation}</h3> ...
+ * <h3> {@link TreeFieldNewOperation}</h3>
  */
 public class TreeFieldNewOperation implements IOperation {
 

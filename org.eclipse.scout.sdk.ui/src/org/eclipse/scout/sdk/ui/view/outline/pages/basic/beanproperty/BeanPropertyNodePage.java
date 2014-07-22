@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.IPropertyBean;
 
 /**
- * <h3>BeanPropertyNodePage</h3> ...
+ * <h3>BeanPropertyNodePage</h3>
  */
 public class BeanPropertyNodePage extends AbstractPage {
   private final IPropertyBean m_propertyDescriptor;

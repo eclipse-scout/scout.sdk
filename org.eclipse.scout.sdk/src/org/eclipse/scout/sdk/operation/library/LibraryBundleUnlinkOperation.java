@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link LibraryBundleUnlinkOperation}</h3> ...
+ * <h3>{@link LibraryBundleUnlinkOperation}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.8.0 13.03.2012

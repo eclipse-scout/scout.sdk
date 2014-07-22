@@ -38,7 +38,7 @@ import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>{@link AbstractFormFieldTemplate}</h3> ...
+ * <h3>{@link AbstractFormFieldTemplate}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.9.0 12.04.2013

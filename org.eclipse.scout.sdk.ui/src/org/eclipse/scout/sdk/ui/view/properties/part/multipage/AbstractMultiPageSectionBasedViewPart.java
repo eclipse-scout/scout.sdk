@@ -21,7 +21,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>AbstractSinglePageSectionBasedViewPart</h3> ...
+ * <h3>AbstractSinglePageSectionBasedViewPart</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 23.07.2010

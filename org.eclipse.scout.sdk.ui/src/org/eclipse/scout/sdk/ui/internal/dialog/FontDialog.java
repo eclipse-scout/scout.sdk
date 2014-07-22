@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 /**
- * <h3>{@link FontDialog}</h3> ...
+ * <h3>{@link FontDialog}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 17.11.2010

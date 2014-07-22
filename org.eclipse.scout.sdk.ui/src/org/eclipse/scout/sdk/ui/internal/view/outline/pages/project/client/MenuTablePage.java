@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>MenuTablePage</h3> ...
+ * <h3>MenuTablePage</h3>
  */
 public class MenuTablePage extends AbstractPage {
 

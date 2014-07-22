@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>BeanPropertyNewOperation</h3> ...
+ * <h3>BeanPropertyNewOperation</h3>
  */
 public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOperation {
 

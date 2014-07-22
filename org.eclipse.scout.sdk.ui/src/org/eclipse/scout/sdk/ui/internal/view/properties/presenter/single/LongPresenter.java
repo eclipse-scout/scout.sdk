@@ -25,7 +25,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>LongPresenter</h3> ...
+ * <h3>LongPresenter</h3>
  */
 public class LongPresenter extends AbstractValuePresenter<Long> {
 

@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.wizard;
 import org.eclipse.core.runtime.MultiStatus;
 
 /**
- * <h3>IStatusProvider</h3> ...
+ * <h3>IStatusProvider</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 12.02.2010

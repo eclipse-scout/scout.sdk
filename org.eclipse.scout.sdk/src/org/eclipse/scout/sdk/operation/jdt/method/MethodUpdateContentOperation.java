@@ -36,7 +36,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.text.edits.ReplaceEdit;
 
 /**
- * <h3>MethodUpdateContentOperation</h3> ...
+ * <h3>MethodUpdateContentOperation</h3>
  * This operation is used to update a content of an existing method. The method must be
  * modifiable.
  */

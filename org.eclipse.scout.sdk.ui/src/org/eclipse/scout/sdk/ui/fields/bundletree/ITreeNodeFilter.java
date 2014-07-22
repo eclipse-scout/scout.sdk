@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.fields.bundletree;
 
 /**
- * <h3>ITreeFilter</h3> ...
+ * <h3>ITreeFilter</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 03.02.2010

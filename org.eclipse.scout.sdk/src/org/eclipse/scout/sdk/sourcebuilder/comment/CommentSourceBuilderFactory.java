@@ -25,7 +25,7 @@ import org.osgi.framework.BundleContext;
 import org.osgi.framework.ServiceReference;
 
 /**
- * <h3>{@link CommentSourceBuilderFactory}</h3> ...
+ * <h3>{@link CommentSourceBuilderFactory}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013

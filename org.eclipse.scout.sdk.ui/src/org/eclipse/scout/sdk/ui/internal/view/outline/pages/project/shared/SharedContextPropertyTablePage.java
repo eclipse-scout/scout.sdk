@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.util.type.PropertyBean;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
- * <h3>SharedContextPropertyTablePage</h3> ...
+ * <h3>SharedContextPropertyTablePage</h3>
  */
 public class SharedContextPropertyTablePage extends AbstractPage {
   public static final String CONTEXT_PROPERTY_BEAN_REGEXP = "^\\s*public.*(static)?[ ]+.*(get|set).*\\{.*\\}$";

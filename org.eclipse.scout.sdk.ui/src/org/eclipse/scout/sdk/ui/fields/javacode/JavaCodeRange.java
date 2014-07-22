@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.fields.javacode;
 
 /**
- * <h3>CodeRange</h3> ...
+ * <h3>CodeRange</h3>
  */
 public class JavaCodeRange {
   public static final int UNKNOWN = 1;

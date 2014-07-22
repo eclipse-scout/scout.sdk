@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
- * <h3>MenuNewOperation</h3> ...
+ * <h3>MenuNewOperation</h3>
  */
 public class SmartTableColumnNewOperation extends TableColumnNewOperation {
 

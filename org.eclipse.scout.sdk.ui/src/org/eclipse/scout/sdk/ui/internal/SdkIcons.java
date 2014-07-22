@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal;
 
 /**
- * <h3>{@link SdkIcons}</h3> ...
+ * <h3>{@link SdkIcons}</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 28.11.2010

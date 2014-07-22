@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.swt.widgets.Shell;
 
 /**
- * <h3>JdtRenameTransaction</h3> ...
+ * <h3>JdtRenameTransaction</h3>
  */
 public class JdtRenameTransaction {
   private final ArrayList<RenameSupport> m_list = new ArrayList<RenameSupport>();

@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
- * <h3>{@link AnnotationSourceBuilder}</h3> ...
+ * <h3>{@link AnnotationSourceBuilder}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.10.0 07.03.2013

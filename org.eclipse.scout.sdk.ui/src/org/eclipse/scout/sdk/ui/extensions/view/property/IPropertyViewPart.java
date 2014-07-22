@@ -14,7 +14,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IMemento;
 
 /**
- * <h3>IPropertyViewPart</h3> ...
+ * <h3>IPropertyViewPart</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 19.07.2010

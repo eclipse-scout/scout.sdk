@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>TableColumnNewOperation</h3> ...
+ * <h3>TableColumnNewOperation</h3>
  */
 public class TableColumnNewOperation implements IOperation {
 

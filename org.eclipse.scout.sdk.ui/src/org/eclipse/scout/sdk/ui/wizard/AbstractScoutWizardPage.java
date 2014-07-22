@@ -25,7 +25,7 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>BCWizardPage</h3> ...
+ * <h3>BCWizardPage</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.0 11.01.2008

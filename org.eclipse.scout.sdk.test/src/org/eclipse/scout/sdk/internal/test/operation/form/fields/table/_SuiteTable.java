@@ -15,7 +15,7 @@ import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
 
 /**
- * <h3>{@link _SuiteTable}</h3> ...
+ * <h3>{@link _SuiteTable}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.8.0 13.02.2013

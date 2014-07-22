@@ -297,7 +297,7 @@ public class FilteredTable extends Composite {
   }
 
   /**
-   * <h3>{@link P_TableSorter}</h3> ...
+   * <h3>{@link P_TableSorter}</h3>
    * The default table sorter. Can be replaced by setting any other sorter or null afterwards.
    *
    * @author Andreas Hoegger
@@ -322,7 +322,7 @@ public class FilteredTable extends Composite {
   }
 
   /**
-   * <h3>{@link P_TableViewer}</h3> ...
+   * <h3>{@link P_TableViewer}</h3>
    *
    * @author Andreas Hoegger
    * @since 3.8.0 17.02.2012

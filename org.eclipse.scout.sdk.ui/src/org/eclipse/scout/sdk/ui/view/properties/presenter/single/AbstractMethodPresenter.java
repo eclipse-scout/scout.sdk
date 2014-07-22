@@ -40,7 +40,7 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 /**
- * <h3>AbstractMethodPresenter</h3> ...
+ * <h3>AbstractMethodPresenter</h3>
  */
 public abstract class AbstractMethodPresenter extends AbstractPresenter {
 

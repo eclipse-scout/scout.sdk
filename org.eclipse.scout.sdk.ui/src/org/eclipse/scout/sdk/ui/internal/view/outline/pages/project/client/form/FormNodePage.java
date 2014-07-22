@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyProvider;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>FormNodePage</h3> ...
+ * <h3>FormNodePage</h3>
  */
 public class FormNodePage extends AbstractScoutTypePage implements ITypeHierarchyProvider {
 

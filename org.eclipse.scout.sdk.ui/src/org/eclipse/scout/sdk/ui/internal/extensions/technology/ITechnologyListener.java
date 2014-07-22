@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.extensions.technology;
 import java.util.EventListener;
 
 /**
- * <h3>{@link ITechnologyListener}</h3> ...
+ * <h3>{@link ITechnologyListener}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 19.02.2012

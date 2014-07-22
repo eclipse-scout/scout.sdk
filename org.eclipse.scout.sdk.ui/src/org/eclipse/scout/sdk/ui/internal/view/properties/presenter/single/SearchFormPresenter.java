@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>SearchFormPresenter</h3> ...
+ * <h3>SearchFormPresenter</h3>
  */
 public class SearchFormPresenter extends AbstractTypeProposalPresenter {
   public SearchFormPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
@@ -63,7 +63,7 @@ public class SearchFormPresenter extends AbstractTypeProposalPresenter {
   }
 
   /**
-   * <h3>{@link P_ContentProvider}</h3> ...
+   * <h3>{@link P_ContentProvider}</h3>
    * The local lazy content provider.
    * It is kept lazy to ensure the proposals are only loaded when used. So the creation of the property view is
    * performance optimized.

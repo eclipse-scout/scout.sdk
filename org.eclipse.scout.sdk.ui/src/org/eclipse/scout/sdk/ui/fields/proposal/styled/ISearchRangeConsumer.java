@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.fields.proposal.styled;
 
 /**
- * <h3>{@link ISearchRangeConsumer}</h3> ...
+ * <h3>{@link ISearchRangeConsumer}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 17.02.2012

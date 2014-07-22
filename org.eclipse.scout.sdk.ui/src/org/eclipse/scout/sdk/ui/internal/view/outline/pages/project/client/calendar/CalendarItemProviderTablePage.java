@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>CalendarItemProducerTablePage</h3> ...
+ * <h3>CalendarItemProducerTablePage</h3>
  */
 public class CalendarItemProviderTablePage extends AbstractPage {
   private InnerTypePageDirtyListener m_innerTypeListener;

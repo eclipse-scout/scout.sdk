@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * <h3>{@link SqlStatement}</h3> ...
+ * <h3>{@link SqlStatement}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 25.02.2011

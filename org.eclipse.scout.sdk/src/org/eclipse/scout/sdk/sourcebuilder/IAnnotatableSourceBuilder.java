@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.IAnnotationSourceBuilder;
 
 /**
- * <h3>{@link IAnnotatableSourceBuilder}</h3> ...
+ * <h3>{@link IAnnotatableSourceBuilder}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.10.0 07.03.2013

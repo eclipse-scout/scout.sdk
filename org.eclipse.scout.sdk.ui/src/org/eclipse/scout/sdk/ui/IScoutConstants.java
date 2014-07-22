@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.internal.view.properties.ScoutPropertyView;
 
 /**
- * <h3>IScoutConstants</h3> ...
+ * <h3>IScoutConstants</h3>
  */
 public interface IScoutConstants {
   String SCOUT_PERSPECTIVE_ID = ScoutPerspective.class.getName();

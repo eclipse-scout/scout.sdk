@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>ColumnTablePage</h3> ...
+ * <h3>ColumnTablePage</h3>
  */
 public class ColumnTablePage extends AbstractPage {
 

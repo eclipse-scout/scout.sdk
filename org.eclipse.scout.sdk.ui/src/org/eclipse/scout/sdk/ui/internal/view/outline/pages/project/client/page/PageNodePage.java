@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanPropertyTablePage;
 
 /**
- * <h3>PageWithTableNodePage</h3> ...
+ * <h3>PageWithTableNodePage</h3>
  */
 public class PageNodePage extends AbstractScoutTypePage {
 

@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
- * <h3>{@link WizardNewWizard}</h3> ...
+ * <h3>{@link WizardNewWizard}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 19.05.2011

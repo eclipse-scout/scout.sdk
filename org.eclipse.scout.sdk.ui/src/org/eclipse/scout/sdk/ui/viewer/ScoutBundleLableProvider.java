@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>{@link ScoutBundleLableProvider}</h3> ...
+ * <h3>{@link ScoutBundleLableProvider}</h3>
  * 
  *  @author Andreas Hoegger
  * @since 3.8.0 19.03.2012

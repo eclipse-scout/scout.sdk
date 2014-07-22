@@ -45,7 +45,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>ServiceNewWizardPage</h3> ...
+ * <h3>ServiceNewWizardPage</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 29.07.2009

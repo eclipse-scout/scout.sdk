@@ -44,7 +44,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 
 /**
- * <h3>JdtTypeMultiPropertyPart</h3> ...
+ * <h3>JdtTypeMultiPropertyPart</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 23.07.2010

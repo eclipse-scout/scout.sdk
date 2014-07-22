@@ -26,7 +26,12 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Image;
 
-/** a wrapper to the Nls Model providing TableViewer methods */
+/**
+ * <h3>{@link NlsTableModel}</h3> a wrapper to the Nls Model providing TableViewer methods
+ *
+ * @author Andreas Hoegger
+ * @since 1.1.0
+ */
 public class NlsTableModel extends ViewerComparator implements IStructuredContentProvider, ITableLabelProvider, ITableColorProvider {
 
   private int m_sortIndex = -2;
@@ -63,7 +68,7 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
 
   /**
    * Gets the language that belongs to the given column index of the table.
-   * 
+   *
    * @param colIndex
    *          The zero based column index of the table.
    * @return The language of the column if the given index has a language. Null otherwise (e.g. when the index of the

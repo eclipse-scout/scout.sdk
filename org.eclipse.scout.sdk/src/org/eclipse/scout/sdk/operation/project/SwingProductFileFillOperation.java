@@ -15,7 +15,7 @@ import java.util.List;
 import org.eclipse.core.resources.IFile;
 
 /**
- * <h3>{@link SwingProductFileFillOperation}</h3> ...
+ * <h3>{@link SwingProductFileFillOperation}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.8.0 10.12.2012

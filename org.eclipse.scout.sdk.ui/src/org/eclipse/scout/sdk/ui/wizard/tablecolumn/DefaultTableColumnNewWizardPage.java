@@ -55,7 +55,7 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
 
 /**
- * <h3>DefaultTableColumnNewWizardPage</h3> ...
+ * <h3>DefaultTableColumnNewWizardPage</h3>
  */
 public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
   private INlsEntry m_nlsName;

@@ -25,7 +25,7 @@ import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 
 /**
- * <h3>{@link ScoutFileLocator}</h3> ...
+ * <h3>{@link ScoutFileLocator}</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 21.12.2010

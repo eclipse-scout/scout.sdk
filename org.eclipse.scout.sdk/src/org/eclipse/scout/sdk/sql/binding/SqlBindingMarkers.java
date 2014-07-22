@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.Marker;
 import org.eclipse.scout.sdk.sql.binding.MethodSqlBindingModel.SQLStatement;
 
 /**
- * <h3>{@link SqlBindingMarkers}</h3> ...
+ * <h3>{@link SqlBindingMarkers}</h3>
  *
  * @author Andreas Hoegger
  * @since 1.0.8 28.02.2011

@@ -15,7 +15,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * <h3>{@link VariableType}</h3> ...
+ * <h3>{@link VariableType}</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 27.02.2011

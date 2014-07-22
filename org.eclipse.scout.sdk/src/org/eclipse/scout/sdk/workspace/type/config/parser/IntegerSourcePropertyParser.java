@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 import org.eclipse.scout.sdk.workspace.type.config.property.AbstractSourceProperty;
 
 /**
- * <h3>{@link IntegerSourcePropertyParser}</h3> ...
+ * <h3>{@link IntegerSourcePropertyParser}</h3>
  * 
  * @author Andreas Hoegger
  * @since 3.8.0 06.03.2013

@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Label;
 
 /**
- * <h3>IconPresenter</h3> ...
+ * <h3>IconPresenter</h3>
  */
 public class IconPresenter extends AbstractMethodPresenter {
 

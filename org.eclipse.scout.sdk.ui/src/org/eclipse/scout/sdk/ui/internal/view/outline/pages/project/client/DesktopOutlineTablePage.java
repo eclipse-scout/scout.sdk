@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
- * <h3>DesktopOutlineTablePage</h3> ...
+ * <h3>DesktopOutlineTablePage</h3>
  */
 public class DesktopOutlineTablePage extends AbstractPage {
 

@@ -66,7 +66,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraphVisitor;
 import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
 
 /**
- * <h3>{@link ScoutBundle}</h3> ...
+ * <h3>{@link ScoutBundle}</h3>
  *
  * @author Matthias Villiger
  * @since 3.9.0 30.01.2013

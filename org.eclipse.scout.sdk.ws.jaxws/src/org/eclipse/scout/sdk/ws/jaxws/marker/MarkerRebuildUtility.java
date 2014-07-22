@@ -78,6 +78,11 @@ import org.eclipse.scout.sdk.ws.jaxws.validator.ServletAliasValidator;
 import org.eclipse.scout.sdk.ws.jaxws.validator.UrlPatternValidator;
 import org.w3c.dom.Element;
 
+/**
+ * <h3>{@link MarkerRebuildUtility}</h3>
+ *
+ * @author Daniel Wiehl
+ */
 @SuppressWarnings("restriction")
 public final class MarkerRebuildUtility {
   public static final String PROPERTY_ENDPOINT_INTERFACE = "endpointInterface";

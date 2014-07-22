@@ -33,7 +33,7 @@ import org.eclipse.ui.IMemento;
 import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 /**
- * <h3>AbstractSectionBasedPart</h3> ...
+ * <h3>AbstractSectionBasedPart</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 20.07.2010

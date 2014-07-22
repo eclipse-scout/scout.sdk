@@ -42,7 +42,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 
 /**
- * <h3>ImageFieldNewWizardPage</h3> ...
+ * <h3>ImageFieldNewWizardPage</h3>
  */
 public class ImageFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 

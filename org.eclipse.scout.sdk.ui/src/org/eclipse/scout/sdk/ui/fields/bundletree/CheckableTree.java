@@ -60,7 +60,7 @@ import org.eclipse.swt.widgets.Tree;
 import org.eclipse.swt.widgets.TreeItem;
 
 /**
- * <h3>BundleTree</h3> ...
+ * <h3>BundleTree</h3>
  * 
  * @author Andreas Hoegger
  * @since 1.0.8 29.01.2010
