@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.internal.ui.fields.IInputChangedListener;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputFormatter;
 import org.eclipse.scout.nls.sdk.internal.ui.formatter.IInputValidator;
@@ -48,7 +49,6 @@ public class TextField<T> extends Composite {
   private List<IInputChangedListener<T>> m_inputChangedListener = new LinkedList<IInputChangedListener<T>>();
   private List<IValidationListener> m_validationListener = new LinkedList<IValidationListener>();
   private Object m_input;
-  private boolean m_valid;
   private IStatus m_status;
   private final int m_labelColWidth;
 
@@ -65,16 +65,6 @@ public class TextField<T> extends Composite {
     this(parent, style, "");
   }
 
-  public void setLabelVisible(boolean visible) {
-    FormData labelData = new FormData();
-    labelData.top = new FormAttachment(0, 0);
-    labelData.left = new FormAttachment(0, 0);
-    if (visible) labelData.right = new FormAttachment(40, 0);
-    labelData.bottom = new FormAttachment(100, 0);
-    m_label.setLayoutData(labelData);
-    m_label.setVisible(visible);
-  }
-
   public TextField(Composite parent, int style, String labelName) {
     this(parent, style, labelName, 40);
   }
@@ -88,8 +78,17 @@ public class TextField<T> extends Composite {
     validateInput();
   }
 
-  private void createComposite(Composite parent, int style) {
+  public void setLabelVisible(boolean visible) {
+    FormData labelData = new FormData();
+    labelData.top = new FormAttachment(0, 0);
+    labelData.left = new FormAttachment(0, 0);
+    if (visible) labelData.right = new FormAttachment(40, 0);
+    labelData.bottom = new FormAttachment(100, 0);
+    m_label.setLayoutData(labelData);
+    m_label.setVisible(visible);
+  }
 
+  private void createComposite(Composite parent, int style) {
     m_label = new Label(parent, SWT.NONE);
     m_label.setAlignment(SWT.RIGHT);
 
@@ -182,23 +181,25 @@ public class TextField<T> extends Composite {
   }
 
   public IStatus validate() {
-    String input = m_text.getText();
-    IStatus valid = m_inputValidator.isValid(input);
-    m_status = valid;
-    if (valid.isOK() != m_valid) {
+    IStatus newValid = m_inputValidator.isValid(m_text.getText());
+
+    if (!CompareUtility.equals(m_status, newValid)) {
+      m_status = newValid;
+
       // fire
       for (IValidationListener listener : m_validationListener) {
-        listener.validationChanged(valid);
+        listener.validationChanged(newValid);
       }
-      m_valid = valid.isOK();
+
+      if (newValid.getSeverity() < IStatus.ERROR) {
+        m_text.setForeground(null);
+      }
+      else {
+        m_text.setForeground(getDisplay().getSystemColor(SWT.COLOR_RED));
+      }
     }
-    if (m_valid) {
-      m_text.setForeground(null);
-    }
-    else {
-      m_text.setForeground(getDisplay().getSystemColor(SWT.COLOR_RED));
-    }
-    return valid;
+
+    return newValid;
   }
 
   @Override
