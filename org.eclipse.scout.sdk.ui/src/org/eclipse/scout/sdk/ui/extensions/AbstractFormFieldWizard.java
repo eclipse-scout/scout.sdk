@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.extensions;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 
 public abstract class AbstractFormFieldWizard extends AbstractWorkspaceWizard {
@@ -31,5 +32,9 @@ public abstract class AbstractFormFieldWizard extends AbstractWorkspaceWizard {
   }
 
   public abstract void setSuperType(IType superType);
+
+  public abstract void setTypeName(String name);
+
+  public abstract void setSibling(SiblingProposal sibling);
 
 }

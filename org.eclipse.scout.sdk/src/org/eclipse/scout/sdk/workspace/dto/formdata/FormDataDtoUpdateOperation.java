@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link FormDataDtoUpdateOperation}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 16.08.2013
  */
@@ -74,7 +74,7 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
 
     // collect all source builders for the whole form data.
     ITypeSourceBuilder formDataSourceBuilder = DtoUtility.createFormDataSourceBuilder(getModelType(), formDataAnnotation, monitor);
-    if (monitor.isCanceled()) {
+    if (monitor.isCanceled() || formDataSourceBuilder == null) {
       return null;
     }
 

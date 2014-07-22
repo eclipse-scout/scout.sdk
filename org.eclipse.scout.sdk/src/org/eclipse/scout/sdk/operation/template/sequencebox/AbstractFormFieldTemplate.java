@@ -114,7 +114,7 @@ public abstract class AbstractFormFieldTemplate implements IContentTemplate {
     if (TypeUtility.exists(form)) {
       String formFieldSimpleName = Signature.getSignatureSimpleName(formFieldSignature);
       MethodNewOperation getterOp = new MethodNewOperation(MethodSourceBuilderFactory.createFieldGetterSourceBuilder(formFieldSignature), form);
-      IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form);
+      IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form, hierarchy);
       getterOp.setSibling(sourceHelper.getSiblingMethodFieldGetter("get" + formFieldSimpleName));
       getterOp.setFormatSource(false);
       getterOp.validate();

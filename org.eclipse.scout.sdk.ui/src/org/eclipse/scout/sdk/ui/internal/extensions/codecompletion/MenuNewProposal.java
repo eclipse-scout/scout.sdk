@@ -18,38 +18,38 @@ import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.wizard.IWorkspaceWizard;
-import org.eclipse.scout.sdk.ui.wizard.code.CodeNewWizard;
+import org.eclipse.scout.sdk.ui.wizard.menu.MenuNewWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.graphics.Image;
 
 /**
- * <h3>{@link CodeNewProposal}</h3>
+ * <h3>{@link MenuNewProposal}</h3>
  *
- * @author Andreas Hoegger
- * @since 3.10.0 25.10.2013
+ * @author Matthias Villiger
+ * @since 4.1.0 11.07.2014
  */
-public class CodeNewProposal extends AbstractSdkWizardProposal {
+public class MenuNewProposal extends AbstractSdkWizardProposal {
 
-  CodeNewProposal(IType declaringType) {
-    super(declaringType, TypeUtility.getType(IRuntimeClasses.ICode));
+  MenuNewProposal(IType declaringType) {
+    super(declaringType, TypeUtility.getType(IRuntimeClasses.IMenu));
   }
 
   @Override
   public String getDisplayString() {
-    return Texts.get("Action_newTypeX", "Code");
+    return Texts.get("Action_newTypeX", "Menu");
   }
 
   @Override
   public Image getImage() {
-    return ScoutSdkUi.getImage(SdkIcons.CodeAdd);
+    return ScoutSdkUi.getImage(SdkIcons.MenuAdd);
   }
 
   @Override
   protected IWorkspaceWizard createWizard(IJavaElement sibling) {
-    CodeNewWizard wizard = new CodeNewWizard();
+    MenuNewWizard wizard = new MenuNewWizard();
     wizard.initWizard(getDeclaringType());
     if (TypeUtility.exists(sibling)) {
-      wizard.setSibling(new SiblingProposal(sibling));
+      wizard.getMenuNewWizardPage().setSibling(new SiblingProposal(sibling));
     }
     return wizard;
   }

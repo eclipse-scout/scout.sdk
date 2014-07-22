@@ -35,6 +35,10 @@ public class MenuNewWizard extends AbstractWorkspaceWizard {
     m_page1.setSuperType(superType);
   }
 
+  public MenuNewWizardPage getMenuNewWizardPage() {
+    return m_page1;
+  }
+
   /**
    * @return the declaringType
    */

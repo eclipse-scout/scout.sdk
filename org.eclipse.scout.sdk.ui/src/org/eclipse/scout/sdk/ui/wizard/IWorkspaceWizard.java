@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard;
 
+import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.operation.IOperation;
 
 /**
@@ -18,7 +19,7 @@ import org.eclipse.scout.sdk.operation.IOperation;
  * @author Andreas Hoegger
  * @since 3.10.0 28.10.2013
  */
-public interface IWorkspaceWizard {
+public interface IWorkspaceWizard extends IWizard {
 
   double ORDER_DEFAULT = 0;
   double ORDER_BEFORE_WIZARD = -10;

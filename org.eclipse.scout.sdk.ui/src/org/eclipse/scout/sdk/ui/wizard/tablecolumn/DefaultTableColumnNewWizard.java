@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
+import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE_OPERATION;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -34,9 +35,23 @@ public class DefaultTableColumnNewWizard extends AbstractFormFieldWizard {
     addPage(m_page1);
   }
 
+  public DefaultTableColumnNewWizardPage getDefaultTableColumnNewWizardPage() {
+    return m_page1;
+  }
+
   @Override
   public void setSuperType(IType superType) {
     m_page1.setSuperType(superType);
+  }
+
+  @Override
+  public void setTypeName(String name) {
+    m_page1.setTypeName(name);
+  }
+
+  @Override
+  public void setSibling(SiblingProposal sibling) {
+    m_page1.setSibling(sibling);
   }
 
   @Override

@@ -337,6 +337,9 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
   public void setSibling(SiblingProposal sibling) {
     try {
       setStateChanging(true);
+      if (sibling == null) {
+        sibling = SiblingProposal.SIBLING_END;
+      }
       m_sibling = sibling;
       if (isControlCreated()) {
         m_siblingField.acceptProposal(sibling);

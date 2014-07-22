@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
+import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -43,6 +44,18 @@ public class ToolbuttonNewWizard extends AbstractFormFieldWizard {
   @Override
   public void setSuperType(IType superType) {
     m_page1.setSuperType(superType);
+  }
+
+  @Override
+  public void setTypeName(String name) {
+    m_page2a.setTypeName(name);
+    m_page2b.setTypeName(name);
+  }
+
+  @Override
+  public void setSibling(SiblingProposal sibling) {
+    m_page2a.setSibling(sibling);
+    m_page2b.setSibling(sibling);
   }
 
   @Override

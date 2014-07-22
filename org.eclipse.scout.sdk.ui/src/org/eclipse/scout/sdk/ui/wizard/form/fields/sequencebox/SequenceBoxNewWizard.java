@@ -50,6 +50,16 @@ public class SequenceBoxNewWizard extends AbstractFormFieldWizard {
   }
 
   @Override
+  public void setTypeName(String name) {
+    m_page1.setTypeName(name);
+  }
+
+  @Override
+  public void setSibling(SiblingProposal sibling) {
+    m_page1.setSibling(sibling);
+  }
+
+  @Override
   protected boolean beforeFinish() throws CoreException {
     m_operation = new SequenceBoxNewOperation(m_page1.getTypeName(), getDeclaringType(), true);
     // write back members

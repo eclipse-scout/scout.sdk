@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class InnerTypeNewOperation extends AbstractTypeNewOperation {
 
   private IJavaElement m_sibling;
-  private final IType m_declaringType;
+  private IType m_declaringType;
 
   public InnerTypeNewOperation(String typeName, IType declaringType) {
     this(new TypeSourceBuilder(typeName), declaringType);
@@ -70,9 +70,15 @@ public class InnerTypeNewOperation extends AbstractTypeNewOperation {
     ICompilationUnit icu = getDeclaringType().getCompilationUnit();
     ImportValidator importValidator = new ImportValidator(icu);
     StringBuilder sourceBuilder = new StringBuilder();
+
+    workingCopyManager.register(icu, monitor);
     getSourceBuilder().createSource(sourceBuilder, ResourceUtility.getLineSeparator(icu), getDeclaringType().getJavaProject(), importValidator);
     setCreatedType(getDeclaringType().createType(sourceBuilder.toString(), getSibling(), true, monitor));
     new ImportsCreateOperation(icu, importValidator).run(monitor, workingCopyManager);
+  }
+
+  protected void setDeclaringType(IType declaringType) {
+    m_declaringType = declaringType;
   }
 
   public IType getDeclaringType() {

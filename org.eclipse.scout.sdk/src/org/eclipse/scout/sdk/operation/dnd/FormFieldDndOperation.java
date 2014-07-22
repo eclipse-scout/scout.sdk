@@ -59,7 +59,7 @@ public class FormFieldDndOperation extends AbstractTypeDndOperation {
         TypeFilters.getPrimaryTypeFilter()));
 
     if (TypeUtility.exists(form)) {
-      IStructuredType structuredForm = ScoutTypeUtility.createStructuredForm(form);
+      IStructuredType structuredForm = ScoutTypeUtility.createStructuredForm(form, hierarchy);
       TreeMap<CompositeObject, IJavaElement> siblings = new TreeMap<CompositeObject, IJavaElement>();
       for (IJavaElement e : structuredForm.getElements(CATEGORIES.METHOD_INNER_TYPE_GETTER)) {
         siblings.put(new CompositeObject(1, e.getElementName()), e);

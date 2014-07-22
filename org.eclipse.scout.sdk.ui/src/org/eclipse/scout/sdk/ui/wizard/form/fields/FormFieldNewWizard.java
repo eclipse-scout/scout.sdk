@@ -12,8 +12,11 @@ package org.eclipse.scout.sdk.ui.wizard.form.fields;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
+import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 
 public class FormFieldNewWizard extends AbstractFormFieldWizard {
+
+  private FormFieldSelectionWizardPage m_page1;
 
   public FormFieldNewWizard(IType declaringType) {
     super();
@@ -23,7 +26,8 @@ public class FormFieldNewWizard extends AbstractFormFieldWizard {
   @Override
   public void initWizard(IType declaringType) {
     super.initWizard(declaringType);
-    addPage(new FormFieldSelectionWizardPage(declaringType));
+    m_page1 = new FormFieldSelectionWizardPage(declaringType);
+    addPage(m_page1);
   }
 
   @Override
@@ -31,10 +35,13 @@ public class FormFieldNewWizard extends AbstractFormFieldWizard {
     return true;
   }
 
+  public FormFieldSelectionWizardPage getFormFieldSelectionWizardPage() {
+    return m_page1;
+  }
+
   @Override
   public boolean canFinish() {
     return false;
-
   }
 
   @Override
@@ -42,4 +49,13 @@ public class FormFieldNewWizard extends AbstractFormFieldWizard {
     // void
   }
 
+  @Override
+  public void setTypeName(String name) {
+    // void
+  }
+
+  @Override
+  public void setSibling(SiblingProposal sibling) {
+    // void
+  }
 }

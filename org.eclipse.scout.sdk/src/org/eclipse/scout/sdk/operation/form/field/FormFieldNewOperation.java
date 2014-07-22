@@ -53,18 +53,24 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
   }
 
   protected void createFormFieldGetter(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
+
+    IType declaringType = TypeUtility.getType(getDeclaringType().getFullyQualifiedName());
+    IType createdType = TypeUtility.getType(getCreatedType().getFullyQualifiedName());
+    setCreatedType(createdType);
+    setDeclaringType(declaringType);
+
     // find form
-    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(getDeclaringType().getCompilationUnit());
-    IType form = TypeUtility.getAncestor(getDeclaringType(), TypeFilters.getMultiTypeFilterOr(
+    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy();
+    IType form = TypeUtility.getAncestor(declaringType, TypeFilters.getMultiTypeFilterOr(
         TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
         TypeFilters.getPrimaryTypeFilter()));
 
     if (TypeUtility.exists(form)) {
-      InnerTypeGetterCreateOperation getterMethodOp = new InnerTypeGetterCreateOperation(getCreatedType(), form, false /* do not pass the formatting in -> performance */);
-      IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form);
+      InnerTypeGetterCreateOperation getterMethodOp = new InnerTypeGetterCreateOperation(createdType, form, false /* do not pass the formatting in -> performance */);
+      IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form, hierarchy);
       IJavaElement sibling = sourceHelper.getSiblingMethodFieldGetter("get" + getElementName());
-      if (sibling == null && getCreatedType().getDeclaringType().equals(form)) {
-        sibling = getCreatedType();
+      if (sibling == null && createdType.getDeclaringType().equals(form)) {
+        sibling = createdType;
       }
       getterMethodOp.setSibling(sibling);
       getterMethodOp.validate();

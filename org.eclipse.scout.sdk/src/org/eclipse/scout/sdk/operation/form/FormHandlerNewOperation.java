@@ -96,7 +96,7 @@ public class FormHandlerNewOperation extends InnerTypeNewOperation {
           source.append("());");
         }
       };
-      IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form);
+      IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form, hierarchy);
       IJavaElement sibling = sourceHelper.getSiblingMethodStartHandler(startMethodName);
       if (sibling == null && getCreatedType().getDeclaringType().equals(form)) {
         sibling = getCreatedType();

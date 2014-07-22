@@ -111,7 +111,12 @@ public class HtmlFieldNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    m_sibling = (SiblingProposal) m_siblingField.getSelectedProposal();
+    if (m_sibling == null) {
+      m_sibling = (SiblingProposal) m_siblingField.getSelectedProposal();
+    }
+    else {
+      m_siblingField.acceptProposal(m_sibling);
+    }
 
     // layout
     parent.setLayout(new GridLayout(1, true));

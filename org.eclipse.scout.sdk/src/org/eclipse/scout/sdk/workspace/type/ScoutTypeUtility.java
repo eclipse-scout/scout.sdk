@@ -972,7 +972,7 @@ public class ScoutTypeUtility extends TypeUtility {
       return createStructuredFormField(type);
     }
     else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm))) {
-      return createStructuredForm(type);
+      return createStructuredForm(type, null);
     }
     else if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICalendar))) {
       return createStructuredCalendar(type);
@@ -1235,6 +1235,10 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static IStructuredType createStructuredForm(IType type) {
+    return createStructuredForm(type, null);
+  }
+
+  public static IStructuredType createStructuredForm(IType type, ITypeHierarchy localHierarchy) {
     EnumSet<CATEGORIES> enabled = EnumSet.of(
         CATEGORIES.FIELD_LOGGER,
         CATEGORIES.FIELD_STATIC,
@@ -1254,7 +1258,7 @@ public class ScoutTypeUtility extends TypeUtility {
         CATEGORIES.TYPE_FORM_HANDLER,
         CATEGORIES.TYPE_UNCATEGORIZED
         );
-    return new ScoutStructuredType(type, enabled);
+    return new ScoutStructuredType(type, enabled, localHierarchy);
   }
 
   public static IStructuredType createStructuredOutline(IType type) {

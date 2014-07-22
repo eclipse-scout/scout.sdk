@@ -37,6 +37,7 @@ import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.fields.table.ISeparator;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -55,7 +56,6 @@ import org.eclipse.swt.widgets.Composite;
  * <h3> {@link TableColumnNewWizardPage1}</h3> ...
  */
 public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
-  private final IType iColumn = TypeUtility.getType(IRuntimeClasses.IColumn);
   private final IType iSmartColumn = TypeUtility.getType(IRuntimeClasses.ISmartColumn);
 
   private IType m_declaringType;
@@ -65,6 +65,8 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
   private Object m_currentSelection;
   private IType m_selectedTemplate;
   private IWizardPage m_nextPage;
+  private String m_name;
+  private SiblingProposal m_sibling;
 
   public TableColumnNewWizardPage1(IType declaringType, CONTINUE_OPERATION op) {
     super(TableColumnNewWizardPage1.class.getName());
@@ -148,12 +150,18 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
         SmartTableColumnNewWizard wizard = new SmartTableColumnNewWizard(m_nextOperation);
         wizard.initWizard(m_declaringType);
         wizard.setSuperType(m_selectedTemplate);
+        // forward properties to next page
+        wizard.getSmartTableColumnNewWizardPage().setTypeName(getTypeName());
+        wizard.getSmartTableColumnNewWizardPage().setSibling(getSibling());
         m_nextPage = wizard.getPages()[0];
       }
       else {
         DefaultTableColumnNewWizard wizard = new DefaultTableColumnNewWizard(m_nextOperation);
         wizard.initWizard(m_declaringType);
         wizard.setSuperType(m_selectedTemplate);
+        // forward properties to next page
+        wizard.getDefaultTableColumnNewWizardPage().setTypeName(getTypeName());
+        wizard.getDefaultTableColumnNewWizardPage().setSibling(getSibling());
         m_nextPage = wizard.getPages()[0];
       }
     }
@@ -186,6 +194,22 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
   public IType getSelectedSuperType() {
     return m_selectedTemplate;
+  }
+
+  public String getTypeName() {
+    return m_name;
+  }
+
+  public void setTypeName(String name) {
+    m_name = name;
+  }
+
+  public SiblingProposal getSibling() {
+    return m_sibling;
+  }
+
+  public void setSibling(SiblingProposal sibling) {
+    m_sibling = sibling;
   }
 
   private final class P_TableContentProvider extends ViewerSorter implements IStructuredContentProvider, ITableLabelProvider {
@@ -230,6 +254,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       templates.add(new ISeparator() {
       });
 
+      IType iColumn = TypeUtility.getType(IRuntimeClasses.IColumn);
       Set<IType> abstractColumnsOnClasspath = TypeUtility.getAbstractTypesOnClasspath(iColumn, javaProject, TypeFilters.getPrimaryTypeFilter());
       for (IType t : abstractColumnsOnClasspath) {
         if (!m_shortList.contains(t.getFullyQualifiedName())) {

@@ -17,10 +17,8 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
-import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IInformationControlCreator;
-import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
@@ -34,7 +32,7 @@ import org.eclipse.swt.graphics.Point;
 
 /**
  * <h3>{@link AbstractSdkProposal}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 25.10.2013
  */
@@ -107,30 +105,6 @@ public abstract class AbstractSdkProposal implements IJavaCompletionProposal, IC
   public void unselected(ITextViewer viewer) {
   }
 
-  protected Point findTriggerWordRange(IDocument document, int offset) throws BadLocationException {
-    IRegion lineRange = document.getLineInformationOfOffset(offset);
-    // find start
-    int startOffest = -1;
-    int index = offset - 1;
-
-    while (index > 0 && index > lineRange.getOffset() && isValidChar(document.getChar(index))) {
-      index--;
-    }
-    startOffest = index;
-
-    // find end
-    int endOffset = -1;
-    index = offset;
-    while ((document.getLength() > index && index < (lineRange.getOffset() + lineRange.getLength())) && isValidChar(document.getChar(index))) {
-      index++;
-    }
-    endOffset = index;
-    if (startOffest > -1 && endOffset > -1 && startOffest <= endOffset) {
-      return new Point(startOffest, endOffset);
-    }
-    return null;
-  }
-
   /**
    * @param declaringType
    * @param offset
@@ -150,27 +124,5 @@ public abstract class AbstractSdkProposal implements IJavaCompletionProposal, IC
     }
 
     return sibling;
-  }
-
-  private boolean isValidChar(char c) {
-    // 0-9
-    if (c >= 48 && c <= 57) {
-      return true;
-    }
-    // A-Z
-    if (c >= 65 && c <= 90) {
-      return true;
-    }
-    // a-z
-    if (c >= 97 && c <= 122) {
-      return true;
-    }
-    // special characters
-    switch (c) {
-      case '-':
-      case '_':
-        return true;
-    }
-    return false;
   }
 }

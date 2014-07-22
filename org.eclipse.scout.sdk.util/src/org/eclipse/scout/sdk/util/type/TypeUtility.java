@@ -300,8 +300,8 @@ public class TypeUtility {
    *          The base type of the primary type hierarchy.
    * @return The primary type hierarchy. The hierarchy will only be initialized with values on first use and will be
    *         cached for later re-use.
-   * @throws 
-   *           if the given type is not a primary type.
+   * @throws if
+   *           the given type is not a primary type.
    */
   public static ICachedTypeHierarchy getPrimaryTypeHierarchy(IType type) {
     return HierarchyCache.getInstance().getPrimaryTypeHierarchy(type);
@@ -757,10 +757,8 @@ public class TypeUtility {
    * @param b
    *          The second {@link IType}
    * @return The more specific type or null according to the rule described above.
-   * @throws JavaModelException
-   *           Occurred during supertype creation.
    */
-  public static IType getMoreSpecificType(IType a, IType b) throws JavaModelException {
+  public static IType getMoreSpecificType(IType a, IType b) {
     if (!exists(a) && !exists(b)) {
       return null;
     }

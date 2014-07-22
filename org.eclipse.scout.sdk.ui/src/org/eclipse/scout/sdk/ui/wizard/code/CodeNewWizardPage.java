@@ -172,7 +172,8 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     }
 
-    final SignatureSubTypeProposalProvider proposalProvider = new SignatureSubTypeProposalProvider(getGenericTypeOfSuperClass(), m_bundle.getJavaProject());
+    IType genericLimitingType = TypeUtility.getMoreSpecificType(TypeUtility.getTypeBySignature(codeIdSignatureFromCodeType), getGenericTypeOfSuperClass());
+    final SignatureSubTypeProposalProvider proposalProvider = new SignatureSubTypeProposalProvider(genericLimitingType, m_bundle.getJavaProject());
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
         new JavaElementAbstractTypeContentProvider(iCode, m_declaringType.getJavaProject(), filter, m_superType), labelColWidthPercent);

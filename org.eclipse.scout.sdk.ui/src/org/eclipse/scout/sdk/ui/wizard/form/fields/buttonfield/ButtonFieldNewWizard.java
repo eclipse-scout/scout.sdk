@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.wizard.form.fields.buttonfield;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
+import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
@@ -49,5 +50,15 @@ public class ButtonFieldNewWizard extends AbstractFormFieldWizard {
    */
   public ButtonFieldNewWizardPage getButtonFieldWizardPage() {
     return m_page1;
+  }
+
+  @Override
+  public void setTypeName(String name) {
+    m_page1.setTypeName(name);
+  }
+
+  @Override
+  public void setSibling(SiblingProposal sibling) {
+    m_page1.setSibling(sibling);
   }
 }

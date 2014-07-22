@@ -17,6 +17,7 @@ import java.util.Set;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
@@ -36,6 +37,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
+import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.fields.table.ISeparator;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -63,7 +65,9 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
   private final IType m_declaringType;
   private AbstractScoutWizardPage m_nextPage;
   private Object m_currentSelection;
-  private HashSet<IType> m_modelTypeShortList;
+  private Set<IType> m_modelTypeShortList;
+  private String m_typeName;
+  private IJavaElement m_sibling;
 
   // ui fields
   private FilteredTable m_table;
@@ -163,6 +167,12 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
       if (wizard != null) {
         wizard.initWizard(m_declaringType);
         wizard.setSuperType(formField);
+        wizard.setTypeName(getTypeName());
+
+        IJavaElement sibling = getSibling();
+        if (TypeUtility.exists(sibling)) {
+          wizard.setSibling(new SiblingProposal(sibling));
+        }
       }
     }
     if (wizard != null) {
@@ -189,6 +199,22 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   public IWizardPage getNextPage() {
     return m_nextPage;
+  }
+
+  public String getTypeName() {
+    return m_typeName;
+  }
+
+  public void setTypeName(String typeName) {
+    m_typeName = typeName;
+  }
+
+  public IJavaElement getSibling() {
+    return m_sibling;
+  }
+
+  public void setSibling(IJavaElement sibling) {
+    m_sibling = sibling;
   }
 
   private class P_ContentProvider implements IStructuredContentProvider, ITableLabelProvider {

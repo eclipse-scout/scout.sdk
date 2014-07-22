@@ -135,12 +135,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
 
     final SignatureSubTypeProposalProvider genericProposalProvider = new SignatureSubTypeProposalProvider(getGenericTypeOfSuperClass(), m_declaringType.getJavaProject());
     IType genericTypeOfSuperClass = getGenericTypeOfSuperClass();
-    try {
-      genericProposalProvider.setBaseType(TypeUtility.getMoreSpecificType(genericTypeOfSuperClass, m_radioButtonGroupValueType));
-    }
-    catch (JavaModelException e1) {
-      ScoutSdkUi.logWarning("Cannot resolve generic base type.", e1);
-    }
+    genericProposalProvider.setBaseType(TypeUtility.getMoreSpecificType(genericTypeOfSuperClass, m_radioButtonGroupValueType));
 
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_BUTTON);
@@ -163,32 +158,27 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
 
         IType gtosc = getGenericTypeOfSuperClass();
-        try {
-          if (TypeUtility.exists(gtosc)) {
-            boolean acceptProp = false;
+        if (TypeUtility.exists(gtosc)) {
+          boolean acceptProp = false;
 
-            if (getGenericSignature() == null) {
-              acceptProp = true;
+          if (getGenericSignature() == null) {
+            acceptProp = true;
+          }
+          else {
+            IType t = TypeUtility.getTypeBySignature(getGenericSignature());
+            if (TypeUtility.exists(t)) {
+              acceptProp = !ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t).contains(gtosc);
             }
             else {
-              IType t = TypeUtility.getTypeBySignature(getGenericSignature());
-              if (TypeUtility.exists(t)) {
-                acceptProp = !ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(t).contains(gtosc);
-              }
-              else {
-                acceptProp = true;
-              }
-            }
-
-            if (acceptProp) {
-              m_genericTypeField.acceptProposal(SignatureCache.createTypeSignature(gtosc.getFullyQualifiedName()));
+              acceptProp = true;
             }
           }
-          genericProposalProvider.setBaseType(TypeUtility.getMoreSpecificType(gtosc, m_radioButtonGroupValueType));
+
+          if (acceptProp) {
+            m_genericTypeField.acceptProposal(SignatureCache.createTypeSignature(gtosc.getFullyQualifiedName()));
+          }
         }
-        catch (JavaModelException e) {
-          ScoutSdkUi.logError(e);
-        }
+        genericProposalProvider.setBaseType(TypeUtility.getMoreSpecificType(gtosc, m_radioButtonGroupValueType));
       }
     });
 
@@ -213,7 +203,12 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    m_sibling = (SiblingProposal) m_siblingField.getSelectedProposal();
+    if (m_sibling == null) {
+      m_sibling = (SiblingProposal) m_siblingField.getSelectedProposal();
+    }
+    else {
+      m_siblingField.acceptProposal(m_sibling);
+    }
 
     // layout
     parent.setLayout(new GridLayout(1, true));

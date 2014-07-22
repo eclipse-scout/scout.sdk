@@ -24,6 +24,8 @@ import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -33,7 +35,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h3>{@link ScoutSdkProposalComputer}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 25.10.2013
  */
@@ -45,22 +47,48 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
 
   @Override
   public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
-    List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(1);
-    if (!(context instanceof JavaContentAssistInvocationContext) || Platform.getBundle(ScoutSdkUi.PLUGIN_ID).getState() != Bundle.ACTIVE) {
-      return proposals;
+    Bundle bundle = Platform.getBundle(ScoutSdkUi.PLUGIN_ID);
+    if (!(context instanceof JavaContentAssistInvocationContext) || bundle == null || bundle.getState() != Bundle.ACTIVE) {
+      return CollectionUtility.emptyArrayList();
     }
 
+    List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(4);
     try {
       JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-      CompletionContext coreContext = javaContext.getCoreContext();
-      if (coreContext != null && coreContext.isExtended()) {
-        IJavaElement element = coreContext.getEnclosingElement();
-        if (TypeUtility.exists(element)) {
-          if (element.getElementType() == IJavaElement.TYPE) {
-            IType declaringType = (IType) element;
-            ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(declaringType);
-            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
-              proposals.add(new CodeNewProposal(declaringType));
+      CharSequence identifierPrefix = javaContext.computeIdentifierPrefix();
+      if (identifierPrefix == null || !StringUtility.hasText(identifierPrefix)) {
+        CompletionContext coreContext = javaContext.getCoreContext();
+        if (coreContext != null && coreContext.isExtended()) {
+          IJavaElement element = coreContext.getEnclosingElement();
+          if (TypeUtility.exists(element)) {
+            if (element.getElementType() == IJavaElement.TYPE) {
+              IType declaringType = (IType) element;
+              declaringType = TypeUtility.getType(declaringType.getFullyQualifiedName());
+              ITypeHierarchy supertypeHierarchy = ScoutSdkCore.getHierarchyCache().getSupertypeHierarchy(declaringType);
+              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
+                proposals.add(new CodeNewProposal(declaringType));
+              }
+              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))) {
+                proposals.add(new ColumnNewProposal(declaringType));
+              }
+              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeField)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm))) {
+                proposals.add(new FormFieldNewProposal(declaringType));
+              }
+              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IMenu)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktop)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithNodes)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITree)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITreeNode)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IButton)) ||
+                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IImageField))) {
+                proposals.add(new MenuNewProposal(declaringType));
+              }
             }
           }
         }
@@ -85,5 +113,4 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
   public String getErrorMessage() {
     return null;
   }
-
 }

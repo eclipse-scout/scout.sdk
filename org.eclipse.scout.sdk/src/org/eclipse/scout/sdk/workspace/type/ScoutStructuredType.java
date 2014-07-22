@@ -53,16 +53,25 @@ public class ScoutStructuredType implements IStructuredType {
 
   private final IType m_type;
   private final EnumSet<CATEGORIES> m_enabledCategories;
-  private final Map<CATEGORIES, List<? extends IJavaElement>> m_elements;
   private final EnumSet<CATEGORIES> m_visitedCategories;
+  private final Map<CATEGORIES, List<? extends IJavaElement>> m_elements;
   private final ITypeHierarchy m_typeHierarchy;
 
   public ScoutStructuredType(IType type, EnumSet<CATEGORIES> enabledCategories) {
+    this(type, enabledCategories, null);
+  }
+
+  public ScoutStructuredType(IType type, EnumSet<CATEGORIES> enabledCategories, ITypeHierarchy localHierarchy) {
     m_type = type;
     m_enabledCategories = enabledCategories;
     m_visitedCategories = EnumSet.noneOf(CATEGORIES.class);
     m_elements = new HashMap<CATEGORIES, List<? extends IJavaElement>>();
-    m_typeHierarchy = TypeUtility.getLocalTypeHierarchy(type);
+    if (localHierarchy == null) {
+      m_typeHierarchy = TypeUtility.getLocalTypeHierarchy(type);
+    }
+    else {
+      m_typeHierarchy = localHierarchy;
+    }
 
     // initially put all into unknown categories
     List<IJavaElement> fields = new ArrayList<IJavaElement>();

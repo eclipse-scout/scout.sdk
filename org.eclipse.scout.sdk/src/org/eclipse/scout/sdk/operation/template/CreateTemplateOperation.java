@@ -207,7 +207,7 @@ public class CreateTemplateOperation implements IOperation {
 
     // getter fields
     org.eclipse.scout.sdk.util.typecache.ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(templateType);
-    IStructuredType structuredForm = ScoutTypeUtility.createStructuredForm(templateType);
+    IStructuredType structuredForm = ScoutTypeUtility.createStructuredForm(templateType, hierarchy);
     TreeMap<CompositeObject, IJavaElement> siblings = new TreeMap<CompositeObject, IJavaElement>();
     IJavaElement sibling = structuredForm.getSibling(CATEGORIES.METHOD_INNER_TYPE_GETTER);
     siblings.put(new CompositeObject(2, ""), sibling);

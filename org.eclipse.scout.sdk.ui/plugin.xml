@@ -99,10 +99,25 @@
                id="org.eclipse.pde.ui.NewProjectWizard">
          </newWizardShortcut>
          <newWizardShortcut
-               id="org.eclipse.pde.ui.NewFragmentWizard">
+               id="org.eclipse.scout.newFormWizard">
          </newWizardShortcut>
          <newWizardShortcut
-               id="org.eclipse.pde.ui.NewFeatureProjectWizard">
+               id="org.eclipse.scout.newPageWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.scout.newProcessServiceWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.scout.newSearchFormWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.scout.newCodeTypeWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.scout.newLookupCallWizard">
+         </newWizardShortcut>
+         <newWizardShortcut
+               id="org.eclipse.scout.newWorkingSetWizard">
          </newWizardShortcut>
          <newWizardShortcut
                id="org.eclipse.jdt.ui.wizards.NewPackageCreationWizard">
@@ -114,22 +129,10 @@
                id="org.eclipse.jdt.ui.wizards.NewInterfaceCreationWizard">
          </newWizardShortcut>
          <newWizardShortcut
-               id="org.eclipse.jdt.ui.wizards.NewSourceFolderCreationWizard">
-         </newWizardShortcut>
-         <newWizardShortcut
                id="org.eclipse.jdt.ui.wizards.NewEnumCreationWizard">
          </newWizardShortcut>
          <newWizardShortcut
                id="org.eclipse.jdt.ui.wizards.NewAnnotationCreationWizard">
-         </newWizardShortcut>
-         <newWizardShortcut
-               id="org.eclipse.scout.newWorkingSetWizard">
-         </newWizardShortcut>
-         <newWizardShortcut
-               id="org.eclipse.jdt.ui.wizards.NewJavaWorkingSetWizard">
-         </newWizardShortcut>
-         <newWizardShortcut
-               id="org.eclipse.pde.ui.NewProductConfigurationWizard">
          </newWizardShortcut>
          <newWizardShortcut
                id="org.eclipse.ui.wizards.new.folder">
@@ -148,6 +151,17 @@
             name="Scout">
       </perspective>
    </extension>
+
+   <extension
+         point="org.eclipse.ui.navigator.navigatorContent">
+         <commonWizard
+            type="new"
+            wizardId="org.eclipse.scout.newWorkingSetWizard">
+         <enablement></enablement>
+      </commonWizard>
+
+   </extension>
+
    <extension
          point="org.eclipse.ui.views">
       <view
