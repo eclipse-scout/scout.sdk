@@ -113,7 +113,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
       }
 
       Properties prop = new Properties();
-      String NL = ResourceUtility.getLineSeparator(m_file);
+      String nl = ResourceUtility.getLineSeparator(m_file);
 
       Map<String, String> allTranslations = getAllTranslations();
       prop.putAll(allTranslations);
@@ -121,7 +121,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
       ByteArrayOutputStream os = new ByteArrayOutputStream();
       try {
         prop.store(os, null);
-        String[] lines = os.toString().split(NL);
+        String[] lines = os.toString().split(nl);
         int i = 0;
         if (lines.length > 0 && lines[0].startsWith("#")) {
           i++;
@@ -134,7 +134,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
           // remove all newline characters because java.lang.Properties class uses OS dependent line delimiters.
           // but we would like to use project dependent line delimiters -> remove all first, add project dependent delimiter afterwards.
           builder.append(lines[i].replace("\n", "").replace("\r", ""));
-          builder.append(NL);
+          builder.append(nl);
         }
 
         m_file.setContents(new ByteArrayInputStream(builder.toString().getBytes()), IFile.KEEP_HISTORY, monitor);

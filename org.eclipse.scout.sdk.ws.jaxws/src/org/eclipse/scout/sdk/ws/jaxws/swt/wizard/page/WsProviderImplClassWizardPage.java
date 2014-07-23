@@ -201,11 +201,9 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
           dialog.setTitle(Texts.get("SessionFactory"));
           dialog.setMessage(Texts.get("ChooseXY", Texts.get("SessionFactory")));
           dialog.setBlockOnOpen(true);
-          if (dialog.open() == Window.OK) {
-            if (dialog.getResult() != null) {
-              IType type = (IType) dialog.getResult()[0];
-              setSessionFactory(type.getFullyQualifiedName());
-            }
+          if (dialog.open() == Window.OK && dialog.getResult() != null) {
+            IType type = (IType) dialog.getResult()[0];
+            setSessionFactory(type.getFullyQualifiedName());
           }
         }
         catch (JavaModelException exception) {
@@ -244,11 +242,9 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
           dialog.setTitle(Texts.get("AuthenticationMechanism"));
           dialog.setMessage(Texts.get("ChooseXY", Texts.get("AuthenticationMechanism")));
           dialog.setBlockOnOpen(true);
-          if (dialog.open() == Window.OK) {
-            if (dialog.getResult() != null) {
-              IType type = (IType) dialog.getResult()[0];
-              setAuthenticationHandler(type.getFullyQualifiedName());
-            }
+          if (dialog.open() == Window.OK && dialog.getResult() != null) {
+            IType type = (IType) dialog.getResult()[0];
+            setAuthenticationHandler(type.getFullyQualifiedName());
           }
         }
         catch (JavaModelException exception) {
@@ -287,11 +283,9 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
           dialog.setTitle(Texts.get("CredentialValidationStrategy"));
           dialog.setMessage(Texts.get("ChooseXY", Texts.get("CredentialValidationStrategy")));
           dialog.setBlockOnOpen(true);
-          if (dialog.open() == Window.OK) {
-            if (dialog.getResult() != null) {
-              IType type = (IType) dialog.getResult()[0];
-              setCredentialValidationStrategy(type.getFullyQualifiedName());
-            }
+          if (dialog.open() == Window.OK && dialog.getResult() != null) {
+            IType type = (IType) dialog.getResult()[0];
+            setCredentialValidationStrategy(type.getFullyQualifiedName());
           }
         }
         catch (JavaModelException exception) {
@@ -695,17 +689,11 @@ public class WsProviderImplClassWizardPage extends AbstractWorkspaceWizardPage {
     dialog.setTitle(Texts.get("Package"));
     dialog.setMessage(Texts.get("ChoosePackageForImplementingClass"));
 
-    if (dialog.open() == Window.OK) {
-      if (dialog.getResult() != null) {
-        packageFragments = Arrays.asList(dialog.getResult()).toArray(new IPackageFragment[0]);
-      }
+    if (dialog.open() == Window.OK && dialog.getResult() != null) {
+      Object[] result = dialog.getResult();
+      packageFragments = Arrays.asList(result).toArray(new IPackageFragment[result.length]);
     }
-    if (packageFragments != null) {
-      return packageFragments;
-    }
-    else {
-      return null;
-    }
+    return packageFragments;
   }
 
   private IJavaSearchScope createSubClassesSearchScope(IType superType) {

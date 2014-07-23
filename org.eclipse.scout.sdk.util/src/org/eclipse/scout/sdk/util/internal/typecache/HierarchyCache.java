@@ -151,10 +151,8 @@ public final class HierarchyCache implements IHierarchyCache {
       List<ICacheableTypeHierarchyResult> hierarchies = getHierarchiesSafe();
       Set<IType> superTypes = superTypeHierarchy.getAllSupertypes(t);
       for (ICacheableTypeHierarchyResult h : hierarchies) {
-        if (h.isCreated()) {
-          if (h.contains(t) != h.isTypeAccepted(t, superTypes)) {
-            h.invalidate();
-          }
+        if (h.isCreated() && h.contains(t) != h.isTypeAccepted(t, superTypes)) {
+          h.invalidate();
         }
       }
     }

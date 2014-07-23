@@ -60,7 +60,7 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
     String servicesName = SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.SERVICES, validator);
     String formDataName = SignatureUtility.getTypeReferenceFromFqn(getFormData().getFullyQualifiedName(), validator);
     if (isCreateExecLoad()) {
-      // execLoad on formhandler
+      // execLoad on form handler
       StringBuilder execLoadBuilder = new StringBuilder();
       execLoadBuilder.append("@Override\n");
       execLoadBuilder.append("public void execLoad() throws " + processingExceptionClass + "{\n");
@@ -81,7 +81,7 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
       getFormHandler().createMethod(execLoadBuilder.toString(), null, true, monitor);
     }
     if (isCreateExecStore()) {
-      // execLoad on formhandler
+      // execLoad on form handler
       StringBuilder execStoreBuilder = new StringBuilder();
       execStoreBuilder.append("@Override\n");
       execStoreBuilder.append("public void execStore() throws " + processingExceptionClass + "{\n");

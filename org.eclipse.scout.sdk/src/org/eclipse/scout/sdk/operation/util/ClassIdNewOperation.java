@@ -148,11 +148,11 @@ public class ClassIdNewOperation implements IOperation {
     Document sourceDoc = new Document(buffer.getContents());
     MultiTextEdit multiEdit = new MultiTextEdit();
     IImportValidator validator = new ImportValidator(icu);
-    String NL = ResourceUtility.getLineSeparator(icu);
+    String nl = ResourceUtility.getLineSeparator(icu);
     for (IType t : types) {
       if (!t.isAnonymous() && !t.isBinary()) {
         AnnotationNewOperation op = new AnnotationNewOperation(AnnotationSourceBuilderFactory.createClassIdAnnotation(t), t);
-        TextEdit edit = op.createEdit(validator, sourceDoc, NL);
+        TextEdit edit = op.createEdit(validator, sourceDoc, nl);
         multiEdit.addChild(edit);
         if (monitor != null) {
           monitor.worked(1);

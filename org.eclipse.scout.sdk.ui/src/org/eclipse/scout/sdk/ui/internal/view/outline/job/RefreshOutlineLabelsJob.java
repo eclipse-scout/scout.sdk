@@ -31,19 +31,19 @@ public class RefreshOutlineLabelsJob extends Job {
   @Override
   protected IStatus run(IProgressMonitor monitor) {
     Display display = ScoutSdkUi.getDisplay();
-    final TreeViewer m_treeViewer = m_view.getTreeViewer();
-    final Control m_treeControl = m_treeViewer.getControl();
+    final TreeViewer treeViewer = m_view.getTreeViewer();
+    final Control treeControl = treeViewer.getControl();
     // gui thread
-    if (m_treeControl == null || m_treeControl.isDisposed()) {
+    if (treeControl == null || treeControl.isDisposed()) {
       return Status.CANCEL_STATUS;
     }
     display.asyncExec(new Runnable() {
       @Override
       public void run() {
-        if (m_treeControl == null || m_treeControl.isDisposed()) {
+        if (treeControl == null || treeControl.isDisposed()) {
           return;
         }
-        m_treeViewer.refresh(true);
+        treeViewer.refresh(true);
       }
     });
     return Status.OK_STATUS;

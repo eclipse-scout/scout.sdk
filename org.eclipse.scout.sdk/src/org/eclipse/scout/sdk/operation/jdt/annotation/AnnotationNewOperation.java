@@ -153,21 +153,21 @@ public class AnnotationNewOperation implements IOperation {
     return "";
   }
 
-  public TextEdit createEdit(IImportValidator validator, Document sourceDocument, String NL) throws CoreException {
+  public TextEdit createEdit(IImportValidator validator, Document sourceDocument, String nl) throws CoreException {
     try {
       // create new source
       StringBuilder builder = new StringBuilder();
-      getSourceBuilder().createSource(builder, NL, getDeclaringType().getJavaProject(), validator);
+      getSourceBuilder().createSource(builder, nl, getDeclaringType().getJavaProject(), validator);
 
       // find insert/replace range
-      ISourceRange replaceRange = getAnnotationReplaceRange(sourceDocument, NL, builder.toString());
+      ISourceRange replaceRange = getAnnotationReplaceRange(sourceDocument, nl, builder.toString());
 
       // insert indentation at the beginning
       builder.insert(0, getIndent(sourceDocument, replaceRange));
 
       // insert newline at the end if required
       if (replaceRange.getLength() == 0) {
-        builder.append(NL);
+        builder.append(nl);
       }
 
       return new ReplaceEdit(replaceRange.getOffset(), replaceRange.getLength(), builder.toString());

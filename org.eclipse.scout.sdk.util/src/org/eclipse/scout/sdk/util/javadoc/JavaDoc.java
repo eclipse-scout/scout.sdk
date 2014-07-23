@@ -11,10 +11,12 @@
 package org.eclipse.scout.sdk.util.javadoc;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.text.edits.InsertEdit;
@@ -26,10 +28,11 @@ import org.eclipse.text.edits.TextEdit;
 public class JavaDoc {
 
   private final IMember m_member;
-  private ArrayList<String> m_newLines = new ArrayList<String>();
+  private final List<String> m_newLines;
 
   public JavaDoc(IMember member) {
     m_member = member;
+    m_newLines = new ArrayList<String>();
   }
 
   public void appendLine(String commentLine) {
@@ -40,15 +43,15 @@ public class JavaDoc {
     m_newLines.remove(commentLine);
   }
 
-  protected String[] getNewLines() {
-    return m_newLines.toArray(m_newLines.toArray(new String[m_newLines.size()]));
+  protected List<String> getNewLines() {
+    return CollectionUtility.arrayList(m_newLines);
   }
 
   public TextEdit getEdit() {
     String NL = ResourceUtility.getLineSeparator(getMember().getCompilationUnit());
     StringBuilder javaDoc = new StringBuilder();
-    String[] newLines = getNewLines();
-    if (newLines.length > 0) {
+    List<String> newLines = getNewLines();
+    if (!newLines.isEmpty()) {
       for (String line : newLines) {
         javaDoc.append("* " + line + NL);
       }

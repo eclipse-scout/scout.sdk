@@ -68,13 +68,13 @@ public class DeleteAction extends AbstractScoutHandler {
     }
     else {
       // delete multiple types
-      MemberSelectionDialog m_confirmDialog = new MemberSelectionDialog(shell, Texts.get("DeleteAction_ensureRequestPlural"));
+      MemberSelectionDialog confirmDialog = new MemberSelectionDialog(shell, Texts.get("DeleteAction_ensureRequestPlural"));
       IMember[] typesToDelete = m_types.toArray(new IMember[m_types.size()]);
-      m_confirmDialog.setMembers(typesToDelete);
-      m_confirmDialog.setSelectedMembers(typesToDelete);
-      if (m_confirmDialog.open() == Dialog.OK) {
+      confirmDialog.setMembers(typesToDelete);
+      confirmDialog.setSelectedMembers(typesToDelete);
+      if (confirmDialog.open() == Dialog.OK) {
         deleteOperation = new JavaElementDeleteOperation();
-        deleteOperation.setMembers(m_confirmDialog.getSelectedMembers());
+        deleteOperation.setMembers(confirmDialog.getSelectedMembers());
       }
     }
 

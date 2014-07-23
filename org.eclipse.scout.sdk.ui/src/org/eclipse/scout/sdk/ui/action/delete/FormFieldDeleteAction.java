@@ -40,12 +40,12 @@ public class FormFieldDeleteAction extends AbstractScoutHandler {
   public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
     IType[] members = m_formFieldTypes.toArray(new IType[m_formFieldTypes.size()]);
 
-    MemberSelectionDialog m_confirmDialog = new MemberSelectionDialog(shell, Texts.get("DeleteFormField"), Texts.get("SelectFieldsToRemove"));
-    m_confirmDialog.setMembers(members);
-    m_confirmDialog.setSelectedMembers(members);
+    MemberSelectionDialog confirmDialog = new MemberSelectionDialog(shell, Texts.get("DeleteFormField"), Texts.get("SelectFieldsToRemove"));
+    confirmDialog.setMembers(members);
+    confirmDialog.setSelectedMembers(members);
 
-    if (m_confirmDialog.open() == Dialog.OK) {
-      IMember[] selectedMembers = m_confirmDialog.getSelectedMembers();
+    if (confirmDialog.open() == Dialog.OK) {
+      IMember[] selectedMembers = confirmDialog.getSelectedMembers();
       BoxDeleteOperation[] deleteOperations = new BoxDeleteOperation[selectedMembers.length];
       for (int i = 0; i < selectedMembers.length; i++) {
         deleteOperations[i] = new BoxDeleteOperation((IType) selectedMembers[i]);

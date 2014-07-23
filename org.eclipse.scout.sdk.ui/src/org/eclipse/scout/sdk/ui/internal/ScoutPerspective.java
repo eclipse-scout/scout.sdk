@@ -38,22 +38,22 @@ public class ScoutPerspective implements IPerspectiveFactory {
     String editorArea = layout.getEditorArea();
     layout.setEditorAreaVisible(true);
 
-    String id_topLeft = "topLeft";
-    String id_bottomLeft = "bottomLeft";
-    String id_bottom = "bottom";
+    String idTopLeft = "topLeft";
+    String idBottomLeft = "bottomLeft";
+    String idBottom = "bottom";
 
     // Top left: Scout Explorer and JDT package explorer
-    IFolderLayout topLeft = layout.createFolder(id_topLeft, IPageLayout.LEFT, 0.25f, editorArea);
+    IFolderLayout topLeft = layout.createFolder(idTopLeft, IPageLayout.LEFT, 0.25f, editorArea);
     topLeft.addView(IScoutConstants.SCOUT_EXPLORER_VIEW);
     topLeft.addView("org.eclipse.jdt.ui.PackageExplorer");
 
     // Bottom left: Scout Property view and Outline View
-    IFolderLayout bottomLeft = layout.createFolder(id_bottomLeft, IPageLayout.BOTTOM, 0.5f, id_topLeft);
+    IFolderLayout bottomLeft = layout.createFolder(idBottomLeft, IPageLayout.BOTTOM, 0.5f, idTopLeft);
     bottomLeft.addView(IScoutConstants.SCOUT_PROPERTY_VIEW);
     bottomLeft.addView(IPageLayout.ID_OUTLINE);
 
     // Bottom: Problems, Progress, Tasks, Console, Javadoc, Error Log
-    IFolderLayout bottom = layout.createFolder(id_bottom, IPageLayout.BOTTOM, 0.8f, editorArea);
+    IFolderLayout bottom = layout.createFolder(idBottom, IPageLayout.BOTTOM, 0.8f, editorArea);
     bottom.addView(IPageLayout.ID_TASK_LIST);
     bottom.addView(IPageLayout.ID_PROBLEM_VIEW);
     bottom.addView(JavaUI.ID_JAVADOC_VIEW);

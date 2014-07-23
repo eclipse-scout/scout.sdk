@@ -277,7 +277,7 @@ public class CreateTemplateOperation implements IOperation {
     try {
       IMethod getterMethod = ScoutTypeUtility.getFormFieldGetterMethod(formField, hierarchy);
       if (TypeUtility.exists(getterMethod)) {
-        String NL = ResourceUtility.getLineSeparator(getterMethod.getCompilationUnit());
+        String nl = ResourceUtility.getLineSeparator(getterMethod.getCompilationUnit());
         P_FormField templateFormField = templateFormFields.get(formField.getElementName());
         // find import
         IImportDeclaration formFieldImport = formField.getCompilationUnit().getImport(fqFormFieldName);
@@ -295,7 +295,7 @@ public class CreateTemplateOperation implements IOperation {
         }
         Matcher deprecatedMatcher = Pattern.compile("(public|protected|private)\\s*(" + formField.getElementName() + "|" + fqFormFieldName + ")", Pattern.MULTILINE).matcher(methodSource);
         if (deprecatedMatcher.find()) {
-          edit.addChild(new InsertEdit(getterMethod.getSourceRange().getOffset() + deprecatedMatcher.start(), "@" + validator.getTypeName(SignatureCache.createTypeSignature(Deprecated.class.getName())) + NL));
+          edit.addChild(new InsertEdit(getterMethod.getSourceRange().getOffset() + deprecatedMatcher.start(), "@" + validator.getTypeName(SignatureCache.createTypeSignature(Deprecated.class.getName())) + nl));
         }
         Matcher returnMatcher = Pattern.compile("(\\s*return\\s*)getFieldByClass\\([^;]*\\;", Pattern.MULTILINE).matcher(methodSource);
         if (returnMatcher.find()) {
@@ -310,7 +310,6 @@ public class CreateTemplateOperation implements IOperation {
     for (IType childField : ScoutTypeUtility.getFormFields(formField, hierarchy)) {
       updateFormFieldGetter(childField, templateFieldGetter, templateFormFields, validator, edit, hierarchy);
     }
-
   }
 
   protected void createFormFieldGetter(IType type, IType formType, TreeMap<CompositeObject, IJavaElement> siblings, HashMap<String, P_FormField> getterMethods, org.eclipse.scout.sdk.util.typecache.ITypeHierarchy hierarchy, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {

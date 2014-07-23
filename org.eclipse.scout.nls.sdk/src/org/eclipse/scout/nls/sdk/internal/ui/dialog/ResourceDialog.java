@@ -68,8 +68,8 @@ public class ResourceDialog extends TitleAreaDialog {
   @Override
   protected Control createDialogArea(Composite parent) {
     Composite rootArea = new Composite(parent, SWT.NONE);
-    Tree m_tree = new Tree(rootArea, SWT.SINGLE);
-    m_viewer = new TreeViewer(m_tree);
+    Tree tree = new Tree(rootArea, SWT.SINGLE);
+    m_viewer = new TreeViewer(tree);
     m_viewer.addSelectionChangedListener(new ISelectionChangedListener() {
       @Override
       public void selectionChanged(SelectionChangedEvent event) {
@@ -116,7 +116,7 @@ public class ResourceDialog extends TitleAreaDialog {
     fdata.left = new FormAttachment(0, 5);
     fdata.right = new FormAttachment(100, -5);
     fdata.bottom = new FormAttachment(100, -5);
-    m_tree.setLayoutData(fdata);
+    tree.setLayoutData(fdata);
     return rootArea;
   }
 

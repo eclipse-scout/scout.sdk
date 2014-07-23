@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.compatibility;
 
 /**
  * <h3>{@link License}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 16.02.2012
  */
@@ -47,8 +47,8 @@ public class License {
     return m_iuId;
   }
 
-  public void setInstallableUnitId(String iu_id) {
-    m_iuId = iu_id;
+  public void setInstallableUnitId(String iuId) {
+    m_iuId = iuId;
   }
 
   private String getFirstLine(String body) {

@@ -119,7 +119,7 @@ public final class JdtUtility {
             if (envVersion < 1.8) {
               execEnv = executionEnvId; // take the newest supported (1.6 and 1.7 are supported on all platforms)
             }
-            else if (envVersion == 1.8) {
+            else if (Math.abs(1.8 - envVersion) < 0.0000001) {
               // 1.8 is only supported on Luna or later platforms
               if (targetPlatformVersion == null || PlatformVersionUtility.isLunaOrLater(targetPlatformVersion)) {
                 execEnv = executionEnvId; // take the newest

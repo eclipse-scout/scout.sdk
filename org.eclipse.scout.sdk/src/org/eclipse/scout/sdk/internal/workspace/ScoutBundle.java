@@ -151,26 +151,24 @@ public class ScoutBundle implements IScoutBundle {
       IProject project = bundle.getUnderlyingResource().getProject();
       if (project != null) {
         IJavaProject jp = JavaCore.create(project);
-        if (jp != null) {
-          if (jp.exists() && !jp.isReadOnly()) {
-            try {
-              IPackageFragmentRoot[] packageFragmentRoots = jp.getPackageFragmentRoots();
-              if (packageFragmentRoots != null) {
-                for (IPackageFragmentRoot root : packageFragmentRoots) {
-                  if (root != null && !root.isArchive() && !root.isReadOnly() && !root.isExternal()) {
-                    return jp;
-                  }
+        if (jp != null && jp.exists() && !jp.isReadOnly()) {
+          try {
+            IPackageFragmentRoot[] packageFragmentRoots = jp.getPackageFragmentRoots();
+            if (packageFragmentRoots != null) {
+              for (IPackageFragmentRoot root : packageFragmentRoots) {
+                if (root != null && !root.isArchive() && !root.isReadOnly() && !root.isExternal()) {
+                  return jp;
                 }
               }
             }
-            catch (JavaModelException e) {
-              BundleDescription bundleDescription = bundle.getBundleDescription();
-              if (bundleDescription != null) {
-                ScoutSdk.logError("Unable to evaluate package fragment roots of bundle '" + bundleDescription.getSymbolicName() + "'. The bundle will be handled as binary.", e);
-              }
-              else {
-                ScoutSdk.logError("Unable to evaluate package fragment roots. The bundle will be handled as binary.", e);
-              }
+          }
+          catch (JavaModelException e) {
+            BundleDescription bundleDescription = bundle.getBundleDescription();
+            if (bundleDescription != null) {
+              ScoutSdk.logError("Unable to evaluate package fragment roots of bundle '" + bundleDescription.getSymbolicName() + "'. The bundle will be handled as binary.", e);
+            }
+            else {
+              ScoutSdk.logError("Unable to evaluate package fragment roots. The bundle will be handled as binary.", e);
             }
           }
         }
@@ -279,11 +277,9 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public synchronized IEclipsePreferences getPreferences() {
-    if (m_projectPreferences == null) {
-      if (getProject() != null) {
-        IScopeContext prefScope = new ProjectScope(getProject());
-        m_projectPreferences = prefScope.getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
-      }
+    if (m_projectPreferences == null && getProject() != null) {
+      IScopeContext prefScope = new ProjectScope(getProject());
+      m_projectPreferences = prefScope.getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
     }
     return m_projectPreferences;
   }
