@@ -83,6 +83,7 @@ public interface IRuntimeClasses {
   String DefaultServiceFactory = "org.eclipse.scout.service.DefaultServiceFactory"; // NO_UCD
   String CopyWidthsOfColumnsMenu = "org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu"; // NO_UCD
   String LocalLookupCall = "org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall"; // NO_UCD
+  String CodeLookupCall = "org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall"; // NO_UCD
   String Order = "org.eclipse.scout.commons.annotations.Order"; // NO_UCD
   String Ranking = "org.eclipse.scout.commons.annotations.Priority"; // NO_UCD
   String SearchFilter = "org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter"; // NO_UCD
