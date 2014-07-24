@@ -217,9 +217,13 @@ public class PropertyViewConfig {
   }
 
   private void loadType(Element type) {
-    if (type == null) return;
+    if (type == null) {
+      return;
+    }
     String name = type.getAttribute(PROP_TYPE_NAME);
-    if (name == null || name.trim().length() < 1) return;
+    if (!StringUtility.hasText(name)) {
+      return;
+    }
 
     HashMap<String, Config> c = new HashMap<String, Config>(20);
     m_typeConfigs.put(name, c);
@@ -253,8 +257,12 @@ public class PropertyViewConfig {
 
   private Double parseOrder(String order) {
     try {
-      if (order == null || order.trim().length() < 1) return null;
-      else return Double.parseDouble(order);
+      if (!StringUtility.hasText(order)) {
+        return null;
+      }
+      else {
+        return Double.parseDouble(order);
+      }
     }
     catch (Exception e) {
       return null;

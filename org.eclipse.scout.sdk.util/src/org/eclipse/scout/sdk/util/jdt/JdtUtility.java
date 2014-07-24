@@ -320,7 +320,7 @@ public final class JdtUtility {
       }
     }
     catch (InvalidInputException e) {
-      SdkUtilActivator.logWarning("String '" + s + "' is not a valid java string literal.");
+      SdkUtilActivator.logWarning("String '" + s + "' is not a valid java string literal.", e);
     }
     return null;
   }
@@ -442,7 +442,8 @@ public final class JdtUtility {
           IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH,
           null);
     }
-    catch (CoreException e) {
+    catch (JavaModelException e) {
+      SdkUtilActivator.logInfo("unable to wait for JDT indexes", e);
     }
   }
 

@@ -158,7 +158,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
           }
         }
         catch (CoreException e) {
-          SdkUtilActivator.logError("could not resolve class instance creation of '" + signature + "' in '" + declaringType.getFullyQualifiedName() + "'.");
+          SdkUtilActivator.logError("could not resolve class instance creation of '" + signature + "' in '" + declaringType.getFullyQualifiedName() + "'.", e);
         }
         m_canceled = true;
         return false;

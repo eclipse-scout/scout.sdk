@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * <h3>AbstractMultiValuePresenter</h3>
- * 
+ *
  * @param <T>
  */
 public abstract class AbstractMultiValuePresenter<T> extends AbstractMultiMethodPresenter<T> {
@@ -103,7 +103,7 @@ public abstract class AbstractMultiValuePresenter<T> extends AbstractMultiMethod
             storeMethods(getMethodBeans(), value);
           }
           catch (CoreException e) {
-            ScoutSdkUi.logInfo("input is not well fomed " + input);
+            ScoutSdkUi.logInfo("input is not well fomed: " + input, e);
             getTextComponent().setForeground(getTextComponent().getDisplay().getSystemColor(SWT.COLOR_RED));
           }
           break;

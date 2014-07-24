@@ -499,7 +499,7 @@ public abstract class AbstractPropertyPresenter<T> extends AbstractPresenter {
 
   /**
    * Sets the value in the presenter's model and notifies attached listeners
-   * 
+   *
    * @param newValue
    */
   protected void setValueFromUI(T newValue) {
@@ -508,7 +508,7 @@ public abstract class AbstractPropertyPresenter<T> extends AbstractPresenter {
 
   /**
    * Sets the value in the presenter's model and notifies attached listeners
-   * 
+   *
    * @param newValue
    * @param force
    *          to force set the value without equality check of new and old value
@@ -521,7 +521,7 @@ public abstract class AbstractPropertyPresenter<T> extends AbstractPresenter {
           listener.propertyChanged(m_presenterId, newValue);
         }
         catch (Exception t) {
-          // nop
+          JaxWsSdk.logError("Error in presenter value changed listener.", t);
         }
       }
     }
@@ -530,7 +530,7 @@ public abstract class AbstractPropertyPresenter<T> extends AbstractPresenter {
 
   /**
    * is called to update the presenter's UI representation
-   * 
+   *
    * @param input
    * @return
    */

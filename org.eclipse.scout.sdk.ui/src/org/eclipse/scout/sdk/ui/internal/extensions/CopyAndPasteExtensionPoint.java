@@ -66,7 +66,7 @@ public final class CopyAndPasteExtensionPoint {
             }
           }
           catch (CoreException e) {
-            ScoutSdkUi.logError("Could not create an executable extension of point '" + extension.getExtensionPointUniqueIdentifier() + "'.");
+            ScoutSdkUi.logError("Could not create an executable extension of point '" + extension.getExtensionPointUniqueIdentifier() + "'.", e);
           }
         }
       }

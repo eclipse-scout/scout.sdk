@@ -141,10 +141,10 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
         m_file.refreshLocal(IResource.DEPTH_ONE, monitor);
       }
       catch (IOException e1) {
-        NlsCore.logError("could not refresh file: " + m_file.getName());
+        NlsCore.logError("could not refresh file: " + m_file.getName(), e1);
       }
       catch (CoreException e1) {
-        NlsCore.logError("could not refresh file: " + m_file.getName());
+        NlsCore.logError("could not refresh file: " + m_file.getName(), e1);
       }
     }
   }

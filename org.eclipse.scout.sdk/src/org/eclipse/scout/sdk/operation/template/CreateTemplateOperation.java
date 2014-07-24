@@ -141,7 +141,7 @@ public class CreateTemplateOperation implements IOperation {
           }
         }
         catch (JavaModelException e) {
-          ScoutSdk.logWarning("Could not create template.");
+          ScoutSdk.logWarning("Could not create template.", e);
         }
       }
     };

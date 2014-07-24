@@ -181,7 +181,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
         setParent(NlsCore.getNlsWorkspace().getNlsProject(new Object[]{superType}));
       }
       catch (CoreException e) {
-        NlsCore.logError("parent of NLS project could not be found. Looked for type '" + superType.getFullyQualifiedName() + "'");
+        NlsCore.logError("parent of NLS project could not be found. Looked for type '" + superType.getFullyQualifiedName() + "'", e);
       }
     }
   }

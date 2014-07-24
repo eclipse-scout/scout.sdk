@@ -218,7 +218,7 @@ public class SqlMethodIvocationVisitor extends DefaultAstVisitor {
             m_currentStatment.setLength(length);
           }
           catch (JavaModelException e) {
-            ScoutSdk.logWarning("could not determ location in resource '" + m_serviceMethod.getElementName() + "' on type '" + m_serviceMethod.getDeclaringType().getFullyQualifiedName() + "'.");
+            ScoutSdk.logWarning("could not determ location in resource '" + m_serviceMethod.getElementName() + "' on type '" + m_serviceMethod.getDeclaringType().getFullyQualifiedName() + "'.", e);
           }
           m_statements.add(m_currentStatment);
         }

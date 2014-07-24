@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link ScoutBundlesUpdateFormDataOperation}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 23.02.2013
  */
@@ -59,7 +59,7 @@ public class ScoutBundlesUpdateFormDataOperation implements IOperation {
         updateOp.run(monitor, workingCopyManager);
       }
       catch (Exception e) {
-        ScoutSdk.logError("could not update form data of bundle '" + client.getSymbolicName() + "'.");
+        ScoutSdk.logError("could not update form data of bundle '" + client.getSymbolicName() + "'.", e);
       }
     }
   }

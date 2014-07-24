@@ -45,6 +45,7 @@ import org.eclipse.scout.sdk.jdt.compile.ICompileResult;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.testing.internal.SdkTestingApi;
 import org.eclipse.scout.sdk.util.internal.typecache.HierarchyCache;
 import org.eclipse.scout.sdk.util.internal.typecache.ICacheableTypeHierarchyResult;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeCache;
@@ -103,14 +104,14 @@ public final class TestWorkspaceUtility {
     Job delJob = new Job("") {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
-        try {
-          for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+        for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
+          try {
             p.refreshLocal(IResource.DEPTH_INFINITE, monitor);
             p.delete(true, true, monitor);
           }
-        }
-        catch (Exception e) {
-          //nop
+          catch (Exception e) {
+            SdkTestingApi.logWarning("Unable to delete project '" + p + "'.", e);
+          }
         }
         return Status.OK_STATUS;
       }
@@ -398,7 +399,7 @@ public final class TestWorkspaceUtility {
       }
     }
     catch (IOException e) {
-      Assert.fail(e.getMessage());
+      throw new CoreException(new ScoutStatus(e));
     }
     finally {
       if (reader != null) {

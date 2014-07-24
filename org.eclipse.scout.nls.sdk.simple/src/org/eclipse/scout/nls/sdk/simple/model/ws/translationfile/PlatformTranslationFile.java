@@ -25,7 +25,7 @@ public class PlatformTranslationFile extends AbstractTranslationResource {
       parseResource(is);
     }
     catch (Exception e) {
-      NlsCore.logError("could not parse translation file: " + getLanguage().getDispalyName());
+      NlsCore.logError("could not parse translation file: " + getLanguage().getDispalyName(), e);
     }
   }
 

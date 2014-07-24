@@ -35,7 +35,6 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.wizards.NewWizardMessages;
 import org.eclipse.jdt.internal.ui.wizards.TypedElementSelectionValidator;
 import org.eclipse.jdt.internal.ui.wizards.TypedViewerFilter;
@@ -334,7 +333,7 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
           return true;
         }
         catch (JavaModelException e) {
-          JavaPlugin.log(e.getStatus()); // just log, no UI in validation
+          NlsSdkSimple.logError("could not find package fragment root", e);
         }
         return false;
       }
@@ -349,7 +348,7 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
             return (((IPackageFragmentRoot) element).getKind() == IPackageFragmentRoot.K_SOURCE);
           }
           catch (JavaModelException e) {
-            JavaPlugin.log(e.getStatus()); // just log, no UI in validation
+            NlsSdkSimple.logError("could not find package fragment root", e);
             return false;
           }
         }

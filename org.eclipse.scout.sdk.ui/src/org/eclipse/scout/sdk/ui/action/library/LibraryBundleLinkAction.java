@@ -40,8 +40,8 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link LibraryBundleLinkAction}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 12.03.2012
  */
 @SuppressWarnings("restriction")
@@ -101,7 +101,7 @@ public class LibraryBundleLinkAction extends AbstractScoutHandler {
             }
           }
           catch (CoreException e) {
-            ScoutSdkUi.logWarning("Could not determ library or not on '" + bundle.getBundleDescription().getName() + "'.");
+            ScoutSdkUi.logWarning("Could not determ library or not on '" + bundle.getBundleDescription().getName() + "'.", e);
           }
         }
       }

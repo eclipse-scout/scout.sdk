@@ -22,10 +22,11 @@ import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
+import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 
 class FineGrainedAstAnalyzer {
-  private IJavaElementDelta m_delta;
-  private ICompilationUnit m_icu;
+  private final IJavaElementDelta m_delta;
+  private final ICompilationUnit m_icu;
 
   public FineGrainedAstAnalyzer(IJavaElementDelta delta) {
     m_delta = delta;
@@ -68,7 +69,7 @@ class FineGrainedAstAnalyzer {
             }
           }
           catch (JavaModelException e1) {
-            // nop
+            SdkUtilActivator.logError(e1);
           }
         }
         return true;

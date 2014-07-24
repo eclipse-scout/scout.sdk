@@ -422,7 +422,7 @@ public final class PropertyMethodSourceUtility {
   }
 
   public static Long parseReturnParameterLong(String parameter) throws CoreException {
-    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
+    if (parameter == null || REGEX_NULL.matcher(parameter).matches() || "".equals(parameter)) {
       return null;
     }
     // handle MIN_VAL / MAX_VAL

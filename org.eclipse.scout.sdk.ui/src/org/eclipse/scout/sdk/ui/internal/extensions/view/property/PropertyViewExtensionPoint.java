@@ -90,7 +90,7 @@ public final class PropertyViewExtensionPoint {
                 orderedExtensions.put(new CompositeObject(-distanceToIPage, ext), ext);
               }
               catch (Exception t) {
-                ScoutSdkUi.logError("Could not determ load extension '" + ext.toString() + "'!");
+                ScoutSdkUi.logError("Could not determ load extension '" + ext.toString() + "'!", t);
               }
             }
             viewExtensions = CollectionUtility.arrayList(orderedExtensions.values());

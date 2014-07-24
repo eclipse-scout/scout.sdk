@@ -118,7 +118,7 @@ public class SqlServiceNewWizard extends AbstractServiceWizard {
       return true;
     }
     catch (IllegalArgumentException e) {
-      ScoutSdkUi.logWarning("validation error of operation '" + m_operation.getOperationName() + "'. " + e.getMessage());
+      ScoutSdkUi.logWarning("validation error of operation '" + m_operation.getOperationName() + "'. ", e);
       return false;
     }
     catch (CoreException e) {

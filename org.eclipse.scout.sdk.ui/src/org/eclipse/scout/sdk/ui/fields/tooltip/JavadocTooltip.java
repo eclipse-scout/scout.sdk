@@ -60,7 +60,7 @@ import org.osgi.framework.Bundle;
  * Renders JavaDoc of a given {@link IMember}.
  * <p>
  * This class is based on {@link JavadocHover}.
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 17.09.2010
  */
@@ -137,7 +137,7 @@ public class JavadocTooltip extends AbstractTooltip {
       // can happen if no browser is installed in the OS or if the browser cannot be found (not correctly registered).
       // see http://www.eclipse.org/swt/faq.php#browserlinuxrcp
       // and: https://bbs.archlinux.org/viewtopic.php?pid=266262#p266262
-      ScoutSdkUi.logError("Error creating Javadoc Tooltip: " + swterr.getMessage());
+      ScoutSdkUi.logError("Error creating Javadoc Tooltip", swterr);
       if (m_browser != null) {
         m_browser.dispose();
         m_browser = null;
@@ -202,7 +202,7 @@ public class JavadocTooltip extends AbstractTooltip {
 
   /**
    * Returns the Javadoc in HTML format.
-   * 
+   *
    * @param result
    *          the Java elements for which to get the Javadoc
    * @param activePart
@@ -258,7 +258,7 @@ public class JavadocTooltip extends AbstractTooltip {
           }
         }
         catch (JavaModelException ex) {
-          JavaPlugin.log(ex.getStatus());
+          ScoutSdkUi.logError("unable to get javadoc html", ex);
         }
         if (reader != null) {
           HTMLPrinter.addParagraph(buffer, reader);
@@ -285,7 +285,7 @@ public class JavadocTooltip extends AbstractTooltip {
 
   /**
    * Gets the label for the given member.
-   * 
+   *
    * @param member
    *          the Java member
    * @param constantValue
@@ -310,7 +310,7 @@ public class JavadocTooltip extends AbstractTooltip {
       }
     }
     catch (Exception e) {
-      ScoutSdkUi.logWarning("could not load image for '" + member.getElementName() + "'.");
+      ScoutSdkUi.logWarning("could not load image for '" + member.getElementName() + "'.", e);
     }
     return JavadocHoverUtility.addImageAndLabel(member, imageName, label.toString());
   }
@@ -335,14 +335,16 @@ public class JavadocTooltip extends AbstractTooltip {
       return HTMLPrinter.convertTopLevelFont(buffer.toString(), fontData);
     }
     catch (IOException ex) {
-      JavaPlugin.log(ex);
+      ScoutSdkUi.logError("unable to load javadoc stylesheet", ex);
       return null;
     }
     finally {
-      try {
-        if (reader != null) reader.close();
-      }
-      catch (IOException e) {
+      if (reader != null) {
+        try {
+          reader.close();
+        }
+        catch (IOException e) {
+        }
       }
     }
   }

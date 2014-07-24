@@ -190,7 +190,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
       @Override
       public void keyTraversed(TraverseEvent e) {
         if (e.detail == SWT.TRAVERSE_TAB_NEXT || e.detail == SWT.TRAVERSE_ARROW_NEXT) {
-          File f = getFileFromInpuString(m_extractTargetLocationField.getText());
+          File f = getFileFromInputString(m_extractTargetLocationField.getText());
           File existing = new File(getExtractTargetFolder());
           if (f != null && !f.equals(existing)) {
             setExtractTargetFolderInternal(f.getAbsolutePath());
@@ -218,7 +218,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     return group;
   }
 
-  private File getFileFromInpuString(String input) {
+  private File getFileFromInputString(String input) {
     try {
       if (StringUtility.hasText(input)) {
         if (input.contains(InstallTargetPlatformFileOperation.ECLIPSE_HOME_VAR)) {
@@ -243,7 +243,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
       @Override
       public void keyTraversed(TraverseEvent e) {
         if (e.detail == SWT.TRAVERSE_TAB_NEXT || e.detail == SWT.TRAVERSE_ARROW_NEXT) {
-          File f = getFileFromInpuString(m_localTargetLocationField.getText());
+          File f = getFileFromInputString(m_localTargetLocationField.getText());
           File existing = new File(getLocalTargetFolder());
           if (f != null && !f.equals(existing)) {
             setLocalTargetFolderInternal(f.getAbsolutePath());

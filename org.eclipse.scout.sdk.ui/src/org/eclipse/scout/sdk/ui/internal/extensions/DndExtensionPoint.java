@@ -57,7 +57,7 @@ public final class DndExtensionPoint {
             }
           }
           catch (CoreException e) {
-            ScoutSdkUi.logError("could not create an executable extension of point '" + extension.getExtensionPointUniqueIdentifier() + "'.");
+            ScoutSdkUi.logError("could not create an executable extension of point '" + extension.getExtensionPointUniqueIdentifier() + "'.", e);
           }
         }
       }

@@ -148,7 +148,7 @@ public final class AstUtility {
       }
     }
     catch (CoreException e) {
-      SdkUtilActivator.logError("could not parse return type of method '" + methodName + "' on type '" + typeSignature + "'");
+      SdkUtilActivator.logError("could not parse return type of method '" + methodName + "' on type '" + typeSignature + "'", e);
     }
     return null;
   }

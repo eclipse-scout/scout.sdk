@@ -109,7 +109,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 /**
  * *
  * h3>JdtTypePropertyPart</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 19.07.2010
  */
@@ -319,7 +319,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       }
     }
     catch (JavaModelException e) {
-      ScoutSdkUi.logWarning("could not create config property page for '" + getPage().getType().getFullyQualifiedName() + "'.");
+      ScoutSdkUi.logWarning("could not create config property page for '" + getPage().getType().getFullyQualifiedName() + "'.", e);
     }
   }
 

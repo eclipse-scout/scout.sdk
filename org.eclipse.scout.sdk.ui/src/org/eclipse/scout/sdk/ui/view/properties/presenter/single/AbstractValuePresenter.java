@@ -94,7 +94,7 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
 
   /**
    * to write the value to the ui component
-   * 
+   *
    * @param value
    * @return
    * @throws CoreException
@@ -103,7 +103,7 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
 
   /**
    * to parse the source input
-   * 
+   *
    * @param input
    * @return
    * @throws CoreException
@@ -112,7 +112,7 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
 
   /**
    * to parse the display input
-   * 
+   *
    * @param input
    * @return
    * @throws CoreException
@@ -174,7 +174,7 @@ public abstract class AbstractValuePresenter<T> extends AbstractMethodPresenter 
             }
           }
           catch (CoreException e) {
-            ScoutSdkUi.logInfo("input is not well formed " + input);
+            ScoutSdkUi.logInfo("input is not well formed: " + input, e);
             getTextComponent().setForeground(getTextComponent().getDisplay().getSystemColor(SWT.COLOR_RED));
           }
           break;

@@ -87,7 +87,7 @@ public final class TechnologyExtensionPoint {
                 String id = element.getAttribute(ATTR_ID);
                 String name = element.getAttribute(ATTR_NAME);
                 String category = element.getAttribute(ATTR_CATEGORY);
-                if (category != null && category.trim().length() < 1) {
+                if (!StringUtility.hasText(category)) {
                   category = null;
                 }
                 if (StringUtility.hasText(name) && StringUtility.hasText(id)) {

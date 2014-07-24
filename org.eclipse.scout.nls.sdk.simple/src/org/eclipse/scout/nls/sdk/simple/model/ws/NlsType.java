@@ -110,7 +110,7 @@ public class NlsType implements INlsType {
       loadSuperTypeHierarchy();
     }
     catch (JavaModelException e) {
-      NlsCore.logError("could not reload NLS type '" + m_type.getFullyQualifiedName() + "'");
+      NlsCore.logError("could not reload NLS type '" + m_type.getFullyQualifiedName() + "'.", e);
     }
   }
 
@@ -143,7 +143,7 @@ public class NlsType implements INlsType {
 
   /**
    * commodity
-   * 
+   *
    * @return
    */
   public IJavaProject getJavaProject() {

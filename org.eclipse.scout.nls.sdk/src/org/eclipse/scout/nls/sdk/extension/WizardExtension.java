@@ -14,7 +14,7 @@ import org.eclipse.scout.nls.sdk.internal.NlsCore;
 
 /**
  * <h4>ImportExportExtensionPoint</h4>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.1.0 (11.11.2010)
  */
@@ -38,7 +38,7 @@ public class WizardExtension {
       return m_wizard.newInstance();
     }
     catch (Exception e) {
-      NlsCore.logError("could not create a new instance of wizard '" + getName() + "'.");
+      NlsCore.logError("could not create a new instance of wizard '" + getName() + "'.", e);
       return null;
     }
   }

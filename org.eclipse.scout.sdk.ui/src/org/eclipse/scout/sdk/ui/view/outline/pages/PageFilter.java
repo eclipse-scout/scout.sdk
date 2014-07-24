@@ -60,7 +60,7 @@ public class PageFilter implements IPageFilter {
     if (regex != null) {
       regex = regex.toLowerCase();
       try {
-        if (!isRegExFilter()) {
+        if (!m_regExFilter) {
           if (!regex.endsWith("*")) {
             regex += "*";
           }

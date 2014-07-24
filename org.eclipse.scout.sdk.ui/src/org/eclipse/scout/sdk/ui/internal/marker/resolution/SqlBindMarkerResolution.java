@@ -29,7 +29,7 @@ import org.eclipse.ui.IMarkerResolution;
 
 /**
  * <h3>{@link SqlBindMarkerResolution}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 15.03.2011
  */
@@ -77,7 +77,7 @@ public class SqlBindMarkerResolution implements IMarkerResolution {
       }
     }
     catch (Exception e) {
-      ScoutSdkUi.logError("could not apply annotation resolution for bindvar '" + bindVar + "' in  '" + icuName + "'.");
+      ScoutSdkUi.logError("could not apply annotation resolution for bindvar '" + bindVar + "' in  '" + icuName + "'.", e);
     }
   }
 

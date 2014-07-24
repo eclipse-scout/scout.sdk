@@ -211,7 +211,7 @@ public final class DtoUtility {
             }
           }
           catch (CoreException e) {
-            ScoutSdk.logError("could not find generic type for form data of type '" + formField.getFullyQualifiedName() + "'.");
+            ScoutSdk.logError("could not find generic type for form data of type '" + formField.getFullyQualifiedName() + "'.", e);
           }
         }
       }

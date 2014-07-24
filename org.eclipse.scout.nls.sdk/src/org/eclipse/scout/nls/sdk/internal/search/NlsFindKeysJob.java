@@ -71,7 +71,7 @@ public class NlsFindKeysJob extends Job {
       searchScope = TextSearchScope.newSearchScope(searchScopeRessources.toArray(new IResource[searchScopeRessources.size()]), Pattern.compile(".*\\.java"), false);
     }
     catch (CoreException e) {
-      NlsCore.logError("Could not create java projects for nls search.");
+      NlsCore.logError("Could not create java projects for nls search.", e);
     }
     TextSearchEngine.create().search(searchScope, m_searchRequstor, m_searchPattern, monitor);
     return Status.OK_STATUS;

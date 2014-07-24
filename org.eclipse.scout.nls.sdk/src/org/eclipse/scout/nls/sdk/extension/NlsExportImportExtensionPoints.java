@@ -89,7 +89,7 @@ public final class NlsExportImportExtensionPoints {
           wizardExtensions.add(wizardExt);
         }
         catch (ClassNotFoundException e) {
-          NlsCore.logError("could not create an executable extension of point '" + extension.getExtensionPointUniqueIdentifier() + "'.");
+          NlsCore.logError("could not create an executable extension of point '" + extension.getExtensionPointUniqueIdentifier() + "'.", e);
         }
       }
     }

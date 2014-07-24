@@ -141,7 +141,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
         Job.getJobManager().join(ResourcesPlugin.FAMILY_AUTO_BUILD, monitor);
       }
       catch (Exception e) {
-        ScoutSdkUi.logError("error during waiting for auto build and refresh");
+        ScoutSdkUi.logError("error during waiting for auto build and refresh", e);
       }
 
       switchPerspective();
@@ -157,7 +157,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
             BasicNewProjectResourceWizard.updatePerspective(new P_ScoutPerspectiveConfigElement());
             IScoutExplorerPart ex = ScoutSdkUi.getExplorer(true);
             if (ex != null)
-              ex.expandAndSelectProjectLevel();
+            ex.expandAndSelectProjectLevel();
           }
         });
       }

@@ -87,13 +87,16 @@ public class PageFilterExpressionPresenter extends AbstractPresenter {
     m_useRegexField.setLayoutData(data);
 
     container.setLayoutData(new GridData(GridData.FILL_BOTH | GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL));
-
   }
 
   private void doVerifyInput() {
     String s = m_textField.getText();
-    if (s == null) s = "";
-    s = s.trim();
+    if (s == null) {
+      s = "";
+    }
+    else {
+      s = s.trim();
+    }
     try {
       m_textField.setBackground(null);
       String newValue = s;

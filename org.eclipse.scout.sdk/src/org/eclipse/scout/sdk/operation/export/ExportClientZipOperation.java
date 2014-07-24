@@ -179,7 +179,7 @@ public class ExportClientZipOperation implements IOperation {
       }
     }
     catch (Exception e) {
-      ScoutSdk.logWarning("could not parse application name out of the index.html in '" + destinationFolder.getFullPath() + "'");
+      ScoutSdk.logWarning("could not parse application name out of the index.html in '" + destinationFolder.getFullPath() + "'", e);
     }
     finally {
       if (reader != null) {
@@ -189,7 +189,6 @@ public class ExportClientZipOperation implements IOperation {
         catch (IOException e) {
           // void
         }
-
       }
     }
     String productName = clientModel.ProductFile.getProduct().getName();

@@ -59,6 +59,7 @@ public final class ScoutFileLocator {
         stream = resolvePlatform(bundleID, path);
       }
       catch (IOException e) {
+        ScoutSdk.logWarning(e);
       }
     }
     return stream;

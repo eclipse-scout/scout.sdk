@@ -21,6 +21,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
+import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.jdt.finegraned.AbstractFineGrainedAstMatcher;
 import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDelta;
@@ -58,14 +59,16 @@ public class JdtEventCollector {
       protected boolean processDelta(boolean match, ASTNode node, Object other) {
         if (!match) {
           try {
-
-            IJavaElement e = ((ICompilationUnit) newAst.getJavaElement()).getElementAt(node.getStartPosition());
-            if (e != null) {
-              set.add(new FineGrainedJavaElementDelta(e));
+            IJavaElement javaElement = newAst.getJavaElement();
+            if (javaElement instanceof ICompilationUnit) {
+              IJavaElement e = ((ICompilationUnit) javaElement).getElementAt(node.getStartPosition());
+              if (e != null) {
+                set.add(new FineGrainedJavaElementDelta(e));
+              }
             }
           }
           catch (JavaModelException e1) {
-            // nop
+            SdkUtilActivator.logError(e1);
           }
         }
         return true;

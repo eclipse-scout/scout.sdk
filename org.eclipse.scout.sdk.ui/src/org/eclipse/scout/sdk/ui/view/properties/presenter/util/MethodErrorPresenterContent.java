@@ -263,12 +263,15 @@ public class MethodErrorPresenterContent extends Composite {
       }
     }
     catch (IOException e) {
+      ScoutSdkUi.logError("Unable to remove line leading tabs.", e);
     }
     finally {
-      try {
-        if (reader != null) reader.close();
-      }
-      catch (IOException e1) {
+      if (reader != null) {
+        try {
+          reader.close();
+        }
+        catch (IOException e1) {
+        }
       }
     }
     return newBody.toString();
