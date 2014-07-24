@@ -143,7 +143,7 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
 
   @Override
   protected FontSpec parseSourceInput(String input) throws CoreException {
-    if (input.equals("")) {
+    if ("".equals(input)) {
       return getDefaultValue();
     }
     else {

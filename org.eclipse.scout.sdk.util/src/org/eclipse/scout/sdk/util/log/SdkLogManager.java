@@ -139,13 +139,13 @@ public class SdkLogManager {
     int level = IStatus.INFO | IStatus.WARNING | IStatus.ERROR | IStatus.CANCEL;
     if (!StringUtility.isNullOrEmpty(loglevel)) {
       String lowerLoglevel = loglevel.toLowerCase();
-      if (lowerLoglevel.equals("warning")) {
+      if ("warning".equals(lowerLoglevel)) {
         level = IStatus.WARNING | IStatus.ERROR | IStatus.CANCEL;
       }
-      else if (lowerLoglevel.equals("error")) {
+      else if ("error".equals(lowerLoglevel)) {
         level = IStatus.ERROR | IStatus.CANCEL;
       }
-      else if (lowerLoglevel.equals("cancel")) {
+      else if ("cancel".equals(lowerLoglevel)) {
         level = IStatus.CANCEL;
       }
     }

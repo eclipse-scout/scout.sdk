@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>{@link AbstractNlsTextCompletionComputer}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 23.10.2013
  */
@@ -56,11 +56,11 @@ public abstract class AbstractNlsTextCompletionComputer implements IJavaCompleti
     int offset = context.getInvocationOffset();
     IDocument doc = context.getDocument();
     if (doc == null || offset > doc.getLength()) {
-      return null;
+      return proposals;
     }
     try {
       IRegion lineInfo = doc.getLineInformationOfOffset(offset);
-      String linePart = doc.get(lineInfo.getOffset(), lineInfo.getLength());//offset - lineInfo.getOffset());
+      String linePart = doc.get(lineInfo.getOffset(), lineInfo.getLength());
       Matcher m = PATTERN.matcher(linePart);
       int cursorPosInLine = offset - lineInfo.getOffset();
       int matchingStart = -1;

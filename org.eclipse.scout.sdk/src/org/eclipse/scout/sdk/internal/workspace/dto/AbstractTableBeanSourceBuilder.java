@@ -56,7 +56,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
  * <h3>{@link AbstractTableBeanSourceBuilder}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
@@ -89,7 +89,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     }
   }
 
-  protected IType[] getColumns(IType table, IType rowDataSuperType, final ITypeHierarchy fieldHierarchy, IProgressMonitor monitor) throws JavaModelException {
+  protected Set<IType> getColumns(IType table, IType rowDataSuperType, final ITypeHierarchy fieldHierarchy, IProgressMonitor monitor) throws JavaModelException {
     // collect all columns that exist in the table and all of its super classes
     TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<IType>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn)), new ITypeFilter() {
@@ -147,7 +147,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
       }
     }
 
-    return allColumnsUpTheHierarchy.toArray(new IType[allColumnsUpTheHierarchy.size()]);
+    return allColumnsUpTheHierarchy;
   }
 
   protected String getColumnBeanName(IType column) {
@@ -184,15 +184,14 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
     }
 
     // get all columns
-    IType[] columns = getColumns(table, rowDataSuperClassType, fieldHierarchy, monitor);
+    Set<IType> columns = getColumns(table, rowDataSuperClassType, fieldHierarchy, monitor);
     if (monitor.isCanceled()) {
       return;
     }
 
     // visit columns
-    for (int i = 0; i < columns.length; i++) {
-      IType column = columns[i];
-
+    int i = 0;
+    for (IType column : columns) {
       String columnBeanName = getColumnBeanName(column);
       String constantColName = columnBeanName;
       if (NamingUtility.isReservedJavaKeyword(constantColName)) {
@@ -218,6 +217,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
       IMethodSourceBuilder setterBuilder = MethodSourceBuilderFactory.createSetter(memberFieldBuilder);
       tableRowDataBuilder.addSortedMethodSourceBuilder(new CompositeObject(SortedMemberKeyFactory.METHOD_PROPERTY_ACCESS, i, 2, setterBuilder), setterBuilder);
 
+      i++;
       if (monitor.isCanceled()) {
         return;
       }
@@ -355,7 +355,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
 
   /**
    * Gets the row data type that is used within the given table data.
-   * 
+   *
    * @param tableData
    *          the table data that contains the row data. the type must exist.
    * @return the type that is referenced in the

@@ -577,7 +577,7 @@ public final class JaxWsSdkUtility {
               // candidate must match the port type
               IMemberValuePair[] properties = annotation.getMemberValuePairs();
               for (IMemberValuePair property : properties) {
-                if (property.getMemberName().equals("name") && property.getValue().equals(portTypeQName.getLocalPart())) {
+                if ("name".equals(property.getMemberName()) && property.getValue().equals(portTypeQName.getLocalPart())) {
                   types.add(candidate);
                   return;
                 }
@@ -663,7 +663,7 @@ public final class JaxWsSdkUtility {
               // candidate must match the service type
               IMemberValuePair[] properties = annotation.getMemberValuePairs();
               for (IMemberValuePair property : properties) {
-                if (property.getMemberName().equals("name") && property.getValue().equals(serviceQName.getLocalPart())) {
+                if ("name.".equals(property.getMemberName()) && property.getValue().equals(serviceQName.getLocalPart())) {
                   types.add(candidate);
                   return;
                 }
@@ -721,7 +721,7 @@ public final class JaxWsSdkUtility {
       return null;
     }
 
-    // ensure service to be a subtype of {@link Service}
+    // ensure service to be a subtype of Service
     if (!JaxWsSdkUtility.isJdtSubType(javax.xml.ws.Service.class.getName(), serviceType)) {
       return null;
     }
@@ -808,10 +808,11 @@ public final class JaxWsSdkUtility {
     String projectSuffex = null;
     for (int i = segments.length - 1; i >= 0; i--) {
       String segment = segments[i];
+      String segmentLow = segment.toLowerCase();
       // exclude node segment
-      if (segment.toLowerCase().equals("server") ||
-          segment.toLowerCase().equals("online") ||
-          segment.toLowerCase().equals("offline")) {
+      if ("server".equals(segmentLow) ||
+          "online".equals(segmentLow) ||
+          "offline".equals(segmentLow)) {
         continue;
       }
       projectSuffex = StringUtility.join(".", projectSuffex, segments[i]);
@@ -856,7 +857,7 @@ public final class JaxWsSdkUtility {
 
     NameConverter nameConverter = NameConverter.standard;
     try {
-      return nameConverter.toPackageName(targetNamespace); // same mechanism as JAX-WS uses. See @{link WSDLModeler#getJavaPackage} and @{link XJC#getDefaultPackageName()}
+      return nameConverter.toPackageName(targetNamespace); // same mechanism as JAX-WS uses. WSDLModeler#getJavaPackage and XJC#getDefaultPackageName()
     }
     catch (Exception e) {
       JaxWsSdk.logError("failed to convert targetNamespace into package name");
@@ -1464,10 +1465,10 @@ public final class JaxWsSdkUtility {
     String namespaceURI = null;
     try {
       for (IMemberValuePair pair : annotation.getMemberValuePairs()) {
-        if (pair.getMemberName().equals("name")) {
+        if ("name".equals(pair.getMemberName())) {
           localPart = (String) pair.getValue();
         }
-        else if (pair.getMemberName().equals("targetNamespace")) {
+        else if ("targetNamespace".equals(pair.getMemberName())) {
           namespaceURI = (String) pair.getValue();
         }
         if (namespaceURI != null && localPart != null) {

@@ -157,7 +157,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
             BasicNewProjectResourceWizard.updatePerspective(new P_ScoutPerspectiveConfigElement());
             IScoutExplorerPart ex = ScoutSdkUi.getExplorer(true);
             if (ex != null)
-            ex.expandAndSelectProjectLevel();
+              ex.expandAndSelectProjectLevel();
           }
         });
       }
@@ -180,10 +180,10 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
   private class P_ScoutPerspectiveConfigElement implements IConfigurationElement {
     @Override
     public String getAttribute(String name) {
-      if (name.equals("finalPerspective")) {
+      if ("finalPerspective".equals(name)) {
         return IScoutConstants.SCOUT_PERSPECTIVE_ID;
       }
-      else if (name.equals("preferredPerspectives")) {
+      else if ("preferredPerspectives".equals(name)) {
         return IScoutConstants.SCOUT_PERSPECTIVE_ID;
       }
       return null;

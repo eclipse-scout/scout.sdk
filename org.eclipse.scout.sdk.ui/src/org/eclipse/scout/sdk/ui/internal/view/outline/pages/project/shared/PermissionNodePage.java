@@ -27,9 +27,6 @@ public class PermissionNodePage extends AbstractScoutTypePage {
     super(SdkProperties.SUFFIX_PERMISSION);
     setParent(parent);
     setType(type);
-    // String name=type.getSimpleName();
-    // setName(name.substring(0, name.lastIndexOf("Permission")));
-
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Permission));
   }
 
@@ -40,7 +37,6 @@ public class PermissionNodePage extends AbstractScoutTypePage {
 
   @Override
   protected void loadChildrenImpl() {
-    // XXX addChild(new PermissionLevelTablePage()); //better solved in attributes view
   }
 
   @Override

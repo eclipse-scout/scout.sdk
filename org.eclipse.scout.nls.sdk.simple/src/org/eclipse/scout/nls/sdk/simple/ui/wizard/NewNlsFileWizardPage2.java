@@ -127,8 +127,6 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
 
     m_containerField = new TextButtonField(group);
     m_fieldValidator.addField(m_containerField);
-    // m_containerField.setInputFormatter(new P_RootPackageFormatter());
-    // m_containerField.setTextEnabled(false);
     m_containerField.setLabelText("Source Folder");
     m_containerField.setButtonText("Browse");
     m_containerField.addTextModifyListener(m_containerFieldModifyListener);
@@ -221,7 +219,7 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
           catch (JavaModelException e) {
             NlsCore.logWarning(e);
           }
-          if (folder.getProjectRelativePath().toOSString().equals("META-INF")) {
+          if ("META-INF".equals(folder.getProjectRelativePath().toOSString())) {
             return false;
           }
           return true;

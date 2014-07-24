@@ -32,9 +32,14 @@ public class MenuVisibilityTester extends PropertyTester {
   private static final int MENU_PREPARATION_MAX_DURATION = 15; // ms
 
   private static <T> boolean contains(T[] list, T toSearch) {
-    if (list == null) return false;
+    if (list == null) {
+      return false;
+    }
+
     for (T t : list) {
-      if (t != null && t.equals(toSearch)) return true;
+      if (t != null && t.equals(toSearch)) {
+        return true;
+      }
     }
     return false;
   }
@@ -72,7 +77,9 @@ public class MenuVisibilityTester extends PropertyTester {
 
   private static boolean isMenuAvailableInAllPages(HashMap<IPage, IContextMenuContributor> contributors) {
     for (IContextMenuContributor c : contributors.values()) {
-      if (c == null) return false;
+      if (c == null) {
+        return false;
+      }
     }
     return true;
   }

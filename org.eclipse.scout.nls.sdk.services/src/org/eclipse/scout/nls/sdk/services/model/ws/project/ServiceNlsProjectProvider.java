@@ -26,6 +26,7 @@ import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.pde.internal.core.PDECore;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.extension.INlsProjectProvider;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
@@ -54,7 +55,11 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
    * @throws JavaModelException
    */
   public static Set<IType> getRegisteredTextProviderTypes() throws JavaModelException {
-    return getRegisteredTextProviderTypes(null, null);
+    Set<IType> registeredTextProviderTypes = getRegisteredTextProviderTypes(null, null);
+    if (registeredTextProviderTypes != null) {
+      return registeredTextProviderTypes;
+    }
+    return CollectionUtility.emptyHashSet();
   }
 
   /**
@@ -275,7 +280,11 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private INlsProject getNlsProjectTree(boolean returnDocServices, Set<String> projectFilter) throws CoreException {
-    return getNlsProjectTree(getRegisteredTextProviderTypes(returnDocServices, projectFilter));
+    Set<IType> registeredTextProviderTypes = getRegisteredTextProviderTypes(returnDocServices, projectFilter);
+    if (registeredTextProviderTypes == null) {
+      return null;
+    }
+    return getNlsProjectTree(registeredTextProviderTypes);
   }
 
   private INlsProject getNlsProjectTree(Set<IType> textProviderServices) throws CoreException {
@@ -300,7 +309,6 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       else if (root == null) {
         // first Type in the chain could not be parsed.
         // this is also the Type that e.g. the editor would show -> show error
-        //NlsCore.logError("The NLS Service for Type " + type.getFullyQualifiedName() + " could not be parsed.");
         throw new CoreException(new ScoutStatus("The NLS Service for Type " + type.getFullyQualifiedName() + " could not be parsed."));
       }
     }
@@ -308,7 +316,9 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static Set<String> getProjectNames(Set<IScoutBundle> scoutBundles) {
-    if (scoutBundles == null || scoutBundles.size() < 1) return null;
+    if (scoutBundles == null || scoutBundles.size() < 1) {
+      return null;
+    }
 
     Set<String> names = new HashSet<String>(scoutBundles.size());
     for (IScoutBundle b : scoutBundles) {

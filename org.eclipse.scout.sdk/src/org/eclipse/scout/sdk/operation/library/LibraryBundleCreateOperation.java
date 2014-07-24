@@ -163,9 +163,12 @@ public class LibraryBundleCreateOperation implements IOperation {
         for (int k = 0; k < children.length; k++) {
           IPackageFragment f = (IPackageFragment) children[k];
           String name = f.getElementName();
-          if (name.equals("")) //$NON-NLS-1$
-          name = "."; //$NON-NLS-1$
-          if ((f.hasChildren() || f.getNonJavaResources().length > 0) && names.add(name)) collector.add(f);
+          if ("".equals(name)) {
+            name = ".";
+          }
+          if ((f.hasChildren() || f.getNonJavaResources().length > 0) && names.add(name)) {
+            collector.add(f);
+          }
         }
       }
     }

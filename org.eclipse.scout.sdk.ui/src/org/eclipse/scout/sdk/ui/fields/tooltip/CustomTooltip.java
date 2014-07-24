@@ -4,12 +4,13 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.tooltip;
 
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
@@ -36,7 +37,7 @@ public class CustomTooltip extends AbstractTooltip {
 
   @Override
   protected void show(int x, int y) {
-    if (m_text == null || m_text.equals("")) {
+    if (!StringUtility.hasText(m_text)) {
       return;
     }
     super.show(x, y);

@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 
 /**
  * <h3>{@link NVPairBindVisitor}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 26.02.2011
  */
@@ -76,7 +76,6 @@ public class NVPairBindVisitor extends DefaultAstVisitor {
     else {
       return super.visit(node);
     }
-
   }
 
   @Override
@@ -84,7 +83,7 @@ public class NVPairBindVisitor extends DefaultAstVisitor {
     if (m_canceled) {
       return false;
     }
-    if (node.getFullyQualifiedName().equals("NVPair")) {
+    if ("NVPair".equals(node.getFullyQualifiedName())) {
       return false;
     }
     if (m_bindName == null) {
@@ -96,7 +95,6 @@ public class NVPairBindVisitor extends DefaultAstVisitor {
     else {
       return super.visit(node);
     }
-
   }
 
   public BindBaseNVPair getBindBase() {
@@ -105,5 +103,4 @@ public class NVPairBindVisitor extends DefaultAstVisitor {
     }
     return null;
   }
-
 }

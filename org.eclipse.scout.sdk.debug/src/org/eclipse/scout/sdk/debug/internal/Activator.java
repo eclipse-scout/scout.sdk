@@ -19,7 +19,7 @@ import org.osgi.framework.BundleContext;
 
 /**
  * <h3>{@link Activator}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 11.02.2011
  */
@@ -42,10 +42,6 @@ public class Activator extends AbstractUIPlugin {
   public Activator() {
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.eclipse.ui.plugin.AbstractUIPlugin#start(org.osgi.framework.BundleContext)
-   */
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
@@ -53,10 +49,6 @@ public class Activator extends AbstractUIPlugin {
     plugin = this;
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.eclipse.ui.plugin.AbstractUIPlugin#stop(org.osgi.framework.BundleContext)
-   */
   @Override
   public void stop(BundleContext context) throws Exception {
     plugin = null;
@@ -66,7 +58,7 @@ public class Activator extends AbstractUIPlugin {
 
   /**
    * Returns the shared instance
-   * 
+   *
    * @return the shared instance
    */
   public static Activator getDefault() {
@@ -110,19 +102,8 @@ public class Activator extends AbstractUIPlugin {
   }
 
   /**
-   * Returns the image for the given composite descriptor.
-   */
-//  public static Image getImage(CompositeImageDescriptor imageDescriptor) {
-//    return getDefault().getImageImpl(imageDescriptor);
-//  }
-//
-//  private Image getImageImpl(CompositeImageDescriptor imageDescriptor) {
-//    return getImageRegistry().get(imageDescriptor);
-//  }
-
-  /**
    * To get a cached image with one of the extensions [gif | png | jpg]
-   * 
+   *
    * @param name
    *          the name without extension located under resources/icons e.g. "person"
    * @return the cached image
@@ -142,7 +123,7 @@ public class Activator extends AbstractUIPlugin {
 
   /**
    * To get a cached image with one of the extensions [gif | png | jpg]
-   * 
+   *
    * @param name
    *          the name without extension located under resources/icons e.g. "person"
    * @return the cached image

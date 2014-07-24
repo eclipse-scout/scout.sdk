@@ -60,7 +60,6 @@ public class TextButtonField extends Composite {
 
     data = new FormData();
     data.top = new FormAttachment(0, 0);
-    // data.left = new FormAttachment(m_label,5);
     data.bottom = new FormAttachment(100, 0);
     data.right = new FormAttachment(100, 0);
     m_smartButton.setLayoutData(data);

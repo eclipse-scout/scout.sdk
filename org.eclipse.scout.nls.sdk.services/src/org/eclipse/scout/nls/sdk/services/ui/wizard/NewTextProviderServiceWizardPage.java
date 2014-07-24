@@ -208,7 +208,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
           catch (JavaModelException e) {
             NlsCore.logWarning(e);
           }
-          if (folder.getProjectRelativePath().toOSString().equals("META-INF")) {
+          if ("META-INF".equals(folder.getProjectRelativePath().toOSString())) {
             return false;
           }
           return true;
@@ -364,7 +364,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
   }
 
   protected void setClassNameInternal(String input) {
-    if (input == null || input.equals("")) {
+    if (!StringUtility.hasText(input)) {
       input = null;
     }
     setPropertyString(PROP_CLASS_NAME, input);

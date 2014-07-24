@@ -299,7 +299,6 @@ public class NlsTableCursor {
         storeText();
       }
     });
-    //m_editor.setEditor(m_editingText);
     m_editingText.open();
     m_editingText.setFocus();
   }
@@ -320,7 +319,6 @@ public class NlsTableCursor {
     if (m_editingText == null || m_editingText.isDisposed()) {
       return;
     }
-    // TableItem row = m_cursor.getRow();
     final int column = m_cursor.getColumn();
     if (!m_inputValidator.validate(m_editingText.getText(), column).isOK()) {
       disposeText();

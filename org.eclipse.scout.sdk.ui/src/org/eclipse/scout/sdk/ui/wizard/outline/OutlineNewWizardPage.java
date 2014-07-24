@@ -85,8 +85,8 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
     // default values
     m_abstractOutline = RuntimeClasses.getSuperType(IRuntimeClasses.IOutline, m_clientBundle.getJavaProject());
     m_superType = m_abstractOutline;
-    setAddToDesktop(TypeUtility.exists(getDesktopType()));
-    setAddToDesktopEnabled(TypeUtility.exists(getDesktopType()));
+    setAddToDesktop(TypeUtility.exists(m_desktopType));
+    setAddToDesktopEnabled(TypeUtility.exists(m_desktopType));
   }
 
   @Override

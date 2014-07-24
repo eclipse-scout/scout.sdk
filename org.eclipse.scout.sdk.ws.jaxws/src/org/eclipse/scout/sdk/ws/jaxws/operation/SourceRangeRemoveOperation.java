@@ -63,11 +63,6 @@ public class SourceRangeRemoveOperation implements IOperation {
 
     // write document back
     icu.getBuffer().setContents(ScoutUtility.cleanLineSeparator(icuDoc.get(), icuDoc));
-
-//    // reconcilation
-//    do not call reconcile as loosing the selection in tree otherwise
-//    workingCopyManager.reconcile(icu, monitor);
-//    workingCopyManager.unregister(icu, monitor);
   }
 
   @Override

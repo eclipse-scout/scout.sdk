@@ -75,7 +75,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
   /**
    * builds the scout bundle graph. The graph contains the new bundles after this method has finished successfully.<br>
    * This method is thread safe.
-   * 
+   *
    * @param eventCollector
    *          the collector that contains all change events that makes up the delta between the old and the new graph.
    * @param m
@@ -126,8 +126,6 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
         return false;
       }
 
-      // printAsTree(scoutBundles);
-
       m_targetPlatformBundles = getTargetPlatformBundles();
 
       Map<String, ScoutBundle> oldGraph = m_bundleGraph;
@@ -165,7 +163,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
   /**
    * gets all dependency issues (e.g. cycles) found in the last graph build.<br>
    * This method is not thread safe and only public for testing purposes.
-   * 
+   *
    * @return the messages for all issues.
    */
   public String[] getDependencyIssues() {
@@ -305,7 +303,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
    * The scout RT bundles itself are not part of the list.<br>
    * When the dependencies of a host-bundle are enhanced by fragments, the dependencies contributed by these fragments
    * are NOT considered.
-   * 
+   *
    * @return the bundle set
    */
   private static Map<String, ScoutBundle> getAllScoutBundles(Set<String> dependencyCollector, IProgressMonitor monitor) {

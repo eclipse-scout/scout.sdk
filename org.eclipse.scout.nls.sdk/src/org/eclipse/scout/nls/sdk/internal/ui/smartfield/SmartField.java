@@ -241,22 +241,6 @@ public class SmartField extends Composite {
     m_smartDialog.setSmartFieldModel(model);
   }
 
-  // public void addCheckboxSelectionListener(SelectionListener listener) {
-  // m_smartButton.addSelectionListener(listener);
-  // }
-  //
-  // public void removeCheckboxSelectionListener(SelectionListener listener) {
-  // m_smartButton.removeSelectionListener(listener);
-  // }
-  //
-  // public boolean isChecked() {
-  // return m_smartButton.getSelection();
-  // }
-  //
-  // public void setChecked(boolean checked) {
-  // m_smartButton.setSelection(checked);
-  // }
-
   @Override
   public void addFocusListener(FocusListener listener) {
     m_text.addFocusListener(listener);

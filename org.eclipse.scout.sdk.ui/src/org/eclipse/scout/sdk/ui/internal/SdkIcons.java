@@ -252,8 +252,8 @@ public interface SdkIcons {
   String RadiobuttonGroup = "radiobuttonGroup.gif";
   String RadiobuttonGroupAdd = "radiobuttonGroup_add.gif";
   String RadiobuttonGroupRemove = "radiobuttonGroup_remove.gif";
-  String FormHandlerAdd = ToolAdd; //TODO "formHandler_add";
-  String FormHandlerRemove = ToolRemove;//TODO "formHandler_remove";
+  String FormHandlerAdd = ToolAdd; //TODO
+  String FormHandlerRemove = ToolRemove;//TODO
   String Calendar = "calendar_small.gif";
   String CalendarAdd = ToolAdd;
   String CalendarRemove = ToolRemove;

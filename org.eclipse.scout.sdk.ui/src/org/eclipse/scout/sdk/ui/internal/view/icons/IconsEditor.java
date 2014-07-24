@@ -56,8 +56,12 @@ public class IconsEditor extends EditorPart {
   private Form m_form;
   private Table m_table;
   private TableViewer m_viewer;
-  private IconRowFilter m_inheritedFilter = new IconRowFilter();
   private IIconProvider m_iconProvider;
+  private final IconRowFilter m_inheritedFilter;
+
+  public IconsEditor() {
+    m_inheritedFilter = new IconRowFilter();
+  }
 
   @Override
   public void createPartControl(Composite parent) {
@@ -103,7 +107,6 @@ public class IconsEditor extends EditorPart {
   }
 
   public void setScoutSharedBundle(IScoutBundle sharedBundle) {
-    // XXX load async
     if (sharedBundle != null) {
       m_iconProvider = sharedBundle.getIconProvider();
       if (m_viewer != null && !m_viewer.getControl().isDisposed()) {
@@ -136,8 +139,6 @@ public class IconsEditor extends EditorPart {
       if (scoutProject != null && IScoutBundle.TYPE_SHARED.equals(scoutProject.getType())) {
         setScoutSharedBundle(scoutProject);
       }
-      // TODO parse file
-      // setScoutSharedBundle(BsiCaseCore.getDefault().getScoutWorkspace().getProjectGroup(file.getProject()));
     }
     setSite(site);
     setInput(input);

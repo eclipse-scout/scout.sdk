@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 
 /**
  * <h3>{@link StringVariableAssignmentVisitor}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 25.02.2011
  */
@@ -66,9 +66,8 @@ public class StringVariableAssignmentVisitor extends DefaultAstVisitor {
         m_rootNode.accept(resolveVisitor);
         m_value.append(" " + resolveVisitor.getValue() + " ");
       }
-      //else {
+      //else
       // skip in order of collecting anything
-      //}
     }
     return false;
   }

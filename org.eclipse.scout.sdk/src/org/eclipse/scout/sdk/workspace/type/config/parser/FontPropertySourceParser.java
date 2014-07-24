@@ -22,7 +22,7 @@ import org.eclipse.swt.SWT;
 
 /**
  * <h3>{@link FontPropertySourceParser}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 12.03.2013
  */
@@ -40,14 +40,14 @@ public class FontPropertySourceParser implements IPropertySourceParser<FontSpec>
       String nextToken = tok.nextToken();
       String s = nextToken.toUpperCase();
       // styles
-      if (s.equals("PLAIN")) {
+      if ("PLAIN".equals(s)) {
         fontSpec.addStyle(SWT.NORMAL);
         // nop
       }
-      else if (s.equals("BOLD")) {
+      else if ("BOLD".equals(s)) {
         fontSpec.addStyle(SWT.BOLD);
       }
-      else if (s.equals("ITALIC")) {
+      else if ("ITALIC".equals(s)) {
         fontSpec.addStyle(SWT.ITALIC);
       }
       else {

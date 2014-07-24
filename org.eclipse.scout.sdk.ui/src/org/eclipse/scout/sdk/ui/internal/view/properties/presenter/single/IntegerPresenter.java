@@ -61,7 +61,7 @@ public class IntegerPresenter extends AbstractValuePresenter<Integer> {
 
   @Override
   protected Integer parseDisplayInput(String input) throws CoreException {
-    if (input.equals("")) {
+    if ("".equals(input)) {
       return getDefaultValue();
     }
     else {

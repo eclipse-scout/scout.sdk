@@ -43,7 +43,6 @@ public class NlsProposalDescriptionProvider implements IProposalDescriptionProvi
       rootArea.setBackground(parent.getBackground());
       Set<Language> lanuageSet = nlsEntry.getAllTranslations().keySet();
       Language[] languageArr = lanuageSet.toArray(new Language[lanuageSet.size()]);
-      // Arrays.sort(languageArr, NlsCore.getLanguageDefaultComparator());
       Label keyLabel = new Label(rootArea, SWT.NONE);
       keyLabel.setBackground(rootArea.getBackground());
       keyLabel.setFont(ScoutSdkUi.getFont(ScoutSdkUi.FONT_SYSTEM_BOLD));

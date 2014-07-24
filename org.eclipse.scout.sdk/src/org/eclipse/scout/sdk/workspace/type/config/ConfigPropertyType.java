@@ -37,7 +37,7 @@ public class ConfigPropertyType {
 
   public ConfigPropertyType(IType type) throws JavaModelException {
     m_type = type;
-    m_superTypeHierarchy = TypeUtility.getSupertypeHierarchy(getType());
+    m_superTypeHierarchy = TypeUtility.getSupertypeHierarchy(type);
     m_affectedTypes = m_superTypeHierarchy.getSuperClassStack(m_type);
 
     TreeMap<String, ConfigurationMethod> configurationMethods = new TreeMap<String, ConfigurationMethod>(new P_MethodNameComparator());

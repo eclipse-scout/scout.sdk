@@ -84,7 +84,7 @@ public class TypeNewWizardPage extends AbstractWorkspaceWizardPage {
   public TypeNewWizardPage(IScoutBundle bundle, String elementName) {
     super(TypeNewWizardPage.class.getName());
     setTitle(Texts.get("CreateNewX", elementName));
-    setDescription(Texts.get("ByClickingFinishXIsCreated", getElementName()));
+    setDescription(Texts.get("ByClickingFinishXIsCreated", elementName));
 
     m_bundle = bundle;
     m_elementName = elementName;
@@ -408,17 +408,10 @@ public class TypeNewWizardPage extends AbstractWorkspaceWizardPage {
     dialog.setTitle(Texts.get("Package"));
     dialog.setMessage(Texts.get("ChoosePackageForX", getElementName()));
 
-    if (dialog.open() == Window.OK) {
-      if (dialog.getResult() != null) {
-        packageFragments = Arrays.asList(dialog.getResult()).toArray(new IPackageFragment[0]);
-      }
+    if (dialog.open() == Window.OK && dialog.getResult() != null) {
+      packageFragments = Arrays.asList(dialog.getResult()).toArray(new IPackageFragment[0]);
     }
-    if (packageFragments != null) {
-      return packageFragments;
-    }
-    else {
-      return null;
-    }
+    return packageFragments;
   }
 
   public String getElementName() {

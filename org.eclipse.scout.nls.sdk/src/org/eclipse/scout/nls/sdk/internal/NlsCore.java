@@ -92,7 +92,7 @@ public class NlsCore extends AbstractUIPlugin implements INlsIcons {
 
   /**
    * Returns the shared instance
-   * 
+   *
    * @return the shared instance
    */
   public static NlsCore getDefault() {
@@ -150,7 +150,6 @@ public class NlsCore extends AbstractUIPlugin implements INlsIcons {
   public static ImageDescriptor getImageDescriptor(String name) {
     ImageDescriptor desc = plugin.getImageRegistry().getDescriptor(name);
     if (desc == null) {
-
       // gif
       desc = imageDescriptorFromPlugin(PLUGIN_ID, imagePath + name + ".gif");
       // png
@@ -163,7 +162,6 @@ public class NlsCore extends AbstractUIPlugin implements INlsIcons {
       }
       if (desc == null) {
         System.err.println("could not find image for plugin: " + PLUGIN_ID + " under: " + imagePath + name);
-        // NlsCore.logWarning("could not find image for plugin: "+PLUGIN_ID+" under: "+imagePath+name);
       }
       plugin.getImageRegistry().put(name, desc);
     }

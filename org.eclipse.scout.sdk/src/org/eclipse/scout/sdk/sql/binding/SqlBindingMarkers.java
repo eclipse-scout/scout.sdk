@@ -85,22 +85,11 @@ public final class SqlBindingMarkers {
             }
           }
           marker.setAttribute(BIND_VARIABLE, bindVarBuilder.toString());
-//          StringBuilder text = new StringBuilder("Binding '");
-//          text.append(markerModel.getBindVariable());
-//          text.append("' could not be resolved");
-//          if (markerModel.getSeverity() == IMarker.SEVERITY_WARNING) {
-//            text.append(" (has unresolved bindings)");
-//          }
-//          text.append(".");
-//          marker.setAttribute(IMarker.MESSAGE, text.toString());
           marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
           marker.setAttribute(IMarker.CHAR_START, statement.getOffset());
           marker.setAttribute(IMarker.CHAR_END, statement.getOffset() + statement.getLength());
-//          marker.setAttribute(IMarker.SEVERITY, markerModel.getSeverity());
-//          marker.setAttribute(BIND_VARIABLE, markerModel.getBindVariable());
         }
       }
-
       catch (CoreException e) {
         ScoutSdk.logError("could not create sql bind markers of '" + method.getElementName() + "' on '" + method.getDeclaringType().getFullyQualifiedName() + "'.", e);
       }

@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 
 /**
  * <h3>{@link BindBasesVisitor}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 25.02.2011
  */
@@ -91,38 +91,6 @@ public class BindBasesVisitor extends DefaultAstVisitor {
         m_currentBase = base;
       }
     }
-//    if (m_currentBase != null) {
-//      if (m_currentBase instanceof BindBaseFormData) {
-//        BindBaseFormData bindBase = (BindBaseFormData) m_currentBase;
-//        // if first check availability
-//        if (!bindBase.hasSegments()) {
-//          VariableType resolveVariable = AstUtility.resolveVariable(node.getFullyQualifiedName(), m_serviceMethod, m_rootNode, node);
-//          if (m_formDataNames.contains(node.getFullyQualifiedName())) {
-//            bindBase.addSegment(node.getFullyQualifiedName());
-//          }
-//          else {
-//            // resolve
-//            ReferencedBindBaseVisitor referencedBindBaseVisitor = new ReferencedBindBaseVisitor(node.getFullyQualifiedName(), m_rootNode, node, m_formDataNames);
-//            m_rootNode.accept(referencedBindBaseVisitor);
-//            m_bindBases.add(referencedBindBaseVisitor.getBindBase());
-//          }
-//        }
-//        else {
-//          bindBase.addSegment(node.getFullyQualifiedName());
-//        }
-//      }
-//    }
-//    else {
-//      if (m_formDataNames.contains(node.getFullyQualifiedName())) {
-//        m_bindBases.add(new BindBaseFormData(node.getFullyQualifiedName()));
-//      }
-//      else {
-//        // resolve
-//        ReferencedBindBaseVisitor referencedBindBaseVisitor = new ReferencedBindBaseVisitor(node.getFullyQualifiedName(), m_rootNode, node, m_formDataNames);
-//        m_rootNode.accept(referencedBindBaseVisitor);
-//        m_bindBases.add(referencedBindBaseVisitor.getBindBase());
-//      }
-//    }
     return false;
   }
 
@@ -180,7 +148,6 @@ public class BindBasesVisitor extends DefaultAstVisitor {
         m_bindBases.add(base);
       }
     }
-    //  new TableHolderFilter(formData.getParticipantTable(), ITableHolder.STATUS_DELETED)
 
     // handle new FormData
     return false;

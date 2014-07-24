@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.ui.internal.jdt;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -33,10 +35,13 @@ import org.eclipse.swt.widgets.Shell;
  * <h3>JdtRenameTransaction</h3>
  */
 public class JdtRenameTransaction {
-  private final ArrayList<RenameSupport> m_list = new ArrayList<RenameSupport>();
-  private final HashSet<ICompilationUnit> m_touchedCompilationUntis = new HashSet<ICompilationUnit>();
+
+  private final List<RenameSupport> m_list;
+  private final Set<ICompilationUnit> m_touchedCompilationUntis;
 
   public JdtRenameTransaction() {
+    m_list = new ArrayList<RenameSupport>();
+    m_touchedCompilationUntis = new HashSet<ICompilationUnit>();
   }
 
   public static int getDefaultFlags() {
@@ -59,7 +64,6 @@ public class JdtRenameTransaction {
 
   public void add(ILocalVariable e, String newName) throws CoreException {
     addRenameSupport(RenameSupport.create(e, newName, getDefaultFlags()));
-
   }
 
   public void add(IMethod e, String newName) throws CoreException {
@@ -99,7 +103,6 @@ public class JdtRenameTransaction {
     }
     // do it
     try {
-      // Shell shell=SDEUI.getShell();
       for (RenameSupport r : m_list) {
         r.perform(shell, new ProgressMonitorDialog(shell));
       }

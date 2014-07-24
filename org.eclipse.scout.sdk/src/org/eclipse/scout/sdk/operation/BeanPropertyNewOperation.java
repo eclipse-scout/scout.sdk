@@ -90,12 +90,6 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     workingCopyManager.register(m_declaringType.getCompilationUnit(), monitor);
-//    ArrayList<String> imports = new ArrayList<String>();
-//    String beanTypeString = ScoutSdkUtility.getSimpleTypeSignature(getBeanTypeSignature(), imports);
-//    for (String imp : imports) {
-//      m_declaringType.createImport(imp, monitor);
-//    }
-
     // field
     String memberName;
     if (m_correctSpelling) {
@@ -122,7 +116,6 @@ public class BeanPropertyNewOperation implements IBeanPropertyNewOperation, IOpe
     if (isCreateGetterMethod()) {
       String prefix = "get";
       if (Signature.SIG_BOOLEAN.equals(getBeanTypeSignature())) {
-        //    if (beanTypeString.equals("boolean")) {
         prefix = "is";
       }
       String getterName = prefix + NamingUtility.ensureStartWithUpperCase(getBeanName());

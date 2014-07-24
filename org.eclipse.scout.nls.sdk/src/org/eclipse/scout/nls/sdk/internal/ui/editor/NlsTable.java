@@ -49,7 +49,7 @@ import org.eclipse.swt.widgets.TableItem;
 
 /**
  * The represenation of a NlsProject.
- * 
+ *
  * @see AbstractNlsProject
  * @see NlsTableModel
  */
@@ -218,8 +218,6 @@ public class NlsTable extends Composite {
       m_viewer.getTable().setRedraw(false);
       m_tableModel = model;
 
-      //final Language[] allLangs = m_tableModel.getProjects().getAllLanguages();
-
       createColumns(m_table);
       m_viewer.setLabelProvider(m_tableModel);
       m_viewer.setContentProvider(m_tableModel);
@@ -362,7 +360,6 @@ public class NlsTable extends Composite {
     }
     else {
       m_viewer.refresh(row);
-      //m_viewer.update(row, null);
     }
   }
 

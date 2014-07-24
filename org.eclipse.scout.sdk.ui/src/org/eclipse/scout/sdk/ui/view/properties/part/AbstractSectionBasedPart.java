@@ -34,7 +34,7 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
 
 /**
  * <h3>AbstractSectionBasedPart</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 20.07.2010
  */
@@ -285,9 +285,7 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
         m_statusText.setText(status.getMessage());
       }
       getForm().reflow(true);
-//      m_sectionContainer.layout(true, true);
     }
-
   }
 
   private IStatus getHighestSeverityStatus(IStatus status, IStatus highestSeverity) {

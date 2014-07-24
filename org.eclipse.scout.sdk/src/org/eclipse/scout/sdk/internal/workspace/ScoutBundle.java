@@ -123,12 +123,12 @@ public class ScoutBundle implements IScoutBundle {
     m_directDependencies = getDirectDependenciesImpl(bundle);
     m_type = RuntimeBundles.getBundleType(this);
     m_javaProject = getJavaProject(bundle);
-    m_isBinary = getJavaProject() == null;
-    m_project = isBinary() ? null : getJavaProject().getProject();
+    m_isBinary = m_javaProject == null;
+    m_project = m_isBinary ? null : getJavaProject().getProject();
     m_symbolicName = bundle.getBundleDescription().getSymbolicName();
     m_defaultComparator = ScoutBundleComparators.getSymbolicNameLevenshteinDistanceComparator(m_symbolicName);
     m_isFragment = bundle.getBundleDescription().getHost() != null;
-    m_id = "{" + m_symbolicName + "@type=" + m_type + "@fragment=" + isFragment() + "@binary=" + m_isBinary + "}";
+    m_id = "{" + m_symbolicName + "@type=" + m_type + "@fragment=" + m_isFragment + "@binary=" + m_isBinary + "}";
     m_hash = m_id.hashCode();
 
     m_nlsProjectHolder = null;
@@ -199,7 +199,7 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if (!(obj instanceof ScoutBundle)) {
       return false;
     }
     return toString().equals(obj.toString());

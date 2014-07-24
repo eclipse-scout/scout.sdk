@@ -57,7 +57,7 @@ public final class PropertyViewExtensionPoint {
             for (IExtension extension : extensions) {
               Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
               for (IConfigurationElement partExtension : extension.getConfigurationElements()) {
-                if (partExtension.getName().equals("part")) {
+                if ("part".equals(partExtension.getName())) {
                   long ranking = -1;
                   String rankingAttribute = partExtension.getAttribute(IRuntimeClasses.EXTENSION_SERVICE_RANKING);
                   if (!StringUtility.isNullOrEmpty(rankingAttribute)) {
@@ -71,10 +71,10 @@ public final class PropertyViewExtensionPoint {
                     tmp.put(pageClass, pageExt);
                   }
                   for (IConfigurationElement part : partExtension.getChildren()) {
-                    if (part.getName().equals("singlePart")) {
+                    if ("singlePart".equals(part.getName())) {
                       pageExt.setSingleViewPartClazz(getClassOfElement(contributerBundle, part.getAttribute("viewPart"), ISinglePropertyViewPart.class), ranking);
                     }
-                    else if (part.getName().equals("multiPart")) {
+                    else if ("multiPart".equals(part.getName())) {
                       pageExt.setMultiViewPartClazz(getClassOfElement(contributerBundle, part.getAttribute("viewPart"), IMultiPropertyViewPart.class), ranking);
                     }
                   }

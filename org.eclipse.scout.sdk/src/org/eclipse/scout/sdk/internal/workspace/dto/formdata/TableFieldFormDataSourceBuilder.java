@@ -50,14 +50,14 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link TableFieldFormDataSourceBuilder}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
 public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder {
   private static final Pattern CONSTANT_NAME_PATTERN = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
   private static final String COLUMN_ID_SUFFIX = "_COLUMN_ID";
-  private static final String OBJECT_SIG = SignatureCache.createTypeSignature(Object.class.getName()); // Ljava.lang.Object;
+  private static final String OBJECT_SIG = SignatureCache.createTypeSignature(Object.class.getName());
 
   private FormDataAnnotation m_formDataAnnotation;
 

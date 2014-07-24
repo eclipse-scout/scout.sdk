@@ -149,7 +149,7 @@ public class WsStubGenerationOperation implements IOperation {
           else {
             for (String value : propValues) {
               // escape paths containing whitespace characters
-              if (propName.equals("b") && StringUtility.hasText(value) && value.matches(".*\\s.*") && !value.startsWith("\\")) {
+              if ("b".equals(propName) && StringUtility.hasText(value) && value.matches(".*\\s.*") && !value.startsWith("\\")) {
                 value = "\"" + value + "\"";
               }
               String directive = StringUtility.join("=", propName, value);
@@ -346,7 +346,7 @@ public class WsStubGenerationOperation implements IOperation {
     if (vmRootFolder == null) {
       return null;
     }
-    if (vmRootFolder.getName().equalsIgnoreCase("jre")) {
+    if ("jre".equalsIgnoreCase(vmRootFolder.getName())) {
       vmRootFolder = vmRootFolder.getParentFile();
     }
 

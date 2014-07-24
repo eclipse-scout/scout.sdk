@@ -46,7 +46,7 @@ public class JdtEventCollector {
     ASTParser parser = AstUtility.newParser();
     parser.setCompilerOptions(JavaCore.getOptions());
     parser.setKind(ASTParser.K_COMPILATION_UNIT);
-    parser.setSource(getCompilationUnit());
+    parser.setSource(m_icu);
     return (CompilationUnit) parser.createAST(null);
   }
 

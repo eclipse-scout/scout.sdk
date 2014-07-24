@@ -58,7 +58,7 @@ public class BigDecimalPresenter extends AbstractValuePresenter<BigDecimal> {
 
   @Override
   protected BigDecimal parseSourceInput(String input) throws CoreException {
-    if (input.equals("")) {
+    if ("".equals(input)) {
       return getDefaultValue();
     }
     else {

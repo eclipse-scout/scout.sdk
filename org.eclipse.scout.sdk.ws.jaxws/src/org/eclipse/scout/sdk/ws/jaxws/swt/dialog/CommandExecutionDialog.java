@@ -125,7 +125,6 @@ public class CommandExecutionDialog extends TitleAreaDialog {
 
     form.updateToolBar();
     form.reflow(true);
-    // form.getShell().layout();
 
     return composite;
   }

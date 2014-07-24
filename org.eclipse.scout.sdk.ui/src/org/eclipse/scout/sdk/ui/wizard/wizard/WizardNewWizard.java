@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link WizardNewWizard}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 19.05.2011
  */
@@ -28,7 +28,7 @@ public class WizardNewWizard extends AbstractWorkspaceWizard {
   public WizardNewWizard(IScoutBundle clientBundle) {
     setWindowTitle(Texts.get("NewWizard"));
     m_clientBundle = clientBundle;
-    m_page1 = new WizardNewWizardPage(getClientBundle());
+    m_page1 = new WizardNewWizardPage(m_clientBundle);
     addPage(m_page1);
   }
 

@@ -457,7 +457,6 @@ public class ProposalTextField extends TextField {
                 if (!StringUtility.equalsIgnoreCase(text, input)) {
                   acceptProposalInternal(null);
                 }
-                // notifyAcceptProposal(m_selectedProposal);
                 closePopup();
               }
             }

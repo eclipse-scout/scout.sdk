@@ -266,11 +266,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   @Override
   public void init(IViewSite site, IMemento memento) throws PartInitException {
     super.init(site, memento);
-//    if (memento != null) {
-//      Integer linkingEnabledInteger = memento.getInteger(LINKING_ENABLED);
-//      boolean linkingEnabled = (linkingEnabledInteger != null) ? linkingEnabledInteger.intValue() == 1 : false;
     setLinkingEnabled(false);
-//    }
   }
 
   @Override

@@ -60,7 +60,7 @@ public class LinkWithEditorAction extends Action {
     init();
   }
 
-  protected void init() {
+  private void init() {
     if (m_propertyListener == null) {
       m_propertyListener = new P_PropertyListener();
     }

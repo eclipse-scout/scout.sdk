@@ -26,7 +26,7 @@ import org.eclipse.text.edits.TextEditVisitor;
 /**
  * TODO: this class is a copy of org.eclipse.jdt.internal.ui.text.correction.proposals.EditAnnotator and can be removed
  * as soon as Eclipse 3.7 support is dropped.
- * 
+ *
  * @since 3.10.0 07.01.2014
  */
 @SuppressWarnings("restriction")
@@ -51,12 +51,12 @@ public class EditAnnotator extends TextEditVisitor {
 
   @Override
   public boolean visit(MoveTargetEdit edit) {
-    return true; //rangeAdded(edit);
+    return true;
   }
 
   @Override
   public boolean visit(CopyTargetEdit edit) {
-    return true; //return rangeAdded(edit);
+    return true;
   }
 
   @Override

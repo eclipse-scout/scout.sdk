@@ -58,10 +58,6 @@ public class JavaElementSelectionDialog extends Dialog {
     newShell.setText(m_title);
   }
 
-  // @Override
-  // protected Point getInitialSize(){
-  // return new Point(300 , 300);
-  // }
   @Override
   protected Point getInitialLocation(Point initialSize) {
     if (m_initialLocation != null) {

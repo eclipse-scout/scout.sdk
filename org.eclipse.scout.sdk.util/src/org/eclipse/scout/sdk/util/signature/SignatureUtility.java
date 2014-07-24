@@ -563,7 +563,7 @@ public final class SignatureUtility {
       if (TypeUtility.exists(superType)) {
         String[] typeParameters = Signature.getTypeArguments(superTypeSignature);
         superTypeParameterSignatures = new String[typeParameters.length];
-        for (int i = 0; i < typeParameters.length; i++) {//String typeParameter: typeParameters){
+        for (int i = 0; i < typeParameters.length; i++) {
           if (Signature.getTypeSignatureKind(typeParameters[i]) == Signature.TYPE_VARIABLE_SIGNATURE) {
             superTypeParameterSignatures[i] = typeDesc.getParameterSignature(Signature.getSignatureSimpleName(typeParameters[i]));
           }
@@ -582,7 +582,7 @@ public final class SignatureUtility {
         if (TypeUtility.exists(interfaceType)) {
           String[] typeParameters = Signature.getTypeParameters(interfaceSignature);
           String[] intefaceTypeParameterSignatures = new String[typeParameters.length];
-          for (int i = 0; i < typeParameters.length; i++) {//String typeParameter: typeParameters){
+          for (int i = 0; i < typeParameters.length; i++) {
             if (Signature.getTypeSignatureKind(typeParameters[i]) == Signature.TYPE_VARIABLE_SIGNATURE) {
               intefaceTypeParameterSignatures[i] = typeDesc.getParameterSignature(Signature.getSignatureSimpleName(typeParameters[i]));
             }

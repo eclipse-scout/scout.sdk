@@ -76,7 +76,6 @@ public class NlsTablePage extends Composite {
     createContent(toolkit, form.getBody());
 
     setLayout(new FillLayout());
-    // createContent(this);
     createFormMenu(form.getToolBarManager());
     form.updateToolBar();
     attachListeners();

@@ -22,7 +22,7 @@ public class PermissionNewWizard extends AbstractWorkspaceWizard {
   public PermissionNewWizard(IScoutBundle sharedBundle) {
     m_sharedBundle = sharedBundle;
     setWindowTitle(Texts.get("NewPermission"));
-    m_page1 = new PermissionWizardPage(getSharedBundle());
+    m_page1 = new PermissionWizardPage(sharedBundle);
     addPage(m_page1);
   }
 

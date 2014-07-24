@@ -57,7 +57,7 @@ public class BigIntegerPresenter extends AbstractValuePresenter<BigInteger> {
 
   @Override
   protected BigInteger parseSourceInput(String input) throws CoreException {
-    if (input.equals("")) {
+    if ("".equals(input)) {
       return getDefaultValue();
     }
     else {

@@ -56,7 +56,7 @@ public class PageFilter implements IPageFilter {
   }
 
   private void createPattern() {
-    String regex = getFilterExpression();
+    String regex = m_filterExpression;
     if (regex != null) {
       regex = regex.toLowerCase();
       try {

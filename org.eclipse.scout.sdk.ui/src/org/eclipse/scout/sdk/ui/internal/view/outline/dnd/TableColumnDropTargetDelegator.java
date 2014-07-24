@@ -34,20 +34,17 @@ public class TableColumnDropTargetDelegator implements IDropTargetDelegator {
       }
       Object currentTargetPage = event.getCurrentTarget();
       IType targetType = null;
-//      IType declaringTable = null;
       if (currentTargetPage instanceof ColumnTablePage) {
         if (event.getCurrentLocation() != ViewerDropAdapter.LOCATION_ON) {
           return false;
         }
         targetType = ((ColumnTablePage) currentTargetPage).getColumnDeclaringType();
-//        declaringTable = ((ColumnTablePage) currentTargetPage).getColumnDeclaringType();
       }
       else if (currentTargetPage instanceof ColumnNodePage) {
         if (event.getCurrentLocation() == ViewerDropAdapter.LOCATION_ON) {
           return false;
         }
         targetType = ((ColumnNodePage) currentTargetPage).getType();
-//        declaringTable = ((ColumnNodePage) currentTargetPage).getType().getDeclaringType();
       }
       if (targetType == null) {
         return false;

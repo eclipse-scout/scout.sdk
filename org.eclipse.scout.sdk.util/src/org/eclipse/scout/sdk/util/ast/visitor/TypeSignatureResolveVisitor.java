@@ -181,17 +181,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
         if (m_methodInvocation != null) {
           m_methodInvocation.m_segments.add(node);
         }
-//        if (m_typeSignature == null) {
-//          IType declaringType = JdtUtility.findDeclaringType(m_containerElement);
-//          String resolveReturnValueSignature = AstUtility.resolveReturnValueSignature(SignatureCache.createTypeSignature(declaringType.getFullyQualifiedName()), node.getFullyQualifiedName());
-//          m_typeSignature = resolveReturnValueSignature;
-//        }
-//        else {
-//          String resolveReturnValueSignature = AstUtility.resolveReturnValueSignature(m_typeSignature, node.getFullyQualifiedName());
-//          m_typeSignature = resolveReturnValueSignature;
-//        }
         return false;
-
       default:
         if (!m_assignedSignatures.isEmpty() || m_typeSignature != null) {
           HashSet<String> newSet = new HashSet<String>();

@@ -191,7 +191,7 @@ public final class PropertyMethodSourceUtility {
    * @throws CoreException
    */
   public static Double parseReturnParameterDouble(String parameter, IMethod method, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
+    if (parameter == null || REGEX_NULL.matcher(parameter).matches() || "".equals(parameter)) {
       return null;
     }
     if ("Double.MAX_VALUE".equals(parameter)) {
@@ -277,14 +277,14 @@ public final class PropertyMethodSourceUtility {
   }
 
   public static Integer parseReturnParameterInteger(String parameter) throws CoreException {
-    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
+    if (parameter == null || REGEX_NULL.matcher(parameter).matches() || "".equals(parameter)) {
       return null;
     }
     // handle MIN_VAL / MAX_VAL
-    if (parameter.equals("Integer.MAX_VALUE")) {
+    if ("Integer.MAX_VALUE".equals(parameter)) {
       return Integer.MAX_VALUE;
     }
-    if (parameter.equals("Integer.MIN_VALUE")) {
+    if ("Integer.MIN_VALUE".equals(parameter)) {
       return Integer.MIN_VALUE;
     }
     Matcher infMatcher = REGEX_NUMBER_INFINITY.matcher(parameter);
@@ -360,7 +360,7 @@ public final class PropertyMethodSourceUtility {
    * @throws CoreException
    */
   public static BigDecimal parseReturnParameterBigDecimal(String parameter) throws CoreException {
-    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
+    if (parameter == null || REGEX_NULL.matcher(parameter).matches() || "".equals(parameter)) {
       return null;
     }
     Matcher m = REGEX_SIMPLE_BIG_DECIMAL.matcher(parameter);
@@ -380,7 +380,7 @@ public final class PropertyMethodSourceUtility {
    *           In case the value could not be parsed.
    */
   public static RoundingMode parseReturnParameterRoundingMode(String parameter) throws CoreException {
-    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
+    if (parameter == null || REGEX_NULL.matcher(parameter).matches() || "".equals(parameter)) {
       return null;
     }
     if (parameter.startsWith(RoundingMode.class.getName()) && parameter.length() > RoundingMode.class.getName().length()) {
@@ -411,7 +411,7 @@ public final class PropertyMethodSourceUtility {
    * @throws CoreException
    */
   public static BigInteger parseReturnParameterBigInteger(String parameter) throws CoreException {
-    if (REGEX_NULL.matcher(parameter).matches() || parameter.equals("")) {
+    if (parameter == null || REGEX_NULL.matcher(parameter).matches() || "".equals(parameter)) {
       return null;
     }
     Matcher m = REGEX_SIMPLE_BIG_INTEGER.matcher(parameter);
@@ -426,11 +426,11 @@ public final class PropertyMethodSourceUtility {
       return null;
     }
     // handle MIN_VAL / MAX_VAL
-    if (parameter.equals("Long.MAX_VALUE")) {
+    if ("Long.MAX_VALUE".equals(parameter)) {
       return Long.MAX_VALUE;
     }
     // handle MIN_VAL / MAX_VAL
-    if (parameter.equals("Long.MIN_VALUE")) {
+    if ("Long.MIN_VALUE".equals(parameter)) {
       return Long.MIN_VALUE;
     }
     Matcher infMatcher = REGEX_NUMBER_INFINITY.matcher(parameter);
@@ -573,7 +573,7 @@ public final class PropertyMethodSourceUtility {
   }
 
   public static String parseReturnParameterIcon(String input, IMethod method) throws CoreException {
-    if (input.equals("null")) {
+    if ("null".equals(input)) {
       return "";
     }
     Matcher matcher = REGEX_REFERENCED_VALUE.matcher(input);

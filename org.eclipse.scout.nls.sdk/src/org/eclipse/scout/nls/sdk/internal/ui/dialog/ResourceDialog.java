@@ -150,24 +150,11 @@ public class ResourceDialog extends TitleAreaDialog {
     return null;
   }
 
-  // private void attachGridData(Control c) {
-  // GridData data = new GridData();
-  // data.grabExcessHorizontalSpace = true;
-  // data.horizontalAlignment = SWT.FILL;
-  // c.setLayoutData(data);
-  // }
-
   private class P_TreeContentProvider implements ITreeContentProvider, ILabelProvider {
 
     @Override
     public Object[] getElements(Object inputElement) {
       return new Object[]{m_root};
-      // try {
-      // return m_root.members();
-      // } catch (CoreException e) {
-      // NlsCore.logWarning(e);
-      // return new Object[] {};
-      // }
     }
 
     @Override

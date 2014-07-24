@@ -61,7 +61,7 @@ public class LongPresenter extends AbstractValuePresenter<Long> {
 
   @Override
   protected Long parseDisplayInput(String input) throws CoreException {
-    if (input.equals("")) {
+    if ("".equals(input)) {
       return getDefaultValue();
     }
     else {

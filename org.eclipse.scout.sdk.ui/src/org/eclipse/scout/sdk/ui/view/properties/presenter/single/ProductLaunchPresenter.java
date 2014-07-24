@@ -56,7 +56,7 @@ import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 /**
  * <h3>{@link ProductLaunchPresenter}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 31.08.2010
  */
@@ -89,7 +89,7 @@ public class ProductLaunchPresenter extends AbstractPresenter {
     super(toolkit, parent);
     m_productFile = productFile;
     m_productName = productFile.getParent().getName() + " " + productFile.getName();
-    m_productType = ScoutUtility.getProductFileType(getProductFile());
+    m_productType = ScoutUtility.getProductFileType(m_productFile);
 
     create(getContainer());
 

@@ -671,7 +671,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
     File tempFile;
     try {
       IPath path = new Path(url.getPath());
-      if (path.getFileExtension() == null || !path.getFileExtension().equalsIgnoreCase("wsdl")) {
+      if (path.getFileExtension() == null || !"wsdl".equalsIgnoreCase(path.getFileExtension())) {
         path = path.addFileExtension("wsdl");
       }
       String filename = path.lastSegment();

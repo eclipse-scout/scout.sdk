@@ -33,7 +33,7 @@ import org.eclipse.swt.widgets.Control;
 
 /**
  * <h3>{@link MenuTypePresenter}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 03.06.2014
  */
@@ -117,7 +117,7 @@ public class MenuTypePresenter extends AbstractValuePresenter<MenuTypesConfig> {
 
   @Override
   protected MenuTypesConfig parseSourceInput(String input) throws CoreException {
-    if (input.equals("")) {
+    if ("".equals(input)) {
       return getDefaultValue();
     }
     else {

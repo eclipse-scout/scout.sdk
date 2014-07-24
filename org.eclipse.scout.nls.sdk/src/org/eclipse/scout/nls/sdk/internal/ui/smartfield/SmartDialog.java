@@ -247,7 +247,6 @@ public class SmartDialog {
     m_smartTableModel.setItems(proposals);
     m_viewer.setInput(m_smartTableModel);
     m_viewer.refresh(true);
-    // m_shell.pack();
     m_shell.layout(true);
     m_shell.setLocation(location);
     m_shell.setSize(m_defaultSize);
@@ -272,7 +271,7 @@ public class SmartDialog {
   }
 
   private class P_SmartFieldTableModel implements IStructuredContentProvider,
-  ITableLabelProvider {
+      ITableLabelProvider {
     private TreeSet<P_CompareableSmartItem> m_items = new TreeSet<P_CompareableSmartItem>();
 
     public void setItems(List<Object> items) {

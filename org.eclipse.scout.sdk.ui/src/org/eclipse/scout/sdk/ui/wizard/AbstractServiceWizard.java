@@ -115,25 +115,28 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
     // rebuild nodes
     serviceRegistrationNode.clearChildren();
     boolean defaultFound = false;
+    List<ITreeNode> createdNodes = null;
     Set<IType> sessions = ScoutTypeUtility.getSessionTypes(bundle.getJavaProject());
-    ArrayList<ITreeNode> createdNodes = new ArrayList<ITreeNode>(sessions.size());
-    int pos = 0;
-    for (IType session : sessions) {
-      boolean isServerSession = TypeUtility.getSupertypeHierarchy(session).contains(TypeUtility.getType(IRuntimeClasses.IServerSession));
-      ImageDescriptor icon = null;
-      if (isServerSession) {
-        icon = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerSession);
-      }
-      else {
-        icon = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientSession);
-      }
+    if (sessions != null) {
+      createdNodes = new ArrayList<ITreeNode>(sessions.size());
+      int pos = 0;
+      for (IType session : sessions) {
+        boolean isServerSession = TypeUtility.getSupertypeHierarchy(session).contains(TypeUtility.getType(IRuntimeClasses.IServerSession));
+        ImageDescriptor icon = null;
+        if (isServerSession) {
+          icon = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServerSession);
+        }
+        else {
+          icon = ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ClientSession);
+        }
 
-      createdNodes.add(TreeUtility.createNode(serviceRegistrationNode, TYPE_SERVICE_REG_SESSION,
-          Texts.get("UseSessionInRegistration", session.getElementName()), icon, pos++, session));
+        createdNodes.add(TreeUtility.createNode(serviceRegistrationNode, TYPE_SERVICE_REG_SESSION,
+            Texts.get("UseSessionInRegistration", session.getElementName()), icon, pos++, session));
 
-      // remember if the current default session could be found amongst all available sessions
-      if (defaultSelection != null && defaultSelection.equals(session)) {
-        defaultFound = true;
+        // remember if the current default session could be found amongst all available sessions
+        if (defaultSelection != null && defaultSelection.equals(session)) {
+          defaultFound = true;
+        }
       }
     }
 
@@ -150,10 +153,12 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
       }
 
       // activate the default session.
-      int i = 0;
-      for (IType session : sessions) {
-        locationPage.setNodeChecked(createdNodes.get(i), CompareUtility.equals(session, defaultSelection));
-        i++;
+      if (createdNodes != null && sessions != null) {
+        int i = 0;
+        for (IType session : sessions) {
+          locationPage.setNodeChecked(createdNodes.get(i), CompareUtility.equals(session, defaultSelection));
+          i++;
+        }
       }
 
       // reload

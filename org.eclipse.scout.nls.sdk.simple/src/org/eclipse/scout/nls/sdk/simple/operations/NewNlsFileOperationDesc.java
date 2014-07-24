@@ -23,6 +23,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
@@ -114,7 +115,7 @@ public class NewNlsFileOperationDesc {
   }
 
   public void setClassName(String input) {
-    if (input == null || input.equals("")) {
+    if (!StringUtility.hasText(input)) {
       input = null;
     }
     m_propertySupport.setPropertyString(PROP_CLASS_NAME, input);

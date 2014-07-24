@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 
 /**
  * <h3>{@link SqlMethodIvocationVisitor}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 25.02.2011
  */
@@ -133,67 +133,67 @@ public class SqlMethodIvocationVisitor extends DefaultAstVisitor {
   @Override
   public boolean visit(MethodInvocation node) {
     if (m_methodInvocation == null) {
-      if (node.getName().getFullyQualifiedName().equals("select")) {
+      if ("select".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 0;
         m_currentStatment = new SqlStatement();
         return true;
       }
-      else if (node.getName().getFullyQualifiedName().equals("selectLimited")) {
+      else if ("selectLimited".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 1;
         m_currentStatment = new SqlStatement();
         return true;
       }
-      else if (node.getName().getFullyQualifiedName().equals("selectInto")) {
+      else if ("selectInto".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 0;
         m_currentStatment = new SqlStatement();
         return true;
       }
-      else if (node.getName().getFullyQualifiedName().equals("selectIntoLimited")) {
+      else if ("selectIntoLimited".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 1;
         m_currentStatment = new SqlStatement();
         return true;
       }
-      else if (node.getName().getFullyQualifiedName().equals("selectStreaming")) {
+      else if ("selectStreaming".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 1;
         m_currentStatment = new SqlStatement();
         return true;
       }
-      else if (node.getName().getFullyQualifiedName().equals("selectStreamingLimited")) {
+      else if ("selectStreamingLimited".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 2;
         m_currentStatment = new SqlStatement();
         return true;
       }
-      else if (node.getName().getFullyQualifiedName().equals("insert")) {
+      else if ("insert".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 0;
         m_currentStatment = new SqlStatement();
         return true;
       }
-      else if (node.getName().getFullyQualifiedName().equals("update")) {
+      else if ("update".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 0;
         m_currentStatment = new SqlStatement();
         return true;
       }
-      else if (node.getName().getFullyQualifiedName().equals("delete")) {
+      else if ("delete".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 0;
         m_currentStatment = new SqlStatement();
         return true;
       }
-      else if (node.getName().getFullyQualifiedName().equals("callStoredProcedure")) {
+      else if ("callStoredProcedure".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 0;
         m_currentStatment = new SqlStatement();
         return true;
       }
-      else if (node.getName().getFullyQualifiedName().equals("createPlainText")) {
+      else if ("createPlainText".equals(node.getName().getFullyQualifiedName())) {
         m_methodInvocation = node;
         m_unusedParametersAfterStatement = 0;
         m_currentStatment = new SqlStatement();

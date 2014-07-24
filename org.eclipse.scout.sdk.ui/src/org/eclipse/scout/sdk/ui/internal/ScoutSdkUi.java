@@ -299,7 +299,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   /**
    * Returns the shared instance
-   * 
+   *
    * @return the shared instance
    */
   public static ScoutSdkUi getDefault() {
@@ -307,7 +307,6 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   }
 
   protected ColorRegistry createColorRegistry() {
-    // m_colorRegistry=PlatformUI.getWorkbench().getThemeManager().getCurrentTheme().getColorRegistry();
     // If we are in the UI Thread use that
     if (Display.getCurrent() != null) {
       return new ColorRegistry(Display.getCurrent());
@@ -315,8 +314,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
     if (PlatformUI.isWorkbenchRunning()) {
       return new ColorRegistry(PlatformUI.getWorkbench().getDisplay());
     }
-    // Invalid thread access if it is not the UI Thread
-    // and the workbench is not created.
+    // Invalid thread access if it is not the UI Thread and the workbench is not created.
     throw new SWTError(SWT.ERROR_THREAD_INVALID_ACCESS);
   }
 
@@ -401,7 +399,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   /**
    * To get a cached image with one of the extensions [gif | png | jpg]
-   * 
+   *
    * @param name
    *          the name without extension located under resources/icons e.g. "person"
    * @return the cached image
@@ -421,7 +419,7 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   /**
    * To get a cached image with one of the extensions [gif | png | jpg]
-   * 
+   *
    * @param name
    *          the file name (with or without extension) located under resources/icons
    * @return the cached image

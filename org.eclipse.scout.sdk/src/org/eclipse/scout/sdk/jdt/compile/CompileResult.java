@@ -20,7 +20,7 @@ import org.eclipse.scout.commons.CompositeObject;
 
 /**
  * <h3>{@link CompileResult}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 18.03.2013
  */
@@ -54,13 +54,7 @@ public class CompileResult implements ICompileResult {
   }
 
   @Override
-  public List<IMarker> getErrorWarnings() {
-    return null;
-  }
-
-  @Override
   public int getSeverity() {
     return m_severity;
   }
-
 }

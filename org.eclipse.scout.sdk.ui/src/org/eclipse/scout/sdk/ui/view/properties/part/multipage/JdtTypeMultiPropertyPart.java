@@ -45,7 +45,7 @@ import org.eclipse.swt.widgets.Display;
 
 /**
  * <h3>JdtTypeMultiPropertyPart</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 23.07.2010
  */
@@ -111,120 +111,18 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
     AbstractMultiMethodPresenter presenter = null;
     String propertyType = methodSet.getConfigAnnotationType();
 
-    if (propertyType.equals("BOOLEAN")) {
+    if ("BOOLEAN".equals(propertyType)) {
       presenter = new MultiBooleanPresenter(getFormToolkit(), parent);
       presenter.setMethodSet(methodSet);
     }
-    //else if (propertyType.equals("DOUBLE")) {
-    // multi double presenter
-    //}
-    //else if (propertyType.equals("DRAG_AND_DROP_TYPE")) {
-    // multi DRAG_AND_DROP_TYPE presenter
-    //}
-    else if (propertyType.equals("INTEGER")) {
+    else if ("INTEGER".equals(propertyType)) {
       presenter = new MultiIntegerPresenter(getFormToolkit(), parent);
       presenter.setMethodSet(methodSet);
     }
-    else if (propertyType.equals("LONG")) {
+    else if ("LONG".equals(propertyType)) {
       presenter = new MultiLongPresenter(getFormToolkit(), parent);
       presenter.setMethodSet(methodSet);
     }
-    //else if (propertyType.equals("STRING")) {
-    // multi string presenter
-    //}
-    //else if (propertyType.equals("FONT")) {
-    // multi font presenter
-    //}
-    //else if (propertyType.equals("COLOR")) {
-    // multi color presenter
-    //}
-    //else if (propertyType.equals("OBJECT")) {
-    // multi object presenter
-    //}
-    //else if (propertyType.equals("BUTTON_DISPLAY_STYLE")) {
-    // multi BUTTON_DISPLAY_STYLE presenter
-    //}
-    //else if (propertyType.equals("BUTTON_SYSTEM_TYPE")) {
-    // multi BUTTON_SYSTEM_TYPE presenter
-    //}
-    //else if (propertyType.equals("CODE_TYPE")) {
-    // multi CODE_TYPE presenter
-    //}
-    //else if (propertyType.equals("COMPOSER_ATTRIBUTE_TYPE")) {
-    // multi COMPOSER_ATTRIBUTE_TYPE presenter
-    //}
-    //else if (propertyType.equals("FILE_EXTENSIONS")) {
-    // multi FILE_EXTENSIONS presenter
-    //}
-    //else if (propertyType.equals("FORM_DISPLAY_HINT")) {
-    // multi FORM_DISPLAY_HINT presenter
-    //}
-    //else if (propertyType.equals("FORM_VIEW_ID")) {
-    // multi FORM_VIEW_ID presenter
-    //}
-    //else if (propertyType.equals("HORIZONTAL_ALIGNMENT")) {
-    // multi HORIZONTAL_ALIGNMENT presenter
-    //}
-    //else if (propertyType.equals("ICON_ID")) {
-    // multi ICON_ID presenter
-    //}
-    //else if (propertyType.equals("KEY_STROKE")) {
-    // multi key stroke presenter
-    //}
-    //else if (propertyType.equals("LOOKUP_CALL")) {
-    // multi LOOKUP_CALL presenter
-    //}
-    //else if (propertyType.equals("LOOKUP_SERVICE")) {
-    // multi LOOKUP_SERVICE presenter
-    //}
-    //else if (propertyType.equals("MASTER_FIELD")) {
-    // multi MASTER_FIELD presenter
-    //}
-    //else if (propertyType.equals("OUTLINE_ROOT_PAGE")) {
-    // multi OUTLINE_ROOT_PAGE presenter
-    //}
-    //else if (propertyType.equals("OUTLINE")) {
-    // multi OUTLINE presenter
-    //}
-    //else if (propertyType.equals("OUTLINES")) {
-    // multi OUTLINES presenter
-    //}
-    //else if (propertyType.equals("FORM")) {
-    // multi form presenter
-    //}
-    //else if (propertyType.equals("SEARCH_FORM")) {
-    // multi SEARCH_FORM presenter
-    //}
-    //else if (propertyType.equals("NLS_PROVIDER")) {
-    // multi NLS_PROVIDER presenter
-    //}
-    //else if (propertyType.equals("SQL_STYLE")) {
-    // multi sql_style presenter
-    //}
-    //else if (propertyType.equals("SQL")) {
-    // multi SQL presenter
-    //}
-    //else if (propertyType.equals("TEXT")) {
-    // multi TEXT presenter
-    //}
-    //else if (propertyType.equals("VERTICAL_ALIGNMENT")) {
-    // multi VERTICAL_ALIGNMENT presenter
-    //}
-    //else if (propertyType.equals("CHART_QNAME")) {
-    // multi CHART_QNAME presenter
-    //}
-    //else if (propertyType.equals("HOUR_OF_DAY")) {
-    // multi HOUR_OF_DAY presenter
-    //}
-    //else if (propertyType.equals("DURATION_MINUTES")) {
-    // multi DURATION_MINUTES presenter
-    //}
-    //else if (propertyType.equals("MENU_CLASS")) {
-    // multi MENU_CLASS presenter
-    //}
-    //else if (propertyType.equals("PRIMITIVE_TYPE")) {
-    // multi PRIMITIVE_TYPE presenter
-    //}
 
     // layout
     if (presenter != null) {

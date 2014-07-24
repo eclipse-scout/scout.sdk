@@ -61,8 +61,8 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>{@link JavaElementCommentBuilderService}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.10.0 12.07.2013
  */
 @SuppressWarnings("restriction")
@@ -231,7 +231,6 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
           }
           seeBuilder.append(")");
           context.setVariable(CodeTemplateContextType.SEE_TO_OVERRIDDEN_TAG, seeBuilder.toString());
-//          context.setVariable(CodeTemplateContextType.TYPENAME, JavaCore.removeJavaLikeExtension(icuSourceBuilder.getElementName()));
           String comment = evaluateTemplate(context, template);
           if (comment != null) {
             source.append(comment);
@@ -293,7 +292,6 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
           return;
         }
         CodeTemplateContext context = new CodeTemplateContext(template.getContextTypeId(), ownerProject, lineDelimiter);
-//        context.setCompilationUnitVariables(cu);
         String getterSetterName = UNDEFINED_VAR_VALUE;
         Matcher matcher = TypeUtility.BEAN_METHOD_NAME.matcher(methodSourceBuilder.getElementName());
         if (matcher.find()) {
@@ -482,7 +480,7 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
       }
       buf.append("@param ").append(paramNames[i]); //$NON-NLS-1$
     }
-    if (returnType != null && !returnType.equals("void")) { //$NON-NLS-1$
+    if (returnType != null && !"void".equals(returnType)) { //$NON-NLS-1$
       if (buf.length() > 0) {
         buf.append(lineDelimiter).append(lineStart);
       }

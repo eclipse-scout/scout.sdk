@@ -485,12 +485,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
         packageFragments = Arrays.asList(dialog.getResult()).toArray(new IPackageFragment[0]);
       }
     }
-    if (packageFragments != null) {
-      return packageFragments;
-    }
-    else {
-      return null;
-    }
+    return packageFragments;
   }
 
   private Set<String> getIllegalTypeNames() {

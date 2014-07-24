@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.core.resources.IFile;
@@ -165,8 +166,6 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
     });
     // layout
     checkBoxGroup.setLayout(new GridLayout(2, true));
-    // attachGridData(m_dynamicBinding);
-    // attachGridData(m_staticBinding);
     GridData data = new GridData();
     data.horizontalSpan = 2;
     data.grabExcessHorizontalSpace = true;
@@ -201,8 +200,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
   }
 
   protected IPluginModel chooseParentPlugin() {
-    PluginSelectionDialog dialog = new PluginSelectionDialog(PDEPlugin.getActiveWorkbenchShell(),
-        getAvailablePlugins(PDECore.getDefault().getModelManager().findModel(m_desc.getPlugin())), false);
+    PluginSelectionDialog dialog = new PluginSelectionDialog(PDEPlugin.getActiveWorkbenchShell(), PDECore.getDefault().getModelManager().getActiveModels(false), false);
     dialog.create();
     if (dialog.open() == Window.OK) {
       Object[] models = dialog.getResult();
@@ -211,21 +209,6 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
       }
     }
     return null;
-  }
-
-  private IPluginModelBase[] getAvailablePlugins(IPluginModelBase model) {
-    /**
-     * @rn imo
-     */
-    // IPluginModelBase[] plugins = PDECore.getDefault().getModelManager().getPluginsOnly();
-    IPluginModelBase[] plugins = PDECore.getDefault().getModelManager().getActiveModels(false);
-
-    // HashSet existingImports = PluginSelectionDialog.getExistingImports(model.getPluginBase());
-    ArrayList<IPluginModelBase> result = new ArrayList<IPluginModelBase>();
-    for (int i = 0; i < plugins.length; i++) {
-      result.add(plugins[i]);
-    }
-    return result.toArray(new IPluginModelBase[result.size()]);
   }
 
   @Override
@@ -359,7 +342,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
   } // end class P_NlsFileSmartFieldModel
 
   private class P_PluginModifyListener implements ModifyListener {
-    HashMap<String, IProject> m_projects = new HashMap<String, IProject>();
+    private final Map<String, IProject> m_projects = new HashMap<String, IProject>();
 
     P_PluginModifyListener() {
       // find all plugin projects in workspace
@@ -394,7 +377,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
   } // end class P_PluginModifyListener
 
   private class P_ParentPluginModifyListener implements ModifyListener {
-    HashMap<String, IPluginModelBase> m_projects = new HashMap<String, IPluginModelBase>();
+    private final Map<String, IPluginModelBase> m_projects = new HashMap<String, IPluginModelBase>();
 
     P_ParentPluginModifyListener() {
       setPlugin(m_desc.getPlugin());
@@ -422,8 +405,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
     private void setPlugin(IProject plugin) {
       if (plugin != null) {
         m_projects.clear();
-        for (IPluginModelBase model : getAvailablePlugins(PDECore.getDefault().getModelManager().findModel(plugin))) {
-
+        for (IPluginModelBase model : PDECore.getDefault().getModelManager().getActiveModels(false)) {
           m_projects.put(model.getBundleDescription().getName(), model);
         }
       }

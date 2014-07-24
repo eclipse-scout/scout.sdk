@@ -65,7 +65,7 @@ public class DoublePresenter extends AbstractValuePresenter<Double> {
 
   @Override
   protected Double parseDisplayInput(String input) throws CoreException {
-    if (input.equals("")) {
+    if ("".equals(input)) {
       return getDefaultValue();
     }
     else {

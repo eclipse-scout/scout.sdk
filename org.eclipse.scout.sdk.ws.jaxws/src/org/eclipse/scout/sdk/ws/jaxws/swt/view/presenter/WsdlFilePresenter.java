@@ -48,7 +48,7 @@ public class WsdlFilePresenter extends FilePresenter {
     ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
     wizardDialog.setPageSize(650, 350);
     wizardDialog.open();
-    // as wizard operation is asynchronously, the presenter's value is updated by setting a new value with {@link AbstractPropertyPresenter#setInput(Object)}
+    // as wizard operation is asynchronously, the presenter's value is updated by setting a new value with AbstractPropertyPresenter#setInput(Object)
     return null;
   }
 
@@ -71,7 +71,7 @@ public class WsdlFilePresenter extends FilePresenter {
 
   /**
    * Used by providers
-   * 
+   *
    * @param sunJaxWsBean
    */
   public void setSunJaxWsBean(SunJaxWsBean sunJaxWsBean) {
