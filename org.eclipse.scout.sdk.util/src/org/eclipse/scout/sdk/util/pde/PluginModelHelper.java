@@ -28,6 +28,7 @@ import org.eclipse.pde.internal.core.bundle.BundlePluginBase;
 import org.eclipse.pde.internal.core.bundle.BundlePluginModelBase;
 import org.eclipse.pde.internal.core.ibundle.IBundlePlugin;
 import org.eclipse.pde.internal.core.ibundle.IManifestHeader;
+import org.eclipse.pde.internal.core.plugin.WorkspaceExtensionsModel;
 import org.eclipse.pde.internal.core.text.bundle.BundleClasspathHeader;
 import org.eclipse.pde.internal.core.text.bundle.ExportPackageHeader;
 import org.eclipse.pde.internal.core.text.bundle.ImportPackageHeader;
@@ -39,7 +40,7 @@ import org.osgi.framework.Version;
 
 /**
  * Helper class for basic plug-in model operations.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0
  */
@@ -66,7 +67,7 @@ public class PluginModelHelper {
    * <br>
    * If there is no project in the workspace with the given name, it is searched in the plug-in registry. Then the
    * resulting instance cannot be modified.
-   * 
+   *
    * @param pluginModelBase
    *          The model base that defines the project name.
    * @throws IllegalArgumentException
@@ -82,7 +83,7 @@ public class PluginModelHelper {
    * <br>
    * If there is no project in the workspace with the given name, it is searched in the plug-in registry. Then the
    * resulting instance cannot be modified.
-   * 
+   *
    * @param projectName
    *          The name of the project.
    * @throws IllegalArgumentException
@@ -104,7 +105,7 @@ public class PluginModelHelper {
 
   /**
    * Creates a new helper that operates on the given project.
-   * 
+   *
    * @param project
    *          The project to modify.
    * @throws IllegalArgumentException
@@ -122,7 +123,7 @@ public class PluginModelHelper {
 
   /**
    * Gets the project associated with this helper.
-   * 
+   *
    * @return The project this helper was created with.
    */
   public IProject getProject() {
@@ -130,7 +131,9 @@ public class PluginModelHelper {
   }
 
   private static String getProjectRelativeResourcePath(IResource r) {
-    if (r == null) return null;
+    if (r == null) {
+      return null;
+    }
     String entry = r.getProjectRelativePath().toString();
     if (r.getType() == IResource.FOLDER) {
       if (!entry.endsWith("/")) {
@@ -154,7 +157,7 @@ public class PluginModelHelper {
      * If a dependency for the given plugin already exists (even if the existing dependency has different options), this
      * method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param pluginId
      *          The plugin ID
      * @throws CoreException
@@ -169,7 +172,7 @@ public class PluginModelHelper {
      * If a dependency for the given plugin already exists (even if the existing dependency has different options), this
      * method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param pluginId
      *          The plugin ID
      * @param reexport
@@ -185,7 +188,7 @@ public class PluginModelHelper {
      * If the given plugin is null, empty or a dependency for the given plugin already exists
      * (even if the existing dependency has different options), this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param pluginId
      *          The plugin ID
      * @param reexport
@@ -196,7 +199,9 @@ public class PluginModelHelper {
      * @throws CoreException
      */
     public void addDependency(String pluginId, boolean reexport, boolean optional) throws CoreException {
-      if (pluginId == null || pluginId.length() < 1) return;
+      if (pluginId == null || pluginId.length() < 1) {
+        return;
+      }
       synchronized (m_model.getProject()) {
         if (!existsDependency(pluginId)) {
           IPluginModelBase pluginModelBase = m_model.getBundlePluginModel();
@@ -212,7 +217,7 @@ public class PluginModelHelper {
 
     /**
      * Removes the given plugin from the dependency list of the project associated with this helper.<br>
-     * 
+     *
      * @param pluginId
      *          The plugin id to remove.
      * @throws CoreException
@@ -246,7 +251,7 @@ public class PluginModelHelper {
 
     /**
      * Checks whether the given plugin id is already in the dependency list of the project associated with this helper.
-     * 
+     *
      * @param pluginId
      *          The plugin id to check
      * @return true if the given plugin is already in the dependency list, false otherwise.
@@ -258,7 +263,7 @@ public class PluginModelHelper {
 
     /**
      * Returns all dependencies defined in the plug-in project associated with this helper.
-     * 
+     *
      * @return an array of import objects
      */
     public IPluginImport[] getAllDependencies() {
@@ -266,7 +271,9 @@ public class PluginModelHelper {
     }
 
     private IPluginImport getDependency(String pluginId) {
-      if (pluginId == null || pluginId.length() < 1) return null;
+      if (pluginId == null || pluginId.length() < 1) {
+        return null;
+      }
       for (IPluginImport existing : m_model.getPluginBase().getImports()) {
         if (existing.getId().equals(pluginId)) {
           return existing;
@@ -277,25 +284,29 @@ public class PluginModelHelper {
 
     /**
      * Checks whether the given package is already exported.
-     * 
+     *
      * @param pck
      *          The package name to check.
      * @return true, if the given package is exported, false otherwise.
      */
     public boolean existsExportPackage(IPackageFragment pck) {
-      if (pck == null) return false;
+      if (pck == null) {
+        return false;
+      }
       return existsExportPackage(pck.getElementName());
     }
 
     /**
      * Checks whether the given package name is already exported.
-     * 
+     *
      * @param packageName
      *          The package name to check.
      * @return true, if the given package is exported, false otherwise.
      */
     public boolean existsExportPackage(String packageName) {
-      if (packageName == null || packageName.length() < 1) return false;
+      if (packageName == null || packageName.length() < 1) {
+        return false;
+      }
       ExportPackageDescription[] exportPackages = m_model.getBundleDescription().getExportPackages();
       for (ExportPackageDescription epd : exportPackages) {
         if (packageName.equals(epd.getName())) {
@@ -307,7 +318,7 @@ public class PluginModelHelper {
 
     /**
      * Gets all exported packages defined in the plug-in project associated with this helper.
-     * 
+     *
      * @return an array of all exported packages (is never null).
      */
     public ExportPackageDescription[] getAllExportedPackages() {
@@ -317,13 +328,15 @@ public class PluginModelHelper {
     /**
      * Checks whether the given package name is already imported.<br>
      * Any version constraints are ignored when checking if the import exists.
-     * 
+     *
      * @param packageName
      *          The package name to check.
      * @return true, if the given package is exported, false otherwise.
      */
     public boolean existsImportPackage(String packageName) {
-      if (packageName == null || packageName.length() < 1) return false;
+      if (packageName == null || packageName.length() < 1) {
+        return false;
+      }
       ImportPackageSpecification[] importedPackages = m_model.getBundleDescription().getImportPackages();
       for (ImportPackageSpecification ips : importedPackages) {
         if (packageName.equals(ips.getName())) {
@@ -335,7 +348,7 @@ public class PluginModelHelper {
 
     /**
      * Gets all imported packages defined in the plug-in project associated with this helper.
-     * 
+     *
      * @return an array of all imported packages (is never null).
      */
     public ImportPackageSpecification[] getAllImportedPackages() {
@@ -346,14 +359,16 @@ public class PluginModelHelper {
      * Adds the given fully qualified package to the imported packages of the bundle associated with this helper.<br>
      * If an import for the given package already exists, this method does nothing (only the package name is
      * considered).
-     * 
+     *
      * @param pck
      *          The package. E.g.: org.eclipse.scout.rt.client
      * @param version
      *          The version constraint for the given import package. E.g.: [1.1.0,2.0.0)
      */
     public void addImportPackage(String pck, String version) {
-      if (pck == null || pck.length() < 1) return;
+      if (pck == null || pck.length() < 1) {
+        return;
+      }
       synchronized (m_model.getProject()) {
         if (!existsImportPackage(pck)) {
           ImportPackageHeader impHeader = getImportPackageHeader();
@@ -373,12 +388,14 @@ public class PluginModelHelper {
      * Adds the given package to the exported packages of the project associated with this helper.<br>
      * If the given package is null, empty or already in the exported list, this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param packageName
      *          The fully qualified name of the package.
      */
     public void addExportPackage(String packageName) {
-      if (packageName == null || packageName.length() < 1) return;
+      if (packageName == null || packageName.length() < 1) {
+        return;
+      }
       synchronized (m_model.getProject()) {
         if (!existsExportPackage(packageName)) {
           ExportPackageHeader expHeader = getExportPackageHeader();
@@ -391,7 +408,7 @@ public class PluginModelHelper {
     /**
      * Adds the given package to the exported packages of the project associated with this helper.<br>
      * If the given package is already in the exported list, this method does nothing.
-     * 
+     *
      * @param pck
      *          The package to add
      */
@@ -402,24 +419,28 @@ public class PluginModelHelper {
     /**
      * Removes the given package from the exported packages list of the project associated with this helper.<br>
      * This method does nothing if the give package is null.
-     * 
+     *
      * @param pck
      *          The package to remove
      */
     public void removeExportPackage(IPackageFragment pck) {
-      if (pck == null) return;
+      if (pck == null) {
+        return;
+      }
       removeExportPackage(pck.getElementName());
     }
 
     /**
      * Removes the given package from the exported packages list of the project associated with this helper.<br>
      * This method does nothing if the give package is null or empty.
-     * 
+     *
      * @param packageName
      *          The fully qualified name of the package
      */
     public void removeExportPackage(String packageName) {
-      if (packageName == null || packageName.length() < 1) return;
+      if (packageName == null || packageName.length() < 1) {
+        return;
+      }
       ExportPackageHeader expHeader = getExportPackageHeader();
       expHeader.removePackage(packageName);
       setEntryValue(Constants.EXPORT_PACKAGE, expHeader.getValue());
@@ -428,12 +449,14 @@ public class PluginModelHelper {
     /**
      * Removes the given package from the imported packages list of the project associated with this helper.<br>
      * This method does nothing if the give package is null or empty.
-     * 
+     *
      * @param packageName
      *          The fully qualified name of the package
      */
     public void removeImportPackage(String packageName) {
-      if (packageName == null || packageName.length() < 1) return;
+      if (packageName == null || packageName.length() < 1) {
+        return;
+      }
       ImportPackageHeader impHeader = getImportPackageHeader();
       impHeader.removePackage(packageName);
       setEntryValue(Constants.IMPORT_PACKAGE, impHeader.getValue());
@@ -457,21 +480,23 @@ public class PluginModelHelper {
     /**
      * Creates or updates the given manifest header key to the given value.<br>
      * This method does nothing if the given key is null or empty.
-     * 
+     *
      * @param key
      *          The key. Will be created if it does not exist.
      * @param value
      *          The value that should be set for the given key. if value is null, the key is removed from the manifest.
      */
     public void setEntryValue(String key, String value) {
-      if (key == null || key.length() < 1) return;
+      if (key == null || key.length() < 1) {
+        return;
+      }
       m_model.getBundle().setHeader(key, value);
     }
 
     /**
      * Removes the given key from the manifest.<br>
      * This method does nothing if the given key is null or empty.
-     * 
+     *
      * @param key
      *          The key to remove.
      */
@@ -481,7 +506,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the value of the given manifest header key.
-     * 
+     *
      * @param key
      *          The property name.
      * @return The value (or null if it does not exist) of the given key.
@@ -492,7 +517,7 @@ public class PluginModelHelper {
 
     /**
      * Gets all classpath entries of the project associated with this helper.
-     * 
+     *
      * @return an array with all entries.
      */
     @SuppressWarnings("unchecked")
@@ -505,24 +530,28 @@ public class PluginModelHelper {
     /**
      * Removes the given entry from the classpath.<br>
      * If a null resource is passed, this method does nothing.
-     * 
+     *
      * @param resource
      *          The entry to remove.
      */
     public void removeClasspathEntry(IResource resource) {
-      if (resource == null) return;
+      if (resource == null) {
+        return;
+      }
       removeClasspathEntry(getProjectRelativeResourcePath(resource));
     }
 
     /**
      * Removes the given entry from the classpath.<br>
      * If a null entry or empty entry is passed, this method does nothing.
-     * 
+     *
      * @param entry
      *          The entry to remove.
      */
     public void removeClasspathEntry(String entry) {
-      if (entry == null || entry.length() < 1) return;
+      if (entry == null || entry.length() < 1) {
+        return;
+      }
 
       BundleClasspathHeader h = getBundleClasspathHeader();
       h.removeLibrary(entry);
@@ -539,27 +568,33 @@ public class PluginModelHelper {
 
     /**
      * Checks whether the given entry is already in the classpath entries of the project associated with this helper.
-     * 
+     *
      * @param resource
      *          The entry to search
      * @return false if the resource is null or does not exist, true otherwise.
      */
     public boolean existsClasspathEntry(IResource resource) {
-      if (resource == null) return false;
+      if (resource == null) {
+        return false;
+      }
       return existsClasspathEntry(getProjectRelativeResourcePath(resource));
     }
 
     /**
      * Checks whether the given entry is already in the classpath entries of the project associated with this helper.
-     * 
+     *
      * @param entry
      *          The entry to search.
      * @return true if the given entry already exists, false otherwise.
      */
     public boolean existsClasspathEntry(String entry) {
-      if (entry == null || entry.length() < 1) return false;
+      if (entry == null || entry.length() < 1) {
+        return false;
+      }
       for (String e : getAllClasspathEntries()) {
-        if (e.equals(entry)) return true;
+        if (e.equals(entry)) {
+          return true;
+        }
       }
       return false;
     }
@@ -568,13 +603,17 @@ public class PluginModelHelper {
      * Adds the given classpath entry to the classpath of the project associated with this helper.<br>
      * If the resource is null, does not exist in the project or is already in the classpath, this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param resource
      *          The classpath entry to add.
      */
     public void addClasspathEntry(IResource resource) {
-      if (resource == null) return;
-      if (!resource.exists()) return;
+      if (resource == null) {
+        return;
+      }
+      if (!resource.exists()) {
+        return;
+      }
       addClasspathEntry(getProjectRelativeResourcePath(resource));
     }
 
@@ -582,12 +621,14 @@ public class PluginModelHelper {
      * Adds the given classpath entry to the classpath of the project associated with this helper.<br>
      * If the given entry is null, an empty string or already exists in the classpath, this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param entry
      *          The classpath entry to add.
      */
     public void addClasspathEntry(String entry) {
-      if (entry == null || entry.length() < 1) return;
+      if (entry == null || entry.length() < 1) {
+        return;
+      }
       synchronized (m_model.getProject()) {
         if (!existsClasspathEntry(entry)) {
           BundleClasspathHeader h = getBundleClasspathHeader();
@@ -600,30 +641,34 @@ public class PluginModelHelper {
     /**
      * Sets the version of the plug-in to the given value.<br>
      * If the given value is null, this method does nothing.
-     * 
+     *
      * @param newVersion
      *          the new version
      */
     public void setVersion(Version newVersion) {
-      if (newVersion == null) return;
+      if (newVersion == null) {
+        return;
+      }
       setVersion(newVersion.toString());
     }
 
     /**
      * Sets the version of the plug-in to the given value.<br>
      * If the given value is empty or null, this method does nothing.
-     * 
+     *
      * @param newVersion
      *          the new version
      */
     public void setVersion(String newVersion) {
-      if (newVersion == null || newVersion.length() < 1) return;
+      if (newVersion == null || newVersion.length() < 1) {
+        return;
+      }
       setEntryValue(Constants.BUNDLE_VERSION, newVersion);
     }
 
     /**
      * Gets the version of the plug-in.
-     * 
+     *
      * @return The version of this plug-in.
      */
     public Version getVersion() {
@@ -632,7 +677,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the version of the plug-in.
-     * 
+     *
      * @return The version of the plug-in.
      */
     public String getVersionAsString() {
@@ -641,7 +686,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the MANIFEST.MF file of the plug-in.
-     * 
+     *
      * @return
      */
     public IFile getFile() {
@@ -673,7 +718,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName attribute1="value1" attribute2="value2"&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full id of the extension point for which the extension should be added.
      * @param elementName
@@ -684,8 +729,12 @@ public class PluginModelHelper {
      */
     public void addSimpleExtension(String extensionPointId, String elementName, Map<String, String> attributes) throws CoreException {
       IPluginExtension pe = null;
+      WorkspaceExtensionsModel extensionsModel = m_model.getExtensionsModel();
+      if (extensionsModel == null) {
+        return; // binary bundle -> no plugin.xml IFile. Cannot modify.
+      }
       // find existing extension
-      for (IPluginExtension existing : m_model.getExtensionsModel().getExtensions().getExtensions()) {
+      for (IPluginExtension existing : extensionsModel.getExtensions().getExtensions()) {
         if (existing.getPoint().equals(extensionPointId)) {
           pe = existing;
           break;
@@ -693,12 +742,12 @@ public class PluginModelHelper {
       }
       if (pe == null) {
         // no extension for given extension point exists: create new
-        pe = m_model.getExtensionsModel().createExtension();
+        pe = extensionsModel.createExtension();
         pe.setPoint(extensionPointId);
-        m_model.getExtensionsModel().getExtensions().add(pe);
+        extensionsModel.getExtensions().add(pe);
       }
 
-      IPluginElement extension = m_model.getExtensionsModel().createElement(pe);
+      IPluginElement extension = extensionsModel.createElement(pe);
       extension.setName(elementName);
       if (attributes != null && attributes.size() > 0) {
         for (Map.Entry<String, String> entry : attributes.entrySet()) {
@@ -717,7 +766,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full id of the extension point for which the extension should be added.
      * @param elementName
@@ -737,7 +786,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName attribute1="value1" attribute2="value2"&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id.
      * @param elementName
@@ -764,7 +813,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id.
      * @param elementName
@@ -792,7 +841,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName attribute1="value1" attribute2="value2"&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id.
      * @param elementName
@@ -835,7 +884,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id.
      * @param elementName
@@ -877,7 +926,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName attribute1="value1" attribute2="value2"&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id
      * @param elementName
@@ -888,7 +937,9 @@ public class PluginModelHelper {
      */
     public IPluginElement getSimpleExtension(String extensionPointId, String elementName, Map<String, String> attributes) {
       IPluginElement[] matches = getSimpleExtensions(extensionPointId, elementName, attributes);
-      if (matches != null && matches.length > 0) return matches[0];
+      if (matches != null && matches.length > 0) {
+        return matches[0];
+      }
       return null;
     }
 
@@ -900,7 +951,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id
      * @param elementName
@@ -920,7 +971,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName attribute1="value1" attribute2="value2"&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id
      * @param elementName
@@ -943,7 +994,7 @@ public class PluginModelHelper {
      * &nbsp;&nbsp;&lt;elementName&gt;&lt;/elementName&gt;<br>
      * &lt;/extension&gt;<br>
      * </code>
-     * 
+     *
      * @param extensionPointId
      *          The full extension point id
      * @param elementName
@@ -956,7 +1007,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the plugin.xml file of the plugin.
-     * 
+     *
      * @return
      */
     public IFile getFile() {
@@ -976,26 +1027,30 @@ public class PluginModelHelper {
     /**
      * Removes the given resource from the binary build includes list.<br>
      * If the resource is null, this method does nothing.
-     * 
+     *
      * @param resource
      *          The resource to remove.
      * @throws CoreException
      */
     public void removeBinaryBuildEntry(IResource resource) throws CoreException {
-      if (resource == null) return;
+      if (resource == null) {
+        return;
+      }
       removeBinaryBuildEntry(getProjectRelativeResourcePath(resource));
     }
 
     /**
      * Removes the given token from the binary build includes list.<br>
      * If the token is null or empty, this method does nothing.
-     * 
+     *
      * @param token
      *          The token to remove.
      * @throws CoreException
      */
     public void removeBinaryBuildEntry(String token) throws CoreException {
-      if (token == null || token.length() < 1) return;
+      if (token == null || token.length() < 1) {
+        return;
+      }
       IBuildEntry entry = m_model.getBuildModel().getBuild().getEntry(BINARY_BUILD_INCLUDES);
       if (entry != null) {
         entry.removeToken(token);
@@ -1004,7 +1059,7 @@ public class PluginModelHelper {
 
     /**
      * Gets all binary build includes.
-     * 
+     *
      * @return An array containing all binary build includes of the plugin.
      */
     public String[] getBinaryBuildEntries() {
@@ -1027,28 +1082,32 @@ public class PluginModelHelper {
     /**
      * Checks whether the given resource exists in the binary build includes list of the project associated with this
      * helper.
-     * 
+     *
      * @param resource
      *          The resource to search.
      * @return true if the given resource is already in the binary build includes list, false otherwise.
      * @throws CoreException
      */
     public boolean existsBinaryBuildEntry(IResource resource) throws CoreException {
-      if (resource == null) return false;
+      if (resource == null) {
+        return false;
+      }
       return existsBinaryBuildEntry(getProjectRelativeResourcePath(resource));
     }
 
     /**
      * Checks whether the given token exists in the binary build includes list of the project associated with this
      * helper.
-     * 
+     *
      * @param token
      *          The token to search.
      * @return true if the given token is already in the binary build includes list, false otherwise.
      * @throws CoreException
      */
     public boolean existsBinaryBuildEntry(String token) throws CoreException {
-      if (token == null || token.length() < 1) return false;
+      if (token == null || token.length() < 1) {
+        return false;
+      }
       IBuildEntry entry = getBuildEntry(BINARY_BUILD_INCLUDES);
       return entry.contains(token);
     }
@@ -1058,14 +1117,18 @@ public class PluginModelHelper {
      * If no "bin.includes" exists, it is created.<br>
      * If the token is null, does not exist or is already in the list, this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param resource
      *          The resource to add.
      * @throws CoreException
      */
     public void addBinaryBuildEntry(IResource resource) throws CoreException {
-      if (resource == null) return;
-      if (!resource.exists()) return;
+      if (resource == null) {
+        return;
+      }
+      if (!resource.exists()) {
+        return;
+      }
       addBinaryBuildEntry(getProjectRelativeResourcePath(resource));
     }
 
@@ -1074,13 +1137,15 @@ public class PluginModelHelper {
      * If no "bin.includes" exists, it is created.<br>
      * If the token is null, empty or is already in the list, this method does nothing.<br>
      * This method is thread safe.
-     * 
+     *
      * @param token
      *          The token to add.
      * @throws CoreException
      */
     public void addBinaryBuildEntry(String token) throws CoreException {
-      if (token == null || token.length() < 1) return;
+      if (token == null || token.length() < 1) {
+        return;
+      }
       synchronized (m_model.getProject()) {
         IBuildEntry entry = getBuildEntry(BINARY_BUILD_INCLUDES);
         if (!entry.contains(token)) {
@@ -1091,7 +1156,7 @@ public class PluginModelHelper {
 
     /**
      * Gets the build.properties file of the plugin.
-     * 
+     *
      * @return
      */
     public IFile getFile() {
