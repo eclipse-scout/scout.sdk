@@ -121,8 +121,7 @@ public class MenuVisibilityTester extends PropertyTester {
             }
 
             IScoutHandler currentMenu = ScoutMenuContributionItemFactory.getMenuInstance(currentMenuClass);
-            if (currentMenu == null)
-            {
+            if (currentMenu == null) {
               return false; // no instance could be created -> do not show the menu
             }
 

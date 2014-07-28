@@ -220,12 +220,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
     boolean acceptsDocPart = returnDocServices == null || returnDocServices == isDocsService(candidate);
     if (acceptsDocPart) {
-      if (candidate.isReadOnly())
-      {
+      if (candidate.isReadOnly()) {
         return true; // always include all text services from the platform
       }
-      if (projects == null)
-      {
+      if (projects == null) {
         return true; // no project filter and doc filter is valid -> filter matches
       }
 

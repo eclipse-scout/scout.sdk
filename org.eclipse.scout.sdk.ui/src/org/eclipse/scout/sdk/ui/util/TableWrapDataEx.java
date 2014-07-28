@@ -176,22 +176,16 @@ public final class TableWrapDataEx {
    *          column span (1 or more)
    */
   public TableWrapDataEx(int align, int valign, int rowspan, int colspan) {
-    if (align != LEFT && align != CENTER && align != RIGHT && align != FILL
-        && align != FILL_GRAB)
-    {
+    if (align != LEFT && align != CENTER && align != RIGHT && align != FILL && align != FILL_GRAB) {
       SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, " \"align\""); //$NON-NLS-1$
     }
-    if (valign != TOP && valign != MIDDLE && valign != BOTTOM
-        && valign != FILL && valign != FILL_GRAB)
-    {
+    if (valign != TOP && valign != MIDDLE && valign != BOTTOM && valign != FILL && valign != FILL_GRAB) {
       SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, " \"valign\""); //$NON-NLS-1$
     }
-    if (rowspan < 1)
-    {
+    if (rowspan < 1) {
       SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, " \"rowspan\""); //$NON-NLS-1$
     }
-    if (colspan < 1)
-    {
+    if (colspan < 1) {
       SWT.error(SWT.ERROR_INVALID_ARGUMENT, null, " \"colspan\""); //$NON-NLS-1$
     }
     if (align == FILL_GRAB) {
