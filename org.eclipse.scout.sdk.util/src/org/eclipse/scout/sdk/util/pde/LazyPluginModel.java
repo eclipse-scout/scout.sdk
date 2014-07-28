@@ -28,7 +28,6 @@ import org.eclipse.pde.internal.core.bundle.WorkspaceBundleModel;
 import org.eclipse.pde.internal.core.ibundle.IBundle;
 import org.eclipse.pde.internal.core.ibundle.IBundlePluginModelBase;
 import org.eclipse.pde.internal.core.plugin.WorkspaceExtensionsModel;
-import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.osgi.framework.Version;
 
 /**
@@ -117,8 +116,9 @@ public final class LazyPluginModel {
       bpmCreated = true;
     }
 
-    if (m_extensionsModel == null && ResourceUtility.exists(getPluginXmlFile())) {
-      wem = new WorkspaceExtensionsModel(getPluginXmlFile());
+    IFile pluginXmlFile = getPluginXmlFile();
+    if (m_extensionsModel == null && pluginXmlFile != null) {
+      wem = new WorkspaceExtensionsModel(pluginXmlFile);
 
       wem.load(getBundleDescription(), getPdeState());
       wem.setDirty(false); // the model is marked dirty after a fresh load

@@ -38,6 +38,7 @@ import org.eclipse.pde.internal.core.bundle.BundlePluginBase;
 import org.eclipse.pde.internal.core.bundle.BundlePluginModelBase;
 import org.eclipse.pde.internal.core.ibundle.IBundlePlugin;
 import org.eclipse.pde.internal.core.ibundle.IManifestHeader;
+import org.eclipse.pde.internal.core.plugin.WorkspaceExtensionsModel;
 import org.eclipse.pde.internal.core.text.bundle.BundleClasspathHeader;
 import org.eclipse.pde.internal.core.text.bundle.ExportPackageHeader;
 import org.eclipse.pde.internal.core.text.bundle.ImportPackageHeader;
@@ -738,8 +739,12 @@ public class PluginModelHelper {
      */
     public void addSimpleExtension(String extensionPointId, String elementName, Map<String, String> attributes) throws CoreException {
       IPluginExtension pe = null;
+      WorkspaceExtensionsModel extensionsModel = m_model.getExtensionsModel();
+      if (extensionsModel == null) {
+        return; // binary bundle -> no plugin.xml IFile. Cannot modify.
+      }
       // find existing extension
-      for (IPluginExtension existing : m_model.getExtensionsModel().getExtensions().getExtensions()) {
+      for (IPluginExtension existing : extensionsModel.getExtensions().getExtensions()) {
         if (existing.getPoint().equals(extensionPointId)) {
           pe = existing;
           break;
@@ -747,12 +752,12 @@ public class PluginModelHelper {
       }
       if (pe == null) {
         // no extension for given extension point exists: create new
-        pe = m_model.getExtensionsModel().createExtension();
+        pe = extensionsModel.createExtension();
         pe.setPoint(extensionPointId);
-        m_model.getExtensionsModel().getExtensions().add(pe);
+        extensionsModel.getExtensions().add(pe);
       }
 
-      IPluginElement extension = m_model.getExtensionsModel().createElement(pe);
+      IPluginElement extension = extensionsModel.createElement(pe);
       extension.setName(elementName);
       if (attributes != null && attributes.size() > 0) {
         for (Map.Entry<String, String> entry : attributes.entrySet()) {
