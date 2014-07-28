@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 /**
  * <h3>{@link TypeHierarchyConstraints}</h3> Specifies constraints for creating a project context type
  * hierarchy.
- * 
+ *
  * @see IHierarchyCache#getProjectContextTypeHierarchy(TypeHierarchyConstraints)
  * @author Matthias Villiger
  * @since 4.0.0 13.05.2014
@@ -58,7 +58,7 @@ public class TypeHierarchyConstraints {
 
   /**
    * Specifies a flag filter. Only types that have all these flags are part of the {@link ITypeHierarchyResult}.
-   * 
+   *
    * @param mods
    *          The modifiers that the {@link IType}s must have.
    * @return this
@@ -75,7 +75,7 @@ public class TypeHierarchyConstraints {
 
   /**
    * Specifies a flag filter. Only types that have NONE of these flags are part of the {@link ITypeHierarchyResult}.
-   * 
+   *
    * @param mods
    *          The modifiers that the {@link IType}s may not have.
    * @return this
@@ -92,7 +92,7 @@ public class TypeHierarchyConstraints {
 
   /**
    * Checks if the given modifiers are accepted by this constraints.
-   * 
+   *
    * @param modifiers
    *          The modifiers
    * @return true if the given modifiers match the modifier constraints defined in this instance.
@@ -106,7 +106,7 @@ public class TypeHierarchyConstraints {
 
   /**
    * Gets if the given type fulfills the constraints defined by this instance.
-   * 
+   *
    * @param candidate
    *          The candidate to check if it fulfills the {@link ITypeHierarchyResult} constraints.
    * @param candidateSuperTypes
@@ -210,7 +210,7 @@ public class TypeHierarchyConstraints {
 
   /**
    * gets the nature of the searched elements.
-   * 
+   *
    * @return One of
    *         <ul>
    *         <li>{@link IJavaSearchConstants#CLASS}: only look for classes</li>
@@ -229,7 +229,7 @@ public class TypeHierarchyConstraints {
 
   /**
    * Sets the nature of the elements to search.
-   * 
+   *
    * @param searchFor
    *          One of
    *          <ul>

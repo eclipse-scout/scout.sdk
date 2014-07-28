@@ -24,7 +24,7 @@ public final class P2Utility {
 
   /**
    * Gets the newest version of an installable unit in a specific P2 repository.
-   * 
+   *
    * @param rootIU
    *          The installable unit for which the latest version should be searched.
    * @param p2RepositoryURI
@@ -40,7 +40,7 @@ public final class P2Utility {
 
   /**
    * Installs the given installable units in the running platform.
-   * 
+   *
    * @param rootIUs
    *          Array of all installable unit Ids to install.
    * @param p2RepositoryURIs
@@ -55,7 +55,7 @@ public final class P2Utility {
 
   /**
    * Gets the licenses of the given installable units.
-   * 
+   *
    * @param rootIUs
    *          Array of all installable units for which the licenses should be loaded.
    * @param p2RepositoryURIs

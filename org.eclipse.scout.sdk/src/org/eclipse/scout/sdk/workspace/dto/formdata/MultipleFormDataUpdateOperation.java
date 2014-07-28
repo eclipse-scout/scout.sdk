@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link MultipleFormDataUpdateOperation}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 03.03.2011
  */

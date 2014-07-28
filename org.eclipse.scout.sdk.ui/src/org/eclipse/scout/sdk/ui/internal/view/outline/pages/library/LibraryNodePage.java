@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 
 /**
  * <h3>{@link LibraryNodePage}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 28.02.2012
  */

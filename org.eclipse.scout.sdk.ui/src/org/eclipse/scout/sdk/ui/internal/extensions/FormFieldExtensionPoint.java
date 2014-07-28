@@ -46,16 +46,16 @@ public final class FormFieldExtensionPoint {
 
   /**
    * To find the new wizard matches best to the given model type.
-   * 
+   *
    * <pre>
    * Hierarchy:
    *  IFormField
    *    ISmartField
    * </pre>
-   * 
+   *
    * createNewWizard(MySmartField) returns the SmartField new wizard if a smart field extensions is registered
    * otherwise it returns the form field new wizard.
-   * 
+   *
    * @param modelType
    * @return the best match extensions new wizard.
    */
@@ -79,16 +79,16 @@ public final class FormFieldExtensionPoint {
 
   /**
    * To find the node page matches best to the given model type.
-   * 
+   *
    * <pre>
    * Hierarchy:
    *  IFormField
    *    ISmartField
    * </pre>
-   * 
+   *
    * createNodePage(MySmartField) returns the SmartField node page if a smart field extensions is registered
    * otherwise it returns the form field node page.
-   * 
+   *
    * @param modelType
    * @return the best match extensions node page.
    */

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 /**
  * <h3>UiRapNodePage</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 20.10.2011
  */

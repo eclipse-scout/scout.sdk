@@ -51,7 +51,9 @@ public class JavaCodeRange {
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof JavaCodeRange)) return false;
+    if (!(obj instanceof JavaCodeRange)) {
+      return false;
+    }
     else {
       return hashCode() == obj.hashCode();
     }

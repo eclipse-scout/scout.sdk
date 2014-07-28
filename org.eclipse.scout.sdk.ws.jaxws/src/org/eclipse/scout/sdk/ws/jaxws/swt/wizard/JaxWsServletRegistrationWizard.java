@@ -31,7 +31,7 @@ public class JaxWsServletRegistrationWizard extends AbstractWorkspaceWizard {
 
   /**
    * To change JAX-WS servlet registration
-   * 
+   *
    * @param bundle
    */
   public JaxWsServletRegistrationWizard(IScoutBundle bundle) {
@@ -42,7 +42,7 @@ public class JaxWsServletRegistrationWizard extends AbstractWorkspaceWizard {
 
   /**
    * To change JAX-WS servlet registration and URL pattern of the given SunJaxWs entry
-   * 
+   *
    * @param bundle
    * @param sunJaxWsBean
    */

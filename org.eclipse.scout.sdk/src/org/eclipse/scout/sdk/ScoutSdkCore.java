@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateManager;
 /**
  * <h3>{@link ScoutSdkCore}</h3>The plug-in runtime class for the Scout SDK containing the core (UI-free) support for
  * Scout projects.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0
  * @noinstantiate This class is not intended to be instantiated by clients.
@@ -35,7 +35,7 @@ public final class ScoutSdkCore {
 
   /**
    * Access to the scout workspace root.
-   * 
+   *
    * @return The scout workspace
    * @see IScoutWorkspace
    */
@@ -73,7 +73,7 @@ public final class ScoutSdkCore {
 
   /**
    * Access to the Scout DTO auto update manager.
-   * 
+   *
    * @return The manager instance or null if the Scout SDK plugin has not yet been started.
    * @see IDtoAutoUpdateManager
    */

@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     Daniel Wiehl (BSI Business Systems Integration AG) - initial API and implementation
  ******************************************************************************/
@@ -16,7 +16,7 @@ package org.eclipse.scout.sdk.ws.jaxws;
  * nls support is not anymore garanteed.
  * This calss is auto generated and is maintained by the plugins
  * translations.nls file in the root directory of the plugin.
- * 
+ *
  * @see translations.nls
  */
 public class Texts extends org.eclipse.scout.sdk.Texts {

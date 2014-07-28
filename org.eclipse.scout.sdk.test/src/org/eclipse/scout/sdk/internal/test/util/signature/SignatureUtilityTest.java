@@ -30,7 +30,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link SignatureUtilityTest}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 23.02.2011
  */

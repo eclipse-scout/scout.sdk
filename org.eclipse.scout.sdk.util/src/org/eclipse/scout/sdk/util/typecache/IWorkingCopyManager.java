@@ -19,7 +19,7 @@ import org.eclipse.jdt.core.JavaModelException;
 
 /**
  * <h3>{@link IWorkingCopyManager}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.6.0 16.05.2014
  */
@@ -29,7 +29,7 @@ public interface IWorkingCopyManager {
    * Register compilation unit BEFORE doing changes on it.
    * Creates a working copy on the first registration.
    * Compilation unit may be registered multiple times
-   * 
+   *
    * @param icu
    *          The compilation unit to register
    * @param monitor
@@ -38,8 +38,8 @@ public interface IWorkingCopyManager {
    * @return true if the given compilation unit was newly registered with this call, false if it was already registered
    * @throws JavaModelException
    *           if the compilation unit could not become a working copy
-   * @throws 
-   *           if the given compilation unit is read only.
+   * @throws if
+   *           the given compilation unit is read only.
    */
   boolean register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException;
 
@@ -47,7 +47,7 @@ public interface IWorkingCopyManager {
    * Unregister compilation unit AFTER doing changes on it.
    * Commits and discards working copy at the first invocation.
    * Compilation unit may be unregistered multiple times
-   * 
+   *
    * @param icu
    *          The compilation unit to unregister
    * @param monitor
@@ -58,7 +58,7 @@ public interface IWorkingCopyManager {
 
   /**
    * unregisters all working copies managed by this instance.
-   * 
+   *
    * @param monitor
    *          a progress monitor used to report progress while opening this compilation unit or null if no progress
    *          should be reported
@@ -70,7 +70,7 @@ public interface IWorkingCopyManager {
    * This is not required if changes are done using for example
    * {@link IType#createMethod(String, IJavaElement, boolean, IProgressMonitor)} or
    * {@link IType#createField(String, IJavaElement, boolean, IProgressMonitor)}
-   * 
+   *
    * @param icu
    *          The compilation unit to reconcile.
    * @param monitor

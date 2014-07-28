@@ -156,8 +156,9 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
           public void run() {
             BasicNewProjectResourceWizard.updatePerspective(new P_ScoutPerspectiveConfigElement());
             IScoutExplorerPart ex = ScoutSdkUi.getExplorer(true);
-            if (ex != null)
-            ex.expandAndSelectProjectLevel();
+            if (ex != null) {
+              ex.expandAndSelectProjectLevel();
+            }
           }
         });
       }

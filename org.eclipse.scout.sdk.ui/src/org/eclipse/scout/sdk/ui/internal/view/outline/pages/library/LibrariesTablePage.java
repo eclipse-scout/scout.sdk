@@ -38,7 +38,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link LibrariesTablePage}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 28.02.2012
  */
@@ -90,11 +90,11 @@ public class LibrariesTablePage extends AbstractPage {
     }
     try {
       // find library projects
-      List<IPluginModelBase> libraries = new ArrayList<IPluginModelBase>(3);
+      List<IPluginModelBase> libraries = new ArrayList<IPluginModelBase>();
       if (getScoutBundle() != null && !getScoutBundle().isBinary()) {
         PluginModelHelper helper = new PluginModelHelper(getScoutBundle().getProject());
-        IPluginImport[] allDependencies = helper.Manifest.getAllDependencies();
-        Set<String> dependencyIds = new HashSet<String>(allDependencies.length);
+        List<IPluginImport> allDependencies = helper.Manifest.getAllDependencies();
+        Set<String> dependencyIds = new HashSet<String>(allDependencies.size());
         for (IPluginImport dependency : allDependencies) {
           dependencyIds.add(dependency.getId());
         }
@@ -148,8 +148,8 @@ public class LibrariesTablePage extends AbstractPage {
   }
 
   /**
-  *
-  */
+   *
+   */
   private final class P_PluginModelListener implements IPluginModelListener {
     @Override
     public void modelsChanged(PluginModelDelta delta) {

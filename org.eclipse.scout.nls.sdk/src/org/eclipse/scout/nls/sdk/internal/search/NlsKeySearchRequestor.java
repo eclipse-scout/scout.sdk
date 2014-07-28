@@ -24,7 +24,7 @@ import org.eclipse.search.ui.text.Match;
 
 /**
  * <h3>{@link NlsKeySearchRequestor}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 07.11.2013
  */

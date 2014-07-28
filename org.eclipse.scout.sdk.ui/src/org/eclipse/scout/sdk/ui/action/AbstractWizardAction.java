@@ -49,7 +49,7 @@ public abstract class AbstractWizardAction extends AbstractScoutHandler {
   /**
    * Return a new wizard instance to show for the current action. used to ensure the wizard is only created, when the
    * menu is pressed.
-   * 
+   *
    * @return
    */
   protected abstract IWizard getNewWizardInstance();

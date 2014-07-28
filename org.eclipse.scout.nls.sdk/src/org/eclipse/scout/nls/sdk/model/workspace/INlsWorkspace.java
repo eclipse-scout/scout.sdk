@@ -19,7 +19,7 @@ public interface INlsWorkspace {
   /**
    * Gets a NLS hierarchy for the given input parameters.
    * If no extension for the given parameters is available, this method returns null.
-   * 
+   *
    * @param args
    *          The arguments to be used when trying to find a INlsProject.
    * @return the NlsProject hierarchy for the given parameters or null.

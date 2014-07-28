@@ -15,7 +15,7 @@ import java.util.Set;
 
 /**
  * <h3>{@link ScoutBundleFilters}</h3> Contains pre-defined scout bundle filters
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 23.02.2013
  * @see IScoutBundleFilter
@@ -85,7 +85,7 @@ public final class ScoutBundleFilters {
   /**
    * creates and returns a filter that only returns bundles matching certain types.<br>
    * If no types are passed as filter, this filter returns no bundles.
-   * 
+   *
    * @param acceptedTypes
    *          the list of types that are accepted.
    * @return a filter that only returns bundles that match the given types
@@ -113,7 +113,7 @@ public final class ScoutBundleFilters {
    * The order of the filters matters: the filter stops evaluating subsequent filters as soon as the first filter does
    * not accept a bundle. Therefore use strong and fast filters first!<br>
    * If no subsequent filters are passed, this filter returns all bundles (no filtering).
-   * 
+   *
    * @param filters
    *          the subsequent filter to evaluate
    * @return the created filter
@@ -129,7 +129,7 @@ public final class ScoutBundleFilters {
    * The order of the filters matters: the filter stops evaluating subsequent filters as soon as the first filter
    * accepts a bundle. Therefore use strong and fast filters first!<br>
    * If no subsequent filters are passed, this filter returns all bundles (no filtering).
-   * 
+   *
    * @param filters
    *          the subsequent filter to evaluate
    * @return the created filter
@@ -164,7 +164,7 @@ public final class ScoutBundleFilters {
 
   /**
    * Creates and returns a filter that returns all bundles except the ones provided in the list.
-   * 
+   *
    * @param list
    *          The list of excluded bundles.
    * @return the created filter
@@ -183,7 +183,7 @@ public final class ScoutBundleFilters {
 
   /**
    * Creates and returns a filter that returns all bundles except the ones provided in the list.
-   * 
+   *
    * @param list
    *          The list of excluded bundles.
    * @return the created filter
@@ -203,7 +203,7 @@ public final class ScoutBundleFilters {
 
   /**
    * Creates and returns a filter that returns all bundles except the ones with given symbolic names.
-   * 
+   *
    * @param symbolicNames
    *          The bundle symbolic names to exclude from the result
    * @return the created filter
@@ -222,7 +222,7 @@ public final class ScoutBundleFilters {
 
   /**
    * Creates and returns a filter that returns all bundles except the ones with given symbolic names.
-   * 
+   *
    * @param symbolicNames
    *          The bundle symbolic names to exclude from the result
    * @return the created filter
@@ -242,7 +242,7 @@ public final class ScoutBundleFilters {
 
   /**
    * Creates and returns a filter that returns all bundles that are NOT accepted by the given filter.
-   * 
+   *
    * @param originalFilter
    *          The original filter that should be inverted.
    * @return the created filter (inverted version of the given filter).
@@ -264,7 +264,7 @@ public final class ScoutBundleFilters {
    * <li>fulfill the given filter and</li>
    * <li>have no direct parent that also fulfills the filter</li>
    * </ol>
-   * 
+   *
    * @param filter
    *          the filter to use as criteria
    * @return the created filter

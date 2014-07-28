@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.TableColumn;
 
 /**
  * <h3>{@link JarSelectionWizardPage}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 29.02.2012
  */

@@ -12,7 +12,7 @@ package org.eclipse.scout.nls.sdk.internal;
 
 /**
  * <h4>INlsIcons</h4>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.1.0 (30.11.2010)
  */

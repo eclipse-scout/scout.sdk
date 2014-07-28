@@ -20,8 +20,8 @@ import org.junit.Test;
 
 /**
  * <h3>{@link TableFieldBeanTest}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.10.0 19.08.2013
  */
 public class TableFieldBeanTest extends AbstractSdkTestWithFormDataProject {

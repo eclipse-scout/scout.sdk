@@ -25,7 +25,7 @@ import org.eclipse.swt.graphics.Point;
 
 /**
  * <h4>NlsProposal</h4>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.1.0 (12.01.2011)
  */

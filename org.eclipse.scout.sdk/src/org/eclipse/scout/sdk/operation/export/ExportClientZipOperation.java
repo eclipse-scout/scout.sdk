@@ -15,6 +15,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.zip.ZipOutputStream;
@@ -27,6 +28,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.pde.internal.core.exports.FeatureExportInfo;
 import org.eclipse.pde.internal.core.exports.ProductExportOperation;
 import org.eclipse.scout.commons.IOUtility;
@@ -104,6 +106,7 @@ public class ExportClientZipOperation implements IOperation {
   private IStatus buildClientProduct(IProgressMonitor monitor) throws CoreException, IOException {
     ProductFileModelHelper pfmh = new ProductFileModelHelper(getClientProduct());
     m_zipName = getZipName(getHtmlFolder(), pfmh) + ".zip";
+    List<BundleDescription> pluginModels = pfmh.ProductFile.getPluginModels();
 
     FeatureExportInfo featureInfo = new FeatureExportInfo();
     featureInfo.toDirectory = true;
@@ -112,7 +115,7 @@ public class ExportClientZipOperation implements IOperation {
     featureInfo.allowBinaryCycles = true;
     featureInfo.exportMetadata = false;
     featureInfo.destinationDirectory = m_tempBuildDir.getAbsolutePath() + "/client/buildDir/" + getZipName();
-    featureInfo.items = pfmh.ProductFile.getPluginModels();
+    featureInfo.items = pluginModels.toArray(new BundleDescription[pluginModels.size()]);
 
     ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + getZipName() + "'...", pfmh.ProductFile.getProduct(), ".");
     productExportOp.schedule();

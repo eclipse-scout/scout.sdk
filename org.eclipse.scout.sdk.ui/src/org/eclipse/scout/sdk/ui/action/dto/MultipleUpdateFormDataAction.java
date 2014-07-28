@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 /**
  * <h3>{@link MultipleUpdateFormDataAction}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 03.03.2011
  */

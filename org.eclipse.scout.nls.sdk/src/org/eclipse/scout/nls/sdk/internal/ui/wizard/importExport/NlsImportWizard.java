@@ -16,7 +16,7 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 
 /**
  * <h4>NlsImportWizard</h4>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.1.0 (12.11.2010)
  */

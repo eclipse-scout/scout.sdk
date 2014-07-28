@@ -21,7 +21,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link AnnotationCopyTest}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 08.05.2014
  */

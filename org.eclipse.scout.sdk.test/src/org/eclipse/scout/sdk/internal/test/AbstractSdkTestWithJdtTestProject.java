@@ -17,7 +17,7 @@ import org.junit.BeforeClass;
 
 /**
  * <h3>{@link AbstractSdkTestWithJdtTestProject}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2013
  */

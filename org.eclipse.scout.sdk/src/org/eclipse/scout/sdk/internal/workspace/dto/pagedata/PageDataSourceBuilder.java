@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
 
 /**
  * <h3>{@link PageDataSourceBuilder}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 28.08.2013
  */

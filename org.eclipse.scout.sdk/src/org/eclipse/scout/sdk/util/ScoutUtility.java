@@ -283,7 +283,7 @@ public final class ScoutUtility {
    */
   public static String getProductFileType(IFile productFile) throws CoreException {
     ProductFileModelHelper pfmh = new ProductFileModelHelper(productFile);
-    String[] symbolicNames = pfmh.ProductFile.getPluginSymbolicNames();
+    List<String> symbolicNames = pfmh.ProductFile.getPluginSymbolicNames();
     return RuntimeBundles.getBundleType(symbolicNames);
   }
 

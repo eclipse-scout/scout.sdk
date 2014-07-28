@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 
 /**
  * <h3>UiSwtNodePage</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2010
  */

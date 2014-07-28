@@ -17,11 +17,11 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    FormHandlerNewOperationTest.class,
-    FormNewOperationTest.class,
-    FormStackNewOperationTest.class,
-    // Suites
-    _SuiteFormFields.class
+  FormHandlerNewOperationTest.class,
+  FormNewOperationTest.class,
+  FormStackNewOperationTest.class,
+  // Suites
+  _SuiteFormFields.class
 })
 public class _SuiteForm {
 

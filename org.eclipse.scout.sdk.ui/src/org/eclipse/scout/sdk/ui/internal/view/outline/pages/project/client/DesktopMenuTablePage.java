@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 
 /**
  * <h3>DesktopMenuTablePage</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 30.06.2010
  */

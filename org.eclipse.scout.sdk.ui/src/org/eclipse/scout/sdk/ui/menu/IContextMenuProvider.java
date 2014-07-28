@@ -16,14 +16,14 @@ public interface IContextMenuProvider {
 
   /**
    * defines which context menu handlers can be available on the current provider
-   * 
+   *
    * @return
    */
   Class<? extends IScoutHandler>[] getSupportedMenuActions();
 
   /**
    * is called for each menu that is supported by this provider and supports the current selection count.
-   * 
+   *
    * @param menu
    */
   void prepareMenuAction(IScoutHandler menu);

@@ -46,7 +46,7 @@ import org.eclipse.ui.IEditorPart;
 /**
  * TODO: this class is a copy of org.eclipse.jdt.ui.text.java.correction.ChangeCorrectionProposal and can be removed as
  * soon as Eclipse 3.7 support is dropped.
- * 
+ *
  * @since 3.10.0 07.01.2014
  */
 @SuppressWarnings("restriction")
@@ -61,7 +61,7 @@ public class ChangeCorrectionProposal implements IJavaCompletionProposal, ICompl
 
   /**
    * Constructs a change correction proposal.
-   * 
+   *
    * @param name
    *          the name that is displayed in the proposal selection dialog
    * @param change
@@ -85,7 +85,7 @@ public class ChangeCorrectionProposal implements IJavaCompletionProposal, ICompl
 
   /**
    * Constructs a change correction proposal. Uses the default image for this proposal.
-   * 
+   *
    * @param name
    *          The name that is displayed in the proposal selection dialog.
    * @param change
@@ -115,7 +115,7 @@ public class ChangeCorrectionProposal implements IJavaCompletionProposal, ICompl
    * Performs the change associated with this proposal.
    * <p>
    * Subclasses may extend, but must call the super implementation.
-   * 
+   *
    * @param activeEditor
    *          the editor currently active or <code>null</code> if no editor is active
    * @param document
@@ -275,7 +275,7 @@ public class ChangeCorrectionProposal implements IJavaCompletionProposal, ICompl
 
   /**
    * Returns the name of the proposal.
-   * 
+   *
    * @return the name of the proposal
    */
   public String getName() {
@@ -300,7 +300,7 @@ public class ChangeCorrectionProposal implements IJavaCompletionProposal, ICompl
 
   /**
    * Sets the proposal's image or <code>null</code> if no image is desired.
-   * 
+   *
    * @param image
    *          the desired image.
    */
@@ -311,7 +311,7 @@ public class ChangeCorrectionProposal implements IJavaCompletionProposal, ICompl
   /**
    * Returns the change that will be executed when the proposal is applied.
    * This method calls {@link #createChange()} to compute the change.
-   * 
+   *
    * @return the change for this proposal, can be <code>null</code> in rare cases if creation of
    *         the change failed
    * @throws CoreException
@@ -391,7 +391,7 @@ public class ChangeCorrectionProposal implements IJavaCompletionProposal, ICompl
    * This method is only called once and only when no change has been passed in
    * {@link #ChangeCorrectionProposal(String, Change, int, Image)}.
    * Subclasses may override.
-   * 
+   *
    * @return the created change
    * @throws CoreException
    *           if the creation of the change failed
@@ -402,7 +402,7 @@ public class ChangeCorrectionProposal implements IJavaCompletionProposal, ICompl
 
   /**
    * Sets the display name.
-   * 
+   *
    * @param name
    *          the name to set
    */
@@ -423,7 +423,7 @@ public class ChangeCorrectionProposal implements IJavaCompletionProposal, ICompl
 
   /**
    * Sets the relevance.
-   * 
+   *
    * @param relevance
    *          the relevance to set
    * @see #getRelevance()

@@ -120,7 +120,9 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
 
     IType superType = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
-    if (superType == null) return null;
+    if (superType == null) {
+      return null;
+    }
 
     Set<IType> serviceImpls = TypeUtility.getPrimaryTypeHierarchy(superType).getAllSubtypes(superType, new ITypeFilter() {
       @Override
@@ -213,11 +215,19 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private static boolean acceptsFilter(Boolean returnDocServices, Set<String> projects, IType candidate) throws JavaModelException {
-    if (candidate == null) return false;
+    if (candidate == null) {
+      return false;
+    }
     boolean acceptsDocPart = returnDocServices == null || returnDocServices == isDocsService(candidate);
     if (acceptsDocPart) {
-      if (candidate.isReadOnly()) return true; // always include all text services from the platform
-      if (projects == null) return true; // no project filter and doc filter is valid -> filter matches
+      if (candidate.isReadOnly())
+      {
+        return true; // always include all text services from the platform
+      }
+      if (projects == null)
+      {
+        return true; // no project filter and doc filter is valid -> filter matches
+      }
 
       // check project filter
       return projects.contains(candidate.getJavaProject().getProject().getName());
@@ -343,7 +353,9 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   private INlsProject getNlsProjectTree(IType type) throws CoreException {
     Set<IType> nlsProviders = getRegisteredTextProviderTypes(isDocsService(type), getProjectNames(getScoutBundlesForType(type)));
-    if (nlsProviders == null) return null;
+    if (nlsProviders == null) {
+      return null;
+    }
 
     String searchString = getTypeIdentifyer(type);
     Set<IType> filtered = new LinkedHashSet<IType>(nlsProviders.size());

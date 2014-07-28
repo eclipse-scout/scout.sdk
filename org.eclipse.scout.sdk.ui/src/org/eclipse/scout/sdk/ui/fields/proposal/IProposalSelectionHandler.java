@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.fields.proposal;
 
 /**
  * <h3>{@link IProposalSelectionHandler}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 08.02.2012
  */

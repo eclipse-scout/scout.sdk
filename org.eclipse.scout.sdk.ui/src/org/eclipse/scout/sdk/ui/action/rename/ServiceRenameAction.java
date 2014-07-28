@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.action.rename;
 
 import java.util.HashMap;
+import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -88,7 +89,7 @@ public class ServiceRenameAction extends AbstractRenameAction {
             PluginModelHelper h = new PluginModelHelper(clientBundle.getProject());
             HashMap<String, String> attributes = new HashMap<String, String>(1);
             attributes.put(attribName, oldFqn);
-            IPluginElement[] simpleExtensions = h.PluginXml.getSimpleExtensions(IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, attributes);
+            List<IPluginElement> simpleExtensions = h.PluginXml.getSimpleExtensions(IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, attributes);
             for (IPluginElement proxy : simpleExtensions) {
               proxy.setAttribute(attribName, newFqn);
             }

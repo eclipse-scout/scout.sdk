@@ -26,7 +26,7 @@ public class JaxWsServletRegistrationCommand extends AbstractExecutableMarkerCom
 
   /**
    * To fix JAX-WS servlet registration
-   * 
+   *
    * @param bundle
    */
   public JaxWsServletRegistrationCommand(IScoutBundle bundle) {
@@ -37,7 +37,7 @@ public class JaxWsServletRegistrationCommand extends AbstractExecutableMarkerCom
 
   /**
    * To fix JAX-WS servlet registration and URL pattern of given sunJaxWs entry
-   * 
+   *
    * @param bundle
    * @param sunJaxWsBean
    */

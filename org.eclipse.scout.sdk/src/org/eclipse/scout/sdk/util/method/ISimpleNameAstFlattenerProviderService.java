@@ -13,9 +13,10 @@ package org.eclipse.scout.sdk.util.method;
 import org.eclipse.jdt.core.dom.SimpleName;
 
 /**
- * <h3>{@link ISimpleNameAstFlattenerProviderService}</h3> Service interface for providers of SimpleName AST rewrite flatteners.<br>
+ * <h3>{@link ISimpleNameAstFlattenerProviderService}</h3> Service interface for providers of SimpleName AST rewrite
+ * flatteners.<br>
  * This service is required to provide more sophisticated flattener algorithms.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 23.01.2014
  * @see SimpleName
@@ -24,7 +25,7 @@ import org.eclipse.jdt.core.dom.SimpleName;
 public interface ISimpleNameAstFlattenerProviderService {
   /**
    * Creates a new SimpleName AST rewrite flattener
-   * 
+   *
    * @param callback
    *          The callback that handles the rewrite of a {@link SimpleName}
    * @return The created flattener instance

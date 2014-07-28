@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws;
 
-
 public final class JaxWsRuntimeClasses {
 
   private JaxWsRuntimeClasses() {

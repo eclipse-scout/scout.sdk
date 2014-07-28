@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Label;
 
 /**
  * <h3>AbstractSinglePageSectionBasedViewPart</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 23.07.2010
  */
@@ -49,13 +49,15 @@ public abstract class AbstractSinglePageSectionBasedViewPart extends AbstractSec
   /**
    * Gets a string that uniquely identifies this part for the current page.<br>
    * Override this method to use a more precise key.
-   * 
+   *
    * @return The default implementation returns a string representing the page instance this part is attached to or null
    *         if no page is present.
    */
   protected String getPartKey() {
     IPage p = getPage();
-    if (p == null) return null;
+    if (p == null) {
+      return null;
+    }
     return p.toString();
   }
 
@@ -80,7 +82,7 @@ public abstract class AbstractSinglePageSectionBasedViewPart extends AbstractSec
   /**
    * Gets if the section with given Id was expanded when used the last time for the page of this part.<br>
    * If no last state exist, the given default value is returned.
-   * 
+   *
    * @param sectionId
    *          The id of the section.
    * @param defaultValue
@@ -89,13 +91,17 @@ public abstract class AbstractSinglePageSectionBasedViewPart extends AbstractSec
    */
   protected boolean wasSectionExpanded(String sectionId, boolean defaultValue) {
     TriState state = wasSectionExpanded(sectionId);
-    if (state == TriState.UNDEFINED) return defaultValue;
-    else return state.getBooleanValue();
+    if (state == TriState.UNDEFINED) {
+      return defaultValue;
+    }
+    else {
+      return state.getBooleanValue();
+    }
   }
 
   /**
    * Gets the expansion state of the section with the given id like it was lastly used for the page of this part.
-   * 
+   *
    * @param sectionId
    *          The id of the section.
    * @return If the given section for the current page was expanded when used the last time. The <code>TriState</code>
@@ -104,13 +110,21 @@ public abstract class AbstractSinglePageSectionBasedViewPart extends AbstractSec
    */
   protected TriState wasSectionExpanded(String sectionId) {
     HashMap<String, Boolean> pageCache = EXPANSION_SETTINGS.get(getPartKey());
-    if (pageCache == null) return TriState.UNDEFINED;
+    if (pageCache == null) {
+      return TriState.UNDEFINED;
+    }
 
     Boolean expanded = pageCache.get(sectionId);
-    if (expanded == null) return TriState.UNDEFINED;
+    if (expanded == null) {
+      return TriState.UNDEFINED;
+    }
 
-    if (expanded) return TriState.TRUE;
-    else return TriState.FALSE;
+    if (expanded) {
+      return TriState.TRUE;
+    }
+    else {
+      return TriState.FALSE;
+    }
   }
 
   @Override

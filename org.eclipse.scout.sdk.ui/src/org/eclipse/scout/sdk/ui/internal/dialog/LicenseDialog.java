@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Text;
 
 /**
  * <h3>{@link LicenseDialog}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 16.02.2012
  */
@@ -145,11 +145,12 @@ public class LicenseDialog extends TitleAreaDialog {
     m_iuViewer.setComparator(new ViewerComparator());
     m_iuViewer.setInput(m_iuToLicenses);
     if (m_iuToLicenses != null && m_iuToLicenses.size() > 0) {
-      for (License[] licenses : m_iuToLicenses.values())
+      for (License[] licenses : m_iuToLicenses.values()) {
         if (licenses != null && licenses.length > 0) {
           m_iuViewer.setSelection(new StructuredSelection(licenses[0]), false);
           break;
         }
+      }
     }
     m_iuViewer.addSelectionChangedListener(new ISelectionChangedListener() {
       @Override

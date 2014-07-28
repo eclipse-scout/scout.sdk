@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
  * <h3>{@link JdtEvent}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.11.2010
  */

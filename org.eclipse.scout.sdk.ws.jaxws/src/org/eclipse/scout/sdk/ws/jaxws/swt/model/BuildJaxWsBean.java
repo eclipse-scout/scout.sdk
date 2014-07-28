@@ -61,7 +61,7 @@ public class BuildJaxWsBean {
 
   /**
    * is only used if consumer build entry
-   * 
+   *
    * @param wsdl
    */
   public void setWsdl(String wsdl) {
@@ -71,7 +71,7 @@ public class BuildJaxWsBean {
 
   /**
    * is only used if consumer build entry
-   * 
+   *
    * @return
    */
   public String getWsdl() {
@@ -120,7 +120,7 @@ public class BuildJaxWsBean {
 
   /**
    * Reloads the entry from disk
-   * 
+   *
    * @param bundle
    * @return true if successful, false otherwise
    */

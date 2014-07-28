@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link Docx4jProdTechnologyHandler}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 23.04.2013
  */
@@ -53,7 +53,7 @@ public class Docx4jProdTechnologyHandler extends AbstractScoutTechnologyHandler 
   public TriState getSelection(IScoutBundle project) throws CoreException {
     return getSelectionProductFiles(new String[]{IRuntimeClasses.ScoutSharedBundleId},
         new String[]{XML_GRAPHICS_PLUGIN_NAME, APACHE_COMMONS_PLUGIN_NAME, APACHE_COMMONS_LOGGING_PLUGIN_NAME, DOCX4J_PLUGIN, DOCX4J_SCOUT_PLUGIN,
-            LOGGING_BRIDGE_LOG4J_FRAGMENT});
+        LOGGING_BRIDGE_LOG4J_FRAGMENT});
   }
 
   @Override

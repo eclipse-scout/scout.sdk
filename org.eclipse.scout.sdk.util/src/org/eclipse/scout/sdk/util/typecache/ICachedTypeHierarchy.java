@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.util.typecache;
 
 /**
  * An {@link ITypeHierarchy} that caches the content.
- * 
+ *
  * @see ITypeHierarchy
  * @see ICachedTypeHierarchyResult
  */

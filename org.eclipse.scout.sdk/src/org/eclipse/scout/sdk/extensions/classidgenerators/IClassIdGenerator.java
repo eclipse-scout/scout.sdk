@@ -22,7 +22,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
  * generators are not evaluated.<br>
  * Classes that implement this interface must provide a default constructor if they are used as classIdGenerator
  * extension.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 02.01.2014
  * @see ClassId
@@ -33,7 +33,7 @@ import org.eclipse.scout.commons.annotations.ClassId;
 public interface IClassIdGenerator {
   /**
    * Generates a new class id as string for the given input.
-   * 
+   *
    * @param context
    *          The {@link ClassIdGenerationContext} in which the annotation will be created.
    * @return The string containing the new Id

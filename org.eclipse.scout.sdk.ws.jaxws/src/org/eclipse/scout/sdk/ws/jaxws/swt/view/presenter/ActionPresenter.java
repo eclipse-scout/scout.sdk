@@ -46,7 +46,7 @@ public class ActionPresenter extends AbstractPresenter {
 
   /**
    * To reset the action
-   * 
+   *
    * @param action
    */
   public void setAction(IPresenterAction action) {

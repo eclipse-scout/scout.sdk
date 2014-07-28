@@ -14,7 +14,7 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 
 /**
  * Describes a parsed {@link IRuntimeClasses#PageData} annotation.
- * 
+ *
  * @since 3.10.0-M1
  */
 public class PageDataAnnotation {

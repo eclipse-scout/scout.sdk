@@ -17,7 +17,7 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * <h3>{@link ResourceLabelProvider}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 15.02.2012
  */

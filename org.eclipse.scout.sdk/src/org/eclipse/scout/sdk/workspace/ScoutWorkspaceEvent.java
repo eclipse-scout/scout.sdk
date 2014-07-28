@@ -14,7 +14,7 @@ import java.util.EventObject;
 
 /**
  * A Scout workspace event that occurred on a single scout bundle
- * 
+ *
  * @see IScoutWorkspace
  * @see IScoutBundle
  */
@@ -61,7 +61,7 @@ public class ScoutWorkspaceEvent extends EventObject {
 
   /**
    * gets the scout bundle that belongs to this event
-   * 
+   *
    * @return
    */
   public IScoutBundle getScoutElement() {

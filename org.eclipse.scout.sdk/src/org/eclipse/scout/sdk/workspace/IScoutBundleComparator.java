@@ -14,7 +14,7 @@ import java.util.Comparator;
 
 /**
  * <h3>{@link IScoutBundleComparator}</h3> Comparator used to compare two scout bundles
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 09.02.2013
  * @see IScoutBundle

@@ -31,7 +31,7 @@ import org.eclipse.ui.dialogs.FilteredItemsSelectionDialog;
 
 /**
  * <h3>{@link ScoutBundleSelectionDialog}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 09.03.2012
  */
@@ -147,7 +147,9 @@ public class ScoutBundleSelectionDialog extends FilteredItemsSelectionDialog {
       int id1 = getId(o1);
       int id2 = getId(o2);
 
-      if (id1 != id2) return id1 - id2;
+      if (id1 != id2) {
+        return id1 - id2;
+      }
       return compareSimilarObjects(o1, o2);
     }
 

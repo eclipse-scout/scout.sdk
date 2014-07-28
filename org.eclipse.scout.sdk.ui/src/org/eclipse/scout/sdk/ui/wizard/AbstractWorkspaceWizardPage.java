@@ -43,7 +43,7 @@ public abstract class AbstractWorkspaceWizardPage extends AbstractScoutWizardPag
   /**
    * Override this method to do modifications on resources. This method will be called within
    * a ProcessJob using the IWorkspaceRoot rule.
-   * 
+   *
    * @param monitor
    * @param manager
    * @return

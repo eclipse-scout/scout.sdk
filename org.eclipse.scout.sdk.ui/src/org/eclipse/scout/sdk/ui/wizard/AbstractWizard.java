@@ -32,7 +32,7 @@ public abstract class AbstractWizard extends Wizard implements IWizard {
 
   /**
    * may be overwritten to provide a special dialog settings key.
-   * 
+   *
    * @return a dialog settings key (default is the fqn of the wizard.
    */
   protected String getDialogSettingsKey() {

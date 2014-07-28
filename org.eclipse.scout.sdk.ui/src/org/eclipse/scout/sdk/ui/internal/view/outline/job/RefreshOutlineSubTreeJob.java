@@ -168,7 +168,7 @@ public class RefreshOutlineSubTreeJob extends Job {
   /**
    * Creates a new {@link TreePath} containing the new {@link IPage}s created after the reload of the children. The new
    * path points to the same location (where possible) as the old one but containing the new {@link IPage} instances.
-   * 
+   *
    * @param oldPath
    *          The old path to convert
    * @return The new path

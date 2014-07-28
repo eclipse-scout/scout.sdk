@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.util.typecache.IJavaResourceChangedEmitter;
 
 /**
  * <h3>{@link IJavaResourceChangedListener}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.11.2010
  * @see IJavaResourceChangedEmitter
@@ -25,7 +25,7 @@ public interface IJavaResourceChangedListener extends EventListener {
 
   /**
    * Callback that notifies this listener about changes.
-   * 
+   *
    * @param event
    *          The event describing the change.
    */

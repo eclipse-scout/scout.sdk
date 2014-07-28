@@ -14,7 +14,7 @@ import org.eclipse.core.resources.IFile;
 
 /**
  * <h3>{@link RapTargetVariableListenerAdapter}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 14.01.2013
  */

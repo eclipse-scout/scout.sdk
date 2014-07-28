@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPageFilter;
 
 /**
  * <h3>{@link IPageFilterable}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 09.12.2013
  */

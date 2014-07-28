@@ -16,14 +16,14 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * <h3>{@link _SuiteSmartField}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 13.02.2013
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    SmartFieldTest.class,
-    SmartFieldNewOperationTest.class
+  SmartFieldTest.class,
+  SmartFieldNewOperationTest.class
 })
 public class _SuiteSmartField {
 

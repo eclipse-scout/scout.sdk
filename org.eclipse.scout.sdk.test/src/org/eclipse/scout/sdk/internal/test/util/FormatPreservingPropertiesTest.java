@@ -21,7 +21,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link FormatPreservingPropertiesTest}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 05.10.2013
  */

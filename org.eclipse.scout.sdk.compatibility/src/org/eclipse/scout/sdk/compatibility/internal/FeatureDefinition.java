@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.compatibility.internal;
 
 /**
  * <h3>{@link FeatureDefinition}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 09.04.2014
  */

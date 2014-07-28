@@ -52,7 +52,7 @@ import org.eclipse.ui.IWorkbench;
 
 /**
  * <h3>LookupCallNewWizard</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 25.08.2010
  */

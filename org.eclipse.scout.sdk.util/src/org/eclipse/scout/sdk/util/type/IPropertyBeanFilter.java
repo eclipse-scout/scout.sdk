@@ -17,7 +17,7 @@ public interface IPropertyBeanFilter {
 
   /**
    * Determines whether the given property is accepted.
-   * 
+   *
    * @param property
    *          the property to analyze.
    * @return Returns <code>true</code> if the property is accepted.

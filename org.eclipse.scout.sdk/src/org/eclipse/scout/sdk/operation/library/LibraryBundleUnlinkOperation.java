@@ -35,8 +35,8 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link LibraryBundleUnlinkOperation}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 13.03.2012
  */
 public class LibraryBundleUnlinkOperation implements IOperation {
@@ -110,7 +110,7 @@ public class LibraryBundleUnlinkOperation implements IOperation {
 
   /**
    * removes the library from the product file if the library bundle is not used by any other bundle of the product.
-   * 
+   *
    * @param prodcutModelHelper
    * @param libraryBundle
    * @throws CoreException

@@ -16,9 +16,9 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    ButtonApiTest.class,
-    FormApiTest.class,
-    FormFieldApiTest.class
+  ButtonApiTest.class,
+  FormApiTest.class,
+  FormFieldApiTest.class
 })
 public class _SuiteApiCompatibility {
 

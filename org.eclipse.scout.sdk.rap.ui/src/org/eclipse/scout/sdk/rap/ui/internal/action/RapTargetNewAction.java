@@ -24,7 +24,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link RapTargetNewAction}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 15.04.2013
  */

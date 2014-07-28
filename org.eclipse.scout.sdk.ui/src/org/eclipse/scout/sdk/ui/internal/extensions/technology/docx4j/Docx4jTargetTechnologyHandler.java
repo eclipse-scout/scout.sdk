@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link Docx4jTargetTechnologyHandler}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 09.04.2014
  */

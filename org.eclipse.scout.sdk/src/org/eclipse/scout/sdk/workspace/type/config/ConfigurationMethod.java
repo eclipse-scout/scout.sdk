@@ -79,7 +79,7 @@ public class ConfigurationMethod {
   /**
    * Pushes the given method onto the top of this stack.<br>
    * <b>Note: Compiler generated methods (Bridge methods) are ignored!</b>
-   * 
+   *
    * @param method
    *          The method to add
    * @see Flags#AccBridge
@@ -138,7 +138,7 @@ public class ConfigurationMethod {
 
   /**
    * returns the method at the top of this stack without removing it from the stack.
-   * 
+   *
    * @return
    */
   public IMethod peekMethod() {

@@ -29,7 +29,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 
 /**
  * <h3>{@link AbstractNlsProposal}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 24.10.2013
  */

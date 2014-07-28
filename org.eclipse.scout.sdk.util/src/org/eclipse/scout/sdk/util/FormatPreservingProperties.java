@@ -50,7 +50,7 @@ import org.eclipse.scout.sdk.util.log.ScoutStatus;
  * be used with care when dealing with large files.<br>
  * <br>
  * As defined in the .properties file specification the files are loaded and stored using the ISO 8859-1 encoding.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 05.10.2013
  * @see #ENCODING
@@ -79,7 +79,7 @@ public class FormatPreservingProperties implements Serializable {
   /**
    * Loads the content of the given properties file.<br>
    * As defined in the .properties file specification the files are loaded using the ISO 8859-1 encoding.
-   * 
+   *
    * @param f
    *          The file to load. Must exist and be accessible and must be of the .properties file format.
    * @throws CoreException
@@ -106,7 +106,7 @@ public class FormatPreservingProperties implements Serializable {
   /**
    * Loads the content of the given input stream.<br>
    * As defined in the .properties file specification the files are loaded using the ISO 8859-1 encoding.
-   * 
+   *
    * @param is
    *          The input stream providing the data to load.
    * @throws CoreException
@@ -124,7 +124,7 @@ public class FormatPreservingProperties implements Serializable {
   /**
    * Stores the properties in the given output stream.<br>
    * As defined in the .properties file specification the files are stored using the ISO 8859-1 encoding.
-   * 
+   *
    * @param out
    * @throws CoreException
    */
@@ -158,7 +158,7 @@ public class FormatPreservingProperties implements Serializable {
    * Sets a new value for a property.<br>
    * If it is a new property, it is appended to the end of the file when storing it. The order in which the new
    * properties are appended is the same as in which they have been added to this instance.
-   * 
+   *
    * @param key
    *          The key of the property.
    * @param value
@@ -185,7 +185,7 @@ public class FormatPreservingProperties implements Serializable {
 
   /**
    * Gets the value of a property.
-   * 
+   *
    * @param key
    *          The key of the property to get.
    * @return The value of the property with the given key.
@@ -220,7 +220,7 @@ public class FormatPreservingProperties implements Serializable {
 
   /**
    * Removes the property with the given key.
-   * 
+   *
    * @param key
    *          The key of the property to remove.
    */
@@ -277,7 +277,7 @@ public class FormatPreservingProperties implements Serializable {
 
   /**
    * Checks if this class has been modified since it was loaded the last time.
-   * 
+   *
    * @return true if the properties are different than after the last load. false otherwise.
    */
   public boolean isDirty() {

@@ -16,14 +16,14 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * <h3>{@link _SuiteTable}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 13.02.2013
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    TableColumnNewOperationTest.class,
-    TableFieldNewOperationTest.class
+  TableColumnNewOperationTest.class,
+  TableFieldNewOperationTest.class
 })
 public class _SuiteTable {
 

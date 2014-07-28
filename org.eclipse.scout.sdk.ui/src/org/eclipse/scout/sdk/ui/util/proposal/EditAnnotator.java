@@ -66,7 +66,9 @@ public class EditAnnotator extends TextEditVisitor {
 
   @Override
   public boolean visit(ReplaceEdit edit) {
-    if (edit.getLength() > 0) return rangeAdded(edit);
+    if (edit.getLength() > 0) {
+      return rangeAdded(edit);
+    }
     return rangeRemoved(edit);
   }
 

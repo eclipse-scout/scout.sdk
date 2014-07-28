@@ -98,7 +98,7 @@ import org.eclipse.jdt.core.dom.WildcardType;
 
 /**
  * <h3>{@link DefaultAstVisitor}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.02.2011
  */

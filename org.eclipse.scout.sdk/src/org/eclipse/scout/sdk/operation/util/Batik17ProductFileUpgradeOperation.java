@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link Batik17ProductFileUpgradeOperation}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 13.11.2013
  */

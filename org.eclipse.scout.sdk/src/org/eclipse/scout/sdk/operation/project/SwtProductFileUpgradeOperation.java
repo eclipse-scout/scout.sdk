@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link SwtProductFileUpgradeOperation}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 19.01.2012
  */
@@ -42,10 +42,14 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
   public void init() {
     ArrayList<IFile> productFiles = new ArrayList<IFile>(2);
     IFile dev = getProperties().getProperty(CreateUiSwtPluginOperation.PROP_PRODUCT_FILE_DEV, IFile.class);
-    if (dev != null) productFiles.add(dev);
+    if (dev != null) {
+      productFiles.add(dev);
+    }
 
     IFile prod = getProperties().getProperty(CreateUiSwtPluginOperation.PROP_PRODUCT_FILE_PROD, IFile.class);
-    if (prod != null) productFiles.add(prod);
+    if (prod != null) {
+      productFiles.add(prod);
+    }
 
     m_swtProdFiles = productFiles.toArray(new IFile[productFiles.size()]);
   }

@@ -11,9 +11,8 @@
 package org.eclipse.scout.sdk.ui.fields.table;
 
 /**
- * <h3>{@link ISeparator}</h3>
- * Marker interface to provide separators in tables.
- * 
+ * <h3>{@link ISeparator}</h3> Marker interface to provide separators in tables.
+ *
  * @see FilteredTable
  * @author Andreas Hoegger
  * @since 3.8.0 04.02.2012

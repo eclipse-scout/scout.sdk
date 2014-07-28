@@ -14,13 +14,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ui.fields.proposal.SelectionStateLabelProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.signature.ImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.swt.graphics.Image;
 
 /**
  * <h3>{@link SignatureLabelProvider}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 09.02.2012
  */

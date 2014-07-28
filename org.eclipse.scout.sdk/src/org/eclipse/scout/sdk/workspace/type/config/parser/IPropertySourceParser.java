@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
 /**
  * <h3>{@link IPropertySourceParser}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 25.02.2013
  */
@@ -25,7 +25,7 @@ public interface IPropertySourceParser<T> {
 
   /**
    * Parses the value out of the source input. The source input is a reference or a simple value.
-   * 
+   *
    * @param source
    *          e.g. "astring" or 12 or Integer.MAX_VALUE
    * @param context

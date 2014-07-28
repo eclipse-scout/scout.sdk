@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link NewNlsProposal}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 23.10.2013
  */

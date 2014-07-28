@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.dom.ReturnStatement;
 /**
  * <h3>{@link ReturnClauseAstVisitor}</h3> An AST visitor decorator that delegates all visits inside a return statement
  * (e.g. "return xyz.abc;") to the wrapped visitor.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 30.09.2013
  */

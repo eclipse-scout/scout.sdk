@@ -265,7 +265,9 @@ public class FilteredTable extends Composite {
     }
 
     public P_FilterResult getFilterResult(Viewer viewer, Object element) {
-      if (viewer == null) return null;
+      if (viewer == null) {
+        return null;
+      }
       String key = DATA_FILTER_RESULT_PREFIX + Integer.toString(element.hashCode());
       return (P_FilterResult) viewer.getData(key);
     }
@@ -297,8 +299,8 @@ public class FilteredTable extends Composite {
   }
 
   /**
-   * <h3>{@link P_TableSorter}</h3>
-   * The default table sorter. Can be replaced by setting any other sorter or null afterwards.
+   * <h3>{@link P_TableSorter}</h3> The default table sorter. Can be replaced by setting any other sorter or null
+   * afterwards.
    *
    * @author Andreas Hoegger
    * @since 3.8.0 27.01.2012

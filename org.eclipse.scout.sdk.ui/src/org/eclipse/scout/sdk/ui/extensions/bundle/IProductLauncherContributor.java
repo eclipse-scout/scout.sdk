@@ -18,14 +18,14 @@ import org.eclipse.scout.sdk.ui.view.properties.presenter.single.ProductLaunchPr
 
 /**
  * <h3>{@link IProductLauncherContributor}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 09.09.2013
  */
 public interface IProductLauncherContributor {
   /**
    * Callback to contribute bundle type specific additional links in the product launch presenter.
-   * 
+   *
    * @param model
    * @throws CoreException
    * @see ProductLaunchPresenter
@@ -34,7 +34,7 @@ public interface IProductLauncherContributor {
 
   /**
    * Called when the launch state of the presenter changes. E.g. when stopping a running application.
-   * 
+   *
    * @param mode
    *          The new state. See {@link ProductLaunchPresenter} and {@link ILaunchManager} for possible constant values.
    */

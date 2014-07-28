@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link NewProjectLoadTargetOperation}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 07.04.2014
  */

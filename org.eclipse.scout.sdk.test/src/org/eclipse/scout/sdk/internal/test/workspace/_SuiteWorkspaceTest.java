@@ -16,8 +16,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    TestWorkingCopyManager.class,
-    TestBundleGraph.class
+  TestWorkingCopyManager.class,
+  TestBundleGraph.class
 })
 public class _SuiteWorkspaceTest {
 

@@ -75,15 +75,23 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   @Override
   public IScoutBundle getScoutBundle() {
-    if (getParent() != null) return getParent().getScoutBundle();
-    else return null;
+    if (getParent() != null) {
+      return getParent().getScoutBundle();
+    }
+    else {
+      return null;
+    }
   }
 
   @Override
   public IPageOutlineView getOutlineView() {
     IPage parent = getParent();
-    if (parent != null) return parent.getOutlineView();
-    else return null;
+    if (parent != null) {
+      return parent.getOutlineView();
+    }
+    else {
+      return null;
+    }
   }
 
   @Override
@@ -121,7 +129,9 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   @Override
   public void addChild(IPage child) {
-    if (child == null) throw new IllegalArgumentException("adding null child to " + getName());
+    if (child == null) {
+      throw new IllegalArgumentException("adding null child to " + getName());
+    }
     synchronized (m_children) {
       m_children.put(new CompositeObject(child.getOrder(), m_children.size(), child), child);
     }
@@ -129,7 +139,9 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   @Override
   public boolean removeChild(IPage childPage) {
-    if (childPage == null) throw new IllegalArgumentException("remove null child to " + getName());
+    if (childPage == null) {
+      throw new IllegalArgumentException("remove null child to " + getName());
+    }
     childPage.setParent(null);
     synchronized (m_children) {
       for (Iterator<Entry<CompositeObject, IPage>> it = m_children.entrySet().iterator(); it.hasNext();) {
@@ -320,7 +332,7 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
 
   /**
    * to handle the node double click
-   * 
+   *
    * @return consumed if the expansion should be prevented
    */
   public boolean handleDoubleClickedDelegate() {

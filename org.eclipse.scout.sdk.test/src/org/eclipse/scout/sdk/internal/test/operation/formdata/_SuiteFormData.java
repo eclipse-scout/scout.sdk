@@ -16,27 +16,27 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * <h3>{@link _SuiteFormData}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 18.02.2011
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    AnnotationCopyTest.class,
-    ExternalCheckboxFieldTest.class,
-    ExternalGroupboxTest.class,
-    ExternalTableFieldTest.class,
-    FormPropertiesTest.class,
-    FormWithGroupboxesTest.class,
-    FormWithTemplateTest.class,
-    IgnoredFieldsFormTest.class,
-    ListBoxFormTest.class,
-    ReplaceFormFieldTest.class,
-    SimpleFormTest.class,
-    TableFieldBeanTest.class,
-    TableFieldFormTest.class,
-    TableFieldWithIgnoredColumnsTest.class,
-    MasterFieldFormDataTest.class
+  AnnotationCopyTest.class,
+  ExternalCheckboxFieldTest.class,
+  ExternalGroupboxTest.class,
+  ExternalTableFieldTest.class,
+  FormPropertiesTest.class,
+  FormWithGroupboxesTest.class,
+  FormWithTemplateTest.class,
+  IgnoredFieldsFormTest.class,
+  ListBoxFormTest.class,
+  ReplaceFormFieldTest.class,
+  SimpleFormTest.class,
+  TableFieldBeanTest.class,
+  TableFieldFormTest.class,
+  TableFieldWithIgnoredColumnsTest.class,
+  MasterFieldFormDataTest.class
 })
 public class _SuiteFormData {
 

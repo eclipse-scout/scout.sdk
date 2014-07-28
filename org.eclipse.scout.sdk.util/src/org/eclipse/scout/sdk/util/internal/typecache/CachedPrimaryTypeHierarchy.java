@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
  * <p>
  * Wraps a {@link CachedTypeHierarchy} and filters the result such that it contains only primary types (i.e.
  * {@link IType}s for which <code>{@link IType#getDeclaringType()} == null</code>)
- * 
+ *
  * @author Michael Schaufelberger
  * @since 4.1.0 04.06.2014
  */

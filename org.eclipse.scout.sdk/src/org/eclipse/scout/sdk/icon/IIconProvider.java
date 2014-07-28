@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.icon;
 
-
 public interface IIconProvider {
 
   ScoutIconDesc[] getIcons();

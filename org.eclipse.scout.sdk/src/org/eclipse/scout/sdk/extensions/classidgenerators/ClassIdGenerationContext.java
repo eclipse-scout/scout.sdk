@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 /**
  * <h3>{@link ClassIdGenerationContext}</h3> Context for a ClassId generation. Holds information about the type that
  * will hold the annotation after it has been created.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 05.01.2014
  */
@@ -46,7 +46,7 @@ public class ClassIdGenerationContext {
 
   /**
    * Gets the source builder to which the annotation will be added.
-   * 
+   *
    * @return The parent source builder that will hold the annotation or null.
    */
   public ITypeSourceBuilder getParentTypeSourceBuilder() {
@@ -55,7 +55,7 @@ public class ClassIdGenerationContext {
 
   /**
    * Gets the declaring type for which the ClassId should be generated.
-   * 
+   *
    * @return The declaring type or null if the type does not exist yet.
    */
   public IType getDeclaringType() {

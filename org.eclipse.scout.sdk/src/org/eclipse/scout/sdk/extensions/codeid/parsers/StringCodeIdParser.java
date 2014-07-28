@@ -20,7 +20,9 @@ public class StringCodeIdParser implements ICodeIdParser {
 
   @Override
   public String getSource(String val) {
-    if (val == null) return null;
+    if (val == null) {
+      return null;
+    }
     return JdtUtility.toStringLiteral(val);
   }
 }

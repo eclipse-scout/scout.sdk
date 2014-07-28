@@ -147,7 +147,9 @@ public class ExportEarOperation implements IOperation {
   }
 
   private String cutExtension(String fileName) {
-    if (fileName == null || fileName.length() < 1) return fileName;
+    if (fileName == null || fileName.length() < 1) {
+      return fileName;
+    }
     int pos = fileName.lastIndexOf('.');
     if (pos > 0) {
       fileName = fileName.substring(0, pos);

@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.util.type.ITypeFilter;
 /**
  * <h3>{@link ITypeHierarchyResult}</h3> Stores the result of a type hierarchy. This may include internal hierarchical
  * graph information or not.
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 14.05.2014
  */
@@ -37,7 +37,7 @@ public interface ITypeHierarchyResult extends Iterable<IType> {
 
   /**
    * Returns all types in this hierarchy result, ordered according to the given comparator.
-   * 
+   *
    * @param typeFilter
    *          a type filter to reduce the result or null.
    * @param comparator
@@ -48,7 +48,7 @@ public interface ITypeHierarchyResult extends Iterable<IType> {
 
   /**
    * Returns whether the given type is part of this hierarchy result.
-   * 
+   *
    * @param type
    *          The type to search
    * @return true if the given type is part of the hierarchy result. false otherwise.
@@ -57,7 +57,7 @@ public interface ITypeHierarchyResult extends Iterable<IType> {
 
   /**
    * Gets the {@link IType} this hierarchy result was focused on.
-   * 
+   *
    * @return the {@link IType} the hierarchy was created for (origin) or null if the hierarchy results not from a
    *         {@link IType}.
    */

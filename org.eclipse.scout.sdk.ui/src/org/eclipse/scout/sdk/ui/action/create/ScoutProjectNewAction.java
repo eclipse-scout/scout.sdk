@@ -23,7 +23,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>ScoutProjectNewAction</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 10.03.2010
  */

@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link AbstractEquinoxSecurityInstallOperation}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 10.12.2012
  */

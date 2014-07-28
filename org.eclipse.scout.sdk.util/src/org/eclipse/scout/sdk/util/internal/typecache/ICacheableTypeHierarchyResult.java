@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyResult;
 
 /**
  * <h3>{@link ICacheableTypeHierarchyResult}</h3> Only used internally for cache handling.
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 16.05.2014
  */
@@ -33,7 +33,7 @@ public interface ICacheableTypeHierarchyResult extends ICachedTypeHierarchyResul
    * Specifies if the given type would be part of the {@link ITypeHierarchyResult}. This method should not actually use
    * the content of the {@link ITypeHierarchyResult} but instead should check according to the constraints that define
    * the hierarchy.
-   * 
+   *
    * @param candidate
    *          The candidate to check if it fulfills the {@link ITypeHierarchyResult} constraints.
    * @param candidateSuperTypes

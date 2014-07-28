@@ -24,7 +24,7 @@ import org.eclipse.scout.nls.sdk.simple.model.ws.project.SimpleNlsProject;
 
 /**
  * The description to generate a new translation file.
- * 
+ *
  * @see TranslationFileNewDialog
  */
 public class TranslationFileNewModel implements ITranslationLocationChooserModel {
@@ -93,9 +93,13 @@ public class TranslationFileNewModel implements ITranslationLocationChooserModel
       return null;
     }
     String countryIso = getCountryIso();
-    if (countryIso == null) countryIso = "";
+    if (countryIso == null) {
+      countryIso = "";
+    }
     String variant = getLanguageVariant();
-    if (variant == null) variant = "";
+    if (variant == null) {
+      variant = "";
+    }
     return new Language(new Locale(langIso, countryIso, variant));
   }
 

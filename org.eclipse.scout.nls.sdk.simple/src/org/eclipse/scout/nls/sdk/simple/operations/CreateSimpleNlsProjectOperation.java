@@ -118,8 +118,12 @@ public class CreateSimpleNlsProjectOperation extends AbstractCreateNlsProjectOpe
 
   public static void createLanguageFile(String lang, IFolder folder, String filePrefix, IProgressMonitor monitor) throws CoreException {
     NlsJdtUtility.createFolder(folder, true, monitor);
-    if (lang == null) lang = "";
-    else lang = "_" + lang;
+    if (lang == null) {
+      lang = "";
+    }
+    else {
+      lang = "_" + lang;
+    }
     String filename = filePrefix + lang + ".properties";
     IFile file = folder.getFile(filename);
     if (!file.exists()) {

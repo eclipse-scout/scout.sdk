@@ -122,7 +122,7 @@ public final class ScoutWorkspace implements IScoutWorkspace {
   /**
    * Schedules a job that rebuilds the scout bundle graph (asynchronously).
    * After finishing, changes are reported using the {@link IScoutWorkspaceListener}
-   * 
+   *
    * @see IScoutWorkspace#addWorkspaceListener(IScoutWorkspaceListener)
    */
   public void rebuildGraph() {

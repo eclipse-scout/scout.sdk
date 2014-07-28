@@ -18,7 +18,7 @@ import org.eclipse.scout.commons.nls.DynamicNls;
  * nls support is not anymore garanteed.
  * This calss is auto generated and is maintained by the plugins
  * Texts.nls file in the root directory of the plugin.
- * 
+ *
  * @see translation.nls
  */
 public class Texts extends DynamicNls {

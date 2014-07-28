@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 
 /**
  * <h3>{@link CachedTypeHierarchy}</h3>
- * 
+ *
  * @author Michael Schaufelberger
  * @since 4.1.0 03.06.2014
  */

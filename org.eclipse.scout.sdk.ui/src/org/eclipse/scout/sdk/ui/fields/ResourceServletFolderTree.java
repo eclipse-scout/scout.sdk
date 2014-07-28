@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link ResourceServletFolderTree}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011
  */

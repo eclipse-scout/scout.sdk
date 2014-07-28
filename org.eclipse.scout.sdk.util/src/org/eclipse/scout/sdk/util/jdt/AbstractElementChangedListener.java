@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDeltaMana
  * WARNING: JDT is not correctly reporting changes in ITypes and IMethods
  * JDT stops reporting at ICompilationUnit workingCopyManager on content-only changes, whereas add/remove changes are
  * reported down to IMethod workingCopyManager.
- * 
+ *
  * @Note never add the IJavaElementDelta.F_FINE_GRAINED flag to the CHANGED_FLAG_MASK.
  *       Therefore this class is taking this into account and tries to report as precise as possible down to fine
  *       grained levels
@@ -55,30 +55,48 @@ public abstract class AbstractElementChangedListener implements IElementChangedL
     if (e != null) {
       switch (kind) {
         case IJavaElementDelta.ADDED: {
-          if (!visit(kind, flags, e, ast)) return false;
-          if (!visitAdd(flags, e, ast)) return false;
+          if (!visit(kind, flags, e, ast)) {
+            return false;
+          }
+          if (!visitAdd(flags, e, ast)) {
+            return false;
+          }
           break;
         }
         case IJavaElementDelta.REMOVED: {
-          if (!visit(kind, flags, e, ast)) return false;
-          if (!visitRemove(flags, e, ast)) return false;
+          if (!visit(kind, flags, e, ast)) {
+            return false;
+          }
+          if (!visitRemove(flags, e, ast)) {
+            return false;
+          }
           break;
         }
         case IJavaElementDelta.CHANGED: {
           if (e.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
-            if (!visitPackageModify(flags, (IPackageFragment) e, ast)) return false;
+            if (!visitPackageModify(flags, (IPackageFragment) e, ast)) {
+              return false;
+            }
           }
           if ((flags & CHANGED_FLAG_MASK) != 0) {
             // workaround: try to find out what really changed
             if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
               for (FineGrainedJavaElementDelta a : FineGrainedJavaElementDeltaManager.getInstance().getDelta(delta)) {
-                if (!visit(kind, flags, a.getElement(), ast)) return false;
-                if (!visitModify(flags, a.getElement(), ast)) return false;
+                if (!visit(kind, flags, a.getElement(), ast)) {
+                  return false;
+                }
+                if (!visitModify(flags, a.getElement(), ast)) {
+                  return false;
+                }
               }
             }
             else {
-              if (!visit(kind, flags, e, ast)) return false;
-              if (!visitModify(flags, e, ast)) return false;
+              if (!visit(kind, flags, e, ast)) {
+                return false;
+              }
+              if (!visitModify(flags, e, ast)) {
+                return false;
+              }
             }
           }
           break;
@@ -90,7 +108,9 @@ public abstract class AbstractElementChangedListener implements IElementChangedL
       IJavaElementDelta[] childDeltas = delta.getAffectedChildren();
       if (childDeltas != null && childDeltas.length > 0) {
         for (int i = 0; i < childDeltas.length; i++) {
-          if (!visitDelta(childDeltas[i], type, ast)) return false;
+          if (!visitDelta(childDeltas[i], type, ast)) {
+            return false;
+          }
         }
       }
     }

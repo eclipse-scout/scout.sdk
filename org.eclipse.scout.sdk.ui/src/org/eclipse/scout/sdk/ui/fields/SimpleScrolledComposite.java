@@ -17,7 +17,7 @@ import org.eclipse.ui.forms.widgets.SharedScrolledComposite;
 
 /**
  * <h3>{@link SimpleScrolledComposite}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 17.12.2012
  */

@@ -14,13 +14,13 @@ import org.eclipse.scout.sdk.ScoutSdkCore;
 
 /**
  * The root of the scout SDK.
- * 
+ *
  * @see ScoutSdkCore#getScoutWorkspace()
  */
 public interface IScoutWorkspace {
   /**
    * adds a new workspace listener to the scout workspace
-   * 
+   *
    * @param listener
    * @see IScoutWorkspaceListener
    */
@@ -28,7 +28,7 @@ public interface IScoutWorkspace {
 
   /**
    * removes a workspace listener from the scout workspace
-   * 
+   *
    * @param listener
    * @see IScoutWorkspaceListener
    */
@@ -36,7 +36,7 @@ public interface IScoutWorkspace {
 
   /**
    * gets the bundle graph containing all scout bundles of the workspace and the target platform
-   * 
+   *
    * @return the scout bundle graph
    * @see IScoutBundleGraph
    */
@@ -45,7 +45,7 @@ public interface IScoutWorkspace {
   /**
    * specifies if the {@link IScoutWorkspace} is initialized. This is true after the
    * {@link ScoutWorkspaceEvent#TYPE_WORKSPACE_INITIALIZED} has been fired until the workspace is disposed.
-   * 
+   *
    * @return true if the workspace is currently initialized, false otherwise.
    */
   boolean isInitialized();

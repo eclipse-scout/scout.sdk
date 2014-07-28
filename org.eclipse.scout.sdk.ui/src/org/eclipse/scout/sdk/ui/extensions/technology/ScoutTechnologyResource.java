@@ -19,7 +19,7 @@ import org.eclipse.ui.model.IWorkbenchAdapter;
 
 /**
  * <h3>{@link ScoutTechnologyResource}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 11.02.2012
  */

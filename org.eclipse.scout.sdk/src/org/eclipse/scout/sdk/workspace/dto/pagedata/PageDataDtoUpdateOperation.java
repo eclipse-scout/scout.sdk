@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
 
 /**
  * <h3>{@link PageDataDtoUpdateOperation}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 16.08.2013
  */

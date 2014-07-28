@@ -43,7 +43,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link MenuTypeDialog}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 03.06.2014
  */

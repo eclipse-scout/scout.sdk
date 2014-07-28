@@ -28,8 +28,8 @@ import org.junit.Test;
 
 /**
  * <h3>{@link GenericTypeNewOperationTest}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 08.02.2013
  */
 public class GenericTypeNewOperationTest extends AbstractSdkTestWithJdtTestProject {
@@ -37,7 +37,7 @@ public class GenericTypeNewOperationTest extends AbstractSdkTestWithJdtTestProje
   /**
    * Step1: Create a primary type with a generic super type.
    * Step2: Override a method from generic super type having the generic parameter as a return value.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -61,7 +61,7 @@ public class GenericTypeNewOperationTest extends AbstractSdkTestWithJdtTestProje
    * Step1: Create a primary type with a generic super type. The generic super type has itself a generic super type with
    * an other generic parameter type.
    * Step2: Override a method from generic super type having the generic parameter as a return value.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -87,10 +87,10 @@ public class GenericTypeNewOperationTest extends AbstractSdkTestWithJdtTestProje
    *   Hierarchy02<F> extends Hierarchy01<F>
    *    Hierarchy03 extends Hierarchy02<String>
    * </pre>
-   * 
+   *
    * Step1: Create a primary type with Hierarchy03 as super type.
    * Step2: Override a method from generic super type having the generic parameter as a return value.
-   * 
+   *
    * @throws Exception
    */
   @Test
@@ -114,7 +114,7 @@ public class GenericTypeNewOperationTest extends AbstractSdkTestWithJdtTestProje
    * Step1: Create a primary type with a generic super type.
    * Step2: Override a method from generic super type having the generic parameter as a return value with a source
    * builder.
-   * 
+   *
    * @throws Exception
    */
   @Test

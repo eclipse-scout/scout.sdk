@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
 /**
  * <h3>{@link ClientBundleUpdateFormDataOperation}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 20.07.2011
  */

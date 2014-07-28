@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link ServiceRegistrationDescription}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 22.11.2013
  */

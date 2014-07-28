@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 
 /**
  * <h3>{@link ServiceMethod}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 09.04.2013
  */

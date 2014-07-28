@@ -63,7 +63,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
   /**
    * Returns a list of all fragments of the host plugin specified by the hostPluginId. If no plugins are found
    * an empty list is returned.
-   * 
+   *
    * @param hostPluginId
    * @return all fragments of the passed host plugin id found in the workspace
    * @throws CoreException
@@ -96,7 +96,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
 
   /**
    * finds all fragments to a cretain plugin project
-   * 
+   *
    * @param project
    * @return
    * @throws FileNotFoundException
@@ -159,7 +159,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
 
   /**
    * Returns the shared instance
-   * 
+   *
    * @return the shared instance
    */
   public static NlsSdkSimple getDefault() {
@@ -170,7 +170,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
    * finds all translations of the passed file in the toLookAt project. e.g. if a file
    * /lib/translations/messages.properties is passed all files /lib/translations/messages_[de|en|..].properties will be
    * returned.
-   * 
+   *
    * @param toLookAt
    *          the project to take a look at usually a fragment of the project the passed file is in.
    * @param file

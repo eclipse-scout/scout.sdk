@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.ui.internal.extensions.technology;
 
 /**
  * <h3>{@link IOrbitConstants}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 02.05.2013
  */

@@ -28,12 +28,12 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>SharedContextBeanPropertyNewOperation</h3> A shared context property looks like:
- * 
+ *
  * <pre>
  * public Long getCompanyNr() {
  *   return getSharedContextVariable(&quot;companyNr&quot;, Long.class);
  * }
- * 
+ *
  * public void setCompanyNr(Long newValue) {
  *   setSharedContextVariable(&quot;companyNr&quot;, Long.class, newValue);
  * }

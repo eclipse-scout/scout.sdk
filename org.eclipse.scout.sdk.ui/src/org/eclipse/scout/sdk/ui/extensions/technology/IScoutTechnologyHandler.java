@@ -24,7 +24,7 @@ public interface IScoutTechnologyHandler {
   /**
    * called when the technology selection checkbox changes its values. this method is called for all handlers before the
    * first selectionChanged() is invoked.
-   * 
+   *
    * @param selected
    *          the new selection value
    * @return true if the processing should continue, false if the processing should be aborted and the checkbox should
@@ -35,7 +35,7 @@ public interface IScoutTechnologyHandler {
 
   /**
    * called when the technology selection checkbox changes its value
-   * 
+   *
    * @param resources
    *          all resources that should be modified. only "own" (returned by getModifactionResourceCandidates) resources
    *          are passed.
@@ -47,7 +47,7 @@ public interface IScoutTechnologyHandler {
   /**
    * called when the technology selection checkbox changes its values. this method is called for all handlers after the
    * last selectionChanged() is invoked.
-   * 
+   *
    * @param selected
    *          the new selection value
    * @throws CoreException
@@ -56,7 +56,7 @@ public interface IScoutTechnologyHandler {
 
   /**
    * gets the current selection the checkbox should have.
-   * 
+   *
    * @param project
    *          the corresponding scout project
    * @return true if this handler is the opinion the checkbox should be selected, false otherwise.
@@ -65,7 +65,7 @@ public interface IScoutTechnologyHandler {
 
   /**
    * gets all resources the user can choose from when modifying a technology.
-   * 
+   *
    * @param project
    *          the corresponding scout project
    * @return The resources that can be modified
@@ -75,7 +75,7 @@ public interface IScoutTechnologyHandler {
   /**
    * specifies if the handler is active. an inactive handler is never used. it cannot contribute resources and will not
    * be executed.
-   * 
+   *
    * @param project
    *          the corresponding scout project
    * @return true if the handler should be used, false otherwise

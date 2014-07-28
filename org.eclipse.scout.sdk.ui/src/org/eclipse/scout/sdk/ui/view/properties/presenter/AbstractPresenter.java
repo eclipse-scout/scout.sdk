@@ -18,7 +18,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>{@link AbstractPresenter}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 31.08.2010
  */

@@ -15,7 +15,7 @@ import java.util.List;
 
 /**
  * <h3>{@link SqlStatement}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 25.02.2011
  */
@@ -73,7 +73,9 @@ public class SqlStatement {
   public String buildStatement() {
     StringBuilder builder = new StringBuilder();
     for (ISqlToken t : m_tokens) {
-      if (t.getType() == ISqlToken.TYPE_STRING_FRAGMENT) builder.append(((StringFragmentToken) t).getValue());
+      if (t.getType() == ISqlToken.TYPE_STRING_FRAGMENT) {
+        builder.append(((StringFragmentToken) t).getValue());
+      }
     }
     return builder.toString();
   }

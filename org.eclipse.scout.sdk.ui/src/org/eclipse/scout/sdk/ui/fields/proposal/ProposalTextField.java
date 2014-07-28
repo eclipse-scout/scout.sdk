@@ -470,7 +470,9 @@ public class ProposalTextField extends TextField {
           break;
         } // end FocusIn
         case SWT.MouseUp: {
-          if (getText().length() > 0) textModified();
+          if (getText().length() > 0) {
+            textModified();
+          }
           break;
         } // end MouseUp
         case SWT.Traverse: {

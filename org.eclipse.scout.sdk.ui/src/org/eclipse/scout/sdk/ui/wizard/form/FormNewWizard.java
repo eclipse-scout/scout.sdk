@@ -54,7 +54,7 @@ import org.eclipse.ui.IWorkbench;
 
 /**
  * <h3> {@link FormNewWizard}</h3> To create a new form.
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 05.11.2009
  */

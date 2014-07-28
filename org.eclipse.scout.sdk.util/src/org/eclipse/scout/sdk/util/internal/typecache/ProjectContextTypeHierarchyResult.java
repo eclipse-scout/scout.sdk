@@ -37,9 +37,8 @@ import org.eclipse.scout.sdk.util.typecache.TypeHierarchyConstraints;
 /**
  * <h3>{@link ProjectContextTypeHierarchyResult}</h3> A hierarchy result that is limited to a specific
  * {@link IJavaProject} classpath.
- * Further {@link TypeHierarchyConstraints} can be specified limiting the content of the
- * {@link ITypeHierarchyResult}.
- * 
+ * Further {@link TypeHierarchyConstraints} can be specified limiting the content of the {@link ITypeHierarchyResult}.
+ *
  * @author Matthias Villiger
  * @since 4.0.0 13.05.2014
  */
@@ -166,13 +165,13 @@ public final class ProjectContextTypeHierarchyResult implements ICacheableTypeHi
         e.searchAllTypeNames(null, SearchPattern.R_EXACT_MATCH, null, SearchPattern.R_EXACT_MATCH, m_constraints.getSearchFor(),
             SearchEngine.createStrictHierarchyScope(m_constraints.getClasspath(), getBaseType(), true, m_constraints.isIncludeBaseType(), null),
             new TypeNameMatchRequestor() {
-              @Override
-              public void acceptTypeNameMatch(TypeNameMatch match) {
-                if (m_constraints.modifiersAccepted(match.getModifiers())) {
-                  collector.add(match.getType());
-                }
-              }
-            }, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, monitor);
+          @Override
+          public void acceptTypeNameMatch(TypeNameMatch match) {
+            if (m_constraints.modifiersAccepted(match.getModifiers())) {
+              collector.add(match.getType());
+            }
+          }
+        }, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, monitor);
         m_cachedTypes = collector;
       }
       catch (JavaModelException e) {

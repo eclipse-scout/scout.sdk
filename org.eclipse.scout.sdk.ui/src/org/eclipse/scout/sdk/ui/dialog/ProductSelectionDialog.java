@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link ProductSelectionDialog}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 09.09.2010
  */

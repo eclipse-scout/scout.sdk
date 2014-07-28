@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.ScoutSdkCore;
 
 /**
  * Listener that gets notified when the scout workspace changes
- * 
+ *
  * @see ScoutSdkCore#getScoutWorkspace()
  * @see IScoutWorkspace
  */
@@ -24,7 +24,7 @@ public interface IScoutWorkspaceListener extends EventListener {
 
   /**
    * is called when the workspace changes
-   * 
+   *
    * @param event
    *          contains information about the event
    * @see ScoutWorkspaceEvent

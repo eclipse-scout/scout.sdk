@@ -17,7 +17,7 @@ import org.eclipse.jdt.core.Signature;
 
 /**
  * <h3>{@link SignatureCache}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 22.11.2012
  */

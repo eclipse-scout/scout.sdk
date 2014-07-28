@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.IPath;
 
 /**
  * Abstraction for different files, e.g. Eclipse-{@link IFile} or Java-{@link File}.
- * 
+ *
  * @param <T>
  */
 public interface IFileHandle<T> {

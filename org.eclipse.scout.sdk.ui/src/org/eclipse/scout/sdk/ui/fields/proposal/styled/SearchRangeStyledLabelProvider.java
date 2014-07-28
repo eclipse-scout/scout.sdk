@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.SelectionStateLabelProvider;
 
 /**
  * <h3>{@link SearchRangeStyledLabelProvider}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 17.02.2012
  */

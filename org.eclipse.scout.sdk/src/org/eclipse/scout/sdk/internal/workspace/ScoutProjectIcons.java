@@ -142,7 +142,9 @@ public class ScoutProjectIcons implements IIconProvider {
 
   @SuppressWarnings("resource")
   protected void findIconInProject(ScoutIconDesc desc) {
-    if (desc == null || desc.getIconName() == null) return;
+    if (desc == null || desc.getIconName() == null) {
+      return;
+    }
 
     for (String baseUrl : m_baseUrls) {
       for (String ext : PREDEFINED_EXTENSIONS) {

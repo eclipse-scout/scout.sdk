@@ -23,8 +23,6 @@ import org.junit.Test;
 
 /**
  * Tests methods of the CompatibilityUtility.
- * 
- * @see CompatibilityUtility
  */
 public class CompatibilityTest extends AbstractScoutSdkTest {
 

@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
  * <li>the changed type is the not member of any child page and does contain the given super type anymore in the
  * supertype hierarchy</li>
  * </ul>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 21.11.2010
  */

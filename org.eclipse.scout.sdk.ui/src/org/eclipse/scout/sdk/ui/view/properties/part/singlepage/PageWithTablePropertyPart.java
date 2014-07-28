@@ -34,7 +34,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>{@link PageWithTablePropertyPart}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 09.10.2013
  */

@@ -14,14 +14,14 @@ import org.eclipse.jdt.core.IMethod;
 
 /**
  * <h3>{@link IMethodReturnValueParser}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 30.09.2013
  */
 public interface IMethodReturnValueParser {
   /**
    * parses the return expression of the given method
-   * 
+   *
    * @param m
    *          the method of which the return expression should be parsed.
    * @return the parsed expression. Depending on the parser used, the result may contain more or less meta information

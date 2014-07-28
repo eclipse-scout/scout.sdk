@@ -14,7 +14,7 @@ import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 
 /**
  * <h3>{@link IMarketplaceConstants}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 15.02.2012
  */

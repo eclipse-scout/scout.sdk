@@ -36,7 +36,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * Returns all resolved subtypes (direct and indirect) of the given type, ordered according to the given comparator
    * limited to the types in this type hierarchy's graph that accept the given {@link ITypeFilter}. An empty {@link Set}
    * is returned if there are no resolved subtypes for the given type and filter.
-   * 
+   *
    * @param type
    *          the base type for which to get the subtypes
    * @param filter
@@ -62,7 +62,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * hierarchy's graph that accept the given {@link ITypeFilter}. An empty {@link Set} is returned if there are no
    * classes in this hierarchy that fulfill the given filter.<br>
    * All {@link IType}s that are no interface are considered to be a class.
-   * 
+   *
    * @param filter
    *          a type filter to reduce the result or null.
    * @param comparator
@@ -87,7 +87,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * An empty {@link Set} is returned if there are no interfaces in this hierarchy that fulfill the given filter.<br>
    * Any interfaces in the creation region which were not resolved to have any subtypes or supertypes are not included
    * in the result.
-   * 
+   *
    * @param filter
    *          a type filter to reduce the result or null.
    * @param comparator
@@ -103,7 +103,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * Otherwise it checks if potentialSubtype is a subtype of type according to this hierarchy. This means that if type
    * or potentialSubtype are not part of the hierarchy, this method returns {@code false}, as long as the types are not
    * equal.
-   * 
+   *
    * @param type
    *          The base type.
    * @param potentialSubtype
@@ -118,7 +118,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * The given {@link IType} is always part of the {@link Deque} and can therefore be found at the first position.<br>
    * You can use {@link Deque#descendingIterator()} to loop through the classes in top-down order.<br>
    * Note: {@link java.lang.Object} is never part of the super classes stack.
-   * 
+   *
    * @param startType
    *          The start {@link IType}. Will always be part of the resulting {@link Deque}.
    * @return The super classes stack in bottom-up order.
@@ -133,7 +133,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * Then it can therefore be found at the first position.<br>
    * You can use {@link Deque#descendingIterator()} to loop through the classes in top-down order.<br>
    * Note: {@link java.lang.Object} is never part of the super classes stack.
-   * 
+   *
    * @param startType
    *          The start {@link IType}.
    * @param includeStartType
@@ -163,7 +163,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * query a class recursively up the superclass chain. Querying an element performs a dynamic resolution, whereas the
    * hierarchy returns a pre-computed result.<br>
    * All {@link IType}s that are no interface are considered to be a class.
-   * 
+   *
    * @param type
    *          the base for which to get the superclasses.
    * @param filter
@@ -191,7 +191,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * NOTE: once a type hierarchy has been created, it is more efficient to query the hierarchy for superinterfaces than
    * to query a type recursively. Querying an element performs a dynamic resolution, whereas the hierarchy returns a
    * pre-computed result.
-   * 
+   *
    * @param type
    *          the base type for which to get the superinterfaces.
    * @param filter
@@ -219,7 +219,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * NOTE: once a type hierarchy has been created, it is more efficient to query the hierarchy for supertypes than to
    * query a type recursively up the supertype chain. Querying an element performs a dynamic resolution, whereas the
    * hierarchy returns a pre-computed result.
-   * 
+   *
    * @param type
    *          the base type for which to get the supertypes.
    * @param filter
@@ -246,7 +246,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * given type is an interface, or if no classes were resolved to be subclasses of the given class according to the
    * given {@link ITypeFilter}.<br>
    * All {@link IType}s that are no interface are considered to be a class.
-   * 
+   *
    * @param type
    *          the base type for which to get the subclasses
    * @param filter
@@ -273,7 +273,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * types in this type hierarchy's graph that are accepted by the given {@link ITypeFilter}.<br>
    * If the type is a class, this returns the resolved subclasses. If the type is an interface, this returns both the
    * classes which implement the interface and the interfaces which extend it.
-   * 
+   *
    * @param type
    *          the context type.
    * @param filter
@@ -288,7 +288,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
   /**
    * Returns the resolved superclass of the given class, or null if the given class has no existing superclass, the
    * superclass could not be resolved, or if the given type is an interface.
-   * 
+   *
    * @param type
    *          The type for which to get the superclass.
    * @return The resolved superclass or null.
@@ -310,7 +310,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * limited to the interfaces in this type hierarchy's graph that accept the given {@link ITypeFilter}.<br>
    * For classes, this gives the interfaces that the class implements. For interfaces, this gives the interfaces that
    * the interface extends.
-   * 
+   *
    * @param type
    *          The type for which to get the super interfaces.
    * @param filter
@@ -338,7 +338,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * For classes, this returns its superclass and the interfaces that the class implements. For interfaces, this returns
    * the interfaces that the interface extends.<br>
    * As a consequence {@link Object} is NOT considered to be a supertype of any interface type.
-   * 
+   *
    * @param type
    *          The type for which to get the supertypes.
    * @param filter

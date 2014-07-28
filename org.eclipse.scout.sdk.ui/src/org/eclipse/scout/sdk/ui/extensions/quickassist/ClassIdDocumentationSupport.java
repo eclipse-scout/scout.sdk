@@ -36,7 +36,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link ClassIdDocumentationSupport}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 28.03.2014
  */
@@ -76,7 +76,7 @@ public class ClassIdDocumentationSupport {
 
   /**
    * Starts editing the type that belongs to this instance. Any UI interaction is executed on the given shell.
-   * 
+   *
    * @param shell
    */
   public void editDocumentation(Shell shell) {
@@ -91,7 +91,7 @@ public class ClassIdDocumentationSupport {
 
   /**
    * Gets the documentation entry that belongs to the type of this instance.
-   * 
+   *
    * @return The documentation entry or null if there is no entry for the type.
    */
   public INlsEntry getNlsEntry() {
@@ -213,7 +213,7 @@ public class ClassIdDocumentationSupport {
 
   /**
    * Gets the {@link INlsProject} that belongs to the type of this instance.
-   * 
+   *
    * @return the nls project or null.
    */
   public INlsProject getNlsProject() {

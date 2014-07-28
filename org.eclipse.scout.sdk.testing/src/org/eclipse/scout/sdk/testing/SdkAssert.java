@@ -16,6 +16,7 @@ import java.io.StringReader;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -595,7 +596,7 @@ public class SdkAssert extends Assert {
 
   /**
    * Asserts that the given annotation exists on the given object.
-   * 
+   *
    * @param annotatable
    * @param fqAnnotationTypeName
    * @return
@@ -728,8 +729,7 @@ public class SdkAssert extends Assert {
    * @param serviceInterface
    */
   public static void assertServiceProxyRegistered(IProject project, IType serviceInterface) {
-    IPluginElement[] simpleExtensions = new PluginModelHelper(project).PluginXml.getSimpleExtensions(
-        "org.eclipse.scout.service.services", "proxy");
+    List<IPluginElement> simpleExtensions = new PluginModelHelper(project).PluginXml.getSimpleExtensions("org.eclipse.scout.service.services", "proxy");
     for (IPluginElement element : simpleExtensions) {
       if (CompareUtility.equals(element.getAttribute("class").getValue(), serviceInterface.getFullyQualifiedName())) {
         return;
@@ -745,8 +745,7 @@ public class SdkAssert extends Assert {
    * @param serviceInterface
    */
   public static void assertServiceRegistered(IProject project, IType serviceInterface) {
-    IPluginElement[] simpleExtensions = new PluginModelHelper(project).PluginXml.getSimpleExtensions(
-        "org.eclipse.scout.service.services", "service");
+    List<IPluginElement> simpleExtensions = new PluginModelHelper(project).PluginXml.getSimpleExtensions("org.eclipse.scout.service.services", "service");
     for (IPluginElement element : simpleExtensions) {
       if (CompareUtility.equals(element.getAttribute("class").getValue(), serviceInterface.getFullyQualifiedName())) {
         return;

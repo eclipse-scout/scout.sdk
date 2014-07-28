@@ -20,7 +20,11 @@ public class BooleanCodeIdParser implements ICodeIdParser {
 
   @Override
   public String getSource(String val) {
-    if (val == null) return null;
-    else return val.toLowerCase();
+    if (val == null) {
+      return null;
+    }
+    else {
+      return val.toLowerCase();
+    }
   }
 }

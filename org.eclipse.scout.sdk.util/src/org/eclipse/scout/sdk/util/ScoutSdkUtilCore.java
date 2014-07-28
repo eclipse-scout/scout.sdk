@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link ScoutSdkUtilCore}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 16.05.2014
  * @noinstantiate This class is not intended to be instantiated by clients.
@@ -33,7 +33,7 @@ public final class ScoutSdkUtilCore {
 
   /**
    * Creates and returns a new working copy manager instance.
-   * 
+   *
    * @return The newly created working copy manager.
    * @see IWorkingCopyManager
    */
@@ -43,7 +43,7 @@ public final class ScoutSdkUtilCore {
 
   /**
    * Access to the type cache.
-   * 
+   *
    * @return The type cache instance.
    * @see ITypeCache
    */
@@ -53,7 +53,7 @@ public final class ScoutSdkUtilCore {
 
   /**
    * Access to the type hierarchy cache.
-   * 
+   *
    * @return The type hierarchy cache instance.
    * @see IHierarchyCache
    */
@@ -63,7 +63,7 @@ public final class ScoutSdkUtilCore {
 
   /**
    * Access to the java resource change emitter.
-   * 
+   *
    * @return The emitter instance.
    * @see IJavaResourceChangedEmitter
    */

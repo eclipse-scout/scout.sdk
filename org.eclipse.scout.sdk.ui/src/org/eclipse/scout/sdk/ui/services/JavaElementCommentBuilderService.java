@@ -427,7 +427,9 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
     catch (TemplateException e) {
       throw new CoreException(Status.CANCEL_STATUS);
     }
-    if (buffer == null) return null;
+    if (buffer == null) {
+      return null;
+    }
     String str = buffer.getString();
 
     if (Strings.containsOnlyWhitespaces(str)) {
@@ -437,7 +439,9 @@ public class JavaElementCommentBuilderService implements IJavaElementCommentBuil
   }
 
   private static Template getCodeTemplate(String id, IJavaProject project) {
-    if (project == null) return JavaPlugin.getDefault().getCodeTemplateStore().findTemplateById(id);
+    if (project == null) {
+      return JavaPlugin.getDefault().getCodeTemplateStore().findTemplateById(id);
+    }
     ProjectTemplateStore projectStore = new ProjectTemplateStore(project.getProject());
     try {
       projectStore.load();

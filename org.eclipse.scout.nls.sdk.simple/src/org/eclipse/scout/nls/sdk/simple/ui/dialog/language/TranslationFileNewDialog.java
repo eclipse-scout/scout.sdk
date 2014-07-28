@@ -125,7 +125,9 @@ public class TranslationFileNewDialog extends TitleAreaDialog {
 
   private void revalidate() {
     Button okButton = getButton(IDialogConstants.OK_ID);
-    if (okButton != null) okButton.setEnabled(false);
+    if (okButton != null) {
+      okButton.setEnabled(false);
+    }
 
     // check that language is specified
     String langIso = m_model.getLanguageIso();
@@ -136,7 +138,9 @@ public class TranslationFileNewDialog extends TitleAreaDialog {
 
     // check if language already exists
     String countryIso = m_model.getCountryIso();
-    if (countryIso == null) countryIso = "";
+    if (countryIso == null) {
+      countryIso = "";
+    }
     Language lang = new Language(new Locale(langIso, countryIso));
     if (m_model.getNlsProject().containsLanguage(lang)) {
       setMessage("This Language already exists.", IMessageProvider.WARNING);
@@ -154,7 +158,9 @@ public class TranslationFileNewDialog extends TitleAreaDialog {
     }
 
     setMessage("Adds a new Language to the project.");
-    if (okButton != null) okButton.setEnabled(true);
+    if (okButton != null) {
+      okButton.setEnabled(true);
+    }
   }
 
   private void attachGridData(Control c) {

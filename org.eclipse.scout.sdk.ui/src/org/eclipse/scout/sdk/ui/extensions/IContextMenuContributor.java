@@ -17,7 +17,7 @@ public interface IContextMenuContributor {
 
   /**
    * Gets an array of all menu action implementations that can be available for the given page.
-   * 
+   *
    * @param page
    *          The page for which the available menus should be returned.
    * @return The list of supported menu classes.
@@ -29,7 +29,7 @@ public interface IContextMenuContributor {
    * The preparation of menus is called before the <code>AbstractScoutHandler.isVisible()</code>.<br>
    * Usually this methods fills the menu handler with all arguments required.<br>
    * It is guaranteed that only menus are passed to this method that are marked as supported by the current handler.
-   * 
+   *
    * @param page
    *          The page on which the menu should be shown.
    * @param menu

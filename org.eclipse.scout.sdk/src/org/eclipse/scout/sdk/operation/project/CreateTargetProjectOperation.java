@@ -23,7 +23,7 @@ import org.osgi.framework.Version;
 
 /**
  * <h3>{@link CreateTargetProjectOperation}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 04.04.2014
  */

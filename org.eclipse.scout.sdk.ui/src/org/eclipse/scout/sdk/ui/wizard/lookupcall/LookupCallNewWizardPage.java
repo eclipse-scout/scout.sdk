@@ -56,7 +56,7 @@ import org.eclipse.swt.widgets.Group;
 
 /**
  * <h3>LookupCallNewWizardPage</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 25.08.2010
  */

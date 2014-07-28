@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.workspace.type.config.property.FieldProperty;
 
 /**
  * <h3>{@link AbstractFieldReferencePropertyParser}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 27.02.2013
  */

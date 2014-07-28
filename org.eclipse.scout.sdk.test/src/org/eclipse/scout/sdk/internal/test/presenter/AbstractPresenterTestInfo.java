@@ -32,7 +32,7 @@ public abstract class AbstractPresenterTestInfo {
 
   /**
    * Creates and initializes a presenter for the given method.
-   * 
+   *
    * @param toolkit
    *          The toolkit to use.
    * @param parent
@@ -48,7 +48,7 @@ public abstract class AbstractPresenterTestInfo {
    * <code>createPresenter</code> method).<br>
    * If the <code>createPresenter</code> takes longer than the value returned by this method, the test for this
    * presenter will fail.
-   * 
+   *
    * @return The maximum accepted duration (nanoseconds) of <code>createPresenter</code>.
    */
   public abstract long getMaxPresenterCreationDuration();

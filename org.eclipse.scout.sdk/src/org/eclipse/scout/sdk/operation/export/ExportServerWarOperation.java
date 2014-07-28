@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.List;
 import java.util.zip.ZipOutputStream;
 
 import org.eclipse.core.resources.IFile;
@@ -29,6 +30,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
+import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.pde.internal.core.exports.FeatureExportInfo;
 import org.eclipse.pde.internal.core.exports.ProductExportOperation;
 import org.eclipse.pde.internal.core.iproduct.IProduct;
@@ -129,7 +131,9 @@ public class ExportServerWarOperation implements IOperation {
   }
 
   private void buildClientProduct(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    if (getClientProduct() == null) return;
+    if (getClientProduct() == null) {
+      return;
+    }
     ExportClientZipOperation exportClient = new ExportClientZipOperation(getClientProduct());
     exportClient.setHtmlFolder(getHtmlFolder());
     exportClient.setTargetDirectory(getHtmlFolder().getLocation().toOSString());
@@ -148,6 +152,7 @@ public class ExportServerWarOperation implements IOperation {
 
   private IStatus buildServerProduct(IProgressMonitor monitor) throws CoreException {
     ProductFileModelHelper pfmh = new ProductFileModelHelper(getServerProduct());
+    List<BundleDescription> pluginModels = pfmh.ProductFile.getPluginModels();
 
     FeatureExportInfo featureInfo = new FeatureExportInfo();
     featureInfo.toDirectory = true;
@@ -157,7 +162,7 @@ public class ExportServerWarOperation implements IOperation {
     featureInfo.exportMetadata = false;
     featureInfo.destinationDirectory = m_tempBuildDir.getAbsolutePath() + "/" + WEB_INF + "/" + SUB_DIR;
     featureInfo.zipFileName = "export.zip";
-    featureInfo.items = pfmh.ProductFile.getPluginModels();
+    featureInfo.items = pluginModels.toArray(new BundleDescription[pluginModels.size()]);
 
     IProduct prod = pfmh.ProductFile.getProduct();
     ProductExportOperation productExportOp = new ProductExportOperation(featureInfo, "Build product '" + prod.getName() + "'...", prod, ".");

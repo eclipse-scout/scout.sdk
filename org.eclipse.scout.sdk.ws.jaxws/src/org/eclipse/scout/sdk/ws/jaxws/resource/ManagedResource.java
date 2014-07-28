@@ -63,7 +63,7 @@ public class ManagedResource {
 
   /**
    * To receive notifications when this resource change.
-   * 
+   *
    * @param listener
    */
   public void addResourceListener(IResourceListener listener) {
@@ -72,7 +72,7 @@ public class ManagedResource {
 
   /**
    * To receive notifications when this resource change.
-   * 
+   *
    * @param element
    *          To only receive notification that origin of the given element within the resource.
    * @param listener
@@ -83,7 +83,7 @@ public class ManagedResource {
 
   /**
    * To receive notifications when this resource change.
-   * 
+   *
    * @param event
    *          the event to be interested in receiving notifications. This is <em>bitwise OR</em>'ing together event
    *          constants defined in {@link IResourceListener}.
@@ -95,7 +95,7 @@ public class ManagedResource {
 
   /**
    * To receive notifications when this resource change.
-   * 
+   *
    * @param element
    *          To only receive notification that origin of the given element within the resource.
    * @param event
@@ -170,7 +170,7 @@ public class ManagedResource {
 
   /**
    * To notify listeners about a change.
-   * 
+   *
    * @param element
    *          the element that changed (defined in {@link IResourceListener})
    * @param event

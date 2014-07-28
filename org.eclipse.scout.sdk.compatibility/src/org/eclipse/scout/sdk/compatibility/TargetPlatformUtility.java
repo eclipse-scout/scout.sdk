@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.compatibility.internal.service.ITargetPlatformCompa
 
 /**
  * <h3>{@link TargetPlatformUtility}</h3> Utility to (eclipse platform independent) handle target platform tasks.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 24.05.2013
  */
@@ -33,7 +33,7 @@ public final class TargetPlatformUtility {
 
   /**
    * Resolves the target specified by the given .target file.
-   * 
+   *
    * @param targetFile
    *          The .target file that should be resolved.
    * @param monitor
@@ -58,7 +58,7 @@ public final class TargetPlatformUtility {
    * Resolves (and optionally loads) the target specified by the given .target file.<br>
    * If the platform defined by the given file cannot be resolved, it will not be loaded even if loadPlatform is set to
    * true.
-   * 
+   *
    * @param targetFile
    *          The .target file that should be resolved.
    * @param loadPlatform
@@ -75,7 +75,7 @@ public final class TargetPlatformUtility {
 
   /**
    * Creates and resolves a new target with given name and the given directories as locations.
-   * 
+   *
    * @param absolutePaths
    *          The directories that should be added to the target.
    * @param targetName
@@ -94,7 +94,7 @@ public final class TargetPlatformUtility {
    * If the platform defined by the given directories cannot be resolved, it will not be loaded even if loadPlatform is
    * set to
    * true.
-   * 
+   *
    * @param absolutePaths
    *          The directories that should be added to the target.
    * @param targetName
@@ -117,7 +117,7 @@ public final class TargetPlatformUtility {
 
   /**
    * Adds the given installable unit to the given .target file.
-   * 
+   *
    * @param targetFile
    *          The target file to which the given unit should be added.
    * @param unitId
@@ -141,7 +141,7 @@ public final class TargetPlatformUtility {
 
   /**
    * Adds the given directory entries to the given .target file.
-   * 
+   *
    * @param targetFile
    *          The file that should be modified.
    * @param dirs
@@ -155,7 +155,7 @@ public final class TargetPlatformUtility {
 
   /**
    * Removes the given installable units from the given .target file.
-   * 
+   *
    * @param targetFile
    *          The .target file to be modified.
    * @param unitIds

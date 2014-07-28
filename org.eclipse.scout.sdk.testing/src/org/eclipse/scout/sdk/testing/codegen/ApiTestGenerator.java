@@ -33,13 +33,13 @@ import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.testing.internal.SdkTestingApi;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.signature.ImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>{@link ApiTestGenerator}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 26.08.2013
  */

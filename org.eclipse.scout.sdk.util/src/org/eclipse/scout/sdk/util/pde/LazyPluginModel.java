@@ -35,7 +35,7 @@ import org.osgi.framework.Version;
  * Base class for PDE model access of workspace plugins.<br>
  * This implementation uses lazy initialization of the PDE models.<br>
  * This class is thread safe.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0
  */

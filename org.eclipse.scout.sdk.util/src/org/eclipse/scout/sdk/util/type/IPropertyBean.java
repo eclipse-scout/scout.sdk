@@ -40,7 +40,7 @@ public interface IPropertyBean {
    * Property inspectors try to determine a bean property's field. Since the JavaBeans specification defines bean
    * properties by their access methods it is possible, that a property is not based on a field at all. This method
    * returns <code>null</code> in such a case.
-   * 
+   *
    * @return The field this property is based on or <code>null</code> if it can not be determined.
    */
   IField getField();

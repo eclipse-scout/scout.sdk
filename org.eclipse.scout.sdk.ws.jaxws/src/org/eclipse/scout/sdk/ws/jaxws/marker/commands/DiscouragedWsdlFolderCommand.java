@@ -36,7 +36,7 @@ public class DiscouragedWsdlFolderCommand extends AbstractExecutableMarkerComman
 
   /**
    * Used for webservice providers
-   * 
+   *
    * @param bundle
    * @param markerGroupUUID
    * @param buildJaxWsBean
@@ -55,7 +55,7 @@ public class DiscouragedWsdlFolderCommand extends AbstractExecutableMarkerComman
 
   /**
    * Used for webservice consumers
-   * 
+   *
    * @param bundle
    * @param markerGroupUUID
    * @param buildJaxWsBean

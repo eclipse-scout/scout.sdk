@@ -40,7 +40,7 @@ import org.eclipse.ui.IMarkerResolution;
 
 /**
  * <h3>{@link ClassIdDuplicateResolution}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 21.05.2014
  */

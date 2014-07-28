@@ -17,7 +17,7 @@ import org.eclipse.core.runtime.PlatformObject;
 
 /**
  * <h3>{@link ScoutLibraryNature}</h3> The
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 31.11.2007
  */

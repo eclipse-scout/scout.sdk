@@ -44,7 +44,9 @@ public class ExportScoutProjectEntry implements Comparable<ExportScoutProjectEnt
 
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof ExportScoutProjectEntry)) return false;
+    if (!(obj instanceof ExportScoutProjectEntry)) {
+      return false;
+    }
 
     ExportScoutProjectEntry o = (ExportScoutProjectEntry) obj;
     return getId().equals(o.getId()) &&

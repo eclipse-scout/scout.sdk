@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 
 /**
  * <h3>{@link RadioButtonGroupNodePage}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 28.11.2010
  */

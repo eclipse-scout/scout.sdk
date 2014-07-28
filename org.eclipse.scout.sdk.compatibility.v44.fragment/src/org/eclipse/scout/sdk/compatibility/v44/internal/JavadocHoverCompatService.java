@@ -18,6 +18,6 @@ import org.eclipse.scout.sdk.compatibility.internal.service.IJavadocHoverCompatS
 public class JavadocHoverCompatService implements IJavadocHoverCompatService {
   @Override
   public String addImageAndLabel(IJavaElement member, String imageName, String label) {
-	  return JavadocHover.getImageAndLabel(member, true, label);
+    return JavadocHover.getImageAndLabel(member, true, label);
   }
 }

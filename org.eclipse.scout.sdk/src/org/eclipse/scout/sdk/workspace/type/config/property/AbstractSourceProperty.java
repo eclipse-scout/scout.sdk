@@ -14,8 +14,8 @@ import org.eclipse.scout.commons.CompareUtility;
 
 /**
  * <h3>{@link AbstractSourceProperty}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 06.03.2013
  */
 public abstract class AbstractSourceProperty<T> {

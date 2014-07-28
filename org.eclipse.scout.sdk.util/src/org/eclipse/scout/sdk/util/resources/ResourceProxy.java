@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 
 /**
  * <h3>{@link ResourceProxy}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 20.05.2014
  */

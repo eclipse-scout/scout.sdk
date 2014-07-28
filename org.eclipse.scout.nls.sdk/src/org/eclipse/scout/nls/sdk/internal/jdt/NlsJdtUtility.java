@@ -86,7 +86,7 @@ public final class NlsJdtUtility {
 
   /**
    * Returns all packages in any of the project's source folders.
-   * 
+   *
    * @param jProject
    * @return
    */

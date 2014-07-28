@@ -286,7 +286,9 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public boolean contains(IJavaElement e) {
-    if (!TypeUtility.exists(e)) return false;
+    if (!TypeUtility.exists(e)) {
+      return false;
+    }
     String contributingBundle = ScoutWorkspace.getInstance().getBundleGraphInternal().getContributingBundleSymbolicName(e);
     return m_symbolicName.equals(contributingBundle);
   }

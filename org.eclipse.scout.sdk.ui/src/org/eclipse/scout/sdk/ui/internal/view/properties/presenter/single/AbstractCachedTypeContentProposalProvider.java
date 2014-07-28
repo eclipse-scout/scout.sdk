@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  * <h3>{@link AbstractCachedTypeContentProposalProvider}</h3> A content provider with cached elements that will be
  * discarded when the given type changes.<br>
  * Important: This content provider must be disposed when no longer needed!
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 30.01.2014
  */

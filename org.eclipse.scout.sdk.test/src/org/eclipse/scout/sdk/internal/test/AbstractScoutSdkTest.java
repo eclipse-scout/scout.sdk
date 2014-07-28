@@ -31,7 +31,7 @@ public abstract class AbstractScoutSdkTest {
 
   /**
    * deletes all workspace projects and waits for a silent workspace
-   * 
+   *
    * @throws Exception
    */
   @AfterClass

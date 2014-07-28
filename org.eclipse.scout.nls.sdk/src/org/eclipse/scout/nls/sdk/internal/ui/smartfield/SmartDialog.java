@@ -271,7 +271,7 @@ public class SmartDialog {
   }
 
   private class P_SmartFieldTableModel implements IStructuredContentProvider,
-      ITableLabelProvider {
+  ITableLabelProvider {
     private TreeSet<P_CompareableSmartItem> m_items = new TreeSet<P_CompareableSmartItem>();
 
     public void setItems(List<Object> items) {

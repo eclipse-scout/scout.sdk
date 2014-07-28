@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Shell;
  * <h3>OperationAction</h3> The operation action is used when an action is needed to be added to a {@link MenuManager}.
  * The action will
  * schedule an {@link OperationJob} which runs with the workspace scheduling rule.
- * 
+ *
  * @see OperationJob
  */
 public abstract class AbstractOperationAction extends AbstractScoutHandler {

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.testing.compare.ICompareResult;
 
 /**
  * <h3>{@link LineCompareResult}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 15.03.2013
  */

@@ -23,7 +23,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link TypeResolverPageDataAction}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 16.10.2013
  */

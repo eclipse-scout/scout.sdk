@@ -14,7 +14,7 @@ import java.util.EventObject;
 
 /**
  * <h3>DndEvent</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 04.02.2010
  */

@@ -90,7 +90,9 @@ public class IconPresenter extends AbstractMethodPresenter {
 
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
-    if (method == null) return;
+    if (method == null) {
+      return;
+    }
     super.init(method);
     IIconProvider newIconProvider = ScoutTypeUtility.findIconProvider(method.getType());
     if (!CompareUtility.equals(newIconProvider, m_iconProvider)) {

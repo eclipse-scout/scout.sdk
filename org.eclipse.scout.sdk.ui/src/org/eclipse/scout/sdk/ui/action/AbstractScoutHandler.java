@@ -61,8 +61,12 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
     m_image = image;
     m_keyStroke = keyStroke;
     m_multiSelectSupported = multiSelectSupported;
-    if (cat == null) m_category = Category.OTHER;
-    else m_category = cat;
+    if (cat == null) {
+      m_category = Category.OTHER;
+    }
+    else {
+      m_category = cat;
+    }
   }
 
   /**
@@ -78,7 +82,7 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
 
   /**
    * use {@link IScoutHandler#isActive()} to calculate and return the enabled/disabled state of the context menu.
-   * 
+   *
    * @return if the current context menu is active or not.
    */
   @Override
@@ -146,7 +150,7 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
 
   /**
    * multi selection evaluation is done before the page has been prepared.
-   * 
+   *
    * @return
    */
   @Override

@@ -35,7 +35,9 @@ public class RapProductJettyUpgradeOperation extends AbstractScoutProjectNewOper
 
     // only add dev-product as prod product has no jetty.
     IFile dev = getProperties().getProperty(CreateUiRapPluginOperation.PROP_PRODUCT_FILE_DEV, IFile.class);
-    if (dev != null) productFiles.add(dev);
+    if (dev != null) {
+      productFiles.add(dev);
+    }
 
     m_rapProdFiles = productFiles.toArray(new IFile[productFiles.size()]);
   }

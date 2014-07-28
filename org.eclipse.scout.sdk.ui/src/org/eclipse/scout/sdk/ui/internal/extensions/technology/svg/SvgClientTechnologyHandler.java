@@ -28,33 +28,33 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
 
   public static final String[] SCOUT_ONLY_SVG_PLUGINS = new String[]{
-      "org.apache.batik.bridge",
-      "org.apache.batik.dom",
-      "org.apache.batik.dom.svg",
-      "org.apache.batik.ext.awt",
-      "org.apache.batik.parser",
-      "org.apache.batik.svggen",
-      "org.apache.batik.swing",
-      "org.apache.batik.transcoder",
-      "org.apache.batik.xml",
-      ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME
+    "org.apache.batik.bridge",
+    "org.apache.batik.dom",
+    "org.apache.batik.dom.svg",
+    "org.apache.batik.ext.awt",
+    "org.apache.batik.parser",
+    "org.apache.batik.svggen",
+    "org.apache.batik.swing",
+    "org.apache.batik.transcoder",
+    "org.apache.batik.xml",
+    ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME
   };
 
   public static final String[] CORE_SVG_PLUGINS = new String[]{
-      "org.apache.batik.css",
-      "org.apache.batik.util",
-      "org.apache.batik.util.gui",
-      "org.w3c.dom.svg",
-      "org.w3c.dom.smil",
-      "org.w3c.css.sac"
+    "org.apache.batik.css",
+    "org.apache.batik.util",
+    "org.apache.batik.util.gui",
+    "org.w3c.dom.svg",
+    "org.w3c.dom.smil",
+    "org.w3c.css.sac"
   };
 
   private static final String[] BATIK_17_CORE_SVG_PLUGINS = new String[]{
-      "org.w3c.dom.events"
+    "org.w3c.dom.events"
   };
 
   private static final String[] BATIK_17_SCOUT_ONLY_SVG_PLUGINS = new String[]{
-      "org.eclipse.scout.org.w3c.dom.svg.fragment"
+    "org.eclipse.scout.org.w3c.dom.svg.fragment"
   };
 
   public SvgClientTechnologyHandler() {

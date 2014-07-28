@@ -17,7 +17,7 @@ import org.eclipse.jdt.core.IMethod;
 
 /**
  * <h3>{@link MethodSqlBindingModel}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 28.02.2011
  */

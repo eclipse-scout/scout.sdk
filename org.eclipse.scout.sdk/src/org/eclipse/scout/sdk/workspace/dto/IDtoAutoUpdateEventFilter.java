@@ -15,14 +15,14 @@ import org.eclipse.core.runtime.CoreException;
 
 /**
  * <h3>{@link IDtoAutoUpdateEventFilter}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 07.10.2013
  */
 public interface IDtoAutoUpdateEventFilter {
   /**
    * defines if the given resource change event should be considered to update a DTO.
-   * 
+   *
    * @param event
    *          The event to check
    * @return true if the event should continue processing.

@@ -43,7 +43,7 @@ import org.eclipse.text.edits.ReplaceEdit;
 
 /**
  * <h3>{@link OutlineDeleteOperation}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 09.03.2012
  */

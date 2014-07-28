@@ -25,7 +25,7 @@ import org.osgi.framework.Bundle;
 
 /**
  * <h3>SqlBindFromFormDataCompletionComputer</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2010
  */

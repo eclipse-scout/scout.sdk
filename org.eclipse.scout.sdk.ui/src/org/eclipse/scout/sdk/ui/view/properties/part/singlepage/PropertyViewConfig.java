@@ -270,7 +270,9 @@ public class PropertyViewConfig {
   }
 
   private void loadConfig(HashMap<String, Config> tc, Element config) {
-    if (config == null) return;
+    if (config == null) {
+      return;
+    }
     String name = config.getAttribute(PROP_CONFIG_NAME);
     if (StringUtility.hasText(name)) {
       String type = config.getAttribute(PROP_CONFIG_TYPE);

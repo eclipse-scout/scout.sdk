@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
  * <h3>{@link TypePropertyParser}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.9.0 22.05.2013
  */

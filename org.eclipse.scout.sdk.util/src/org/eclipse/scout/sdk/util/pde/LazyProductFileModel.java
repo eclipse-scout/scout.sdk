@@ -74,7 +74,7 @@ public final class LazyProductFileModel {
 
   /**
    * gets the config.ini file specified in the product.
-   * 
+   *
    * @return the config.ini file or null if no file is specified for the running OS ({@link Platform#getOS()}).
    * @throws CoreException
    */
@@ -145,7 +145,7 @@ public final class LazyProductFileModel {
   /**
    * TODO can be eliminated when <b>BUG 362398</b> is fixed (was fixed for Indigo SR1).<br>
    * When the bug is fixed call m_model.save() directly instead of calling this method.
-   * 
+   *
    * @see <a href="http://bugs.eclipse.org/bugs/show_bug.cgi?id=362398">Bugzilla #362398</a>
    */
   private void saveProductModel() throws CoreException {

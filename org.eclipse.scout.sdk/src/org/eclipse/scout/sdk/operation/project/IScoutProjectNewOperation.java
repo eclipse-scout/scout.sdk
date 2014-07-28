@@ -44,7 +44,7 @@ public interface IScoutProjectNewOperation extends IOperation {
 
   /**
    * 1. step for an operation in the project creation pipeline: the properties are set
-   * 
+   *
    * @param properties
    */
   void setProperties(PropertyMap properties);
@@ -53,7 +53,7 @@ public interface IScoutProjectNewOperation extends IOperation {
    * 2. step for an operation in the project creation pipeline: the operation can define if it is required to execute
    * (based on the properties).
    * If this method returns false, the operation is not allowed to progress further in the pipeline.
-   * 
+   *
    * @return
    */
   boolean isRelevant();
@@ -66,13 +66,13 @@ public interface IScoutProjectNewOperation extends IOperation {
 
   /**
    * 4. step for an operation in the project creation pipeline: the operation is validated
-   * 
+   *
    * @see IOperation
    */
 
   /**
    * 5. step for an operation in the project creation pipeline: the operation is executed
-   * 
+   *
    * @see IOperation
    */
 }

@@ -14,7 +14,7 @@ import org.eclipse.jdt.core.dom.ASTNode;
 
 /**
  * <h3>{@link BindBaseNVPair}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 25.02.2011
  */

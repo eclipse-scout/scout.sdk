@@ -31,7 +31,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link RecreateTypeTest}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 15.07.2011
  */

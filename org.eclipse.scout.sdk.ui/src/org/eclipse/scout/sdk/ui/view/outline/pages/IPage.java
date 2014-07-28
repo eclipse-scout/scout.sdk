@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link IPage}</h3> Represents a single node in the Scout Explorer
- * 
+ *
  * @see IScoutExplorerPart
  * @since 3.7.0
  */
@@ -37,21 +37,21 @@ public interface IPage {
   /**
    * Specifies the label text to display in the tree.<br>
    * The name should be set by the page itself.
-   * 
+   *
    * @return the label of this node in the tree
    */
   String getName();
 
   /**
    * gets the image descriptor of the icon of this page
-   * 
+   *
    * @param descriptor
    */
   void setImageDescriptor(ImageDescriptor descriptor);
 
   /**
    * Sets the parent of this page. This also adds this page to the children of the given parent.
-   * 
+   *
    * @param parent
    *          the new parent
    */
@@ -59,21 +59,21 @@ public interface IPage {
 
   /**
    * gets the parent page.
-   * 
+   *
    * @return the parent page
    */
   IPage getParent();
 
   /**
    * gets the order of this page
-   * 
+   *
    * @return the order
    */
   int getOrder();
 
   /**
    * Gets the scout bundle this page belongs to or null if this page is not below a scout bundle.
-   * 
+   *
    * @return the scout bundle or null
    * @see IScoutBundle
    */
@@ -81,14 +81,14 @@ public interface IPage {
 
   /**
    * Gets the Scout Explorer this page belongs to.
-   * 
+   *
    * @return the Scout Explorer this page belongs to or null.
    */
   IPageOutlineView getOutlineView();
 
   /**
    * Adds the given page to the child list of this page.
-   * 
+   *
    * @param childPage
    *          The page to add (may not be null!)
    */
@@ -96,7 +96,7 @@ public interface IPage {
 
   /**
    * Removes the given page from the child list of this page
-   * 
+   *
    * @param childPage
    *          The page to remove (may not be null!).
    * @return true if the page has been removed, false otherwise (e.g. if the page could not be found).
@@ -112,14 +112,14 @@ public interface IPage {
 
   /**
    * Gets an array of all direct children of this page
-   * 
+   *
    * @return an array of all direct children of this page
    */
   IPage[] getChildArray();
 
   /**
    * Gets an array of all direct children of this page matching the given filter.
-   * 
+   *
    * @param filter
    *          the filter or null
    * @return all direct child pages matching the given filter
@@ -134,7 +134,7 @@ public interface IPage {
   /**
    * After the page has been loaded this method returns if this page has child pages.
    * If the page has not been loaded yet, this method always returns false.
-   * 
+   *
    * @return true if the page has been loaded and this page has child pages.
    * @see IPage#isChildrenLoaded()
    */
@@ -142,7 +142,7 @@ public interface IPage {
 
   /**
    * Specifies if the children of this page have already been loaded.
-   * 
+   *
    * @return true if the children are loaded, false otherwise.
    * @see IPage#loadChildren()
    */
@@ -152,7 +152,7 @@ public interface IPage {
    * Specifies if this page should load its children when the Scout Explorer is initialized.<br>
    * This must be true if the page should be expanded by default. Has only an effect, if all parents of this page also
    * have isInitiallyLoaded() set to true.
-   * 
+   *
    * @return true if the page should load its children when the scout explorer is initialized.
    */
   boolean isInitiallyLoaded();
@@ -167,7 +167,7 @@ public interface IPage {
    * Refreshes this page.<br>
    * The default implementation just marks the page as dirty (see {@link IPage#markStructureDirty()}).<br>
    * Pages may add special refresh behavior if the clearCache flag is set (e.g. completely recalculate all children).
-   * 
+   *
    * @param clearCache
    *          true if the user pressed shift+f5, false if the user just pressed f5. if true, pages should completely
    *          recalculate the children (e.g. refresh
@@ -177,7 +177,7 @@ public interface IPage {
 
   /**
    * returns the quality (e.g. Error) of this page
-   * 
+   *
    * @return one of the {@link IMarker#SEVERITY_*} constants
    */
   int getQuality();
@@ -185,7 +185,7 @@ public interface IPage {
   /**
    * Accepts the given visitor to this page and (potentially) its children.<br>
    * If the visitor will continue can be controlled by the visitor or the page itself.
-   * 
+   *
    * @param visitor
    *          the visitor to apply.
    * @return one of {@link INodeVisitor#CONTINUE}, {@link INodeVisitor#CONTINUE_BRANCH}, {@link INodeVisitor#CANCEL},
@@ -195,7 +195,7 @@ public interface IPage {
 
   /**
    * Marks this page as dirty. This will trigger the Scout Explorer to reload this part of the tree asynchronously.
-   * 
+   *
    * @see DirtyUpdateManager
    * @see RefreshOutlineSubTreeJob
    */
@@ -210,7 +210,7 @@ public interface IPage {
    * Specifies if this page is a folder. If true, the page will get another default image and contains a filter section
    * in
    * its property part (if available).
-   * 
+   *
    * @return true if it is a folder.
    */
   boolean isFolder();

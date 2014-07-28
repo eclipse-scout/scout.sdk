@@ -14,13 +14,13 @@ import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.QualifiedName;
 import org.eclipse.jdt.core.dom.SimpleName;
 import org.eclipse.jdt.internal.corext.dom.ASTFlattener;
-import org.eclipse.scout.sdk.util.method.ISimpleNameAstFlattenerCallback;
 import org.eclipse.scout.sdk.util.method.IAstRewriteFlattener;
+import org.eclipse.scout.sdk.util.method.ISimpleNameAstFlattenerCallback;
 import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
 
 /**
  * <h3>{@link SimpleNameRewriteAstFlattener}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 23.01.2014
  */

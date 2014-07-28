@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>BundleTreeWizardPage</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 12.02.2010
  */

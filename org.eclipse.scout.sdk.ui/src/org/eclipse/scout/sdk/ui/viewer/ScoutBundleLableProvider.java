@@ -19,8 +19,8 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * <h3>{@link ScoutBundleLableProvider}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 19.03.2012
  */
 public class ScoutBundleLableProvider extends SearchRangeStyledLabelProvider {

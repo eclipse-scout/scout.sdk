@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.util.PropertyMap;
 
 /**
  * <h3>AbstractProjectNewWizardPage</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 06.03.2010
  */

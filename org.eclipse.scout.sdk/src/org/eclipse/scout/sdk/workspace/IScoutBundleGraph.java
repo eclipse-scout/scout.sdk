@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.ScoutSdkCore;
 /**
  * <h3>{@link IScoutBundleGraph}</h3> The bundle graph responsible for holding and building the scout bundles and the
  * connections between them.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 31.01.2013
  * @see IScoutWorkspace#getBundleGraph()
@@ -33,7 +33,7 @@ public interface IScoutBundleGraph {
    * If the bundle graph is currently building, this method blocks until the current build has been finished (completed
    * or cancelled). This does not imply that the graph has processed all workspace changes. Use {@link #waitFor()} to
    * wait for all changes.
-   * 
+   *
    * @param filter
    *          The filter to decide which bundle will be returned or null when no filter should be applied.
    * @param comparator
@@ -54,7 +54,7 @@ public interface IScoutBundleGraph {
    * If the bundle graph is currently building, this method blocks until the current build has been finished (completed
    * or cancelled). This does not imply that the graph has processed all workspace changes. Use {@link #waitFor()} to
    * wait for all changes.
-   * 
+   *
    * @param filter
    *          The filter to decide which bundle will be returned or null when no filter should be applied.
    * @return all scout bundles matching the given filter.
@@ -70,7 +70,7 @@ public interface IScoutBundleGraph {
    * If the bundle graph is currently building, this method blocks until the current build has been finished (completed
    * or cancelled). This does not imply that the graph has processed all workspace changes. Use {@link #waitFor()} to
    * wait for all changes.
-   * 
+   *
    * @param je
    *          the java element
    * @return the scout bundle containing the given element or null.
@@ -85,7 +85,7 @@ public interface IScoutBundleGraph {
    * If the bundle graph is currently building, this method blocks until the current build has been finished (completed
    * or cancelled). This does not imply that the graph has processed all workspace changes. Use {@link #waitFor()} to
    * wait for all changes.
-   * 
+   *
    * @param p
    *          the project that belongs to the returned scout bundle
    * @return the scout bundle that belongs to the given project or null.
@@ -99,7 +99,7 @@ public interface IScoutBundleGraph {
    * If the bundle graph is currently building, this method blocks until the current build has been finished (completed
    * or cancelled). This does not imply that the graph has processed all workspace changes. Use {@link #waitFor()} to
    * wait for all changes.
-   * 
+   *
    * @param symbolicName
    *          the symbolic name of the scout bundle to search.
    * @return the scout bundle matching the given symbolic name or null.

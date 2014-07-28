@@ -21,7 +21,7 @@ import org.eclipse.swt.graphics.Image;
 
 public class LanguageSmartFieldModel implements ISmartFieldModel {
 
-	private Locale[] m_locales;
+  private Locale[] m_locales;
 
   public LanguageSmartFieldModel() {
     ArrayList<Locale> locs = new ArrayList<Locale>();

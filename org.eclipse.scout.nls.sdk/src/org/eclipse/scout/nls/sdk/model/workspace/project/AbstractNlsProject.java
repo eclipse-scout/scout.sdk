@@ -91,7 +91,7 @@ public abstract class AbstractNlsProject implements INlsProject {
 
   /**
    * Provides all languages supported by this project and all its ancestors.
-   * 
+   *
    * @return a sorted list of all supported languages
    */
   @Override
@@ -203,7 +203,7 @@ public abstract class AbstractNlsProject implements INlsProject {
 
   /**
    * Returns the parent NlsProject or null if no parent has been defined.
-   * 
+   *
    * @return
    */
   @Override

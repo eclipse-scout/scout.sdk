@@ -16,13 +16,13 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * <h3>{@link _SuitePageData}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 22.04.2010
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    PageBeanDataTest.class
+  PageBeanDataTest.class
 /*suites*/
 
 })

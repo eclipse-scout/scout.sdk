@@ -14,8 +14,8 @@ import org.eclipse.scout.sdk.workspace.type.config.property.AbstractSourceProper
 
 /**
  * <h3>{@link UiSourceProperty}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 06.03.2013
  */
 public class UiSourceProperty<T> extends AbstractSourceProperty<T> {

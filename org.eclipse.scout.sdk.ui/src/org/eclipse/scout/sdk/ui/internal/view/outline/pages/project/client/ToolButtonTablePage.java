@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 
 /**
  * <h3>ToolTablePage</h3> Finds all inner subclasses of ITool for the given parent type.
- * 
+ *
  * @see ToolButtonNodePage
  */
 public class ToolButtonTablePage extends AbstractPage {

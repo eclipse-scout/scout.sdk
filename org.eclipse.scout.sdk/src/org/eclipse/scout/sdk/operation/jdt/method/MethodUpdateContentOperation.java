@@ -36,8 +36,8 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.text.edits.ReplaceEdit;
 
 /**
- * <h3>MethodUpdateContentOperation</h3>
- * This operation is used to update a content of an existing method. The method must be
+ * <h3>MethodUpdateContentOperation</h3> This operation is used to update a content of an existing method. The method
+ * must be
  * modifiable.
  */
 public class MethodUpdateContentOperation implements IOperation {
@@ -139,7 +139,7 @@ public class MethodUpdateContentOperation implements IOperation {
    * can be overridden to provide a specific method body. The method body is defined as part between the method body{}.
    * Use {@link SignatureUtility#getTypeReference(String, IImportValidator)} to determ class references (fully
    * qualified vs. simple name).
-   * 
+   *
    * @param sourceBuilder
    * @param lineDelimiter
    * @param validator

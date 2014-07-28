@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.service;
 
 /**
  * Service for getting and providing feedback from and to the user, respectively.
- * 
+ *
  * @since 3.10.0-M1
  */
 public interface IMessageBoxService {
@@ -25,7 +25,7 @@ public interface IMessageBoxService {
   /**
    * Shows the given message to the user as well as some means for <em>Yes</em> and <em>No</em>. If the interaction with
    * the user is not possible, the default answer is returned.
-   * 
+   *
    * @param title
    * @param message
    * @param defaultAnswer
@@ -35,7 +35,7 @@ public interface IMessageBoxService {
 
   /**
    * Shows the given warning.
-   * 
+   *
    * @param title
    * @param message
    */

@@ -51,7 +51,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>{@link LocalLookupCallNewWizardPage}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 31.08.2010
  */
@@ -100,12 +100,12 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("LookupCallSuperType"),
         new AbstractJavaElementContentProvider() {
-          @Override
-          protected Object[][] computeProposals() {
-            Set<IType> superTypes = TypeUtility.getClassesOnClasspath(localLookupCall, ScoutUtility.getJavaProject(getClientBundle()), TypeFilters.getNotInTypes(localLookupCall));
-            return new Object[][]{new IType[]{localLookupCall}, superTypes.toArray(new IType[superTypes.size()])};
-          }
-        }, labelColWidthPercent);
+      @Override
+      protected Object[][] computeProposals() {
+        Set<IType> superTypes = TypeUtility.getClassesOnClasspath(localLookupCall, ScoutUtility.getJavaProject(getClientBundle()), TypeFilters.getNotInTypes(localLookupCall));
+        return new Object[][]{new IType[]{localLookupCall}, superTypes.toArray(new IType[superTypes.size()])};
+      }
+    }, labelColWidthPercent);
     m_superTypeField.acceptProposal(getLookupCallSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

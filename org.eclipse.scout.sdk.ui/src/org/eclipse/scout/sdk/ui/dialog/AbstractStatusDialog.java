@@ -64,7 +64,7 @@ public abstract class AbstractStatusDialog extends TitleAreaDialog {
 
   /**
    * NOTE: always call this method in a try finally block.
-   * 
+   *
    * @param changing
    */
   protected void setStateChanging(boolean changing) {
@@ -83,7 +83,7 @@ public abstract class AbstractStatusDialog extends TitleAreaDialog {
   /**
    * call to revalidate the wizard page. this method calls the overwritable method
    * {@link AbstractScoutWizardPage#validatePage(MultiStatus)}.
-   * 
+   *
    * @see {@link AbstractScoutWizardPage#validatePage(MultiStatus)}
    */
   protected final void revalidate() {
@@ -95,7 +95,7 @@ public abstract class AbstractStatusDialog extends TitleAreaDialog {
   /**
    * overwrite this method to do some validation and
    * add additional status to the given multi status.
-   * 
+   *
    * @param multiStatus
    */
   protected void validate(MultiStatus multiStatus) {

@@ -25,8 +25,8 @@ import org.junit.Test;
 
 /**
  * <h3>{@link CompilationUnitNewOperationTest}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.8.0 08.02.2013
  */
 public class CompilationUnitNewOperationTest extends AbstractScoutSdkTest {

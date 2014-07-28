@@ -19,7 +19,7 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * <h3>{@link SimpleProposal}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 07.02.2012
  */
@@ -41,7 +41,7 @@ public class SimpleProposal {
 
   /**
    * might be overridden for advanced text
-   * 
+   *
    * @return
    */
   public String getTextSelected() {
@@ -54,7 +54,7 @@ public class SimpleProposal {
 
   /**
    * might be overridden for advanced image
-   * 
+   *
    * @return
    */
   public Image getImageSelected() {

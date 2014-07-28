@@ -35,7 +35,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
 
   /**
    * the language of the resource
-   * 
+   *
    * @param language
    */
   public AbstractTranslationResource(Language language) {
@@ -56,7 +56,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
 
   /**
    * parses the content of the input stream for key value translation pairs.
-   * 
+   *
    * @param stream
    * @throws IOException
    * @throws InvalidTranslationResourceException

@@ -41,7 +41,7 @@ import org.eclipse.ui.forms.widgets.Hyperlink;
 
 /**
  * <h3>{@link AbstractMultiMethodPresenter}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 31.08.2010
  * @param <T>

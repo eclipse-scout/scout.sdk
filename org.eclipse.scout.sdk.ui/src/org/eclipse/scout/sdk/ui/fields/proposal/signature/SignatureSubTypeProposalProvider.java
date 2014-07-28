@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 /**
  * <h3>{@link SignatureSubTypeProposalProvider}</h3> Proposal provider that returns all signature proposals that are
  * subtypes of a given base type.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 24.01.2014
  */

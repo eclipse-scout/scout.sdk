@@ -37,14 +37,16 @@ public class ImageRegistry extends org.eclipse.jface.resource.ImageRegistry {
 
   /**
    * Returns the image associated with the given image descriptor.
-   * 
+   *
    * @param descriptor
    *          the image descriptor for which the registry manages an image
    * @return the image associated with the image descriptor or <code>null</code> if the image descriptor can't create
    *         the requested image.
    */
   public Image get(ImageDescriptor descriptor) {
-    if (descriptor == null) descriptor = ImageDescriptor.getMissingImageDescriptor();
+    if (descriptor == null) {
+      descriptor = ImageDescriptor.getMissingImageDescriptor();
+    }
 
     Image result = m_registry.get(descriptor);
     if (result != null) {

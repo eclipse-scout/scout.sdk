@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.CompareUtility;
 
 /**
  * <h3>{@link JavaElementComparator}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 06.03.2012
  */

@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.util.PropertyMap;
 /**
  * <h3>{@link INewScoutBundleHandler}</h3> Controls the behavior when a new bundle of a certain type should be created.
  * Classes of this type are contributed using the extension point 'org.eclipse.scout.sdk.ui.scoutBundle'.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 27.02.2013
  */
@@ -25,7 +25,7 @@ public interface INewScoutBundleHandler {
 
   /**
    * invoked when the user checks or unchecks a bundle node in the wizard. Allows e.g. to add other wizard pages.
-   * 
+   *
    * @param wizard
    *          The wizard in which the event occured.
    * @param selected
@@ -35,7 +35,7 @@ public interface INewScoutBundleHandler {
 
   /**
    * Called during validation. Allows to contribute messages or validation checks.
-   * 
+   *
    * @param wizard
    *          the wizard that is validating.
    * @return the status
@@ -44,7 +44,7 @@ public interface INewScoutBundleHandler {
 
   /**
    * Called during initialization of the wizard. Allows e.g. to hide/show nodes based on the selection of the wizard.
-   * 
+   *
    * @param wizard
    *          the wizard that is starting.
    * @param extension
@@ -54,7 +54,7 @@ public interface INewScoutBundleHandler {
 
   /**
    * Called before the bundle creation operation starts. Allows to pass properties to the operation.
-   * 
+   *
    * @param wizard
    *          The wizard that wants to create bundles.
    * @param properties

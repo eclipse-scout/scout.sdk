@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /***
  * Vertical Button group aligned to the default label positions.
- * 
+ *
  * @param <T>
  *          Value type associated with a button.
  */
@@ -64,7 +64,9 @@ public class ButtonGroup<T> extends Composite {
    */
   public ButtonGroup(Composite parent, int type) {
     super(parent, SWT.NONE);
-    if (type != BUTTON_TYPE_RADIO && type != BUTTON_TYPE_CHECK) throw new IllegalArgumentException("selection button type not valid");
+    if (type != BUTTON_TYPE_RADIO && type != BUTTON_TYPE_CHECK) {
+      throw new IllegalArgumentException("selection button type not valid");
+    }
     m_eventListeners = new EventListenerList();
     m_buttons = new ArrayList<Button>();
     m_type = type;
@@ -85,7 +87,7 @@ public class ButtonGroup<T> extends Composite {
 
   /**
    * adds a new button with given label and given value to the list.
-   * 
+   *
    * @param label
    *          The label of the button.
    * @param value
@@ -112,7 +114,7 @@ public class ButtonGroup<T> extends Composite {
 
   /**
    * Selects the button (if existent) that was created with the given value.
-   * 
+   *
    * @param val
    *          the button value.
    */
@@ -153,7 +155,7 @@ public class ButtonGroup<T> extends Composite {
 
   /**
    * Gets the first selected value. Convenience method for radio button style.
-   * 
+   *
    * @return The first value of all selected values.
    */
   public T getValue() {
@@ -172,7 +174,7 @@ public class ButtonGroup<T> extends Composite {
 
   /**
    * Gets all selected values.
-   * 
+   *
    * @return the selected values.
    */
   @SuppressWarnings("unchecked")

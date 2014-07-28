@@ -16,7 +16,7 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * <h3>{@link MoreElementsProposal}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 16.04.2012
  */

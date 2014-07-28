@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link Oracle11g2JdbcTargetTechnologyHandler}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 09.04.2014
  */

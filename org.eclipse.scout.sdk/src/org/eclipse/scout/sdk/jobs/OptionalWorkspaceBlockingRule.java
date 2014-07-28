@@ -14,9 +14,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 
 /**
- * <h3>{@link OptionalWorkspaceBlockingRule}</h3>Scheduling rule that always conflicts instances of itself and optionally
+ * <h3>{@link OptionalWorkspaceBlockingRule}</h3>Scheduling rule that always conflicts instances of itself and
+ * optionally
  * the full workspace.
- * 
+ *
  * @author Matthias Villiger
  * @since 4.1.0 04.06.2014
  */

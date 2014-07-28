@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
  * <h3>{@link FieldSourceBuilder}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
@@ -61,7 +61,7 @@ public class FieldSourceBuilder extends AbstractAnnotatableSourceBuilder impleme
    * can be overridden to assign a specific value to the field.
    * Use {@link SignatureUtility#getTypeReference(String, IImportValidator)} to determ class references (fully
    * qualified vs. simple name).
-   * 
+   *
    * @param sourceBuilder
    * @param lineDelimiter
    * @param ownerProject

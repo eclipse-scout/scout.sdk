@@ -55,7 +55,9 @@ public class License {
     int i = body.indexOf('\n');
     int j = body.indexOf('\r');
     if (i > 0) {
-      if (j > 0) return body.substring(0, i < j ? i : j);
+      if (j > 0) {
+        return body.substring(0, i < j ? i : j);
+      }
       return body.substring(0, i);
     }
     else if (j > 0) {

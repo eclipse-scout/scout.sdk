@@ -61,7 +61,9 @@ public class ScoutCompatibilityActivator extends Plugin {
   }
 
   private static boolean matchesAnyVersion(String versions) {
-    if (versions == null || versions.length() < 1) return false;
+    if (versions == null || versions.length() < 1) {
+      return false;
+    }
     String[] compatibleVersions = versions.split(",");
     for (String v : compatibleVersions) {
       if (matchesVersion(v)) {
@@ -72,13 +74,19 @@ public class ScoutCompatibilityActivator extends Plugin {
   }
 
   private static boolean matchesVersion(String version) {
-    if (version == null) return false;
+    if (version == null) {
+      return false;
+    }
     version = version.trim();
-    if (version.length() == 0) return false;
+    if (version.length() == 0) {
+      return false;
+    }
 
     Version pv = PlatformVersionUtility.getPlatformVersion();
     String[] segments = version.split("\\.");
-    if (segments.length == 0) return false;
+    if (segments.length == 0) {
+      return false;
+    }
     String[] platformVersion = new String[]{"" + pv.getMajor(), "" + pv.getMinor(), "" + pv.getMicro(), pv.getQualifier()};
 
     for (int i = 0; i < Math.min(segments.length, platformVersion.length); i++) {
@@ -116,7 +124,9 @@ public class ScoutCompatibilityActivator extends Plugin {
     }
     catch (InvalidSyntaxException e) {
     }
-    if (references == null || references.size() < 1) return null;
+    if (references == null || references.size() < 1) {
+      return null;
+    }
     if (references.size() != 1) {
       throw new RuntimeException("more than one service found for " + type.getName());
     }

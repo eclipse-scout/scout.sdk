@@ -216,13 +216,17 @@ public class JavadocTooltip extends AbstractTooltip {
   private String getJavadocHtml(IJavaElement[] result) {
     StringBuffer buffer = new StringBuffer();
     int nResults = result.length;
-    if (nResults == 0) return null;
+    if (nResults == 0) {
+      return null;
+    }
     String base = null;
     if (nResults > 1) {
       for (int i = 0; i < result.length; i++) {
         HTMLPrinter.startBulletList(buffer);
         IJavaElement curr = result[i];
-        if (curr instanceof IMember || curr.getElementType() == IJavaElement.LOCAL_VARIABLE) HTMLPrinter.addBullet(buffer, getInfoText(curr, null, false));
+        if (curr instanceof IMember || curr.getElementType() == IJavaElement.LOCAL_VARIABLE) {
+          HTMLPrinter.addBullet(buffer, getInfoText(curr, null, false));
+        }
         HTMLPrinter.endBulletList(buffer);
       }
     }
@@ -247,10 +251,18 @@ public class JavadocTooltip extends AbstractTooltip {
             IOpenable openable = member.getOpenable();
             boolean hasSource = openable.getBuffer() != null;
 
-            if (!hasAttachedSource && !hasAttachedJavadoc) reader = new StringReader("");
-            else if (!hasAttachedJavadoc && !hasSource) reader = new StringReader("");
-            else if (!hasAttachedSource) reader = new StringReader("");
-            else if (!hasSource) reader = new StringReader("");
+            if (!hasAttachedSource && !hasAttachedJavadoc) {
+              reader = new StringReader("");
+            }
+            else if (!hasAttachedJavadoc && !hasSource) {
+              reader = new StringReader("");
+            }
+            else if (!hasAttachedSource) {
+              reader = new StringReader("");
+            }
+            else if (!hasSource) {
+              reader = new StringReader("");
+            }
 
           }
           else {
@@ -318,7 +330,9 @@ public class JavadocTooltip extends AbstractTooltip {
   private static String loadStyleSheet() {
     Bundle bundle = JavaPlugin.getDefault().getBundle();
     URL styleSheetURL = bundle.getEntry("/JavadocViewStyleSheet.css"); //$NON-NLS-1$
-    if (styleSheetURL == null) return null;
+    if (styleSheetURL == null) {
+      return null;
+    }
 
     BufferedReader reader = null;
     try {
@@ -379,7 +393,9 @@ public class JavadocTooltip extends AbstractTooltip {
          * A solution could be https://bugs.eclipse.org/bugs/show_bug.cgi?id=149022 .
          */
         IPath location = resource.getLocation();
-        if (location != null) return location.toFile().toURI().toString();
+        if (location != null) {
+          return location.toFile().toURI().toString();
+        }
       }
     }
     return null;

@@ -12,14 +12,14 @@ package org.eclipse.scout.sdk.util.typecache;
 
 /**
  * <h3>{@link ICachedTypeHierarchyResult}</h3> An {@link ITypeHierarchyResult} that caches the content.
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 14.05.2014
  */
 public interface ICachedTypeHierarchyResult extends ITypeHierarchyResult {
   /**
    * Adds the given {@link ITypeHierarchyChangedListener} to this hierarchy (if not already added).
-   * 
+   *
    * @param listener
    *          The {@link ITypeHierarchyChangedListener} to add.
    */
@@ -27,7 +27,7 @@ public interface ICachedTypeHierarchyResult extends ITypeHierarchyResult {
 
   /**
    * Removes the given {@link ITypeHierarchyChangedListener} from the list to notify.
-   * 
+   *
    * @param listener
    */
   void removeHierarchyListener(ITypeHierarchyChangedListener listener);

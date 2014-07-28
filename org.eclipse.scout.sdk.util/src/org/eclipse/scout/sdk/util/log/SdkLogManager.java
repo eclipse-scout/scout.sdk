@@ -131,8 +131,12 @@ public class SdkLogManager {
   }
 
   private static String getLogLevelProperty(BundleContext context) {
-    if (context == null) return null;
-    else return context.getProperty(context.getBundle().getSymbolicName() + LOG_LEVEL_SUFFIX);
+    if (context == null) {
+      return null;
+    }
+    else {
+      return context.getProperty(context.getBundle().getSymbolicName() + LOG_LEVEL_SUFFIX);
+    }
   }
 
   private static int parseLogLevel(String loglevel) {

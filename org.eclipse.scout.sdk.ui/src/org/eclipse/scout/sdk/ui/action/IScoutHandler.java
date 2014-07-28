@@ -26,7 +26,7 @@ public interface IScoutHandler extends IHandler2 {
   /**
    * <h3>{@link Category}</h3> Enum for the supported context menu categories. The grouping of the menus is according to
    * the category.
-   * 
+   *
    * @author Matthias Villiger
    * @since 3.10.0 18.09.2013
    */
@@ -63,14 +63,14 @@ public interface IScoutHandler extends IHandler2 {
 
   /**
    * is evaluated after the menu has been prepared by the contributor.
-   * 
+   *
    * @return true if the menu should be visible. false otherwise.
    */
   boolean isVisible();
 
   /**
    * is evaluated after the menu has been prepared by the contributor.
-   * 
+   *
    * @return true if the menu should be enabled. false otherwise.
    */
   boolean isActive();
@@ -88,7 +88,7 @@ public interface IScoutHandler extends IHandler2 {
 
   /**
    * Currently not supported.
-   * 
+   *
    * @see {@link CommandContributionItemParameter#tooltip}
    * @param toolTip
    */
@@ -96,7 +96,7 @@ public interface IScoutHandler extends IHandler2 {
 
   /**
    * Currently not supported.
-   * 
+   *
    * @see {@link CommandContributionItemParameter#tooltip}
    * @param toolTip
    */
@@ -126,7 +126,7 @@ public interface IScoutHandler extends IHandler2 {
 
   /**
    * multi selection evaluation is done before the page has been prepared by the contributor.
-   * 
+   *
    * @return true if the context menu supports multi selection. If true, the context menu will also be shown, when
    *         multiple pages supporting a context menu are selected.
    */
@@ -134,7 +134,7 @@ public interface IScoutHandler extends IHandler2 {
 
   /**
    * sets if the context menu supports multi selection
-   * 
+   *
    * @param multiSelectSupported
    */
   void setMultiSelectSupported(boolean multiSelectSupported);
@@ -159,7 +159,7 @@ public interface IScoutHandler extends IHandler2 {
 
   /**
    * called when the context menu is invoked by the user.
-   * 
+   *
    * @param shell
    *          the shell in which the menu exists.
    * @param selection

@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link AbstractLibraryBundleCreateOperation}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 11.03.2012
  */

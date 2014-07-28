@@ -16,7 +16,7 @@ import org.eclipse.ui.IPersistableElement;
 
 /**
  * <h3>{@link ScoutBundlePersistableElementAdapter}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 10.04.2013
  */

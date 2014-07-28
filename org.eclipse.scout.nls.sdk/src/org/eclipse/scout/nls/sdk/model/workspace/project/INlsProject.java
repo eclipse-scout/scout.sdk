@@ -30,7 +30,7 @@ public interface INlsProject {
    * Adds an event listener to this project.
    * The last listener added is the first to be called.
    * If a listener is added that already exists in the list, the listener is added an additional time.
-   * 
+   *
    * @param projectListener
    *          The new listener.
    */
@@ -39,7 +39,7 @@ public interface INlsProject {
   /**
    * Removes all registrations of the given listener.
    * the listeners are identified using reference equality (==).
-   * 
+   *
    * @param projectListener
    */
   void removeProjectListener(INlsProjectListener projectListener);
@@ -51,21 +51,21 @@ public interface INlsProject {
 
   /**
    * returns all keys of the current NLS project.
-   * 
+   *
    * @return
    */
   String[] getAllKeys();
 
   /**
    * Gets the name of the nls project. This e.g. used in the editor to display which project is displayed.
-   * 
+   *
    * @return The project name.
    */
   String getName();
 
   /**
    * Gets the entry with the given key.
-   * 
+   *
    * @param key
    *          The key to search for.
    * @return The cached entry.
@@ -74,7 +74,7 @@ public interface INlsProject {
 
   /**
    * Returns all entries with a key starting with the given prefix.
-   * 
+   *
    * @param prefix
    *          The prefix to search for
    * @param caseSensitive
@@ -85,28 +85,28 @@ public interface INlsProject {
 
   /**
    * Get all entries in this project.
-   * 
+   *
    * @return The complete list.
    */
   INlsEntry[] getAllEntries();
 
   /**
    * Gets the parent project or null if no parent exists.
-   * 
+   *
    * @return
    */
   INlsProject getParent();
 
   /**
    * Gets all languages of this project.
-   * 
+   *
    * @return The existing languages.
    */
   Language[] getAllLanguages();
 
   /**
    * Checks whether the given language exists in this project.
-   * 
+   *
    * @param languge
    *          The language to search.
    * @return True if the given language exists.
@@ -116,7 +116,7 @@ public interface INlsProject {
   /**
    * Updates (or creates if not existing) the given row.
    * If the key is inherited, this method does nothing.
-   * 
+   *
    * @param row
    *          The row to update or create.
    * @param monitor
@@ -126,7 +126,7 @@ public interface INlsProject {
   /**
    * Updates (or creates if not existing) the given row.
    * If the key is inherited, this method does nothing.
-   * 
+   *
    * @param row
    *          The row to update or create.
    * @param flush
@@ -137,7 +137,7 @@ public interface INlsProject {
 
   /**
    * Changes the key of the entry with the same key as the given row
-   * 
+   *
    * @param row
    *          The entry with the same key as in row is updated.
    * @param newKey
@@ -148,7 +148,7 @@ public interface INlsProject {
 
   /**
    * Gets a fresh NewLanguageContext that can be used to create new languages in a project specific way.
-   * 
+   *
    * @return a newly created NewLanguageContext
    */
   INewLanguageContext getTranslationCreationContext();
@@ -158,7 +158,7 @@ public interface INlsProject {
   /**
    * To find the best matching language supported of the project:
    * <p>
-   * 
+   *
    * <pre>
    * Example:<br/>
    * Supported languages = [default, en, de , de_ch, fr]
@@ -166,9 +166,9 @@ public interface INlsProject {
    * INPUT: de_de OUTPUT: de
    * INPUT: it OUTPUT: default
    * </pre>
-   * 
+   *
    * </p>
-   * 
+   *
    * @param language
    * @return the best matching language supported by this project
    */
@@ -176,21 +176,21 @@ public interface INlsProject {
 
   /**
    * Gets the best matching language of the eclipse instance running.
-   * 
+   *
    * @return
    */
   Language getDevelopmentLanguage();
 
   /**
    * Gets the type that is used to access translations at runtime (e.g. Texts or TEXTS)
-   * 
+   *
    * @return
    */
   IType getNlsAccessorType();
 
   /**
    * gets the translation resource for the given language.
-   * 
+   *
    * @param language
    * @return
    */
@@ -198,7 +198,7 @@ public interface INlsProject {
 
   /**
    * Generates a new key based on the given input text.
-   * 
+   *
    * @param baseText
    *          The input text a key should be generated for.
    * @return The key generated from the given input text. The result may already exist in the NlsProject.
@@ -207,7 +207,7 @@ public interface INlsProject {
 
   /**
    * Generates a new key based on the given input text.
-   * 
+   *
    * @param baseText
    *          The input text a key should be generated for.
    * @return a new key. it is guaranteed, that this key does not exist in this project at the time of key generation.
@@ -216,14 +216,14 @@ public interface INlsProject {
 
   /**
    * specifies if this project contains read-only resources or not.
-   * 
+   *
    * @return true if this project contains at least one read-only resource.
    */
   boolean isReadOnly();
 
   /**
    * Flushes all changes done to this NLS project to the underlying resources.
-   * 
+   *
    * @param monitor
    */
   void flush(IProgressMonitor monitor);

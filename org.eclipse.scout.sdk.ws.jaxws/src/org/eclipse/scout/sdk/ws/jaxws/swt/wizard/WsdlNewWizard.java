@@ -40,7 +40,7 @@ public class WsdlNewWizard extends AbstractWorkspaceWizard {
 
   /**
    * Used for WS provider
-   * 
+   *
    * @param bundle
    * @param sunJaxWsBean
    * @param wsdlResource
@@ -55,7 +55,7 @@ public class WsdlNewWizard extends AbstractWorkspaceWizard {
 
   /**
    * Used for WS consumer
-   * 
+   *
    * @param bundle
    * @param buildJaxWsBean
    * @param wsdlResource

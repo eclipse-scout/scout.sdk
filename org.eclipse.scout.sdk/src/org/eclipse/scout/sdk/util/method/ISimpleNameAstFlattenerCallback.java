@@ -14,14 +14,14 @@ import org.eclipse.jdt.core.dom.SimpleName;
 
 /**
  * <h3>{@link ISimpleNameAstFlattenerCallback}</h3> Rewrite strategy for {@link SimpleName} AST nodes.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 23.01.2014
  */
 public interface ISimpleNameAstFlattenerCallback {
   /**
    * Rewrites the given node.
-   * 
+   *
    * @param node
    *          The {@link SimpleName} to rewrite
    * @param buffer

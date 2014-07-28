@@ -145,7 +145,9 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
 
   @Override
   protected String getPartKey() {
-    if (getPage() == null || !TypeUtility.exists(getPage().getType())) return null;
+    if (getPage() == null || !TypeUtility.exists(getPage().getType())) {
+      return null;
+    }
     return getPage().getType().getFullyQualifiedName();
   }
 

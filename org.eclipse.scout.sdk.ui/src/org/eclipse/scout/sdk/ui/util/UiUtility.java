@@ -248,7 +248,9 @@ public final class UiUtility {
         List<IEditorReference> partsToSave = new ArrayList<IEditorReference>(editorReferences.length);
         for (IEditorReference r : editorReferences) {
           if (editorId == null || editorId.equals(r.getId())) {
-            if (files == null || files.isEmpty() || isEditorInputInFiles(r, files)) partsToSave.add(r);
+            if (files == null || files.isEmpty() || isEditorInputInFiles(r, files)) {
+              partsToSave.add(r);
+            }
           }
         }
         if (!partsToSave.isEmpty()) {

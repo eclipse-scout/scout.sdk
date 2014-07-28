@@ -154,7 +154,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
 
   /**
    * To load the model of a page
-   * 
+   *
    * @param pageClazz
    * @param markerGroupUUID
    * @param dataMask
@@ -191,7 +191,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
 
   /**
    * Register page to receive reload requests
-   * 
+   *
    * @param pageClazz
    * @param page
    */
@@ -208,7 +208,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
 
   /**
    * Unregister page from receiving reload requests
-   * 
+   *
    * @param pageClazz
    * @param page
    */
@@ -258,7 +258,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
 
   /**
    * To get a cached image with one of the extensions [gif | png | jpg]
-   * 
+   *
    * @param name
    *          the name without extension located under resources/icons e.g. "person"
    * @return the cached image
@@ -278,7 +278,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
 
   /**
    * To get a cached image with one of the extensions [gif | png | jpg]
-   * 
+   *
    * @param name
    *          the name without extension located under resources/icons e.g. "person"
    * @return the cached image

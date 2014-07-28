@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.workspace;
 
 /**
  * <h3>{@link IScoutBundleGraphVisitor}</h3> A visitor used to traverse the scout bundle graph.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 20.11.2013
  * @see IScoutBundle#visit(IScoutBundleGraphVisitor, boolean, boolean)
@@ -22,7 +22,7 @@ public interface IScoutBundleGraphVisitor {
    * Callback for every visited bundle.<br>
    * The visit performs a breadth first (aka level order) traversal which means the traversalLevel will always increase
    * during the visits.
-   * 
+   *
    * @param bundle
    *          The current bundle visited.
    * @param traversalLevel

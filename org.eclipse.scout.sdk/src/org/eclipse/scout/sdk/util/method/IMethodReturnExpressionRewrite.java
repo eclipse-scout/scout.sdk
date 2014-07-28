@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 /**
  * <h3>{@link IMethodReturnExpressionRewrite}</h3> Rewrite callback used if the default {@link SimpleName} rewrite
  * cannot be performed.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 23.01.2014
  * @see MethodReturnExpression
@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 public interface IMethodReturnExpressionRewrite {
   /**
    * Callback for {@link SimpleName} nodes that could not be rewritten automatically.
-   * 
+   *
    * @param node
    *          The AST node
    * @param element

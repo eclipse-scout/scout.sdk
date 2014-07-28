@@ -16,16 +16,16 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * <h3>{@link _SuiteService}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 22.04.2010
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    CalendarServiceNewOperationTest.class,
-    LookupServiceNewOperationTest.class,
-    ProcessServiceNewOperationTest.class,
-    ServiceNewOperationTest.class,
+  CalendarServiceNewOperationTest.class,
+  LookupServiceNewOperationTest.class,
+  ProcessServiceNewOperationTest.class,
+  ServiceNewOperationTest.class,
 })
 public class _SuiteService {
 

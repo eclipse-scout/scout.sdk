@@ -31,7 +31,7 @@ import org.eclipse.ui.forms.widgets.ImageHyperlink;
 
 /**
  * <h3>{@link DocumentationPresenter}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 08.01.2014
  */

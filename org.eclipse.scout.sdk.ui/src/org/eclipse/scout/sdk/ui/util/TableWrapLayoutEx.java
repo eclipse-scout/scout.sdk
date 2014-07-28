@@ -45,7 +45,7 @@ import org.eclipse.ui.forms.widgets.SizeCache;
  * If none of the columns contain expandable and wrappable controls, the end-result will be similar to the one provided
  * by GridLayout. The difference will show up for layouts that contain controls whose minimum and maximum widths are not
  * the same.
- * 
+ *
  * @see TableWrapDataEx
  * @since 3.0
  */
@@ -132,19 +132,23 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
       // is currentRow within this span?
       if (currentRow >= row && currentRow < row + td.rowspan) {
         totalHeight += rowHeight;
-        if (currentRow > row) totalHeight += verticalSpacing;
+        if (currentRow > row) {
+          totalHeight += verticalSpacing;
+        }
       }
     }
 
     public int getRequiredHeightIncrease() {
-      if (totalHeight < height) return height - totalHeight;
+      if (totalHeight < height) {
+        return height - totalHeight;
+      }
       return 0;
     }
   }
 
   /**
    * Implements ILayoutExtension. Should not be called directly.
-   * 
+   *
    * @see ILayoutExtension
    */
   @Override
@@ -168,7 +172,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
       grid = new Vector();
       createGrid(parent);
     }
-    if (minColumnWidths == null) minColumnWidths = new int[numColumns];
+    if (minColumnWidths == null) {
+      minColumnWidths = new int[numColumns];
+    }
     for (int i = 0; i < numColumns; i++) {
       minColumnWidths[i] = 0;
     }
@@ -177,7 +183,7 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
 
   /**
    * Implements ILayoutExtension. Should not be called directly.
-   * 
+   *
    * @see ILayoutExtension
    */
   @Override
@@ -200,7 +206,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
       grid = new Vector();
       createGrid(parent);
     }
-    if (maxColumnWidths == null) maxColumnWidths = new int[numColumns];
+    if (maxColumnWidths == null) {
+      maxColumnWidths = new int[numColumns];
+    }
     for (int i = 0; i < numColumns; i++) {
       maxColumnWidths[i] = 0;
     }
@@ -219,7 +227,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
       cache.flush();
     }
 
-    if (children.length == 0) return;
+    if (children.length == 0) {
+      return;
+    }
 
     cache.setControls(children);
 
@@ -248,7 +258,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
           columnWidths[i] = widestColumnWidth;
         }
       }
-      else columnWidths = minColumnWidths;
+      else {
+        columnWidths = minColumnWidths;
+      }
     }
     else if (parentWidth > maxWidth) {
       if (growingColumns.length == 0) {
@@ -294,7 +306,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
           placeControl(child, td, x, y, rowHeights, i);
         }
         x += columnWidths[j];
-        if (j < numColumns - 1) x += horizontalSpacing;
+        if (j < numColumns - 1) {
+          x += horizontalSpacing;
+        }
       }
       y += rowHeight + verticalSpacing;
     }
@@ -316,7 +330,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
         int cwidth = 0;
         for (int k = j; k < j + span; k++) {
           cwidth += columnWidths[k];
-          if (k < j + span - 1) cwidth += horizontalSpacing;
+          if (k < j + span - 1) {
+            cwidth += horizontalSpacing;
+          }
         }
         Point size = computeSize(td.childIndex, cwidth, td.indent, td.maxWidth, td.maxHeight);
         td.compWidth = cwidth;
@@ -328,14 +344,18 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
         if (rowspan == null) {
           rowHeights[i] = Math.max(rowHeights[i], size.y);
         }
-        else rowspan.height = size.y;
+        else {
+          rowspan.height = size.y;
+        }
       }
       updateRowSpans(i, rowHeights[i]);
     }
     for (Enumeration enm = rowspans.elements(); enm.hasMoreElements();) {
       RowSpan rowspan = (RowSpan) enm.nextElement();
       int increase = rowspan.getRequiredHeightIncrease();
-      if (increase == 0) continue;
+      if (increase == 0) {
+        continue;
+      }
       TableWrapDataEx td = (TableWrapDataEx) rowspan.child.getLayoutData();
       int ngrowing = 0;
       int[] affectedRows = new int[grid.size()];
@@ -361,9 +381,13 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
   }
 
   boolean isGrowingColumn(int col) {
-    if (growingColumns == null) return false;
+    if (growingColumns == null) {
+      return false;
+    }
     for (int i = 0; i < growingColumns.length; i++) {
-      if (col == growingColumns[i]) return true;
+      if (col == growingColumns[i]) {
+        return true;
+      }
     }
     return false;
   }
@@ -394,10 +418,16 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
   Point computeSize(int childIndex, int width, int indent, int maxWidth, int maxHeight) {
     int widthArg = width - indent;
     SizeCache controlCache = cache.getCache(childIndex);
-    if (!isWrap(controlCache.getControl())) widthArg = SWT.DEFAULT;
+    if (!isWrap(controlCache.getControl())) {
+      widthArg = SWT.DEFAULT;
+    }
     Point size = controlCache.computeSize(widthArg, SWT.DEFAULT);
-    if (maxWidth != SWT.DEFAULT) size.x = Math.min(size.x, maxWidth);
-    if (maxHeight != SWT.DEFAULT) size.y = Math.min(size.y, maxHeight);
+    if (maxWidth != SWT.DEFAULT) {
+      size.x = Math.min(size.x, maxWidth);
+    }
+    if (maxHeight != SWT.DEFAULT) {
+      size.y = Math.min(size.y, maxHeight);
+    }
     size.x += indent;
     return size;
   }
@@ -415,7 +445,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     if (rowspan != null) {
       slotHeight = 0;
       for (int i = row; i < row + td.rowspan; i++) {
-        if (i > row) slotHeight += verticalSpacing;
+        if (i > row) {
+          slotHeight += verticalSpacing;
+        }
         slotHeight += rowHeights[i];
       }
     }
@@ -451,7 +483,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     rowspans = new Hashtable();
     //
     children = getOrderdVisibleChildren(composite);
-    if (children.length == 0) return;
+    if (children.length == 0) {
+      return;
+    }
     //
     grid.addElement(createEmptyRow());
     row = 0;
@@ -549,7 +583,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     int affectedColumn = column + spec.colspan - 1;
     for (int i = 0; i < gc.size(); i++) {
       Integer col = (Integer) gc.get(i);
-      if (col.intValue() == affectedColumn) return;
+      if (col.intValue() == affectedColumn) {
+        return;
+      }
     }
     gc.add(Integer.valueOf(affectedColumn));
   }
@@ -558,15 +594,18 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     int affectedRow = row + spec.rowspan - 1;
     for (int i = 0; i < gr.size(); i++) {
       Integer irow = (Integer) gr.get(i);
-      if (irow.intValue() == affectedRow) return;
+      if (irow.intValue() == affectedRow) {
+        return;
+      }
     }
     gr.add(Integer.valueOf(affectedRow));
   }
 
   private TableWrapDataEx[] createEmptyRow() {
     TableWrapDataEx[] row = new TableWrapDataEx[numColumns];
-    for (int i = 0; i < numColumns; i++)
+    for (int i = 0; i < numColumns; i++) {
       row[i] = null;
+    }
     return row;
   }
 
@@ -601,7 +640,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
     int minWidth = internalGetMinimumWidth(parent, changed);
     int maxWidth = internalGetMaximumWidth(parent, changed);
 
-    if (wHint == SWT.DEFAULT) parentWidth = maxWidth;
+    if (wHint == SWT.DEFAULT) {
+      parentWidth = maxWidth;
+    }
 
     int tableWidth = parentWidth;
     int[] columnWidths;
@@ -613,7 +654,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
           columnWidths[i] = widestColumnWidth;
         }
       }
-      else columnWidths = minColumnWidths;
+      else {
+        columnWidths = minColumnWidths;
+      }
     }
     else if (parentWidth >= maxWidth) {
       if (makeColumnsEqualWidth) {
@@ -660,7 +703,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
         int span = td.colspan;
         int cwidth = 0;
         for (int k = j; k < j + span; k++) {
-          if (k > j) cwidth += horizontalSpacing;
+          if (k > j) {
+            cwidth += horizontalSpacing;
+          }
           cwidth += columnWidths[k];
         }
         int cy = td.heightHint;
@@ -679,16 +724,22 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
         }
       }
       updateRowSpans(i, rowHeight);
-      if (i > 0) innerHeight += verticalSpacing;
+      if (i > 0) {
+        innerHeight += verticalSpacing;
+      }
       innerHeight += rowHeight;
     }
-    if (!rowspans.isEmpty()) innerHeight = compensateForRowSpans(innerHeight);
+    if (!rowspans.isEmpty()) {
+      innerHeight = compensateForRowSpans(innerHeight);
+    }
     totalHeight = topMargin + innerHeight + bottomMargin;
     return new Point(tableWidth, totalHeight);
   }
 
   private void updateRowSpans(int row, int rowHeight) {
-    if (rowspans == null || rowspans.size() == 0) return;
+    if (rowspans == null || rowspans.size() == 0) {
+      return;
+    }
     for (Enumeration enm = rowspans.elements(); enm.hasMoreElements();) {
       RowSpan rowspan = (RowSpan) enm.nextElement();
       rowspan.update(row, rowHeight);
@@ -704,9 +755,10 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
   }
 
   int internalGetMinimumWidth(Composite parent, boolean changed) {
-    if (changed)
-    //calculateMinimumColumnWidths(parent, true);
-    calculateColumnWidths(parent, minColumnWidths, false, true, makeColumnsEqualWidth);
+    if (changed) {
+      //calculateMinimumColumnWidths(parent, true);
+      calculateColumnWidths(parent, minColumnWidths, false, true, makeColumnsEqualWidth);
+    }
     int minimumWidth = 0;
     widestColumnWidth = 0;
     if (makeColumnsEqualWidth) {
@@ -716,9 +768,15 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
       }
     }
     for (int i = 0; i < numColumns; i++) {
-      if (i > 0) minimumWidth += horizontalSpacing;
-      if (makeColumnsEqualWidth) minimumWidth += widestColumnWidth;
-      else minimumWidth += minColumnWidths[i];
+      if (i > 0) {
+        minimumWidth += horizontalSpacing;
+      }
+      if (makeColumnsEqualWidth) {
+        minimumWidth += widestColumnWidth;
+      }
+      else {
+        minimumWidth += minColumnWidths[i];
+      }
     }
     // add margins
     minimumWidth += leftMargin + rightMargin;
@@ -726,12 +784,15 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
   }
 
   int internalGetMaximumWidth(Composite parent, boolean changed) {
-    if (changed)
-    //calculateMaximumColumnWidths(parent, true);
-    calculateColumnWidths(parent, maxColumnWidths, true, true, makeColumnsEqualWidth);
+    if (changed) {
+      //calculateMaximumColumnWidths(parent, true);
+      calculateColumnWidths(parent, maxColumnWidths, true, true, makeColumnsEqualWidth);
+    }
     int maximumWidth = 0;
     for (int i = 0; i < numColumns; i++) {
-      if (i > 0) maximumWidth += horizontalSpacing;
+      if (i > 0) {
+        maximumWidth += horizontalSpacing;
+      }
       maximumWidth += maxColumnWidths[i];
     }
     // add margins
@@ -740,8 +801,12 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
   }
 
   void resetColumnWidths() {
-    if (minColumnWidths == null) minColumnWidths = new int[numColumns];
-    if (maxColumnWidths == null) maxColumnWidths = new int[numColumns];
+    if (minColumnWidths == null) {
+      minColumnWidths = new int[numColumns];
+    }
+    if (maxColumnWidths == null) {
+      maxColumnWidths = new int[numColumns];
+    }
     for (int i = 0; i < numColumns; i++) {
       minColumnWidths[i] = 0;
     }
@@ -757,7 +822,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
       TableWrapDataEx[] row = (TableWrapDataEx[]) grid.elementAt(i);
       for (int j = 0; j < numColumns; j++) {
         TableWrapDataEx td = row[j];
-        if (td.isItemData == false) continue;
+        if (td.isItemData == false) {
+          continue;
+        }
 
         if (td.colspan > 1) {
           // we will not do controls with multiple column span
@@ -770,7 +837,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
         SizeCache childCache = cache.getCache(td.childIndex);
         // !!
         int width = max ? childCache.computeMaximumWidth() : childCache.computeMinimumWidth();
-        if (td.maxWidth != SWT.DEFAULT) width = Math.min(width, td.maxWidth);
+        if (td.maxWidth != SWT.DEFAULT) {
+          width = Math.min(width, td.maxWidth);
+        }
 
         width += td.indent;
         columnWidths[j] = Math.max(columnWidths[j], width);
@@ -782,18 +851,24 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
         columnWidths[i] = widestColumnWidth;
       }
     }
-    if (!secondPassNeeded) return;
+    if (!secondPassNeeded) {
+      return;
+    }
 
     // Second pass for controls with multi-column horizontal span
     for (int i = 0; i < grid.size(); i++) {
       TableWrapDataEx[] row = (TableWrapDataEx[]) grid.elementAt(i);
       for (int j = 0; j < numColumns; j++) {
         TableWrapDataEx td = row[j];
-        if (td.isItemData == false || td.colspan == 1) continue;
+        if (td.isItemData == false || td.colspan == 1) {
+          continue;
+        }
 
         SizeCache childCache = cache.getCache(td.childIndex);
         int width = max ? childCache.computeMaximumWidth() : childCache.computeMinimumWidth();
-        if (td.maxWidth != SWT.DEFAULT) width = Math.min(width, td.maxWidth);
+        if (td.maxWidth != SWT.DEFAULT) {
+          width = Math.min(width, td.maxWidth);
+        }
 
         width += td.indent;
         // check if the current width is enough to
@@ -801,7 +876,9 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
         // the last column or to all the growing columns, if present
         int current = 0;
         for (int k = j; k < j + td.colspan; k++) {
-          if (k > j) current += horizontalSpacing;
+          if (k > j) {
+            current += horizontalSpacing;
+          }
           current += columnWidths[k];
         }
         if (width > current) {
@@ -822,9 +899,13 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
             // distribute the delta to the growing
             // columns
             int percolumn = (width - current) / ndiv;
-            if ((width - current) % ndiv > 0) percolumn++;
+            if ((width - current) % ndiv > 0) {
+              percolumn++;
+            }
             for (int k = j; k < j + td.colspan; k++) {
-              if (isGrowingColumn(k)) columnWidths[k] += percolumn;
+              if (isGrowingColumn(k)) {
+                columnWidths[k] += percolumn;
+              }
             }
           }
         }
@@ -834,12 +915,16 @@ public final class TableWrapLayoutEx extends Layout implements ILayoutExtension 
 
   boolean isWrap(Control control) {
     if (control instanceof Composite
-        && ((Composite) control).getLayout() instanceof ILayoutExtension) return true;
+        && ((Composite) control).getLayout() instanceof ILayoutExtension) {
+      return true;
+    }
     return (control.getStyle() & SWT.WRAP) != 0;
   }
 
   private void initializeIfNeeded(Composite parent, boolean changed) {
-    if (changed) initialLayout = true;
+    if (changed) {
+      initialLayout = true;
+    }
     if (initialLayout) {
       initializeLayoutData(parent);
       initialLayout = false;

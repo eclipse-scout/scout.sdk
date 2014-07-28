@@ -116,22 +116,31 @@ public class MenuVisibilityTester extends PropertyTester {
             HashMap<IPage, IContextMenuContributor> contributors = getMenuContributorsForAllPages(currentMenuClass, selectedNodes);
 
             // check if a contributor is available for each selected page (if not: the menu is not supported by each selected node)
-            if (!isMenuAvailableInAllPages(contributors)) return false;
+            if (!isMenuAvailableInAllPages(contributors)) {
+              return false;
+            }
 
             IScoutHandler currentMenu = ScoutMenuContributionItemFactory.getMenuInstance(currentMenuClass);
-            if (currentMenu == null) return false; // no instance could be created -> do not show the menu
+            if (currentMenu == null)
+            {
+              return false; // no instance could be created -> do not show the menu
+            }
 
             cmd.setHandler(currentMenu);
 
             // check for multi select
-            if (!currentMenu.isMultiSelectSupported() && selectedNodes.size() > 1) return false;
+            if (!currentMenu.isMultiSelectSupported() && selectedNodes.size() > 1) {
+              return false;
+            }
 
             // prepare the menu
             prepareMenu(currentMenu, contributors);
 
             long menuPreparationStartTime = System.currentTimeMillis();
             // check if menu is visible
-            if (!currentMenu.isVisible()) return false;
+            if (!currentMenu.isVisible()) {
+              return false;
+            }
 
             // evaluate the enabled state after the menu has been prepared
             currentMenu.setEnabled(new BooleanHolder(currentMenu.isActive()));

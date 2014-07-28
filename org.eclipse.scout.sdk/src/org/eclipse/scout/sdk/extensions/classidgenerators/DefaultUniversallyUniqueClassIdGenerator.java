@@ -14,7 +14,7 @@ import java.util.UUID;
 
 /**
  * <h3>{@link DefaultUniversallyUniqueClassIdGenerator}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 02.01.2014
  */

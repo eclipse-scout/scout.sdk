@@ -22,13 +22,13 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    RecreateTypeTest.class,
-    TypeCacheTest.class,
-    TypeHierarchyTest1.class,
-    TypeHierarchyTest2.class,
-    PrimaryTypeHierarchyTest.class,
-    TypeUtilityTest.class,
-    ProjectContextTypeHierarchyResultTest.class
+  RecreateTypeTest.class,
+  TypeCacheTest.class,
+  TypeHierarchyTest1.class,
+  TypeHierarchyTest2.class,
+  PrimaryTypeHierarchyTest.class,
+  TypeUtilityTest.class,
+  ProjectContextTypeHierarchyResultTest.class
 })
 public class _SuiteTypes {
 

@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.styled.ISearchRangeConsumer;
 
 /**
  * <h3>{@link StaticContentProvider}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 12.02.2012
  */

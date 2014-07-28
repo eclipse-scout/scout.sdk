@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.sql.binding.model;
 
 /**
  * <h3>{@link StringFragmentToken}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 25.02.2011
  */

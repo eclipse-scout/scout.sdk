@@ -121,7 +121,7 @@ public class TypeFilters {
   /**
    * Creates a new {@link ITypeFilter} that only returns {@link IType}s where the simple name exactly matches the given
    * typeName.
-   * 
+   *
    * @param typeName
    *          The simple name the types must have.
    * @return The newly created {@link ITypeFilter}
@@ -138,7 +138,7 @@ public class TypeFilters {
   /**
    * Creates and gets a new type filter that accepts all types where the simple name matches the given regex with the
    * given regex flags.
-   * 
+   *
    * @param regex
    *          The expression to use
    * @param regexFlags
@@ -160,7 +160,7 @@ public class TypeFilters {
   /**
    * Creates and gets a new type filter that accepts all types where the simple name matches the given regex pattern.<br>
    * <b>Note: The given regex uses case-insensitive matching!</b>
-   * 
+   *
    * @param regex
    *          The regex to use for the matching.
    * @return the created filter
@@ -204,7 +204,7 @@ public class TypeFilters {
 
   /**
    * Creates a new {@link ITypeFilter} that accepts all {@link IType}s that have at least all of the given flags set.
-   * 
+   *
    * @param flags
    *          The flags of the types.
    * @return The newly created {@link ITypeFilter}.
@@ -228,7 +228,7 @@ public class TypeFilters {
   /**
    * Gets a filter that accepts only types that are classes.<br>
    * A class is defined as a type that is neither abstract, an interface or deprecated.
-   * 
+   *
    * @return The filter that only accepts classes.
    * @see #isClass(IType)
    */
@@ -269,7 +269,7 @@ public class TypeFilters {
   /**
    * Gets if the given type is a class.<br>
    * A class is defined as a type that is neither an anonymous, abstract, interface or deprecated type.
-   * 
+   *
    * @param type
    *          The type to check
    * @return true if the given type has none of the following flags: abstract, interface, deprecated
@@ -346,7 +346,7 @@ public class TypeFilters {
    * Creates and gets a new filter that returns all types whose type parameter is a sub-type of a given base parameter<br>
    * <br>
    * Note: This filter is expensive! Use only on small lists.
-   * 
+   *
    * @param baseSig
    *          The base signature the type parameter must be a sub-type of.
    * @param paramDefiningSuperTypeFqn

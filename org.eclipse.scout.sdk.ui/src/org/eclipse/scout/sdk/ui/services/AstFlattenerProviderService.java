@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.services;
 
+import org.eclipse.scout.sdk.util.method.IAstRewriteFlattener;
 import org.eclipse.scout.sdk.util.method.ISimpleNameAstFlattenerCallback;
 import org.eclipse.scout.sdk.util.method.ISimpleNameAstFlattenerProviderService;
-import org.eclipse.scout.sdk.util.method.IAstRewriteFlattener;
 
 /**
  * <h3>{@link AstFlattenerProviderService}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 23.01.2014
  */

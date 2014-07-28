@@ -15,7 +15,7 @@ import java.util.EventListener;
 
 /**
  * <h3>{@link IFileSelectionListener}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 06.02.2011
  */

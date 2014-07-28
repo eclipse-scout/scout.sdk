@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link F2ManifestTechnologyHandler}</h3>
- * 
+ *
  * @author Judith Gull
  * @since 3.10.0 02.07.2013
  */

@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link ClassIdNewAction}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 05.01.2014
  */

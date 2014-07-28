@@ -17,7 +17,7 @@ import org.eclipse.scout.nls.sdk.model.INlsEntry;
 
 /**
  * <h3>{@link IClassIdDocumentationListener}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 28.03.2014
  */
@@ -41,7 +41,7 @@ public interface IClassIdDocumentationListener extends EventListener {
 
   /**
    * Callback when a documentation translation has been created or modified
-   * 
+   *
    * @param eventType
    *          The type of the event. One of {@link #TYPE_NLS_VALUE_CREATED_EXISTING_CLASS_ID},
    *          {@link #TYPE_NLS_VALUE_CREATED_NEW_CLASS_ID}, {@link #TYPE_NLS_VALUE_EDITED}

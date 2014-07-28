@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.extensions.runtime.bundles;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -197,11 +200,9 @@ public final class RuntimeBundles {
       return null;
     }
     Set<IPluginModelBase> allDependencies = bundle.getAllDependencies();
-    String[] symbolicNames = new String[allDependencies.size()];
-    int i = 0;
+    List<String> symbolicNames = new ArrayList<String>(allDependencies.size());
     for (IPluginModelBase dependency : allDependencies) {
-      symbolicNames[i] = dependency.getBundleDescription().getSymbolicName();
-      i++;
+      symbolicNames.add(dependency.getBundleDescription().getSymbolicName());
     }
     return getBundleType(symbolicNames);
   }
@@ -217,8 +218,8 @@ public final class RuntimeBundles {
    *         <code>org.eclipse.scout.sdk.runtimeBundles</code> extension point. The predefined types are available in
    *         the {@link IScoutBundle}.TYPE* constants.
    */
-  public static String getBundleType(String[] symbolicNames) {
-    if (symbolicNames == null || symbolicNames.length < 1) {
+  public static String getBundleType(Collection<String> symbolicNames) {
+    if (symbolicNames == null || symbolicNames.isEmpty()) {
       return null;
     }
     ensureCached();

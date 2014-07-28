@@ -15,7 +15,7 @@ import org.eclipse.ui.IWorkbenchPart;
 
 /**
  * <h3>{@link IPageOutlineView}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 10.12.2013
  */

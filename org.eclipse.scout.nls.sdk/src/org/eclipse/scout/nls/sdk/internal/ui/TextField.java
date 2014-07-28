@@ -82,7 +82,9 @@ public class TextField<T> extends Composite {
     FormData labelData = new FormData();
     labelData.top = new FormAttachment(0, 0);
     labelData.left = new FormAttachment(0, 0);
-    if (visible) labelData.right = new FormAttachment(40, 0);
+    if (visible) {
+      labelData.right = new FormAttachment(40, 0);
+    }
     labelData.bottom = new FormAttachment(100, 0);
     m_label.setLayoutData(labelData);
     m_label.setVisible(visible);

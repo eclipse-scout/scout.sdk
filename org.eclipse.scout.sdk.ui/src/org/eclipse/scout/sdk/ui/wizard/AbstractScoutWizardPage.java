@@ -26,7 +26,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>BCWizardPage</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.0 11.01.2008
  * @see ScoutWizardDialog
@@ -77,7 +77,7 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
 
   /**
    * Overwrite this method to add your controls to the wizard page.
-   * 
+   *
    * @param parent
    */
   protected abstract void createContent(Composite parent);
@@ -163,7 +163,7 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
 
   /**
    * NOTE: always call this method in a try finally block.
-   * 
+   *
    * @param changing
    */
   protected void setStateChanging(boolean changing) {
@@ -182,7 +182,7 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
   /**
    * call to revalidate the wizard page. this method calls the overwritable method
    * {@link AbstractScoutWizardPage#validatePage(MultiStatus)}.
-   * 
+   *
    * @see {@link AbstractScoutWizardPage#validatePage(MultiStatus)}
    */
   protected final void revalidate() {
@@ -197,7 +197,7 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
   /**
    * Classes extending BCWizardPage can overwrite this method to do some page validation and
    * add additional status to the given multi status.
-   * 
+   *
    * @param multiStatus
    */
   protected void validatePage(MultiStatus multiStatus) {

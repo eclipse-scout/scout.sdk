@@ -20,29 +20,29 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    BigdecimalFieldNewOperationTest.class,
-    BooleanFieldNewOperationTest.class,
-    ButtonFieldNewOperationTest.class,
-    CheckboxFieldNewOperationTest.class,
-    ComposerFieldNewOperationTest.class,
-    DateFieldNewOperationTest.class,
-    DoubleFieldNewOperationTest.class,
-    FileChooserFieldNewOperationTest.class,
-    GroupBoxNewOperationTest.class,
-    HtmlFieldNewOperationTest.class,
-    ListBoxFieldNewOperationTest.class,
-    PlannerFieldNewOperationTest.class,
-    SequenceBoxNewOperationTest.class,
-    StringFieldNewOperationTest.class,
-    TabBoxNewOperationTest.class,
-    TreeBoxNewOperationTest.class,
-    TreeFieldNewOperationTest.class,
+  BigdecimalFieldNewOperationTest.class,
+  BooleanFieldNewOperationTest.class,
+  ButtonFieldNewOperationTest.class,
+  CheckboxFieldNewOperationTest.class,
+  ComposerFieldNewOperationTest.class,
+  DateFieldNewOperationTest.class,
+  DoubleFieldNewOperationTest.class,
+  FileChooserFieldNewOperationTest.class,
+  GroupBoxNewOperationTest.class,
+  HtmlFieldNewOperationTest.class,
+  ListBoxFieldNewOperationTest.class,
+  PlannerFieldNewOperationTest.class,
+  SequenceBoxNewOperationTest.class,
+  StringFieldNewOperationTest.class,
+  TabBoxNewOperationTest.class,
+  TreeBoxNewOperationTest.class,
+  TreeFieldNewOperationTest.class,
 
-    // suites
-    _SuiteCalendarField.class,
-    _SuiteComposerField.class,
-    _SuiteSmartField.class,
-    _SuiteTable.class
+  // suites
+  _SuiteCalendarField.class,
+  _SuiteComposerField.class,
+  _SuiteSmartField.class,
+  _SuiteTable.class
 })
 public class _SuiteFormFields {
 

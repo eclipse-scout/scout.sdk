@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 /**
  * <h3>FormFieldNewOperation</h3> To create an instance of a form field. Usually this operation is used if no specific
  * op (e.g. SmartFieldNewOperation) can be found.
- * 
+ *
  * @see FormFieldNewWizard
  */
 public class DefaultFormFieldNewOperation implements IOperation {

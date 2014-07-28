@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.compatibility.License;
 
 /**
  * <h3>{@link IP2CompatService}</h3> P2 Compatibility service interface.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 03.05.2013
  */
@@ -27,7 +27,7 @@ public interface IP2CompatService {
 
   /**
    * Gets the newest version of an installable unit in a specific P2 repository.
-   * 
+   *
    * @param rootIU
    *          The installable unit for which the latest version should be searched.
    * @param p2RepositoryURI
@@ -41,7 +41,7 @@ public interface IP2CompatService {
 
   /**
    * Installs the given installable units in the running platform.
-   * 
+   *
    * @param rootIUs
    *          Array of all installable unit Ids to install.
    * @param p2RepositoryURIs
@@ -54,7 +54,7 @@ public interface IP2CompatService {
 
   /**
    * Gets the licenses of the given installable units.
-   * 
+   *
    * @param rootIUs
    *          Array of all installable unit Ids for which the licenses should be loaded.
    * @param p2RepositoryURIs

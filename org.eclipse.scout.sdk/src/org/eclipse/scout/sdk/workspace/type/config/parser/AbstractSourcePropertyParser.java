@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.workspace.type.config.property.AbstractSourceProper
 
 /**
  * <h3>{@link AbstractSourcePropertyParser}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 27.02.2013
  */

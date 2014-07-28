@@ -86,11 +86,11 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
               IJavaSearchConstants.DECLARATIONS,
               matchStrategy
               ),
-          new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
-          m_seachScope,
-          searchRequestor
-          ,
-          null
+              new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
+              m_seachScope,
+              searchRequestor
+              ,
+              null
           );
     }
     catch (CoreException e) {

@@ -14,6 +14,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -283,11 +284,10 @@ public final class ProductFileModelHelper {
      * @return the plug-in models of all plug-ins this product is dependent of.
      * @throws CoreException
      */
-    public BundleDescription[] getPluginModels() throws CoreException {
-      ArrayList<BundleDescription> list = new ArrayList<BundleDescription>();
+    public List<BundleDescription> getPluginModels() throws CoreException {
       State state = TargetPlatformHelper.getState();
-
       IProductPlugin[] plugins = m_model.getWorkspaceProductModel().getProduct().getPlugins();
+      ArrayList<BundleDescription> list = new ArrayList<BundleDescription>(plugins.length);
       for (int i = 0; i < plugins.length; i++) {
         BundleDescription bundle = null;
 
@@ -302,8 +302,7 @@ public final class ProductFileModelHelper {
           list.add(bundle);
         }
       }
-
-      return list.toArray(new BundleDescription[list.size()]);
+      return list;
     }
 
     /**
@@ -313,11 +312,11 @@ public final class ProductFileModelHelper {
      * @return The symbolic names of all plug-ins in the product.
      * @throws CoreException
      */
-    public String[] getPluginSymbolicNames() throws CoreException {
+    public List<String> getPluginSymbolicNames() throws CoreException {
       IProductPlugin[] plugins = m_model.getWorkspaceProductModel().getProduct().getPlugins();
-      String[] result = new String[plugins.length];
-      for (int i = 0; i < result.length; i++) {
-        result[i] = plugins[i].getId();
+      ArrayList<String> result = new ArrayList<String>(plugins.length);
+      for (int i = 0; i < plugins.length; i++) {
+        result.add(plugins[i].getId());
       }
       return result;
     }
@@ -485,10 +484,12 @@ public final class ProductFileModelHelper {
       writer.println("/>"); //$NON-NLS-1$
     }
 
+    // do not add @Override annotation as long as eclipse versions older than 3.8 (Juno) are supported.
     public boolean isFragment() {
       return m_fragment;
     }
 
+    // do not add @Override annotation as long as eclipse versions older than 3.8 (Juno) are supported.
     public void setFragment(boolean isFragment) {
       m_fragment = isFragment;
     }

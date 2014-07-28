@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
 
 /**
  * <h3>{@link BigDecimalPropertySourceParser}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 02.12.2013
  */

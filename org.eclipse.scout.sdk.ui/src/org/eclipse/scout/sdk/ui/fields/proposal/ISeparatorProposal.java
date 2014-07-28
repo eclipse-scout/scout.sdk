@@ -14,7 +14,7 @@ import org.eclipse.swt.graphics.Image;
 
 /**
  * <h3>ISeparatorProposal</h3> A marker interface to provide unselectable proposal items
- * 
+ *
  * @see AsyncContentProposalAdapter
  */
 public interface ISeparatorProposal {

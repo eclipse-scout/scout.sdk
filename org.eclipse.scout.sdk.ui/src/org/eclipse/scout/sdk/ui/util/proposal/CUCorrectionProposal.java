@@ -41,7 +41,7 @@ import org.eclipse.ui.IWorkbenchPage;
 /**
  * TODO: this class is a copy of org.eclipse.jdt.ui.text.java.correction.CUCorrectionProposal and can be removed as soon
  * as Eclipse 3.7 support is dropped.
- * 
+ *
  * @since 3.10.0 07.01.2014
  */
 @SuppressWarnings("restriction")
@@ -52,7 +52,7 @@ public class CUCorrectionProposal extends ChangeCorrectionProposal {
 
   /**
    * Constructs a correction proposal working on a compilation unit with a given text change.
-   * 
+   *
    * @param name
    *          the name that is displayed in the proposal selection dialog
    * @param cu
@@ -78,7 +78,7 @@ public class CUCorrectionProposal extends ChangeCorrectionProposal {
   /**
    * Constructs a correction proposal working on a compilation unit with a given text change. Uses
    * the default image for this proposal.
-   * 
+   *
    * @param name
    *          the name that is displayed in the proposal selection dialog
    * @param cu
@@ -100,7 +100,7 @@ public class CUCorrectionProposal extends ChangeCorrectionProposal {
    * Users have to override {@link #addEdits(IDocument, TextEdit)} to provide the text edits or
    * {@link #createTextChange()} to provide a text change.
    * </p>
-   * 
+   *
    * @param name
    *          the name that is displayed in the proposal selection dialog
    * @param cu
@@ -122,7 +122,7 @@ public class CUCorrectionProposal extends ChangeCorrectionProposal {
    * <p>
    * The default implementation does not add any edits
    * </p>
-   * 
+   *
    * @param document
    *          content of the underlying compilation unit. To be accessed read only.
    * @param editRoot
@@ -204,7 +204,7 @@ public class CUCorrectionProposal extends ChangeCorrectionProposal {
    * Creates the text change for this proposal.
    * This method is only called once and only when no text change has been passed in
    * {@link #CUCorrectionProposal(String, ICompilationUnit, TextChange, int, Image)}.
-   * 
+   *
    * @return the created text change
    * @throws CoreException
    *           if the creation of the text change failed
@@ -250,7 +250,7 @@ public class CUCorrectionProposal extends ChangeCorrectionProposal {
 
   /**
    * Returns the text change that is invoked when the change is applied.
-   * 
+   *
    * @return the text change that is invoked when the change is applied
    * @throws CoreException
    *           if accessing the change failed
@@ -261,7 +261,7 @@ public class CUCorrectionProposal extends ChangeCorrectionProposal {
 
   /**
    * The compilation unit on which the change works.
-   * 
+   *
    * @return the compilation unit on which the change works
    */
   public final ICompilationUnit getCompilationUnit() {
@@ -270,7 +270,7 @@ public class CUCorrectionProposal extends ChangeCorrectionProposal {
 
   /**
    * Creates a preview of the content of the compilation unit after applying the change.
-   * 
+   *
    * @return the preview of the changed compilation unit
    * @throws CoreException
    *           if the creation of the change failed
@@ -296,7 +296,7 @@ public class CUCorrectionProposal extends ChangeCorrectionProposal {
 
   /**
    * Returns whether the changed compilation unit was not previously open in an editor.
-   * 
+   *
    * @return <code>true</code> if the changed compilation unit was not previously open in an
    *         editor, <code>false</code> if the changed compilation unit was already open in an
    *         editor

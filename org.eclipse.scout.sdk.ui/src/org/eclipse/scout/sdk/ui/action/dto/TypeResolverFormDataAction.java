@@ -20,7 +20,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link TypeResolverFormDataAction}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 02.10.2013
  */

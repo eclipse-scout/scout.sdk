@@ -145,7 +145,7 @@ public class SunJaxWsEntryCreateOperation implements IOperation {
 
   /**
    * After execution, to get the created {@link SunJaxWsBean}.
-   * 
+   *
    * @return
    */
   public SunJaxWsBean getCreatedSunJaxWsBean() {

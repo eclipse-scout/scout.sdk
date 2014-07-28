@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -15,7 +15,7 @@ import java.util.ArrayList;
 /**
  * <h3>ILinkGroup</h3> A group having a name and an order number.
  * The order number decides where to place the current group within a context of link groups.
- * 
+ *
  * @see LinksPresenterModel#getOrderedNotEmtyGroups()
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2010

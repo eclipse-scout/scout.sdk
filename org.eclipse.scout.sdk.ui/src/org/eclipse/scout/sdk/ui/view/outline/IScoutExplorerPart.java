@@ -19,14 +19,14 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 public interface IScoutExplorerPart extends IPageOutlineView, IDirtyManageable {
   /**
    * gets the current selection of the scout explorer tree.
-   * 
+   *
    * @return The structured selection of the tree.
    */
   IStructuredSelection getSelection();
 
   /**
    * sets the new selection of the scout explorer tree.
-   * 
+   *
    * @param selection
    *          the new selection containing the {@link IPage} instances that should be selected.
    */
@@ -39,7 +39,7 @@ public interface IScoutExplorerPart extends IPageOutlineView, IDirtyManageable {
 
   /**
    * gets the (invisible) root page. this page contains the project nodes.
-   * 
+   *
    * @return the invisible root page.
    */
   IPage getRootPage();

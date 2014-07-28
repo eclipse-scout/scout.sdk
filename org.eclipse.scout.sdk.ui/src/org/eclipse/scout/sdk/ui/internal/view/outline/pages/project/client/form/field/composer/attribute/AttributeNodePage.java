@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty.BeanProper
 
 /**
  * <h3>{@link AttributeNodePage}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 02.09.2010
  */

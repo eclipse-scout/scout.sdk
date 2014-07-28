@@ -25,7 +25,7 @@ import org.junit.Test;
 
 /**
  * <h3>{@link PageBeanDataTest}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 19.08.2013
  */

@@ -117,7 +117,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
 
   /**
    * only used for webservice consumer
-   * 
+   *
    * @return
    */
   public IPath getWsdlProjectRelativePath() {
@@ -126,7 +126,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
 
   /**
    * only used for webservice consumer
-   * 
+   *
    * @param wsdlProjectRelativePath
    */
   public void setWsdlProjectRelativePath(IPath wsdlProjectRelativePath) {
@@ -135,7 +135,7 @@ public class BuildJaxWsEntryCreateOperation implements IOperation {
 
   /**
    * After execution, to get the created {@link BuildJaxWsBean}.
-   * 
+   *
    * @return
    */
   public BuildJaxWsBean getCreatedBuildJaxWsBean() {

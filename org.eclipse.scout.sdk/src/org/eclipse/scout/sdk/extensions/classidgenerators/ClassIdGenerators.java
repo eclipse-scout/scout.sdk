@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.internal.ScoutSdk;
 
 /**
  * <h3>{@link ClassIdGenerators}</h3> Provides a single access point to get class id values.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 02.01.2014
  * @see IClassIdGenerator
@@ -108,7 +108,7 @@ public final class ClassIdGenerators {
 
   /**
    * Sets if the {@link ClassId} annotation should automatically be created.
-   * 
+   *
    * @param newValue
    *          true if it should be created automatically, false otherwise.
    */
@@ -121,7 +121,7 @@ public final class ClassIdGenerators {
   /**
    * Gets a new class id for the given type. All class id generators are considered until the first (according to the
    * priorities) provides a value.
-   * 
+   *
    * @param type
    *          The type for which the new id should be generated.
    * @return The new id or null if no generator provided an id.

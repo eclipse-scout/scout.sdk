@@ -233,7 +233,9 @@ public class Technology implements Comparable<Technology> {
   }
 
   public void addAllHandlers(Collection<IScoutTechnologyHandler> c) {
-    if (c == null || c.size() == 0) return;
+    if (c == null || c.size() == 0) {
+      return;
+    }
     m_handlers.addAll(c);
   }
 

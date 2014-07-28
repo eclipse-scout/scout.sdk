@@ -14,7 +14,7 @@ import org.eclipse.scout.sdk.util.NamingUtility;
 
 /**
  * <h3>{@link ScoutBundleComparators}</h3> Contains pre-defined scout bundle comparators
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 09.02.2013
  * @see IScoutBundleComparator
@@ -47,7 +47,7 @@ public final class ScoutBundleComparators {
    * the list.<br>
    * If two bundles have the same distance to the reference, they are sorted ascending by their symbolic name as a
    * second sorting criteria.
-   * 
+   *
    * @param ref
    *          the reference bundle. the symbolic name of this bundle is used as reference
    * @return the created comparator
@@ -66,7 +66,7 @@ public final class ScoutBundleComparators {
    * The bundle with the symbolic name most similar to the given reference is the first in the list.<br>
    * If two bundles have the same distance to the reference, they are sorted ascending by their symbolic name as a
    * second sorting criteria.
-   * 
+   *
    * @param symbolicName
    *          the name to use as reference
    * @return the created comparator

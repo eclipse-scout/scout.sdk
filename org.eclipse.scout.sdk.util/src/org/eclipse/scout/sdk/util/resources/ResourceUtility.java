@@ -280,7 +280,9 @@ public final class ResourceUtility {
     if (r != null) {
       IScopeContext[] scopeContext = new IScopeContext[]{new ProjectScope(r.getProject())};
       String lineSeparator = Platform.getPreferencesService().getString(Platform.PI_RUNTIME, Platform.PREF_LINE_SEPARATOR, null, scopeContext);
-      if (lineSeparator != null) return lineSeparator;
+      if (lineSeparator != null) {
+        return lineSeparator;
+      }
     }
     return getLineSeparator();
   }

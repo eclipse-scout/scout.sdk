@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataDtoUpdateOperation;
 /**
  * Auto-update handler responding on {@link IRuntimeClasses#PageData} annotations that are placed on table pages (i.e.
  * {@link IRuntimeClasses#IPageWithTable}).
- * 
+ *
  * @since 3.10.0-M1
  */
 public class PageDataAutoUpdateHandler extends AbstractDtoUpdateHandler {

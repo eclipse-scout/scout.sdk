@@ -17,18 +17,18 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * <h3>{@link _SuiteUtil}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 22.04.2010
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-    CompatibilityTest.class,
-    RegexTest.class,
-    ImportValidatorTest.class,
-    UtilitiesTest.class,
-    // suites
-    _SuiteSignature.class})
+  CompatibilityTest.class,
+  RegexTest.class,
+  ImportValidatorTest.class,
+  UtilitiesTest.class,
+  // suites
+  _SuiteSignature.class})
 public class _SuiteUtil {
 
 }

@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link RapProductFileUpgradeOperation}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 13.11.2013
  */
@@ -39,10 +39,14 @@ public class RapProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
   public void init() {
     ArrayList<IFile> productFiles = new ArrayList<IFile>(2);
     IFile f = getProperties().getProperty(CreateUiRapPluginOperation.PROP_PRODUCT_FILE_DEV, IFile.class);
-    if (f != null) productFiles.add(f);
+    if (f != null) {
+      productFiles.add(f);
+    }
 
     f = getProperties().getProperty(CreateUiRapPluginOperation.PROP_PRODUCT_FILE_PROD, IFile.class);
-    if (f != null) productFiles.add(f);
+    if (f != null) {
+      productFiles.add(f);
+    }
 
     m_prodFiles = productFiles.toArray(new IFile[productFiles.size()]);
   }

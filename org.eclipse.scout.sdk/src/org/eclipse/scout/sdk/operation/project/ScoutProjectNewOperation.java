@@ -292,9 +292,13 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     }
 
     private static String cleanString(String input) {
-      if (input == null) return null;
+      if (input == null) {
+        return null;
+      }
       input = input.trim();
-      if (input.length() == 0) return null;
+      if (input.length() == 0) {
+        return null;
+      }
       return input;
     }
   }

@@ -63,8 +63,12 @@ public abstract class AbstractMethodPresenter extends AbstractPresenter {
   }
 
   protected void init(ConfigurationMethod method) throws CoreException {
-    if (m_labelLink != null) m_labelLink.dispose();
-    if (m_label != null) m_label.dispose();
+    if (m_labelLink != null) {
+      m_labelLink.dispose();
+    }
+    if (m_label != null) {
+      m_label.dispose();
+    }
 
     GridData gd = new GridData(SWT.RIGHT, SWT.TOP, true, false);
     if (isLinkMode()) {

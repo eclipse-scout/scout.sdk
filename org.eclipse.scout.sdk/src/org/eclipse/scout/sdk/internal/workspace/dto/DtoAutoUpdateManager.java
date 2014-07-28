@@ -49,7 +49,7 @@ import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateOperation;
 
 /**
  * <h3>{@link DtoAutoUpdateManager}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @author Andreas Hoegger
  * @since 3.10.0 15.08.2013
@@ -140,7 +140,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
   /**
    * Securely inserts the given element in the given queue.<br>
    * If the thread is interrupted to often while waiting for space in the queue it gives up.
-   * 
+   *
    * @param queue
    *          The queue to insert to
    * @param element
@@ -248,7 +248,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     /**
      * Creates {@link IDtoAutoUpdateOperation}s for the types of the given {@link ICompilationUnit} using
      * {@link IAutoUpdateHandler}. All handers are requested for providing update operations.
-     * 
+     *
      * @param icu
      * @return Returns a non-empty set of {@link IDtoAutoUpdateOperation}s or <code>null</code> if there are no derived
      *         resources.

@@ -33,7 +33,9 @@ public class LoadInitialOutlineJob extends AbstractWorkspaceBlockingJob {
   @Override
   protected void run(final IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Control c = m_view.getTreeViewer().getControl();
-    if (c.isDisposed()) return;
+    if (c.isDisposed()) {
+      return;
+    }
     //
     Display display = c.getDisplay();
     final IPage rootPage = m_view.getRootPage();

@@ -20,7 +20,7 @@ public interface INlsProjectProvider {
   /**
    * Return the <code>INlsProject</code> hierarchy for the given parameters or null if the implementation does not
    * understand the given parameters.
-   * 
+   *
    * @param args
    * @return The <code>INlsProject</code> hierarchy.
    */

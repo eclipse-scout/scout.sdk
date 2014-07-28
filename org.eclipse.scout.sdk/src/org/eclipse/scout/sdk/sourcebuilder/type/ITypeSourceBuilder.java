@@ -21,8 +21,8 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 
 /**
  * <h3>{@link ITypeSourceBuilder}</h3>
- * 
- *  @author Andreas Hoegger
+ *
+ * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
 public interface ITypeSourceBuilder extends IAnnotatableSourceBuilder {

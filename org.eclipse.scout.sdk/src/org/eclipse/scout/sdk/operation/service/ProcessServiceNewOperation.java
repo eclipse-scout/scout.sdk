@@ -153,8 +153,8 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
   }
 
   /**
-  *
-  */
+   *
+   */
   private void createLoadMethod(String interfaceFqn, String formDataSignature, final INlsProject nlsProject) {
     ServiceMethod loadMethod = new ServiceMethod("load", interfaceFqn);
     loadMethod.addParameter(new MethodParameter("formData", formDataSignature));
@@ -188,8 +188,8 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
   }
 
   /**
-  *
-  */
+   *
+   */
   private void createPrepareCreateMethod(String interfaceFqn, String formDataSignature, final INlsProject nlsProject) {
     ServiceMethod serviceMethod = new ServiceMethod("prepareCreate", interfaceFqn);
     serviceMethod.addParameter(new MethodParameter("formData", formDataSignature));
@@ -223,8 +223,8 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
   }
 
   /**
-  *
-  */
+   *
+   */
   private void createStoreMethod(String interfaceFqn, String formDataSignature, final INlsProject nlsProject) {
     ServiceMethod serviceMethod = new ServiceMethod("store", interfaceFqn);
     serviceMethod.addParameter(new MethodParameter("formData", formDataSignature));

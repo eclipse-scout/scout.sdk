@@ -142,7 +142,7 @@ public class ScoutSdk extends Plugin {
 
   /**
    * gets the DTO auto update manager
-   * 
+   *
    * @return the manager instance or null if this plug-in has not yet been started.
    */
   public DtoAutoUpdateManager getAutoUpdateManager() {

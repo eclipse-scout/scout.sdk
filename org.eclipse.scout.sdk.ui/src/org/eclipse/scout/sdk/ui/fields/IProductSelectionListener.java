@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IFile;
 
 /**
  * <h3>{@link IProductSelectionListener}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 06.02.2011
  */

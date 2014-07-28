@@ -60,8 +60,7 @@ public class OutlineRootPagePresenter extends AbstractTypeProposalPresenter {
   }
 
   /**
-   * <h3>{@link P_ContentProvider}</h3>
-   * The local lazy content provider.
+   * <h3>{@link P_ContentProvider}</h3> The local lazy content provider.
    * It is kept lazy to ensure the proposals are only loaded when used. So the creation of the property view is
    * performance optimized.
    *

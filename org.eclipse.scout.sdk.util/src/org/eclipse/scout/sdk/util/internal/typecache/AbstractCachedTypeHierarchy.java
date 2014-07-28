@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 
 /**
  * <h3>{@link AbstractCachedTypeHierarchy}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 16.05.2014
  */

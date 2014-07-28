@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link ScoutBundleNodeGroup}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.9.0 11.02.2013
  */
@@ -105,7 +105,7 @@ public class ScoutBundleNodeGroup implements Comparable<ScoutBundleNodeGroup> {
 
   /**
    * gets if all bundles directly contained in this group are binary.
-   * 
+   *
    * @return true if all bundles in this group are binary.
    */
   public boolean isBinary() {

@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h4>TranslationNewAction</h4>
- * 
+ *
  * @see INewLanguageContext
  */
 public class TranslationNewAction extends AbstractWorkspaceAction {

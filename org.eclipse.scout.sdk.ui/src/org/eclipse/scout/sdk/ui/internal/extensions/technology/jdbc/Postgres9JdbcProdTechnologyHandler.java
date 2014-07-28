@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
  * <h3>{@link Postgres9JdbcProdTechnologyHandler}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 15.02.2012
  */

@@ -26,7 +26,7 @@ public final class ScoutPropertyBeanFilters {
   /**
    * Creates a new filter used to extract form properties that are part of the form data as well. Candidates have an
    * annotated getter and setter, respectively.
-   * 
+   *
    * @return Returns a new filter instance.
    */
   public static IPropertyBeanFilter getFormDataPropertyFilter() {

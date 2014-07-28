@@ -45,7 +45,9 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
 
   @Override
   public Object[] getElements(Object inputElement) {
-    if (getProjects() == null) return new Object[]{};
+    if (getProjects() == null) {
+      return new Object[]{};
+    }
     return getProjects().getAllEntries();
   }
 

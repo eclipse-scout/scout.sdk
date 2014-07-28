@@ -126,7 +126,9 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
 
   @Override
   protected void init(ConfigurationMethod method) throws CoreException {
-    if (method == null) return;
+    if (method == null) {
+      return;
+    }
     super.init(method);
     INlsProject newNlsProject = resolveNlsProject(method);
     if (!CompareUtility.equals(newNlsProject, m_nlsProject)) {
@@ -158,7 +160,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
 
   /**
    * might be overridden to provide another nls project
-   * 
+   *
    * @param method
    *          not null
    * @return an nls project
@@ -173,7 +175,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
 
   /**
    * might be overridden to provide an own implementation of a content provider
-   * 
+   *
    * @param project
    *          might be null
    * @return a content provider or null
@@ -187,7 +189,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
 
   /**
    * might be overridden to provide an own implementation of a label provider
-   * 
+   *
    * @param project
    *          might be null
    * @return a label provider or null
@@ -201,7 +203,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
 
   /**
    * might be overridden to provide an own implementation of a selection handler
-   * 
+   *
    * @param project
    *          might be null
    * @return a selection handler or null

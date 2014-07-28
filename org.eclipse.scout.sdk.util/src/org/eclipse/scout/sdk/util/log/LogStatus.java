@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.Status;
 
 /**
  * <h3>{@link LogStatus}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.11.2010
  */

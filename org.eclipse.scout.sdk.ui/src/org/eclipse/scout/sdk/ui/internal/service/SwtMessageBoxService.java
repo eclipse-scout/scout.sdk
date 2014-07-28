@@ -20,7 +20,7 @@ import org.eclipse.ui.PlatformUI;
 
 /**
  * SWT-based {@link IMessageBoxService} implementation that presents a message box to the user.
- * 
+ *
  * @since 3.10.0
  */
 public class SwtMessageBoxService implements IMessageBoxService {

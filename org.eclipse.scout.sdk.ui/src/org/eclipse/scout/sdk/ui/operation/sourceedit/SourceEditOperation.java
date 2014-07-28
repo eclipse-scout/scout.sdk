@@ -26,7 +26,7 @@ import org.eclipse.text.edits.TextEdit;
 
 /**
  * <h3>{@link SourceEditOperation}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 28.10.2013
  */

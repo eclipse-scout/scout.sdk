@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IFolder;
 
 /**
  * <h3>{@link IFolderSelectedListener}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 09.02.2011
  */

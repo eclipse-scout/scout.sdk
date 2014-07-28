@@ -223,7 +223,9 @@ public final class JdtUtility {
    * @return the literal string ready to be directly inserted into java source or null if the input string is null.
    */
   public static String toStringLiteral(String s) {
-    if (s == null) return null;
+    if (s == null) {
+      return null;
+    }
 
     int len = s.length();
     StringBuilder b = new StringBuilder(len + 2);

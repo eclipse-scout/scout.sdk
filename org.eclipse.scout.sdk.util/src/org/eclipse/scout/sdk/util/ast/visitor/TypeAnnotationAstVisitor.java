@@ -27,7 +27,7 @@ import org.eclipse.jdt.core.dom.TypeDeclaration;
 /**
  * <h3>{@link TypeAnnotationAstVisitor}</h3> An AST visitor decorator that delegates all visits that are part of the
  * given annotation to the wrapped visitor
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 09.05.2014
  */

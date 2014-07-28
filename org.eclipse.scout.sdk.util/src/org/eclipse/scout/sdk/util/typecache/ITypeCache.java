@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  * <h3>{@link ITypeCache}</h3> Type cache handling access to {@link IType} instances.<br>
  * <br>
  * Use the {@link TypeUtility} to search for types hold by the type cache.
- * 
+ *
  * @author Matthias Villiger
  * @since 3.4
  * @see TypeUtility
@@ -30,7 +30,7 @@ public interface ITypeCache {
   /**
    * Returns the first {@link IType} having the given name that is on all classpaths in the
    * workspace (all {@link IJavaProject}s).
-   * 
+   *
    * @param typeName
    *          The fully qualified or simple name of the {@link IType} to return.
    * @return The first {@link IType} having the given name that is on all classpaths in the
@@ -41,7 +41,7 @@ public interface ITypeCache {
   /**
    * Returns all {@link IType}s with the given name that are on all classpaths in the
    * workspace (all {@link IJavaProject}s).
-   * 
+   *
    * @param typeName
    *          The fully qualified or simple name of the {@link IType}s to return.
    * @return All {@link IType}s with the given name that are on all classpaths in the

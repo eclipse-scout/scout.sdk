@@ -16,7 +16,7 @@ import org.eclipse.core.resources.IResourceProxyVisitor;
 
 /**
  * <h3>{@link IResourceFilter}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 14.03.2012
  * @see ResourceFilters
@@ -30,7 +30,7 @@ public interface IResourceFilter {
    * Only accessible resources are visited. For files and folders, this is equivalent to existing; for projects, this is
    * equivalent to existing and being open. The workspace root is always accessible. See
    * {@link IResource#isAccessible()}.
-   * 
+   *
    * @param resource
    *          proxy for requesting information about the resource being visited;
    *          this object is only valid for the duration of the invocation of this

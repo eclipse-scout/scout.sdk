@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 /**
  * <h3>{@link NlsTextSelectionHandler}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.8.0 10.02.2012
  */

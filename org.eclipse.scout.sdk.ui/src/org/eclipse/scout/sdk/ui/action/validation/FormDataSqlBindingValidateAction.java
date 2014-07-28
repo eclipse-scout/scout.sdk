@@ -30,7 +30,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link FormDataSqlBindingValidateAction}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 24.02.2011
  */

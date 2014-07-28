@@ -105,7 +105,7 @@ public class TechnologyPresenter extends AbstractPresenter {
         tec.addSelectionChangedListener(new ITechnologyListener() {
           @Override
           public void selectionChangeCompleted(boolean newSelection) {
-            setCheckBoxVal(checkbox, TriState.parseTriState(newSelection));
+            setCheckBoxVal(checkbox, TriState.parse(newSelection));
             if (!checkbox.isDisposed()) {
               checkbox.setEnabled(true);
             }
@@ -136,7 +136,9 @@ public class TechnologyPresenter extends AbstractPresenter {
   }
 
   private static void setCheckBoxVal(Button checkbox, TriState val) {
-    if (checkbox == null || checkbox.isDisposed()) return;
+    if (checkbox == null || checkbox.isDisposed()) {
+      return;
+    }
     if (val == TriState.FALSE) {
       checkbox.setSelection(false);
       checkbox.setGrayed(false);

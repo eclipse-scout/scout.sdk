@@ -14,7 +14,7 @@ import org.eclipse.jface.viewers.TreeViewer;
 
 /**
  * <h3>{@link IDirtyManageable}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 10.12.2013
  */

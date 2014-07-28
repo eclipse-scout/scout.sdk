@@ -19,7 +19,7 @@ import org.eclipse.ui.IMarkerResolutionGenerator;
 
 /**
  * <h3>{@link ClassIdDuplicateResolutionGenerator}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 4.0.0 21.05.2014
  */

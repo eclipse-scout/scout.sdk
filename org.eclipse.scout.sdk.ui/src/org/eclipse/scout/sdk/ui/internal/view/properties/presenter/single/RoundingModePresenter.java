@@ -28,7 +28,7 @@ import org.eclipse.swt.widgets.Composite;
 
 /**
  * <h3>{@link RoundingModePresenter}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.10.0 02.12.2013
  */

@@ -434,7 +434,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
               resource.getFileExtension() != null &&
               "java".equalsIgnoreCase(resource.getFileExtension()) &&
               (resource.getName().endsWith(simpleName + ".java") ||
-                  resource.getName().endsWith(simpleName + ".class"))) {
+              resource.getName().endsWith(simpleName + ".class"))) {
             IType type = TypeUtility.getType(getValue());
             ICompilationUnit cu = JavaCore.createCompilationUnitFrom((IFile) resource);
 

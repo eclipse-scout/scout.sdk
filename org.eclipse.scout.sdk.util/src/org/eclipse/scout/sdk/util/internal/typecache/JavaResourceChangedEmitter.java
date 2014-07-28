@@ -44,17 +44,17 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
 
   public static final int CHANGED_FLAG_MASK =
       IJavaElementDelta.F_CONTENT |
-          IJavaElementDelta.F_MODIFIERS |
-          IJavaElementDelta.F_MOVED_FROM |
-          IJavaElementDelta.F_MOVED_TO |
-          IJavaElementDelta.F_REORDER |
-          IJavaElementDelta.F_SUPER_TYPES |
-          IJavaElementDelta.F_OPENED |
-          IJavaElementDelta.F_CLOSED |
-          IJavaElementDelta.F_PRIMARY_WORKING_COPY |
-          IJavaElementDelta.F_CATEGORIES |
-          IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED |
-          IJavaElementDelta.F_ANNOTATIONS;
+      IJavaElementDelta.F_MODIFIERS |
+      IJavaElementDelta.F_MOVED_FROM |
+      IJavaElementDelta.F_MOVED_TO |
+      IJavaElementDelta.F_REORDER |
+      IJavaElementDelta.F_SUPER_TYPES |
+      IJavaElementDelta.F_OPENED |
+      IJavaElementDelta.F_CLOSED |
+      IJavaElementDelta.F_PRIMARY_WORKING_COPY |
+      IJavaElementDelta.F_CATEGORIES |
+      IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED |
+      IJavaElementDelta.F_ANNOTATIONS;
 
   private static final JavaResourceChangedEmitter INSTANCE = new JavaResourceChangedEmitter(HierarchyCache.getInstance());
 

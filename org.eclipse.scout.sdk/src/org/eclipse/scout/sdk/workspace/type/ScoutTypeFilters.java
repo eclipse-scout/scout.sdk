@@ -21,7 +21,7 @@ public class ScoutTypeFilters extends TypeFilters {
 
   /**
    * Creates and returns a filter that accepts all types that are in the given scout bundle.
-   * 
+   *
    * @param b
    *          The scout bundle in which the types must be.
    * @return the newly created filter.
@@ -37,7 +37,7 @@ public class ScoutTypeFilters extends TypeFilters {
 
   /**
    * Creates and returns a filter that accepts all types that are in the given scout bundles.
-   * 
+   *
    * @param bundles
    *          The scout bundles in which the types must be.
    * @return the newly created filter.
@@ -54,7 +54,7 @@ public class ScoutTypeFilters extends TypeFilters {
   /**
    * Creates and returns a filter that accepts all types that are in the given scout bundles.<br>
    * Furthermore types that are abstract, an interface or deprecated are not accepted!
-   * 
+   *
    * @param bundles
    *          The scout bundles in which the types must be.
    * @return the newly created filter.
@@ -73,7 +73,7 @@ public class ScoutTypeFilters extends TypeFilters {
   /**
    * Creates and returns a filter that accepts all types that are in the given scout bundle.<br>
    * Furthermore types that are abstract, an interface or deprecated are not accepted!
-   * 
+   *
    * @param b
    *          The scout bundle in which the types must be.
    * @return the newly created filter.

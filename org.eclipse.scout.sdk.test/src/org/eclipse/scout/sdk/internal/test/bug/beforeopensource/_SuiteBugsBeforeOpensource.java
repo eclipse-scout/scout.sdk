@@ -16,9 +16,9 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-    Bug87400Test.class,
-    Bug87486Test.class,
-    Bug77596Test.class})
+  Bug87400Test.class,
+  Bug87486Test.class,
+  Bug77596Test.class})
 public class _SuiteBugsBeforeOpensource {
 
 }

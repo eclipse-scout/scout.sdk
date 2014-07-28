@@ -33,7 +33,7 @@ public class NlsEntry implements INlsEntry {
 
   /**
    * copy constructor used to apply modifications to the NlsProject
-   * 
+   *
    * @param row
    */
   public NlsEntry(INlsEntry row) {

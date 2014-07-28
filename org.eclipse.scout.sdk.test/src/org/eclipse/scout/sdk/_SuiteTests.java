@@ -17,7 +17,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 /**
  * <h3>{@link _SuiteTests}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 14.07.2011
  */

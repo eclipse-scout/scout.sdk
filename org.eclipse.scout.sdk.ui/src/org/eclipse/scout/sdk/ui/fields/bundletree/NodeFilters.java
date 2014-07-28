@@ -14,7 +14,7 @@ import org.eclipse.scout.commons.CompareUtility;
 
 /**
  * <h3>NodeFilters</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 03.02.2010
  */

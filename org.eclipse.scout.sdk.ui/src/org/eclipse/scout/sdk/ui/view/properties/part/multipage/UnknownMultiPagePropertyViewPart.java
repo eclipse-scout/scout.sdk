@@ -16,7 +16,7 @@ import org.eclipse.swt.widgets.Label;
 
 /**
  * <h3>UnknownPropertyViewPart</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 1.0.8 21.07.2010
  */

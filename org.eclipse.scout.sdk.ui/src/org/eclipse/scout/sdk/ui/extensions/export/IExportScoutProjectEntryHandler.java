@@ -22,7 +22,7 @@ public interface IExportScoutProjectEntryHandler {
   /**
    * called on every change on the export module selection page (first). This gives the handler the possibility to
    * contribute a validation status to the page.
-   * 
+   *
    * @param wizard
    *          The export wizard. gives access to all pages and parameters.
    * @return The status for this handler
@@ -32,7 +32,7 @@ public interface IExportScoutProjectEntryHandler {
   /**
    * Specifies if this handler should be offered on the export module selection page (first page).
    * If this method returns false, the entry that belongs to this handler is not visible.
-   * 
+   *
    * @param wizard
    *          The export wizard. gives access to all pages and parameters.
    * @return true if the entry should be displayed in the tree.
@@ -41,14 +41,14 @@ public interface IExportScoutProjectEntryHandler {
 
   /**
    * Specifies if the entry associated with this handler should be checked by default or not.
-   * 
+   *
    * @return true if it should be checked by default, false otherwise.
    */
   boolean getDefaultSelection();
 
   /**
    * called when the selection of the entry tree changes.
-   * 
+   *
    * @param wizard
    *          The export wizard. gives access to all pages and parameters.
    * @param selected
@@ -58,7 +58,7 @@ public interface IExportScoutProjectEntryHandler {
 
   /**
    * Called when the wizard is finished. Creates the module that belongs to this handler.
-   * 
+   *
    * @param wizard
    *          The export wizard. gives access to all pages and parameters.
    * @param monitor

@@ -69,7 +69,9 @@ public final class FineGrainedJavaElementDeltaManager {
           String oldContent = m_sourceCache.get(path);
           IFile file = (IFile) icu.getResource();
           String bufferContent = null;
-          if (file.exists()) bufferContent = IOUtility.getContent(new InputStreamReader(file.getContents(true), file.getCharset()));
+          if (file.exists()) {
+            bufferContent = IOUtility.getContent(new InputStreamReader(file.getContents(true), file.getCharset()));
+          }
           String newContent = icu.getSource();
           // update source cache
           if (oldContent == null) {

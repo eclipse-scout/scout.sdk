@@ -14,7 +14,7 @@ import java.util.EventListener;
 
 /**
  * Listener to be invoked when a cached hierarchy has been invalidated.
- * 
+ *
  * @see ICachedTypeHierarchyResult
  */
 public interface ITypeHierarchyChangedListener extends EventListener {
