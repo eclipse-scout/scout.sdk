@@ -13,8 +13,6 @@ package org.eclipse.scout.sdk.internal.workspace;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +26,7 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutFileLocator;
+import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
 import org.eclipse.scout.sdk.icon.ScoutIconDesc;
@@ -36,6 +35,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchyChangedListener;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -49,8 +49,8 @@ public class ScoutProjectIcons implements IIconProvider {
   private final IScoutBundle m_bundle;
   private final ICachedTypeHierarchy m_iconsHierarchy;
 
-  private HashMap<String, ScoutIconDesc> m_cachedIcons;
-  private String[] m_baseUrls;
+  private Map<String, ScoutIconDesc> m_cachedIcons;
+  private List<String> m_baseUrls;
 
   public ScoutProjectIcons(IScoutBundle bundle) {
     m_bundle = bundle;
@@ -94,19 +94,37 @@ public class ScoutProjectIcons implements IIconProvider {
     }
   }
 
-  private String[] buildBaseUrls() {
-    List<String> projects = new ArrayList<String>();
-    for (IScoutBundle parentBundle : m_bundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true)) {
-      projects.add(parentBundle.getSymbolicName());
+  private List<String> buildBaseUrls() {
+    Set<IScoutBundle> childBundles = m_bundle.getChildBundles(new IScoutBundleFilter() {
+      @Override
+      public boolean accept(IScoutBundle bundle) {
+        return isInterestingBundleType(bundle.getType());
+      }
+    }, true);
+    String[] types = RuntimeBundles.getTypes();
+    ArrayList<String> bundles = new ArrayList<String>(childBundles.size() + types.length);
+
+    // Project bundles
+    for (IScoutBundle parentBundle : childBundles) {
+      bundles.add(parentBundle.getSymbolicName());
     }
 
-    projects.add(IRuntimeClasses.ScoutClientBundleId);
-    projects.add(IRuntimeClasses.ScoutUiSwtBundleId);
-    projects.add(IRuntimeClasses.ScoutUiSwingBundleId);
+    // Scout RT Bundles
+    for (String s : types) {
+      if (isInterestingBundleType(s)) {
+        String bundleSymbolicName = RuntimeBundles.getBundleSymbolicName(s);
+        if (StringUtility.hasText(bundleSymbolicName)) {
+          bundles.add(bundleSymbolicName);
+        }
+      }
+    }
 
-    String[] result = projects.toArray(new String[projects.size()]);
-    Arrays.sort(result, Collections.reverseOrder()); //TODO: correct to use natural ordering?
-    return result;
+    bundles.trimToSize();
+    return bundles;
+  }
+
+  protected boolean isInterestingBundleType(String type) {
+    return StringUtility.hasText(type) && (type.contains(IScoutBundle.TYPE_CLIENT) || type.contains("UI_")) && !type.contains("TESTING");
   }
 
   protected void collectIconNames(Map<String, ScoutIconDesc> collector) {
