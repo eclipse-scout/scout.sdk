@@ -26,6 +26,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutFileLocator;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.icon.IIconProvider;
@@ -142,7 +143,7 @@ public class ScoutProjectIcons implements IIconProvider {
 
   @SuppressWarnings("resource")
   protected void findIconInProject(ScoutIconDesc desc) {
-    if (desc == null || desc.getIconName() == null) {
+    if (desc == null || !StringUtility.hasText(desc.getIconName())) {
       return;
     }
 

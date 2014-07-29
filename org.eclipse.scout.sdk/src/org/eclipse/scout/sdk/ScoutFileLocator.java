@@ -40,10 +40,11 @@ public final class ScoutFileLocator {
    * platform.
    *
    * @param bundleID
-   *          the bundle to search
+   *          the bundle to search in
    * @param path
    *          the path to search in the bundle
-   * @return The input stream to the path. Must be closed by the caller!
+   * @return The input stream to the file. <code>null</code> if the requested resource does not exist. The
+   *         {@link InputStream} Must be closed by the caller!
    */
   @SuppressWarnings("resource")
   public static InputStream resolve(String bundleID, String path) {
@@ -51,21 +52,21 @@ public final class ScoutFileLocator {
     try {
       stream = resolveWs(bundleID, path);
     }
-    catch (Exception e) {
-      ScoutSdk.logWarning(e);
+    catch (CoreException e) {
+      ScoutSdk.logWarning("Unable to resolve icon in the workspace.", e);
     }
     if (stream == null) {
       try {
         stream = resolvePlatform(bundleID, path);
       }
       catch (IOException e) {
-        ScoutSdk.logWarning(e);
+        // no action needed. The requested file does not exist.
       }
     }
     return stream;
   }
 
-  private static InputStream resolveWs(String bundleID, String path) throws URISyntaxException, CoreException {
+  private static InputStream resolveWs(String bundleID, String path) throws CoreException {
     IProject project = ResourcesPlugin.getWorkspace().getRoot().getProject(bundleID);
     IFile file = project.getFile(new Path(path));
     if (file != null && file.exists()) {
