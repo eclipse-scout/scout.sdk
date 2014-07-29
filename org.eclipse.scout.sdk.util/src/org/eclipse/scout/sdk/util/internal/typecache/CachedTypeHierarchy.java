@@ -42,5 +42,4 @@ public final class CachedTypeHierarchy extends AbstractCachedTypeHierarchy {
       SdkUtilActivator.logError("Unable to create type hierarchy for type " + getBaseType().getFullyQualifiedName(), e);
     }
   }
-
 }

@@ -141,7 +141,7 @@ public final class FormFieldExtensionPoint {
                 }
                 IType modelType = TypeUtility.getType(modClassName);
                 if (!TypeUtility.exists(modelType)) {
-                  ScoutSdkUi.logError("FormFieldExtension: the model type '" + modClassName + "' can not be found.");
+                  ScoutSdkUi.logWarning("FormFieldExtension: the model type '" + modClassName + "' can not be found.");
                   break;
                 }
                 ITypeHierarchy superTypeHierarchy = null;

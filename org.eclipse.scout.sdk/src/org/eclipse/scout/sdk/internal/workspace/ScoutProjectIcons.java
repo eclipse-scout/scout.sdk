@@ -46,7 +46,6 @@ public class ScoutProjectIcons implements IIconProvider {
   private static final String[] PREDEFINED_EXTENSIONS = new String[]{"png", "ico", "gif"};
   private static final String[] PREDEFINED_SUB_FOLDERS = new String[]{"resources/icons/internal/", "resources/icons/"};
 
-  private final IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
   private final IScoutBundle m_bundle;
   private final ICachedTypeHierarchy m_iconsHierarchy;
 
@@ -55,6 +54,7 @@ public class ScoutProjectIcons implements IIconProvider {
 
   public ScoutProjectIcons(IScoutBundle bundle) {
     m_bundle = bundle;
+    IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
     m_iconsHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
     m_iconsHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
       @Override
@@ -111,6 +111,7 @@ public class ScoutProjectIcons implements IIconProvider {
 
   protected void collectIconNames(Map<String, ScoutIconDesc> collector) {
     Set<IScoutBundle> parentSharedBundles = m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
+    IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
     for (IScoutBundle parentShared : parentSharedBundles) {
       for (IType iconType : m_iconsHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getInScoutBundles(parentShared))) {
         if (TypeUtility.exists(iconType)) {

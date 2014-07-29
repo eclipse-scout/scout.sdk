@@ -43,6 +43,12 @@ public abstract class AbstractCachedTypeHierarchy extends TypeHierarchy implemen
   }
 
   @Override
+  protected void setBaseType(IType newBaseType) {
+    super.setBaseType(newBaseType);
+    invalidate();
+  }
+
+  @Override
   public boolean contains(IType type) {
     revalidateImpl();
     return super.contains(type);
@@ -134,12 +140,20 @@ public abstract class AbstractCachedTypeHierarchy extends TypeHierarchy implemen
       synchronized (this) {
         if (!isCreated()) {
           if (getBaseType() == null) {
-            HierarchyCache.getInstance().removeCachedHierarchy(getBaseType());
-            throw new IllegalArgumentException("type 'null' does not exist");
+            HierarchyCache.getInstance().removeCachedHierarchy(null);
+            throw new IllegalArgumentException("type 'null' does not exist.");
           }
           if (!getBaseType().exists()) {
-            HierarchyCache.getInstance().removeCachedHierarchy(getBaseType());
-            throw new IllegalArgumentException("type '" + getBaseType().getFullyQualifiedName() + "' does not exist");
+            // type does no longer exist: try new resolve
+            IType tmp = TypeUtility.getType(getBaseType().getFullyQualifiedName());
+            if (TypeUtility.exists(tmp)) {
+              setBaseType(tmp);
+            }
+            else {
+              // still does not exist
+              HierarchyCache.getInstance().removeCachedHierarchy(getBaseType());
+              throw new IllegalArgumentException("type '" + getBaseType().getFullyQualifiedName() + "' does not exist");
+            }
           }
           if (!TypeUtility.exists(getBaseType().getJavaProject())) {
             HierarchyCache.getInstance().removeCachedHierarchy(getBaseType());

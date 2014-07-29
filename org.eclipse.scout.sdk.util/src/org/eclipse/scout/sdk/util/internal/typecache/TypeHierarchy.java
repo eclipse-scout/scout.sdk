@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.ITypeHierarchy {
 
   private ITypeHierarchy m_hierarchy;
-  private final IType m_type;
+  private IType m_type;
 
   TypeHierarchy(IType type) {
     this(type, null);
@@ -57,6 +57,15 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   @Override
   public IType getBaseType() {
     return m_type;
+  }
+
+  /**
+   * Does not set a new hierarchy!
+   *
+   * @param newBaseType
+   */
+  protected void setBaseType(IType newBaseType) {
+    m_type = newBaseType;
   }
 
   /**
