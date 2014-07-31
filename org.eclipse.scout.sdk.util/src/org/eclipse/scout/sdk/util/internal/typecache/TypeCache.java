@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -43,7 +44,7 @@ public final class TypeCache implements ITypeCache {
   private static final TypeCache INSTANCE = new TypeCache();
   private static final Comparator<IType> COMPARATOR = new P_TypeMatchComparator();
 
-  private final HashMap<String, TreeSet<IType>> m_cache;
+  private final Map<String, TreeSet<IType>> m_cache;
   private final P_ResourceListener m_resourceChangeListener;
 
   public static TypeCache getInstance() {
