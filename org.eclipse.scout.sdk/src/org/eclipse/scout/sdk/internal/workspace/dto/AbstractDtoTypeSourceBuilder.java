@@ -19,10 +19,12 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -53,7 +55,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link AbstractDtoTypeSourceBuilder}</h3>
- *
+ * 
  * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
@@ -160,6 +162,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
 
                 // check if there is source available
                 String copySrc = annotation.getSource();
+
                 if (!StringUtility.hasText(copySrc)) {
                   ScoutSdk.logInfo("DTO relevant annotation '" + annotationDeclarationType.getFullyQualifiedName() + "' in type '" + declaringType.getFullyQualifiedName() + "' has no source code. Annotation will be skipped.");
                   return;
@@ -171,6 +174,14 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
                   if (!TypeUtility.isOnClasspath(t, ownerProject)) {
                     ScoutSdk.logInfo("Type '" + t.getFullyQualifiedName() + "' referenced in DTO relevant annotation '" + annotationDeclarationType.getFullyQualifiedName() + "' in type '" + declaringType.getFullyQualifiedName() + "' is not accessible from DTO project '" + ownerProject.getElementName() + "'. Annotation will be skipped.");
                     return;
+                  }
+                }
+                IType classIdType = TypeUtility.getType(IRuntimeClasses.ClassId);
+                if (CompareUtility.equals(annotationDeclarationType, classIdType)) {
+                  // classid append formdata
+                  IMemberValuePair[] memberValuePairs = annotation.getMemberValuePairs();
+                  if (memberValuePairs != null && memberValuePairs.length == 1 && memberValuePairs[0].getMemberName().equals("value")) {
+                    copySrc = copySrc.replace(memberValuePairs[0].getValue().toString(), memberValuePairs[0].getValue().toString() + "-formdata");
                   }
                 }
 
