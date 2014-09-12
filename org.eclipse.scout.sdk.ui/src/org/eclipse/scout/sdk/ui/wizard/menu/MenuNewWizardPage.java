@@ -93,7 +93,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("PropText"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

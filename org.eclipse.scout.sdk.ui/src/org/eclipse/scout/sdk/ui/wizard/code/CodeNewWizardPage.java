@@ -110,7 +110,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"), labelColWidthPercent);
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("PropText"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

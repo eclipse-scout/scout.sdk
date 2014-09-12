@@ -92,7 +92,7 @@ public class OutlineNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   protected void createContent(Composite parent) {
     int labelColWidthPercent = 20;
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getClientBundle().getNlsProject(), Texts.get("Name"), labelColWidthPercent);
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, getClientBundle().getNlsProject(), Texts.get("PropTitle"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

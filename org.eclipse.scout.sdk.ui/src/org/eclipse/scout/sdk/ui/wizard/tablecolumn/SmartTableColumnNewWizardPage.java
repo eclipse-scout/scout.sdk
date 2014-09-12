@@ -116,7 +116,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     Group g = new Group(p, SWT.NONE);
     g.setText(Texts.get("Column"));
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(g, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(g, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("PropHeaderText"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
