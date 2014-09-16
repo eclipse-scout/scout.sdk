@@ -454,7 +454,8 @@
 		<config name="getConfiguredSearchRequired" type="Normal" category="Behavior" />
 		<config name="getConfiguredShowEmptySpaceMenus" type="Advanced" category="Appearance" />
 		<config name="getConfiguredShowTableRowMenus" type="Advanced" category="Appearance" />
-		<config name="execLoadTableData" type="Normal" category="Data" />
+		<config name="execLoadData" type="Normal" category="Data" />
+		<config name="execLoadTableData" type="Advanced" category="Data" />
 		<config name="execPopulateTable" type="Advanced" category="BusinessLogic" />
 		<config name="execCreateChildPage" type="Normal" category="BusinessLogic" />
 		<config name="execCreateVirtualChildPage" type="Advanced" category="BusinessLogic" />
