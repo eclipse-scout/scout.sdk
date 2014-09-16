@@ -103,7 +103,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getClientBundle() != null) {
       nls = getClientBundle().getNlsProject();
     }
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, nls, Texts.get("Name"), labelColWidthPercent);
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, nls, Texts.get("PropTitle"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(getNlsName());
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

@@ -96,7 +96,7 @@ public class PageNewAttributesWizardPage extends AbstractWorkspaceWizardPage {
     Group group = new Group(parent, SWT.SHADOW_ETCHED_OUT);
     group.setText(Texts.get("Page"));
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, getClientBundle().getNlsProject(), Texts.get("Name"), labelColWidthPercent);
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(group, getClientBundle().getNlsProject(), Texts.get("PropTitle"), labelColWidthPercent);
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

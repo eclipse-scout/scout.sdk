@@ -117,7 +117,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     fieldGroup.setText(Texts.get("Column"));
 
     INlsProject nlsProject = ScoutTypeUtility.findNlsProject(m_declaringType);
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(fieldGroup, nlsProject, Texts.get("Name"));
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(fieldGroup, nlsProject, Texts.get("PropHeaderText"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

@@ -84,7 +84,7 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewDefaultField"));
     setDescription(Texts.get("CreateANewDefaultField"));
 
-    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("Name"));
+    m_nlsNameField = getFieldToolkit().createNlsProposalTextField(parent, ScoutTypeUtility.findNlsProject(m_declaringType), Texts.get("PropLabel"));
     m_nlsNameField.acceptProposal(m_nlsName);
     m_nlsNameField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
