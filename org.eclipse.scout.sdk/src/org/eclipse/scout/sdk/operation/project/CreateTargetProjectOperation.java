@@ -74,7 +74,7 @@ public class CreateTargetProjectOperation extends AbstractCreateEclipseProjectOp
       // add scout if the running eclipse has no scout installed
       if (!JdtUtility.areAllPluginsInstalled(IRuntimeClasses.ScoutClientBundleId, IRuntimeClasses.ScoutServerBundleId,
           IRuntimeClasses.ScoutSharedBundleId, IRuntimeClasses.ScoutUiSwingBundleId, IRuntimeClasses.ScoutUiSwtBundleId)) {
-        op.addUpdateSite(UPDATE_SITE_URL_LUNA, SCOUT_RT_FEATURE, null);
+        op.addUpdateSite(UPDATE_SITE_URL_MARS, SCOUT_RT_FEATURE, null);
       }
     }
     else {

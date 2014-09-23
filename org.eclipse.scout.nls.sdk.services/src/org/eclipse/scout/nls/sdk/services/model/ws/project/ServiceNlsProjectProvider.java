@@ -15,6 +15,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
@@ -140,12 +141,12 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         }
       }
     });
-    HashMap<String, IType> typeMap = new HashMap<String, IType>(serviceImpls.size());
+    Map<String, IType> typeMap = new HashMap<String, IType>(serviceImpls.size());
     for (IType t : serviceImpls) {
       typeMap.put(t.getFullyQualifiedName(), t);
     }
 
-    HashMap<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<TextProviderService, TextProviderServiceDeclaration>(serviceImpls.size());
+    Map<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<TextProviderService, TextProviderServiceDeclaration>(serviceImpls.size());
     IExtension[] allServiceExtensions = PDECore.getDefault().getExtensionsRegistry().findExtensions(IRuntimeClasses.EXTENSION_POINT_SERVICES, true);
     for (IExtension e : allServiceExtensions) {
       for (IConfigurationElement c : e.getConfigurationElements()) {

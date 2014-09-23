@@ -29,7 +29,15 @@ public final class PlatformVersionUtility {
    * @return
    */
   public static boolean isLatest() {
-    return isLuna();
+    return isMars();
+  }
+
+  public static boolean isMars() {
+    return isMars(getPlatformVersion());
+  }
+
+  public static boolean isMars(Version v) {
+    return v.getMajor() == 4 && v.getMinor() == 5;
   }
 
   public static boolean isLuna() {
@@ -58,6 +66,10 @@ public final class PlatformVersionUtility {
 
   public static boolean isLunaOrLater(Version v) {
     return (v.getMajor() == 4 && v.getMinor() >= 4) || v.getMajor() > 4;
+  }
+
+  public static boolean isMarsOrLater(Version v) {
+    return (v.getMajor() == 4 && v.getMinor() >= 5) || v.getMajor() > 4;
   }
 
   public static boolean isJuno() {

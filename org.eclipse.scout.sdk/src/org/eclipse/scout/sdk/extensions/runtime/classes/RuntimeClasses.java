@@ -218,6 +218,8 @@ public final class RuntimeClasses implements IRuntimeClasses {
           }
         }
       }
+      // no default seems to be on the class path: return the first as a guess
+      return defaults.firstEntry().getValue();
     }
     return null;
   }

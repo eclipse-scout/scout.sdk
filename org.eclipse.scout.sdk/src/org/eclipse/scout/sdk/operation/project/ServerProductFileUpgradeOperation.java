@@ -25,7 +25,7 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
 
   @Override
   public boolean isRelevant() {
-    return PlatformVersionUtility.isJunoOrLater(getTargetPlatformVersion()) && isNodeChecked(CreateServerPluginOperation.BUNDLE_ID);
+    return isNodeChecked(CreateServerPluginOperation.BUNDLE_ID);
   }
 
   @Override
@@ -56,8 +56,10 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    JettyProductFileUpgradeOperation op = new JettyProductFileUpgradeOperation(m_serverProdFiles);
-    op.validate();
-    op.run(monitor, workingCopyManager);
+    if (PlatformVersionUtility.isJunoOrLater(getTargetPlatformVersion())) {
+      JettyProductFileUpgradeOperation op = new JettyProductFileUpgradeOperation(m_serverProdFiles);
+      op.validate();
+      op.run(monitor, workingCopyManager);
+    }
   }
 }

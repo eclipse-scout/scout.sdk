@@ -26,6 +26,7 @@ import org.osgi.framework.Version;
 
 public abstract class AbstractScoutProjectNewOperation implements IScoutProjectNewOperation {
 
+  public static final String UPDATE_SITE_URL_MARS = "http://download.eclipse.org/releases/mars";
   public static final String UPDATE_SITE_URL_LUNA = "http://download.eclipse.org/releases/luna";
   public static final String UPDATE_SITE_URL_JUNO_38 = "http://download.eclipse.org/eclipse/updates/3.8";
   public static final String UPDATE_SITE_URL_INDIGO = "http://download.eclipse.org/releases/indigo";
@@ -91,6 +92,9 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
     }
     else if (PlatformVersionUtility.isLuna(targetPlatformVersion)) {
       return UPDATE_SITE_URL_LUNA;
+    }
+    else if (PlatformVersionUtility.isMars(targetPlatformVersion)) {
+      return UPDATE_SITE_URL_MARS;
     }
     else {
       return UPDATE_SITE_URL_JUNO_38;

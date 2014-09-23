@@ -83,8 +83,8 @@ public class AppendRapTargetOperation extends AbstractScoutProjectNewOperation {
     }
     else if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_REMOTE) {
       // remote target using the update sites
-      TargetPlatformUtility.addInstallableUnitToTarget(targetFile, SCOUT_RT_RAP_FEATURE, null, UPDATE_SITE_URL_LUNA, monitor);
-      TargetPlatformUtility.addInstallableUnitToTarget(targetFile, ECLIPSE_RT_RAP_FEATURE, null, UPDATE_SITE_URL_LUNA, monitor);
+      TargetPlatformUtility.addInstallableUnitToTarget(targetFile, SCOUT_RT_RAP_FEATURE, null, UPDATE_SITE_URL_MARS, monitor);
+      TargetPlatformUtility.addInstallableUnitToTarget(targetFile, ECLIPSE_RT_RAP_FEATURE, null, UPDATE_SITE_URL_MARS, monitor);
     }
     else if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT) {
       // locally extracted, new target from rap.target plug-in

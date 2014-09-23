@@ -202,7 +202,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   protected SimpleProposal[] getTargetPlatformProposals() {
     final String RECOMMENDED_VERSION = "3.8";
-    final String[][] supportedPlatforms = new String[][]{{"Indigo", "3.7"}, {"Juno", "3.8"}, {"Luna", "4.4"}};
+    final String[][] supportedPlatforms = new String[][]{{"Indigo", "3.7"}, {"Juno", "3.8"}, {"Luna", "4.4"}, {"Mars", "4.5"}};
     ArrayList<SimpleProposal> ret = new ArrayList<SimpleProposal>(supportedPlatforms.length);
     for (String[] platform : supportedPlatforms) {
       String codeName = platform[0];
@@ -213,7 +213,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       StringBuilder txt = new StringBuilder("New Eclipse ");
       txt.append(codeName).append(" Target (").append(ver);
       if (isCurrent) {
-        txt.append(", ").append(Texts.get("currrent"));
+        txt.append(", ").append(Texts.get("current"));
       }
       if (isRecommended) {
         txt.append(", ").append(Texts.get("recommended"));

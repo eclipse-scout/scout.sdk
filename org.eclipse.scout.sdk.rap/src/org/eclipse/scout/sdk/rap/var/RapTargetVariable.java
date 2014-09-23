@@ -195,6 +195,9 @@ public final class RapTargetVariable {
     }
 
     private boolean isScoutRapTargetVarPresent(IFile r) throws CoreException {
+      if (!r.exists()) {
+        return false;
+      }
       String s = ResourceUtility.getContent(r);
       return s.contains(RAP_TARGET_KEY);
     }
@@ -208,7 +211,7 @@ public final class RapTargetVariable {
       return ResourceUtility.getAllResources(d, new IResourceFilter() {
         @Override
         public boolean accept(IResourceProxy resource) {
-          return resource.getType() == IResource.FILE && resource.getName().toLowerCase().endsWith(".target");
+          return resource.getType() == IResource.FILE && resource.isAccessible() && resource.getName().toLowerCase().endsWith(".target");
         }
       });
     }

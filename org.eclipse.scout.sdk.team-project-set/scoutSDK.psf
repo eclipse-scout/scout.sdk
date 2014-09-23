@@ -12,6 +12,7 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.compatibility.v38v42.fragment"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.compatibility.v43.fragment"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.compatibility.v44.fragment"/>
+<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.compatibility.v45.fragment"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.debug"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.help"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.parent"/>
@@ -49,6 +50,7 @@
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.sdk.compatibility.v37v41.fragment" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.sdk.compatibility.v38v42.fragment" type="4"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.sdk.compatibility.v44.fragment" type="4"/>
+<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.sdk.compatibility.v45.fragment" type="4"/>
 <item elementID="=org.eclipse.scout.sdk.compatibility" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.sdk.compatibility.v43.fragment" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 </workingSets>

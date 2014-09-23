@@ -52,6 +52,7 @@ public class InstallJavaFileOperation extends InstallTextFileOperation {
     IJavaElement e = JavaCore.create(getCreatedFile());
     if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
       ICompilationUnit cu = (ICompilationUnit) e;
+      workingCopyManager.register(cu, monitor);
       IJavaElement pck = cu.getParent();
       if (pck.getElementType() == IJavaElement.PACKAGE_FRAGMENT) {
         // add package to exported packages
