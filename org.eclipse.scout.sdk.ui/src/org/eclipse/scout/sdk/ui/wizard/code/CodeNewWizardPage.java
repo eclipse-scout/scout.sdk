@@ -281,7 +281,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName());
     }
     op.setSuperTypeSignature(sig);
-    if (getSibling() == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCodeType(m_declaringType);
       op.setSibling(structuredType.getSibling(CATEGORIES.TYPE_CODE));
     }

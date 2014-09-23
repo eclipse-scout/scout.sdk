@@ -241,7 +241,7 @@ public class WizardStepNewWizardPage extends AbstractWorkspaceWizardPage {
     if (superTypeProp != null) {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
-    if (getSibling() == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredWizard(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_WIZARD_STEP));
     }

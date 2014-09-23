@@ -235,7 +235,7 @@ public class MenuNewWizardPage extends AbstractWorkspaceWizardPage {
       String signature = SignatureCache.createTypeSignature(superType.getFullyQualifiedName());
       operation.setSuperTypeSignature(signature);
     }
-    if (getSibling() == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredType(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_MENU));
     }

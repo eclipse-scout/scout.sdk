@@ -326,7 +326,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getLookupCall() != null) {
       operation.setLookupCall(getLookupCall());
     }
-    if (getSibling() == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredTable(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_COLUMN));
     }

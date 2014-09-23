@@ -756,7 +756,11 @@ public class ProposalPopup extends Window {
           int[] matchingRegions = labelProvider.getMatchRanges(element);
           if (matchingRegions != null && matchingRegions.length > 0) {
             for (int i = 0; i < matchingRegions.length - 1; i += 2) {
-              text.setStyle(matchingRegions[i], matchingRegions[i + 1], m_boldStyler);
+              int offset = matchingRegions[i];
+              int length = matchingRegions[i + 1];
+              if (offset >= 0 && (offset + length) <= text.length()) {
+                text.setStyle(offset, length, m_boldStyler);
+              }
             }
           }
           if (labelProvider.isFormatConcatString()) {

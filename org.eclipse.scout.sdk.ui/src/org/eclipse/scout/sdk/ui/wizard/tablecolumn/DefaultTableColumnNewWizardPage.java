@@ -210,7 +210,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
       operation.setSuperTypeSignature(sig);
     }
     operation.setNlsEntry(getNlsName());
-    if (getSibling() == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredTable(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_COLUMN));
     }

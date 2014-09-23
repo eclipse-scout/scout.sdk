@@ -55,7 +55,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link AbstractDtoTypeSourceBuilder}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
@@ -180,7 +180,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
                 if (CompareUtility.equals(annotationDeclarationType, classIdType)) {
                   // classid append formdata
                   IMemberValuePair[] memberValuePairs = annotation.getMemberValuePairs();
-                  if (memberValuePairs != null && memberValuePairs.length == 1 && memberValuePairs[0].getMemberName().equals("value")) {
+                  if (memberValuePairs != null && memberValuePairs.length == 1 && "value".equals(memberValuePairs[0].getMemberName())) {
                     copySrc = copySrc.replace(memberValuePairs[0].getValue().toString(), memberValuePairs[0].getValue().toString() + "-formdata");
                   }
                 }

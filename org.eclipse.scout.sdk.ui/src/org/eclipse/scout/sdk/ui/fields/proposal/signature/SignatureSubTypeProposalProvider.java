@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.scout.sdk.ui.fields.proposal.styled.ISearchRangeConsumer;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -53,9 +54,14 @@ public class SignatureSubTypeProposalProvider extends SignatureProposalProvider 
 
     TreeSet<Object> signatures = new TreeSet<Object>();
     if (TypeUtility.exists(getBaseType())) {
+      boolean isFormatConcatString = false;
+      if (getLabelProvider() instanceof ISearchRangeConsumer) {
+        isFormatConcatString = ((ISearchRangeConsumer) getLabelProvider()).isFormatConcatString();
+      }
+
       NormalizedPattern normalizedPattern = createNormalizedSearchPattern(searchPattern);
       String parentTypeSig = SignatureCache.createTypeSignature(getBaseType().getFullyQualifiedName());
-      int[] matchRegions = getMatchingRegions(parentTypeSig, getLabelProvider().getText(parentTypeSig), normalizedPattern);
+      int[] matchRegions = getMatchingRegions(parentTypeSig, getLabelProvider().getText(parentTypeSig), normalizedPattern, isFormatConcatString);
       if (matchRegions != null) {
         signatures.add(parentTypeSig);
       }
@@ -63,7 +69,7 @@ public class SignatureSubTypeProposalProvider extends SignatureProposalProvider 
       ICachedTypeHierarchy hier = TypeUtility.getPrimaryTypeHierarchy(getBaseType());
       for (IType t : hier.getAllSubtypes(getBaseType(), null, TypeComparators.getTypeNameComparator())) {
         String curSig = SignatureCache.createTypeSignature(t.getFullyQualifiedName());
-        matchRegions = getMatchingRegions(curSig, getLabelProvider().getText(curSig), normalizedPattern);
+        matchRegions = getMatchingRegions(curSig, getLabelProvider().getText(curSig), normalizedPattern, isFormatConcatString);
         if (matchRegions != null && TypeUtility.isOnClasspath(t, m_classpath)) {
           signatures.add(curSig);
 

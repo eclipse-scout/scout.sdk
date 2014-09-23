@@ -39,26 +39,30 @@ public class StaticContentProvider extends ContentProposalProvider {
       searchPattern = "*";
     }
 
-    ArrayList<Object> props = new ArrayList<Object>();
-    NormalizedPattern normalizedPattern = createNormalizedSearchPattern(searchPattern);
     Object[] elements = getElements();
+    if (elements == null) {
+      return new Object[]{};
+    }
+
+    ArrayList<Object> props = new ArrayList<Object>(elements.length);
     ISearchRangeConsumer searchRangeLabelProvider = null;
+    boolean isFormatConcatString = false;
     if (getLabelProvider() instanceof ISearchRangeConsumer) {
       searchRangeLabelProvider = (ISearchRangeConsumer) getLabelProvider();
       searchRangeLabelProvider.startRecordMatchRegions();
+      isFormatConcatString = searchRangeLabelProvider.isFormatConcatString();
     }
-    if (elements != null) {
-      for (Object prop : elements) {
-        if (monitor.isCanceled()) {
-          break;
-        }
-        int[] matchRegions = getMatchingRegions(prop, getLabelProvider().getText(prop), normalizedPattern);
-        if (matchRegions != null) {
-          props.add(prop);
-        }
-        if (searchRangeLabelProvider != null) {
-          searchRangeLabelProvider.addMatchRegions(prop, matchRegions);
-        }
+    NormalizedPattern normalizedPattern = createNormalizedSearchPattern(searchPattern);
+    for (Object prop : elements) {
+      if (monitor.isCanceled()) {
+        break;
+      }
+      int[] matchRegions = getMatchingRegions(prop, getLabelProvider().getText(prop), normalizedPattern, isFormatConcatString);
+      if (matchRegions != null) {
+        props.add(prop);
+      }
+      if (searchRangeLabelProvider != null) {
+        searchRangeLabelProvider.addMatchRegions(prop, matchRegions);
       }
     }
     if (searchRangeLabelProvider != null) {

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.fields.proposal.styled;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.scout.sdk.ui.fields.proposal.SelectionStateLabelProvider;
 
@@ -22,7 +23,7 @@ import org.eclipse.scout.sdk.ui.fields.proposal.SelectionStateLabelProvider;
  */
 public class SearchRangeStyledLabelProvider extends SelectionStateLabelProvider implements ISearchRangeConsumer {
 
-  private HashMap<Object, int[]> m_searchRanges = new HashMap<Object, int[]>();
+  private final Map<Object, int[]> m_searchRanges = new HashMap<Object, int[]>();
 
   @Override
   public int[] getMatchRanges(Object element) {

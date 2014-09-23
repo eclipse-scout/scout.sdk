@@ -275,7 +275,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     operation.setCodeType(getCodeType());
     operation.setLookupCall(getLookupCall());
 
-    if (getSibling() == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }

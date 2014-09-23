@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.ui.JavaElementLabels;
 import org.eclipse.jface.viewers.Viewer;
-import org.eclipse.scout.commons.StringUtility;
 
 /**
  * <h3>{@link ContentProposalProvider}</h3>
@@ -40,21 +39,23 @@ public class ContentProposalProvider implements ILazyProposalContentProvider {
     return null;
   }
 
-  public static int[] getMatchingRegions(Object element, String elementText, NormalizedPattern pattern) {
+  public static int[] getMatchingRegions(Object element, String elementText, NormalizedPattern pattern, boolean isFormatConcatString) {
     if (element instanceof ISeparatorProposal) {
       return new int[0];
     }
     if (elementText == null) {
       return null;
     }
-    String filterText = elementText;
-    if (!StringUtility.isNullOrEmpty(filterText)) {
-      int index = filterText.indexOf(JavaElementLabels.CONCAT_STRING);
+
+    // remove all behind the concat string
+    if (isFormatConcatString && elementText.length() > 0) {
+      int index = elementText.indexOf(JavaElementLabels.CONCAT_STRING);
       if (index > -1) {
-        filterText = filterText.substring(0, index);
+        elementText = elementText.substring(0, index);
       }
     }
-    int[] matchingRegions = SearchPattern.getMatchingRegions(pattern.getPattern(), filterText, pattern.getMatchKind());
+
+    int[] matchingRegions = SearchPattern.getMatchingRegions(pattern.getPattern(), elementText, pattern.getMatchKind());
     return matchingRegions;
   }
 

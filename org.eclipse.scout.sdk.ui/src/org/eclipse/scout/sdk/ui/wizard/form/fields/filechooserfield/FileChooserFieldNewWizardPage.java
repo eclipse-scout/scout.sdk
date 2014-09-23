@@ -138,7 +138,7 @@ public class FileChooserFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }
 
-    if (getSibling() == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }

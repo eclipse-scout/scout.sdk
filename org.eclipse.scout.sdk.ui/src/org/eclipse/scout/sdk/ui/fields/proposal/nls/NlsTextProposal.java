@@ -114,17 +114,17 @@ public class NlsTextProposal implements Comparable<NlsTextProposal> {
     return m_matchedForeignLangTranslation;
   }
 
-  public int[] getMatchingRegions(NormalizedPattern pattern) {
+  public int[] getMatchingRegions(NormalizedPattern pattern, boolean isFormatConcatString) {
     int offset = 0;
     switch (getMatchKind()) {
       case MATCH_DEV_LANG_TRANSLATION:
-        return ContentProposalProvider.getMatchingRegions(this, getDevLangTranslation(), pattern);
+        return ContentProposalProvider.getMatchingRegions(this, getDevLangTranslation(), pattern, isFormatConcatString);
       case MATCH_KEY:
         offset = getDevLangTranslation().length() + KEY_PREFIX.length();
-        return adapt(ContentProposalProvider.getMatchingRegions(this, getKey(), pattern), offset);
+        return adapt(ContentProposalProvider.getMatchingRegions(this, getKey(), pattern, isFormatConcatString), offset);
       case MATCH_FOREIGN_LANG:
         offset = getDevLangTranslation().length() + KEY_PREFIX.length() + getKey().length() + FOREIGN_LANG_PREFIX.length();
-        return adapt(ContentProposalProvider.getMatchingRegions(this, getMatchedForeignLangTranslation(), pattern), offset);
+        return adapt(ContentProposalProvider.getMatchingRegions(this, getMatchedForeignLangTranslation(), pattern, isFormatConcatString), offset);
     }
     return null;
   }
@@ -145,6 +145,9 @@ public class NlsTextProposal implements Comparable<NlsTextProposal> {
   }
 
   private int[] adapt(int[] matchingRegions, int offset) {
+    if (matchingRegions == null) {
+      return null;
+    }
     for (int i = 0; i < matchingRegions.length; i += 2) {
       matchingRegions[i] += offset;
     }

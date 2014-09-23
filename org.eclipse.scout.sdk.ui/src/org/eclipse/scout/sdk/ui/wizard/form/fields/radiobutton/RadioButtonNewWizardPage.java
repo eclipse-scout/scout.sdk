@@ -234,13 +234,12 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
       }
       op.setSuperTypeSignature(sig);
     }
-    SiblingProposal siblingProposal = getSibling();
-    if (siblingProposal == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(m_declaringType);
       op.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }
-    else if (siblingProposal != null) {
-      op.setSibling(siblingProposal.getElement());
+    else {
+      op.setSibling(getSibling().getElement());
     }
 
     op.validate();

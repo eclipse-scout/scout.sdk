@@ -60,7 +60,7 @@ public class NlsTextContentProvider extends ContentProposalProvider implements I
 
         NlsTextProposal candidate = new NlsTextProposal(entry, developmentLanguage);
         if (candidate.matches(pattern)) {
-          int[] matchingRegions = candidate.getMatchingRegions(pattern);
+          int[] matchingRegions = candidate.getMatchingRegions(pattern, getLabelProvider().isFormatConcatString());
           if (candidate.getMatchKind() == NlsTextProposal.MATCH_DEV_LANG_TRANSLATION) {
             firstGroup.add(candidate);
           }

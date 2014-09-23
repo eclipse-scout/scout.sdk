@@ -138,7 +138,7 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getSuperType() != null) {
       buttonFieldOp.setSuperTypeSignature(SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName()));
     }
-    if (getSibling() == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(m_declaringType);
       buttonFieldOp.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }

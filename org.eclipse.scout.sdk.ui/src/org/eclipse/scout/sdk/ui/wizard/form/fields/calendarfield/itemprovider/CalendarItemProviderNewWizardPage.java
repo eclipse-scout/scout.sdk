@@ -125,7 +125,7 @@ public class CalendarItemProviderNewWizardPage extends AbstractWorkspaceWizardPa
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName()));
     }
 
-    if (getSibling() == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCalendar(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_CALENDAR_ITEM_PROVIDER));
     }

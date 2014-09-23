@@ -69,7 +69,7 @@ public class SequenceBoxNewWizard extends AbstractFormFieldWizard {
     if (m_page1.getSuperType() != null) {
       m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(m_page1.getSuperType().getFullyQualifiedName()));
     }
-    if (m_page1.getSibling() == SiblingProposal.SIBLING_END) {
+    if (m_page1.getSibling() == SiblingProposal.SIBLING_END || m_page1.getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredCompositeField(getDeclaringType());
       m_operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_FORM_FIELD));
     }

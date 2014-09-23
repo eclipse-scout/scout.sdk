@@ -69,7 +69,7 @@ public class DesktopMenuNewWizard extends AbstractWorkspaceWizard {
       String signature = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName());
       m_operation.setSuperTypeSignature(signature);
     }
-    if (m_page1.getSibling() == SiblingProposal.SIBLING_END) {
+    if (m_page1.getSibling() == SiblingProposal.SIBLING_END || m_page1.getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredDesktop(m_declaringType);
       m_operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_MENU));
     }

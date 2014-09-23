@@ -27,7 +27,7 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 public class NlsEntry implements INlsEntry {
 
   private String m_key;
-  private HashMap<Language, String> m_translations;
+  private Map<Language, String> m_translations;
   private final INlsProject m_project;
   private final ReentrantReadWriteLock m_lock;
 
@@ -105,9 +105,10 @@ public class NlsEntry implements INlsEntry {
   public void update(INlsEntry refEntry) {
     try {
       m_lock.writeLock().lock();
-      m_translations = new HashMap<Language, String>();
+      Map<Language, String> allTranslations = refEntry.getAllTranslations();
+      m_translations = new HashMap<Language, String>(allTranslations.size());
       m_key = refEntry.getKey();
-      for (Entry<Language, String> entry : refEntry.getAllTranslations().entrySet()) {
+      for (Entry<Language, String> entry : allTranslations.entrySet()) {
         addTranslationInternal(entry.getKey(), entry.getValue());
       }
     }

@@ -54,7 +54,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard,
 
   public ScoutProjectNewWizard() {
     setWindowTitle(Texts.get("NewScoutProjectNoPopup"));
-    setHelpAvailable(true);
+    setHelpAvailable(false);
   }
 
   @Override

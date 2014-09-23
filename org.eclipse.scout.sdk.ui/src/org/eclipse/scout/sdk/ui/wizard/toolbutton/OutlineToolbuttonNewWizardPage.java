@@ -141,7 +141,7 @@ public class OutlineToolbuttonNewWizardPage extends AbstractWorkspaceWizardPage 
     if (getOutline() != null) {
       operation.setOutlineType(getOutline());
     }
-    if (getSibling() == SiblingProposal.SIBLING_END) {
+    if (getSibling() == SiblingProposal.SIBLING_END || getSibling() == null) {
       IStructuredType structuredType = ScoutTypeUtility.createStructuredOutline(m_declaringType);
       operation.setSibling(structuredType.getSibling(CATEGORIES.TYPE_TOOL_BUTTON));
     }
