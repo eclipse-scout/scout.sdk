@@ -16,6 +16,7 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
@@ -59,6 +60,7 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.entity.EntityTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.AllPagesTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageNodePage;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageTemplateTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithNodeNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithTableNodePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.childpage.NodePageChildPageTablePage;
@@ -230,6 +232,22 @@ public class EditorSelectionVisitor implements INodeVisitor {
     return hierarchy;
   }
 
+  protected boolean isAbstractTypeElement() {
+    IJavaElement currentElement = getCurrentElement();
+    if (TypeUtility.exists(currentElement) && currentElement.getElementType() == IJavaElement.TYPE) {
+      IType t = (IType) currentElement;
+      int flags = 0;
+      try {
+        flags = t.getFlags();
+      }
+      catch (JavaModelException e) {
+        ScoutSdkUi.logWarning("Unable to retrieve flags of type '" + t.getFullyQualifiedName() + "'.", e);
+      }
+      return Flags.isAbstract(flags);
+    }
+    return false;
+  }
+
   @Override
   public int visit(IPage page) {
     if (m_visitedNodes.contains(page)) {
@@ -276,7 +294,13 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitTypeInHierarchyPage(TypeUtility.getType(IRuntimeClasses.ISearchForm));
     }
     else if (page instanceof FormTablePage) {
-      return visitFormTablePage((FormTablePage) page);
+      if (isAbstractTypeElement()) {
+        // if it is abstract: not the form table page should be processed but the form templates page instead
+        return CANCEL_SUBTREE;
+      }
+      else {
+        return visitFormTablePage((FormTablePage) page);
+      }
     }
     else if (page instanceof FormNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);
@@ -348,7 +372,13 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitPageWithType((AbstractScoutTypePage) page);
     }
     else if (page instanceof AllPagesTablePage) {
-      return visitTypeInHierarchyPage(TypeUtility.getType(IRuntimeClasses.IPage));
+      if (isAbstractTypeElement()) {
+        // if it is abstract: not the all pages table page should be processed but the page templates page instead
+        return CANCEL_SUBTREE;
+      }
+      else {
+        return visitTypeInHierarchyPage(TypeUtility.getType(IRuntimeClasses.IPage));
+      }
     }
     else if (page instanceof NodePageChildPageTablePage) {
       return visitTypeInHierarchyPage(TypeUtility.getType(IRuntimeClasses.IPage));
@@ -451,6 +481,9 @@ public class EditorSelectionVisitor implements INodeVisitor {
     }
     else if (page instanceof FormTemplateTablePage) {
       return CONTINUE;
+    }
+    else if (page instanceof PageTemplateTablePage) {
+      return visitTypeInHierarchyPage(TypeUtility.getType(IRuntimeClasses.IPage));
     }
     else if (page instanceof TablePageChildPageTablePage) {
       return CANCEL_SUBTREE;
