@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.code.type;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
@@ -43,6 +44,7 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
@@ -251,9 +253,36 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_genericCodeIdField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
+  /**
+   * Enables/Disables and probably clears the generic type fields depending on which generics that are available on the
+   * selected super type class.
+   */
   protected void handleGenericFieldEnableState() {
-    m_genericTypeField.setEnabled(m_superTypeParameters.size() > 0 && getSharedBundle() != null);
-    m_genericCodeIdField.setEnabled(m_superTypeParameters.size() > 1 && getSharedBundle() != null);
+    String codeTypeIdSig = null;
+    String codeIdSig = null;
+
+    if (TypeUtility.exists(getSuperType())) {
+      try {
+        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
+        LinkedHashMap<String, ITypeGenericMapping> collector = new LinkedHashMap<String, ITypeGenericMapping>();
+        SignatureUtility.resolveGenericParametersInSuperHierarchy(getSuperType(), superHierarchy, collector);
+        ITypeGenericMapping iTypeGenericMapping = collector.get(getSuperType().getFullyQualifiedName());
+        codeTypeIdSig = iTypeGenericMapping.getParameterSignature(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_TYPE_ID);
+        codeIdSig = iTypeGenericMapping.getParameterSignature(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID);
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError("Unable to calculate the visible generic signature fields for code types.", e);
+      }
+    }
+
+    m_genericTypeField.setEnabled(codeTypeIdSig != null && getSharedBundle() != null);
+    if (!m_genericTypeField.isEnabled()) {
+      m_genericTypeField.acceptProposal(null);
+    }
+    m_genericCodeIdField.setEnabled(codeIdSig != null && getSharedBundle() != null);
+    if (!m_genericCodeIdField.isEnabled()) {
+      m_genericCodeIdField.acceptProposal(null);
+    }
   }
 
   @Override
@@ -302,11 +331,17 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     multiStatus.add(getStatusNextCodeIdField());
     multiStatus.add(getStatusNameField());
     multiStatus.add(getStatusSuperType());
-    multiStatus.add(getStatusGenericType());
-    multiStatus.add(getStatusGenericCodeIdType());
     multiStatus.add(getStatusTargetPackge());
-    multiStatus.add(getStatusGenericTypeToSuperClass(getGenericCodeIdSignature(), IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
-    multiStatus.add(getStatusGenericTypeToSuperClass(getGenericSignature(), IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_TYPE_ID));
+
+    if (m_genericTypeField != null && !m_genericTypeField.isDisposed() && m_genericTypeField.isEnabled()) {
+      multiStatus.add(getStatusGenericType());
+      multiStatus.add(getStatusGenericTypeToSuperClass(getGenericSignature(), IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_TYPE_ID));
+    }
+
+    if (m_genericCodeIdField != null && !m_genericCodeIdField.isDisposed() && m_genericCodeIdField.isEnabled()) {
+      multiStatus.add(getStatusGenericCodeIdType());
+      multiStatus.add(getStatusGenericTypeToSuperClass(getGenericCodeIdSignature(), IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
+    }
   }
 
   protected IStatus getStatusWorkspace() {

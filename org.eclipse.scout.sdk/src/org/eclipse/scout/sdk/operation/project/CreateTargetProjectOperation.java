@@ -80,7 +80,7 @@ public class CreateTargetProjectOperation extends AbstractCreateEclipseProjectOp
     else {
       // use remote target
       String url = getUpdateSiteUrl();
-      op.addUpdateSite(UPDATE_SITE_URL_LUNA, SCOUT_RT_FEATURE, null);
+      op.addUpdateSite(UPDATE_SITE_URL_MARS, SCOUT_RT_FEATURE, null);
       op.addUpdateSite(url, ECLIPSE_PLATFORM_FEATURE, null);
       op.addUpdateSite(url, ECLIPSE_RPC_FEATURE, null);
       op.addUpdateSite(url, ECLIPSE_EQUINOX_SDK_FEATURE, null);
