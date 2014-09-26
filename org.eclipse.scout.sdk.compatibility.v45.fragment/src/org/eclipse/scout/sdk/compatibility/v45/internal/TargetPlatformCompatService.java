@@ -138,8 +138,11 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
       @Override
       public void contribute(List<ITargetLocation> liveList, Map<IUBundleContainer, Set<FeatureDefinition>> features, ITargetPlatformService svc) {
         for (String dir : dirs) {
-          if (dir != null && dir.trim().length() > 0) {
-            liveList.add(svc.newDirectoryLocation(dir));
+          if (dir != null) {
+            String cleanDir = dir.trim();
+            if (cleanDir.length() > 0) {
+              liveList.add(svc.newDirectoryLocation(cleanDir));
+            }
           }
         }
       }
