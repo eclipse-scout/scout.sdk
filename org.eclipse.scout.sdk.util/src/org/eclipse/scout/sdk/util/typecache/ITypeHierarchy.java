@@ -99,10 +99,11 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
   /**
    * Checks if the given potentialSubtype is a subtype of type.<br>
    * <br>
-   * If type and potentialSubtype are equal, this method returns always {@code true}. <br>
-   * Otherwise it checks if potentialSubtype is a subtype of type according to this hierarchy. This means that if type
-   * or potentialSubtype are not part of the hierarchy, this method returns {@code false}, as long as the types are not
-   * equal.
+   * <b>Notes:</b> <br>
+   * If one of the given parameters is null, this method call returns {@code false}.<br>
+   * If no parameter is null and both are equal, this method always returns {@code true}.<br>
+   * Otherwise this method checks according to this hierarchy only. This means that if type or potentialSubtype are not
+   * part of the hierarchy, this method returns {@code false}, as long as the types are not equal.
    *
    * @param type
    *          The base type.

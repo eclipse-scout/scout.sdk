@@ -51,6 +51,9 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
 
   @Override
   public boolean contains(IType type) {
+    if (type == null) {
+      return false;
+    }
     return m_hierarchy.contains(type);
   }
 
@@ -107,6 +110,9 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   @Override
   public Deque<IType> getSuperClassStack(IType startType, boolean includeStartType) {
     LinkedList<IType> result = new LinkedList<IType>();
+    if (startType == null) {
+      return result;
+    }
     IType cur = null;
     if (includeStartType) {
       cur = startType;
@@ -128,6 +134,9 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
 
   @Override
   public boolean isSubtype(IType type, IType potentialSubtype) {
+    if (type == null || potentialSubtype == null) {
+      return false;
+    }
     if (CompareUtility.equals(type, potentialSubtype)) {
       return true;
     }

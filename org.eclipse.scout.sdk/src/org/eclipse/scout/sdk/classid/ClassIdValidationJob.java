@@ -94,28 +94,28 @@ public final class ClassIdValidationJob extends JobEx {
       e.search(SearchPattern.createPattern(m_classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH),
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
           SearchEngine.createWorkspaceScope(), new SearchRequestor() {
-        @Override
-        public void acceptSearchMatch(SearchMatch match) throws CoreException {
-          Object owner = match.getElement();
-          if (owner instanceof IType) {
-            IType ownerType = (IType) owner;
-            if (TypeUtility.exists(ownerType)) {
-              // do not check for annotation duplicates within DTOs.
-              IType toplevelType = ScoutTypeUtility.getToplevelType(ownerType);
-              if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType) && !formDataHierarchy.contains(toplevelType) && !formFieldDataHierarchy.contains(toplevelType)) {
-                IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
-                if (element == null) {
-                  // e.g. when the annotation is fully qualified. try reading from owner
-                  element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
-                }
-                if (element instanceof IAnnotation && TypeUtility.exists(element)) {
-                  result.add((IAnnotation) element);
+            @Override
+            public void acceptSearchMatch(SearchMatch match) throws CoreException {
+              Object owner = match.getElement();
+              if (owner instanceof IType) {
+                IType ownerType = (IType) owner;
+                if (TypeUtility.exists(ownerType)) {
+                  // do not check for annotation duplicates within DTOs.
+                  IType toplevelType = ScoutTypeUtility.getToplevelType(ownerType);
+                  if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType) && !formDataHierarchy.contains(toplevelType) && !formFieldDataHierarchy.contains(toplevelType)) {
+                    IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
+                    if (element == null) {
+                      // e.g. when the annotation is fully qualified. try reading from owner
+                      element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
+                    }
+                    if (element instanceof IAnnotation && TypeUtility.exists(element)) {
+                      result.add((IAnnotation) element);
+                    }
+                  }
                 }
               }
             }
-          }
-        }
-      }, monitor);
+          }, monitor);
     }
     catch (OperationCanceledException oce) {
       //nop
@@ -273,7 +273,14 @@ public final class ClassIdValidationJob extends JobEx {
           IType abstractFormData = TypeUtility.getType(IRuntimeClasses.AbstractFormData);
           IType abstractFormFieldData = TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData);
           if (TypeUtility.exists(classId) && TypeUtility.exists(abstractFormData) && TypeUtility.exists(abstractFormFieldData)) {
+            // cancel currently running job. we are starting a new one right afterwards
             Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
+
+            // wait until all JDT initializations have been executed.
+            // @see org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob
+            JdtUtility.waitForJobFamily("org.eclipse.jdt.ui"); // from JavaUI.ID_PLUGIN
+
+            // start the new validation
             new ClassIdValidationJob(classId, abstractFormData, abstractFormFieldData).schedule(startDelay);
           }
         }
