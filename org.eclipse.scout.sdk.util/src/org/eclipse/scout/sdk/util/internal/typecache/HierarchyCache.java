@@ -226,7 +226,7 @@ public final class HierarchyCache implements IHierarchyCache {
   /**
    * will be notified before events are passed through the event listener list from {@link JavaResourceChangedEmitter}
    */
-  public void elementChanged(JdtEvent e) {
+  void elementChanged(JdtEvent e) {
     switch (e.getEventType()) {
       case IJavaElementDelta.ADDED:
       case IJavaElementDelta.CHANGED: {

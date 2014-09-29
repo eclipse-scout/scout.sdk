@@ -50,10 +50,12 @@ public class SharedNodePage extends AbstractBundleNodeTablePage {
 
     if (getScoutBundle().getIconProvider() != null) {
       IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
-      ICachedTypeHierarchy iconHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
-      Set<IType> iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), null);
-      if (iconTypes.size() > 0) {
-        new IconNodePage(this, CollectionUtility.firstElement(iconTypes));
+      if (TypeUtility.exists(abstractIcons)) {
+        ICachedTypeHierarchy iconHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
+        Set<IType> iconTypes = iconHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), null);
+        if (iconTypes.size() > 0) {
+          new IconNodePage(this, CollectionUtility.firstElement(iconTypes));
+        }
       }
     }
 

@@ -55,7 +55,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
   private static final String SECTION_ID_LINKS = "section.links";
 
   private final IType iService = TypeUtility.getType(IRuntimeClasses.IService);
-  private final IType basicPermission = TypeUtility.getType(IRuntimeClasses.BasicPermission);
+  private final IType permission = TypeUtility.getType(IRuntimeClasses.Permission);
 
   @Override
   protected void createSections() {
@@ -154,7 +154,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
               ScoutTypeFilters.getInScoutBundles(shareds)
               );
           LinkGroup permissionGroup = model.getOrCreateGroup(Texts.get("PermissionTablePage"), 20);
-          for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(basicPermission).getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator())) {
+          for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(permission).getAllSubtypes(permission, filter, TypeComparators.getTypeNameComparator())) {
             permissionGroup.addLink(new TypeOpenLink(candidate));
           }
         }

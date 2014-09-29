@@ -66,6 +66,7 @@ public interface IRuntimeClasses {
 
   String BasicHierarchyPermission = "org.eclipse.scout.rt.shared.security.BasicHierarchyPermission"; // NO_UCD
   String BasicPermission = "java.security.BasicPermission"; // NO_UCD
+  String Permission = "java.security.Permission"; // NO_UCD
   String FormData = "org.eclipse.scout.commons.annotations.FormData"; // NO_UCD
   String PageData = "org.eclipse.scout.commons.annotations.PageData"; // NO_UCD
   String ColumnData = "org.eclipse.scout.commons.annotations.ColumnData"; // NO_UCD

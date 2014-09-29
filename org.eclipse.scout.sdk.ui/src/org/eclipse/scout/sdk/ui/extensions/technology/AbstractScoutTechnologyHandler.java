@@ -184,8 +184,11 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     if (pluginIds == null || pluginIds.length == 0) {
       return TriState.FALSE;
     }
+    if (project == null || project.getProject() == null || !project.getProject().exists()) {
+      return TriState.FALSE;
+    }
 
-    PluginModelHelper pluginModel = new PluginModelHelper(project.getSymbolicName());
+    PluginModelHelper pluginModel = new PluginModelHelper(project.getProject());
     TriState ret = TriState.parse(pluginModel.Manifest.existsDependency(pluginIds[0]));
     for (int i = 1; i < pluginIds.length; i++) {
       TriState tmp = TriState.parse(pluginModel.Manifest.existsDependency(pluginIds[i]));

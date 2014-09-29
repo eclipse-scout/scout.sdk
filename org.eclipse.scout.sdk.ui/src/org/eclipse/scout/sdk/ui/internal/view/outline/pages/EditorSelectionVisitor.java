@@ -408,7 +408,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
       return visitSharedContextPropertyNodePage((SharedContextPropertyNodePage) page);
     }
     else if (page instanceof PermissionTablePage) {
-      return visitTypeInHierarchyPage(TypeUtility.getType(IRuntimeClasses.BasicPermission));
+      return visitTypeInHierarchyPage(TypeUtility.getType(IRuntimeClasses.Permission));
     }
     else if (page instanceof PermissionNodePage) {
       return visitPageWithType((AbstractScoutTypePage) page);

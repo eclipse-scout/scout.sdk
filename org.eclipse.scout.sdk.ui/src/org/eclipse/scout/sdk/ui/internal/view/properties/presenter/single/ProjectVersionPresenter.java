@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -42,19 +44,21 @@ import org.osgi.framework.Version;
 public class ProjectVersionPresenter extends AbstractPresenter {
   private Text m_versionField;
   private ImageHyperlink m_applyVersionLink;
-  private final HashMap<IProject, PluginModelHelper> m_bundles;
+  private final IScoutBundle m_project;
 
   public ProjectVersionPresenter(PropertyViewFormToolkit toolkit, Composite parent, IScoutBundle scoutProject) {
     super(toolkit, parent);
-    Set<IScoutBundle> scoutBundles = scoutProject.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true);
-    m_bundles = new HashMap<IProject, PluginModelHelper>(scoutBundles.size());
-    for (IScoutBundle sb : scoutBundles) {
-      if (!sb.isBinary()) {
-        m_bundles.put(sb.getProject(), new PluginModelHelper(sb.getProject()));
-      }
-    }
-
+    m_project = scoutProject;
     createContent(getContainer());
+  }
+
+  private Map<IProject, PluginModelHelper> getModels() {
+    Set<IScoutBundle> scoutBundles = m_project.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
+    Map<IProject, PluginModelHelper> bundles = new HashMap<IProject, PluginModelHelper>(scoutBundles.size());
+    for (IScoutBundle sb : scoutBundles) {
+      bundles.put(sb.getProject(), new PluginModelHelper(sb.getProject()));
+    }
+    return bundles;
   }
 
   private void createContent(Composite container) {
@@ -110,17 +114,18 @@ public class ProjectVersionPresenter extends AbstractPresenter {
     Version newVersion = parseVersion();
     if (newVersion != null) {
       String newVersionStr = newVersion.toString();
+      Map<IProject, PluginModelHelper> models = getModels();
       LinkedList<String> errPlugins = new LinkedList<String>();
-      for (IProject p : m_bundles.keySet()) {
-        PluginModelHelper mf = m_bundles.get(p);
+      for (Entry<IProject, PluginModelHelper> entry : models.entrySet()) {
+        PluginModelHelper mf = entry.getValue();
         if (!newVersionStr.equals(mf.Manifest.getVersionAsString())) {
           try {
             mf.Manifest.setVersion(newVersionStr);
             mf.save();
           }
           catch (Exception e) {
-            errPlugins.add(p.getName());
-            ScoutSdkUi.logError("Unable to set the new version for plugin " + p.getName(), e);
+            errPlugins.add(entry.getKey().getName());
+            ScoutSdkUi.logError("Unable to set the new version for plugin " + entry.getKey().getName(), e);
           }
         }
       }
@@ -151,7 +156,8 @@ public class ProjectVersionPresenter extends AbstractPresenter {
 
   private String getCommonPluginVerionString() {
     String v = null;
-    for (PluginModelHelper b : m_bundles.values()) {
+    Map<IProject, PluginModelHelper> models = getModels();
+    for (PluginModelHelper b : models.values()) {
       String bundleVersion = b.Manifest.getVersionAsString();
       if (v == null) {
         v = bundleVersion;

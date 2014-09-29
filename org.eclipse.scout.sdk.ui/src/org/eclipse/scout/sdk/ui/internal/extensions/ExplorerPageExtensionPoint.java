@@ -13,12 +13,14 @@ package org.eclipse.scout.sdk.ui.internal.extensions;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.extensions.IPageFactory;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -34,50 +36,62 @@ public final class ExplorerPageExtensionPoint {
   public static final String PAGE_ATTRIBUTE = "page";
   public static final String PAGE_FACTORY_ATTRIBUTE = "pageFactory";
 
-  private final HashMap<String /* parentId */, List<ExplorerPageExtension> /* extensions */> m_pages = new HashMap<String, List<ExplorerPageExtension>>();
-
-  private static final ExplorerPageExtensionPoint INSTANCE = new ExplorerPageExtensionPoint();
+  private static final Object LOCK = new Object();
+  private static Map<String /* parentId */, List<ExplorerPageExtension> /* extensions */> pages = null;
 
   private ExplorerPageExtensionPoint() {
-    init();
   }
 
-  private void init() {
-    IExtensionRegistry reg = Platform.getExtensionRegistry();
-    IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXPLORER_PAGE_EXTENSION_ID);
-    IExtension[] extensions = xp.getExtensions();
-    for (IExtension extension : extensions) {
-      IConfigurationElement[] elements = extension.getConfigurationElements();
-      for (IConfigurationElement element : elements) {
-        if (PAGE_ATTRIBUTE.equals(element.getName())) {
-          ExplorerPageExtension pageExt = new ExplorerPageExtension();
-          pageExt.setParentPageId(element.getAttribute(PARENT_PAGE_ATTRIBUTE));
-          Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
-          pageExt.setPageClass(getClassOfContribution(contributerBundle, element, "page", IPage.class));
-          addExtension(pageExt);
-        }
-        else if (PAGE_FACTORY_ATTRIBUTE.equals(element.getName())) {
-          ExplorerPageExtension pageExt = new ExplorerPageExtension();
-          pageExt.setParentPageId(element.getAttribute(PARENT_PAGE_ATTRIBUTE));
-          Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
-          pageExt.setFactoryClass(getClassOfContribution(contributerBundle, element, "factory", IPageFactory.class));
-          addExtension(pageExt);
+  private static void load() {
+    if (pages == null) {
+      synchronized (LOCK) {
+        if (pages == null) {
+          Map<String, List<ExplorerPageExtension>> tmp = new HashMap<String, List<ExplorerPageExtension>>();
+          IExtensionRegistry reg = Platform.getExtensionRegistry();
+          IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXPLORER_PAGE_EXTENSION_ID);
+          IExtension[] extensions = xp.getExtensions();
+          for (IExtension extension : extensions) {
+            IConfigurationElement[] elements = extension.getConfigurationElements();
+            for (IConfigurationElement element : elements) {
+              if (PAGE_ATTRIBUTE.equals(element.getName())) {
+                ExplorerPageExtension pageExt = new ExplorerPageExtension();
+                pageExt.setParentPageId(element.getAttribute(PARENT_PAGE_ATTRIBUTE));
+                Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
+                Class<? extends IPage> pageClass = getClassOfContribution(contributerBundle, element, "page", IPage.class);
+                if (pageClass != null) {
+                  pageExt.setPageClass(pageClass);
+                  addExtension(tmp, pageExt);
+                }
+              }
+              else if (PAGE_FACTORY_ATTRIBUTE.equals(element.getName())) {
+                ExplorerPageExtension pageExt = new ExplorerPageExtension();
+                pageExt.setParentPageId(element.getAttribute(PARENT_PAGE_ATTRIBUTE));
+                Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
+                Class<? extends IPageFactory> factoryClass = getClassOfContribution(contributerBundle, element, "factory", IPageFactory.class);
+                if (factoryClass != null) {
+                  pageExt.setFactoryClass(factoryClass);
+                  addExtension(tmp, pageExt);
+                }
+              }
+            }
+          }
+          pages = tmp;
         }
       }
     }
   }
 
-  private void addExtension(ExplorerPageExtension page) {
-    List<ExplorerPageExtension> childNodes = m_pages.get(page.getParentPageId());
+  private static void addExtension(Map<String, List<ExplorerPageExtension>> collector, ExplorerPageExtension page) {
+    List<ExplorerPageExtension> childNodes = collector.get(page.getParentPageId());
     if (childNodes == null) {
       childNodes = new ArrayList<ExplorerPageExtension>();
-      m_pages.put(page.getParentPageId(), childNodes);
+      collector.put(page.getParentPageId(), childNodes);
     }
     childNodes.add(page);
   }
 
   @SuppressWarnings("unchecked")
-  private <T> Class<? extends T> getClassOfContribution(Bundle bundle, IConfigurationElement element, String attribute, Class<T> t) {
+  private static <T> Class<? extends T> getClassOfContribution(Bundle bundle, IConfigurationElement element, String attribute, Class<T> t) {
     Class<? extends T> clazz = null;
     if (bundle != null) {
       String clazzName = element.getAttribute(attribute);
@@ -86,26 +100,23 @@ public final class ExplorerPageExtensionPoint {
           clazz = (Class<? extends T>) bundle.loadClass(clazzName);
         }
         catch (Exception tt) {
-          ScoutSdkUi.logWarning("could not load class of extension '" + element.getName() + "'.", tt);
+          ScoutSdkUi.logWarning("Could not load class of extension '" + element.getName() + "'.", tt);
         }
       }
       else {
-        ScoutSdkUi.logWarning("page extension without class found. Contributed in bundle '" + bundle.getSymbolicName() + "'. Will be ignored.");
+        ScoutSdkUi.logWarning("Page extension without class found. Contributed in bundle '" + bundle.getSymbolicName() + "'. Will be ignored.");
       }
     }
     return clazz;
   }
 
-  public static ExplorerPageExtension[] getExtensions(IPage parentPage) {
-    return INSTANCE.getExtensionsImpl(parentPage);
-  }
-
-  private ExplorerPageExtension[] getExtensionsImpl(IPage parentPage) {
-    List<ExplorerPageExtension> list = m_pages.get(parentPage.getPageId());
+  public static List<ExplorerPageExtension> getExtensions(IPage parentPage) {
+    load();
+    List<ExplorerPageExtension> list = pages.get(parentPage.getPageId());
     if (list != null) {
-      return list.toArray(new ExplorerPageExtension[list.size()]);
+      return CollectionUtility.arrayList(list);
     }
-    return new ExplorerPageExtension[0];
+    return CollectionUtility.emptyArrayList();
   }
 
   public static class ExplorerPageExtension {
@@ -146,7 +157,7 @@ public final class ExplorerPageExtensionPoint {
       return m_factoryClass;
     }
 
-    public IPageFactory createFactoryClass() {
+    public IPageFactory createFactoryInstance() {
       try {
         return getFactoryClass().newInstance();
       }

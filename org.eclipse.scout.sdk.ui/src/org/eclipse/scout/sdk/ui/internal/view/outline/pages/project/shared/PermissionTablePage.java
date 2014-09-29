@@ -64,16 +64,17 @@ public class PermissionTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    IType basicPermission = TypeUtility.getType(IRuntimeClasses.BasicPermission);
-
-    if (m_basicPermissionHierarchy == null) {
-      m_basicPermissionHierarchy = TypeUtility.getPrimaryTypeHierarchy(basicPermission);
-      m_basicPermissionHierarchy.addHierarchyListener(getPageDirtyListener());
-    }
-    ITypeFilter filter = ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle());
-    Set<IType> permissions = m_basicPermissionHierarchy.getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator());
-    for (IType type : permissions) {
-      new PermissionNodePage(this, type);
+    IType permission = TypeUtility.getType(IRuntimeClasses.Permission);
+    if (TypeUtility.exists(permission)) {
+      if (m_basicPermissionHierarchy == null) {
+        m_basicPermissionHierarchy = TypeUtility.getPrimaryTypeHierarchy(permission);
+        m_basicPermissionHierarchy.addHierarchyListener(getPageDirtyListener());
+      }
+      ITypeFilter filter = ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle());
+      Set<IType> permissions = m_basicPermissionHierarchy.getAllSubtypes(permission, filter, TypeComparators.getTypeNameComparator());
+      for (IType type : permissions) {
+        new PermissionNodePage(this, type);
+      }
     }
   }
 

@@ -63,7 +63,13 @@ public class TechnologyPresenter extends AbstractPresenter {
         uiModel.technology = t;
         uiModel.active = uiModel.technology.isActive(m_scoutProject);
         if (uiModel.active) {
-          uiModel.selection = uiModel.technology.getSelection(m_scoutProject);
+          try {
+            uiModel.selection = uiModel.technology.getSelection(m_scoutProject);
+          }
+          catch (Exception e) {
+            ScoutSdkUi.logError("unable to calculate selection for technology '" + t.getId() + "'.", e);
+            uiModel.selection = TriState.UNDEFINED;
+          }
         }
         m_techModels.add(uiModel);
       }

@@ -280,6 +280,9 @@ public class TypeFilters {
    */
   protected static boolean isClass(IType type) {
     try {
+      if (!TypeUtility.exists(type)) {
+        return false;
+      }
       if (type.isAnonymous()) {
         return false;
       }

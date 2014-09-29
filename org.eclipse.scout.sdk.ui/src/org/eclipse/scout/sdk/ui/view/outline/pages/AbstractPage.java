@@ -224,23 +224,25 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
         try {
           loadChildrenImpl();
           // extension point
-          ExplorerPageExtension[] extensions = ExplorerPageExtensionPoint.getExtensions(this);
-          if (extensions != null) {
-            for (ExplorerPageExtension ext : extensions) {
+          for (ExplorerPageExtension ext : ExplorerPageExtensionPoint.getExtensions(this)) {
+            if (ext.getFactoryClass() != null) {
               try {
-                if (ext.getFactoryClass() != null) {
-                  IPageFactory factory = ext.createFactoryClass();
-                  factory.createChildren(this);
-                }
-                else if (ext.getPageClass() != null) {
-                  IPage childPage = ext.createPageInstance();
-                  if (childPage != null) {
-                    childPage.setParent(this);
-                  }
+                IPageFactory factory = ext.createFactoryInstance();
+                factory.createChildren(this);
+              }
+              catch (Exception t) {
+                ScoutSdkUi.logError("could not load extension '" + ext.getFactoryClass().getName() + "'!", t);
+              }
+            }
+            else if (ext.getPageClass() != null) {
+              try {
+                IPage childPage = ext.createPageInstance();
+                if (childPage != null) {
+                  childPage.setParent(this);
                 }
               }
               catch (Exception t) {
-                ScoutSdkUi.logError("could not load extension '" + ext.getPageClass() + "'!", t);
+                ScoutSdkUi.logError("could not load extension '" + ext.getPageClass().getName() + "'!", t);
               }
             }
           }

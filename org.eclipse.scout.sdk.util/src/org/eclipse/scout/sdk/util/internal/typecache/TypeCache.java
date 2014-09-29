@@ -172,9 +172,13 @@ public final class TypeCache implements ITypeCache {
 
     @Override
     public int compare(IType o1, IType o2) {
+      if (o1 == o2) {
+        return 0;
+      }
+
+      // favor types in the workspace
       boolean b1 = o1.isBinary();
       boolean b2 = o2.isBinary();
-
       if (b1 != b2) {
         if (b1) {
           return 1;
@@ -184,7 +188,15 @@ public final class TypeCache implements ITypeCache {
         }
       }
 
-      return o1.getFullyQualifiedName().compareTo(o2.getFullyQualifiedName());
+      // descending (newest first)
+      return buildPath(o2).compareTo(buildPath(o1));
+    }
+
+    private String buildPath(IType t) {
+      StringBuilder sb = new StringBuilder();
+      sb.append(t.getFullyQualifiedName());
+      sb.append(t.getPath().toPortableString());
+      return sb.toString();
     }
   }
 

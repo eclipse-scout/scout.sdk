@@ -41,7 +41,7 @@ import org.eclipse.swt.widgets.Composite;
 public class ServicePropertyPart extends JdtTypePropertyPart {
   private static final String SECTION_ID_LINKS = "section.links";
 
-  private final IType basicPermission = TypeUtility.getType(IRuntimeClasses.BasicPermission);
+  private final IType permission = TypeUtility.getType(IRuntimeClasses.Permission);
 
   @Override
   protected void createSections() {
@@ -95,7 +95,7 @@ public class ServicePropertyPart extends JdtTypePropertyPart {
           ScoutTypeFilters.getInScoutBundles(getPage().getScoutBundle().getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false))
           );
       LinkGroup permissionGroup = model.getOrCreateGroup(Texts.get("PermissionTablePage"), 20);
-      for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(basicPermission).getAllSubtypes(basicPermission, filter, TypeComparators.getTypeNameComparator())) {
+      for (IType candidate : TypeUtility.getPrimaryTypeHierarchy(permission).getAllSubtypes(permission, filter, TypeComparators.getTypeNameComparator())) {
         permissionGroup.addLink(new TypeOpenLink(candidate));
       }
     }

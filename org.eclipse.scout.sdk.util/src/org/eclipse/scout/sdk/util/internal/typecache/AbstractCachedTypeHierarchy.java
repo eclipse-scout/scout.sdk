@@ -141,26 +141,26 @@ public abstract class AbstractCachedTypeHierarchy extends TypeHierarchy implemen
         if (!isCreated()) {
           if (getBaseType() == null) {
             HierarchyCache.getInstance().removeCachedHierarchy(null);
-            throw new IllegalArgumentException("type 'null' does not exist.");
+            throw new IllegalArgumentException("Type 'null' does not exist.");
           }
-          if (!getBaseType().exists()) {
+          if (!getBaseType().exists() || !TypeUtility.exists(getBaseType().getJavaProject())) {
             // type does no longer exist: try new resolve
             IType tmp = TypeUtility.getType(getBaseType().getFullyQualifiedName());
-            if (TypeUtility.exists(tmp)) {
+            if (TypeUtility.exists(tmp) && TypeUtility.exists(tmp.getJavaProject())) {
               setBaseType(tmp);
             }
             else {
               // still does not exist
               HierarchyCache.getInstance().removeCachedHierarchy(getBaseType());
-              throw new IllegalArgumentException("type '" + getBaseType().getFullyQualifiedName() + "' does not exist");
+              throw new IllegalArgumentException("Type '" + getBaseType().getFullyQualifiedName() + "' does not exist");
             }
-          }
-          if (!TypeUtility.exists(getBaseType().getJavaProject())) {
-            HierarchyCache.getInstance().removeCachedHierarchy(getBaseType());
-            throw new IllegalArgumentException("project of type '" + getBaseType().getFullyQualifiedName() + "' does not exist");
           }
           revalidate();
           m_created = getJdtHierarchy() != null;
+          if (!m_created) {
+            // re-validate failed. cancel
+            throw new IllegalArgumentException("Hierarchy '" + getBaseType().getFullyQualifiedName() + "' could not be re-validated. See prior errors for details.");
+          }
         }
       }
     }

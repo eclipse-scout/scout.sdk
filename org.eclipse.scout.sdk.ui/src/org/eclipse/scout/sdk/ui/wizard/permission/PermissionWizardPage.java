@@ -46,7 +46,7 @@ import org.eclipse.swt.widgets.Composite;
  * <h3>CodeTypeWizardPage</h3>
  */
 public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
-  private final IType basicPermission = TypeUtility.getType(IRuntimeClasses.BasicPermission);
+  private final IType permission = TypeUtility.getType(IRuntimeClasses.Permission);
   private final IType basicHierarchyPermission = TypeUtility.getType(IRuntimeClasses.BasicHierarchyPermission);
 
   private String m_packageName;
@@ -90,7 +90,7 @@ public class PermissionWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"),
-        new JavaElementAbstractTypeContentProvider(basicHierarchyPermission, getSharedBundle().getJavaProject(), basicPermission), labelColWidthPercent);
+        new JavaElementAbstractTypeContentProvider(permission, getSharedBundle().getJavaProject(), basicHierarchyPermission), labelColWidthPercent);
     m_superTypeField.acceptProposal(m_superType);
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override

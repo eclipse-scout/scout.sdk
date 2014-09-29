@@ -25,6 +25,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.sdk.ScoutFileLocator;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -47,21 +48,13 @@ public class ScoutProjectIcons implements IIconProvider {
   private static final String[] PREDEFINED_SUB_FOLDERS = new String[]{"resources/icons/internal/", "resources/icons/"};
 
   private final IScoutBundle m_bundle;
-  private final ICachedTypeHierarchy m_iconsHierarchy;
+  private P_Listener m_listener;
 
   private Map<String, ScoutIconDesc> m_cachedIcons;
   private List<String> m_baseUrls;
 
   public ScoutProjectIcons(IScoutBundle bundle) {
     m_bundle = bundle;
-    IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
-    m_iconsHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
-    m_iconsHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
-      @Override
-      public void hierarchyInvalidated() {
-        clearCache();
-      }
-    });
   }
 
   @Override
@@ -128,13 +121,23 @@ public class ScoutProjectIcons implements IIconProvider {
   }
 
   protected void collectIconNames(Map<String, ScoutIconDesc> collector) {
-    Set<IScoutBundle> parentSharedBundles = m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
     IType abstractIcons = TypeUtility.getType(IRuntimeClasses.AbstractIcons);
+    if (!TypeUtility.exists(abstractIcons)) {
+      return;
+    }
+
+    ICachedTypeHierarchy iconsHierarchy = TypeUtility.getPrimaryTypeHierarchy(abstractIcons);
+    if (m_listener == null) {
+      m_listener = new P_Listener();
+      iconsHierarchy.addHierarchyListener(m_listener);
+    }
+
+    Set<IScoutBundle> parentSharedBundles = m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
     for (IScoutBundle parentShared : parentSharedBundles) {
-      for (IType iconType : m_iconsHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getInScoutBundles(parentShared))) {
+      for (IType iconType : iconsHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getInScoutBundles(parentShared))) {
         if (TypeUtility.exists(iconType)) {
           try {
-            collectIconNamesOfType(iconType, collector);
+            collectIconNamesOfType(iconType, iconsHierarchy, collector);
           }
           catch (Exception e) {
             ScoutSdk.logWarning("Unable to collect icon names for class '" + iconType.getFullyQualifiedName() + "'.", e);
@@ -144,7 +147,7 @@ public class ScoutProjectIcons implements IIconProvider {
     }
   }
 
-  protected void collectIconNamesOfType(IType iconType, Map<String, ScoutIconDesc> collector) throws JavaModelException {
+  protected void collectIconNamesOfType(IType iconType, ICachedTypeHierarchy iconsHierarchy, Map<String, ScoutIconDesc> collector) throws JavaModelException {
     if (TypeUtility.exists(iconType)) {
       boolean inherited = CompareUtility.notEquals(ScoutTypeUtility.getScoutBundle(iconType), m_bundle);
       for (IField field : iconType.getFields()) {
@@ -156,7 +159,7 @@ public class ScoutProjectIcons implements IIconProvider {
           }
         }
       }
-      collectIconNamesOfType(m_iconsHierarchy.getSuperclass(iconType), collector);
+      collectIconNamesOfType(iconsHierarchy.getSuperclass(iconType), iconsHierarchy, collector);
     }
   }
 
@@ -193,6 +196,13 @@ public class ScoutProjectIcons implements IIconProvider {
           }
         }
       }
+    }
+  }
+
+  private class P_Listener implements ITypeHierarchyChangedListener, WeakEventListener {
+    @Override
+    public void hierarchyInvalidated() {
+      clearCache();
     }
   }
 }

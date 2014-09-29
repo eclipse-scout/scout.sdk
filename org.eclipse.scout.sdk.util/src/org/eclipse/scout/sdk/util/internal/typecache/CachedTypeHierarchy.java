@@ -15,6 +15,7 @@ import java.util.Set;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 
 /**
  * <h3>{@link CachedTypeHierarchy}</h3>
@@ -35,11 +36,28 @@ public final class CachedTypeHierarchy extends AbstractCachedTypeHierarchy {
 
   @Override
   protected void revalidate() {
+    String msg = "Unable to create type hierarchy for type ";
     try {
-      setJdtHierarchy(getBaseType().newTypeHierarchy(null));
+      revalidateImpl();
     }
     catch (JavaModelException e) {
-      SdkUtilActivator.logError("Unable to create type hierarchy for type " + getBaseType().getFullyQualifiedName(), e);
+      SdkUtilActivator.logError(msg + getBaseType().getFullyQualifiedName(), e);
     }
+    catch (IllegalArgumentException e) {
+      // [mvi] workaround:
+      // may happen after a java project has been opened, that affects the existing hierarchies.
+      // not ready yet: try a second time after waiting for the indexes (don't wait for the indexes every time. only in error case).
+      try {
+        JdtUtility.waitForIndexesReady();
+        revalidateImpl();
+      }
+      catch (JavaModelException e1) {
+        SdkUtilActivator.logError(msg + getBaseType().getFullyQualifiedName(), e);
+      }
+    }
+  }
+
+  private void revalidateImpl() throws JavaModelException {
+    setJdtHierarchy(getBaseType().newTypeHierarchy(null));
   }
 }
