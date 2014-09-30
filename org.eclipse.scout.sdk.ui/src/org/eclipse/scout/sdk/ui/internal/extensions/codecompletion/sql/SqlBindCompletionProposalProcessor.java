@@ -29,6 +29,7 @@ import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.beans.FastBeanUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.NamingUtility;
@@ -70,14 +71,14 @@ public class SqlBindCompletionProposalProcessor {
       HashSet<ICompletionProposal> collector = new HashSet<ICompletionProposal>();
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formData);
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
-        String propName = NamingUtility.ensureStartWithLowerCase(t.getElementName());
+        String propName = FastBeanUtility.decapitalize(NamingUtility.ensureStartWithUpperCase(t.getElementName()));
         SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
         addInnerTypesInSuperClasses(t, TypeUtility.getSupertypeHierarchy(t), collector, prefix, propName + ".", context);
       }
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractPropertyData, hierarchy))) {
-        String propName = t.getElementName();
-        propName = NamingUtility.ensureStartWithLowerCase(propName.replaceAll("Property$", ""));
+        String propName = NamingUtility.ensureStartWithUpperCase(t.getElementName());
+        propName = FastBeanUtility.decapitalize(propName.replaceAll("Property$", ""));
         SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
       }
@@ -104,7 +105,7 @@ public class SqlBindCompletionProposalProcessor {
     for (IType superClass : baseTypeSuperHierarchy.getSuperClassStack(baseType, false)) {
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(superClass);
       for (IType innerType : TypeUtility.getInnerTypes(superClass, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
-        SqlBindProposal prop = new SqlBindProposal(namePrefix + NamingUtility.ensureStartWithLowerCase(innerType.getElementName()), prefix, context.getInvocationOffset(), m_image);
+        SqlBindProposal prop = new SqlBindProposal(namePrefix + FastBeanUtility.decapitalize(NamingUtility.ensureStartWithUpperCase(innerType.getElementName())), prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
         addInnerTypesInSuperClasses(innerType, TypeUtility.getSupertypeHierarchy(innerType), collector, prefix, prop.getDisplayString() + ".", context);
       }
