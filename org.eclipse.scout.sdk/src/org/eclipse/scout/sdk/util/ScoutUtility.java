@@ -88,8 +88,8 @@ public final class ScoutUtility {
   private static final ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<String>();
 
   private static final IMethodReturnValueParser[] METHOD_RETURN_VALUE_PARSERS = new IMethodReturnValueParser[]{
-      SimpleMethodReturnValueParser.INSTANCE,
-      AstMethodReturnValueParser.INSTANCE
+    SimpleMethodReturnValueParser.INSTANCE,
+    AstMethodReturnValueParser.INSTANCE
   };
 
   private ScoutUtility() {
@@ -499,7 +499,7 @@ public final class ScoutUtility {
     }
 
     try {
-      List<IType> allTypesWithSameSimpleName = TypeUtility.getAllTypes(declaringType.getCompilationUnit(), TypeFilters.getElementNameFilter(name));
+      List<IType> allTypesWithSameSimpleName = TypeUtility.getAllTypes(declaringType.getCompilationUnit(), TypeFilters.getElementNameFilter(name, false));
       if (allTypesWithSameSimpleName.size() > 0) {
         return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, Texts.get("Error_nameAlreadyUsed"));
       }

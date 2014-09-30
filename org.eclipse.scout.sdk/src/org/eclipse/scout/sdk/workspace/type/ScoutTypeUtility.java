@@ -334,7 +334,7 @@ public class ScoutTypeUtility extends TypeUtility {
       parseFormDataAnnotationReq(annotation, superType, hierarchy, replaceAnnotationPresent);
 
       if (replaceAnnotationPresent) {
-        if (!existsReplaceAnnotation(superType)) {
+        if (TypeUtility.exists(superType) && !existsReplaceAnnotation(superType)) {
           // super type is the original field that is going to be replaced by the given type
           // check whether the super type is embedded into a form field that is annotated by @FormData with SdkCommand.IGNORE.
           try {

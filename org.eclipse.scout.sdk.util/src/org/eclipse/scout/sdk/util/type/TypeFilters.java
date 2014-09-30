@@ -127,12 +127,36 @@ public class TypeFilters {
    * @return The newly created {@link ITypeFilter}
    */
   public static ITypeFilter getElementNameFilter(final String typeName) {
-    return new ITypeFilter() {
-      @Override
-      public boolean accept(IType type) {
-        return type.getElementName().equals(typeName);
-      }
-    };
+    return getElementNameFilter(typeName, true);
+  }
+
+  /**
+   * Creates a new {@link ITypeFilter} that only returns {@link IType}s where the simple name matches the given
+   * typeName.
+   *
+   * @param typeName
+   *          The simple name the types must have.
+   * @param caseSensitive
+   *          {@code true} if case-sensitive comparison should be performed, {@code false} otherwise.
+   * @return The newly created {@link ITypeFilter}
+   */
+  public static ITypeFilter getElementNameFilter(final String typeName, boolean caseSensitive) {
+    if (caseSensitive) {
+      return new ITypeFilter() {
+        @Override
+        public boolean accept(IType type) {
+          return typeName.equals(type.getElementName());
+        }
+      };
+    }
+    else {
+      return new ITypeFilter() {
+        @Override
+        public boolean accept(IType type) {
+          return typeName.equalsIgnoreCase(type.getElementName());
+        }
+      };
+    }
   }
 
   /**

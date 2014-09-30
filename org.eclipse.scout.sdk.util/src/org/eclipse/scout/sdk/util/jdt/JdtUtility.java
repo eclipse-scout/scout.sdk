@@ -180,6 +180,10 @@ public final class JdtUtility {
   }
 
   public static IAnnotation getAnnotation(IAnnotatable element, String fullyQualifiedAnnotation) {
+    if (element == null) {
+      return null;
+    }
+
     String simpleName = Signature.getSimpleName(fullyQualifiedAnnotation);
     String startSimple = '@' + simpleName;
     String startFq = '@' + fullyQualifiedAnnotation;

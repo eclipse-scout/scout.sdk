@@ -183,7 +183,7 @@ public final class MethodSourceBuilderFactory {
   }
 
   public static IMethodSourceBuilder createFieldGetterSourceBuilder(final String fieldSignature) {
-    String fieldSimpleName = Signature.getSignatureSimpleName(fieldSignature);
+    String fieldSimpleName = NamingUtility.ensureStartWithUpperCase(Signature.getSignatureSimpleName(fieldSignature));
     IMethodSourceBuilder getterBuilder = new MethodSourceBuilder("get" + fieldSimpleName);
     getterBuilder.setFlags(Flags.AccPublic);
     getterBuilder.setReturnTypeSignature(fieldSignature);

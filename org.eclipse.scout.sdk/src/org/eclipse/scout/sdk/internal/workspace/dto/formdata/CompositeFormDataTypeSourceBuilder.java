@@ -24,6 +24,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -113,8 +114,10 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           }
           fieldSourceBuilder.setFlags(fieldSourceBuilder.getFlags() | Flags.AccStatic);
           addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormDataPropertyKey(fieldSourceBuilder), fieldSourceBuilder);
-          // property getter for field
-          IMethodSourceBuilder getterBuilder = new MethodSourceBuilder("get" + formDataTypeName);
+
+          // getter for field
+          String methodName = NamingUtility.ensureStartWithUpperCase(formDataTypeName); // Scout RT requires the first char to be upper-case for a getter. See org.eclipse.scout.commons.beans.FastBeanUtility.BEAN_METHOD_PAT.
+          IMethodSourceBuilder getterBuilder = new MethodSourceBuilder("get" + methodName);
           getterBuilder.setFlags(Flags.AccPublic);
           getterBuilder.setReturnTypeSignature(Signature.createTypeSignature(formDataTypeName, false));
           getterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return getFieldByClass(" + formDataTypeName + ".class);"));

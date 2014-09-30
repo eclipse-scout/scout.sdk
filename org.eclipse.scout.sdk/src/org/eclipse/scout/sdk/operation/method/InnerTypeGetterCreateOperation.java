@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.operation.jdt.method.MethodNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -35,7 +36,7 @@ public class InnerTypeGetterCreateOperation extends MethodNewOperation {
   }
 
   public InnerTypeGetterCreateOperation(IType field, IType getterDeclaringType, boolean formatSource) throws JavaModelException {
-    super("get" + field.getElementName(), getterDeclaringType, formatSource);
+    super("get" + NamingUtility.ensureStartWithUpperCase(field.getElementName()), getterDeclaringType, formatSource);
     m_field = field;
     setFlags(Flags.AccPublic);
     setReturnTypeSignature(SignatureCache.createTypeSignature(m_field.getFullyQualifiedName()));
