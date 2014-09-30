@@ -810,9 +810,9 @@ public final class JaxWsSdkUtility {
       String segment = segments[i];
       String segmentLow = segment.toLowerCase();
       // exclude node segment
-      if ("server".equals(segmentLow) ||
-          "online".equals(segmentLow) ||
-          "offline".equals(segmentLow)) {
+      if ("server".equals(segmentLow)
+          || "online".equals(segmentLow)
+          || "offline".equals(segmentLow)) {
         continue;
       }
       projectSuffex = StringUtility.join(".", projectSuffex, segments[i]);

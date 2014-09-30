@@ -247,8 +247,8 @@ public class ConfigurationMethodSection {
         return false;
       }
       ConfigurationMethodEx other = (ConfigurationMethodEx) obj;
-      return m_category.getOrder() == other.m_category.getOrder() && m_order.equals(other.m_order) &&
-          m_configMethod.getMethodName().equals(other.m_configMethod.getMethodName());
+      return m_category.getOrder() == other.m_category.getOrder() && m_order.equals(other.m_order)
+          && m_configMethod.getMethodName().equals(other.m_configMethod.getMethodName());
     }
 
     @Override

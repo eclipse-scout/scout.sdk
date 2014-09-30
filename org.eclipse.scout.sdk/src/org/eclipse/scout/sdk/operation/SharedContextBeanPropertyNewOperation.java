@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  * public Long getCompanyNr() {
  *   return getSharedContextVariable(&quot;companyNr&quot;, Long.class);
  * }
- *
+ * 
  * public void setCompanyNr(Long newValue) {
  *   setSharedContextVariable(&quot;companyNr&quot;, Long.class, newValue);
  * }

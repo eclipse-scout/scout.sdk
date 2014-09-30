@@ -101,8 +101,8 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       public boolean equals(Object obj) {
         if (obj instanceof TextProviderService) {
           TextProviderService o = (TextProviderService) obj;
-          return textProvider.getFullyQualifiedName().equals(o.textProvider.getFullyQualifiedName()) &&
-              contributingBundleName.equals(o.contributingBundleName);
+          return textProvider.getFullyQualifiedName().equals(o.textProvider.getFullyQualifiedName())
+              && contributingBundleName.equals(o.contributingBundleName);
         }
         else {
           return false;

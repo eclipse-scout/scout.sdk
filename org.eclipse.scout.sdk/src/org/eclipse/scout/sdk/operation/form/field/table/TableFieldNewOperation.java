@@ -49,7 +49,6 @@ public class TableFieldNewOperation implements IOperation {
   private double m_orderNr;
 
   private IType m_createdField;
-  private IType m_createdTable;
 
   public TableFieldNewOperation(String typeName, IType declaringType) {
     this(typeName, declaringType, true);
@@ -124,10 +123,6 @@ public class TableFieldNewOperation implements IOperation {
 
   public IType getCreatedField() {
     return m_createdField;
-  }
-
-  public IType getCreatedTable() {
-    return m_createdTable;
   }
 
   public IType getDeclaringType() {

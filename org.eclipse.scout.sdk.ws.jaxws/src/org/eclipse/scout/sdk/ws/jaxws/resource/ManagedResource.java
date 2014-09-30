@@ -188,9 +188,9 @@ public class ManagedResource {
     Set<IResourceListener> listenersProcessed = new HashSet<IResourceListener>();
 
     for (P_ResourceListenerEntry entry : m_resourceListeners.toArray(new P_ResourceListenerEntry[m_resourceListeners.size()])) {
-      if (!listenersProcessed.contains(entry.getListener()) &&
-          (entry.getElement() == null || entry.getElement().equals(element)) &&
-          (entry.getEvent() == null || (entry.getEvent() & event) > 0)) {
+      if (!listenersProcessed.contains(entry.getListener())
+          && (entry.getElement() == null || entry.getElement().equals(element))
+          && (entry.getEvent() == null || (entry.getEvent() & event) > 0)) {
         try {
           entry.getListener().changed(element, event);
         }

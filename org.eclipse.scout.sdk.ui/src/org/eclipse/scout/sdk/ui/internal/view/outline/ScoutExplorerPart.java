@@ -223,8 +223,8 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
           }
           else if (page instanceof AbstractBundleNodeTablePage) {
             if (page.getScoutBundle() != null) {
-              if ((!page.getScoutBundle().isBinary() && !BundlePresentation.FLAT.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation()) && !BundlePresentation.FLAT_GROUPS.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) ||
-                  (page.getScoutBundle().isBinary() && BundlePresentation.HIERARCHICAL.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation()))) {
+              if ((!page.getScoutBundle().isBinary() && !BundlePresentation.FLAT.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation()) && !BundlePresentation.FLAT_GROUPS.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation()))
+                  || (page.getScoutBundle().isBinary() && BundlePresentation.HIERARCHICAL.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation()))) {
                 expandedPages.add(page);
               }
               if (page.getScoutBundle().isBinary()) {

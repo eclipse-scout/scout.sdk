@@ -473,7 +473,7 @@ public class ControlDecoration {
             // No need to listen any longer
             printRemoveListener(event.widget, "MOUSEMOVE"); //$NON-NLS-1$
             ((Control) event.widget)
-            .removeMouseMoveListener(mouseMoveListener);
+                .removeMouseMoveListener(mouseMoveListener);
             moveListeningTarget = null;
           }
         }
@@ -509,7 +509,7 @@ public class ControlDecoration {
             else if (target != moveListeningTarget) {
               printRemoveListener(moveListeningTarget, "MOUSEMOVE"); //$NON-NLS-1$
               moveListeningTarget
-              .removeMouseMoveListener(mouseMoveListener);
+                  .removeMouseMoveListener(mouseMoveListener);
               printAddListener(target, "MOUSEMOVE"); //$NON-NLS-1$
               target.addMouseMoveListener(mouseMoveListener);
               moveListeningTarget = target;
@@ -742,7 +742,7 @@ public class ControlDecoration {
     Rectangle rect = getDecorationRectangle(control.getShell());
     // Redraw this rectangle in all children
     control.getShell()
-    .redraw(rect.x, rect.y, rect.width, rect.height, true);
+        .redraw(rect.x, rect.y, rect.width, rect.height, true);
     control.getShell().update();
     if (hover != null && getDescriptionText() != null) {
       hover.setText(getDescriptionText(), getDecorationRectangle(control
@@ -904,7 +904,7 @@ public class ControlDecoration {
     listenerInstalls++;
     if (DEBUG) {
       System.out
-      .println("Added listener>>>" + listenerType + " to>>>" + widget); //$NON-NLS-1$//$NON-NLS-2$
+          .println("Added listener>>>" + listenerType + " to>>>" + widget); //$NON-NLS-1$//$NON-NLS-2$
     }
   }
 
@@ -915,7 +915,7 @@ public class ControlDecoration {
     listenerInstalls--;
     if (DEBUG) {
       System.out
-      .println("Removed listener>>>" + listenerType + " from>>>" + widget); //$NON-NLS-1$//$NON-NLS-2$
+          .println("Removed listener>>>" + listenerType + " from>>>" + widget); //$NON-NLS-1$//$NON-NLS-2$
     }
   }
 }

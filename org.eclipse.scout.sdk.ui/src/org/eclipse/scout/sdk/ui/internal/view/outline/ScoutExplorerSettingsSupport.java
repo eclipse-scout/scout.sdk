@@ -92,12 +92,12 @@ public final class ScoutExplorerSettingsSupport {
     preferenceStore.addPropertyChangeListener(new IPropertyChangeListener() {
       @Override
       public void propertyChange(PropertyChangeEvent event) {
-        if (PREF_BUNDLE_DISPLAY_STYLE_KEY.equals(event.getProperty()) ||
-            PREF_SHOW_FRAGMENTS_KEY.equals(event.getProperty()) ||
-            PREF_SHOW_BINARY_BUNDLES_KEY.equals(event.getProperty()) ||
-            PREF_HIDDEN_BUNDLES_TYPES.equals(event.getProperty()) ||
-            PREF_HIDDEN_WORKING_SETS.equals(event.getProperty()) ||
-            PREF_WORKING_SETS_ORDER.equals(event.getProperty())) {
+        if (PREF_BUNDLE_DISPLAY_STYLE_KEY.equals(event.getProperty())
+            || PREF_SHOW_FRAGMENTS_KEY.equals(event.getProperty())
+            || PREF_SHOW_BINARY_BUNDLES_KEY.equals(event.getProperty())
+            || PREF_HIDDEN_BUNDLES_TYPES.equals(event.getProperty())
+            || PREF_HIDDEN_WORKING_SETS.equals(event.getProperty())
+            || PREF_WORKING_SETS_ORDER.equals(event.getProperty())) {
           readFromStore();
         }
       }

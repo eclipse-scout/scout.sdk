@@ -49,10 +49,10 @@ public class ExportScoutProjectEntry implements Comparable<ExportScoutProjectEnt
     }
 
     ExportScoutProjectEntry o = (ExportScoutProjectEntry) obj;
-    return getId().equals(o.getId()) &&
-        getName().equals(o.getName()) &&
-        Integer.valueOf(getOrder()).equals(o.getOrder()) &&
-        getIcon().equals(o.getIcon());
+    return getId().equals(o.getId())
+        && getName().equals(o.getName())
+        && Integer.valueOf(getOrder()).equals(o.getOrder())
+        && getIcon().equals(o.getIcon());
   }
 
   public String getId() {

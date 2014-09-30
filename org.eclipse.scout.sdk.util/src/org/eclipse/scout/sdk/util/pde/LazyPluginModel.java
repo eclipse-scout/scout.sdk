@@ -82,9 +82,9 @@ public final class LazyPluginModel {
   }
 
   private boolean isInteresting() {
-    return getProject() != null && getProject().isOpen() &&
-        getManifestFile() != null && getManifestFile().exists() &&
-        getPluginXmlFile() != null && /* plugin.xml must not exist yet */
+    return getProject() != null && getProject().isOpen()
+        && getManifestFile() != null && getManifestFile().exists()
+        && getPluginXmlFile() != null && /* plugin.xml must not exist yet */
         getBuildPropertiesFile() != null /* build properties must not exist (e.g. in an imported binary project, see bug 415083) */;
   }
 

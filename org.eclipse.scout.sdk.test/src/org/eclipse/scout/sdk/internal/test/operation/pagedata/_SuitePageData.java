@@ -22,7 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  PageBeanDataTest.class
+    PageBeanDataTest.class
 /*suites*/
 
 })

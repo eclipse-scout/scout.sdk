@@ -16,7 +16,7 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  NlsSearchKeyReferencesTest.class
+    NlsSearchKeyReferencesTest.class
 })
 public class _SuiteNls {
 

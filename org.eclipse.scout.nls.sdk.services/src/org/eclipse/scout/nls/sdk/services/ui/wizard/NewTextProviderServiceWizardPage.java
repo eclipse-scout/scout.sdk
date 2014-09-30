@@ -324,8 +324,8 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
 
     if (m_existingServicesInPlugin != null) {
       for (NlsServiceType existing : m_existingServicesInPlugin) {
-        if (CompareUtility.equals(cleanFolder(existing.getTranslationsFolderName()), cleanFolder(getTranslationFolder())) &&
-            CompareUtility.equals(existing.getTranslationsPrefix(), getTranlationFileName())) {
+        if (CompareUtility.equals(cleanFolder(existing.getTranslationsFolderName()), cleanFolder(getTranslationFolder()))
+            && CompareUtility.equals(existing.getTranslationsPrefix(), getTranlationFileName())) {
           multiStatus.add(new Status(IStatus.ERROR, NlsSdkService.PLUGIN_ID, "A service for the given translations does already exist."));
           break;
         }

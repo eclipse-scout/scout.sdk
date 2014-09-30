@@ -120,8 +120,8 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
   protected void validateNextPage() {
     FormHandlerNewWizardPage2 nextPage = (FormHandlerNewWizardPage2) getWizard().getNextPage(this);
-    if (m_selectedTemplate == null || m_selectedTemplate.getId() == HandlerTemplate.ID_CUSTOM ||
-        m_selectedTemplate.getId() == HandlerTemplate.ID_CUSTOM) {
+    if (m_selectedTemplate == null || m_selectedTemplate.getId() == HandlerTemplate.ID_CUSTOM
+        || m_selectedTemplate.getId() == HandlerTemplate.ID_CUSTOM) {
       nextPage.setTypeName("");
     }
     else {

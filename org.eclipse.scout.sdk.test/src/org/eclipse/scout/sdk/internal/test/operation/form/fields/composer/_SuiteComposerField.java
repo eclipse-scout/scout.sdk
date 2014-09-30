@@ -16,8 +16,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  ComposerAttributeNewOperationTest.class,
-  ComposerEntityNewOperationTest.class
+    ComposerAttributeNewOperationTest.class,
+    ComposerEntityNewOperationTest.class
 })
 public class _SuiteComposerField {
 

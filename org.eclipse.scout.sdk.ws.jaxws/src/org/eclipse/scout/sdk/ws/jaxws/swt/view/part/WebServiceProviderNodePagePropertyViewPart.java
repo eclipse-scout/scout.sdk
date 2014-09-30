@@ -717,9 +717,9 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
   }
 
   private void validateRebuildStubPresenter() {
-    boolean valid = (getPage().getBuildJaxWsBean() != null &&
-        getPage().getSunJaxWsBean() != null &&
-        !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getPage().getMarkerGroupUUID(), IMarker.SEVERITY_ERROR));
+    boolean valid = (getPage().getBuildJaxWsBean() != null
+        && getPage().getSunJaxWsBean() != null
+        && !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getPage().getMarkerGroupUUID(), IMarker.SEVERITY_ERROR));
     m_rebuildStubPresenter.setEnabled(valid);
 
     if (valid) {

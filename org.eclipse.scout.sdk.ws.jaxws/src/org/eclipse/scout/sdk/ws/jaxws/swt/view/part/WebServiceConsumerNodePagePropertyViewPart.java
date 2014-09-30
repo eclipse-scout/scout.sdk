@@ -569,8 +569,8 @@ public class WebServiceConsumerNodePagePropertyViewPart extends JdtTypePropertyP
   }
 
   private void validateRebuildStubPresenter() {
-    boolean valid = (getPage().getBuildJaxWsBean() != null &&
-        !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getPage().getMarkerGroupUUID(), IMarker.SEVERITY_ERROR));
+    boolean valid = (getPage().getBuildJaxWsBean() != null
+        && !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getPage().getMarkerGroupUUID(), IMarker.SEVERITY_ERROR));
     m_rebuildStubPresenter.setEnabled(valid);
 
     if (valid) {

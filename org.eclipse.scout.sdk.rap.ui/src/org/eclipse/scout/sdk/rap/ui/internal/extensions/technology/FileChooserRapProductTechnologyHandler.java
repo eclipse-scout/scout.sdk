@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 public class FileChooserRapProductTechnologyHandler extends AbstractScoutTechnologyHandler {
 
   public static final String[] RAP_FILE_CHOOSER_PLUGINS = new String[]{"org.eclipse.scout.rt.ui.rap.incubator.filechooser",
-    "org.apache.commons.fileupload", "org.apache.commons.io", "org.eclipse.rap.addons.filedialog", "org.eclipse.rap.addons.fileupload"};
+      "org.apache.commons.fileupload", "org.apache.commons.io", "org.eclipse.rap.addons.filedialog", "org.eclipse.rap.addons.fileupload"};
 
   @Override
   public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {

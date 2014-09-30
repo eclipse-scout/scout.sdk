@@ -14,7 +14,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -61,8 +60,6 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
   private boolean m_createMainBox;
 
   private IType m_createdMainBox;
-  private IMethod m_createdNlsLabelMethod;
-  private IMethod m_createdMainBoxGetter;
 
   public FormNewOperation(String typeName, String packageName, IJavaProject clientProject) throws JavaModelException {
     super(typeName, packageName, clientProject);
@@ -84,8 +81,8 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
 
   @Override
   public void validate() {
-    if (StringUtility.hasText(getFormIdName()) && StringUtility.isNullOrEmpty(getFormIdSignature()) ||
-        StringUtility.isNullOrEmpty(getFormIdName()) && StringUtility.hasText(getFormIdSignature())) {
+    if (StringUtility.hasText(getFormIdName()) && StringUtility.isNullOrEmpty(getFormIdSignature())
+        || StringUtility.isNullOrEmpty(getFormIdName()) && StringUtility.hasText(getFormIdSignature())) {
       throw new IllegalArgumentException("Form id is not set properly. 'formIdName' and 'formIdSignature' must be set!");
     }
     super.validate();
@@ -222,14 +219,6 @@ public class FormNewOperation extends PrimaryTypeNewOperation {
 
   public IType getCreatedMainBox() {
     return m_createdMainBox;
-  }
-
-  public IMethod getCreatedNlsLabelMethod() {
-    return m_createdNlsLabelMethod;
-  }
-
-  public IMethod getCreatedMainBoxGetter() {
-    return m_createdMainBoxGetter;
   }
 
   public INlsEntry getNlsEntry() {

@@ -142,9 +142,9 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
         final IAnnotation annotation = a;
         String elementName = annotation.getElementName();
 
-        if (!IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName) &&
-            !Signature.getSimpleName(IRuntimeClasses.FormData).equals(elementName) && !Signature.getSimpleName(IRuntimeClasses.Order).equals(elementName) &&
-            !Signature.getSimpleName(IRuntimeClasses.PageData).equals(elementName)) {
+        if (!IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName)
+            && !Signature.getSimpleName(IRuntimeClasses.FormData).equals(elementName) && !Signature.getSimpleName(IRuntimeClasses.Order).equals(elementName)
+            && !Signature.getSimpleName(IRuntimeClasses.PageData).equals(elementName)) {
           if (!NamingUtility.isFullyQualifiedName(elementName)) {
             elementName = TypeUtility.getReferencedTypeFqn(declaringType, elementName, true);
           }
@@ -235,8 +235,8 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
         }
 
         if (desc.getReadMethod() != null || desc.getWriteMethod() != null) {
-          if (FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getReadMethod())) &&
-              FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getWriteMethod()))) {
+          if (FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getReadMethod()))
+              && FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getWriteMethod()))) {
             String beanName = NamingUtility.ensureValidParameterName(desc.getBeanName());
             String lowerCaseBeanName = NamingUtility.ensureStartWithLowerCase(beanName);
             final String upperCaseBeanName = NamingUtility.ensureStartWithUpperCase(beanName);

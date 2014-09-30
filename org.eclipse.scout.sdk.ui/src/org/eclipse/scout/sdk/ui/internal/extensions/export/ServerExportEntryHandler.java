@@ -91,7 +91,7 @@ public class ServerExportEntryHandler implements IExportScoutProjectEntryHandler
       wizard.addPage(page);
     }
 
-    page.setExcludePage((!selected && !wizard.getExportWizardPage().isNodesSelected(ClientExportEntryHandler.ID)) ||
-        !isClientAvailable(wizard));
+    page.setExcludePage((!selected && !wizard.getExportWizardPage().isNodesSelected(ClientExportEntryHandler.ID))
+        || !isClientAvailable(wizard));
   }
 }

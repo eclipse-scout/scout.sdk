@@ -22,8 +22,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  MethodNewOperationTest.class,
-  MethodTest.class
+    MethodNewOperationTest.class,
+    MethodTest.class
 })
 public class _SuiteMethodOperations {
 

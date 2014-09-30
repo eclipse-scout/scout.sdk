@@ -270,8 +270,7 @@ public class SmartDialog {
     m_shell.setVisible(false);
   }
 
-  private class P_SmartFieldTableModel implements IStructuredContentProvider,
-  ITableLabelProvider {
+  private class P_SmartFieldTableModel implements IStructuredContentProvider, ITableLabelProvider {
     private TreeSet<P_CompareableSmartItem> m_items = new TreeSet<P_CompareableSmartItem>();
 
     public void setItems(List<Object> items) {

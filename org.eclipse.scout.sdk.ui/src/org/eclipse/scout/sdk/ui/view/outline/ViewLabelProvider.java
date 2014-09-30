@@ -29,7 +29,6 @@ import org.eclipse.ui.PlatformUI;
 public class ViewLabelProvider extends LabelProvider implements IColorProvider, IFontProvider {
 
   private Composite m_parent;
-  private Font m_fontPlain;// always null
   private Font m_fontPlainItalic;
   private final IPageFilterable m_filterable;
 
@@ -89,7 +88,7 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
       IPage p = (IPage) element;
       IPageFilter filter = m_filterable.getPageFilter(p);
       if (filter == null || filter.isEmpty()) {
-        return m_fontPlain;
+        return null; // no special font
       }
       else {
         return m_fontPlainItalic;

@@ -30,17 +30,17 @@ import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDeltaMana
  */
 public abstract class AbstractElementChangedListener implements IElementChangedListener {
   public static final int CHANGED_FLAG_MASK =
-      IJavaElementDelta.F_CONTENT |
-          IJavaElementDelta.F_MODIFIERS |
-          IJavaElementDelta.F_MOVED_FROM |
-          IJavaElementDelta.F_MOVED_TO |
-          IJavaElementDelta.F_REORDER |
-          IJavaElementDelta.F_SUPER_TYPES |
-          IJavaElementDelta.F_OPENED |
-          IJavaElementDelta.F_CLOSED |
-          IJavaElementDelta.F_CATEGORIES |
-          IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED |
-          IJavaElementDelta.F_ANNOTATIONS;
+      IJavaElementDelta.F_CONTENT
+          | IJavaElementDelta.F_MODIFIERS
+          | IJavaElementDelta.F_MOVED_FROM
+          | IJavaElementDelta.F_MOVED_TO
+          | IJavaElementDelta.F_REORDER
+          | IJavaElementDelta.F_SUPER_TYPES
+          | IJavaElementDelta.F_OPENED
+          | IJavaElementDelta.F_CLOSED
+          | IJavaElementDelta.F_CATEGORIES
+          | IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED
+          | IJavaElementDelta.F_ANNOTATIONS;
 
   @Override
   public void elementChanged(ElementChangedEvent e) {

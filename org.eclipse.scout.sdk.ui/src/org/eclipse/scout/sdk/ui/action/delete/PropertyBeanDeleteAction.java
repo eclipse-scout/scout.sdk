@@ -88,8 +88,8 @@ public class PropertyBeanDeleteAction extends AbstractScoutHandler {
       else {
         HashSet<IMember> members = new HashSet<IMember>(Arrays.asList(selection));
         if (members.contains(getBeanDesc().getField())) {
-          if ((getBeanDesc().getReadMethod() != null && !members.contains(getBeanDesc().getReadMethod())) ||
-              (getBeanDesc().getWriteMethod() != null && !members.contains(getBeanDesc().getWriteMethod()))) {
+          if ((getBeanDesc().getReadMethod() != null && !members.contains(getBeanDesc().getReadMethod()))
+              || (getBeanDesc().getWriteMethod() != null && !members.contains(getBeanDesc().getWriteMethod()))) {
             canOk = false;
             m_confirmDialog.setMessage(Texts.get("FieldCanBeDeletedWithWriteMethod"), IMessageProvider.ERROR);
           }

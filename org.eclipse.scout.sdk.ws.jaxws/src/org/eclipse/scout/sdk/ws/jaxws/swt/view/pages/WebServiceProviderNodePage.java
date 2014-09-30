@@ -162,10 +162,10 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
     List<Class<? extends AbstractScoutHandler>> actions = new ArrayList<Class<? extends AbstractScoutHandler>>();
     actions.add(WsProviderDeleteAction.class);
     actions.add(RefreshAction.class);
-    if (getBuildJaxWsBean() != null &&
-        getSunJaxWsBean() != null &&
-        !MarkerUtility.containsMarker(m_bundle, MarkerType.StubFolder, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR) &&
-        !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)) {
+    if (getBuildJaxWsBean() != null
+        && getSunJaxWsBean() != null
+        && !MarkerUtility.containsMarker(m_bundle, MarkerType.StubFolder, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)
+        && !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)) {
       actions.add(StubRebuildAction.class);
     }
 
@@ -204,8 +204,8 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
     if ((dataMask & DATA_WSDL_FILE) > 0) {
       m_wsdlDefinition = loadWsdlDefinition();
     }
-    if ((dataMask & DATA_BINDING_FILE) > 0 ||
-        (dataMask & DATA_BUILD_JAXWS_ENTRY) > 0) {
+    if ((dataMask & DATA_BINDING_FILE) > 0
+        || (dataMask & DATA_BUILD_JAXWS_ENTRY) > 0) {
       m_bindingFileResources = loadBindingFiles();
     }
     if ((dataMask & DATA_STUB_FILES) > 0) {

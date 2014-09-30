@@ -64,28 +64,28 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
               // don't directly use the element (AssistSourceType) because it has invalid source ranges!
               IType declaringType = TypeUtility.getType(((IType) element).getFullyQualifiedName());
               ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
-              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
+              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
                 proposals.add(new CodeNewProposal(declaringType));
               }
               if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))) {
                 proposals.add(new ColumnNewProposal(declaringType));
               }
-              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeField)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm))) {
+              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeField))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm))) {
                 proposals.add(new FormFieldNewProposal(declaringType));
               }
-              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IMenu)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktop)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithNodes)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITree)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITreeNode)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IButton)) ||
-                  supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IImageField))) {
+              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IMenu))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktop))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithNodes))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITree))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITreeNode))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IButton))
+                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IImageField))) {
                 proposals.add(new MenuNewProposal(declaringType));
               }
             }

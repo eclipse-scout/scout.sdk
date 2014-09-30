@@ -45,8 +45,6 @@ public class PlannerFieldNewOperation implements IOperation {
   private String m_superTypeSignature;
   private IJavaElement m_sibling;
   private IType m_createdField;
-  private IType m_createdActivityMapType;
-  private IType m_createdPlannerTable;
 
   public PlannerFieldNewOperation(String typeName, IType declaringType) {
     this(typeName, declaringType, true);
@@ -85,7 +83,6 @@ public class PlannerFieldNewOperation implements IOperation {
       newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
       createPlannerTable(newOp.getSourceBuilder(), monitor, workingCopyManager);
       createActivityMap(newOp.getSourceBuilder(), monitor, workingCopyManager);
-
     }
     // getConfiguredLabel method
     if (getNlsEntry() != null) {
@@ -136,8 +133,8 @@ public class PlannerFieldNewOperation implements IOperation {
     activityMapBuilder.setFlags(Flags.AccPublic);
     String activityMapSuperTypeSig = RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IActivityMap, getDeclaringType().getJavaProject());
     String superTypeFqn = SignatureUtility.getFullyQualifiedName(activityMapSuperTypeSig);
-    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractActivityMap) ||
-        CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractExtensibleActivityMap)) {
+    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractActivityMap)
+        || CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractExtensibleActivityMap)) {
       // super type sig
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
       superTypeSigBuilder.append('<').append(Long.class.getName()).append(',');
@@ -159,14 +156,6 @@ public class PlannerFieldNewOperation implements IOperation {
 
   public IType getCreatedField() {
     return m_createdField;
-  }
-
-  public IType getCreatedPlannerTable() {
-    return m_createdPlannerTable;
-  }
-
-  public IType getCreatedActivityMapType() {
-    return m_createdActivityMapType;
   }
 
   public IType getDeclaringType() {

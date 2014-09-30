@@ -22,8 +22,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  TableColumnNewOperationTest.class,
-  TableFieldNewOperationTest.class
+    TableColumnNewOperationTest.class,
+    TableFieldNewOperationTest.class
 })
 public class _SuiteTable {
 

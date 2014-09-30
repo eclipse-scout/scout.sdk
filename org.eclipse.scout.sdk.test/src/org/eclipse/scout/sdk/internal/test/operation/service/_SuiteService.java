@@ -22,10 +22,10 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  CalendarServiceNewOperationTest.class,
-  LookupServiceNewOperationTest.class,
-  ProcessServiceNewOperationTest.class,
-  ServiceNewOperationTest.class,
+    CalendarServiceNewOperationTest.class,
+    LookupServiceNewOperationTest.class,
+    ProcessServiceNewOperationTest.class,
+    ServiceNewOperationTest.class,
 })
 public class _SuiteService {
 

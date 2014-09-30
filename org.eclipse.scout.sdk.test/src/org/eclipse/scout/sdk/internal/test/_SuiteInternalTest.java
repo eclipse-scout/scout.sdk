@@ -24,15 +24,15 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  _SuiteApiCompatibility.class,
-  _SuiteBugsBeforeOpensource.class,
-  _SuiteJdt.class,
-  _SuiteNls.class,
-  _SuiteOperation.class,
-  /*  _SuitePresenter.class,*/
-  _SuiteTypes.class,
-  _SuiteUtil.class,
-  _SuiteWorkspaceTest.class
+    _SuiteApiCompatibility.class,
+    _SuiteBugsBeforeOpensource.class,
+    _SuiteJdt.class,
+    _SuiteNls.class,
+    _SuiteOperation.class,
+    /*  _SuitePresenter.class,*/
+    _SuiteTypes.class,
+    _SuiteUtil.class,
+    _SuiteWorkspaceTest.class
 })
 public class _SuiteInternalTest {
 

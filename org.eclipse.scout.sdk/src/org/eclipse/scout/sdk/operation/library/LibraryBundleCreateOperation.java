@@ -89,9 +89,8 @@ public class LibraryBundleCreateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    IProject libraryProject = createProject(monitor, workingCopyManager);
-    processLibraryUserBundles(libraryProject);
-
+    m_createdProject = createProject(monitor, workingCopyManager);
+    processLibraryUserBundles(m_createdProject);
   }
 
   protected IProject createProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {

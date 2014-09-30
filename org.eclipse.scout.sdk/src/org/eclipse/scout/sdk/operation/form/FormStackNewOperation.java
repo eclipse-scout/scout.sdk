@@ -78,8 +78,6 @@ public class FormStackNewOperation extends FormNewOperation {
   private IType m_createdCreatePermission;
   private IType m_createdReadPermission;
   private IType m_createdUpdatePermission;
-  private IType m_createdNewHandler;
-  private IType m_createdModifyHandler;
 
   public FormStackNewOperation(String formName, String formPackageName, IJavaProject formProject) throws JavaModelException {
     super(formName, formPackageName, formProject);
@@ -530,20 +528,6 @@ public class FormStackNewOperation extends FormNewOperation {
    */
   public IType getCreatedUpdatePermission() {
     return m_createdUpdatePermission;
-  }
-
-  /**
-   * @return the outNewHandler
-   */
-  public IType getOutNewHandler() {
-    return m_createdNewHandler;
-  }
-
-  /**
-   * @return the outModifyHandler
-   */
-  public IType getOutModifyHandler() {
-    return m_createdModifyHandler;
   }
 
   public String getFormDataPackage() {

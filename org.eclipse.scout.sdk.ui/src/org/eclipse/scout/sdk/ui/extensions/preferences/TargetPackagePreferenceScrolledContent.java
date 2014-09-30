@@ -140,8 +140,8 @@ public class TargetPackagePreferenceScrolledContent implements IScoutProjectScro
       if (curText == null) {
         curText = "";
       }
-      boolean visible = CharOperation.match(searchPatternArray, curText.toCharArray(), false) ||
-          CharOperation.match(searchPatternArray, txt.getLabelText().toCharArray(), false);
+      boolean visible = CharOperation.match(searchPatternArray, curText.toCharArray(), false)
+          || CharOperation.match(searchPatternArray, txt.getLabelText().toCharArray(), false);
 
       txt.setVisible(visible);
       ((GridData) txt.getLayoutData()).exclude = !visible;

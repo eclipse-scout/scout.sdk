@@ -96,9 +96,9 @@ public class FontSpec {
       return false;
     }
     FontSpec fontSpec = (FontSpec) obj;
-    return CompareUtility.equals(fontSpec.getName(), getName()) &&
-        CompareUtility.equals(fontSpec.getStyle(), getStyle()) &&
-        CompareUtility.equals(fontSpec.getHeight(), getHeight());
+    return CompareUtility.equals(fontSpec.getName(), getName())
+        && CompareUtility.equals(fontSpec.getStyle(), getStyle())
+        && CompareUtility.equals(fontSpec.getHeight(), getHeight());
   }
 
   @Override

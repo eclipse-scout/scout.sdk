@@ -101,9 +101,9 @@ public class SessionFactoryTablePage extends AbstractPage {
     List<IType> types = new ArrayList<IType>();
     try {
       for (IType type : m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory))) {
-        if (TypeUtility.isOnClasspath(type, getScoutBundle().getJavaProject()) &&
-            !type.isInterface() && !Flags.isAbstract(type.getFlags()) &&
-            !Signature.getQualifier(type.getFullyQualifiedName()).contains("internal")) {
+        if (TypeUtility.isOnClasspath(type, getScoutBundle().getJavaProject())
+            && !type.isInterface() && !Flags.isAbstract(type.getFlags())
+            && !Signature.getQualifier(type.getFullyQualifiedName()).contains("internal")) {
           types.add(type);
         }
       }

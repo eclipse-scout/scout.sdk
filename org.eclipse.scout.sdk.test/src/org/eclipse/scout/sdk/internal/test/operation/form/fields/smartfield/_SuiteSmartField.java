@@ -22,8 +22,8 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  SmartFieldTest.class,
-  SmartFieldNewOperationTest.class
+    SmartFieldTest.class,
+    SmartFieldNewOperationTest.class
 })
 public class _SuiteSmartField {
 

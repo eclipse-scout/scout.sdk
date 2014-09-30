@@ -27,14 +27,14 @@ import org.eclipse.swt.widgets.Composite;
 public class PrimitiveTypePresenter extends AbstractTypeProposalPresenter {
 
   private static final IType[] PRIMITIVE_TYPES = new IType[]{
-    TypeUtility.getType(String.class.getName()),
-    TypeUtility.getType(Double.class.getName()),
-    TypeUtility.getType(Float.class.getName()),
-    TypeUtility.getType(Long.class.getName()),
-    TypeUtility.getType(Integer.class.getName()),
-    TypeUtility.getType(Short.class.getName()),
-    TypeUtility.getType(Date.class.getName()),
-    TypeUtility.getType(Byte.class.getName())};
+      TypeUtility.getType(String.class.getName()),
+      TypeUtility.getType(Double.class.getName()),
+      TypeUtility.getType(Float.class.getName()),
+      TypeUtility.getType(Long.class.getName()),
+      TypeUtility.getType(Integer.class.getName()),
+      TypeUtility.getType(Short.class.getName()),
+      TypeUtility.getType(Date.class.getName()),
+      TypeUtility.getType(Byte.class.getName())};
 
   public PrimitiveTypePresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);

@@ -193,8 +193,8 @@ public class SimpleNlsProject extends AbstractNlsProject {
   private class P_NlsClassPropertyChangeListener implements PropertyChangeListener, WeakEventListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
-      if (NlsType.PROP_TRANSLATION_FILE_PREFIX.equals(evt.getPropertyName()) ||
-          NlsType.PROP_TRANSLATION_FOLDER_NAME.equals(evt.getPropertyName())) {
+      if (NlsType.PROP_TRANSLATION_FILE_PREFIX.equals(evt.getPropertyName())
+          || NlsType.PROP_TRANSLATION_FOLDER_NAME.equals(evt.getPropertyName())) {
         refresh();
       }
       else if (NlsType.PROP_SUPER_TYPE.equals(evt.getPropertyName())) {

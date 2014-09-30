@@ -61,14 +61,14 @@ public class ProjectsTablePage extends AbstractPage {
   private final IPropertyChangeListener m_explorerConfigChangeListener = new IPropertyChangeListener() {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
-      if (ScoutExplorerSettingsSupport.PREF_BUNDLE_DISPLAY_STYLE_KEY.equals(event.getProperty()) ||
-          ScoutExplorerSettingsSupport.PREF_SHOW_FRAGMENTS_KEY.equals(event.getProperty()) ||
-          ScoutExplorerSettingsSupport.PREF_SHOW_BINARY_BUNDLES_KEY.equals(event.getProperty()) ||
-          ScoutExplorerSettingsSupport.PREF_HIDDEN_BUNDLES_TYPES.equals(event.getProperty())) {
+      if (ScoutExplorerSettingsSupport.PREF_BUNDLE_DISPLAY_STYLE_KEY.equals(event.getProperty())
+          || ScoutExplorerSettingsSupport.PREF_SHOW_FRAGMENTS_KEY.equals(event.getProperty())
+          || ScoutExplorerSettingsSupport.PREF_SHOW_BINARY_BUNDLES_KEY.equals(event.getProperty())
+          || ScoutExplorerSettingsSupport.PREF_HIDDEN_BUNDLES_TYPES.equals(event.getProperty())) {
         markStructureDirty();
       }
-      else if (ScoutExplorerSettingsSupport.PREF_HIDDEN_WORKING_SETS.equals(event.getProperty()) ||
-          ScoutExplorerSettingsSupport.PREF_WORKING_SETS_ORDER.equals(event.getProperty())) {
+      else if (ScoutExplorerSettingsSupport.PREF_HIDDEN_WORKING_SETS.equals(event.getProperty())
+          || ScoutExplorerSettingsSupport.PREF_WORKING_SETS_ORDER.equals(event.getProperty())) {
         if (ScoutExplorerSettingsSupport.BundlePresentation.WORKING_SET.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
           markStructureDirty();
         }

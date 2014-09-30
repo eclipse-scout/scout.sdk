@@ -47,9 +47,7 @@ public class SearchFormNewOperation extends FormNewOperation {
   private IType m_tablePage;
 
   // created types
-  private IType m_createdFormType;
   private IType m_createdFormDataType;
-  private IType m_createdSearchHandler;
 
   /**
    * @param typeName
@@ -155,16 +153,8 @@ public class SearchFormNewOperation extends FormNewOperation {
     return "New Search Form...";
   }
 
-  public IType getCreatedFormType() {
-    return m_createdFormType;
-  }
-
   public IType getCreatedFormDataType() {
     return m_createdFormDataType;
-  }
-
-  public IType getCreatedSearchHandler() {
-    return m_createdSearchHandler;
   }
 
   public IScoutBundle getSearchFormDataLocationBundle() {

@@ -47,8 +47,8 @@ public class MissingPortTypeCommand extends AbstractExecutableMarkerCommand {
     String portType = m_sunJaxWsBean.getImplementation();
     if (portType == null) {
       String name = m_sunJaxWsBean.getAlias();
-      if (!name.toLowerCase().endsWith("service") ||
-          !name.toLowerCase().endsWith("webservice")) {
+      if (!name.toLowerCase().endsWith("service")
+          || !name.toLowerCase().endsWith("webservice")) {
         name += "WebService";
       }
       m_fqnPortType = StringUtility.join(".", JaxWsSdkUtility.getRecommendedProviderImplPackageName(m_bundle), name);

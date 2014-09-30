@@ -34,9 +34,9 @@ public class SwtProductFileMacOsXOperation extends AbstractScoutProjectNewOperat
 
   @Override
   public boolean isRelevant() {
-    return Platform.OS_MACOSX.equals(Platform.getOS()) &&
-        Platform.ARCH_X86.equals(Platform.getOSArch()) &&
-        isNodeChecked(CreateUiSwtPluginOperation.BUNDLE_ID);
+    return Platform.OS_MACOSX.equals(Platform.getOS())
+        && Platform.ARCH_X86.equals(Platform.getOSArch())
+        && isNodeChecked(CreateUiSwtPluginOperation.BUNDLE_ID);
   }
 
   @Override

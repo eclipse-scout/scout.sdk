@@ -142,8 +142,8 @@ public final class MethodFilters {
                 mParam = mParam.substring(mArrCount);
                 mParam = Signature.getTypeErasure(mParam);
                 cParam = Signature.getTypeErasure(cParam);
-                if (Signature.getTypeSignatureKind(cParam) == Signature.TYPE_VARIABLE_SIGNATURE ||
-                    Signature.getTypeSignatureKind(mParam) == Signature.TYPE_VARIABLE_SIGNATURE) {
+                if (Signature.getTypeSignatureKind(cParam) == Signature.TYPE_VARIABLE_SIGNATURE
+                    || Signature.getTypeSignatureKind(mParam) == Signature.TYPE_VARIABLE_SIGNATURE) {
                   continue;
                 }
                 else if (!Signature.getSignatureSimpleName(mParam).equals(Signature.getSignatureSimpleName(cParam))) {

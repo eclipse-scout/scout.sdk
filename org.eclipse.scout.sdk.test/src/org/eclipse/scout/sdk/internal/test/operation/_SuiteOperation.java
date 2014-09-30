@@ -29,22 +29,22 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  CodeNewOperationTest.class,
-  CodeTypeNewOperationTest.class,
-  OutlineNewOperationTest.class,
-  OutlineToolbuttonNewOperationTest.class,
-  PageNewOperationTest.class,
-  ToolbuttonNewOperationTest.class,
-  WizardNewOperationTest.class,
-  WizardStepNewOperationTest.class,
-  /*suites*/
-  _SuiteForm.class,
-  _SuiteFormData.class,
-  _SuiteJdtOperations.class,
-  _SuiteLookupCall.class,
-  _SuitePageData.class,
-  _SuiteProject.class,
-  _SuiteService.class
+    CodeNewOperationTest.class,
+    CodeTypeNewOperationTest.class,
+    OutlineNewOperationTest.class,
+    OutlineToolbuttonNewOperationTest.class,
+    PageNewOperationTest.class,
+    ToolbuttonNewOperationTest.class,
+    WizardNewOperationTest.class,
+    WizardStepNewOperationTest.class,
+    /*suites*/
+    _SuiteForm.class,
+    _SuiteFormData.class,
+    _SuiteJdtOperations.class,
+    _SuiteLookupCall.class,
+    _SuitePageData.class,
+    _SuiteProject.class,
+    _SuiteService.class
 })
 public class _SuiteOperation {
 

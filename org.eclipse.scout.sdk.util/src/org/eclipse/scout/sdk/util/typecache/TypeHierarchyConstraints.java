@@ -100,8 +100,8 @@ public class TypeHierarchyConstraints {
    * @see Flags
    */
   public boolean modifiersAccepted(int modifiers) {
-    return ((modifiers & m_setFlags) == m_setFlags || m_setFlags == 0) &&
-        ((modifiers & m_notSetFlags) == 0 || m_notSetFlags == 0);
+    return ((modifiers & m_setFlags) == m_setFlags || m_setFlags == 0)
+        && ((modifiers & m_notSetFlags) == 0 || m_notSetFlags == 0);
   }
 
   /**

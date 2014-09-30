@@ -61,11 +61,11 @@ public abstract class AbstractTypeChangedListener implements IResourceChangeList
           if (delta.getKind() == IResourceDelta.ADDED || (delta.getKind() == IResourceDelta.CHANGED && (delta.getFlags() & IResourceDelta.CONTENT) != 0)) { // it is crucial to exclude marker update events
             IResource resource = delta.getResource();
 
-            if (resource.getType() == IResource.FILE &&
-                resource.getFileExtension() != null &&
-                "java".equalsIgnoreCase(resource.getFileExtension()) &&
-                resource.getName().endsWith(m_type.getElementName() + ".java") &&
-                resource.getProject() == m_type.getJavaProject().getProject()) {
+            if (resource.getType() == IResource.FILE
+                && resource.getFileExtension() != null
+                && "java".equalsIgnoreCase(resource.getFileExtension())
+                && resource.getName().endsWith(m_type.getElementName() + ".java")
+                && resource.getProject() == m_type.getJavaProject().getProject()) {
 
               ICompilationUnit cu = JavaCore.createCompilationUnitFrom((IFile) resource);
               if (cu == null) {

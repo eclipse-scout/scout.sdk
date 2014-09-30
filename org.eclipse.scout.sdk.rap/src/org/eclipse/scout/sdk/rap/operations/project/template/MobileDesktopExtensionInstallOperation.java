@@ -52,8 +52,8 @@ public class MobileDesktopExtensionInstallOperation extends AbstractScoutProject
 
   @Override
   public boolean isRelevant() {
-    return isNodeChecked(CreateUiRapPluginOperation.BUNDLE_ID) &&
-        (OutlineTemplateOperation.TEMPLATE_ID.equals(getTemplateName()) || SingleFormTemplateOperation.TEMPLATE_ID.equals(getTemplateName()));
+    return isNodeChecked(CreateUiRapPluginOperation.BUNDLE_ID)
+        && (OutlineTemplateOperation.TEMPLATE_ID.equals(getTemplateName()) || SingleFormTemplateOperation.TEMPLATE_ID.equals(getTemplateName()));
   }
 
   @Override

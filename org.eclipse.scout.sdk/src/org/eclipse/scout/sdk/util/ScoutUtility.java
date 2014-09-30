@@ -88,8 +88,8 @@ public final class ScoutUtility {
   private static final ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<String>();
 
   private static final IMethodReturnValueParser[] METHOD_RETURN_VALUE_PARSERS = new IMethodReturnValueParser[]{
-    SimpleMethodReturnValueParser.INSTANCE,
-    AstMethodReturnValueParser.INSTANCE
+      SimpleMethodReturnValueParser.INSTANCE,
+      AstMethodReturnValueParser.INSTANCE
   };
 
   private ScoutUtility() {

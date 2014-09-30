@@ -22,7 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  AnnotationTest.class})
+    AnnotationTest.class})
 public class _SuiteAnnotationOperations {
 
 }

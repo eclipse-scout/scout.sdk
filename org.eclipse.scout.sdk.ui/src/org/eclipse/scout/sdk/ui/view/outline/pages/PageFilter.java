@@ -95,8 +95,8 @@ public class PageFilter implements IPageFilter {
   public boolean equals(Object obj) {
     if (obj instanceof PageFilter) {
       PageFilter other = (PageFilter) obj;
-      return this.m_regExFilter == other.m_regExFilter &&
-          CompareUtility.equals(this.m_filterExpression, other.m_filterExpression);
+      return this.m_regExFilter == other.m_regExFilter
+          && CompareUtility.equals(this.m_filterExpression, other.m_filterExpression);
     }
     return false;
   }

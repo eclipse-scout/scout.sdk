@@ -179,8 +179,8 @@ public class SuperTypePreferenceScrolledContent implements IScoutProjectScrolled
       Label lbl = m_allLabels.get(i);
       DefaultSuperClassModel model = m_entries.get(i);
 
-      boolean visible = CharOperation.match(searchPatternArray, model.interfaceFqn.toCharArray(), false) ||
-          CharOperation.match(searchPatternArray, model.label.toCharArray(), false);
+      boolean visible = CharOperation.match(searchPatternArray, model.interfaceFqn.toCharArray(), false)
+          || CharOperation.match(searchPatternArray, model.label.toCharArray(), false);
       if (!visible) {
         for (String s : model.getProposals()) {
           boolean matches = CharOperation.match(searchPatternArray, s.toCharArray(), false);

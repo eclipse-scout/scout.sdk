@@ -145,8 +145,8 @@ public class JaxWsServletRegistrationOperation implements IOperation {
         XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(candidateBundle);
         buildJaxWsResource = ResourceFactory.getBuildJaxWsResource(candidateBundle);
 
-        if (JaxWsSdkUtility.exists(buildJaxWsResource.getFile()) &&
-            JaxWsSdkUtility.exists(sunJaxWsResource.getFile())) {
+        if (JaxWsSdkUtility.exists(buildJaxWsResource.getFile())
+            && JaxWsSdkUtility.exists(sunJaxWsResource.getFile())) {
           String bundleNameOfRegistration = ServletRegistrationUtility.getBuildJaxServletRegistrationBundleName(candidateBundle);
           if (bundleNameOfRegistration != null && bundleNameOfRegistration.equals(m_registrationBundle.getSymbolicName())) {
             Document sunJaxWsXmlDocument = sunJaxWsResource.loadXml();

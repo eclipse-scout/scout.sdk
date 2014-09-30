@@ -25,16 +25,16 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  FieldNewOperationTest.class,
-  GenericTypeNewOperationTest.class,
-  PackageFragmentNewOperationTest.class,
-  SourceFormatOperationTest.class,
-  TypeNewOperationTest.class,
+    FieldNewOperationTest.class,
+    GenericTypeNewOperationTest.class,
+    PackageFragmentNewOperationTest.class,
+    SourceFormatOperationTest.class,
+    TypeNewOperationTest.class,
 
-  // suites
-  _SuiteAnnotationOperations.class,
-  _SuiteIcuOperations.class,
-  _SuiteMethodOperations.class
+    // suites
+    _SuiteAnnotationOperations.class,
+    _SuiteIcuOperations.class,
+    _SuiteMethodOperations.class
 })
 public class _SuiteJdtOperations {
 

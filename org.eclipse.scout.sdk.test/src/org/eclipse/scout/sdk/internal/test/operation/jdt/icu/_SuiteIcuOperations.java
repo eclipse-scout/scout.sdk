@@ -22,7 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  CompilationUnitNewOperationTest.class})
+    CompilationUnitNewOperationTest.class})
 public class _SuiteIcuOperations {
 
 }

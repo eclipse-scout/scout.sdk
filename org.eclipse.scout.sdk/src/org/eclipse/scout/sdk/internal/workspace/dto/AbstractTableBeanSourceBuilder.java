@@ -336,8 +336,8 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
   }
 
   protected String getTableRowDataSuperClassSignature(IType table) throws CoreException {
-    if (!SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTablePageData).equals(getSuperTypeSignature()) &&
-        !SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableFieldBeanData).equals(getSuperTypeSignature())) {
+    if (!SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTablePageData).equals(getSuperTypeSignature())
+        && !SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableFieldBeanData).equals(getSuperTypeSignature())) {
       // use the row data in the super page data.
       IType superType = TypeUtility.getTypeBySignature(getSuperTypeSignature());
       IType[] rowDatas = superType.getTypes();

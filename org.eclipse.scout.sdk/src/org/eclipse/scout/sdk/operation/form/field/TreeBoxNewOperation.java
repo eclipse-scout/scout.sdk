@@ -46,7 +46,6 @@ public class TreeBoxNewOperation implements IOperation {
   private IJavaElement m_sibling;
 
   private IType m_createdField;
-  private IType m_createdTree;
 
   public TreeBoxNewOperation(String typeName, IType declaringType) {
     this(typeName, declaringType, true);
@@ -108,10 +107,6 @@ public class TreeBoxNewOperation implements IOperation {
 
   public IType getCreatedField() {
     return m_createdField;
-  }
-
-  public IType getCreatedTree() {
-    return m_createdTree;
   }
 
   public IType getDeclaringType() {

@@ -536,7 +536,7 @@ public final class JdtUtility {
 
   public static boolean isBatik17OrNewer() {
     BundleDescription batikUtil = JdtUtility.getNewestBundleInActiveTargetPlatform("org.apache.batik.util");
-    return batikUtil != null &&
-        ((batikUtil.getVersion().getMajor() == 1 && batikUtil.getVersion().getMinor() >= 7) || batikUtil.getVersion().getMajor() > 1);
+    return batikUtil != null
+        && ((batikUtil.getVersion().getMajor() == 1 && batikUtil.getVersion().getMinor() >= 7) || batikUtil.getVersion().getMajor() > 1);
   }
 }

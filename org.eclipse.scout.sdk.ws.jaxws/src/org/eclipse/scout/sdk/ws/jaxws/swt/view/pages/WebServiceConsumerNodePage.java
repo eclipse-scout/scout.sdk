@@ -142,9 +142,9 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
       list.add(c);
     }
 
-    if (getBuildJaxWsBean() != null &&
-        !MarkerUtility.containsMarker(m_bundle, MarkerType.StubFolder, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR) &&
-        !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)) {
+    if (getBuildJaxWsBean() != null
+        && !MarkerUtility.containsMarker(m_bundle, MarkerType.StubFolder, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)
+        && !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)) {
       list.add(StubRebuildAction.class);
     }
     list.add(RefreshAction.class);
@@ -396,8 +396,8 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
 
     @Override
     public void changed(String element, int event) {
-      if (event == IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED ||
-          event == IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED) {
+      if (event == IResourceListener.EVENT_BUILDJAXWS_PROPERTIES_CHANGED
+          || event == IResourceListener.EVENT_SUNJAXWS_WSDL_CHANGED) {
         reloadPage(DATA_BUILD_JAXWS_ENTRY | DATA_WSDL_FILE);
       }
       else {

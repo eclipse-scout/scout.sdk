@@ -16,8 +16,8 @@ import org.junit.runners.Suite.SuiteClasses;
 
 @RunWith(Suite.class)
 @SuiteClasses({
-  CalendarFieldNewOperationTest.class,
-  CalendarItemProviderNewOperationTest.class
+    CalendarFieldNewOperationTest.class,
+    CalendarItemProviderNewOperationTest.class
 })
 public class _SuiteCalendarField {
 

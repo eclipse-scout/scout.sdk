@@ -73,9 +73,9 @@ public class NlsEntry implements INlsEntry {
 
     try {
       m_lock.readLock().lock();
-      return CompareUtility.equals(m_key, other.m_key) &&
-          CompareUtility.equals(m_translations, other.m_translations) &&
-          CompareUtility.equals(getType(), other.getType());
+      return CompareUtility.equals(m_key, other.m_key)
+          && CompareUtility.equals(m_translations, other.m_translations)
+          && CompareUtility.equals(getType(), other.getType());
     }
     finally {
       m_lock.readLock().unlock();
