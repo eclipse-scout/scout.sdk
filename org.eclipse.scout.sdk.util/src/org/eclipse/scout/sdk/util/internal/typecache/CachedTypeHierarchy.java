@@ -52,7 +52,7 @@ public final class CachedTypeHierarchy extends AbstractCachedTypeHierarchy {
         revalidateImpl();
       }
       catch (JavaModelException e1) {
-        SdkUtilActivator.logError(msg + getBaseType().getFullyQualifiedName(), e);
+        SdkUtilActivator.logError(msg + getBaseType().getFullyQualifiedName(), e1);
       }
     }
   }
