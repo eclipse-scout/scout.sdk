@@ -10,31 +10,33 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.job;
 
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jobs.AbstractWorkspaceBlockingJob;
+import org.eclipse.scout.sdk.jobs.OptionalWorkspaceBlockingRule;
 import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Cursor;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 
-public class LoadInitialOutlineJob extends AbstractWorkspaceBlockingJob {
+public class LoadInitialOutlineJob extends Job {
   private ScoutExplorerPart m_view;
 
   public LoadInitialOutlineJob(ScoutExplorerPart view) {
     super(Texts.get("LoadingScoutExplorer") + "...");
     m_view = view;
+    setRule(new OptionalWorkspaceBlockingRule(false));
   }
 
   @Override
-  protected void run(final IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  protected IStatus run(final IProgressMonitor monitor) {
     Control c = m_view.getTreeViewer().getControl();
     if (c.isDisposed()) {
-      return;
+      return Status.OK_STATUS;
     }
     //
     Display display = c.getDisplay();
@@ -72,6 +74,7 @@ public class LoadInitialOutlineJob extends AbstractWorkspaceBlockingJob {
         }
       });
     }
+    return Status.OK_STATUS;
   }
 
   /**

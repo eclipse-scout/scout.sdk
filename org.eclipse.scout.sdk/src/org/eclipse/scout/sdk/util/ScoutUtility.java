@@ -88,8 +88,8 @@ public final class ScoutUtility {
   private static final ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<String>();
 
   private static final IMethodReturnValueParser[] METHOD_RETURN_VALUE_PARSERS = new IMethodReturnValueParser[]{
-      SimpleMethodReturnValueParser.INSTANCE,
-      AstMethodReturnValueParser.INSTANCE
+    SimpleMethodReturnValueParser.INSTANCE,
+    AstMethodReturnValueParser.INSTANCE
   };
 
   private ScoutUtility() {
@@ -296,7 +296,7 @@ public final class ScoutUtility {
 
   public static Set<String> getEntities(IScoutBundle p) throws JavaModelException {
     Set<String> ret = new TreeSet<String>();
-    Set<IScoutBundle> roots = p.getParentBundles(ScoutBundleFilters.getRootBundlesFilter(), true);
+    Set<? extends IScoutBundle> roots = p.getParentBundles(ScoutBundleFilters.getRootBundlesFilter(), true);
     IScoutBundleFilter workspaceClientSharedServerFilter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(),
         ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
     for (IScoutBundle root : roots) {

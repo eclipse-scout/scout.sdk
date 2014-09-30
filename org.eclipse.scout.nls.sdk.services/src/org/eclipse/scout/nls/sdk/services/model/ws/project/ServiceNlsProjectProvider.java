@@ -324,7 +324,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return root;
   }
 
-  private static Set<String> getProjectNames(Set<IScoutBundle> scoutBundles) {
+  private static Set<String> getProjectNames(Set<? extends IScoutBundle> scoutBundles) {
     if (scoutBundles == null || scoutBundles.size() < 1) {
       return null;
     }
@@ -336,12 +336,12 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return names;
   }
 
-  private static Set<IScoutBundle> getScoutBundlesForType(IType type) {
+  private static Set<? extends IScoutBundle> getScoutBundlesForType(IType type) {
     IScoutBundle b = ScoutTypeUtility.getScoutBundle(type.getJavaProject());
     return getParentSharedBundlesFor(b);
   }
 
-  private static Set<IScoutBundle> getParentSharedBundlesFor(IScoutBundle b) {
+  private static Set<? extends IScoutBundle> getParentSharedBundlesFor(IScoutBundle b) {
     if (b != null) {
       return b.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
     }
@@ -406,7 +406,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return null;
   }
 
-  private INlsProject getAllProjects(boolean returnDocServices, Set<IScoutBundle> wsBundles) {
+  private INlsProject getAllProjects(boolean returnDocServices, Set<? extends IScoutBundle> wsBundles) {
     try {
       return getNlsProjectTree(returnDocServices, getProjectNames(wsBundles));
     }

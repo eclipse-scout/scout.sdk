@@ -153,14 +153,14 @@ public class Docx4jDesktopTechnologyHandler extends AbstractScoutTechnologyHandl
     }
   }
 
-  private Set<IScoutBundle> getClientBundlesBelow(IScoutBundle startBundle) {
+  private Set<? extends IScoutBundle> getClientBundlesBelow(IScoutBundle startBundle) {
     IScoutBundleFilter filter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT),
         ScoutBundleFilters.getWorkspaceBundlesFilter());
     return startBundle.getChildBundles(filter, true);
   }
 
   private IType getDesktopToolsMenu(IScoutBundle startBundle) {
-    Set<IScoutBundle> clients = getClientBundlesBelow(startBundle);
+    Set<? extends IScoutBundle> clients = getClientBundlesBelow(startBundle);
     IType iDesktop = TypeUtility.getType(IRuntimeClasses.IDesktop);
     if (TypeUtility.exists(iDesktop)) {
       ICachedTypeHierarchy desktopHierarchy = TypeUtility.getPrimaryTypeHierarchy(iDesktop);

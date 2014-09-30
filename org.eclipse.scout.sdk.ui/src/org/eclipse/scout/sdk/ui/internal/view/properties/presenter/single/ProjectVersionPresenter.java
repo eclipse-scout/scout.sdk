@@ -53,7 +53,7 @@ public class ProjectVersionPresenter extends AbstractPresenter {
   }
 
   private Map<IProject, PluginModelHelper> getModels() {
-    Set<IScoutBundle> scoutBundles = m_project.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
+    Set<? extends IScoutBundle> scoutBundles = m_project.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
     Map<IProject, PluginModelHelper> bundles = new HashMap<IProject, PluginModelHelper>(scoutBundles.size());
     for (IScoutBundle sb : scoutBundles) {
       bundles.put(sb.getProject(), new PluginModelHelper(sb.getProject()));

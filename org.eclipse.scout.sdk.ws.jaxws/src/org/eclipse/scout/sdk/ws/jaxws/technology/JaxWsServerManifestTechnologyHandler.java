@@ -53,7 +53,7 @@ public class JaxWsServerManifestTechnologyHandler extends AbstractScoutTechnolog
     contributeManifestFiles(getServerBundlesBelow(project), list);
   }
 
-  private Set<IScoutBundle> getServerBundlesBelow(IScoutBundle start) {
+  private Set<? extends IScoutBundle> getServerBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
   }
 }

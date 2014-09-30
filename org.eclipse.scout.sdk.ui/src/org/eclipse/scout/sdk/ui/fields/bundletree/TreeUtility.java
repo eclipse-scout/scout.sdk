@@ -123,7 +123,7 @@ public final class TreeUtility {
   }
 
   public static ITreeNode createBundleTreeNode(ITreeNode parent, IScoutBundle b, ITreeNodeFilter filter) {
-    ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(b.getType());
+    ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(b);
     TreeNode childNode = null;
     if (uiExt != null) {
       childNode = new TreeNode(b.getType(), b.getSymbolicName(), b);
@@ -176,7 +176,7 @@ public final class TreeUtility {
     return node;
   }
 
-  private static boolean isProductFileContainingBundles(IFile productFile, Set<IScoutBundle> filter) {
+  private static boolean isProductFileContainingBundles(IFile productFile, Set<? extends IScoutBundle> filter) {
     try {
       ProductFileModelHelper pfmh = new ProductFileModelHelper(productFile);
       for (IScoutBundle b : filter) {
@@ -240,7 +240,7 @@ public final class TreeUtility {
         visibleFilter = NodeFilters.getAcceptAll();
       }
 
-      Set<IScoutBundle> containingScoutBundles = project.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true);
+      Set<? extends IScoutBundle> containingScoutBundles = project.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true);
 
       List<IResource> productFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileFilter());
       ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
@@ -253,7 +253,7 @@ public final class TreeUtility {
           IProject fileProject = file.getProject();
           IScoutBundle bundle = ScoutTypeUtility.getScoutBundle(fileProject);
           ITreeNode bundleNode = null;
-          if (bundle == null || ScoutBundleExtensionPoint.getExtension(bundle.getType()) == null) {
+          if (bundle == null || ScoutBundleExtensionPoint.getExtension(bundle) == null) {
             // the product is in any other project or the scout project has no UI presentation
             bundleNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(fileProject));
             if (bundleNode == null) {

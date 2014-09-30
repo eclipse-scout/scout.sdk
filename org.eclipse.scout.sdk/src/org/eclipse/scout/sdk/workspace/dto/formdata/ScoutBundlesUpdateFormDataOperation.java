@@ -51,7 +51,7 @@ public class ScoutBundlesUpdateFormDataOperation implements IOperation {
   }
 
   private void processProject(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    Set<IScoutBundle> childClientBundles = getProject().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true);
+    Set<? extends IScoutBundle> childClientBundles = getProject().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true);
     for (IScoutBundle client : childClientBundles) {
       ClientBundleUpdateFormDataOperation updateOp = new ClientBundleUpdateFormDataOperation(client);
       updateOp.validate();

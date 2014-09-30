@@ -76,7 +76,7 @@ public final class ServletRegistrationUtility {
     return null;
   }
 
-  public static Set<IScoutBundle> getJaxWsBundlesOnClasspath(IScoutBundle bundle) {
+  public static Set<? extends IScoutBundle> getJaxWsBundlesOnClasspath(IScoutBundle bundle) {
     // get bundles on classpath with JAX-WS dependency installed
     if (bundle == null) {
       return CollectionUtility.hashSet();

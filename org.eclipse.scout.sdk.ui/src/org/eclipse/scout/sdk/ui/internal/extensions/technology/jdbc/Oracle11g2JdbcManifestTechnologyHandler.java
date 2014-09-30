@@ -54,7 +54,7 @@ public class Oracle11g2JdbcManifestTechnologyHandler extends AbstractScoutTechno
     contributeManifestFiles(getServerBundlesBelow(project), list);
   }
 
-  private Set<IScoutBundle> getServerBundlesBelow(IScoutBundle start) {
+  private Set<? extends IScoutBundle> getServerBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
   }
 }

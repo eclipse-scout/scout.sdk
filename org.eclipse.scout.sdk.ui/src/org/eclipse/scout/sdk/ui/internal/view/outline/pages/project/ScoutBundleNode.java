@@ -45,7 +45,7 @@ public class ScoutBundleNode {
     if (!ScoutExplorerSettingsSupport.BundlePresentation.FLAT.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
       for (IScoutBundle child : bundle.getDirectChildBundles()) {
         if (ScoutExplorerSettingsBundleFilter.get().accept(child)) {
-          ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(child.getType());
+          ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(child);
           if (childExt != null) {
             m_childNodes.add(new ScoutBundleNode(child, childExt));
           }

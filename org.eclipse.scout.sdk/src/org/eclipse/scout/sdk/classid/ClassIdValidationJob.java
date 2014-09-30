@@ -84,7 +84,7 @@ public final class ClassIdValidationJob extends JobEx {
     m_formFieldDataBaseType = formFieldDataBaseType;
   }
 
-  private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(IProgressMonitor monitor) {
+  private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(final IProgressMonitor monitor) {
     final ICachedTypeHierarchy formDataHierarchy = TypeUtility.getTypeHierarchy(m_formDataBaseType);
     final ICachedTypeHierarchy formFieldDataHierarchy = TypeUtility.getTypeHierarchy(m_formFieldDataBaseType);
 
@@ -94,28 +94,31 @@ public final class ClassIdValidationJob extends JobEx {
       e.search(SearchPattern.createPattern(m_classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH),
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
           SearchEngine.createWorkspaceScope(), new SearchRequestor() {
-        @Override
-        public void acceptSearchMatch(SearchMatch match) throws CoreException {
-          Object owner = match.getElement();
-          if (owner instanceof IType) {
-            IType ownerType = (IType) owner;
-            if (TypeUtility.exists(ownerType)) {
-              // do not check for annotation duplicates within DTOs.
-              IType toplevelType = ScoutTypeUtility.getToplevelType(ownerType);
-              if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType) && !formDataHierarchy.contains(toplevelType) && !formFieldDataHierarchy.contains(toplevelType)) {
-                IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
-                if (element == null) {
-                  // e.g. when the annotation is fully qualified. try reading from owner
-                  element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
-                }
-                if (element instanceof IAnnotation && TypeUtility.exists(element)) {
-                  result.add((IAnnotation) element);
+            @Override
+            public void acceptSearchMatch(SearchMatch match) throws CoreException {
+              if (monitor.isCanceled()) {
+                return;
+              }
+              Object owner = match.getElement();
+              if (owner instanceof IType) {
+                IType ownerType = (IType) owner;
+                if (TypeUtility.exists(ownerType)) {
+                  // do not check for annotation duplicates within DTOs.
+                  IType toplevelType = ScoutTypeUtility.getToplevelType(ownerType);
+                  if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType) && !formDataHierarchy.contains(toplevelType) && !formFieldDataHierarchy.contains(toplevelType)) {
+                    IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
+                    if (element == null) {
+                      // e.g. when the annotation is fully qualified. try reading from owner
+                      element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
+                    }
+                    if (element instanceof IAnnotation && TypeUtility.exists(element)) {
+                      result.add((IAnnotation) element);
+                    }
+                  }
                 }
               }
             }
-          }
-        }
-      }, monitor);
+          }, monitor);
     }
     catch (OperationCanceledException oce) {
       //nop
@@ -290,7 +293,10 @@ public final class ClassIdValidationJob extends JobEx {
         catch (IllegalStateException e) {
           // can happen e.g. when the preference nodes are changed: "java.lang.IllegalStateException: Preference node "org.eclipse.jdt.core" has been removed."
           // in that case we just ignore the event and check back later.
-          ScoutSdk.logInfo("Could not schedule class id validation. ", e);
+          ScoutSdk.logInfo("Could not schedule class id validation.", e);
+        }
+        catch (Exception e) {
+          ScoutSdk.logError("Error while preparing to search for duplicate @ClassIds.", e);
         }
         return Status.OK_STATUS;
       }

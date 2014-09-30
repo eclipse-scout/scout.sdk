@@ -10,11 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.extensions.bundle;
 
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -22,9 +23,12 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 
 /**
@@ -118,19 +122,60 @@ public final class ScoutBundleExtensionPoint {
     return allExtensions;
   }
 
-  public static ScoutBundleUiExtension[] getExtensions() {
-    Collection<ScoutBundleUiExtension> all = getAllExtensions().values();
-    ScoutBundleUiExtension[] array = all.toArray(new ScoutBundleUiExtension[all.size()]);
-    Arrays.sort(array, new Comparator<ScoutBundleUiExtension>() {
+  /**
+   * @return A {@link List} with all {@link ScoutBundleUiExtension}s registered ordered according to the order number of
+   *         the extensions (most specific first).
+   */
+  public static List<ScoutBundleUiExtension> getExtensions() {
+    List<ScoutBundleUiExtension> ret = CollectionUtility.arrayList(getAllExtensions().values());
+    Collections.sort(ret, new Comparator<ScoutBundleUiExtension>() {
       @Override
       public int compare(ScoutBundleUiExtension o1, ScoutBundleUiExtension o2) {
         return o1.getOrderNumber() - o2.getOrderNumber();
       }
     });
-    return array;
+    return ret;
   }
 
-  public static ScoutBundleUiExtension getExtension(String type) {
-    return getAllExtensions().get(type);
+  /**
+   * @param bundleType
+   *          The type of UI extension to return.
+   * @return The {@link ScoutBundleUiExtension} that is linked to the given bundle type.
+   * @see IScoutBundle#getType()
+   */
+  public static ScoutBundleUiExtension getExtension(String bundleType) {
+    return getAllExtensions().get(bundleType);
+  }
+
+  /**
+   * Gets the {@link ScoutBundleUiExtension} that belongs to the given {@link IScoutBundle}. This may be the UI
+   * extension that exactly belongs to the type of the {@link IScoutBundle} if it exists. Otherwise the most specific UI
+   * extension that is fulfilled by the given {@link IScoutBundle} is returned or null if no UI extension exists for the
+   * given bundle.
+   *
+   * @param bundle
+   *          The {@link IScoutBundle} for which to return UI extension.
+   * @return The {@link ScoutBundleUiExtension} that represents the given bundle the best.
+   */
+  public static ScoutBundleUiExtension getExtension(IScoutBundle bundle) {
+    // try direct first
+    ScoutBundleUiExtension result = getExtension(bundle.getType());
+    if (result != null) {
+      return result;
+    }
+
+    Set<String> dependencySymbolicNames = bundle.getAllDependencies().keySet();
+    for (String bundleType : RuntimeBundles.getTypes()) {
+      result = getAllExtensions().get(bundleType);
+      if (result != null) {
+        String bundleSymbolicName = RuntimeBundles.getBundleSymbolicName(bundleType);
+        if (dependencySymbolicNames.contains(bundleSymbolicName)) {
+          // it is also of this type which as a UI representation
+          return result;
+        }
+      }
+    }
+
+    return null;
   }
 }

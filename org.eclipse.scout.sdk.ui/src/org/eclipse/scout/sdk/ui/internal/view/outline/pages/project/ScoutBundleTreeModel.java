@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -42,14 +43,14 @@ public class ScoutBundleTreeModel {
 
   private ScoutBundleNodeGroup createProjects(IScoutBundle bundle, String curType) {
     if (curType.equals(bundle.getType()) && ScoutExplorerSettingsBundleFilter.get().accept(bundle)) {
-      ScoutBundleUiExtension extension = ScoutBundleExtensionPoint.getExtension(bundle.getType());
+      ScoutBundleUiExtension extension = ScoutBundleExtensionPoint.getExtension(bundle);
       if (extension != null) {
         ScoutBundleNodeGroup sbg = new ScoutBundleNodeGroup(new ScoutBundleNode(bundle, extension));
         for (IScoutBundle child : bundle.getDirectChildBundles()) {
           if (ScoutExplorerSettingsBundleFilter.get().accept(child)) {
             ScoutBundleNodeGroup childProject = createProjects(child, curType);
             if (childProject == null) {
-              ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(child.getType());
+              ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(child);
               if (childExt != null) {
                 sbg.addChildBundle(new ScoutBundleNode(child, childExt));
               }
@@ -83,13 +84,13 @@ public class ScoutBundleTreeModel {
 
   private Set<ScoutBundleNodeGroup> buildProjectGraph() {
     Set<ScoutBundleNodeGroup> scoutProjects = new TreeSet<ScoutBundleNodeGroup>();
-    String[] types = RuntimeBundles.getTypes();
+    List<String> types = RuntimeBundles.getTypes();
 
-    for (int i = types.length - 1; i >= 0; i--) {
+    for (int i = types.size() - 1; i >= 0; i--) {
       // create projects recursively
       for (IScoutBundle root : ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(
           ScoutBundleFilters.getFilteredRootBundlesFilter(ScoutExplorerSettingsBundleFilter.get()), ScoutBundleComparators.getSymbolicNameAscComparator())) {
-        ScoutBundleNodeGroup sbg = createProjects(root, types[i]);
+        ScoutBundleNodeGroup sbg = createProjects(root, types.get(i));
         if (sbg != null) {
           scoutProjects.add(sbg);
         }

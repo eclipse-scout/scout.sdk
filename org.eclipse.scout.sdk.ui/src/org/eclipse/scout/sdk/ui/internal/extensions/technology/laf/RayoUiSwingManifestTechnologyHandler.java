@@ -51,7 +51,7 @@ public class RayoUiSwingManifestTechnologyHandler extends AbstractScoutTechnolog
     contributeManifestFiles(getSwingBundlesBelow(project), list);
   }
 
-  private Set<IScoutBundle> getSwingBundlesBelow(IScoutBundle start) {
+  private Set<? extends IScoutBundle> getSwingBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
   }
 }

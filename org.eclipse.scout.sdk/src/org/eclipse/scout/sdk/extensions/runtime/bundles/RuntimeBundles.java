@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.extensions.runtime.bundles;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,6 +30,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
@@ -195,15 +195,11 @@ public final class RuntimeBundles {
    *         <code>org.eclipse.scout.sdk.runtimeBundles</code> extension point. The predefined types are available in
    *         the {@link IScoutBundle}.TYPE* constants.
    */
-  public static String getBundleType(ScoutBundle bundle) {
+  public static String getBundleType(IScoutBundle bundle) {
     if (bundle == null) {
       return null;
     }
-    Set<IPluginModelBase> allDependencies = bundle.getAllDependencies();
-    List<String> symbolicNames = new ArrayList<String>(allDependencies.size());
-    for (IPluginModelBase dependency : allDependencies) {
-      symbolicNames.add(dependency.getBundleDescription().getSymbolicName());
-    }
+    Set<String> symbolicNames = bundle.getAllDependencies().keySet();
     return getBundleType(symbolicNames);
   }
 
@@ -236,9 +232,9 @@ public final class RuntimeBundles {
   /**
    * @return Gets all bundle types registered.
    */
-  public static String[] getTypes() {
+  public static List<String> getTypes() {
     ensureCached();
-    return bundleToTypeMap.values().toArray(new String[bundleToTypeMap.size()]);
+    return CollectionUtility.arrayList(bundleToTypeMap.values());
   }
 
   /**

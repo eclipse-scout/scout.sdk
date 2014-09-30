@@ -219,7 +219,7 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard implements INew
         if (formDataNode != null) {
           ITreeNode oldFomDataParent = formDataNode.getParent();
           IScoutBundle formBundle = (IScoutBundle) dndEvent.node.getParent().getData();
-          Set<IScoutBundle> sharedBundles = formBundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
+          Set<? extends IScoutBundle> sharedBundles = formBundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
           for (IScoutBundle formDataBundle : sharedBundles) {
             ITreeNode sharedNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByData(formDataBundle));
             if (sharedNode != null) {

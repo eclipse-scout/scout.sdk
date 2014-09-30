@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace;
 
+import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.resources.IProject;
@@ -20,6 +21,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
@@ -91,7 +93,7 @@ public interface IScoutBundle extends IAdaptable {
    * @see <a
    *      href="http://en.wikipedia.org/wiki/Breadth-first_search">http://en.wikipedia.org/wiki/Breadth-first_search</a>
    */
-  Set<IScoutBundle> getParentBundles(IScoutBundleFilter filter, boolean includeThis);
+  Set<? extends IScoutBundle> getParentBundles(IScoutBundleFilter filter, boolean includeThis);
 
   /**
    * Performs a breadth first (aka level order) traversal going up the tree visiting all parents (=dependencies) and
@@ -182,7 +184,7 @@ public interface IScoutBundle extends IAdaptable {
    * @see <a
    *      href="http://en.wikipedia.org/wiki/Breadth-first_search">http://en.wikipedia.org/wiki/Breadth-first_search</a>
    */
-  Set<IScoutBundle> getChildBundles(IScoutBundleFilter filter, boolean includeThis);
+  Set<? extends IScoutBundle> getChildBundles(IScoutBundleFilter filter, boolean includeThis);
 
   /**
    * Performs a breadth first (aka level order) traversal going down the tree visiting all children (=dependents) and
@@ -389,5 +391,20 @@ public interface IScoutBundle extends IAdaptable {
    *      href="http://en.wikipedia.org/wiki/Breadth-first_search">http://en.wikipedia.org/wiki/Breadth-first_search</a>
    */
   void visit(IScoutBundleGraphVisitor visitor, boolean includeThis, boolean up);
+
+  /**
+   * Gets a {@link Map} of all dependencies of this bundle.<br>
+   * The key represents the symbolic name of the dependency, the value the corresponding {@link IPluginModelBase}.<br>
+   * <br>
+   * <b>Note:</b><br>
+   * Because of performance reasons some commonly used dependencies may not be part of the resulting {@link Map} even
+   * though the dependency may be present at runtime (e.g. <code>org.eclipse.core.runtime</code>). See the concrete
+   * {@link IScoutBundle} implementation for details and a list of excluded bundles.
+   *
+   * @since 4.1.0 M2
+   * @return A {@link Map} of all dependencies of this bundle.
+   * @see IPluginModelBase
+   */
+  Map<String, IPluginModelBase> getAllDependencies();
 
 }

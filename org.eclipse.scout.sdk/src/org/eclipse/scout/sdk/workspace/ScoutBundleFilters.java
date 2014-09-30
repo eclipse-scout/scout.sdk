@@ -27,7 +27,7 @@ public final class ScoutBundleFilters {
   private static final IScoutBundleFilter ROOT_BUNDLES = new IScoutBundleFilter() {
     @Override
     public boolean accept(IScoutBundle bundle) {
-      return bundle.getDirectParentBundles().size() == 0;
+      return bundle.getDirectParentBundles().isEmpty();
     }
   };
 

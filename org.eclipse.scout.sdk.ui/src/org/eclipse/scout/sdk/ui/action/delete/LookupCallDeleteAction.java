@@ -119,7 +119,7 @@ public class LookupCallDeleteAction extends AbstractScoutHandler {
     if (m_lookupServiceInterface != null && m_lookupService == null) {
       String serviceName = getLookupCall().getElementName().replaceAll("^(.*)" + SdkProperties.SUFFIX_LOOKUP_CALL + "$", "$1" + SdkProperties.SUFFIX_LOOKUP_SERVICE);
       IScoutBundle sharedBundle = ScoutTypeUtility.getScoutBundle(getLookupCall());
-      Set<IScoutBundle> visibleServers = sharedBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false);
+      Set<? extends IScoutBundle> visibleServers = sharedBundle.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false);
       ITypeFilter serviceFilter = TypeFilters.getMultiTypeFilterAnd(ScoutTypeFilters.getInScoutBundles(visibleServers), TypeFilters.getClassFilter());
       for (IType candidate : serviceHierarchy.getAllSubtypes(iService, serviceFilter, null)) {
         if (candidate.getElementName().equals(serviceName)) {

@@ -88,14 +88,14 @@ public class ScoutProjectIcons implements IIconProvider {
   }
 
   private List<String> buildBaseUrls() {
-    Set<IScoutBundle> childBundles = m_bundle.getChildBundles(new IScoutBundleFilter() {
+    Set<? extends IScoutBundle> childBundles = m_bundle.getChildBundles(new IScoutBundleFilter() {
       @Override
       public boolean accept(IScoutBundle bundle) {
         return isInterestingBundleType(bundle.getType());
       }
     }, true);
-    String[] types = RuntimeBundles.getTypes();
-    ArrayList<String> bundles = new ArrayList<String>(childBundles.size() + types.length);
+    List<String> types = RuntimeBundles.getTypes();
+    ArrayList<String> bundles = new ArrayList<String>(childBundles.size() + types.size());
 
     // Project bundles
     for (IScoutBundle parentBundle : childBundles) {
@@ -132,7 +132,7 @@ public class ScoutProjectIcons implements IIconProvider {
       iconsHierarchy.addHierarchyListener(m_listener);
     }
 
-    Set<IScoutBundle> parentSharedBundles = m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
+    Set<? extends IScoutBundle> parentSharedBundles = m_bundle.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
     for (IScoutBundle parentShared : parentSharedBundles) {
       for (IType iconType : iconsHierarchy.getAllSubtypes(abstractIcons, ScoutTypeFilters.getInScoutBundles(parentShared))) {
         if (TypeUtility.exists(iconType)) {

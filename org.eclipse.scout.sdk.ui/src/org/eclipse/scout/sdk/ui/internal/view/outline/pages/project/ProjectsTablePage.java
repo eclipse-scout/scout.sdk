@@ -173,7 +173,7 @@ public class ProjectsTablePage extends AbstractPage {
 
   public static void createBundlePage(IPage parentPage, IScoutBundle b) {
     if (b != null) {
-      ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(b.getType());
+      ScoutBundleUiExtension childExt = ScoutBundleExtensionPoint.getExtension(b);
       if (childExt != null) {
         ScoutBundleNode rootNode = new ScoutBundleNode(b, childExt);
         rootNode.createBundlePage(parentPage);

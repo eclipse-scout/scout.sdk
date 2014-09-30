@@ -76,7 +76,7 @@ public class ClassIdNewOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
       monitor.beginTask("Search for classes...", 10);
-      Set<IScoutBundle> allBundlesToProcess = m_bundle.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
+      Set<? extends IScoutBundle> allBundlesToProcess = m_bundle.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
       HashSet<String> bundleSymbolicNames = new HashSet<String>(allBundlesToProcess.size());
       for (IScoutBundle b : allBundlesToProcess) {
         bundleSymbolicNames.add(b.getSymbolicName());

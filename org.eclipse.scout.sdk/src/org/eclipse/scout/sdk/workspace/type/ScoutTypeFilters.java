@@ -42,7 +42,7 @@ public class ScoutTypeFilters extends TypeFilters {
    *          The scout bundles in which the types must be.
    * @return the newly created filter.
    */
-  public static ITypeFilter getInScoutBundles(final Collection<IScoutBundle> bundles) {
+  public static ITypeFilter getInScoutBundles(final Collection<? extends IScoutBundle> bundles) {
     return new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
@@ -61,7 +61,7 @@ public class ScoutTypeFilters extends TypeFilters {
    * @see TypeFilters#isClass(IType)
    * @see TypeFilters#getClassFilter()
    */
-  public static ITypeFilter getClassesInScoutBundles(final Collection<IScoutBundle> bundles) {
+  public static ITypeFilter getClassesInScoutBundles(final Collection<? extends IScoutBundle> bundles) {
     return new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
@@ -89,7 +89,7 @@ public class ScoutTypeFilters extends TypeFilters {
     };
   }
 
-  private static boolean isInScoutBundles(IType type, Collection<IScoutBundle> bundles) {
+  private static boolean isInScoutBundles(IType type, Collection<? extends IScoutBundle> bundles) {
     if (bundles != null) {
       for (IScoutBundle b : bundles) {
         if (b.contains(type)) {

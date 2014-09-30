@@ -33,7 +33,7 @@ public class ScoutBundleLableProvider extends SearchRangeStyledLabelProvider {
   @Override
   public Image getImage(Object element) {
     IScoutBundle bundle = (IScoutBundle) element;
-    ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(bundle.getType());
+    ScoutBundleUiExtension uiExt = ScoutBundleExtensionPoint.getExtension(bundle);
     if (uiExt != null) {
       return ScoutSdkUi.getDefault().getImageRegistry().get(uiExt.getIcon());
     }

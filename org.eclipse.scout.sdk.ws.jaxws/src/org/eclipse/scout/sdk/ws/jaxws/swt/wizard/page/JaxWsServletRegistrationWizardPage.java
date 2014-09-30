@@ -70,7 +70,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
   private StyledTextField m_urlPatternField;
 
   private IScoutBundle m_bundle;
-  private Set<IScoutBundle> m_candidateBundles;
+  private Set<? extends IScoutBundle> m_candidateBundles;
   private Map<IScoutBundle, String> m_servletRegistrationAliasMap;
 
   private boolean m_urlPatternVisible;
@@ -199,7 +199,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
     Registration registration = ServletRegistrationUtility.getServletRegistration(m_bundle);
     if (registration == null || StringUtility.isNullOrEmpty(registration.getAlias())) {
       Registration[] candidateRegistrations = ServletRegistrationUtility.getJaxWsServletRegistrationsOnClasspath(m_bundle);
-      Set<IScoutBundle> candidateBundles = ServletRegistrationUtility.getJaxWsBundlesOnClasspath(m_bundle);
+      Set<? extends IScoutBundle> candidateBundles = ServletRegistrationUtility.getJaxWsBundlesOnClasspath(m_bundle);
       if (candidateRegistrations.length > 0) {
         Registration candidateRegistration = candidateRegistrations[0];
         setRegistrationBundle(candidateRegistration.getBundle());

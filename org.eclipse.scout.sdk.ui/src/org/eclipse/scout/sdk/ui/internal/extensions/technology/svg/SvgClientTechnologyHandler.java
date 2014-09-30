@@ -87,7 +87,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
 
   @Override
   public TriState getSelection(IScoutBundle project) {
-    Set<IScoutBundle> clientBundlesBelow = getClientBundlesBelow(project);
+    Set<? extends IScoutBundle> clientBundlesBelow = getClientBundlesBelow(project);
     TriState t1 = getSelectionManifests(clientBundlesBelow, ScoutProjectAddOperation.CLIENT_SVG_BUNDLE_NAME);
     TriState t2 = getSelectionManifestsImportPackage(clientBundlesBelow, ScoutProjectAddOperation.W3C_DOM_SVG_PACKAGE);
     if (t1.equals(t2)) {
@@ -103,7 +103,7 @@ public class SvgClientTechnologyHandler extends AbstractScoutTechnologyHandler {
     contributeManifestFiles(getClientBundlesBelow(project), list);
   }
 
-  private Set<IScoutBundle> getClientBundlesBelow(IScoutBundle start) {
+  private Set<? extends IScoutBundle> getClientBundlesBelow(IScoutBundle start) {
     return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), true);
   }
 }

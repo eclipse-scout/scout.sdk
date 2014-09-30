@@ -155,7 +155,7 @@ public class BundleNodeGroupTablePage extends AbstractPage {
   protected Set<IType> resolveServices() {
     IType iService = TypeUtility.getType(IRuntimeClasses.IService);
     ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);
-    Set<IScoutBundle> serverBundles = getScoutBundle().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
+    Set<? extends IScoutBundle> serverBundles = getScoutBundle().getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), true);
     return serviceHierarchy.getAllSubtypes(iService, ScoutTypeFilters.getClassesInScoutBundles(serverBundles));
   }
 

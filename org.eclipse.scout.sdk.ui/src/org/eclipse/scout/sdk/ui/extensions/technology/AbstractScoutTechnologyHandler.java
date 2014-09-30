@@ -113,7 +113,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     }
   }
 
-  protected void contributeManifestFiles(Set<IScoutBundle> bundles, List<IScoutTechnologyResource> list) {
+  protected void contributeManifestFiles(Set<? extends IScoutBundle> bundles, List<IScoutTechnologyResource> list) {
     for (IScoutBundle bundle : bundles) {
       contributeManifestFile(bundle, list);
     }
@@ -128,7 +128,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     }
   }
 
-  protected TriState getSelectionManifestsImportPackage(Set<IScoutBundle> projects, String... importPackages) {
+  protected TriState getSelectionManifestsImportPackage(Set<? extends IScoutBundle> projects, String... importPackages) {
     if (projects == null || projects.size() == 0) {
       return null;
     }
@@ -162,7 +162,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
     return ret;
   }
 
-  protected TriState getSelectionManifests(Set<IScoutBundle> projects, String... pluginIds) {
+  protected TriState getSelectionManifests(Set<? extends IScoutBundle> projects, String... pluginIds) {
     if (projects == null || projects.size() == 0) {
       return TriState.FALSE;
     }
