@@ -16,8 +16,8 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.dom.CompilationUnit;
-import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDelta;
-import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDeltaManager;
+import org.eclipse.scout.sdk.util.internal.typecache.JavaResourceChangedEmitter;
+import org.eclipse.scout.sdk.util.jdt.finegrained.FineGrainedJavaElementDeltaManager;
 
 /**
  * WARNING: JDT is not correctly reporting changes in ITypes and IMethods
@@ -29,18 +29,6 @@ import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDeltaMana
  *       grained levels
  */
 public abstract class AbstractElementChangedListener implements IElementChangedListener {
-  public static final int CHANGED_FLAG_MASK =
-      IJavaElementDelta.F_CONTENT
-          | IJavaElementDelta.F_MODIFIERS
-          | IJavaElementDelta.F_MOVED_FROM
-          | IJavaElementDelta.F_MOVED_TO
-          | IJavaElementDelta.F_REORDER
-          | IJavaElementDelta.F_SUPER_TYPES
-          | IJavaElementDelta.F_OPENED
-          | IJavaElementDelta.F_CLOSED
-          | IJavaElementDelta.F_CATEGORIES
-          | IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED
-          | IJavaElementDelta.F_ANNOTATIONS;
 
   @Override
   public void elementChanged(ElementChangedEvent e) {
@@ -78,14 +66,14 @@ public abstract class AbstractElementChangedListener implements IElementChangedL
               return false;
             }
           }
-          if ((flags & CHANGED_FLAG_MASK) != 0) {
+          if ((flags & JavaResourceChangedEmitter.CHANGED_FLAG_MASK) != 0) {
             // workaround: try to find out what really changed
             if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
-              for (FineGrainedJavaElementDelta a : FineGrainedJavaElementDeltaManager.getInstance().getDelta(delta)) {
-                if (!visit(kind, flags, a.getElement(), ast)) {
+              for (IJavaElement a : FineGrainedJavaElementDeltaManager.getInstance().getDelta(delta)) {
+                if (!visit(kind, flags, a, ast)) {
                   return false;
                 }
-                if (!visitModify(flags, a.getElement(), ast)) {
+                if (!visitModify(flags, a, ast)) {
                   return false;
                 }
               }

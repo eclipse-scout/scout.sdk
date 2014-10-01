@@ -8,9 +8,10 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.util.jdt.finegraned;
+package org.eclipse.scout.sdk.util.jdt.finegrained;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -20,6 +21,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
@@ -33,9 +35,9 @@ class FineGrainedAstAnalyzer {
     m_icu = (ICompilationUnit) delta.getElement();
   }
 
-  public FineGrainedJavaElementDelta[] calculateDeltas(String oldContent, String newContent) {
+  public Set<IJavaElement> calculateDeltas(String oldContent, String newContent) {
     if (CompareUtility.equals(oldContent, newContent)) {
-      return new FineGrainedJavaElementDelta[0];
+      return CollectionUtility.hashSet();
     }
     CompilationUnit oldAst = null;
     if (oldAst == null) {
@@ -56,8 +58,8 @@ class FineGrainedAstAnalyzer {
     return calculateDeltas(oldAst, newAst);
   }
 
-  public FineGrainedJavaElementDelta[] calculateDeltas(CompilationUnit oldAst, CompilationUnit newAst) {
-    final HashSet<FineGrainedJavaElementDelta> set = new HashSet<FineGrainedJavaElementDelta>();
+  public Set<IJavaElement> calculateDeltas(CompilationUnit oldAst, CompilationUnit newAst) {
+    final HashSet<IJavaElement> set = new HashSet<IJavaElement>();
     AbstractFineGrainedAstMatcher matcher = new AbstractFineGrainedAstMatcher() {
       @Override
       protected boolean processDelta(boolean match, ASTNode node, Object other) {
@@ -65,7 +67,7 @@ class FineGrainedAstAnalyzer {
           try {
             IJavaElement e = m_icu.getElementAt(node.getStartPosition());
             if (e != null) {
-              set.add(new FineGrainedJavaElementDelta(e));
+              set.add(e);
             }
           }
           catch (JavaModelException e1) {
@@ -76,7 +78,7 @@ class FineGrainedAstAnalyzer {
       }
     };
     newAst.subtreeMatch(matcher, oldAst);
-    return set.toArray(new FineGrainedJavaElementDelta[set.size()]);
+    return set;
   }
 
 }

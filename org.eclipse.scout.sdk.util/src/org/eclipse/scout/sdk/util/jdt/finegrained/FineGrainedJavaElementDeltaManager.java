@@ -8,18 +8,21 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.util.jdt.finegraned;
+package org.eclipse.scout.sdk.util.jdt.finegrained;
 
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jdt.core.BufferChangedEvent;
 import org.eclipse.jdt.core.IBufferChangedListener;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 
@@ -34,13 +37,13 @@ public final class FineGrainedJavaElementDeltaManager {
   }
 
   private final Object m_cacheLock;
-  private final WeakHashMap<IJavaElementDelta, FineGrainedJavaElementDelta[]> m_deltaCache;
+  private final WeakHashMap<IJavaElementDelta, Set<IJavaElement>> m_deltaCache;
   private final Map<String/* path */, String/* source */> m_sourceCache;
   private final IBufferChangedListener m_bufferListener;
 
   private FineGrainedJavaElementDeltaManager() {
     m_cacheLock = new Object();
-    m_deltaCache = new WeakHashMap<IJavaElementDelta, FineGrainedJavaElementDelta[]>();
+    m_deltaCache = new WeakHashMap<IJavaElementDelta, Set<IJavaElement>>();
     m_sourceCache = new HashMap<String, String>();
     m_bufferListener = new IBufferChangedListener() {
       @Override
@@ -58,8 +61,8 @@ public final class FineGrainedJavaElementDeltaManager {
     };
   }
 
-  public FineGrainedJavaElementDelta[] getDelta(IJavaElementDelta delta) {
-    FineGrainedJavaElementDelta[] astDeltas;
+  public Set<IJavaElement> getDelta(IJavaElementDelta delta) {
+    Set<IJavaElement> astDeltas;
     synchronized (m_cacheLock) {
       astDeltas = m_deltaCache.get(delta);
       if (astDeltas == null) {
@@ -85,12 +88,11 @@ public final class FineGrainedJavaElementDeltaManager {
             icu.getBuffer().removeBufferChangedListener(m_bufferListener);
             icu.getBuffer().addBufferChangedListener(m_bufferListener);
           }
-          //
           astDeltas = new FineGrainedAstAnalyzer(delta).calculateDeltas(oldContent, newContent);
         }
         catch (Exception e) {
           SdkUtilActivator.logWarning(e);
-          astDeltas = new FineGrainedJavaElementDelta[0];
+          astDeltas = CollectionUtility.hashSet();
         }
         m_deltaCache.put(delta, astDeltas);
       }

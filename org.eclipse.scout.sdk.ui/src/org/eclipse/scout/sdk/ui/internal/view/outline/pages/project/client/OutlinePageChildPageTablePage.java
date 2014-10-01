@@ -27,6 +27,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -35,11 +36,12 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 public class OutlinePageChildPageTablePage extends AbstractPage {
   private final IType m_outlineType;
   private P_MethodListener m_methodListener;
+  private ICachedTypeHierarchy m_iPageTypeHierarchy;
 
   /**
    * @param parent
    * @param type
-   *          a subtype of AbstractOutline
+   *          The outline type
    */
   public OutlinePageChildPageTablePage(IPage parent, IType outlineType) {
     m_outlineType = outlineType;
@@ -60,6 +62,10 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
 
   @Override
   public void unloadPage() {
+    if (m_iPageTypeHierarchy != null) {
+      m_iPageTypeHierarchy.removeHierarchyListener(getPageDirtyListener());
+      m_iPageTypeHierarchy = null;
+    }
     if (m_methodListener != null) {
       ScoutSdkCore.getJavaResourceChangedEmitter().removeMethodChangedListener(getOutlineType(), m_methodListener);
     }
@@ -68,14 +74,20 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
+    IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
+
+    if (m_iPageTypeHierarchy == null) {
+      m_iPageTypeHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
+      m_iPageTypeHierarchy.addHierarchyListener(getPageDirtyListener());
+    }
     if (m_methodListener == null) {
       m_methodListener = new P_MethodListener();
       ScoutSdkCore.getJavaResourceChangedEmitter().addMethodChangedListener(getOutlineType(), m_methodListener);
     }
+
     IMethod createChildPagesMethod = TypeUtility.getMethod(getOutlineType(), NodePageChildPageTablePage.EXEC_CREATE_CHILD_PAGES);
     if (TypeUtility.exists(createChildPagesMethod)) {
-      IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
-      PageNodePageHelper.createRepresentationFor(this, ScoutTypeUtility.getNewTypeOccurencesInMethod(createChildPagesMethod), TypeUtility.getPrimaryTypeHierarchy(iPage));
+      PageNodePageHelper.createRepresentationFor(this, ScoutTypeUtility.getNewTypeOccurencesInMethod(createChildPagesMethod), m_iPageTypeHierarchy);
     }
   }
 

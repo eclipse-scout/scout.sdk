@@ -12,6 +12,9 @@ package org.eclipse.scout.sdk.util.internal.typecache;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
@@ -20,11 +23,11 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTParser;
 import org.eclipse.jdt.core.dom.CompilationUnit;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
-import org.eclipse.scout.sdk.util.jdt.finegraned.AbstractFineGrainedAstMatcher;
-import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDelta;
+import org.eclipse.scout.sdk.util.jdt.finegrained.AbstractFineGrainedAstMatcher;
 
 /**
  *
@@ -32,9 +35,9 @@ import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDelta;
 public class JdtEventCollector {
 
   private final ICompilationUnit m_icu;
+  private final Map<IJavaElement, JdtEvent> m_events;
   private long m_lastModification;
   private CompilationUnit m_ast;
-  private HashMap<IJavaElement, JdtEvent> m_events;
 
   JdtEventCollector(ICompilationUnit icu) {
     m_icu = icu;
@@ -51,9 +54,9 @@ public class JdtEventCollector {
     return (CompilationUnit) parser.createAST(null);
   }
 
-  public FineGrainedJavaElementDelta[] updateAst() {
+  public Set<IJavaElement> updateAst() {
     final CompilationUnit newAst = createAst();
-    final HashSet<FineGrainedJavaElementDelta> set = new HashSet<FineGrainedJavaElementDelta>();
+    final Set<IJavaElement> set = new HashSet<IJavaElement>();
     AbstractFineGrainedAstMatcher matcher = new AbstractFineGrainedAstMatcher() {
       @Override
       protected boolean processDelta(boolean match, ASTNode node, Object other) {
@@ -63,7 +66,7 @@ public class JdtEventCollector {
             if (javaElement instanceof ICompilationUnit) {
               IJavaElement e = ((ICompilationUnit) javaElement).getElementAt(node.getStartPosition());
               if (e != null) {
-                set.add(new FineGrainedJavaElementDelta(e));
+                set.add(e);
               }
             }
           }
@@ -76,7 +79,7 @@ public class JdtEventCollector {
     };
     newAst.subtreeMatch(matcher, m_ast);
     m_ast = newAst;
-    return set.toArray(new FineGrainedJavaElementDelta[set.size()]);
+    return set;
   }
 
   public void addEvent(JdtEvent e) {
@@ -91,15 +94,11 @@ public class JdtEventCollector {
     return !m_events.isEmpty();
   }
 
-  public JdtEvent[] getEvents() {
-    return m_events.values().toArray(new JdtEvent[m_events.size()]);
-  }
-
-  public JdtEvent[] removeAllEvents(long resourceTimestamp) {
-    JdtEvent[] events = m_events.values().toArray(new JdtEvent[m_events.size()]);
+  public List<JdtEvent> removeAllEvents(long resourceTimestamp) {
+    List<JdtEvent> values = CollectionUtility.arrayList(m_events.values());
     m_events.clear();
     m_lastModification = resourceTimestamp;
-    return events;
+    return values;
   }
 
   public boolean isEmpty() {

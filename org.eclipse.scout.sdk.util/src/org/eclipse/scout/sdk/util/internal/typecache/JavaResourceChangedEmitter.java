@@ -14,7 +14,11 @@ import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.WeakHashMap;
 
 import org.eclipse.jdt.core.BufferChangedEvent;
@@ -32,7 +36,6 @@ import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
-import org.eclipse.scout.sdk.util.jdt.finegraned.FineGrainedJavaElementDelta;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IJavaResourceChangedEmitter;
 
@@ -42,28 +45,28 @@ import org.eclipse.scout.sdk.util.typecache.IJavaResourceChangedEmitter;
 public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmitter {
   public static final int CHANGED_EXTERNAL = 229;
 
-  public static final int CHANGED_FLAG_MASK =
-      IJavaElementDelta.F_CONTENT
-          | IJavaElementDelta.F_MODIFIERS
-          | IJavaElementDelta.F_MOVED_FROM
-          | IJavaElementDelta.F_MOVED_TO
-          | IJavaElementDelta.F_REORDER
-          | IJavaElementDelta.F_SUPER_TYPES
-          | IJavaElementDelta.F_OPENED
-          | IJavaElementDelta.F_CLOSED
-          | IJavaElementDelta.F_PRIMARY_WORKING_COPY
-          | IJavaElementDelta.F_CATEGORIES
-          | IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED
-          | IJavaElementDelta.F_ANNOTATIONS;
+  public static final int CHANGED_FLAG_MASK = IJavaElementDelta.F_CONTENT
+      | IJavaElementDelta.F_MODIFIERS
+      | IJavaElementDelta.F_MOVED_FROM
+      | IJavaElementDelta.F_MOVED_TO
+      | IJavaElementDelta.F_REORDER
+      | IJavaElementDelta.F_SUPER_TYPES
+      | IJavaElementDelta.F_OPENED
+      | IJavaElementDelta.F_CLOSED
+      | IJavaElementDelta.F_PRIMARY_WORKING_COPY
+      | IJavaElementDelta.F_CATEGORIES
+      | IJavaElementDelta.F_RESOLVED_CLASSPATH_CHANGED
+      | IJavaElementDelta.F_ANNOTATIONS
+      | IJavaElementDelta.F_AST_AFFECTED;
 
   private static final JavaResourceChangedEmitter INSTANCE = new JavaResourceChangedEmitter(HierarchyCache.getInstance());
 
   private final P_JavaElementChangedListener m_javaElementListener;
   private final Object m_resourceLock;
-  private final HashMap<ICompilationUnit, JdtEventCollector> m_eventCollectors;
+  private final Map<ICompilationUnit, JdtEventCollector> m_eventCollectors;
   private final EventListenerList m_eventListeners;
-  private final WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>> m_innerTypeChangedListeners;
-  private final WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>> m_methodChangedListeners;
+  private final Map<IType, List<WeakReference<IJavaResourceChangedListener>>> m_innerTypeChangedListeners;
+  private final Map<IType, List<WeakReference<IJavaResourceChangedListener>>> m_methodChangedListeners;
   private final Object m_eventListenerLock;
   private final HierarchyCache m_hierarchyCache;
   private final IBufferChangedListener m_sourceBufferListener;
@@ -79,8 +82,8 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     m_eventCollectors = new HashMap<ICompilationUnit, JdtEventCollector>();
     m_eventListenerLock = new Object();
     m_resourceLock = new Object();
-    m_innerTypeChangedListeners = new WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>>();
-    m_methodChangedListeners = new WeakHashMap<IType, ArrayList<WeakReference<IJavaResourceChangedListener>>>();
+    m_innerTypeChangedListeners = new WeakHashMap<IType, List<WeakReference<IJavaResourceChangedListener>>>();
+    m_methodChangedListeners = new WeakHashMap<IType, List<WeakReference<IJavaResourceChangedListener>>>();
     m_eventListeners = new EventListenerList();
     m_sourceBufferListener = new P_SourceBufferListener();
     m_javaElementListener = new P_JavaElementChangedListener();
@@ -112,7 +115,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   @Override
   public void addInnerTypeChangedListener(IType type, IJavaResourceChangedListener listener) {
     synchronized (m_eventListenerLock) {
-      ArrayList<WeakReference<IJavaResourceChangedListener>> listenerList = m_innerTypeChangedListeners.get(type);
+      List<WeakReference<IJavaResourceChangedListener>> listenerList = m_innerTypeChangedListeners.get(type);
       if (listenerList == null) {
         listenerList = new ArrayList<WeakReference<IJavaResourceChangedListener>>();
         m_innerTypeChangedListeners.put(type, listenerList);
@@ -124,7 +127,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   @Override
   public void removeInnerTypeChangedListener(IType type, IJavaResourceChangedListener listener) {
     synchronized (m_eventListenerLock) {
-      ArrayList<WeakReference<IJavaResourceChangedListener>> listenerList = m_innerTypeChangedListeners.get(type);
+      List<WeakReference<IJavaResourceChangedListener>> listenerList = m_innerTypeChangedListeners.get(type);
       if (listenerList != null) {
         for (Iterator<WeakReference<IJavaResourceChangedListener>> it = listenerList.iterator(); it.hasNext();) {
           IJavaResourceChangedListener curListener = it.next().get();
@@ -142,7 +145,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   @Override
   public void addMethodChangedListener(IType type, IJavaResourceChangedListener listener) {
     synchronized (m_eventListenerLock) {
-      ArrayList<WeakReference<IJavaResourceChangedListener>> listenerList = m_methodChangedListeners.get(type);
+      List<WeakReference<IJavaResourceChangedListener>> listenerList = m_methodChangedListeners.get(type);
       if (listenerList == null) {
         listenerList = new ArrayList<WeakReference<IJavaResourceChangedListener>>();
         m_methodChangedListeners.put(type, listenerList);
@@ -154,7 +157,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   @Override
   public void removeMethodChangedListener(IType type, IJavaResourceChangedListener listener) {
     synchronized (m_eventListenerLock) {
-      ArrayList<WeakReference<IJavaResourceChangedListener>> listenerList = m_methodChangedListeners.get(type);
+      List<WeakReference<IJavaResourceChangedListener>> listenerList = m_methodChangedListeners.get(type);
       if (listenerList != null) {
         for (Iterator<WeakReference<IJavaResourceChangedListener>> it = listenerList.iterator(); it.hasNext();) {
           IJavaResourceChangedListener curListener = it.next().get();
@@ -226,15 +229,15 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
         }
         else if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
           if (collector != null && (flags & CHANGED_FLAG_MASK) != 0) {
-            FineGrainedJavaElementDelta[] astDiff = collector.updateAst();
-            if (astDiff != null && astDiff.length > 0) {
-              for (FineGrainedJavaElementDelta a : astDiff) {
-                if (TypeUtility.exists(a.getElement())) {
-                  addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, a.getElement()));
+            Set<IJavaElement> astDiff = collector.updateAst();
+            if (!astDiff.isEmpty()) {
+              for (IJavaElement a : astDiff) {
+                if (TypeUtility.exists(a)) {
+                  addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, a));
                 }
               }
             }
-            else if (collector.isEmpty()) {
+            else {
               addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e));
             }
           }
@@ -298,7 +301,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     }
     if (collector != null && !collector.isEmpty()) {
       boolean fireChanges = false;
-      JdtEvent[] jdtEvents = new JdtEvent[0];
+      List<JdtEvent> jdtEvents = null;
       synchronized (m_resourceLock) {
         if (collector.hasEvents()) {
           long resourceModification = icu.getResource().getModificationStamp();
@@ -306,7 +309,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
           jdtEvents = collector.removeAllEvents(resourceModification);
         }
       }
-      if (fireChanges) {
+      if (fireChanges && jdtEvents != null && !jdtEvents.isEmpty()) {
         for (JdtEvent e : jdtEvents) {
           fireEvent(e);
         }
@@ -341,9 +344,9 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     }
     // type
     if (e.getElementType() == IJavaElement.TYPE) {
-      ArrayList<IJavaResourceChangedListener> listeners = new ArrayList<IJavaResourceChangedListener>();
+      List<IJavaResourceChangedListener> listeners = new LinkedList<IJavaResourceChangedListener>();
       synchronized (m_eventListenerLock) {
-        ArrayList<WeakReference<IJavaResourceChangedListener>> listenerList = m_innerTypeChangedListeners.get(e.getDeclaringType());
+        List<WeakReference<IJavaResourceChangedListener>> listenerList = m_innerTypeChangedListeners.get(e.getDeclaringType());
         if (listenerList != null) {
           for (Iterator<WeakReference<IJavaResourceChangedListener>> it = listenerList.iterator(); it.hasNext();) {
             WeakReference<IJavaResourceChangedListener> ref = it.next();
@@ -371,9 +374,9 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     }
     // method
     if (e.getElementType() == IJavaElement.METHOD) {
-      ArrayList<IJavaResourceChangedListener> listeners = new ArrayList<IJavaResourceChangedListener>();
+      List<IJavaResourceChangedListener> listeners = new LinkedList<IJavaResourceChangedListener>();
       synchronized (m_eventListenerLock) {
-        ArrayList<WeakReference<IJavaResourceChangedListener>> listenerList = m_methodChangedListeners.get(e.getDeclaringType());
+        List<WeakReference<IJavaResourceChangedListener>> listenerList = m_methodChangedListeners.get(e.getDeclaringType());
         if (listenerList != null) {
           for (Iterator<WeakReference<IJavaResourceChangedListener>> it = listenerList.iterator(); it.hasNext();) {
             WeakReference<IJavaResourceChangedListener> ref = it.next();
