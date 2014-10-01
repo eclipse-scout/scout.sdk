@@ -21,6 +21,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.eclipse.core.runtime.FileLocator;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.sdk.Texts;
@@ -70,21 +71,21 @@ public class PropertyViewConfig {
      * Examples:<br>
      * Label text, icons, titles, colors, fonts, numeric fraction-digits, ...
      */
-    APPEARANCE(100 /* defines in which order the categories appear in a section */, "Appearance"),
+    APPEARANCE(100 /* defines in which order the categories appear in a section */, "Appearance", "Appearance"),
 
     /**
      * Used for properties that influence how the item is positioned.<br>
      * Examples:<br>
      * alignments, widths, heights, label-visibilities, positions (x,y), display view hints, ...
      */
-    LAYOUT(200, "Layout"),
+    LAYOUT(200, "Layout", "Layout"),
 
     /**
      * Used for properties that influence how the item behaves at runtime.<br>
      * Examples:<br>
      * type of buttons, column displayable, editable, sortings, modality of dialogs, enabled, ...
      */
-    BEHAVIOR(300, "Behavior"),
+    BEHAVIOR(300, "Behavior", "Behavior"),
 
     /**
      * Used for properties that influence how the item behaves at runtime.<br>
@@ -92,23 +93,25 @@ public class PropertyViewConfig {
      * min/max values, lookup calls, code types, master fields, max lengths, most service properties, data filters, load
      * table data, ...
      */
-    DATA(400, "Data"),
+    DATA(400, "Data", "Data"),
 
     /**
      * Used for most operations that have no influence on the appearance of an item.
      */
-    BUSINESS_LOGIC(500, "BusinessLogic"),
+    BUSINESS_LOGIC(500, "BusinessLogic", "BusinessLogic"),
 
     /**
      * Undefined or various other operations and properties. Default for methods that have nothing configured.
      */
-    MISC(Integer.MAX_VALUE, "Misc");
+    MISC(Integer.MAX_VALUE, "Misc", "Misc");
 
     private final int m_order;
     private final String m_name;
+    private final String m_xmlKey;
 
-    private ConfigCategory(int order, String textNameSuffix) {
+    private ConfigCategory(int order, String textNameSuffix, String xmlKey) {
       m_order = order;
+      m_xmlKey = xmlKey;
       m_name = Texts.get("PropertyViewConfig.Categories." + textNameSuffix);
     }
 
@@ -118,6 +121,10 @@ public class PropertyViewConfig {
 
     public String getLabel() {
       return m_name;
+    }
+
+    public String getXmlKey() {
+      return m_xmlKey;
     }
   }
 
@@ -247,12 +254,12 @@ public class PropertyViewConfig {
   }
 
   private ConfigCategory parseConfigCategory(String cat) {
-    try {
-      return ConfigCategory.valueOf(cat.toUpperCase());
+    for (ConfigCategory c : ConfigCategory.values()) {
+      if (CompareUtility.equals(cat, c.getXmlKey())) {
+        return c;
+      }
     }
-    catch (Exception e) {
-      return DEFAULT_CONFIG_CATEGORY;
-    }
+    return DEFAULT_CONFIG_CATEGORY;
   }
 
   private Double parseOrder(String order) {
