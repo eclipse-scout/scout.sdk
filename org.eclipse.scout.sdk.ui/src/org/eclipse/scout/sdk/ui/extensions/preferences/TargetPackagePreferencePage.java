@@ -46,7 +46,7 @@ public class TargetPackagePreferencePage extends AbstractScoutProjectPreferenceP
 
       List<TargetPackageModel> list = new ArrayList<TargetPackageModel>();
       for (TargetPackageEntry entry : defaultPackages) {
-        if (e.getKey().getType().equals(entry.getBundleType())) {
+        if (e.getKey().hasType(entry.getBundleType())) {
           list.add(new TargetPackageModel(entry.getId(), entry.getDefaultSuffix(), e.getKey()));
         }
       }

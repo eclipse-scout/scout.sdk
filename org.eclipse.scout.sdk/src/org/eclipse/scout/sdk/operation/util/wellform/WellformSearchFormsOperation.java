@@ -42,7 +42,7 @@ public class WellformSearchFormsOperation implements IOperation {
 
   @Override
   public void validate() {
-    if (!getClientBundle().getType().equals(IScoutBundle.TYPE_CLIENT)) {
+    if (!getClientBundle().hasType(IScoutBundle.TYPE_CLIENT)) {
       throw new IllegalArgumentException("bundle must be a client bundle.");
     }
   }

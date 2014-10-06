@@ -26,7 +26,7 @@ public class WebServicePageFactory implements IPageFactory {
   @Override
   public void createChildren(IPage parentPage) {
     IScoutBundle bundle = parentPage.getScoutBundle();
-    if (!IScoutBundle.TYPE_SERVER.equals(bundle.getType())) {
+    if (!bundle.hasType(IScoutBundle.TYPE_SERVER)) {
       return;
     }
 

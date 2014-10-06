@@ -15,7 +15,6 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
@@ -115,7 +114,7 @@ public final class ScoutBundleExtensionPoint {
               }
             }
           }
-          allExtensions = tmp;
+          allExtensions = CollectionUtility.copyMap(tmp);
         }
       }
     }
@@ -156,26 +155,20 @@ public final class ScoutBundleExtensionPoint {
    * @param bundle
    *          The {@link IScoutBundle} for which to return UI extension.
    * @return The {@link ScoutBundleUiExtension} that represents the given bundle the best.
+   * @see IScoutBundle#hasType(String)
    */
   public static ScoutBundleUiExtension getExtension(IScoutBundle bundle) {
-    // try direct first
-    ScoutBundleUiExtension result = getExtension(bundle.getType());
-    if (result != null) {
-      return result;
+    ScoutBundleUiExtension extension = getExtension(bundle.getType());
+    if (extension != null) {
+      return extension;
     }
 
-    Set<String> dependencySymbolicNames = bundle.getAllDependencies().keySet();
-    for (String bundleType : RuntimeBundles.getTypes()) {
-      result = getAllExtensions().get(bundleType);
-      if (result != null) {
-        String bundleSymbolicName = RuntimeBundles.getBundleSymbolicName(bundleType);
-        if (dependencySymbolicNames.contains(bundleSymbolicName)) {
-          // it is also of this type which as a UI representation
-          return result;
-        }
+    for (String type : RuntimeBundles.getReferencedTypes(bundle.getType())) {
+      extension = getAllExtensions().get(type);
+      if (extension != null) {
+        return extension;
       }
     }
-
     return null;
   }
 }

@@ -44,16 +44,19 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * @since 3.9.0 31.01.2013
  */
 public final class RuntimeBundles {
-  private static final String EXTENSION_POINT_NAME = "runtimeBundles";
-  private static final String TAG_NAME = "bundle";
-  private static final String ATTRIB_NAME = "symbolicName";
-  private static final String ATTRIB_TYPE = "type";
-  private static final String ATTRIB_ORDER = "order";
+  public static final String EXTENSION_POINT_NAME = "runtimeBundles";
+  public static final String TAG_NAME_BUNDLE = "bundle";
+  public static final String ATTRIB_NAME = "symbolicName";
+  public static final String ATTRIB_TYPE = "type";
+  public static final String ATTRIB_ORDER = "order";
+  public static final String TAG_NAME_REF = "ref";
+  public static final String ATTRIB_REF_TYPE = "type";
 
   private static final Object LOCK = new Object();
   private static volatile Set<String /* symbolic name */> allScoutRtBundles = null;
   private static volatile Map<String /* symbolic name */, String /* type */> bundleToTypeMap = null;
   private static volatile Map<String /* type */, String /* symbolic name */> typeToBundleMap = null;
+  private static volatile Map<String /* type */, Set<String /* referenced types */>> referencedBundles = null;
 
   private RuntimeBundles() {
   }
@@ -63,7 +66,8 @@ public final class RuntimeBundles {
       synchronized (LOCK) {
         if (allScoutRtBundles == null || bundleToTypeMap == null || typeToBundleMap == null) {
           Set<String> all = new HashSet<String>();
-          TreeMap<Integer, String[]> typeDefOrdered = new TreeMap<Integer, String[]>();
+          Map<Integer, String[]> typeDefOrdered = new TreeMap<Integer, String[]>();
+          Map<String, Set<String>> refBundles = new HashMap<String, Set<String>>();
 
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);
@@ -71,7 +75,7 @@ public final class RuntimeBundles {
           for (IExtension extension : extensions) {
             IConfigurationElement[] elements = extension.getConfigurationElements();
             for (IConfigurationElement element : elements) {
-              if (TAG_NAME.equals(element.getName())) {
+              if (TAG_NAME_BUNDLE.equals(element.getName())) {
                 String symbolicName = element.getAttribute(ATTRIB_NAME);
                 if (StringUtility.hasText(symbolicName)) {
                   all.add(symbolicName);
@@ -83,9 +87,19 @@ public final class RuntimeBundles {
                     Integer o = parseOrder(order);
                     if (o != null) {
                       typeDefOrdered.put(o, new String[]{symbolicName, type});
-                    }
-                    else {
-                      ScoutSdk.logWarning("The order must be a valid integer.");
+
+                      // search for referenced types
+                      for (IConfigurationElement ref : element.getChildren(TAG_NAME_REF)) {
+                        String refType = ref.getAttribute(ATTRIB_REF_TYPE);
+                        if (StringUtility.hasText(refType)) {
+                          Set<String> list = refBundles.get(type);
+                          if (list == null) {
+                            list = new HashSet<String>(2);
+                            refBundles.put(type, list);
+                          }
+                          list.add(refType);
+                        }
+                      }
                     }
                   }
                 }
@@ -95,13 +109,18 @@ public final class RuntimeBundles {
               }
             }
           }
-          allScoutRtBundles = all;
-          bundleToTypeMap = new LinkedHashMap<String, String>(typeDefOrdered.size());
-          typeToBundleMap = new HashMap<String, String>(typeDefOrdered.size());
+
+          LinkedHashMap<String, String> tmpBundleToTypeMap = new LinkedHashMap<String, String>(typeDefOrdered.size());
+          HashMap<String, String> tmpTypeToBundleMap = new HashMap<String, String>(typeDefOrdered.size());
           for (String[] items : typeDefOrdered.values()) {
-            bundleToTypeMap.put(items[0], items[1]);
-            typeToBundleMap.put(items[1], items[0]);
+            tmpBundleToTypeMap.put(items[0], items[1]);
+            tmpTypeToBundleMap.put(items[1], items[0]);
           }
+
+          typeToBundleMap = tmpTypeToBundleMap;
+          bundleToTypeMap = tmpBundleToTypeMap;
+          allScoutRtBundles = CollectionUtility.hashSet(all);
+          referencedBundles = CollectionUtility.copyMap(refBundles);
         }
       }
     }
@@ -112,6 +131,7 @@ public final class RuntimeBundles {
       return Integer.parseInt(order);
     }
     catch (NumberFormatException e) {
+      ScoutSdk.logWarning("Unable to process RuntimeBundle extension. The order must be a valid integer.", e);
       return null;
     }
   }
@@ -227,6 +247,34 @@ public final class RuntimeBundles {
       }
     }
     return null;
+  }
+
+  /**
+   * Gets all referenced types of the given start type.
+   *
+   * @param startType
+   *          The bundle start type.
+   * @return The referenced types. The startType itself is not part of the resulting {@link Set}.
+   */
+  public static Set<String> getReferencedTypes(String startType) {
+    return CollectionUtility.hashSet(referencedBundles.get(startType));
+  }
+
+  /**
+   * Checks if the given search-bundle-type is in the referenced types list of the given bundle-start-type.
+   *
+   * @param startType
+   *          The bundle-type for which the referenced types should be searched
+   * @param typeToSearch
+   *          The referenced type that is searched.
+   * @return <code>true</code> if typeToSearch is in the referenced types list of startType, <code>false</code>
+   *         otherwise.
+   * @see #getReferencedTypes(String)
+   */
+  public static boolean hasReferencedType(String startType, String typeToSearch) {
+    ensureCached();
+    Set<String> set = referencedBundles.get(startType);
+    return set != null && set.contains(typeToSearch);
   }
 
   /**

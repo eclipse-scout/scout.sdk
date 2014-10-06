@@ -49,7 +49,7 @@ public class WellformSharedBundleOperation implements IOperation {
     if (getBundle() == null) {
       throw new IllegalArgumentException("Bundle can not be null.");
     }
-    if (!getBundle().getType().equals(IScoutBundle.TYPE_SHARED)) {
+    if (!getBundle().hasType(IScoutBundle.TYPE_SHARED)) {
       throw new IllegalArgumentException("bundle must be a shared bundle.");
     }
   }

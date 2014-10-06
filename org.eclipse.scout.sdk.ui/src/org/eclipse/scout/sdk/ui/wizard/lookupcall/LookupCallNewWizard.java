@@ -44,6 +44,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
@@ -110,9 +111,8 @@ public class LookupCallNewWizard extends AbstractServiceWizard implements INewWi
   }
 
   private ITreeNode createTree(IScoutBundle clientBundle, IScoutBundle sharedBundle, IScoutBundle serverBundle) {
-    ITreeNode rootNode = TreeUtility.createBundleTree(sharedBundle,
-        NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED),
-        ScoutBundleFilters.getWorkspaceBundlesFilter());
+    IScoutBundleFilter bundleFilter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
+    ITreeNode rootNode = TreeUtility.createBundleTree(sharedBundle, bundleFilter);
 
     // client
     if (clientBundle != null) {

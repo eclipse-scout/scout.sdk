@@ -54,6 +54,9 @@
          </documentation>
       </annotation>
       <complexType>
+         <sequence>
+            <element ref="ref" minOccurs="0" maxOccurs="unbounded"/>
+         </sequence>
          <attribute name="symbolicName" type="string" use="required">
             <annotation>
                <documentation>
@@ -80,6 +83,26 @@ A bundle in the workspace having the following type defining dependencies:
 In this case the client dependency is stronger than the shared dependency defining this bundle as type &apos;CLIENT&apos;.
 The bundle graph searches through the type defining bundles in ascending order. Therefore &apos;CLIENT&apos; must have a lower order than shared giving it a higher priority.
                </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="ref">
+      <annotation>
+         <documentation>
+            References to other types that are included in the current bundle type
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="type" type="string" use="required">
+            <annotation>
+               <documentation>
+                  A referenced type. A runtime bundle that is asked for having a specific type will answer with &quot;yes&quot; for its own type and all that are referenced to its own type (direct or indirect).
+               </documentation>
+               <appInfo>
+                  <meta.attribute kind="identifier" basedOn="org.eclipse.scout.sdk.runtimeBundles/bundle/@type"/>
+               </appInfo>
             </annotation>
          </attribute>
       </complexType>

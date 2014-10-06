@@ -34,7 +34,7 @@ public class SharedScoutBundleExtension implements INewScoutBundleHandler {
   @Override
   public void init(IScoutProjectWizard wizard, ScoutBundleUiExtension extension) {
     IScoutBundle selected = wizard.getScoutProject();
-    boolean available = selected == null || selected.getType().equals(IScoutBundle.TYPE_SHARED);
+    boolean available = selected == null || selected.hasType(IScoutBundle.TYPE_SHARED);
     wizard.getProjectWizardPage().setBundleNodeAvailable(available, available, ID);
   }
 

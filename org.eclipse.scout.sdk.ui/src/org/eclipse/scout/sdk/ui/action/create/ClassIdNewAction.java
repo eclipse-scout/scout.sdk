@@ -13,13 +13,11 @@ package org.eclipse.scout.sdk.ui.action.create;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.ClassIdNewOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
@@ -37,11 +35,6 @@ public class ClassIdNewAction extends AbstractScoutHandler {
 
   public ClassIdNewAction() {
     super(Texts.get("CreateMissingClassIdAnnotations"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceLocatorAdd), null, false, Category.NEW);
-  }
-
-  @Override
-  public boolean isVisible() {
-    return TypeUtility.existsType(IRuntimeClasses.ITypeWithClassId);
   }
 
   public void setScoutBundle(IScoutBundle sb) {

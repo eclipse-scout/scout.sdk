@@ -42,7 +42,7 @@ public class ScoutBundleTreeModel {
   }
 
   private ScoutBundleNodeGroup createProjects(IScoutBundle bundle, String curType) {
-    if (curType.equals(bundle.getType()) && ScoutExplorerSettingsBundleFilter.get().accept(bundle)) {
+    if (bundle.hasType(curType) && ScoutExplorerSettingsBundleFilter.get().accept(bundle)) {
       ScoutBundleUiExtension extension = ScoutBundleExtensionPoint.getExtension(bundle);
       if (extension != null) {
         ScoutBundleNodeGroup sbg = new ScoutBundleNodeGroup(new ScoutBundleNode(bundle, extension));

@@ -31,7 +31,6 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class ScoutBundleNode {
 
   private final String m_symbolicName;
-  private final String m_type;
   private final Set<ScoutBundleNode> m_childNodes;
   private final ScoutBundleUiExtension m_uiExtension;
   private final IScoutBundle m_scoutBundle;
@@ -39,7 +38,6 @@ public class ScoutBundleNode {
   public ScoutBundleNode(IScoutBundle bundle, ScoutBundleUiExtension uiExtension) {
     m_scoutBundle = bundle;
     m_symbolicName = bundle.getSymbolicName();
-    m_type = bundle.getType();
     m_childNodes = new HashSet<ScoutBundleNode>();
     m_uiExtension = uiExtension;
     if (!ScoutExplorerSettingsSupport.BundlePresentation.FLAT.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
@@ -56,10 +54,6 @@ public class ScoutBundleNode {
 
   public String getSymbolicName() {
     return m_symbolicName;
-  }
-
-  public String getType() {
-    return m_type;
   }
 
   public void removeChildBundle(ScoutBundleNode node) {

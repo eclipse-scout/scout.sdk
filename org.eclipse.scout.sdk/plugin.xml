@@ -906,36 +906,43 @@
             order="100"
             symbolicName="org.eclipse.scout.rt.testing.ui.swing"
             type="UI_SWING_TESTING">
+         <ref
+               type="UI_SWING">
+         </ref>
       </bundle>
       <bundle
             order="200"
             symbolicName="org.eclipse.scout.rt.testing.ui.swt"
             type="UI_SWT_TESTING">
-      </bundle>
-      <bundle
-            order="400"
-            symbolicName="org.eclipse.scout.rt.testing.client"
-            type="CLIENT_TESTING">
-      </bundle>
-      <bundle
-            order="500"
-            symbolicName="org.eclipse.scout.rt.testing.server"
-            type="SERVER_TESTING">
+         <ref
+               type="UI_SWT">
+         </ref>
       </bundle>
       <bundle
             order="600"
-            symbolicName="org.eclipse.scout.rt.testing.shared"
-            type="SHARED_TESTING">
-      </bundle>
-      <bundle
-            order="700"
             symbolicName="org.eclipse.scout.rt.ui.swing"
             type="UI_SWING">
       </bundle>
       <bundle
-            order="900"
+            order="700"
             symbolicName="org.eclipse.scout.rt.ui.swt"
             type="UI_SWT">
+      </bundle>
+      <bundle
+            order="800"
+            symbolicName="org.eclipse.scout.rt.testing.client"
+            type="CLIENT_TESTING">
+         <ref
+               type="CLIENT">
+         </ref>
+      </bundle>
+      <bundle
+            order="900"
+            symbolicName="org.eclipse.scout.rt.testing.server"
+            type="SERVER_TESTING">
+         <ref
+               type="SERVER">
+         </ref>
       </bundle>
       <bundle
             order="1000"
@@ -949,6 +956,14 @@
       </bundle>
       <bundle
             order="1200"
+            symbolicName="org.eclipse.scout.rt.testing.shared"
+            type="SHARED_TESTING">
+         <ref
+               type="SHARED">
+         </ref>
+      </bundle>
+      <bundle
+            order="1300"
             symbolicName="org.eclipse.scout.rt.shared"
             type="SHARED">
       </bundle>
@@ -1006,6 +1021,15 @@
       <bundle
             symbolicName="org.eclipse.scout.svg.ui.swt">
       </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.client.testenvironment">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.server.testenvironment">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.spec.client">
+      </bundle>
       <!-- may be installed from the marketplace. -->
       <bundle
             symbolicName="com.bsiag.scout.rt.server.jdbc.mysql5117">
@@ -1021,6 +1045,9 @@
       </bundle>
       <bundle
             symbolicName="org.eclipse.scout.rt.docx4j.client">
+      </bundle>
+      <bundle
+            symbolicName="org.eclipse.scout.rt.server.rabbitmq">
       </bundle>
    </extension>
    <extension

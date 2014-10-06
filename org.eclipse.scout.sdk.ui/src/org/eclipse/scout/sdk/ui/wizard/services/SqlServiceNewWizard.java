@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
@@ -80,9 +81,8 @@ public class SqlServiceNewWizard extends AbstractServiceWizard {
   }
 
   private ITreeNode createTree(IScoutBundle serverBundle) {
-    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle,
-        NodeFilters.getByType(IScoutBundle.TYPE_SHARED, IScoutBundle.TYPE_SERVER),
-        ScoutBundleFilters.getWorkspaceBundlesFilter());
+    IScoutBundleFilter bundleFilter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
+    ITreeNode rootNode = TreeUtility.createBundleTree(serverBundle, bundleFilter);
 
     ITreeNode serverNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(serverBundle));
     TreeUtility.createNode(serverNode, TYPE_SERVICE_IMPLEMENTATION, Texts.get("Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Class), 1);

@@ -32,7 +32,7 @@ public class SwtScoutBundleExtension implements INewScoutBundleHandler {
   @Override
   public void init(IScoutProjectWizard wizard, ScoutBundleUiExtension extension) {
     IScoutBundle selected = wizard.getScoutProject();
-    boolean available = selected == null || selected.getType().equals(IScoutBundle.TYPE_UI_SWT) || selected.getType().equals(IScoutBundle.TYPE_CLIENT);
+    boolean available = selected == null || selected.hasType(IScoutBundle.TYPE_UI_SWT) || selected.hasType(IScoutBundle.TYPE_CLIENT);
     wizard.getProjectWizardPage().setBundleNodeAvailable(available, available, ID);
   }
 

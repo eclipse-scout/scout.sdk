@@ -89,7 +89,7 @@ public final class ScoutBundleFilters {
    * @param acceptedTypes
    *          the list of types that are accepted.
    * @return a filter that only returns bundles that match the given types
-   * @see IScoutBundle#getType()
+   * @see IScoutBundle#hasType(String)
    */
   public static IScoutBundleFilter getBundlesOfTypeFilter(final String... acceptedTypes) {
     return new IScoutBundleFilter() {
@@ -99,7 +99,7 @@ public final class ScoutBundleFilters {
           return false;
         }
         for (String type : acceptedTypes) {
-          if (bundle.getType().equals(type)) {
+          if (bundle.hasType(type)) {
             return true;
           }
         }

@@ -61,7 +61,7 @@ public class Docx4jManifestTechnologyHandler extends AbstractScoutTechnologyHand
   @Override
   public void selectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutTechnologyResource r : resources) {
-      if (IScoutBundle.TYPE_CLIENT.equals(r.getBundle().getType())) {
+      if (r.getBundle().hasType(IScoutBundle.TYPE_CLIENT)) {
         selectionChangedManifest(r, selected, DOCX4J_PLUGIN, DOCX4J_SCOUT_PLUGIN, DOCX4J_SCOUT_CLIENT_PLUGIN);
       }
       else {

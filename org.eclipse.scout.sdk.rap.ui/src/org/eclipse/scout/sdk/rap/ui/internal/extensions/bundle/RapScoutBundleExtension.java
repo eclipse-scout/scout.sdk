@@ -44,7 +44,7 @@ public class RapScoutBundleExtension implements INewScoutBundleHandler {
   @Override
   public void init(IScoutProjectWizard wizard, ScoutBundleUiExtension extension) {
     IScoutBundle selected = wizard.getScoutProject();
-    boolean available = selected == null || selected.getType().equals(IScoutSdkRapConstants.TYPE_UI_RAP) || selected.getType().equals(IScoutBundle.TYPE_CLIENT);
+    boolean available = selected == null || selected.hasType(IScoutSdkRapConstants.TYPE_UI_RAP) || selected.hasType(IScoutBundle.TYPE_CLIENT);
     wizard.getProjectWizardPage().setBundleNodeAvailable(available, available, ID);
   }
 

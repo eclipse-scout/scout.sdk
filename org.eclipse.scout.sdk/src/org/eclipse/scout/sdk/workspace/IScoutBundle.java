@@ -31,12 +31,12 @@ import org.eclipse.scout.sdk.util.NamingUtility;
 
 /**
  * <h3>{@link IScoutBundle}</h3><br>
- * Represents a plug-in having a dependency on scout runtime bundles.<br>
+ * Represents a plug-in having a dependency on Scout runtime bundles.<br>
  * <br>
- * Do not hold references to IScoutBundle instances without handling the corresponding scout workspace events: If the
+ * Do not hold references to IScoutBundle instances without handling the corresponding Scout workspace events: If the
  * bundle model (e.g. a manifest file or the target platform) changes in the workspace, this may trigger a complete
- * re-build of the scout bundle graph. On a re-build all existing scout bundle instances are discarded and replaced by
- * new instances matching the new workspace situation. Ensure to listen for the corresponding scout workspace events
+ * re-build of the Scout bundle graph. On a re-build all existing Scout bundle instances are discarded and replaced by
+ * new instances matching the new workspace situation. Ensure to listen for the corresponding Scout workspace events
  * (see {@link IScoutWorkspace} and {@link IScoutWorkspaceListener} acquired from {@link ScoutSdkCore}) to replace your
  * instances when necessary.
  *
@@ -53,25 +53,36 @@ public interface IScoutBundle extends IAdaptable {
   String TYPE_UI_SWT = "UI_SWT";
 
   /**
-   * Gets the type of the scout bundle. <br>
-   * This string is always one of the types contributed by the
-   * 'org.eclipse.scout.sdk.runtimeBundles' extension point.
+   * Gets the type of this Scout bundle. <br>
+   * This string is always one of the types contributed by the <code>org.eclipse.scout.sdk.runtimeBundles</code>
+   * extension point.<br>
+   * <br>
+   * <b>Note:</b><br>
+   * Use this method to check if this bundle is EXACTLY of a certain type (e.g. SERVER, CLIENT, SHARED).<br>
+   * To check if this bundle has AT LEAST the character of a certain type use {@link #hasType(String)} instead.<br>
+   * <br>
+   * <b>Example:</b><br>
+   * If this bundle is of a type SERVER_TESTING it may have the dependency to <code>org.eclipse.scout.rt.server</code>
+   * but also to <code>org.eclipse.scout.rt.testing.server</code>. {@link #getType()} will then return SERVER_TESTING.
+   * But {@link #hasType(String)} will also return <code>true</code> for the parameter "SERVER" because it is also has
+   * server characteristics.
    *
-   * @return the
+   * @return the type of this Scout bundle.
    * @see RuntimeBundles
+   * @see #hasType(String)
    */
   String getType();
 
   /**
-   * gets a live-list of the direct parent scout bundles (non-recursive). This is equal to the most specific
-   * dependencies of this bundle to other scout bundles.
+   * gets a live-list of the direct parent Scout bundles (non-recursive). This is equal to the most specific
+   * dependencies of this bundle to other Scout bundles.
    *
    * @return a live-set containing all direct parents.
    */
   Set<? extends IScoutBundle> getDirectParentBundles();
 
   /**
-   * gets a live-list of the direct child scout bundles (non-recursive). this is equal to the scout bundles having most
+   * gets a live-list of the direct child Scout bundles (non-recursive). this is equal to the Scout bundles having most
    * specific dependencies to this bundle (my dependents).
    *
    * @return a live-set containing all direct children.
@@ -80,7 +91,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * Performs a breadth first (aka level order) traversal going up the tree visiting all parents (=dependencies) and
-   * maybe myself recursively. It returns all scout bundles matching the given filter (including maybe myself) ordered
+   * maybe myself recursively. It returns all Scout bundles matching the given filter (including maybe myself) ordered
    * by level (the closest level first). Within a level the order of the bundles is undefined.
    *
    * @param filter
@@ -106,7 +117,7 @@ public interface IScoutBundle extends IAdaptable {
    * @param includeThis
    *          Specifies if the current instance should be visited as well. If true, this may be the result (if it
    *          matches the filter).
-   * @return The scout bundle on the nearest level matching the given filter.
+   * @return The Scout bundle on the nearest level matching the given filter.
    * @see IScoutBundleFilter
    * @see ScoutBundleFilters
    * @see IScoutBundleComparator
@@ -132,7 +143,7 @@ public interface IScoutBundle extends IAdaptable {
    * @param includeThis
    *          Specifies if the current instance should be visited as well. If true, this may be the result (if it
    *          matches the filter).
-   * @return The scout bundle on the nearest level matching the given filter.
+   * @return The Scout bundle on the nearest level matching the given filter.
    * @see IScoutBundleFilter
    * @see ScoutBundleFilters
    * @see IScoutBundleComparator
@@ -158,7 +169,7 @@ public interface IScoutBundle extends IAdaptable {
    * @param includeThis
    *          Specifies if the current instance should be visited as well. If true, this may be the result (if it
    *          matches the filter).
-   * @return The scout bundle on the nearest level matching the given filter. If multiple bundles on the same level
+   * @return The Scout bundle on the nearest level matching the given filter. If multiple bundles on the same level
    *         fulfill the filter, the first (least) as defined by the given comparator is returned.
    * @see IScoutBundleFilter
    * @see ScoutBundleFilters
@@ -171,7 +182,7 @@ public interface IScoutBundle extends IAdaptable {
 
   /**
    * Performs a breadth first (aka level order) traversal going down the tree visiting all children (=dependents) and
-   * maybe myself recursively. It returns all scout bundles matching the given filter (including maybe myself) ordered
+   * maybe myself recursively. It returns all Scout bundles matching the given filter (including maybe myself) ordered
    * by level (closest level first). Within a level the order of the bundles is undefined.
    *
    * @param filter
@@ -197,7 +208,7 @@ public interface IScoutBundle extends IAdaptable {
    * @param includeThis
    *          Specifies if the current instance should be visited as well. If true, this may be the result (if it
    *          matches the filter).
-   * @return The scout bundle on the nearest level matching the given filter.
+   * @return The Scout bundle on the nearest level matching the given filter.
    * @see IScoutBundleFilter
    * @see ScoutBundleFilters
    * @see IScoutBundleComparator
@@ -223,7 +234,7 @@ public interface IScoutBundle extends IAdaptable {
    * @param includeThis
    *          Specifies if the current instance should be visited as well. If true, this may be the result (if it
    *          matches the filter).
-   * @return The scout bundle on the nearest level matching the given filter.
+   * @return The Scout bundle on the nearest level matching the given filter.
    * @see IScoutBundleFilter
    * @see ScoutBundleFilters
    * @see IScoutBundleComparator
@@ -249,7 +260,7 @@ public interface IScoutBundle extends IAdaptable {
    * @param includeThis
    *          Specifies if the current instance should be visited as well. If true, this may be the result (if it
    *          matches the filter).
-   * @return The scout bundle on the nearest level matching the given filter. If multiple bundles on the same level
+   * @return The Scout bundle on the nearest level matching the given filter. If multiple bundles on the same level
    *         fulfill the filter, the first (least) as defined by the given comparator is returned.
    * @see IScoutBundleFilter
    * @see ScoutBundleFilters
@@ -407,4 +418,28 @@ public interface IScoutBundle extends IAdaptable {
    */
   Map<String, IPluginModelBase> getAllDependencies();
 
+  /**
+   * Checks if this Scout bundle has the characteristic of the given bundle type.<br>
+   * <br>
+   * <b>Note:</b><br>
+   * Use this method to check if this bundle has AT LEAST the character of a certain type (e.g. SERVER, CLIENT, SHARED).<br>
+   * To check if this bundle is EXACTLY of a certain type use {@link #getType()} instead.<br>
+   * <br>
+   * <b>Example:</b><br>
+   * If this bundle is of a type SERVER_TESTING it may have the dependency to <code>org.eclipse.scout.rt.server</code>
+   * but also to <code>org.eclipse.scout.rt.testing.server</code>. {@link #getType()} will then return SERVER_TESTING.
+   * But {@link #hasType(String)} will also return <code>true</code> for the parameter "SERVER" because it is also has
+   * server characteristics.
+   *
+   * @param type
+   *          It is checked if this Scout bundle instance has the characteristics of the given type. This string is
+   *          always one of the types contributed by the <code>org.eclipse.scout.sdk.runtimeBundles</code> extension
+   *          point.
+   * @return <code>true</code> if this Scout bundle has the characteristic of the given type. <code>false</code>
+   *         otherwise.
+   * @since 4.1.0 M3
+   * @see RuntimeBundles
+   * @see #getType()
+   */
+  boolean hasType(String type);
 }

@@ -40,7 +40,7 @@ public final class ServletRegistrationUtility {
     if (bundle == null) {
       return null;
     }
-    if (!IScoutBundle.TYPE_SERVER.equals(bundle.getType())) {
+    if (!bundle.hasType(IScoutBundle.TYPE_SERVER)) {
       return null;
     }
 
@@ -87,7 +87,7 @@ public final class ServletRegistrationUtility {
       @Override
       public boolean accept(IScoutBundle candidate) {
         // ensure server bundle
-        if (!IScoutBundle.TYPE_SERVER.equals(candidate.getType())) {
+        if (!candidate.hasType(IScoutBundle.TYPE_SERVER)) {
           return false;
         }
         // check whether JAX-WS dependency is installed on bundle

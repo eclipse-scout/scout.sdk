@@ -46,6 +46,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
@@ -119,9 +120,8 @@ public class FormNewWizard extends AbstractServiceWizard implements INewWizard {
       serverBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER)), clientBundle, false);
     }
 
-    ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle,
-        NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED),
-        ScoutBundleFilters.getWorkspaceBundlesFilter());
+    IScoutBundleFilter bundleFilter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
+    ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle, bundleFilter);
 
     ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(getClientBundle()));
     // form

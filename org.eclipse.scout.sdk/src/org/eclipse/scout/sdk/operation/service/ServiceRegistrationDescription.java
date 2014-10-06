@@ -83,13 +83,13 @@ public class ServiceRegistrationDescription {
     if (b == null) {
       throw new InvalidParameterException("could not find a scout bundle for service registration.");
     }
-    if (IScoutBundle.TYPE_CLIENT.equals(b.getType())) {
+    if (b.hasType(IScoutBundle.TYPE_CLIENT)) {
       return IRuntimeClasses.ClientServiceFactory;
     }
-    else if (IScoutBundle.TYPE_SERVER.equals(b.getType())) {
+    else if (b.hasType(IScoutBundle.TYPE_SERVER)) {
       return IRuntimeClasses.ServerServiceFactory;
     }
-    else if (IScoutBundle.TYPE_SHARED.equals(b.getType())) {
+    else if (b.hasType(IScoutBundle.TYPE_SHARED)) {
       return IRuntimeClasses.DefaultServiceFactory;
     }
     else {

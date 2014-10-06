@@ -43,6 +43,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
@@ -111,9 +112,8 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard implements INew
 
   private ITreeNode createTree(IScoutBundle clientBundle) {
     IScoutBundle sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED)), false);
-    ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle,
-        NodeFilters.getByType(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SHARED),
-        ScoutBundleFilters.getWorkspaceBundlesFilter());
+    IScoutBundleFilter bundleFilter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SHARED));
+    ITreeNode rootNode = TreeUtility.createBundleTree(clientBundle, bundleFilter);
     ITreeNode clientNode = TreeUtility.findNode(rootNode, NodeFilters.getByData(clientBundle));
 
     // form

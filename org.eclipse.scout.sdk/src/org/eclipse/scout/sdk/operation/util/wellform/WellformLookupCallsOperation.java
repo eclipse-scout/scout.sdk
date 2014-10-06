@@ -42,8 +42,7 @@ public class WellformLookupCallsOperation implements IOperation {
 
   @Override
   public void validate() {
-    String bundleType = getBundle().getType();
-    if (!bundleType.equals(IScoutBundle.TYPE_CLIENT) && !bundleType.equals(IScoutBundle.TYPE_SHARED)) {
+    if (!getBundle().hasType(IScoutBundle.TYPE_CLIENT) && !getBundle().hasType(IScoutBundle.TYPE_SHARED)) {
       throw new IllegalArgumentException("bundle must be a client or shared bundle.");
     }
   }

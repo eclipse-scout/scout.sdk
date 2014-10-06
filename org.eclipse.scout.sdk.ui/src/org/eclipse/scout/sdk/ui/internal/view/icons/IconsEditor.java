@@ -136,7 +136,7 @@ public class IconsEditor extends EditorPart {
     if (input instanceof FileEditorInput) {
       IFile file = ((FileEditorInput) input).getFile();
       IScoutBundle scoutProject = ScoutTypeUtility.getScoutBundle(file.getProject());
-      if (scoutProject != null && IScoutBundle.TYPE_SHARED.equals(scoutProject.getType())) {
+      if (scoutProject != null && scoutProject.hasType(IScoutBundle.TYPE_SHARED)) {
         setScoutSharedBundle(scoutProject);
       }
     }

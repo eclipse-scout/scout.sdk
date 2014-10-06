@@ -49,6 +49,7 @@ import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.commons.CollectionUtility;
+import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
@@ -186,6 +187,14 @@ public class ScoutBundle implements IScoutBundle {
   @Override
   public String getType() {
     return m_type;
+  }
+
+  @Override
+  public boolean hasType(String type) {
+    if (CompareUtility.equals(m_type, type)) {
+      return true;
+    }
+    return RuntimeBundles.hasReferencedType(m_type, type);
   }
 
   @Override

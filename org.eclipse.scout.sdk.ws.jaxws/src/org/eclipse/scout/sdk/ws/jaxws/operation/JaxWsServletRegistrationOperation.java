@@ -54,13 +54,13 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     if (m_bundle == null) {
       throw new IllegalArgumentException("bundle must not be null");
     }
-    if (!IScoutBundle.TYPE_SERVER.equals(m_bundle.getType())) {
+    if (!m_bundle.hasType(IScoutBundle.TYPE_SERVER)) {
       throw new IllegalArgumentException("bundle must be SERVER bundle");
     }
     if (m_registrationBundle == null) {
       throw new IllegalArgumentException("servlet registration bundle must not be null");
     }
-    if (!IScoutBundle.TYPE_SERVER.equals(m_registrationBundle.getType())) {
+    if (!m_registrationBundle.hasType(IScoutBundle.TYPE_SERVER)) {
       throw new IllegalArgumentException("servlet registration bundle must be SERVER bundle");
     }
     if (!StringUtility.hasText(m_jaxWsAlias)) {
@@ -137,7 +137,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
       Set<? extends IScoutBundle> candidateBundles = m_registrationBundle.getParentBundles(new IScoutBundleFilter() {
         @Override
         public boolean accept(IScoutBundle bundle) {
-          return IScoutBundle.TYPE_SERVER.equals(bundle.getType()) && TypeUtility.isOnClasspath(TypeUtility.getType(JaxWsRuntimeClasses.JaxWsActivator), bundle.getJavaProject()); // ensure JAX-WS installed on bundle
+          return bundle.hasType(IScoutBundle.TYPE_SERVER) && TypeUtility.isOnClasspath(TypeUtility.getType(JaxWsRuntimeClasses.JaxWsActivator), bundle.getJavaProject()); // ensure JAX-WS installed on bundle
         }
       }, true);
 
@@ -188,15 +188,6 @@ public class JaxWsServletRegistrationOperation implements IOperation {
       m_sunJaxWsBean.setUrlPattern(urlPattern);
       ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_URL_PATTERN_CHANGED, m_sunJaxWsBean.getAlias());
     }
-  }
-
-  public static IScoutBundleFilter getServerFilter() {
-    return new IScoutBundleFilter() {
-      @Override
-      public boolean accept(IScoutBundle bundle) {
-        return IScoutBundle.TYPE_SERVER.equals(bundle.getType());
-      }
-    };
   }
 
   @Override

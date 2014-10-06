@@ -74,9 +74,12 @@
             order="300"
             symbolicName="org.eclipse.scout.rt.testing.ui.rap"
             type="UI_RAP_TESTING">
+         <ref
+               type="UI_RAP">
+         </ref>
       </bundle>
       <bundle
-            order="800"
+            order="500"
             symbolicName="org.eclipse.scout.rt.ui.rap"
             type="UI_RAP">
       </bundle>

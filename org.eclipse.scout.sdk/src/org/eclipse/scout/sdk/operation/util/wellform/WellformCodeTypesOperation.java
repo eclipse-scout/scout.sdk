@@ -42,7 +42,7 @@ public class WellformCodeTypesOperation implements IOperation {
 
   @Override
   public void validate() {
-    if (!getSharedBundle().getType().equals(IScoutBundle.TYPE_SHARED)) {
+    if (!getSharedBundle().hasType(IScoutBundle.TYPE_SHARED)) {
       throw new IllegalArgumentException("bundle must be a shared bundle.");
     }
   }

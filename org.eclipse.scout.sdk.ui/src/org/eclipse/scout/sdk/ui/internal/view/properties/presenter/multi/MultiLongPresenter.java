@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.multi;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -64,7 +65,7 @@ public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
     else if (value.longValue() == Long.MIN_VALUE) {
       return "Long.MIN_VALUE";
     }
-    return DecimalFormat.getNumberInstance().format(value);
+    return DecimalFormat.getNumberInstance(Locale.ENGLISH).format(value);
   }
 
   @Override
@@ -75,7 +76,7 @@ public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
     else if (value.longValue() == Long.MIN_VALUE) {
       return SdkProperties.NUMBER_MIN;
     }
-    return DecimalFormat.getNumberInstance().format(value);
+    return DecimalFormat.getNumberInstance(Locale.ENGLISH).format(value);
   }
 
   @Override

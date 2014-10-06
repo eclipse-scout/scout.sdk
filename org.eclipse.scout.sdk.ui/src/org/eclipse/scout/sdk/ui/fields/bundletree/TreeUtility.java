@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.ui.fields.bundletree;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -87,9 +86,13 @@ public final class TreeUtility {
     }
   }
 
-  public static ITreeNode createBundleTree(IScoutBundle scoutProject, ITreeNodeFilter treeNodeFilter, IScoutBundleFilter scoutBundleFilter) {
+  public static ITreeNode createBundleTree(IScoutBundle scoutProject, IScoutBundleFilter scoutBundleFilter) {
     ITreeNode rootNode = new TreeNode(CheckableTree.TYPE_ROOT, "root");
     rootNode.setVisible(false);
+
+    if (scoutProject == null) {
+      return rootNode;
+    }
 
     IScoutBundleFilter rootFilter = null;
     if (scoutBundleFilter == null) {
@@ -99,21 +102,18 @@ public final class TreeUtility {
       rootFilter = ScoutBundleFilters.getFilteredRootBundlesFilter(scoutBundleFilter);
     }
 
-    HashSet<IScoutBundle> rootBundles = new HashSet<IScoutBundle>();
-    if (scoutProject != null) {
-      for (IScoutBundle root : scoutProject.getParentBundles(rootFilter, true)) {
-        rootBundles.add(root);
-      }
-    }
-    recAddChildNodes(rootNode, rootBundles, treeNodeFilter);
+    Set<? extends IScoutBundle> rootBundles = scoutProject.getParentBundles(rootFilter, true);
+    recAddChildNodes(rootNode, rootBundles, scoutBundleFilter);
     return rootNode;
   }
 
-  private static void recAddChildNodes(ITreeNode node, Set<? extends IScoutBundle> bundles, ITreeNodeFilter filter) {
+  private static void recAddChildNodes(ITreeNode node, Set<? extends IScoutBundle> bundles, IScoutBundleFilter scoutBundleFilter) {
     for (IScoutBundle b : bundles) {
-      ITreeNode childNode = createBundleTreeNode(node, b, filter);
-      if (childNode != null) {
-        recAddChildNodes(childNode, b.getDirectChildBundles(), filter);
+      if (scoutBundleFilter == null || scoutBundleFilter.accept(b)) {
+        ITreeNode childNode = createBundleTreeNode(node, b);
+        if (childNode != null) {
+          recAddChildNodes(childNode, b.getDirectChildBundles(), scoutBundleFilter);
+        }
       }
     }
   }

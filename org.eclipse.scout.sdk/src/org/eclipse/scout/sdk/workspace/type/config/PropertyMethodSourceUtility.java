@@ -335,7 +335,7 @@ public final class PropertyMethodSourceUtility {
         referencedValue = referencedValue.replace('x', 'X');
         referencedValue = referencedValue.replace("E+", "E");
         try {
-          return DecimalFormat.getNumberInstance().parse(prefix + referencedValue).longValue();
+          return DecimalFormat.getNumberInstance(Locale.ENGLISH).parse(prefix + referencedValue).longValue();
         }
         catch (ParseException e) {
           throw new CoreException(new ScoutStatus("Error parsing parameter '" + prefix + referencedValue + "' to a decimal.", e));
@@ -446,7 +446,7 @@ public final class PropertyMethodSourceUtility {
       parameter = parameter.replace('e', 'E');
       parameter = parameter.replace("E+", "E");
       try {
-        return DecimalFormat.getNumberInstance().parse(parameter).longValue();
+        return DecimalFormat.getNumberInstance(Locale.ENGLISH).parse(parameter).longValue();
       }
       catch (ParseException e) {
         throw new CoreException(new ScoutStatus("Error parsing parameter '" + parameter + "' to a decimal.", e));

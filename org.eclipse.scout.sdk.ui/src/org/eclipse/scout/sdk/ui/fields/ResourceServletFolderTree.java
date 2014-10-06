@@ -30,7 +30,6 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNodeFilter;
-import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -49,7 +48,7 @@ public class ResourceServletFolderTree {
   private ITreeNode m_rootNode;
 
   public ResourceServletFolderTree(IScoutBundle project) {
-    m_rootNode = TreeUtility.createBundleTree(project, NodeFilters.getAcceptAll(), ScoutBundleFilters.getWorkspaceBundlesFilter());
+    m_rootNode = TreeUtility.createBundleTree(project, ScoutBundleFilters.getWorkspaceBundlesFilter());
     initTree(m_rootNode);
   }
 

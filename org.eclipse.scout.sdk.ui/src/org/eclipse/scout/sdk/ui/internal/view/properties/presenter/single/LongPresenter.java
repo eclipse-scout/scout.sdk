@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.properties.presenter.single;
 
 import java.text.DecimalFormat;
+import java.util.Locale;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -51,7 +52,7 @@ public class LongPresenter extends AbstractValuePresenter<Long> {
     else if (value.longValue() == Long.MIN_VALUE) {
       return SdkProperties.NUMBER_MIN;
     }
-    return DecimalFormat.getNumberInstance().format(value);
+    return DecimalFormat.getNumberInstance(Locale.ENGLISH).format(value);
   }
 
   @Override

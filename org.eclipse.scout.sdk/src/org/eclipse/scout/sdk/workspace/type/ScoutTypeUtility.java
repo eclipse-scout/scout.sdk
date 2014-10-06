@@ -1630,11 +1630,11 @@ public class ScoutTypeUtility extends TypeUtility {
    * @see IScoutBundleGraph
    */
   public static Set<IType> getSessionTypes(IJavaProject context) {
-    String type = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(context).getType();
-    if (IScoutBundle.TYPE_CLIENT.equals(type)) {
+    IScoutBundle bundle = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(context);
+    if (bundle.hasType(IScoutBundle.TYPE_CLIENT)) {
       return getClientSessionTypes(context);
     }
-    else if (IScoutBundle.TYPE_SERVER.equals(type)) {
+    else if (bundle.hasType(IScoutBundle.TYPE_SERVER)) {
       return getServerSessionTypes(context);
     }
     return null;
