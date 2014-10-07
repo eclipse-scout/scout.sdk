@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.marker.commands;
 
-import java.util.Arrays;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.operation.util.SourceFormatOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.ScoutUtility;
@@ -53,8 +54,8 @@ public class InvalidServiceCommand extends AbstractExecutableMarkerCommand {
 
   @Override
   public boolean prepareForUi() throws CoreException {
-    IType[] candidates = JaxWsSdkUtility.resolveServiceTypes(null, m_stubJarFile);
-    switch (candidates.length) {
+    Set<IType> candidates = JaxWsSdkUtility.resolveServiceTypes(null, m_stubJarFile);
+    switch (candidates.size()) {
       case 0: {
         MessageBox messageBox = new MessageBox(ScoutSdkUi.getShell(), SWT.ICON_INFORMATION | SWT.OK);
         messageBox.setText(Texts.get("Information"));
@@ -63,12 +64,12 @@ public class InvalidServiceCommand extends AbstractExecutableMarkerCommand {
         break;
       }
       case 1: {
-        m_serviceType = candidates[0];
+        m_serviceType = CollectionUtility.firstElement(candidates);
         break;
       }
       default: {
         TypeSelectionDialog dialog = new TypeSelectionDialog(ScoutSdkUi.getShell(), Texts.get("Service"), Texts.get("PleaseChooseServiceType"));
-        dialog.setElements(Arrays.asList(candidates));
+        dialog.setElements(candidates);
         if (dialog.open() == Dialog.OK) {
           m_serviceType = dialog.getElement();
         }

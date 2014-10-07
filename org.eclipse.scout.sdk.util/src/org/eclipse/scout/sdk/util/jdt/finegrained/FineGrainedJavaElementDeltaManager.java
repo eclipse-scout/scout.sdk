@@ -37,7 +37,7 @@ public final class FineGrainedJavaElementDeltaManager {
   }
 
   private final Object m_cacheLock;
-  private final WeakHashMap<IJavaElementDelta, Set<IJavaElement>> m_deltaCache;
+  private final Map<IJavaElementDelta, Set<IJavaElement>> m_deltaCache;
   private final Map<String/* path */, String/* source */> m_sourceCache;
   private final IBufferChangedListener m_bufferListener;
 
@@ -48,13 +48,11 @@ public final class FineGrainedJavaElementDeltaManager {
     m_bufferListener = new IBufferChangedListener() {
       @Override
       public void bufferChanged(BufferChangedEvent e) {
-        if (e.getBuffer().isClosed()) {
-          if (e.getBuffer().getOwner() instanceof ICompilationUnit) {
-            ICompilationUnit icu = (ICompilationUnit) e.getBuffer().getOwner();
-            synchronized (m_cacheLock) {
-              String path = icu.getPath().toString();
-              m_sourceCache.remove(path);
-            }
+        if (e.getBuffer().isClosed() && e.getBuffer().getOwner() instanceof ICompilationUnit) {
+          ICompilationUnit icu = (ICompilationUnit) e.getBuffer().getOwner();
+          synchronized (m_cacheLock) {
+            String path = icu.getPath().toString();
+            m_sourceCache.remove(path);
           }
         }
       }

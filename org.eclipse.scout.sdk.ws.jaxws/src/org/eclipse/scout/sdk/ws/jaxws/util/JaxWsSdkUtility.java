@@ -91,6 +91,7 @@ import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.ViewerFilter;
 import org.eclipse.jface.window.Window;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
@@ -98,6 +99,7 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.ImportValidator;
@@ -553,34 +555,35 @@ public final class JaxWsSdkUtility {
       new SearchEngine().search(
           SearchPattern.createPattern("*", IJavaSearchConstants.INTERFACE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_PATTERN_MATCH),
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
-          new JarFileSearchScope(jarFile), //SearchEngine.createWorkspaceScope(),
+          new JarFileSearchScope(jarFile),
           new SearchRequestor() {
             @Override
             public void acceptSearchMatch(SearchMatch match) throws CoreException {
               if (!(match instanceof TypeDeclarationMatch)) {
                 return;
               }
+
               IType candidate = (IType) match.getElement();
               if (!TypeUtility.exists(candidate) || !candidate.isBinary()) {
                 // type must be binary
                 return;
               }
+
               // candidates must be annotated WebService annotation
               IAnnotation annotation = JaxWsSdkUtility.getAnnotation(candidate, WebService.class.getName(), false);
               if (!TypeUtility.exists(annotation)) {
                 return;
               }
+
               if (portTypeQName == null) {
                 types.add(candidate);
                 return;
               }
+
               // candidate must match the port type
-              IMemberValuePair[] properties = annotation.getMemberValuePairs();
-              for (IMemberValuePair property : properties) {
-                if ("name".equals(property.getMemberName()) && property.getValue().equals(portTypeQName.getLocalPart())) {
-                  types.add(candidate);
-                  return;
-                }
+              String serviceName = JdtUtility.getAnnotationValueString(annotation, "name");
+              if (CompareUtility.equals(serviceName, portTypeQName.getLocalPart())) {
+                types.add(candidate);
               }
             }
           },
@@ -604,14 +607,14 @@ public final class JaxWsSdkUtility {
     if (serviceQName == null) {
       return null;
     }
-    IType[] types = resolveServiceTypes(serviceQName, jarFile);
-    if (types.length == 0) {
+    Set<IType> types = resolveServiceTypes(serviceQName, jarFile);
+    if (types.size() == 0) {
       return null;
     }
-    else if (types.length > 1) {
+    else if (types.size() > 1) {
       JaxWsSdk.logWarning("Multiple service types found for service '" + serviceQName + "'");
     }
-    return types[0];
+    return CollectionUtility.firstElement(types);
   }
 
   /**
@@ -623,13 +626,13 @@ public final class JaxWsSdkUtility {
    *          the jar file the service type to be searched in
    * @return
    */
-  public static IType[] resolveServiceTypes(final QName serviceQName, IFile jarFile) {
+  public static Set<IType> resolveServiceTypes(final QName serviceQName, IFile jarFile) {
     final Set<IType> types = new HashSet<IType>();
     try {
       new SearchEngine().search(
           SearchPattern.createPattern("*", IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_PATTERN_MATCH),
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
-          new JarFileSearchScope(jarFile), //SearchEngine.createWorkspaceScope(),
+          new JarFileSearchScope(jarFile),
           new SearchRequestor() {
             @Override
             public void acceptSearchMatch(SearchMatch match) throws CoreException {
@@ -651,22 +654,22 @@ public final class JaxWsSdkUtility {
               if (!JaxWsSdkUtility.isJdtSubType(javax.xml.ws.Service.class.getName(), candidate)) {
                 return;
               }
+
               // candidates must be annotated WebServiceClient annotation
               IAnnotation annotation = JaxWsSdkUtility.getAnnotation(candidate, WebServiceClient.class.getName(), false);
               if (!TypeUtility.exists(annotation)) {
                 return;
               }
+
               if (serviceQName == null) {
                 types.add(candidate);
                 return;
               }
+
               // candidate must match the service type
-              IMemberValuePair[] properties = annotation.getMemberValuePairs();
-              for (IMemberValuePair property : properties) {
-                if ("name.".equals(property.getMemberName()) && property.getValue().equals(serviceQName.getLocalPart())) {
-                  types.add(candidate);
-                  return;
-                }
+              String serviceName = JdtUtility.getAnnotationValueString(annotation, "name");
+              if (CompareUtility.equals(serviceName, serviceQName.getLocalPart())) {
+                types.add(candidate);
               }
             }
           },
@@ -676,7 +679,7 @@ public final class JaxWsSdkUtility {
     catch (Exception e) {
       JaxWsSdk.logError("Failed to resolve portType interface type", e);
     }
-    return types.toArray(new IType[types.size()]);
+    return types;
   }
 
   public static boolean isProviderAuthenticationSet(String fqn) {
@@ -892,32 +895,26 @@ public final class JaxWsSdkUtility {
    * @return
    */
   public static IAnnotation getAnnotation(IType declaringType, String fqnAnnotationName, boolean recursively) {
-    try {
-      if (!TypeUtility.exists(declaringType)) {
-        return null;
-      }
-      IAnnotation[] annotations = declaringType.getAnnotations();
-      for (IAnnotation annotation : annotations) {
-        if (declaringType.isBinary()) {
-          // annotation name is always fully qualified name if coming from a class file
-          if (annotation.getElementName().equals(fqnAnnotationName)) {
-            return annotation;
-          }
-        }
-        else {
-          if (annotation.getElementName().equals(fqnAnnotationName) || annotation.getElementName().equals(Signature.getSimpleName(fqnAnnotationName))) {
-            return annotation;
-          }
-        }
-      }
-
-      if (recursively) {
-        IType superType = TypeUtility.getSupertypeHierarchy(declaringType).getSuperclass(declaringType);
-        return getAnnotation(superType, fqnAnnotationName, recursively);
-      }
+    ITypeHierarchy superTypeHierarchy = null;
+    if (recursively) {
+      superTypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
     }
-    catch (JavaModelException e) {
-      JaxWsSdk.logError("failed to resolve annotations", e);
+    return getAnnotation(declaringType, fqnAnnotationName, recursively, superTypeHierarchy);
+  }
+
+  private static IAnnotation getAnnotation(IType declaringType, String fqnAnnotationName, boolean recursively, ITypeHierarchy superTypeHierarchy) {
+    if (!TypeUtility.exists(declaringType)) {
+      return null;
+    }
+
+    IAnnotation annotation = JdtUtility.getAnnotation(declaringType, fqnAnnotationName);
+    if (TypeUtility.exists(annotation)) {
+      return annotation;
+    }
+
+    if (recursively) {
+      IType superType = superTypeHierarchy.getSuperclass(declaringType);
+      return getAnnotation(superType, fqnAnnotationName, recursively, superTypeHierarchy);
     }
     return null;
   }
@@ -1131,17 +1128,16 @@ public final class JaxWsSdkUtility {
    * @return
    */
   public static boolean isJdtSubType(String fqnSuperType, IType candidateToCheck) {
-    if (candidateToCheck == null) {
+    if (!TypeUtility.exists(candidateToCheck)) {
       return false;
     }
-    Set<IType> superTypes = TypeUtility.getTypes(fqnSuperType);
-    ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(candidateToCheck);
-    for (IType superType : superTypes) {
-      if (superTypeHierarchy.contains(superType)) {
-        return true;
-      }
+
+    IType superTypes = TypeUtility.getType(fqnSuperType);
+    if (!TypeUtility.exists(superTypes)) {
+      return false;
     }
-    return false;
+
+    return TypeUtility.getSupertypeHierarchy(candidateToCheck).isSubtype(superTypes, candidateToCheck);
   }
 
   public static String resolveTypeName(IType declaringType, IType typeToBeResolved) throws CoreException {
