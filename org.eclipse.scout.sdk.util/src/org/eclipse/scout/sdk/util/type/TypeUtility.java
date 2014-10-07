@@ -51,7 +51,6 @@ import org.eclipse.jdt.core.dom.Block;
 import org.eclipse.jdt.core.dom.MethodDeclaration;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutSdkUtilCore;
@@ -641,24 +640,31 @@ public class TypeUtility {
     return element != null && element.exists();
   }
 
-  public static IType findInnerType(IType type, String innerTypeName) {
-    if (type == null) {
+  /**
+   * Searches for an {@link IType} with a specific name within the given type recursively checking all inner types. The
+   * given {@link IType} itself is checked as well.
+   *
+   * @param type
+   *          The {@link IType} to start searching. All nested inner {@link IType}s are visited recursively.
+   * @param innerTypeName
+   *          The simple name (case sensitive) to search for.
+   * @return The first {@link IType} found in the nested {@link IType} tree below the given start type that has the
+   *         given simple name or <code>null</code> if nothing could be found.
+   * @throws JavaModelException
+   */
+  public static IType findInnerType(IType type, String innerTypeName) throws JavaModelException {
+    if (!TypeUtility.exists(type)) {
       return null;
     }
-    else if (StringUtility.equalsIgnoreCase(type.getElementName(), innerTypeName)) {
+    else if (CompareUtility.equals(type.getElementName(), innerTypeName)) {
       return type;
     }
     else {
-      try {
-        for (IType innerType : type.getTypes()) {
-          IType found = findInnerType(innerType, innerTypeName);
-          if (found != null) {
-            return found;
-          }
+      for (IType innerType : type.getTypes()) {
+        IType found = findInnerType(innerType, innerTypeName);
+        if (found != null) {
+          return found;
         }
-      }
-      catch (JavaModelException e) {
-        SdkUtilActivator.logError("could not find inner type named '" + innerTypeName + "' in type '" + type.getFullyQualifiedName() + "'.", e);
       }
     }
     return null;

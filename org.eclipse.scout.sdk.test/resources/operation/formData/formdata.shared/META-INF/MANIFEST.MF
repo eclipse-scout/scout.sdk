@@ -10,7 +10,8 @@ Export-Package: formdata.shared,
  formdata.shared.services.pages,
  formdata.shared.services.process,
  formdata.shared.services.process.replace,
- formdata.shared.ui.forms
+ formdata.shared.ui.forms,
+ formdata.shared.ui.template.formfield.replace.levels
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.shared;visibility:=reexport
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

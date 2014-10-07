@@ -383,7 +383,7 @@ public final class DtoUtility {
     }
 
     // search field data within form data
-    IType formDataType = primaryType.getType(formDataName);
+    IType formDataType = TypeUtility.findInnerType(primaryType, formDataName);
     if (TypeUtility.exists(formDataType)) {
       return formDataType;
     }
