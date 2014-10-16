@@ -11,10 +11,11 @@
 package org.eclipse.scout.sdk.ui.dialog;
 
 import java.util.EventListener;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IMember;
 
 public interface IMemberSelectionChangedListener extends EventListener {
 
-  void handleSelectionChanged(IMember[] selection);
+  void handleSelectionChanged(Set<? extends IMember> selection);
 }

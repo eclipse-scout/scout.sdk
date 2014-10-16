@@ -17,15 +17,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
-import org.eclipse.scout.sdk.operation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.action.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction;
-import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service.ServiceOperationNodePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -43,15 +41,14 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
 
   private final IType m_interfaceType;
-  private final String m_readOnlySuffix;
   private P_ServiceMethodsListener m_serviceMethodListener;
 
   public AbstractServiceNodePage(AbstractPage parent, IType type, IType interfaceType, String readOnlySuffix) {
+    super(readOnlySuffix);
     setParent(parent);
     setType(type);
-    m_interfaceType = interfaceType;
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Service));
-    m_readOnlySuffix = readOnlySuffix;
+    m_interfaceType = interfaceType;
   }
 
   @Override
@@ -91,39 +88,9 @@ public abstract class AbstractServiceNodePage extends AbstractScoutTypePage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class,
-        ServiceOperationNewAction.class, ServiceDeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof ServiceRenameAction) {
-      ServiceRenameAction sra = (ServiceRenameAction) menu;
-      sra.setServiceImplementation(getType());
-      sra.setServiceInterface(getInterfaceType());
-      sra.setReadOnlySuffix(m_readOnlySuffix);
-      sra.setOldName(getType().getElementName());
-    }
-    else if (menu instanceof FormDataSqlBindingValidateAction) {
-      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          return CollectionUtility.hashSet(getType());
-        }
-      });
-    }
-    else if (menu instanceof ServiceOperationNewAction) {
-      ((ServiceOperationNewAction) menu).init(getInterfaceType(), getType());
-    }
-    else if (menu instanceof ServiceDeleteAction) {
-      ServiceDeleteAction action = (ServiceDeleteAction) menu;
-      action.setServiceImplementation(getType());
-      action.setServiceInterface(getInterfaceType());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class, ServiceOperationNewAction.class, ServiceDeleteAction.class);
   }
 
   public IType getInterfaceType() {

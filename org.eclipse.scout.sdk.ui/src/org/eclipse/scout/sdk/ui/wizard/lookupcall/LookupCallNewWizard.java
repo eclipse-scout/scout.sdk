@@ -48,7 +48,6 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 /**
@@ -57,7 +56,7 @@ import org.eclipse.ui.IWorkbench;
  * @author Andreas Hoegger
  * @since 1.0.8 25.08.2010
  */
-public class LookupCallNewWizard extends AbstractServiceWizard implements INewWizard {
+public class LookupCallNewWizard extends AbstractServiceWizard {
 
   public static final String TYPE_LOOKUPCALL = "lookupCall";
   public static final String TYPE_SERVICE_INTERFACE = "svcIfc";
@@ -65,37 +64,29 @@ public class LookupCallNewWizard extends AbstractServiceWizard implements INewWi
   public static final String TYPE_SERVICE_REG_CLIENT = "svcRegClient";
   public static final String TYPE_SERVICE_REG_SERVER = "svcRegServer";
 
-  private IScoutBundle m_sharedBundle;
   private LookupCallNewWizardPage m_page1;
   private BundleTreeWizardPage m_page2;
   private ITreeNode m_locationPageRoot;
   private LookupCallNewOperation m_operation;
 
-  public LookupCallNewWizard() {
-    this(null);
-  }
-
-  public LookupCallNewWizard(IScoutBundle sharedBundle) {
-    setWindowTitle(Texts.get("NewLookupCall"));
-    m_sharedBundle = sharedBundle;
-  }
-
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
-    m_sharedBundle = UiUtility.getScoutBundleFromSelection(selection, m_sharedBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED));
+    setWindowTitle(Texts.get("NewLookupCall"));
+
+    IScoutBundle sharedBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED));
 
     IScoutBundle clientBundle = null;
     IScoutBundle serverBundle = null;
-    if (m_sharedBundle != null) {
-      clientBundle = m_sharedBundle.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT)), false);
-      serverBundle = m_sharedBundle.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER)), false);
+    if (sharedBundle != null) {
+      clientBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT)), false);
+      serverBundle = sharedBundle.getChildBundle(ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER)), false);
     }
 
-    m_page1 = new LookupCallNewWizardPage(m_sharedBundle, serverBundle);
+    m_page1 = new LookupCallNewWizardPage(sharedBundle, serverBundle);
     addPage(m_page1);
 
-    if (m_sharedBundle != null) {
-      m_locationPageRoot = createTree(clientBundle, m_sharedBundle, serverBundle);
+    if (sharedBundle != null) {
+      m_locationPageRoot = createTree(clientBundle, sharedBundle, serverBundle);
 
       m_page2 = new BundleTreeWizardPage(Texts.get("LookupCallLocations"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
       m_page2.addStatusProvider(new P_StatusRevalidator());

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
-import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.client.ui.form.field.AbstractFormFieldNodePage;
@@ -25,13 +23,5 @@ public class HtmlFieldNodePage extends AbstractFormFieldNodePage {
   @Override
   public String getPageId() {
     return IScoutPageConstants.HTML_FIELD_NODE_PAGE;
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof FormFieldDeleteAction) {
-      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.HtmlFieldRemove));
-    }
   }
 }

@@ -16,7 +16,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformFormsOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.FormNewAction;
@@ -34,7 +33,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 /**
  * <h3>FormTablePage</h3>
  */
-public class FormTablePage extends AbstractPage {
+public class FormTablePage extends AbstractPage implements ITypeResolver {
   private ICachedTypeHierarchy m_formHierarchy;
 
   public FormTablePage(AbstractPage parent) {
@@ -70,12 +69,13 @@ public class FormTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    for (IType t : resolveForms()) {
+    for (IType t : getTypes()) {
       new FormNodePage(this, t);
     }
   }
 
-  protected Set<IType> resolveForms() {
+  @Override
+  public Set<IType> getTypes() {
     IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
     IType iSearchForm = TypeUtility.getType(IRuntimeClasses.ISearchForm);
 
@@ -91,30 +91,8 @@ public class FormTablePage extends AbstractPage {
     return allForms;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, FormNewAction.class, TypeResolverFormDataAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof WellformAction) {
-      WellformAction action = (WellformAction) menu;
-      action.setOperation(new WellformFormsOperation(getScoutBundle()));
-      action.init(getScoutBundle());
-      action.setLabel(Texts.get("WellformAllForms"));
-    }
-    else if (menu instanceof FormNewAction) {
-      ((FormNewAction) menu).setScoutBundle(getScoutBundle());
-    }
-    else if (menu instanceof TypeResolverFormDataAction) {
-      ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          return resolveForms();
-        }
-      }, getScoutBundle());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(WellformAction.class, FormNewAction.class, TypeResolverFormDataAction.class);
   }
 }

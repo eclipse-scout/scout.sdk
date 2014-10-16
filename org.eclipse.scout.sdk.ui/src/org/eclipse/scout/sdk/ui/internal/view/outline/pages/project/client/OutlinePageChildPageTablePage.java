@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
@@ -91,20 +93,9 @@ public class OutlinePageChildPageTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{PageLinkAction.class, PageNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof PageLinkAction) {
-      ((PageLinkAction) menu).init(getScoutBundle(), getOutlineType());
-    }
-    else if (menu instanceof PageNewAction) {
-      ((PageNewAction) menu).init(getScoutBundle(), getOutlineType());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(PageLinkAction.class, PageNewAction.class);
   }
 
   public IType getOutlineType() {

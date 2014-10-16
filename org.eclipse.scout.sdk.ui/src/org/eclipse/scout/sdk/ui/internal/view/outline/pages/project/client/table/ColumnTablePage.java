@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
@@ -74,24 +76,12 @@ public class ColumnTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TableColumnNewAction.class, TableColumnWidthsPasteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof TableColumnNewAction) {
-      ((TableColumnNewAction) menu).init(getColumnDeclaringType());
-    }
-    else if (menu instanceof TableColumnWidthsPasteAction) {
-      ((TableColumnWidthsPasteAction) menu).init(this);
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TableColumnNewAction.class, TableColumnWidthsPasteAction.class);
   }
 
   public IType getColumnDeclaringType() {
     return m_columnDeclaringType;
   }
-
 }

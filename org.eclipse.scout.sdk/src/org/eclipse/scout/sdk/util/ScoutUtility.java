@@ -508,7 +508,7 @@ public final class ScoutUtility {
       ScoutSdk.logError("unable to get all types in '" + declaringType.getCompilationUnit().getElementName() + "'.", e);
       return new Status(IStatus.ERROR, ScoutSdk.PLUGIN_ID, "Fatal: " + e.getMessage());
     }
-    IType formType = TypeUtility.getToplevelType(declaringType);
+    IType formType = TypeUtility.getPrimaryType(declaringType);
     String plainName = removeFieldSuffix(name);
     String pat = "(?:get|is)(?:" + name + "|" + plainName + ")";
     Set<IMethod> existingMethods = TypeUtility.getMethods(formType, MethodFilters.getNameRegexFilter(Pattern.compile(pat)));

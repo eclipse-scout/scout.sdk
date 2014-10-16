@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.ui.menu;
 
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -50,9 +50,9 @@ public class ScoutMenuContributionItemFactory extends ExtensionContributionFacto
   @Override
   public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {
 
-    Map<IScoutHandler.Category, ArrayList<IScoutHandler>> sorted = ContextMenuContributorExtensionPoint.getAllRegisteredContextMenusByCategory();
+    Map<IScoutHandler.Category, List<IScoutHandler>> sorted = ContextMenuContributorExtensionPoint.getAllRegisteredContextMenusByCategory();
 
-    for (Entry<IScoutHandler.Category, ArrayList<IScoutHandler>> entry : sorted.entrySet()) {
+    for (Entry<IScoutHandler.Category, List<IScoutHandler>> entry : sorted.entrySet()) {
       for (IScoutHandler a : entry.getValue()) {
         Command cmd = getCommand(serviceLocator, a);
 

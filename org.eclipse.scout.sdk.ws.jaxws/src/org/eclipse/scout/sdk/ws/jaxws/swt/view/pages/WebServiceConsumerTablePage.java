@@ -85,16 +85,8 @@ public class WebServiceConsumerTablePage extends AbstractPage {
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof ConsumerNewWizardAction) {
-      ((ConsumerNewWizardAction) menu).init(getScoutBundle());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ConsumerNewWizardAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(ConsumerNewWizardAction.class);
   }
 
   @Override

@@ -10,34 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.wizard.step.WizardStepNewWizard;
 
-public class WizardStepNewAction extends AbstractWizardAction {
-
-  private IType m_type;
+public class WizardStepNewAction extends AbstractScoutHandler {
 
   public WizardStepNewAction() {
     super(Texts.get("Action_newTypeX", "Wizard step"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardStepAdd), null, false, Category.NEW);
-  }
-
-  @Override
-  public boolean isVisible() {
-    return isEditable(m_type);
-  }
-
-  public void init(IType type) {
-    m_type = type;
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    WizardStepNewWizard wizard = new WizardStepNewWizard();
-    wizard.initWizard(m_type);
-    return wizard;
   }
 }

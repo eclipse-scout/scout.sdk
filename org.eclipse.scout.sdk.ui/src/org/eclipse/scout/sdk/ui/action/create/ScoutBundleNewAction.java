@@ -10,12 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.wizard.newbundle.ScoutBundleAddWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link ScoutBundleNewAction}</h3>
@@ -23,20 +20,9 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * @author Matthias Villiger
  * @since 3.8.0 02.03.2012
  */
-public class ScoutBundleNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_project;
+public class ScoutBundleNewAction extends AbstractScoutHandler {
 
   public ScoutBundleNewAction() {
     super(Texts.get("NewScoutBundles"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ScoutProjectAdd), null, false, Category.NEW);
-  }
-
-  public void setScoutProject(IScoutBundle project) {
-    m_project = project;
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new ScoutBundleAddWizard(m_project);
   }
 }

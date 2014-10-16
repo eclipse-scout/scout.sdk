@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.xml.ws.handler.Handler;
 
@@ -86,16 +87,8 @@ public class HandlerTablePage extends AbstractPage {
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof HandlerNewWizardAction) {
-      ((HandlerNewWizardAction) menu).init(getScoutBundle());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{HandlerNewWizardAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(HandlerNewWizardAction.class);
   }
 
   @Override

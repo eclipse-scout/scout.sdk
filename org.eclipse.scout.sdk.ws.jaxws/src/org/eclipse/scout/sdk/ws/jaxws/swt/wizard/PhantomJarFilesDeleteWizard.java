@@ -12,10 +12,12 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.wizard;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -31,14 +33,14 @@ import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 public class PhantomJarFilesDeleteWizard extends AbstractWorkspaceWizard {
 
   private ResourceSelectionWizardPage m_wizardPage;
-  private IScoutBundle m_bundle;
-  private IFile[] m_phantomJarFiles;
+  private final IScoutBundle m_bundle;
+  private final Set<IFile> m_phantomJarFiles;
   private IFile[] m_phantomJarFilesToBeDeleted;
 
-  public PhantomJarFilesDeleteWizard(IScoutBundle bundle, IFile[] phantomJarFiles) {
+  public PhantomJarFilesDeleteWizard(IScoutBundle bundle, Set<IFile> phantomJarFiles) {
     setWindowTitle(Texts.get("CleanupPhantomStubFiles"));
     m_bundle = bundle;
-    m_phantomJarFiles = phantomJarFiles;
+    m_phantomJarFiles = CollectionUtility.hashSet(phantomJarFiles);
   }
 
   @Override

@@ -23,7 +23,7 @@ public interface IFormFieldExtension {
 
   boolean isInShortList();
 
-  Class<? extends AbstractFormFieldWizard> getNewWizardClazz();
+  Class<? extends AbstractInnerTypeWizard> getNewWizardClazz();
 
   Class<? extends AbstractScoutTypePage> getNodePage();
 

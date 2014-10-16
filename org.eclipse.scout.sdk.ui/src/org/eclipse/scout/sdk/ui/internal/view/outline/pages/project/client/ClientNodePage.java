@@ -13,12 +13,8 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.operation.ITypeResolver;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.InstallClientSessionAction;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.ClassIdNewAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction;
@@ -36,7 +32,6 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.dto.formdata.ClientBundleUpdateFormDataOperation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -130,41 +125,8 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, MultipleUpdateFormDataAction.class, InstallClientSessionAction.class,
-        ScoutBundleNewAction.class, TypeResolverPageDataAction.class, ClassIdNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof WellformAction) {
-      WellformAction action = (WellformAction) menu;
-      action.setOperation(new WellformClientBundleOperation(CollectionUtility.hashSet(getScoutBundle())));
-      action.init(getScoutBundle());
-    }
-    else if (menu instanceof MultipleUpdateFormDataAction) {
-      ((MultipleUpdateFormDataAction) menu).setOperation(new ClientBundleUpdateFormDataOperation(getScoutBundle()));
-    }
-    else if (menu instanceof InstallClientSessionAction) {
-      ((InstallClientSessionAction) menu).init(m_clientSessionHierarchy, getScoutBundle());
-    }
-    else if (menu instanceof ScoutBundleNewAction) {
-      ((ScoutBundleNewAction) menu).setScoutProject(getScoutBundle());
-    }
-    else if (menu instanceof ClassIdNewAction) {
-      ((ClassIdNewAction) menu).setScoutBundle(getScoutBundle());
-    }
-    else if (menu instanceof TypeResolverPageDataAction) {
-      ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
-          ICachedTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
-          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
-        }
-      }, getScoutBundle());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(WellformAction.class, MultipleUpdateFormDataAction.class, ScoutBundleNewAction.class, TypeResolverPageDataAction.class, ClassIdNewAction.class);
   }
 }

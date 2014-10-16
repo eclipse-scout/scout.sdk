@@ -11,22 +11,30 @@
 package org.eclipse.scout.sdk.ui.wizard.outline;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.ui.IWorkbench;
 
 public class OutlineNewWizard extends AbstractWorkspaceWizard {
 
   private OutlineNewWizardPage m_page1;
 
-  public OutlineNewWizard(IScoutBundle clientBundle) {
-    this(clientBundle, null);
-  }
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
 
-  public OutlineNewWizard(IScoutBundle clientBunldle, IType desktopType) {
     setWindowTitle(Texts.get("NewOutline"));
-    m_page1 = new OutlineNewWizardPage(clientBunldle, desktopType);
 
+    IScoutBundle clientBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+    IType desktopType = UiUtility.getTypeFromSelection(selection, TypeFilters.getSubtypeFilter(IRuntimeClasses.IDesktop));
+
+    m_page1 = new OutlineNewWizardPage(clientBundle, desktopType);
     addPage(m_page1);
   }
 }

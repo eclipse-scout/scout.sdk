@@ -12,23 +12,30 @@ package org.eclipse.scout.nls.sdk.services.ui.wizard;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.nls.sdk.services.operation.CreateServiceNlsProjectOperation;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.ui.IWorkbench;
 
 public class NewNlsServiceWizard extends AbstractWorkspaceWizard {
 
-  private final IScoutBundle m_bundle;
-  private final NewTextProviderServiceWizardPage m_page1;
+  private IScoutBundle m_bundle;
+  private NewTextProviderServiceWizardPage m_page1;
   private CreateServiceNlsProjectOperation m_op;
 
-  public NewNlsServiceWizard(IScoutBundle b) {
-    m_bundle = b;
-    m_page1 = new NewTextProviderServiceWizardPage(m_bundle);
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
     setWindowTitle("Create a new Text Provider Service");
+
+    m_bundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED));
+    m_page1 = new NewTextProviderServiceWizardPage(m_bundle);
     addPage(m_page1);
   }
 
@@ -48,15 +55,9 @@ public class NewNlsServiceWizard extends AbstractWorkspaceWizard {
   }
 
   @Override
-  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
-    try {
-      m_op.validate();
-      m_op.run(monitor, workingCopyManager);
-      return true;
-    }
-    catch (CoreException e) {
-      ScoutSdkUi.logError("Error during creation of new Text Provider Service.", e);
-      return false;
-    }
+  protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    m_op.validate();
+    m_op.run(monitor, workingCopyManager);
+    return true;
   }
 }

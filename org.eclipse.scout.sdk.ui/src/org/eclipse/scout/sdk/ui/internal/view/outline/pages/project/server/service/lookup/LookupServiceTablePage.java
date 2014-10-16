@@ -17,9 +17,9 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.action.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.LookupServiceNewAction;
-import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
-public class LookupServiceTablePage extends AbstractPage {
+public class LookupServiceTablePage extends AbstractPage implements ITypeResolver {
 
   private ICachedTypeHierarchy m_serviceHierarchy;
 
@@ -66,15 +66,15 @@ public class LookupServiceTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    for (IType service : resolveAllLookupServices()) {
+    for (IType service : getTypes()) {
       Set<IType> interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
       new LookupServiceNodePage(this, service, CollectionUtility.firstElement(interfaces));
     }
   }
 
-  protected Set<IType> resolveAllLookupServices() {
+  @Override
+  public Set<IType> getTypes() {
     IType iLookupService = TypeUtility.getType(IRuntimeClasses.ILookupService);
-
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iLookupService);
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
@@ -82,24 +82,8 @@ public class LookupServiceTablePage extends AbstractPage {
     return m_serviceHierarchy.getAllSubtypes(iLookupService, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{FormDataSqlBindingValidateAction.class, LookupServiceNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof FormDataSqlBindingValidateAction) {
-      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          return resolveAllLookupServices();
-        }
-      });
-    }
-    else if (menu instanceof LookupServiceNewAction) {
-      ((LookupServiceNewAction) menu).setScoutBundle(getScoutBundle());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(FormDataSqlBindingValidateAction.class, LookupServiceNewAction.class);
   }
 }

@@ -77,15 +77,9 @@ public class WizardStepTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WizardStepNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    ((WizardStepNewAction) menu).init(getWizardType());
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(WizardStepNewAction.class);
   }
 
   public IType getWizardType() {

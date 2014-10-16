@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.operation.jdt;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -38,7 +39,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class JavaElementDeleteOperation implements IOperation {
 
-  private List<IJavaElement> m_typesToDelete;
+  private List<IJavaElement> m_elementsToDelete;
   private boolean m_formatSource;
 
   public JavaElementDeleteOperation() {
@@ -47,26 +48,26 @@ public class JavaElementDeleteOperation implements IOperation {
 
   public JavaElementDeleteOperation(boolean formatSource) {
     m_formatSource = formatSource;
-    m_typesToDelete = new ArrayList<IJavaElement>();
+    m_elementsToDelete = new ArrayList<IJavaElement>();
   }
 
-  public void setMembers(IJavaElement[] members) {
-    m_typesToDelete = CollectionUtility.arrayList(members);
+  public void setMembers(Collection<? extends IJavaElement> members) {
+    m_elementsToDelete = CollectionUtility.arrayList(members);
   }
 
   public void addMember(IJavaElement element) {
-    m_typesToDelete.add(element);
+    m_elementsToDelete.add(element);
   }
 
   public boolean removeMember(IJavaElement type) {
-    return m_typesToDelete.remove(type);
+    return m_elementsToDelete.remove(type);
   }
 
   @Override
   public String getOperationName() {
     StringBuilder builder = new StringBuilder();
     builder.append("delete ");
-    for (IJavaElement t : m_typesToDelete) {
+    for (IJavaElement t : m_elementsToDelete) {
       builder.append(t.getElementName() + ", ");
     }
     builder.replace(builder.length() - 2, builder.length(), "");
@@ -76,10 +77,10 @@ public class JavaElementDeleteOperation implements IOperation {
 
   @Override
   public void validate() {
-    if (m_typesToDelete == null) {
+    if (m_elementsToDelete == null) {
       throw new IllegalArgumentException("null argument for members not allowed.");
     }
-    for (IJavaElement m : m_typesToDelete) {
+    for (IJavaElement m : m_elementsToDelete) {
       if (m == null) {
         throw new IllegalArgumentException("null member in the member array.");
       }
@@ -92,7 +93,7 @@ public class JavaElementDeleteOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     HashSet<ICompilationUnit> icuForOrganizeImports = new HashSet<ICompilationUnit>();
-    for (IJavaElement m : m_typesToDelete) {
+    for (IJavaElement m : m_elementsToDelete) {
       if (TypeUtility.exists(m)) {
         ICompilationUnit icuDoDel = null;
         if (m.getElementType() == IJavaElement.TYPE && ((IType) m).getDeclaringType() == null) {

@@ -27,8 +27,10 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -61,6 +63,7 @@ import org.eclipse.scout.sdk.ws.jaxws.util.SchemaUtility.WsdlArtifact.TypeEnum;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility;
 import org.eclipse.scout.sdk.ws.jaxws.util.ServletRegistrationUtility.Registration;
 import org.eclipse.scout.sdk.ws.jaxws.util.listener.IOperationFinishedListener;
+import org.eclipse.ui.IWorkbench;
 
 public class WsProviderNewWizard extends AbstractWorkspaceWizard {
 
@@ -86,10 +89,14 @@ public class WsProviderNewWizard extends AbstractWorkspaceWizard {
   private String m_alias;
   private boolean m_createBindingFile;
 
-  public WsProviderNewWizard(IScoutBundle bundle) {
-    m_bundle = bundle;
-    m_copyOperations = new ExternalFileCopyOperation[0];
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
     setWindowTitle(Texts.get("CreateWsProvider"));
+
+    m_copyOperations = new ExternalFileCopyOperation[0];
+    m_bundle = UiUtility.getScoutBundleFromSelection(selection);
   }
 
   @Override

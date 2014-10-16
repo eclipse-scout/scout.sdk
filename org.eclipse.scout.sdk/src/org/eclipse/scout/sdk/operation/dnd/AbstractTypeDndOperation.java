@@ -156,7 +156,7 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
     }
 
     // format
-    JavaElementFormatOperation formatOp = new JavaElementFormatOperation(TypeUtility.getToplevelType(getTargetDeclaringType()), true);
+    JavaElementFormatOperation formatOp = new JavaElementFormatOperation(TypeUtility.getPrimaryType(getTargetDeclaringType()), true);
     formatOp.validate();
     formatOp.run(monitor, workingCopyManager);
   }

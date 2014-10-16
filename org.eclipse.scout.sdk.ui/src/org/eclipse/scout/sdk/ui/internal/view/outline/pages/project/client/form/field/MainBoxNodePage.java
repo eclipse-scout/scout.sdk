@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
+import java.util.Set;
+
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
@@ -32,9 +34,8 @@ public class MainBoxNodePage extends AbstractBoxNodePage {
     return IScoutPageConstants.MAIN_BOX_NODE_PAGE;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{FormFieldRenameAction.class, ShowJavaReferencesAction.class, FormFieldNewAction.class, CreateTemplateAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(FormFieldRenameAction.class, ShowJavaReferencesAction.class, FormFieldNewAction.class, CreateTemplateAction.class);
   }
 }

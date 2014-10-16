@@ -16,7 +16,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -81,11 +80,5 @@ public class AccessControlServiceTablePage extends AbstractPage {
       m_serviceHierarchy.addHierarchyListener(getPageDirtyListener());
     }
     return m_serviceHierarchy.getAllSubtypes(iAccessControlService, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{};
   }
 }

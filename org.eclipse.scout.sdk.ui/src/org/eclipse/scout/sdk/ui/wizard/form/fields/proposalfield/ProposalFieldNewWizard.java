@@ -10,51 +10,40 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.form.fields.proposalfield;
 
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
-import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.form.fields.smartfield.SmartFieldNewWizardPage;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.ui.IWorkbench;
 
-public class ProposalFieldNewWizard extends AbstractFormFieldWizard {
+public class ProposalFieldNewWizard extends AbstractInnerTypeWizard {
 
   private SmartFieldNewWizardPage m_page1;
 
-  public ProposalFieldNewWizard() {
-    setWindowTitle(Texts.get("NewProposalField"));
-  }
-
   @Override
-  public void initWizard(IType declaringType) {
-    super.initWizard(declaringType);
-    m_page1 = new SmartFieldNewWizardPage(getDeclaringType(), Texts.get("NewProposalField"), Texts.get("CreateANewProposalField"), RuntimeClasses.getSuperType(IRuntimeClasses.IProposalField, declaringType.getJavaProject()));
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
+    setWindowTitle(Texts.get("NewProposalField"));
+
+    m_page1 = new SmartFieldNewWizardPage(getDeclaringType(), Texts.get("NewProposalField"), Texts.get("CreateANewProposalField"), RuntimeClasses.getSuperType(IRuntimeClasses.IProposalField, getDeclaringType().getJavaProject()));
+    if (getSiblingProposal() != null) {
+      m_page1.setSibling(getSiblingProposal());
+    }
+    if (getTypeName() != null) {
+      m_page1.setTypeName(getTypeName());
+    }
+    if (getSuperType() != null) {
+      m_page1.setSuperType(getSuperType());
+    }
     addPage(m_page1);
   }
 
   @Override
-  public void setSuperType(IType superType) {
-    m_page1.setSuperType(superType);
-  }
-
-  @Override
-  public void setTypeName(String name) {
-    m_page1.setTypeName(name);
-  }
-
-  @Override
-  public void setSibling(SiblingProposal sibling) {
-    m_page1.setSibling(sibling);
-  }
-
-  @Override
   protected void postFinishDisplayThread() {
-    IType createdField = m_page1.getCreatedField();
-    if (TypeUtility.exists(createdField)) {
-      ScoutSdkUi.showJavaElementInEditor(createdField, false);
-    }
+    ScoutSdkUi.showJavaElementInEditor(m_page1.getCreatedField(), false);
   }
 }

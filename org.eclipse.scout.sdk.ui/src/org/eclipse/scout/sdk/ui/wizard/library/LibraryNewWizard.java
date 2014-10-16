@@ -18,12 +18,15 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.operation.library.LibraryBundleCreateOperation;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.ui.IWorkbench;
 
 /**
  * <h3>{@link LibraryNewWizard}</h3>
@@ -35,10 +38,14 @@ public class LibraryNewWizard extends AbstractWorkspaceWizard {
 
   private JarSelectionWizardPage m_jarSelectionWizardPage;
   private LibraryTypeWizardPage m_libraryWizardPage;
-  private final IScoutBundle m_ownerBundle;
+  private IScoutBundle m_ownerBundle;
 
-  public LibraryNewWizard(IScoutBundle ownerBundle) {
-    m_ownerBundle = ownerBundle;
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
+    m_ownerBundle = UiUtility.getScoutBundleFromSelection(selection);
+
     m_jarSelectionWizardPage = new JarSelectionWizardPage();
     // listener to track jar selection
     m_jarSelectionWizardPage.addPropertyChangeListener(new PropertyChangeListener() {
@@ -77,7 +84,8 @@ public class LibraryNewWizard extends AbstractWorkspaceWizard {
       }
     });
     addPage(m_jarSelectionWizardPage);
-    m_libraryWizardPage = new LibraryTypeWizardPage(ownerBundle);
+
+    m_libraryWizardPage = new LibraryTypeWizardPage(m_ownerBundle);
     addPage(m_libraryWizardPage);
   }
 

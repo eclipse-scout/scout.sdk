@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
@@ -43,18 +45,8 @@ public class LookupCallNodePage extends AbstractScoutTypePage {
     new BeanPropertyTablePage(this, getType());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ShowJavaReferencesAction.class, LookupCallDeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof LookupCallDeleteAction) {
-      LookupCallDeleteAction action = (LookupCallDeleteAction) menu;
-      action.setLookupCall(getType());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(ShowJavaReferencesAction.class, LookupCallDeleteAction.class);
   }
 }

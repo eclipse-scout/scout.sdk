@@ -10,48 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsConstants;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsRuntimeClasses;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
-import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
-import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
-import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
-import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
-import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
-import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.PhantomJarFilesDeleteWizard;
-import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.MessageBox;
-import org.eclipse.swt.widgets.Shell;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 public class CleanupPhantomJarFileAction extends AbstractLinkAction {
-
-  private IScoutBundle m_bundle;
 
   public CleanupPhantomJarFileAction() {
     super(Texts.get("CleanupUnreferencedJarFiles"), JaxWsSdk.getImageDescriptor(JaxWsIcons.Jar));
@@ -60,120 +23,4 @@ public class CleanupPhantomJarFileAction extends AbstractLinkAction {
     setToolTip(Texts.get("TooltipCleanupUnreferencedJarFiles"));
   }
 
-  public void init(IScoutBundle bundle) {
-    m_bundle = bundle;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  @Override
-  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    IFile[] phantomJarFiles = getPhantomJarFiles();
-    if (phantomJarFiles.length == 0) {
-      MessageBox messageBox = new MessageBox(ScoutSdkUi.getShell(), SWT.ICON_INFORMATION | SWT.OK);
-      messageBox.setText(Texts.get("Information"));
-      messageBox.setMessage(Texts.get("NoPhantomJarFilesFound"));
-      messageBox.open();
-      return null;
-    }
-
-    IWizard wizard = new PhantomJarFilesDeleteWizard(m_bundle, phantomJarFiles);
-    ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
-    wizardDialog.setHelpAvailable(false);
-    wizardDialog.open();
-    return null;
-  }
-
-  private IFile[] getPhantomJarFiles() {
-    IFolder folder = JaxWsSdkUtility.getFolder(m_bundle, JaxWsConstants.STUB_FOLDER, false);
-    if (folder == null || !folder.exists()) {
-      return new IFile[0];
-    }
-
-    // determine referenced JAR files
-    Set<IFile> usedJarFiles = new HashSet<IFile>();
-    usedJarFiles.addAll(Arrays.asList(getProviderJarFiles()));
-    usedJarFiles.addAll(Arrays.asList(getConsumerJarFiles()));
-
-    // get all JAR files in stub folder
-    Set<IFile> candidates = new HashSet<IFile>();
-    try {
-      for (IResource resource : folder.members()) {
-        if (!resource.exists() || resource.getType() != IResource.FILE) {
-          continue;
-        }
-        IFile file = (IFile) resource;
-        if ("jar".equalsIgnoreCase(file.getFileExtension())) {
-          candidates.add(file);
-        }
-      }
-
-      // determine phantom JAR files
-      Set<IFile> phantomJarFiles = new HashSet<IFile>();
-      for (IFile candiate : candidates) {
-        if (!usedJarFiles.contains(candiate)) {
-          phantomJarFiles.add(candiate);
-        }
-      }
-      return phantomJarFiles.toArray(new IFile[phantomJarFiles.size()]);
-    }
-    catch (CoreException e) {
-      JaxWsSdk.logError(e);
-      return new IFile[0];
-    }
-  }
-
-  private IFile[] getProviderJarFiles() {
-    Set<IFile> jarFiles = new HashSet<IFile>();
-
-    XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(m_bundle);
-    Document sunJaxWsXmlDocument = sunJaxWsResource.loadXml();
-
-    if (sunJaxWsXmlDocument == null || sunJaxWsXmlDocument.getDocumentElement() == null) {
-      return new IFile[0];
-    }
-
-    String tagName = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(sunJaxWsXmlDocument.getDocumentElement()), SunJaxWsBean.XML_ENDPOINT);
-    List<Element> childElements = JaxWsSdkUtility.getChildElements(sunJaxWsXmlDocument.getDocumentElement().getChildNodes(), tagName);
-    for (Element sunJaxWsXml : childElements) {
-      SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
-      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, sunJaxWsBean.getAlias(), WebserviceEnum.PROVIDER);
-      if (buildJaxWsBean == null) {
-        // only consider by-contract providers
-        continue;
-      }
-
-      IFile jarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, buildJaxWsBean, sunJaxWsBean.getWsdl());
-      if (jarFile != null && jarFile.exists()) {
-        jarFiles.add(jarFile);
-      }
-    }
-    return jarFiles.toArray(new IFile[jarFiles.size()]);
-  }
-
-  private IFile[] getConsumerJarFiles() {
-    Set<IFile> jarFiles = new HashSet<IFile>();
-
-    ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient));
-    Set<IType> wsConsumerTypes = hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), ScoutTypeFilters.getClassesInScoutBundles(m_bundle));
-
-    for (IType consumerType : wsConsumerTypes) {
-      if (!TypeUtility.exists(consumerType)) {
-        continue;
-      }
-      BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(m_bundle, consumerType.getElementName(), WebserviceEnum.CONSUMER);
-      if (buildJaxWsBean == null) {
-        continue;
-      }
-      IFile jarFile = JaxWsSdkUtility.getStubJarFile(m_bundle, buildJaxWsBean, buildJaxWsBean.getWsdl());
-      if (jarFile != null && jarFile.exists()) {
-        jarFiles.add(jarFile);
-      }
-    }
-
-    return jarFiles.toArray(new IFile[jarFiles.size()]);
-  }
 }

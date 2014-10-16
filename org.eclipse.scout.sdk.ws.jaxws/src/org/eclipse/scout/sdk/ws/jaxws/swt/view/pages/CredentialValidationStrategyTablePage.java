@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
@@ -79,16 +80,8 @@ public class CredentialValidationStrategyTablePage extends AbstractPage {
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof CredentialValidationStrategyNewAction) {
-      ((CredentialValidationStrategyNewAction) menu).init(getScoutBundle());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{CredentialValidationStrategyNewAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(CredentialValidationStrategyNewAction.class);
   }
 
   @Override

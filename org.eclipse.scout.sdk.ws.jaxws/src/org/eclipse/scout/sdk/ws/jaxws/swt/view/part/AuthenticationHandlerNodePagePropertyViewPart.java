@@ -87,8 +87,8 @@ public class AuthenticationHandlerNodePagePropertyViewPart extends AbstractSingl
 
       // QuickLink 'Open Type'
       TypeOpenAction action = new TypeOpenAction();
-      action.init(getPage().getType());
-      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), action, getFormToolkit());
+      action.setLinkText(getPage().getType().getElementName());
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), action, getFormToolkit(), getPage().getType());
       applyLayoutData(actionPresenter);
 
       m_transactionalPresenter = new AnnotationPresenter(getSection(SECTION_ID_PROPERTIES).getSectionClient(), getFormToolkit(),

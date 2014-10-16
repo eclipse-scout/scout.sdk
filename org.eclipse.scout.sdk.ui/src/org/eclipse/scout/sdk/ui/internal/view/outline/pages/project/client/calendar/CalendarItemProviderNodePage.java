@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.calendar;
 
+import java.util.Set;
+
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
-import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
+import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
@@ -40,19 +42,8 @@ public class CalendarItemProviderNodePage extends AbstractScoutTypePage {
     new MenuTablePage(this, getType());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, MemberListDeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof MemberListDeleteAction) {
-      MemberListDeleteAction action = (MemberListDeleteAction) menu;
-      action.addMemberToDelete(getType());
-      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarItemProviderRemove));
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class);
   }
 }

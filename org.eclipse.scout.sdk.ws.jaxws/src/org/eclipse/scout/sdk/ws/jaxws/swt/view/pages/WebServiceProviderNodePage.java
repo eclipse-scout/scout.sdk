@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -31,7 +30,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -48,7 +46,6 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ManagedResource;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.RefreshAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.StubRebuildAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderDeleteAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
@@ -147,21 +144,10 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof WsProviderDeleteAction) {
-      ((WsProviderDeleteAction) menu).init(m_bundle, getSunJaxWsBean(), getBuildJaxWsBean());
-    }
-    else if (menu instanceof StubRebuildAction) {
-      ((StubRebuildAction) menu).init(m_bundle, getBuildJaxWsBean(), getWsdlResource(), m_markerGroupUUID, WebserviceEnum.PROVIDER);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    List<Class<? extends AbstractScoutHandler>> actions = new ArrayList<Class<? extends AbstractScoutHandler>>();
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    Set<Class<? extends IScoutHandler>> actions = new HashSet<Class<? extends IScoutHandler>>();
+    actions.addAll(super.getSupportedMenuActions());
     actions.add(WsProviderDeleteAction.class);
-    actions.add(RefreshAction.class);
     if (getBuildJaxWsBean() != null
         && getSunJaxWsBean() != null
         && !MarkerUtility.containsMarker(m_bundle, MarkerType.StubFolder, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)
@@ -169,7 +155,7 @@ public class WebServiceProviderNodePage extends AbstractPage implements IMarkerR
       actions.add(StubRebuildAction.class);
     }
 
-    return actions.toArray(new Class[actions.size()]);
+    return actions;
   }
 
   @Override

@@ -22,7 +22,6 @@ import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.CleanupPhantomJarFileAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction.FileExtensionType;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServicesTablePage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.ActionPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.InformationPresenter;
@@ -52,16 +51,16 @@ public class WebServicesTablePagePropertyViewPart extends AbstractSinglePageSect
       IFile buildJaxWsFile = ResourceFactory.getBuildJaxWsResource(m_bundle).getFile();
       if (JaxWsSdkUtility.exists(buildJaxWsFile)) {
         FileOpenAction a = new FileOpenAction();
-        a.init(buildJaxWsFile, buildJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsSdk.BuildJaxWsXmlFile), FileExtensionType.XML);
+        a.setLinkText(buildJaxWsFile.getName());
+        a.setImage(JaxWsSdk.getImageDescriptor(JaxWsSdk.BuildJaxWsXmlFile));
         a.setToolTip(Texts.get("JaxWsBuildDescriptor"));
-        ActionPresenter presenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit());
+        ActionPresenter presenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit(), buildJaxWsFile);
         applyLayoutData(presenter);
       }
 
       // cleanup phantom JAR-Files
       CleanupPhantomJarFileAction b = new CleanupPhantomJarFileAction();
-      b.init(m_bundle);
-      AbstractPresenter presenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit());
+      AbstractPresenter presenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit(), getPage());
       applyLayoutData(presenter);
 
       // JAX-WS library conflict

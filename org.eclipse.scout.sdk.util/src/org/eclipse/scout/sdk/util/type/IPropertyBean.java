@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.util.type;
 
 import java.beans.PropertyDescriptor;
+import java.util.List;
 
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMember;
@@ -48,7 +49,7 @@ public interface IPropertyBean {
   /**
    * @return the read, write method and the field if not null.
    */
-  IMember[] getAllMembers();
+  List<IMember> getAllMembers();
 
   /**
    * @return Returns the bean's name.

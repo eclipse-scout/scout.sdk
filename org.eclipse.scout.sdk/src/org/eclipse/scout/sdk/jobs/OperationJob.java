@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.jobs;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -29,7 +28,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class OperationJob extends AbstractWorkspaceBlockingJob {
 
-  private List<IOperation> m_operations;
+  private final List<IOperation> m_operations;
 
   public OperationJob() {
     this((Collection<IOperation>) null);
@@ -40,13 +39,12 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
   }
 
   public OperationJob(Collection<IOperation> operations) {
+    this(CollectionUtility.arrayList(operations));
+  }
+
+  private OperationJob(List<IOperation> operations) {
     super("");
-    if (operations == null) {
-      m_operations = new ArrayList<IOperation>();
-    }
-    else {
-      m_operations = new ArrayList<IOperation>(operations);
-    }
+    m_operations = operations;
     updateJobName();
   }
 
@@ -87,7 +85,7 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
 
   @Override
   protected final void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    IOperation[] allOps;
+    List<IOperation> allOps;
     synchronized (m_operations) {
       allOps = getAllOperations();
     }
@@ -127,9 +125,9 @@ public class OperationJob extends AbstractWorkspaceBlockingJob {
     updateJobName();
   }
 
-  public IOperation[] getAllOperations() {
+  public List<IOperation> getAllOperations() {
     synchronized (m_operations) {
-      return m_operations.toArray(new IOperation[m_operations.size()]);
+      return CollectionUtility.arrayList(m_operations);
     }
   }
 

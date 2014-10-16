@@ -36,12 +36,18 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.ui.executor.AbstractWizardExecutor;
+import org.eclipse.scout.sdk.ui.executor.DefaultTableColumnNewExecutor;
+import org.eclipse.scout.sdk.ui.executor.SmartTableColumnNewExecutor;
+import org.eclipse.scout.sdk.ui.executor.selection.ScoutStructuredSelection;
+import org.eclipse.scout.sdk.ui.extensions.executor.ExecutorExtensionPoint;
+import org.eclipse.scout.sdk.ui.extensions.executor.IExecutor;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
 import org.eclipse.scout.sdk.ui.fields.table.ISeparator;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard.ContinueOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE_OPERATION;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -50,6 +56,8 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.INewWizard;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3> {@link TableColumnNewWizardPage1}</h3>
@@ -58,7 +66,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
   private final IType iSmartColumn = TypeUtility.getType(IRuntimeClasses.ISmartColumn);
 
   private IType m_declaringType;
-  private CONTINUE_OPERATION m_nextOperation;
+  private ContinueOperation m_nextOperation;
 
   private FilteredTable m_filteredTable;
   private Object m_currentSelection;
@@ -67,7 +75,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
   private String m_name;
   private SiblingProposal m_sibling;
 
-  public TableColumnNewWizardPage1(IType declaringType, CONTINUE_OPERATION op) {
+  public TableColumnNewWizardPage1(IType declaringType, ContinueOperation op) {
     super(TableColumnNewWizardPage1.class.getName());
     setTitle(Texts.get("TableColumnTemplates"));
     setDescription(Texts.get("ChooseATemplateForYourTableColumn"));
@@ -115,7 +123,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
           validateNextPage();
           IWizardPage page = getNextPage();
           if (page == null) {
-            // something must have happend getting the next page
+            // something must have happened getting the next page
             return;
           }
 
@@ -144,24 +152,28 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       m_nextPage = null;
     }
     else {
+      IExecutor exec = null;
       ITypeHierarchy selectedSuperTypeHierarchy = TypeUtility.getSupertypeHierarchy(m_selectedTemplate);
       if (selectedSuperTypeHierarchy != null && selectedSuperTypeHierarchy.contains(iSmartColumn)) {
-        SmartTableColumnNewWizard wizard = new SmartTableColumnNewWizard(m_nextOperation);
-        wizard.initWizard(m_declaringType);
-        wizard.setSuperType(m_selectedTemplate);
-        // forward properties to next page
-        wizard.getSmartTableColumnNewWizardPage().setTypeName(getTypeName());
-        wizard.getSmartTableColumnNewWizardPage().setSibling(getSibling());
-        m_nextPage = wizard.getPages()[0];
+        exec = ExecutorExtensionPoint.getExecutorFor(SmartTableColumnNewExecutor.ID);
       }
       else {
-        DefaultTableColumnNewWizard wizard = new DefaultTableColumnNewWizard(m_nextOperation);
-        wizard.initWizard(m_declaringType);
-        wizard.setSuperType(m_selectedTemplate);
-        // forward properties to next page
-        wizard.getDefaultTableColumnNewWizardPage().setTypeName(getTypeName());
-        wizard.getDefaultTableColumnNewWizardPage().setSibling(getSibling());
-        m_nextPage = wizard.getPages()[0];
+        exec = ExecutorExtensionPoint.getExecutorFor(DefaultTableColumnNewExecutor.ID);
+      }
+
+      m_nextPage = null;
+      if (exec instanceof AbstractWizardExecutor) {
+        AbstractWizardExecutor wizExec = (AbstractWizardExecutor) exec;
+        INewWizard nextWizard = wizExec.getNewWizardInstance();
+        if (nextWizard != null) {
+          ScoutStructuredSelection selection = new ScoutStructuredSelection(new Object[]{m_declaringType});
+          selection.setContinueOperation(m_nextOperation);
+          selection.setTypeName(getTypeName());
+          selection.setSibling(getSibling());
+          selection.setSuperType(m_selectedTemplate);
+          nextWizard.init(PlatformUI.getWorkbench(), selection);
+          m_nextPage = nextWizard.getPages()[0];
+        }
       }
     }
   }
@@ -182,10 +194,17 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
   }
 
   public void setSuperType(IType selectedType) {
-    IStructuredContentProvider prov = (IStructuredContentProvider) m_filteredTable.getViewer().getContentProvider();
-    for (Object row : prov.getElements(null)) {
-      if (((IType) row).equals(selectedType)) {
-        m_filteredTable.getViewer().setSelection(new StructuredSelection(selectedType));
+    if (isControlCreated()) {
+      if (!TypeUtility.exists(selectedType)) {
+        m_filteredTable.getViewer().setSelection(null, false);
+      }
+      else {
+        IStructuredContentProvider prov = (IStructuredContentProvider) m_filteredTable.getViewer().getContentProvider();
+        for (Object row : prov.getElements(null)) {
+          if (((IType) row).equals(selectedType)) {
+            m_filteredTable.getViewer().setSelection(new StructuredSelection(selectedType), true);
+          }
+        }
       }
     }
     validateNextPage();

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline.pages;
 
+import java.util.Set;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
@@ -52,6 +54,10 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
     return m_type;
   }
 
+  public String getReadOnlySuffix() {
+    return m_readOnlySuffix;
+  }
+
   protected ITypeHierarchy getLocalHierarchy() {
     IPage p = this;
     while (p != null) {
@@ -81,23 +87,9 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
     return quality;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof TypeRenameAction) {
-      TypeRenameAction action = (TypeRenameAction) menu;
-      action.setOldName(getType().getElementName());
-      action.setReadOnlySuffix(m_readOnlySuffix);
-      action.setType(getType());
-    }
-    else if (menu instanceof ShowJavaReferencesAction) {
-      ((ShowJavaReferencesAction) menu).setElement(getType());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TypeRenameAction.class, ShowJavaReferencesAction.class);
   }
 
   @Override

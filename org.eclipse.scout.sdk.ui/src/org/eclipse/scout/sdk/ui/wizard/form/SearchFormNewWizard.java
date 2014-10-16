@@ -19,12 +19,14 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.IDefaultTargetPackage;
 import org.eclipse.scout.sdk.operation.form.SearchFormNewOperation;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
@@ -41,72 +43,66 @@ import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
+import org.eclipse.scout.sdk.util.type.TypeFilters;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
-public class SearchFormNewWizard extends AbstractWorkspaceWizard implements INewWizard {
+public class SearchFormNewWizard extends AbstractWorkspaceWizard {
 
   public static final String TYPE_SEARCH_FORM = "searchForm";
   public static final String TYPE_SEARCH_FORM_DATA = "searchFormData";
   public static final String TYPE_HANDLER_SEARCH = "searchHandler";
 
-  private IScoutBundle m_clientBundle;
   private SearchFormNewWizardPage m_page1;
   private BundleTreeWizardPage m_page2;
   private SearchFormNewOperation m_operation;
   private ITreeNode m_locationPageRoot;
 
-  public SearchFormNewWizard() {
-    this(null);
-  }
-
-  public SearchFormNewWizard(IScoutBundle clientBundle) {
-    setWindowTitle(Texts.get("NewSearchForm"));
-    m_clientBundle = clientBundle;
-  }
-
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
-    m_clientBundle = UiUtility.getScoutBundleFromSelection(selection, m_clientBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+    setWindowTitle(Texts.get("NewSearchForm"));
+
+    IScoutBundle clientBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
     String pck = UiUtility.getPackageSuffix(selection);
+    IType tablePageType = UiUtility.getTypeFromSelection(selection, TypeFilters.getSubtypeFilter(IRuntimeClasses.IPageWithTable));
+    INlsEntry nlsEntry = null;
+    if (TypeUtility.exists(tablePageType)) {
+      IMethod titleMethod = TypeUtility.getMethod(tablePageType, "getConfiguredTitle");
+      if (TypeUtility.exists(titleMethod)) {
+        try {
+          nlsEntry = ScoutUtility.getReturnNlsEntry(titleMethod);
+        }
+        catch (CoreException e) {
+          ScoutSdkUi.logWarning("could not parse nls entry for method '" + titleMethod.getElementName() + "'.", e);
+        }
+      }
+    }
 
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-    m_page1 = new SearchFormNewWizardPage(m_clientBundle);
+    m_page1 = new SearchFormNewWizardPage(clientBundle);
     m_page1.setTargetPackage(pck);
     m_page1.addStatusProvider(statusProvider);
+    m_page1.setTablePageType(tablePageType);
+    m_page1.setNlsName(nlsEntry);
+    if (nlsEntry != null) {
+      m_page1.setTypeName(nlsEntry.getKey() + SdkProperties.SUFFIX_SEARCH_FORM);
+    }
     addPage(m_page1);
 
-    if (m_clientBundle != null) {
-      m_locationPageRoot = createTree(m_clientBundle);
+    if (clientBundle != null) {
+      m_locationPageRoot = createTree(clientBundle);
       m_page2 = new BundleTreeWizardPage(Texts.get("SearchFormClassLocations"), Texts.get("OrganiseLocations"), m_locationPageRoot, new P_InitialCheckedFilter());
       m_page2.addStatusProvider(statusProvider);
       m_page2.addDndListener(new P_TreeDndListener());
       addPage(m_page2);
 
-      // init
       m_page1.addPropertyChangeListener(new P_LocationPropertyListener());
-    }
-  }
-
-  public void setTablePage(IType tablePage) {
-    if (tablePage != null) {
-      m_page1.setTablePageType(tablePage);
-    }
-  }
-
-  public void setNlsEntry(INlsEntry nlsEntry) {
-    if (nlsEntry != null) {
-      m_page1.setNlsName(nlsEntry);
-      m_page1.setTypeName(nlsEntry.getKey() + SdkProperties.SUFFIX_SEARCH_FORM);
-    }
-    else {
-      m_page1.setNlsName(null);
     }
   }
 
@@ -159,10 +155,6 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard implements INew
       ScoutSdkUi.logError("exception during perfoming finish of wizard.", e);
       return false;
     }
-  }
-
-  public IScoutBundle getClientBundle() {
-    return m_clientBundle;
   }
 
   private class P_LocationPropertyListener implements PropertyChangeListener {

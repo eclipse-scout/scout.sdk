@@ -64,16 +64,8 @@ public class WebServiceProviderTablePage extends AbstractPage {
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof ProviderNewWizardAction) {
-      ((ProviderNewWizardAction) menu).init(m_bundle);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ProviderNewWizardAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(ProviderNewWizardAction.class);
   }
 
   @Override

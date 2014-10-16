@@ -44,10 +44,9 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
-public class PageNewWizard extends AbstractWorkspaceWizard implements INewWizard {
+public class PageNewWizard extends AbstractWorkspaceWizard {
 
   private static final String TYPE_PAGE = "page";
   private static final String TYPE_PAGE_DATA = "pageData";
@@ -55,7 +54,6 @@ public class PageNewWizard extends AbstractWorkspaceWizard implements INewWizard
   // members
   private IScoutBundle m_clientBundle;
   private ITreeNode m_locationWizardPageRoot;
-  private IType m_holderType; // optional the outline to add the page to
   private PageNewOperation m_operation;
 
   // pages
@@ -63,18 +61,12 @@ public class PageNewWizard extends AbstractWorkspaceWizard implements INewWizard
   private PageNewAttributesWizardPage m_pageAttributePage;
   private BundleTreeWizardPage m_locationWizardPage;
 
-  public PageNewWizard() {
-    this(null);
-  }
-
-  public PageNewWizard(IScoutBundle clientBundle) {
-    setWindowTitle(Texts.get("NewPage"));
-    m_clientBundle = clientBundle;
-  }
-
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
-    m_clientBundle = UiUtility.getScoutBundleFromSelection(selection, m_clientBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+    setWindowTitle(Texts.get("NewPage"));
+
+    m_clientBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+    IType holderType = UiUtility.getTypeFromSelection(selection);
 
     m_templatePage = new PageNewTemplatesWizardPage(m_clientBundle);
     addPage(m_templatePage);
@@ -83,12 +75,14 @@ public class PageNewWizard extends AbstractWorkspaceWizard implements INewWizard
       m_locationWizardPageRoot = createTree(m_clientBundle);
 
       P_StatusRevalidator validator = new P_StatusRevalidator();
+      m_locationWizardPage = new BundleTreeWizardPage(Texts.get("LookupServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckedFilter());
+
       m_pageAttributePage = new PageNewAttributesWizardPage(m_clientBundle);
       m_pageAttributePage.addPropertyChangeListener(new P_PageAttributesPropertyListener());
       m_pageAttributePage.addStatusProvider(validator);
+      m_pageAttributePage.setHolderType(holderType); // parent page or outline
       addPage(m_pageAttributePage);
 
-      m_locationWizardPage = new BundleTreeWizardPage(Texts.get("LookupServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckedFilter());
       m_locationWizardPage.addStatusProvider(validator);
       m_locationWizardPage.addDndListener(new P_TreeDndListener());
       addPage(m_locationWizardPage);
@@ -101,15 +95,6 @@ public class PageNewWizard extends AbstractWorkspaceWizard implements INewWizard
 
   public void setLocationWizardPageVisible(boolean visible) {
     m_locationWizardPage.setExcludePage(!visible);
-  }
-
-  public void setHolderType(IType holderType) {
-    m_holderType = holderType;
-    m_pageAttributePage.setHolderType(holderType);
-  }
-
-  public IType getHolderType() {
-    return m_holderType;
   }
 
   private static ITreeNode createTree(IScoutBundle clientBundle) {

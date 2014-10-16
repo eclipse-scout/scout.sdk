@@ -13,14 +13,10 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.operation.ITypeResolver;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformClientBundleOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.ScoutProjectNewAction;
@@ -33,8 +29,6 @@ import org.eclipse.scout.sdk.ui.internal.view.outline.ScoutExplorerSettingsSuppo
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
@@ -181,41 +175,9 @@ public class ProjectsTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ScoutProjectNewAction.class, TypeResolverFormDataAction.class, TypeResolverPageDataAction.class, WellformAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof TypeResolverFormDataAction) {
-      ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
-          ICachedTypeHierarchy formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
-          return formHierarchy.getAllSubtypes(iForm);
-        }
-      }, null);
-    }
-    else if (menu instanceof TypeResolverPageDataAction) {
-      ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
-          ICachedTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
-          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable);
-        }
-      }, getScoutBundle());
-    }
-    else if (menu instanceof WellformAction) {
-      WellformAction action = (WellformAction) menu;
-      Set<IScoutBundle> clients = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
-      action.setOperation(new WellformClientBundleOperation(clients));
-      action.init(getScoutBundle());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(ScoutProjectNewAction.class, TypeResolverFormDataAction.class, TypeResolverPageDataAction.class, WellformAction.class);
   }
 
   @Override

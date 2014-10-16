@@ -251,8 +251,8 @@ public class BuildPropertiesWizardPage extends AbstractWorkspaceWizardPage {
 
   public class P_ContentProvider implements IStructuredContentProvider {
 
-    @Override
     @SuppressWarnings("unchecked")
+    @Override
     public Object[] getElements(Object inputElement) {
       List<BuildProperty> properties = (List<BuildProperty>) inputElement;
       return properties.toArray(new BuildProperty[properties.size()]);

@@ -17,21 +17,21 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
-import org.eclipse.scout.sdk.operation.jdt.type.InnerTypeNewOperation;
+import org.eclipse.scout.sdk.operation.jdt.type.OrderedInnerTypeNewOperation;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
-import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.FieldSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodBodySourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.SdkProperties;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>WizardStepNewOperation</h3>
  */
-public class ComposerAttributeNewOperation extends InnerTypeNewOperation {
+public class ComposerAttributeNewOperation extends OrderedInnerTypeNewOperation {
 
   // in member
   private INlsEntry m_nlsEntry;
@@ -47,7 +47,7 @@ public class ComposerAttributeNewOperation extends InnerTypeNewOperation {
     // default values
     setFlags(Flags.AccPublic);
     setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IDataModelAttribute, getDeclaringType().getJavaProject()));
-    setTypeCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
+    setOrderDefinitionType(TypeUtility.getType(IRuntimeClasses.IDataModelAttribute));
   }
 
   @Override

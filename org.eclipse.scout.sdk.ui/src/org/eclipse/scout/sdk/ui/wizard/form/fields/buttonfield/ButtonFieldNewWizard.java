@@ -10,55 +10,39 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.form.fields.buttonfield;
 
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
-import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.ui.IWorkbench;
 
-public class ButtonFieldNewWizard extends AbstractFormFieldWizard {
+public class ButtonFieldNewWizard extends AbstractInnerTypeWizard {
 
   private ButtonFieldNewWizardPage m_page1;
 
-  public ButtonFieldNewWizard() {
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
     setWindowTitle(Texts.get("NewButtonField"));
-  }
-
-  @Override
-  public void initWizard(IType declaringType) {
-    super.initWizard(declaringType);
     m_page1 = new ButtonFieldNewWizardPage(getDeclaringType());
-    addPage(getButtonFieldWizardPage());
-  }
-
-  @Override
-  public void setSuperType(IType superType) {
-    getButtonFieldWizardPage().setSuperType(superType);
+    if (getSiblingProposal() != null) {
+      m_page1.setSibling(getSiblingProposal());
+    }
+    if (getTypeName() != null) {
+      m_page1.setTypeName(getTypeName());
+    }
+    if (getSuperType() != null) {
+      m_page1.setSuperType(getSuperType());
+    }
+    addPage(m_page1);
   }
 
   @Override
   protected void postFinishDisplayThread() {
-    IType createdField = getButtonFieldWizardPage().getCreatedField();
-    if (TypeUtility.exists(createdField)) {
-      ScoutSdkUi.showJavaElementInEditor(createdField, false);
-    }
+    ScoutSdkUi.showJavaElementInEditor(m_page1.getCreatedField(), false);
   }
 
-  /**
-   * @return the page1
-   */
-  public ButtonFieldNewWizardPage getButtonFieldWizardPage() {
+  public ButtonFieldNewWizardPage getButtonFieldNewWizardPage() {
     return m_page1;
-  }
-
-  @Override
-  public void setTypeName(String name) {
-    m_page1.setTypeName(name);
-  }
-
-  @Override
-  public void setSibling(SiblingProposal sibling) {
-    m_page1.setSibling(sibling);
   }
 }

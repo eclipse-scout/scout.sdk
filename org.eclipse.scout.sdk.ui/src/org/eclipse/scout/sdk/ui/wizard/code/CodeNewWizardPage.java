@@ -145,7 +145,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
     ITypeFilter filter = null;
     String codeIdSignatureFromCodeType = null;
     try {
-      IType codeType = TypeUtility.getToplevelType(m_declaringType);
+      IType codeType = TypeUtility.getPrimaryType(m_declaringType);
       codeIdSignatureFromCodeType = ScoutTypeUtility.getCodeIdGenericTypeSignature(codeType);
 
       String codeSignature = ScoutTypeUtility.getCodeSignature(codeType, TypeUtility.getSupertypeHierarchy(codeType));

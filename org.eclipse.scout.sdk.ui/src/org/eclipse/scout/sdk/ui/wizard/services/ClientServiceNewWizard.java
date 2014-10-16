@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -34,6 +35,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractServiceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
@@ -46,6 +48,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
+import org.eclipse.ui.IWorkbench;
 
 public class ClientServiceNewWizard extends AbstractServiceWizard {
 
@@ -53,12 +56,15 @@ public class ClientServiceNewWizard extends AbstractServiceWizard {
   public static final String TYPE_SERVICE_IMPLEMENTATION = "svcImpl";
   public static final String TYPE_SERVICE_REGISTRATION = "svcReg";
 
-  private final BundleTreeWizardPage m_locationWizardPage;
-  private final ServiceNewWizardPage m_serviceNewWizardPage;
-  private final ITreeNode m_locationPageRoot;
+  private BundleTreeWizardPage m_locationWizardPage;
+  private ServiceNewWizardPage m_serviceNewWizardPage;
+  private ITreeNode m_locationPageRoot;
   private ServiceNewOperation m_operation;
 
-  public ClientServiceNewWizard(IScoutBundle clientBundle) {
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    IScoutBundle clientBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+
     setWindowTitle(Texts.get("NewClientService"));
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewClientService"), Texts.get("CreateANewClientService"),
@@ -73,7 +79,7 @@ public class ClientServiceNewWizard extends AbstractServiceWizard {
     m_locationWizardPage.addDndListener(new P_TreeDndListener());
     m_locationWizardPage.addCheckSelectionListener(new P_SessionCheckListener());
     addPage(m_locationWizardPage);
-    // init
+
     m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IService, clientBundle.getJavaProject()));
   }
 

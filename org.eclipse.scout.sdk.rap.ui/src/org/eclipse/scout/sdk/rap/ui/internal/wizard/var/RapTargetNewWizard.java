@@ -14,13 +14,15 @@ import java.io.File;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.rap.operations.project.AppendRapTargetOperation.TARGET_STRATEGY;
+import org.eclipse.scout.sdk.rap.operations.project.AppendRapTargetOperation.TargetStrategy;
 import org.eclipse.scout.sdk.rap.operations.project.ScoutRapTargetCreationOperation;
 import org.eclipse.scout.sdk.rap.ui.internal.wizard.project.RapTargetPlatformWizardPage;
 import org.eclipse.scout.sdk.rap.var.RapTargetVariable;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.ui.IWorkbench;
 
 /**
  * <h3>{@link RapTargetNewWizard}</h3>
@@ -31,13 +33,17 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public class RapTargetNewWizard extends AbstractWorkspaceWizard {
   private RapTargetPlatformWizardPage m_page1;
 
-  private TARGET_STRATEGY m_strategy;
+  private TargetStrategy m_strategy;
   private String m_localFolder;
   private String m_extractFolder;
 
-  public RapTargetNewWizard() {
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
     setWindowTitle(Texts.get("SpecifyTheRAPTargetLocation"));
-    m_page1 = new RapTargetPlatformWizardPage(new TARGET_STRATEGY[]{TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING, TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT});
+
+    m_page1 = new RapTargetPlatformWizardPage(new TargetStrategy[]{TargetStrategy.STRATEGY_LOCAL_EXISTING, TargetStrategy.STRATEGY_LOCAL_EXTRACT});
     m_page1.setTitle(Texts.get("SpecifyTheRAPTargetLocation"));
     addPage(m_page1);
   }
@@ -53,7 +59,7 @@ public class RapTargetNewWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    if (TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING.equals(m_strategy)) {
+    if (TargetStrategy.STRATEGY_LOCAL_EXISTING.equals(m_strategy)) {
       // existing local target
       File f = new File(m_localFolder);
       RapTargetVariable.get().setValue(f.getAbsolutePath());

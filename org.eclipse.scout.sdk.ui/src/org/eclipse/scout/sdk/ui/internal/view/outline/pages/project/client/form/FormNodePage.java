@@ -10,14 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
-import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction;
 import org.eclipse.scout.sdk.ui.action.delete.FormDeleteAction;
 import org.eclipse.scout.sdk.ui.action.dto.FormDataUpdateAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
@@ -94,7 +95,7 @@ public class FormNodePage extends AbstractScoutTypePage implements ITypeHierarch
         @Override
         public void handleEvent(JdtEvent event) {
           if (event.getElementType() == IJavaElement.TYPE) {
-            if (getType().getCompilationUnit().equals(event.getElement().getAncestor(IJavaElement.COMPILATION_UNIT))) {
+            if (!getType().isBinary() && getType().getCompilationUnit().equals(event.getElement().getAncestor(IJavaElement.COMPILATION_UNIT))) {
               clearTypeHierarchy();
             }
           }
@@ -113,26 +114,9 @@ public class FormNodePage extends AbstractScoutTypePage implements ITypeHierarch
     new FormHandlerTablePage(this, getType());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, FormDeleteAction.class, WellformAction.class, FormDataUpdateAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof FormDeleteAction) {
-      ((FormDeleteAction) menu).setFormType(getType());
-    }
-    else if (menu instanceof WellformAction) {
-      WellformAction action = (WellformAction) menu;
-      action.init(getScoutBundle(), getType());
-      action.setOperation(new WellformScoutTypeOperation(getType(), true));
-    }
-    else if (menu instanceof FormDataUpdateAction) {
-      ((FormDataUpdateAction) menu).setFormDataOwner(getType());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TypeRenameAction.class, ShowJavaReferencesAction.class, FormDeleteAction.class, WellformScoutTypeAction.class, FormDataUpdateAction.class);
   }
 
   @Override

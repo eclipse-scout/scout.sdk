@@ -10,9 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.wizard;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.ui.IWorkbench;
 
 /**
  * <h3>{@link WizardNewWizard}</h3>
@@ -23,17 +27,15 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 public class WizardNewWizard extends AbstractWorkspaceWizard {
 
   private WizardNewWizardPage m_page1;
-  private final IScoutBundle m_clientBundle;
 
-  public WizardNewWizard(IScoutBundle clientBundle) {
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
     setWindowTitle(Texts.get("NewWizard"));
-    m_clientBundle = clientBundle;
-    m_page1 = new WizardNewWizardPage(m_clientBundle);
+
+    IScoutBundle clientBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+    m_page1 = new WizardNewWizardPage(clientBundle);
     addPage(m_page1);
   }
-
-  public IScoutBundle getClientBundle() {
-    return m_clientBundle;
-  }
-
 }

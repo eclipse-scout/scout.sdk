@@ -10,6 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.dialog;
 
+import java.util.LinkedHashSet;
+import java.util.Set;
+
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
@@ -42,8 +45,8 @@ import org.eclipse.swt.widgets.TableColumn;
 
 public class MemberSelectionDialog extends TitleAreaDialog {
 
-  private IMember[] m_members;
-  private IMember[] m_selectedMembers;
+  private Set<? extends IMember> m_members;
+  private Set<? extends IMember> m_selectedMembers;
   private CheckboxTableViewer m_viewer;
   private EventListenerList m_listeners;
   private final String m_title;
@@ -82,25 +85,30 @@ public class MemberSelectionDialog extends TitleAreaDialog {
     }
   }
 
-  public void setMembers(IMember[] members) {
-    m_members = members;
+  public void setMembers(Set<? extends IMember> members) {
+    m_members = new LinkedHashSet<IMember>(members);
   }
 
-  public IMember[] getMembers() {
-    return m_members;
+  public Set<? extends IMember> getMembers() {
+    return new LinkedHashSet<IMember>(m_members);
   }
 
-  public void setSelectedMembers(IMember[] selectedMembers) {
-    m_selectedMembers = selectedMembers;
-    if (m_viewer != null && !m_viewer.getTable().isDisposed()) {
-      m_viewer.setCheckedElements(selectedMembers);
-      fireSelectionChanged(m_selectedMembers);
+  public void setSelectedMembers(Set<? extends IMember> selectedMembers) {
+    if (selectedMembers == null) {
+      m_selectedMembers = new LinkedHashSet<IMember>(0);
+    }
+    else {
+      m_selectedMembers = new LinkedHashSet<IMember>(selectedMembers);
     }
 
+    if (m_viewer != null && !m_viewer.getTable().isDisposed()) {
+      m_viewer.setCheckedElements(m_selectedMembers.toArray(new IMember[m_selectedMembers.size()]));
+      fireSelectionChanged(m_selectedMembers);
+    }
   }
 
-  public IMember[] getSelectedMembers() {
-    return m_selectedMembers;
+  public Set<? extends IMember> getSelectedMembers() {
+    return new LinkedHashSet<IMember>(m_selectedMembers);
   }
 
   public Button getOkButton() {
@@ -124,9 +132,13 @@ public class MemberSelectionDialog extends TitleAreaDialog {
       @Override
       public void checkStateChanged(CheckStateChangedEvent event) {
         Object[] checkedElements = m_viewer.getCheckedElements();
-        IMember[] dest = new IMember[checkedElements.length];
-        System.arraycopy(checkedElements, 0, dest, 0, checkedElements.length);
-        m_selectedMembers = dest;
+        Set<IMember> newChecked = new LinkedHashSet<IMember>(checkedElements.length);
+        for (Object m : checkedElements) {
+          if (m instanceof IMember) {
+            newChecked.add((IMember) m);
+          }
+        }
+        m_selectedMembers = newChecked;
         fireSelectionChanged(m_selectedMembers);
       }
     });
@@ -134,7 +146,7 @@ public class MemberSelectionDialog extends TitleAreaDialog {
     m_viewer.setContentProvider(provider);
     m_viewer.setLabelProvider(provider);
     m_viewer.setInput(provider);
-    m_viewer.setCheckedElements(getSelectedMembers());
+    m_viewer.setCheckedElements(getSelectedMembers().toArray());
 
     Control buttonArea = createButtons(rootPane);
     // layout
@@ -162,7 +174,7 @@ public class MemberSelectionDialog extends TitleAreaDialog {
     deselectAll.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        setSelectedMembers(new IMember[0]);
+        setSelectedMembers(null);
       }
     });
     // layout
@@ -185,14 +197,13 @@ public class MemberSelectionDialog extends TitleAreaDialog {
     m_listeners.remove(IMemberSelectionChangedListener.class, listener);
   }
 
-  protected void fireSelectionChanged(final IMember[] selectedMembers) {
+  protected void fireSelectionChanged(final Set<? extends IMember> selectedMembers) {
     for (final IMemberSelectionChangedListener listener : m_listeners.getListeners(IMemberSelectionChangedListener.class)) {
       SafeRunner.run(new SafeRunnable() {
         @Override
         public void run() throws Exception {
           listener.handleSelectionChanged(selectedMembers);
         }
-
       });
     }
   }
@@ -201,7 +212,7 @@ public class MemberSelectionDialog extends TitleAreaDialog {
 
     @Override
     public Object[] getElements(Object inputElement) {
-      return getMembers();
+      return getMembers().toArray();
     }
 
     @Override

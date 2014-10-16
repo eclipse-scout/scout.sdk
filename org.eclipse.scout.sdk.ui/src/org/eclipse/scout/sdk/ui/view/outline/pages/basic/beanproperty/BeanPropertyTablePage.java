@@ -83,15 +83,9 @@ public class BeanPropertyTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{BeanPropertyNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    ((BeanPropertyNewAction) menu).setType(m_declaringType);
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(BeanPropertyNewAction.class);
   }
 
   private class P_MethodChangedListener implements IJavaResourceChangedListener {

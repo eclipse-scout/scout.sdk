@@ -47,7 +47,6 @@ public class LibraryBundleUnlinkOperation implements IOperation {
   public LibraryBundleUnlinkOperation(IScoutBundle bundle, Collection<IPluginModelBase> libraries) {
     m_bundle = bundle;
     m_libraries = libraries;
-
   }
 
   @Override

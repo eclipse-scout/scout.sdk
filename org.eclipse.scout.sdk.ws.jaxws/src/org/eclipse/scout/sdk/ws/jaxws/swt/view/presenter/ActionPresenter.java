@@ -10,13 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter;
 
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.jdt.ui.JavaElementImageDescriptor;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
-import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.IPresenterAction;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Point;
@@ -33,15 +32,21 @@ import org.eclipse.ui.forms.widgets.ImageHyperlink;
 public class ActionPresenter extends AbstractPresenter {
 
   private IPresenterAction m_presenterAction;
+  private Object[] m_actionParams;
 
   private Label m_icon;
   private Text m_text;
   private ImageHyperlink m_link;
 
-  public ActionPresenter(Composite parent, IPresenterAction presenterAction, PropertyViewFormToolkit toolkit) {
+  public ActionPresenter(Composite parent, IPresenterAction presenterAction, PropertyViewFormToolkit toolkit, Object... actionParams) {
     super(toolkit, parent);
     m_presenterAction = presenterAction;
+    m_actionParams = actionParams;
     createPresenter();
+  }
+
+  public void setActionParams(Object... args) {
+    m_actionParams = args;
   }
 
   /**
@@ -63,7 +68,7 @@ public class ActionPresenter extends AbstractPresenter {
   }
 
   public Control createPresenter() {
-    Composite presenter = getContainer();
+    final Composite presenter = getContainer();
     if (m_presenterAction == null) {
       return presenter; // not initialized yet
     }
@@ -92,12 +97,7 @@ public class ActionPresenter extends AbstractPresenter {
 
       @Override
       public void linkActivated(HyperlinkEvent e) {
-        try {
-          m_presenterAction.execute(null, null, null);
-        }
-        catch (ExecutionException e1) {
-          JaxWsSdk.logError(e1);
-        }
+        AbstractScoutHandler.exec(presenter.getShell(), m_presenterAction, m_actionParams);
       }
     });
 

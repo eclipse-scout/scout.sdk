@@ -130,21 +130,9 @@ public class LibrariesTablePage extends AbstractPage {
     return libraries;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{LibraryBundleNewAction.class, LibraryBundleLinkAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof LibraryBundleNewAction) {
-      ((LibraryBundleNewAction) menu).setOwnerBundle(getScoutBundle());
-    }
-    else if (menu instanceof LibraryBundleLinkAction) {
-      ((LibraryBundleLinkAction) menu).setLibraryUserBundle(getScoutBundle());
-    }
-    super.prepareMenuAction(menu);
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(LibraryBundleNewAction.class, LibraryBundleLinkAction.class);
   }
 
   /**

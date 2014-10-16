@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction.FileExtensionType;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.ProviderNewWizardAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceProviderTablePage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.ActionPresenter;
@@ -58,9 +57,10 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
       IFile sunJaxWsFile = ResourceFactory.getSunJaxWsResource(m_bundle).getFile();
       if (JaxWsSdkUtility.exists(sunJaxWsFile)) {
         FileOpenAction b = new FileOpenAction();
-        b.init(sunJaxWsFile, sunJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.XML);
+        b.setLinkText(sunJaxWsFile.getName());
+        b.setImage(JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile));
         b.setToolTip(Texts.get("JaxWsDeploymentDescriptor"));
-        ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit());
+        ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit(), sunJaxWsFile);
         applyLayoutData(actionPresenter);
         sectionLinksVisible = true;
       }
@@ -69,9 +69,10 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
       IFile buildJaxWsFile = ResourceFactory.getBuildJaxWsResource(m_bundle).getFile();
       if (JaxWsSdkUtility.exists(buildJaxWsFile)) {
         FileOpenAction c = new FileOpenAction();
-        c.init(buildJaxWsFile, buildJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), FileExtensionType.XML);
+        c.setLinkText(buildJaxWsFile.getName());
+        c.setImage(JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile));
         c.setToolTip(Texts.get("JaxWsBuildDescriptor"));
-        ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), c, getFormToolkit());
+        ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), c, getFormToolkit(), buildJaxWsFile);
         applyLayoutData(actionPresenter);
         sectionLinksVisible = true;
       }
@@ -79,8 +80,7 @@ public class WebServiceProviderTablePagePropertyViewPart extends AbstractSingleP
 
       // QuickLink 'Create new Provider'
       ProviderNewWizardAction d = new ProviderNewWizardAction();
-      d.init(m_bundle);
-      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_PROVIDER).getSectionClient(), d, getFormToolkit());
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_PROVIDER).getSectionClient(), d, getFormToolkit(), m_bundle);
       applyLayoutData(actionPresenter);
     }
     finally {

@@ -153,11 +153,6 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
   }
 
-  @Override
-  public LocalLookupCallNewWizard getWizard() {
-    return (LocalLookupCallNewWizard) super.getWizard();
-  }
-
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getLookupCallSuperType())) {
       try {

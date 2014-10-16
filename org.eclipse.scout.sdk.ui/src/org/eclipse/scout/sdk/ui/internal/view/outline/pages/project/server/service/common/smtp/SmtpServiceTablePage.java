@@ -17,9 +17,9 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.action.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.SmtpServiceNewAction;
-import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 /**
  * <h3>SmtpServiceTablePage</h3>
  */
-public class SmtpServiceTablePage extends AbstractPage {
+public class SmtpServiceTablePage extends AbstractPage implements ITypeResolver {
 
   private ICachedTypeHierarchy m_serviceHierarchy;
 
@@ -71,13 +71,14 @@ public class SmtpServiceTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    for (IType service : resolveServices()) {
+    for (IType service : getTypes()) {
       Set<IType> interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
       new SmtpServiceNodePage(this, service, CollectionUtility.firstElement(interfaces));
     }
   }
 
-  protected Set<IType> resolveServices() {
+  @Override
+  public Set<IType> getTypes() {
     IType iSMTPService = TypeUtility.getType(IRuntimeClasses.ISMTPService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iSMTPService);
@@ -86,24 +87,8 @@ public class SmtpServiceTablePage extends AbstractPage {
     return m_serviceHierarchy.getAllSubtypes(iSMTPService, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{FormDataSqlBindingValidateAction.class, SmtpServiceNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof FormDataSqlBindingValidateAction) {
-      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          return resolveServices();
-        }
-      });
-    }
-    else if (menu instanceof SmtpServiceNewAction) {
-      ((SmtpServiceNewAction) menu).setScoutBundle(getScoutBundle());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(FormDataSqlBindingValidateAction.class, SmtpServiceNewAction.class);
   }
 }

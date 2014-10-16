@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.action.dto;
 
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractOperationAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 /**
@@ -20,14 +20,9 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
  * @author Andreas Hoegger
  * @since 1.0.8 03.03.2011
  */
-public class MultipleUpdateFormDataAction extends AbstractOperationAction {
+public class MultipleUpdateFormDataAction extends AbstractScoutHandler {
 
   public MultipleUpdateFormDataAction() {
     super(Texts.get("UpdateAllFormdatas"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), null, false, Category.UDPATE);
-  }
-
-  @Override
-  public boolean isVisible() {
-    return getOperationCount() > 0;
   }
 }

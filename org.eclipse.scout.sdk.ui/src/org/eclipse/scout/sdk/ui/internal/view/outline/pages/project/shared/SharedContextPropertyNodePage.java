@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
-import java.util.ArrayList;
+import java.util.Set;
 
-import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
@@ -45,39 +44,9 @@ public class SharedContextPropertyNodePage extends AbstractPage {
     return IScoutPageConstants.SHARED_CONTEXT_PROPERTY_NODE_PAGE;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{PropertyBeansRenameAction.class, MemberListDeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof MemberListDeleteAction) {
-      MemberListDeleteAction action = (MemberListDeleteAction) menu;
-      if (getServerDesc() != null) {
-        for (IMember m : getServerDesc().getAllMembers()) {
-          action.addMemberToDelete(m);
-        }
-      }
-      if (getClientDesc() != null) {
-        for (IMember m : getClientDesc().getAllMembers()) {
-          action.addMemberToDelete(m);
-        }
-      }
-      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableRemove));
-    }
-    else if (menu instanceof PropertyBeansRenameAction) {
-      ArrayList<IPropertyBean> descs = new ArrayList<IPropertyBean>(2);
-      if (getClientDesc() != null) {
-        descs.add(getClientDesc());
-      }
-      if (getServerDesc() != null) {
-        descs.add(getServerDesc());
-      }
-      ((PropertyBeansRenameAction) menu).setPropertyBeanDescriptors(descs.toArray(new IPropertyBean[descs.size()]));
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(PropertyBeansRenameAction.class, MemberListDeleteAction.class);
   }
 
   public IPropertyBean getServerDesc() {
@@ -87,5 +56,4 @@ public class SharedContextPropertyNodePage extends AbstractPage {
   public IPropertyBean getClientDesc() {
     return m_clientDesc;
   }
-
 }

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.childpage;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
@@ -91,24 +93,13 @@ public class TablePageChildPageTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
     IMethod createChildPageMethod = TypeUtility.getMethod(getTablePageType(), PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE);
     if (!TypeUtility.exists(createChildPageMethod)) {
-      return new Class[]{PageLinkAction.class, PageNewAction.class};
+      return newSet(PageLinkAction.class, PageNewAction.class);
     }
     return null;
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof PageLinkAction) {
-      ((PageLinkAction) menu).init(getScoutBundle(), getTablePageType());
-    }
-    else if (menu instanceof PageNewAction) {
-      ((PageNewAction) menu).init(getScoutBundle(), getTablePageType());
-    }
   }
 
   public IType getTablePageType() {

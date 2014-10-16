@@ -10,12 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler2;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.swt.widgets.Shell;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.ui.menus.CommandContributionItemParameter;
 
 /**
@@ -41,7 +38,6 @@ public interface IScoutHandler extends IHandler2 {
     DELETE("org.eclipse.scout.sdk.ui.menu.category.delete", 1000),
     WS("org.eclipse.scout.sdk.ui.menu.category.ws", 2000),
     SPEC("org.eclipse.scout.sdk.ui.menu.category.spec", 3000),
-    WICKET("org.eclipse.scout.sdk.ui.menu.category.wicket", 4000),
     OTHER("org.eclipse.scout.sdk.ui.menu.category.other", 10000);
 
     private String m_id;
@@ -62,18 +58,22 @@ public interface IScoutHandler extends IHandler2 {
   }
 
   /**
-   * is evaluated after the menu has been prepared by the contributor.
+   * Specifies if the menu should be visible for the given {@link IStructuredSelection}
    *
-   * @return true if the menu should be visible. false otherwise.
+   * @param selection
+   *          The {@link IStructuredSelection} to evaluate
+   * @return <code>true</code> if the menu should be visible, <code>false</code> otherwise.
    */
-  boolean isVisible();
+  boolean isVisible(IStructuredSelection selection);
 
   /**
-   * is evaluated after the menu has been prepared by the contributor.
-   *
-   * @return true if the menu should be enabled. false otherwise.
+   * Specifies if the menu should be enabled for the given {@link IStructuredSelection}.
+   * 
+   * @param selection
+   *          the {@link IStructuredSelection} to evaluate
+   * @return <code>true</code> if the menu should be visible, <code>false</code> otherwise.
    */
-  boolean isActive();
+  boolean isActive(IStructuredSelection selection);
 
   /**
    * @return the text shown on the context menu
@@ -156,17 +156,4 @@ public interface IScoutHandler extends IHandler2 {
    * @return the id of the context menu. must be unique over all context menus.
    */
   String getId();
-
-  /**
-   * called when the context menu is invoked by the user.
-   *
-   * @param shell
-   *          the shell in which the menu exists.
-   * @param selection
-   *          the pages selected while invoking the menu.
-   * @param event
-   * @return
-   * @throws ExecutionException
-   */
-  Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException;
 }

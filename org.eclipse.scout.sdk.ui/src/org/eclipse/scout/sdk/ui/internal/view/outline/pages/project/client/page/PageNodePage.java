@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
@@ -47,20 +49,8 @@ public class PageNodePage extends AbstractScoutTypePage {
     new BeanPropertyTablePage(this, getType());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof DeleteAction) {
-      DeleteAction action = (DeleteAction) menu;
-      action.addType(getType());
-      action.setName(getName());
-      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PageRemove));
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TypeRenameAction.class, ShowJavaReferencesAction.class, DeleteAction.class);
   }
 }

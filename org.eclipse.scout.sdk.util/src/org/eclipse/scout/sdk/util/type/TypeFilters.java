@@ -94,6 +94,27 @@ public class TypeFilters {
   }
 
   /**
+   * @param fqn
+   * @return
+   * @note this filter is expensive - for every candidate a super type hierarchy will be created. Use
+   *       {@link TypeFilters#getSubtypeFilter(IType, ITypeHierarchy)} when ever possible.
+   */
+  public static ITypeFilter getSubtypeFilter(String fqn) {
+    IType type = TypeUtility.getType(fqn);
+    if (TypeUtility.exists(type)) {
+      return getSubtypeFilter(type);
+    }
+    else {
+      return new ITypeFilter() {
+        @Override
+        public boolean accept(IType t) {
+          return false;
+        }
+      };
+    }
+  }
+
+  /**
    * @param type
    * @return
    * @note this filter is expensive - for every candidate a super type hierarchy will be created. Use

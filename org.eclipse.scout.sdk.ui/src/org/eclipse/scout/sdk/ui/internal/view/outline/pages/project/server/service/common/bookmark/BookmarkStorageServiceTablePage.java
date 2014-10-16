@@ -17,9 +17,9 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.action.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.BookmarkStorageServiceNewAction;
-import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 /**
  * <h3>SqlServiceTablePage</h3>
  */
-public class BookmarkStorageServiceTablePage extends AbstractPage {
+public class BookmarkStorageServiceTablePage extends AbstractPage implements ITypeResolver {
 
   private ICachedTypeHierarchy m_serviceHierarchy;
 
@@ -71,13 +71,14 @@ public class BookmarkStorageServiceTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    for (IType service : resolveServices()) {
+    for (IType service : getTypes()) {
       Set<IType> interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
       new BookmarkStorageServiceNodePage(this, service, CollectionUtility.firstElement(interfaces));
     }
   }
 
-  protected Set<IType> resolveServices() {
+  @Override
+  public Set<IType> getTypes() {
     IType iBookmarkStorageService = TypeUtility.getType(IRuntimeClasses.IBookmarkStorageService);
     if (m_serviceHierarchy == null) {
       m_serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iBookmarkStorageService);
@@ -86,24 +87,8 @@ public class BookmarkStorageServiceTablePage extends AbstractPage {
     return m_serviceHierarchy.getAllSubtypes(iBookmarkStorageService, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{FormDataSqlBindingValidateAction.class, BookmarkStorageServiceNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof FormDataSqlBindingValidateAction) {
-      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          return resolveServices();
-        }
-      });
-    }
-    else if (menu instanceof BookmarkStorageServiceNewAction) {
-      ((BookmarkStorageServiceNewAction) menu).setScoutBundle(getScoutBundle());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(FormDataSqlBindingValidateAction.class, BookmarkStorageServiceNewAction.class);
   }
 }

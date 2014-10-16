@@ -12,34 +12,15 @@ package org.eclipse.scout.sdk.ui.action.create;
 
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
-import org.eclipse.scout.sdk.ui.wizard.services.CalendarServiceNewWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 
 /**
  *
  */
-public class CalendarServiceNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_bundle;
+public class CalendarServiceNewAction extends AbstractScoutHandler {
 
   public CalendarServiceNewAction() {
     super(Texts.get("Action_newTypeX", "Calendar Service"), JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CLASS), null, false, Category.NEW);
-  }
-
-  public void setScoutBundle(IScoutBundle bundle) {
-    m_bundle = bundle;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new CalendarServiceNewWizard(m_bundle);
   }
 }

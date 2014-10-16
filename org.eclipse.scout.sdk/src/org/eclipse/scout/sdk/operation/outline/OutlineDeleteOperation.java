@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
@@ -71,7 +70,7 @@ public class OutlineDeleteOperation extends JavaElementDeleteOperation {
 
     m_desktops = desktopsAndDesktopExtensions;
     m_outline = outlineType;
-    setMembers(new IJavaElement[]{m_outline});
+    addMember(m_outline);
   }
 
   @Override

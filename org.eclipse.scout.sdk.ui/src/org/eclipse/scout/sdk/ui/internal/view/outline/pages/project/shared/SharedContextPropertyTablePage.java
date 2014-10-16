@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared;
 
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.jdt.core.IJavaElement;
@@ -35,7 +36,6 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
  * <h3>SharedContextPropertyTablePage</h3>
  */
 public class SharedContextPropertyTablePage extends AbstractPage {
-  public static final String CONTEXT_PROPERTY_BEAN_REGEXP = "^\\s*public.*(static)?[ ]+.*(get|set).*\\{.*\\}$";
   private final IType m_clientSession;
   private final IType m_serverSession;
 
@@ -74,9 +74,9 @@ public class SharedContextPropertyTablePage extends AbstractPage {
       JavaCore.addElementChangedListener(m_methodChangedListener);
     }
     P_PropertyMethodFilter clientFilter = new P_PropertyMethodFilter();
-    TypeUtility.getMethods(m_clientSession, clientFilter, null);
+    TypeUtility.getMethods(getClientSession(), clientFilter, null);
     P_PropertyMethodFilter serverFilter = new P_PropertyMethodFilter();
-    TypeUtility.getMethods(m_serverSession, serverFilter, null);
+    TypeUtility.getMethods(getServerSession(), serverFilter, null);
     for (IPropertyBean bean : serverFilter.m_beans.values()) {
       IPropertyBean clientBean = clientFilter.m_beans.get(bean.getBeanName());
       if (clientBean != null) {
@@ -85,15 +85,17 @@ public class SharedContextPropertyTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{SharedContextBeanPropertyNewAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(SharedContextBeanPropertyNewAction.class);
   }
 
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    ((SharedContextBeanPropertyNewAction) menu).init(m_serverSession, m_clientSession);
+  public IType getClientSession() {
+    return m_clientSession;
+  }
+
+  public IType getServerSession() {
+    return m_serverSession;
   }
 
   private class P_PropertyMethodFilter implements IMethodFilter {
@@ -140,7 +142,7 @@ public class SharedContextPropertyTablePage extends AbstractPage {
     protected boolean visit(int kind, int flags, IJavaElement e, CompilationUnit ast) {
       if (e != null && e.getElementType() == IJavaElement.METHOD) {
         IType declaringType = ((IMethod) e).getDeclaringType();
-        if (declaringType.equals(m_clientSession) || declaringType.equals(m_serverSession)) {
+        if (declaringType.equals(getClientSession()) || declaringType.equals(getServerSession())) {
           markStructureDirty();
           return false;
         }

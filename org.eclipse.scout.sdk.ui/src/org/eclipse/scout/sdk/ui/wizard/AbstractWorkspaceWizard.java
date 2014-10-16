@@ -16,14 +16,18 @@ import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.ui.executor.selection.ScoutStructuredSelection;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.ui.IWorkbench;
 
 /**
  * <h3>AbstractProcessWizard</h3>
@@ -32,8 +36,28 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
 
   private final Map<CompositeObject, IOperation> m_performFinishOperations;
 
+  private ContinueOperation m_continueOperation;
+
+  public static enum ContinueOperation {
+    ADD_SAME, ADD_OTHER, FINISH
+  }
+
   public AbstractWorkspaceWizard() {
     m_performFinishOperations = new TreeMap<CompositeObject, IOperation>();
+  }
+
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    if (selection instanceof ScoutStructuredSelection) {
+      m_continueOperation = ((ScoutStructuredSelection) selection).getContinueOperation();
+    }
+    if (m_continueOperation == null) {
+      m_continueOperation = ContinueOperation.FINISH;
+    }
+  }
+
+  public ContinueOperation getContinueOperation() {
+    return m_continueOperation;
   }
 
   @Override
@@ -138,12 +162,17 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
 
     @Override
     public String getOperationName() {
-      return getWindowTitle();
+      String windowTitle = getWindowTitle();
+      if (StringUtility.isNullOrEmpty(windowTitle)) {
+        return getClass().getName();
+      }
+      else {
+        return windowTitle;
+      }
     }
 
     @Override
     public void validate() {
-
     }
 
     @Override
@@ -151,7 +180,6 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
       try {
         performFinish(monitor, workingCopyManager);
         m_display.asyncExec(new Runnable() {
-
           @Override
           public void run() {
             postFinishDisplayThread();
@@ -162,7 +190,7 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
         throw e;
       }
       catch (Exception e) {
-        ScoutSdkUi.logError("exception during perfoming finish on wizard page '" + AbstractWorkspaceWizard.this.getClass().getName() + "'.", e);
+        ScoutSdkUi.logError("Exception during perfoming finish on wizard page '" + AbstractWorkspaceWizard.class.getName() + "'.", e);
       }
     }
   } // end class P_PerformFinishOperation

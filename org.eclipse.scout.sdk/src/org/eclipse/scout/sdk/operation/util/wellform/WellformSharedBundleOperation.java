@@ -39,9 +39,7 @@ public class WellformSharedBundleOperation implements IOperation {
 
   @Override
   public String getOperationName() {
-    StringBuilder builder = new StringBuilder();
-    builder.append("Wellform '" + getBundle().getSymbolicName() + "'...");
-    return builder.toString();
+    return "Wellform '" + getBundle().getSymbolicName() + "'...";
   }
 
   @Override

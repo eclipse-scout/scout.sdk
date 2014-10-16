@@ -116,6 +116,7 @@ public final class TestWorkspaceUtility {
         return Status.OK_STATUS;
       }
     };
+
     delJob.setRule(ResourcesPlugin.getWorkspace().getRoot());
     delJob.schedule();
     try {

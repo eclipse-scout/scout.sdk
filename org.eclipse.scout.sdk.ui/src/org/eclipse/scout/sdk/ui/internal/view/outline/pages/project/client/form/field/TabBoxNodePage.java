@@ -39,6 +39,7 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
   private InnerTypePageDirtyListener m_innerTypeListener;
 
   public TabBoxNodePage() {
+    super(SdkProperties.SUFFIX_BOX);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Tabbox));
   }
 
@@ -77,25 +78,9 @@ public class TabBoxNodePage extends AbstractFormFieldNodePage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ShowJavaReferencesAction.class, CreateTemplateAction.class, FormFieldRenameAction.class,
-        FormFieldDeleteAction.class, GroupBoxNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof FormFieldRenameAction) {
-      FormFieldRenameAction a = (FormFieldRenameAction) menu;
-      a.setReadOnlySuffix(SdkProperties.SUFFIX_BOX);
-    }
-    else if (menu instanceof FormFieldDeleteAction) {
-      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TabboxRemove));
-    }
-    else if (menu instanceof GroupBoxNewAction) {
-      ((GroupBoxNewAction) menu).setType(getType());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(ShowJavaReferencesAction.class, CreateTemplateAction.class, FormFieldRenameAction.class,
+        FormFieldDeleteAction.class, GroupBoxNewAction.class);
   }
 }

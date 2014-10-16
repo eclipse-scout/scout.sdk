@@ -10,23 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.library;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
-
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.jobs.OperationJob;
-import org.eclipse.scout.sdk.operation.library.LibraryBundleUnlinkOperation;
 import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.swt.custom.BusyIndicator;
-import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link LibrariesBundleUnlinkAction}</h3>
@@ -36,53 +22,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class LibrariesBundleUnlinkAction extends AbstractScoutHandler {
 
-  private HashMap<IScoutBundle, List<IPluginModelBase>> m_libraries;
-
   public LibrariesBundleUnlinkAction() {
     super(Texts.get("UnlinkLibraryBundlePopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LibrariesRemove), "Delete", true, Category.DELETE);
-    m_libraries = new HashMap<IScoutBundle, List<IPluginModelBase>>();
   }
-
-  @Override
-  public Object execute(final Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    BusyIndicator.showWhile(shell.getDisplay(), new Runnable() {
-      @Override
-      public void run() {
-        unlinkLibraries();
-      }
-    });
-    return null;
-  }
-
-  protected void unlinkLibraries() {
-    OperationJob job = new OperationJob();
-    for (Entry<IScoutBundle, List<IPluginModelBase>> workUnit : m_libraries.entrySet()) {
-      LibraryBundleUnlinkOperation op = new LibraryBundleUnlinkOperation(workUnit.getKey(), workUnit.getValue());
-      job.addOperation(op);
-    }
-    job.schedule();
-  }
-
-  @Override
-  public boolean isVisible() {
-    if (m_libraries.size() < 1) {
-      return false;
-    }
-    for (IScoutBundle b : m_libraries.keySet()) {
-      if (b.isBinary()) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  public void addLibraryToRemove(IScoutBundle ownerBundle, IPluginModelBase libraryModel) {
-    List<IPluginModelBase> libs = m_libraries.get(ownerBundle);
-    if (libs == null) {
-      libs = new ArrayList<IPluginModelBase>(3);
-      m_libraries.put(ownerBundle, libs);
-    }
-    libs.add(libraryModel);
-  }
-
 }

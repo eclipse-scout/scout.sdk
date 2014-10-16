@@ -44,10 +44,9 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
-public class ProcessServiceNewWizard extends AbstractServiceWizard implements INewWizard {
+public class ProcessServiceNewWizard extends AbstractServiceWizard {
   private static final String TYPE_PERMISSION_CREATE = "permCreate";
   private static final String TYPE_PERMISSION_READ = "permRead";
   private static final String TYPE_PERMISSION_UPDATE = "permUpdate";
@@ -60,30 +59,22 @@ public class ProcessServiceNewWizard extends AbstractServiceWizard implements IN
   private ProcessServiceNewWizardPage m_serviceNewWizardPage;
   private ProcessServiceNewOperation m_operation;
   private ITreeNode m_locationWizardPageRoot;
-  private IScoutBundle m_serverBundle;
-
-  public ProcessServiceNewWizard() {
-    this(null);
-  }
-
-  public ProcessServiceNewWizard(IScoutBundle serverBundle) {
-    setWindowTitle(Texts.get("NewProcessService"));
-    m_serverBundle = serverBundle;
-  }
 
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
-    m_serverBundle = UiUtility.getScoutBundleFromSelection(selection, m_serverBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER));
+    setWindowTitle(Texts.get("NewProcessService"));
+
+    IScoutBundle serverBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER));
     String pck = UiUtility.getPackageSuffix(selection);
 
-    m_serviceNewWizardPage = new ProcessServiceNewWizardPage(m_serverBundle);
+    m_serviceNewWizardPage = new ProcessServiceNewWizardPage(serverBundle);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
     m_serviceNewWizardPage.setTargetPackage(pck);
     addPage(m_serviceNewWizardPage);
 
-    if (m_serverBundle != null) {
+    if (serverBundle != null) {
       P_StatusRevalidator statusProvider = new P_StatusRevalidator();
-      m_locationWizardPageRoot = createTree(m_serverBundle);
+      m_locationWizardPageRoot = createTree(serverBundle);
       m_locationWizardPage = new BundleTreeWizardPage(Texts.get("ProcessServiceLocation"), Texts.get("OrganiseLocations"), m_locationWizardPageRoot, new P_InitialCheckedFilter());
       m_locationWizardPage.addStatusProvider(statusProvider);
       m_locationWizardPage.addDndListener(new P_TreeDndListener());
@@ -91,7 +82,7 @@ public class ProcessServiceNewWizard extends AbstractServiceWizard implements IN
       addPage(m_locationWizardPage);
 
       // init
-      m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IService, m_serverBundle.getJavaProject()));
+      m_serviceNewWizardPage.setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IService, serverBundle.getJavaProject()));
     }
   }
 

@@ -86,15 +86,9 @@ public class CalendarItemProviderTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{CalendarItemProviderNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    ((CalendarItemProviderNewAction) menu).setType(getCalendarType());
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(CalendarItemProviderNewAction.class);
   }
 
   public IType getCalendarType() {

@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.ui.services.OrganizeImportService;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.scout.sdk.util.method.ISimpleNameAstFlattenerProviderService;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
@@ -540,6 +541,10 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
   @SuppressWarnings("restriction")
   private void showJavaElementInEditorImpl(IJavaElement e, boolean createNew) {
+    if (!TypeUtility.exists(e)) {
+      return;
+    }
+
     try {
       IEditorPart editor = null;
       if (createNew) {

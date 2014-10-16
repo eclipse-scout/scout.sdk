@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.library;
 
+import java.util.Set;
+
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.library.LibrariesBundleUnlinkAction;
@@ -40,21 +42,9 @@ public class LibraryNodePage extends AbstractPage {
     return IScoutPageConstants.LIBRARIES_NODE_PAGE;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{LibrariesBundleUnlinkAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu.getClass() == LibrariesBundleUnlinkAction.class) {
-      LibrariesBundleUnlinkAction unlinkAction = (LibrariesBundleUnlinkAction) menu;
-      unlinkAction.addLibraryToRemove(getScoutBundle(), getPluginModel());
-    }
-    else {
-      super.prepareMenuAction(menu);
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(LibrariesBundleUnlinkAction.class);
   }
 
   public IPluginModelBase getPluginModel() {

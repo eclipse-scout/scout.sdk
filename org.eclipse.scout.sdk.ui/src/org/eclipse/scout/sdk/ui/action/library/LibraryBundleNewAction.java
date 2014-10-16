@@ -10,12 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.library;
 
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.library.LibraryNewWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  * <h3>{@link LibraryBundleNewAction}</h3>
@@ -23,9 +20,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  * @author Andreas Hoegger
  * @since 3.8.0 29.02.2012
  */
-public class LibraryBundleNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_ownerBundle;
+public class LibraryBundleNewAction extends AbstractScoutHandler {
 
   /**
    * @param label
@@ -35,21 +30,4 @@ public class LibraryBundleNewAction extends AbstractWizardAction {
     super(Texts.get("NewLibraryBundlePopup"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LibrariesAdd));
   }
 
-  @Override
-  public boolean isVisible() {
-    return m_ownerBundle == null || !m_ownerBundle.isBinary();
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new LibraryNewWizard(getOwnerBundle());
-  }
-
-  public IScoutBundle getOwnerBundle() {
-    return m_ownerBundle;
-  }
-
-  public void setOwnerBundle(IScoutBundle ownerBundle) {
-    m_ownerBundle = ownerBundle;
-  }
 }

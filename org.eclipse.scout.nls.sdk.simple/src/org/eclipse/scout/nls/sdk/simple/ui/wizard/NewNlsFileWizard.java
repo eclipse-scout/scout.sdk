@@ -17,11 +17,10 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.nls.sdk.simple.operations.AbstractCreateNlsProjectOperation;
 import org.eclipse.scout.nls.sdk.simple.operations.CreateSimpleNlsProjectOperation;
 import org.eclipse.scout.nls.sdk.simple.operations.NewNlsFileOperationDesc;
-import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
-public class NewNlsFileWizard extends BasicNewResourceWizard implements INewWizard {
+public class NewNlsFileWizard extends BasicNewResourceWizard {
 
   private NewNlsFileOperationDesc m_desc;
 

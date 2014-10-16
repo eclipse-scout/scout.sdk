@@ -15,8 +15,6 @@ import java.util.Set;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.operation.ITypeResolver;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformPagesOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.PageNewAction;
@@ -80,31 +78,8 @@ public class AllPagesTablePage extends AbstractPage {
     PageNodePageHelper.createRepresentationFor(this, allPages, m_cachedTypeHierarchy);
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, PageNewAction.class, TypeResolverPageDataAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof WellformAction) {
-      WellformAction action = (WellformAction) menu;
-      action.init(getScoutBundle());
-      action.setOperation(new WellformPagesOperation(getScoutBundle()));
-    }
-    else if (menu instanceof PageNewAction) {
-      ((PageNewAction) menu).init(getScoutBundle());
-    }
-    else if (menu instanceof TypeResolverPageDataAction) {
-      ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
-          ICachedTypeHierarchy pageWithTableHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPageWithTable);
-          return pageWithTableHierarchy.getAllSubtypes(iPageWithTable, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
-        }
-      }, getScoutBundle());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(WellformAction.class, PageNewAction.class, TypeResolverPageDataAction.class);
   }
 }

@@ -10,38 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.code.type.CodeTypeNewWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.ui.PlatformUI;
 
 /**
  *
  */
-public class CodeTypeNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_bundle;
+public class CodeTypeNewAction extends AbstractScoutHandler {
 
   public CodeTypeNewAction() {
-    super(Texts.get("Action_newTypeX", "Code Type"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeTypeAdd), null, false, Category.NEW);
-  }
-
-  public void setScoutBundle(IScoutBundle bundle) {
-    m_bundle = bundle;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    CodeTypeNewWizard ctnw = new CodeTypeNewWizard(m_bundle);
-    ctnw.init(PlatformUI.getWorkbench(), null);
-    return ctnw;
+    super(Texts.get("Action_newTypeX", "Code Type"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeTypeAdd), null, false, IScoutHandler.Category.NEW);
   }
 }

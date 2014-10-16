@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
@@ -71,15 +73,9 @@ public class KeyStrokeTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{KeyStrokeNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    ((KeyStrokeNewAction) menu).setType(getDeclaringType());
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(KeyStrokeNewAction.class);
   }
 
   public IType getDeclaringType() {

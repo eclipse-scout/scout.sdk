@@ -49,21 +49,9 @@ public class TableFieldNodePage extends AbstractFormFieldNodePage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ShowJavaReferencesAction.class, CreateTemplateAction.class, FormFieldRenameAction.class,
-        FormFieldDeleteAction.class, TableColumnWidthsPasteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof FormFieldDeleteAction) {
-      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TableFieldRemove));
-    }
-    else if (menu instanceof TableColumnWidthsPasteAction) {
-      ((TableColumnWidthsPasteAction) menu).init(this);
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(ShowJavaReferencesAction.class, CreateTemplateAction.class, FormFieldRenameAction.class,
+        FormFieldDeleteAction.class, TableColumnWidthsPasteAction.class);
   }
 }

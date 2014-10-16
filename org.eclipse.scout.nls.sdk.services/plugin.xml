@@ -37,4 +37,17 @@
           id="shared.services.textprovider">
     </targetPackage>
  </extension>
+ <extension
+       point="org.eclipse.scout.sdk.ui.executor">
+    <executor
+          class="org.eclipse.scout.nls.sdk.services.ui.executor.TextProviderServiceDeleteExecutor"
+          id="org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceDeleteAction"
+          order="0">
+    </executor>
+    <executor
+          class="org.eclipse.scout.nls.sdk.services.ui.executor.TextProviderServiceNewExecutor"
+          id="org.eclipse.scout.nls.sdk.services.ui.action.TextProviderServiceNewAction"
+          order="0">
+    </executor>
+ </extension>
 </plugin>

@@ -14,8 +14,6 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
@@ -44,14 +42,6 @@ public class ListBoxNodePage extends AbstractFormFieldNodePage {
       TableNodePage tableNodePage = new TableNodePage();
       tableNodePage.setParent(this);
       tableNodePage.setType(CollectionUtility.firstElement(tables));
-    }
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof FormFieldDeleteAction) {
-      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ListboxFieldRemove));
     }
   }
 }

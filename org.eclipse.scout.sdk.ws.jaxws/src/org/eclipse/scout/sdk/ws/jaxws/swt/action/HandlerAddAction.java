@@ -10,49 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
-import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
-import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
-import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
-import org.eclipse.swt.widgets.Shell;
-import org.w3c.dom.Element;
 
 public class HandlerAddAction extends AbstractLinkAction {
-
-  private IScoutBundle m_bundle;
-
-  private SunJaxWsBean m_sunJaxWsBean;
-  private Element m_xmlHandlerChain;
 
   public HandlerAddAction() {
     super(Texts.get("AddHandler"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolAdd));
     setLinkText(Texts.get("AddHandler"));
     setToolTip(Texts.get("TooltipHandlerNew"));
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  public void init(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean, Element xmlHandlerChain) {
-    m_bundle = bundle;
-    m_sunJaxWsBean = sunJaxWsBean;
-    m_xmlHandlerChain = xmlHandlerChain;
-  }
-
-  @Override
-  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    Element xmlHandler = m_xmlHandlerChain.getOwnerDocument().createElement(m_sunJaxWsBean.toQualifiedName("handler"));
-    m_xmlHandlerChain.appendChild(xmlHandler);
-
-    // persist
-    ResourceFactory.getSunJaxWsResource(m_bundle).storeXmlAsync(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
-    return null;
   }
 }

@@ -15,6 +15,7 @@ Export-Package: org.eclipse.scout.nls.sdk.services.internal,
  org.eclipse.scout.nls.sdk.services.model.ws.project,
  org.eclipse.scout.nls.sdk.services.operation,
  org.eclipse.scout.nls.sdk.services.ui.action,
+ org.eclipse.scout.nls.sdk.services.ui.executor,
  org.eclipse.scout.nls.sdk.services.ui.page,
  org.eclipse.scout.nls.sdk.services.ui.part,
  org.eclipse.scout.nls.sdk.services.ui.wizard

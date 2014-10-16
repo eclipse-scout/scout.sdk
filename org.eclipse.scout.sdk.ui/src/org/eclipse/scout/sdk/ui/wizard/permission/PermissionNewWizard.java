@@ -10,23 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.permission;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.ui.IWorkbench;
 
 public class PermissionNewWizard extends AbstractWorkspaceWizard {
 
   private PermissionWizardPage m_page1;
-  private final IScoutBundle m_sharedBundle;
 
-  public PermissionNewWizard(IScoutBundle sharedBundle) {
-    m_sharedBundle = sharedBundle;
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
     setWindowTitle(Texts.get("NewPermission"));
+
+    IScoutBundle sharedBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED));
+
     m_page1 = new PermissionWizardPage(sharedBundle);
     addPage(m_page1);
-  }
-
-  public IScoutBundle getSharedBundle() {
-    return m_sharedBundle;
   }
 }

@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  * @author Andreas Hoegger
  * @since 1.0.8 11.09.2010
  */
-public class FormTemplateTablePage extends AbstractPage {
+public class FormTemplateTablePage extends AbstractPage implements ITypeResolver {
   private ICachedTypeHierarchy m_formHierarchy;
 
   public FormTemplateTablePage(IPage parent) {
@@ -65,41 +65,25 @@ public class FormTemplateTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    for (IType formTemplate : resolveFormTemplates()) {
+    for (IType formTemplate : getTypes()) {
       new FormNodePage(this, formTemplate);
     }
   }
 
-  protected Set<IType> resolveFormTemplates() {
+  @Override
+  public Set<IType> getTypes() {
     IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
-
     if (m_formHierarchy == null) {
       m_formHierarchy = TypeUtility.getPrimaryTypeHierarchy(iForm);
       m_formHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(
-        ScoutTypeFilters.getInScoutBundles(getScoutBundle()),
-        TypeFilters.getFlagsFilter(Flags.AccAbstract | Flags.AccPublic)
-        );
+    ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(ScoutTypeFilters.getInScoutBundles(getScoutBundle()), TypeFilters.getFlagsFilter(Flags.AccAbstract | Flags.AccPublic));
     return m_formHierarchy.getAllSubtypes(iForm, filter, TypeComparators.getTypeNameComparator());
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof TypeResolverFormDataAction) {
-      ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          return resolveFormTemplates();
-        }
-      }, getScoutBundle());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TypeResolverFormDataAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TypeResolverFormDataAction.class);
   }
 
   @Override

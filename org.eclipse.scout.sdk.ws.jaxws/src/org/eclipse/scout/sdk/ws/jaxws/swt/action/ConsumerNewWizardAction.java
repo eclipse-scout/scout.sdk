@@ -10,42 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
-import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
-import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.WsConsumerNewWizard;
-import org.eclipse.swt.widgets.Shell;
 
 public class ConsumerNewWizardAction extends AbstractLinkAction {
-  private IScoutBundle m_bundle;
 
   public ConsumerNewWizardAction() {
     super(Texts.get("Action_newTypeX", Texts.get("Consumer")), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolAdd));
     setLeadingText(Texts.get("CreateNewWsConsumerByClicking"));
     setLinkText(Texts.get("here"));
-  }
-
-  public void init(IScoutBundle bundle) {
-    m_bundle = bundle;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  @Override
-  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    IWizard wizard = new WsConsumerNewWizard(m_bundle);
-    ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
-    wizardDialog.setPageSize(680, 350);
-    wizardDialog.setHelpAvailable(false);
-    wizardDialog.open();
-    return null;
   }
 }

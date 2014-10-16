@@ -17,9 +17,9 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
+import org.eclipse.scout.sdk.ui.action.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.create.ProcessServiceNewAction;
-import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
-public class ServerServicesTablePage extends AbstractPage {
+public class ServerServicesTablePage extends AbstractPage implements ITypeResolver {
 
   private ICachedTypeHierarchy m_serviceHierarchy;
 
@@ -69,14 +69,19 @@ public class ServerServicesTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    for (IType service : resolveServices()) {
+    for (IType service : getTypes()) {
       Set<IType> interfaces = m_serviceHierarchy.getSuperInterfaces(service, TypeFilters.getElementNameFilter("I" + service.getElementName()));
       new ServerServicesNodePage(this, service, CollectionUtility.firstElement(interfaces));
     }
   }
 
-  protected Set<IType> resolveServices() {
+  @Override
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(FormDataSqlBindingValidateAction.class, ProcessServiceNewAction.class);
+  }
 
+  @Override
+  public Set<IType> getTypes() {
     IType iService = TypeUtility.getType(IRuntimeClasses.IService);
     IType iSqlService = TypeUtility.getType(IRuntimeClasses.ISqlService);
     IType iBookmarkStorageService = TypeUtility.getType(IRuntimeClasses.IBookmarkStorageService);
@@ -101,27 +106,5 @@ public class ServerServicesTablePage extends AbstractPage {
     return m_serviceHierarchy.getAllSubtypes(iService,
         TypeFilters.getMultiTypeFilterAnd(ScoutTypeFilters.getClassesInScoutBundles(sb), TypeFilters.getNotInTypes(excluded)),
         TypeComparators.getTypeNameComparator());
-
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{FormDataSqlBindingValidateAction.class, ProcessServiceNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof FormDataSqlBindingValidateAction) {
-      ((FormDataSqlBindingValidateAction) menu).setTyperesolver(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          return resolveServices();
-        }
-      });
-    }
-    else if (menu instanceof ProcessServiceNewAction) {
-      ((ProcessServiceNewAction) menu).setScoutBundle(getScoutBundle());
-    }
   }
 }

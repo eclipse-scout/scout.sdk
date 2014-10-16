@@ -61,7 +61,7 @@ public class ComposerFieldNewWizardPage extends AbstractWorkspaceWizardPage {
 
   public ComposerFieldNewWizardPage(IType declaringType) {
     super(ComposerFieldNewWizardPage.class.getName());
-    setTitle(Texts.get("NewCheckboxField"));
+    setTitle(Texts.get("CreateANewComposerField"));
     setDescription(Texts.get("CreateANewComposerField"));
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IComposerField, m_declaringType.getJavaProject()));

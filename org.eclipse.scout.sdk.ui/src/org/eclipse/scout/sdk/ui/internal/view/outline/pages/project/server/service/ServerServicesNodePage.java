@@ -10,13 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.server.service;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.sdk.ui.action.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction;
 import org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction;
-import org.eclipse.scout.sdk.ui.action.validation.FormDataSqlBindingValidateAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
@@ -36,20 +38,9 @@ public class ServerServicesNodePage extends AbstractServiceNodePage {
     return IScoutPageConstants.SERVER_SERVICE_NODE_PAGE;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class,
-        ServiceOperationNewAction.class, ServiceDeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof ServiceDeleteAction) {
-      ServiceDeleteAction action = (ServiceDeleteAction) menu;
-      action.setServiceImplementation(getType());
-      action.setServiceInterface(getInterfaceType());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(ServiceRenameAction.class, ShowJavaReferencesAction.class, FormDataSqlBindingValidateAction.class,
+        ServiceOperationNewAction.class, ServiceDeleteAction.class);
   }
 }

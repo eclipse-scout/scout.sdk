@@ -16,31 +16,20 @@ import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
-import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
-public class CodeTypeNewWizard extends AbstractWorkspaceWizard implements INewWizard {
+public class CodeTypeNewWizard extends AbstractWorkspaceWizard {
 
   private CodeTypeNewWizardPage m_page1;
-  private IScoutBundle m_sharedBundle;
-
-  public CodeTypeNewWizard() {
-    this(null);
-  }
-
-  public CodeTypeNewWizard(IScoutBundle sharedBundle) {
-    m_sharedBundle = sharedBundle;
-  }
 
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
-
-    m_sharedBundle = UiUtility.getScoutBundleFromSelection(selection, m_sharedBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED));
+    IScoutBundle sharedBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED));
     String pck = UiUtility.getPackageSuffix(selection);
 
     setWindowTitle(Texts.get("NewCodeType"));
 
-    m_page1 = new CodeTypeNewWizardPage(m_sharedBundle);
+    m_page1 = new CodeTypeNewWizardPage(sharedBundle);
     m_page1.setTargetPackage(pck);
     addPage(m_page1);
   }

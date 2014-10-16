@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
@@ -79,16 +80,8 @@ public class SessionFactoryTablePage extends AbstractPage {
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof SessionFactoryNewAction) {
-      ((SessionFactoryNewAction) menu).init(getScoutBundle());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{SessionFactoryNewAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(SessionFactoryNewAction.class);
   }
 
   @Override

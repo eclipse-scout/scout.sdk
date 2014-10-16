@@ -11,42 +11,27 @@
 package org.eclipse.scout.sdk.ui.wizard.page;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.ui.IWorkbench;
 
 public class PageLinkWizard extends AbstractWorkspaceWizard {
 
-  private PageLinkWizardPage m_linkPageWizardPage;
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
 
-  public PageLinkWizard(IScoutBundle clientBunlde) {
     setWindowTitle(Texts.get("LinkPage"));
-    setLinkPageWizardPage(new PageLinkWizardPage(clientBunlde));
-    addPage(getLinkPageWizardPage());
-  }
 
-  public void setLinkPageWizardPage(PageLinkWizardPage linkPageWizardPage) {
-    m_linkPageWizardPage = linkPageWizardPage;
-  }
+    IScoutBundle clientBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+    IType holderType = UiUtility.getTypeFromSelection(selection);
 
-  public PageLinkWizardPage getLinkPageWizardPage() {
-    return m_linkPageWizardPage;
+    PageLinkWizardPage linkPageWizardPage = new PageLinkWizardPage(clientBundle);
+    linkPageWizardPage.setHolderType(holderType);
+    addPage(linkPageWizardPage);
   }
-
-  public void setHolderType(IType type) {
-    getLinkPageWizardPage().setHolderType(type);
-  }
-
-  public void setHolderEnabled(boolean enabled) {
-    getLinkPageWizardPage().setHolderTypeEnabled(enabled);
-  }
-
-  public void setPageType(IType type) {
-    getLinkPageWizardPage().setPageType(type);
-  }
-
-  public void setPageEnabled(boolean enabled) {
-    getLinkPageWizardPage().setPageTypeFieldEnabled(enabled);
-  }
-
 }

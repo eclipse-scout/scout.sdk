@@ -396,8 +396,8 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     setProperty(PROP_LIBRARY_TYPE, libraryType);
   }
 
+  @SuppressWarnings("unchecked")
   public Set<IScoutBundle> getLibraryUserBundles() {
-    @SuppressWarnings("unchecked")
     Set<IScoutBundle> libraryUserBundles = (Set<IScoutBundle>) getProperty(PROP_USER_BUNDLES);
     if (libraryUserBundles == null) {
       libraryUserBundles = new TreeSet<IScoutBundle>();
