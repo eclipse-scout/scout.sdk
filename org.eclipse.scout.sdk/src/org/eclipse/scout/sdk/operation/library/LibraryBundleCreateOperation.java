@@ -149,7 +149,7 @@ public class LibraryBundleCreateOperation implements IOperation {
     if (getFragmentHost() != null) {
       manifest.setEntryValue("Fragment-Host", getFragmentHost());
     }
-    manifest.setEntryValue("Bundle-RequiredExecutionEnvironment", JdtUtility.getDefaultJvmExecutionEnvironment(JdtUtility.getTargetPlatformVersion()));
+    manifest.setEntryValue("Bundle-RequiredExecutionEnvironment", JdtUtility.getDefaultJvmExecutionEnvironment());
   }
 
   private void collectPackages(IProject project, Collection<IPackageFragment> collector) throws JavaModelException {
