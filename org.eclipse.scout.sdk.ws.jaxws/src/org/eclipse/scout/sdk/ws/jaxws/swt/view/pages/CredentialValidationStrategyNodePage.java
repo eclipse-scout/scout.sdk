@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
+import java.util.Set;
+
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
@@ -20,9 +22,10 @@ import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 
-public class CredentialValidationStrategyNodePage extends AbstractPage {
+public class CredentialValidationStrategyNodePage extends AbstractPage implements ITypePage {
 
   private IType m_type;
 
@@ -66,29 +69,12 @@ public class CredentialValidationStrategyNodePage extends AbstractPage {
     return false;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
     if (!m_type.isBinary()) {
-      return new Class[]{DeleteAction.class, TypeRenameAction.class, ShowJavaReferencesAction.class};
+      return newSet(DeleteAction.class, TypeRenameAction.class, ShowJavaReferencesAction.class);
     }
-    return new Class[]{ShowJavaReferencesAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof TypeRenameAction) {
-      TypeRenameAction action = (TypeRenameAction) menu;
-      action.setOldName(getType().getElementName());
-      action.setType(getType());
-    }
-    else if (menu instanceof ShowJavaReferencesAction) {
-      ((ShowJavaReferencesAction) menu).setElement(getType());
-    }
-    else if (menu instanceof DeleteAction) {
-      ((DeleteAction) menu).addType(getType());
-      ((DeleteAction) menu).setName(getType().getElementName());
-    }
+    return newSet(ShowJavaReferencesAction.class);
   }
 
   @Override
@@ -96,7 +82,13 @@ public class CredentialValidationStrategyNodePage extends AbstractPage {
     return false;
   }
 
+  @Override
   public IType getType() {
     return m_type;
+  }
+
+  @Override
+  public void setType(IType type) {
+    m_type = type;
   }
 }

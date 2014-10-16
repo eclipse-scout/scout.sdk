@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 
 import java.util.List;
 
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -25,6 +26,9 @@ import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.form.field.table.TableColumnNewOperation;
+import org.eclipse.scout.sdk.ui.action.create.TableColumnNewAction;
+import org.eclipse.scout.sdk.ui.executor.selection.ScoutStructuredSelection;
+import org.eclipse.scout.sdk.ui.extensions.executor.ExecutorExtensionPoint;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.ButtonGroup;
 import org.eclipse.scout.sdk.ui.fields.buttongroup.IButtonGroupListener;
@@ -33,9 +37,8 @@ import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard.ContinueOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
-import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
-import org.eclipse.scout.sdk.ui.wizard.tablecolumn.TableColumnNewWizard.CONTINUE_OPERATION;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
@@ -62,7 +65,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
   private String m_typeName;
   private String m_genericSignature;
   private SiblingProposal m_sibling;
-  private CONTINUE_OPERATION m_continueOperation;
+  private ContinueOperation m_continueOperation;
 
   private ProposalTextField m_nlsNameField;
   private StyledTextField m_typeNameField;
@@ -74,7 +77,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
   private IType m_superType;
   private IType m_createdColumn;
 
-  public DefaultTableColumnNewWizardPage(IType declaringType, CONTINUE_OPERATION op) {
+  public DefaultTableColumnNewWizardPage(IType declaringType, ContinueOperation op) {
     super(DefaultTableColumnNewWizardPage.class.getName());
     setTitle(Texts.get("NewTableColumn"));
     setDescription(Texts.get("CreateANewTableColumn"));
@@ -98,13 +101,13 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     g.setLayout(new GridLayout(1, false));
     g.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
-    ButtonGroup<CONTINUE_OPERATION> nextStepOptions = new ButtonGroup<CONTINUE_OPERATION>(g, SWT.RADIO);
-    nextStepOptions.createButton(Texts.get("CreateMoreColumn"), CONTINUE_OPERATION.ADD_MORE_COLUMNS);
-    nextStepOptions.createButton(Texts.get("FinishWizard"), CONTINUE_OPERATION.FINISH);
-    nextStepOptions.addButtonGroupListener(new IButtonGroupListener<CONTINUE_OPERATION>() {
+    ButtonGroup<ContinueOperation> nextStepOptions = new ButtonGroup<ContinueOperation>(g, SWT.RADIO);
+    nextStepOptions.createButton(Texts.get("CreateMoreColumn"), ContinueOperation.ADD_OTHER);
+    nextStepOptions.createButton(Texts.get("FinishWizard"), ContinueOperation.FINISH);
+    nextStepOptions.addButtonGroupListener(new IButtonGroupListener<ContinueOperation>() {
 
       @Override
-      public void handleSelectionChanged(List<CONTINUE_OPERATION> newSelection) {
+      public void handleSelectionChanged(List<ContinueOperation> newSelection) {
         m_continueOperation = newSelection.get(0);
       }
     });
@@ -183,15 +186,14 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
 
-    if (CONTINUE_OPERATION.ADD_MORE_COLUMNS == m_continueOperation) {
+    if (ContinueOperation.ADD_OTHER == m_continueOperation) {
       // start another wizard if one additional column should be created.
       Display.getDefault().asyncExec(new Runnable() {
         @Override
         public void run() {
-          TableColumnNewWizard wizard = new TableColumnNewWizard(m_continueOperation);
-          wizard.initWizard(m_declaringType);
-          ScoutWizardDialog wizardDialog = new ScoutWizardDialog(wizard);
-          wizardDialog.open();
+          ScoutStructuredSelection selection = new ScoutStructuredSelection(new Object[]{m_declaringType});
+          selection.setContinueOperation(m_continueOperation);
+          ExecutorExtensionPoint.getExecutorFor(TableColumnNewAction.class.getName()).run(getShell(), selection, new ExecutionEvent());
         }
       });
     }

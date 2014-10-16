@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
-import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
-import org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.MenuTablePage;
@@ -26,6 +23,7 @@ import org.eclipse.scout.sdk.util.SdkProperties;
 public class ButtonNodePage extends AbstractFormFieldNodePage {
 
   public ButtonNodePage() {
+    super(SdkProperties.SUFFIX_BUTTON);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Button));
   }
 
@@ -38,17 +36,5 @@ public class ButtonNodePage extends AbstractFormFieldNodePage {
   protected void loadChildrenImpl() {
     new MenuTablePage(this, getType());
     new KeyStrokeTablePage(this, getType());
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof FormFieldRenameAction) {
-      FormFieldRenameAction a = (FormFieldRenameAction) menu;
-      a.setReadOnlySuffix(SdkProperties.SUFFIX_BUTTON);
-    }
-    else if (menu instanceof FormFieldDeleteAction) {
-      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ButtonRemove));
-    }
   }
 }

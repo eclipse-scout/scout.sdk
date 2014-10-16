@@ -11,51 +11,44 @@
 package org.eclipse.scout.sdk.ui.wizard.toolbutton;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
-import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
+import org.eclipse.ui.IWorkbench;
 
-public class ToolbuttonNewWizard extends AbstractFormFieldWizard {
+public class ToolbuttonNewWizard extends AbstractInnerTypeWizard {
 
   private ToolbuttonNewWizardPage1 m_page1;
   private ToolbuttonNewWizardPage2 m_page2a;
   private OutlineToolbuttonNewWizardPage m_page2b;
 
-  public ToolbuttonNewWizard(IType formType) {
-    setWindowTitle(Texts.get("NewToolButton"));
-    initWizard(formType);
-  }
-
   @Override
-  public void initWizard(IType declaringType) {
-    super.initWizard(declaringType);
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
+    setWindowTitle(Texts.get("NewToolButton"));
+
     m_page1 = new ToolbuttonNewWizardPage1(getDeclaringType());
+    if (getSuperType() != null) {
+      m_page1.setSuperType(getSuperType());
+    }
     addPage(m_page1);
     m_page2a = new ToolbuttonNewWizardPage2(getDeclaringType());
+    if (getTypeName() != null) {
+      m_page2a.setTypeName(getTypeName());
+    }
     addPage(m_page2a);
     m_page2b = new OutlineToolbuttonNewWizardPage(getDeclaringType());
+    if (getSiblingProposal() != null) {
+      m_page2b.setSibling(getSiblingProposal());
+    }
+    if (getTypeName() != null) {
+      m_page2b.setTypeName(getTypeName());
+    }
     addPage(m_page2b);
-  }
-
-  @Override
-  public void setSuperType(IType superType) {
-    m_page1.setSuperType(superType);
-  }
-
-  @Override
-  public void setTypeName(String name) {
-    m_page2a.setTypeName(name);
-    m_page2b.setTypeName(name);
-  }
-
-  @Override
-  public void setSibling(SiblingProposal sibling) {
-    m_page2a.setSibling(sibling);
-    m_page2b.setSibling(sibling);
   }
 
   @Override

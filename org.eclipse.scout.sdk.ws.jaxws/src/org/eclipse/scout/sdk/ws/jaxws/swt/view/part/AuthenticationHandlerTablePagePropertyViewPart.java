@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.part;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.AbstractSinglePageSectionBasedViewPart;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.AuthenticationHandlerNewWizardAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.AuthenticationHandlerTablePage;
@@ -25,13 +24,6 @@ public class AuthenticationHandlerTablePagePropertyViewPart extends AbstractSing
 
   public static final String SECTION_ID_FILTER = "section.jaxws.filter";
   public static final String SECTION_ID_AUTHENTICATION_HANDLERS = "section.jaxws.links";
-
-  private IScoutBundle m_bundle;
-
-  @Override
-  protected void init() {
-    m_bundle = getPage().getScoutBundle();
-  }
 
   @Override
   protected void createSections() {
@@ -55,8 +47,7 @@ public class AuthenticationHandlerTablePagePropertyViewPart extends AbstractSing
 
       // QuickLink 'Create new credential validation strategy'
       AuthenticationHandlerNewWizardAction action = new AuthenticationHandlerNewWizardAction();
-      action.init(m_bundle, getPage().getWebserviceEnum());
-      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_AUTHENTICATION_HANDLERS).getSectionClient(), action, getFormToolkit());
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_AUTHENTICATION_HANDLERS).getSectionClient(), action, getFormToolkit(), getPage());
       applyLayoutData(actionPresenter);
     }
     finally {

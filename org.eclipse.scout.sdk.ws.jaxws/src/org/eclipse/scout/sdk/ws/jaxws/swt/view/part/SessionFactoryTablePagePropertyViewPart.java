@@ -46,8 +46,7 @@ public class SessionFactoryTablePagePropertyViewPart extends AbstractSinglePageS
 
       // QuickLink 'Create new Session Factory'
       SessionFactoryNewAction action = new SessionFactoryNewAction();
-      action.init(m_bundle);
-      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_SESSION_FACTORIES).getSectionClient(), action, getFormToolkit());
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_SESSION_FACTORIES).getSectionClient(), action, getFormToolkit(), m_bundle);
       applyLayoutData(actionPresenter);
     }
     finally {

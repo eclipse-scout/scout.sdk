@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.services.ui.page;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CompareUtility;
@@ -64,17 +66,8 @@ public class TextServiceNodePage extends AbstractServiceNodePage {
     // void
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TextProviderServiceDeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof TextProviderServiceDeleteAction) {
-      ((TextProviderServiceDeleteAction) menu).addTextServiceToDelete(getType());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TextProviderServiceDeleteAction.class);
   }
 }

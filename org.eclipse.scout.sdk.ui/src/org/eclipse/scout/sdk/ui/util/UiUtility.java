@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.ui.util;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -36,9 +38,10 @@ import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
+import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
@@ -285,25 +288,28 @@ public final class UiUtility {
 
   /**
    * Tries to calculate the most specific scout bundle that contains the given selection.
-   * The given filter is taken into account so that clients can influence which types of scout bundles around the
-   * selected one that should be used.<br>
-   * If the priorityBundle is not null, this bundle is directly returned and the selection is not evaluated.
    *
    * @param selection
-   * @param priorityBundle
+   * @return
+   */
+  public static IScoutBundle getScoutBundleFromSelection(IStructuredSelection selection) {
+    return getScoutBundleFromSelection(selection, null);
+  }
+
+  /**
+   * Tries to calculate the most specific scout bundle that contains the given selection.
+   * The given filter is taken into account so that clients can influence which types of scout bundles around the
+   * selected one that should be used.<br>
+   *
+   * @param selection
    * @param filter
    * @return
    */
-  public static IScoutBundle getScoutBundleFromSelection(IStructuredSelection selection, IScoutBundle priorityBundle, IScoutBundleFilter filter) {
-    if (priorityBundle != null) {
-      return priorityBundle;
-    }
-
-    // parse from selection
+  public static IScoutBundle getScoutBundleFromSelection(IStructuredSelection selection, IScoutBundleFilter filter) {
     if (selection != null) {
       IScoutBundle b = UiUtility.adapt(selection.getFirstElement(), IScoutBundle.class);
       if (b != null) {
-        if (filter.accept(b)) {
+        if (filter == null || filter.accept(b)) {
           return b;
         }
         else {
@@ -336,6 +342,40 @@ public final class UiUtility {
     return null;
   }
 
+  public static IType getTypeFromSelection(IStructuredSelection selection) {
+    return getTypeFromSelection(selection, null);
+  }
+
+  public static IType getTypeFromSelection(IStructuredSelection selection, ITypeFilter filter) {
+    return getTypeFromSelection(selection.getFirstElement(), filter);
+  }
+
+  private static IType getTypeFromSelection(Object o, ITypeFilter filter) {
+    IType t = UiUtility.adapt(o, IType.class);
+    if (TypeUtility.exists(t) && (filter == null || filter.accept(t))) {
+      return t;
+    }
+    return null;
+  }
+
+  public static Set<IType> getTypesFromSelection(IStructuredSelection selection, ITypeFilter filter) {
+    Set<IType> result = new LinkedHashSet<IType>(selection.size());
+    if (selection.isEmpty()) {
+      return result;
+    }
+
+    Iterator<?> it = selection.iterator();
+    while (it.hasNext()) {
+      Object o = it.next();
+      IType t = getTypeFromSelection(o, filter);
+      if (t != null) {
+        result.add(t);
+      }
+    }
+
+    return result;
+  }
+
   /**
    * Tries to convert the given element into the given class.
    * This method respects scout IPage classes.
@@ -354,20 +394,30 @@ public final class UiUtility {
     if (targetClass.isInstance(element)) {
       return (T) element;
     }
+
+    // get element out of the pages
     if (element instanceof IPage) {
       IPage page = (IPage) element;
       IScoutBundle sb = page.getScoutBundle();
       if (sb != null) {
         element = sb;
       }
-      if (page instanceof AbstractScoutTypePage) {
-        AbstractScoutTypePage astp = (AbstractScoutTypePage) page;
-        IType t = astp.getType();
-        if (TypeUtility.exists(t)) {
-          element = t;
+
+      do {
+        if (page instanceof ITypePage) {
+          ITypePage astp = (ITypePage) page;
+          IType t = astp.getType();
+          if (TypeUtility.exists(t)) {
+            element = t;
+            break;
+          }
         }
+        page = page.getParent();
       }
+      while (page != null);
     }
+
+    // try to adapt
     if (element instanceof IAdaptable) {
       IAdaptable ad = (IAdaptable) element;
       T result = (T) ad.getAdapter(targetClass);
@@ -378,10 +428,14 @@ public final class UiUtility {
           IJavaElement je = (IJavaElement) ad.getAdapter(IJavaElement.class);
           if (TypeUtility.exists(je)) {
             r = je.getResource();
+            if (!ResourceUtility.exists(r) && targetClass.isAssignableFrom(IScoutBundle.class)) {
+              // binary java element
+              result = (T) ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(je);
+            }
           }
         }
 
-        if (ResourceUtility.exists(r)) {
+        if (result == null && ResourceUtility.exists(r)) {
           // try to convert from a resource
           result = (T) r.getAdapter(targetClass);
         }

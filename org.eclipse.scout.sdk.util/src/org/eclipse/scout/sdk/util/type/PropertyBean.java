@@ -11,13 +11,13 @@
 package org.eclipse.scout.sdk.util.type;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
@@ -48,8 +48,8 @@ public class PropertyBean implements IPropertyBean {
   }
 
   @Override
-  public IMember[] getAllMembers() {
-    ArrayList<IMember> members = new ArrayList<IMember>();
+  public List<IMember> getAllMembers() {
+    List<IMember> members = new ArrayList<IMember>(3);
     if (TypeUtility.exists(m_field)) {
       members.add(m_field);
     }
@@ -59,7 +59,7 @@ public class PropertyBean implements IPropertyBean {
     if (TypeUtility.exists(m_writeMethod)) {
       members.add(m_writeMethod);
     }
-    return members.toArray(new IMember[members.size()]);
+    return members;
   }
 
   public void setBeanName(String beanName) {
@@ -76,8 +76,7 @@ public class PropertyBean implements IPropertyBean {
     String beanSignature = null;
     if (TypeUtility.exists(getReadMethod())) {
       try {
-        String methodSig = getReadMethod().getSignature();
-        beanSignature = Signature.getReturnType(methodSig);
+        beanSignature = getReadMethod().getReturnType();
         beanSignature = SignatureUtility.getQualifiedSignature(beanSignature, getReadMethod().getDeclaringType());
         return beanSignature;
       }
@@ -87,10 +86,9 @@ public class PropertyBean implements IPropertyBean {
     }
     if (TypeUtility.exists(getWriteMethod())) {
       try {
-        String methodSig = getReadMethod().getSignature();
-        String[] paramSignature = Signature.getParameterTypes(methodSig);
-        if (paramSignature != null && paramSignature.length == 1) {
-          beanSignature = paramSignature[0];
+        String[] parameterTypes = getWriteMethod().getParameterTypes();
+        if (parameterTypes != null && parameterTypes.length == 1) {
+          beanSignature = parameterTypes[0];
           beanSignature = SignatureUtility.getQualifiedSignature(beanSignature, getWriteMethod().getDeclaringType());
           return beanSignature;
         }

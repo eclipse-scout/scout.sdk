@@ -10,41 +10,34 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.form.fields.composerfield.entity;
 
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.ui.IWorkbench;
 
-public class EntityNewWizard extends AbstractWorkspaceWizard {
+public class EntityNewWizard extends AbstractInnerTypeWizard {
 
   private EntityNewWizardPage m_page1;
-  private IType m_declaringType;
-
-  public EntityNewWizard(IType declaringType) {
-    setWindowTitle(Texts.get("NewComposerFieldEntity"));
-    m_declaringType = declaringType;
-
-  }
 
   @Override
-  public void addPages() {
-    m_page1 = new EntityNewWizardPage(getDeclaringType());
-    addPage(m_page1);
-  }
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
 
-  /**
-   * @return the declaringType
-   */
-  public IType getDeclaringType() {
-    return m_declaringType;
+    setWindowTitle(Texts.get("NewComposerFieldEntity"));
+
+    m_page1 = new EntityNewWizardPage(getDeclaringType());
+    if (getTypeName() != null) {
+      m_page1.setTypeName(getTypeName());
+    }
+    if (getSuperType() != null) {
+      m_page1.setSuperType(getSuperType());
+    }
+    addPage(m_page1);
   }
 
   @Override
   protected void postFinishDisplayThread() {
-    IType createdField = m_page1.getCreatedEntity();
-    if (TypeUtility.exists(createdField)) {
-      ScoutSdkUi.showJavaElementInEditor(createdField, false);
-    }
+    ScoutSdkUi.showJavaElementInEditor(m_page1.getCreatedEntity(), false);
   }
 }

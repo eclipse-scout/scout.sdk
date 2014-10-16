@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion;
 
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction;
+import org.eclipse.scout.sdk.ui.extensions.executor.ExecutorExtensionPoint;
+import org.eclipse.scout.sdk.ui.extensions.executor.IExecutor;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.SdkIcons;
-import org.eclipse.scout.sdk.ui.wizard.IWorkspaceWizard;
-import org.eclipse.scout.sdk.ui.wizard.form.fields.FormFieldNewWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.graphics.Image;
 
@@ -44,10 +44,7 @@ public class FormFieldNewProposal extends AbstractSdkWizardProposal {
   }
 
   @Override
-  protected IWorkspaceWizard createWizard(IJavaElement sibling) {
-    FormFieldNewWizard wizard = new FormFieldNewWizard(getDeclaringType());
-    wizard.getFormFieldSelectionWizardPage().setSibling(sibling);
-    return wizard;
+  protected IExecutor createExecutor() {
+    return ExecutorExtensionPoint.getExecutorFor(FormFieldNewAction.class.getName());
   }
-
 }

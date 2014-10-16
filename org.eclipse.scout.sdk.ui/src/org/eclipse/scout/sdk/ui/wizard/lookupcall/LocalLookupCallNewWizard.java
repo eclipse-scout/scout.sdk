@@ -10,9 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.lookupcall;
 
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
+import org.eclipse.ui.IWorkbench;
 
 /**
  * <h3>{@link LocalLookupCallNewWizard}</h3>
@@ -22,18 +26,13 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
  */
 public class LocalLookupCallNewWizard extends AbstractWorkspaceWizard {
 
-  private final IScoutBundle m_clientBundle;
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
 
-  public LocalLookupCallNewWizard(IScoutBundle clientBundle) {
     setWindowTitle(Texts.get("NewLocalLookupCallNoPopup"));
-    m_clientBundle = clientBundle;
-    addPage(new LocalLookupCallNewWizardPage(clientBundle));
-  }
 
-  /**
-   * @return the clientBundle
-   */
-  public IScoutBundle getClientBundle() {
-    return m_clientBundle;
+    IScoutBundle clientBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+    addPage(new LocalLookupCallNewWizardPage(clientBundle));
   }
 }

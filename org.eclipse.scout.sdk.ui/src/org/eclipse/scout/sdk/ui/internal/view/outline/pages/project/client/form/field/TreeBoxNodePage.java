@@ -14,8 +14,6 @@ import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.KeyStrokeTablePage;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.tree.TreeNodePage;
@@ -40,14 +38,6 @@ public class TreeBoxNodePage extends AbstractFormFieldNodePage {
     Set<IType> trees = ScoutTypeUtility.getTrees(getType());
     if (trees.size() > 0) {
       new TreeNodePage(this, CollectionUtility.firstElement(trees));
-    }
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof FormFieldDeleteAction) {
-      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TreeBoxRemove));
     }
   }
 }

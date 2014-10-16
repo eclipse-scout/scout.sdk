@@ -44,7 +44,7 @@ public class SequenceBoxNewOperationTest extends AbstractSdkTestWithSampleProjec
     SdkAssert.assertPublic(field).assertNoMoreFlags();
     SdkAssert.assertOrderAnnotation(field, Double.valueOf(-1000));
     SdkAssert.assertOrderAnnotation(okButton, Double.valueOf(10));
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest01Box");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest01Box");
     // clean up
     BoxDeleteOperation delOp = new BoxDeleteOperation(field, true);
     executeBuildAssertNoCompileErrors(delOp);
@@ -67,9 +67,9 @@ public class SequenceBoxNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType to = SdkAssert.assertTypeExists(field, "Test02To");
     SdkAssert.assertHasSuperType(from, RuntimeClasses.IDateField);
     SdkAssert.assertHasSuperType(to, RuntimeClasses.IDateField);
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest02Box");
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest02From");
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest02To");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest02Box");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest02From");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest02To");
     // clean up
     BoxDeleteOperation delOp = new BoxDeleteOperation(field, true);
     executeBuildAssertNoCompileErrors(delOp);
@@ -92,9 +92,9 @@ public class SequenceBoxNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType to = SdkAssert.assertTypeExists(field, "Test03To");
     SdkAssert.assertHasSuperType(from, RuntimeClasses.IDateField);
     SdkAssert.assertHasSuperType(to, RuntimeClasses.IDateField);
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest03Box");
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest03From");
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest03To");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest03Box");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest03From");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest03To");
     SdkAssert.assertMethodExist(from, "getConfiguredHasTime");
     SdkAssert.assertMethodExist(to, "getConfiguredHasTime");
     // clean up
@@ -119,9 +119,9 @@ public class SequenceBoxNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType to = SdkAssert.assertTypeExists(field, "Test04To");
     SdkAssert.assertHasSuperType(from, RuntimeClasses.IDoubleField);
     SdkAssert.assertHasSuperType(to, RuntimeClasses.IDoubleField);
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest04Box");
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest04From");
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest04To");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest04Box");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest04From");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest04To");
     // clean up
     BoxDeleteOperation delOp = new BoxDeleteOperation(field, true);
     executeBuildAssertNoCompileErrors(delOp);
@@ -144,9 +144,9 @@ public class SequenceBoxNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType to = SdkAssert.assertTypeExists(field, "Test05To");
     SdkAssert.assertHasSuperType(from, RuntimeClasses.IIntegerField);
     SdkAssert.assertHasSuperType(to, RuntimeClasses.IIntegerField);
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest05Box");
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest05From");
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest05To");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest05Box");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest05From");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest05To");
     // clean up
     BoxDeleteOperation delOp = new BoxDeleteOperation(field, true);
     executeBuildAssertNoCompileErrors(delOp);
@@ -169,9 +169,9 @@ public class SequenceBoxNewOperationTest extends AbstractSdkTestWithSampleProjec
     IType to = SdkAssert.assertTypeExists(field, "Test06To");
     SdkAssert.assertHasSuperType(from, RuntimeClasses.ILongField);
     SdkAssert.assertHasSuperType(to, RuntimeClasses.ILongField);
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest06Box");
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest06From");
-    SdkAssert.assertMethodExist(TypeUtility.getToplevelType(mainBox), "getTest06To");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest06Box");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest06From");
+    SdkAssert.assertMethodExist(TypeUtility.getPrimaryType(mainBox), "getTest06To");
     // clean up
     BoxDeleteOperation delOp = new BoxDeleteOperation(field, true);
     executeBuildAssertNoCompileErrors(delOp);

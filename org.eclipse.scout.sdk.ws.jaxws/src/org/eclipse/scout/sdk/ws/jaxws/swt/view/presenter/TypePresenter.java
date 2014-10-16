@@ -445,7 +445,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
             try {
               for (IType typeChanged : cu.getTypes()) {
                 if (TypeUtility.exists(typeChanged)) {
-                  typeChanged = TypeUtility.getToplevelType(typeChanged);
+                  typeChanged = TypeUtility.getPrimaryType(typeChanged);
 
                   if ((CompareUtility.equals(typeChanged, type))) {
                     updateInfo();

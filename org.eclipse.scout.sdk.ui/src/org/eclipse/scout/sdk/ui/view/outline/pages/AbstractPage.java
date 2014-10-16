@@ -11,10 +11,12 @@
 package org.eclipse.scout.sdk.ui.view.outline.pages;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.core.resources.IMarker;
@@ -28,7 +30,7 @@ import org.eclipse.scout.sdk.ui.extensions.IPageFactory;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.extensions.ExplorerPageExtensionPoint.ExplorerPageExtension;
-import org.eclipse.scout.sdk.ui.menu.IContextMenuProvider;
+import org.eclipse.scout.sdk.ui.menu.IContextMenuHolder;
 import org.eclipse.scout.sdk.ui.view.outline.IPageOutlineView;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.graphics.Image;
@@ -37,7 +39,7 @@ import org.eclipse.swt.graphics.Point;
 /**
  * Tree Node with editor adapter of type ICfgAdapter
  */
-public abstract class AbstractPage implements IPage, IContextMenuProvider {
+public abstract class AbstractPage implements IPage, IContextMenuHolder {
 
   private static final Point ICON_SIZE = new Point(16, 16);
 
@@ -375,12 +377,22 @@ public abstract class AbstractPage implements IPage, IContextMenuProvider {
   }
 
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
     return null;
   }
 
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
+  @SuppressWarnings("unchecked")
+  protected Set<Class<? extends IScoutHandler>> newSet(Class<?>... handlers) {
+    if (handlers == null || handlers.length < 1) {
+      return null;
+    }
+    Set<Class<? extends IScoutHandler>> result = new HashSet<Class<? extends IScoutHandler>>(handlers.length);
+    for (Class<?> clazz : handlers) {
+      if (IScoutHandler.class.isAssignableFrom(clazz)) {
+        result.add((Class<? extends IScoutHandler>) clazz);
+      }
+    }
+    return result;
   }
 
   /**

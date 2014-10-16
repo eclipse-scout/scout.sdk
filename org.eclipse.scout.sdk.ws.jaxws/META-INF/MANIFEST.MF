@@ -13,6 +13,8 @@ Require-Bundle: org.eclipse.core.runtime;bundle-version="[3.7.0,4.0.0)",
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.scout.sdk.ws.jaxws,
+ org.eclipse.scout.sdk.ws.jaxws.executor,
+ org.eclipse.scout.sdk.ws.jaxws.executor.param,
  org.eclipse.scout.sdk.ws.jaxws.ext,
  org.eclipse.scout.sdk.ws.jaxws.marker,
  org.eclipse.scout.sdk.ws.jaxws.marker.commands,

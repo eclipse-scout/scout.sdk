@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.table;
 
+import java.util.Set;
+
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.TableColumnDeleteAction;
@@ -17,11 +19,12 @@ import org.eclipse.scout.sdk.ui.action.rename.TableColumnRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.SdkProperties;
 
 public class ColumnNodePage extends AbstractScoutTypePage {
 
   public ColumnNodePage() {
-    super();
+    super(SdkProperties.SUFFIX_TABLE_COLUMN);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TableColumn));
   }
 
@@ -35,22 +38,8 @@ public class ColumnNodePage extends AbstractScoutTypePage {
     return "getConfiguredHeaderText";
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TableColumnRenameAction.class, TableColumnDeleteAction.class, ShowJavaReferencesAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof TableColumnRenameAction) {
-      TableColumnRenameAction action = (TableColumnRenameAction) menu;
-      action.setTableColumn(getType());
-      action.setOldName(getType().getElementName());
-    }
-    else if (menu instanceof TableColumnDeleteAction) {
-      ((TableColumnDeleteAction) menu).addTableColumn(getType());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TableColumnRenameAction.class, TableColumnDeleteAction.class, ShowJavaReferencesAction.class);
   }
 }

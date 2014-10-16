@@ -24,6 +24,7 @@ public abstract class AbstractLinkAction extends AbstractScoutHandler implements
 
   public AbstractLinkAction(String menuText, ImageDescriptor icon, String keyStroke) {
     super(menuText, icon, keyStroke, false, Category.WS);
+    setLeadingText(menuText);
   }
 
   @Override

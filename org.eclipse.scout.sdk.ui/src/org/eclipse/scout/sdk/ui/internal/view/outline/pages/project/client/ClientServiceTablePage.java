@@ -80,14 +80,8 @@ public class ClientServiceTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ClientServiceNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    ((ClientServiceNewAction) menu).setScoutBundle(getScoutBundle());
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(ClientServiceNewAction.class);
   }
 }

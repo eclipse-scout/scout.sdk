@@ -10,24 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.form.fields;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
-import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
+import org.eclipse.ui.IWorkbench;
 
-public class FormFieldNewWizard extends AbstractFormFieldWizard {
-
-  private FormFieldSelectionWizardPage m_page1;
-
-  public FormFieldNewWizard(IType declaringType) {
-    super();
-    initWizard(declaringType);
-  }
+public class FormFieldNewWizard extends AbstractInnerTypeWizard {
 
   @Override
-  public void initWizard(IType declaringType) {
-    super.initWizard(declaringType);
-    m_page1 = new FormFieldSelectionWizardPage(declaringType);
-    addPage(m_page1);
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+    FormFieldSelectionWizardPage page1 = new FormFieldSelectionWizardPage(getDeclaringType());
+    addPage(page1);
   }
 
   @Override
@@ -35,27 +28,8 @@ public class FormFieldNewWizard extends AbstractFormFieldWizard {
     return true;
   }
 
-  public FormFieldSelectionWizardPage getFormFieldSelectionWizardPage() {
-    return m_page1;
-  }
-
   @Override
   public boolean canFinish() {
     return false;
-  }
-
-  @Override
-  public void setSuperType(IType superType) {
-    // void
-  }
-
-  @Override
-  public void setTypeName(String name) {
-    // void
-  }
-
-  @Override
-  public void setSibling(SiblingProposal sibling) {
-    // void
   }
 }

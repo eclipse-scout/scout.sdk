@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.util.InstallTargetPlatformFileOperation;
 import org.eclipse.scout.sdk.rap.IScoutSdkRapConstants;
 import org.eclipse.scout.sdk.rap.operations.project.AppendRapTargetOperation;
-import org.eclipse.scout.sdk.rap.operations.project.AppendRapTargetOperation.TARGET_STRATEGY;
+import org.eclipse.scout.sdk.rap.operations.project.AppendRapTargetOperation.TargetStrategy;
 import org.eclipse.scout.sdk.rap.operations.project.CreateUiRapPluginOperation;
 import org.eclipse.scout.sdk.rap.ui.internal.ScoutSdkRapUI;
 import org.eclipse.scout.sdk.ui.fields.FileSelectionField;
@@ -69,35 +69,35 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   private FileSelectionField m_extractTargetLocationField;
   private FileSelectionField m_localTargetLocationField;
 
-  private TARGET_STRATEGY[] m_offeredTargetStrategies;
+  private TargetStrategy[] m_offeredTargetStrategies;
 
   public RapTargetPlatformWizardPage() {
-    this(TARGET_STRATEGY.values());
+    this(TargetStrategy.values());
   }
 
-  public RapTargetPlatformWizardPage(TARGET_STRATEGY[] offeredTargetStrategies) {
+  public RapTargetPlatformWizardPage(TargetStrategy[] offeredTargetStrategies) {
     super(RapTargetPlatformWizardPage.class.getName());
     setTitle(Texts.get("RapTargetDownloadWizardPageTitle"));
     initOfferedTargetStrategies(offeredTargetStrategies);
 
     File defRap = getDefaultRapLocation();
-    if (defRap != null && defRap.exists() && isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING)) {
-      setTargetStrategy(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING);
+    if (defRap != null && defRap.exists() && isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXISTING)) {
+      setTargetStrategy(TargetStrategy.STRATEGY_LOCAL_EXISTING);
       setLocalTargetFolder(defRap.getAbsolutePath());
-      if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT)) {
+      if (isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXTRACT)) {
         setExtractTargetFolder(defRap.getAbsolutePath());
       }
     }
     else {
       setLocalTargetFolder(ResourceUtility.getEclipseInstallLocation().getAbsolutePath());
-      if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT)) {
-        setTargetStrategy(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT);
+      if (isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXTRACT)) {
+        setTargetStrategy(TargetStrategy.STRATEGY_LOCAL_EXTRACT);
         if (defRap != null) {
           setExtractTargetFolder(defRap.getAbsolutePath());
         }
       }
-      else if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_REMOTE)) {
-        setTargetStrategy(TARGET_STRATEGY.STRATEGY_REMOTE);
+      else if (isStrategyOffered(TargetStrategy.STRATEGY_REMOTE)) {
+        setTargetStrategy(TargetStrategy.STRATEGY_REMOTE);
       }
       else if (getOfferedTargetStrategies().length > 0) {
         setTargetStrategy(getOfferedTargetStrategies()[0]);
@@ -110,53 +110,53 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     if (getOfferedTargetStrategies().length > 1) {
       Composite switchBox = new Composite(parent, SWT.NONE);
 
-      if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT)) {
+      if (isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXTRACT)) {
         m_extractButton = new Button(switchBox, SWT.RADIO);
         m_extractButton.setText(Texts.get("CreateNewRAPTarget"));
-        m_extractButton.setSelection(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT.equals(getTargetStrategy()));
-        m_extractButton.addSelectionListener(new P_StrategySelectionListener(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT));
+        m_extractButton.setSelection(TargetStrategy.STRATEGY_LOCAL_EXTRACT.equals(getTargetStrategy()));
+        m_extractButton.addSelectionListener(new P_StrategySelectionListener(TargetStrategy.STRATEGY_LOCAL_EXTRACT));
       }
 
-      if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_REMOTE)) {
+      if (isStrategyOffered(TargetStrategy.STRATEGY_REMOTE)) {
         m_remoteButton = new Button(switchBox, SWT.RADIO);
         m_remoteButton.setText(Texts.get("DownloadRAPTarget"));
-        m_remoteButton.setSelection(TARGET_STRATEGY.STRATEGY_REMOTE.equals(getTargetStrategy()));
-        m_remoteButton.addSelectionListener(new P_StrategySelectionListener(TARGET_STRATEGY.STRATEGY_REMOTE));
+        m_remoteButton.setSelection(TargetStrategy.STRATEGY_REMOTE.equals(getTargetStrategy()));
+        m_remoteButton.addSelectionListener(new P_StrategySelectionListener(TargetStrategy.STRATEGY_REMOTE));
       }
 
-      if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING)) {
+      if (isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXISTING)) {
         m_localButton = new Button(switchBox, SWT.RADIO);
         m_localButton.setText(Texts.get("LocalRAPTarget"));
-        m_localButton.setSelection(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING.equals(getTargetStrategy()));
-        m_localButton.addSelectionListener(new P_StrategySelectionListener(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING));
+        m_localButton.setSelection(TargetStrategy.STRATEGY_LOCAL_EXISTING.equals(getTargetStrategy()));
+        m_localButton.addSelectionListener(new P_StrategySelectionListener(TargetStrategy.STRATEGY_LOCAL_EXISTING));
       }
 
-      if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LATER)) {
+      if (isStrategyOffered(TargetStrategy.STRATEGY_LATER)) {
         m_laterButton = new Button(switchBox, SWT.RADIO);
         m_laterButton.setText(Texts.get("InstallRapTargetLater"));
-        m_laterButton.setSelection(TARGET_STRATEGY.STRATEGY_LATER.equals(getTargetStrategy()));
-        m_laterButton.addSelectionListener(new P_StrategySelectionListener(TARGET_STRATEGY.STRATEGY_LATER));
+        m_laterButton.setSelection(TargetStrategy.STRATEGY_LATER.equals(getTargetStrategy()));
+        m_laterButton.addSelectionListener(new P_StrategySelectionListener(TargetStrategy.STRATEGY_LATER));
       }
 
       switchBox.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL));
       switchBox.setLayout(new GridLayout(getOfferedTargetStrategies().length, true));
     }
 
-    if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT)) {
+    if (isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXTRACT)) {
       m_extractTargetGroup = createExtractTargetGroup(parent);
-      m_extractTargetGroup.setVisible(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT.equals(getTargetStrategy()));
+      m_extractTargetGroup.setVisible(TargetStrategy.STRATEGY_LOCAL_EXTRACT.equals(getTargetStrategy()));
 
       GridData extractGroupData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-      extractGroupData.exclude = !TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT.equals(getTargetStrategy());
+      extractGroupData.exclude = !TargetStrategy.STRATEGY_LOCAL_EXTRACT.equals(getTargetStrategy());
       m_extractTargetGroup.setLayoutData(extractGroupData);
     }
 
-    if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING)) {
+    if (isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXISTING)) {
       m_localTargetGroup = createLocalTargetGroup(parent);
-      m_localTargetGroup.setVisible(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING.equals(getTargetStrategy()));
+      m_localTargetGroup.setVisible(TargetStrategy.STRATEGY_LOCAL_EXISTING.equals(getTargetStrategy()));
 
       GridData localGroupData = new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL);
-      localGroupData.exclude = !TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING.equals(getTargetStrategy());
+      localGroupData.exclude = !TargetStrategy.STRATEGY_LOCAL_EXISTING.equals(getTargetStrategy());
       m_localTargetGroup.setLayoutData(localGroupData);
     }
 
@@ -276,8 +276,8 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     return (ScoutProjectNewWizard) super.getWizard();
   }
 
-  @Override
   @SuppressWarnings("unchecked")
+  @Override
   public void putProperties(PropertyMap properties) {
     Set<String> checkedNodeIds = properties.getProperty(IScoutProjectNewOperation.PROP_PROJECT_CHECKED_NODES, Set.class);
     if (checkedNodeIds != null && checkedNodeIds.contains(CreateUiRapPluginOperation.BUNDLE_ID)) {
@@ -293,31 +293,31 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     ResourceUtility.showUrlInBrowser("https://wiki.eclipse.org/Scout/HowTo/4.0/Create_a_new_project#Step_3_.28Optional.29");
   }
 
-  public void setTargetStrategy(TARGET_STRATEGY strategy) {
+  public void setTargetStrategy(TargetStrategy strategy) {
     try {
       if (strategy == null) {
-        strategy = TARGET_STRATEGY.STRATEGY_REMOTE;
+        strategy = TargetStrategy.STRATEGY_REMOTE;
       }
       setTargetStrategyInternal(strategy);
       if (isControlCreated()) {
         switch (strategy) {
           case STRATEGY_LOCAL_EXISTING:
-            if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING)) {
+            if (isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXISTING)) {
               m_localButton.setSelection(true);
             }
             break;
           case STRATEGY_LOCAL_EXTRACT:
-            if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT)) {
+            if (isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXTRACT)) {
               m_extractButton.setSelection(true);
             }
             break;
           case STRATEGY_REMOTE:
-            if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_REMOTE)) {
+            if (isStrategyOffered(TargetStrategy.STRATEGY_REMOTE)) {
               m_remoteButton.setSelection(true);
             }
             break;
           case STRATEGY_LATER:
-            if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LATER)) {
+            if (isStrategyOffered(TargetStrategy.STRATEGY_LATER)) {
               m_laterButton.setSelection(true);
             }
             break;
@@ -329,15 +329,15 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     }
   }
 
-  private void setTargetStrategyInternal(TARGET_STRATEGY strategy) {
+  private void setTargetStrategyInternal(TargetStrategy strategy) {
     if (!isStrategyOffered(strategy)) {
       throw new IllegalArgumentException("unsupported strategy: " + strategy);
     }
     setProperty(PROP_TARGET_STRATEGY, strategy);
   }
 
-  public TARGET_STRATEGY getTargetStrategy() {
-    return (TARGET_STRATEGY) getProperty(PROP_TARGET_STRATEGY);
+  public TargetStrategy getTargetStrategy() {
+    return (TargetStrategy) getProperty(PROP_TARGET_STRATEGY);
   }
 
   public String getExtractTargetFolder() {
@@ -393,8 +393,8 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
     multiStatus.add(getStatusStrategy());
   }
 
-  private boolean isStrategyOffered(TARGET_STRATEGY strategy) {
-    for (TARGET_STRATEGY item : getOfferedTargetStrategies()) {
+  private boolean isStrategyOffered(TargetStrategy strategy) {
+    for (TargetStrategy item : getOfferedTargetStrategies()) {
       if (item.equals(strategy)) {
         return true;
       }
@@ -403,7 +403,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
   }
 
   private IStatus getStatusStrategy() {
-    if (TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING.equals(getTargetStrategy())) {
+    if (TargetStrategy.STRATEGY_LOCAL_EXISTING.equals(getTargetStrategy())) {
       if (!StringUtility.hasText(getLocalTargetFolder())) {
         return new Status(IStatus.ERROR, ScoutSdkRapUI.PLUGIN_ID, Texts.get("NoRAPTargetLocationDefined"));
       }
@@ -439,7 +439,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
         return new Status(IStatus.ERROR, ScoutSdkRapUI.PLUGIN_ID, Texts.get("NoRAPTargetFoundUnder", getLocalTargetFolder()));
       }
     }
-    else if (TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT.equals(getTargetStrategy())) {
+    else if (TargetStrategy.STRATEGY_LOCAL_EXTRACT.equals(getTargetStrategy())) {
       if (!StringUtility.hasText(getExtractTargetFolder())) {
         return new Status(IStatus.ERROR, ScoutSdkRapUI.PLUGIN_ID, Texts.get("NoRAPTargetLocationDefined"));
       }
@@ -455,51 +455,51 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
         return new Status(IStatus.INFO, ScoutSdkRapUI.PLUGIN_ID, Texts.get("ANewRAPTargetWillBeCreated", getExtractTargetFolder()));
       }
     }
-    else if (TARGET_STRATEGY.STRATEGY_REMOTE.equals(getTargetStrategy())) {
+    else if (TargetStrategy.STRATEGY_REMOTE.equals(getTargetStrategy())) {
       return new Status(IStatus.INFO, ScoutSdkRapUI.PLUGIN_ID, Texts.get("TheRAPTargetWillBeDownloaded"));
     }
-    else if (TARGET_STRATEGY.STRATEGY_LATER.equals(getTargetStrategy())) {
+    else if (TargetStrategy.STRATEGY_LATER.equals(getTargetStrategy())) {
       return new Status(IStatus.INFO, ScoutSdkRapUI.PLUGIN_ID, Texts.get("NoRAPTargetWillBeSet"));
     }
     return Status.OK_STATUS;
   }
 
-  public TARGET_STRATEGY[] getOfferedTargetStrategies() {
+  public TargetStrategy[] getOfferedTargetStrategies() {
     return m_offeredTargetStrategies;
   }
 
-  private void initOfferedTargetStrategies(TARGET_STRATEGY[] offeredTargetStrategies) {
+  private void initOfferedTargetStrategies(TargetStrategy[] offeredTargetStrategies) {
     boolean isRapTargetPluginAvailable = Platform.getBundle(IScoutSdkRapConstants.ScoutRapTargetPlugin) != null;
 
     if (!isRapTargetPluginAvailable) {
       // the rap target plugin is not installed: filter the strategy out if it is in the list
-      ArrayList<TARGET_STRATEGY> strategies = new ArrayList<TARGET_STRATEGY>(offeredTargetStrategies.length);
-      for (TARGET_STRATEGY s : offeredTargetStrategies) {
-        if (!TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT.equals(s)) {
+      ArrayList<TargetStrategy> strategies = new ArrayList<TargetStrategy>(offeredTargetStrategies.length);
+      for (TargetStrategy s : offeredTargetStrategies) {
+        if (!TargetStrategy.STRATEGY_LOCAL_EXTRACT.equals(s)) {
           strategies.add(s);
         }
       }
-      offeredTargetStrategies = strategies.toArray(new TARGET_STRATEGY[strategies.size()]);
+      offeredTargetStrategies = strategies.toArray(new TargetStrategy[strategies.size()]);
     }
 
     m_offeredTargetStrategies = offeredTargetStrategies;
   }
 
   private class P_StrategySelectionListener extends SelectionAdapter {
-    private final TARGET_STRATEGY m_strategy;
+    private final TargetStrategy m_strategy;
 
-    public P_StrategySelectionListener(TARGET_STRATEGY strategy) {
+    public P_StrategySelectionListener(TargetStrategy strategy) {
       m_strategy = strategy;
     }
 
     private void setGroupVisible(Control toBeVisible) {
-      if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING)) {
+      if (isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXISTING)) {
         boolean localVisible = m_localTargetGroup == toBeVisible;
         m_localTargetGroup.setVisible(localVisible);
         ((GridData) m_localTargetGroup.getLayoutData()).exclude = !localVisible;
       }
 
-      if (isStrategyOffered(TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT)) {
+      if (isStrategyOffered(TargetStrategy.STRATEGY_LOCAL_EXTRACT)) {
         boolean extractVisible = m_extractTargetGroup == toBeVisible;
         m_extractTargetGroup.setVisible(extractVisible);
         ((GridData) m_extractTargetGroup.getLayoutData()).exclude = !extractVisible;

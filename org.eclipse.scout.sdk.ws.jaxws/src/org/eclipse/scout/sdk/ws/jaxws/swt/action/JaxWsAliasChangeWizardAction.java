@@ -10,44 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
-import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
-import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.JaxWsServletRegistrationWizard;
-import org.eclipse.swt.widgets.Shell;
 
 public class JaxWsAliasChangeWizardAction extends AbstractLinkAction {
-
-  private IScoutBundle m_bundle;
 
   public JaxWsAliasChangeWizardAction() {
     super(Texts.get("ChangeJaxWsAlias"), JaxWsSdk.getImageDescriptor(JaxWsIcons.JaxWsAlias));
     setLeadingText(Texts.get("ChangeJaxWsAliasByClicking"));
     setLinkText(Texts.get("here"));
-  }
-
-  public void init(IScoutBundle bundle) {
-    m_bundle = bundle;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  @Override
-  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    IWizard wizard = new JaxWsServletRegistrationWizard(m_bundle);
-    ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
-    wizardDialog.setPageSize(650, 150);
-    wizardDialog.setHelpAvailable(false);
-    wizardDialog.open();
-    return null;
   }
 }

@@ -10,25 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions;
 
+import java.util.Set;
+
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.extensions.IContextMenuContributor;
-import org.eclipse.scout.sdk.ui.menu.IContextMenuProvider;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
+import org.eclipse.scout.sdk.ui.menu.IContextMenuHolder;
 
 public class DefaultMenuContributorExtension implements IContextMenuContributor {
 
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActionsFor(IPage p) {
-    if (p instanceof IContextMenuProvider) {
-      return ((IContextMenuProvider) p).getSupportedMenuActions();
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActionsFor(Object o) {
+    if (o instanceof IContextMenuHolder) {
+      return ((IContextMenuHolder) o).getSupportedMenuActions();
     }
     return null;
-  }
-
-  @Override
-  public void prepareMenuAction(IPage p, IScoutHandler menu) {
-    if (p instanceof IContextMenuProvider) {
-      ((IContextMenuProvider) p).prepareMenuAction(menu);
-    }
   }
 }

@@ -28,9 +28,9 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsIcons;
 import org.eclipse.scout.sdk.ws.jaxws.JaxWsSdk;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
+import org.eclipse.scout.sdk.ws.jaxws.executor.param.HandlerParams;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction.FileExtensionType;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerAddAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainFilterEditAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainNewAction;
@@ -97,9 +97,10 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
 
       // QuickLink 'Open sun-jaxws.xml'
       FileOpenAction a = new FileOpenAction();
-      a.init(ResourceFactory.getSunJaxWsResource(m_bundle).getFile(), ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.XML);
+      a.setLinkText(ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName());
+      a.setImage(JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile));
       a.setToolTip(Texts.get("JaxWsDeploymentDescriptor"));
-      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit());
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit(), ResourceFactory.getSunJaxWsResource(m_bundle).getFile());
       applyLayoutData(actionPresenter);
 
       if (getPage().getSunJaxWsBean() == null) {
@@ -108,8 +109,7 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
 
       // Add Handler Chain
       HandlerChainNewAction action = new HandlerChainNewAction();
-      action.init(m_bundle, getPage().getSunJaxWsBean());
-      ActionPresenter presenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), action, getFormToolkit());
+      ActionPresenter presenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), action, getFormToolkit(), getPage());
       presenter.setEnabled(getPage().getSunJaxWsBean() != null);
       GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
       gd.horizontalAlignment = SWT.RIGHT;
@@ -160,30 +160,29 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
           section.setText(Texts.get("HandlerChain"));
         }
 
+        HandlerParams param = new HandlerParams(m_bundle, getPage().getSunJaxWsBean(), xmlHandlerChain);
+
         // Edit Filter
         HandlerChainFilterEditAction filterAction = new HandlerChainFilterEditAction();
         FilterTypeEnum filterType = getFilterType(sunJaxWsBean, xmlHandlerChain);
         if (filterType != FilterTypeEnum.NO_FILTER) {
           filterAction.setLinkText(Texts.get("EditFilterXActive", filterType.getLabel()));
         }
-        filterAction.init(m_bundle, getPage().getSunJaxWsBean(), xmlHandlerChain);
-        ActionPresenter presenter = new ActionPresenter(section.getSectionClient(), filterAction, getFormToolkit());
+        ActionPresenter presenter = new ActionPresenter(section.getSectionClient(), filterAction, getFormToolkit(), param);
         GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
         gd.horizontalAlignment = SWT.RIGHT;
         presenter.getContainer().setLayoutData(gd);
 
         // Remove Handler Chain
         HandlerChainRemoveAction removeChainAction = new HandlerChainRemoveAction();
-        removeChainAction.init(m_bundle, getPage().getSunJaxWsBean(), xmlHandlerChain);
-        presenter = new ActionPresenter(section.getSectionClient(), removeChainAction, getFormToolkit());
+        presenter = new ActionPresenter(section.getSectionClient(), removeChainAction, getFormToolkit(), param);
         gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
         gd.horizontalAlignment = SWT.RIGHT;
         presenter.getContainer().setLayoutData(gd);
 
         // Add Handler
         HandlerAddAction newHandlerAction = new HandlerAddAction();
-        newHandlerAction.init(m_bundle, getPage().getSunJaxWsBean(), xmlHandlerChain);
-        presenter = new ActionPresenter(section.getSectionClient(), newHandlerAction, getFormToolkit());
+        presenter = new ActionPresenter(section.getSectionClient(), newHandlerAction, getFormToolkit(), param);
         gd = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
         gd.verticalIndent = 20;
         gd.horizontalAlignment = SWT.RIGHT;

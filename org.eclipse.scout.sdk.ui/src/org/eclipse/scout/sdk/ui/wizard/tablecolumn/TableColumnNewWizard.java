@@ -10,10 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
-import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
+import org.eclipse.ui.IWorkbench;
 
 /**
  * <h3> {@link TableColumnNewWizard}</h3> This wizard is the starting wizard to create a new table column. and will be
@@ -21,40 +21,27 @@ import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
  *
  * @see TableColumnNewWizardPage1
  */
-public class TableColumnNewWizard extends AbstractFormFieldWizard {
+public class TableColumnNewWizard extends AbstractInnerTypeWizard {
 
   private TableColumnNewWizardPage1 m_page1;
-  private CONTINUE_OPERATION m_nextOperation;
 
-  public static enum CONTINUE_OPERATION {
-    ADD_MORE_COLUMNS, FINISH
-  }
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
 
-  public TableColumnNewWizard(CONTINUE_OPERATION op) {
     setWindowTitle(Texts.get("NewTableColumn"));
-    m_nextOperation = op;
-  }
 
-  @Override
-  public void initWizard(IType declaringType) {
-    super.initWizard(declaringType);
-    m_page1 = new TableColumnNewWizardPage1(getDeclaringType(), m_nextOperation);
+    m_page1 = new TableColumnNewWizardPage1(getDeclaringType(), getContinueOperation());
+    if (getSiblingProposal() != null) {
+      m_page1.setSibling(getSiblingProposal());
+    }
+    if (getTypeName() != null) {
+      m_page1.setTypeName(getTypeName());
+    }
+    if (getSuperType() != null) {
+      m_page1.setSuperType(getSuperType());
+    }
     addPage(m_page1);
-  }
-
-  @Override
-  public void setSuperType(IType superType) {
-    m_page1.setSuperType(superType);
-  }
-
-  @Override
-  public void setTypeName(String name) {
-    m_page1.setTypeName(name);
-  }
-
-  @Override
-  public void setSibling(SiblingProposal sibling) {
-    m_page1.setSibling(sibling);
   }
 
   @Override

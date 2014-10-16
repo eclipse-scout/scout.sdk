@@ -51,9 +51,6 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
   // process members
   private LinkPageOperation m_operation;
 
-  private boolean m_holderTypeEnabled = true;
-  private boolean m_pageTypeFieldEnabled = true;
-
   private IScoutBundle m_clientBundle;
 
   public PageLinkWizardPage(IScoutBundle clientBundle) {
@@ -74,7 +71,6 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
     m_pageTypeField.acceptProposal(getPageType());
-    m_pageTypeField.setEnabled(isPageTypeFieldEnabled());
     m_pageTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -92,7 +88,7 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
     m_holderTypeField.acceptProposal(getHolderType());
-    m_holderTypeField.setEnabled(isHolderTypeEnabled());
+    m_holderTypeField.setEnabled(false);
     m_holderTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -158,17 +154,6 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
     return m_holderType;
   }
 
-  public void setHolderTypeEnabled(boolean hoderTypeEnabled) {
-    if (isControlCreated()) {
-      throw new IllegalStateException("control already created.");
-    }
-    m_holderTypeEnabled = hoderTypeEnabled;
-  }
-
-  public boolean isHolderTypeEnabled() {
-    return m_holderTypeEnabled;
-  }
-
   public void setPageType(IType pageType) {
     try {
       setStateChanging(true);
@@ -185,13 +170,4 @@ public class PageLinkWizardPage extends AbstractWorkspaceWizardPage {
   public IType getPageType() {
     return m_pageType;
   }
-
-  public void setPageTypeFieldEnabled(boolean pageTypeFieldEnabled) {
-    m_pageTypeFieldEnabled = pageTypeFieldEnabled;
-  }
-
-  public boolean isPageTypeFieldEnabled() {
-    return m_pageTypeFieldEnabled;
-  }
-
 }

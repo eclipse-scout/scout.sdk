@@ -10,41 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.services.ui.action;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jface.wizard.IWizard;
-import org.eclipse.scout.nls.sdk.services.ui.wizard.NewNlsServiceWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.swt.widgets.Shell;
 
-public class TextProviderServiceNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_bundle;
+public class TextProviderServiceNewAction extends AbstractScoutHandler {
 
   public TextProviderServiceNewAction() {
     super(Texts.get("Action_newTypeX", "Text Provider Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.TextAdd), null, false, Category.NEW);
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  @Override
-  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    return super.execute(shell, selection, event);
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new NewNlsServiceWizard(m_bundle);
-  }
-
-  public void setScoutBundle(IScoutBundle sb) {
-    m_bundle = sb;
   }
 }

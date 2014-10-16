@@ -10,35 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.lookupcall.LocalLookupCallNewWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  *
  */
-public class LocalLookupCallNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_scoutBundle;
+public class LocalLookupCallNewAction extends AbstractScoutHandler {
 
   public LocalLookupCallNewAction() {
     super(Texts.get("NewLocalLookupCall"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LookupCallAdd), null, false, Category.NEW);
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_scoutBundle.isBinary();
-  }
-
-  public void setScoutBundle(IScoutBundle scoutBundle) {
-    m_scoutBundle = scoutBundle;
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new LocalLookupCallNewWizard(m_scoutBundle);
   }
 }

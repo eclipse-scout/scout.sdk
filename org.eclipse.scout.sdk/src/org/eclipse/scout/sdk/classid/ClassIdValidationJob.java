@@ -104,7 +104,7 @@ public final class ClassIdValidationJob extends JobEx {
                 IType ownerType = (IType) owner;
                 if (TypeUtility.exists(ownerType)) {
                   // do not check for annotation duplicates within DTOs.
-                  IType toplevelType = ScoutTypeUtility.getToplevelType(ownerType);
+                  IType toplevelType = ScoutTypeUtility.getPrimaryType(ownerType);
                   if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType) && !formDataHierarchy.contains(toplevelType) && !formFieldDataHierarchy.contains(toplevelType)) {
                     IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
                     if (element == null) {

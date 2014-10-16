@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard;
 
+import java.util.Set;
+
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.delete.WizardStepDeleteAction;
@@ -17,6 +19,7 @@ import org.eclipse.scout.sdk.ui.action.rename.WizardStepRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.util.SdkProperties;
 
 /**
  * <h3>WizardStepNodePage</h3>
@@ -24,6 +27,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
 public class WizardStepNodePage extends AbstractScoutTypePage {
 
   public WizardStepNodePage() {
+    super(SdkProperties.SUFFIX_WIZARD_STEP);
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardStep));
   }
 
@@ -37,23 +41,8 @@ public class WizardStepNodePage extends AbstractScoutTypePage {
     return "getConfiguredTitle";
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WizardStepRenameAction.class, WizardStepDeleteAction.class, ShowJavaReferencesAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof WizardStepRenameAction) {
-      WizardStepRenameAction action = (WizardStepRenameAction) menu;
-      action.setOldName(getType().getElementName());
-      action.setWizardStep(getType());
-    }
-    else if (menu instanceof WizardStepDeleteAction) {
-      WizardStepDeleteAction action = (WizardStepDeleteAction) menu;
-      action.addWizardStep(getType());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(WizardStepRenameAction.class, WizardStepDeleteAction.class, ShowJavaReferencesAction.class);
   }
 }

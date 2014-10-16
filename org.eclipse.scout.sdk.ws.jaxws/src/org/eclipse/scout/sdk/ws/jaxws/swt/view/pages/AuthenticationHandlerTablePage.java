@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
@@ -34,8 +35,8 @@ import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 public class AuthenticationHandlerTablePage extends AbstractPage {
 
   private ICachedTypeHierarchy m_hierarchy;
-  private IType m_superInterfaceType;
-  private WebserviceEnum m_webserviceEnum;
+  private final IType m_superInterfaceType;
+  private final WebserviceEnum m_webserviceEnum;
 
   private ITypeHierarchyChangedListener m_hierarchyChangedListener;
 
@@ -88,16 +89,8 @@ public class AuthenticationHandlerTablePage extends AbstractPage {
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof AuthenticationHandlerNewWizardAction) {
-      ((AuthenticationHandlerNewWizardAction) menu).init(getScoutBundle(), m_webserviceEnum);
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{AuthenticationHandlerNewWizardAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(AuthenticationHandlerNewWizardAction.class);
   }
 
   @Override

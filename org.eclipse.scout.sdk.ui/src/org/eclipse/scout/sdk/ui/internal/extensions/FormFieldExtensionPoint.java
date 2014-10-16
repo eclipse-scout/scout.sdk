@@ -26,7 +26,7 @@ import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -142,7 +142,7 @@ public final class FormFieldExtensionPoint {
                 IType modelType = TypeUtility.getType(modClassName);
                 if (!TypeUtility.exists(modelType)) {
                   ScoutSdkUi.logWarning("FormFieldExtension: the model type '" + modClassName + "' can not be found.");
-                  break;
+                  continue;
                 }
                 ITypeHierarchy superTypeHierarchy = null;
                 superTypeHierarchy = TypeUtility.getSupertypeHierarchy(modelType);
@@ -158,7 +158,7 @@ public final class FormFieldExtensionPoint {
                   formFieldExtensions.put(key, formFieldExtension);
                 }
                 Bundle contributerBundle = Platform.getBundle(extension.getNamespaceIdentifier());
-                Class<? extends AbstractFormFieldWizard> wizardClazz = getClassOfContribution(contributerBundle, element.getChildren("newWizard"), "wizard", AbstractFormFieldWizard.class);
+                Class<? extends AbstractInnerTypeWizard> wizardClazz = getClassOfContribution(contributerBundle, element.getChildren("newWizard"), "wizard", AbstractInnerTypeWizard.class);
                 if (wizardClazz != null) {
                   if (formFieldExtension.getNewWizardClazz() != null) {
                     ScoutSdkUi.logWarning("double defined new wizard class.");

@@ -10,36 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.menu.MenuNewWizard;
 
 /**
  *
  */
-public class MenuNewAction extends AbstractWizardAction {
-  private IType m_type;
-
+public class MenuNewAction extends AbstractScoutHandler {
   public MenuNewAction() {
     super(Texts.get("Action_newTypeX", "Menu"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.MenuAdd), null, false, Category.NEW);
-  }
-
-  public void setType(IType t) {
-    m_type = t;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return isEditable(m_type);
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    MenuNewWizard wizard = new MenuNewWizard();
-    wizard.initWizard(m_type);
-    return wizard;
   }
 }

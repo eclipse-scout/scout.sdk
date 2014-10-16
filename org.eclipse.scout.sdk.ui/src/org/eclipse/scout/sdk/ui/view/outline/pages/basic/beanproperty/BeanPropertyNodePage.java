@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline.pages.basic.beanproperty;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -17,7 +19,7 @@ import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.delete.PropertyBeanDeleteAction;
+import org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -73,19 +75,8 @@ public class BeanPropertyNodePage extends AbstractPage {
     return m_propertyDescriptor;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{PropertyBeansRenameAction.class, PropertyBeanDeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof PropertyBeansRenameAction) {
-      ((PropertyBeansRenameAction) menu).setPropertyBeanDescriptors(new IPropertyBean[]{getPropertyDescriptor()});
-    }
-    else if (menu instanceof PropertyBeanDeleteAction) {
-      ((PropertyBeanDeleteAction) menu).setBeanDesc(getPropertyDescriptor());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(PropertyBeansRenameAction.class, MemberListDeleteAction.class);
   }
 }

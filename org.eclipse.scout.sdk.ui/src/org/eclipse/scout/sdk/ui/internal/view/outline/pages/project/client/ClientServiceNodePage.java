@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
@@ -29,24 +31,13 @@ public class ClientServiceNodePage extends AbstractServiceNodePage {
     setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.Service));
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{ServiceRenameAction.class, ShowJavaReferencesAction.class, ServiceOperationNewAction.class, ServiceDeleteAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(ServiceRenameAction.class, ShowJavaReferencesAction.class, ServiceOperationNewAction.class, ServiceDeleteAction.class);
   }
 
   @Override
   public String getPageId() {
     return IScoutPageConstants.CLIENT_SERVICE_NODE_PAGE;
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof ServiceDeleteAction) {
-      ServiceDeleteAction action = (ServiceDeleteAction) menu;
-      action.setServiceImplementation(getType());
-      action.setServiceInterface(getInterfaceType());
-    }
   }
 }

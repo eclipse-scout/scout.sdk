@@ -107,7 +107,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     sourceSetter.append(" void set" + beanName + "(");
     sourceSetter.append(beanReference);
     sourceSetter.append(" " + varName + "){\n" + SdkProperties.TAB);
-    sourceSetter.append("setSharedContextVariable(\"" + varName + "\"," + sigTypeSimpleName + ".class," + varName + ");\n}\n");
+    sourceSetter.append("setSharedContextVariable(\"" + varName + "\", " + sigTypeSimpleName + ".class, " + varName + ");\n}\n");
     IMethod writeMethod = serverSession.createMethod(sourceSetter.toString(), getSiblingServerSession(), true, monitor);
     // getter
     StringBuilder sourceGetter = new StringBuilder();
@@ -115,7 +115,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     sourceGetter.append(" " + beanReference + " ");
 
     sourceGetter.append("get" + beanName + "() {\n" + SdkProperties.TAB);
-    sourceGetter.append("return getSharedContextVariable(\"" + varName + "\"," + sigTypeSimpleName + ".class);\n}\n");
+    sourceGetter.append("return getSharedContextVariable(\"" + varName + "\", " + sigTypeSimpleName + ".class);\n}\n");
     serverSession.createMethod(sourceGetter.toString(), writeMethod, true, monitor);
     // imports
     new ImportsCreateOperation(serverSession.getCompilationUnit(), validator).run(monitor, manager);
@@ -135,7 +135,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
     sourceGetter.append(methodFlagsToString());
     sourceGetter.append(" " + beanReference + " ");
     sourceGetter.append("get" + beanName + "() {\n" + SdkProperties.TAB);
-    sourceGetter.append("return getSharedContextVariable(\"" + varName + "\"," + sigTypeSimpleName + ".class);\n}\n");
+    sourceGetter.append("return getSharedContextVariable(\"" + varName + "\", " + sigTypeSimpleName + ".class);\n}\n");
     clientSession.createMethod(sourceGetter.toString(), getSiblingClientSession(), true, monitor);
 
     new ImportsCreateOperation(clientSession.getCompilationUnit(), validator).run(monitor, manager);

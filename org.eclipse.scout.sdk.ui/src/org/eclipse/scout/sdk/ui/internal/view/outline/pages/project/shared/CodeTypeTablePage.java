@@ -15,7 +15,6 @@ import java.util.Set;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformCodeTypesOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.CodeTypeNewAction;
@@ -78,22 +77,8 @@ public class CodeTypeTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, CodeTypeNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof WellformAction) {
-      WellformAction action = (WellformAction) menu;
-      action.init(getScoutBundle());
-      action.setOperation(new WellformCodeTypesOperation(getScoutBundle()));
-      action.setLabel(Texts.get("WellformAllCodeTypes"));
-    }
-    else if (menu instanceof CodeTypeNewAction) {
-      ((CodeTypeNewAction) menu).setScoutBundle(getScoutBundle());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(WellformAction.class, CodeTypeNewAction.class);
   }
 }

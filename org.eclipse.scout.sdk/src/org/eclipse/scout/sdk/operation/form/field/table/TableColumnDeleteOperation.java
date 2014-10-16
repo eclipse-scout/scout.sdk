@@ -10,13 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.form.field.table;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.operation.jdt.JavaElementDeleteOperation;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -30,15 +30,15 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class TableColumnDeleteOperation extends JavaElementDeleteOperation {
 
-  private final List<IType> m_columns;
+  private final Set<IType> m_columns;
 
   public TableColumnDeleteOperation(IType... columns) {
-    this(Arrays.asList(columns));
+    this(CollectionUtility.hashSet(columns));
   }
 
-  public TableColumnDeleteOperation(List<IType> columns) {
+  public TableColumnDeleteOperation(Set<IType> columns) {
     super(true);
-    m_columns = columns;
+    m_columns = CollectionUtility.hashSet(columns);
   }
 
   @Override
@@ -53,11 +53,10 @@ public class TableColumnDeleteOperation extends JavaElementDeleteOperation {
         }
       }
     }
-    validate();
     super.run(monitor, workingCopyManager);
   }
 
-  public List<IType> getColumns() {
-    return m_columns;
+  public Set<IType> getColumns() {
+    return CollectionUtility.hashSet(m_columns);
   }
 }

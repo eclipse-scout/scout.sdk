@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.part;
 
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.AbstractSinglePageSectionBasedViewPart;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.JaxWsAliasChangeWizardAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.ProviderTablePage;
@@ -23,13 +22,6 @@ public class ProviderTablePagePropertyViewPart extends AbstractSinglePageSection
 
   public static final String SECTION_ID_GENERAL = "section.jaxws.general";
 
-  private IScoutBundle m_bundle;
-
-  @Override
-  protected void init() {
-    m_bundle = getPage().getScoutBundle();
-  }
-
   @Override
   protected void createSections() {
     getForm().setRedraw(false);
@@ -38,8 +30,7 @@ public class ProviderTablePagePropertyViewPart extends AbstractSinglePageSection
 
       // Change webservice servlet alias
       JaxWsAliasChangeWizardAction e = new JaxWsAliasChangeWizardAction();
-      e.init(m_bundle);
-      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_GENERAL).getSectionClient(), e, getFormToolkit());
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_GENERAL).getSectionClient(), e, getFormToolkit(), getPage());
       applyLayoutData(actionPresenter);
     }
     finally {

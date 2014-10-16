@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client;
 
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -104,15 +105,9 @@ public class DesktopOutlineTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{OutlineNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    ((OutlineNewAction) menu).init(getScoutBundle(), getDesktopType());
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(OutlineNewAction.class);
   }
 
   private class P_MethodListener implements IJavaResourceChangedListener {

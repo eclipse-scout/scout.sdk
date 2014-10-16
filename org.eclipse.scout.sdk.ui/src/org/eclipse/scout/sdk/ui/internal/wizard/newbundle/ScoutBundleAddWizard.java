@@ -15,6 +15,7 @@ import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 import org.eclipse.scout.sdk.ui.internal.wizard.newproject.ScoutProjectNewWizard;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.project.IScoutProjectWizardPage;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.ui.IWorkbench;
@@ -26,24 +27,21 @@ import org.eclipse.ui.IWorkbench;
  * @since 3.8.0 02.03.2012
  */
 public class ScoutBundleAddWizard extends ScoutProjectNewWizard {
-  private final ScoutBundleAddWizardPage m_page1;
+  private ScoutBundleAddWizardPage m_page1;
   private ProductFileSelectionWizardPage m_page2;
-  private final IScoutBundle m_scoutProject;
-
-  public ScoutBundleAddWizard(IScoutBundle project) {
-    setWindowTitle(Texts.get("CreateNewScoutBundles"));
-    m_scoutProject = project;
-
-    m_page1 = new ScoutBundleAddWizardPage(project);
-    addPage(m_page1);
-
-    m_page2 = new ProductFileSelectionWizardPage(project);
-    addPage(m_page2);
-  }
+  private IScoutBundle m_scoutProject;
 
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
-    //nop
+    setWindowTitle(Texts.get("CreateNewScoutBundles"));
+
+    m_scoutProject = UiUtility.getScoutBundleFromSelection(selection);
+
+    m_page1 = new ScoutBundleAddWizardPage(m_scoutProject);
+    addPage(m_page1);
+
+    m_page2 = new ProductFileSelectionWizardPage(m_scoutProject);
+    addPage(m_page2);
   }
 
   @Override

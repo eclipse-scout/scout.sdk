@@ -10,16 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.dto;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.operation.ITypeResolver;
-import org.eclipse.scout.sdk.ui.action.AbstractOperationAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.dto.pagedata.MultiplePageDataUpdateOperation;
-import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link TypeResolverPageDataAction}</h3>
@@ -27,27 +20,9 @@ import org.eclipse.swt.widgets.Shell;
  * @author Matthias Villiger
  * @since 3.10.0 16.10.2013
  */
-public class TypeResolverPageDataAction extends AbstractOperationAction {
-  private ITypeResolver m_typeResolver;
-  private IScoutBundle m_bundle;
+public class TypeResolverPageDataAction extends AbstractScoutHandler {
 
   public TypeResolverPageDataAction() {
     super(Texts.get("UpdateAllPageDataClasses"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), null, false, Category.UDPATE);
-  }
-
-  public void init(ITypeResolver typeResolver, IScoutBundle bundle) {
-    m_typeResolver = typeResolver;
-    m_bundle = bundle;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return m_typeResolver != null && (m_bundle == null || !m_bundle.isBinary());
-  }
-
-  @Override
-  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    setOperation(new MultiplePageDataUpdateOperation(m_typeResolver));
-    return super.execute(shell, selection, event);
   }
 }

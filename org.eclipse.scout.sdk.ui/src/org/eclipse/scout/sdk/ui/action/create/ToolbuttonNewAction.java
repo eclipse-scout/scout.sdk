@@ -10,31 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.toolbutton.ToolbuttonNewWizard;
 
-public class ToolbuttonNewAction extends AbstractWizardAction {
-  private IType m_type;
-
+public class ToolbuttonNewAction extends AbstractScoutHandler {
   public ToolbuttonNewAction() {
     super(Texts.get("Action_newTypeX", "Tool item"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ButtonAdd), null, false, Category.NEW);
-  }
-
-  @Override
-  public boolean isVisible() {
-    return isEditable(m_type);
-  }
-
-  public void init(IType t) {
-    m_type = t;
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new ToolbuttonNewWizard(m_type);
   }
 }

@@ -35,9 +35,9 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class WellformClientBundleOperation implements IOperation {
 
-  private final Set<IScoutBundle> m_bundles;
+  private final Set<? extends IScoutBundle> m_bundles;
 
-  public WellformClientBundleOperation(Set<IScoutBundle> bundles) {
+  public WellformClientBundleOperation(Set<? extends IScoutBundle> bundles) {
     m_bundles = bundles;
   }
 

@@ -78,14 +78,8 @@ public class PermissionTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{PermissionNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    ((PermissionNewAction) menu).setScoutBundle(getScoutBundle());
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(PermissionNewAction.class);
   }
 }

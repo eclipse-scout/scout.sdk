@@ -10,35 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.services.ClientServiceNewWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  *
  */
-public class ClientServiceNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_scoutBundle;
+public class ClientServiceNewAction extends AbstractScoutHandler {
 
   public ClientServiceNewAction() {
     super(Texts.get("Action_newTypeX", "Client Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd), null, false, Category.NEW);
-  }
-
-  public void setScoutBundle(IScoutBundle scoutBundle) {
-    m_scoutBundle = scoutBundle;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_scoutBundle.isBinary();
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new ClientServiceNewWizard(m_scoutBundle);
   }
 }

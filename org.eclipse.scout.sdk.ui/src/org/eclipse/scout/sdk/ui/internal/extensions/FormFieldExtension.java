@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.internal.extensions;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
@@ -22,7 +22,7 @@ public class FormFieldExtension implements IFormFieldExtension {
 
   private final IType m_modelType;
   private final String m_name;
-  private Class<? extends AbstractFormFieldWizard> m_newWizardClazz;
+  private Class<? extends AbstractInnerTypeWizard> m_newWizardClazz;
   private Class<? extends AbstractScoutTypePage> m_nodePageClazz;
 
   private boolean m_inShortList;
@@ -74,11 +74,11 @@ public class FormFieldExtension implements IFormFieldExtension {
   }
 
   @Override
-  public Class<? extends AbstractFormFieldWizard> getNewWizardClazz() {
+  public Class<? extends AbstractInnerTypeWizard> getNewWizardClazz() {
     return m_newWizardClazz;
   }
 
-  public void setNewWizardClazz(Class<? extends AbstractFormFieldWizard> newWizardClazz) {
+  public void setNewWizardClazz(Class<? extends AbstractInnerTypeWizard> newWizardClazz) {
     m_newWizardClazz = newWizardClazz;
   }
 

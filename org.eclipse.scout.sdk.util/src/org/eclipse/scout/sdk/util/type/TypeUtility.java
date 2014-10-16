@@ -617,7 +617,7 @@ public class TypeUtility {
    *
    * @return the primary type of the compilation unit this type is declared in.
    */
-  public static IType getToplevelType(IJavaElement e) {
+  public static IType getPrimaryType(IJavaElement e) {
     if (e == null) {
       return null;
     }

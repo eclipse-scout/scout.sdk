@@ -75,7 +75,7 @@ public abstract class AbstractTypeChangedListener implements IResourceChangeList
 
               for (IType typeChanged : cu.getTypes()) {
                 if (TypeUtility.exists(typeChanged)) {
-                  typeChanged = TypeUtility.getToplevelType(typeChanged);
+                  typeChanged = TypeUtility.getPrimaryType(typeChanged);
                 }
                 if (TypeUtility.exists(typeChanged) && (CompareUtility.equals(typeChanged, m_type))) {
                   typeChanged();

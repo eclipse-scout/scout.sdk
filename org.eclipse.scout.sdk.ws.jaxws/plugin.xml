@@ -172,22 +172,21 @@
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.ConsumerNewWizardAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.ProviderNewWizardAction"></contextMenu>
-		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.RefreshAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.RepairAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.StubRebuildAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.TypeOpenAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsConsumerDeleteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderDeleteAction"></contextMenu>
 		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderCodeFirstDeleteAction"></contextMenu>
-    <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.JaxWsAliasChangeWizardAction"></contextMenu>
-    <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainFilterEditAction"></contextMenu>
-    <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainRemoveAction"></contextMenu>
-    <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainNewAction"></contextMenu>
-    <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerNewWizardAction"></contextMenu>
-    <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.SessionFactoryNewAction"></contextMenu>
-    <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.CredentialValidationStrategyNewAction"></contextMenu>
-    <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.AuthenticationHandlerNewWizardAction"></contextMenu>
-    <contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.CleanupPhantomJarFileAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.JaxWsAliasChangeWizardAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainFilterEditAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainRemoveAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerNewWizardAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.SessionFactoryNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.CredentialValidationStrategyNewAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.AuthenticationHandlerNewWizardAction"></contextMenu>
+		<contextMenu class="org.eclipse.scout.sdk.ws.jaxws.swt.action.CleanupPhantomJarFileAction"></contextMenu>
    </extension>
    <extension
          point="org.eclipse.scout.sdk.ui.technology">
@@ -204,5 +203,113 @@
             class="org.eclipse.scout.sdk.ws.jaxws.technology.JaxWsServerManifestTechnologyHandler"
             technology="scout.technology.ws.jaxws">
       </handler>
+   </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.executor">
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.AuthenticationHandlerNewWizardExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.AuthenticationHandlerNewWizardAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.BindingFileNewExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.BindingFileNewAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.BuildPropertiesEditExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.BuildPropertiesEditAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.CleanupPhantomJarFileExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.CleanupPhantomJarFileAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.ConsumerNewWizardExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.ConsumerNewWizardAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.CredentialValidationStrategyNewExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.CredentialValidationStrategyNewAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.FileOpenExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.HandlerAddExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerAddAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.HandlerChainFilterEditExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainFilterEditAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.HandlerChainNewExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainNewAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.HandlerChainRemoveExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainRemoveAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.HandlerNewWizardExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerNewWizardAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.JaxWsAliasChangeWizardExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.JaxWsAliasChangeWizardAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.ProviderNewWizardExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.ProviderNewWizardAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.RepairExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.RepairAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.SessionFactoryNewExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.SessionFactoryNewAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.StubRebuildExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.StubRebuildAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.TypeOpenExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.TypeOpenAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.WsConsumerDeleteExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsConsumerDeleteAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.WsProviderCodeFirstDeleteExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderCodeFirstDeleteAction"
+            order="0">
+      </executor>
+      <executor
+            class="org.eclipse.scout.sdk.ws.jaxws.executor.WsProviderDeleteExecutor"
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderDeleteAction"
+            order="0">
+      </executor>
    </extension>
 </plugin>

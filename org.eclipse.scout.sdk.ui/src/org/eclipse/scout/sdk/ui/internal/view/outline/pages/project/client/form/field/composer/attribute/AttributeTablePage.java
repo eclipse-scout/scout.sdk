@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field.composer.attribute;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
@@ -75,19 +77,12 @@ public class AttributeTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{AttributeNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    ((AttributeNewAction) menu).setType(getDeclaringType());
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(AttributeNewAction.class);
   }
 
   public IType getDeclaringType() {
     return m_declaringType;
   }
-
 }

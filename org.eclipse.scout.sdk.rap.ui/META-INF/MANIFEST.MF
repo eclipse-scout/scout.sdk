@@ -13,6 +13,7 @@ Bundle-ActivationPolicy: lazy
 Export-Package: org.eclipse.scout.sdk.rap.ui,
  org.eclipse.scout.sdk.rap.ui.internal,
  org.eclipse.scout.sdk.rap.ui.internal.action,
+ org.eclipse.scout.sdk.rap.ui.internal.executor,
  org.eclipse.scout.sdk.rap.ui.internal.extensions.bundle,
  org.eclipse.scout.sdk.rap.ui.internal.extensions.export,
  org.eclipse.scout.sdk.rap.ui.internal.extensions.technology,

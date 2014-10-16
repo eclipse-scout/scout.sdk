@@ -77,7 +77,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     Set<IType> subtypes = formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getClassesInScoutBundles(sb));
     Assert.assertEquals(1, subtypes.size());
     final IntegerHolder formCountHolder = new IntegerHolder(-1);
-    formHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
+    ITypeHierarchyChangedListener listener = new ITypeHierarchyChangedListener() {
       @Override
       public void hierarchyInvalidated() {
         formCountHolder.setValue(formHierarchy.getAllSubtypes(iForm, ScoutTypeFilters.getClassesInScoutBundles(sb)).size());
@@ -85,19 +85,25 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
           formCountHolder.notifyAll();
         }
       }
-    });
-    IScoutBundle client = ScoutTypeUtility.getScoutBundle(project.getProject());
-    SdkAssert.assertNotNull(client);
-    FormNewOperation formOp = new FormNewOperation("ANewForm", client.getPackageName(".ui.forms"), client.getJavaProject());
-    formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, project));
-    executeBuildAssertNoCompileErrors(formOp);
-    synchronized (formCountHolder) {
-      while (formCountHolder.getValue() == -1) {
-        formCountHolder.wait();
+    };
+    try {
+      formHierarchy.addHierarchyListener(listener);
+      IScoutBundle client = ScoutTypeUtility.getScoutBundle(project.getProject());
+      SdkAssert.assertNotNull(client);
+      FormNewOperation formOp = new FormNewOperation("ANewForm", client.getPackageName(".ui.forms"), client.getJavaProject());
+      formOp.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IForm, project));
+      executeBuildAssertNoCompileErrors(formOp);
+      synchronized (formCountHolder) {
+        while (formCountHolder.getValue() == -1) {
+          formCountHolder.wait();
+        }
       }
+      // expect created form
+      Assert.assertEquals(2, formCountHolder.getValue().intValue());
     }
-    // expect created form
-    Assert.assertEquals(2, formCountHolder.getValue().intValue());
+    finally {
+      formHierarchy.removeHierarchyListener(listener);
+    }
   }
 
   @Test
@@ -107,7 +113,7 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
     Set<IType> subtypes = serviceHierarchy.getAllSubtypes(iService, TypeFilters.getInWorkspaceFilter());
     Assert.assertEquals(2, subtypes.size());
     final IntegerHolder serviceCountHolder = new IntegerHolder(-1);
-    serviceHierarchy.addHierarchyListener(new ITypeHierarchyChangedListener() {
+    ITypeHierarchyChangedListener listener = new ITypeHierarchyChangedListener() {
       @Override
       public void hierarchyInvalidated() {
         serviceCountHolder.setValue(serviceHierarchy.getAllSubtypes(iService, TypeFilters.getInWorkspaceFilter()).size());
@@ -115,30 +121,36 @@ public class TypeHierarchyTest1 extends AbstractScoutSdkTest {
           serviceCountHolder.notifyAll();
         }
       }
-    });
-    IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_CLIENT));
-    SdkAssert.assertNotNull(clientBundle);
-    IScoutBundle sharedBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_SHARED));
-    SdkAssert.assertNotNull(sharedBundle);
-    IScoutBundle serverBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_SERVER));
-    SdkAssert.assertNotNull(serverBundle);
-    ServiceNewOperation serviceOp = new ServiceNewOperation("ITestService", "TestService");
-    serviceOp.addProxyRegistrationProject(clientBundle.getJavaProject());
-    serviceOp.addServiceRegistration(new ServiceRegistrationDescription(serverBundle.getJavaProject()));
-    serviceOp.setImplementationProject(serverBundle.getJavaProject());
-    serviceOp.setInterfaceProject(sharedBundle.getJavaProject());
-    serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
-    serviceOp.setInterfacePackageName(sharedBundle.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES) + ".notexisting");
-    serviceOp.setImplementationPackageName(serverBundle.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES) + ".notexisting");
-    serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, serverBundle.getJavaProject()));
-    executeBuildAssertNoCompileErrors(serviceOp);
-    synchronized (serviceCountHolder) {
-      while (serviceCountHolder.getValue() == -1) {
-        serviceCountHolder.wait();
+    };
+    try {
+      serviceHierarchy.addHierarchyListener(listener);
+      IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_CLIENT));
+      SdkAssert.assertNotNull(clientBundle);
+      IScoutBundle sharedBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_SHARED));
+      SdkAssert.assertNotNull(sharedBundle);
+      IScoutBundle serverBundle = ScoutTypeUtility.getScoutBundle(getProject(BUNDLE_NAME_SERVER));
+      SdkAssert.assertNotNull(serverBundle);
+      ServiceNewOperation serviceOp = new ServiceNewOperation("ITestService", "TestService");
+      serviceOp.addProxyRegistrationProject(clientBundle.getJavaProject());
+      serviceOp.addServiceRegistration(new ServiceRegistrationDescription(serverBundle.getJavaProject()));
+      serviceOp.setImplementationProject(serverBundle.getJavaProject());
+      serviceOp.setInterfaceProject(sharedBundle.getJavaProject());
+      serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(RuntimeClasses.IService));
+      serviceOp.setInterfacePackageName(sharedBundle.getDefaultPackage(IDefaultTargetPackage.SHARED_SERVICES) + ".notexisting");
+      serviceOp.setImplementationPackageName(serverBundle.getDefaultPackage(IDefaultTargetPackage.SERVER_SERVICES) + ".notexisting");
+      serviceOp.setImplementationSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(RuntimeClasses.IService, serverBundle.getJavaProject()));
+      executeBuildAssertNoCompileErrors(serviceOp);
+      synchronized (serviceCountHolder) {
+        while (serviceCountHolder.getValue() == -1) {
+          serviceCountHolder.wait();
+        }
       }
+      // expect created form
+      Assert.assertEquals(4, serviceCountHolder.getValue().intValue());
     }
-    // expect created form
-    Assert.assertEquals(4, serviceCountHolder.getValue().intValue());
+    finally {
+      serviceHierarchy.removeHierarchyListener(listener);
+    }
   }
 
   @AfterClass

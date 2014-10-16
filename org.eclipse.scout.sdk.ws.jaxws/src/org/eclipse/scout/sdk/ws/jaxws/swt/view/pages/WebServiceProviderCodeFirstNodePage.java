@@ -10,9 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.UUID;
 
@@ -27,7 +25,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
-import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -109,18 +106,11 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof WsProviderCodeFirstDeleteAction) {
-      ((WsProviderCodeFirstDeleteAction) menu).init(m_bundle, getSunJaxWsBean());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    List<Class<? extends AbstractScoutHandler>> actions = new ArrayList<Class<? extends AbstractScoutHandler>>();
-    actions.add(WsProviderCodeFirstDeleteAction.class);
-    return actions.toArray(new Class[actions.size()]);
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    Set<Class<? extends IScoutHandler>> list = new HashSet<Class<? extends IScoutHandler>>();
+    list.addAll(super.getSupportedMenuActions());
+    list.add(WsProviderCodeFirstDeleteAction.class);
+    return list;
   }
 
   @Override

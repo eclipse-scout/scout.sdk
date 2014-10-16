@@ -10,34 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.services.ServiceOperationNewWizard;
 
-public class ServiceOperationNewAction extends AbstractWizardAction {
-
-  private IType m_interfaceType;
-  private IType m_type;
-
+public class ServiceOperationNewAction extends AbstractScoutHandler {
   public ServiceOperationNewAction() {
     super(Texts.get("NewServiceOperation"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceOperationAdd), null, false, Category.NEW);
-  }
-
-  public void init(IType interfaceType, IType type) {
-    m_type = type;
-    m_interfaceType = interfaceType;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return isEditable(m_type);
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new ServiceOperationNewWizard(m_interfaceType, m_type);
   }
 }

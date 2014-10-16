@@ -214,9 +214,8 @@ public class MenuNewOperation implements IOperation {
     return m_formToOpen;
   }
 
-  public void setFormToOpen(IType bcType) {
-    m_formToOpen = bcType;
-
+  public void setFormToOpen(IType formToOpenType) {
+    m_formToOpen = formToOpenType;
   }
 
   public void setFormHandler(IType formHandler) {

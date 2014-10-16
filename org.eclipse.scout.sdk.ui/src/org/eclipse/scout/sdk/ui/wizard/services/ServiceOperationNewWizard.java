@@ -11,15 +11,28 @@
 package org.eclipse.scout.sdk.ui.wizard.services;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
+import org.eclipse.scout.sdk.ui.view.outline.pages.project.server.service.AbstractServiceNodePage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
+import org.eclipse.ui.IWorkbench;
 
 public class ServiceOperationNewWizard extends AbstractWorkspaceWizard {
 
-  public ServiceOperationNewWizard(IType serviceInterface, IType serviceImpl) {
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
+    IType serviceImpl = UiUtility.getTypeFromSelection(selection);
+    IType serviceInterface = null;
+    Object firstElement = selection.getFirstElement();
+    if (firstElement instanceof AbstractServiceNodePage) {
+      serviceInterface = ((AbstractServiceNodePage) firstElement).getInterfaceType();
+    }
+
     setWindowTitle(Texts.get("NewServiceOperationNoPopup"));
     ServiceOperationNewWizardPage page1 = new ServiceOperationNewWizardPage(serviceInterface, serviceImpl);
     addPage(page1);
   }
-
 }

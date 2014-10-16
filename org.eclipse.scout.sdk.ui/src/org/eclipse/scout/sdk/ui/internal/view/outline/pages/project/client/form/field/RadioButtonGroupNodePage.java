@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
+import java.util.Set;
+
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
 import org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction;
@@ -44,20 +46,8 @@ public class RadioButtonGroupNodePage extends AbstractBoxNodePage {
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof RadioButtonNewAction) {
-      ((RadioButtonNewAction) menu).setType(getType());
-    }
-    if (menu instanceof FormFieldDeleteAction) {
-      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.RadiobuttonGroupRemove));
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{FormFieldRenameAction.class, ShowJavaReferencesAction.class, RadioButtonNewAction.class,
-        FormFieldDeleteAction.class, CreateTemplateAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(FormFieldRenameAction.class, ShowJavaReferencesAction.class, RadioButtonNewAction.class,
+        FormFieldDeleteAction.class, CreateTemplateAction.class);
   }
 }

@@ -15,7 +15,6 @@ import java.util.Set;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformWizardsOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.WizardNewAction;
@@ -82,21 +81,7 @@ public class WizardTablePage extends AbstractPage {
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof WellformAction) {
-      WellformAction action = (WellformAction) menu;
-      action.init(getScoutBundle());
-      action.setLabel(Texts.get("WellformAllWizards"));
-      action.setOperation(new WellformWizardsOperation(getScoutBundle()));
-    }
-    else if (menu instanceof WizardNewAction) {
-      ((WizardNewAction) menu).setScoutResource(getScoutBundle());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, WizardNewAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(WellformAction.class, WizardNewAction.class);
   }
 }

@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form.field;
 
-import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
@@ -36,14 +34,6 @@ public class SequenceBoxFieldNodePage extends AbstractBoxNodePage {
       // expect from to fields
       childArray[1].setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormFieldFrom));
       childArray[2].setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormFieldTo));
-    }
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof FormFieldDeleteAction) {
-      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SequenceboxRemove));
     }
   }
 }

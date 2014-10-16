@@ -63,7 +63,7 @@ public final class TypeCache implements ITypeCache {
     clearCache();
   }
 
-  private synchronized void clearCache() {
+  public synchronized void clearCache() {
     m_cache.clear();
   }
 

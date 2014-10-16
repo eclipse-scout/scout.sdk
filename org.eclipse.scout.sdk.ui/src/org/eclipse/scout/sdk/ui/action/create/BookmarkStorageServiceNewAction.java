@@ -10,35 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.services.BookmarkStorageServiceNewWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  *
  */
-public class BookmarkStorageServiceNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_bundle;
+public class BookmarkStorageServiceNewAction extends AbstractScoutHandler {
 
   public BookmarkStorageServiceNewAction() {
     super(Texts.get("Action_newTypeX", "Bookmark Storage Service"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ServiceAdd), null, false, Category.NEW);
-  }
-
-  public void setScoutBundle(IScoutBundle bundle) {
-    m_bundle = bundle;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new BookmarkStorageServiceNewWizard(m_bundle);
   }
 }

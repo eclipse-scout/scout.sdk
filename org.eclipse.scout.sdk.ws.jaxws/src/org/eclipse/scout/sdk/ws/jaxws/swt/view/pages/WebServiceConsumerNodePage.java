@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.view.pages;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -44,7 +43,6 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.ManagedResource;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.resource.WsdlResource;
 import org.eclipse.scout.sdk.ws.jaxws.resource.XmlResource;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.RefreshAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.StubRebuildAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.WsConsumerDeleteAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.BuildJaxWsBean;
@@ -134,33 +132,18 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
     return false;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    List<Class<? extends IScoutHandler>> list = new ArrayList<Class<? extends IScoutHandler>>();
-    for (Class<? extends IScoutHandler> c : super.getSupportedMenuActions()) {
-      list.add(c);
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    Set<Class<? extends IScoutHandler>> list = new HashSet<Class<? extends IScoutHandler>>();
+    list.addAll(super.getSupportedMenuActions());
 
     if (getBuildJaxWsBean() != null
         && !MarkerUtility.containsMarker(m_bundle, MarkerType.StubFolder, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)
         && !MarkerUtility.containsMarker(m_bundle, MarkerType.Wsdl, getMarkerGroupUUID(), IMarker.SEVERITY_ERROR)) {
       list.add(StubRebuildAction.class);
     }
-    list.add(RefreshAction.class);
     list.add(WsConsumerDeleteAction.class);
-    return list.toArray(new Class[list.size()]);
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof WsConsumerDeleteAction) {
-      ((WsConsumerDeleteAction) menu).init(m_bundle, getType(), getBuildJaxWsBean());
-    }
-    else if (menu instanceof StubRebuildAction) {
-      ((StubRebuildAction) menu).init(m_bundle, getBuildJaxWsBean(), getWsdlResource(), m_markerGroupUUID, WebserviceEnum.CONSUMER);
-    }
+    return list;
   }
 
   @Override

@@ -77,14 +77,8 @@ public class LookupCallTablePage extends AbstractPage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{LookupCallNewAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    ((LookupCallNewAction) menu).setScoutBundle(getScoutBundle());
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(LookupCallNewAction.class);
   }
 }

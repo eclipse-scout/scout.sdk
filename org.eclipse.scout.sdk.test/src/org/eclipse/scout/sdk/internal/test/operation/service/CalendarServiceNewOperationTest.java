@@ -49,7 +49,7 @@ public class CalendarServiceNewOperationTest extends AbstractSdkTestWithSamplePr
     IMethod getItemsMethod = SdkAssert.assertMethodExist(implementationType, "getItems");
     SdkAssert.assertMethodExist(implementationType, "storeItems");
     SdkAssert.assertEquals(2, implementationType.getMethods().length);
-    SdkAssert.assertEquals("[QICalendarItem;", getItemsMethod.getReturnType());
+    SdkAssert.assertEquals("QSet<QICalendarItem;>;", getItemsMethod.getReturnType());
   }
 
 }

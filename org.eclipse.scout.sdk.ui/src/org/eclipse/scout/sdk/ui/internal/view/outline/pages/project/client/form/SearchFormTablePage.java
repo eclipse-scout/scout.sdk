@@ -16,7 +16,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformSearchFormsOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.WellformAction;
 import org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction;
@@ -32,7 +31,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 /**
  * <h3>SearchFormTablePage</h3>
  */
-public class SearchFormTablePage extends AbstractPage {
+public class SearchFormTablePage extends AbstractPage implements ITypeResolver {
   private ICachedTypeHierarchy m_searchFormHierarchy;
 
   public SearchFormTablePage(AbstractPage parent) {
@@ -70,13 +69,14 @@ public class SearchFormTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    for (IType searchForm : resolveSearchForms()) {
+    for (IType searchForm : getTypes()) {
       FormNodePage form = new FormNodePage(this, searchForm);
       form.setImageDescriptor(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.SearchForm));
     }
   }
 
-  protected Set<IType> resolveSearchForms() {
+  @Override
+  public Set<IType> getTypes() {
     IType iSearchForm = TypeUtility.getType(IRuntimeClasses.ISearchForm);
 
     if (m_searchFormHierarchy == null) {
@@ -86,30 +86,8 @@ public class SearchFormTablePage extends AbstractPage {
     return m_searchFormHierarchy.getAllSubtypes(iSearchForm, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()), TypeComparators.getTypeNameComparator());
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{WellformAction.class, SearchFormNewAction.class, TypeResolverFormDataAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof WellformAction) {
-      WellformAction action = (WellformAction) menu;
-      action.setOperation(new WellformSearchFormsOperation(getScoutBundle()));
-      action.init(getScoutBundle());
-      action.setLabel(Texts.get("WellformAllSearchForms"));
-    }
-    else if (menu instanceof SearchFormNewAction) {
-      ((SearchFormNewAction) menu).init(getScoutBundle());
-    }
-    else if (menu instanceof TypeResolverFormDataAction) {
-      ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          return resolveSearchForms();
-        }
-      }, getScoutBundle());
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(WellformAction.class, SearchFormNewAction.class, TypeResolverFormDataAction.class);
   }
 }

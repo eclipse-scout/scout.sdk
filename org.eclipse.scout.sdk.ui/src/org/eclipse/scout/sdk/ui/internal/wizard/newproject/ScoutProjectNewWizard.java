@@ -47,18 +47,16 @@ import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.wizards.newresource.BasicNewProjectResourceWizard;
 
-public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard, IScoutProjectWizard {
+public class ScoutProjectNewWizard extends AbstractWizard implements IScoutProjectWizard, INewWizard {
 
   private ScoutProjectNewWizardPage m_page1;
   private ScoutProjectTemplateWizardPage m_page2;
 
-  public ScoutProjectNewWizard() {
-    setWindowTitle(Texts.get("NewScoutProjectNoPopup"));
-    setHelpAvailable(false);
-  }
-
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
+    setWindowTitle(Texts.get("NewScoutProjectNoPopup"));
+    setHelpAvailable(false);
+
     m_page1 = new ScoutProjectNewWizardPage();
     addPage(m_page1);
     m_page2 = new ScoutProjectTemplateWizardPage();

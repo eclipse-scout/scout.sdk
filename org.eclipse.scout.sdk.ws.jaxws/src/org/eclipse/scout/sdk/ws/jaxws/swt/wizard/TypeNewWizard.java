@@ -65,7 +65,9 @@ public class TypeNewWizard extends AbstractWorkspaceWizard {
     else {
       m_page.setInterfaceTypeSearchScopeFactory(new JavaSearchScopeFactory());
     }
-    m_page.setSuperType(getSuperType());
+    if (getSuperType() != null) {
+      m_page.setSuperType(getSuperType());
+    }
     m_page.setInterfaceType(getInterfaceType());
 
     addPage(m_page);

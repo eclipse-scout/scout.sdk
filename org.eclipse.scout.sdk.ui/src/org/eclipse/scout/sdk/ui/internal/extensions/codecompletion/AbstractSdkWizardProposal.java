@@ -10,18 +10,22 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion;
 
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
+import org.eclipse.scout.sdk.ui.executor.selection.ScoutStructuredSelection;
+import org.eclipse.scout.sdk.ui.extensions.executor.IExecutor;
+import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.IWorkspaceWizard;
-import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.swt.widgets.Shell;
 
 /**
  * <h3>{@link AbstractSdkWizardProposal}</h3>
@@ -43,7 +47,7 @@ public abstract class AbstractSdkWizardProposal extends AbstractSdkProposal {
     return m_declaringType;
   }
 
-  protected abstract IWorkspaceWizard createWizard(IJavaElement sibling);
+  protected abstract IExecutor createExecutor();
 
   protected IJavaElement findSibling(int sourceRangeOffset) {
     IJavaElement sibling = null;
@@ -62,11 +66,20 @@ public abstract class AbstractSdkWizardProposal extends AbstractSdkProposal {
 
   @Override
   public void apply(ITextViewer viewer, char trigger, int stateMask, int offset) {
-    IWorkspaceWizard wizard = createWizard(findSibling(offset));
-    if (wizard != null) {
-      ScoutWizardDialog wizardDialog = new ScoutWizardDialog(wizard);
-      wizardDialog.open();
+    SiblingProposal proposal = null;
+    IJavaElement sibling = findSibling(offset);
+    if (TypeUtility.exists(sibling)) {
+      proposal = new SiblingProposal(sibling);
     }
+
+    ScoutStructuredSelection selection = new ScoutStructuredSelection(new Object[]{getDeclaringType()});
+    selection.setSibling(proposal);
+
+    IExecutor executor = createExecutor();
+    Shell shell = ScoutSdkUi.getShell();
+    ExecutionEvent event = AbstractScoutHandler.createEvent(shell, selection);
+
+    executor.run(shell, selection, event);
   }
 
   @Override

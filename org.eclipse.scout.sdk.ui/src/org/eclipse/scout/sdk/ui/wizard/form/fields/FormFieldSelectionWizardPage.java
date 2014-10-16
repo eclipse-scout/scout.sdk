@@ -35,7 +35,8 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
+import org.eclipse.scout.sdk.ui.executor.selection.ScoutStructuredSelection;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.fields.table.FilteredTable;
@@ -53,6 +54,7 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * <h3>FormFieldSelectionWizardPage</h3>
@@ -160,19 +162,19 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   private void handleSelection(Object selectedItem) {
-    AbstractFormFieldWizard wizard = null;
+    AbstractInnerTypeWizard wizard = null;
     if (selectedItem instanceof IType) {
       IType formField = (IType) selectedItem;
-      wizard = (AbstractFormFieldWizard) FormFieldExtensionPoint.createNewWizard(formField);
+      wizard = (AbstractInnerTypeWizard) FormFieldExtensionPoint.createNewWizard(formField);
       if (wizard != null) {
-        wizard.initWizard(m_declaringType);
-        wizard.setSuperType(formField);
-        wizard.setTypeName(getTypeName());
-
+        ScoutStructuredSelection sel = new ScoutStructuredSelection(new Object[]{m_declaringType});
+        sel.setSuperType(formField);
+        sel.setTypeName(getTypeName());
         IJavaElement sibling = getSibling();
         if (TypeUtility.exists(sibling)) {
-          wizard.setSibling(new SiblingProposal(sibling));
+          sel.setSibling(new SiblingProposal(sibling));
         }
+        wizard.init(PlatformUI.getWorkbench(), sel);
       }
     }
     if (wizard != null) {

@@ -81,16 +81,7 @@ public class MenuTablePage extends AbstractPage {
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof MenuNewAction) {
-      MenuNewAction action = (MenuNewAction) menu;
-      action.setType(getDeclaringType());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{MenuNewAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(MenuNewAction.class);
   }
 }

@@ -10,15 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.extensions.codecompletion;
 
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
-import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
+import org.eclipse.scout.sdk.ui.action.create.MenuNewAction;
+import org.eclipse.scout.sdk.ui.extensions.executor.ExecutorExtensionPoint;
+import org.eclipse.scout.sdk.ui.extensions.executor.IExecutor;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.SdkIcons;
-import org.eclipse.scout.sdk.ui.wizard.IWorkspaceWizard;
-import org.eclipse.scout.sdk.ui.wizard.menu.MenuNewWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.swt.graphics.Image;
 
@@ -45,12 +44,7 @@ public class MenuNewProposal extends AbstractSdkWizardProposal {
   }
 
   @Override
-  protected IWorkspaceWizard createWizard(IJavaElement sibling) {
-    MenuNewWizard wizard = new MenuNewWizard();
-    wizard.initWizard(getDeclaringType());
-    if (TypeUtility.exists(sibling)) {
-      wizard.getMenuNewWizardPage().setSibling(new SiblingProposal(sibling));
-    }
-    return wizard;
+  protected IExecutor createExecutor() {
+    return ExecutorExtensionPoint.getExecutorFor(MenuNewAction.class.getName());
   }
 }

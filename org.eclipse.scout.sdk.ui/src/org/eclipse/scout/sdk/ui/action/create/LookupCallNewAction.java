@@ -10,38 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.lookupcall.LookupCallNewWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.ui.PlatformUI;
 
 /**
  *
  */
-public class LookupCallNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_type;
+public class LookupCallNewAction extends AbstractScoutHandler {
 
   public LookupCallNewAction() {
     super(Texts.get("Action_newTypeX", "LookupCall"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.LookupCallAdd), null, false, Category.NEW);
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_type.isBinary();
-  }
-
-  public void setScoutBundle(IScoutBundle t) {
-    m_type = t;
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    LookupCallNewWizard lcnw = new LookupCallNewWizard(m_type);
-    lcnw.init(PlatformUI.getWorkbench(), null);
-    return lcnw;
   }
 }

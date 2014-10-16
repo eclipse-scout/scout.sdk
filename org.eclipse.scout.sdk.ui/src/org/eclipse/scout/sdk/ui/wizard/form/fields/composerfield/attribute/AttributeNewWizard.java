@@ -10,40 +10,34 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.form.fields.composerfield.attribute;
 
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.ui.IWorkbench;
 
-public class AttributeNewWizard extends AbstractWorkspaceWizard {
+public class AttributeNewWizard extends AbstractInnerTypeWizard {
 
   private AttributeNewWizardPage m_page1;
-  private IType m_declaringType;
-
-  public AttributeNewWizard(IType declaringType) {
-    setWindowTitle(Texts.get("NewAttribute"));
-    m_declaringType = declaringType;
-  }
-
-  @Override
-  public void addPages() {
-    m_page1 = new AttributeNewWizardPage(getDeclaringType());
-    addPage(m_page1);
-  }
-
-  /**
-   * @return the declaringType
-   */
-  public IType getDeclaringType() {
-    return m_declaringType;
-  }
 
   @Override
   protected void postFinishDisplayThread() {
-    IType createdField = m_page1.getCreatedAttribute();
-    if (TypeUtility.exists(createdField)) {
-      ScoutSdkUi.showJavaElementInEditor(createdField, false);
+    ScoutSdkUi.showJavaElementInEditor(m_page1.getCreatedAttribute(), false);
+  }
+
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
+    setWindowTitle(Texts.get("NewAttribute"));
+
+    m_page1 = new AttributeNewWizardPage(getDeclaringType());
+    if (getTypeName() != null) {
+      m_page1.setTypeName(getTypeName());
     }
+    if (getSuperType() != null) {
+      m_page1.setSuperType(getSuperType());
+    }
+    addPage(m_page1);
   }
 }

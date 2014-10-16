@@ -12,51 +12,44 @@ package org.eclipse.scout.sdk.ui.wizard.form.fields.sequencebox;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.form.field.SequenceBoxNewOperation;
-import org.eclipse.scout.sdk.ui.extensions.AbstractFormFieldWizard;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.fields.proposal.SiblingProposal;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.ui.IWorkbench;
 
-public class SequenceBoxNewWizard extends AbstractFormFieldWizard {
+public class SequenceBoxNewWizard extends AbstractInnerTypeWizard {
 
   private SequenceBoxNewWizardPage m_page1;
   private SequenceBoxTemplateWizardPage m_templatePage;
   private SequenceBoxNewOperation m_operation;
 
-  public SequenceBoxNewWizard() {
-    setWindowTitle(Texts.get("NewSequenceBox"));
-  }
-
   @Override
-  public void initWizard(IType declaringType) {
-    super.initWizard(declaringType);
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
+    setWindowTitle(Texts.get("NewSequenceBox"));
+
     m_page1 = new SequenceBoxNewWizardPage(getDeclaringType());
+    if (getSiblingProposal() != null) {
+      m_page1.setSibling(getSiblingProposal());
+    }
+    if (getTypeName() != null) {
+      m_page1.setTypeName(getTypeName());
+    }
+    if (getSuperType() != null) {
+      m_page1.setSuperType(getSuperType());
+    }
     addPage(m_page1);
     m_templatePage = new SequenceBoxTemplateWizardPage(getDeclaringType());
     addPage(m_templatePage);
-  }
-
-  @Override
-  public void setSuperType(IType superType) {
-    m_page1.setSuperType(superType);
-  }
-
-  @Override
-  public void setTypeName(String name) {
-    m_page1.setTypeName(name);
-  }
-
-  @Override
-  public void setSibling(SiblingProposal sibling) {
-    m_page1.setSibling(sibling);
   }
 
   @Override
@@ -102,10 +95,6 @@ public class SequenceBoxNewWizard extends AbstractFormFieldWizard {
 
   @Override
   protected void postFinishDisplayThread() {
-    IType createdField = m_operation.getCreatedField();
-    if (TypeUtility.exists(createdField)) {
-      ScoutSdkUi.showJavaElementInEditor(createdField, false);
-    }
+    ScoutSdkUi.showJavaElementInEditor(m_operation.getCreatedField(), false);
   }
-
 }

@@ -10,37 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.form.fields.radiobutton.RadioButtonNewWizard;
 
 /**
  *
  */
-public class RadioButtonNewAction extends AbstractWizardAction {
-
-  private IType m_type;
+public class RadioButtonNewAction extends AbstractScoutHandler {
 
   public RadioButtonNewAction() {
     super(Texts.get("NewRadioButton"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.RadiobuttonAdd), null, false, Category.NEW);
-  }
-
-  public void setType(IType type) {
-    m_type = type;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return isEditable(m_type);
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    RadioButtonNewWizard wizard = new RadioButtonNewWizard();
-    wizard.initWizard(m_type);
-    return wizard;
   }
 }

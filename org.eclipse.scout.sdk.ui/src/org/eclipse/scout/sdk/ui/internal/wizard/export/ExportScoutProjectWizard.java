@@ -23,11 +23,13 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.export.ExportEarOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.internal.extensions.export.ExportScoutProjectEntry;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizard;
 import org.eclipse.scout.sdk.ui.wizard.export.IExportScoutProjectWizardPage;
@@ -36,20 +38,24 @@ import org.eclipse.scout.sdk.util.resources.ResourceFilters;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.ui.IWorkbench;
 
 public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements IExportScoutProjectWizard {
   private static final Pattern ALIAS_REGEX = Pattern.compile(".*products.*/([^-]*)-.*.product");
 
-  private final ExportScoutProjectWizardPage m_page1;
-  private final IScoutBundle m_project;
+  private ExportScoutProjectWizardPage m_page1;
+  private IScoutBundle m_project;
+  private String m_projectAlias;
 
-  private final String m_projectAlias;
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
 
-  public ExportScoutProjectWizard(IScoutBundle project) {
-    m_project = project;
-    m_projectAlias = findProjectAlias();
-    m_page1 = new ExportScoutProjectWizardPage(project);
     setWindowTitle(Texts.get("ExportScoutProject"));
+
+    m_project = UiUtility.getScoutBundleFromSelection(selection);
+    m_projectAlias = findProjectAlias();
+    m_page1 = new ExportScoutProjectWizardPage(m_project);
     addPage(m_page1);
   }
 

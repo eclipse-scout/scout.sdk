@@ -10,47 +10,37 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.menu;
 
-import org.eclipse.jdt.core.IType;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.ui.IWorkbench;
 
-public class MenuNewWizard extends AbstractWorkspaceWizard {
+public class MenuNewWizard extends AbstractInnerTypeWizard {
 
   private MenuNewWizardPage m_page1;
-  private IType m_declaringType;
 
-  public MenuNewWizard() {
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
     setWindowTitle(Texts.get("NewMenu"));
-  }
 
-  public void initWizard(IType declaringType) {
-    m_declaringType = declaringType;
     m_page1 = new MenuNewWizardPage(getDeclaringType());
+    if (getSiblingProposal() != null) {
+      m_page1.setSibling(getSiblingProposal());
+    }
+    if (getTypeName() != null) {
+      m_page1.setTypeName(getTypeName());
+    }
+    if (getSuperType() != null) {
+      m_page1.setSuperType(getSuperType());
+    }
     addPage(m_page1);
-  }
-
-  public void setSuperType(IType superType) {
-    m_page1.setSuperType(superType);
-  }
-
-  public MenuNewWizardPage getMenuNewWizardPage() {
-    return m_page1;
-  }
-
-  /**
-   * @return the declaringType
-   */
-  public IType getDeclaringType() {
-    return m_declaringType;
   }
 
   @Override
   protected void postFinishDisplayThread() {
-    IType createdField = m_page1.getCreatedMenu();
-    if (TypeUtility.exists(createdField)) {
-      ScoutSdkUi.showJavaElementInEditor(createdField, false);
-    }
+    ScoutSdkUi.showJavaElementInEditor(m_page1.getCreatedMenu(), false);
   }
 }

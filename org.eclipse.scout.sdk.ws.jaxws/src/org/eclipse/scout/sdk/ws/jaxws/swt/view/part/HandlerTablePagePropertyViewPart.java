@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.view.part;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
 import org.eclipse.scout.sdk.ui.view.properties.part.singlepage.AbstractSinglePageSectionBasedViewPart;
 import org.eclipse.scout.sdk.ui.view.properties.presenter.AbstractPresenter;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerNewWizardAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.HandlerTablePage;
@@ -24,13 +23,6 @@ public class HandlerTablePagePropertyViewPart extends AbstractSinglePageSectionB
 
   public static final String SECTION_ID_FILTER = "section.jaxws.filter";
   public static final String SECTION_ID_LINKS = "section.jaxws.links";
-
-  private IScoutBundle m_bundle;
-
-  @Override
-  protected void init() {
-    m_bundle = getPage().getScoutBundle();
-  }
 
   @Override
   protected void createSections() {
@@ -46,8 +38,7 @@ public class HandlerTablePagePropertyViewPart extends AbstractSinglePageSectionB
 
       // QuickLink 'Create new Handler'
       HandlerNewWizardAction action = new HandlerNewWizardAction();
-      action.init(m_bundle);
-      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), action, getFormToolkit());
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), action, getFormToolkit(), getPage());
       applyLayoutData(actionPresenter);
     }
     finally {

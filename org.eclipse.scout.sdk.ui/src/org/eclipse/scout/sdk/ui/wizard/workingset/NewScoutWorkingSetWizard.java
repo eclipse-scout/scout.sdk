@@ -29,22 +29,12 @@ public class NewScoutWorkingSetWizard extends Wizard implements INewWizard {
 
   private ScoutWorkingSetWizardPage m_page1;
 
-  public NewScoutWorkingSetWizard() {
-    setWindowTitle(Texts.get("NewScoutWorkingSet"));
-  }
-
-  @Override
-  public void addPages() {
-    super.addPages();
-    if (m_page1 == null) {
-      m_page1 = new ScoutWorkingSetWizardPage();
-    }
-    addPage(m_page1);
-  }
-
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
-    //nop
+    setWindowTitle(Texts.get("NewScoutWorkingSet"));
+
+    m_page1 = new ScoutWorkingSetWizardPage();
+    addPage(m_page1);
   }
 
   @Override

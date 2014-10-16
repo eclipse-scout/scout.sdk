@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.form
 import java.util.Set;
 
 import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.ITypeResolver;
@@ -31,6 +32,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchyResult;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
 
@@ -40,7 +42,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  * @author Andreas Hoegger
  * @since 1.0.8 11.09.2010
  */
-public class FormFieldTemplateTablePage extends AbstractPage {
+public class FormFieldTemplateTablePage extends AbstractPage implements ITypeResolver {
   private ICachedTypeHierarchyResult m_formFieldHierarchy;
 
   public FormFieldTemplateTablePage(IPage parent) {
@@ -68,7 +70,7 @@ public class FormFieldTemplateTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    Set<IType> resolveFormFieldTemplates = resolveFormFieldTemplates();
+    Set<IType> resolveFormFieldTemplates = getTypes();
     ITypeHierarchy localTypeHierarchy = TypeUtility.getLocalTypeHierarchy(resolveFormFieldTemplates);
     for (IType fieldTemplate : resolveFormFieldTemplates) {
       ITypePage nodePage = (ITypePage) FormFieldExtensionPoint.createNodePage(fieldTemplate, localTypeHierarchy);
@@ -79,33 +81,31 @@ public class FormFieldTemplateTablePage extends AbstractPage {
     }
   }
 
-  protected Set<IType> resolveFormFieldTemplates() {
+  @Override
+  public Set<IType> getTypes() {
     if (m_formFieldHierarchy == null) {
       IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
-      IScoutBundle workspaceBundle = getScoutBundle().getParentBundle(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
-      m_formFieldHierarchy = TypeUtility.getAbstractTypesOnClasspathHierarchy(iFormField, workspaceBundle.getJavaProject());
-      m_formFieldHierarchy.addHierarchyListener(getPageDirtyListener());
+      IScoutBundleFilter filter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(), ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+      IScoutBundle workspaceBundle = getScoutBundle().getParentBundle(filter, true);
+      if (workspaceBundle == null) {
+        workspaceBundle = getScoutBundle().getChildBundle(filter, getScoutBundle(), true);
+      }
+      if (workspaceBundle != null) {
+        m_formFieldHierarchy = TypeUtility.getAbstractTypesOnClasspathHierarchy(iFormField, workspaceBundle.getJavaProject());
+        m_formFieldHierarchy.addHierarchyListener(getPageDirtyListener());
+      }
     }
-    ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getPrimaryTypeFilter(), ScoutTypeFilters.getInScoutBundles(getScoutBundle()));
-    return m_formFieldHierarchy.getAllTypes(filter, TypeComparators.getTypeNameComparator());
+
+    if (m_formFieldHierarchy != null) {
+      ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getPrimaryTypeFilter(), ScoutTypeFilters.getInScoutBundles(getScoutBundle()));
+      return m_formFieldHierarchy.getAllTypes(filter, TypeComparators.getTypeNameComparator());
+    }
+    return CollectionUtility.hashSet();
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof TypeResolverFormDataAction) {
-      ((TypeResolverFormDataAction) menu).init(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          return resolveFormFieldTemplates();
-        }
-      }, getScoutBundle());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TypeResolverFormDataAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TypeResolverFormDataAction.class);
   }
 
   @Override

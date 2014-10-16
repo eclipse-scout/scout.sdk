@@ -10,18 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.rap.ui.internal;
 
+import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.MessageDialogWithToggle;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.resource.CompositeImageDescriptor;
 import org.eclipse.jface.resource.ImageDescriptor;
-import org.eclipse.jface.wizard.WizardDialog;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.rap.ui.SdkRapIcons;
-import org.eclipse.scout.sdk.rap.ui.internal.wizard.var.RapTargetNewWizard;
+import org.eclipse.scout.sdk.rap.ui.internal.action.RapTargetNewAction;
 import org.eclipse.scout.sdk.rap.var.RapTargetVariable;
 import org.eclipse.scout.sdk.rap.var.RapTargetVariableListenerAdapter;
+import org.eclipse.scout.sdk.ui.extensions.executor.ExecutorExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.ImageRegistry;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.eclipse.swt.SWT;
@@ -218,8 +220,7 @@ public class ScoutSdkRapUI extends AbstractUIPlugin implements SdkRapIcons {
                 Texts.get("EmptyRapTargetVarFoundMsg", RapTargetVariable.RAP_TARGET_KEY, targetFile.getLocation().toOSString()), Texts.get("DoNotShowAgain"),
                 false, m_store, RAP_TARGET_VARIABLE_EMPTY_MSG);
             if (msgbox.getReturnCode() == IDialogConstants.YES_ID) {
-              WizardDialog dialog = new WizardDialog(display.getActiveShell(), new RapTargetNewWizard());
-              dialog.open();
+              ExecutorExtensionPoint.getExecutorFor(RapTargetNewAction.class.getName()).run(display.getActiveShell(), new StructuredSelection(targetFile), new ExecutionEvent());
             }
           }
         });

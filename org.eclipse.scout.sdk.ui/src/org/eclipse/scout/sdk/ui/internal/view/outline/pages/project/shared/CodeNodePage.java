@@ -72,23 +72,8 @@ public class CodeNodePage extends AbstractScoutTypePage {
     }
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, CodeNewAction.class, DeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof CodeNewAction) {
-      ((CodeNewAction) menu).setType(getType());
-    }
-    else if (menu instanceof DeleteAction) {
-      DeleteAction action = (DeleteAction) menu;
-      action.addType(getType());
-      action.setName(getName());
-      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CodeRemove));
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TypeRenameAction.class, ShowJavaReferencesAction.class, CodeNewAction.class, DeleteAction.class);
   }
 }

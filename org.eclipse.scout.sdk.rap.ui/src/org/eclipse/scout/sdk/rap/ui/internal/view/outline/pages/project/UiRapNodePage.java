@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.rap.ui.internal.view.outline.pages.project;
 
+import java.util.Set;
+
 import org.eclipse.scout.sdk.rap.ui.internal.action.RapTargetNewAction;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.AbstractBundleNodeTablePage;
@@ -33,9 +35,8 @@ public class UiRapNodePage extends AbstractBundleNodeTablePage {
     return "org.eclipse.scout.sdk.page.UiRapNodePage";
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{RapTargetNewAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(RapTargetNewAction.class);
   }
 }

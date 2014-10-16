@@ -89,8 +89,7 @@ public class SourceFormatOperation implements IOperation {
         // create full range
         range = new SourceRange(0, document.getLength());
       }
-      // XXX check which code is calling this with a type source
-      CodeFormatter formatter = ToolFactory.createCodeFormatter(getProject().getJavaProject().getOptions(true));
+      CodeFormatter formatter = ToolFactory.createCodeFormatter(getProject().getOptions(true));
       int kind = CodeFormatter.F_INCLUDE_COMMENTS | CodeFormatter.K_UNKNOWN;
       TextEdit te = formatter.format(kind, document.get(), range.getOffset(), range.getLength(), m_indent, ResourceUtility.getLineSeparator(getDocument()));
       if (te != null) {

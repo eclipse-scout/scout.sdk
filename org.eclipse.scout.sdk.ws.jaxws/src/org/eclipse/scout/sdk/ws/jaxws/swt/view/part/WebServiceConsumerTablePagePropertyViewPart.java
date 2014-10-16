@@ -21,7 +21,6 @@ import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.ConsumerNewWizardAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction.FileExtensionType;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceConsumerTablePage;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.presenter.ActionPresenter;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
@@ -59,17 +58,17 @@ public class WebServiceConsumerTablePagePropertyViewPart extends AbstractSingleP
       IFile buildJaxWsFile = ResourceFactory.getBuildJaxWsResource(m_bundle).getFile();
       if (JaxWsSdkUtility.exists(buildJaxWsFile)) {
         FileOpenAction b = new FileOpenAction();
-        b.init(buildJaxWsFile, buildJaxWsFile.getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile), FileExtensionType.XML);
+        b.setLinkText(buildJaxWsFile.getName());
+        b.setImage(JaxWsSdk.getImageDescriptor(JaxWsIcons.BuildJaxWsXmlFile));
         b.setToolTip(Texts.get("JaxWsBuildDescriptor"));
-        ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit());
+        ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), b, getFormToolkit(), buildJaxWsFile);
         applyLayoutData(actionPresenter);
         sectionLinksVisible = true;
       }
 
       // QuickLink 'Create new Webservice consumer'
       ConsumerNewWizardAction action = new ConsumerNewWizardAction();
-      action.init(m_bundle);
-      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_CONSUMER).getSectionClient(), action, getFormToolkit());
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_CONSUMER).getSectionClient(), action, getFormToolkit(), getPage());
       applyLayoutData(actionPresenter);
 
       getSection(SECTION_ID_LINKS).setVisible(sectionLinksVisible);

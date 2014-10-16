@@ -50,7 +50,6 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
-import org.eclipse.ui.INewWizard;
 import org.eclipse.ui.IWorkbench;
 
 /**
@@ -59,7 +58,7 @@ import org.eclipse.ui.IWorkbench;
  * @author Andreas Hoegger
  * @since 1.0.8 05.11.2009
  */
-public class FormNewWizard extends AbstractServiceWizard implements INewWizard {
+public class FormNewWizard extends AbstractServiceWizard {
   public static final String TYPE_FORM = "form";
   public static final String TYPE_FORM_BUTTON_OK = "okbutton";
   public static final String TYPE_FORM_BUTTON_CANCEL = "cancelbutton";
@@ -80,18 +79,11 @@ public class FormNewWizard extends AbstractServiceWizard implements INewWizard {
   private ITreeNode m_locationPageRoot;
   private FormStackNewOperation m_operation;
 
-  public FormNewWizard() {
-    this(null);
-  }
-
-  public FormNewWizard(IScoutBundle clientBundle) {
-    setWindowTitle(Texts.get("NewForm"));
-    m_clientBundle = clientBundle;
-  }
-
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
-    m_clientBundle = UiUtility.getScoutBundleFromSelection(selection, m_clientBundle, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
+    setWindowTitle(Texts.get("NewForm"));
+
+    m_clientBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
     String pck = UiUtility.getPackageSuffix(selection);
 
     m_formPage = new FormNewWizardPage(m_clientBundle);

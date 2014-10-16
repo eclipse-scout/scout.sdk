@@ -20,38 +20,49 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.SharedContextBeanPropertyNewOperation;
+import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.shared.SharedContextPropertyTablePage;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
 import org.eclipse.scout.sdk.util.type.MethodFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.ui.IWorkbench;
 
 public class SharedContextBeanPropertyNewWizard extends AbstractWorkspaceWizard {
 
-  public SharedContextBeanPropertyNewWizard(IType serverSessionType, IType clientSessionType) {
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
     setWindowTitle(Texts.get("NewSharedContextProperty"));
-    IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{serverSessionType.getJavaProject()});
-    BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(searchScope, serverSessionType);
 
-    SharedContextBeanPropertyNewOperation op = new SharedContextBeanPropertyNewOperation(serverSessionType, clientSessionType);
-    beanPropertyWizardPage.setOperation(op);
+    Object firstElement = selection.getFirstElement();
+    if (firstElement instanceof SharedContextPropertyTablePage) {
+      SharedContextPropertyTablePage sel = (SharedContextPropertyTablePage) firstElement;
+      IType serverSessionType = sel.getServerSession();
+      IType clientSessionType = sel.getClientSession();
 
-    // find all used method names
-    HashSet<String> notAllowedMethodNames = new HashSet<String>();
-    collectMethodNames(serverSessionType, notAllowedMethodNames);
-    if (clientSessionType != null) {
-      collectMethodNames(clientSessionType, notAllowedMethodNames);
+      IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{serverSessionType.getJavaProject()});
+      BeanPropertyNewWizardPage beanPropertyWizardPage = new BeanPropertyNewWizardPage(searchScope, serverSessionType);
+
+      SharedContextBeanPropertyNewOperation op = new SharedContextBeanPropertyNewOperation(serverSessionType, clientSessionType);
+      beanPropertyWizardPage.setOperation(op);
+
+      // find all used method names
+      HashSet<String> notAllowedMethodNames = new HashSet<String>();
+      collectMethodNames(serverSessionType, notAllowedMethodNames);
+      if (clientSessionType != null) {
+        collectMethodNames(clientSessionType, notAllowedMethodNames);
+      }
+      beanPropertyWizardPage.setNotAllowedNames(notAllowedMethodNames);
+      addPage(beanPropertyWizardPage);
     }
-    beanPropertyWizardPage.setNotAllowedNames(notAllowedMethodNames);
-    addPage(beanPropertyWizardPage);
   }
 
   protected void collectMethodNames(IType type, Set<String> collector) {
-    IMethodFilter filter = MethodFilters.getMultiMethodFilter(
-        MethodFilters.getFlagsFilter(Flags.AccPublic),
-        MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is).*")));
-
+    IMethodFilter filter = MethodFilters.getMultiMethodFilter(MethodFilters.getFlagsFilter(Flags.AccPublic), MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is).*")));
     for (IMethod m : TypeUtility.getMethods(type, filter)) {
       collector.add(m.getElementName());
     }

@@ -36,7 +36,7 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeFilters;
  * @author Matthias Villiger
  * @since 4.1.0 22.07.2014
  */
-public class PageTemplateTablePage extends AbstractPage {
+public class PageTemplateTablePage extends AbstractPage implements ITypeResolver {
   private ICachedTypeHierarchy m_pageHierarchy;
 
   public PageTemplateTablePage(IPage parent) {
@@ -64,10 +64,11 @@ public class PageTemplateTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    PageNodePageHelper.createRepresentationFor(this, resolvePageTemplates(), m_pageHierarchy);
+    PageNodePageHelper.createRepresentationFor(this, getTypes(), m_pageHierarchy);
   }
 
-  protected Set<IType> resolvePageTemplates() {
+  @Override
+  public Set<IType> getTypes() {
     IType iPage = TypeUtility.getType(IRuntimeClasses.IPage);
     if (m_pageHierarchy == null) {
       m_pageHierarchy = TypeUtility.getPrimaryTypeHierarchy(iPage);
@@ -82,21 +83,8 @@ public class PageTemplateTablePage extends AbstractPage {
   }
 
   @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    if (menu instanceof TypeResolverPageDataAction) {
-      ((TypeResolverPageDataAction) menu).init(new ITypeResolver() {
-        @Override
-        public Set<IType> getTypes() {
-          return resolvePageTemplates();
-        }
-      }, getScoutBundle());
-    }
-  }
-
-  @SuppressWarnings("unchecked")
-  @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TypeResolverPageDataAction.class};
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TypeResolverPageDataAction.class);
   }
 
   @Override

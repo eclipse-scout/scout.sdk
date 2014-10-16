@@ -10,35 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.beanproperty.BeanPropertyNewWizard;
 
 /**
  *
  */
-public class BeanPropertyNewAction extends AbstractWizardAction {
-
-  private IType m_type;
+public class BeanPropertyNewAction extends AbstractScoutHandler {
 
   public BeanPropertyNewAction() {
     super(Texts.get("Action_newTypeX", "Property Bean"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableAdd), null, false, Category.NEW);
-  }
-
-  public void setType(IType t) {
-    m_type = t;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return isEditable(m_type);
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new BeanPropertyNewWizard(m_type);
   }
 }

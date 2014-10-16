@@ -46,8 +46,7 @@ public class CredentialValidationStrategyTablePagePropertyViewPart extends Abstr
 
       // QuickLink 'Create new credential validation strategy'
       CredentialValidationStrategyNewAction action = new CredentialValidationStrategyNewAction();
-      action.init(m_bundle);
-      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_CREDENTIAL_VALIDATION_STRATEGIES).getSectionClient(), action, getFormToolkit());
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_CREDENTIAL_VALIDATION_STRATEGIES).getSectionClient(), action, getFormToolkit(), m_bundle);
       applyLayoutData(actionPresenter);
     }
     finally {

@@ -71,4 +71,12 @@
             class="org.eclipse.scout.sdk.rap.ui.internal.action.RapTargetNewAction">
       </contextMenu>
    </extension>
+   <extension
+         point="org.eclipse.scout.sdk.ui.executor">
+      <executor
+            class="org.eclipse.scout.sdk.rap.ui.internal.executor.RapTargetNewExecutor"
+            id="org.eclipse.scout.sdk.rap.ui.internal.action.RapTargetNewAction"
+            order="0">
+      </executor>
+   </extension>
 </plugin>

@@ -10,25 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
-import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.page.PageWithTableNodePage;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.Texts;
+import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 
 /**
  *
  */
-public class WellformScoutTypeAction extends WellformAction {
-
-  private IType m_type;
-
-  @Override
-  public boolean isVisible() {
-    return isEditable(m_type) && !TypeUtility.exists(TypeUtility.getMethod(m_type, PageWithTableNodePage.METHOD_EXEC_CREATE_CHILD_PAGE));
-  }
-
-  public void setType(IType type) {
-    m_type = type;
-    setOperation(new WellformScoutTypeOperation(type, true));
+public class WellformScoutTypeAction extends AbstractScoutHandler {
+  public WellformScoutTypeAction() {
+    super(Texts.get("Wellform"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolLoading), null, false, Category.UDPATE);
   }
 }

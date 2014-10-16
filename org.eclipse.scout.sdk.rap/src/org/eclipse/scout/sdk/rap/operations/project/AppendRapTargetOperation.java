@@ -40,7 +40,7 @@ public class AppendRapTargetOperation extends AbstractScoutProjectNewOperation {
 
   private static final String RAP_TARGET_VARIABLE = "${" + RapTargetVariable.RAP_TARGET_KEY + "}";
 
-  public static enum TARGET_STRATEGY {
+  public static enum TargetStrategy {
     STRATEGY_REMOTE,
     STRATEGY_LOCAL_EXISTING,
     STRATEGY_LOCAL_EXTRACT,
@@ -63,7 +63,7 @@ public class AppendRapTargetOperation extends AbstractScoutProjectNewOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LATER) {
+    if (getTargetStrategy() == TargetStrategy.STRATEGY_LATER) {
       // no target set
       return;
     }
@@ -74,19 +74,19 @@ public class AppendRapTargetOperation extends AbstractScoutProjectNewOperation {
       return;
     }
 
-    if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXISTING) {
+    if (getTargetStrategy() == TargetStrategy.STRATEGY_LOCAL_EXISTING) {
       // set the environment variable
       RapTargetVariable.get().setValue(getLocalTargetFolder());
 
       // existing local RAP target
       TargetPlatformUtility.addDirectoryToTarget(targetFile, new String[]{RAP_TARGET_VARIABLE});
     }
-    else if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_REMOTE) {
+    else if (getTargetStrategy() == TargetStrategy.STRATEGY_REMOTE) {
       // remote target using the update sites
       TargetPlatformUtility.addInstallableUnitToTarget(targetFile, SCOUT_RT_RAP_FEATURE, null, UPDATE_SITE_URL_MARS, monitor);
       TargetPlatformUtility.addInstallableUnitToTarget(targetFile, ECLIPSE_RT_RAP_FEATURE, null, UPDATE_SITE_URL_MARS, monitor);
     }
-    else if (getTargetStrategy() == TARGET_STRATEGY.STRATEGY_LOCAL_EXTRACT) {
+    else if (getTargetStrategy() == TargetStrategy.STRATEGY_LOCAL_EXTRACT) {
       // locally extracted, new target from rap.target plug-in
       ScoutRapTargetCreationOperation scoutRapTargetExtractOp = new ScoutRapTargetCreationOperation();
       scoutRapTargetExtractOp.setDestinationDirectory(new File(getExtractTargetFolder()));
@@ -110,7 +110,7 @@ public class AppendRapTargetOperation extends AbstractScoutProjectNewOperation {
     return getProperties().getProperty(PROP_EXTRACT_TARGET_FOLDER, String.class);
   }
 
-  protected TARGET_STRATEGY getTargetStrategy() {
-    return getProperties().getProperty(PROP_TARGET_STRATEGY, TARGET_STRATEGY.class);
+  protected TargetStrategy getTargetStrategy() {
+    return getProperties().getProperty(PROP_TARGET_STRATEGY, TargetStrategy.class);
   }
 }

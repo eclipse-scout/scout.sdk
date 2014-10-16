@@ -19,15 +19,21 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.BeanPropertyNewOperation;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.type.MethodFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.ui.IWorkbench;
 
 public class BeanPropertyNewWizard extends AbstractWorkspaceWizard {
 
-  public BeanPropertyNewWizard(IType declaringType) {
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    IType declaringType = UiUtility.getTypeFromSelection(selection);
+
     setWindowTitle(Texts.get("NewProperty"));
     IJavaSearchScope createJavaSearchScope = SearchEngine.createJavaSearchScope(new IJavaElement[]{declaringType.getJavaProject()});
 

@@ -10,38 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.form.FormNewWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.ui.PlatformUI;
 
 /**
  *
  */
-public class FormNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_scoutBundle;
+public class FormNewAction extends AbstractScoutHandler {
 
   public FormNewAction() {
     super(Texts.get("Action_newTypeX", "Form"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.FormAdd), null, false, Category.NEW);
-  }
-
-  public void setScoutBundle(IScoutBundle scoutBundle) {
-    m_scoutBundle = scoutBundle;
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    FormNewWizard fnw = new FormNewWizard(m_scoutBundle);
-    fnw.init(PlatformUI.getWorkbench(), null);
-    return fnw;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_scoutBundle.isBinary();
   }
 }

@@ -10,27 +10,27 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action;
 
-import java.util.Iterator;
+import java.util.Collections;
 
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.core.expressions.EvaluationContext;
+import org.eclipse.core.expressions.IEvaluationContext;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.ISelection;
-import org.eclipse.jface.viewers.ISelectionProvider;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.scout.commons.holders.BooleanHolder;
+import org.eclipse.scout.sdk.ui.extensions.executor.ExecutorExtensionPoint;
+import org.eclipse.scout.sdk.ui.extensions.executor.IExecutor;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
-import org.eclipse.ui.IWorkbenchPage;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.IWorkbenchPartSite;
-import org.eclipse.ui.IWorkbenchWindow;
+import org.eclipse.ui.ISources;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.handlers.HandlerUtil;
+import org.eclipse.ui.services.IEvaluationService;
 
 public abstract class AbstractScoutHandler extends AbstractHandler implements IScoutHandler {
   private String m_label;
@@ -39,6 +39,7 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
   private String m_keyStroke;
   private boolean m_multiSelectSupported;
   private Category m_category;
+  private final IExecutor m_menuExecutor;
 
   public AbstractScoutHandler(String label) {
     this(label, null);
@@ -67,10 +68,18 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
     else {
       m_category = cat;
     }
+    m_menuExecutor = ExecutorExtensionPoint.getExecutorFor(getExecutorId());
+  }
+
+  protected String getExecutorId() {
+    return getClass().getName();
   }
 
   /**
-   * use {@link IScoutHandler#isActive()} to calculate and return the enabled/disabled state of the context menu.
+   * use {@link IScoutHandler#isActive(IStructuredSelection))} to calculate and return the enabled/disabled state of the
+   * context menu.
+   *
+   * @see IScoutHandler#isActive(IStructuredSelection)
    */
   @Override
   public final void setEnabled(Object evaluationContext) {
@@ -81,9 +90,10 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
   }
 
   /**
-   * use {@link IScoutHandler#isActive()} to calculate and return the enabled/disabled state of the context menu.
+   * use {@link IScoutHandler#isActive(IStructuredSelection))} to calculate and return the enabled/disabled state of the
+   * context menu.
    *
-   * @return if the current context menu is active or not.
+   * @see IScoutHandler#isActive(IStructuredSelection)
    */
   @Override
   public final boolean isEnabled() {
@@ -91,7 +101,10 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
   }
 
   /**
-   * use {@link IScoutHandler#isActive()} to calculate and return the enabled/disabled state of the context menu.
+   * use {@link IScoutHandler#isActive(IStructuredSelection))} to calculate and return the enabled/disabled state of the
+   * context menu.
+   *
+   * @see IScoutHandler#isActive(IStructuredSelection)
    */
   @Override
   protected final void setBaseEnabled(boolean state) {
@@ -99,13 +112,13 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
   }
 
   @Override
-  public boolean isActive() {
+  public boolean isActive(IStructuredSelection selection) {
     return true;
   }
 
   @Override
-  public boolean isVisible() {
-    return true;
+  public final boolean isVisible(IStructuredSelection selection) {
+    return m_menuExecutor.canRun(selection);
   }
 
   @Override
@@ -175,60 +188,66 @@ public abstract class AbstractScoutHandler extends AbstractHandler implements IS
 
   @Override
   public final String getId() {
-    return this.getClass().getName();
+    return getClass().getName();
   }
 
-  private ISelection getCurrentSelection() {
-    IWorkbenchWindow workbenchWindow = ScoutSdkUi.getWorkbenchWindow();
-    if (workbenchWindow != null) {
-      IWorkbenchPage activePage = workbenchWindow.getActivePage();
-      if (activePage != null) {
-        IWorkbenchPart activePart = activePage.getActivePart();
-        if (activePart != null) {
-          IWorkbenchPartSite site = activePart.getSite();
-          if (site != null) {
-            ISelectionProvider selectionProvider = site.getSelectionProvider();
-            if (selectionProvider != null) {
-              return selectionProvider.getSelection();
-            }
-          }
-        }
+  public static void exec(Shell shell, IScoutHandler action, Object... args) {
+    ExecutionEvent event = createEvent(shell, args);
+    IStructuredSelection selection = (IStructuredSelection) HandlerUtil.getCurrentSelection(event);
+    if (action.isVisible(selection) && action.isActive(selection)) {
+      try {
+        action.execute(event);
+      }
+      catch (ExecutionException e1) {
+        ScoutSdkUi.logError("Unable to execute action. ", e1);
       }
     }
-    return null;
   }
 
-  @SuppressWarnings("unchecked")
+  public static ExecutionEvent createEvent(Shell shell, IStructuredSelection sel) {
+    IEvaluationContext parent = null;
+    IEvaluationService esrvc = (IEvaluationService) PlatformUI.getWorkbench().getService(IEvaluationService.class);
+    if (esrvc != null) {
+      parent = esrvc.getCurrentState();
+    }
+
+    EvaluationContext ctx = new EvaluationContext(parent, sel);
+    ctx.setAllowPluginActivation(true);
+    ctx.addVariable(ISources.ACTIVE_CURRENT_SELECTION_NAME, sel);
+    ctx.addVariable(ISources.ACTIVE_SHELL_NAME, shell);
+    ExecutionEvent event = new ExecutionEvent(null, Collections.EMPTY_MAP, null, ctx);
+    return event;
+  }
+
+  public static ExecutionEvent createEvent(Shell shell, Object... args) {
+    return createEvent(shell, new StructuredSelection(args));
+  }
+
   @Override
   public final Object execute(ExecutionEvent event) throws ExecutionException {
-    ISelection sel = getCurrentSelection();
+
+    ISelection sel = HandlerUtil.getCurrentSelection(event);
+
+    // get selection
+    IStructuredSelection selection = null;
     if (sel instanceof IStructuredSelection) {
-      IStructuredSelection selection = (IStructuredSelection) sel;
-      IPage[] selectedPages = new IPage[selection.size()];
+      selection = (IStructuredSelection) sel;
+    }
+    else {
+      selection = StructuredSelection.EMPTY;
+    }
 
-      // iterator can only contain IPage's. this is ensured by the MenuVisibilityTester class
-      Iterator<IPage> it = selection.iterator();
-      int index = 0;
-      while (it.hasNext()) {
-        selectedPages[index++] = it.next();
+    // get shell
+    Shell shell = HandlerUtil.getActiveShell(event);
+    if (shell == null) {
+      shell = ScoutSdkUi.getShell();
+    }
+    if (shell == null) {
+      Display display = Display.getDefault();
+      if (display != null) {
+        shell = display.getActiveShell();
       }
-
-      return execute(ScoutSdkUi.getShell(), selectedPages, event);
     }
-    return null;
-  }
-
-  @Override
-  public abstract Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException;
-
-  protected boolean isEditable(IJavaElement element) {
-    if (!TypeUtility.exists(element)) {
-      return false;
-    }
-    if (element.isReadOnly()) {
-      return false;
-    }
-    IScoutBundle b = ScoutTypeUtility.getScoutBundle(element);
-    return b != null && !b.isBinary();
+    return m_menuExecutor.run(shell, selection, event);
   }
 }

@@ -10,12 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.wizard;
 
+import java.util.Set;
+
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.operation.util.wellform.WellformScoutTypeOperation;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction;
-import org.eclipse.scout.sdk.ui.action.WellformAction;
+import org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction;
 import org.eclipse.scout.sdk.ui.action.delete.DeleteAction;
 import org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -58,25 +58,8 @@ public class WizardNodePage extends AbstractScoutTypePage {
     return false;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
-  public Class<? extends IScoutHandler>[] getSupportedMenuActions() {
-    return new Class[]{TypeRenameAction.class, ShowJavaReferencesAction.class, WellformAction.class, DeleteAction.class};
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof WellformAction) {
-      WellformAction action = (WellformAction) menu;
-      action.setLabel(Texts.get("WellformWizard"));
-      action.init(getScoutBundle(), getType());
-      action.setOperation(new WellformScoutTypeOperation(getType(), true));
-    }
-    else if (menu instanceof DeleteAction) {
-      DeleteAction action = (DeleteAction) menu;
-      action.addType(getType());
-      action.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.WizardRemove));
-    }
+  public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
+    return newSet(TypeRenameAction.class, ShowJavaReferencesAction.class, WellformScoutTypeAction.class, DeleteAction.class);
   }
 }

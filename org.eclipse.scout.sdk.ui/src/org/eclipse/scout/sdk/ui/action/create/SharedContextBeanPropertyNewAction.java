@@ -10,37 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.beanproperty.SharedContextBeanPropertyNewWizard;
 
 /**
  *
  */
-public class SharedContextBeanPropertyNewAction extends AbstractWizardAction {
-
-  private IType m_serverSession;
-  private IType m_clientSession;
+public class SharedContextBeanPropertyNewAction extends AbstractScoutHandler {
 
   public SharedContextBeanPropertyNewAction() {
     super(Texts.get("Action_newTypeX", "Shared Context Property"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.VariableAdd), null, false, Category.NEW);
-  }
-
-  public void init(IType serverSession, IType clientSession) {
-    m_serverSession = serverSession;
-    m_clientSession = clientSession;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return isEditable(m_clientSession) && isEditable(m_serverSession);
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new SharedContextBeanPropertyNewWizard(m_serverSession, m_clientSession);
   }
 }

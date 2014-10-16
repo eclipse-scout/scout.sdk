@@ -10,35 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.wizard.permission.PermissionNewWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
 /**
  *
  */
-public class PermissionNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_bundle;
+public class PermissionNewAction extends AbstractScoutHandler {
 
   public PermissionNewAction() {
     super(Texts.get("Action_newTypeX", "Permission"), ScoutSdkUi.getImageDescriptor(ScoutSdkUi.PermissionAdd), null, false, Category.NEW);
-  }
-
-  public void setScoutBundle(IScoutBundle b) {
-    m_bundle = b;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new PermissionNewWizard(m_bundle);
   }
 }

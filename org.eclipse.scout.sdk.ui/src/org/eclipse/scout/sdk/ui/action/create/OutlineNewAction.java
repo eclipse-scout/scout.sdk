@@ -10,43 +10,17 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.action.create;
 
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.ui.action.AbstractWizardAction;
-import org.eclipse.scout.sdk.ui.wizard.outline.OutlineNewWizard;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
+import org.eclipse.scout.sdk.ui.action.AbstractScoutHandler;
 
 /**
  *
  */
-public class OutlineNewAction extends AbstractWizardAction {
-
-  private IScoutBundle m_bundle;
-  private IType m_type;
+public class OutlineNewAction extends AbstractScoutHandler {
 
   public OutlineNewAction() {
     super(Texts.get("Action_newTypeX", "Outline"), JavaUI.getSharedImages().getImageDescriptor(ISharedImages.IMG_OBJS_CLASS), null, false, Category.NEW);
-  }
-
-  public void init(IScoutBundle b) {
-    m_bundle = b;
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  public void init(IScoutBundle b, IType t) {
-    m_bundle = b;
-    m_type = t;
-  }
-
-  @Override
-  protected IWizard getNewWizardInstance() {
-    return new OutlineNewWizard(m_bundle, m_type);
   }
 }

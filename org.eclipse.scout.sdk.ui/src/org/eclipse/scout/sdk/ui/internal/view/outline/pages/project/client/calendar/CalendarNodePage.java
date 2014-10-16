@@ -11,8 +11,6 @@
 package org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.calendar;
 
 import org.eclipse.jdt.core.IType;
-import org.eclipse.scout.sdk.ui.action.IScoutHandler;
-import org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -39,13 +37,5 @@ public class CalendarNodePage extends AbstractScoutTypePage {
   @Override
   public boolean isFolder() {
     return false;
-  }
-
-  @Override
-  public void prepareMenuAction(IScoutHandler menu) {
-    super.prepareMenuAction(menu);
-    if (menu instanceof FormFieldDeleteAction) {
-      menu.setImage(ScoutSdkUi.getImageDescriptor(ScoutSdkUi.CalendarRemove));
-    }
   }
 }

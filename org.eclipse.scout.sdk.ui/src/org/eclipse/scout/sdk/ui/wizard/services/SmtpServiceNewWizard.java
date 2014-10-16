@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -34,6 +35,7 @@ import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.fields.bundletree.NodeFilters;
 import org.eclipse.scout.sdk.ui.fields.bundletree.TreeUtility;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
+import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractServiceWizard;
 import org.eclipse.scout.sdk.ui.wizard.BundleTreeWizardPage;
 import org.eclipse.scout.sdk.ui.wizard.IStatusProvider;
@@ -46,18 +48,24 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleFilter;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.dnd.DND;
+import org.eclipse.ui.IWorkbench;
 
 public class SmtpServiceNewWizard extends AbstractServiceWizard {
   public static final String TYPE_SERVICE_IMPLEMENTATION = "svcImpl";
   public static final String TYPE_SERVICE_REG_SERVER = "svcServerReg";
 
-  private final ServiceNewWizardPage m_serviceNewWizardPage;
-  private final BundleTreeWizardPage m_locationWizardPage;
-  private final ITreeNode m_locationWizardPageRoot;
+  private ServiceNewWizardPage m_serviceNewWizardPage;
+  private BundleTreeWizardPage m_locationWizardPage;
+  private ITreeNode m_locationWizardPageRoot;
   private ServiceNewOperation m_operation;
 
-  public SmtpServiceNewWizard(IScoutBundle serverBundle) {
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection selection) {
+    super.init(workbench, selection);
+
     setWindowTitle(Texts.get("NewSmtpService"));
+
+    IScoutBundle serverBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER));
     IType smtpServiceType = RuntimeClasses.getSuperType(IRuntimeClasses.ISMTPService, serverBundle.getJavaProject());
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_serviceNewWizardPage = new ServiceNewWizardPage(Texts.get("NewSmtpService"), Texts.get("CreateANewSMTPService"),
@@ -74,7 +82,6 @@ public class SmtpServiceNewWizard extends AbstractServiceWizard {
     m_locationWizardPage.addCheckSelectionListener(new P_SessionCheckListener());
     addPage(m_locationWizardPage);
 
-    // init
     m_serviceNewWizardPage.setSuperType(smtpServiceType);
   }
 

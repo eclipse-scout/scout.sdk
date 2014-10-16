@@ -33,7 +33,6 @@ import org.eclipse.scout.sdk.ws.jaxws.Texts;
 import org.eclipse.scout.sdk.ws.jaxws.operation.AnnotationUpdateOperation;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction;
-import org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction.FileExtensionType;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.RepairAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.action.TypeOpenAction;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
@@ -104,8 +103,7 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
       createSection(SECTION_ID_REPAIR, Texts.get("RepairRequired"), Texts.get("SectionRepairDescription"), false);
       getSection(SECTION_ID_REPAIR).setVisible(JaxWsSdk.getDefault().containsMarkerCommands(getPage().getMarkerGroupUUID()));
       RepairAction a = new RepairAction();
-      a.init(getPage().getMarkerGroupUUID(), m_bundle);
-      AbstractPresenter presenter = new ActionPresenter(getSection(SECTION_ID_REPAIR).getSectionClient(), a, getFormToolkit());
+      AbstractPresenter presenter = new ActionPresenter(getSection(SECTION_ID_REPAIR).getSectionClient(), a, getFormToolkit(), getPage());
       applyLayoutData(presenter);
 
       /*
@@ -254,9 +252,10 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
 
       // QuickLink 'Open sun-jaxws.xml'
       FileOpenAction a = new FileOpenAction();
-      a.init(ResourceFactory.getSunJaxWsResource(m_bundle).getFile(), ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName(), JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), FileExtensionType.XML);
+      a.setLinkText(ResourceFactory.getSunJaxWsResource(m_bundle).getFile().getName());
       a.setToolTip(Texts.get("JaxWsDeploymentDescriptor"));
-      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit());
+      a.setImage(JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile));
+      ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit(), ResourceFactory.getSunJaxWsResource(m_bundle).getFile());
       applyLayoutData(actionPresenter);
     }
     finally {
@@ -281,8 +280,8 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
 
     // QuickLink 'Open PortType'
     TypeOpenAction a = new TypeOpenAction();
-    a.init(wsProviderImplType);
-    ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit());
+    a.setLinkText(wsProviderImplType.getElementName());
+    ActionPresenter actionPresenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), a, getFormToolkit(), wsProviderImplType);
     applyLayoutData(actionPresenter);
 
     // QuickLink 'Open PortType Interface'
@@ -305,9 +304,9 @@ public class WebServiceProviderCodeFirstNodePagePropertyViewPart extends Abstrac
     }
 
     TypeOpenAction action = new TypeOpenAction();
-    action.init(portTypeInterfaceType);
+    action.setLinkText(portTypeInterfaceType.getElementName());
     action.setToolTip(Texts.get("JaxWsPortTypeInterface"));
-    ActionPresenter presenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), action, getFormToolkit());
+    ActionPresenter presenter = new ActionPresenter(getSection(SECTION_ID_LINKS).getSectionClient(), action, getFormToolkit(), portTypeInterfaceType);
     applyLayoutData(presenter);
   }
 

@@ -10,44 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ws.jaxws.swt.action;
 
-import org.eclipse.core.commands.ExecutionEvent;
-import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.ws.jaxws.Texts;
-import org.eclipse.scout.sdk.ws.jaxws.swt.dialog.ScoutWizardDialogEx;
-import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
-import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.WsProviderCodeFirstDeleteWizard;
-import org.eclipse.swt.widgets.Shell;
 
 public class WsProviderCodeFirstDeleteAction extends AbstractLinkAction {
 
-  private IScoutBundle m_bundle;
-  private SunJaxWsBean m_sunJaxWsBean;
-
   public WsProviderCodeFirstDeleteAction() {
     super("Delete...", ScoutSdkUi.getImageDescriptor(ScoutSdkUi.ToolRemove));
-  }
-
-  @Override
-  public boolean isVisible() {
-    return !m_bundle.isBinary();
-  }
-
-  public void init(IScoutBundle bundle, SunJaxWsBean sunJaxWsBean) {
-    setLabel(Texts.get("Action_deleteTypeX", "'" + sunJaxWsBean.getAlias() + "'"));
-    m_bundle = bundle;
-    m_sunJaxWsBean = sunJaxWsBean;
-  }
-
-  @Override
-  public Object execute(Shell shell, IPage[] selection, ExecutionEvent event) throws ExecutionException {
-    WsProviderCodeFirstDeleteWizard wizard = new WsProviderCodeFirstDeleteWizard();
-    wizard.setBundle(m_bundle);
-    wizard.setSunJaxWsBean(m_sunJaxWsBean);
-    ScoutWizardDialogEx wizardDialog = new ScoutWizardDialogEx(wizard);
-    wizardDialog.open();
-    return null;
   }
 }
