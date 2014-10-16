@@ -456,12 +456,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("PleaseChooseATargetPlatform"));
     }
 
-    // info that java8 is only available on Luna platform or newer.
     SimpleProposal p = (SimpleProposal) m_eclipseTargetPlatform.getSelectedProposal();
-    double javaVersion = JdtUtility.getExecEnvVersion(JdtUtility.getDefaultJvmExecutionEnvironment(null));
-    if (javaVersion >= 1.8 && Double.parseDouble(p.getData(PROP_PLATFORM_VERSION).toString()) < 4.4) {
-      return new Status(IStatus.WARNING, ScoutSdkUi.PLUGIN_ID, Texts.get("Java8FoundButCannotUse"));
-    }
 
     // info that current platform is used
     boolean keepCurrent = ((Boolean) p.getData(PROP_KEEP_CURRENT)).booleanValue();

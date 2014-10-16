@@ -104,7 +104,7 @@ public final class JdtUtility {
    *         target platform.
    * @see #getExecEnvVersion(String)
    */
-  public static String getDefaultJvmExecutionEnvironment(Version targetPlatformVersion) {
+  public static String getDefaultJvmExecutionEnvironment() {
     // defaults
     String execEnv = EXEC_ENV_PREFIX + MIN_JVM_VERSION;
     double execEnvVersion = getExecEnvVersion(execEnv);
@@ -116,19 +116,7 @@ public final class JdtUtility {
         if (env.isStrictlyCompatible(defaultVm)) {
           double envVersion = getExecEnvVersion(executionEnvId);
           if (envVersion > execEnvVersion) {
-            if (envVersion < 1.8) {
-              execEnv = executionEnvId; // take the newest supported (1.6 and 1.7 are supported on all platforms)
-            }
-            else if (Math.abs(1.8 - envVersion) < 0.0000001) {
-              // 1.8 is only supported on Luna or later platforms
-              if (targetPlatformVersion == null || PlatformVersionUtility.isLunaOrLater(targetPlatformVersion)) {
-                execEnv = executionEnvId; // take the newest
-              }
-              else {
-                // it is a JRE 1.8 but an eclipse older than Luna: reduce to 1.7 level
-                execEnv = EXEC_ENV_PREFIX + "1.7";
-              }
-            }
+            execEnv = executionEnvId; // take the newest
           }
         }
       }
