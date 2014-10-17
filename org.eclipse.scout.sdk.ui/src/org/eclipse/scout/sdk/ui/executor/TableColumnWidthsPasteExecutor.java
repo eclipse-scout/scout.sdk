@@ -22,7 +22,6 @@ import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.IOUtility;
@@ -134,8 +133,7 @@ public class TableColumnWidthsPasteExecutor extends AbstractExecutor {
       return map;
     }
     catch (Exception e) {
-      // no error log, because content could not be parsed
-      // just no processing afterwards
+      ScoutSdkUi.logError("Unable to parse column widths", e);
       return null;
     }
   }
@@ -186,9 +184,9 @@ public class TableColumnWidthsPasteExecutor extends AbstractExecutor {
       }
       return false;
     }
-    catch (JavaModelException e) {
+    catch (Exception e) {
       ScoutSdkUi.logError("Unable to get the identification constant from the scout class", e);
-      return true; // try to parse it anyway
+      return false;
     }
   }
 

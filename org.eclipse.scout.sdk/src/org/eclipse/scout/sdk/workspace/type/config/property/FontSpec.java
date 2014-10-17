@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.type.config.property;
 
-import org.eclipse.scout.commons.CompareUtility;
-
 /**
  * <h3>{@link FontSpec}</h3>
  *
@@ -86,34 +84,57 @@ public class FontSpec {
   }
 
   public boolean isDefault() {
-    return hashCode() == 12345;
+    return m_name == null && m_style == null && m_height == null;
 
-  }
-
-  @Override
-  public boolean equals(Object obj) {
-    if (!(obj instanceof FontSpec)) {
-      return false;
-    }
-    FontSpec fontSpec = (FontSpec) obj;
-    return CompareUtility.equals(fontSpec.getName(), getName())
-        && CompareUtility.equals(fontSpec.getStyle(), getStyle())
-        && CompareUtility.equals(fontSpec.getHeight(), getHeight());
   }
 
   @Override
   public int hashCode() {
-    int code = 12345;
-    if (getName() != null) {
-      code ^= getName().hashCode();
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_height == null) ? 0 : m_height.hashCode());
+    result = prime * result + ((m_name == null) ? 0 : m_name.hashCode());
+    result = prime * result + ((m_style == null) ? 0 : m_style.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
     }
-    if (getStyle() != null) {
-      code ^= getStyle().hashCode();
+    if (obj == null) {
+      return false;
     }
-    if (getHeight() != null) {
-      code ^= getHeight().hashCode();
+    if (!(obj instanceof FontSpec)) {
+      return false;
     }
-    return code;
+    FontSpec other = (FontSpec) obj;
+    if (m_height == null) {
+      if (other.m_height != null) {
+        return false;
+      }
+    }
+    else if (!m_height.equals(other.m_height)) {
+      return false;
+    }
+    if (m_name == null) {
+      if (other.m_name != null) {
+        return false;
+      }
+    }
+    else if (!m_name.equals(other.m_name)) {
+      return false;
+    }
+    if (m_style == null) {
+      if (other.m_style != null) {
+        return false;
+      }
+    }
+    else if (!m_style.equals(other.m_style)) {
+      return false;
+    }
+    return true;
   }
 
   @Override

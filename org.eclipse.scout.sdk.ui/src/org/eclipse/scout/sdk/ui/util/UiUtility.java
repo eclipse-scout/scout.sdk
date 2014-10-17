@@ -35,7 +35,6 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -330,15 +329,6 @@ public final class UiUtility {
       }
     }
 
-    // nothing in the selection. just choose one
-    Set<IScoutBundle> bundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getFilteredRootBundlesFilter(ScoutBundleFilters.getWorkspaceBundlesFilter()));
-    for (IScoutBundle root : bundles) {
-      IScoutBundle candidate = root.getChildBundle(filter, true);
-      if (candidate != null) {
-        return candidate;
-      }
-    }
-
     return null;
   }
 
@@ -428,14 +418,10 @@ public final class UiUtility {
           IJavaElement je = (IJavaElement) ad.getAdapter(IJavaElement.class);
           if (TypeUtility.exists(je)) {
             r = je.getResource();
-            if (!ResourceUtility.exists(r) && targetClass.isAssignableFrom(IScoutBundle.class)) {
-              // binary java element
-              result = (T) ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(je);
-            }
           }
         }
 
-        if (result == null && ResourceUtility.exists(r)) {
+        if (ResourceUtility.exists(r)) {
           // try to convert from a resource
           result = (T) r.getAdapter(targetClass);
         }

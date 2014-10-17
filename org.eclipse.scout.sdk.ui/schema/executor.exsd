@@ -6,7 +6,7 @@
          <meta.schema plugin="org.eclipse.scout.sdk.ui" id="executor" name="UI Action Exectutors"/>
       </appinfo>
       <documentation>
-         [Enter description of this extension point.]
+         Defines Executors for Scout Actions (IScoutHandler).
       </documentation>
    </annotation>
 
@@ -48,11 +48,16 @@
    </element>
 
    <element name="executor">
+      <annotation>
+         <documentation>
+            Defines an Executor for a Scout Action (IScoutHandler)
+         </documentation>
+      </annotation>
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The executor class. This class is being invoked by default when the IScoutHandler is prepared and executed.
                </documentation>
                <appinfo>
                   <meta.attribute kind="java" basedOn=":org.eclipse.scout.sdk.ui.executor.IExecutor"/>
@@ -62,21 +67,21 @@
          <attribute name="id" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The identifyer of the executor. This must match the executorId of the IScoutHandler
                </documentation>
             </annotation>
          </attribute>
          <attribute name="order" type="string" use="required">
             <annotation>
                <documentation>
-                  
+                  The priority of the executor. Only the executor with the highest order number can be active for each Id. Must be an integer value.
                </documentation>
             </annotation>
          </attribute>
          <attribute name="active" type="boolean">
             <annotation>
                <documentation>
-                  
+                  Describes if the extension is active or not.
                </documentation>
             </annotation>
          </attribute>
@@ -88,36 +93,12 @@
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         4.2
       </documentation>
    </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="examples"/>
-      </appinfo>
-      <documentation>
-         [Enter extension point usage example here.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="apiinfo"/>
-      </appinfo>
-      <documentation>
-         [Enter API information here.]
-      </documentation>
-   </annotation>
 
-   <annotation>
-      <appinfo>
-         <meta.section type="implementation"/>
-      </appinfo>
-      <documentation>
-         [Enter information about supplied implementation of this extension point.]
-      </documentation>
-   </annotation>
 
 
 </schema>

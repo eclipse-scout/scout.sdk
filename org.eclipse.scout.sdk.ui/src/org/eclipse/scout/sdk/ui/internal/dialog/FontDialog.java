@@ -54,7 +54,7 @@ import org.eclipse.swt.widgets.Text;
 public class FontDialog extends TitleAreaDialog {
 
   private SystemFonts m_fonts;
-  private FontSpec m_fontSpec;
+  private final FontSpec m_fontSpec;
   private FilteredTable m_fontNameTable;
   private FilteredTable m_fontStyleTable;
   private Button m_defaultFontStyleButton;
@@ -348,7 +348,7 @@ public class FontDialog extends TitleAreaDialog {
 
     @Override
     public Object[] getElements(Object inputElement) {
-      return m_fonts.getAllFontNames();
+      return m_fonts.getAllFontNames().toArray();
     }
 
     @Override
