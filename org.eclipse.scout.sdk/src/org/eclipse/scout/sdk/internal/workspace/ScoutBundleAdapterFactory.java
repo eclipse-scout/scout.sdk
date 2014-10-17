@@ -17,7 +17,14 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 
-public class ResourcesAdapterFactory implements IAdapterFactory {
+/**
+ * <h3>{@link ScoutBundleAdapterFactory}</h3> Factory which can adapt an {@link IResource} to {@link IJavaElement}s or
+ * {@link IScoutBundle}s and {@link IJavaElement}s to {@link IScoutBundle}s.
+ *
+ * @author Matthias Villiger
+ * @since 4.1.0 17.10.2014
+ */
+public class ScoutBundleAdapterFactory implements IAdapterFactory {
 
   @Override
   public Object getAdapter(Object adaptableObject, Class adapterType) {
@@ -30,6 +37,13 @@ public class ResourcesAdapterFactory implements IAdapterFactory {
       else if (IJavaElement.class.isAssignableFrom(adapterType)) {
         // convert IResource to IJavaElement
         return JavaCore.create(r);
+      }
+    }
+    else if (adaptableObject instanceof IJavaElement) {
+      IJavaElement el = (IJavaElement) adaptableObject;
+      if (IScoutBundle.class.isAssignableFrom(adapterType)) {
+        // convert IResource to IScoutBundle
+        return ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(el);
       }
     }
     return null;

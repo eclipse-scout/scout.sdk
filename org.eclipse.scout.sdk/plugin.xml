@@ -1054,12 +1054,19 @@
          point="org.eclipse.core.runtime.adapters">
       <factory
             adaptableType="org.eclipse.core.resources.IResource"
-            class="org.eclipse.scout.sdk.internal.workspace.ResourcesAdapterFactory">
+            class="org.eclipse.scout.sdk.internal.workspace.ScoutBundleAdapterFactory">
          <adapter
                type="org.eclipse.scout.sdk.workspace.IScoutBundle">
          </adapter>
          <adapter
                type="org.eclipse.jdt.core.IJavaElement">
+         </adapter>
+      </factory>
+      <factory
+            adaptableType="org.eclipse.jdt.core.IJavaElement"
+            class="org.eclipse.scout.sdk.internal.workspace.ScoutBundleAdapterFactory">
+         <adapter
+               type="org.eclipse.scout.sdk.workspace.IScoutBundle">
          </adapter>
       </factory>
    </extension>

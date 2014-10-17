@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.ui.executor;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
@@ -27,11 +26,9 @@ import org.eclipse.ui.PlatformUI;
 public abstract class AbstractWizardExecutor extends AbstractExecutor {
   @Override
   public final Object run(Shell shell, IStructuredSelection selection, ExecutionEvent event) {
-    IWizard newWizardInstance = getNewWizardInstance();
+    INewWizard newWizardInstance = getNewWizardInstance();
     if (newWizardInstance != null) {
-      if (newWizardInstance instanceof INewWizard) {
-        ((INewWizard) newWizardInstance).init(PlatformUI.getWorkbench(), selection);
-      }
+      newWizardInstance.init(PlatformUI.getWorkbench(), selection);
       ScoutWizardDialog wizardDialog = new ScoutWizardDialog(shell, newWizardInstance);
       wizardDialog.open();
     }

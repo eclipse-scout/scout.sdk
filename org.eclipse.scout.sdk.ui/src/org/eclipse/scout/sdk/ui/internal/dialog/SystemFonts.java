@@ -11,7 +11,11 @@
 package org.eclipse.scout.sdk.ui.internal.dialog;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -24,37 +28,39 @@ import org.eclipse.swt.graphics.FontData;
  * @since 1.0.8 17.11.2010
  */
 public class SystemFonts {
-  private HashMap<String /*fontname*/, ArrayList<FontData>> m_fonts;
+  private Map<String /*font name*/, List<FontData>> m_fonts;
 
   public SystemFonts(FontData[] fontData) {
-    m_fonts = new HashMap<String, ArrayList<FontData>>();
-    for (FontData d : fontData) {
-      ArrayList<FontData> set = m_fonts.get(d.getName());
-      if (set == null) {
-        set = new ArrayList<FontData>();
-        m_fonts.put(d.getName(), set);
+    m_fonts = new HashMap<String, List<FontData>>();
+    if (fontData != null) {
+      for (FontData d : fontData) {
+        List<FontData> set = m_fonts.get(d.getName());
+        if (set == null) {
+          set = new ArrayList<FontData>();
+          m_fonts.put(d.getName(), set);
+        }
+        set.add(d);
       }
-      set.add(d);
     }
   }
 
-  public String[] getAllFontNames() {
+  public Collection<String> getAllFontNames() {
     TreeMap<String, String> fontNames = new TreeMap<String, String>();
     for (String fontName : m_fonts.keySet()) {
       fontNames.put(fontName.toLowerCase(), fontName);
     }
-    return fontNames.values().toArray(new String[fontNames.size()]);
+    return fontNames.values();
   }
 
-  public Integer[] getFontStyles(String fontName) {
-    TreeSet<Integer> sizes = new TreeSet<Integer>();
-    ArrayList<FontData> set = m_fonts.get(fontName);
+  public Set<Integer> getFontStyles(String fontName) {
+    Set<Integer> sizes = new TreeSet<Integer>();
+    List<FontData> set = m_fonts.get(fontName);
     if (set != null) {
       for (FontData d : set) {
         sizes.add(d.getStyle());
       }
     }
-    return sizes.toArray(new Integer[sizes.size()]);
+    return sizes;
   }
 
 }

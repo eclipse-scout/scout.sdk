@@ -21,7 +21,25 @@ import org.eclipse.swt.widgets.Shell;
  * @since 4.1.0 08.10.2014
  */
 public interface IExecutor {
+  /**
+   * Specifies if {@link #run(Shell, IStructuredSelection, ExecutionEvent)} of this {@link IExecutor} can be called.
+   *
+   * @param selection
+   *          The {@link IStructuredSelection} which should be evaluated
+   * @return <code>true</code> if this {@link IExecutor} can be run. <code>false</code> otherwise.
+   */
   boolean canRun(IStructuredSelection selection);
 
+  /**
+   * Starts this {@link IExecutor}.
+   * 
+   * @param shell
+   *          The {@link Shell} to use for the UI.
+   * @param selection
+   *          The {@link IStructuredSelection} that was active when the {@link IExecutor} was invoked.
+   * @param event
+   *          An {@link ExecutionEvent} containing all the information about the current state of the application.
+   * @return the result of the execution. Reserved for future use, must be null.
+   */
   Object run(Shell shell, IStructuredSelection selection, ExecutionEvent event);
 }

@@ -62,4 +62,57 @@ public class ScoutStructuredSelection extends StructuredSelection {
   public void setContinueOperation(ContinueOperation continueOperation) {
     m_continueOperation = continueOperation;
   }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + ((m_continueOperation == null) ? 0 : m_continueOperation.hashCode());
+    result = prime * result + ((m_sibling == null) ? 0 : m_sibling.hashCode());
+    result = prime * result + ((m_superType == null) ? 0 : m_superType.hashCode());
+    result = prime * result + ((m_typeName == null) ? 0 : m_typeName.hashCode());
+    return result;
+  }
+
+  @Override
+  public boolean equals(Object obj) {
+    if (this == obj) {
+      return true;
+    }
+    if (!super.equals(obj)) {
+      return false;
+    }
+    if (!(obj instanceof ScoutStructuredSelection)) {
+      return false;
+    }
+    ScoutStructuredSelection other = (ScoutStructuredSelection) obj;
+    if (m_continueOperation != other.m_continueOperation) {
+      return false;
+    }
+    if (m_sibling == null) {
+      if (other.m_sibling != null) {
+        return false;
+      }
+    }
+    else if (!m_sibling.equals(other.m_sibling)) {
+      return false;
+    }
+    if (m_superType == null) {
+      if (other.m_superType != null) {
+        return false;
+      }
+    }
+    else if (!m_superType.equals(other.m_superType)) {
+      return false;
+    }
+    if (m_typeName == null) {
+      if (other.m_typeName != null) {
+        return false;
+      }
+    }
+    else if (!m_typeName.equals(other.m_typeName)) {
+      return false;
+    }
+    return true;
+  }
 }

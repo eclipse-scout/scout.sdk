@@ -41,14 +41,14 @@ public class HandlerAddExecutor extends AbstractExecutor {
 
   @Override
   public Object run(Shell shell, IStructuredSelection selection, ExecutionEvent event) {
-    SunJaxWsBean m_sunJaxWsBean = m_params.getSunJaxWsBean();
-    Element m_xmlHandlerChain = m_params.getXmlHandlerChain();
+    SunJaxWsBean sunJaxWsBean = m_params.getSunJaxWsBean();
+    Element xmlHandlerChain = m_params.getXmlHandlerChain();
 
-    Element xmlHandler = m_xmlHandlerChain.getOwnerDocument().createElement(m_sunJaxWsBean.toQualifiedName("handler"));
-    m_xmlHandlerChain.appendChild(xmlHandler);
+    Element xmlHandler = xmlHandlerChain.getOwnerDocument().createElement(sunJaxWsBean.toQualifiedName("handler"));
+    xmlHandlerChain.appendChild(xmlHandler);
 
     // persist
-    ResourceFactory.getSunJaxWsResource(m_params.getBundle()).storeXmlAsync(m_sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, m_sunJaxWsBean.getAlias());
+    ResourceFactory.getSunJaxWsResource(m_params.getBundle()).storeXmlAsync(sunJaxWsBean.getXml().getOwnerDocument(), IResourceListener.EVENT_SUNJAXWS_HANDLER_CHANGED, sunJaxWsBean.getAlias());
     return null;
   }
 
