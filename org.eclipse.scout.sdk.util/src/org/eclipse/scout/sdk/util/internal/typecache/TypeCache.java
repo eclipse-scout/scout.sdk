@@ -43,6 +43,7 @@ public final class TypeCache implements ITypeCache {
 
   private static final TypeCache INSTANCE = new TypeCache();
   private static final Comparator<IType> COMPARATOR = new P_TypeMatchComparator();
+  private static final String PDE_BUNDLE_POOL_IDENTIFYER = ".bundle_pool";
 
   private final Map<String, TreeSet<IType>> m_cache;
   private final P_ResourceListener m_resourceChangeListener;
@@ -141,10 +142,6 @@ public final class TypeCache implements ITypeCache {
   private TreeSet<IType> resolveType(final String fqn) throws CoreException {
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
     String fastPat = Signature.getSimpleName(fqn);
-    if (!StringUtility.hasText(fastPat)) {
-      return null;
-    }
-
     final TreeSet<IType> matchList = new TreeSet<IType>(COMPARATOR);
     new SearchEngine().search(
         SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH),
@@ -188,14 +185,32 @@ public final class TypeCache implements ITypeCache {
         }
       }
 
+      String path1 = buildPath(o1);
+      String path2 = buildPath(o2);
+
+      // favor types in the bundle_pool
+      boolean p1 = path1.contains(PDE_BUNDLE_POOL_IDENTIFYER);
+      boolean p2 = path2.contains(PDE_BUNDLE_POOL_IDENTIFYER);
+      if (p1 != p2) {
+        if (p1) {
+          return -1;
+        }
+        else {
+          return 1;
+        }
+      }
+
       // descending (newest first)
-      return buildPath(o2).compareTo(buildPath(o1));
+      return path2.compareTo(path1);
     }
 
     private String buildPath(IType t) {
-      StringBuilder sb = new StringBuilder();
-      sb.append(t.getFullyQualifiedName());
-      sb.append(t.getPath().toPortableString());
+      String fqn = t.getFullyQualifiedName();
+      String portableString = t.getPath().toPortableString();
+
+      StringBuilder sb = new StringBuilder(fqn.length() + portableString.length());
+      sb.append(fqn);
+      sb.append(portableString);
       return sb.toString();
     }
   }
