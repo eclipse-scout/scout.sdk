@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.scout.sdk"
       label="%featureName"
-      version="4.1.0.qualifier"
+      version="4.2.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.scout.sdk"
       license-feature="org.eclipse.license"
@@ -29,7 +29,7 @@
       <import feature="org.eclipse.pde" version="3.7.2" match="greaterOrEqual"/>
       <import feature="org.eclipse.platform" version="3.7.2" match="greaterOrEqual"/>
       <import feature="org.eclipse.jdt" version="3.7.2" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.scout.commons" version="4.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.scout.commons" version="4.2.0" match="greaterOrEqual"/>
       <import plugin="javax.wsdl" version="1.5.1" match="greaterOrEqual"/>
    </requires>
 
