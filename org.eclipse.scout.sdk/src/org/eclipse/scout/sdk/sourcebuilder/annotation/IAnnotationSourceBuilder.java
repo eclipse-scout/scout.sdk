@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.sourcebuilder.annotation;
 
+import java.util.List;
+
 import org.eclipse.scout.sdk.sourcebuilder.ISourceBuilder;
 
 /**
@@ -40,6 +42,6 @@ public interface IAnnotationSourceBuilder extends ISourceBuilder {
   /**
    * @return
    */
-  String[] getParameters();
+  List<String> getParameters();
 
 }

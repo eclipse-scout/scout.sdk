@@ -36,6 +36,7 @@ import org.eclipse.scout.sdk.ui.fields.javacode.EntityTextField;
 import org.eclipse.scout.sdk.ui.fields.proposal.ContentProposalEvent;
 import org.eclipse.scout.sdk.ui.fields.proposal.IProposalAdapterListener;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
+import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.AbstractJavaElementContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.javaelement.JavaElementAbstractTypeContentProvider;
 import org.eclipse.scout.sdk.ui.fields.proposal.signature.SignatureSubTypeProposalProvider;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -65,24 +66,24 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   private final IType iCodeType = TypeUtility.getType(IRuntimeClasses.ICodeType);
 
-  private String m_nextCodeId;
-  private String m_nextCodeIdSource;
-  private INlsEntry m_nlsName;
-  private String m_typeName;
-  private String m_packageName;
-  private IType m_superType;
-  private IType m_defaultCodeType;
-  private String m_genericSignature;
-  private String m_genericCodeIdSignature;
-  private List<ITypeParameter> m_superTypeParameters;
+  protected String m_nextCodeId;
+  protected String m_nextCodeIdSource;
+  protected INlsEntry m_nlsName;
+  protected String m_typeName;
+  protected String m_packageName;
+  protected IType m_superType;
+  protected IType m_defaultCodeType;
+  protected String m_genericSignature;
+  protected String m_genericCodeIdSignature;
+  protected List<ITypeParameter> m_superTypeParameters;
 
-  private CodeIdField m_nextCodeIdField;
-  private ProposalTextField m_nlsNameField;
-  private StyledTextField m_typeNameField;
-  private EntityTextField m_entityField;
-  private ProposalTextField m_superTypeField;
-  private ProposalTextField m_genericTypeField;
-  private ProposalTextField m_genericCodeIdField;
+  protected CodeIdField m_nextCodeIdField;
+  protected ProposalTextField m_nlsNameField;
+  protected StyledTextField m_typeNameField;
+  protected EntityTextField m_entityField;
+  protected ProposalTextField m_superTypeField;
+  protected ProposalTextField m_genericTypeField;
+  protected ProposalTextField m_genericCodeIdField;
 
   // process members
   private final IScoutBundle m_sharedBundle;
@@ -108,7 +109,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    int labelColWidthPercent = 35;
+    int labelColWidthPercent = 20;
     final boolean isEnabled = getSharedBundle() != null;
     m_nextCodeIdField = new CodeIdField(parent, getSharedBundle(), labelColWidthPercent);
     m_nextCodeIdField.addModifyListener(new ModifyListener() {
@@ -173,15 +174,14 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
       m_entityField.setEnabled(isEnabled);
     }
 
-    final JavaElementAbstractTypeContentProvider contentProvider = new JavaElementAbstractTypeContentProvider(iCodeType, ScoutUtility.getJavaProject(getSharedBundle()), (ITypeFilter) null, m_defaultCodeType);
-    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), contentProvider, labelColWidthPercent);
+    m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("SuperType"), createSuperTypeContentProvider(), labelColWidthPercent);
 
-    final SignatureSubTypeProposalProvider genericProposalProvider = new SignatureSubTypeProposalProvider(getGenericTypeOfSuperClass(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_TYPE_ID), getSharedBundle().getJavaProject());
+    final SignatureSubTypeProposalProvider genericProposalProvider = new SignatureSubTypeProposalProvider(getGenericTypeOfSuperClass(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_TYPE_ID), ScoutUtility.getJavaProject(getSharedBundle()));
     m_genericTypeField = getFieldToolkit().createProposalField(parent, Texts.get("CodeTypeIdDatatype"), ProposalTextField.STYLE_DEFAULT, labelColWidthPercent);
     m_genericTypeField.setContentProvider(genericProposalProvider);
     m_genericTypeField.setLabelProvider(genericProposalProvider.getLabelProvider());
 
-    final SignatureSubTypeProposalProvider genericCodeIdProposalProvider = new SignatureSubTypeProposalProvider(getGenericTypeOfSuperClass(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID), getSharedBundle().getJavaProject());
+    final SignatureSubTypeProposalProvider genericCodeIdProposalProvider = new SignatureSubTypeProposalProvider(getGenericTypeOfSuperClass(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID), ScoutUtility.getJavaProject(getSharedBundle()));
     m_genericCodeIdField = getFieldToolkit().createProposalField(parent, Texts.get("DatatypeOfNestedCodeIds"), ProposalTextField.STYLE_DEFAULT, labelColWidthPercent);
     m_genericCodeIdField.setContentProvider(genericCodeIdProposalProvider);
     m_genericCodeIdField.setLabelProvider(genericCodeIdProposalProvider.getLabelProvider());
@@ -241,6 +241,8 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
         }
       }
     });
+    m_genericCodeIdField.setEnabled(isEnabled);
+    m_genericTypeField.setEnabled(isEnabled);
 
     // layout
     parent.setLayout(new GridLayout(1, true));
@@ -251,6 +253,10 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_superTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_genericTypeField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
     m_genericCodeIdField.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
+  }
+
+  protected AbstractJavaElementContentProvider createSuperTypeContentProvider() {
+    return new JavaElementAbstractTypeContentProvider(iCodeType, ScoutUtility.getJavaProject(getSharedBundle()), (ITypeFilter) null, m_defaultCodeType);
   }
 
   /**
@@ -295,7 +301,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getGenericSignature() != null) {
       StringBuilder fqn = new StringBuilder(getSuperType().getFullyQualifiedName());
       if (m_superTypeParameters.size() > 0) {
-        fqn.append('<');
+        fqn.append(Signature.C_GENERIC_START);
         fqn.append(Signature.toString(getGenericSignature()));
         if (m_superTypeParameters.size() > 1) {
           fqn.append(", ");
@@ -303,12 +309,12 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
           if (m_superTypeParameters.size() > 2) {
             fqn.append(", ");
             fqn.append(IRuntimeClasses.ICode);
-            fqn.append('<');
+            fqn.append(Signature.C_GENERIC_START);
             fqn.append(Signature.toString(getGenericCodeIdSignature()));
-            fqn.append('>');
+            fqn.append(Signature.C_GENERIC_END);
           }
         }
-        fqn.append('>');
+        fqn.append(Signature.C_GENERIC_END);
         sig = SignatureCache.createTypeSignature(fqn.toString());
       }
       else {
@@ -333,12 +339,12 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     multiStatus.add(getStatusSuperType());
     multiStatus.add(getStatusTargetPackge());
 
-    if (m_genericTypeField != null && !m_genericTypeField.isDisposed() && m_genericTypeField.isEnabled()) {
+    if (m_genericTypeField != null && !m_genericTypeField.isDisposed() && m_genericTypeField.isEnabled() && m_genericTypeField.isVisible()) {
       multiStatus.add(getStatusGenericType());
       multiStatus.add(getStatusGenericTypeToSuperClass(getGenericSignature(), IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_TYPE_ID));
     }
 
-    if (m_genericCodeIdField != null && !m_genericCodeIdField.isDisposed() && m_genericCodeIdField.isEnabled()) {
+    if (m_genericCodeIdField != null && !m_genericCodeIdField.isDisposed() && m_genericCodeIdField.isEnabled() && m_genericCodeIdField.isVisible()) {
       multiStatus.add(getStatusGenericCodeIdType());
       multiStatus.add(getStatusGenericTypeToSuperClass(getGenericCodeIdSignature(), IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
     }
@@ -397,15 +403,17 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   protected IType getGenericTypeOfSuperClass(String typeArgName) {
-    try {
-      ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
-      String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.ICodeType, typeArgName);
-      if (typeParamSig != null) {
-        return TypeUtility.getTypeBySignature(typeParamSig);
+    if (TypeUtility.exists(getSuperType())) {
+      try {
+        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
+        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.ICodeType, typeArgName);
+        if (typeParamSig != null) {
+          return TypeUtility.getTypeBySignature(typeParamSig);
+        }
       }
-    }
-    catch (CoreException e) {
-      ScoutSdkUi.logError(e);
+      catch (CoreException e) {
+        ScoutSdkUi.logError(e);
+      }
     }
     return null;
   }

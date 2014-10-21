@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.util.internal.typecache;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -59,7 +58,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
       | IJavaElementDelta.F_ANNOTATIONS
       | IJavaElementDelta.F_AST_AFFECTED;
 
-  private static final JavaResourceChangedEmitter INSTANCE = new JavaResourceChangedEmitter(HierarchyCache.getInstance());
+  private static final JavaResourceChangedEmitter INSTANCE = new JavaResourceChangedEmitter(HierarchyCache.getInstance(), TypeCache.getInstance());
 
   private final P_JavaElementChangedListener m_javaElementListener;
   private final Object m_resourceLock;
@@ -69,6 +68,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   private final Map<IType, List<WeakReference<IJavaResourceChangedListener>>> m_methodChangedListeners;
   private final Object m_eventListenerLock;
   private final HierarchyCache m_hierarchyCache;
+  private final TypeCache m_typeCache;
   private final IBufferChangedListener m_sourceBufferListener;
 
   public static ICompilationUnit[] getPendingWorkingCopies() {
@@ -77,7 +77,8 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     }
   }
 
-  private JavaResourceChangedEmitter(HierarchyCache hierarchyCache) {
+  private JavaResourceChangedEmitter(HierarchyCache hierarchyCache, TypeCache typeCache) {
+    m_typeCache = typeCache;
     m_hierarchyCache = hierarchyCache;
     m_eventCollectors = new HashMap<ICompilationUnit, JdtEventCollector>();
     m_eventListenerLock = new Object();
@@ -117,7 +118,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     synchronized (m_eventListenerLock) {
       List<WeakReference<IJavaResourceChangedListener>> listenerList = m_innerTypeChangedListeners.get(type);
       if (listenerList == null) {
-        listenerList = new ArrayList<WeakReference<IJavaResourceChangedListener>>();
+        listenerList = new LinkedList<WeakReference<IJavaResourceChangedListener>>();
         m_innerTypeChangedListeners.put(type, listenerList);
       }
       listenerList.add(new WeakReference<IJavaResourceChangedListener>(listener));
@@ -147,7 +148,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
     synchronized (m_eventListenerLock) {
       List<WeakReference<IJavaResourceChangedListener>> listenerList = m_methodChangedListeners.get(type);
       if (listenerList == null) {
-        listenerList = new ArrayList<WeakReference<IJavaResourceChangedListener>>();
+        listenerList = new LinkedList<WeakReference<IJavaResourceChangedListener>>();
         m_methodChangedListeners.put(type, listenerList);
       }
       listenerList.add(new WeakReference<IJavaResourceChangedListener>(listener));
@@ -330,10 +331,10 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   }
 
   private void fireEvent(JdtEvent e) {
-    // first notify hierarchies which could be used by other listeners
-    if (m_hierarchyCache != null) {
-      m_hierarchyCache.elementChanged(e);
-    }
+    // first notify our caches which could be used by other listeners
+    m_typeCache.elementChanged(e);
+    m_hierarchyCache.elementChanged(e);
+
     for (IJavaResourceChangedListener l : m_eventListeners.getListeners(IJavaResourceChangedListener.class)) {
       try {
         l.handleEvent(e);

@@ -157,9 +157,7 @@ public final class JdtUtility {
         if (name.equals(p.getMemberName())) {
           Object val = p.getValue();
           if (val != null) {
-            if (p.getValueKind() == IMemberValuePair.K_CHAR || p.getValueKind() == IMemberValuePair.K_STRING) {
-              return "" + val;
-            }
+            return "" + val;
           }
         }
       }

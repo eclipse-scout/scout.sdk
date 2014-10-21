@@ -31,5 +31,4 @@ public class NlsFolder implements INlsFolder {
   public int getType() {
     return m_type;
   }
-
 }

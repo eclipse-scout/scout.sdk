@@ -126,7 +126,7 @@ public final class RuntimeBundles {
     }
   }
 
-  public static Integer parseOrder(String order) {
+  private static Integer parseOrder(String order) {
     try {
       return Integer.parseInt(order);
     }

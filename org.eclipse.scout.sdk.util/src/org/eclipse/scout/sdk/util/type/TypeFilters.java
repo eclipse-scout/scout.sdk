@@ -80,6 +80,18 @@ public class TypeFilters {
       }
     }
   };
+  private static final ITypeFilter NO_SURROUNDING_CONTEXT_TYPE_FILTER = new ITypeFilter() {
+    @Override
+    public boolean accept(IType type) {
+      try {
+        return type != null && !type.isAnonymous() && (type.getDeclaringType() == null || Flags.isStatic(type.getFlags()));
+      }
+      catch (JavaModelException e) {
+        SdkUtilActivator.logWarning("could not evalutate flags of type '" + type.getFullyQualifiedName() + "'.", e);
+        return false;
+      }
+    }
+  };
 
   protected TypeFilters() {
   }
@@ -292,6 +304,16 @@ public class TypeFilters {
       }
     }
     return getNotInTypes(excludedSet);
+  }
+
+  /**
+   * Returns an {@link ITypeFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}.<br>
+   * More formally: Accepts all {@link IType}s that are either static or primary types (= have no declaring type).
+   *
+   * @return an {@link ITypeFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}.
+   */
+  public static ITypeFilter getNoSurroundingContextTypeFilter() {
+    return NO_SURROUNDING_CONTEXT_TYPE_FILTER;
   }
 
   public static ITypeFilter getNotInTypes(final Set<IType> excludedTypes) {

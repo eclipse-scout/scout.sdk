@@ -180,7 +180,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
         source.append(validator.getTypeName(outlinesTableFieldTableSignature)).append(" table = getOutlinesTableField().getTable();").append(lineDelimiter);
         String listTypeName = validator.getTypeName(SignatureCache.createTypeSignature(List.class.getName()));
         String outlineTypeName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.IOutline));
-        source.append(listTypeName).append('<').append(outlineTypeName).append("> outlines = getDesktop().getAvailableOutlines();").append(lineDelimiter);
+        source.append(listTypeName).append(Signature.C_GENERIC_START).append(outlineTypeName).append(Signature.C_GENERIC_END).append(" outlines = getDesktop().getAvailableOutlines();").append(lineDelimiter);
         source.append("for (").append(outlineTypeName).append(" outline : outlines) {").append(lineDelimiter);
         source.append("if (outline.isVisible() && outline.getRootNode() != null) {").append(lineDelimiter);
         source.append(validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.ITableRow))).append(" row = table.createRow(new Object[]{outline, outline.getTitle()});").append(lineDelimiter);
@@ -284,7 +284,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     ITypeSourceBuilder outlinesTableFieldBuilder = new TypeSourceBuilder(OUTLINE_TABLE_FIELD_NAME);
     String genericTableFqn = new StringBuilder(mainBoxFqn).append('.').append(outlinesTableFieldBuilder.getElementName()).append('.').append(tableBuilder.getElementName()).toString();
     outlinesTableFieldBuilder.setFlags(Flags.AccPublic);
-    outlinesTableFieldBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.ITableField, mobileClient) + "<" + genericTableFqn.toString() + ">"));
+    outlinesTableFieldBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.ITableField, mobileClient) + Signature.C_GENERIC_START + genericTableFqn.toString() + Signature.C_GENERIC_END));
     outlinesTableFieldBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
 
     // method getConfiguredLabelVisible
@@ -361,7 +361,7 @@ public class OutlineTemplateHomeFormCreateOperation extends AbstractScoutProject
     outlineColumnBuilder.setFlags(Flags.AccPublic);
     IType superType = RuntimeClasses.getSuperType(IRuntimeClasses.IColumn, mobileClient);
     if (TypeUtility.isGenericType(superType)) {
-      outlineColumnBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName() + "<" + IRuntimeClasses.IOutline + ">"));
+      outlineColumnBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName() + Signature.C_GENERIC_START + IRuntimeClasses.IOutline + Signature.C_GENERIC_END));
     }
     else {
       outlineColumnBuilder.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName()));

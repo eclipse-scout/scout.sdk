@@ -35,6 +35,9 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
 
+  public static final String ID_FIELD_NAME = "ID";
+  public static final String GET_ID_METHOD_NAME = "getId";
+
   private String m_nextCodeId;
   private INlsEntry m_nlsEntry;
 
@@ -63,8 +66,9 @@ public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // serial version UID
     addFieldSourceBuilder(FieldSourceBuilderFactory.createSerialVersionUidBuilder());
+
     // field ID
-    FieldSourceBuilder idFieldBuilder = new FieldSourceBuilder("ID") {
+    FieldSourceBuilder idFieldBuilder = new FieldSourceBuilder(ID_FIELD_NAME) {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         super.createSource(source, lineDelimiter, ownerProject, validator);
@@ -73,7 +77,6 @@ public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
         }
       }
     };
-
     if (StringUtility.isNullOrEmpty(getNextCodeId())) {
       idFieldBuilder.setValue("null");
     }
@@ -83,17 +86,10 @@ public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
     idFieldBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesFieldCommentBuilder());
     idFieldBuilder.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
 
-    IMethodSourceBuilder getIdSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(getSourceBuilder(), "getId");
+    IMethodSourceBuilder getIdSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(getSourceBuilder(), GET_ID_METHOD_NAME);
     getIdSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return ID;"));
-
     idFieldBuilder.setSignature(getIdSourceBuilder.getReturnTypeSignature());
     addFieldSourceBuilder(idFieldBuilder);
-    // constructor
-    IMethodSourceBuilder constructorSourceBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
-    constructorSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
-    constructorSourceBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
-    constructorSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorSourceBuilder), constructorSourceBuilder);
 
     // nls
     if (getNlsEntry() != null) {
@@ -101,11 +97,21 @@ public class CodeTypeNewOperation extends PrimaryTypeNewOperation {
       nlsSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createNlsEntryReferenceBody(getNlsEntry()));
       addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodGetConfiguredKey(nlsSourceBuilder), nlsSourceBuilder);
     }
-    // get id method
 
+    // get id method
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getIdSourceBuilder), getIdSourceBuilder);
 
+    addConstructorSourceBuilders();
+
     super.run(monitor, workingCopyManager);
+  }
+
+  protected void addConstructorSourceBuilders() {
+    IMethodSourceBuilder constructorSourceBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
+    constructorSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
+    constructorSourceBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
+    constructorSourceBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("super();"));
+    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorSourceBuilder), constructorSourceBuilder);
   }
 
   public void setNextCodeId(String nextCodeId) {

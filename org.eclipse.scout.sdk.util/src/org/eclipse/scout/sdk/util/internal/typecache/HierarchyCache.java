@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.internal.typecache;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +53,7 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   public synchronized List<ICacheableTypeHierarchyResult> getAllCachedHierarchies() {
-    return CollectionUtility.arrayList(m_cachedHierarchyResults.values());
+    return getHierarchiesSafe();
   }
 
   @Override
@@ -109,6 +108,11 @@ public final class HierarchyCache implements IHierarchyCache {
     m_cachedHierarchyResults.remove(type);
   }
 
+  synchronized void replaceCachedHierarchy(Object oldKey, Object newKey, ICacheableTypeHierarchyResult hierarchyToAdd) {
+    m_cachedHierarchyResults.remove(oldKey);
+    m_cachedHierarchyResults.put(newKey, hierarchyToAdd);
+  }
+
   @Override
   public ITypeHierarchy getLocalTypeHierarchy(IRegion region) {
     try {
@@ -135,7 +139,8 @@ public final class HierarchyCache implements IHierarchyCache {
 
   @Override
   public synchronized void invalidateAll() {
-    for (ICacheableTypeHierarchyResult h : m_cachedHierarchyResults.values()) {
+    List<ICacheableTypeHierarchyResult> hierarchies = getHierarchiesSafe(); // get a copy to prevent ConcurrentModificationException
+    for (ICacheableTypeHierarchyResult h : hierarchies) {
       if (h.isCreated()) {
         h.invalidate();
       }
@@ -143,7 +148,7 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   private synchronized List<ICacheableTypeHierarchyResult> getHierarchiesSafe() {
-    return new ArrayList<ICacheableTypeHierarchyResult>(m_cachedHierarchyResults.values());
+    return CollectionUtility.arrayList(m_cachedHierarchyResults.values());
   }
 
   private void handleTypeChange(IType t, ITypeHierarchy superTypeHierarchy) {

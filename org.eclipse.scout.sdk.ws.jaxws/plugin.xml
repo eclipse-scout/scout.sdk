@@ -208,108 +208,87 @@
          point="org.eclipse.scout.sdk.ui.executor">
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.AuthenticationHandlerNewWizardExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.AuthenticationHandlerNewWizardAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.AuthenticationHandlerNewWizardAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.BindingFileNewExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.BindingFileNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.BindingFileNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.BuildPropertiesEditExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.BuildPropertiesEditAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.BuildPropertiesEditAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.CleanupPhantomJarFileExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.CleanupPhantomJarFileAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.CleanupPhantomJarFileAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.ConsumerNewWizardExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.ConsumerNewWizardAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.ConsumerNewWizardAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.CredentialValidationStrategyNewExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.CredentialValidationStrategyNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.CredentialValidationStrategyNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.FileOpenExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.FileOpenAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.HandlerAddExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerAddAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerAddAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.HandlerChainFilterEditExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainFilterEditAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainFilterEditAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.HandlerChainNewExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.HandlerChainRemoveExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainRemoveAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerChainRemoveAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.HandlerNewWizardExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerNewWizardAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.HandlerNewWizardAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.JaxWsAliasChangeWizardExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.JaxWsAliasChangeWizardAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.JaxWsAliasChangeWizardAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.ProviderNewWizardExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.ProviderNewWizardAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.ProviderNewWizardAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.RepairExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.RepairAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.RepairAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.SessionFactoryNewExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.SessionFactoryNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.SessionFactoryNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.StubRebuildExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.StubRebuildAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.StubRebuildAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.TypeOpenExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.TypeOpenAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.TypeOpenAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.WsConsumerDeleteExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsConsumerDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsConsumerDeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.WsProviderCodeFirstDeleteExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderCodeFirstDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderCodeFirstDeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ws.jaxws.executor.WsProviderDeleteExecutor"
-            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ws.jaxws.swt.action.WsProviderDeleteAction">
       </executor>
    </extension>
 </plugin>

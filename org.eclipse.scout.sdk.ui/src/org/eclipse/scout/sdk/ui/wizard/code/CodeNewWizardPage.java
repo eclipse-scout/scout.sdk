@@ -183,12 +183,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
         try {
           setStateChanging(true);
           m_superType = (IType) event.proposal;
-          if (TypeUtility.isGenericType(getSuperType())) {
-            m_genericTypeField.setEnabled(true);
-          }
-          else {
-            m_genericTypeField.setEnabled(false);
-          }
+          m_genericTypeField.setEnabled(TypeUtility.isGenericType(getSuperType()));
 
           IType genericTypeOfSuperClass = getGenericTypeOfSuperClass();
           if (TypeUtility.exists(genericTypeOfSuperClass)) {
@@ -275,7 +270,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
     op.setTypeName(getTypeName());
     String sig = null;
     if (getGenericSignature() != null && TypeUtility.isGenericType(getSuperType())) {
-      sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
+      sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName() + Signature.C_GENERIC_START + Signature.toString(getGenericSignature()) + Signature.C_GENERIC_END);
     }
     else {
       sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName());

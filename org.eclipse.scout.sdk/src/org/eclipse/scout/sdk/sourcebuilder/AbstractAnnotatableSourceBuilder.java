@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.sourcebuilder;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -33,8 +35,8 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
 
   private int m_flags;
 
-  private List<IAnnotationSourceBuilder> m_annotationSourceBuilders;
-  private Map<CompositeObject, IAnnotationSourceBuilder> m_sortedAnnotationSourceBuilders;
+  private final List<IAnnotationSourceBuilder> m_annotationSourceBuilders;
+  private final Map<CompositeObject, IAnnotationSourceBuilder> m_sortedAnnotationSourceBuilders;
 
   public AbstractAnnotatableSourceBuilder(String elementName) {
     super(elementName);
@@ -50,11 +52,35 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
   }
 
   protected void createAnnotations(StringBuilder sourceBuilder, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-    for (IAnnotationSourceBuilder annotationOp : getAnnotationSourceBuilders()) {
-      if (annotationOp != null) {
-        // use as source builder
-        annotationOp.createSource(sourceBuilder, lineDelimiter, ownerProject, validator);
+    List<IAnnotationSourceBuilder> asbs = getAnnotationSourceBuilders();
+    if (m_sortedAnnotationSourceBuilders.isEmpty()) {
+      // unsorted list: use length of source as order
+      List<StringBuilder> annotSrc = new ArrayList<StringBuilder>(asbs.size());
+      for (IAnnotationSourceBuilder sb : asbs) {
+        if (sb != null) {
+          StringBuilder src = new StringBuilder();
+          sb.createSource(src, lineDelimiter, ownerProject, validator);
+          annotSrc.add(src);
+        }
+      }
+      Collections.sort(annotSrc, new Comparator<StringBuilder>() {
+        @Override
+        public int compare(StringBuilder o1, StringBuilder o2) {
+          return Integer.valueOf(o1.length()).compareTo(Integer.valueOf(o2.length()));
+        }
+      });
+
+      for (StringBuilder sb : annotSrc) {
+        sourceBuilder.append(sb);
         sourceBuilder.append(lineDelimiter);
+      }
+    }
+    else {
+      for (IAnnotationSourceBuilder sb : asbs) {
+        if (sb != null) {
+          sb.createSource(sourceBuilder, lineDelimiter, ownerProject, validator);
+          sourceBuilder.append(lineDelimiter);
+        }
       }
     }
   }

@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -77,9 +78,9 @@ public class PlannerFieldNewOperation implements IOperation {
     if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractPlannerField)) {
       // super type sig
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
-      superTypeSigBuilder.append("<").append(getTypeName()).append(".").append(SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE).append(",");
+      superTypeSigBuilder.append(Signature.C_GENERIC_START).append(getTypeName()).append(".").append(SdkProperties.TYPE_NAME_PLANNERFIELD_TABLE).append(",");
       superTypeSigBuilder.append(getTypeName()).append(".").append(SdkProperties.TYPE_NAME_PLANNERFIELD_ACTIVITYMAP).append(",");
-      superTypeSigBuilder.append(Long.class.getName()).append(",").append(Long.class.getName()).append(">");
+      superTypeSigBuilder.append(Long.class.getName()).append(",").append(Long.class.getName()).append(Signature.C_GENERIC_END);
       newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
       createPlannerTable(newOp.getSourceBuilder(), monitor, workingCopyManager);
       createActivityMap(newOp.getSourceBuilder(), monitor, workingCopyManager);
@@ -137,8 +138,8 @@ public class PlannerFieldNewOperation implements IOperation {
         || CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractExtensibleActivityMap)) {
       // super type sig
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
-      superTypeSigBuilder.append('<').append(Long.class.getName()).append(',');
-      superTypeSigBuilder.append(Long.class.getName()).append('>');
+      superTypeSigBuilder.append(Signature.C_GENERIC_START).append(Long.class.getName()).append(',');
+      superTypeSigBuilder.append(Long.class.getName()).append(Signature.C_GENERIC_END);
       activityMapSuperTypeSig = SignatureCache.createTypeSignature(superTypeSigBuilder.toString());
     }
     activityMapBuilder.setSuperTypeSignature(activityMapSuperTypeSig);

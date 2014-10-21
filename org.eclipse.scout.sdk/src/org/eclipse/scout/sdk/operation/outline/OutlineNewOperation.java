@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -158,7 +159,7 @@ public class OutlineNewOperation extends PrimaryTypeNewOperation {
     String classRef = validator.getTypeName(SignatureCache.createTypeSignature(Class.class.getName()));
     String iOutlineRef = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.IOutline));
 
-    StringBuilder genericPart = new StringBuilder().append('<').append(classRef).append("<? extends ").append(iOutlineRef).append(">>");
+    StringBuilder genericPart = new StringBuilder().append(Signature.C_GENERIC_START).append(classRef).append(Signature.C_GENERIC_START).append("? extends ").append(iOutlineRef).append(Signature.C_GENERIC_END).append(Signature.C_GENERIC_END);
 
     source.append(listRef).append(genericPart).append(" outlines = ").append("new ").append(arrayListRef).append(genericPart).append("();").append(lineDelimiter);
     if (outlineTypes != null && outlineTypes.size() > 0) {

@@ -16,6 +16,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -103,7 +104,7 @@ public class WizardStepNewOperation implements IOperation {
       if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractWizardStep)) {
         // update generic in supertype signature
         StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
-        superTypeSigBuilder.append("<").append(getForm().getFullyQualifiedName()).append(">");
+        superTypeSigBuilder.append(Signature.C_GENERIC_START).append(getForm().getFullyQualifiedName()).append(Signature.C_GENERIC_END);
         wizardStepOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
         // execActivate method
         IMethodSourceBuilder execActivateBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(wizardStepOp.getSourceBuilder(), "execActivate");

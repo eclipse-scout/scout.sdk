@@ -81,7 +81,7 @@ public abstract class AbstractScoutTypePage extends AbstractPage implements ITyp
   @Override
   public int getQuality() {
     int quality = IMarker.SEVERITY_INFO;
-    if (getType().exists()) {
+    if (TypeUtility.exists(getType())) {
       quality = ScoutSeverityManager.getInstance().getSeverityOf(getType());
     }
     return quality;

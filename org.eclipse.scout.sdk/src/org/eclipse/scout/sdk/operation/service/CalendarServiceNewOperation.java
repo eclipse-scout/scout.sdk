@@ -54,7 +54,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     TypeSourceBuilder interfaceSourceBuilder = getInterfaceSourceBuilder();
     IMethodSourceBuilder interfaceGetItemsBuilder = new MethodSourceBuilder("getItems");
     interfaceGetItemsBuilder.setFlags(Flags.AccInterface);
-    interfaceGetItemsBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(Set.class.getName() + "<" + IRuntimeClasses.ICalendarItem + ">"));
+    interfaceGetItemsBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(Set.class.getName() + Signature.C_GENERIC_START + IRuntimeClasses.ICalendarItem + Signature.C_GENERIC_END));
     interfaceGetItemsBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
     interfaceGetItemsBuilder.addParameter(new MethodParameter("minDate", SignatureCache.createTypeSignature(Date.class.getName())));
     interfaceGetItemsBuilder.addParameter(new MethodParameter("maxDate", SignatureCache.createTypeSignature(Date.class.getName())));
@@ -65,7 +65,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     interfaceStoreItemsBuilder.setFlags(Flags.AccInterface);
     interfaceStoreItemsBuilder.setReturnTypeSignature(Signature.SIG_VOID);
     interfaceStoreItemsBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodCommentBuilder());
-    interfaceStoreItemsBuilder.addParameter(new MethodParameter("items", SignatureCache.createTypeSignature(Set.class.getName() + "<" + IRuntimeClasses.ICalendarItem + ">")));
+    interfaceStoreItemsBuilder.addParameter(new MethodParameter("items", SignatureCache.createTypeSignature(Set.class.getName() + Signature.C_GENERIC_START + IRuntimeClasses.ICalendarItem + Signature.C_GENERIC_END)));
     interfaceStoreItemsBuilder.addParameter(new MethodParameter("delta", Signature.SIG_BOOLEAN));
     interfaceStoreItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     interfaceSourceBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(interfaceStoreItemsBuilder), interfaceStoreItemsBuilder);
@@ -75,7 +75,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     IMethodSourceBuilder implementationGetItemsBuilder = new MethodSourceBuilder("getItems");
     implementationGetItemsBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
     implementationGetItemsBuilder.setFlags(Flags.AccPublic);
-    implementationGetItemsBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(Set.class.getName() + "<" + IRuntimeClasses.ICalendarItem + ">"));
+    implementationGetItemsBuilder.setReturnTypeSignature(SignatureCache.createTypeSignature(Set.class.getName() + Signature.C_GENERIC_START + IRuntimeClasses.ICalendarItem + Signature.C_GENERIC_END));
     implementationGetItemsBuilder.addParameter(new MethodParameter("minDate", SignatureCache.createTypeSignature(Date.class.getName())));
     implementationGetItemsBuilder.addParameter(new MethodParameter("maxDate", SignatureCache.createTypeSignature(Date.class.getName())));
     implementationGetItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
@@ -93,7 +93,7 @@ public class CalendarServiceNewOperation extends ServiceNewOperation {
     implementationStoreItemsBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
     implementationStoreItemsBuilder.setFlags(Flags.AccPublic);
     implementationStoreItemsBuilder.setReturnTypeSignature(Signature.SIG_VOID);
-    implementationStoreItemsBuilder.addParameter(new MethodParameter("items", SignatureCache.createTypeSignature(Set.class.getName() + "<" + IRuntimeClasses.ICalendarItem + ">")));
+    implementationStoreItemsBuilder.addParameter(new MethodParameter("items", SignatureCache.createTypeSignature(Set.class.getName() + Signature.C_GENERIC_START + IRuntimeClasses.ICalendarItem + Signature.C_GENERIC_END)));
     implementationStoreItemsBuilder.addParameter(new MethodParameter("delta", Signature.SIG_BOOLEAN));
     implementationStoreItemsBuilder.addExceptionSignature(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException));
     implementationStoreItemsBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(ScoutUtility.getCommentBlock("business logic here.")));

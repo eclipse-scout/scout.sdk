@@ -26,6 +26,8 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
@@ -36,6 +38,7 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeCache;
 
@@ -238,6 +241,30 @@ public final class TypeCache implements ITypeCache {
       }
       catch (CoreException e) {
         SdkUtilActivator.logWarning(e);
+      }
+    }
+  }
+
+  /**
+   * will be notified before events are passed through the event listener list from {@link JavaResourceChangedEmitter}
+   */
+  void elementChanged(JdtEvent e) {
+    switch (e.getEventType()) {
+      case IJavaElementDelta.ADDED:
+      case IJavaElementDelta.CHANGED: {
+        if (e.getElementType() == IJavaElement.JAVA_PROJECT) {
+          if ((e.getFlags() & IJavaElementDelta.F_OPENED) != 0 || e.getFlags() == 0) {
+            // a new java project has been created/imported/opened/added in the workspace
+            clearCache();
+          }
+        }
+        else if (e.getElementType() == IJavaElement.PACKAGE_FRAGMENT_ROOT) {
+          if ((e.getFlags() & (IJavaElementDelta.F_ADDED_TO_CLASSPATH | IJavaElementDelta.F_REMOVED_FROM_CLASSPATH | IJavaElementDelta.F_ARCHIVE_CONTENT_CHANGED | IJavaElementDelta.F_REORDER)) != 0 || e.getFlags() == 0) {
+            // the classpath has been changed
+            clearCache();
+          }
+        }
+        break;
       }
     }
   }

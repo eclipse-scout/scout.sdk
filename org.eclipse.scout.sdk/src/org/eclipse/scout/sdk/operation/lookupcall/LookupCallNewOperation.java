@@ -92,9 +92,9 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
         StringBuilder ifcSuperInterface = new StringBuilder(IRuntimeClasses.ILookupService);
         String[] typeParams = Signature.getTypeArguments(getServiceSuperTypeSignature());
         if (typeParams != null && typeParams.length > 0) {
-          ifcSuperInterface.append('<');
+          ifcSuperInterface.append(Signature.C_GENERIC_START);
           ifcSuperInterface.append(Signature.toString(typeParams[0]));
-          ifcSuperInterface.append('>');
+          ifcSuperInterface.append(Signature.C_GENERIC_END);
         }
 
         serviceOp.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(ifcSuperInterface.toString()));

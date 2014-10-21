@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.jdt.annotation;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -215,7 +216,7 @@ public class AnnotationNewOperation implements IOperation {
    * @return
    * @see org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilder#getParameters()
    */
-  public String[] getParameters() {
+  public List<String> getParameters() {
     return m_sourceBuilder.getParameters();
   }
 }

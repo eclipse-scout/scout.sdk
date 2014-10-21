@@ -126,7 +126,7 @@ public class LookupServiceNewWizard extends AbstractServiceWizard {
   protected boolean beforeFinish() throws CoreException {
     m_operation = new LookupServiceNewOperation(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     IType superType = m_serviceNewWizardPage.getSuperType();
-    String genericPart = "<" + Signature.toString(m_serviceNewWizardPage.getGenericTypeSignature()) + ">";
+    String genericPart = Signature.C_GENERIC_START + Signature.toString(m_serviceNewWizardPage.getGenericTypeSignature()) + Signature.C_GENERIC_END;
     if (superType != null) {
       m_operation.setImplementationSuperTypeSignature(SignatureCache.createTypeSignature(superType.getFullyQualifiedName() + genericPart));
     }

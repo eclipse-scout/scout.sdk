@@ -203,9 +203,9 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     IType superTypeProp = getLookupCallSuperType();
     if (superTypeProp != null) {
       StringBuilder superType = new StringBuilder(superTypeProp.getFullyQualifiedName());
-      superType.append('<');
+      superType.append(Signature.C_GENERIC_START);
       superType.append(Signature.toString(getGenericTypeSignature()));
-      superType.append('>');
+      superType.append(Signature.C_GENERIC_END);
       op.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.toString()));
     }
     op.validate();

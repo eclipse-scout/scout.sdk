@@ -92,8 +92,8 @@ public class LocalLookupCallNewOperation extends PrimaryTypeNewOperation {
             refGenericType = validator.getTypeName(SignatureCache.createTypeSignature(Object.class.getName()));
           }
 
-          source.append(refList).append("< ? extends ").append(refLookupRow).append('<').append(refGenericType).append('>').append("> rows = new ");
-          source.append(refArrayList).append('<').append(refLookupRow).append('<').append(refGenericType).append('>').append(">();").append(lineDelimiter);
+          source.append(refList).append(Signature.C_GENERIC_START).append("? extends ").append(refLookupRow).append(Signature.C_GENERIC_START).append(refGenericType).append(Signature.C_GENERIC_END).append(Signature.C_GENERIC_END).append(" rows = new ");
+          source.append(refArrayList).append(Signature.C_GENERIC_START).append(refLookupRow).append(Signature.C_GENERIC_START).append(refGenericType).append(Signature.C_GENERIC_END).append(Signature.C_GENERIC_END).append("();").append(lineDelimiter);
           source.append("  ").append(ScoutUtility.getCommentBlock("Create lookup rows here.")).append(lineDelimiter);
           source.append("  return rows;");
         }

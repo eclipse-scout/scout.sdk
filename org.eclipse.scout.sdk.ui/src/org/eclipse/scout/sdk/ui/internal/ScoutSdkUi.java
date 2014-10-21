@@ -28,6 +28,7 @@ import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.jface.viewers.DecorationOverlayIcon;
 import org.eclipse.jface.viewers.IDecoration;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
@@ -35,6 +36,7 @@ import org.eclipse.scout.sdk.operation.util.IOrganizeImportService;
 import org.eclipse.scout.sdk.service.IMessageBoxService;
 import org.eclipse.scout.sdk.sourcebuilder.comment.IJavaElementCommentBuilderService;
 import org.eclipse.scout.sdk.ui.IScoutConstants;
+import org.eclipse.scout.sdk.ui.extensions.executor.ExecutorExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.service.SwtMessageBoxService;
 import org.eclipse.scout.sdk.ui.services.AstFlattenerProviderService;
 import org.eclipse.scout.sdk.ui.services.JavaElementCommentBuilderService;
@@ -133,6 +135,9 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
 
     getPreferenceStore().setDefault(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION, false);
     ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(getPreferenceStore().getBoolean(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION));
+
+    getPreferenceStore().setDefault(ExecutorExtensionPoint.PROP_CURRENT_CATEGORY, ExecutorExtensionPoint.getCurrentCategory());
+    ExecutorExtensionPoint.setCurrentCategory(getPreferenceStore().getString(ExecutorExtensionPoint.PROP_CURRENT_CATEGORY));
 
     m_shutdownListener = new IWorkbenchListener() {
       @Override
@@ -591,6 +596,12 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
         Boolean automaticallyCreate = (Boolean) event.getNewValue();
         if (automaticallyCreate != null) {
           ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(automaticallyCreate.booleanValue());
+        }
+      }
+      else if (ExecutorExtensionPoint.PROP_CURRENT_CATEGORY.equals(event.getProperty())) {
+        String newCategory = (String) event.getNewValue();
+        if (StringUtility.hasText(newCategory)) {
+          ExecutorExtensionPoint.setCurrentCategory(newCategory);
         }
       }
     }

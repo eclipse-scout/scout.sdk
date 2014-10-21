@@ -56,7 +56,7 @@ public class ListBoxFieldNewOperation implements IOperation {
     m_declaringType = declaringType;
     m_formatSource = formatSource;
     // default
-    setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.IListBox, getDeclaringType().getJavaProject()) + "<" + Long.class.getName() + ">"));
+    setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.IListBox, getDeclaringType().getJavaProject()) + Signature.C_GENERIC_START + Long.class.getName() + Signature.C_GENERIC_END));
   }
 
   @Override

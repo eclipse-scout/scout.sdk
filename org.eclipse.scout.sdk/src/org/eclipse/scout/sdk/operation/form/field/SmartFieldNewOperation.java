@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -56,7 +57,7 @@ public class SmartFieldNewOperation implements IOperation {
     m_formatSource = formatSource;
     // default
     String superTypeName = RuntimeClasses.getSuperTypeName(IRuntimeClasses.ISmartField, getDeclaringType().getJavaProject());
-    setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeName + "<" + Long.class.getName() + ">"));
+    setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeName + Signature.C_GENERIC_START + Long.class.getName() + Signature.C_GENERIC_END));
   }
 
   @Override
