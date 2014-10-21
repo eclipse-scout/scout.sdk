@@ -79,7 +79,7 @@ public class CodeIdField extends Composite {
       setValue(null);
     }
 
-    m_nextCodeIdField.setEnabled(enabled);
+    m_nextCodeIdField.setEnabled(enabled && super.isEnabled());
   }
 
   private String getGenericSignature() {
@@ -162,6 +162,7 @@ public class CodeIdField extends Composite {
   @Override
   public void setEnabled(boolean enabled) {
     if (m_nextCodeIdField != null) {
+      super.setEnabled(enabled);
       m_nextCodeIdField.setEnabled(enabled);
     }
   }

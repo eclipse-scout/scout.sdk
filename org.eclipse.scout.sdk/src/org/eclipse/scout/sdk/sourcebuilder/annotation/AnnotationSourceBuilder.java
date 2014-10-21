@@ -15,6 +15,7 @@ import java.util.List;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -45,12 +46,11 @@ public class AnnotationSourceBuilder implements IAnnotationSourceBuilder {
   @Override
   public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
     source.append("@" + SignatureUtility.getTypeReference(getSignature(), validator));
-    String[] params = getParameters();
-    if (params != null && params.length > 0) {
+    if (m_parameters.size() > 0) {
       source.append("(");
-      for (int i = 0; i < params.length; i++) {
-        source.append(params[i]);
-        if (i < (params.length - 1)) {
+      for (int i = 0; i < m_parameters.size(); i++) {
+        source.append(m_parameters.get(i));
+        if (i < (m_parameters.size() - 1)) {
           source.append(",");
         }
       }
@@ -74,8 +74,8 @@ public class AnnotationSourceBuilder implements IAnnotationSourceBuilder {
   }
 
   @Override
-  public String[] getParameters() {
-    return m_parameters.toArray(new String[m_parameters.size()]);
+  public List<String> getParameters() {
+    return CollectionUtility.arrayList(m_parameters);
   }
 
 }

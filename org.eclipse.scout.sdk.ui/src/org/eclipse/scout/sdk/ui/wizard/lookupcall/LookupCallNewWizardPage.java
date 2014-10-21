@@ -507,7 +507,6 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
     public P_LookupServiceStrategyButtonListener(LOOKUP_SERVICE_STRATEGY strategy) {
       m_strategy = strategy;
-
     }
 
     @Override

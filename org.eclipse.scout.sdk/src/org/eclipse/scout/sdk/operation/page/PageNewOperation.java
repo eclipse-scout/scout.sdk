@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -130,7 +131,7 @@ public class PageNewOperation extends AbstractPageOperation {
 
       // update generic in supertype signature
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
-      superTypeSigBuilder.append("<").append(newOp.getPackageName()).append(".").append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE).append(">");
+      superTypeSigBuilder.append(Signature.C_GENERIC_START).append(newOp.getPackageName()).append(".").append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE).append(Signature.C_GENERIC_END);
       newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
     }
 

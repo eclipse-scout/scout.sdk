@@ -45,15 +45,14 @@ public class JavaElementAbstractTypeContentProvider extends AbstractJavaElementC
 
   @Override
   protected Object[][] computeProposals() {
-
     ITypeFilter filter = null;
     IType[] mostlyUsed = null;
     if (getFilter() == null) {
-      filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getNotInTypes(m_mostlyUsed));
+      filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getNotInTypes(m_mostlyUsed), TypeFilters.getNoSurroundingContextTypeFilter());
       mostlyUsed = m_mostlyUsed;
     }
     else {
-      filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getPrimaryTypeFilter(), TypeFilters.getNotInTypes(m_mostlyUsed), getFilter());
+      filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getNotInTypes(m_mostlyUsed), TypeFilters.getNoSurroundingContextTypeFilter(), getFilter());
 
       // filter the mostly used
       if (m_mostlyUsed != null) {

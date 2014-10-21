@@ -10,11 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.extensions.preferences;
 
+import java.util.Set;
+
 import org.eclipse.jface.preference.BooleanFieldEditor;
+import org.eclipse.jface.preference.ComboFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
+import org.eclipse.scout.sdk.ui.extensions.executor.ExecutorExtensionPoint;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateManager;
 import org.eclipse.ui.IWorkbench;
@@ -32,6 +36,7 @@ public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements
   private BooleanFieldEditor m_updateFormDataAutomaticallyField;
   private BooleanFieldEditor m_targetPackageConfigEnabledField;
   private BooleanFieldEditor m_automaticallyCreateClassIdAnnotation;
+  private ComboFieldEditor m_executorCategories;
 
   public ScoutSdkPreferencePage() {
     super(GRID);
@@ -55,6 +60,17 @@ public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements
 
     m_automaticallyCreateClassIdAnnotation = new BooleanFieldEditor(ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION, Texts.get("AutomaticallyCreateClassIdAnnotation"), getFieldEditorParent());
     addField(m_automaticallyCreateClassIdAnnotation);
+
+    Set<String> allCategories = ExecutorExtensionPoint.getAllCategories();
+    String[][] values = new String[allCategories.size()][];
+    int i = 0;
+    for (String c : allCategories) {
+      values[i] = new String[]{c, c};
+      i++;
+    }
+    m_executorCategories = new ComboFieldEditor(ExecutorExtensionPoint.PROP_CURRENT_CATEGORY, Texts.get("CodeStyle"), values, getFieldEditorParent());
+    addField(m_executorCategories);
+    m_executorCategories.setEnabled(allCategories.size() > 1, getFieldEditorParent());
   }
 
   @Override

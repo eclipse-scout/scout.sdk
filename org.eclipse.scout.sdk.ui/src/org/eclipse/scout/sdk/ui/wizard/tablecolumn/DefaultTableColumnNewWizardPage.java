@@ -204,7 +204,7 @@ public class DefaultTableColumnNewWizardPage extends AbstractWorkspaceWizardPage
     if (superTypeProp != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
+        sig = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName() + Signature.C_GENERIC_START + Signature.toString(getGenericSignature()) + Signature.C_GENERIC_END);
       }
       else {
         sig = SignatureCache.createTypeSignature(superTypeProp.getFullyQualifiedName());

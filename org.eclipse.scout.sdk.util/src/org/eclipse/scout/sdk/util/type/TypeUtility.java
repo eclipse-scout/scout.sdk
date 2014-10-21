@@ -27,6 +27,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IImportDeclaration;
@@ -353,7 +354,6 @@ public class TypeUtility {
   public static IMethod getFirstMethod(IType type, IMethodFilter filter) {
     try {
       for (IMethod method : type.getMethods()) {
-
         if (filter == null || filter.accept(method)) {
           return method;
         }
@@ -377,10 +377,7 @@ public class TypeUtility {
    */
   public static IMethod getMethod(IType type, final String methodName) {
     Set<IMethod> methods = getMethods(type, MethodFilters.getNameFilter(methodName));
-    if (CollectionUtility.hasElements(methods)) {
-      return CollectionUtility.firstElement(methods);
-    }
-    return null;
+    return CollectionUtility.firstElement(methods);
   }
 
   /**
@@ -611,24 +608,48 @@ public class TypeUtility {
    * &nbsp;&nbsp;&nbsp;&nbsp;}<br>
    * &nbsp;&nbsp;}<br>
    * }<br>
-   * // A.getTopLevelType() returns A<br>
-   * // D.getTopLevelType() returns A
+   * // A.getPrimaryType() returns A<br>
+   * // D.getPrimaryType() returns A
    * </code>
    *
    * @return the primary type of the compilation unit this type is declared in.
+   * @throws JavaModelException
    */
   public static IType getPrimaryType(IJavaElement e) {
-    if (e == null) {
+    if (!exists(e)) {
       return null;
     }
-    IType surroundingType = (IType) e.getAncestor(IJavaElement.TYPE);
+
+    IType surroundingType = null;
+    if (e.getElementType() == IJavaElement.TYPE) {
+      surroundingType = (IType) e;
+    }
+    else if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
+      try {
+        IType[] types = ((ICompilationUnit) e).getTypes();
+        if (types != null && types.length == 1) {
+          surroundingType = types[0];
+        }
+      }
+      catch (JavaModelException e1) {
+        SdkUtilActivator.logError("Unable to retrieve types of icu '" + e.getElementName() + "'.", e1);
+        return null;
+      }
+    }
+    else if (e.getElementType() == IJavaElement.CLASS_FILE) {
+      surroundingType = ((IClassFile) e).getType();
+    }
+    else {
+      surroundingType = (IType) e.getAncestor(IJavaElement.TYPE);
+    }
+
     if (!exists(surroundingType)) {
       return null; // element is not within a type.
     }
 
     IType result = null;
     IType tmp = surroundingType;
-    while (exists(tmp)) {
+    while (tmp != null && tmp.exists()) {
       result = tmp;
       tmp = tmp.getDeclaringType();
     }

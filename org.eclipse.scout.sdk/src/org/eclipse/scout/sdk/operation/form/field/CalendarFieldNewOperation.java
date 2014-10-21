@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -95,7 +96,7 @@ public class CalendarFieldNewOperation implements IOperation {
       newOp.addTypeSourceBuilder(calendarBuilder);
       // update generic in super type signature
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
-      superTypeSigBuilder.append("<").append(calendarBuilder.getFullyQualifiedName().replace('$', '.')).append(">");
+      superTypeSigBuilder.append(Signature.C_GENERIC_START).append(calendarBuilder.getFullyQualifiedName().replace('$', '.')).append(Signature.C_GENERIC_END);
       newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
     }
 

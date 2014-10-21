@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.Texts;
@@ -136,7 +137,7 @@ public class TreeBoxNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getSuperType() != null) {
       String superTypeName = getSuperType().getFullyQualifiedName();
       if (TypeUtility.isGenericType(getSuperType())) {
-        superTypeName += "<" + Long.class.getName() + ">";
+        superTypeName += Signature.C_GENERIC_START + Long.class.getName() + Signature.C_GENERIC_END;
       }
       operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeName));
     }

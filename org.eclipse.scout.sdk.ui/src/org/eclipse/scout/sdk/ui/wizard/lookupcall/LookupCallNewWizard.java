@@ -147,9 +147,9 @@ public class LookupCallNewWizard extends AbstractServiceWizard {
 
     StringBuilder superType = new StringBuilder();
     superType.append(RuntimeClasses.getSuperTypeName(IRuntimeClasses.ILookupCall, lookupCallBundle));
-    superType.append('<');
+    superType.append(Signature.C_GENERIC_START);
     superType.append(Signature.toString(m_page1.getGenericTypeSignature()));
-    superType.append('>');
+    superType.append(Signature.C_GENERIC_END);
 
     m_operation.setSuperTypeSignature(SignatureCache.createTypeSignature(superType.toString()));
 
@@ -174,9 +174,9 @@ public class LookupCallNewWizard extends AbstractServiceWizard {
         IType superTypeProp = m_page1.getServiceSuperType();
         if (superTypeProp != null) {
           StringBuilder svcSuperTypeSig = new StringBuilder(superTypeProp.getFullyQualifiedName());
-          svcSuperTypeSig.append('<');
+          svcSuperTypeSig.append(Signature.C_GENERIC_START);
           svcSuperTypeSig.append(Signature.toString(m_page1.getGenericTypeSignature()));
-          svcSuperTypeSig.append('>');
+          svcSuperTypeSig.append(Signature.C_GENERIC_END);
           m_operation.setServiceSuperTypeSignature(SignatureCache.createTypeSignature(svcSuperTypeSig.toString()));
           for (ServiceRegistrationDescription desc : getCheckedServiceRegistrations(m_page2.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true))) {
             m_operation.addServiceRegistration(desc);

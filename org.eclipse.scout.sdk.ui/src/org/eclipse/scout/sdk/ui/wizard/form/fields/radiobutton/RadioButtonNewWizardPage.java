@@ -227,7 +227,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     if (getSuperType() != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
+        sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName() + Signature.C_GENERIC_START + Signature.toString(getGenericSignature()) + Signature.C_GENERIC_END);
       }
       else {
         sig = SignatureCache.createTypeSignature(getSuperType().getFullyQualifiedName());

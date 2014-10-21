@@ -139,23 +139,28 @@ public abstract class AbstractCachedTypeHierarchy extends TypeHierarchy implemen
     if (!isCreated()) {
       synchronized (this) {
         if (!isCreated()) {
+          HierarchyCache hierarchyCache = HierarchyCache.getInstance();
           if (getBaseType() == null) {
-            HierarchyCache.getInstance().removeCachedHierarchy(null);
+            hierarchyCache.removeCachedHierarchy(null);
             throw new IllegalArgumentException("Type 'null' does not exist.");
           }
-          if (!getBaseType().exists() || !TypeUtility.exists(getBaseType().getJavaProject())) {
-            // type does no longer exist: try new resolve
-            IType tmp = TypeUtility.getType(getBaseType().getFullyQualifiedName());
-            if (TypeUtility.exists(tmp) && TypeUtility.exists(tmp.getJavaProject())) {
-              setBaseType(tmp);
-            }
-            else {
-              // still does not exist
-              HierarchyCache.getInstance().removeCachedHierarchy(getBaseType());
-              throw new IllegalArgumentException("Type '" + getBaseType().getFullyQualifiedName() + "' does not exist");
+
+          // Always re-resolve the base IType to ensure we still have the most accurate
+          IType newBaseType = TypeUtility.getType(getBaseType().getFullyQualifiedName());
+          if (TypeUtility.exists(newBaseType) && TypeUtility.exists(newBaseType.getJavaProject())) {
+            if (!newBaseType.equals(getBaseType())) {
+              hierarchyCache.replaceCachedHierarchy(getBaseType(), newBaseType, this);
+              setBaseType(newBaseType);
             }
           }
+          else {
+            // base type does no longer exist -> remove
+            hierarchyCache.removeCachedHierarchy(getBaseType());
+            throw new IllegalArgumentException("Type '" + getBaseType().getFullyQualifiedName() + "' does not exist.");
+          }
+
           revalidate();
+
           m_created = getJdtHierarchy() != null;
           if (!m_created) {
             // re-validate failed. cancel

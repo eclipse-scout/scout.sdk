@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -103,7 +104,7 @@ public class MenuNewOperation implements IOperation {
           String treeMenuTypeName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.TreeMenuType));
           String valueFieldMenuTypeName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.ValueFieldMenuType));
 
-          source.append("return ").append(collUtilityName).append(".<").append(iMenuTypeName).append("> hashSet(");
+          source.append("return ").append(collUtilityName).append(".").append(Signature.C_GENERIC_START).append(iMenuTypeName).append(Signature.C_GENERIC_END).append(" hashSet(");
           if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))) {
             source.append(tableMenuTypeName).append(".EmptySpace");
           }

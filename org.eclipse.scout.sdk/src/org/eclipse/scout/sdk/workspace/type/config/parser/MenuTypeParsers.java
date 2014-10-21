@@ -64,7 +64,7 @@ public class MenuTypeParsers implements IPropertySourceParser<MenuTypesConfig> {
     if (validator != null) {
       String iMenuTypeName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.IMenuType));
       String collUtilityName = validator.getTypeName(SignatureCache.createTypeSignature(IRuntimeClasses.CollectionUtility));
-      source.append(collUtilityName).append(".<").append(iMenuTypeName).append("> hashSet(");
+      source.append(collUtilityName).append(".").append(Signature.C_GENERIC_START).append(iMenuTypeName).append(Signature.C_GENERIC_END).append(" hashSet(");
     }
 
     boolean itemFound = false;

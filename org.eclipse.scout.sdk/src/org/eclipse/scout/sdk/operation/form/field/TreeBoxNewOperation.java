@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
@@ -90,7 +91,7 @@ public class TreeBoxNewOperation implements IOperation {
       newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTeeKey(treeBuilder), treeBuilder);
       // update generic in supertype signature
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
-      superTypeSigBuilder.append("<").append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_TREEBOX_TREE).append(">");
+      superTypeSigBuilder.append(Signature.C_GENERIC_START).append(newOp.getElementName()).append(".").append(SdkProperties.TYPE_NAME_TREEBOX_TREE).append(Signature.C_GENERIC_END);
       setSuperTypeSignature(SignatureCache.createTypeSignature(superTypeSigBuilder.toString()));
     }
     newOp.setFormatSource(isFormatSource());

@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.NlsEntry;
@@ -194,7 +195,7 @@ public final class SearchFormFromTablePageHelper {
       if (TypeUtility.exists(codeTypeMethod)) {
         final IType codeType = PropertyMethodSourceUtility.parseReturnParameterClass(PropertyMethodSourceUtility.getMethodReturnValue(codeTypeMethod), codeTypeMethod);
         // listbox
-        ITypeSourceBuilder listBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.IListBox, searchFormProject) + "<" + Long.class.getName() + ">"), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+        ITypeSourceBuilder listBoxBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.IListBox, searchFormProject) + Signature.C_GENERIC_START + Long.class.getName() + Signature.C_GENERIC_END), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
         if (TypeUtility.exists(codeType)) {
           // getConfiguredCodeType method
           IMethodSourceBuilder getConfiguredCodeTypeBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(listBoxBuilder, "getConfiguredCodeType");
@@ -207,7 +208,7 @@ public final class SearchFormFromTablePageHelper {
         if (TypeUtility.exists(lookupCallMethod)) {
           final IType lookupCall = PropertyMethodSourceUtility.parseReturnParameterClass(PropertyMethodSourceUtility.getMethodReturnValue(lookupCallMethod), lookupCallMethod);
           // smartfield
-          ITypeSourceBuilder smartFieldBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.ISmartField, searchFormProject) + "<" + Long.class.getName() + ">"), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
+          ITypeSourceBuilder smartFieldBuilder = addFormField(fieldNamePlain + SdkProperties.SUFFIX_FORM_FIELD, nlsEntry, SignatureCache.createTypeSignature(RuntimeClasses.getSuperTypeName(IRuntimeClasses.ISmartField, searchFormProject) + Signature.C_GENERIC_START + Long.class.getName() + Signature.C_GENERIC_END), orderNr, fieldOwnerFqn, fieldOwnerBuilder, fieldGetterOwnerBuilder);
           if (TypeUtility.exists(lookupCall)) {
             // getConfiguredLookupCall method
             IMethodSourceBuilder getConfiguredCodeTypeBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(smartFieldBuilder, "getConfiguredLookupCall");

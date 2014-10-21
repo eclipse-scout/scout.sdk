@@ -252,7 +252,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
             TypeSourceBuilder propertyTypeBuilder = new TypeSourceBuilder(propName);
             propertyTypeBuilder.setFlags(Flags.AccPublic | Flags.AccStatic);
             String superTypeSig = SignatureCache.createTypeSignature(IRuntimeClasses.AbstractPropertyData);
-            superTypeSig = DtoUtility.ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll("<" + unboxedSignature + ">;");
+            superTypeSig = DtoUtility.ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll(Signature.C_GENERIC_START + unboxedSignature + Signature.C_GENERIC_END + Signature.C_SEMICOLON);
             propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
             IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
             propertyTypeBuilder.addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);

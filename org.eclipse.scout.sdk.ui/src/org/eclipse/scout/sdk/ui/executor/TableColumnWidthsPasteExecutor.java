@@ -198,6 +198,7 @@ public class TableColumnWidthsPasteExecutor extends AbstractExecutor {
       return IOUtility.getContent(reader, true);
     }
     catch (Exception e) {
+      ScoutSdkUi.logError("Unable to get content from clipboard", e);
       return null;
     }
   }

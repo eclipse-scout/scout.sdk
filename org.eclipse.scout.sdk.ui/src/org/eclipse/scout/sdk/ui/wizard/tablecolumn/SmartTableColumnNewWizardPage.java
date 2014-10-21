@@ -316,7 +316,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     if (superType != null) {
       String sig = null;
       if (getGenericSignature() != null) {
-        sig = SignatureCache.createTypeSignature(superType.getFullyQualifiedName() + "<" + Signature.toString(getGenericSignature()) + ">");
+        sig = SignatureCache.createTypeSignature(superType.getFullyQualifiedName() + Signature.C_GENERIC_START + Signature.toString(getGenericSignature()) + Signature.C_GENERIC_END);
       }
       else {
         sig = SignatureCache.createTypeSignature(superType.getFullyQualifiedName());

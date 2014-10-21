@@ -57,6 +57,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
+import org.eclipse.scout.sdk.util.type.MethodFilters;
 import org.eclipse.scout.sdk.util.type.TypeComparators;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -736,7 +737,7 @@ public class ScoutTypeUtility extends TypeUtility {
       if (codeIdSig == null) {
         return null;
       }
-      return SignatureCache.createTypeSignature(IRuntimeClasses.ICode + '<' + Signature.toString(codeIdSig) + '>');
+      return SignatureCache.createTypeSignature(IRuntimeClasses.ICode + Signature.C_GENERIC_START + Signature.toString(codeIdSig) + Signature.C_GENERIC_END);
     }
   }
 
@@ -877,35 +878,46 @@ public class ScoutTypeUtility extends TypeUtility {
       Iterator<IType> topDownIterator = bottomUpAffectedTypes.descendingIterator();
       while (topDownIterator.hasNext()) {
         IType t = topDownIterator.next();
-        IMethod m = TypeUtility.getMethod(t, methodName);
-        if (TypeUtility.exists(m)) {
-          if (newMethod != null) {
-            newMethod.pushMethod(m);
-          }
-          else {
-            if (methodType == 0) {
-              IAnnotation configPropAnnotation = JdtUtility.getAnnotation(m, IRuntimeClasses.ConfigProperty);
-              if (TypeUtility.exists(configPropAnnotation)) {
-                methodType = ConfigurationMethod.PROPERTY_METHOD;
-
-                if (!StringUtility.hasText(configPropertyType)) {
-                  configPropertyType = JdtUtility.getAnnotationValueString(configPropAnnotation, "value");
-                }
-              }
-              else {
-                IAnnotation configOpAnnotation = JdtUtility.getAnnotation(m, IRuntimeClasses.ConfigOperation);
-                if (TypeUtility.exists(configOpAnnotation)) {
-                  methodType = ConfigurationMethod.OPERATION_METHOD;
-                }
-              }
-            }
-
-            if (methodType != 0) {
-              newMethod = new ConfigurationMethod(declaringType, superTypeHierarchy, methodName, methodType);
+        Set<IMethod> methods = TypeUtility.getMethods(t, MethodFilters.getNameFilter(methodName));
+        for (IMethod m : methods) {
+          if (TypeUtility.exists(m)) {
+            if (newMethod != null) {
               newMethod.pushMethod(m);
+            }
+            else {
+              if (methodType == 0) {
+                IAnnotation configPropAnnotation = JdtUtility.getAnnotation(m, IRuntimeClasses.ConfigProperty);
+                if (TypeUtility.exists(configPropAnnotation)) {
+                  methodType = ConfigurationMethod.PROPERTY_METHOD;
 
-              if (methodType == ConfigurationMethod.PROPERTY_METHOD && StringUtility.hasText(configPropertyType)) {
-                newMethod.setConfigAnnotationType(configPropertyType);
+                  if (!StringUtility.hasText(configPropertyType)) {
+                    String annotValue = JdtUtility.getAnnotationValueString(configPropAnnotation, "value");
+                    if (annotValue != null) {
+                      int lastDot = annotValue.lastIndexOf('.');
+                      if (lastDot > 0 && annotValue.length() > lastDot) {
+                        annotValue = annotValue.substring(lastDot + 1);
+                      }
+                    }
+                    if (StringUtility.hasText(annotValue)) {
+                      configPropertyType = annotValue;
+                    }
+                  }
+                }
+                else {
+                  IAnnotation configOpAnnotation = JdtUtility.getAnnotation(m, IRuntimeClasses.ConfigOperation);
+                  if (TypeUtility.exists(configOpAnnotation)) {
+                    methodType = ConfigurationMethod.OPERATION_METHOD;
+                  }
+                }
+              }
+
+              if (methodType != 0) {
+                newMethod = new ConfigurationMethod(declaringType, superTypeHierarchy, methodName, methodType);
+                newMethod.pushMethod(m);
+
+                if (methodType == ConfigurationMethod.PROPERTY_METHOD && StringUtility.hasText(configPropertyType)) {
+                  newMethod.setConfigAnnotationType(configPropertyType);
+                }
               }
             }
           }

@@ -1211,353 +1211,283 @@
          point="org.eclipse.scout.sdk.ui.executor">
             <executor
             class="org.eclipse.scout.sdk.ui.executor.AttributeNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.AttributeNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.AttributeNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.BeanPropertyNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.BeanPropertyNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.BeanPropertyNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.BookmarkStorageServiceNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.BookmarkStorageServiceNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.BookmarkStorageServiceNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.CalendarItemProviderNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.CalendarItemProviderNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.CalendarItemProviderNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.CalendarServiceNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.CalendarServiceNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.CalendarServiceNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ClientServiceNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.ClientServiceNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.ClientServiceNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.CodeNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.CodeNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.CodeNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.CodeTypeNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.CodeTypeNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.CodeTypeNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.DefaultTableColumnNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.DefaultTableColumnNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.DefaultTableColumnNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.DesktopMenuNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.DesktopMenuNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.DesktopMenuNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.EntityNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.EntityNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.EntityNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ExportScoutProjectExecutor"
-            id="org.eclipse.scout.sdk.ui.action.ExportScoutProjectAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.ExportScoutProjectAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.FormDeleteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.delete.FormDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.delete.FormDeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.FormFieldNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.FormFieldNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.FormHandlerNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.FormHandlerNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.FormHandlerNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.FormNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.FormNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.FormNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.GroupBoxNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.GroupBoxNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.GroupBoxNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.KeyStrokeNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.KeyStrokeNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.KeyStrokeNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.LibraryBundleNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.library.LibraryBundleNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.library.LibraryBundleNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.LocalLookupCallNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.LocalLookupCallNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.LocalLookupCallNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.LookupCallNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.LookupCallNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.LookupCallNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.LookupServiceNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.LookupServiceNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.LookupServiceNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.MenuNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.MenuNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.MenuNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.OutlineNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.OutlineNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.OutlineNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.PageLinkExecutor"
-            id="org.eclipse.scout.sdk.ui.action.PageLinkAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.PageLinkAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.PageNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.PageNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.PageNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.PermissionNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.PermissionNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.PermissionNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ProcessServiceNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.ProcessServiceNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.ProcessServiceNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.RadioButtonNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.RadioButtonNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.RadioButtonNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ScoutBundleNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.ScoutBundleNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ScoutProjectNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.ScoutProjectNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.ScoutProjectNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.SearchFormNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.SearchFormNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ServiceOperationNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.ServiceOperationNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.SharedContextBeanPropertyNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.SharedContextBeanPropertyNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.SharedContextBeanPropertyNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.SmartTableColumnNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.SmartTableColumnNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.SmartTableColumnNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.SmtpServiceNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.SmtpServiceNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.SmtpServiceNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.SqlServiceNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.SqlServiceNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.SqlServiceNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.TableColumnNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.TableColumnNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.TableColumnNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ToolbuttonNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.ToolbuttonNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.ToolbuttonNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.WizardNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.WizardNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.WizardNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.WizardStepNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.WizardStepNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.WizardStepNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ClassIdNewExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.ClassIdNewAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.ClassIdNewAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.CreateTemplateExecutor"
-            id="org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.create.CreateTemplateAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.DeleteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.delete.DeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.delete.DeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.FormFieldDeleteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.delete.FormFieldDeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.LookupCallDeleteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.delete.LookupCallDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.delete.LookupCallDeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.MemberListDeleteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.delete.MemberListDeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.OutlineDeleteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.delete.OutlineDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.delete.OutlineDeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ServiceDeleteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.delete.ServiceDeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.TableColumnDeleteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.delete.TableColumnDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.delete.TableColumnDeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.WizardStepDeleteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.delete.WizardStepDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.delete.WizardStepDeleteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.FormDataUpdateExecutor"
-            id="org.eclipse.scout.sdk.ui.action.dto.FormDataUpdateAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.dto.FormDataUpdateAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.PageDataUpdateExecutor"
-            id="org.eclipse.scout.sdk.ui.action.dto.PageDataUpdateAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.dto.PageDataUpdateAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.LibrariesBundleUnlinkExecutor"
-            id="org.eclipse.scout.sdk.ui.action.library.LibrariesBundleUnlinkAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.library.LibrariesBundleUnlinkAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.LibraryBundleLinkExecutor"
-            id="org.eclipse.scout.sdk.ui.action.library.LibraryBundleLinkAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.library.LibraryBundleLinkAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.TableColumnWidthsPasteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.TableColumnWidthsPasteAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.FormFieldRenameExecutor"
-            id="org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.rename.FormFieldRenameAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.PropertyBeansRenameExecutor"
-            id="org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.rename.PropertyBeansRenameAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ServiceRenameExecutor"
-            id="org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.rename.ServiceRenameAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.TableColumnRenameExecutor"
-            id="org.eclipse.scout.sdk.ui.action.rename.TableColumnRenameAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.rename.TableColumnRenameAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.TypeRenameExecutor"
-            id="org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.rename.TypeRenameAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.WizardStepRenameExecutor"
-            id="org.eclipse.scout.sdk.ui.action.rename.WizardStepRenameAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.rename.WizardStepRenameAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.ShowJavaReferencesExecutor"
-            id="org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.ShowJavaReferencesAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.FormDataSqlBindingValidateExecutor"
-            id="org.eclipse.scout.sdk.ui.action.FormDataSqlBindingValidateAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.FormDataSqlBindingValidateAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.TypeResolverPageDataExecutor"
-            id="org.eclipse.scout.sdk.ui.action.dto.TypeResolverPageDataAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.dto.TypeResolverPageDataAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.WellformScoutTypeExecutor"
-            id="org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.WellformScoutTypeAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.WellformExecutor"
-            id="org.eclipse.scout.sdk.ui.action.WellformAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.WellformAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.MultipleUpdateFormDataExecutor"
-            id="org.eclipse.scout.sdk.ui.action.dto.MultipleUpdateFormDataAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.dto.MultipleUpdateFormDataAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.TypeResolverFormDataExecutor"
-            id="org.eclipse.scout.sdk.ui.action.dto.TypeResolverFormDataAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.dto.TypeResolverFormDataAction">
       </executor>
       <executor
             class="org.eclipse.scout.sdk.ui.executor.PageWithTableDeleteExecutor"
-            id="org.eclipse.scout.sdk.ui.action.delete.PageWithTableDeleteAction"
-            order="0">
+            id="org.eclipse.scout.sdk.ui.action.delete.PageWithTableDeleteAction">
       </executor>
    </extension>
 </plugin>
