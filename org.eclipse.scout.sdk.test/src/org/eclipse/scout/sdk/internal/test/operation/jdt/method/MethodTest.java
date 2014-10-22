@@ -117,13 +117,13 @@ public class MethodTest extends AbstractScoutSdkTest {
     IType tableField = SdkAssert.assertTypeExists("test.client.ui.forms.Test2Form.MainBox.TableField");
     overrideExecMethod(tableField, "execDataChanged");
     overrideExecMethod(tableField, "execSaveUpdatedRow");
+
     // tablefield.table
     IType tableFieldTable = SdkAssert.assertTypeExists("test.client.ui.forms.Test2Form.MainBox.TableField.Table");
     overrideExecMethod(tableFieldTable, "execRowClick");
     overrideExecMethod(tableFieldTable, "execDecorateCell");
 
     testApiOfTest2Form();
-
   }
 
   private void overrideExecMethod(IType declaringType, String name) throws Exception {
@@ -365,7 +365,7 @@ public class MethodTest extends AbstractScoutSdkTest {
     IMethod execFormatValue1 = SdkAssert.assertMethodExist(listboxField, "execFormatValue", new String[]{"QSet<QLong;>;"});
     SdkAssert.assertMethodReturnTypeSignature(execFormatValue1, "QString;");
     SdkAssert.assertAnnotation(execFormatValue1, "java.lang.Override");
-    
+
     SdkAssert.assertEquals("inner types count of 'ListboxField'", 0, listboxField.getTypes().length);
     // type TableField
     IType tableField = SdkAssert.assertTypeExists(mainBox, "TableField");
