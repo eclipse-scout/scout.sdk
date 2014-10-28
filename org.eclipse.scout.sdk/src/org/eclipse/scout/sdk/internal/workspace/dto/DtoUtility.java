@@ -25,8 +25,10 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -54,8 +56,6 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
@@ -78,7 +78,7 @@ public final class DtoUtility {
   private DtoUtility() {
   }
 
-  public static ITypeSourceBuilder createFormDataSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, IProgressMonitor monitor) {
+  public static ITypeSourceBuilder createFormDataSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, ICompilationUnit formDataIcu, IProgressMonitor monitor) {
     String superTypeSignature = formDataAnnotation.getSuperTypeSignature();
     if (StringUtility.hasText(superTypeSignature)) {
       IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
@@ -88,14 +88,14 @@ public final class DtoUtility {
       String formDataTypeName = Signature.getSignatureSimpleName(formDataTypeSignature);
       ITypeSourceBuilder formDataSourceBuilder = null;
       if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableFieldData))) {
-        formDataSourceBuilder = new TableFieldFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation, monitor);
+        formDataSourceBuilder = new TableFieldFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation, formDataIcu, monitor);
       }
       else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.AbstractTableFieldBeanData))) {
         // fill table bean
-        formDataSourceBuilder = new TableFieldBeanFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation, monitor);
+        formDataSourceBuilder = new TableFieldBeanFormDataSourceBuilder(modelType, formDataTypeName, formDataAnnotation, formDataIcu, monitor);
       }
       else {
-        formDataSourceBuilder = new CompositeFormDataTypeSourceBuilder(modelType, formDataTypeName, formDataAnnotation, monitor);
+        formDataSourceBuilder = new CompositeFormDataTypeSourceBuilder(modelType, formDataTypeName, formDataAnnotation, formDataIcu, monitor);
       }
 
       // primary class comment
@@ -105,43 +105,49 @@ public final class DtoUtility {
       formDataSourceBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createGeneratedAnnotation(FormDataDtoUpdateOperation.class.getName(), GENERATED_MSG));
 
       // add interfaces and @Override annotation for all methods that exist in the given interfaces
-      Set<IType> allSuperInterfaces = new HashSet<IType>();
-      IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(modelType.getJavaProject());
-      IScoutBundle sharedBundle = clientBundle.getParentBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
-
-      for (String ifcSig : formDataAnnotation.getInterfaceSignatures()) {
-        IType ifcType = TypeUtility.getTypeBySignature(ifcSig);
-
-        if (TypeUtility.isOnClasspath(ifcType, sharedBundle.getJavaProject())) {
-          formDataSourceBuilder.addInterfaceSignature(ifcSig);
-          allSuperInterfaces.addAll(TypeUtility.getSupertypeHierarchy(ifcType).getAllInterfaces());
-        }
-      }
-      Set<String> allSuperInterfaceMethods = new HashSet<String>();
-      try {
-        for (IType t : allSuperInterfaces) {
-          for (IMethod m : t.getMethods()) {
-            allSuperInterfaceMethods.add(SignatureUtility.getMethodIdentifier(m));
-          }
-        }
-      }
-      catch (CoreException e) {
-        ScoutSdk.logError("Unable to read existing methods from super interfaces of formdata for '" + modelType.getFullyQualifiedName() + "'. The resulting formdata may miss some @Override annotations.", e);
-      }
-      for (IMethodSourceBuilder msb : formDataSourceBuilder.getMethodSourceBuilders()) {
-        if (allSuperInterfaceMethods.contains(msb.getMethodIdentifier())) {
-          msb.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
-        }
-      }
+      addFormDataAdditionalInterfaces(formDataAnnotation, formDataSourceBuilder, formDataIcu.getJavaProject());
 
       return formDataSourceBuilder;
     }
     return null;
   }
 
-  public static ITypeSourceBuilder createPageDataSourceBuilder(IType modelType, PageDataAnnotation pageDataAnnotation, IProgressMonitor monitor) {
+  public static void addFormDataAdditionalInterfaces(FormDataAnnotation formDataAnnotation, ITypeSourceBuilder sourceBuilder, IJavaProject formDataJavaProject) {
+    Set<String> interfaceSignatures = formDataAnnotation.getInterfaceSignatures();
+    if (interfaceSignatures.isEmpty()) {
+      return;
+    }
+
+    Set<IType> allSuperInterfaces = new HashSet<IType>();
+    for (String ifcSig : interfaceSignatures) {
+      IType ifcType = TypeUtility.getTypeBySignature(ifcSig);
+
+      if (TypeUtility.isOnClasspath(ifcType, formDataJavaProject)) {
+        sourceBuilder.addInterfaceSignature(ifcSig);
+        allSuperInterfaces.addAll(TypeUtility.getSupertypeHierarchy(ifcType).getAllInterfaces());
+      }
+    }
+    Set<String> allSuperInterfaceMethods = new HashSet<String>();
+    try {
+      for (IType t : allSuperInterfaces) {
+        for (IMethod m : t.getMethods()) {
+          allSuperInterfaceMethods.add(SignatureUtility.getMethodIdentifier(m));
+        }
+      }
+    }
+    catch (CoreException e) {
+      ScoutSdk.logError("Unable to read existing methods from super interfaces of formdata for '" + formDataAnnotation.getAnnotationOwner().getElementName() + "'. The resulting formdata may miss some @Override annotations.", e);
+    }
+    for (IMethodSourceBuilder msb : sourceBuilder.getMethodSourceBuilders()) {
+      if (allSuperInterfaceMethods.contains(msb.getMethodIdentifier())) {
+        msb.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
+      }
+    }
+  }
+
+  public static ITypeSourceBuilder createPageDataSourceBuilder(IType modelType, PageDataAnnotation pageDataAnnotation, ICompilationUnit pageDataIcu, IProgressMonitor monitor) {
     String pageDataSignature = pageDataAnnotation.getPageDataTypeSignature();
-    ITypeSourceBuilder pageDataSourceBuilder = new PageDataSourceBuilder(modelType, Signature.getSignatureSimpleName(pageDataSignature), pageDataAnnotation, monitor);
+    ITypeSourceBuilder pageDataSourceBuilder = new PageDataSourceBuilder(modelType, Signature.getSignatureSimpleName(pageDataSignature), pageDataAnnotation, pageDataIcu, monitor);
 
     // primary class comment
     pageDataSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("<b>NOTE:</b><br>" + GENERATED_MSG + "\n\n@generated"));

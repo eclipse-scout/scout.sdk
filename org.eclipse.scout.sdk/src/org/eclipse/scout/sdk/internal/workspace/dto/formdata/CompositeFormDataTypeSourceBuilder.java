@@ -12,12 +12,14 @@ package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.method.IMethodSourceBuilder;
@@ -47,8 +49,8 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
    * @param elementName
    * @param formDataAnnotation
    */
-  public CompositeFormDataTypeSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, IProgressMonitor monitor) {
-    super(modelType, elementName, formDataAnnotation, monitor);
+  public CompositeFormDataTypeSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, elementName, formDataAnnotation, derivedCu, monitor);
   }
 
   @Override
@@ -89,20 +91,20 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(superType);
           ITypeSourceBuilder fieldSourceBuilder = null;
           if (SignatureUtility.isEqualSignature(typeErasure, SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTableFieldData))) {
-            fieldSourceBuilder = new TableFieldFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
+            fieldSourceBuilder = new TableFieldFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation, getDerivedCompilationUnit(), monitor);
           }
           else if (superTypeHierarchy != null && superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.AbstractTableFieldBeanData))) {
             // fill table bean
-            fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
+            fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, formDataTypeName, fieldAnnotation, getDerivedCompilationUnit(), monitor);
           }
           else if (declaringTypeHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.ICompositeField), formField)
               && !declaringTypeHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IValueField), formField)) {
             // field extends a field template.
             fieldExtendsTemplateField = true;
-            fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
+            fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder(formField, formDataTypeName, fieldAnnotation, getDerivedCompilationUnit(), monitor);
           }
           else {
-            fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, formDataTypeName, fieldAnnotation, monitor);
+            fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, formDataTypeName, fieldAnnotation, getDerivedCompilationUnit(), monitor);
 
             // special case if a boolean (primitive!) property has the same name as a form field -> show warning
             for (IMethodSourceBuilder msb : getMethodSourceBuilders()) {
@@ -114,6 +116,9 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           }
           fieldSourceBuilder.setFlags(fieldSourceBuilder.getFlags() | Flags.AccStatic);
           addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormDataPropertyKey(fieldSourceBuilder), fieldSourceBuilder);
+
+          // add interfaces specified on the formdata annotation
+          DtoUtility.addFormDataAdditionalInterfaces(fieldAnnotation, fieldSourceBuilder, getDerivedCompilationUnit().getJavaProject());
 
           // getter for field
           String methodName = NamingUtility.ensureStartWithUpperCase(formDataTypeName); // Scout RT requires the first char to be upper-case for a getter. See org.eclipse.scout.commons.beans.FastBeanUtility.BEAN_METHOD_PAT.

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.internal.workspace.dto.pagedata;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
@@ -31,8 +32,8 @@ public class PageDataSourceBuilder extends AbstractTableBeanSourceBuilder {
    * @param elementName
    * @param setup
    */
-  public PageDataSourceBuilder(IType modelType, String elementName, PageDataAnnotation pageDataAnnotation, IProgressMonitor monitor) {
-    super(modelType, elementName, false, monitor);
+  public PageDataSourceBuilder(IType modelType, String elementName, PageDataAnnotation pageDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, elementName, false, derivedCu, monitor);
     m_pageDataAnnotation = pageDataAnnotation;
     setup(monitor);
   }

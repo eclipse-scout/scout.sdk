@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.internal.workspace.dto;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -32,8 +33,8 @@ public abstract class AbstractTableSourceBuilder extends AbstractDtoTypeSourceBu
    * @param elementName
    * @param setup
    */
-  public AbstractTableSourceBuilder(IType modelType, String elementName, boolean setup, IProgressMonitor monitor) {
-    super(modelType, elementName, setup, monitor);
+  public AbstractTableSourceBuilder(IType modelType, String elementName, boolean setup, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, elementName, setup, derivedCu, monitor);
   }
 
   protected String getColumnSignature(IType type, ITypeHierarchy columnHierarchy) throws CoreException {
