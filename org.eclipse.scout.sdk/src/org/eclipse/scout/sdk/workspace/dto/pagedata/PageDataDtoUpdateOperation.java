@@ -64,17 +64,17 @@ public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
 
   @Override
   protected String createDerivedTypeSource(IProgressMonitor monitor) throws CoreException {
-    PageDataAnnotation pageDataAnnotation = getPageDataAnnotation();
-    ITypeSourceBuilder pageDataSourceBuilder = DtoUtility.createPageDataSourceBuilder(getModelType(), pageDataAnnotation, monitor);
-    if (monitor.isCanceled()) {
-      return null;
-    }
-
     IType dtoType = ensureDerivedType();
     if (!TypeUtility.exists(dtoType)) {
       return null;
     }
     ICompilationUnit dtoIcu = dtoType.getCompilationUnit();
+
+    PageDataAnnotation pageDataAnnotation = getPageDataAnnotation();
+    ITypeSourceBuilder pageDataSourceBuilder = DtoUtility.createPageDataSourceBuilder(getModelType(), pageDataAnnotation, dtoIcu, monitor);
+    if (monitor.isCanceled()) {
+      return null;
+    }
 
     CompilationUnitSourceBuilder cuSourceBuilder = new CompilationUnitSourceBuilder(dtoIcu.getElementName(), dtoIcu.getParent().getElementName());
     cuSourceBuilder.addTypeSourceBuilder(pageDataSourceBuilder);

@@ -72,12 +72,6 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
   protected String createDerivedTypeSource(IProgressMonitor monitor) throws CoreException {
     FormDataAnnotation formDataAnnotation = getFormDataAnnotation();
 
-    // collect all source builders for the whole form data.
-    ITypeSourceBuilder formDataSourceBuilder = DtoUtility.createFormDataSourceBuilder(getModelType(), formDataAnnotation, monitor);
-    if (monitor.isCanceled() || formDataSourceBuilder == null) {
-      return null;
-    }
-
     IType formDataType = ensureDerivedType();
     if (!TypeUtility.exists(formDataType)) {
       return null;
@@ -86,6 +80,12 @@ public class FormDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
       return null;
     }
     ICompilationUnit formDataIcu = formDataType.getCompilationUnit();
+
+    // collect all source builders for the whole form data.
+    ITypeSourceBuilder formDataSourceBuilder = DtoUtility.createFormDataSourceBuilder(getModelType(), formDataAnnotation, formDataIcu, monitor);
+    if (monitor.isCanceled() || formDataSourceBuilder == null) {
+      return null;
+    }
 
     CompilationUnitSourceBuilder cuSourceBuilder = new CompilationUnitSourceBuilder(formDataIcu.getElementName(), formDataIcu.getParent().getElementName());
     cuSourceBuilder.addTypeSourceBuilder(formDataSourceBuilder);

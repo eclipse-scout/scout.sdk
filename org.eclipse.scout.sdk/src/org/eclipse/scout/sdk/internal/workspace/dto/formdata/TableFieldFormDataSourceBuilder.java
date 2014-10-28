@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -65,8 +66,8 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
    * @param modelType
    * @param elementName
    */
-  public TableFieldFormDataSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, IProgressMonitor monitor) {
-    super(modelType, elementName, false, monitor);
+  public TableFieldFormDataSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, elementName, false, derivedCu, monitor);
     m_formDataAnnotation = formDataAnnotation;
     setup(monitor);
   }

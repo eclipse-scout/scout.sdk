@@ -18,6 +18,7 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMethod;
@@ -68,8 +69,8 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractTableSource
   /**
    * @param elementName
    */
-  public AbstractTableBeanSourceBuilder(IType modelType, String elementName, boolean setup, IProgressMonitor monitor) {
-    super(modelType, elementName, setup, monitor);
+  public AbstractTableBeanSourceBuilder(IType modelType, String elementName, boolean setup, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, elementName, setup, derivedCu, monitor);
   }
 
   @Override

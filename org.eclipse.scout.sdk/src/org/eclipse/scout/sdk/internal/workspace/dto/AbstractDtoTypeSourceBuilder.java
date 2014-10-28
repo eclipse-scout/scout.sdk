@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
@@ -63,18 +64,20 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
 
   private IType m_modelType;
   private ITypeHierarchy m_localTypeHierarchy;
+  private final ICompilationUnit m_derivedCu;
   protected static final String SIG_FOR_IS_METHOD_NAME = Signature.SIG_BOOLEAN;
 
-  public AbstractDtoTypeSourceBuilder(IType modelType, String elementName, IProgressMonitor monitor) {
-    this(modelType, elementName, true, monitor);
+  public AbstractDtoTypeSourceBuilder(IType modelType, String elementName, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    this(modelType, elementName, true, derivedCu, monitor);
   }
 
   /**
    * @param elementName
    */
-  public AbstractDtoTypeSourceBuilder(IType modelType, String elementName, boolean setup, IProgressMonitor monitor) {
+  public AbstractDtoTypeSourceBuilder(IType modelType, String elementName, boolean setup, ICompilationUnit derivedCu, IProgressMonitor monitor) {
     super(elementName);
     m_modelType = modelType;
+    m_derivedCu = derivedCu;
     m_localTypeHierarchy = TypeUtility.getLocalTypeHierarchy(modelType);
     if (setup) {
       setup(monitor);
@@ -337,4 +340,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
     return source.toString();
   }
 
+  public ICompilationUnit getDerivedCompilationUnit() {
+    return m_derivedCu;
+  }
 }

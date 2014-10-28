@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
@@ -55,7 +56,6 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
   private static final Pattern REGEX_STRING_LITERALS = Pattern.compile("\"+[^\"]+\"", Pattern.DOTALL);
   private static final Pattern REGEX_CONSTRUCTOR_CALL = Pattern.compile("new\\s+[A-Za-z][a-zA-Z0-9_\\.]{0,200}\\s*\\([^\\(\\)]*\\)");
-  private final IType iValueField = TypeUtility.getType(IRuntimeClasses.IValueField);
 
   private FormDataAnnotation m_formDataAnnotation;
 
@@ -63,8 +63,8 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
    * @param modelType
    * @param elementName
    */
-  public FormDataTypeSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, IProgressMonitor monitor) {
-    super(modelType, elementName, false, monitor);
+  public FormDataTypeSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, elementName, false, derivedCu, monitor);
     m_formDataAnnotation = formDataAnnotation;
     setup(monitor);
   }
@@ -259,7 +259,7 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
 
                   IType type = (IType) element;
                   ITypeHierarchy h = TypeUtility.getSupertypeHierarchy(type);
-                  if (h.contains(iValueField)) {
+                  if (h.contains(TypeUtility.getType(IRuntimeClasses.IValueField))) {
                     String formDataFieldName = NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(type.getElementName()));
                     buffer.append(formDataFieldName);
                     return true; // rewrite done

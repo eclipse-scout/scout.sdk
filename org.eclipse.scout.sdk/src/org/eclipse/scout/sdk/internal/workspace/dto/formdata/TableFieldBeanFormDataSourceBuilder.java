@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
@@ -35,8 +36,8 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
    * @param elementName
    * @param setup
    */
-  public TableFieldBeanFormDataSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, IProgressMonitor monitor) {
-    super(modelType, elementName, false, monitor);
+  public TableFieldBeanFormDataSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, elementName, false, derivedCu, monitor);
     m_formDataAnnotation = formDataAnnotation;
     setup(monitor);
   }
