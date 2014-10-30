@@ -165,7 +165,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
     AbstractInnerTypeWizard wizard = null;
     if (selectedItem instanceof IType) {
       IType formField = (IType) selectedItem;
-      wizard = (AbstractInnerTypeWizard) FormFieldExtensionPoint.createNewWizard(formField);
+      wizard = FormFieldExtensionPoint.createNewWizard(formField);
       if (wizard != null) {
         ScoutStructuredSelection sel = new ScoutStructuredSelection(new Object[]{m_declaringType});
         sel.setSuperType(formField);
@@ -178,7 +178,7 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
       }
     }
     if (wizard != null) {
-      m_nextPage = (AbstractScoutWizardPage) wizard.getPages()[0];
+      m_nextPage = (AbstractScoutWizardPage) wizard.getStartingPage();
     }
     else {
       m_nextPage = null;

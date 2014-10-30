@@ -31,7 +31,6 @@ import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.osgi.framework.Bundle;
@@ -59,7 +58,7 @@ public final class FormFieldExtensionPoint {
    * @param modelType
    * @return the best match extensions new wizard.
    */
-  public static AbstractWorkspaceWizard createNewWizard(IType modelType) {
+  public static AbstractInnerTypeWizard createNewWizard(IType modelType) {
     ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(modelType);
     for (IFormFieldExtension ext : getSortedExtensions(modelType, superTypeHierarchy, -1)) {
       if (ext.getNewWizardClazz() != null) {

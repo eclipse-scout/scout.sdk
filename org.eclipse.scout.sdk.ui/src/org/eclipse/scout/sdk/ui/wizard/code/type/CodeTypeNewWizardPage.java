@@ -107,10 +107,14 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     m_nlsNameField.setFocus();
   }
 
+  protected boolean isPageEnabled() {
+    return getSharedBundle() != null;
+  }
+
   @Override
   protected void createContent(Composite parent) {
     int labelColWidthPercent = 20;
-    final boolean isEnabled = getSharedBundle() != null;
+    final boolean isEnabled = isPageEnabled();
     m_nextCodeIdField = new CodeIdField(parent, getSharedBundle(), labelColWidthPercent);
     m_nextCodeIdField.addModifyListener(new ModifyListener() {
       @Override
