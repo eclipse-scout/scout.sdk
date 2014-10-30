@@ -16,7 +16,6 @@ import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 
 public class FormFieldExtension implements IFormFieldExtension {
 
@@ -33,7 +32,7 @@ public class FormFieldExtension implements IFormFieldExtension {
   }
 
   @Override
-  public AbstractWorkspaceWizard createNewWizard() {
+  public AbstractInnerTypeWizard createNewWizard() {
     if (m_newWizardClazz == null) {
       ScoutSdkUi.logWarning("new Wizard is not defined");
       return null;

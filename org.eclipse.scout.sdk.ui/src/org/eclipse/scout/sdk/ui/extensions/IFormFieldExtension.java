@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.ui.extensions;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractScoutTypePage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
-import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 
 public interface IFormFieldExtension {
 
@@ -27,7 +26,7 @@ public interface IFormFieldExtension {
 
   Class<? extends AbstractScoutTypePage> getNodePage();
 
-  AbstractWorkspaceWizard createNewWizard();
+  AbstractInnerTypeWizard createNewWizard();
 
   IPage createNodePage();
 
