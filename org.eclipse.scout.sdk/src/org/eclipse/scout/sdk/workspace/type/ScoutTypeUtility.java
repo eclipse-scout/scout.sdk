@@ -333,6 +333,9 @@ public class ScoutTypeUtility extends TypeUtility {
       boolean replaceAnnotationPresent = existsReplaceAnnotation(type);
       IType superType = hierarchy.getSuperclass(type);
       parseFormDataAnnotationReq(annotation, superType, hierarchy, replaceAnnotationPresent);
+      for (IType superInterface : hierarchy.getSuperInterfaces(type)) {
+        parseFormDataAnnotationReq(annotation, superInterface, hierarchy, replaceAnnotationPresent);
+      }
 
       if (replaceAnnotationPresent) {
         if (TypeUtility.exists(superType) && !existsReplaceAnnotation(superType)) {
