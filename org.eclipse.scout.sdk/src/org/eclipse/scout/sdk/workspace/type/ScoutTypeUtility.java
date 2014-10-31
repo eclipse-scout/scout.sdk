@@ -455,6 +455,13 @@ public class ScoutTypeUtility extends TypeUtility {
               }
             }
           }
+          else if (value instanceof String && StringUtility.hasText(value.toString())) {
+            String referencedTypeSignature = SignatureUtility.getReferencedTypeSignature(contextType, value.toString(), true);
+            if (StringUtility.hasText(referencedTypeSignature)) {
+              interfaceSignatures = new ArrayList<String>(1);
+              interfaceSignatures.add(referencedTypeSignature);
+            }
+          }
         }
       }
 
