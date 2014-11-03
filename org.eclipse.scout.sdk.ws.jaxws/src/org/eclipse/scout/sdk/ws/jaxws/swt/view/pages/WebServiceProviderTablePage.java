@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -114,7 +115,15 @@ public class WebServiceProviderTablePage extends AbstractPage {
 
   private class P_SunJaxWsResourceListener implements IResourceListener {
     private boolean isContentAvailable(IFile file) {
-      File osFile = file.getRawLocation().makeAbsolute().toFile();
+      if (file == null) {
+        return false;
+      }
+      IPath rawLocation = file.getRawLocation();
+      if (rawLocation == null) {
+        return false;
+      }
+
+      File osFile = rawLocation.makeAbsolute().toFile();
       return osFile.length() > 0;
     }
 
