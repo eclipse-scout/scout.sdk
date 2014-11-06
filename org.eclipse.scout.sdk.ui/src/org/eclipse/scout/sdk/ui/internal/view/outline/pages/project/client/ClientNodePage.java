@@ -74,14 +74,16 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
 
     if (m_clientSessionHierarchy == null) {
       IType iClientSession = TypeUtility.getType(IRuntimeClasses.IClientSession);
-      m_clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
-      m_clientSessionHierarchy.addHierarchyListener(getPageDirtyListener());
+      if (TypeUtility.exists(iClientSession)) {
+        m_clientSessionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iClientSession);
+        m_clientSessionHierarchy.addHierarchyListener(getPageDirtyListener());
+      }
     }
-    if (m_desktopHierarchy == null) {
+    if (m_desktopHierarchy == null && TypeUtility.exists(iDesktop)) {
       m_desktopHierarchy = TypeUtility.getPrimaryTypeHierarchy(iDesktop);
       m_desktopHierarchy.addHierarchyListener(getPageDirtyListener());
     }
-    if (m_desktopExtensionHierarchy == null) {
+    if (m_desktopExtensionHierarchy == null && TypeUtility.exists(iDesktopExtension)) {
       m_desktopExtensionHierarchy = TypeUtility.getPrimaryTypeHierarchy(iDesktopExtension);
       m_desktopExtensionHierarchy.addHierarchyListener(getPageDirtyListener());
     }
@@ -91,17 +93,21 @@ public class ClientNodePage extends AbstractBundleNodeTablePage {
       new ClientSessionNodePage(this, clientSession);
     }
     // desktop
-    Set<IType> desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
-    if (desktops.size() > 1) {
-      ScoutSdkUi.logWarning("more than one desktop found.");
+    if (m_desktopHierarchy != null) {
+      Set<IType> desktops = m_desktopHierarchy.getAllSubtypes(iDesktop, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
+      if (desktops.size() > 1) {
+        ScoutSdkUi.logWarning("more than one desktop found.");
+      }
+      for (IType desktop : desktops) {
+        new DesktopNodePage(this, desktop);
+      }
     }
-    for (IType desktop : desktops) {
-      new DesktopNodePage(this, desktop);
-    }
-    // desktop extension
-    Set<IType> desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
-    for (IType desktopExtension : desktopExtensions) {
-      new DesktopExtensionNodePage(this, desktopExtension);
+    if (m_desktopExtensionHierarchy != null) {
+      // desktop extension
+      Set<IType> desktopExtensions = m_desktopExtensionHierarchy.getAllSubtypes(iDesktopExtension, ScoutTypeFilters.getClassesInScoutBundles(getScoutBundle()));
+      for (IType desktopExtension : desktopExtensions) {
+        new DesktopExtensionNodePage(this, desktopExtension);
+      }
     }
     //others
     new FormTablePage(this);
