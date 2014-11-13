@@ -296,8 +296,7 @@ public class ScoutTypeUtility extends TypeUtility {
    *         {@link IRuntimeClasses#Replace} annotation.
    */
   public static boolean existsReplaceAnnotation(IAnnotatable element) {
-    IAnnotation annotation = JdtUtility.getAnnotation(element, IRuntimeClasses.Replace);
-    return TypeUtility.exists(annotation);
+    return JdtUtility.hasAnnotation(element, IRuntimeClasses.Replace);
   }
 
   public static FormDataAnnotation findFormDataAnnotation(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
@@ -657,7 +656,14 @@ public class ScoutTypeUtility extends TypeUtility {
   public static Set<IType> getInnerTypes(IType declaringType, IType superType, Comparator<IType> comparator) {
     if (TypeUtility.exists(declaringType)) {
       ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(declaringType);
-      return TypeUtility.getInnerTypes(declaringType, TypeFilters.getSubtypeFilter(superType, typeHierarchy), comparator);
+      return getInnerTypes(declaringType, typeHierarchy, superType, comparator);
+    }
+    return CollectionUtility.hashSet();
+  }
+
+  public static Set<IType> getInnerTypes(IType declaringType, ITypeHierarchy localHierarchyOfDeclaringType, IType superType, Comparator<IType> comparator) {
+    if (TypeUtility.exists(declaringType)) {
+      return TypeUtility.getInnerTypes(declaringType, TypeFilters.getSubtypeFilter(superType, localHierarchyOfDeclaringType), comparator);
     }
     return CollectionUtility.hashSet();
   }
@@ -752,7 +758,27 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static Set<IType> getCodes(IType declaringType) {
-    return getInnerTypes(declaringType, TypeUtility.getType(IRuntimeClasses.ICode), ScoutTypeComparators.getOrderAnnotationComparator());
+    Set<IType> collector = new TreeSet<IType>(ScoutTypeComparators.getOrderAnnotationComparator());
+    IType iCode = TypeUtility.getType(IRuntimeClasses.ICode);
+    ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(declaringType);
+    Deque<IType> superClassStack = typeHierarchy.getSuperClassStack(declaringType);
+    for (IType t : superClassStack) {
+      Set<IType> innerTypes = getInnerTypes(t, iCode, null);
+      collector.addAll(innerTypes);
+    }
+
+    // handle @Replace
+    for (IType candidate : CollectionUtility.arrayList(collector)) {
+      for (IType t : typeHierarchy.getSuperClassStack(candidate)) {
+        if (existsReplaceAnnotation(t)) {
+          IType superclass = typeHierarchy.getSuperclass(t);
+          if (TypeUtility.exists(superclass)) {
+            collector.remove(superclass);
+          }
+        }
+      }
+    }
+    return collector;
   }
 
   public static Set<IType> getKeyStrokes(IType declaringType) {
