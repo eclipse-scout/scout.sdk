@@ -36,7 +36,7 @@ public class FileChooserRapTargetTechnologyHandler extends AbstractScoutTechnolo
   private static final String RAP_INCUBATOR_FEATURE_NAME = "org.eclipse.rap.fileupload.feature.feature.group";
 
   private static final String SCOUT_INCUBATOR_FEATURE_NAME = "org.eclipse.scout.rt.ui.rap.incubator.filechooser.source.feature.group";
-  private static final String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/4.1";
+  private static final String SCOUT_INCUBATOR_UPDATE_SITE_URL = "http://download.eclipse.org/scout/releases/4.2";
 
   @Override
   public boolean preSelectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor) throws CoreException {
