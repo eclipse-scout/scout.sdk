@@ -55,7 +55,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements IScoutProje
   @Override
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     setWindowTitle(Texts.get("NewScoutProjectNoPopup"));
-    setHelpAvailable(false);
+    setHelpAvailable(true);
 
     m_page1 = new ScoutProjectNewWizardPage();
     addPage(m_page1);
