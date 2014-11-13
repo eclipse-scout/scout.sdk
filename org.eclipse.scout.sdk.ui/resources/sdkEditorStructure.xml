@@ -1,7 +1,0 @@
-<structure name="Extended mode">
-	<field name="org.eclipse.scout.rt.client.ui.form.field.AbstractStringField">
-		<categroy name="General">
-			<method>"execInitField"</method>
-		</categroy>
-	</field>
-</structure>

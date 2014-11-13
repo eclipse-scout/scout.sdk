@@ -158,7 +158,7 @@ public interface IRuntimeClasses {
   @Deprecated
   String IComposerAttribute = "org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute"; // NO_UCD
   /**
-   * @deprecated use {@link IRuntimeClasses#IDataModelAttribute}
+   * @deprecated use {@link IRuntimeClasses#IDataModelEntity}
    */
   @Deprecated
   String IComposerEntity = "org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity"; // NO_UCD
