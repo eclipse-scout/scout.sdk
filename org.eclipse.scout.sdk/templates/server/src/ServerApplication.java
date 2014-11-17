@@ -21,14 +21,14 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * eclipse.product=@@BUNDLE_SERVER_NAME@@.product
  */
 public class ServerApplication implements IApplication{
-  private static IScoutLogger logger=ScoutLogManager.getLogger(ServerApplication.class);
+  private static IScoutLogger logger = ScoutLogManager.getLogger(ServerApplication.class);
 
   @Override
   public Object start(IApplicationContext context) throws Exception {
     //start the scheduler
     /*
-    Scheduler scheduler=new Scheduler(Activator.getDefault().getBackendSubject(),ServerSession.class);
-    scheduler.addJob(new LoadJobs());
+    Scheduler scheduler = new Scheduler();
+    scheduler.addJob(new YourCustomJob());
     scheduler.start();
     Activator.getDefault().setScheduler(scheduler);
     */
@@ -38,6 +38,5 @@ public class ServerApplication implements IApplication{
 
   @Override
   public void stop() {
-
   }
 }
