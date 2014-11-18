@@ -22,10 +22,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.operation.ITypeParameter;
 import org.eclipse.scout.sdk.sourcebuilder.AbstractAnnotatableSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.IAnnotationSourceBuilder;
@@ -45,6 +48,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implements ITypeSourceBuilder {
 
   private String m_superTypeSignature;
+  private List<ITypeParameter> m_typeParameters;
   private String m_parentFullyQualifiedName;
   private ITypeSourceBuilder m_parentSourceBuilder;
   private final List<String> m_interfaceSignatures;
@@ -61,6 +65,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
    */
   public TypeSourceBuilder(String elementName) {
     super(elementName);
+    m_typeParameters = new ArrayList<ITypeParameter>();
     m_interfaceSignatures = new ArrayList<String>();
     m_fieldSourceBuilders = new ArrayList<IFieldSourceBuilder>();
     m_sortedFieldSourceBuilders = new TreeMap<CompositeObject, IFieldSourceBuilder>();
@@ -86,8 +91,36 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
     source.append(Flags.toString(getFlags())).append(" ");
     source.append(((getFlags() & Flags.AccInterface) != 0) ? ("interface ") : ("class "));
     source.append(getElementName());
+    // parameter types
+    if (getTypeParameters().size() > 0) {
+      source.append(Signature.C_GENERIC_START);
+      Iterator<ITypeParameter> it = getTypeParameters().iterator();
+      // first
+      ITypeParameter tp = it.next();
+      if (StringUtility.hasText(tp.getParameterName())) {
+        source.append(tp.getParameterName());
+        source.append(" extends ");
+      }
+      source.append(SignatureUtility.getTypeReference(tp.getParameterSignature(), validator));
+      // rest
+      while (it.hasNext()) {
+        source.append(", ");
+        tp = it.next();
+        if (StringUtility.hasText(tp.getParameterName())) {
+          source.append(tp.getParameterName());
+          IType tpType = TypeUtility.getTypeBySignature(tp.getParameterSignature());
+          if (tpType.isInterface()) {
+            source.append(" implements ");
+          }
+          else {
+            source.append(" extends ");
+          }
+        }
+        source.append(SignatureUtility.getTypeReference(tp.getParameterSignature(), validator));
 
-    // add our own type name to the validator so that it cannot interfere with other types (e.g. in the jre) with the same name.
+      }
+      source.append(Signature.C_GENERIC_END);
+    }
     validator.getTypeName(SignatureCache.createTypeSignature(getFullyQualifiedName()));
 
     // super type (extends)
@@ -168,6 +201,21 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
         }
       }
     }
+  }
+
+  @Override
+  public void addTypeParameter(ITypeParameter typeParameter) {
+    m_typeParameters.add(typeParameter);
+  }
+
+  @Override
+  public void setTypeParameters(List<? extends ITypeParameter> typeParameters) {
+    m_typeParameters = CollectionUtility.arrayList(typeParameters);
+  }
+
+  @Override
+  public List<ITypeParameter> getTypeParameters() {
+    return m_typeParameters;
   }
 
   @Override

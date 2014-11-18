@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.sourcebuilder.method;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -27,7 +26,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 
 /**
  * <h3>{@link MethodSourceBuilder}</h3>
- *
+ * 
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
@@ -61,11 +60,18 @@ public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implem
     Iterator<MethodParameter> parameterIterator = getParameters().iterator();
     if (parameterIterator.hasNext()) {
       MethodParameter param = parameterIterator.next();
+      if (param.getFlags() != Flags.AccDefault) {
+        source.append(Flags.toString(param.getFlags())).append(" ");
+      }
       source.append(SignatureUtility.getTypeReference(param.getSignature(), validator)).append(" ").append(param.getName());
     }
     while (parameterIterator.hasNext()) {
+      source.append(", ");
       MethodParameter param = parameterIterator.next();
-      source.append(", ").append(SignatureUtility.getTypeReference(param.getSignature(), validator)).append(" ").append(param.getName());
+      if (param.getFlags() != Flags.AccDefault) {
+        source.append(Flags.toString(param.getFlags())).append(" ");
+      }
+      source.append(SignatureUtility.getTypeReference(param.getSignature(), validator)).append(" ").append(param.getName());
     }
     source.append(")");
     // exceptions
@@ -162,9 +168,9 @@ public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implem
   }
 
   @Override
-  public void setExceptionSignatures(String[] exceptionSignatures) {
+  public void setExceptionSignatures(List<String> exceptionSignatures) {
     m_exceptionSignatures.clear();
-    m_exceptionSignatures.addAll(Arrays.asList(exceptionSignatures));
+    m_exceptionSignatures.addAll(exceptionSignatures);
   }
 
   @Override

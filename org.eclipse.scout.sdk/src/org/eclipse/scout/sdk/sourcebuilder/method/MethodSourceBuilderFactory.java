@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>{@link MethodSourceBuilderFactory}</h3>
- *
+ * 
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
@@ -84,9 +84,9 @@ public final class MethodSourceBuilderFactory {
     String[] unresolvedExceptionSignatures = method.getExceptionTypes();
     String[] resolvedExceptionSignatures = new String[unresolvedExceptionSignatures.length];
     for (int i = 0; i < unresolvedExceptionSignatures.length; i++) {
-      resolvedExceptionSignatures[i] = SignatureUtility.getResolvedSignature(unresolvedExceptionSignatures[i], contextType);
+      resolvedExceptionSignatures[i] = SignatureUtility.getResolvedSignature(unresolvedExceptionSignatures[i], method.getDeclaringType(), contextType);
     }
-    sourceBuilder.setExceptionSignatures(resolvedExceptionSignatures);
+    sourceBuilder.setExceptionSignatures(CollectionUtility.arrayList(resolvedExceptionSignatures));
     sourceBuilder.setParameters(TypeUtility.getMethodParameters(method, contextType));
     int flags = method.getFlags() & (~Flags.AccTransient);
     if (!method.getDeclaringType().equals(contextType)) {
@@ -162,7 +162,7 @@ public final class MethodSourceBuilderFactory {
         resolvedExceptionSignatures[i] = SignatureUtility.getResolvedSignature(methodToOverride.getDeclaringType(), localGenericMapping, unresolvedExceptionSignatures[i]);
       }
 
-      builder.setExceptionSignatures(resolvedExceptionSignatures);
+      builder.setExceptionSignatures(CollectionUtility.arrayList(resolvedExceptionSignatures));
 
       // parameters
       builder.setParameters(TypeUtility.getMethodParameters(methodToOverride, localGenericMapping));

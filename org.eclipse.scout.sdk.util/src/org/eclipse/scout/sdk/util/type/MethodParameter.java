@@ -10,12 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.type;
 
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.jdt.core.Flags;
 
 /**
  * <h3>{@link MethodParameter}</h3>
- *
+ * 
  * @author Andreas Hoegger
  * @since 3.8.0 06.12.2012
  */
@@ -23,10 +22,16 @@ public class MethodParameter {
 
   private final String m_name;
   private final String m_signature;
+  private int m_flags;
 
   public MethodParameter(String name, String signature) {
+    this(name, signature, Flags.AccDefault);
+  }
+
+  public MethodParameter(String name, String signature, int flags) {
     m_name = name;
     m_signature = signature;
+    m_flags = flags;
   }
 
   public String getName() {
@@ -37,30 +42,56 @@ public class MethodParameter {
     return m_signature;
   }
 
+  public int getFlags() {
+    return m_flags;
+  }
+
+  public void setFlags(int flags) {
+    m_flags = flags;
+  }
+
+  @Override
+  public int hashCode() {
+    final int prime = 31;
+    int result = 1;
+    result = prime * result + m_flags;
+    result = prime * result + ((m_name == null) ? 0 : m_name.hashCode());
+    result = prime * result + ((m_signature == null) ? 0 : m_signature.hashCode());
+    return result;
+  }
+
   @Override
   public boolean equals(Object obj) {
-    if (!(obj instanceof MethodParameter)) {
+    if (this == obj) {
+      return true;
+    }
+    if (obj == null) {
       return false;
     }
-    MethodParameter refParam = (MethodParameter) obj;
-    if (!CompareUtility.equals(refParam.getName(), getName())) {
+    if (getClass() != obj.getClass()) {
       return false;
     }
-    if (!CompareUtility.equals(refParam.getSignature(), getSignature())) {
+    MethodParameter other = (MethodParameter) obj;
+    if (m_flags != other.m_flags) {
+      return false;
+    }
+    if (m_name == null) {
+      if (other.m_name != null) {
+        return false;
+      }
+    }
+    else if (!m_name.equals(other.m_name)) {
+      return false;
+    }
+    if (m_signature == null) {
+      if (other.m_signature != null) {
+        return false;
+      }
+    }
+    else if (!m_signature.equals(other.m_signature)) {
       return false;
     }
     return true;
   }
 
-  @Override
-  public int hashCode() {
-    int hashCode = 0;
-    if (StringUtility.hasText(getName())) {
-      hashCode = getName().hashCode();
-    }
-    if (StringUtility.hasText(getSignature())) {
-      hashCode ^= getSignature().hashCode();
-    }
-    return hashCode;
-  }
 }
