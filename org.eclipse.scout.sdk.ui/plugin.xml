@@ -4,7 +4,6 @@
    <extension-point id="formField" name="Form Field" schema="schema/formField.exsd"/>
    <extension-point id="outlineDragAndDrop" name="Drag And Drop" schema="schema/outlineDragAndDrop.exsd"/>
    <extension-point id="explorerPage" name="Scout Explorer Page" schema="schema/explorerPage.exsd"/>
-   <extension-point id="propertyStructure" name="Scout Property View Structure" schema="schema/propertyStructure.exsd"/>
    <extension-point id="propertyViewPart" name="Property View Part" schema="schema/propertyViewPart.exsd"/>
    <extension-point id="outlineCopyAndPaste" name="Copy And Paste" schema="schema/outlineCopyAndPaste.exsd"/>
    <extension-point id="contextMenu" name="contextMenu" schema="schema/contextMenu.exsd"/>
@@ -802,12 +801,6 @@
                value="plugin_customization.ini">
          </property>
       </product>
-   </extension>
-   <extension
-         point="org.eclipse.scout.sdk.ui.propertyStructure">
-      <propertyDefinition
-            file="resources/sdkEditorStructure.xml">
-      </propertyDefinition>
    </extension>
    <extension
          point="org.eclipse.scout.sdk.ui.propertyViewPart">

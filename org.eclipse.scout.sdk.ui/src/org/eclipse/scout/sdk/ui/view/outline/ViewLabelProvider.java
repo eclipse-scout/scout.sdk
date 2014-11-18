@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.view.outline;
 
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.IColorProvider;
 import org.eclipse.jface.viewers.IFontProvider;
 import org.eclipse.jface.viewers.LabelProvider;
@@ -17,6 +18,9 @@ import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPageFilter;
+import org.eclipse.scout.sdk.ui.view.outline.pages.ITypePage;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Font;
@@ -74,7 +78,15 @@ public class ViewLabelProvider extends LabelProvider implements IColorProvider, 
   public Color getForeground(Object element) {
     if (element instanceof IPage) {
       IPage p = (IPage) element;
-      if (p.getScoutBundle() != null && p.getScoutBundle().isBinary()) {
+      if (p instanceof ITypePage) {
+        IType t = ((ITypePage) p).getType();
+        if (TypeUtility.exists(t) && t.isBinary()) {
+          return ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
+        }
+      }
+
+      IScoutBundle scoutBundle = p.getScoutBundle();
+      if (scoutBundle != null && scoutBundle.isBinary()) {
         return ScoutSdkUi.getDisplay().getSystemColor(SWT.COLOR_WIDGET_DARK_SHADOW);
       }
     }
