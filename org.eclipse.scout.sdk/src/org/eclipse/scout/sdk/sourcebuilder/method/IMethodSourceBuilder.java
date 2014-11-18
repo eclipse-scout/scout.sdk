@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 
 /**
  * <h3>{@link IMethodSourceBuilder}</h3>
- *
+ * 
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
@@ -115,7 +115,7 @@ public interface IMethodSourceBuilder extends IAnnotatableSourceBuilder {
   /**
    * @param exceptionSignatures
    */
-  void setExceptionSignatures(String[] exceptionSignatures);
+  void setExceptionSignatures(List<String> exceptionSignatures);
 
   /**
    * @param methodBodySourceBuilder
@@ -127,7 +127,7 @@ public interface IMethodSourceBuilder extends IAnnotatableSourceBuilder {
    * 'methodname(param1Signature,param2Signature)'.<br>
    * The result of this method can be used to compare methods together with the
    * {@link SignatureUtility#getMethodIdentifier(org.eclipse.jdt.core.IMethod)}.
-   *
+   * 
    * @return
    */
   String getMethodIdentifier();

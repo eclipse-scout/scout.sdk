@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.sourcebuilder.type;
 import java.util.List;
 
 import org.eclipse.scout.commons.CompositeObject;
+import org.eclipse.scout.sdk.operation.ITypeParameter;
 import org.eclipse.scout.sdk.sourcebuilder.IAnnotatableSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.ICommentSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.IAnnotationSourceBuilder;
@@ -180,4 +181,19 @@ public interface ITypeSourceBuilder extends IAnnotatableSourceBuilder {
    * @param parentFullyQualifiedName
    */
   void setParentFullyQualifiedName(String parentFullyQualifiedName);
+
+  /**
+   * @param typeParameter
+   */
+  void addTypeParameter(ITypeParameter typeParameter);
+
+  /**
+   * @param typeParameters
+   */
+  void setTypeParameters(List<? extends ITypeParameter> typeParameters);
+
+  /**
+   * @return
+   */
+  List<ITypeParameter> getTypeParameters();
 }

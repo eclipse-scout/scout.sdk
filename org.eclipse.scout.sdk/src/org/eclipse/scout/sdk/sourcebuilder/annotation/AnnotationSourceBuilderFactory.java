@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
 /**
  * <h3>{@link AnnotationSourceBuilderFactory}</h3>
- *
+ * 
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
@@ -52,9 +52,15 @@ public final class AnnotationSourceBuilderFactory {
     return orderAnnoation;
   }
 
+  public static IAnnotationSourceBuilder createSupressWarningAnnotation(String parameter) {
+    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(SignatureCache.createTypeSignature(SuppressWarnings.class.getName()));
+    orderAnnoation.addParameter(parameter);
+    return orderAnnoation;
+  }
+
   /**
    * Creates a Priority annotation using the given priority value.
-   *
+   * 
    * @param priority
    *          Must be a string containing a valid float value (without 'f' suffix).
    * @return The created builder.
@@ -68,7 +74,7 @@ public final class AnnotationSourceBuilderFactory {
 
   /**
    * Creates a new {@link ClassId} annotation source builder for the given generation context.
-   *
+   * 
    * @param context
    *          The context for which the annotation should be created.
    * @return the created source builder
@@ -79,7 +85,7 @@ public final class AnnotationSourceBuilderFactory {
 
   /**
    * Creates a new {@link ClassId} annotation source builder
-   *
+   * 
    * @param classIdValue
    *          the class id value to use
    * @return the created source builder
@@ -92,7 +98,7 @@ public final class AnnotationSourceBuilderFactory {
 
   /**
    * Creates a new {@link ClassId} annotation source builder for the given type.
-   *
+   * 
    * @param parentTypeSourceBuilder
    *          the type source builder for which the annotation should be created.
    * @return the created source builder
@@ -103,7 +109,7 @@ public final class AnnotationSourceBuilderFactory {
 
   /**
    * Creates a new {@link ClassId} annotation source builder for the given type.
-   *
+   * 
    * @param declaringType
    *          The type for which the annotation should be created.
    * @return the created source builder

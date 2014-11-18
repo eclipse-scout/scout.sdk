@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
 /**
  * <h3>{@link AbstractMethodNewOperation}</h3>
- *
+ * 
  * @author Andreas Hoegger
  * @since 3.10.0 13.03.2013
  */
@@ -258,9 +258,9 @@ public abstract class AbstractMethodNewOperation implements IOperation {
 
   /**
    * @param exceptionSignatures
-   * @see org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder#setExceptionSignatures(java.lang.String[])
+   * @see org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilder#setExceptionSignatures(List)
    */
-  public void setExceptionSignatures(String[] exceptionSignatures) {
+  public void setExceptionSignatures(List<String> exceptionSignatures) {
     m_sourceBuilder.setExceptionSignatures(exceptionSignatures);
   }
 
