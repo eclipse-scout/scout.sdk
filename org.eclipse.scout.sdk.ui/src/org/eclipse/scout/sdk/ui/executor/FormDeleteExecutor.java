@@ -118,7 +118,7 @@ public class FormDeleteExecutor extends AbstractExecutor {
 
     // form data
     try {
-      m_formData = ScoutTypeUtility.findFormDataForForm(m_formType);
+      m_formData = ScoutTypeUtility.findDtoForForm(m_formType);
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError(e);

@@ -108,10 +108,23 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   }
 
   @Override
+  public Deque<IType> getSuperClassStack(IType startType) {
+    return getSuperClassStack(startType, true);
+  }
+
+  @Override
   public Deque<IType> getSuperClassStack(IType startType, boolean includeStartType) {
+    return getSuperClassStack(startType, includeStartType, null);
+  }
+
+  @Override
+  public Deque<IType> getSuperClassStack(IType startType, boolean includeStartType, String stopTypeFqn) {
     LinkedList<IType> result = new LinkedList<IType>();
     if (startType == null) {
       return result;
+    }
+    if (stopTypeFqn == null) {
+      stopTypeFqn = Object.class.getName();
     }
     IType cur = null;
     if (includeStartType) {
@@ -120,16 +133,11 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
     else {
       cur = getSuperclass(startType);
     }
-    while (TypeUtility.exists(cur) && !Object.class.getName().equals(cur.getFullyQualifiedName())) {
+    while (TypeUtility.exists(cur) && !stopTypeFqn.equals(cur.getFullyQualifiedName())) {
       result.add(cur);
       cur = getSuperclass(cur);
     }
     return result;
-  }
-
-  @Override
-  public Deque<IType> getSuperClassStack(IType startType) {
-    return getSuperClassStack(startType, true);
   }
 
   @Override

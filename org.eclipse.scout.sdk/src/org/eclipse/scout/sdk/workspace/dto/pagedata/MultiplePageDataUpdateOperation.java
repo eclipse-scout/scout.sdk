@@ -56,10 +56,10 @@ public class MultiplePageDataUpdateOperation implements IOperation {
     for (IType t : pages) {
       i++;
       monitor.setTaskName("Updating Page Data " + i + " of " + pages.size() + " (" + t.getElementName() + ")");
-      PageDataAnnotation annotation = ScoutTypeUtility.findPageDataAnnotation(t, TypeUtility.getSupertypeHierarchy(t));
+      DataAnnotation annotation = ScoutTypeUtility.findDataAnnotation(t, TypeUtility.getSupertypeHierarchy(t));
       if (annotation != null) {
-        IType pageDataType = TypeUtility.getTypeBySignature(annotation.getPageDataTypeSignature());
-        if (TypeUtility.exists(pageDataType)) {
+        IType dataType = TypeUtility.getTypeBySignature(annotation.getDataTypeSignature());
+        if (TypeUtility.exists(dataType)) {
           PageDataDtoUpdateOperation op = new PageDataDtoUpdateOperation(t, annotation);
           op.validate();
           op.run(innerMonitor, workingCopyManager);

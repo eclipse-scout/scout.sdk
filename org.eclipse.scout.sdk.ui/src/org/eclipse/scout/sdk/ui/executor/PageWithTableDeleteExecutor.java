@@ -100,7 +100,7 @@ public class PageWithTableDeleteExecutor extends AbstractExecutor {
     // page data
     IType pageData = null;
     try {
-      pageData = ScoutTypeUtility.findPageDataForPage(m_pageType);
+      pageData = ScoutTypeUtility.findDtoForPage(m_pageType);
     }
     catch (JavaModelException e) {
       ScoutSdkUi.logError(e);

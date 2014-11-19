@@ -24,19 +24,19 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
 
 /**
- * <h3>{@link PageDataDtoUpdateOperation}</h3>
+ * <h3>{@link RowDataDtoUpdateOperation}</h3>
  *
- * @author Andreas Hoegger
- * @since 3.10.0 16.08.2013
+ * @author Matthias Villiger
+ * @since 4.1.0 19.11.2014
  */
-public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
+public class RowDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
 
   private final DataAnnotation m_dataAnnotation;
 
   /**
    * @param modelType
    */
-  public PageDataDtoUpdateOperation(IType modelType, DataAnnotation dataAnnotation) {
+  public RowDataDtoUpdateOperation(IType modelType, DataAnnotation dataAnnotation) {
     super(modelType);
     m_dataAnnotation = dataAnnotation;
   }
@@ -70,23 +70,16 @@ public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
     }
     ICompilationUnit dtoIcu = dtoType.getCompilationUnit();
 
-    DataAnnotation dataAnnotation = getDataAnnotation();
-    ITypeSourceBuilder pageDataSourceBuilder = DtoUtility.createPageDataSourceBuilder(getModelType(), dataAnnotation, dtoIcu, monitor);
+    ITypeSourceBuilder rowDataSourceBuilder = DtoUtility.createTableRowDataTypeSourceBuilder(getModelType(), getDataAnnotation(), monitor);
     if (monitor.isCanceled()) {
       return null;
     }
 
     CompilationUnitSourceBuilder cuSourceBuilder = new CompilationUnitSourceBuilder(dtoIcu.getElementName(), dtoIcu.getParent().getElementName());
-    cuSourceBuilder.addTypeSourceBuilder(pageDataSourceBuilder);
+    cuSourceBuilder.addTypeSourceBuilder(rowDataSourceBuilder);
     cuSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
 
     ImportValidator validator = new ImportValidator(TypeUtility.getPackage(dtoIcu).getElementName());
-    if (monitor.isCanceled()) {
-      return null;
-    }
-
-    // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
-    consumeAllTypeNamesRec(pageDataSourceBuilder, validator);
     if (monitor.isCanceled()) {
       return null;
     }
@@ -96,5 +89,4 @@ public class PageDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
     String source = sourceBuilder.toString();
     return source;
   }
-
 }

@@ -54,7 +54,7 @@ public class TypeResolverFormDataExecutor extends AbstractExecutor {
       m_resolver = (ITypeResolver) selectedElement;
     }
 
-    return m_resolver != null && isEditable(scoutBundle);
+    return m_resolver != null && (scoutBundle == null || !scoutBundle.isBinary());
   }
 
   @Override

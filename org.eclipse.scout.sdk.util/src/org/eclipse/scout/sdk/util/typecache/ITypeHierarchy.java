@@ -115,7 +115,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
   boolean isSubtype(IType type, IType potentialSubtype);
 
   /**
-   * Builds the super classes stack for the given {@link IType} in bottom-up order.<br>
+   * Builds the full super classes stack for the given {@link IType} in bottom-up order.<br>
    * The given {@link IType} is always part of the {@link Deque} and can therefore be found at the first position.<br>
    * You can use {@link Deque#descendingIterator()} to loop through the classes in top-down order.<br>
    * Note: {@link java.lang.Object} is never part of the super classes stack.
@@ -129,7 +129,7 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
   Deque<IType> getSuperClassStack(IType startType);
 
   /**
-   * Builds the super classes stack for the given {@link IType} in bottom-up order.<br>
+   * Builds the full super classes stack for the given {@link IType} in bottom-up order.<br>
    * The given {@link IType} itself is only part of the {@link Deque} if includeStartType is set to <code>true</code>.
    * Then it can therefore be found at the first position.<br>
    * You can use {@link Deque#descendingIterator()} to loop through the classes in top-down order.<br>
@@ -145,6 +145,28 @@ public interface ITypeHierarchy extends ITypeHierarchyResult {
    * @see Deque#descendingIterator()
    */
   Deque<IType> getSuperClassStack(IType startType, boolean includeStartType);
+
+  /**
+   * Builds the bottom-up ordered super classes stack for the given {@link IType} until the given stopTypeFqn is found.<br>
+   * The stop type itself is never part of the resulting stack.<br>
+   * The given {@link IType} itself is only part of the {@link Deque} if includeStartType is set to <code>true</code>.
+   * Then it can therefore be found at the first position.<br>
+   * You can use {@link Deque#descendingIterator()} to loop through the classes in top-down order.<br>
+   * Note: {@link java.lang.Object} is never part of the super classes stack.
+   *
+   * @param startType
+   *          The start {@link IType}.
+   * @param includeStartType
+   *          Specifies if the given startType should be part of the {@link Deque} (<code>true</code>) or not (
+   *          <code>false</code>).
+   * @param stopTypeFqn
+   *          The fully qualified type name when to stop following the super classes.
+   * @return The super classes stack from the given startType to the given stopType in bottom-up order (startType
+   *         first).
+   * @see Deque
+   * @see Deque#descendingIterator()
+   */
+  Deque<IType> getSuperClassStack(IType startType, boolean includeStartType, String stopTypeFqn);
 
   /**
    * @see ITypeHierarchy#getAllSuperclasses(IType, ITypeFilter, Comparator)

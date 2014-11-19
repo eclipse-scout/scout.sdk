@@ -58,7 +58,7 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
 
   @Override
   public String getOperationName() {
-    return "Update DTO for '" + getModelType().getElementName() + "'";
+    return "Update DTO for '" + getModelType().getElementName() + "'.";
   }
 
   @Override

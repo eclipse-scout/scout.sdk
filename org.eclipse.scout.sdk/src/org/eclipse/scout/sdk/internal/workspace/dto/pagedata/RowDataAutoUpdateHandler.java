@@ -18,19 +18,19 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.DtoUpdateProperties;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateOperation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.DataAnnotation;
-import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataDtoUpdateOperation;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.RowDataDtoUpdateOperation;
 
 /**
- * Auto-update handler responding on {@link IRuntimeClasses#PageData} annotations that are placed on table pages (i.e.
- * {@link IRuntimeClasses#IPageWithTable}).
+ * <h3>{@link RowDataAutoUpdateHandler}</h3>
  *
- * @since 3.10.0-M1
+ * @author mvi
+ * @since 4.1.0 19.11.2014
  */
-public class PageDataAutoUpdateHandler extends AbstractDtoUpdateHandler {
+public class RowDataAutoUpdateHandler extends AbstractDtoUpdateHandler {
 
   private boolean checkType(DtoUpdateProperties properties) throws CoreException {
     ITypeHierarchy superTypeHierarchy = ensurePropertySuperTypeHierarchy(properties);
-    if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable))) {
+    if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IColumn)) || superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITableExtension))) {
       DataAnnotation dataAnnotation = ensurePropertyDataAnnotation(properties);
       return dataAnnotation != null;
     }
@@ -40,7 +40,7 @@ public class PageDataAutoUpdateHandler extends AbstractDtoUpdateHandler {
   @Override
   public IDtoAutoUpdateOperation createUpdateOperation(DtoUpdateProperties properties) throws CoreException {
     if (checkType(properties)) {
-      return new PageDataDtoUpdateOperation(properties.getType(), ensurePropertyDataAnnotation(properties));
+      return new RowDataDtoUpdateOperation(properties.getType(), ensurePropertyDataAnnotation(properties));
     }
     return null;
   }

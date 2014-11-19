@@ -28,6 +28,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilder;
@@ -50,7 +51,6 @@ import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.type.PropertyBeanComparators;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
-import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutPropertyBeanFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -67,18 +67,18 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
   private final ICompilationUnit m_derivedCu;
   protected static final String SIG_FOR_IS_METHOD_NAME = Signature.SIG_BOOLEAN;
 
-  public AbstractDtoTypeSourceBuilder(IType modelType, String elementName, ICompilationUnit derivedCu, IProgressMonitor monitor) {
-    this(modelType, elementName, true, derivedCu, monitor);
+  public AbstractDtoTypeSourceBuilder(IType modelType, ITypeHierarchy modelLocalTypeHierarchy, String elementName, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    this(modelType, modelLocalTypeHierarchy, elementName, true, derivedCu, monitor);
   }
 
   /**
    * @param elementName
    */
-  public AbstractDtoTypeSourceBuilder(IType modelType, String elementName, boolean setup, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+  public AbstractDtoTypeSourceBuilder(IType modelType, ITypeHierarchy modelLocalTypeHierarchy, String elementName, boolean setup, ICompilationUnit derivedCu, IProgressMonitor monitor) {
     super(elementName);
     m_modelType = modelType;
     m_derivedCu = derivedCu;
-    m_localTypeHierarchy = TypeUtility.getLocalTypeHierarchy(modelType);
+    m_localTypeHierarchy = modelLocalTypeHierarchy;
     if (setup) {
       setup(monitor);
     }
@@ -145,9 +145,14 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
         final IAnnotation annotation = a;
         String elementName = annotation.getElementName();
 
-        if (!IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName)
-            && !Signature.getSimpleName(IRuntimeClasses.FormData).equals(elementName) && !Signature.getSimpleName(IRuntimeClasses.Order).equals(elementName)
-            && !Signature.getSimpleName(IRuntimeClasses.PageData).equals(elementName)) {
+        if (!IRuntimeClasses.FormData.equals(elementName)
+            && !IRuntimeClasses.Order.equals(elementName)
+            && !IRuntimeClasses.PageData.equals(elementName)
+            && !RuntimeClasses.Data.equals(elementName)
+            && !Signature.getSimpleName(IRuntimeClasses.FormData).equals(elementName)
+            && !Signature.getSimpleName(IRuntimeClasses.Order).equals(elementName)
+            && !Signature.getSimpleName(IRuntimeClasses.PageData).equals(elementName)
+            && !Signature.getSimpleName(IRuntimeClasses.Data).equals(elementName)) {
           if (!NamingUtility.isFullyQualifiedName(elementName)) {
             elementName = TypeUtility.getReferencedTypeFqn(declaringType, elementName, true);
           }
@@ -229,7 +234,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
   }
 
   protected void collectProperties(IProgressMonitor monitor) {
-    Set<? extends IPropertyBean> beanPropertyDescriptors = TypeUtility.getPropertyBeans(getModelType(), ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
+    Set<? extends IPropertyBean> beanPropertyDescriptors = TypeUtility.getPropertyBeans(getModelType(), ScoutPropertyBeanFilters.getDtoPropertyFilter(), PropertyBeanComparators.getNameComparator());
     for (IPropertyBean desc : beanPropertyDescriptors) {
       try {
 
@@ -237,67 +242,61 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
           return;
         }
 
-        if (desc.getReadMethod() != null || desc.getWriteMethod() != null) {
-          if (FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getReadMethod()))
-              && FormDataAnnotation.isCreate(ScoutTypeUtility.findFormDataAnnotation(desc.getWriteMethod()))) {
-            String beanName = NamingUtility.ensureValidParameterName(desc.getBeanName());
-            String lowerCaseBeanName = NamingUtility.ensureStartWithLowerCase(beanName);
-            final String upperCaseBeanName = NamingUtility.ensureStartWithUpperCase(beanName);
+        String beanName = NamingUtility.ensureValidParameterName(desc.getBeanName());
+        String lowerCaseBeanName = NamingUtility.ensureStartWithLowerCase(beanName);
+        final String upperCaseBeanName = NamingUtility.ensureStartWithUpperCase(beanName);
 
-            String propName = upperCaseBeanName + "Property";
-            String resolvedSignature = SignatureUtility.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());
-            if (!StringUtility.hasText(resolvedSignature)) {
-              resolvedSignature = SignatureCache.createTypeSignature(Object.class.getName());
-            }
-            String unboxedSignature = SignatureUtility.unboxPrimitiveSignature(resolvedSignature);
-
-            // property class
-            TypeSourceBuilder propertyTypeBuilder = new TypeSourceBuilder(propName);
-            propertyTypeBuilder.setFlags(Flags.AccPublic | Flags.AccStatic);
-            String superTypeSig = SignatureCache.createTypeSignature(IRuntimeClasses.AbstractPropertyData);
-            superTypeSig = DtoUtility.ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll(Signature.C_GENERIC_START + unboxedSignature + Signature.C_GENERIC_END + Signature.C_SEMICOLON);
-            propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
-            IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
-            propertyTypeBuilder.addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
-            IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(propName);
-            propertyTypeBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
-            addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormDataPropertyKey(propertyTypeBuilder), propertyTypeBuilder);
-
-            // copy annotations over to the DTO
-            IMethod propertyMethod = desc.getReadMethod();
-            if (!TypeUtility.exists(propertyMethod)) {
-              propertyMethod = desc.getWriteMethod();
-            }
-            if (TypeUtility.exists(propertyMethod)) {
-              copyAnnotations(propertyMethod, propertyMethod.getDeclaringType(), propertyTypeBuilder);
-            }
-
-            // getter
-            IMethodSourceBuilder propertyGetterBuilder = new MethodSourceBuilder("get" + propName);
-            propertyGetterBuilder.setFlags(Flags.AccPublic);
-            propertyGetterBuilder.setReturnTypeSignature(Signature.createTypeSignature(propName, false));
-            propertyGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return getPropertyByClass(" + propName + ".class);"));
-            addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(propertyGetterBuilder), propertyGetterBuilder);
-
-            // legacy getter
-            IMethodSourceBuilder legacyPropertyGetterBuilder = new MethodSourceBuilder((SIG_FOR_IS_METHOD_NAME.equals(resolvedSignature) ? "is" : "get") + upperCaseBeanName);
-            legacyPropertyGetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
-            legacyPropertyGetterBuilder.setFlags(Flags.AccPublic);
-            legacyPropertyGetterBuilder.setReturnTypeSignature(resolvedSignature);
-            legacyPropertyGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(getLegacyGetterMethodBody(resolvedSignature, propName)));
-            addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertyGetterBuilder), legacyPropertyGetterBuilder);
-
-            // legacy setter
-            IMethodSourceBuilder legacyPropertySetterBuilder = new MethodSourceBuilder("set" + upperCaseBeanName);
-            legacyPropertySetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
-            legacyPropertySetterBuilder.setFlags(Flags.AccPublic);
-            legacyPropertySetterBuilder.setReturnTypeSignature(Signature.SIG_VOID);
-            legacyPropertySetterBuilder.addParameter(new MethodParameter(lowerCaseBeanName, resolvedSignature));
-            legacyPropertySetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("get" + propName + "().setValue(" + lowerCaseBeanName + ");"));
-            addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertySetterBuilder), legacyPropertySetterBuilder);
-
-          }
+        String propName = upperCaseBeanName + "Property";
+        String resolvedSignature = SignatureUtility.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());
+        if (!StringUtility.hasText(resolvedSignature)) {
+          resolvedSignature = SignatureCache.createTypeSignature(Object.class.getName());
         }
+        String unboxedSignature = SignatureUtility.unboxPrimitiveSignature(resolvedSignature);
+
+        // property class
+        TypeSourceBuilder propertyTypeBuilder = new TypeSourceBuilder(propName);
+        propertyTypeBuilder.setFlags(Flags.AccPublic | Flags.AccStatic);
+        String superTypeSig = SignatureCache.createTypeSignature(IRuntimeClasses.AbstractPropertyData);
+        superTypeSig = DtoUtility.ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll(Signature.C_GENERIC_START + unboxedSignature + Signature.C_GENERIC_END + Signature.C_SEMICOLON);
+        propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
+        IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
+        propertyTypeBuilder.addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
+        IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(propName);
+        propertyTypeBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+        addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormDataPropertyKey(propertyTypeBuilder), propertyTypeBuilder);
+
+        // copy annotations over to the DTO
+        IMethod propertyMethod = desc.getReadMethod();
+        if (!TypeUtility.exists(propertyMethod)) {
+          propertyMethod = desc.getWriteMethod();
+        }
+        if (TypeUtility.exists(propertyMethod)) {
+          copyAnnotations(propertyMethod, propertyMethod.getDeclaringType(), propertyTypeBuilder);
+        }
+
+        // getter
+        IMethodSourceBuilder propertyGetterBuilder = new MethodSourceBuilder("get" + propName);
+        propertyGetterBuilder.setFlags(Flags.AccPublic);
+        propertyGetterBuilder.setReturnTypeSignature(Signature.createTypeSignature(propName, false));
+        propertyGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return getPropertyByClass(" + propName + ".class);"));
+        addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(propertyGetterBuilder), propertyGetterBuilder);
+
+        // legacy getter
+        IMethodSourceBuilder legacyPropertyGetterBuilder = new MethodSourceBuilder((SIG_FOR_IS_METHOD_NAME.equals(resolvedSignature) ? "is" : "get") + upperCaseBeanName);
+        legacyPropertyGetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
+        legacyPropertyGetterBuilder.setFlags(Flags.AccPublic);
+        legacyPropertyGetterBuilder.setReturnTypeSignature(resolvedSignature);
+        legacyPropertyGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(getLegacyGetterMethodBody(resolvedSignature, propName)));
+        addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertyGetterBuilder), legacyPropertyGetterBuilder);
+
+        // legacy setter
+        IMethodSourceBuilder legacyPropertySetterBuilder = new MethodSourceBuilder("set" + upperCaseBeanName);
+        legacyPropertySetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
+        legacyPropertySetterBuilder.setFlags(Flags.AccPublic);
+        legacyPropertySetterBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+        legacyPropertySetterBuilder.addParameter(new MethodParameter(lowerCaseBeanName, resolvedSignature));
+        legacyPropertySetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("get" + propName + "().setValue(" + lowerCaseBeanName + ");"));
+        addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertySetterBuilder), legacyPropertySetterBuilder);
       }
       catch (CoreException e) {
         ScoutSdk.logError("could append property to form data '" + getElementName() + "'.", e);

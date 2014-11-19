@@ -15,35 +15,36 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuilder;
-import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.DataAnnotation;
 
 /**
- * <h3>{@link PageDataSourceBuilder}</h3>
+ * <h3>{@link TableBeanDataSourceBuilder}</h3>
  *
  * @author Andreas Hoegger
  * @since 3.10.0 28.08.2013
  */
-public class PageDataSourceBuilder extends AbstractTableBeanSourceBuilder {
+public class TableBeanDataSourceBuilder extends AbstractTableBeanSourceBuilder {
 
-  private PageDataAnnotation m_pageDataAnnotation;
+  private DataAnnotation m_dataAnnotation;
 
   /**
    * @param modelType
    * @param elementName
    * @param setup
    */
-  public PageDataSourceBuilder(IType modelType, String elementName, PageDataAnnotation pageDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
-    super(modelType, elementName, false, derivedCu, monitor);
-    m_pageDataAnnotation = pageDataAnnotation;
+  public TableBeanDataSourceBuilder(IType modelType, ITypeHierarchy modelLocalTypeHierarchy, String elementName, DataAnnotation dataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, modelLocalTypeHierarchy, elementName, false, derivedCu, monitor);
+    m_dataAnnotation = dataAnnotation;
     setup(monitor);
   }
 
   @Override
   protected String computeSuperTypeSignature() throws CoreException {
-    return getPageDataAnnotation().getSuperPageDataTypeSignature();
+    return getDataAnnotation().getSuperDataTypeSignature();
   }
 
-  public PageDataAnnotation getPageDataAnnotation() {
-    return m_pageDataAnnotation;
+  public DataAnnotation getDataAnnotation() {
+    return m_dataAnnotation;
   }
 }

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
-import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.DataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Test;
@@ -41,7 +41,7 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
     IType field = SdkAssert.assertTypeExists(typeName);
 
     ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(field);
-    PageDataAnnotation annotation = ScoutTypeUtility.findPageDataAnnotation(field, superTypeHierarchy);
+    DataAnnotation annotation = ScoutTypeUtility.findDataAnnotation(field, superTypeHierarchy);
     PageDataDtoUpdateOperation op = new PageDataDtoUpdateOperation(field, annotation);
     TestWorkspaceUtility.executeAndBuildWorkspace(op);
 

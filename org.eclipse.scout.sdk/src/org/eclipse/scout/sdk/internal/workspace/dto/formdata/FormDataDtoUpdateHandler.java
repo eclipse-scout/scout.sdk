@@ -11,14 +11,18 @@
 package org.eclipse.scout.sdk.internal.workspace.dto.formdata;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractDtoUpdateHandler;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.DtoUpdateProperties;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateOperation;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataDtoUpdateOperation;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.DataAnnotation;
 
 /**
  * <h3>{@link FormDataDtoUpdateHandler}</h3>
@@ -29,12 +33,32 @@ import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataDtoUpdateOperation;
 public class FormDataDtoUpdateHandler extends AbstractDtoUpdateHandler {
 
   private boolean checkType(DtoUpdateProperties properties) throws CoreException {
+    FormDataAnnotation formDataAnnotation = null;
+
     ITypeHierarchy superTypeHierarchy = ensurePropertySuperTypeHierarchy(properties);
     if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm)) || superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IFormField))) {
-      FormDataAnnotation formDataAnnotation = ensurePropertyFormDataAnnotation(properties);
-      return FormDataAnnotation.isCreate(formDataAnnotation);
+      formDataAnnotation = ensurePropertyFormDataAnnotation(properties);
     }
-    return false;
+    else if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IFormExtension)) || superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IFormFieldExtension))) {
+      DataAnnotation dataAnnotation = ensurePropertyDataAnnotation(properties);
+      if (dataAnnotation != null) {
+        formDataAnnotation = new FormDataAnnotation();
+        formDataAnnotation.setAnnotationOwner(properties.getType());
+        formDataAnnotation.setDefaultSubtypeSdkCommand(DefaultSubtypeSdkCommand.CREATE);
+        formDataAnnotation.setFormDataTypeSignature(dataAnnotation.getDataTypeSignature());
+        formDataAnnotation.setGenericOrdinal(-1);
+        formDataAnnotation.setSdkCommand(SdkCommand.CREATE);
+        String superDataTypeSignature = dataAnnotation.getSuperDataTypeSignature();
+        if (superDataTypeSignature != null) {
+          formDataAnnotation.setSuperTypeSignature(superDataTypeSignature);
+        }
+        else {
+          formDataAnnotation.setSuperTypeSignature(SignatureCache.createTypeSignature(IRuntimeClasses.AbstractFormFieldData));
+        }
+        properties.setFormDataAnnotation(formDataAnnotation);
+      }
+    }
+    return FormDataAnnotation.isCreate(formDataAnnotation);
   }
 
   @Override
@@ -42,8 +66,6 @@ public class FormDataDtoUpdateHandler extends AbstractDtoUpdateHandler {
     if (checkType(properties)) {
       return new FormDataDtoUpdateOperation(properties.getType(), ensurePropertyFormDataAnnotation(properties));
     }
-    else {
-      return null;
-    }
+    return null;
   }
 }

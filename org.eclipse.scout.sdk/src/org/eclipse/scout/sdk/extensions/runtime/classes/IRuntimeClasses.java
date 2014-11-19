@@ -69,9 +69,11 @@ public interface IRuntimeClasses {
   String Permission = "java.security.Permission"; // NO_UCD
   String FormData = "org.eclipse.scout.commons.annotations.FormData"; // NO_UCD
   String PageData = "org.eclipse.scout.commons.annotations.PageData"; // NO_UCD
+  String Data = "org.eclipse.scout.commons.annotations.Data"; // NO_UCD
   String ColumnData = "org.eclipse.scout.commons.annotations.ColumnData"; // NO_UCD
   String Replace = "org.eclipse.scout.commons.annotations.Replace"; // NO_UCD
   String ClassId = "org.eclipse.scout.commons.annotations.ClassId"; // NO_UCD
+  String Extends = "org.eclipse.scout.commons.annotations.Extends"; // NO_UCD
   String DtoRelevant = "org.eclipse.scout.commons.annotations.DtoRelevant"; // NO_UCD
   String InjectFieldTo = "org.eclipse.scout.commons.annotations.InjectFieldTo"; // NO_UCD
   String ClientProxyServiceFactory = "org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"; // NO_UCD
@@ -172,9 +174,12 @@ public interface IRuntimeClasses {
   String IDesktopExtension = "org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension"; // NO_UCD
   String IDoubleField = "org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField"; // NO_UCD
   String IDNDSupport = "org.eclipse.scout.rt.client.ui.IDNDSupport"; // NO_UCD
+  String IExtension = "org.eclipse.scout.rt.shared.extension.IExtension"; // NO_UCD
   String IFileChooserField = "org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField"; // NO_UCD
   String IForm = "org.eclipse.scout.rt.client.ui.form.IForm"; // NO_UCD
+  String IFormExtension = "org.eclipse.scout.rt.client.extension.ui.form.IFormExtension"; // NO_UCD
   String IFormField = "org.eclipse.scout.rt.client.ui.form.fields.IFormField"; // NO_UCD
+  String IFormFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension"; // NO_UCD
   String IFormHandler = "org.eclipse.scout.rt.client.ui.form.IFormHandler"; // NO_UCD
   String IGroupBox = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBox"; // NO_UCD
   String IGroupBoxBodyGrid = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid"; // NO_UCD
@@ -215,6 +220,7 @@ public interface IRuntimeClasses {
   String ISwingEnvironment = "org.eclipse.scout.rt.ui.swing.ISwingEnvironment"; // NO_UCD
   String ITabBox = "org.eclipse.scout.rt.client.ui.form.fields.tabbox.ITabBox"; // NO_UCD
   String ITable = "org.eclipse.scout.rt.client.ui.basic.table.ITable"; // NO_UCD
+  String ITableExtension = "org.eclipse.scout.rt.client.extension.ui.basic.table.ITableExtension"; // NO_UCD
   String ITableRow = "org.eclipse.scout.rt.client.ui.basic.table.ITableRow"; // NO_UCD
   String ITableField = "org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField"; // NO_UCD
   String IToolButton = "org.eclipse.scout.rt.client.ui.action.tool.IToolButton"; // NO_UCD

@@ -273,6 +273,11 @@ public final class CachedPrimaryTypeHierarchy implements ICachedTypeHierarchy {
   }
 
   @Override
+  public Deque<IType> getSuperClassStack(IType startType, boolean includeStartType, String stopTypeFqn) {
+    return m_cachedTypeHierarchy.getSuperClassStack(startType, includeStartType, stopTypeFqn);
+  }
+
+  @Override
   public void addHierarchyListener(ITypeHierarchyChangedListener listener) {
     m_cachedTypeHierarchy.addHierarchyListener(listener);
   }

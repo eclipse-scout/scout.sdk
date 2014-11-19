@@ -92,9 +92,12 @@ public final class ProjectContextTypeHierarchyResult implements ICacheableTypeHi
   }
 
   @Override
-  public synchronized boolean contains(IType t) {
+  public synchronized boolean contains(IType type) {
+    if (type == null) {
+      return false;
+    }
     getTypesCached(null); // load cache
-    return m_cachedTypes.contains(t);
+    return m_cachedTypes.contains(type);
   }
 
   @Override
@@ -165,13 +168,13 @@ public final class ProjectContextTypeHierarchyResult implements ICacheableTypeHi
         e.searchAllTypeNames(null, SearchPattern.R_EXACT_MATCH, null, SearchPattern.R_EXACT_MATCH, m_constraints.getSearchFor(),
             SearchEngine.createStrictHierarchyScope(m_constraints.getClasspath(), getBaseType(), true, m_constraints.isIncludeBaseType(), null),
             new TypeNameMatchRequestor() {
-              @Override
-              public void acceptTypeNameMatch(TypeNameMatch match) {
-                if (m_constraints.modifiersAccepted(match.getModifiers())) {
-                  collector.add(match.getType());
-                }
-              }
-            }, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, monitor);
+          @Override
+          public void acceptTypeNameMatch(TypeNameMatch match) {
+            if (m_constraints.modifiersAccepted(match.getModifiers())) {
+              collector.add(match.getType());
+            }
+          }
+        }, IJavaSearchConstants.WAIT_UNTIL_READY_TO_SEARCH, monitor);
         m_cachedTypes = collector;
       }
       catch (JavaModelException e) {

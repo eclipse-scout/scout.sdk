@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.DtoUpdateProperties;
 import org.eclipse.scout.sdk.workspace.dto.IDtoAutoUpdateHandler;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.DataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
@@ -28,29 +28,29 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 public abstract class AbstractDtoUpdateHandler implements IDtoAutoUpdateHandler {
 
   protected FormDataAnnotation ensurePropertyFormDataAnnotation(DtoUpdateProperties properties) throws CoreException {
-    FormDataAnnotation annotation = properties.getFormDataAnnotation();
-    if (annotation == null && !properties.contains(DtoUpdateProperties.PROP_FORM_DATA_ANNOTATION)) {
-      annotation = ScoutTypeUtility.findFormDataAnnotation(properties.getType(), ensurePropertySuperTypeHierarchy(properties));
-      properties.put(DtoUpdateProperties.PROP_FORM_DATA_ANNOTATION, annotation);
+    if (!properties.contains(DtoUpdateProperties.PROP_FORM_DATA_ANNOTATION)) {
+      FormDataAnnotation annotation = ScoutTypeUtility.findFormDataAnnotation(properties.getType(), ensurePropertySuperTypeHierarchy(properties));
+      properties.setFormDataAnnotation(annotation);
+      return annotation;
     }
-    return annotation;
+    return properties.getFormDataAnnotation();
   }
 
-  protected PageDataAnnotation ensurePropertyPageDataAnnotation(DtoUpdateProperties properties) throws CoreException {
-    PageDataAnnotation annotation = properties.getPageDataAnnotation();
-    if (annotation == null && !properties.contains(DtoUpdateProperties.PROP_PAGE_DATA_ANNOTATION)) {
-      annotation = ScoutTypeUtility.findPageDataAnnotation(properties.getType(), ensurePropertySuperTypeHierarchy(properties));
-      properties.put(DtoUpdateProperties.PROP_FORM_DATA_ANNOTATION, annotation);
+  protected DataAnnotation ensurePropertyDataAnnotation(DtoUpdateProperties properties) throws CoreException {
+    if (!properties.contains(DtoUpdateProperties.PROP_DATA_ANNOTATION)) {
+      DataAnnotation annotation = ScoutTypeUtility.findDataAnnotation(properties.getType(), ensurePropertySuperTypeHierarchy(properties));
+      properties.setDataAnnotation(annotation);
+      return annotation;
     }
-    return annotation;
+    return properties.getDataAnnotation();
   }
 
   protected ITypeHierarchy ensurePropertySuperTypeHierarchy(DtoUpdateProperties properties) throws CoreException {
-    ITypeHierarchy hierarchy = properties.getSuperTypeHierarchy();
-    if (hierarchy == null && !properties.contains(DtoUpdateProperties.PROP_SUPER_TYPE_HIERARCHY)) {
-      hierarchy = TypeUtility.getSupertypeHierarchy(properties.getType());
-      properties.put(DtoUpdateProperties.PROP_SUPER_TYPE_HIERARCHY, hierarchy);
+    if (!properties.contains(DtoUpdateProperties.PROP_SUPER_TYPE_HIERARCHY)) {
+      ITypeHierarchy hierarchy = TypeUtility.getSupertypeHierarchy(properties.getType());
+      properties.setSuperTypeHierarchy(hierarchy);
+      return hierarchy;
     }
-    return hierarchy;
+    return properties.getSuperTypeHierarchy();
   }
 }

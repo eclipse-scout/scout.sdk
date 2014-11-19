@@ -102,7 +102,7 @@ public class PageWithTablePropertyPart extends JdtTypePropertyPart {
             // page data
             IType pageDataType = null;
             try {
-              pageDataType = ScoutTypeUtility.findPageDataForPage(getPage().getType());
+              pageDataType = ScoutTypeUtility.findDtoForPage(getPage().getType());
               if (TypeUtility.exists(pageDataType)) {
                 model.addGlobalLink(new TypeOpenLink(pageDataType));
               }

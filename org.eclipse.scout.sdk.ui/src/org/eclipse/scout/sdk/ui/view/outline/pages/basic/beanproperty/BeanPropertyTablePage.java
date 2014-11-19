@@ -77,7 +77,7 @@ public class BeanPropertyTablePage extends AbstractPage {
       m_methodChangedListener = new P_MethodChangedListener();
       ScoutSdkCore.getJavaResourceChangedEmitter().addMethodChangedListener(getDeclaringType(), m_methodChangedListener);
     }
-    Set<? extends IPropertyBean> beans = TypeUtility.getPropertyBeans(getDeclaringType(), ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
+    Set<? extends IPropertyBean> beans = TypeUtility.getPropertyBeans(getDeclaringType(), ScoutPropertyBeanFilters.getDtoPropertyFilter(), PropertyBeanComparators.getNameComparator());
     for (IPropertyBean bean : beans) {
       new BeanPropertyNodePage(this, bean);
     }

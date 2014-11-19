@@ -119,7 +119,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
           // form data
           IType formDataType = null;
           try {
-            formDataType = ScoutTypeUtility.findFormDataForForm(form);
+            formDataType = ScoutTypeUtility.findDtoForForm(form);
           }
           catch (JavaModelException e) {
             ScoutSdkUi.logError(e);

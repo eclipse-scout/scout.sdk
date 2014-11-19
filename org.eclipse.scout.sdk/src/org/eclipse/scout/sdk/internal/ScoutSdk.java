@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoAutoUpdateManager;
 import org.eclipse.scout.sdk.internal.workspace.dto.formdata.FormDataDtoUpdateHandler;
 import org.eclipse.scout.sdk.internal.workspace.dto.pagedata.PageDataAutoUpdateHandler;
+import org.eclipse.scout.sdk.internal.workspace.dto.pagedata.RowDataAutoUpdateHandler;
 import org.eclipse.scout.sdk.util.log.SdkLogManager;
 import org.osgi.framework.BundleContext;
 
@@ -57,6 +58,7 @@ public class ScoutSdk extends Plugin {
     m_autoUpdateManager = new DtoAutoUpdateManager();
     m_autoUpdateManager.addModelDataUpdateHandler(new FormDataDtoUpdateHandler());
     m_autoUpdateManager.addModelDataUpdateHandler(new PageDataAutoUpdateHandler());
+    m_autoUpdateManager.addModelDataUpdateHandler(new RowDataAutoUpdateHandler());
   }
 
   @Override

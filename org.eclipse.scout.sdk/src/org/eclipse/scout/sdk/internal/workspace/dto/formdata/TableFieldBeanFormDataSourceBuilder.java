@@ -18,6 +18,7 @@ import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableBeanSourceBuild
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
@@ -36,8 +37,8 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
    * @param elementName
    * @param setup
    */
-  public TableFieldBeanFormDataSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
-    super(modelType, elementName, false, derivedCu, monitor);
+  public TableFieldBeanFormDataSourceBuilder(IType modelType, ITypeHierarchy modelLocalTypeHierarchy, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, modelLocalTypeHierarchy, elementName, false, derivedCu, monitor);
     m_formDataAnnotation = formDataAnnotation;
     setup(monitor);
   }

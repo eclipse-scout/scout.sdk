@@ -63,8 +63,8 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
    * @param modelType
    * @param elementName
    */
-  public FormDataTypeSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
-    super(modelType, elementName, false, derivedCu, monitor);
+  public FormDataTypeSourceBuilder(IType modelType, ITypeHierarchy modelLocalTypeHierarchy, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, modelLocalTypeHierarchy, elementName, false, derivedCu, monitor);
     m_formDataAnnotation = formDataAnnotation;
     setup(monitor);
   }

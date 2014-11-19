@@ -72,6 +72,7 @@ public class FormDataAnnotation {
   private String m_superTypeSignature;
   private IJavaElement m_annotationOwner;
   private final Set<String> m_interfaceSignatures;
+  private IType m_genericOrdinalDefinitionType;
 
   public FormDataAnnotation() {
     m_interfaceSignatures = new LinkedHashSet<String>();
@@ -181,5 +182,13 @@ public class FormDataAnnotation {
 
   public Set<String> getInterfaceSignatures() {
     return new LinkedHashSet<String>(m_interfaceSignatures);
+  }
+
+  public IType getGenericOrdinalDefinitionType() {
+    return m_genericOrdinalDefinitionType;
+  }
+
+  public void setGenericOrdinalDefinitionType(IType genericOrdinalDefinitionType) {
+    m_genericOrdinalDefinitionType = genericOrdinalDefinitionType;
   }
 }

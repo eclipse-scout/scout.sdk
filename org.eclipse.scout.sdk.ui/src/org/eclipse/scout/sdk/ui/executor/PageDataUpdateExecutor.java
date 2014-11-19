@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.DataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.swt.SWT;
@@ -46,8 +46,8 @@ public class PageDataUpdateExecutor extends AbstractExecutor {
   @Override
   public Object run(Shell shell, IStructuredSelection selection, ExecutionEvent event) {
     try {
-      PageDataAnnotation pageDataAnnotation = ScoutTypeUtility.findPageDataAnnotation(m_pageDataOwner, TypeUtility.getSupertypeHierarchy(m_pageDataOwner));
-      if (pageDataAnnotation != null && !StringUtility.isNullOrEmpty(pageDataAnnotation.getPageDataTypeSignature())) {
+      DataAnnotation pageDataAnnotation = ScoutTypeUtility.findDataAnnotation(m_pageDataOwner, TypeUtility.getSupertypeHierarchy(m_pageDataOwner));
+      if (pageDataAnnotation != null && !StringUtility.isNullOrEmpty(pageDataAnnotation.getDataTypeSignature())) {
         OperationJob job = new OperationJob(new PageDataDtoUpdateOperation(m_pageDataOwner, pageDataAnnotation));
         job.schedule();
       }

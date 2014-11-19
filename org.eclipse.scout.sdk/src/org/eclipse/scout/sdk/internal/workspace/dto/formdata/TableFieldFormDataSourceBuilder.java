@@ -26,7 +26,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.internal.workspace.dto.AbstractTableSourceBuilder;
+import org.eclipse.scout.sdk.internal.workspace.dto.AbstractDtoTypeSourceBuilder;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
@@ -45,6 +45,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.MethodParameter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -55,19 +56,19 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
-public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder {
+public class TableFieldFormDataSourceBuilder extends AbstractDtoTypeSourceBuilder {
   private static final Pattern CONSTANT_NAME_PATTERN = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
   private static final String COLUMN_ID_SUFFIX = "_COLUMN_ID";
   private static final String OBJECT_SIG = SignatureCache.createTypeSignature(Object.class.getName());
 
-  private FormDataAnnotation m_formDataAnnotation;
+  private final FormDataAnnotation m_formDataAnnotation;
 
   /**
    * @param modelType
    * @param elementName
    */
-  public TableFieldFormDataSourceBuilder(IType modelType, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
-    super(modelType, elementName, false, derivedCu, monitor);
+  public TableFieldFormDataSourceBuilder(IType modelType, ITypeHierarchy modelLocalTypeHierarchy, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
+    super(modelType, modelLocalTypeHierarchy, elementName, false, derivedCu, monitor);
     m_formDataAnnotation = formDataAnnotation;
     setup(monitor);
   }
@@ -93,34 +94,36 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
 
   protected void visitTable(IType table, IProgressMonitor monitor) throws CoreException {
     final Set<IType> columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), getLocalTypeHierarchy()), ScoutTypeComparators.getOrderAnnotationComparator());
+    if (columns.size() < 1) {
+      return;
+    }
+
     final String[] colunmSignatures = new String[columns.size()];
     final Map<Integer, String> columnIdMap = new HashMap<Integer, String>();
 
-    if (columns.size() > 0) {
-      int i = 0;
-      for (IType column : columns) {
-        String constantColName = getConstantName(ScoutUtility.removeFieldSuffix(column.getElementName())) + COLUMN_ID_SUFFIX;
-        IFieldSourceBuilder fieldBuilder = new FieldSourceBuilder(constantColName);
-        fieldBuilder.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
-        fieldBuilder.setSignature(Signature.SIG_INT);
-        fieldBuilder.setValue(Integer.toString(i));
-        addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldConstantTableColumnIdKey(fieldBuilder, i), fieldBuilder);
-        columnIdMap.put(Integer.valueOf(i), constantColName);
+    int i = 0;
+    for (IType column : columns) {
+      String constantColName = getConstantName(ScoutUtility.removeFieldSuffix(column.getElementName())) + COLUMN_ID_SUFFIX;
+      IFieldSourceBuilder fieldBuilder = new FieldSourceBuilder(constantColName);
+      fieldBuilder.setFlags(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal);
+      fieldBuilder.setSignature(Signature.SIG_INT);
+      fieldBuilder.setValue(Integer.toString(i));
+      addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldConstantTableColumnIdKey(fieldBuilder, i), fieldBuilder);
+      columnIdMap.put(Integer.valueOf(i), constantColName);
 
-        if (monitor.isCanceled()) {
-          return;
-        }
-        i++;
+      if (monitor.isCanceled()) {
+        return;
       }
+      i++;
     }
 
-    int i = 0;
+    i = 0;
     for (IType column : columns) {
       try {
         String upperColName = NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
         String lowerColName = NamingUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
         String methodParameterName = NamingUtility.ensureValidParameterName(lowerColName);
-        final String colSignature = getColumnSignature(column, getLocalTypeHierarchy());
+        final String colSignature = ScoutTypeUtility.getColumnValueTypeSignature(column, getLocalTypeHierarchy());
         colunmSignatures[i] = colSignature;
         // setter
         IMethodSourceBuilder columnSetterBuilder = new MethodSourceBuilder("set" + upperColName);
@@ -165,48 +168,46 @@ public class TableFieldFormDataSourceBuilder extends AbstractTableSourceBuilder 
     getColumnCountBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return " + columns.size() + ";"));
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getColumnCountBuilder), getColumnCountBuilder);
 
-    if (columns.size() > 0) {
-      // setValueAt method
-      IMethodSourceBuilder setValueAtBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "setValueAt");
-      setValueAtBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-        @Override
-        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          source.append("  switch(column){").append(lineDelimiter);
-          int j = 0;
-          for (IType column : columns) {
-            source.append("    case " + getColumnConstantName(j, columnIdMap) + ":").append(lineDelimiter);
-            source.append("set").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName())));
-            source.append("(row,");
-            if (!OBJECT_SIG.equals(colunmSignatures[j])) {
-              source.append("(").append(SignatureUtility.getTypeReference(colunmSignatures[j], validator)).append(") ");
-            }
-            source.append("value);").append(lineDelimiter);
-            source.append("break;").append(lineDelimiter);
-            j++;
+    // setValueAt method
+    IMethodSourceBuilder setValueAtBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "setValueAt");
+    setValueAtBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append("  switch(column){").append(lineDelimiter);
+        int j = 0;
+        for (IType column : columns) {
+          source.append("    case " + getColumnConstantName(j, columnIdMap) + ":").append(lineDelimiter);
+          source.append("set").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName())));
+          source.append("(row,");
+          if (!OBJECT_SIG.equals(colunmSignatures[j])) {
+            source.append("(").append(SignatureUtility.getTypeReference(colunmSignatures[j], validator)).append(") ");
           }
-          source.append("  }");
+          source.append("value);").append(lineDelimiter);
+          source.append("break;").append(lineDelimiter);
+          j++;
         }
-      });
-      addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(setValueAtBuilder), setValueAtBuilder);
+        source.append("  }");
+      }
+    });
+    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(setValueAtBuilder), setValueAtBuilder);
 
-      // getValueAt method
-      IMethodSourceBuilder getValueAtBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getValueAt");
-      getValueAtBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
-        @Override
-        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          source.append("  switch(column){").append(lineDelimiter);
-          int j = 0;
-          for (IType column : columns) {
-            source.append("    case " + getColumnConstantName(j, columnIdMap) + ":").append(lineDelimiter);
-            source.append("return get").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName()))).append("(row);").append(lineDelimiter);
-            j++;
-          }
-          source.append("    default: return null;").append(lineDelimiter);
-          source.append("  }");
+    // getValueAt method
+    IMethodSourceBuilder getValueAtBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, "getValueAt");
+    getValueAtBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      @Override
+      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+        source.append("  switch(column){").append(lineDelimiter);
+        int j = 0;
+        for (IType column : columns) {
+          source.append("    case " + getColumnConstantName(j, columnIdMap) + ":").append(lineDelimiter);
+          source.append("return get").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName()))).append("(row);").append(lineDelimiter);
+          j++;
         }
-      });
-      addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getValueAtBuilder), getValueAtBuilder);
-    }
+        source.append("    default: return null;").append(lineDelimiter);
+        source.append("  }");
+      }
+    });
+    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getValueAtBuilder), getValueAtBuilder);
   }
 
   private String getConstantName(String name) {

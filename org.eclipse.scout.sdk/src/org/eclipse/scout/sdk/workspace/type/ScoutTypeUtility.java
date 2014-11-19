@@ -66,7 +66,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutBundleGraph;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.DataAnnotation;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType.CATEGORIES;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
@@ -259,7 +259,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @return the form data type or null if it could not be found.
    * @throws JavaModelException
    */
-  public static IType findFormDataForForm(IType form) throws JavaModelException {
+  public static IType findDtoForForm(IType form) throws JavaModelException {
     if (TypeUtility.exists(form)) {
       FormDataAnnotation a = findFormDataAnnotation(form, TypeUtility.getSupertypeHierarchy(form));
       if (a != null) {
@@ -278,11 +278,11 @@ public class ScoutTypeUtility extends TypeUtility {
    * @return the page data class or null.
    * @throws JavaModelException
    */
-  public static IType findPageDataForPage(IType page) throws JavaModelException {
+  public static IType findDtoForPage(IType page) throws JavaModelException {
     if (TypeUtility.exists(page)) {
-      PageDataAnnotation anot = findPageDataAnnotation(page, TypeUtility.getSupertypeHierarchy(page));
-      if (anot != null && !StringUtility.isNullOrEmpty(anot.getPageDataTypeSignature())) {
-        IType result = TypeUtility.getTypeBySignature(anot.getPageDataTypeSignature());
+      DataAnnotation anot = findDataAnnotation(page, TypeUtility.getSupertypeHierarchy(page));
+      if (anot != null && !StringUtility.isNullOrEmpty(anot.getDataTypeSignature())) {
+        IType result = TypeUtility.getTypeBySignature(anot.getDataTypeSignature());
         if (TypeUtility.exists(result)) {
           return result;
         }
@@ -297,6 +297,20 @@ public class ScoutTypeUtility extends TypeUtility {
    */
   public static boolean existsReplaceAnnotation(IAnnotatable element) {
     return JdtUtility.hasAnnotation(element, IRuntimeClasses.Replace);
+  }
+
+  public static String findExtendsAnnotationSignature(IType element, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+    Deque<IType> superClassStack = superTypeHierarchy.getSuperClassStack(element);
+    for (IType t : superClassStack) {
+      IAnnotation dataAnnotation = JdtUtility.getAnnotation(t, IRuntimeClasses.Extends);
+      if (TypeUtility.exists(dataAnnotation)) {
+        String v = JdtUtility.getAnnotationValueString(dataAnnotation, "value");
+        if (StringUtility.hasText(v)) {
+          return SignatureUtility.getReferencedTypeSignature(element, v, true);
+        }
+      }
+    }
+    return null;
   }
 
   public static FormDataAnnotation findFormDataAnnotation(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
@@ -393,6 +407,7 @@ public class ScoutTypeUtility extends TypeUtility {
       DefaultSubtypeSdkCommand subTypeCommand = null;
       int genericOrdinal = -1;
       List<String> interfaceSignatures = null;
+      IType genericOrdinalDefinitionType = null;
 
       for (IMemberValuePair p : annotation.getMemberValuePairs()) {
         String memberName = p.getMemberName();
@@ -434,6 +449,7 @@ public class ScoutTypeUtility extends TypeUtility {
         else if ("genericOrdinal".equals(memberName)) {
           try {
             genericOrdinal = ((Integer) value).intValue();
+            genericOrdinalDefinitionType = contextType;
           }
           catch (Exception e) {
             ScoutSdk.logError("could not parse formdata annotation genericOrdinal '" + value + "'.", e);
@@ -488,6 +504,9 @@ public class ScoutTypeUtility extends TypeUtility {
       if (genericOrdinal > -1) {
         formDataAnnotation.setGenericOrdinal(genericOrdinal);
       }
+      if (TypeUtility.exists(genericOrdinalDefinitionType)) {
+        formDataAnnotation.setGenericOrdinalDefinitionType(genericOrdinalDefinitionType);
+      }
       // correction
       if (isOwner && sdkCommand == SdkCommand.USE && !StringUtility.isNullOrEmpty(valueSignature) && element.getParent().getElementType() != IJavaElement.COMPILATION_UNIT) {
         formDataAnnotation.setSuperTypeSignature(valueSignature);
@@ -502,64 +521,62 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   /**
-   * Parses the possible available {@link IRuntimeClasses#PageData} annotation on the given type. If the type is not
-   * annotated, <code>null</code> is returned.
+   * Parses the possible available {@link IRuntimeClasses#PageData} or {@link IRuntimeClasses#Data} annotation on the
+   * given type. If the type is not annotated, <code>null</code> is returned.
    *
    * @since 3.10.0-M1
    */
-  public static PageDataAnnotation findPageDataAnnotation(IType type, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+  public static DataAnnotation findDataAnnotation(IType type, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
     if (!TypeUtility.exists(type)) {
       return null;
     }
 
-    String typeSignature = getPageDataAnnotationValue(type);
+    String typeSignature = getDataAnnotationValue(type);
     if (StringUtility.isNullOrEmpty(typeSignature)) {
       return null;
     }
 
-    IType tmpType = type;
     String superTypeSignature = null;
-    IType iPageWithTable = TypeUtility.getType(IRuntimeClasses.IPageWithTable);
-
-    do {
-      if (!superTypeHierarchy.contains(iPageWithTable)) {
+    Deque<IType> superClassStack = superTypeHierarchy.getSuperClassStack(type, false);
+    for (IType t : superClassStack) {
+      superTypeSignature = getDataAnnotationValue(t);
+      if (superTypeSignature != null) {
         break;
       }
-
-      tmpType = superTypeHierarchy.getSuperclass(tmpType);
-      superTypeSignature = getPageDataAnnotationValue(tmpType);
     }
-    while (superTypeSignature == null && tmpType != null);
 
-    if (superTypeSignature == null) {
+    if (superTypeSignature == null && superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithTable))) {
+      // default for IPageWithTable
       superTypeSignature = SignatureCache.createTypeSignature(IRuntimeClasses.AbstractTablePageData);
     }
 
-    return new PageDataAnnotation(typeSignature, superTypeSignature);
+    return new DataAnnotation(typeSignature, superTypeSignature, type);
   }
 
   /**
-   * Checks whether the given type is annotated with a {@link IRuntimeClasses#PageData} annotation and if so, this
+   * Checks whether the given type is annotated with a {@link IRuntimeClasses#Data} annotation and if so, this
    * method returns its <code>value()</code> as resolved type signature. Otherwise <code>null</code>.
    *
    * @since 3.10.0-M1
    */
-  private static String getPageDataAnnotationValue(IType type) throws JavaModelException {
+  private static String getDataAnnotationValue(IType type) throws JavaModelException {
     if (!TypeUtility.exists(type)) {
       return null;
     }
 
-    IAnnotation annotation = JdtUtility.getAnnotation(type, IRuntimeClasses.PageData);
+    IAnnotation annotation = JdtUtility.getAnnotation(type, IRuntimeClasses.Data);
     if (!TypeUtility.exists(annotation)) {
-      return null;
+      annotation = JdtUtility.getAnnotation(type, IRuntimeClasses.PageData); // fall back to old name
+
+      if (!TypeUtility.exists(annotation)) {
+        return null;
+      }
     }
 
-    for (IMemberValuePair p : annotation.getMemberValuePairs()) {
-      if ("value".equals(p.getMemberName())) {
-        Object value = p.getValue();
-        String simpleName = SUFF_CLASS_REGEX.matcher((String) value).replaceAll("");
-        return SignatureUtility.getReferencedTypeSignature(type, simpleName, true);
-      }
+    String value = JdtUtility.getAnnotationValueString(annotation, "value");
+    if (StringUtility.hasText(value)) {
+      String simpleName = SUFF_CLASS_REGEX.matcher(value).replaceAll("");
+      return SignatureUtility.getReferencedTypeSignature(type, simpleName, true);
     }
 
     return null;
@@ -569,9 +586,10 @@ public class ScoutTypeUtility extends TypeUtility {
    * Parses the possible available {@link IRuntimeClasses#ColumnData} annotation on the given type. If the type is not
    * annotated, <code>null</code> is returned.
    *
+   * @throws JavaModelException
    * @since 3.10.0-M5
    */
-  public static SdkColumnCommand findColumnDataSdkColumnCommand(IType type, ITypeHierarchy superTypeHierarchy) {
+  public static SdkColumnCommand findColumnDataSdkColumnCommand(IType type, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
     if (!TypeUtility.exists(type)) {
       return null;
     }
@@ -595,9 +613,10 @@ public class ScoutTypeUtility extends TypeUtility {
    * Checks whether the given type is annotated with a {@link IRuntimeClasses#ColumnData} annotation and if so, this
    * method returns its <code>value()</code> as resolved type signature. Otherwise <code>null</code>.
    *
+   * @throws JavaModelException
    * @since 3.10.0-M5
    */
-  private static SdkColumnCommand getColumnDataAnnotationValue(IType type) {
+  private static SdkColumnCommand getColumnDataAnnotationValue(IType type) throws JavaModelException {
     if (!TypeUtility.exists(type)) {
       return null;
     }
@@ -607,25 +626,12 @@ public class ScoutTypeUtility extends TypeUtility {
       return null;
     }
 
-    try {
-      for (IMemberValuePair p : annotation.getMemberValuePairs()) {
-        if ("value".equals(p.getMemberName())) {
-          Object value = p.getValue();
-          try {
-            Matcher m = PATTERN.matcher((String) value);
-            if (m.find() && m.group().length() > 0) {
-              return SdkColumnCommand.valueOf(m.group());
-            }
-          }
-          catch (Exception e) {
-            ScoutSdk.logError("cannot parse @ColumnData.value(): '" + value + "'", e);
-          }
-          break;
-        }
+    String value = JdtUtility.getAnnotationValueString(annotation, "value");
+    if (StringUtility.hasText(value)) {
+      Matcher m = PATTERN.matcher(value);
+      if (m.find() && m.group().length() > 0) {
+        return SdkColumnCommand.valueOf(m.group());
       }
-    }
-    catch (JavaModelException me) {
-      ScoutSdk.logError("exception while reading values", me);
     }
 
     return null;
@@ -843,6 +849,14 @@ public class ScoutTypeUtility extends TypeUtility {
       return method;
     }
     return null;
+  }
+
+  public static String getColumnValueTypeSignature(IType column, ITypeHierarchy columnHierarchy) throws CoreException {
+    if (!TypeUtility.exists(column) || Object.class.getName().equals(column.getFullyQualifiedName())) {
+      return null;
+    }
+
+    return SignatureUtility.resolveGenericParameterInSuperHierarchy(column, columnHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
   }
 
   public static IMethod getColumnGetterMethod(IType column) {

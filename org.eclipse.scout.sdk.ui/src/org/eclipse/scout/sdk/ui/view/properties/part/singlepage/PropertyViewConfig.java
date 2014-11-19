@@ -14,6 +14,7 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -42,7 +43,7 @@ public class PropertyViewConfig {
   private static final String PROP_CONFIG_CATEGORY = "category";
   private static final String PROP_CONFIG_ORDER = "order";
 
-  private final HashMap<String, HashMap<String, Config>> m_typeConfigs;
+  private final Map<String, Map<String, Config>> m_typeConfigs;
 
   public static final ConfigTypes DEFAULT_CONFIG_TYPE = ConfigTypes.ADVANCED;
   public static final ConfigCategory DEFAULT_CONFIG_CATEGORY = ConfigCategory.MISC;
@@ -166,7 +167,7 @@ public class PropertyViewConfig {
   }
 
   public PropertyViewConfig() {
-    m_typeConfigs = new HashMap<String, HashMap<String, Config>>(100);
+    m_typeConfigs = new HashMap<String, Map<String, Config>>(100);
     load();
   }
 
@@ -212,7 +213,7 @@ public class PropertyViewConfig {
   public Config getConfiguration(ConfigurationMethod m) {
     Deque<IType> superTypes = m.getSuperTypeHierarchy().getSuperClassStack(m.getType());
     for (IType superType : superTypes) {
-      HashMap<String, Config> tc = m_typeConfigs.get(superType.getFullyQualifiedName());
+      Map<String, Config> tc = m_typeConfigs.get(superType.getFullyQualifiedName());
       if (tc != null) {
         Config c = tc.get(m.getMethodName());
         if (c != null) {

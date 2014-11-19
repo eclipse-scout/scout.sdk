@@ -44,7 +44,7 @@ public class TypeUtilityTest extends AbstractScoutSdkTest {
   @Before
   public void setup1() {
     m_type = TypeUtility.getType("a.BeanProperties");
-    m_propertyBeans = TypeUtility.getPropertyBeans(m_type, ScoutPropertyBeanFilters.getFormDataPropertyFilter(), PropertyBeanComparators.getNameComparator());
+    m_propertyBeans = TypeUtility.getPropertyBeans(m_type, ScoutPropertyBeanFilters.getDtoPropertyFilter(), PropertyBeanComparators.getNameComparator());
   }
 
   @After

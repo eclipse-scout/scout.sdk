@@ -16,7 +16,7 @@ import java.util.Map;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.formdata.FormDataAnnotation;
-import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataAnnotation;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.DataAnnotation;
 
 /**
  * <h3>{@link DtoUpdateProperties}</h3>
@@ -28,12 +28,12 @@ public class DtoUpdateProperties {
   public static final String PROP_TYPE = "Type";
   public static final String PROP_SUPER_TYPE_HIERARCHY = "SuperTypeHierarchy";
   public static final String PROP_FORM_DATA_ANNOTATION = "FormDataAnnotation";
-  public static final String PROP_PAGE_DATA_ANNOTATION = "PageDataAnnotation";
+  public static final String PROP_DATA_ANNOTATION = "DataAnnotation";
 
-  private Map<String, Object> m_properties;
+  private final Map<String, Object> m_properties;
 
   public DtoUpdateProperties() {
-    m_properties = new HashMap<String, Object>();
+    m_properties = new HashMap<String, Object>(4);
   }
 
   public void put(String key, Object value) {
@@ -72,11 +72,11 @@ public class DtoUpdateProperties {
     put(PROP_FORM_DATA_ANNOTATION, annotation);
   }
 
-  public PageDataAnnotation getPageDataAnnotation() {
-    return (PageDataAnnotation) get(PROP_PAGE_DATA_ANNOTATION);
+  public DataAnnotation getDataAnnotation() {
+    return (DataAnnotation) get(PROP_DATA_ANNOTATION);
   }
 
-  public void setPageDataAnnotation(PageDataAnnotation annotation) {
-    put(PROP_PAGE_DATA_ANNOTATION, annotation);
+  public void setDataAnnotation(DataAnnotation annotation) {
+    put(PROP_DATA_ANNOTATION, annotation);
   }
 }

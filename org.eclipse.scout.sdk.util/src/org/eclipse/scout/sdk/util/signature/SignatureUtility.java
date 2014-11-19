@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -637,6 +638,7 @@ public final class SignatureUtility {
       }
     }
     collector.put(typeDesc.getFullyQualifiedName(), typeDesc);
+
     // super class
     if (!Flags.isInterface(type.getFlags())) {
       String superclassTypeSignature = type.getSuperclassTypeSignature();
@@ -656,25 +658,30 @@ public final class SignatureUtility {
         resolveGenericParametersInSuperHierarchy(hierarchy.getSuperclass(type), superclassParameterSignatures, hierarchy, collector);
       }
     }
+
     // interfaces
-    String[] superInterfaceTypeSignatures = type.getSuperInterfaceTypeSignatures();
-    for (String superInterfaceTypeSignature : superInterfaceTypeSignatures) {
-      String[] interfaceParameterSigs = Signature.getTypeArguments(superInterfaceTypeSignature);
-      String[] interfaceParameterSignatures = new String[interfaceParameterSigs.length];
+    Set<IType> superInterfaces = hierarchy.getSuperInterfaces(type);
+    if (CollectionUtility.hasElements(superInterfaces)) {
+      int index = 0;
+      String[] superInterfaceTypeSignatures = type.getSuperInterfaceTypeSignatures();
+      for (IType superInterface : superInterfaces) {
+        String[] interfaceParameterSigs = Signature.getTypeArguments(superInterfaceTypeSignatures[index]);
+        String[] interfaceParameterSignatures = new String[interfaceParameterSigs.length];
 
-      for (int i = 0; i < interfaceParameterSignatures.length; i++) {
-        String resolvedSignature = getResolvedSignature(type, typeDesc.getParameters(), interfaceParameterSigs[i]);
-        String signatureQualifier = Signature.getSignatureQualifier(resolvedSignature);
-        String signatureSimpleName = Signature.getSignatureSimpleName(resolvedSignature);
-        if (StringUtility.isNullOrEmpty(signatureQualifier) && typeDesc.getParameterSignature(signatureSimpleName) != null) {
-          // resolve parameter
-          resolvedSignature = typeDesc.getParameterSignature(signatureSimpleName);
+        for (int i = 0; i < interfaceParameterSignatures.length; i++) {
+          String resolvedSignature = getResolvedSignature(type, typeDesc.getParameters(), interfaceParameterSigs[i]);
+          String signatureQualifier = Signature.getSignatureQualifier(resolvedSignature);
+          String signatureSimpleName = Signature.getSignatureSimpleName(resolvedSignature);
+          if (StringUtility.isNullOrEmpty(signatureQualifier) && typeDesc.getParameterSignature(signatureSimpleName) != null) {
+            // resolve parameter
+            resolvedSignature = typeDesc.getParameterSignature(signatureSimpleName);
+          }
+          interfaceParameterSignatures[i] = resolvedSignature;
         }
-        interfaceParameterSignatures[i] = resolvedSignature;
+        resolveGenericParametersInSuperHierarchy(superInterface, interfaceParameterSignatures, hierarchy, collector);
+        index++;
       }
-      resolveGenericParametersInSuperHierarchy(TypeUtility.getTypeBySignature(superInterfaceTypeSignature), interfaceParameterSignatures, hierarchy, collector);
     }
-
   }
 
   public static String getResolvedSignature(IType contextType, Map<String, String> parameterSignatures, String unresolvedSignature) throws JavaModelException {

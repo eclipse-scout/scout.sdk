@@ -25,10 +25,10 @@ public class ScoutTypeComparators extends TypeComparators {
       Double val1 = getOrderAnnotation(t1);
       Double val2 = getOrderAnnotation(t2);
       int result = val1.compareTo(val2);
-      if (result == 0) {
-        return t1.getElementName().compareTo(t2.getElementName());
+      if (result != 0) {
+        return result;
       }
-      return result;
+      return t1.getFullyQualifiedName().compareTo(t2.getFullyQualifiedName());
     }
 
     private Double getOrderAnnotation(IType type) {
