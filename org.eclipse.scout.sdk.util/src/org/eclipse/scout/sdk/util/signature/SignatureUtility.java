@@ -633,7 +633,7 @@ public final class SignatureUtility {
           typeDesc.addParameter(typeParameters[i].getElementName(), getResolvedSignature(type, paramsUnresolved, boundsSignatures[0]));
         }
         else {
-          typeDesc.addParameter(typeParameters[i].getElementName(), SignatureCache.createTypeSignature(Object.class.getName()));
+          typeDesc.addParameter(typeParameters[i].getElementName(), SignatureCache.createTypeSignature(typeParameters[i].getElementName()));
         }
       }
     }
