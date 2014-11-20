@@ -727,6 +727,9 @@ public final class SignatureUtility {
         if (sig != null) {
           sigBuilder.append(sig);
         }
+        else {
+          sigBuilder.append(unresolvedSignature);
+        }
 
         break;
       case Signature.CLASS_TYPE_SIGNATURE:

@@ -10,9 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+
 /**
  * <h3>{@link ITypeParameter}</h3>
- * 
+ *
  * @author aho
  * @since 4.1.0 09.11.2014
  */
@@ -21,5 +24,7 @@ public interface ITypeParameter {
   String getParameterName();
 
   String getParameterSignature();
+
+  String getFullyQualifiedName(IImportValidator validator) throws CoreException;
 
 }

@@ -10,9 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation;
 
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.sdk.util.signature.IImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
+
 /**
  * <h3>{@link TypeParameter}</h3>
- * 
+ *
  * @author aho
  * @since 4.1.0 09.11.2014
  */
@@ -41,4 +46,18 @@ public class TypeParameter implements ITypeParameter {
     return m_parameterSignature;
   }
 
+  @Override
+  public String getFullyQualifiedName(IImportValidator validator) throws CoreException {
+    StringBuilder fqnBuilder = new StringBuilder();
+    if (StringUtility.hasText(getParameterName())) {
+      fqnBuilder.append(getParameterName());
+    }
+    else if (StringUtility.hasText(getParameterSignature())) {
+      fqnBuilder.append("?");
+    }
+    if (StringUtility.hasText(getParameterSignature())) {
+      fqnBuilder.append(" extends ").append(SignatureUtility.getTypeReference(getParameterSignature(), validator));
+    }
+    return fqnBuilder.toString();
+  }
 }

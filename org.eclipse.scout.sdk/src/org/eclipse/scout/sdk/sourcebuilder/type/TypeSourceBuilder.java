@@ -97,27 +97,12 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
       Iterator<ITypeParameter> it = getTypeParameters().iterator();
       // first
       ITypeParameter tp = it.next();
-      if (StringUtility.hasText(tp.getParameterName())) {
-        source.append(tp.getParameterName());
-        source.append(" extends ");
-      }
-      source.append(SignatureUtility.getTypeReference(tp.getParameterSignature(), validator));
+      source.append(tp.getFullyQualifiedName(validator));
       // rest
       while (it.hasNext()) {
         source.append(", ");
         tp = it.next();
-        if (StringUtility.hasText(tp.getParameterName())) {
-          source.append(tp.getParameterName());
-          IType tpType = TypeUtility.getTypeBySignature(tp.getParameterSignature());
-          if (tpType.isInterface()) {
-            source.append(" implements ");
-          }
-          else {
-            source.append(" extends ");
-          }
-        }
-        source.append(SignatureUtility.getTypeReference(tp.getParameterSignature(), validator));
-
+        source.append(tp.getFullyQualifiedName(validator));
       }
       source.append(Signature.C_GENERIC_END);
     }
