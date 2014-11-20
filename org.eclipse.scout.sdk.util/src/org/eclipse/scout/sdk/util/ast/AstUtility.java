@@ -81,6 +81,11 @@ public final class AstUtility {
     ISourceRange r = null;
     try {
       r = member.getSourceRange();
+
+      // check for source availability for better error message
+      if (member.getSource() == null) {
+        throw new IllegalStateException("Cannot calculate AST for member '" + member.getElementName() + "'. No source could be found. Ensure that the source code is available.");
+      }
     }
     catch (JavaModelException e) {
       // could not find source range
