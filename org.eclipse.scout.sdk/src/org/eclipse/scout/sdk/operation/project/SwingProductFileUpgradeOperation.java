@@ -11,11 +11,14 @@
 package org.eclipse.scout.sdk.operation.project;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.util.Batik17ProductFileUpgradeOperation;
+import org.eclipse.scout.sdk.operation.util.OsgiSystemCapabilitiesAddOperation;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -27,7 +30,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class SwingProductFileUpgradeOperation extends AbstractScoutProjectNewOperation {
 
-  protected IFile[] m_prodFiles;
+  protected List<IFile> m_prodFiles;
 
   @Override
   public boolean isRelevant() {
@@ -47,7 +50,7 @@ public class SwingProductFileUpgradeOperation extends AbstractScoutProjectNewOpe
       productFiles.add(f);
     }
 
-    m_prodFiles = productFiles.toArray(new IFile[productFiles.size()]);
+    m_prodFiles = productFiles;
   }
 
   @Override
@@ -58,7 +61,7 @@ public class SwingProductFileUpgradeOperation extends AbstractScoutProjectNewOpe
   @Override
   public void validate() {
     super.validate();
-    if (m_prodFiles == null || m_prodFiles.length != 2) {
+    if (m_prodFiles == null || m_prodFiles.size() != 2) {
       throw new IllegalArgumentException("product file not found.");
     }
   }
@@ -72,6 +75,14 @@ public class SwingProductFileUpgradeOperation extends AbstractScoutProjectNewOpe
       }
       op.validate();
       op.run(monitor, workingCopyManager);
+    }
+
+    boolean isMin18 = isMinJavaVersion(1.8);
+    if (isMin18 && !PlatformVersionUtility.isLunaOrLater(getTargetPlatformVersion())) {
+      String javaVersionStr = (String) getProperties().getProperty(PROP_JAVA_VERSION);
+      OsgiSystemCapabilitiesAddOperation osgiCapAddOperation = new OsgiSystemCapabilitiesAddOperation(m_prodFiles, javaVersionStr);
+      osgiCapAddOperation.validate();
+      osgiCapAddOperation.run(monitor, workingCopyManager);
     }
   }
 }

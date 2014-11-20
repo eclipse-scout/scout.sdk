@@ -11,12 +11,14 @@
 package org.eclipse.scout.sdk.operation.project;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.util.Batik17ProductFileUpgradeOperation;
+import org.eclipse.scout.sdk.operation.util.OsgiSystemCapabilitiesAddOperation;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -31,7 +33,7 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
 
   public static final String E4_UI_CSS_CORE_PLUGIN_ID = "org.eclipse.e4.ui.css.core";
 
-  private IFile[] m_swtProdFiles;
+  private List<IFile> m_swtProdFiles;
 
   @Override
   public boolean isRelevant() {
@@ -51,13 +53,13 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
       productFiles.add(prod);
     }
 
-    m_swtProdFiles = productFiles.toArray(new IFile[productFiles.size()]);
+    m_swtProdFiles = productFiles;
   }
 
   @Override
   public void validate() {
     super.validate();
-    if (m_swtProdFiles == null || m_swtProdFiles.length != 2) {
+    if (m_swtProdFiles == null || m_swtProdFiles.size() != 2) {
       throw new IllegalArgumentException("dev or prod swt product file not found.");
     }
   }
@@ -72,8 +74,17 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
     if (PlatformVersionUtility.isE4(getTargetPlatformVersion())) {
       upgradeToE4(monitor, workingCopyManager);
     }
+
     if (JdtUtility.isBatik17OrNewer()) {
       upgradeToBatik17(monitor, workingCopyManager);
+    }
+
+    boolean isMin18 = isMinJavaVersion(1.8);
+    if (isMin18 && !PlatformVersionUtility.isLunaOrLater(getTargetPlatformVersion())) {
+      String javaVersionStr = (String) getProperties().getProperty(PROP_JAVA_VERSION);
+      OsgiSystemCapabilitiesAddOperation osgiCapAddOperation = new OsgiSystemCapabilitiesAddOperation(m_swtProdFiles, javaVersionStr);
+      osgiCapAddOperation.validate();
+      osgiCapAddOperation.run(monitor, workingCopyManager);
     }
   }
 

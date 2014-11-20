@@ -10,16 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.operation.project;
 
+import java.util.ArrayList;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.util.JettyProductFileUpgradeOperation;
+import org.eclipse.scout.sdk.operation.util.OsgiSystemCapabilitiesAddOperation;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
-import org.osgi.framework.Constants;
 
 public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOperation {
 
@@ -50,7 +52,6 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
     return "Upgrade Server Products";
   }
 
-  @SuppressWarnings("deprecation")
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // Jetty update for DEV product
@@ -70,30 +71,30 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
     }
 
     // Java 1.8/1.6 fragment for JAX-WS
-    double javaVersion = JdtUtility.getExecEnvVersion(getExecutionEnvironment());
-    boolean is18OrNewer = Math.abs(1.8 - javaVersion) < 0.0000001;
+    boolean isMin18 = isMinJavaVersion(1.8);
     String jaxWsFragment = null;
-    if (is18OrNewer) {
+    if (isMin18) {
       jaxWsFragment = "org.eclipse.scout.jaxws216.jre18.fragment";
     }
     else {
       jaxWsFragment = "org.eclipse.scout.jaxws216.jre16.fragment";
     }
 
-    // apply the product file modifications
-    for (IFile f : CollectionUtility.arrayList(m_serverDevProdFile, m_serverProdFile)) {
+    // add jaxws fragments
+    ArrayList<IFile> productFiles = CollectionUtility.arrayList(m_serverDevProdFile, m_serverProdFile);
+    for (IFile f : productFiles) {
       ProductFileModelHelper h = new ProductFileModelHelper(f);
       h.ProductFile.addDependency(servletPlugin);
       h.ProductFile.addDependency(jaxWsFragment);
 
-      if (is18OrNewer && !PlatformVersionUtility.isLunaOrLater(getTargetPlatformVersion())) {
-        // Java 1.8 is only support for Luna platforms or newer.
-        // For all other platforms we must add the 1.8 ExecEnv to the config.ini
-        h.ConfigurationFile.setEntry(Constants.FRAMEWORK_EXECUTIONENVIRONMENT, "OSGi/Minimum-1.0,OSGi/Minimum-1.1,OSGi/Minimum-1.2,JRE-1.1,J2SE-1.2,J2SE-1.3,J2SE-1.4,J2SE-1.5,JavaSE-1.6,JavaSE-1.7,JavaSE-1.8");
-        h.ConfigurationFile.setEntry(Constants.FRAMEWORK_SYSTEMCAPABILITIES_EXTRA, "osgi.ee;osgi.ee=\"JavaSE\";version:List<Version>=\"" + getProperties().getProperty(PROP_JAVA_VERSION) + "\"");
-      }
-
       h.save();
+    }
+
+    if (isMin18 && !PlatformVersionUtility.isLunaOrLater(getTargetPlatformVersion())) {
+      String javaVersionStr = (String) getProperties().getProperty(PROP_JAVA_VERSION);
+      OsgiSystemCapabilitiesAddOperation osgiCapAddOperation = new OsgiSystemCapabilitiesAddOperation(productFiles, javaVersionStr);
+      osgiCapAddOperation.validate();
+      osgiCapAddOperation.run(monitor, workingCopyManager);
     }
   }
 }

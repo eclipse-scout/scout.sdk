@@ -22,6 +22,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.util.PropertyMap;
+import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.osgi.framework.Version;
 
 public abstract class AbstractScoutProjectNewOperation implements IScoutProjectNewOperation {
@@ -216,6 +217,18 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
 
   protected final Version getTargetPlatformVersion() {
     return getProperties().getProperty(PROP_TARGET_PLATFORM_VERSION, Version.class);
+  }
+
+  /**
+   * Checks if the java version used is at least the given version
+   * 
+   * @param minVersionToCheck
+   *          The version to check (e.g. 1.8).
+   * @return true if the java version used is at least the given version. false otherwise.
+   */
+  protected final boolean isMinJavaVersion(double minVersionToCheck) {
+    double javaVersion = JdtUtility.getExecEnvVersion(getExecutionEnvironment());
+    return Math.abs(minVersionToCheck - javaVersion) < 0.0000001;
   }
 
   protected final String getScoutProjectName() {
