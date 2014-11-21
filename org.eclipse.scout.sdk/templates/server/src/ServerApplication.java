@@ -21,7 +21,7 @@ import org.eclipse.scout.commons.logger.ScoutLogManager;
  * eclipse.product=@@BUNDLE_SERVER_NAME@@.product
  */
 public class ServerApplication implements IApplication{
-  private static IScoutLogger logger = ScoutLogManager.getLogger(ServerApplication.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerApplication.class);
 
   @Override
   public Object start(IApplicationContext context) throws Exception {
@@ -32,7 +32,7 @@ public class ServerApplication implements IApplication{
     scheduler.start();
     Activator.getDefault().setScheduler(scheduler);
     */
-    logger.info("@@ALIAS@@ server initialized");
+    LOG.info("@@ALIAS@@ server initialized");
     return EXIT_OK;
   }
 

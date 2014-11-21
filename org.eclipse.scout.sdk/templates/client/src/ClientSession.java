@@ -4,15 +4,12 @@ import @@BUNDLE_CLIENT_NAME@@.ui.desktop.Desktop;
 
 import org.eclipse.scout.commons.UriUtility;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.commons.logger.IScoutLogger;
-import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.rt.client.AbstractClientSession;
 import org.eclipse.scout.rt.client.ClientJob;
 import org.eclipse.scout.rt.client.servicetunnel.http.ClientHttpServiceTunnel;
 import org.eclipse.scout.rt.shared.services.common.code.CODES;
 
-public class ClientSession extends AbstractClientSession{
-  private static IScoutLogger logger = ScoutLogManager.getLogger(ClientSession.class);
+public class ClientSession extends AbstractClientSession {
 
   public ClientSession(){
     super(true);

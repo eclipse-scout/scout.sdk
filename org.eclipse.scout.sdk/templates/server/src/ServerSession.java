@@ -8,7 +8,7 @@ import org.eclipse.scout.rt.server.AbstractServerSession;
 
 public class ServerSession extends AbstractServerSession{
   private static final long serialVersionUID = 1L;
-  private static IScoutLogger logger=ScoutLogManager.getLogger(ServerSession.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(ServerSession.class);
 
   public ServerSession(){
     super(true);
@@ -23,6 +23,6 @@ public class ServerSession extends AbstractServerSession{
 
   @Override
   protected void execLoadSession() throws ProcessingException{
-    logger.info("created a new session for "+getUserId());
+    LOG.info("created a new session for " + getUserId());
   }
 }

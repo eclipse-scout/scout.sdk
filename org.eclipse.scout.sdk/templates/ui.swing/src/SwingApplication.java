@@ -16,7 +16,7 @@ import @@BUNDLE_CLIENT_NAME@@.ClientSession;
 
 
 public class SwingApplication extends AbstractSwingApplication{
-  private static IScoutLogger logger = ScoutLogManager.getLogger(SwingApplication.class);
+  private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingApplication.class);
 
   @Override
   public Object start(final IApplicationContext context) throws Exception{
@@ -41,7 +41,7 @@ public class SwingApplication extends AbstractSwingApplication{
     }
     catch(Throwable t){
       // no net handler found
-      logger.warn("NetActivator is not available", t);
+      LOG.warn("NetActivator is not available", t);
     }
     return super.start(context);
   }
