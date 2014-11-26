@@ -2,7 +2,7 @@
 <feature
       id="org.eclipse.scout.sdk.rap"
       label="%featureName"
-      version="4.2.0.qualifier"
+      version="4.3.0.qualifier"
       provider-name="%providerName"
       plugin="org.eclipse.scout.sdk.rap"
       license-feature="org.eclipse.license"
@@ -26,8 +26,8 @@
    </url>
 
    <requires>
-      <import feature="org.eclipse.scout.sdk" version="4.2.0" match="greaterOrEqual"/>
-      <import feature="org.eclipse.scout.sdk.source" version="4.2.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.scout.sdk" version="4.3.0" match="greaterOrEqual"/>
+      <import feature="org.eclipse.scout.sdk.source" version="4.3.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
