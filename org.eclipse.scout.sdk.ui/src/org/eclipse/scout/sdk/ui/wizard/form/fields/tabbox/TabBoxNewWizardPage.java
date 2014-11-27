@@ -65,7 +65,6 @@ public class TabBoxNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewTabBox"));
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.ITabBox, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

@@ -65,7 +65,6 @@ public class BooleanFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     super(BooleanFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IBooleanField, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

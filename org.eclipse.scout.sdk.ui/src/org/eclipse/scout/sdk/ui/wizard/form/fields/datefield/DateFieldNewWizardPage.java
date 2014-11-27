@@ -63,7 +63,6 @@ public class DateFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     super(DateFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IDateField, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

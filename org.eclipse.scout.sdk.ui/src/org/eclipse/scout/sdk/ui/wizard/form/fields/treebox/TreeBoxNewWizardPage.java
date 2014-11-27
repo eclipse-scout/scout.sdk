@@ -67,7 +67,6 @@ public class TreeBoxNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewTreeBox"));
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.ITreeBox, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

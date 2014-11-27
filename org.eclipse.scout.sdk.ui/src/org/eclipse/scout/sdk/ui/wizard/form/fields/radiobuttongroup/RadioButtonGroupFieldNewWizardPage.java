@@ -76,7 +76,6 @@ public class RadioButtonGroupFieldNewWizardPage extends AbstractWorkspaceWizardP
     m_abstractRadioButtonGroup = RuntimeClasses.getSuperType(IRuntimeClasses.IRadioButtonGroup, m_declaringType.getJavaProject());
     setSuperType(m_abstractRadioButtonGroup);
     m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

@@ -81,9 +81,6 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewRadioButtonNoPopup"));
     setDescription(Texts.get("CreateANewRadioButton"));
     m_declaringType = declaringType;
-
-    // default values
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

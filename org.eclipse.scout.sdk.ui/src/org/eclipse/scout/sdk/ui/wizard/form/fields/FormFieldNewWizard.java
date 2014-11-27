@@ -20,6 +20,10 @@ public class FormFieldNewWizard extends AbstractInnerTypeWizard {
   public void init(IWorkbench workbench, IStructuredSelection selection) {
     super.init(workbench, selection);
     FormFieldSelectionWizardPage page1 = new FormFieldSelectionWizardPage(getDeclaringType());
+    if (getSiblingProposal() != null) {
+      page1.setSibling(getSiblingProposal().getElement());
+    }
+    page1.setTypeName(getTypeName());
     addPage(page1);
   }
 
