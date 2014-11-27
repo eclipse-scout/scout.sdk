@@ -398,7 +398,7 @@ public class MethodTest extends AbstractScoutSdkTest {
     IMethod execDecorateCell = SdkAssert.assertMethodExist(table, "execDecorateCell", new String[]{"QCell;", "QITableRow;", "QIColumn<*>;"});
     SdkAssert.assertMethodReturnTypeSignature(execDecorateCell, "V");
     SdkAssert.assertAnnotation(execDecorateCell, "java.lang.Override");
-    IMethod execRowClick = SdkAssert.assertMethodExist(table, "execRowClick", new String[]{"QITableRow;"});
+    IMethod execRowClick = SdkAssert.assertMethodExist(table, "execRowClick", new String[]{"QITableRow;", "QMouseButton;"});
     SdkAssert.assertMethodReturnTypeSignature(execRowClick, "V");
     SdkAssert.assertAnnotation(execRowClick, "java.lang.Override");
 
