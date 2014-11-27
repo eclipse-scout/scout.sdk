@@ -19,8 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.util.InstallTargetPlatformFileOperation;
@@ -49,7 +47,7 @@ import org.eclipse.swt.widgets.Group;
 
 public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
-  private static final String[] RAP_PLUGIN_DETECTION_PREFIXES = new String[]{"org.eclipse.rap.rwt_3", "org.eclipse.scout.rt.ui.rap_4.2", "org.eclipse.scout.rt.ui.rap.mobile_4.2"};
+  private static final String[] RAP_PLUGIN_DETECTION_PREFIXES = new String[]{"org.eclipse.rap.rwt_3", "org.eclipse.scout.rt.ui.rap_4.3", "org.eclipse.scout.rt.ui.rap.mobile_4.3"};
   private static final String RAP_TARGET_DEFAULT_SUB_FOLDER = "rap_target";
 
   private static final String PROP_TARGET_STRATEGY = "propTargetStrategy";
