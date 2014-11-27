@@ -65,7 +65,6 @@ public class TableFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewTableField"));
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.ITableField, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

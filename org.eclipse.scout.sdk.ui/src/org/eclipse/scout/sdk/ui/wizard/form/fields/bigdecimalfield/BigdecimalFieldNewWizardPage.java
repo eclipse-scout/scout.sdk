@@ -65,7 +65,6 @@ public class BigdecimalFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     super(BigdecimalFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
     m_superType = RuntimeClasses.getSuperType(IRuntimeClasses.IBigDecimalField, m_declaringType.getJavaProject());
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

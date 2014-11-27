@@ -63,7 +63,6 @@ public class GroupBoxNewWizardPage extends AbstractWorkspaceWizardPage {
     super(GroupBoxNewWizardPage.class.getName());
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IGroupBox, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

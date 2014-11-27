@@ -65,7 +65,6 @@ public class DoubleFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewDoubleField"));
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IDoubleField, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

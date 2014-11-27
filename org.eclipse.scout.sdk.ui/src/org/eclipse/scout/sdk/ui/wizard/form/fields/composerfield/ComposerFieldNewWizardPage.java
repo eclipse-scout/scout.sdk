@@ -65,7 +65,6 @@ public class ComposerFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewComposerField"));
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IComposerField, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

@@ -67,7 +67,6 @@ public class CalendarFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewCalendarField"));
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.ICalendarField, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

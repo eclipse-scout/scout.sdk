@@ -65,7 +65,6 @@ public class LabelFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewLabelField"));
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.ILabelField, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

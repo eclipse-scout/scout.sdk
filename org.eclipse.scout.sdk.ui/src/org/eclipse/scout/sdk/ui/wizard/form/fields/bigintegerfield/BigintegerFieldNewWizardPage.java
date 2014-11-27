@@ -65,7 +65,6 @@ public class BigintegerFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     super(BigintegerFieldNewWizardPage.class.getName());
     m_declaringType = declaringType;
     m_superType = RuntimeClasses.getSuperType(IRuntimeClasses.IBigIntegerField, m_declaringType.getJavaProject());
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

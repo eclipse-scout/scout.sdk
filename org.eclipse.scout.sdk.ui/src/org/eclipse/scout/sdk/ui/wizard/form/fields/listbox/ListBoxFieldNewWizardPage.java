@@ -85,7 +85,6 @@ public class ListBoxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     // default
     m_superType = RuntimeClasses.getSuperType(IRuntimeClasses.IListBox, m_declaringType.getJavaProject());
     m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
-    m_sibling = SiblingProposal.SIBLING_END;
     m_codeTypeDefinesGenericType = false;
   }
 
