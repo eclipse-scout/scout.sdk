@@ -74,7 +74,6 @@ public class DefaultFormFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     m_declaringType = declaringType;
     m_abstractFormField = RuntimeClasses.getSuperType(IRuntimeClasses.IFormField, m_declaringType.getJavaProject());
     m_superType = m_abstractFormField;
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

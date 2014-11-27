@@ -57,7 +57,6 @@ public class SequenceBoxNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("CreateANewSequenceBox"));
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.ISequenceBox, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override

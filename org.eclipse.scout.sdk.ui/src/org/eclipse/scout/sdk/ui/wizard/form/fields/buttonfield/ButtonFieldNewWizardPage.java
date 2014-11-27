@@ -74,7 +74,6 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(message);
     m_declaringType = declaringType;
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.IButton, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override
@@ -113,7 +112,6 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     });
 
     m_siblingField = getFieldToolkit().createFormFieldSiblingProposalField(parent, m_declaringType);
-    m_siblingField.acceptProposal(m_sibling);
     m_siblingField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
@@ -121,6 +119,12 @@ public class ButtonFieldNewWizardPage extends AbstractWorkspaceWizardPage {
         pingStateChanging();
       }
     });
+    if (m_sibling == null) {
+      m_sibling = (SiblingProposal) m_siblingField.getSelectedProposal();
+    }
+    else {
+      m_siblingField.acceptProposal(m_sibling);
+    }
 
     // layout
     parent.setLayout(new GridLayout(1, true));

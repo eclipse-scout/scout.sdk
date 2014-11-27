@@ -83,7 +83,6 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     // default
     setSuperType(superType);
     m_genericSignature = SignatureCache.createTypeSignature(Long.class.getName());
-    m_sibling = SiblingProposal.SIBLING_END;
     m_codeTypeDefinesGenericType = false;
     m_title = title;
     m_desc = desc;

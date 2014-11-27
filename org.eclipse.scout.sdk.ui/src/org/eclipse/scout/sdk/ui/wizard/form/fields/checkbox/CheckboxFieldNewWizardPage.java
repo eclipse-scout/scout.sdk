@@ -64,9 +64,7 @@ public class CheckboxFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("NewCheckboxField"));
     setDescription(Texts.get("CreateANewCheckboxField"));
     m_declaringType = declaringType;
-
     setSuperType(RuntimeClasses.getSuperType(IRuntimeClasses.ICheckBox, m_declaringType.getJavaProject()));
-    m_sibling = SiblingProposal.SIBLING_END;
   }
 
   @Override
