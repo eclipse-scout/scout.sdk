@@ -60,7 +60,7 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
     setDeclaringType(declaringType);
 
     // find form
-    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy();
+    ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(declaringType.getCompilationUnit());
     IType form = TypeUtility.getAncestor(declaringType, TypeFilters.getMultiTypeFilterOr(
         TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), hierarchy),
         TypeFilters.getPrimaryTypeFilter()));

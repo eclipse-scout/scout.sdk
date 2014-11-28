@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
@@ -36,6 +38,7 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
+import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.executor.AbstractWizardExecutor;
 import org.eclipse.scout.sdk.ui.executor.DefaultTableColumnNewExecutor;
 import org.eclipse.scout.sdk.ui.executor.SmartTableColumnNewExecutor;
@@ -48,6 +51,7 @@ import org.eclipse.scout.sdk.ui.fields.table.ISeparator;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard.ContinueOperation;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
+import org.eclipse.scout.sdk.ui.wizard.IWorkspaceWizard;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
@@ -172,10 +176,25 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
           selection.setSibling(getSibling());
           selection.setSuperType(m_selectedTemplate);
           nextWizard.init(PlatformUI.getWorkbench(), selection);
+
+          if (nextWizard instanceof IWorkspaceWizard) {
+            // copy over the additional finish operations to the real finishing wizard.
+            // the operations registered on the FormFieldNewWizard will not be executed.
+            Map<Double, IOperation> performFinishOperations = getWizard().getPerformFinishOperations();
+            for (Entry<Double, IOperation> entry : performFinishOperations.entrySet()) {
+              ((IWorkspaceWizard) nextWizard).addAdditionalPerformFinishOperation(entry.getValue(), entry.getKey());
+            }
+          }
+
           m_nextPage = nextWizard.getPages()[0];
         }
       }
     }
+  }
+
+  @Override
+  public TableColumnNewWizard getWizard() {
+    return (TableColumnNewWizard) super.getWizard();
   }
 
   @Override

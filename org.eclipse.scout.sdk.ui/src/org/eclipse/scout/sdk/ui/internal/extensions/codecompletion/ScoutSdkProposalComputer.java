@@ -19,13 +19,14 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.CompletionContext;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.internal.codeassist.InternalCompletionContext;
+import org.eclipse.jdt.internal.compiler.ast.ASTNode;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -38,6 +39,7 @@ import org.osgi.framework.Bundle;
  * @author Andreas Hoegger
  * @since 3.10.0 25.10.2013
  */
+@SuppressWarnings("restriction")
 public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer {
 
   @Override
@@ -54,40 +56,45 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
     List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(4);
     try {
       JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-      CharSequence identifierPrefix = javaContext.computeIdentifierPrefix();
-      if (identifierPrefix == null || !StringUtility.hasText(identifierPrefix)) {
-        CompletionContext coreContext = javaContext.getCoreContext();
-        if (coreContext != null && coreContext.isExtended()) {
-          IJavaElement element = coreContext.getEnclosingElement();
-          if (TypeUtility.exists(element)) {
-            if (element.getElementType() == IJavaElement.TYPE) {
-              // don't directly use the element (AssistSourceType) because it has invalid source ranges!
-              IType declaringType = TypeUtility.getType(((IType) element).getFullyQualifiedName());
-              ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
-              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
-                proposals.add(new CodeNewProposal(declaringType));
-              }
-              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))) {
-                proposals.add(new ColumnNewProposal(declaringType));
-              }
-              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeField))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm))) {
-                proposals.add(new FormFieldNewProposal(declaringType));
-              }
-              if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IMenu))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktop))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithNodes))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITree))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITreeNode))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IButton))
-                  || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IImageField))) {
-                proposals.add(new MenuNewProposal(declaringType));
-              }
+      CompletionContext cContext = javaContext.getCoreContext();
+      if (cContext instanceof InternalCompletionContext && cContext.isExtended()) {
+        InternalCompletionContext coreContext = (InternalCompletionContext) cContext;
+        IJavaElement element = coreContext.getEnclosingElement();
+        if (TypeUtility.exists(element)) {
+          if (element.getElementType() == IJavaElement.TYPE) {
+            IType declaringType = TypeUtility.getType(((IType) element).getFullyQualifiedName());
+
+            int startOffset = -1;
+            ASTNode completionNode = coreContext.getCompletionNode();
+            if (completionNode != null) {
+              startOffset = completionNode.sourceStart();
+            }
+
+            // don't directly use the element (AssistSourceType) because it has invalid source ranges!
+            ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
+            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
+              proposals.add(new CodeNewProposal(declaringType, startOffset));
+            }
+            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))) {
+              proposals.add(new ColumnNewProposal(declaringType, startOffset));
+            }
+            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeField))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm))) {
+              proposals.add(new FormFieldNewProposal(declaringType, startOffset));
+            }
+            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IMenu))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktop))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithNodes))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITree))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITreeNode))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IButton))
+                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IImageField))) {
+              proposals.add(new MenuNewProposal(declaringType, startOffset));
             }
           }
         }

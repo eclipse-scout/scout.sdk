@@ -124,6 +124,7 @@ public class SearchFormNewWizardPage extends AbstractWorkspaceWizardPage {
     m_typeNameField = getFieldToolkit().createStyledTextField(group, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_SEARCH_FORM);
     m_typeNameField.setText(getTypeName());
+    setTypeNameInternal(m_typeNameField.getText()); // ensure the type name contains the suffix
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {

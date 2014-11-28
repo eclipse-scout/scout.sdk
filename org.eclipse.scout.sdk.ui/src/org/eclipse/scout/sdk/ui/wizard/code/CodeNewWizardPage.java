@@ -141,6 +141,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       }
     });
     m_typeNameField.setText(m_typeName);
+    m_typeName = m_typeNameField.getText(); // ensure the type name contains the suffix
 
     ITypeFilter filter = null;
     String codeIdSignatureFromCodeType = null;

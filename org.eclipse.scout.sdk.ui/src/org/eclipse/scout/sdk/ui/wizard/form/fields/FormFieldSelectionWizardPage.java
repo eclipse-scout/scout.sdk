@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.ui.wizard.form.fields;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
@@ -35,6 +37,7 @@ import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.annotations.ScoutSdkIgnore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
+import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.ui.executor.selection.ScoutStructuredSelection;
 import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.scout.sdk.ui.extensions.IFormFieldExtension;
@@ -175,6 +178,13 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
           sel.setSibling(new SiblingProposal(sibling));
         }
         wizard.init(PlatformUI.getWorkbench(), sel);
+
+        // copy over the additional finish operations to the real finishing wizard.
+        // the operations registered on the FormFieldNewWizard will not be executed.
+        Map<Double, IOperation> performFinishOperations = getWizard().getPerformFinishOperations();
+        for (Entry<Double, IOperation> entry : performFinishOperations.entrySet()) {
+          wizard.addAdditionalPerformFinishOperation(entry.getValue(), entry.getKey());
+        }
       }
     }
     if (wizard != null) {
@@ -184,6 +194,11 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
       m_nextPage = null;
     }
     revalidate();
+  }
+
+  @Override
+  public FormFieldNewWizard getWizard() {
+    return (FormFieldNewWizard) super.getWizard();
   }
 
   @Override

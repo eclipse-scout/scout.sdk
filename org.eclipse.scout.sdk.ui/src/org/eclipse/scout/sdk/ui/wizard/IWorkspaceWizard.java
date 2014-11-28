@@ -22,11 +22,9 @@ import org.eclipse.ui.INewWizard;
 public interface IWorkspaceWizard extends INewWizard {
 
   double ORDER_DEFAULT = 0;
-  double ORDER_BEFORE_WIZARD = -10;
-  double ORDER_AFTER_WIZARD = 10;
 
   IOperation addAdditionalPerformFinishOperation(IOperation op, double orderNr);
 
-  IOperation removeAdditionalPerformFinishOperation(IOperation op);
+  boolean removeAdditionalPerformFinishOperation(IOperation op);
 
 }

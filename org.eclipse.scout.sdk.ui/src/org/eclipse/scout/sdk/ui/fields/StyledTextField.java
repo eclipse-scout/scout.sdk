@@ -133,20 +133,34 @@ public class StyledTextField extends TextField {
       text = "";
     }
     String prefix = "";
+    String suffix = "";
+
     if (m_suffixListener != null) {
       prefix = m_suffixListener.getPrefix();
-    }
-    if (!text.startsWith(prefix)) {
-      text = prefix + text;
-    }
-    String suffix = "";
-    if (m_suffixListener != null) {
       suffix = m_suffixListener.getSuffix();
+      if (prefix == null) {
+        prefix = "";
+      }
+      if (suffix == null) {
+        suffix = "";
+      }
     }
-    if (!text.endsWith(suffix)) {
-      text += suffix;
+
+    int start = 0;
+    int end = text.length();
+    String lowerText = text.toLowerCase();
+    if (StringUtility.hasText(prefix) && lowerText.startsWith(prefix.toLowerCase())) {
+      start = prefix.length();
     }
-    super.setText(text);
+    if (StringUtility.hasText(suffix) && lowerText.endsWith(suffix.toLowerCase())) {
+      end = text.length() - suffix.length();
+    }
+
+    StringBuilder sb = new StringBuilder(end - start + prefix.length() + suffix.length());
+    sb.append(prefix);
+    sb.append(text.substring(start, end));
+    sb.append(suffix);
+    super.setText(sb.toString());
   }
 
   private class P_SuffixListener implements Listener, VerifyKeyListener {
