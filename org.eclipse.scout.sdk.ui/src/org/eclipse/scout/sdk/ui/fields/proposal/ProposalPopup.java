@@ -109,6 +109,7 @@ public class ProposalPopup extends Window {
 
   private P_LazyLoader m_lazyLoaderJob;
   private IDialogSettings m_dialogSettings;
+  private Point m_shellSizeDif;
 
   public ProposalPopup(Control proposalField) {
     super(proposalField.getShell());
@@ -465,6 +466,16 @@ public class ProposalPopup extends Window {
 
       shell.setBounds(shellBounds);
       shell.layout();
+
+      // workaround: on some operating systems (e.g. ubuntu) the shell does not have the size we just applied in setBounds(). It actually is slightly smaller.
+      // therefore we remember the difference to correct it afterwards in close() where we save the last popup size.
+      // this prevents the popup from getting smaller and smaller. See bugzilla 453515 for details.
+      Point sizeAfterSetBounds = shell.getSize();
+      int deltaX = shellBounds.width - sizeAfterSetBounds.x;
+      int deltaY = shellBounds.height - sizeAfterSetBounds.y;
+      if (deltaX != 0 || deltaY != 0) {
+        m_shellSizeDif = new Point(deltaX / 2, deltaY);
+      }
     }
     finally {
       shell.setRedraw(true);
@@ -512,6 +523,11 @@ public class ProposalPopup extends Window {
         // double width if description area is visible
         if (!((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
           size.x = size.x / 2;
+        }
+        if (m_shellSizeDif != null) {
+          size.x += m_shellSizeDif.x;
+          size.y += m_shellSizeDif.y;
+          m_shellSizeDif = null;
         }
         getDialogSettings().put(DIALOG_SETTINGS_WIDTH, size.x);
         getDialogSettings().put(DIALOG_SETTINGS_HEIGHT, size.y);
