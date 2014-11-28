@@ -29,8 +29,8 @@ import org.eclipse.swt.graphics.Image;
  */
 public class MenuNewProposal extends AbstractSdkWizardProposal {
 
-  MenuNewProposal(IType declaringType) {
-    super(declaringType, TypeUtility.getType(IRuntimeClasses.IMenu));
+  MenuNewProposal(IType declaringType, int startOffset) {
+    super(declaringType, TypeUtility.getType(IRuntimeClasses.IMenu), startOffset);
   }
 
   @Override

@@ -117,6 +117,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"), labelPercentage);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_LOOKUP_CALL);
     m_typeNameField.setText(getTypeName());
+    setTypeNameInternal(m_typeNameField.getText()); // ensure the type name contains the suffix
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {

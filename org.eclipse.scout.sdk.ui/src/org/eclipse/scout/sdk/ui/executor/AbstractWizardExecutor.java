@@ -10,8 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.executor;
 
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.TreeMap;
+
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.sdk.operation.IOperation;
+import org.eclipse.scout.sdk.ui.wizard.IWorkspaceWizard;
 import org.eclipse.scout.sdk.ui.wizard.ScoutWizardDialog;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.ui.INewWizard;
@@ -24,11 +30,32 @@ import org.eclipse.ui.PlatformUI;
  * @since 4.1.0 08.10.2014
  */
 public abstract class AbstractWizardExecutor extends AbstractExecutor {
+
+  private Map<Double, IOperation> m_performFinishOperations;
+
+  protected AbstractWizardExecutor() {
+  }
+
+  public IOperation addAdditionalPerformFinishOperation(IOperation op, double orderNr) {
+    if (m_performFinishOperations == null) {
+      m_performFinishOperations = new TreeMap<Double, IOperation>();
+    }
+    return m_performFinishOperations.put(Double.valueOf(orderNr), op);
+  }
+
   @Override
   public final Object run(Shell shell, IStructuredSelection selection, ExecutionEvent event) {
     INewWizard newWizardInstance = getNewWizardInstance();
     if (newWizardInstance != null) {
       newWizardInstance.init(PlatformUI.getWorkbench(), selection);
+
+      if (m_performFinishOperations != null && newWizardInstance instanceof IWorkspaceWizard) {
+        IWorkspaceWizard workspaceWiz = (IWorkspaceWizard) newWizardInstance;
+        for (Entry<Double, IOperation> entry : m_performFinishOperations.entrySet()) {
+          workspaceWiz.addAdditionalPerformFinishOperation(entry.getValue(), entry.getKey());
+        }
+      }
+
       ScoutWizardDialog wizardDialog = new ScoutWizardDialog(shell, newWizardInstance);
       wizardDialog.open();
     }

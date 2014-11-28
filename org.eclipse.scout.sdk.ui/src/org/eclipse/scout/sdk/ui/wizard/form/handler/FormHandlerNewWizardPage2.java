@@ -60,6 +60,7 @@ public class FormHandlerNewWizardPage2 extends AbstractWorkspaceWizardPage {
     m_typeNameField = getFieldToolkit().createStyledTextField(parent, Texts.get("TypeName"));
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_FORM_HANDLER);
     m_typeNameField.setText(m_typeName);
+    m_typeName = m_typeNameField.getText(); // ensure the type name contains the suffix
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
