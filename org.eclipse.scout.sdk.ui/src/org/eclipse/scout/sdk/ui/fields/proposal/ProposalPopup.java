@@ -10,9 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.proposal;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -40,6 +37,7 @@ import org.eclipse.jface.viewers.ViewerCell;
 import org.eclipse.jface.viewers.ViewerColumn;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.CompareUtility;
+import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.commons.job.JobEx;
@@ -73,16 +71,12 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Table;
 
 public class ProposalPopup extends Window {
-  protected static final String DIALOG_SETTINGS_WIDTH = "dialogSettingsWidth";
-  protected static final String DIALOG_SETTINGS_HEIGHT = "dialogSettingsHeight";
 
+  private static final String DIALOG_SETTINGS_WIDTH = "dialogSettingsWidth";
+  private static final String DIALOG_SETTINGS_HEIGHT = "dialogSettingsHeight";
   private static final int POPUP_OFFSET = 2;
-
-  /*
-   * The minimum pixel width for the popup. May be overridden by using
-   * setInitialPopupSize.
-   */
   private static final int MINIMUM_HEIGHT = 100;
+  private static final int MINIMUM_WIDTH = 200;
   private static final int DEFAULT_WIDTH = 400;
   private static final int DEFAULT_HEIGHT = 300;
 
@@ -98,13 +92,15 @@ public class ProposalPopup extends Window {
     }
   }};
 
-  private Control m_proposalField;
+  private final Control m_proposalField;
+  private final EventListenerList m_selectionListeners;
+  private final OptimisticLock m_uiLock;
+
   private TableViewer m_tableViewer;
   private Label m_itemCountLabel;
   private ScrolledComposite m_proposalDescriptionArea;
 
   private Object m_selectedProposal;
-  private List<IProposalPopupListener> m_selectionListeners = new ArrayList<IProposalPopupListener>();
 
   private SearchPatternInput m_input;
   private IProposalDescriptionProvider m_proposalDescriptionProvider;
@@ -112,14 +108,15 @@ public class ProposalPopup extends Window {
   private IContentProvider m_contentProvider;
 
   private P_LazyLoader m_lazyLoaderJob;
-  private OptimisticLock m_uiLock = new OptimisticLock();
   private IDialogSettings m_dialogSettings;
+  private Point m_shellSizeDif;
 
   public ProposalPopup(Control proposalField) {
     super(proposalField.getShell());
+    m_uiLock = new OptimisticLock();
+    m_selectionListeners = new EventListenerList();
     m_proposalField = proposalField;
-    int style = SWT.RESIZE | SWT.NO_FOCUS | SWT.ON_TOP | SWT.TOOL;
-    setShellStyle(style);
+    setShellStyle(SWT.RESIZE | SWT.NO_FOCUS | SWT.ON_TOP | SWT.TOOL);
     setBlockOnOpen(false);
     // listeners
     getOwnerControl().getShell().addListener(SWT.Move, new Listener() {
@@ -149,7 +146,6 @@ public class ProposalPopup extends Window {
             else {
               close();
             }
-
           }
         });
       }
@@ -418,10 +414,8 @@ public class ProposalPopup extends Window {
       shell.setRedraw(false);
       Rectangle ownerBounds = getOwnerControl().getDisplay().map(getOwnerControl().getParent(), null, getOwnerControl().getBounds());
       Rectangle displayBounds = shell.getDisplay().getBounds();
-      Rectangle shellBounds = shell.getBounds();
-      shellBounds = new Rectangle(shellBounds.x, shellBounds.y, DEFAULT_WIDTH, DEFAULT_HEIGHT);
-      shellBounds.x = ownerBounds.x + POPUP_OFFSET;
-      shellBounds.y = ownerBounds.y + ownerBounds.height + POPUP_OFFSET;
+      Rectangle shellBounds = new Rectangle(ownerBounds.x + POPUP_OFFSET, ownerBounds.y + ownerBounds.height + POPUP_OFFSET, DEFAULT_WIDTH, DEFAULT_HEIGHT);
+
       if (getDialogSettings() != null) {
         String widthString = getDialogSettings().get(DIALOG_SETTINGS_WIDTH);
         if (!StringUtility.isNullOrEmpty(widthString)) {
@@ -432,13 +426,16 @@ public class ProposalPopup extends Window {
           shellBounds.height = Integer.parseInt(heightString);
         }
       }
+
       // double width if description area is visible
       if (!((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
         shellBounds.width = shellBounds.width * 2;
       }
+
       // max screen 50% of screen size
       shellBounds.height = Math.min(displayBounds.height / 2, shellBounds.height);
       shellBounds.width = Math.min(displayBounds.width / 2, shellBounds.width);
+
       // check fit y axis
       int yDiff = (displayBounds.y + displayBounds.height) - (shellBounds.y + shellBounds.height);
       if (yDiff < 0) {
@@ -451,6 +448,7 @@ public class ProposalPopup extends Window {
           shellBounds.y = shellBounds.y - (ownerBounds.height - 2 * POPUP_OFFSET) - shellBounds.height - 10;
         }
       }
+
       // check x axis
       int xDiff = (displayBounds.x + displayBounds.width) - (shellBounds.x + shellBounds.width);
       if (xDiff < 0) {
@@ -458,10 +456,26 @@ public class ProposalPopup extends Window {
         shellBounds.x = shellBounds.x + xDiff;
       }
 
-      // check below
+      // check min sizes
+      if (shellBounds.width < MINIMUM_WIDTH) {
+        shellBounds.width = MINIMUM_WIDTH;
+      }
+      if (shellBounds.height < MINIMUM_HEIGHT) {
+        shellBounds.height = MINIMUM_HEIGHT;
+      }
+
       shell.setBounds(shellBounds);
       shell.layout();
 
+      // workaround: on some operating systems (e.g. ubuntu) the shell does not have the size we just applied in setBounds(). It actually is slightly smaller.
+      // therefore we remember the difference to correct it afterwards in close() where we save the last popup size.
+      // this prevents the popup from getting smaller and smaller. See bugzilla 453515 for details.
+      Point sizeAfterSetBounds = shell.getSize();
+      int deltaX = shellBounds.width - sizeAfterSetBounds.x;
+      int deltaY = shellBounds.height - sizeAfterSetBounds.y;
+      if (deltaX != 0 || deltaY != 0) {
+        m_shellSizeDif = new Point(deltaX / 2, deltaY);
+      }
     }
     finally {
       shell.setRedraw(true);
@@ -510,6 +524,11 @@ public class ProposalPopup extends Window {
         if (!((GridData) m_proposalDescriptionArea.getLayoutData()).exclude) {
           size.x = size.x / 2;
         }
+        if (m_shellSizeDif != null) {
+          size.x += m_shellSizeDif.x;
+          size.y += m_shellSizeDif.y;
+          m_shellSizeDif = null;
+        }
         getDialogSettings().put(DIALOG_SETTINGS_WIDTH, size.x);
         getDialogSettings().put(DIALOG_SETTINGS_HEIGHT, size.y);
       }
@@ -539,19 +558,15 @@ public class ProposalPopup extends Window {
   }
 
   public void addPopupListener(IProposalPopupListener proposalSelectionListener) {
-    m_selectionListeners.add(proposalSelectionListener);
+    m_selectionListeners.add(IProposalPopupListener.class, proposalSelectionListener);
   }
 
   public void removePopupListener(IProposalPopupListener proposalSelectionListener) {
-    m_selectionListeners.remove(proposalSelectionListener);
+    m_selectionListeners.remove(IProposalPopupListener.class, proposalSelectionListener);
   }
 
   private void firePopupEvent(ProposalPopupEvent event) {
-    IProposalPopupListener[] listeners;
-    synchronized (m_selectionListeners) {
-      listeners = m_selectionListeners.toArray(new IProposalPopupListener[m_selectionListeners.size()]);
-    }
-    for (IProposalPopupListener listener : listeners) {
+    for (IProposalPopupListener listener : m_selectionListeners.getListeners(IProposalPopupListener.class)) {
       try {
         listener.popupChanged(event);
       }
