@@ -251,7 +251,7 @@ public final class SignatureUtility {
         // try to resolve type
         String sig = findTypeParameterSignature(signature, signatureOwner, contextType);
         if (CompareUtility.equals(sig, signature)) {
-          sigBuilder.append(sig);
+          sigBuilder.append(Signature.toString(sig));
         }
         else {
           sigBuilder.append(getTypeReference(sig, signatureOwner, contextType, validator));

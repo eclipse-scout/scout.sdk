@@ -21,10 +21,13 @@ import java.util.regex.Pattern;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IImportDeclaration;
 import org.eclipse.jdt.core.IPackageDeclaration;
+import org.eclipse.jdt.core.IPackageFragment;
+import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
+import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class ImportValidator implements IImportValidator {
   private final Map<String/* simpleName */, String/* packageName */> m_initialImports;
@@ -57,7 +60,7 @@ public class ImportValidator implements IImportValidator {
   }
 
   public ImportValidator(ICompilationUnit icu) {
-    this(getImportsFromIcu(icu), getPackageFromIcu(icu));
+    this(getUsedImportsFromIcu(icu), getPackageFromIcu(icu));
   }
 
   protected static String getPackageFromIcu(ICompilationUnit icu) {
@@ -74,8 +77,14 @@ public class ImportValidator implements IImportValidator {
     return pck;
   }
 
-  protected static Map<String, String> getImportsFromIcu(ICompilationUnit icu) {
-    Map<String, String> usedImps = null;
+  protected static Map<String, String> getUsedImportsFromIcu(ICompilationUnit icu) {
+    Map<String, String> usedImps = new HashMap<String, String>();
+    collectExistingImportsFromIcu(icu, usedImps);
+    collectTypesInPackage(TypeUtility.getPackage(icu), usedImps);
+    return usedImps;
+  }
+
+  protected static void collectExistingImportsFromIcu(ICompilationUnit icu, Map<String, String> usedImps) {
     try {
       IImportDeclaration[] imports = icu.getImports();
       usedImps = new HashMap<String, String>(imports.length);
@@ -89,7 +98,19 @@ public class ImportValidator implements IImportValidator {
     catch (JavaModelException e) {
       SdkUtilActivator.logWarning("could not collect imports of compilation unit '" + icu.getElementName() + "'!", e);
     }
-    return usedImps;
+  }
+
+  protected static void collectTypesInPackage(IPackageFragment pck, Map<String, String> usedImps) {
+    try {
+      for (ICompilationUnit icu : pck.getCompilationUnits()) {
+        for (IType t : icu.getTypes()) {
+          usedImps.put(t.getElementName(), pck.getElementName());
+        }
+      }
+    }
+    catch (JavaModelException e) {
+      SdkUtilActivator.logWarning("could not collect all used typenames in package '" + pck.getElementName() + "'!", e);
+    }
   }
 
   @Override
