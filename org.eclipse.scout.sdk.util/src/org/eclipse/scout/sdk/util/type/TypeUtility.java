@@ -313,14 +313,18 @@ public class TypeUtility {
   }
 
   public static IMethod getMethod(IType declaringType, String methodName, List<String> resolvedParameterSignatures) throws CoreException {
+    List<String> cleanedParameterSignatures = new ArrayList<String>(resolvedParameterSignatures.size());
+    for (String sig : resolvedParameterSignatures) {
+      cleanedParameterSignatures.add(sig.replaceAll("\\$", "."));
+    }
     for (IMethod m : declaringType.getMethods()) {
       if (CompareUtility.equals(m.getElementName(), methodName)) {
         // signature compare
         List<String> parameterSignatures = SignatureUtility.getMethodParameterSignatureResolved(m);
-        if (parameterSignatures.size() == resolvedParameterSignatures.size()) {
+        if (parameterSignatures.size() == cleanedParameterSignatures.size()) {
           boolean signatureEquals = true;
           for (int i = 0; i < parameterSignatures.size(); i++) {
-            if (!CompareUtility.equals(resolvedParameterSignatures.get(i), parameterSignatures.get(i))) {
+            if (!CompareUtility.equals(cleanedParameterSignatures.get(i), parameterSignatures.get(i))) {
               signatureEquals = false;
               break;
             }
