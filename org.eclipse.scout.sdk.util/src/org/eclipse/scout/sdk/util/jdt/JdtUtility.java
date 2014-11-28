@@ -24,8 +24,10 @@ import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
@@ -165,6 +167,33 @@ public final class JdtUtility {
     return null;
   }
 
+  private static String getAnnotationSourceFixed(IMember member, IAnnotation annotation, String startSimple) {
+    try {
+      ISourceRange annotSourceRange = annotation.getSourceRange();
+      ISourceRange ownerSourceRange = member.getSourceRange();
+      if (annotSourceRange != null && ownerSourceRange != null) {
+        if (annotSourceRange.getOffset() >= 0 && ownerSourceRange.getOffset() >= 0 && ownerSourceRange.getOffset() > annotSourceRange.getOffset()) {
+          String icuSource = member.getCompilationUnit().getSource();
+          if (icuSource != null && icuSource.length() >= ownerSourceRange.getOffset()) {
+            String diff = icuSource.substring(annotSourceRange.getOffset(), ownerSourceRange.getOffset());
+            int offset = diff.lastIndexOf(startSimple);
+            if (offset >= 0) {
+              offset += annotSourceRange.getOffset();
+              int end = offset + annotSourceRange.getLength();
+              if (icuSource.length() >= end) {
+                return icuSource.substring(offset, end);
+              }
+            }
+          }
+        }
+      }
+    }
+    catch (JavaModelException e) {
+      SdkUtilActivator.logWarning("Unable to find source for annotation '" + annotation.getElementName() + "' in '" + member.getElementName() + "'.", e);
+    }
+    return null;
+  }
+
   public static IAnnotation getAnnotation(IAnnotatable element, String fullyQualifiedAnnotation) {
     if (element == null) {
       return null;
@@ -178,26 +207,38 @@ public final class JdtUtility {
     IAnnotation annotation = element.getAnnotation(simpleName);
     if (TypeUtility.exists(annotation)) {
       try {
-        annotSource = annotation.getSource();
+        annotSource = StringUtility.trim(annotation.getSource());
       }
       catch (Exception e) {
         SdkUtilActivator.logWarning("Could not get source of annotation '" + fullyQualifiedAnnotation + "' in element '" + element.toString() + "'.", e);
       }
       if (annotSource == null || annotSource.startsWith(startSimple) || annotSource.startsWith(startFq)) {
         return annotation;
+      }
+      else if (element instanceof IMember) {
+        annotSource = getAnnotationSourceFixed((IMember) element, annotation, startSimple);
+        if (annotSource != null && (annotSource.startsWith(startSimple) || annotSource.startsWith(startFq))) {
+          return annotation;
+        }
       }
     }
 
     annotation = element.getAnnotation(fullyQualifiedAnnotation);
     if (TypeUtility.exists(annotation)) {
       try {
-        annotSource = annotation.getSource();
+        annotSource = StringUtility.trim(annotation.getSource());
       }
       catch (Exception e) {
         SdkUtilActivator.logWarning("Could not get source of annotation '" + fullyQualifiedAnnotation + "' in element '" + element.toString() + "'.", e);
       }
       if (annotSource == null || annotSource.startsWith(startSimple) || annotSource.startsWith(startFq)) {
         return annotation;
+      }
+      else if (element instanceof IMember) {
+        annotSource = getAnnotationSourceFixed((IMember) element, annotation, startSimple);
+        if (annotSource != null && (annotSource.startsWith(startSimple) || annotSource.startsWith(startFq))) {
+          return annotation;
+        }
       }
     }
     return null;

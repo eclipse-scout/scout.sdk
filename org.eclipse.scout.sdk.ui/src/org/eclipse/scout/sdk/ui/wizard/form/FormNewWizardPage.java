@@ -135,6 +135,7 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
     m_typeNameField = getFieldToolkit().createStyledTextField(group, Texts.get("TypeName"), labelColWidthPercent);
     m_typeNameField.setReadOnlySuffix(SdkProperties.SUFFIX_FORM);
     m_typeNameField.setText(getTypeName());
+    setTypeNameInternal(m_typeNameField.getText()); // ensure the type name contains the suffix
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
@@ -203,7 +204,8 @@ public class FormNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_formIdField = getFieldToolkit().createStyledTextField(group, Texts.get("PropertyNameId"), labelColWidthPercent);
     m_formIdField.setReadOnlySuffix(SdkProperties.SUFFIX_ID);
-    m_formIdField.setText(getTypeName());
+    m_formIdField.setText(getFormId());
+    setFormIdInternal(m_formIdField.getText()); // ensure the type name contains the suffix
     m_formIdField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {

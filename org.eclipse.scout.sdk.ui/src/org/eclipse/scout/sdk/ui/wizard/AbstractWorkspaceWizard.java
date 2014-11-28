@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard;
 
+import java.util.Iterator;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.eclipse.core.runtime.CoreException;
@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.CompareUtility;
-import org.eclipse.scout.commons.CompositeObject;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
@@ -34,7 +33,7 @@ import org.eclipse.ui.IWorkbench;
  */
 public abstract class AbstractWorkspaceWizard extends AbstractWizard implements IWorkspaceWizard {
 
-  private final Map<CompositeObject, IOperation> m_performFinishOperations;
+  private final Map<Double, IOperation> m_performFinishOperations;
 
   private ContinueOperation m_continueOperation;
 
@@ -43,7 +42,15 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
   }
 
   public AbstractWorkspaceWizard() {
-    m_performFinishOperations = new TreeMap<CompositeObject, IOperation>();
+    m_performFinishOperations = new TreeMap<Double, IOperation>();
+  }
+
+  public Map<Double, IOperation> getPerformFinishOperations() {
+    return new TreeMap<Double, IOperation>(m_performFinishOperations);
+  }
+
+  protected Map<Double, IOperation> getPerformFinishOperationsInternal() {
+    return m_performFinishOperations;
   }
 
   @Override
@@ -62,22 +69,21 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
 
   @Override
   public IOperation addAdditionalPerformFinishOperation(IOperation op, double orderNr) {
-    return m_performFinishOperations.put(new CompositeObject(orderNr, op), op);
+    return m_performFinishOperations.put(Double.valueOf(orderNr), op);
   }
 
   @Override
-  public IOperation removeAdditionalPerformFinishOperation(IOperation op) {
-    CompositeObject key = null;
-    for (Entry<CompositeObject, IOperation> e : m_performFinishOperations.entrySet()) {
-      if (CompareUtility.equals(e.getValue(), op)) {
-        key = e.getKey();
-        break;
+  public boolean removeAdditionalPerformFinishOperation(IOperation op) {
+    boolean changed = false;
+    Iterator<IOperation> it = m_performFinishOperations.values().iterator();
+    while (it.hasNext()) {
+      IOperation operation = it.next();
+      if (CompareUtility.equals(operation, op)) {
+        it.remove();
+        changed = true;
       }
     }
-    if (key != null) {
-      return m_performFinishOperations.remove(key);
-    }
-    return null;
+    return changed;
   }
 
   @Override
@@ -98,7 +104,7 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
         return false;
       }
       P_PerformFinishOperation performFinishOperation = new P_PerformFinishOperation(getShell().getDisplay());
-      m_performFinishOperations.put(new CompositeObject(IWorkspaceWizard.ORDER_DEFAULT, performFinishOperation), performFinishOperation);
+      m_performFinishOperations.put(IWorkspaceWizard.ORDER_DEFAULT, performFinishOperation);
 
       OperationJob job = new OperationJob(m_performFinishOperations.values());
       job.schedule();

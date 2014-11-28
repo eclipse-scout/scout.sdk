@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.form.fields;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
 import org.eclipse.ui.IWorkbench;
@@ -25,6 +26,14 @@ public class FormFieldNewWizard extends AbstractInnerTypeWizard {
     }
     page1.setTypeName(getTypeName());
     addPage(page1);
+  }
+
+  @Override
+  protected boolean beforeFinish() throws CoreException {
+    // we never want to execute the finish operations on this wizard.
+    // They have been passed to the concrete nested wizard and will be executed there.
+    getPerformFinishOperationsInternal().clear();
+    return super.beforeFinish();
   }
 
   @Override

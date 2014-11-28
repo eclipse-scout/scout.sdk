@@ -97,7 +97,6 @@ public class MethodUpdateContentOperation implements IOperation {
         ReplaceEdit redit = new ReplaceEdit(contentRange.getOffset(), contentRange.getLength(), methodBodyDocument.get());
         redit.apply(doc);
         if (isFormatSource()) {
-
           ISourceRange methodSourceRange = getMethod().getSourceRange();
           int offset = methodSourceRange.getOffset();
           int length = methodSourceRange.getLength() + divLength;

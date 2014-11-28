@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.tablecolumn;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.extensions.AbstractInnerTypeWizard;
@@ -42,6 +43,14 @@ public class TableColumnNewWizard extends AbstractInnerTypeWizard {
       m_page1.setSuperType(getSuperType());
     }
     addPage(m_page1);
+  }
+
+  @Override
+  protected boolean beforeFinish() throws CoreException {
+    // we never want to execute the finish operations on this wizard.
+    // They have been passed to the concrete nested wizard and will be executed there.
+    getPerformFinishOperationsInternal().clear();
+    return super.beforeFinish();
   }
 
   @Override

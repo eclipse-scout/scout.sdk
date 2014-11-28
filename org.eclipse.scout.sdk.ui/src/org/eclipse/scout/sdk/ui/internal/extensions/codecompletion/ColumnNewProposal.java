@@ -29,8 +29,8 @@ import org.eclipse.swt.graphics.Image;
  */
 public class ColumnNewProposal extends AbstractSdkWizardProposal {
 
-  ColumnNewProposal(IType declaringType) {
-    super(declaringType, TypeUtility.getType(IRuntimeClasses.IColumn));
+  ColumnNewProposal(IType declaringType, int startOffset) {
+    super(declaringType, TypeUtility.getType(IRuntimeClasses.IColumn), startOffset);
   }
 
   @Override

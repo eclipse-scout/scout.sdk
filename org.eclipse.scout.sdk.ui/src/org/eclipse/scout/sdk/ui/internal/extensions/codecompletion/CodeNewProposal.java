@@ -29,8 +29,8 @@ import org.eclipse.swt.graphics.Image;
  */
 public class CodeNewProposal extends AbstractSdkWizardProposal {
 
-  CodeNewProposal(IType declaringType) {
-    super(declaringType, TypeUtility.getType(IRuntimeClasses.ICode));
+  CodeNewProposal(IType declaringType, int startOffset) {
+    super(declaringType, TypeUtility.getType(IRuntimeClasses.ICode), startOffset);
   }
 
   @Override

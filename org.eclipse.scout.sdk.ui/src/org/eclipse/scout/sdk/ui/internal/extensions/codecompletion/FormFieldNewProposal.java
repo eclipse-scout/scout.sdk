@@ -29,8 +29,8 @@ import org.eclipse.swt.graphics.Image;
  */
 public class FormFieldNewProposal extends AbstractSdkWizardProposal {
 
-  FormFieldNewProposal(IType declaringType) {
-    super(declaringType, TypeUtility.getType(IRuntimeClasses.IFormField));
+  FormFieldNewProposal(IType declaringType, int startOffset) {
+    super(declaringType, TypeUtility.getType(IRuntimeClasses.IFormField), startOffset);
   }
 
   @Override

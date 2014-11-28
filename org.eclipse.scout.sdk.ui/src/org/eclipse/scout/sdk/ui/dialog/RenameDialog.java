@@ -65,6 +65,7 @@ public class RenameDialog extends TitleAreaDialog {
     m_typeNameField.setReadOnlySuffix(getReadOnlySuffix());
     m_typeNameField.setReadOnlyPrefix(getReadOnlyPrefix());
     m_typeNameField.setText(getNewName());
+    setNewName(m_typeNameField.getText()); // ensure the type name contains the suffix
     m_typeNameField.addModifyListener(new ModifyListener() {
       @Override
       public void modifyText(ModifyEvent e) {
