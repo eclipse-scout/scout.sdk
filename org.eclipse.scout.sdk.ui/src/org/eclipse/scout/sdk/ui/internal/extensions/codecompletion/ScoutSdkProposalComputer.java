@@ -19,8 +19,6 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.jdt.core.CompletionContext;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.internal.codeassist.InternalCompletionContext;
-import org.eclipse.jdt.internal.compiler.ast.ASTNode;
 import org.eclipse.jdt.ui.text.java.ContentAssistInvocationContext;
 import org.eclipse.jdt.ui.text.java.IJavaCompletionProposalComputer;
 import org.eclipse.jdt.ui.text.java.JavaContentAssistInvocationContext;
@@ -39,7 +37,6 @@ import org.osgi.framework.Bundle;
  * @author Andreas Hoegger
  * @since 3.10.0 25.10.2013
  */
-@SuppressWarnings("restriction")
 public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer {
 
   @Override
@@ -56,19 +53,13 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
     List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(4);
     try {
       JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
-      CompletionContext cContext = javaContext.getCoreContext();
-      if (cContext instanceof InternalCompletionContext && cContext.isExtended()) {
-        InternalCompletionContext coreContext = (InternalCompletionContext) cContext;
+      CompletionContext coreContext = javaContext.getCoreContext();
+      if (coreContext != null && coreContext.isExtended()) {
         IJavaElement element = coreContext.getEnclosingElement();
         if (TypeUtility.exists(element)) {
           if (element.getElementType() == IJavaElement.TYPE) {
             IType declaringType = TypeUtility.getType(((IType) element).getFullyQualifiedName());
-
-            int startOffset = -1;
-            ASTNode completionNode = coreContext.getCompletionNode();
-            if (completionNode != null) {
-              startOffset = completionNode.sourceStart();
-            }
+            int startOffset = coreContext.getTokenStart();
 
             // don't directly use the element (AssistSourceType) because it has invalid source ranges!
             ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
