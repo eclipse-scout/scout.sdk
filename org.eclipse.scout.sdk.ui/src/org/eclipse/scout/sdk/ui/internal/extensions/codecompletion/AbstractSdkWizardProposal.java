@@ -68,7 +68,8 @@ public abstract class AbstractSdkWizardProposal extends AbstractSdkProposal {
     try {
       ITypeFilter filter = null;
       if (m_siblingSubTypeFilter != null) {
-        filter = TypeFilters.getSubtypeFilter(m_siblingSubTypeFilter, TypeUtility.getLocalTypeHierarchy(getDeclaringType()));
+        // do not use the filter using the TypeUtility.getLocalTypeHierarchy(getDeclaringType()) because in dirty compilation units, this hierarchy may be empty!
+        filter = TypeFilters.getSubtypeFilter(m_siblingSubTypeFilter);
       }
       sibling = findSibling(getDeclaringType(), sourceRangeOffset, filter);
     }
