@@ -58,10 +58,10 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
         IJavaElement element = coreContext.getEnclosingElement();
         if (TypeUtility.exists(element)) {
           if (element.getElementType() == IJavaElement.TYPE) {
-            IType declaringType = TypeUtility.getType(((IType) element).getFullyQualifiedName());
-            int startOffset = coreContext.getTokenStart();
-
             // don't directly use the element (AssistSourceType) because it has invalid source ranges!
+            IType declaringType = TypeUtility.getType(((IType) element).getFullyQualifiedName());
+
+            int startOffset = coreContext.getTokenStart();
             ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
             if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType))
                 || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
