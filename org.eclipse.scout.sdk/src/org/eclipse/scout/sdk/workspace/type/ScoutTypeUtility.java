@@ -909,20 +909,20 @@ public class ScoutTypeUtility extends TypeUtility {
     return method;
   }
 
-  public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName) {
+  public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName) throws CoreException {
     ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
     return getConfigurationMethod(declaringType, methodName, superTypeHierarchy);
   }
 
-  public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName, ITypeHierarchy superTypeHierarchy) {
+  public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName, ITypeHierarchy superTypeHierarchy) throws CoreException {
     return getConfigurationMethod(declaringType, methodName, superTypeHierarchy, 0, null);
   }
 
-  public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName, ITypeHierarchy superTypeHierarchy, int methodType, String configPropertyType) {
+  public static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName, ITypeHierarchy superTypeHierarchy, int methodType, String configPropertyType) throws CoreException {
     return getConfigurationMethod(declaringType, methodName, superTypeHierarchy, superTypeHierarchy.getSuperClassStack(declaringType), methodType, configPropertyType);
   }
 
-  private static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName, ITypeHierarchy superTypeHierarchy, Deque<IType> bottomUpAffectedTypes, int methodType, String configPropertyType) {
+  private static ConfigurationMethod getConfigurationMethod(IType declaringType, String methodName, ITypeHierarchy superTypeHierarchy, Deque<IType> bottomUpAffectedTypes, int methodType, String configPropertyType) throws CoreException {
     ConfigurationMethod newMethod = null;
     try {
       Iterator<IType> topDownIterator = bottomUpAffectedTypes.descendingIterator();
@@ -932,7 +932,12 @@ public class ScoutTypeUtility extends TypeUtility {
         for (IMethod m : methods) {
           if (TypeUtility.exists(m)) {
             if (newMethod != null) {
-              newMethod.pushMethod(m);
+              String existingMethodId = SignatureUtility.getMethodIdentifier(newMethod.getDefaultMethod());
+              String newMethodId = SignatureUtility.getMethodIdentifier(m);
+              if (existingMethodId.equals(newMethodId)) {
+                // only add to stack if the signature is same
+                newMethod.pushMethod(m);
+              }
             }
             else {
               if (methodType == 0) {
