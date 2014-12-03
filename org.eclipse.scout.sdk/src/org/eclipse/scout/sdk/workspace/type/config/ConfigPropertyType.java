@@ -18,10 +18,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -35,7 +35,7 @@ public class ConfigPropertyType {
   private final Deque<IType> m_affectedTypes;
   private final ITypeHierarchy m_superTypeHierarchy;
 
-  public ConfigPropertyType(IType type) throws JavaModelException {
+  public ConfigPropertyType(IType type) throws CoreException {
     m_type = type;
     m_superTypeHierarchy = TypeUtility.getSupertypeHierarchy(type);
     m_affectedTypes = m_superTypeHierarchy.getSuperClassStack(m_type);
@@ -92,7 +92,7 @@ public class ConfigPropertyType {
     return m_affectedTypes.contains(type);
   }
 
-  public ConfigurationMethod updateIfChanged(IMethod method) {
+  public ConfigurationMethod updateIfChanged(IMethod method) throws CoreException {
     String methodName = method.getElementName();
     ConfigurationMethod newMethod = ScoutTypeUtility.getConfigurationMethod(m_type, methodName, m_superTypeHierarchy);
     if (newMethod != null) {
