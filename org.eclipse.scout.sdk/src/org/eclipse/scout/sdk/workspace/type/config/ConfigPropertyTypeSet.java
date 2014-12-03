@@ -15,9 +15,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CollectionUtility;
 
 /**
@@ -27,13 +27,13 @@ public class ConfigPropertyTypeSet {
   private final Map<IType, ConfigPropertyType> m_propertyTypes;
   private final Map<String, ConfigurationMethodSet> m_commonConfigPropertyMethodSets;
 
-  public ConfigPropertyTypeSet(List<IType> types) throws JavaModelException {
+  public ConfigPropertyTypeSet(List<IType> types) throws CoreException {
     m_propertyTypes = new HashMap<IType, ConfigPropertyType>();
     m_commonConfigPropertyMethodSets = new TreeMap<String, ConfigurationMethodSet>();
     init(types);
   }
 
-  private void init(List<IType> types) throws JavaModelException {
+  private void init(List<IType> types) throws CoreException {
     ConfigPropertyType reference = null;
     for (IType t : types) {
       ConfigPropertyType value = new ConfigPropertyType(t);
@@ -95,8 +95,9 @@ public class ConfigPropertyTypeSet {
   /**
    * @param method
    * @return
+   * @throws CoreException
    */
-  public ConfigurationMethod updateIfChanged(IMethod method) {
+  public ConfigurationMethod updateIfChanged(IMethod method) throws CoreException {
     for (ConfigPropertyType type : m_propertyTypes.values()) {
       ConfigurationMethod oldMethod = type.getConfigurationMethod(method);
       ConfigurationMethod newConfigurationMethod = type.updateIfChanged(method);

@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -24,7 +25,6 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
@@ -90,7 +90,7 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
         JavaCore.addElementChangedListener(m_methodChangedListener);
       }
     }
-    catch (JavaModelException e) {
+    catch (CoreException e) {
       ScoutSdkUi.logError("Unable to create multi property part.", e);
     }
   }
@@ -139,12 +139,17 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
 
   private void handleMethodChanged(IMethod method) {
     if (m_configPropertyTypeSet.isRelevantType(method.getDeclaringType())) {
-      ConfigurationMethod updatedMethod = m_configPropertyTypeSet.updateIfChanged(method);
-      if (updatedMethod != null) {
-        AbstractMultiMethodPresenter presenter = m_methodPresenters.get(updatedMethod.getMethodName());
-        if (presenter != null) {
-          m_updateJob.update(presenter, m_configPropertyTypeSet.getConfigurationMethodSet(updatedMethod.getMethodName()));
+      try {
+        ConfigurationMethod updatedMethod = m_configPropertyTypeSet.updateIfChanged(method);
+        if (updatedMethod != null) {
+          AbstractMultiMethodPresenter presenter = m_methodPresenters.get(updatedMethod.getMethodName());
+          if (presenter != null) {
+            m_updateJob.update(presenter, m_configPropertyTypeSet.getConfigurationMethodSet(updatedMethod.getMethodName()));
+          }
         }
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError("Unable to update method '" + method.getElementName() + "'.", e);
       }
     }
   }
