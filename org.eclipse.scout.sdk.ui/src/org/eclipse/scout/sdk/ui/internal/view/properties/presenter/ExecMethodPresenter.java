@@ -89,7 +89,7 @@ public class ExecMethodPresenter extends AbstractMethodPresenter {
   protected void overrideMethod() {
     if (!getMethod().isImplemented()) {
       try {
-        MethodOverrideOperation overrideOp = new MethodOverrideOperation(getMethod().getMethodName(), getMethod().getType());
+        MethodOverrideOperation overrideOp = new MethodOverrideOperation(getMethod().getDefaultMethod(), getMethod().getType());
         overrideOp.setFormatSource(true);
         IJavaElement sibling = null;
         IStructuredType structuredType = ScoutTypeUtility.createStructuredType(getMethod().getType());

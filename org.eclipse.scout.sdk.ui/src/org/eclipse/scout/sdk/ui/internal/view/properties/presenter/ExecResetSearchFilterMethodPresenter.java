@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.view.properties.presenter;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
+import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
@@ -44,7 +45,7 @@ public class ExecResetSearchFilterMethodPresenter extends ExecMethodPresenter {
   protected void overrideMethod() {
     if (!getMethod().isImplemented()) {
       try {
-        P_OverrideExecResetSearchFilterMethod methodOverrideOperation = new P_OverrideExecResetSearchFilterMethod(getMethod().getMethodName(), getMethod().getType());
+        P_OverrideExecResetSearchFilterMethod methodOverrideOperation = new P_OverrideExecResetSearchFilterMethod(getMethod().getDefaultMethod(), getMethod().getType());
         OperationJob job = new OperationJob(methodOverrideOperation);
         job.schedule();
         try {
@@ -73,8 +74,8 @@ public class ExecResetSearchFilterMethodPresenter extends ExecMethodPresenter {
      * @param content
      * @throws CoreException
      */
-    public P_OverrideExecResetSearchFilterMethod(String methodName, IType declaringType) throws CoreException {
-      super(methodName, declaringType);
+    public P_OverrideExecResetSearchFilterMethod(IMethod method, IType declaringType) throws CoreException {
+      super(method, declaringType);
       setFormatSource(true);
       m_formDataType = null;
       m_formType = declaringType;
