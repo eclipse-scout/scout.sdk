@@ -27,7 +27,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IField;
-import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
@@ -205,13 +204,12 @@ public final class DtoUtility {
   public static String computeSuperTypeSignatureForFormData(IType formField, FormDataAnnotation formDataAnnotation, ITypeHierarchy localHierarchy) {
     String superTypeSignature = formDataAnnotation.getSuperTypeSignature();
     if (formDataAnnotation.getGenericOrdinal() >= 0) {
-      IJavaElement annotationOwner = formDataAnnotation.getAnnotationOwner();
-      if (TypeUtility.exists(annotationOwner) && annotationOwner.getElementType() == IJavaElement.TYPE) {
-        IType annotationType = (IType) annotationOwner;
+      IType genericOrdinalDefinitionType = formDataAnnotation.getGenericOrdinalDefinitionType();
+      if (TypeUtility.exists(genericOrdinalDefinitionType)) {
         IType superType = TypeUtility.getTypeBySignature(superTypeSignature);
         if (TypeUtility.isGenericType(superType)) {
           try {
-            String genericTypeSig = computeDtoGenericType(formField, annotationType, formDataAnnotation.getGenericOrdinal(), localHierarchy);
+            String genericTypeSig = computeDtoGenericType(formField, genericOrdinalDefinitionType, formDataAnnotation.getGenericOrdinal(), localHierarchy);
             if (genericTypeSig != null) {
               superTypeSignature = ENDING_SEMICOLON_PATTERN.matcher(superTypeSignature).replaceAll(Signature.C_GENERIC_START + genericTypeSig + Signature.C_GENERIC_END + Signature.C_SEMICOLON);
             }

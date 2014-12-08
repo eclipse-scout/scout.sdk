@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.dto.formdata;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -72,6 +73,7 @@ public class FormDataAnnotation {
   private String m_superTypeSignature;
   private IJavaElement m_annotationOwner;
   private final Set<String> m_interfaceSignatures;
+  private IType m_genericOrdinalDefinitionType;
 
   public FormDataAnnotation() {
     m_interfaceSignatures = new LinkedHashSet<String>();
@@ -179,7 +181,19 @@ public class FormDataAnnotation {
     m_interfaceSignatures.add(sig);
   }
 
+  public void addInterfaceSignatures(Collection<String> signatures) {
+    m_interfaceSignatures.addAll(signatures);
+  }
+
   public Set<String> getInterfaceSignatures() {
     return new LinkedHashSet<String>(m_interfaceSignatures);
+  }
+
+  public IType getGenericOrdinalDefinitionType() {
+    return m_genericOrdinalDefinitionType;
+  }
+
+  public void setGenericOrdinalDefinitionType(IType genericOrdinalDefinitionType) {
+    m_genericOrdinalDefinitionType = genericOrdinalDefinitionType;
   }
 }

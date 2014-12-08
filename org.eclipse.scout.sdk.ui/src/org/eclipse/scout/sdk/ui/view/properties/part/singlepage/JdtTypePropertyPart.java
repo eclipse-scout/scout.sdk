@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -320,7 +321,7 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
         setCompilationUnitDirty(getPage().getType().getCompilationUnit().isWorkingCopy() && getPage().getType().getCompilationUnit().getBuffer().hasUnsavedChanges());
       }
     }
-    catch (JavaModelException e) {
+    catch (CoreException e) {
       ScoutSdkUi.logWarning("could not create config property page for '" + getPage().getType().getFullyQualifiedName() + "'.", e);
     }
   }
@@ -563,13 +564,18 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
 
   private void handleMethodChanged(IMethod method) {
     if (m_configPropertyType.isRelevantType(method.getDeclaringType())) {
-      ConfigurationMethod updatedMethod = m_configPropertyType.updateIfChanged(method);
-      if (updatedMethod != null) {
-        synchronized (m_methodUpdateLock) {
-          m_methodsToUpdate.put(updatedMethod.getMethodName(), updatedMethod);
-          m_updateJob.cancel();
-          m_updateJob.schedule(150);
+      try {
+        ConfigurationMethod updatedMethod = m_configPropertyType.updateIfChanged(method);
+        if (updatedMethod != null) {
+          synchronized (m_methodUpdateLock) {
+            m_methodsToUpdate.put(updatedMethod.getMethodName(), updatedMethod);
+            m_updateJob.cancel();
+            m_updateJob.schedule(150);
+          }
         }
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError("Unable to update method '" + method.getElementName() + "'.", e);
       }
     }
   }

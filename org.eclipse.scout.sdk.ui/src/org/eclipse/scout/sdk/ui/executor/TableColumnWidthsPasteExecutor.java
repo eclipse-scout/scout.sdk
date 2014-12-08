@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.scout.commons.CollectionUtility;
@@ -71,7 +72,12 @@ public class TableColumnWidthsPasteExecutor extends AbstractExecutor {
   public Object run(Shell shell, IStructuredSelection selection, ExecutionEvent event) {
     Map<String, Integer> clipBoardContent = parseContent(m_stringFromClipboard);
     if (clipBoardContent != null && !clipBoardContent.isEmpty()) {
-      changeColumnWidths(m_tableType, clipBoardContent, shell);
+      try {
+        changeColumnWidths(m_tableType, clipBoardContent, shell);
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError("Unable to change column widths.", e);
+      }
     }
     else {
       showInfoMessageBox(shell, Texts.get("Action_PasteColumnWidths_InvalidClipboard"));
@@ -79,7 +85,7 @@ public class TableColumnWidthsPasteExecutor extends AbstractExecutor {
     return null;
   }
 
-  private void changeColumnWidths(IType tableType, Map<String, Integer> map, Shell shell) {
+  private void changeColumnWidths(IType tableType, Map<String, Integer> map, Shell shell) throws CoreException {
     // for all columns within the table
     List<IOperation> updateOps = new LinkedList<IOperation>();
     for (IType innerType : ScoutTypeUtility.getColumns(tableType)) {

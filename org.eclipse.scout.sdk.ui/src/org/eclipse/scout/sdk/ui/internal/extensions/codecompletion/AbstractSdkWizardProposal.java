@@ -124,7 +124,7 @@ public abstract class AbstractSdkWizardProposal extends AbstractSdkProposal {
     return true;
   }
 
-  private static class P_RemovePrefixOperation implements IOperation {
+  private static final class P_RemovePrefixOperation implements IOperation {
 
     private final IDocument m_document;
     private final int m_start, m_end;

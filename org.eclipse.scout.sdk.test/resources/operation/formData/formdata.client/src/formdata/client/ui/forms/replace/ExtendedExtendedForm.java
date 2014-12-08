@@ -16,6 +16,7 @@ import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 
 import formdata.client.ui.forms.replace.BaseForm.MainBox.GroupBox;
+import formdata.shared.IFormDataInterface03;
 import formdata.shared.services.process.replace.ExtendedExtendedFormData;
 import formdata.shared.services.process.replace.UsingFormFieldData;
 
@@ -43,7 +44,7 @@ public class ExtendedExtendedForm extends ExtendedForm {
   }
 
   @Replace
-  @FormData(sdkCommand = SdkCommand.CREATE)
+  @FormData(sdkCommand = SdkCommand.CREATE, interfaces = IFormDataInterface03.class)
   public class SdkCommandNoneNoneCreateField extends ExtendedForm.SdkCommandNoneNoneField {
     public SdkCommandNoneNoneCreateField(BaseForm.MainBox.NoneFormDataFieldsGroupBox container) {
       super(container);
