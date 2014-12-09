@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.workspace.dto.formdata;
 
+import java.util.Collection;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
@@ -178,6 +179,10 @@ public class FormDataAnnotation {
 
   public void addInterfaceSignature(String sig) {
     m_interfaceSignatures.add(sig);
+  }
+
+  public void addInterfaceSignatures(Collection<String> signatures) {
+    m_interfaceSignatures.addAll(signatures);
   }
 
   public Set<String> getInterfaceSignatures() {

@@ -669,6 +669,7 @@ public class ReplaceFormFieldTest extends AbstractSdkTestWithFormDataProject {
     IType extendedExtendedFormData = SdkAssert.assertTypeExists("formdata.shared.services.process.replace.ExtendedExtendedFormData");
     SdkAssert.assertHasFlags(extendedExtendedFormData, 1);
     SdkAssert.assertHasSuperTypeSignature(extendedExtendedFormData, "QExtendedFormData;");
+    SdkAssert.assertAnnotation(extendedExtendedFormData, "javax.annotation.Generated");
 
     // fields of ExtendedExtendedFormData
     SdkAssert.assertEquals("field count of 'ExtendedExtendedFormData'", 1, extendedExtendedFormData.getFields().length);
@@ -1561,6 +1562,7 @@ public class ReplaceFormFieldTest extends AbstractSdkTestWithFormDataProject {
     IType sdkCommandNoneNoneCreate = SdkAssert.assertTypeExists(extendedExtendedFormData, "SdkCommandNoneNoneCreate");
     SdkAssert.assertHasFlags(sdkCommandNoneNoneCreate, 9);
     SdkAssert.assertHasSuperTypeSignature(sdkCommandNoneNoneCreate, "QSdkCommandNoneNone;");
+    SdkAssert.assertHasSuperIntefaceSignatures(sdkCommandNoneNoneCreate, new String[]{"QIFormDataInterface03;"});
     SdkAssert.assertAnnotation(sdkCommandNoneNoneCreate, "org.eclipse.scout.commons.annotations.Replace");
 
     // fields of SdkCommandNoneNoneCreate
@@ -1990,4 +1992,5 @@ public class ReplaceFormFieldTest extends AbstractSdkTestWithFormDataProject {
 
     SdkAssert.assertEquals("inner types count of 'SdkCommandUseUseUse'", 0, sdkCommandUseUseUse.getTypes().length);
   }
+
 }
