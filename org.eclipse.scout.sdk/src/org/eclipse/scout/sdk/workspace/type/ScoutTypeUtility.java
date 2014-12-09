@@ -313,81 +313,59 @@ public class ScoutTypeUtility extends TypeUtility {
     return null;
   }
 
-  public static FormDataAnnotation findFormDataAnnotation(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
-    return findFormDataAnnnotationImpl(type, hierarchy);
+  public static FormDataAnnotation findFormDataAnnotation(IType type, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+    return findFormDataAnnnotationImpl(type, superTypeHierarchy);
   }
 
   public static FormDataAnnotation findFormDataAnnotation(IMethod method) throws JavaModelException {
     FormDataAnnotation annotation = new FormDataAnnotation();
-    try {
-      fillFormDataAnnotation(method, annotation, true);
-    }
-    catch (Exception e) {
-      ScoutSdk.logWarning("could not parse formdata annotation of method '" + method.getElementName() + "' on '" + method.getDeclaringType().getFullyQualifiedName() + "'", e);
-      return null;
-    }
+    fillFormDataAnnotation(method, annotation, true, false);
     return annotation;
   }
 
   private static FormDataAnnotation findFormDataAnnnotationImpl(IType type, ITypeHierarchy hierarchy) throws JavaModelException {
     FormDataAnnotation anot = new FormDataAnnotation();
-    try {
-      parseFormDataAnnotationReq(anot, type, hierarchy, true);
-    }
-    catch (Exception e) {
-      ScoutSdk.logWarning("could not parse formdata annotation of type '" + type.getFullyQualifiedName() + "'.", e);
-      return null;
-    }
+    parseFormDataAnnotationRec(anot, type, hierarchy, true);
     return anot;
   }
 
-  private static void parseFormDataAnnotationReq(FormDataAnnotation annotation, IType type, ITypeHierarchy hierarchy, boolean isOwner) {
+  private static void parseFormDataAnnotationRec(FormDataAnnotation annotation, IType type, ITypeHierarchy hierarchy, boolean isOwner) throws JavaModelException {
     if (TypeUtility.exists(type)) {
       boolean replaceAnnotationPresent = existsReplaceAnnotation(type);
       IType superType = hierarchy.getSuperclass(type);
-      parseFormDataAnnotationReq(annotation, superType, hierarchy, replaceAnnotationPresent);
+
+      parseFormDataAnnotationRec(annotation, superType, hierarchy, replaceAnnotationPresent);
       for (IType superInterface : hierarchy.getSuperInterfaces(type)) {
-        parseFormDataAnnotationReq(annotation, superInterface, hierarchy, replaceAnnotationPresent);
+        parseFormDataAnnotationRec(annotation, superInterface, hierarchy, replaceAnnotationPresent);
       }
 
-      if (replaceAnnotationPresent) {
-        if (TypeUtility.exists(superType) && !existsReplaceAnnotation(superType)) {
-          // super type is the original field that is going to be replaced by the given type
-          // check whether the super type is embedded into a form field that is annotated by @FormData with SdkCommand.IGNORE.
-          try {
-            IType declaringType = superType.getDeclaringType();
-            while (TypeUtility.exists(declaringType)) {
-              FormDataAnnotation declaringTypeformDataAnnotation = findFormDataAnnotation(declaringType, hierarchy);
-              if (FormDataAnnotation.isIgnore(declaringTypeformDataAnnotation)) {
-                // super type is embedded into a ignored form field. Hence this field is ignored as well. Adjust parsed annotation.
-                annotation.setSdkCommand(SdkCommand.IGNORE);
-                break;
-              }
-              declaringType = declaringType.getDeclaringType();
-            }
+      if (replaceAnnotationPresent && TypeUtility.exists(superType) && !existsReplaceAnnotation(superType)) {
+        // super type is the original field that is going to be replaced by the given type
+        // check whether the super type is embedded into a form field that is annotated by @FormData with SdkCommand.IGNORE.
+        IType declaringType = superType.getDeclaringType();
+        while (TypeUtility.exists(declaringType)) {
+          FormDataAnnotation declaringTypeformDataAnnotation = findFormDataAnnotation(declaringType, hierarchy);
+          if (FormDataAnnotation.isIgnore(declaringTypeformDataAnnotation)) {
+            // super type is embedded into a ignored form field. Hence this field is ignored as well. Adjust parsed annotation.
+            annotation.setSdkCommand(SdkCommand.IGNORE);
+            break;
           }
-          catch (JavaModelException e) {
-            ScoutSdk.logWarning("could not determine enclosing class's @FormData annotation", e);
-          }
-        }
-
-        if (!FormDataAnnotation.isIgnore(annotation)) {
-          // a form field data must always be created for a replacing fields if its parent has one and it must extend the parent field's field data class
-          return;
+          declaringType = declaringType.getDeclaringType();
         }
       }
 
-      try {
-        fillFormDataAnnotation(type, annotation, isOwner);
-      }
-      catch (JavaModelException e) {
-        ScoutSdk.logWarning("could not parse form data annotation of '" + type.getFullyQualifiedName() + "'.", e);
-      }
+      // If a replace annotation is present, the original field defines the attributes of the form data. In that case these attributes can be ignored for a formData annotation on a level.
+      // An exception are attributes that are cumulative and may be added on any level. Those may be added even though the @Replace annotation is available.
+      // A field that is once marked so that a DTO should be created, can never be set to ignore again. But an ignored field may be changed to create. Afterwards it can never be set to ignore again.
+      // Therefore ignored fields may define all attributes and they are inherited from the first level that declares it to be created.
+      boolean cumulativeAttribsOnly = replaceAnnotationPresent && !FormDataAnnotation.isIgnore(annotation);
+
+      fillFormDataAnnotation(type, annotation, isOwner, cumulativeAttribsOnly);
     }
   }
 
   @SuppressWarnings("null")
-  private static void fillFormDataAnnotation(IJavaElement element, FormDataAnnotation formDataAnnotation, boolean isOwner) throws JavaModelException {
+  private static void fillFormDataAnnotation(IJavaElement element, FormDataAnnotation formDataAnnotation, boolean isOwner, boolean cumulativeAttributesOnly) throws JavaModelException {
     IAnnotation annotation = null;
     if (element instanceof IAnnotatable) {
       annotation = JdtUtility.getAnnotation((IAnnotatable) element, IRuntimeClasses.FormData);
@@ -481,32 +459,35 @@ public class ScoutTypeUtility extends TypeUtility {
       }
 
       // default setup
+      if (!cumulativeAttributesOnly) {
+        if (!StringUtility.isNullOrEmpty(valueSignature)) {
+          if (isOwner) {
+            formDataAnnotation.setFormDataTypeSignature(valueSignature);
+          }
+          else {
+            formDataAnnotation.setSuperTypeSignature(valueSignature);
+          }
+        }
+        if (isOwner && sdkCommand != null) {
+          formDataAnnotation.setSdkCommand(sdkCommand);
+        }
+        if (subTypeCommand != null) {
+          formDataAnnotation.setDefaultSubtypeSdkCommand(subTypeCommand);
+        }
+        if (genericOrdinal > -1) {
+          formDataAnnotation.setGenericOrdinal(genericOrdinal);
+        }
+        if (TypeUtility.exists(genericOrdinalDefinitionType)) {
+          formDataAnnotation.setGenericOrdinalDefinitionType(genericOrdinalDefinitionType);
+        }
+      }
+
+      // always add cumulative attributes
       formDataAnnotation.setAnnotationOwner(element);
-      if (interfaceSignatures != null && !interfaceSignatures.isEmpty()) {
-        for (String sig : interfaceSignatures) {
-          formDataAnnotation.addInterfaceSignature(sig);
-        }
+      if (CollectionUtility.hasElements(interfaceSignatures)) {
+        formDataAnnotation.addInterfaceSignatures(interfaceSignatures);
       }
-      if (!StringUtility.isNullOrEmpty(valueSignature)) {
-        if (isOwner) {
-          formDataAnnotation.setFormDataTypeSignature(valueSignature);
-        }
-        else {
-          formDataAnnotation.setSuperTypeSignature(valueSignature);
-        }
-      }
-      if (isOwner && sdkCommand != null) {
-        formDataAnnotation.setSdkCommand(sdkCommand);
-      }
-      if (subTypeCommand != null) {
-        formDataAnnotation.setDefaultSubtypeSdkCommand(subTypeCommand);
-      }
-      if (genericOrdinal > -1) {
-        formDataAnnotation.setGenericOrdinal(genericOrdinal);
-      }
-      if (TypeUtility.exists(genericOrdinalDefinitionType)) {
-        formDataAnnotation.setGenericOrdinalDefinitionType(genericOrdinalDefinitionType);
-      }
+
       // correction
       if (isOwner && sdkCommand == SdkCommand.USE && !StringUtility.isNullOrEmpty(valueSignature) && element.getParent().getElementType() != IJavaElement.COMPILATION_UNIT) {
         formDataAnnotation.setSuperTypeSignature(valueSignature);
