@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.net.URL;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -269,7 +270,7 @@ public class JavadocTooltip extends AbstractTooltip {
             base = getBaseURL(member);
           }
         }
-        catch (JavaModelException ex) {
+        catch (CoreException ex) {
           ScoutSdkUi.logError("unable to get javadoc html", ex);
         }
         if (reader != null) {
