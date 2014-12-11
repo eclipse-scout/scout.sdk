@@ -232,17 +232,6 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
       protected String getConfiguredText() {
         return TEXTS.get("New2");
       }
-
-      @Override
-      protected boolean getConfiguredSingleSelectionAction() {
-        return false;
-      }
-
-      @Override
-      protected boolean getConfiguredMultiSelectionAction() {
-        return false;
-      }
-
     }
 
     @Order(90.0f)
@@ -250,16 +239,6 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
       @Override
       protected String getConfiguredText() {
         return TEXTS.get("OpenDocument");
-      }
-
-      @Override
-      protected boolean getConfiguredSingleSelectionAction() {
-        return true;
-      }
-
-      @Override
-      protected boolean getConfiguredMultiSelectionAction() {
-        return false;
       }
 
       @Override
@@ -275,17 +254,6 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
       protected String getConfiguredText() {
         return TEXTS.get("SaveNewVersionInDatabase");
       }
-
-      @Override
-      protected boolean getConfiguredSingleSelectionAction() {
-        return true;
-      }
-
-      @Override
-      protected boolean getConfiguredMultiSelectionAction() {
-        return false;
-      }
-
     }
 
     @Order(110.0f)
@@ -302,22 +270,6 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
       protected String getConfiguredText() {
         return TEXTS.get("Edit");
       }
-
-      @Override
-      protected boolean getConfiguredSingleSelectionAction() {
-        return true;
-      }
-
-      @Override
-      protected boolean getConfiguredMultiSelectionAction() {
-        return false;
-      }
-
-      @Override
-      protected boolean getConfiguredInheritAccessibility() {
-        return false;
-      }
-
     }
 
     @Order(130.0f)
@@ -325,16 +277,6 @@ public abstract class AbstractDocumentTableField extends AbstractTableField<Abst
       @Override
       protected String getConfiguredText() {
         return TEXTS.get("Delete2");
-      }
-
-      @Override
-      protected boolean getConfiguredSingleSelectionAction() {
-        return true;
-      }
-
-      @Override
-      protected boolean getConfiguredMultiSelectionAction() {
-        return false;
       }
 
       @Override

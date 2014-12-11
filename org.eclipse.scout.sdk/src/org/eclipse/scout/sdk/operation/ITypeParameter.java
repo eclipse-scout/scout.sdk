@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.util.signature.IImportValidator;
 /**
  * <h3>{@link ITypeParameter}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  * @since 4.1.0 09.11.2014
  */
 public interface ITypeParameter {

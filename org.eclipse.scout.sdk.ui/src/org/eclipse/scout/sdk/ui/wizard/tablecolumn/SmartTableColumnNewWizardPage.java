@@ -49,7 +49,6 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
@@ -278,7 +277,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
       return null;
     }
     try {
-      return SignatureUtility.resolveGenericParameterInSuperHierarchy(m_lookupCall, TypeUtility.getSupertypeHierarchy(m_lookupCall), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
+      return SignatureUtility.resolveTypeParameter(m_lookupCall, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
     }
     catch (CoreException e) {
       ScoutSdkUi.logError("Could not compute generic type of lookup call '" + m_lookupCall.getFullyQualifiedName() + "'.", e);
@@ -354,11 +353,10 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  protected IType getGenericType(IType t, String genericDefiningType, String paramName) {
+  protected IType getGenericType(IType t, String genericDefiningType, int paramIndex) {
     if (TypeUtility.exists(t)) {
       try {
-        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(t);
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, superHierarchy, genericDefiningType, paramName);
+        String typeParamSig = SignatureUtility.resolveTypeParameter(t, genericDefiningType, paramIndex);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }

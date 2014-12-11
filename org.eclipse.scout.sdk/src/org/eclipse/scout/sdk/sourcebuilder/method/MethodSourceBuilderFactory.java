@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.sourcebuilder.method;
 
-import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +28,8 @@ import org.eclipse.scout.sdk.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
+import org.eclipse.scout.sdk.util.signature.IResolvedTypeParameter;
+import org.eclipse.scout.sdk.util.signature.ITypeParameterMapping;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 /**
  * <h3>{@link MethodSourceBuilderFactory}</h3>
- * 
+ *
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
@@ -145,14 +145,13 @@ public final class MethodSourceBuilderFactory {
       return null;
     }
     else {
-      LinkedHashMap<String, ITypeGenericMapping> genericMapping = new LinkedHashMap<String, ITypeGenericMapping>();
-      SignatureUtility.resolveGenericParametersInSuperHierarchy(SignatureCache.createTypeSignature(typeSourceBuilder.getElementName()), typeSourceBuilder.getSuperTypeSignature(),
-          typeSourceBuilder.getInterfaceSignatures(), genericMapping);
+      String signature = SignatureCache.createTypeSignature(typeSourceBuilder.getElementName());
+      Map<String, ITypeParameterMapping> genericMapping = SignatureUtility.resolveTypeParameters(signature, typeSourceBuilder.getSuperTypeSignature(), typeSourceBuilder.getInterfaceSignatures());
 
       MethodSourceBuilder builder = new MethodSourceBuilder(methodName);
 
       // return type
-      Map<String, String> localGenericMapping = genericMapping.get(methodToOverride.getDeclaringType().getFullyQualifiedName()).getParameters();
+      Map<String, IResolvedTypeParameter> localGenericMapping = genericMapping.get(methodToOverride.getDeclaringType().getFullyQualifiedName()).getTypeParameters();
       builder.setReturnTypeSignature(SignatureUtility.getResolvedSignature(methodToOverride.getDeclaringType(), localGenericMapping, methodToOverride.getReturnType()));
 
       // exceptions

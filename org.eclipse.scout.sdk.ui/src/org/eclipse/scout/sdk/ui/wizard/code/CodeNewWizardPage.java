@@ -43,7 +43,6 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.IStructuredType;
@@ -152,7 +151,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       String codeSignature = ScoutTypeUtility.getCodeSignature(codeType, TypeUtility.getSupertypeHierarchy(codeType));
       if (codeSignature != null) {
         if (codeIdSignatureFromCodeType != null) {
-          filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getSubtypeFilter(TypeUtility.getTypeBySignature(codeSignature)), TypeFilters.getTypeParamSubTypeFilter(codeIdSignatureFromCodeType, IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID));
+          filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getSubtypeFilter(TypeUtility.getTypeBySignature(codeSignature)), TypeFilters.getTypeParamSubTypeFilter(codeIdSignatureFromCodeType, IRuntimeClasses.ICode, 0));
         }
         else {
           filter = TypeFilters.getSubtypeFilter(TypeUtility.getTypeBySignature(codeSignature));
@@ -320,8 +319,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getSuperType())) {
       try {
-        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID);
+        String typeParamSig = SignatureUtility.resolveTypeParameter(getSuperType(), IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }
