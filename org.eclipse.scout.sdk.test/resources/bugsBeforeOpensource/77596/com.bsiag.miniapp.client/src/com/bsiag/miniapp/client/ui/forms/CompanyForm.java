@@ -140,6 +140,7 @@ public class CompanyForm extends AbstractForm {
 
   public CompanyForm() throws ProcessingException {
     super();
+    LOG.info("company form created");
   }
 
   @Override
@@ -884,12 +885,6 @@ public class CompanyForm extends AbstractForm {
             protected String getConfiguredText() {
               return TEXTS.get("NewMenu");
             }
-
-            @Override
-            protected boolean getConfiguredSingleSelectionAction() {
-              return false;
-            }
-
           }
 
           @Order(110.0f)
@@ -904,17 +899,6 @@ public class CompanyForm extends AbstractForm {
             protected boolean getConfiguredInheritAccessibility() {
               return false;
             }
-
-            @Override
-            protected boolean getConfiguredSingleSelectionAction() {
-              return true;
-            }
-
-            @Override
-            protected boolean getConfiguredMultiSelectionAction() {
-              return false;
-            }
-
           }
 
           @Order(120.0f)
@@ -923,16 +907,6 @@ public class CompanyForm extends AbstractForm {
             @Override
             protected String getConfiguredText() {
               return TEXTS.get("DeleteMenu");
-            }
-
-            @Override
-            protected boolean getConfiguredSingleSelectionAction() {
-              return true;
-            }
-
-            @Override
-            protected boolean getConfiguredMultiSelectionAction() {
-              return true;
             }
 
             @Override
@@ -946,16 +920,6 @@ public class CompanyForm extends AbstractForm {
             @Override
             protected String getConfiguredText() {
               return TEXTS.get("TwixTel");
-            }
-
-            @Override
-            protected boolean getConfiguredSingleSelectionAction() {
-              return true;
-            }
-
-            @Override
-            protected boolean getConfiguredMultiSelectionAction() {
-              return false;
             }
 
             @Override
@@ -982,16 +946,6 @@ public class CompanyForm extends AbstractForm {
             }
 
             @Override
-            protected boolean getConfiguredSingleSelectionAction() {
-              return true;
-            }
-
-            @Override
-            protected boolean getConfiguredMultiSelectionAction() {
-              return false;
-            }
-
-            @Override
             protected boolean getConfiguredInheritAccessibility() {
               return false;
             }
@@ -1014,22 +968,10 @@ public class CompanyForm extends AbstractForm {
             }
 
             @Override
-            protected boolean getConfiguredSingleSelectionAction() {
-              return true;
-            }
-
-            @Override
-            protected boolean getConfiguredMultiSelectionAction() {
-              return false;
-            }
-
-            @Override
             protected boolean getConfiguredInheritAccessibility() {
               return false;
             }
-
           }
-
         }
       }
     }
@@ -1410,17 +1352,6 @@ public class CompanyForm extends AbstractForm {
               protected String getConfiguredText() {
                 return TEXTS.get("Edit");
               }
-
-              @Override
-              protected boolean getConfiguredSingleSelectionAction() {
-                return true;
-              }
-
-              @Override
-              protected boolean getConfiguredMultiSelectionAction() {
-                return false;
-              }
-
             }
           }
         }
@@ -1568,20 +1499,9 @@ public class CompanyForm extends AbstractForm {
               }
 
               @Override
-              protected boolean getConfiguredSingleSelectionAction() {
-                return true;
-              }
-
-              @Override
-              protected boolean getConfiguredMultiSelectionAction() {
-                return false;
-              }
-
-              @Override
               protected boolean getConfiguredInheritAccessibility() {
                 return false;
               }
-
             }
           }
         }

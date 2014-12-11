@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 /**
  * <h3>{@link TypeParameter}</h3>
  *
- * @author aho
+ * @author Andreas Hoegger
  * @since 4.1.0 09.11.2014
  */
 public class TypeParameter implements ITypeParameter {
@@ -33,7 +33,6 @@ public class TypeParameter implements ITypeParameter {
   public TypeParameter(String parameterName, String parameterSignature) {
     m_parameterName = parameterName;
     m_parameterSignature = parameterSignature;
-
   }
 
   @Override

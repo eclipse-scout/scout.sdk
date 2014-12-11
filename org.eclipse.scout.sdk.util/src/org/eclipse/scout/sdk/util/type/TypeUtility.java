@@ -59,6 +59,7 @@ import org.eclipse.scout.sdk.util.ast.AstUtility;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.internal.typecache.HierarchyCache;
 import org.eclipse.scout.sdk.util.internal.typecache.TypeCache;
+import org.eclipse.scout.sdk.util.signature.IResolvedTypeParameter;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchyResult;
@@ -499,7 +500,7 @@ public class TypeUtility {
     return params;
   }
 
-  public static List<MethodParameter> getMethodParameters(IMethod method, Map<String, String> generics) throws CoreException {
+  public static List<MethodParameter> getMethodParameters(IMethod method, Map<String, IResolvedTypeParameter> generics) throws CoreException {
     String[] paramNames = method.getParameterNames();
     List<String> resolvedParamSignatures = SignatureUtility.getMethodParameterSignatureResolved(method, generics);
     if (paramNames.length != resolvedParamSignatures.size()) {
@@ -774,7 +775,13 @@ public class TypeUtility {
   }
 
   public static boolean isGenericType(IType type) {
-    return getTypeParameters(type).size() > 0;
+    try {
+      return getTypeParameters(type).size() > 0;
+    }
+    catch (JavaModelException e) {
+      SdkUtilActivator.logError("Unable to parse type parameters of type '" + type + "'.", e);
+      return false;
+    }
   }
 
   /**
@@ -810,14 +817,9 @@ public class TypeUtility {
     }
   }
 
-  public static List<ITypeParameter> getTypeParameters(IType type) {
+  public static List<ITypeParameter> getTypeParameters(IType type) throws JavaModelException {
     if (TypeUtility.exists(type)) {
-      try {
-        return CollectionUtility.arrayList(type.getTypeParameters());
-      }
-      catch (JavaModelException e) {
-        SdkUtilActivator.logWarning("could not get generic information of type: " + type.getFullyQualifiedName(), e);
-      }
+      return CollectionUtility.arrayList(type.getTypeParameters());
     }
     return CollectionUtility.arrayList();
   }

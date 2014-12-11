@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.code.type;
 
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -20,7 +20,9 @@ import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeParameter;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -45,12 +47,12 @@ import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
 import org.eclipse.scout.sdk.util.NamingUtility;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
-import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
+import org.eclipse.scout.sdk.util.signature.IResolvedTypeParameter;
+import org.eclipse.scout.sdk.util.signature.ITypeParameterMapping;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
@@ -197,7 +199,13 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
         try {
           setStateChanging(true);
           m_superType = (IType) event.proposal;
-          m_superTypeParameters = TypeUtility.getTypeParameters(getSuperType());
+          try {
+            m_superTypeParameters = TypeUtility.getTypeParameters(getSuperType());
+          }
+          catch (JavaModelException e) {
+            ScoutSdkUi.logError("Unable to parse type parameters of type '" + getSuperType() + "'.", e);
+            m_superTypeParameters = CollectionUtility.emptyArrayList();
+          }
           handleGenericFieldEnableState();
           genericProposalProvider.setBaseType(getGenericTypeOfSuperClass(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_TYPE_ID));
           genericCodeIdProposalProvider.setBaseType(getGenericTypeOfSuperClass(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
@@ -246,8 +254,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
         }
       }
     });
-    m_genericCodeIdField.setEnabled(isEnabled);
-    m_genericTypeField.setEnabled(isEnabled);
+    handleGenericFieldEnableState();
 
     // layout
     parent.setLayout(new GridLayout(1, true));
@@ -269,28 +276,30 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
    * selected super type class.
    */
   protected void handleGenericFieldEnableState() {
-    String codeTypeIdSig = null;
-    String codeIdSig = null;
+    boolean codeTypeIdTypeParamAvailable = false;
+    boolean codeIdTypeParamAvailable = false;
 
     if (TypeUtility.exists(getSuperType())) {
       try {
-        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
-        LinkedHashMap<String, ITypeGenericMapping> collector = new LinkedHashMap<String, ITypeGenericMapping>();
-        SignatureUtility.resolveGenericParametersInSuperHierarchy(getSuperType(), superHierarchy, collector);
-        ITypeGenericMapping iTypeGenericMapping = collector.get(getSuperType().getFullyQualifiedName());
-        codeTypeIdSig = iTypeGenericMapping.getParameterSignature(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_TYPE_ID);
-        codeIdSig = iTypeGenericMapping.getParameterSignature(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID);
+        Map<String, ITypeParameterMapping> collector = SignatureUtility.resolveTypeParameters(getSuperType());
+        ITypeParameterMapping iTypeGenericMapping = collector.get(IRuntimeClasses.ICodeType);
+
+        IResolvedTypeParameter codeTypeIdTypeParam = iTypeGenericMapping.getTypeParameter(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_TYPE_ID);
+        IResolvedTypeParameter codeIdTypeParam = iTypeGenericMapping.getTypeParameter(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID);
+
+        codeTypeIdTypeParamAvailable = codeTypeIdTypeParam.getCorrespondingTypeParameterOnSubLevel(getSuperType()) != null;
+        codeIdTypeParamAvailable = codeIdTypeParam.getCorrespondingTypeParameterOnSubLevel(getSuperType()) != null;
       }
       catch (CoreException e) {
         ScoutSdkUi.logError("Unable to calculate the visible generic signature fields for code types.", e);
       }
     }
 
-    m_genericTypeField.setEnabled(codeTypeIdSig != null && getSharedBundle() != null);
+    m_genericTypeField.setEnabled(codeTypeIdTypeParamAvailable && isPageEnabled());
     if (!m_genericTypeField.isEnabled()) {
       m_genericTypeField.acceptProposal(null);
     }
-    m_genericCodeIdField.setEnabled(codeIdSig != null && getSharedBundle() != null);
+    m_genericCodeIdField.setEnabled(codeIdTypeParamAvailable && isPageEnabled());
     if (!m_genericCodeIdField.isEnabled()) {
       m_genericCodeIdField.acceptProposal(null);
     }
@@ -407,11 +416,10 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     return Status.OK_STATUS;
   }
 
-  protected IType getGenericTypeOfSuperClass(String typeArgName) {
+  protected IType getGenericTypeOfSuperClass(int typeArgIndex) {
     if (TypeUtility.exists(getSuperType())) {
       try {
-        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.ICodeType, typeArgName);
+        String typeParamSig = SignatureUtility.resolveTypeParameter(getSuperType(), IRuntimeClasses.ICodeType, typeArgIndex);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }
@@ -423,9 +431,9 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     return null;
   }
 
-  protected IStatus getStatusGenericTypeToSuperClass(String genericSignature, String superClassTypeArgName) {
+  protected IStatus getStatusGenericTypeToSuperClass(String genericSignature, int superClassTypeArgIndex) {
     if (genericSignature != null) {
-      IType superType = getGenericTypeOfSuperClass(superClassTypeArgName);
+      IType superType = getGenericTypeOfSuperClass(superClassTypeArgIndex);
       if (TypeUtility.exists(superType)) {
         IType generic = TypeUtility.getTypeBySignature(genericSignature);
         if (TypeUtility.exists(generic) && !TypeUtility.getSupertypeHierarchy(generic).contains(superType)) {

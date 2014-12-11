@@ -235,7 +235,7 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
       return null;
     }
     try {
-      return SignatureUtility.resolveGenericParameterInSuperHierarchy(m_lookupCall, TypeUtility.getSupertypeHierarchy(m_lookupCall), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
+      return SignatureUtility.resolveTypeParameter(m_lookupCall, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
     }
     catch (CoreException e) {
       ScoutSdkUi.logError("Could not compute generic type of lookup call '" + m_lookupCall.getFullyQualifiedName() + "'.", e);
@@ -298,10 +298,10 @@ public class SmartFieldNewWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  protected IType getGenericType(IType t, String genericDefiningType, String paramName) {
+  protected IType getGenericType(IType t, String genericDefiningType, int paramIndex) {
     if (TypeUtility.exists(t)) {
       try {
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(t, TypeUtility.getSupertypeHierarchy(t), genericDefiningType, paramName);
+        String typeParamSig = SignatureUtility.resolveTypeParameter(t, genericDefiningType, paramIndex);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }

@@ -408,8 +408,8 @@ public class TypeFilters {
     return getMultiTypeFilter(false, filters);
   }
 
-  public static ITypeFilter getTypeParamSuperTypeFilter(final String baseSig, final String paramDefiningSuperTypeFqn, final String paramName) {
-    return getTypeParamFilter(baseSig, paramDefiningSuperTypeFqn, paramName, false);
+  public static ITypeFilter getTypeParamSuperTypeFilter(String baseSig, String paramDefiningSuperTypeFqn, int paramIndex) {
+    return getTypeParamFilter(baseSig, paramDefiningSuperTypeFqn, paramIndex, false);
   }
 
   /**
@@ -421,15 +421,15 @@ public class TypeFilters {
    *          The base signature the type parameter must be a sub-type of.
    * @param paramDefiningSuperTypeFqn
    *          The fully qualified name of the class defining the type parameter
-   * @param paramName
-   *          The name of the type parameter
+   * @param paramIndex
+   *          The index of the type parameter
    * @return The new created filter.
    */
-  public static ITypeFilter getTypeParamSubTypeFilter(final String baseSig, final String paramDefiningSuperTypeFqn, final String paramName) {
-    return getTypeParamFilter(baseSig, paramDefiningSuperTypeFqn, paramName, true);
+  public static ITypeFilter getTypeParamSubTypeFilter(String baseSig, String paramDefiningSuperTypeFqn, int paramIndex) {
+    return getTypeParamFilter(baseSig, paramDefiningSuperTypeFqn, paramIndex, true);
   }
 
-  private static ITypeFilter getTypeParamFilter(final String baseSig, final String paramDefiningSuperTypeFqn, final String paramName, final boolean sub) {
+  private static ITypeFilter getTypeParamFilter(final String baseSig, final String paramDefiningSuperTypeFqn, final int paramIndex, final boolean sub) {
     if (baseSig == null) {
       return new ITypeFilter() {
         @Override
@@ -445,8 +445,7 @@ public class TypeFilters {
       @Override
       public boolean accept(IType type) {
         try {
-          ITypeHierarchy superHierarchy = ScoutSdkUtilCore.getHierarchyCache().getSupertypeHierarchy(type);
-          String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(type, superHierarchy, paramDefiningSuperTypeFqn, paramName);
+          String typeParamSig = SignatureUtility.resolveTypeParameter(type, paramDefiningSuperTypeFqn, paramIndex);
           if (typeParamSig != null) {
             if (objectSig.equals(typeParamSig)) {
               return true;

@@ -14,8 +14,6 @@ import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.Signature;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.fields.proposal.ProposalTextField;
@@ -27,7 +25,6 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.widgets.Composite;
 
@@ -86,29 +83,23 @@ public class CodeTypeProposalPresenter extends AbstractTypeProposalPresenter {
 
     @Override
     protected Set<?> computeProposals() {
-      IType iCodeType = TypeUtility.getType(IRuntimeClasses.ICodeType);
-
       String genericSignature = null;
       try {
-        String paramName = IRuntimeClasses.TYPE_PARAM_VALUEFIELD__VALUE_TYPE;
         IMethod defaultMethod = getMethod().getDefaultMethod();
-        String[] typeParameters = Signature.getTypeArguments(defaultMethod.getReturnType());
-        if (typeParameters != null && typeParameters.length == 1) {
-          typeParameters = Signature.getTypeArguments(typeParameters[0]);
-          if (typeParameters != null && typeParameters.length == 1) {
-            paramName = Signature.getSignatureSimpleName(typeParameters[0]);
-          }
-        }
-        ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(getType());
-        genericSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(getType(), supertypeHierarchy, defaultMethod.getDeclaringType().getFullyQualifiedName(), paramName);
-
+        genericSignature = SignatureUtility.resolveTypeParameter(getType(), defaultMethod.getDeclaringType().getFullyQualifiedName(), IRuntimeClasses.TYPE_PARAM_VALUEFIELD__VALUE_TYPE);
       }
       catch (CoreException e) {
         ScoutSdkUi.logError(e);
       }
 
-      ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
-      return TypeUtility.getClassesOnClasspath(iCodeType, getType().getJavaProject(), filter);
+      ITypeFilter filter = null;
+      if (genericSignature == null) {
+        filter = TypeFilters.getNoGenericTypesFilter();
+      }
+      else {
+        filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getNoGenericTypesFilter(), TypeFilters.getTypeParamSubTypeFilter(genericSignature, IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID));
+      }
+      return TypeUtility.getClassesOnClasspath(TypeUtility.getType(IRuntimeClasses.ICodeType), getType().getJavaProject(), filter);
     }
   }
 }
