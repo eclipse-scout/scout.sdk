@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.workspace.dto.pagedata.RowDataDtoUpdateOperation;
 /**
  * <h3>{@link RowDataAutoUpdateHandler}</h3>
  *
- * @author mvi
+ * @author Matthias Villiger
  * @since 4.1.0 19.11.2014
  */
 public class RowDataAutoUpdateHandler extends AbstractDtoUpdateHandler {

@@ -10,14 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.services;
 
-import java.util.List;
-
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.targetpackage.DefaultTargetPackage;
@@ -36,7 +33,6 @@ import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
@@ -78,18 +74,6 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(message);
   }
 
-  private String getTypeParamName() {
-    if (TypeUtility.isGenericType(m_definitionType)) {
-      try {
-        return m_definitionType.getTypeParameters()[0].getElementName();
-      }
-      catch (JavaModelException e1) {
-        ScoutSdkUi.logError(e1);
-      }
-    }
-    return null;
-  }
-
   @Override
   protected void createContent(Composite parent) {
     int labelColWidthPercent = 20;
@@ -108,9 +92,8 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
     final boolean isGenericDefType = TypeUtility.isGenericType(m_definitionType);
 
     ITypeFilter filter = null;
-    String typeParamName = getTypeParamName();
-    if (typeParamName != null) {
-      filter = TypeFilters.getTypeParamSubTypeFilter(getGenericTypeSignature(), m_definitionType.getFullyQualifiedName(), typeParamName);
+    if (TypeUtility.isGenericType(m_definitionType)) {
+      filter = TypeFilters.getTypeParamSubTypeFilter(getGenericTypeSignature(), m_definitionType.getFullyQualifiedName(), 0);
     }
 
     final JavaElementAbstractTypeContentProvider contentProvider = new JavaElementAbstractTypeContentProvider(m_definitionType, m_bundle.getJavaProject(), filter, getSuperType());
@@ -177,10 +160,8 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
 
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getSuperType())) {
-      List<ITypeParameter> typeParameters = TypeUtility.getTypeParameters(m_definitionType);
       try {
-        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, m_definitionType.getFullyQualifiedName(), typeParameters.get(0).getElementName());
+        String typeParamSig = SignatureUtility.resolveTypeParameter(getSuperType(), m_definitionType.getFullyQualifiedName(), 0);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }
@@ -212,8 +193,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
       }
       if (TypeUtility.exists(getSuperType())) {
         try {
-          ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
-          String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, m_definitionType.getFullyQualifiedName(), getTypeParamName());
+          String typeParamSig = SignatureUtility.resolveTypeParameter(getSuperType(), m_definitionType.getFullyQualifiedName(), 0);
           if (typeParamSig != null) {
             IType generic = TypeUtility.getTypeBySignature(getGenericTypeSignature());
             IType superType = TypeUtility.getTypeBySignature(typeParamSig);

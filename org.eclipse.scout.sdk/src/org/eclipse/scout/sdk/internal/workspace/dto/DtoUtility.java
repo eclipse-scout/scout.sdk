@@ -14,8 +14,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
@@ -53,7 +53,7 @@ import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.method.MethodReturnExpression;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
-import org.eclipse.scout.sdk.util.signature.ITypeGenericMapping;
+import org.eclipse.scout.sdk.util.signature.ITypeParameterMapping;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
@@ -123,7 +123,7 @@ public final class DtoUtility {
     boolean isExtension = TypeUtility.exists(iExtension) && localHierarchy.isSubtype(iExtension, modelType);
     if (isExtension) {
       // 1. try to read from generic
-      String ownerSignature = SignatureUtility.resolveGenericParameterInSuperHierarchy(modelType, localHierarchy, IRuntimeClasses.IExtension, "OWNER");
+      String ownerSignature = SignatureUtility.resolveTypeParameter(modelType, localHierarchy, IRuntimeClasses.IExtension, IRuntimeClasses.TYPE_PARAM_EXTENSION__OWNER);
       if (ownerSignature != null) {
         return TypeUtility.getTypeBySignature(ownerSignature);
       }
@@ -293,19 +293,18 @@ public final class DtoUtility {
       return null;
     }
 
-    LinkedHashMap<String, ITypeGenericMapping> collector = new LinkedHashMap<String, ITypeGenericMapping>();
-    SignatureUtility.resolveGenericParametersInSuperHierarchy(contextType, formFieldHierarchy, collector);
+    Map<String, ITypeParameterMapping> collector = SignatureUtility.resolveTypeParameters(contextType, formFieldHierarchy);
 
     boolean annotOwnerPassed = false;
-    for (Entry<String, ITypeGenericMapping> entry : collector.entrySet()) {
+    for (Entry<String, ITypeParameterMapping> entry : collector.entrySet()) {
       if (!annotOwnerPassed && CompareUtility.equals(annotationOwnerType.getFullyQualifiedName(), entry.getKey())) {
         annotOwnerPassed = true;
       }
 
       if (annotOwnerPassed) {
-        ITypeGenericMapping genericMapping = entry.getValue();
+        ITypeParameterMapping genericMapping = entry.getValue();
         if (genericMapping.getParameterCount() > genericOrdinal) {
-          return genericMapping.getParameter(genericOrdinal)[1];
+          return CollectionUtility.firstElement(genericMapping.getTypeParameterBounds(genericOrdinal));
         }
       }
     }

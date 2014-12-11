@@ -40,7 +40,6 @@ import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.swt.events.ModifyEvent;
@@ -101,12 +100,12 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
 
     m_superTypeField = getFieldToolkit().createJavaElementProposalField(parent, Texts.get("LookupCallSuperType"),
         new AbstractJavaElementContentProvider() {
-          @Override
-          protected Object[][] computeProposals() {
-            Set<IType> superTypes = TypeUtility.getClassesOnClasspath(localLookupCall, ScoutUtility.getJavaProject(getClientBundle()), TypeFilters.getNotInTypes(localLookupCall));
-            return new Object[][]{new IType[]{localLookupCall}, superTypes.toArray(new IType[superTypes.size()])};
-          }
-        }, labelColWidthPercent);
+      @Override
+      protected Object[][] computeProposals() {
+        Set<IType> superTypes = TypeUtility.getClassesOnClasspath(localLookupCall, ScoutUtility.getJavaProject(getClientBundle()), TypeFilters.getNotInTypes(localLookupCall));
+        return new Object[][]{new IType[]{localLookupCall}, superTypes.toArray(new IType[superTypes.size()])};
+      }
+    }, labelColWidthPercent);
     m_superTypeField.acceptProposal(getLookupCallSuperType());
     m_superTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
@@ -157,8 +156,7 @@ public class LocalLookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getLookupCallSuperType())) {
       try {
-        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getLookupCallSuperType());
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getLookupCallSuperType(), superHierarchy, IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
+        String typeParamSig = SignatureUtility.resolveTypeParameter(getLookupCallSuperType(), IRuntimeClasses.ILookupCall, IRuntimeClasses.TYPE_PARAM_LOOKUPCALL__KEY_TYPE);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }

@@ -109,7 +109,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
     ITypeFilter filter = null;
     try {
       ITypeHierarchy radioGroupSuperTypeHierarchy = TypeUtility.getSupertypeHierarchy(m_declaringType);
-      m_radioButtonGroupValueTypeSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(m_declaringType, radioGroupSuperTypeHierarchy, IRuntimeClasses.IRadioButtonGroup, IRuntimeClasses.TYPE_PARAM_RADIOBUTTONGROUP__VALUE_TYPE);
+      m_radioButtonGroupValueTypeSig = SignatureUtility.resolveTypeParameter(m_declaringType, radioGroupSuperTypeHierarchy, IRuntimeClasses.IRadioButtonGroup, IRuntimeClasses.TYPE_PARAM_RADIOBUTTONGROUP__VALUE_TYPE);
       if (m_radioButtonGroupValueTypeSig != null) {
         m_radioButtonGroupValueType = TypeUtility.getTypeBySignature(m_radioButtonGroupValueTypeSig);
         filter = TypeFilters.getTypeParamSubTypeFilter(m_radioButtonGroupValueTypeSig, IRuntimeClasses.IRadioButton, IRuntimeClasses.TYPE_PARAM_RADIOBUTTON__VALUE_TYPE);
@@ -293,8 +293,7 @@ public class RadioButtonNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType getGenericTypeOfSuperClass() {
     if (TypeUtility.exists(getSuperType())) {
       try {
-        ITypeHierarchy superHierarchy = TypeUtility.getSupertypeHierarchy(getSuperType());
-        String typeParamSig = SignatureUtility.resolveGenericParameterInSuperHierarchy(getSuperType(), superHierarchy, IRuntimeClasses.IRadioButton, IRuntimeClasses.TYPE_PARAM_RADIOBUTTON__VALUE_TYPE);
+        String typeParamSig = SignatureUtility.resolveTypeParameter(getSuperType(), IRuntimeClasses.IRadioButton, IRuntimeClasses.TYPE_PARAM_RADIOBUTTON__VALUE_TYPE);
         if (typeParamSig != null) {
           return TypeUtility.getTypeBySignature(typeParamSig);
         }

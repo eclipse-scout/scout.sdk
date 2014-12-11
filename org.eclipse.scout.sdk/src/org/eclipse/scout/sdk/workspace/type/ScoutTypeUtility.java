@@ -24,6 +24,7 @@ import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
@@ -728,12 +729,12 @@ public class ScoutTypeUtility extends TypeUtility {
    * @throws CoreException
    */
   public static String getCodeIdGenericTypeSignature(IType codeType, ITypeHierarchy superTypeHierarchy) throws CoreException {
-    return SignatureUtility.resolveGenericParameterInSuperHierarchy(codeType, superTypeHierarchy, IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID);
+    return SignatureUtility.resolveTypeParameter(codeType, superTypeHierarchy, IRuntimeClasses.ICodeType, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_ID);
   }
 
   public static String getCodeSignature(IType codeType, ITypeHierarchy superTypeHierarchy) throws CoreException {
     if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.AbstractCodeTypeWithGeneric))) {
-      return SignatureUtility.resolveGenericParameterInSuperHierarchy(codeType, superTypeHierarchy, IRuntimeClasses.AbstractCodeTypeWithGeneric, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE);
+      return SignatureUtility.resolveTypeParameter(codeType, superTypeHierarchy, IRuntimeClasses.AbstractCodeTypeWithGeneric, IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE);
     }
     else {
       String codeIdSig = getCodeIdGenericTypeSignature(codeType, superTypeHierarchy);
@@ -837,7 +838,7 @@ public class ScoutTypeUtility extends TypeUtility {
       return null;
     }
 
-    return SignatureUtility.resolveGenericParameterInSuperHierarchy(column, columnHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
+    return SignatureUtility.resolveTypeParameter(column, columnHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
   }
 
   public static IMethod getColumnGetterMethod(IType column) {
@@ -912,6 +913,11 @@ public class ScoutTypeUtility extends TypeUtility {
         Set<IMethod> methods = TypeUtility.getMethods(t, MethodFilters.getNameFilter(methodName));
         for (IMethod m : methods) {
           if (TypeUtility.exists(m)) {
+            if (Flags.isFinal(m.getFlags())) {
+              // the method is made final in the super hierarchy -> cancel
+              return null;
+            }
+
             if (newMethod != null) {
               String existingMethodId = SignatureUtility.getMethodIdentifier(newMethod.getDefaultMethod());
               String newMethodId = SignatureUtility.getMethodIdentifier(m);
