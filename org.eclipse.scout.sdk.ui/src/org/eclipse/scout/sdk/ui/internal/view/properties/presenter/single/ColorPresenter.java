@@ -171,11 +171,11 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
     if (value == null) {
       return "";
     }
-    String rgbSt = Integer.toHexString((value.red << 16) | (value.green << 8) | (value.blue));
+    StringBuilder rgbSt = new StringBuilder(Integer.toHexString((value.red << 16) | (value.green << 8) | (value.blue)));
     while (rgbSt.length() < 6) {
-      rgbSt = "0" + rgbSt;
+      rgbSt.insert(0, '0');
     }
-    return rgbSt.toUpperCase();
+    return rgbSt.toString().toUpperCase();
   }
 
   @Override

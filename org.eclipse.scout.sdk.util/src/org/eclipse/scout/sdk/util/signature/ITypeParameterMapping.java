@@ -62,7 +62,11 @@ public interface ITypeParameterMapping {
    * <br>
    * Type parameter bounds are the restrictions for a type parameter:<br>
    * <code>&lt;T extends {@link Comparable} & {@link Cloneable}&gt;</code><br>
-   * In that case the bounds contains the signatures of {@link Comparable} and {@link Cloneable}.
+   * In that case the bounds contains the signatures of {@link Comparable} and {@link Cloneable}.<br>
+   * <br>
+   * <b>Note:</b><br>
+   * The signature for a type parameter depends on which focus type the mappings have been created for (see
+   * {@link SignatureUtility#resolveTypeParameters(IType)}) and are valid in the context of the focus type.
    *
    * @param index
    *          The index (>=0) of the bounds that should be returned.
@@ -77,7 +81,11 @@ public interface ITypeParameterMapping {
    * <br>
    * Type parameter bounds are the restrictions for a type parameter:<br>
    * <code>&lt;T extends {@link Comparable} & {@link Cloneable}&gt;</code><br>
-   * In that case the bounds contains the signatures of {@link Comparable} and {@link Cloneable}.
+   * In that case the bounds contains the signatures of {@link Comparable} and {@link Cloneable}.<br>
+   * <br>
+   * <b>Note:</b><br>
+   * The signature for a type parameter depends on which focus type the mappings have been created for (see
+   * {@link SignatureUtility#resolveTypeParameters(IType)}) and are valid in the context of the focus type.
    *
    * @param name
    *          The name of the type parameter on the this type (e.g. "T").
@@ -131,12 +139,21 @@ public interface ITypeParameterMapping {
   ITypeParameterMapping getSuperMapping(String fullyQualifiedName);
 
   /**
-   * Gets the {@link ITypeParameterMapping} below the current mapping. Because {@link ITypeParameterMapping}s are always
-   * created bottom-up this can only be one mapping.
-   * 
-   * @return The sub {@link ITypeParameterMapping} or <code>null</code> if no mapping exists below this (this means this
+   * Gets the {@link ITypeParameterMapping} below the current mapping having the given fully qualified name.
+   *
+   * @param fullyQualifiedName
+   * @return The sub {@link ITypeParameterMapping} with the given name or <code>null</code> if no such mapping exists
+   *         below this (this means this
    *         is the bottom of the mapping tree).
    */
-  ITypeParameterMapping getSubMapping();
+  ITypeParameterMapping getSubMapping(String fullyQualifiedName);
+
+  /**
+   * Gets all direct sub {@link ITypeParameterMapping}s that exist for this type.
+   *
+   * @return A {@link Map} containing the fully qualified name of the sub type as key and the corresponding
+   *         {@link ITypeParameterMapping} as value.
+   */
+  Map<String, ITypeParameterMapping> getSubMappings();
 
 }

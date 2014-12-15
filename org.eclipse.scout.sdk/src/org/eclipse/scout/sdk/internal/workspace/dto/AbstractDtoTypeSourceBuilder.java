@@ -249,7 +249,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
         String propName = upperCaseBeanName + "Property";
         String resolvedSignature = SignatureUtility.getResolvedSignature(desc.getBeanSignature(), desc.getDeclaringType());
         if (!StringUtility.hasText(resolvedSignature)) {
-          resolvedSignature = SignatureCache.createTypeSignature(Object.class.getName());
+          resolvedSignature = SignatureUtility.SIG_OBJECT;
         }
         String unboxedSignature = SignatureUtility.unboxPrimitiveSignature(resolvedSignature);
 

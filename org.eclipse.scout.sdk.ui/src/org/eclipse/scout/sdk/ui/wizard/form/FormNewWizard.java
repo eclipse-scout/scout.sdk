@@ -325,7 +325,7 @@ public class FormNewWizard extends AbstractServiceWizard {
 
     @Override
     public void dndPerformed(DndEvent dndEvent) {
-      if (dndEvent.node.getType() == TYPE_FORM) {
+      if (TYPE_FORM.equals(dndEvent.node.getType())) {
         ITreeNode formDataNode = TreeUtility.findNode(m_locationPageRoot, NodeFilters.getByType(TYPE_FORM_DATA));
         if (formDataNode != null) {
           ITreeNode oldFomDataParent = formDataNode.getParent();
@@ -345,7 +345,7 @@ public class FormNewWizard extends AbstractServiceWizard {
           }
         }
       }
-      else if (dndEvent.node.getType() == TYPE_SERVICE_REG_SERVER) {
+      else if (TYPE_SERVICE_REG_SERVER.equals(dndEvent.node.getType())) {
         refreshAvailableSessions(dndEvent.newNode, dndEvent.node);
       }
       m_formPage.pingStateChanging();

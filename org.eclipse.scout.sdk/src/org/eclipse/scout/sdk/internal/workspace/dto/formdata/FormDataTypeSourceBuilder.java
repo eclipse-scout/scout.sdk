@@ -203,10 +203,11 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
                   String ruleDecl;
                   if (vm.getRuleField() != null) {
                     validator.getTypeName(SignatureCache.createTypeSignature(vm.getRuleField().getDeclaringType().getFullyQualifiedName())); // add to imports if necessary
-                    ruleDecl = vm.getRuleField().getDeclaringType().getElementName() + "." + vm.getRuleField().getElementName();
+                    ruleDecl = new StringBuilder(vm.getRuleField().getDeclaringType().getElementName()).append('.').append(vm.getRuleField().getElementName()).toString();
                   }
                   else {
-                    ruleDecl = "\"" + vm.getRuleName() + "\"";
+                    String ruleName = vm.getRuleName();
+                    ruleDecl = new StringBuilder(ruleName.length() + 2).append('"').append(ruleName).append('"').toString();
                   }
 
                   source.append(lineDelimiter);
