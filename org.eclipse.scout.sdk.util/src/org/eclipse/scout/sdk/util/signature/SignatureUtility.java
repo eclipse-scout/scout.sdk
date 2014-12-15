@@ -55,6 +55,8 @@ public final class SignatureUtility {
    */
   public static final int ARBITRARY_ARRAY_SIGNATURE = 29;
 
+  public static final String SIG_OBJECT = SignatureCache.createTypeSignature(Object.class.getName());
+
   private SignatureUtility() {
   }
 
@@ -316,11 +318,14 @@ public final class SignatureUtility {
    * @throws CoreException
    */
   public static List<String> getMethodParameterSignatureResolved(IMethod jdtMethod, IType contextType) throws CoreException {
-    Map<String, ITypeParameterMapping> mappings = resolveTypeParameters(contextType);
-    ITypeParameterMapping mapping = mappings.get(jdtMethod.getDeclaringType().getFullyQualifiedName());
     Map<String, IResolvedTypeParameter> parameters = null;
-    if (mapping != null) {
-      parameters = mapping.getTypeParameters();
+    if (jdtMethod.getParameterTypes().length > 0) {
+      // only resolve type parameters if the method has parameters.
+      Map<String, ITypeParameterMapping> mappings = resolveTypeParameters(contextType);
+      ITypeParameterMapping mapping = mappings.get(jdtMethod.getDeclaringType().getFullyQualifiedName());
+      if (mapping != null) {
+        parameters = mapping.getTypeParameters();
+      }
     }
     return getMethodParameterSignatureResolved(jdtMethod, parameters);
   }
@@ -336,7 +341,8 @@ public final class SignatureUtility {
 
   /**
    * The get parameter signatures of the given method. The signature starts with
-   * {@link ScoutSignature#C_ARBITRARY_ARRAY} if the parameter is a arbitrary array. <h5>NOTE:</h5> <b>generic types are
+   * {@link ScoutSignature#C_ARBITRARY_ARRAY} if the parameter is an arbitrary array. <h5>NOTE:</h5> <b>generic types
+   * are
    * not resolved use {@link ScoutSignature#getMethodParameterSignatureResolved(IMethod)} to get resolved and
    * generic substituted parameter signature</b><br>
    * <br>
@@ -451,16 +457,16 @@ public final class SignatureUtility {
       }
     }
     if (parameterIndex < 0) {
-      return SignatureCache.createTypeSignature(Object.class.getName());
+      return SIG_OBJECT;
     }
     for (IType hType : hierarchyList) {
       String superClassSignature = hType.getSuperclassTypeSignature();
       if (StringUtility.isNullOrEmpty(superClassSignature)) {
-        return SignatureCache.createTypeSignature(Object.class.getName());
+        return SIG_OBJECT;
       }
       String[] superClassParameterSignatures = Signature.getTypeArguments(superClassSignature);
       if (superClassParameterSignatures.length < parameterIndex + 1) {
-        return SignatureCache.createTypeSignature(Object.class.getName());
+        return SIG_OBJECT;
       }
       else {
         // translate
@@ -531,14 +537,18 @@ public final class SignatureUtility {
   }
 
   public static Map<String, ITypeParameterMapping> resolveTypeParameters(String signature, String superClassSignature, List<String> interfaceSignatures) throws CoreException {
-    HashMap<String, ITypeParameterMapping> collector = new HashMap<String, ITypeParameterMapping>();
+    if (!StringUtility.hasText(signature)) {
+      return null;
+    }
+
+    Map<String, TypeParameterMapping> collector = new HashMap<String, TypeParameterMapping>();
     TypeParameterMapping first = new TypeParameterMapping(signature, superClassSignature, interfaceSignatures);
     collector.put(Signature.toString(signature), first);
 
     if (StringUtility.hasText(superClassSignature)) {
       IType superType = TypeUtility.getTypeBySignature(superClassSignature);
       if (TypeUtility.exists(superType)) {
-        resolveTypeParametersRec(superType, TypeUtility.getSupertypeHierarchy(superType), collector, first);
+        TypeParameterMapping.buildMappingRec(superType, TypeUtility.getSupertypeHierarchy(superType), collector, first);
       }
     }
 
@@ -546,21 +556,27 @@ public final class SignatureUtility {
       for (String ifcSig : interfaceSignatures) {
         IType interfaceType = TypeUtility.getTypeBySignature(ifcSig);
         if (TypeUtility.exists(interfaceType)) {
-          resolveTypeParametersRec(interfaceType, TypeUtility.getSupertypeHierarchy(interfaceType), collector, first);
+          TypeParameterMapping.buildMappingRec(interfaceType, TypeUtility.getSupertypeHierarchy(interfaceType), collector, first);
         }
       }
     }
 
-    return collector;
+    return new HashMap<String, ITypeParameterMapping>(collector);
   }
 
   public static String resolveTypeParameter(IType type, String paramDefiningSuperTypeFqn, int paramIndex) throws CoreException {
+    if (!TypeUtility.exists(type) || !StringUtility.hasText(paramDefiningSuperTypeFqn)) {
+      return null;
+    }
     return resolveTypeParameter(type, TypeUtility.getSupertypeHierarchy(type), paramDefiningSuperTypeFqn, paramIndex);
   }
 
   public static String resolveTypeParameter(IType type, ITypeHierarchy supertypeHierarchy, String paramDefiningSuperTypeFqn, int paramIndex) throws CoreException {
-    HashMap<String, ITypeParameterMapping> collector = new HashMap<String, ITypeParameterMapping>();
-    resolveTypeParametersRec(type, supertypeHierarchy, collector, null);
+    if (!TypeUtility.exists(type) || supertypeHierarchy == null || !StringUtility.hasText(paramDefiningSuperTypeFqn)) {
+      return null;
+    }
+    Map<String, TypeParameterMapping> collector = new HashMap<String, TypeParameterMapping>();
+    TypeParameterMapping.buildMappingRec(type, supertypeHierarchy, collector, null);
     ITypeParameterMapping mapping = collector.get(paramDefiningSuperTypeFqn);
     if (mapping == null) {
       return null;
@@ -570,6 +586,9 @@ public final class SignatureUtility {
   }
 
   public static Map<String, ITypeParameterMapping> resolveTypeParameters(IType type) throws CoreException {
+    if (!TypeUtility.exists(type)) {
+      return null;
+    }
     return resolveTypeParameters(type, TypeUtility.getSupertypeHierarchy(type));
   }
 
@@ -578,25 +597,9 @@ public final class SignatureUtility {
       return null;
     }
 
-    HashMap<String, ITypeParameterMapping> collector = new HashMap<String, ITypeParameterMapping>();
-    resolveTypeParametersRec(type, supertypeHierarchy, collector, null);
-    return collector;
-  }
-
-  private static void resolveTypeParametersRec(IType type, ITypeHierarchy supertypeHierarchy, HashMap<String, ITypeParameterMapping> collector, TypeParameterMapping child) throws CoreException {
-    String fullyQualifiedName = type.getFullyQualifiedName();
-    if (collector.containsKey(fullyQualifiedName)) {
-      return; // already calculated
-    }
-
-    TypeParameterMapping curLevel = new TypeParameterMapping(type, child);
-    String objectClassFqn = Object.class.getName();
-    collector.put(fullyQualifiedName, curLevel);
-    for (IType superType : supertypeHierarchy.getSupertypes(type)) {
-      if (!objectClassFqn.equals(superType.getFullyQualifiedName())) {
-        resolveTypeParametersRec(superType, supertypeHierarchy, collector, curLevel);
-      }
-    }
+    Map<String, TypeParameterMapping> collector = new HashMap<String, TypeParameterMapping>();
+    TypeParameterMapping.buildMappingRec(type, supertypeHierarchy, collector, null);
+    return new HashMap<String, ITypeParameterMapping>(collector);
   }
 
   public static String getResolvedSignature(IType contextType, Map<String /* type param name */, ? extends IResolvedTypeParameter> parameterSignatures, String unresolvedSignature) throws JavaModelException {
@@ -644,7 +647,7 @@ public final class SignatureUtility {
           sigBuilder.append(sig);
         }
         else {
-          sigBuilder.append(unresolvedSignature);
+          sigBuilder.append(SIG_OBJECT);
         }
 
         break;

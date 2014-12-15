@@ -21,7 +21,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.util.ScoutSdkUtilCore;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
-import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 
@@ -440,14 +439,13 @@ public class TypeFilters {
     }
 
     final IType baseType = TypeUtility.getTypeBySignature(baseSig);
-    final String objectSig = SignatureCache.createTypeSignature(Object.class.getName());
     return new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
         try {
           String typeParamSig = SignatureUtility.resolveTypeParameter(type, paramDefiningSuperTypeFqn, paramIndex);
           if (typeParamSig != null) {
-            if (objectSig.equals(typeParamSig)) {
+            if (SignatureUtility.SIG_OBJECT.equals(typeParamSig)) {
               return true;
             }
             IType typeParam = TypeUtility.getTypeBySignature(typeParamSig);

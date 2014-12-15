@@ -59,7 +59,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 public class TableFieldFormDataSourceBuilder extends AbstractDtoTypeSourceBuilder {
   private static final Pattern CONSTANT_NAME_PATTERN = Pattern.compile("(?<!(^|[A-Z]))(?=[A-Z])|(?<!^)(?=[A-Z][a-z])");
   private static final String COLUMN_ID_SUFFIX = "_COLUMN_ID";
-  private static final String OBJECT_SIG = SignatureCache.createTypeSignature(Object.class.getName());
 
   private final FormDataAnnotation m_formDataAnnotation;
 
@@ -141,7 +140,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractDtoTypeSourceBuilde
           @Override
           public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
             source.append("return ");
-            if (!OBJECT_SIG.equals(colSignature)) {
+            if (!SignatureUtility.SIG_OBJECT.equals(colSignature)) {
               // cast
               source.append("(").append(SignatureUtility.getTypeReference(colSignature, validator)).append(") ");
             }
@@ -179,7 +178,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractDtoTypeSourceBuilde
           source.append("    case " + getColumnConstantName(j, columnIdMap) + ":").append(lineDelimiter);
           source.append("set").append(NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName())));
           source.append("(row,");
-          if (!OBJECT_SIG.equals(colunmSignatures[j])) {
+          if (!SignatureUtility.SIG_OBJECT.equals(colunmSignatures[j])) {
             source.append("(").append(SignatureUtility.getTypeReference(colunmSignatures[j], validator)).append(") ");
           }
           source.append("value);").append(lineDelimiter);

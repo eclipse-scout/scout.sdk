@@ -31,11 +31,14 @@ public class ColorPropertySourceParser implements IPropertySourceParser<RGB> {
     if (value == null) {
       return "null";
     }
-    String rgbSt = Integer.toHexString((value.red << 16) | (value.green << 8) | (value.blue));
+    StringBuilder rgbSt = new StringBuilder(6);
+    rgbSt.append(Integer.toHexString((value.red << 16) | (value.green << 8) | (value.blue)));
     while (rgbSt.length() < 6) {
-      rgbSt = "0" + rgbSt;
+      rgbSt.insert(0, '0');
     }
-    return "\"" + rgbSt.toUpperCase() + "\"";
+    rgbSt.insert(0, '"');
+    rgbSt.append('"');
+    return rgbSt.toString().toUpperCase();
   }
 
   @Override

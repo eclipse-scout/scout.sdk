@@ -276,27 +276,6 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
     return result;
   }
 
-  @SuppressWarnings("unused")
-  private static void printAsTree(Map<String, ScoutBundle> graph) {
-    for (ScoutBundle p : graph.values()) {
-      if (p.getDirectParentBundles().size() == 0) { // only root bundles
-        p.print(System.out);
-      }
-    }
-
-    System.out.println();
-    System.out.println("multiple parents:");
-    HashSet<ScoutBundle> multipleParents = new HashSet<ScoutBundle>();
-    for (ScoutBundle b : graph.values()) {
-      if (b.getDirectParentBundles().size() > 1) {
-        multipleParents.add(b);
-      }
-    }
-    for (ScoutBundle b : multipleParents) {
-      System.out.println(b);
-    }
-  }
-
   /**
    * Gets all available bundles & fragments (workspace & target platform) that have scout RT bundles in its full
    * dependency tree.<br>
