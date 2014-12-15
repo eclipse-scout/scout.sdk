@@ -451,10 +451,6 @@ public final class ProductFileModelHelper {
     private static final long serialVersionUID = 1L;
     private boolean m_fragment;
 
-    private P_ProductPlugin(IProductModel model, String id) {
-      this(model, id, false);
-    }
-
     private P_ProductPlugin(IProductModel model, String id, boolean isFragment) {
       super(model);
       m_fragment = isFragment;

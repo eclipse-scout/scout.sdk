@@ -514,9 +514,6 @@ public final class DtoUtility {
       return null;
     }
     FormDataAnnotation formDataAnnotation = ScoutTypeUtility.findFormDataAnnotation(recursiveDeclaringType, hierarchy);
-    if (formDataAnnotation == null) {
-      return null;
-    }
     if (FormDataAnnotation.isIgnore(formDataAnnotation)) {
       return null;
     }

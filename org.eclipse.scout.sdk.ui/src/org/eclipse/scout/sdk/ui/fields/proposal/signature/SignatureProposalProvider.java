@@ -69,7 +69,6 @@ public class SignatureProposalProvider extends ContentProposalProvider {
       SignatureCache.createTypeSignature(String.class.getName()),
       SignatureCache.createTypeSignature(BigDecimal.class.getName()),
       SignatureCache.createTypeSignature(BigInteger.class.getName()),
-      SignatureCache.createTypeSignature(Object.class.getName()),
       SignatureCache.createTypeSignature(java.lang.Runnable.class.getName()),
       SignatureCache.createTypeSignature(Collection.class.getName()),
       SignatureCache.createTypeSignature(List.class.getName()),

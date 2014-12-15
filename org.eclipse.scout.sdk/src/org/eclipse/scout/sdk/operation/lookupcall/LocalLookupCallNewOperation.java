@@ -31,6 +31,7 @@ import org.eclipse.scout.sdk.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.signature.IImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
+import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -89,7 +90,7 @@ public class LocalLookupCallNewOperation extends PrimaryTypeNewOperation {
             refGenericType = validator.getTypeName(args[0]);
           }
           else {
-            refGenericType = validator.getTypeName(SignatureCache.createTypeSignature(Object.class.getName()));
+            refGenericType = validator.getTypeName(SignatureUtility.SIG_OBJECT);
           }
 
           source.append(refList).append(Signature.C_GENERIC_START).append("? extends ").append(refLookupRow).append(Signature.C_GENERIC_START).append(refGenericType).append(Signature.C_GENERIC_END).append(Signature.C_GENERIC_END).append(" rows = new ");

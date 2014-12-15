@@ -209,7 +209,7 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
   @Test
   public void testGenericResolver04() throws Exception {
     Map<String, ITypeParameterMapping> mappings = SignatureUtility.resolveTypeParameters(TypeUtility.getType("org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField"));
-    Assert.assertEquals(CollectionUtility.hashSet(Signature.createTypeSignature(Object.class.getName(), true)),
+    Assert.assertEquals(CollectionUtility.hashSet("TVALUE;"),
         mappings.get(IRuntimeClasses.IValueField).getTypeParameterBounds(0));
   }
 
@@ -222,12 +222,29 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
   }
 
   @Test
+  public void testGenericResolver06() throws Exception {
+    String typeName = "signature.tests.generic.AbstractClass02B";
+    String superTypeName = "signature.tests.generic.AbstractClass01";
+    Map<String, ITypeParameterMapping> mappings = SignatureUtility.resolveTypeParameters(TypeUtility.getType(typeName));
+    Assert.assertEquals(2, mappings.get(typeName).getTypeParameter("X").getSuperReferences(superTypeName).size());
+  }
+
+  @Test
+  public void testGenericResolver07() throws Exception {
+    String typeName = "signature.tests.generic.AbstractClass02C";
+    String superTypeName = "signature.tests.generic.AbstractClass01";
+    Map<String, ITypeParameterMapping> mappings = SignatureUtility.resolveTypeParameters(TypeUtility.getType(typeName));
+    Assert.assertEquals(1, mappings.get(typeName).getTypeParameter("X").getSuperReferences(superTypeName).size());
+  }
+
+  @Test
   public void testGenericResolverHierarchy() throws Exception {
     String startClass = "signature.tests.generic.Level01Class";
     String middleClass = "signature.tests.generic.Level02Class";
     String middleIfc = "signature.tests.generic.Level02Ifc";
     String topIfc = "signature.tests.generic.Level03Ifc";
     String topIfcB = "signature.tests.generic.Level03IfcB";
+    String topClass = "signature.tests.generic.Level03Class";
     IType type = TypeUtility.getType(startClass);
     SdkAssert.assertExist(type);
 
@@ -251,21 +268,21 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
 
     // A01 on Level01Class
     IResolvedTypeParameter A01 = mappingLevel01.getTypeParameter(0);
-    Map<String, Set<IResolvedTypeParameter>> allReferences = A01.getAllReferences();
+    Map<String, Set<IResolvedTypeParameter>> allReferences = A01.getSuperReferences();
     Assert.assertEquals(2, allReferences.size());
 
     // A01 on Level02Class
-    Set<IResolvedTypeParameter> referencesOfA01 = A01.getReferences(middleClass);
+    Set<IResolvedTypeParameter> referencesOfA01 = A01.getSuperReferences(middleClass);
     Assert.assertEquals(1, referencesOfA01.size());
     A01 = CollectionUtility.firstElement(referencesOfA01);
 
     // A01 on Level02Ifc
-    referencesOfA01 = A01.getReferences(middleIfc);
+    referencesOfA01 = A01.getSuperReferences(middleIfc);
     Assert.assertEquals(1, referencesOfA01.size());
     A01 = CollectionUtility.firstElement(referencesOfA01);
 
     // A01 on Level03Ifc
-    referencesOfA01 = A01.getReferences(topIfc);
+    referencesOfA01 = A01.getSuperReferences(topIfc);
     Assert.assertEquals(1, referencesOfA01.size());
     A01 = CollectionUtility.firstElement(referencesOfA01);
 
@@ -274,9 +291,7 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
     IResolvedTypeParameter correspondingTypeParameterOnSubLevel = A01.getCorrespondingTypeParameterOnSubLevel(mappingLevel01.getType());
 
     // walk down again
-    for (int i = 0; i < 3; i++) {
-      A01 = A01.getReferencedTypeParameter();
-    }
+    A01 = A01.getSubReference(topClass).getSubReference(middleClass).getSubReference(startClass);
 
     Assert.assertSame(mappingLevel01.getTypeParameter("A01"), A01);
     Assert.assertSame(A01, correspondingTypeParameterOnSubLevel);
