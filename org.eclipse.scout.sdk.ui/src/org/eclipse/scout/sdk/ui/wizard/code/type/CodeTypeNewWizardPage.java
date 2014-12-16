@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.code.type;
 
-import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -22,7 +21,6 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
-import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -77,7 +75,7 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
   protected IType m_defaultCodeType;
   protected String m_genericSignature;
   protected String m_genericCodeIdSignature;
-  protected List<ITypeParameter> m_superTypeParameters;
+  protected ITypeParameter[] m_superTypeParameters;
 
   protected CodeIdField m_nextCodeIdField;
   protected ProposalTextField m_nlsNameField;
@@ -200,11 +198,16 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
           setStateChanging(true);
           m_superType = (IType) event.proposal;
           try {
-            m_superTypeParameters = TypeUtility.getTypeParameters(getSuperType());
+            if (TypeUtility.exists(getSuperType())) {
+              m_superTypeParameters = getSuperType().getTypeParameters();
+            }
+            else {
+              m_superTypeParameters = null;
+            }
           }
           catch (JavaModelException e) {
             ScoutSdkUi.logError("Unable to parse type parameters of type '" + getSuperType() + "'.", e);
-            m_superTypeParameters = CollectionUtility.emptyArrayList();
+            m_superTypeParameters = null;
           }
           handleGenericFieldEnableState();
           genericProposalProvider.setBaseType(getGenericTypeOfSuperClass(IRuntimeClasses.TYPE_PARAM_CODETYPE__CODE_TYPE_ID));
@@ -314,13 +317,13 @@ public class CodeTypeNewWizardPage extends AbstractWorkspaceWizardPage {
     String sig = null;
     if (getGenericSignature() != null) {
       StringBuilder fqn = new StringBuilder(getSuperType().getFullyQualifiedName());
-      if (m_superTypeParameters.size() > 0) {
+      if (m_superTypeParameters != null && m_superTypeParameters.length > 0) {
         fqn.append(Signature.C_GENERIC_START);
         fqn.append(Signature.toString(getGenericSignature()));
-        if (m_superTypeParameters.size() > 1) {
+        if (m_superTypeParameters.length > 1) {
           fqn.append(", ");
           fqn.append(Signature.toString(getGenericCodeIdSignature()));
-          if (m_superTypeParameters.size() > 2) {
+          if (m_superTypeParameters.length > 2) {
             fqn.append(", ");
             fqn.append(IRuntimeClasses.ICode);
             fqn.append(Signature.C_GENERIC_START);
