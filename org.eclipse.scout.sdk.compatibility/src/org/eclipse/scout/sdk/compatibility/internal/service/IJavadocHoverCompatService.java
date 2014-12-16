@@ -10,8 +10,12 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.compatibility.internal.service;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IMember;
 
 public interface IJavadocHoverCompatService {
   String addImageAndLabel(IJavaElement member, String imageName, String label);
+
+  String getHtmlContent(IMember member) throws CoreException;
 }

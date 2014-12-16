@@ -20,6 +20,7 @@ import java.io.StringReader;
 import java.net.URL;
 
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -33,7 +34,6 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.corext.javadoc.JavaDocLocations;
 import org.eclipse.jdt.internal.ui.JavaPlugin;
 import org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover;
-import org.eclipse.jdt.internal.ui.text.javadoc.JavadocContentAccess2;
 import org.eclipse.jdt.internal.ui.viewsupport.JavaElementLinks;
 import org.eclipse.jdt.ui.JavaElementLabels;
 import org.eclipse.jdt.ui.JavaUI;
@@ -240,7 +240,7 @@ public class JavadocTooltip extends AbstractTooltip {
         HTMLPrinter.addSmallHeader(buffer, getInfoText(member, constantValue, true));
         Reader reader = null;
         try {
-          String content = JavadocContentAccess2.getHTMLContent(member, true);
+          String content = JavadocHoverUtility.getHtmlContent(member);
           reader = content == null ? null : new StringReader(content);
 
           // Provide hint why there's no Javadoc
@@ -269,7 +269,7 @@ public class JavadocTooltip extends AbstractTooltip {
             base = getBaseURL(member);
           }
         }
-        catch (JavaModelException ex) {
+        catch (CoreException ex) {
           ScoutSdkUi.logError("unable to get javadoc html", ex);
         }
         if (reader != null) {
@@ -337,7 +337,7 @@ public class JavadocTooltip extends AbstractTooltip {
     BufferedReader reader = null;
     try {
       reader = new BufferedReader(new InputStreamReader(styleSheetURL.openStream()));
-      StringBuffer buffer = new StringBuffer(1500);
+      StringBuilder buffer = new StringBuilder(3000);
       String line = reader.readLine();
       while (line != null) {
         buffer.append(line);
