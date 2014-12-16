@@ -13,11 +13,11 @@ package org.eclipse.scout.sdk.util.type;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 
@@ -73,30 +73,27 @@ public class PropertyBean implements IPropertyBean {
 
   @Override
   public String getBeanSignature() {
-    String beanSignature = null;
     if (TypeUtility.exists(getReadMethod())) {
       try {
-        beanSignature = getReadMethod().getReturnType();
-        beanSignature = SignatureUtility.getQualifiedSignature(beanSignature, getReadMethod().getDeclaringType());
-        return beanSignature;
+        return SignatureUtility.getResolvedSignature(getReadMethod().getReturnType(), getReadMethod().getDeclaringType());
       }
-      catch (JavaModelException e) {
+      catch (CoreException e) {
         SdkUtilActivator.logWarning("could not parse signature of '" + getReadMethod().getElementName() + "' in type '" + getReadMethod().getDeclaringType().getFullyQualifiedName() + "'.", e);
       }
     }
+
     if (TypeUtility.exists(getWriteMethod())) {
       try {
         String[] parameterTypes = getWriteMethod().getParameterTypes();
         if (parameterTypes != null && parameterTypes.length == 1) {
-          beanSignature = parameterTypes[0];
-          beanSignature = SignatureUtility.getQualifiedSignature(beanSignature, getWriteMethod().getDeclaringType());
-          return beanSignature;
+          return SignatureUtility.getResolvedSignature(parameterTypes[0], getWriteMethod().getDeclaringType());
         }
       }
-      catch (JavaModelException e) {
+      catch (CoreException e) {
         SdkUtilActivator.logWarning("could not parse signature of '" + getWriteMethod().getElementName() + "' in type '" + getWriteMethod().getDeclaringType().getFullyQualifiedName() + "'.", e);
       }
     }
+
     return null;
   }
 

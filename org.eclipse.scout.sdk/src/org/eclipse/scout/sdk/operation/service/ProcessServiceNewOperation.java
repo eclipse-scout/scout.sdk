@@ -131,11 +131,11 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         IType createPermission = getCreatedCreatePermission();
         if (createPermission != null) {
-          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ACCESS, validator));
-          source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(createPermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
-          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.VetoException, validator)).append("(");
+          source.append("if(!").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.ACCESS), validator));
+          source.append(".check(new ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(createPermission.getFullyQualifiedName()), validator)).append("())){").append(lineDelimiter);
+          source.append("throw new ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.VetoException), validator)).append("(");
           if (nlsProject != null) {
-            source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
+            source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(nlsProject.getNlsAccessorType().getFullyQualifiedName()), validator));
             source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
           }
           else {
@@ -166,11 +166,11 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         IType readPermission = getCreatedReadPermission();
         if (readPermission != null) {
-          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ACCESS, validator));
-          source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(readPermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
-          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.VetoException, validator)).append("(");
+          source.append("if(!").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.ACCESS), validator));
+          source.append(".check(new ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(readPermission.getFullyQualifiedName()), validator)).append("())){").append(lineDelimiter);
+          source.append("throw new ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.VetoException), validator)).append("(");
           if (nlsProject != null) {
-            source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
+            source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(nlsProject.getNlsAccessorType().getFullyQualifiedName()), validator));
             source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
           }
           else {
@@ -201,11 +201,11 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         IType createPermission = getCreatedCreatePermission();
         if (createPermission != null) {
-          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ACCESS, validator));
-          source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(createPermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
-          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.VetoException, validator)).append("(");
+          source.append("if(!").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.ACCESS), validator));
+          source.append(".check(new ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(createPermission.getFullyQualifiedName()), validator)).append("())){").append(lineDelimiter);
+          source.append("throw new ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.VetoException), validator)).append("(");
           if (nlsProject != null) {
-            source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
+            source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(nlsProject.getNlsAccessorType().getFullyQualifiedName()), validator));
             source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
           }
           else {
@@ -236,11 +236,11 @@ public class ProcessServiceNewOperation extends ServiceNewOperation {
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         IType updatePermission = getCreatedUpdatePermission();
         if (updatePermission != null) {
-          source.append("if(!").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ACCESS, validator));
-          source.append(".check(new ").append(SignatureUtility.getTypeReferenceFromFqn(updatePermission.getFullyQualifiedName(), validator)).append("())){").append(lineDelimiter);
-          source.append("throw new ").append(SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.VetoException, validator)).append("(");
+          source.append("if(!").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.ACCESS), validator));
+          source.append(".check(new ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(updatePermission.getFullyQualifiedName()), validator)).append("())){").append(lineDelimiter);
+          source.append("throw new ").append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.VetoException), validator)).append("(");
           if (nlsProject != null) {
-            source.append(SignatureUtility.getTypeReferenceFromFqn(nlsProject.getNlsAccessorType().getFullyQualifiedName(), validator));
+            source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(nlsProject.getNlsAccessorType().getFullyQualifiedName()), validator));
             source.append(".get(\"").append(TEXT_AUTHORIZATION_FAILED).append("\")");
           }
           else {
