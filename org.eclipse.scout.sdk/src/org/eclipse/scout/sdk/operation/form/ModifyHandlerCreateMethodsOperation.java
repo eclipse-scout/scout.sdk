@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.operation.jdt.icu.ImportsCreateOperation;
 import org.eclipse.scout.sdk.util.ScoutUtility;
 import org.eclipse.scout.sdk.util.SdkProperties;
 import org.eclipse.scout.sdk.util.signature.ImportValidator;
+import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -55,10 +56,10 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
     String TAB = SdkProperties.TAB;
     ImportValidator validator = new ImportValidator(getFormHandler().getCompilationUnit());
     workingCopyManager.register(getFormHandler().getCompilationUnit(), monitor);
-    String processingExceptionClass = SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.ProcessingException, validator);
-    String serviceInterfaceName = SignatureUtility.getTypeReferenceFromFqn(getServiceInterface().getFullyQualifiedName(), validator);
-    String servicesName = SignatureUtility.getTypeReferenceFromFqn(IRuntimeClasses.SERVICES, validator);
-    String formDataName = SignatureUtility.getTypeReferenceFromFqn(getFormData().getFullyQualifiedName(), validator);
+    String processingExceptionClass = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.ProcessingException), validator);
+    String serviceInterfaceName = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getServiceInterface().getFullyQualifiedName()), validator);
+    String servicesName = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(IRuntimeClasses.SERVICES), validator);
+    String formDataName = SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getFormData().getFullyQualifiedName()), validator);
     if (isCreateExecLoad()) {
       // execLoad on form handler
       StringBuilder execLoadBuilder = new StringBuilder();
@@ -75,7 +76,7 @@ public class ModifyHandlerCreateMethodsOperation implements IOperation {
       }
       execLoadBuilder.append(TAB + "importFormData(formData);\n");
       if (getUpdatePermission() != null) {
-        execLoadBuilder.append(TAB + "setEnabledPermission(new " + SignatureUtility.getTypeReferenceFromFqn(getUpdatePermission().getFullyQualifiedName(), validator) + "());\n");
+        execLoadBuilder.append(TAB + "setEnabledPermission(new " + SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getUpdatePermission().getFullyQualifiedName()), validator) + "());\n");
       }
       execLoadBuilder.append("}");
       getFormHandler().createMethod(execLoadBuilder.toString(), null, true, monitor);

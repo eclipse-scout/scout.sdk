@@ -17,6 +17,7 @@ import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
@@ -46,9 +47,6 @@ import org.eclipse.swt.graphics.Image;
  * @since 1.0.8 09.02.2010
  */
 public class SqlBindCompletionProposalProcessor {
-  private final IType AbstractFormData = TypeUtility.getType(IRuntimeClasses.AbstractFormData);
-  private final IType AbstractFormFieldData = TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData);
-  private final IType AbstractPropertyData = TypeUtility.getType(IRuntimeClasses.AbstractPropertyData);
 
   private final Image m_image;
   private static final Pattern REGEX_QUOTES = Pattern.compile("\\\"");
@@ -63,20 +61,28 @@ public class SqlBindCompletionProposalProcessor {
       if (!isSqlStatementLocation(context.getViewer(), context.getInvocationOffset())) {
         return Collections.emptyList();
       }
+
       IType formData = getFormDataParameterType(context);
       if (formData == null || !formData.exists()) {
         return Collections.emptyList();
       }
+
+      IType abstractFormFieldData = TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData);
+      IType abstractPropertyData = TypeUtility.getType(IRuntimeClasses.AbstractPropertyData);
+      if (TypeUtility.exists(abstractPropertyData) || !TypeUtility.exists(abstractFormFieldData)) {
+        return Collections.emptyList();
+      }
+
       String prefix = getPrefix(context.getViewer(), context.getInvocationOffset());
       HashSet<ICompletionProposal> collector = new HashSet<ICompletionProposal>();
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formData);
-      for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
+      for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(abstractFormFieldData, hierarchy))) {
         String propName = FastBeanUtility.decapitalize(NamingUtility.ensureStartWithUpperCase(t.getElementName()));
         SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
         addInnerTypesInSuperClasses(t, TypeUtility.getSupertypeHierarchy(t), collector, prefix, propName + ".", context);
       }
-      for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(AbstractPropertyData, hierarchy))) {
+      for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(abstractPropertyData, hierarchy))) {
         String propName = NamingUtility.ensureStartWithUpperCase(t.getElementName());
         propName = FastBeanUtility.decapitalize(propName.replaceAll("Property$", ""));
         SqlBindProposal prop = new SqlBindProposal(propName, prefix, context.getInvocationOffset(), m_image);
@@ -92,19 +98,18 @@ public class SqlBindCompletionProposalProcessor {
 
       return CollectionUtility.arrayList(sorted.values());
     }
-    catch (BadLocationException e) {
-      ScoutSdkUi.logWarning("error during creating sql copletion.", e);
+    catch (Exception e) {
+      ScoutSdkUi.logWarning("error while creating sql completion.", e);
+      return Collections.emptyList();
     }
-    catch (JavaModelException e) {
-      ScoutSdkUi.logWarning("error during creating sql copletion.", e);
-    }
-    return Collections.emptyList();
   }
 
   private void addInnerTypesInSuperClasses(IType baseType, ITypeHierarchy baseTypeSuperHierarchy, HashSet<ICompletionProposal> collector, String prefix, String namePrefix, JavaContentAssistInvocationContext context) throws JavaModelException {
+    IType abstractFormFieldData = TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData);
+
     for (IType superClass : baseTypeSuperHierarchy.getSuperClassStack(baseType, false)) {
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(superClass);
-      for (IType innerType : TypeUtility.getInnerTypes(superClass, TypeFilters.getSubtypeFilter(AbstractFormFieldData, hierarchy))) {
+      for (IType innerType : TypeUtility.getInnerTypes(superClass, TypeFilters.getSubtypeFilter(abstractFormFieldData, hierarchy))) {
         SqlBindProposal prop = new SqlBindProposal(namePrefix + FastBeanUtility.decapitalize(NamingUtility.ensureStartWithUpperCase(innerType.getElementName())), prefix, context.getInvocationOffset(), m_image);
         collector.add(prop);
         addInnerTypesInSuperClasses(innerType, TypeUtility.getSupertypeHierarchy(innerType), collector, prefix, prop.getDisplayString() + ".", context);
@@ -130,17 +135,23 @@ public class SqlBindCompletionProposalProcessor {
     return stringLocation;
   }
 
-  private IType getFormDataParameterType(JavaContentAssistInvocationContext context) throws JavaModelException {
-    IJavaElement element = context.getCoreContext().getEnclosingElement();
-    if (element.getElementType() == IJavaElement.METHOD) {
-      IMethod method = (IMethod) element;
-      for (String parameter : method.getParameterTypes()) {
-        String fqs = SignatureUtility.getQualifiedSignature(parameter, method.getDeclaringType());
-        if (SignatureUtility.getTypeSignatureKind(fqs) == Signature.CLASS_TYPE_SIGNATURE) {
-          String fqn = Signature.getSignatureQualifier(fqs) + "." + Signature.getSignatureSimpleName(fqs);
-          IType candidate = TypeUtility.getType(fqn);
-          if (TypeUtility.getSupertypeHierarchy(candidate).contains(AbstractFormData)) {
-            return candidate;
+  private IType getFormDataParameterType(JavaContentAssistInvocationContext context) throws CoreException {
+    IType abstractFormData = TypeUtility.getType(IRuntimeClasses.AbstractFormData);
+    if (TypeUtility.exists(abstractFormData)) {
+      IJavaElement element = context.getCoreContext().getEnclosingElement();
+      if (element.getElementType() == IJavaElement.METHOD) {
+        IMethod method = (IMethod) element;
+        for (String parameter : method.getParameterTypes()) {
+          String fqs = SignatureUtility.getResolvedSignature(parameter, method.getDeclaringType());
+          if (SignatureUtility.getTypeSignatureKind(fqs) == Signature.CLASS_TYPE_SIGNATURE) {
+            IType candidate = TypeUtility.getTypeBySignature(fqs);
+            if (TypeUtility.exists(candidate)) {
+              ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(candidate);
+              if (supertypeHierarchy != null && supertypeHierarchy.contains(abstractFormData)) {
+
+                return candidate;
+              }
+            }
           }
         }
       }

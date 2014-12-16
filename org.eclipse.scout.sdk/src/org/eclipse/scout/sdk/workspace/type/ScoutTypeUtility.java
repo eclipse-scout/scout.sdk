@@ -808,7 +808,6 @@ public class ScoutTypeUtility extends TypeUtility {
         TypeFilters.getPrimaryTypeFilter()));
 
     if (TypeUtility.exists(form)) {
-
       final String formFieldSignature = SignatureCache.createTypeSignature(formField.getFullyQualifiedName());
       final String regex = "^get" + formField.getElementName();
       IMethod method = TypeUtility.getFirstMethod(form, new IMethodFilter() {

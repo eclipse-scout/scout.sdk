@@ -40,7 +40,6 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.ITypeParameter;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -775,13 +774,15 @@ public class TypeUtility {
   }
 
   public static boolean isGenericType(IType type) {
-    try {
-      return getTypeParameters(type).size() > 0;
+    if (TypeUtility.exists(type)) {
+      try {
+        return type.getTypeParameters().length > 0;
+      }
+      catch (JavaModelException e) {
+        SdkUtilActivator.logError("Unable to parse type parameters of type '" + type + "'.", e);
+      }
     }
-    catch (JavaModelException e) {
-      SdkUtilActivator.logError("Unable to parse type parameters of type '" + type + "'.", e);
-      return false;
-    }
+    return false;
   }
 
   /**
@@ -815,13 +816,6 @@ public class TypeUtility {
     else {
       return null;
     }
-  }
-
-  public static List<ITypeParameter> getTypeParameters(IType type) throws JavaModelException {
-    if (TypeUtility.exists(type)) {
-      return CollectionUtility.arrayList(type.getTypeParameters());
-    }
-    return CollectionUtility.arrayList();
   }
 
   public static ICachedTypeHierarchyResult getAbstractTypesOnClasspathHierarchy(IType hierarchyBaseType, IJavaProject project) {
