@@ -28,6 +28,7 @@
 		<config name="getConfiguredMenuTypes" type="Normal" category="Behavior" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.action.AbstractAction">
+		<config name="getConfiguredViewOrder" type="Advanced" category="Appearance" />
 		<config name="getConfiguredText" type="Normal" category="Appearance" />
 		<config name="getConfiguredKeyStroke" type="Normal" category="Behavior" />
 		<config name="getConfiguredTooltipText" type="Advanced" category="Appearance" />
@@ -100,6 +101,7 @@
 	<type name="org.eclipse.scout.rt.shared.services.common.code.AbstractCode">
 		<config name="getConfiguredText" type="Normal" category="Appearance" />
 		<config name="getConfiguredActive" type="Advanced" category="Data" />
+		<config name="getConfiguredViewOrder" type="Advanced" category="Appearance" />
 		<config name="getConfiguredEnabled" type="Advanced" category="Data" />
 		<config name="getConfiguredIconId" type="Advanced" category="Appearance" />
 		<config name="getConfiguredTooltipText" type="Advanced" category="Appearance" />
@@ -121,6 +123,7 @@
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn">
 		<config name="getConfiguredVisible" type="Normal" category="Appearance" />
+		<config name="getConfiguredViewOrder" type="Advanced" category="Appearance" />
 		<config name="getConfiguredHeaderText" type="Normal" category="Appearance" />
 		<config name="getConfiguredHeaderTooltipText" type="Advanced" category="Appearance" />
 		<config name="getConfiguredHeaderForegroundColor" type="Advanced" category="Appearance" />
@@ -154,6 +157,7 @@
 	<type name="org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute">
 		<config name="getConfiguredIconId" type="Advanced" category="Appearance" />
 		<config name="getConfiguredText" type="Normal" category="Appearance" />
+		<config name="getConfiguredViewOrder" type="Advanced" category="Appearance" />
 		<config name="getConfiguredLookupCall" type="Normal" category="Data" />
 		<config name="getConfiguredCodeType" type="Normal" category="Data" />
 		<config name="getConfiguredType" type="Normal" category="Behavior" />
@@ -167,6 +171,7 @@
 	<type name="org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity">
 		<config name="getConfiguredText" type="Normal" category="Appearance" />
 		<config name="getConfiguredIconId" type="Advanced" category="Appearance" />
+		<config name="getConfiguredViewOrder" type="Advanced" category="Appearance" />
 		<config name="getConfiguredVisible" type="Advanced" category="Appearance" />
 		<config name="getConfiguredOneToMany" type="Advanced" category="Data" />
 	</type>
@@ -278,6 +283,7 @@
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.AbstractFormField">
 		<config name="getConfiguredLabel" type="Normal" category="Appearance" />
+		<config name="getConfiguredViewOrder" type="Advanced" category="Appearance" />
 		<config name="getConfiguredLabelPosition" type="Advanced" category="Layout" />
 		<config name="getConfiguredLabelWidthInPixel" type="Advanced" category="Layout" />
 		<config name="getConfiguredLabelHorizontalAlignment" type="Advanced" category="Layout" />
@@ -426,6 +432,7 @@
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline">
 		<config name="getConfiguredTitle" type="Normal" category="Appearance" />
+		<config name="getConfiguredViewOrder" type="Advanced" category="Appearance" />
 		<config name="getConfiguredEnabled" type="Advanced" category="Behavior" />
 		<config name="getConfiguredVisible" type="Advanced" category="Appearance" />
 		<config name="getConfiguredSortNo" type="Advanced" category="Appearance" />
@@ -507,8 +514,9 @@
 		<config name="getConfiguredBrowseHierarchy" type="Advanced" category="Behavior" />
 		<config name="getConfiguredSortCodesByDisplayText" type="Advanced" category="Behavior" />
 	</type>
-	<type name="org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField">
+	<type name="org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractContentAssistField">
 		<config name="getConfiguredBrowseIconId" type="Advanced" category="Appearance" />
+		<config name="getConfiguredProposalFormHeight" type="Advanced" category="Appearance" />
 		<config name="getConfiguredIconId" type="Advanced" category="Appearance" />
 		<config name="getConfiguredBrowseAutoExpandAll" type="Advanced" category="Behavior" />
 		<config name="getConfiguredAllowCustomText" type="Advanced" category="Behavior" />
@@ -735,6 +743,7 @@
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.wizard.AbstractWizardStep">
 		<config name="getConfiguredEnabled" type="Advanced" category="Behavior" />
+		<config name="getConfiguredViewOrder" type="Advanced" category="Appearance" />
 		<config name="getConfiguredTitle" type="Normal" category="Appearance" />
 		<config name="getConfiguredTooltipText" type="Advanced" category="Appearance" />
 		<config name="getConfiguredTitleHtml" type="Advanced" category="Appearance" />
