@@ -102,6 +102,10 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     connectWithChild(child);
   }
 
+  /**
+   * Returns the type parameter in the given child mapping whose name matches the simple name of the given type variable
+   * signature.
+   */
   private ResolvedTypeParameter getMatchingChildTypeParam(TypeParameterMapping child, String curParamNameInSuperTypeDeclaration) {
     if (Signature.getTypeSignatureKind(curParamNameInSuperTypeDeclaration) == Signature.TYPE_VARIABLE_SIGNATURE) {
       return child.getTypeParameter(Signature.getSignatureSimpleName(curParamNameInSuperTypeDeclaration));
@@ -109,6 +113,10 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     return null;
   }
 
+  /**
+   * Gets the super type declaration that matches the type of this mapping and extracts the type parameter with given
+   * index.
+   */
   private String getParamNameInSuperTypeDeclaration(TypeParameterMapping child, int typeParamIndex) {
     if (child != null) {
       List<String> paramNamesInSuperTypeDeclaration = child.getSuperTypeParameters(getType());
@@ -120,6 +128,9 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     return null;
   }
 
+  /**
+   * connects this mapping and its parameters with the matching child mapping and its parameters
+   */
   private void connectWithChild(TypeParameterMapping child) {
     if (child != null) {
       child.addSuperMapping(this);
@@ -130,12 +141,54 @@ public class TypeParameterMapping implements ITypeParameterMapping {
         String curParamNameInSuperTypeDeclaration = getParamNameInSuperTypeDeclaration(child, i++);
         if (curParamNameInSuperTypeDeclaration != null) {
           ResolvedTypeParameter matchingChildTypeParam = getMatchingChildTypeParam(child, curParamNameInSuperTypeDeclaration);
+          if (matchingChildTypeParam == null) {
+            // the curParamNameInSuperTypeDeclaration is no type variable reference or could not be found.
+            // try to extract a unique type parameter from the arguments of the signature
+            matchingChildTypeParam = getTypeParameterOfSigArgument(child, curParamNameInSuperTypeDeclaration);
+          }
+
           if (matchingChildTypeParam != null) {
             matchingChildTypeParam.addReference(param);
           }
         }
       }
     }
+  }
+
+  /**
+   * Tries to find a unique type parameter of the given child that matches a type argument of the given signature.
+   * Only follows the nested type arguments as long as there is only one. Otherwise the path of the param ends and a new
+   * one starts (merge or split).
+   */
+  private ResolvedTypeParameter getTypeParameterOfSigArgument(TypeParameterMapping child, String sig) {
+    List<String> typeVarArgs = getTypeVariableSignatureArguments(sig);
+    while (CollectionUtility.size(typeVarArgs) == 1) {
+      String curTypeVarArg = typeVarArgs.get(0);
+      ResolvedTypeParameter matchingChildTypeParam = getMatchingChildTypeParam(child, curTypeVarArg);
+      if (matchingChildTypeParam != null) {
+        return matchingChildTypeParam;
+      }
+      typeVarArgs = getTypeVariableSignatureArguments(curTypeVarArg);
+    }
+    return null;
+  }
+
+  /**
+   * Gets all type arguments from the given signature that are type variable signatures (references to a type variable).<br>
+   * Type arguments that are type signatures (e.g. Ljava.lang.Long;) are filtered out.
+   */
+  private List<String> getTypeVariableSignatureArguments(String sig) {
+    String[] args = Signature.getTypeArguments(sig);
+    if (args.length < 1) {
+      return null;
+    }
+    List<String> result = new ArrayList<String>(args.length);
+    for (String arg : args) {
+      if (Signature.getTypeSignatureKind(arg) == Signature.TYPE_VARIABLE_SIGNATURE) {
+        result.add(arg);
+      }
+    }
+    return result;
   }
 
   public static void buildMappingRec(IType type, ITypeHierarchy supertypeHierarchy, Map<String, TypeParameterMapping> collector, TypeParameterMapping child) throws CoreException {
