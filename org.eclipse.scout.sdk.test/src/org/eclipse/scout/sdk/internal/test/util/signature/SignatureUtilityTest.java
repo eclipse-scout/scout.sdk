@@ -234,7 +234,16 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
     String typeName = "signature.tests.generic.AbstractClass02C";
     String superTypeName = "signature.tests.generic.AbstractClass01";
     Map<String, ITypeParameterMapping> mappings = SignatureUtility.resolveTypeParameters(TypeUtility.getType(typeName));
-    Assert.assertEquals(1, mappings.get(typeName).getTypeParameter("X").getSuperReferences(superTypeName).size());
+    Assert.assertEquals(2, mappings.get(typeName).getTypeParameter("X").getSuperReferences(superTypeName).size());
+    Assert.assertSame(mappings.get(typeName).getTypeParameter("X"), mappings.get("signature.tests.generic.IInterface01").getTypeParameter(0).getSubReference(superTypeName).getSubReference(typeName));
+  }
+
+  @Test
+  public void testGenericResolver08() throws Exception {
+    String typeName = "signature.tests.generic.AbstractClass02D";
+    String superTypeName = "signature.tests.generic.IInterface01";
+    Map<String, ITypeParameterMapping> mappings = SignatureUtility.resolveTypeParameters(TypeUtility.getType(typeName));
+    Assert.assertEquals(0, mappings.get(typeName).getTypeParameter("X").getSuperReferences(superTypeName).size());
   }
 
   @Test

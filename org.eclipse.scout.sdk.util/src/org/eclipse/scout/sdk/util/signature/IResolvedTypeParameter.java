@@ -117,7 +117,7 @@ public interface IResolvedTypeParameter {
    * @param ownerTypeFqn
    *          The fully qualified name of the super type for which the references should be returned.
    * @return A {@link Set} containing all {@link IResolvedTypeParameter}s on the given type that reference to this type
-   *         parameter.
+   *         parameter. Never returns <code>null</code>.
    */
   Set<IResolvedTypeParameter> getSuperReferences(String ownerTypeFqn);
 

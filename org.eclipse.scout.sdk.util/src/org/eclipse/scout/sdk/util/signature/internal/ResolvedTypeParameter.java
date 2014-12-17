@@ -134,7 +134,7 @@ public class ResolvedTypeParameter implements IResolvedTypeParameter {
   public Set<IResolvedTypeParameter> getSuperReferences(String ownerTypeFqn) {
     Set<ResolvedTypeParameter> c = m_superTypeParamReferences.get(ownerTypeFqn);
     if (c == null) {
-      return null;
+      return new LinkedHashSet<IResolvedTypeParameter>(0);
     }
     return new LinkedHashSet<IResolvedTypeParameter>(c);
   }
