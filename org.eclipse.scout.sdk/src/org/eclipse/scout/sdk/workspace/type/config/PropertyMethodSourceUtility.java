@@ -228,13 +228,9 @@ public final class PropertyMethodSourceUtility {
       parameter = matcher.group(2);
       String referencedValue = findReferencedValue(parameter, method, superTypeHierarchy);
       if (referencedValue != null) {
-        referencedValue = referencedValue.replace('e', 'E');
-        referencedValue = referencedValue.replace("E+", "E");
-        try {
-          return DecimalFormat.getInstance(Locale.ENGLISH).parse(prefix + referencedValue).doubleValue();
-        }
-        catch (ParseException e) {
-          throw new CoreException(new ScoutStatus("Error parsing parameter '" + prefix + referencedValue + "' to a decimal.", e));
+        Double val = parseReturnParameterDouble(prefix + referencedValue, method, superTypeHierarchy);
+        if (val != null) {
+          return val;
         }
       }
     }
