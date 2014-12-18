@@ -16,6 +16,7 @@ import java.util.Deque;
 import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -832,23 +833,48 @@ public class ScoutTypeUtility extends TypeUtility {
     return null;
   }
 
-  public static String getColumnValueTypeSignature(IType column, ITypeHierarchy columnHierarchy) throws CoreException {
+  public static Deque<IType> getDeclaringTypesWithSuperTypeParams(IType startType) throws JavaModelException {
+    Deque<IType> result = new LinkedList<IType>();
+    IType t = startType;
+    while (TypeUtility.exists(t)) {
+      if (Flags.isStatic(t.getFlags())) {
+        break; // cancel on static declaring types
+      }
+      String superclassTypeSignature = t.getSuperclassTypeSignature();
+      if (superclassTypeSignature != null) {
+        String[] typeArguments = Signature.getTypeArguments(superclassTypeSignature);
+        if (typeArguments.length > 0) {
+          result.add(t);
+        }
+      }
+      t = t.getDeclaringType();
+    }
+    return result;
+  }
+
+  public static String getColumnValueTypeSignature(IType column, IType lowestLevelColumnContainer, ITypeHierarchy columnHierarchy) throws CoreException {
     if (!TypeUtility.exists(column) || Object.class.getName().equals(column.getFullyQualifiedName())) {
       return null;
     }
 
-    return SignatureUtility.resolveTypeParameter(column, columnHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
+    String columnValueTypeSig = SignatureUtility.resolveTypeParameter(column, columnHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
+    if (columnValueTypeSig != null && TypeUtility.exists(lowestLevelColumnContainer) && Signature.getTypeSignatureKind(columnValueTypeSig) == Signature.TYPE_VARIABLE_SIGNATURE) {
+      // it resolved to a type variable. it must have been defined in a declaring type -> try to resolve with context
+      Deque<IType> declaringContextInToOut = getDeclaringTypesWithSuperTypeParams(lowestLevelColumnContainer);
+      columnValueTypeSig = SignatureUtility.resolveTypeParameter(column, columnHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE, declaringContextInToOut);
+    }
+    return columnValueTypeSig;
   }
 
   public static IMethod getColumnGetterMethod(IType column) {
     IType table = column.getDeclaringType();
     final String formFieldSignature = IRegEx.DOLLAR_REPLACEMENT.matcher(SignatureCache.createTypeSignature(column.getFullyQualifiedName())).replaceAll(".");
 
-    final String regex = "^get" + column.getElementName();
+    final Pattern regex = Pattern.compile("^get" + column.getElementName());
     IMethod method = TypeUtility.getFirstMethod(table, new IMethodFilter() {
       @Override
       public boolean accept(IMethod candidate) {
-        if (candidate.getElementName().matches(regex)) {
+        if (regex.matcher(candidate.getElementName()).matches()) {
           try {
             String returnTypeSignature = Signature.getReturnType(candidate.getSignature());
             returnTypeSignature = SignatureUtility.getResolvedSignature(returnTypeSignature, candidate.getDeclaringType());
