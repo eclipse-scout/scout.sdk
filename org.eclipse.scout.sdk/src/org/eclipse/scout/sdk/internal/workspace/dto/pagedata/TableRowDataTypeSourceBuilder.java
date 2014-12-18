@@ -136,10 +136,10 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
       memberFieldBuilder.setFlags(Flags.AccPrivate);
 
       // try to find the column value type with the local hierarchy first.
-      String columnValueTypeSignature = ScoutTypeUtility.getColumnValueTypeSignature(column, getModelLocalHierarchy());
+      String columnValueTypeSignature = ScoutTypeUtility.getColumnValueTypeSignature(column, getColumnContainer(), getModelLocalHierarchy());
       if (columnValueTypeSignature == null) {
         // this cannot find anything, in case the column is inherited from a parent table. try again with super hierarchy
-        columnValueTypeSignature = ScoutTypeUtility.getColumnValueTypeSignature(column, TypeUtility.getSupertypeHierarchy(column));
+        columnValueTypeSignature = ScoutTypeUtility.getColumnValueTypeSignature(column, getColumnContainer(), TypeUtility.getSupertypeHierarchy(column));
       }
       memberFieldBuilder.setSignature(columnValueTypeSignature);
       addSortedFieldSourceBuilder(new CompositeObject(SortedMemberKeyFactory.FIELD_MEMBER + 1, i, columnBeanName), memberFieldBuilder);

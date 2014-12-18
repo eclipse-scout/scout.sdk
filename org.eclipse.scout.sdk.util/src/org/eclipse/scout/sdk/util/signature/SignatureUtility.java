@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.util.signature;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -440,6 +441,12 @@ public final class SignatureUtility {
           return new StringBuilder(typeParamName.length() + 2).append(Signature.C_TYPE_VARIABLE).append(typeParamName).append(Signature.C_SEMICOLON).toString();
         }
       }
+
+      // the generic is not defined on this type. try declaring type
+      IType declaringType = signatureOwner.getDeclaringType();
+      if (TypeUtility.exists(declaringType)) {
+        return ensureSourceTypeParametersAreCorrect(signature, declaringType);
+      }
       return signature;
     }
   }
@@ -459,7 +466,7 @@ public final class SignatureUtility {
   /**
    * Returns an unique identifier for a method with given name and given parameter signatures. The identifier looks like
    * 'methodname(sigOfParam1,sigOfParam2)'.
-   * 
+   *
    * @param methodName
    *          The method name.
    * @param resolvedParamSignatures
@@ -520,7 +527,7 @@ public final class SignatureUtility {
    */
   public static Map<String, ITypeParameterMapping> resolveTypeParameters(String signature, String superClassSignature, List<String> interfaceSignatures) throws CoreException {
     if (!StringUtility.hasText(signature)) {
-      return null;
+      return CollectionUtility.emptyHashMap();
     }
 
     Map<String, TypeParameterMapping> collector = new HashMap<String, TypeParameterMapping>();
@@ -530,7 +537,7 @@ public final class SignatureUtility {
     if (StringUtility.hasText(superClassSignature)) {
       IType superType = TypeUtility.getTypeBySignature(superClassSignature);
       if (TypeUtility.exists(superType)) {
-        TypeParameterMapping.buildMappingRec(superType, TypeUtility.getSupertypeHierarchy(superType), collector, first);
+        TypeParameterMapping.buildMapping(superType, null, collector, first);
       }
     }
 
@@ -538,7 +545,7 @@ public final class SignatureUtility {
       for (String ifcSig : interfaceSignatures) {
         IType interfaceType = TypeUtility.getTypeBySignature(ifcSig);
         if (TypeUtility.exists(interfaceType)) {
-          TypeParameterMapping.buildMappingRec(interfaceType, TypeUtility.getSupertypeHierarchy(interfaceType), collector, first);
+          TypeParameterMapping.buildMapping(interfaceType, null, collector, first);
         }
       }
     }
@@ -562,10 +569,11 @@ public final class SignatureUtility {
    * @throws CoreException
    */
   public static String resolveTypeParameter(IType type, String paramDefiningSuperTypeFqn, int paramIndex) throws CoreException {
-    if (!TypeUtility.exists(type) || !StringUtility.hasText(paramDefiningSuperTypeFqn)) {
-      return null;
-    }
-    return resolveTypeParameter(type, TypeUtility.getSupertypeHierarchy(type), paramDefiningSuperTypeFqn, paramIndex);
+    return resolveTypeParameter(type, null, paramDefiningSuperTypeFqn, paramIndex);
+  }
+
+  public static String resolveTypeParameter(IType type, ITypeHierarchy supertypeHierarchy, String paramDefiningSuperTypeFqn, int paramIndex) throws CoreException {
+    return resolveTypeParameter(type, supertypeHierarchy, paramDefiningSuperTypeFqn, paramIndex, null);
   }
 
   /**
@@ -575,22 +583,27 @@ public final class SignatureUtility {
    * @param type
    *          The focus {@link IType} that defines the bounds of the type parameter calculation.
    * @param supertypeHierarchy
-   *          The super type hierarchy of the focus type.
+   *          The super type hierarchy of the focus type or null.
    * @param paramDefiningSuperTypeFqn
    *          The fully qualified type name of the {@link IType} which defines the given type parameter.
    * @param paramIndex
    *          The index of the type parameter on the given paramDefiningSuperTypeFqn whose resolved signature should be
    *          returned.
-   * @return The signature of the given type parameter as narrowed by the given focus type and its super types or
-   *         <code>null</code> if the type parameter could not be found.
+   * @param declaringChildContextsInToOut
+   *          {@link Collection} of declaring context types that should be considered when calculating the
+   *          type parameter signature or null. This parameter may be used if the given focus type uses a type parameter
+   *          defined in a declaring type and narrowed in a sub class of this declaring class. In that case passing such
+   *          narrowed sub classes allows to consider these bounds.
+   * @return The first signature of the given type parameter bounds narrowed by the given focus type and its super types
+   *         or <code>null</code> if the type parameter could not be found.
    * @throws CoreException
    */
-  public static String resolveTypeParameter(IType type, ITypeHierarchy supertypeHierarchy, String paramDefiningSuperTypeFqn, int paramIndex) throws CoreException {
-    if (!TypeUtility.exists(type) || supertypeHierarchy == null || !StringUtility.hasText(paramDefiningSuperTypeFqn)) {
+  public static String resolveTypeParameter(IType type, ITypeHierarchy supertypeHierarchy, String paramDefiningSuperTypeFqn, int paramIndex, Collection<IType> declaringChildContextsInToOut) throws CoreException {
+    if (!TypeUtility.exists(type) || !StringUtility.hasText(paramDefiningSuperTypeFqn) || paramIndex < 0) {
       return null;
     }
     Map<String, TypeParameterMapping> collector = new HashMap<String, TypeParameterMapping>();
-    TypeParameterMapping.buildMappingRec(type, supertypeHierarchy, collector, null);
+    TypeParameterMapping.buildMapping(type, supertypeHierarchy, collector, declaringChildContextsInToOut);
     ITypeParameterMapping mapping = collector.get(paramDefiningSuperTypeFqn);
     if (mapping == null) {
       return null;
@@ -606,15 +619,11 @@ public final class SignatureUtility {
    * @param type
    *          The focus type for which the type parameter hierarchy should be calculated.
    * @return A {@link Map} containing the fully qualified type name of the super hierarchy of the given focus type and
-   *         the corresponding {@link ITypeParameterMapping} for each type. May return null if the given type does not
-   *         exist.
+   *         the corresponding {@link ITypeParameterMapping} for each type.
    * @throws CoreException
    */
   public static Map<String, ITypeParameterMapping> resolveTypeParameters(IType type) throws CoreException {
-    if (!TypeUtility.exists(type)) {
-      return null;
-    }
-    return resolveTypeParameters(type, TypeUtility.getSupertypeHierarchy(type));
+    return resolveTypeParameters(type, null);
   }
 
   /**
@@ -624,19 +633,40 @@ public final class SignatureUtility {
    * @param type
    *          The focus type for which the type parameter hierarchy should be calculated.
    * @param supertypeHierarchy
-   *          The super hierarchy of the given focus type.
+   *          The super hierarchy of the given focus type or null.
    * @return A {@link Map} containing the fully qualified type name of the super hierarchy of the given focus type and
-   *         the corresponding {@link ITypeParameterMapping} for each type. May return null if the given type of
-   *         hierarchy are <code>null</code>.
+   *         the corresponding {@link ITypeParameterMapping} for each type.
    * @throws CoreException
    */
   public static Map<String, ITypeParameterMapping> resolveTypeParameters(IType type, ITypeHierarchy supertypeHierarchy) throws CoreException {
-    if (!TypeUtility.exists(type) || supertypeHierarchy == null) {
-      return null;
+    return resolveTypeParameters(type, supertypeHierarchy, null);
+  }
+
+  /**
+   * Resolves all type parameters on the given focus type and all its super types. The type parameters are narrowed
+   * against the bounds defined on the focus type and are valid on the focus type only.
+   *
+   * @param type
+   *          The focus type for which the type parameter hierarchy should be calculated.
+   * @param supertypeHierarchy
+   *          The super hierarchy of the given focus type or null.
+   * @return A {@link Map} containing the fully qualified type name of the super hierarchy of the given focus type and
+   *         the corresponding {@link ITypeParameterMapping} for each type.
+   * @param declaringChildContextsInToOut
+   *          {@link Collection} of declaring context types that should be
+   *          considered when calculating the
+   *          type parameter signature or null. This parameter may be used if the given focus type uses a type parameter
+   *          defined in a declaring type and narrowed in a sub class of this declaring class. In that case passing such
+   *          narrowed sub classes allows to consider these bounds.
+   * @throws CoreException
+   */
+  public static Map<String, ITypeParameterMapping> resolveTypeParameters(IType type, ITypeHierarchy supertypeHierarchy, Collection<IType> declaringChildContextsInToOut) throws CoreException {
+    if (!TypeUtility.exists(type)) {
+      return CollectionUtility.emptyHashMap();
     }
 
     Map<String, TypeParameterMapping> collector = new HashMap<String, TypeParameterMapping>();
-    TypeParameterMapping.buildMappingRec(type, supertypeHierarchy, collector, null);
+    TypeParameterMapping.buildMapping(type, supertypeHierarchy, collector, declaringChildContextsInToOut);
     return new HashMap<String, ITypeParameterMapping>(collector);
   }
 

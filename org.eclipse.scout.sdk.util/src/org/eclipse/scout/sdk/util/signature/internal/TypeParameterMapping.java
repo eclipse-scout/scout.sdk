@@ -11,17 +11,22 @@
 package org.eclipse.scout.sdk.util.signature.internal;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeParameter;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.util.signature.IResolvedTypeParameter;
@@ -61,10 +66,10 @@ public class TypeParameterMapping implements ITypeParameterMapping {
       m_typeParametersByIndex.add(parameter);
     }
 
-    m_superParametersByType = getSuperTypeParameters(superTypeSignature, superInterfacesSignatures);
+    m_superParametersByType = getSuperTypeParameters(superTypeSignature, superInterfacesSignatures, null);
   }
 
-  public TypeParameterMapping(IType t, TypeParameterMapping child) throws CoreException {
+  public TypeParameterMapping(IType t, TypeParameterMapping child, Map<String, IResolvedTypeParameter> declaringTypeParams) throws CoreException {
     m_type = t;
     m_fullyQualifiedName = t.getFullyQualifiedName();
     ITypeParameter[] typeParameters = getType().getTypeParameters();
@@ -94,7 +99,7 @@ public class TypeParameterMapping implements ITypeParameterMapping {
       m_typeParametersByIndex.add(parameter);
     }
 
-    m_superParametersByType = getSuperTypeParameters(t.getSuperclassTypeSignature(), CollectionUtility.arrayList(t.getSuperInterfaceTypeSignatures()));
+    m_superParametersByType = getSuperTypeParameters(t.getSuperclassTypeSignature(), CollectionUtility.arrayList(t.getSuperInterfaceTypeSignatures()), declaringTypeParams);
     m_superMappings = new LinkedHashMap<String, TypeParameterMapping>();
     m_subMappings = new LinkedHashMap<String, TypeParameterMapping>();
 
@@ -191,7 +196,71 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     return result;
   }
 
-  public static void buildMappingRec(IType type, ITypeHierarchy supertypeHierarchy, Map<String, TypeParameterMapping> collector, TypeParameterMapping child) throws CoreException {
+  private static IType findContextType(Collection<IType> declaringChildContextsInToOut, ITypeHierarchy childHierarchy, IType superTypeToSearch) {
+    for (IType candidate : declaringChildContextsInToOut) {
+      if (childHierarchy.getAllSupertypes(candidate).contains(superTypeToSearch)) {
+        return candidate;
+      }
+    }
+    return null;
+  }
+
+  private static Deque<IType> getDeclaringTypesWithParameters(IType startType) throws JavaModelException {
+    Deque<IType> result = new LinkedList<IType>();
+    IType t = startType;
+    while (TypeUtility.exists(t)) {
+      if (Flags.isStatic(t.getFlags())) {
+        break; // cancel on static declaring types
+      }
+      if (TypeUtility.isGenericType(t)) {
+        result.add(t);
+      }
+      t = t.getDeclaringType();
+    }
+    return result;
+  }
+
+  public static void buildMapping(IType type, ITypeHierarchy supertypeHierarchy, Map<String, TypeParameterMapping> collector, TypeParameterMapping child) throws CoreException {
+    buildMappingRecInternal(type, supertypeHierarchy, collector, child, null);
+  }
+
+  public static void buildMapping(IType type, ITypeHierarchy supertypeHierarchy, Map<String, TypeParameterMapping> collector, Collection<IType> declaringChildContextsInToOut) throws CoreException {
+    Map<String, IResolvedTypeParameter> declaringTypeParamMappings = null;
+    if (CollectionUtility.hasElements(declaringChildContextsInToOut)) {
+      // collect all declaring types with type parameters
+      Deque<IType> declaringTypesInToOut = getDeclaringTypesWithParameters(type);
+      if (!declaringTypesInToOut.isEmpty()) {
+        ITypeHierarchy localTypeHierarchy = TypeUtility.getLocalTypeHierarchy(declaringChildContextsInToOut);
+
+        // loop through the generic declaring classes (inwards)
+        Iterator<IType> outToInIterator = declaringTypesInToOut.descendingIterator();
+        while (outToInIterator.hasNext()) {
+          IType declaringType = outToInIterator.next();
+          // find context type that has the current declaring type in its super hierarchy
+          IType childContext = findContextType(declaringChildContextsInToOut, localTypeHierarchy, declaringType);
+          if (TypeUtility.exists(childContext)) {
+            // resolve the context type parameters and get the mapping on the level of the current declaring type
+            Map<String, ITypeParameterMapping> resolveTypeParameters = SignatureUtility.resolveTypeParameters(childContext, localTypeHierarchy);
+            ITypeParameterMapping paramMapping = resolveTypeParameters.get(declaringType.getFullyQualifiedName());
+            if (paramMapping != null) {
+              Map<String, IResolvedTypeParameter> typeParameters = paramMapping.getTypeParameters();
+              if (!typeParameters.isEmpty()) {
+                if (declaringTypeParamMappings == null) {
+                  declaringTypeParamMappings = new LinkedHashMap<String, IResolvedTypeParameter>();
+                }
+                // collect all type parameter that are defined in the children of the declaring types.
+                declaringTypeParamMappings.putAll(typeParameters);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    buildMappingRecInternal(type, supertypeHierarchy, collector, null, declaringTypeParamMappings);
+  }
+
+  private static void buildMappingRecInternal(IType type, ITypeHierarchy supertypeHierarchy, Map<String, TypeParameterMapping> collector, TypeParameterMapping child, Map<String, IResolvedTypeParameter> declaringTypeParams) throws CoreException {
     String fullyQualifiedName = type.getFullyQualifiedName();
     TypeParameterMapping existing = collector.get(fullyQualifiedName);
     if (existing != null && child != null) {
@@ -200,20 +269,24 @@ public class TypeParameterMapping implements ITypeParameterMapping {
       return;
     }
 
-    TypeParameterMapping curLevel = new TypeParameterMapping(type, child);
+    if (supertypeHierarchy == null) {
+      supertypeHierarchy = TypeUtility.getSupertypeHierarchy(type);
+    }
+
+    TypeParameterMapping curLevel = new TypeParameterMapping(type, child, declaringTypeParams);
     String objectClassFqn = Object.class.getName();
     collector.put(fullyQualifiedName, curLevel);
     for (IType superType : supertypeHierarchy.getSupertypes(type)) {
       if (!objectClassFqn.equals(superType.getFullyQualifiedName())) {
-        buildMappingRec(superType, supertypeHierarchy, collector, curLevel);
+        buildMappingRecInternal(superType, supertypeHierarchy, collector, curLevel, declaringTypeParams);
       }
     }
   }
 
-  private Map<String, List<String>> getSuperTypeParameters(String superclassTypeSignature, List<String> superInterfacesSignatures) throws CoreException {
+  private Map<String, List<String>> getSuperTypeParameters(String superclassTypeSignature, List<String> superInterfacesSignatures, Map<String, IResolvedTypeParameter> declaringTypeParams) throws CoreException {
     LinkedHashMap<String, List<String>> result = new LinkedHashMap<String, List<String>>(CollectionUtility.size(superInterfacesSignatures) + 1);
     if (superclassTypeSignature != null && !SignatureUtility.SIG_OBJECT.equals(superclassTypeSignature)) {
-      List<String> superTypeSigParams = getTypeParametersForTypeSignature(superclassTypeSignature);
+      List<String> superTypeSigParams = getTypeParametersForTypeSignature(superclassTypeSignature, declaringTypeParams);
       if (CollectionUtility.hasElements(superTypeSigParams)) {
         result.put(Signature.toString(Signature.getTypeErasure(superclassTypeSignature)), superTypeSigParams);
       }
@@ -221,7 +294,7 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     if (CollectionUtility.hasElements(superInterfacesSignatures)) {
       for (String superIfcSig : superInterfacesSignatures) {
         if (superIfcSig != null) {
-          List<String> superInterfaceSigParams = getTypeParametersForTypeSignature(superIfcSig);
+          List<String> superInterfaceSigParams = getTypeParametersForTypeSignature(superIfcSig, declaringTypeParams);
           if (CollectionUtility.hasElements(superInterfaceSigParams)) {
             result.put(Signature.toString(Signature.getTypeErasure(superIfcSig)), superInterfaceSigParams);
           }
@@ -231,7 +304,7 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     return result;
   }
 
-  private List<String> getTypeParametersForTypeSignature(String sig) throws CoreException {
+  private List<String> getTypeParametersForTypeSignature(String sig, Map<String, IResolvedTypeParameter> declaringTypeParams) throws CoreException {
     String[] superTypeArgs = Signature.getTypeArguments(sig);
     if (superTypeArgs.length < 1) {
       return null;
@@ -241,11 +314,16 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     for (String superSig : superTypeArgs) {
       superSig = SignatureUtility.ensureSourceTypeParametersAreCorrect(superSig, getType());
       if (Signature.getTypeSignatureKind(superSig) == Signature.TYPE_VARIABLE_SIGNATURE) {
-        // already a type variable
-        result.add(superSig);
+        // already a type parameter signature
+        if (CollectionUtility.containsKey(declaringTypeParams, Signature.getSignatureSimpleName(superSig))) {
+          result.add(SignatureUtility.getResolvedSignature(getType(), declaringTypeParams, superSig));
+        }
+        else {
+          result.add(superSig);
+        }
       }
       else {
-        // a type variable: resolve according to current scope
+        // a type signature: resolve according to current scope
         result.add(SignatureUtility.getResolvedSignature(getType(), m_typeParametersByName, superSig));
       }
     }
