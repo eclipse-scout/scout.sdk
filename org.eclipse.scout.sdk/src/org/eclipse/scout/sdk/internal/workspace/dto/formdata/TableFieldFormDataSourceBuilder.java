@@ -117,12 +117,17 @@ public class TableFieldFormDataSourceBuilder extends AbstractDtoTypeSourceBuilde
     }
 
     i = 0;
+    boolean supressNeeded = false;
     for (IType column : columns) {
       try {
         String upperColName = NamingUtility.ensureStartWithUpperCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
         String lowerColName = NamingUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
         String methodParameterName = NamingUtility.ensureValidParameterName(lowerColName);
-        final String colSignature = ScoutTypeUtility.getColumnValueTypeSignature(column, getLocalTypeHierarchy());
+        final String colSignature = ScoutTypeUtility.getColumnValueTypeSignature(column, table, getLocalTypeHierarchy());
+        boolean requiresSupressWarnings = Signature.getTypeArguments(colSignature).length > 0;
+        if (requiresSupressWarnings) {
+          supressNeeded = true;
+        }
         colunmSignatures[i] = colSignature;
         // setter
         IMethodSourceBuilder columnSetterBuilder = new MethodSourceBuilder("set" + upperColName);
@@ -135,7 +140,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractDtoTypeSourceBuilde
 
         // getter
         final String finalColumnName = getColumnConstantName(i, columnIdMap);
-        IMethodSourceBuilder columnGetterBuilder = new MethodSourceBuilder("get" + upperColName);
+        final IMethodSourceBuilder columnGetterBuilder = new MethodSourceBuilder("get" + upperColName);
         columnGetterBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
           @Override
           public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
@@ -150,6 +155,9 @@ public class TableFieldFormDataSourceBuilder extends AbstractDtoTypeSourceBuilde
         columnGetterBuilder.setFlags(Flags.AccPublic);
         columnGetterBuilder.setReturnTypeSignature(colSignature);
         columnGetterBuilder.addParameter(new MethodParameter("row", Signature.SIG_INT));
+        if (requiresSupressWarnings) {
+          columnGetterBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createSupressWarningAnnotation("\"unchecked\""));
+        }
         addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodFormDataColumnAccessKey(columnGetterBuilder), columnGetterBuilder);
       }
       catch (JavaModelException e) {
@@ -188,6 +196,9 @@ public class TableFieldFormDataSourceBuilder extends AbstractDtoTypeSourceBuilde
         source.append("  }");
       }
     });
+    if (supressNeeded) {
+      setValueAtBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createSupressWarningAnnotation("\"unchecked\""));
+    }
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(setValueAtBuilder), setValueAtBuilder);
 
     // getValueAt method

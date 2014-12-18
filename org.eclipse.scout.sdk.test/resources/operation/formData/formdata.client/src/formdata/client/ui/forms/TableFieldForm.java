@@ -4,7 +4,6 @@ import java.util.Map;
 import java.util.Set;
 
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
@@ -16,13 +15,16 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
 import formdata.client.ui.forms.TableFieldForm.MainBox.CompanyTableField;
 import formdata.client.ui.forms.TableFieldForm.MainBox.PersonTableField;
 import formdata.client.ui.template.formfield.AbstractCompanyTableField;
+import formdata.client.ui.template.formfield.AbstractTableWithExtKey;
 import formdata.shared.services.process.TableFieldFormData;
 
-@FormData(value = TableFieldFormData.class, sdkCommand = SdkCommand.CREATE)
+@FormData(value = TableFieldFormData.class, sdkCommand = FormData.SdkCommand.CREATE)
 public class TableFieldForm extends AbstractForm {
 
   public TableFieldForm() throws ProcessingException {
@@ -95,6 +97,28 @@ public class TableFieldForm extends AbstractForm {
     @Order(20.0)
     public class CompanyTableField extends AbstractCompanyTableField {
 
+    }
+
+    @Order(400.0)
+    @FormData(value = AbstractTableFieldBeanData.class, sdkCommand = FormData.SdkCommand.USE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE)
+    public class ConcreteTableField extends AbstractTableField<ConcreteTableField.Table> {
+
+      @Order(10.0)
+      public class Table extends AbstractTableWithExtKey<Integer> {
+
+        public NameColumn getNameColumn() {
+          return getColumnSet().getColumnByClass(NameColumn.class);
+        }
+
+        @Order(20.0)
+        public class NameColumn extends AbstractStringColumn {
+
+          @Override
+          protected String getConfiguredHeaderText() {
+            return TEXTS.get("Name");
+          }
+        }
+      }
     }
 
   }

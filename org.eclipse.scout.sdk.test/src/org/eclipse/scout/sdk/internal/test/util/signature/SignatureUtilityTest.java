@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.internal.test.util.signature;
 
 import java.io.Serializable;
+import java.util.Deque;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -29,6 +30,7 @@ import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -244,6 +246,21 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
     String superTypeName = "signature.tests.generic.IInterface01";
     Map<String, ITypeParameterMapping> mappings = SignatureUtility.resolveTypeParameters(TypeUtility.getType(typeName));
     Assert.assertEquals(0, mappings.get(typeName).getTypeParameter("X").getSuperReferences(superTypeName).size());
+  }
+
+  @Test
+  public void testGenericResolverHierarchyWithDeclaringTypeContext() throws Exception {
+    String templateInnerClass = "signature.tests.generic.context.TemplateWithTypeParam.InnerColumn";
+    IType innerTemplateClass = TypeUtility.getType(templateInnerClass);
+
+    String templateUse = "signature.tests.generic.context.TemplateUse.ConcreteTemplateUse";
+    IType concreteClass = TypeUtility.getType(templateUse);
+
+    Deque<IType> declaringTypesWithParameters = ScoutTypeUtility.getDeclaringTypesWithSuperTypeParams(concreteClass);
+    Assert.assertEquals(2, declaringTypesWithParameters.size());
+
+    String resolvedParamSig = SignatureUtility.resolveTypeParameter(innerTemplateClass, null, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE, declaringTypesWithParameters);
+    Assert.assertEquals(SignatureCache.createTypeSignature(Number.class.getName()), resolvedParamSig);
   }
 
   @Test
