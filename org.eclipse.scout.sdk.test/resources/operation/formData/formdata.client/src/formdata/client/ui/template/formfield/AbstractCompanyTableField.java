@@ -5,14 +5,14 @@ import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
-import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractArrayTableField;
 import org.eclipse.scout.rt.shared.ScoutTexts;
 import org.eclipse.scout.rt.shared.TEXTS;
 
 import formdata.shared.services.process.AbstractCompanyTableFieldData;
 
 @FormData(value = AbstractCompanyTableFieldData.class, sdkCommand = SdkCommand.CREATE)
-public abstract class AbstractCompanyTableField extends AbstractTableField<AbstractCompanyTableField.Table> {
+public abstract class AbstractCompanyTableField extends AbstractArrayTableField<AbstractCompanyTableField.Table> {
 
   @Override
   protected String getConfiguredLabel() {

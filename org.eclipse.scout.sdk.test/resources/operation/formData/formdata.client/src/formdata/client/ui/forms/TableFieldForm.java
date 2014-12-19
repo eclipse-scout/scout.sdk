@@ -14,9 +14,9 @@ import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractSmartColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
+import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractArrayTableField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.TEXTS;
-import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
 import formdata.client.ui.forms.TableFieldForm.MainBox.CompanyTableField;
 import formdata.client.ui.forms.TableFieldForm.MainBox.PersonTableField;
@@ -47,7 +47,7 @@ public class TableFieldForm extends AbstractForm {
   public class MainBox extends AbstractGroupBox {
 
     @Order(10.0)
-    public class PersonTableField extends AbstractTableField<PersonTableField.Table> {
+    public class PersonTableField extends AbstractArrayTableField<PersonTableField.Table> {
 
       @Order(10.0)
       public class Table extends AbstractTable {
@@ -100,7 +100,6 @@ public class TableFieldForm extends AbstractForm {
     }
 
     @Order(400.0)
-    @FormData(value = AbstractTableFieldBeanData.class, sdkCommand = FormData.SdkCommand.USE, defaultSubtypeSdkCommand = FormData.DefaultSubtypeSdkCommand.CREATE)
     public class ConcreteTableField extends AbstractTableField<ConcreteTableField.Table> {
 
       @Order(10.0)
