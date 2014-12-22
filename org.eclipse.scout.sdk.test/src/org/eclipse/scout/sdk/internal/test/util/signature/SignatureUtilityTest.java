@@ -256,7 +256,7 @@ public class SignatureUtilityTest extends AbstractScoutSdkTest {
     String templateUse = "signature.tests.generic.context.TemplateUse.ConcreteTemplateUse";
     IType concreteClass = TypeUtility.getType(templateUse);
 
-    Deque<IType> declaringTypesWithParameters = ScoutTypeUtility.getDeclaringTypesWithSuperTypeParams(concreteClass);
+    Deque<IType> declaringTypesWithParameters = ScoutTypeUtility.getDeclaringTypes(concreteClass);
     Assert.assertEquals(2, declaringTypesWithParameters.size());
 
     String resolvedParamSig = SignatureUtility.resolveTypeParameter(innerTemplateClass, null, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE, declaringTypesWithParameters);

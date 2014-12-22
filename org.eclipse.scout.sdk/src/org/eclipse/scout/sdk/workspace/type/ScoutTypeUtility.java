@@ -833,19 +833,23 @@ public class ScoutTypeUtility extends TypeUtility {
     return null;
   }
 
-  public static Deque<IType> getDeclaringTypesWithSuperTypeParams(IType startType) throws JavaModelException {
+  /**
+   * Gets all declaring types of the given start type until a static type is found or there is no declaring type
+   * anymore.
+   *
+   * @param startType
+   *          The type to start (inclusive)
+   * @return A {@link Deque} containing all declaring types of the given type. The given type itself is always part of
+   *         the result.
+   * @throws JavaModelException
+   */
+  public static Deque<IType> getDeclaringTypes(IType startType) throws JavaModelException {
     Deque<IType> result = new LinkedList<IType>();
     IType t = startType;
     while (TypeUtility.exists(t)) {
+      result.add(t);
       if (Flags.isStatic(t.getFlags())) {
-        break; // cancel on static declaring types
-      }
-      String superclassTypeSignature = t.getSuperclassTypeSignature();
-      if (superclassTypeSignature != null) {
-        String[] typeArguments = Signature.getTypeArguments(superclassTypeSignature);
-        if (typeArguments.length > 0) {
-          result.add(t);
-        }
+        return result; // cancel on static declaring types
       }
       t = t.getDeclaringType();
     }
@@ -859,8 +863,8 @@ public class ScoutTypeUtility extends TypeUtility {
 
     String columnValueTypeSig = SignatureUtility.resolveTypeParameter(column, columnHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
     if (columnValueTypeSig != null && TypeUtility.exists(lowestLevelColumnContainer) && Signature.getTypeSignatureKind(columnValueTypeSig) == Signature.TYPE_VARIABLE_SIGNATURE) {
-      // it resolved to a type variable. it must have been defined in a declaring type -> try to resolve with context
-      Deque<IType> declaringContextInToOut = getDeclaringTypesWithSuperTypeParams(lowestLevelColumnContainer);
+      // it resolved to a type variable. it must have been defined in a declaring type -> try to resolve with declaring context
+      Deque<IType> declaringContextInToOut = getDeclaringTypes(lowestLevelColumnContainer);
       columnValueTypeSig = SignatureUtility.resolveTypeParameter(column, columnHierarchy, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE, declaringContextInToOut);
     }
     return columnValueTypeSig;
