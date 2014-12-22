@@ -17,6 +17,9 @@ import org.eclipse.jdt.internal.ui.text.java.hover.JavadocHover;
 import org.eclipse.jdt.internal.ui.text.javadoc.JavadocContentAccess2;
 import org.eclipse.scout.sdk.compatibility.internal.service.IJavadocHoverCompatService;
 
+/**
+ * Implementation of {@link IJavadocHoverCompatService} for Eclipse Mars.
+ */
 @SuppressWarnings("restriction")
 public class JavadocHoverCompatService implements IJavadocHoverCompatService {
   @Override
