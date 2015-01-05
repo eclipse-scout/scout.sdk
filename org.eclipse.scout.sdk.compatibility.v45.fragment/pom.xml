@@ -25,6 +25,6 @@
   <packaging>eclipse-plugin</packaging>
 
   <properties>
-    <target-platform>eclipse-mars</target-platform>
+    <target-platform>eclipse-staging</target-platform>
   </properties>
 </project>
