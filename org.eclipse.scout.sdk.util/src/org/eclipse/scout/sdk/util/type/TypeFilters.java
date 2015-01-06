@@ -19,6 +19,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.util.ScoutSdkUtilCore;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
@@ -439,26 +440,28 @@ public class TypeFilters {
     }
 
     final IType baseType = TypeUtility.getTypeBySignature(baseSig);
+    final boolean baseTypeExists = TypeUtility.exists(baseType);
     return new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
         try {
           String typeParamSig = SignatureUtility.resolveTypeParameter(type, paramDefiningSuperTypeFqn, paramIndex);
-          if (typeParamSig != null) {
-            if (SignatureUtility.SIG_OBJECT.equals(typeParamSig)) {
-              return true;
+          if (typeParamSig == null // no type parameter defined
+              || Signature.getTypeSignatureKind(typeParamSig) == Signature.TYPE_VARIABLE_SIGNATURE // it is a type variable (no bounds are defined)
+              || SignatureUtility.SIG_OBJECT.equals(typeParamSig)) { // java.lang.Object bounds
+            return true;
+          }
+
+          IType typeParam = TypeUtility.getTypeBySignature(typeParamSig);
+          if (TypeUtility.exists(typeParam) && baseTypeExists) {
+            if (sub) {
+              return TypeUtility.getSupertypeHierarchy(typeParam).contains(baseType);
             }
-            IType typeParam = TypeUtility.getTypeBySignature(typeParamSig);
-            if (TypeUtility.exists(typeParam)) {
-              if (sub) {
-                return TypeUtility.getSupertypeHierarchy(typeParam).contains(baseType);
-              }
-              else {
-                return TypeUtility.getSupertypeHierarchy(baseType).contains(typeParam);
-              }
+            else {
+              return TypeUtility.getSupertypeHierarchy(baseType).contains(typeParam);
             }
           }
-          return true; // generic is not specified -> Object
+          return false; // the type defined in the generic could not be found
         }
         catch (CoreException e) {
           SdkUtilActivator.logWarning("Could not evaluate generic parameters of type '" + type.getFullyQualifiedName() + "'.", e);

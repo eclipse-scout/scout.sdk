@@ -151,7 +151,7 @@ public class CodeNewWizardPage extends AbstractWorkspaceWizardPage {
       String codeSignature = ScoutTypeUtility.getCodeSignature(codeType, TypeUtility.getSupertypeHierarchy(codeType));
       if (codeSignature != null) {
         if (codeIdSignatureFromCodeType != null) {
-          filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getSubtypeFilter(TypeUtility.getTypeBySignature(codeSignature)), TypeFilters.getTypeParamSubTypeFilter(codeIdSignatureFromCodeType, IRuntimeClasses.ICode, 0));
+          filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getSubtypeFilter(TypeUtility.getTypeBySignature(codeSignature)), TypeFilters.getTypeParamSubTypeFilter(codeIdSignatureFromCodeType, IRuntimeClasses.ICode, IRuntimeClasses.TYPE_PARAM_CODE__CODE_ID));
         }
         else {
           filter = TypeFilters.getSubtypeFilter(TypeUtility.getTypeBySignature(codeSignature));

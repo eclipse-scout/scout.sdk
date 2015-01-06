@@ -219,6 +219,9 @@ public class TypeUtility {
     if (signature == null) {
       return null;
     }
+    if (Signature.getTypeSignatureKind(signature) == Signature.TYPE_VARIABLE_SIGNATURE) {
+      return null;
+    }
     return getType(SignatureUtility.getFullyQualifiedName(signature));
   }
 
