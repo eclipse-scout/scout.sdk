@@ -196,14 +196,8 @@ public final class RuntimeBundles {
     if (bundle == null) {
       return null;
     }
-    Set<IPluginModelBase> allDependencies = bundle.getAllDependencies();
-    String[] symbolicNames = new String[allDependencies.size()];
-    int i = 0;
-    for (IPluginModelBase dependency : allDependencies) {
-      symbolicNames[i] = dependency.getBundleDescription().getSymbolicName();
-      i++;
-    }
-    return getBundleType(symbolicNames);
+    Set<String> symbolicNames = bundle.getAllDependencies().keySet();
+    return getBundleType(symbolicNames.toArray(new String[symbolicNames.size()]));
   }
 
   /**

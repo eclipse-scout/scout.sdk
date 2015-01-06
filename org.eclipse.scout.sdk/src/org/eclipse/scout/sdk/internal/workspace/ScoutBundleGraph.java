@@ -105,11 +105,11 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
       }
 
       for (ScoutBundle b : newGraph.values()) {
-        for (IPluginModelBase dependency : b.getAllDependencies()) {
+        for (String dependency : b.getAllDependencies().keySet()) {
           if (monitor.isCanceled()) {
             return false;
           }
-          ScoutBundle parent = newGraph.get(dependency.getBundleDescription().getSymbolicName());
+          ScoutBundle parent = newGraph.get(dependency);
           if (parent != null && !b.containsBundleRec(parent)) { // do not create circles
             parent.addChildProject(b);
           }
@@ -352,7 +352,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
       messageCollector.addAll(b.getDependencyIssues());
       if (b.getType() != null) {
         collector.put(b.getSymbolicName(), b);
-        for (IPluginModelBase dependency : b.getAllDependencies()) {
+        for (IPluginModelBase dependency : b.getAllDependencies().values()) {
           if (monitor.isCanceled()) {
             return;
           }

@@ -12,10 +12,12 @@ package org.eclipse.scout.sdk.internal.workspace;
 
 import java.io.PrintStream;
 import java.util.Deque;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Map;
 import java.util.Set;
 import java.util.Stack;
 import java.util.TreeSet;
@@ -75,24 +77,7 @@ public class ScoutBundle implements IScoutBundle {
 
   private static final Pattern REGEX_LEADING_DOTS = Pattern.compile("^\\.*");
 
-  /**
-   * bundles that will stop the dependency tree processing. when one of these is found, the children are no longer
-   * followed. This is to increase performance for bundles which are known to be not of interest.
-   */
-  private static final Set<String> EXCLUDED_BUNDLE_SYMBOLIC_NAMES;
-  static {
-    String[] bundles = new String[]{"org.eclipse.core.runtime", "org.eclipse.equinox.http.registry",
-        "org.eclipse.equinox.common", "org.eclipse.core.net", "org.eclipse.equinox.security", "org.eclipse.equinox.registry", "org.eclipse.osgi",
-        "org.eclipse.birt.chart.engine", "org.eclipse.scout.commons", "org.eclipse.core.variables", "org.eclipse.core.expressions", "org.eclipse.core.filesystem",
-        "org.eclipse.core.resources", "org.eclipse.ant.core", "org.apache.batik.util", "org.eclipse.emf.ecore", "org.eclipse.birt.core"};
-    EXCLUDED_BUNDLE_SYMBOLIC_NAMES = new HashSet<String>(bundles.length);
-    for (String bundle : bundles) {
-      EXCLUDED_BUNDLE_SYMBOLIC_NAMES.add(bundle);
-    }
-  }
-
-  private final Set<IPluginModelBase> m_allDependencies;
-  private final Set<IPluginModelBase> m_directDependencies;
+  private final Map<String, IPluginModelBase> m_allDependencies;
   private final Set<ScoutBundle> m_parentBundles;
   private final Set<ScoutBundle> m_childBundles;
   private final Set<String> m_dependencyIssues;
@@ -120,7 +105,6 @@ public class ScoutBundle implements IScoutBundle {
     m_childBundles = new HashSet<ScoutBundle>();
     m_dependencyIssues = new HashSet<String>();
     m_allDependencies = getAllDependenciesImpl(bundle, monitor);
-    m_directDependencies = getDirectDependenciesImpl(bundle);
     m_type = RuntimeBundles.getBundleType(this);
     m_javaProject = getJavaProject(bundle);
     m_isBinary = getJavaProject() == null;
@@ -505,12 +489,8 @@ public class ScoutBundle implements IScoutBundle {
     child.m_parentBundles.remove(this);
   }
 
-  public Set<IPluginModelBase> getAllDependencies() {
+  public Map<String, IPluginModelBase> getAllDependencies() {
     return m_allDependencies;
-  }
-
-  public Set<IPluginModelBase> getDirectDependencies() {
-    return m_directDependencies;
   }
 
   void removeImplicitChildren() {
@@ -546,8 +526,8 @@ public class ScoutBundle implements IScoutBundle {
     return m_dependencyIssues;
   }
 
-  private Set<IPluginModelBase> getAllDependenciesImpl(IPluginModelBase bundle, IProgressMonitor monitor) {
-    Set<IPluginModelBase> collector = new HashSet<IPluginModelBase>();
+  private Map<String, IPluginModelBase> getAllDependenciesImpl(IPluginModelBase bundle, IProgressMonitor monitor) {
+    Map<String, IPluginModelBase> collector = new HashMap<String, IPluginModelBase>();
     Stack<IPluginModelBase> dependencyStack = new Stack<IPluginModelBase>();
     Set<String> messageCollector = new HashSet<String>();
     collectDependencies(bundle, collector, dependencyStack, messageCollector, true, monitor);
@@ -568,25 +548,17 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static Set<IPluginModelBase> getDirectDependenciesImpl(IPluginModelBase bundle) {
-    Set<IPluginModelBase> bd = new HashSet<IPluginModelBase>();
-    Stack<IPluginModelBase> dependencyStack = new Stack<IPluginModelBase>();
-    collectDependencies(bundle, bd, dependencyStack, null, false, null);
-    return bd;
-  }
-
-  private static void collectDependencies(IPluginModelBase bundle, Set<IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector, boolean rec, IProgressMonitor monitor) {
+  private static void collectDependencies(IPluginModelBase bundle, Map<String, IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector, boolean rec, IProgressMonitor monitor) {
     if (bundle != null && bundle.getBundleDescription() != null) {
       for (BundleSpecification dependency : bundle.getBundleDescription().getRequiredBundles()) {
         if (monitor != null && monitor.isCanceled()) {
           return;
         }
-        if (!EXCLUDED_BUNDLE_SYMBOLIC_NAMES.contains(dependency.getName())) { // exclusions (performance)
-          if (!bundle.getBundleDescription().getSymbolicName().equals(dependency.getName())) { // ignore dependencies on the bundle itself
-            IPluginModelBase model = PluginRegistry.findModel(dependency.getName());
-            if (model != null) {
-              addDependency(model, collector, dependencyStack, messageCollector, rec, monitor);
-            }
+
+        if (!bundle.getBundleDescription().getSymbolicName().equals(dependency.getName())) { // ignore dependencies on the bundle itself
+          IPluginModelBase model = PluginRegistry.findModel(dependency.getName());
+          if (model != null) {
+            addDependency(model, collector, dependencyStack, messageCollector, rec, monitor);
           }
         }
       }
@@ -603,7 +575,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static boolean handleDependencyCycle(IPluginModelBase bundle, Set<IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector) {
+  private static boolean handleDependencyCycle(IPluginModelBase bundle, Map<String, IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector) {
     if (dependencyStack.contains(bundle)) {
       // a dependency loop was detected: log the loop
       StringBuilder loopMsg = new StringBuilder(Texts.get("DependencyLoopDetected"));
@@ -626,14 +598,18 @@ public class ScoutBundle implements IScoutBundle {
     return false; // no cycle found
   }
 
-  private static void addDependency(IPluginModelBase bundle, Set<IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector, boolean rec, IProgressMonitor monitor) {
+  private static void addDependency(IPluginModelBase bundle, Map<String, IPluginModelBase> collector, Stack<IPluginModelBase> dependencyStack, Set<String> messageCollector, boolean rec, IProgressMonitor monitor) {
     // dependency loop detection & prevention
     if (handleDependencyCycle(bundle, collector, dependencyStack, messageCollector)) {
       // cycle found and corrected: stop processing of this part of the dependency graph
       return;
     }
 
-    collector.add(bundle);
+    IPluginModelBase existingBundle = collector.put(bundle.getBundleDescription().getSymbolicName(), bundle);
+    if (existingBundle != null) {
+      // we have already processed this bundle and its children. cancel here.
+      return;
+    }
 
     try {
       dependencyStack.push(bundle);
