@@ -108,7 +108,7 @@ public class FormStackNewOperation extends FormNewOperation {
       setFormDataSignature(SignatureCache.createTypeSignature(getCreatedFormData().getFullyQualifiedName()));
     }
     // service
-    ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation(getServiceImplementationName());
+    ProcessServiceNewOperation serviceOp = new ProcessServiceNewOperation(getServiceInterfaceName(), getServiceImplementationName());
     serviceOp.setFormatSource(isFormatSource());
     serviceOp.setFormData(m_createdFormData);
     serviceOp.setImplementationPackageName(getServiceImplementationPackage());
