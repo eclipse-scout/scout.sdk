@@ -197,7 +197,7 @@ public class ServiceNewWizardPage extends AbstractWorkspaceWizardPage {
           if (typeParamSig != null) {
             IType generic = TypeUtility.getTypeBySignature(getGenericTypeSignature());
             IType superType = TypeUtility.getTypeBySignature(typeParamSig);
-            if (TypeUtility.exists(generic) && !TypeUtility.getSupertypeHierarchy(generic).contains(superType)) {
+            if (TypeUtility.exists(generic) && TypeUtility.exists(superType) && !TypeUtility.getSupertypeHierarchy(generic).contains(superType)) {
               return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("GenericTypeDoesNotMatchSuperClass"));
             }
           }
