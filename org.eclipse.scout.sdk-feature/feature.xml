@@ -29,7 +29,7 @@
       <import feature="org.eclipse.pde" version="3.7.2" match="greaterOrEqual"/>
       <import feature="org.eclipse.platform" version="3.7.2" match="greaterOrEqual"/>
       <import feature="org.eclipse.jdt" version="3.7.2" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.scout.commons" version="4.0.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.scout.commons" version="4.0.200" match="greaterOrEqual"/>
    </requires>
 
    <plugin
