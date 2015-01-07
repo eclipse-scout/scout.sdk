@@ -96,7 +96,7 @@ public class Desktop extends AbstractExtensibleDesktop {
     @Override
     protected void execAction() throws ProcessingException {
       if (getOutline() != null) {
-        IPage page = getOutline().getActivePage();
+        IPage<?> page = getOutline().getActivePage();
         if (page != null) {
           page.reloadPage();
         }
