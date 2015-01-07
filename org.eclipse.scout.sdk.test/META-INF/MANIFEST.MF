@@ -2,13 +2,13 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Scout SDK Testing
 Bundle-SymbolicName: org.eclipse.scout.sdk.test;singleton:=true
-Bundle-Version: 4.0.100.qualifier
+Bundle-Version: 4.0.200.qualifier
 Bundle-Activator: org.eclipse.scout.sdk.internal.test.Activator
 Bundle-Vendor: Eclipse Scout Project
-Require-Bundle: org.eclipse.scout.sdk;bundle-version="[4.0.100,4.1.0)";visibility:=reexport,
- org.eclipse.scout.sdk.ui;bundle-version="[4.0.100,4.1.0)";visibility:=reexport,
- org.eclipse.scout.rt.testing.shared;bundle-version="[4.0.100,4.1.0)";visibility:=reexport,
- org.eclipse.scout.sdk.testing;bundle-version="[4.0.100,4.1.0)"
+Require-Bundle: org.eclipse.scout.sdk;bundle-version="[4.0.200,4.1.0)";visibility:=reexport,
+ org.eclipse.scout.sdk.ui;bundle-version="[4.0.200,4.1.0)";visibility:=reexport,
+ org.eclipse.scout.rt.testing.shared;bundle-version="[4.0.200,4.1.0)";visibility:=reexport,
+ org.eclipse.scout.sdk.testing;bundle-version="[4.0.200,4.1.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Eclipse-BundleShape: dir
