@@ -48,6 +48,7 @@ import org.eclipse.osgi.service.resolver.BundleDescription;
 import org.eclipse.osgi.service.resolver.BundleSpecification;
 import org.eclipse.pde.core.plugin.IPluginModelBase;
 import org.eclipse.pde.core.plugin.PluginRegistry;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.commons.holders.Holder;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
@@ -68,7 +69,7 @@ import org.eclipse.scout.sdk.workspace.IScoutBundleGraphVisitor;
 import org.eclipse.scout.sdk.workspace.ScoutBundleComparators;
 
 /**
- * <h3>{@link ScoutBundle}</h3> ...
+ * <h3>{@link ScoutBundle}</h3>
  * 
  * @author Matthias Villiger
  * @since 3.9.0 30.01.2013
@@ -107,12 +108,12 @@ public class ScoutBundle implements IScoutBundle {
     m_allDependencies = getAllDependenciesImpl(bundle, monitor);
     m_type = RuntimeBundles.getBundleType(this);
     m_javaProject = getJavaProject(bundle);
-    m_isBinary = getJavaProject() == null;
-    m_project = isBinary() ? null : getJavaProject().getProject();
+    m_isBinary = m_javaProject == null;
+    m_project = m_isBinary ? null : getJavaProject().getProject();
     m_symbolicName = bundle.getBundleDescription().getSymbolicName();
     m_defaultComparator = ScoutBundleComparators.getSymbolicNameLevenshteinDistanceComparator(m_symbolicName);
     m_isFragment = bundle.getBundleDescription().getHost() != null;
-    m_id = "{" + m_symbolicName + "@type=" + m_type + "@fragment=" + isFragment() + "@binary=" + m_isBinary + "}";
+    m_id = "{" + m_symbolicName + "@type=" + m_type + "@fragment=" + m_isFragment + "@binary=" + m_isBinary + "}";
     m_hash = m_id.hashCode();
 
     m_nlsProjectHolder = null;
@@ -135,26 +136,24 @@ public class ScoutBundle implements IScoutBundle {
       IProject project = bundle.getUnderlyingResource().getProject();
       if (project != null) {
         IJavaProject jp = JavaCore.create(project);
-        if (jp != null) {
-          if (jp.exists() && !jp.isReadOnly()) {
-            try {
-              IPackageFragmentRoot[] packageFragmentRoots = jp.getPackageFragmentRoots();
-              if (packageFragmentRoots != null) {
-                for (IPackageFragmentRoot root : packageFragmentRoots) {
-                  if (root != null && !root.isArchive() && !root.isReadOnly() && !root.isExternal()) {
-                    return jp;
-                  }
+        if (jp != null && jp.exists() && !jp.isReadOnly()) {
+          try {
+            IPackageFragmentRoot[] packageFragmentRoots = jp.getPackageFragmentRoots();
+            if (packageFragmentRoots != null) {
+              for (IPackageFragmentRoot root : packageFragmentRoots) {
+                if (root != null && !root.isArchive() && !root.isReadOnly() && !root.isExternal()) {
+                  return jp;
                 }
               }
             }
-            catch (JavaModelException e) {
-              BundleDescription bundleDescription = bundle.getBundleDescription();
-              if (bundleDescription != null) {
-                ScoutSdk.logError("Unable to evaluate package fragment roots of bundle '" + bundleDescription.getSymbolicName() + "'. The bundle will be handled as binary.", e);
-              }
-              else {
-                ScoutSdk.logError("Unable to evaluate package fragment roots. The bundle will be handled as binary.", e);
-              }
+          }
+          catch (JavaModelException e) {
+            BundleDescription bundleDescription = bundle.getBundleDescription();
+            if (bundleDescription != null) {
+              ScoutSdk.logError("Unable to evaluate package fragment roots of bundle '" + bundleDescription.getSymbolicName() + "'. The bundle will be handled as binary.", e);
+            }
+            else {
+              ScoutSdk.logError("Unable to evaluate package fragment roots. The bundle will be handled as binary.", e);
             }
           }
         }
@@ -185,7 +184,7 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public boolean equals(Object obj) {
-    if (obj == null) {
+    if (!(obj instanceof ScoutBundle)) {
       return false;
     }
     return toString().equals(obj.toString());
@@ -193,12 +192,12 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public Set<? extends IScoutBundle> getDirectParentBundles() {
-    return m_parentBundles;
+    return CollectionUtility.hashSet(m_parentBundles);
   }
 
   @Override
   public Set<ScoutBundle> getDirectChildBundles() {
-    return m_childBundles;
+    return CollectionUtility.hashSet(m_childBundles);
   }
 
   @Override
@@ -263,18 +262,18 @@ public class ScoutBundle implements IScoutBundle {
 
   @Override
   public synchronized IEclipsePreferences getPreferences() {
-    if (m_projectPreferences == null) {
-      if (getProject() != null) {
-        IScopeContext prefScope = new ProjectScope(getProject());
-        m_projectPreferences = prefScope.getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
-      }
+    if (m_projectPreferences == null && getProject() != null) {
+      IScopeContext prefScope = new ProjectScope(getProject());
+      m_projectPreferences = prefScope.getNode(ScoutSdk.getDefault().getBundle().getSymbolicName());
     }
     return m_projectPreferences;
   }
 
   @Override
   public boolean contains(IJavaElement e) {
-    if (!TypeUtility.exists(e)) return false;
+    if (!TypeUtility.exists(e)) {
+      return false;
+    }
     String contributingBundle = ScoutWorkspace.getInstance().getBundleGraphInternal().getContributingBundleSymbolicName(e);
     return m_symbolicName.equals(contributingBundle);
   }
@@ -494,12 +493,12 @@ public class ScoutBundle implements IScoutBundle {
   }
 
   void removeImplicitChildren() {
-    Iterator<ScoutBundle> bundleIt = getDirectChildBundles().iterator();
+    Iterator<ScoutBundle> bundleIt = m_childBundles.iterator();
     while (bundleIt.hasNext()) {
       ScoutBundle bundle = bundleIt.next();
       bundle.removeImplicitChildren();
 
-      ScoutBundle[] otherChildren = getDirectChildBundles().toArray(new ScoutBundle[getDirectChildBundles().size()]);
+      ScoutBundle[] otherChildren = m_childBundles.toArray(new ScoutBundle[m_childBundles.size()]);
       for (ScoutBundle otherChild : otherChildren) {
         if (otherChild != bundle && otherChild.containsBundleRec(bundle)) {
           bundleIt.remove(); // remove bundle from my children
@@ -511,7 +510,7 @@ public class ScoutBundle implements IScoutBundle {
   }
 
   boolean containsBundleRec(ScoutBundle search) {
-    for (ScoutBundle b : getDirectChildBundles()) {
+    for (ScoutBundle b : m_childBundles) {
       if (b == search) {
         return true;
       }
@@ -586,9 +585,10 @@ public class ScoutBundle implements IScoutBundle {
           loopBeginFound = true;
         }
         if (loopBeginFound) {
-          loopMsg.append(s.getBundleDescription().getSymbolicName());
+          String symbolicName = s.getBundleDescription().getSymbolicName();
+          loopMsg.append(symbolicName);
           loopMsg.append('\n');
-          collector.remove(s); // correction: remove all dependencies that build up the cycle
+          collector.remove(symbolicName); // correction: remove all dependencies that build up the cycle
         }
       }
       loopMsg.append(bundle.getBundleDescription().getSymbolicName());
@@ -629,7 +629,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static class P_BundleCollector implements IScoutBundleGraphVisitor {
+  private static final class P_BundleCollector implements IScoutBundleGraphVisitor {
     private final LinkedHashSet<IScoutBundle> m_collector;
     private final IScoutBundleFilter m_filter;
 
@@ -651,7 +651,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static class P_SingleBundleByLevelCollector implements IScoutBundleGraphVisitor {
+  private static final class P_SingleBundleByLevelCollector implements IScoutBundleGraphVisitor {
     private final IScoutBundleFilter m_filter;
     private final TreeSet<IScoutBundle> m_collector;
     private int m_lastLevel;
@@ -694,7 +694,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static class P_TextProviderServiceHierarchyChangedListener implements ITypeHierarchyChangedListener, WeakEventListener {
+  private static final class P_TextProviderServiceHierarchyChangedListener implements ITypeHierarchyChangedListener, WeakEventListener {
     private ScoutBundle m_observer;
 
     private P_TextProviderServiceHierarchyChangedListener(ScoutBundle observer) {
@@ -707,7 +707,7 @@ public class ScoutBundle implements IScoutBundle {
     }
   }
 
-  private static class P_TraverseComposite {
+  private static final class P_TraverseComposite {
     private final int m_level;
     private final ScoutBundle m_bundle;
 
