@@ -45,7 +45,7 @@ public class InnerTypeGetterCreateOperation extends MethodNewOperation {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append("  return getFieldByClass(");
-        source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(m_field.getFullyQualifiedName()), m_field, validator) + ".class");
+        source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(m_field.getFullyQualifiedName()), validator) + ".class");
         source.append(");");
       }
     });

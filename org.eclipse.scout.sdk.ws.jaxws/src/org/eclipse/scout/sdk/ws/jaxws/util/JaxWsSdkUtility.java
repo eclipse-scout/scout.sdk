@@ -1143,7 +1143,7 @@ public final class JaxWsSdkUtility {
   public static String resolveTypeName(IType declaringType, IType typeToBeResolved) throws CoreException {
     String typeSignature = SignatureCache.createTypeSignature(typeToBeResolved.getFullyQualifiedName());
     ImportValidator validator = new ImportValidator(declaringType.getCompilationUnit());
-    return SignatureUtility.getTypeReference(typeSignature, declaringType, validator);
+    return SignatureUtility.getTypeReference(typeSignature, validator);
   }
 
   public static boolean containsGlobalBindingSection(IScoutBundle bundle, Map<String, List<String>> propertiers, boolean checkForMultipleOccurences) {

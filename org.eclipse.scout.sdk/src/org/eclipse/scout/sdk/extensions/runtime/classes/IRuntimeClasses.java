@@ -103,6 +103,7 @@ public interface IRuntimeClasses {
   String TreeMenuType = "org.eclipse.scout.rt.client.ui.action.menu.TreeMenuType"; // NO_UCD
   String ValueFieldMenuType = "org.eclipse.scout.rt.client.ui.action.menu.ValueFieldMenuType"; // NO_UCD
 
+  String AbstractExtensionChain = "org.eclipse.scout.rt.shared.extension.AbstractExtensionChain"; // NO_UCD
   String AbstractFormData = "org.eclipse.scout.rt.shared.data.form.AbstractFormData"; // NO_UCD
   String AbstractFormFieldData = "org.eclipse.scout.rt.shared.data.form.fields.AbstractFormFieldData"; // NO_UCD
   String AbstractPropertyData = "org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData"; // NO_UCD

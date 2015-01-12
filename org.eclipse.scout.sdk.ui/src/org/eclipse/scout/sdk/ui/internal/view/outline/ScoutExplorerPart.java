@@ -214,9 +214,12 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
             return CONTINUE;
           }
           else if (page instanceof BundleNodeGroupTablePage) {
-            IScoutBundle b = page.getParent().getScoutBundle();
-            if (page.getParent() instanceof ProjectsTablePage || (b != null && b.isBinary())) {
-              expandedPages.add(page);
+            IPage parent = page.getParent();
+            if (parent != null) {
+              IScoutBundle b = parent.getScoutBundle();
+              if (parent instanceof ProjectsTablePage || (b != null && b.isBinary())) {
+                expandedPages.add(page);
+              }
             }
             if (!page.getScoutBundle().isBinary() && firstBundleGroup.getValue() == null) {
               firstBundleGroup.setValue(page);
