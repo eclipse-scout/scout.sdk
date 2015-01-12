@@ -148,7 +148,6 @@ public final class MethodFilters {
                 }
                 else if (!Signature.getSignatureSimpleName(mParam).equals(Signature.getSignatureSimpleName(cParam))) {
                   return false;
-
                 }
               }
               return true;

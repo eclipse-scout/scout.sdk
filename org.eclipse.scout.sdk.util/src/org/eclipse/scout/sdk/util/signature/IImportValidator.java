@@ -31,7 +31,7 @@ public interface IImportValidator {
    *         other type with the same simple name in the scope (e.g. java.lang.String).
    * @see Signature
    */
-  String getTypeName(String singleTypeSignature);
+  String getTypeName(String signature);
 
   /**
    * Gets the list of imports to be created.<br>

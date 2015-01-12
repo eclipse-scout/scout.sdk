@@ -78,12 +78,15 @@ public class ImportValidator implements IImportValidator {
     Map<String, String> usedImps = null;
     try {
       IImportDeclaration[] imports = icu.getImports();
-      usedImps = new HashMap<String, String>(imports.length);
-      for (IImportDeclaration imp : imports) {
-        String fqImp = imp.getElementName();
-        String packageName = Signature.getQualifier(fqImp);
-        String simpleName = Signature.getSimpleName(fqImp);
-        usedImps.put(simpleName, packageName);
+      if (imports.length > 0) {
+        Map<String, String> importsFromIcu = new HashMap<String, String>(imports.length);
+        for (IImportDeclaration imp : imports) {
+          String fqImp = imp.getElementName();
+          String packageName = Signature.getQualifier(fqImp);
+          String simpleName = Signature.getSimpleName(fqImp);
+          importsFromIcu.put(simpleName, packageName);
+        }
+        usedImps.putAll(importsFromIcu);
       }
     }
     catch (JavaModelException e) {
@@ -102,8 +105,8 @@ public class ImportValidator implements IImportValidator {
     }
 
     // handle unresolved signatures
-    if (singleTypeSignature.charAt(0) == Signature.C_UNRESOLVED) {
-      return Signature.getSignatureSimpleName(singleTypeSignature);
+    if (SignatureUtility.isUnresolved(singleTypeSignature)) {
+      return Signature.toString(singleTypeSignature);
     }
 
     StringBuilder result = new StringBuilder(singleTypeSignature.length() + EXT_PREFIX.length());

@@ -22,22 +22,23 @@ import org.junit.runners.Suite.SuiteClasses;
  */
 @RunWith(Suite.class)
 @SuiteClasses({
-  AnnotationCopyTest.class,
-  ExternalCheckboxFieldTest.class,
-  ExternalGroupboxTest.class,
-  ExternalTableFieldTest.class,
-  FormPropertiesTest.class,
-  FormWithGroupboxesTest.class,
-  FormWithTemplateTest.class,
-  IgnoredFieldsFormTest.class,
-  ListBoxFormTest.class,
-  ReplaceFormFieldTest.class,
-  SimpleFormTest.class,
-  TableFieldBeanTest.class,
-  TableFieldFormTest.class,
-  TableFieldWithIgnoredColumnsTest.class,
-  MasterFieldFormDataTest.class,
-  NestedMultiLevelFormFieldTest.class
+    AnnotationCopyTest.class,
+    ExternalCheckboxFieldTest.class,
+    ExternalGroupboxTest.class,
+    ExternalTableFieldTest.class,
+    FormPropertiesTest.class,
+    FormWithGroupboxesTest.class,
+    FormWithTemplateTest.class,
+    IgnoredFieldsFormTest.class,
+    ListBoxFormTest.class,
+    ReplaceFormFieldTest.class,
+    SimpleFormTest.class,
+    TableFieldBeanTest.class,
+    TableFieldFormTest.class,
+    TableFieldWithIgnoredColumnsTest.class,
+    MasterFieldFormDataTest.class,
+    NestedMultiLevelFormFieldTest.class,
+    ExtensionFormDataTest.class
 })
 public class _SuiteFormData {
 

@@ -77,6 +77,7 @@ import org.eclipse.scout.sdk.ui.view.outline.pages.INodeVisitor;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPageFilter;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IScoutPageConstants;
+import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.IScoutWorkspaceListener;
 import org.eclipse.scout.sdk.workspace.ScoutWorkspaceEvent;
 import org.eclipse.swt.SWT;
@@ -213,8 +214,12 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
             return CONTINUE;
           }
           else if (page instanceof BundleNodeGroupTablePage) {
-            if (page.getParent() instanceof ProjectsTablePage || page.getParent().getScoutBundle().isBinary()) {
-              expandedPages.add(page);
+            IPage parent = page.getParent();
+            if (parent != null) {
+              IScoutBundle b = parent.getScoutBundle();
+              if (parent instanceof ProjectsTablePage || (b != null && b.isBinary())) {
+                expandedPages.add(page);
+              }
             }
             if (!page.getScoutBundle().isBinary() && firstBundleGroup.getValue() == null) {
               firstBundleGroup.setValue(page);
