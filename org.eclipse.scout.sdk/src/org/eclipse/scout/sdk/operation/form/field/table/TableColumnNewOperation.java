@@ -106,7 +106,7 @@ public class TableColumnNewOperation implements IOperation {
       @Override
       public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         source.append("return getColumnSet().getColumnByClass(");
-        source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getCreatedColumn().getFullyQualifiedName()), getDeclaringType(), validator) + ".class");
+        source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getCreatedColumn().getFullyQualifiedName()), validator) + ".class");
         source.append(");");
       }
     });

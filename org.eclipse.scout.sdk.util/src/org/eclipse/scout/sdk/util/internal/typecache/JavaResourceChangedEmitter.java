@@ -207,10 +207,10 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
       case IJavaElementDelta.ADDED:
         if (e.getElementType() < IJavaElement.COMPILATION_UNIT) {
           // fire straight
-          fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e));
+          fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e, delta.getCompilationUnitAST()));
         }
         else {
-          addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e));
+          addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e, delta.getCompilationUnitAST()));
         }
         break;
       case IJavaElementDelta.REMOVED:
@@ -218,15 +218,15 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
           // remove all open event collectors
           removeEventCollectors(e);
           // fire straight
-          fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e));
+          fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e, delta.getCompilationUnitAST()));
         }
         else {
-          addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e));
+          addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e, delta.getCompilationUnitAST()));
         }
         break;
       case IJavaElementDelta.CHANGED:
         if (e.getElementType() < IJavaElement.COMPILATION_UNIT) {
-          fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, delta.getElement()));
+          fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, delta.getElement(), delta.getCompilationUnitAST()));
         }
         else if (e.getElementType() == IJavaElement.COMPILATION_UNIT) {
           if (collector != null && (flags & CHANGED_FLAG_MASK) != 0) {
@@ -234,17 +234,17 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
             if (!astDiff.isEmpty()) {
               for (IJavaElement a : astDiff) {
                 if (TypeUtility.exists(a)) {
-                  addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, a));
+                  addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, a, delta.getCompilationUnitAST()));
                 }
               }
             }
             else {
-              addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e));
+              addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, kind, flags, e, delta.getCompilationUnitAST()));
             }
           }
         }
         else {
-          addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, (collector != null) ? kind : CHANGED_EXTERNAL, flags, e));
+          addEvent(collector, new JdtEvent(JavaResourceChangedEmitter.this, (collector != null) ? kind : CHANGED_EXTERNAL, flags, e, delta.getCompilationUnitAST()));
         }
         break;
     }
@@ -272,7 +272,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   private void addEvent(JdtEventCollector collector, JdtEvent event) {
     if (collector != null) {
       if (collector.isEmpty()) {
-        fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_DIRTY, 0, collector.getCompilationUnit()));
+        fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_DIRTY, 0, collector.getCompilationUnit(), null));
       }
       collector.addEvent(event);
     }
@@ -315,7 +315,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
           fireEvent(e);
         }
       }
-      fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_SYNC, 0, icu));
+      fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_SYNC, 0, icu, null));
     }
   }
 

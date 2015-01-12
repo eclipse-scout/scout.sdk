@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.util.ScoutSdkUtilCore;
 import org.eclipse.scout.sdk.util.internal.SdkUtilActivator;
@@ -54,16 +55,18 @@ public class JdtEvent extends EventObject {
   private final int m_eventType;
   private final int m_flags;
   private final IJavaElement m_element;
+  private final CompilationUnit m_ast;
   private IType m_declaringType;
 
   private ITypeHierarchy m_superTypeHierarchy;
 
-  public JdtEvent(Object source, int eventType, int flags, IJavaElement element) {
+  public JdtEvent(Object source, int eventType, int flags, IJavaElement element, CompilationUnit ast) {
     super(source);
     m_superTypeHierarchy = null;
     m_eventType = eventType;
     m_element = element;
     m_flags = flags;
+    m_ast = ast;
   }
 
   public int getEventType() {
@@ -142,6 +145,10 @@ public class JdtEvent extends EventObject {
       }
     }
     return m_superTypeHierarchy;
+  }
+
+  public CompilationUnit getCompilationUnitAST() {
+    return m_ast;
   }
 
   public IType getDeclaringType() {

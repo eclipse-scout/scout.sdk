@@ -14,6 +14,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoUtility;
 import org.eclipse.scout.sdk.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
@@ -22,6 +23,7 @@ import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.ImportValidator;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.dto.AbstractDtoAutoUpdateOperation;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link RowDataDtoUpdateOperation}</h3>
@@ -33,9 +35,10 @@ public class RowDataDtoUpdateOperation extends AbstractDtoAutoUpdateOperation {
 
   private final DataAnnotation m_dataAnnotation;
 
-  /**
-   * @param modelType
-   */
+  public RowDataDtoUpdateOperation(IType modelType) throws JavaModelException {
+    this(modelType, ScoutTypeUtility.findDataAnnotation(modelType, TypeUtility.getSupertypeHierarchy(modelType)));
+  }
+
   public RowDataDtoUpdateOperation(IType modelType, DataAnnotation dataAnnotation) {
     super(modelType);
     m_dataAnnotation = dataAnnotation;

@@ -119,6 +119,23 @@
       </attribute>
    </extension>
    <extension
+         id="org.eclipse.scout.sdk.extension.operation.call"
+         name="Chainable Method Call"
+         point="org.eclipse.core.resources.markers">
+      <persistent
+            value="false">
+      </persistent>
+      <super
+            type="org.eclipse.core.resources.marker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.textmarker">
+      </super>
+      <super
+            type="org.eclipse.core.resources.problemmarker">
+      </super>
+   </extension>
+   <extension
          id="org.eclipse.scout.sdk.classid.duplicate"
          name="ClassId Duplicate"
          point="org.eclipse.core.resources.markers">

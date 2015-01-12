@@ -158,47 +158,31 @@ public final class SignatureUtility {
         if (typeGeneric != null) {
           sig = CollectionUtility.firstElement(typeGeneric.getBoundsSignatures()); // currently only handles the first bound
         }
-        if (startsWith(sig, Signature.C_UNRESOLVED) && TypeUtility.exists(contextType)) {
-          String simpleName = Signature.getSignatureSimpleName(sig);
-          String referencedTypeSignature = getReferencedTypeSignature(contextType, simpleName, false);
-          if (referencedTypeSignature != null) {
-            sig = referencedTypeSignature;
-          }
+        if (isUnresolved(sig)) {
+          sig = resolveSignature(sig, contextType);
         }
+
         if (sig != null) {
           sigBuilder.append(sig);
         }
         else {
           sigBuilder.append(SIG_OBJECT);
         }
-
         break;
       case Signature.CLASS_TYPE_SIGNATURE:
         String[] typeArguments = Signature.getTypeArguments(unresolvedSignature);
         unresolvedSignature = Signature.getTypeErasure(unresolvedSignature);
-        unresolvedSignature = IRegEx.DOLLAR_REPLACEMENT.matcher(unresolvedSignature).replaceAll(".");
-        if (startsWith(unresolvedSignature, Signature.C_UNRESOLVED)) {
-          // unresolved
-          if (StringUtility.hasText(Signature.getSignatureQualifier(unresolvedSignature))) {
-            // kind of a qualified signature
-            IType t = TypeUtility.getTypeBySignature(unresolvedSignature);
-            if (TypeUtility.exists(t)) {
-              unresolvedSignature = SignatureCache.createTypeSignature(t.getFullyQualifiedName().replace('$', '.'));
-            }
-          }
-          else if (TypeUtility.exists(contextType)) {
-            String simpleName = Signature.getSignatureSimpleName(unresolvedSignature);
-            String referencedTypeSignature = getReferencedTypeSignature(contextType, simpleName, false);
-            if (referencedTypeSignature != null) {
-              unresolvedSignature = referencedTypeSignature;
-            }
-          }
+        unresolvedSignature = unresolvedSignature.replace('$', '.');
+
+        if (isUnresolved(unresolvedSignature)) {
+          unresolvedSignature = resolveSignature(unresolvedSignature, contextType);
         }
+
         if (endsWith(unresolvedSignature, Signature.C_NAME_END)) {
           unresolvedSignature = unresolvedSignature.substring(0, unresolvedSignature.length() - 1);
         }
         sigBuilder.append(unresolvedSignature);
-        if (typeArguments != null && typeArguments.length > 0) {
+        if (typeArguments.length > 0) {
           sigBuilder.append(Signature.C_GENERIC_START);
           for (int i = 0; i < typeArguments.length; i++) {
             sigBuilder.append(getResolvedSignature(contextType, parameterSignatures, typeArguments[i]));
@@ -208,10 +192,48 @@ public final class SignatureUtility {
         sigBuilder.append(Signature.C_NAME_END);
         break;
       default:
-        SdkUtilActivator.logWarning("unhandled signature type: '" + Signature.getTypeSignatureKind(unresolvedSignature) + "'");
+        SdkUtilActivator.logWarning("Unhandled signature type: '" + Signature.getTypeSignatureKind(unresolvedSignature) + "'.");
         break;
     }
     return sigBuilder.toString();
+  }
+
+  /**
+   * Gets if the given signature is unresolved.
+   *
+   * @param signature
+   *          The signature to check.
+   * @return <code>true</code> if the given signature is unresolved. <code>false</code> if it is resolved or
+   *         <code>null</code>.
+   */
+  public static boolean isUnresolved(String signature) {
+    if (signature == null) {
+      return false;
+    }
+    if (startsWith(signature, Signature.C_EXTENDS)) {
+      signature = signature.substring(1);
+    }
+    return startsWith(signature, Signature.C_UNRESOLVED);
+  }
+
+  private static String resolveSignature(String unresolvedSignature, IType contextType) throws JavaModelException {
+    // if it is qualified: try to find a matching type first
+    String name = Signature.toString(unresolvedSignature);
+    if (StringUtility.hasText(Signature.getSignatureQualifier(unresolvedSignature))) {
+      // kind of a qualified signature
+      IType t = TypeUtility.getTypeBySignature(unresolvedSignature);
+      if (TypeUtility.exists(t) && t.getFullyQualifiedName().equals(name)) {
+        return SignatureCache.createTypeSignature(t.getFullyQualifiedName().replace('$', '.'));
+      }
+    }
+
+    if (TypeUtility.exists(contextType)) {
+      String referencedTypeSignature = getReferencedTypeSignature(contextType, name, false);
+      if (referencedTypeSignature != null) {
+        return referencedTypeSignature;
+      }
+    }
+    return unresolvedSignature;
   }
 
   private static boolean endsWith(String stringToSearchIn, char charToFind) {
@@ -235,25 +257,15 @@ public final class SignatureUtility {
   }
 
   /**
-   * @throws CoreException
-   * @see {@link #getTypeReference(String, IType, IImportValidator)}
-   */
-  public static String getTypeReference(String signature, IImportValidator importValidator) throws CoreException {
-    return getTypeReference(signature, null, importValidator);
-  }
-
-  /**
    * @param signature
    *          fully parameterized signature
-   * @param signatureOwner
-   *          the owner of the signature used to lookup unresolved types.
    * @param validator
    *          an import validator to decide simple name vs. fully qualified name.
    * @return the type reference
    * @throws CoreException
-   * @see {@link IImportValidator}, {@link ImportValidator}, {@link CompilationUnitImportValidator}
+   * @see {@link IImportValidator}
    */
-  public static String getTypeReference(String signature, IType signatureOwner, IImportValidator validator) throws CoreException {
+  public static String getTypeReference(String signature, IImportValidator validator) throws CoreException {
     StringBuilder sigBuilder = new StringBuilder();
     int arrayCount = 0;
     boolean isArbitraryArray = false;
@@ -262,16 +274,16 @@ public final class SignatureUtility {
         sigBuilder.append("?");
         if (signature.length() > 1) {
           sigBuilder.append(" extends ");
-          sigBuilder.append(getTypeReference(signature.substring(1), signatureOwner, validator));
+          sigBuilder.append(getTypeReference(signature.substring(1), validator));
         }
         break;
       case Signature.ARRAY_TYPE_SIGNATURE:
         arrayCount = Signature.getArrayCount(signature);
-        sigBuilder.append(getTypeReference(signature.substring(arrayCount), signatureOwner, validator));
+        sigBuilder.append(getTypeReference(signature.substring(arrayCount), validator));
         break;
       case ARBITRARY_ARRAY_SIGNATURE:
         isArbitraryArray = true;
-        sigBuilder.append(getTypeReference(signature.substring(1), signatureOwner, validator));
+        sigBuilder.append(getTypeReference(signature.substring(1), validator));
         break;
       case Signature.BASE_TYPE_SIGNATURE:
         sigBuilder.append(Signature.getSignatureSimpleName(signature));
@@ -281,32 +293,15 @@ public final class SignatureUtility {
         break;
       default:
         String[] typeArguments = Signature.getTypeArguments(signature);
-        signature = Signature.getTypeErasure(signature);
-        signature = IRegEx.DOLLAR_REPLACEMENT.matcher(signature).replaceAll(".");
-        if (startsWith(signature, Signature.C_UNRESOLVED)) {
-          // unresolved
-          if (signatureOwner != null) {
-            String simpleName = Signature.getSignatureSimpleName(signature);
-            String referencedTypeSignature = getReferencedTypeSignature(signatureOwner, simpleName, false);
-            if (referencedTypeSignature != null) {
-              sigBuilder.append(validator.getTypeName(referencedTypeSignature));
-            }
-          }
-          else {
-            sigBuilder.append(Signature.toString(signature));
-          }
-        }
-        else {
-          // resolved
-          sigBuilder.append(validator.getTypeName(signature));
-        }
+        signature = Signature.getTypeErasure(signature).replace('$', '.');
+        sigBuilder.append(validator.getTypeName(signature));
         if (typeArguments != null && typeArguments.length > 0) {
           sigBuilder.append(Signature.C_GENERIC_START);
           for (int i = 0; i < typeArguments.length; i++) {
             if (i > 0) {
               sigBuilder.append(", ");
             }
-            sigBuilder.append(getTypeReference(typeArguments[i], signatureOwner, validator));
+            sigBuilder.append(getTypeReference(typeArguments[i], validator));
           }
           sigBuilder.append(Signature.C_GENERIC_END);
         }

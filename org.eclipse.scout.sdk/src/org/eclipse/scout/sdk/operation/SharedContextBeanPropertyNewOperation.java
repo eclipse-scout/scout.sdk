@@ -95,7 +95,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
   protected void runServer(IType serverSession, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     manager.register(serverSession.getCompilationUnit(), monitor);
     IImportValidator validator = new ImportValidator(serverSession.getCompilationUnit());
-    String beanReference = SignatureUtility.getTypeReference(getBeanTypeSignature(), serverSession, validator);
+    String beanReference = SignatureUtility.getTypeReference(getBeanTypeSignature(), validator);
     String sigTypeSimpleName = beanReference.replaceAll("([^<]*).*", "$1");
 
     String beanName = NamingUtility.ensureStartWithUpperCase(getBeanName());
@@ -124,7 +124,7 @@ public class SharedContextBeanPropertyNewOperation implements IBeanPropertyNewOp
   protected void runClient(IType clientSession, IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     manager.register(clientSession.getCompilationUnit(), monitor);
     IImportValidator validator = new ImportValidator(clientSession.getCompilationUnit());
-    String beanReference = SignatureUtility.getTypeReference(getBeanTypeSignature(), clientSession, validator);
+    String beanReference = SignatureUtility.getTypeReference(getBeanTypeSignature(), validator);
     String sigTypeSimpleName = beanReference.replaceAll("([^<]*).*", "$1");
 
     String beanName = NamingUtility.ensureStartWithUpperCase(getBeanName());

@@ -91,15 +91,11 @@ public class TableFieldNewOperation implements IOperation {
       tableBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOrderAnnotation(SdkProperties.ORDER_ANNOTATION_VALUE_STEP));
       newOp.addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTableKey(tableBuilder), tableBuilder);
 
-      // update generic in supertype signature
-      String tableFieldSuperTypeSig = getSuperTypeSignature();
-      if (StringUtility.hasText(tableFieldSuperTypeSig) && tableFieldSuperTypeSig.charAt(tableFieldSuperTypeSig.length() - 1) == Signature.C_SEMICOLON) {
-        StringBuilder sigBuilder = new StringBuilder(tableFieldSuperTypeSig.substring(0, tableFieldSuperTypeSig.length() - 1));
-        sigBuilder.append(Signature.C_GENERIC_START).append(Signature.C_UNRESOLVED).append(newOp.getElementName()).append(".");
-        sigBuilder.append(tableBuilder.getElementName()).append(Signature.C_SEMICOLON).append(Signature.C_GENERIC_END).append(Signature.C_SEMICOLON);
-        tableFieldSuperTypeSig = sigBuilder.toString();
-      }
-      setSuperTypeSignature(tableFieldSuperTypeSig);
+      // update generic in super type signature
+      String superTypeSig = new StringBuilder().append(Signature.C_RESOLVED).append(superTypeFqn).append(Signature.C_GENERIC_START)
+          .append(Signature.C_UNRESOLVED).append(getTypeName()).append(Signature.C_DOT).append(tableBuilder.getElementName()).append(Signature.C_SEMICOLON).append(Signature.C_GENERIC_END).append(Signature.C_SEMICOLON).toString();
+
+      setSuperTypeSignature(superTypeSig);
     }
     newOp.setSuperTypeSignature(getSuperTypeSignature());
 
