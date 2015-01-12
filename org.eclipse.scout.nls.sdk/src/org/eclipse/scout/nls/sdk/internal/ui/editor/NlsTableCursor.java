@@ -220,11 +220,11 @@ public class NlsTableCursor {
     }
     m_editingText = new TableTextEditor(m_cursor, style);
     INlsEntry entry = (INlsEntry) m_cursor.getRow().getData();
-    Language[] allLangs = entry.getProject().getAllLanguages();
+    List<Language> allLangs = entry.getProject().getAllLanguages();
     int langIndex = m_cursor.getColumn() - (NlsTable.AMOUNT_UTILITY_COLS + 1);
     String input = null;
-    if (langIndex >= 0 && langIndex < allLangs.length) {
-      Language lang = allLangs[langIndex];
+    if (langIndex >= 0 && langIndex < allLangs.size()) {
+      Language lang = allLangs.get(langIndex);
       input = entry.getTranslation(lang);
     }
     else {

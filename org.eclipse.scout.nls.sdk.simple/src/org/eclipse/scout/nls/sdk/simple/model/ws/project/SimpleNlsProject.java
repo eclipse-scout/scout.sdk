@@ -29,13 +29,13 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.internal.core.JarEntryFile;
 import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.WeakEventListener;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.INlsFolder;
 import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.model.workspace.project.AbstractNlsProject;
 import org.eclipse.scout.nls.sdk.model.workspace.project.NlsProjectEvent;
-import org.eclipse.scout.nls.sdk.model.workspace.translationResource.AbstractTranslationResource;
 import org.eclipse.scout.nls.sdk.model.workspace.translationResource.ITranslationResource;
 import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.model.ws.NlsType;
@@ -65,12 +65,12 @@ public class SimpleNlsProject extends AbstractNlsProject {
   }
 
   @Override
-  public ITranslationResource[] loadTranslationResources() throws CoreException {
+  protected List<ITranslationResource> loadTranslationResources() throws CoreException {
     if (getNlsType().getType().isReadOnly()) {
       IPackageFragmentRoot r = (IPackageFragmentRoot) getNlsType().getType().getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
       if (r == null) {
         NlsCore.logWarning("Could not find text resource for type '" + getNlsType().getType().getFullyQualifiedName() + "'.");
-        return new ITranslationResource[]{};
+        return CollectionUtility.emptyArrayList();
       }
       return loadTranslationFilesFromPlatform(getNlsType(), r);
     }
@@ -79,9 +79,9 @@ public class SimpleNlsProject extends AbstractNlsProject {
     }
   }
 
-  private ITranslationResource[] loadTranslationFilesWorkspace(NlsType nlsType) throws CoreException {
+  private List<ITranslationResource> loadTranslationFilesWorkspace(NlsType nlsType) throws CoreException {
     // try to find all translation files
-    ArrayList<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
+    List<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
     if (nlsType != null && TypeUtility.exists(nlsType.getType()) && nlsType.getTranslationsFolderName() != null && nlsType.getTranslationsPrefix() != null) {
       Path translationPath = new Path(nlsType.getTranslationsFolderName());
       for (IFile file : NlsSdkSimple.getAllTranslations(nlsType.getJavaProject().getProject(), translationPath, nlsType.getTranslationsPrefix())) {
@@ -94,11 +94,11 @@ public class SimpleNlsProject extends AbstractNlsProject {
         }
       }
     }
-    return translationFiles.toArray(new ITranslationResource[translationFiles.size()]);
+    return translationFiles;
   }
 
-  private ITranslationResource[] loadTranslationFilesFromPlatform(NlsType nlsType, IPackageFragmentRoot r) throws CoreException {
-    ArrayList<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
+  private List<ITranslationResource> loadTranslationFilesFromPlatform(NlsType nlsType, IPackageFragmentRoot r) throws CoreException {
+    List<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
     char delim = '.';
     String path = nlsType.getTranslationsFolderName().replace(NlsType.FOLDER_SEGMENT_SEPARATOR, delim);
     String d = "" + delim;
@@ -134,7 +134,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
         }
       }
     }
-    return translationFiles.toArray(new AbstractTranslationResource[translationFiles.size()]);
+    return translationFiles;
   }
 
   private void createTranslationFile(Language language, INlsFolder folder, IProgressMonitor monitor) throws CoreException {

@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.internal.model;
 
+import java.util.List;
+
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
 import org.eclipse.jface.viewers.ITableColorProvider;
@@ -48,7 +50,7 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
     if (getProjects() == null) {
       return new Object[]{};
     }
-    return getProjects().getAllEntries();
+    return getProjects().getAllEntries().toArray();
   }
 
   @Override
@@ -77,10 +79,10 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
    *         key column is passed or when the index is out of bounds).
    */
   public Language getLanguageOfColumn(int colIndex) {
-    Language[] allLanguages = getProjects().getAllLanguages();
+    List<Language> allLanguages = getProjects().getAllLanguages();
     int offset = (NlsTable.AMOUNT_UTILITY_COLS + 1);
-    if (allLanguages != null && colIndex >= offset && allLanguages.length > 0 && (allLanguages.length + offset) > colIndex) {
-      return allLanguages[colIndex - offset];
+    if (allLanguages != null && colIndex >= offset && allLanguages.size() > 0 && (allLanguages.size() + offset) > colIndex) {
+      return allLanguages.get(colIndex - offset);
     }
     return null;
   }

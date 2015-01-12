@@ -206,7 +206,7 @@ public class NlsTable extends Composite {
   }
 
   private Language getLanguageOfTableColumn(int columnIndex) {
-    return m_tableModel.getProjects().getAllLanguages()[columnIndex - (INDEX_COLUMN_KEYS + 1)];
+    return m_tableModel.getProjects().getAllLanguages().get(columnIndex - (INDEX_COLUMN_KEYS + 1));
   }
 
   public NlsTableModel getModel() {

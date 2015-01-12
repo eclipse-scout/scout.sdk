@@ -16,10 +16,12 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
@@ -27,7 +29,7 @@ import org.eclipse.scout.nls.sdk.model.util.Language;
 
 public abstract class AbstractTranslationResource implements ITranslationResource {
 
-  private HashMap<String/* key */, String/* translation */> m_entries;
+  private Map<String/* key */, String/* translation */> m_entries;
 
   private final Language m_language;
 
@@ -64,11 +66,14 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
    */
   protected void parseResource(InputStream stream) throws IOException, InvalidTranslationResourceException {
     TranslationResourceEvent multiEvent = new TranslationResourceEvent(this);
-    HashMap<String, String> newEntries = new HashMap<String, String>();
 
+    // load items
     Properties prop = new Properties();
     prop.load(stream);
-    for (Entry<Object, Object> entry : prop.entrySet()) {
+    Set<Entry<Object, Object>> entrySet = prop.entrySet();
+
+    Map<String, String> newEntries = new HashMap<String, String>(entrySet.size());
+    for (Entry<Object, Object> entry : entrySet) {
       if (newEntries.get(entry.getKey()) != null) {
         NlsCore.getDefault().getLog().log(new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, "Doubled entry for key: " + entry.getKey() + " skipping this entry", new Exception()));
       }
@@ -124,7 +129,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
    */
   @Override
   public boolean isDefaultLanguage() {
-    return m_language.equals(Language.LANGUAGE_DEFAULT);
+    return Language.LANGUAGE_DEFAULT.equals(m_language);
   }
 
   /**
@@ -136,8 +141,8 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
   }
 
   @Override
-  public String[] getAllKeys() {
-    return m_entries.keySet().toArray(new String[m_entries.size()]);
+  public Set<String> getAllKeys() {
+    return CollectionUtility.hashSet(m_entries.keySet());
   }
 
   protected void setTranslation(String key, String translation, IProgressMonitor monitor) {
@@ -201,5 +206,4 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
   public IStatus remove(String key, IProgressMonitor monitor) {
     throw new UnsupportedOperationException("this method is not supported on : " + this.getClass().getSimpleName() + " readOnly=" + isReadOnly());
   }
-
 }
