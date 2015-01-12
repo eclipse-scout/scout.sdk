@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.Signature;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
@@ -233,7 +234,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         if (getGenericTypeSignature() == null && TypeUtility.exists(t)) {
           try {
             String lookupSvcKeyTypeSig = SignatureUtility.resolveTypeParameter(t, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
-            if (lookupSvcKeyTypeSig != null) {
+            if (lookupSvcKeyTypeSig != null && Signature.getTypeSignatureKind(lookupSvcKeyTypeSig) != Signature.TYPE_VARIABLE_SIGNATURE) {
               setGenericTypeSignature(lookupSvcKeyTypeSig);
             }
           }
