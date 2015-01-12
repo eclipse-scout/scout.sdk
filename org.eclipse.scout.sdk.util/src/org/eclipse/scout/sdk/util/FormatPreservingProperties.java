@@ -91,6 +91,12 @@ public class FormatPreservingProperties implements Serializable {
       is = f.getContents();
       load(is);
     }
+    catch (IllegalArgumentException e) {
+      throw new IllegalArgumentException("Error while parsing properties file '" + f.getLocation().toOSString() + "'.", e);
+    }
+    catch (CoreException e) {
+      throw new CoreException(new ScoutStatus("Error loading properties file '" + f.getLocation().toOSString() + "'.", e));
+    }
     finally {
       if (is != null) {
         try {
@@ -166,7 +172,7 @@ public class FormatPreservingProperties implements Serializable {
    */
   public void setProperty(String key, String value) {
     if (key == null || value == null) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException("null parameter is not allowed");
     }
     try {
       m_lock.writeLock().lock();
@@ -318,6 +324,7 @@ public class FormatPreservingProperties implements Serializable {
       reader.reset();
       String lineContent = null;
       boolean lastLineEndsWithBackSlash = false;
+      int lineNum = 1;
       while ((lineContent = reader.readLine()) != null) {
         String lineContentTrim = lineContent.trim();
         P_PropertyLine line = new P_PropertyLine();
@@ -335,7 +342,7 @@ public class FormatPreservingProperties implements Serializable {
               line.key = key;
             }
             else {
-              throw new IllegalArgumentException("Invalid properties file format");
+              throw new IllegalArgumentException("Invalid properties file format. Error on line " + lineNum + ".");
             }
           }
         }
@@ -343,6 +350,7 @@ public class FormatPreservingProperties implements Serializable {
         m_lines.add(line);
 
         lastLineEndsWithBackSlash = lineContentTrim.length() > 0 && lineContentTrim.charAt(lineContentTrim.length() - 1) == '\\';
+        lineNum++;
       }
 
       // remember the values loaded
@@ -416,7 +424,7 @@ public class FormatPreservingProperties implements Serializable {
         return (String) CollectionUtility.firstElement(keySet);
       }
       else {
-        throw new IllegalArgumentException("Invalid properties file format");
+        return null;
       }
     }
     catch (IOException e) {
