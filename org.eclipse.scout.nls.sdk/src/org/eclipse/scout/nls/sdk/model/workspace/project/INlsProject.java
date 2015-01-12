@@ -10,6 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.model.workspace.project;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.IType;
@@ -54,7 +58,7 @@ public interface INlsProject {
    *
    * @return
    */
-  String[] getAllKeys();
+  Set<String> getAllKeys();
 
   /**
    * Gets the name of the nls project. This e.g. used in the editor to display which project is displayed.
@@ -81,14 +85,14 @@ public interface INlsProject {
    *          if true, the search is done case sensitive.
    * @return The entries found.
    */
-  INlsEntry[] getEntries(String prefix, boolean caseSensitive);
+  List<INlsEntry> getEntries(String prefix, boolean caseSensitive);
 
   /**
    * Get all entries in this project.
    *
    * @return The complete list.
    */
-  INlsEntry[] getAllEntries();
+  List<INlsEntry> getAllEntries();
 
   /**
    * Gets the parent project or null if no parent exists.
@@ -102,7 +106,7 @@ public interface INlsProject {
    *
    * @return The existing languages.
    */
-  Language[] getAllLanguages();
+  List<Language> getAllLanguages();
 
   /**
    * Checks whether the given language exists in this project.
@@ -153,7 +157,7 @@ public interface INlsProject {
    */
   INewLanguageContext getTranslationCreationContext();
 
-  IStatus removeEntries(INlsEntry[] entries, IProgressMonitor m);
+  IStatus removeEntries(Collection<INlsEntry> entries, IProgressMonitor m);
 
   /**
    * To find the best matching language supported of the project:

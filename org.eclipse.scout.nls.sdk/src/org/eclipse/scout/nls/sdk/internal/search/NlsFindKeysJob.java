@@ -11,8 +11,10 @@
 package org.eclipse.scout.nls.sdk.internal.search;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.resources.IProject;
@@ -59,6 +61,10 @@ public class NlsFindKeysJob extends Job {
 
   @Override
   public IStatus run(IProgressMonitor monitor) {
+    if (m_searchPattern == null) {
+      return Status.OK_STATUS;
+    }
+
     IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
     ArrayList<IResource> searchScopeRessources = new ArrayList<IResource>();
     TextSearchScope searchScope = null;
@@ -96,14 +102,19 @@ public class NlsFindKeysJob extends Job {
   }
 
   public static Pattern createPatternForAllNlsKeys(INlsProject project) {
-    StringBuilder patternBuilder = new StringBuilder();
-    String[] allKeys = project.getAllKeys();
-    if (allKeys.length > 0) {
-      patternBuilder.append("\\\"").append(allKeys[0]).append("\\\"");
+    Set<String> allKeys = project.getAllKeys();
+    Iterator<String> iterator = allKeys.iterator();
+    if (iterator.hasNext()) {
+      String key = iterator.next();
+      StringBuilder patternBuilder = new StringBuilder();
+      patternBuilder.append("\\\"").append(key).append("\\\"");
+      while (iterator.hasNext()) {
+        patternBuilder.append("|\\\"").append(iterator.next()).append("\\\"");
+      }
+      return Pattern.compile(patternBuilder.toString());
     }
-    for (int i = 1; i < allKeys.length; i++) {
-      patternBuilder.append("|\\\"").append(allKeys[i]).append("\\\"");
+    else {
+      return null;
     }
-    return Pattern.compile(patternBuilder.toString());
   }
 }
