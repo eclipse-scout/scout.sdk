@@ -12,6 +12,7 @@ package org.eclipse.scout.nls.sdk.internal.ui.editor;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.jface.action.IMenuListener;
@@ -215,7 +216,8 @@ public class NlsTablePage extends Composite {
     @Override
     public void menuAboutToShow(IMenuManager manager) {
       IStructuredSelection selection = (IStructuredSelection) m_table.getViewer().getSelection();
-      ArrayList<NlsEntry> entries = new ArrayList<NlsEntry>(selection.size());
+      List<INlsEntry> entries = new ArrayList<INlsEntry>(selection.size());
+
       for (Iterator<?> it = selection.iterator(); it.hasNext();) {
         entries.add((NlsEntry) it.next());
       }
@@ -230,7 +232,7 @@ public class NlsTablePage extends Composite {
           row = m_table.getViewer().getTable().getItem(cursorPos.x);
         }
         if (row != null) {
-          NlsEntry e = entries.get(0);
+          INlsEntry e = entries.get(0);
           int colIndex = cursorPos.y;
           String txt = null;
           Language languageOfColumn = m_tableModel.getLanguageOfColumn(colIndex);
@@ -241,11 +243,11 @@ public class NlsTablePage extends Composite {
         }
       }
       else if (entries.size() > 1) {
-        addMultiSelectMenues(menuManager, entries.toArray(new INlsEntry[entries.size()]));
+        addMultiSelectMenues(menuManager, entries);
       }
     }
 
-    private void addSingleSelectMenues(MenuManager manager, NlsEntry entry, int cursorColumn, String cursorText, boolean isInheritedEntry) {
+    private void addSingleSelectMenues(MenuManager manager, INlsEntry entry, int cursorColumn, String cursorText, boolean isInheritedEntry) {
       if (!isInheritedEntry) {
         if (cursorColumn == NlsTable.INDEX_COLUMN_KEYS) {
           manager.add(new Action("Edit key") {
@@ -272,7 +274,7 @@ public class NlsTablePage extends Composite {
       }
     }
 
-    private void addMultiSelectMenues(MenuManager manager, INlsEntry[] entries) {
+    private void addMultiSelectMenues(MenuManager manager, List<INlsEntry> entries) {
       manager.add(new UpdateReferenceCountAction(m_nlsProjects, m_table, m_tableModel));
       manager.add(new Separator());
       manager.add(new RemoveAction("Remove entries", m_nlsProjects, entries));

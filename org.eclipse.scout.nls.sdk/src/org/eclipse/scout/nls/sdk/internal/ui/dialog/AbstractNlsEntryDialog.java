@@ -369,8 +369,8 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
       ArrayList<Object> collector = new ArrayList<Object>();
       INlsProject p = m_rootProject;
       do {
-        Language[] languages = p.getAllLanguages();
-        if (languages.length > 0 && !p.getTranslationResource(languages[0]).isReadOnly()) {
+        List<Language> languages = p.getAllLanguages();
+        if (languages.size() > 0 && !p.getTranslationResource(languages.get(0)).isReadOnly()) {
           if (!StringUtility.hasText(pattern) || p.getName().toLowerCase().startsWith(pattern.toLowerCase())) {
             collector.add(p);
           }

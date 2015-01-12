@@ -178,8 +178,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
    * @return
    * @throws CoreException
    */
-  public static List<IFile> getAllTranslations(IProject toLookAt, IPath path, String fileNamePrefix)
-      throws CoreException {
+  public static List<IFile> getAllTranslations(IProject toLookAt, IPath path, String fileNamePrefix) throws CoreException {
     List<IFolder> folders = new LinkedList<IFolder>();
     List<INlsFolder> nlsFolders = getFoldersOfProject(toLookAt, path, true);
     for (INlsFolder folder : nlsFolders) {

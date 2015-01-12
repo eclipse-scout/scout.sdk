@@ -10,24 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.internal.ui.action;
 
+import java.util.Iterator;
+import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jface.action.Action;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.INlsEntry;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.util.concurrent.AbstractJob;
 
 public class RemoveAction extends Action {
-  private INlsProject m_nlsProject;
+  private final INlsProject m_nlsProject;
   private IStatus m_status;
-  private final INlsEntry[] m_entries;
+  private final List<INlsEntry> m_entries;
 
   public RemoveAction(String name, INlsProject project, INlsEntry entry) {
-    this(name, project, new INlsEntry[]{entry});
+    this(name, project, CollectionUtility.arrayList(entry));
   }
 
-  public RemoveAction(String name, INlsProject project, INlsEntry[] entries) {
+  public RemoveAction(String name, INlsProject project, List<INlsEntry> entries) {
     super(name);
     m_nlsProject = project;
     m_entries = entries;
@@ -54,18 +58,19 @@ public class RemoveAction extends Action {
     }
   }
 
-  private static String getVerbose(INlsEntry[] entries) {
+  private static String getVerbose(List<INlsEntry> entries) {
     if (entries == null) {
       return "[no entries]";
     }
-    StringBuilder builder = new StringBuilder("[");
-    for (int i = 0; i < entries.length; i++) {
-      builder.append("'" + entries[i].getKey() + "'");
-      if (i + 1 != entries.length) {
-        builder.append(", ");
+    StringBuilder builder = new StringBuilder('[');
+    Iterator<INlsEntry> iterator = entries.iterator();
+    if (iterator.hasNext()) {
+      builder.append('\'').append(iterator.next()).append('\'');
+      while (iterator.hasNext()) {
+        builder.append(", ").append('\'').append(iterator.next()).append('\'');
       }
     }
-    builder.append("]");
+    builder.append(']');
     return builder.toString();
   }
 
