@@ -33,10 +33,13 @@ import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.Signature;
+import org.eclipse.jdt.core.dom.ASTNode;
 import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IMethodBinding;
+import org.eclipse.jdt.core.dom.ITypeBinding;
 import org.eclipse.jdt.core.dom.MethodInvocation;
+import org.eclipse.jdt.core.dom.TypeDeclaration;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CollectionUtility;
@@ -47,7 +50,6 @@ import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
-import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
@@ -251,6 +253,7 @@ public class ExtensionValidation {
         final Map<IMethod, P_ProblemCandidates> methodsToCheck = new HashMap<IMethod, P_ProblemCandidates>();
 
         m_ast.accept(new ASTVisitor() {
+
           @Override
           public boolean visit(MethodInvocation node) {
             String methodName = node.getName().getIdentifier();
@@ -261,16 +264,19 @@ public class ExtensionValidation {
                 IJavaElement javaElement = bindings.getJavaElement();
                 if (javaElement instanceof IMethod) {
                   IMethod m = (IMethod) javaElement;
-                  try {
-                    String id = SignatureUtility.getMethodIdentifier(m);
-                    Set<String> owners = map.get(id);
-                    if (owners != null) {
-                      P_ProblemCandidates candidate = new P_ProblemCandidates(owners, node.getStartPosition(), node.getLength(), m.getElementName());
-                      methodsToCheck.put(m, candidate);
+                  IType declaringType = getDeclaringTypeOf(node);
+                  if (!isLocalExtension(declaringType, m)) {
+                    try {
+                      String id = SignatureUtility.getMethodIdentifier(m);
+                      Set<String> owners = map.get(id);
+                      if (owners != null) {
+                        P_ProblemCandidates candidate = new P_ProblemCandidates(owners, node.getStartPosition(), node.getLength(), m.getElementName());
+                        methodsToCheck.put(m, candidate);
+                      }
                     }
-                  }
-                  catch (CoreException e) {
-                    ScoutSdk.logError("Unable to perform extension validation.", e);
+                    catch (CoreException e) {
+                      ScoutSdk.logError("Unable to perform extension validation.", e);
+                    }
                   }
                 }
               }
@@ -286,10 +292,46 @@ public class ExtensionValidation {
           }
         }
       }
-      catch (CoreException e) {
-        return new ScoutStatus("Error performing extension validation.", e);
+      catch (Exception e) {
+        ScoutSdk.logWarning("Unable to check for chainable method calls.", e);
       }
       return Status.OK_STATUS;
+    }
+
+    private IType getDeclaringTypeOf(MethodInvocation mi) {
+      TypeDeclaration td = null;
+      ASTNode cur = mi;
+      while (cur != null && td == null) {
+        if (cur instanceof TypeDeclaration) {
+          td = (TypeDeclaration) cur;
+        }
+        cur = cur.getParent();
+      }
+
+      if (td != null) {
+        ITypeBinding binding = td.resolveBinding();
+        if (binding != null) {
+          IJavaElement javaElement = binding.getJavaElement();
+          if (TypeUtility.exists(javaElement) && javaElement.getElementType() == IJavaElement.TYPE) {
+            return (IType) javaElement;
+          }
+        }
+      }
+
+      return null;
+    }
+
+    private boolean isLocalExtension(IType declaringTypeOfMethodInvocation, IMethod methodDeclaration) {
+      if (declaringTypeOfMethodInvocation == null || methodDeclaration == null) {
+        return false;
+      }
+
+      IType declaringTypeOfLocalExtension = declaringTypeOfMethodInvocation.getDeclaringType();
+      if (declaringTypeOfLocalExtension == null) {
+        return false;
+      }
+
+      return declaringTypeOfLocalExtension.equals(methodDeclaration.getDeclaringType());
     }
 
     private void createErrorMarkerIfNecessary(ICompilationUnit icu, IResource resource, P_ProblemCandidates problemCandidate, ITypeHierarchy supertypeHierarchy) throws CoreException {
