@@ -230,18 +230,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
       public void proposalAccepted(ContentProposalEvent event) {
         IType t = (IType) event.proposal;
         setServiceSuperTypeInternal(t);
-        m_genericTypeField.setEnabled(TypeUtility.isGenericType(t));
-        if (getGenericTypeSignature() == null && TypeUtility.exists(t)) {
-          try {
-            String lookupSvcKeyTypeSig = SignatureUtility.resolveTypeParameter(t, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
-            if (lookupSvcKeyTypeSig != null && Signature.getTypeSignatureKind(lookupSvcKeyTypeSig) != Signature.TYPE_VARIABLE_SIGNATURE) {
-              setGenericTypeSignature(lookupSvcKeyTypeSig);
-            }
-          }
-          catch (CoreException e) {
-            ScoutSdkUi.logError(e);
-          }
-        }
+        updateKeyTypeFor(t);
         pingStateChanging();
       }
     });
@@ -273,7 +262,9 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_lookupServiceTypeField.addProposalAdapterListener(new IProposalAdapterListener() {
       @Override
       public void proposalAccepted(ContentProposalEvent event) {
-        setLookupServiceTypeInternal((IType) event.proposal);
+        IType t = (IType) event.proposal;
+        setLookupServiceTypeInternal(t);
+        updateKeyTypeFor(t);
         pingStateChanging();
       }
     });
@@ -293,6 +284,21 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
     m_lookupServiceTypeField.setLayoutData(lookupServiceData);
 
     return group;
+  }
+
+  private void updateKeyTypeFor(IType t) {
+    m_genericTypeField.setEnabled(TypeUtility.isGenericType(t));
+    if (getGenericTypeSignature() == null && TypeUtility.exists(t)) {
+      try {
+        String lookupSvcKeyTypeSig = SignatureUtility.resolveTypeParameter(t, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
+        if (lookupSvcKeyTypeSig != null && Signature.getTypeSignatureKind(lookupSvcKeyTypeSig) != Signature.TYPE_VARIABLE_SIGNATURE) {
+          setGenericTypeSignature(lookupSvcKeyTypeSig);
+        }
+      }
+      catch (CoreException e) {
+        ScoutSdkUi.logError(e);
+      }
+    }
   }
 
   @Override
