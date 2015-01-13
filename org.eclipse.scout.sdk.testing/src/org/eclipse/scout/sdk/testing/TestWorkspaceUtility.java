@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.net.URL;
 import java.util.List;
 
@@ -40,6 +42,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.jdt.compile.ICompileResult;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
@@ -181,7 +184,20 @@ public final class TestWorkspaceUtility {
         builder.append("WARNING: ");
         break;
     }
-    builder.append(status.getMessage());
+    String message = status.getMessage();
+    if (StringUtility.hasText(message)) {
+      builder.append(message);
+    }
+    Throwable exception = status.getException();
+    if (exception != null) {
+      StringWriter dest = new StringWriter();
+      PrintWriter w = new PrintWriter(dest);
+      exception.printStackTrace(w);
+      if (builder.length() > 0) {
+        builder.append('\n');
+      }
+      builder.append(dest.getBuffer());
+    }
   }
 
   public static void buildWorkspaceAndAssertNoCompileErrors() throws CoreException {
