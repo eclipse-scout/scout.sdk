@@ -261,6 +261,10 @@ public class TypeParameterMapping implements ITypeParameterMapping {
   }
 
   private static void buildMappingRecInternal(IType type, ITypeHierarchy supertypeHierarchy, Map<String, TypeParameterMapping> collector, TypeParameterMapping child, Map<String, IResolvedTypeParameter> declaringTypeParams) throws CoreException {
+    if (!TypeUtility.exists(type)) {
+      return;
+    }
+
     String fullyQualifiedName = type.getFullyQualifiedName();
     TypeParameterMapping existing = collector.get(fullyQualifiedName);
     if (existing != null && child != null) {
@@ -276,9 +280,12 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     TypeParameterMapping curLevel = new TypeParameterMapping(type, child, declaringTypeParams);
     String objectClassFqn = Object.class.getName();
     collector.put(fullyQualifiedName, curLevel);
-    for (IType superType : supertypeHierarchy.getSupertypes(type)) {
-      if (!objectClassFqn.equals(superType.getFullyQualifiedName())) {
-        buildMappingRecInternal(superType, supertypeHierarchy, collector, curLevel, declaringTypeParams);
+
+    if (supertypeHierarchy != null) {
+      for (IType superType : supertypeHierarchy.getSupertypes(type)) {
+        if (!objectClassFqn.equals(superType.getFullyQualifiedName())) {
+          buildMappingRecInternal(superType, supertypeHierarchy, collector, curLevel, declaringTypeParams);
+        }
       }
     }
   }
