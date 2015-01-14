@@ -287,7 +287,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   private void updateKeyTypeFor(IType t) {
-    m_genericTypeField.setEnabled(TypeUtility.isGenericType(t));
+    m_genericTypeField.setEnabled(t == null || TypeUtility.isGenericType(t));
     if (getGenericTypeSignature() == null && TypeUtility.exists(t)) {
       try {
         String lookupSvcKeyTypeSig = SignatureUtility.resolveTypeParameter(t, IRuntimeClasses.ILookupService, IRuntimeClasses.TYPE_PARAM_LOOKUPSERVICE__KEY_TYPE);
@@ -524,6 +524,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
           m_lookupServiceTypeField.setVisible(false);
           ((GridData) m_lookupServiceTypeField.getLayoutData()).exclude = true;
           getWizard().getLocationsPage().setExcludePage(false);
+          updateKeyTypeFor(getServiceSuperType());
           break;
         case USE_EXISTING:
           m_serviceSuperTypeField.setVisible(false);
@@ -531,6 +532,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
           m_lookupServiceTypeField.setVisible(true);
           ((GridData) m_lookupServiceTypeField.getLayoutData()).exclude = false;
           getWizard().getLocationsPage().setExcludePage(true);
+          updateKeyTypeFor(getLookupServiceType());
           break;
         case NO_SERVICE:
           m_serviceSuperTypeField.setVisible(false);
@@ -538,6 +540,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
           m_lookupServiceTypeField.setVisible(false);
           ((GridData) m_lookupServiceTypeField.getLayoutData()).exclude = true;
           getWizard().getLocationsPage().setExcludePage(true);
+          updateKeyTypeFor(null);
           break;
       }
       m_lookupServiceTypeField.getParent().layout(true);
