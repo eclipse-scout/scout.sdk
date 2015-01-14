@@ -18,6 +18,7 @@ import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.jdt.core.dom.AST;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.util.ScoutSdkUtilCore;
@@ -147,6 +148,14 @@ public class JdtEvent extends EventObject {
     return m_superTypeHierarchy;
   }
 
+  /**
+   * Returns the {@link CompilationUnit} {@link AST} created by the last reconcile operation on this event's element.
+   *
+   * @return the {@link AST} created during the last reconcile operation or <code>null</code> if no {@link AST} is
+   *         present.
+   * @see IJavaElementDelta#getCompilationUnitAST()
+   * @since 4.2
+   */
   public CompilationUnit getCompilationUnitAST() {
     return m_ast;
   }
