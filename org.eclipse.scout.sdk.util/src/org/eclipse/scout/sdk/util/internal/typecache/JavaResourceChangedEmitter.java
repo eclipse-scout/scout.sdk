@@ -272,7 +272,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
   private void addEvent(JdtEventCollector collector, JdtEvent event) {
     if (collector != null) {
       if (collector.isEmpty()) {
-        fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_DIRTY, 0, collector.getCompilationUnit(), null));
+        fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_DIRTY, 0, collector.getCompilationUnit(), event.getCompilationUnitAST()));
       }
       collector.addEvent(event);
     }
@@ -315,7 +315,7 @@ public final class JavaResourceChangedEmitter implements IJavaResourceChangedEmi
           fireEvent(e);
         }
       }
-      fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_SYNC, 0, icu, null));
+      fireEvent(new JdtEvent(JavaResourceChangedEmitter.this, JdtEvent.BUFFER_SYNC, 0, icu, collector.getAst()));
     }
   }
 
