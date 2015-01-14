@@ -65,13 +65,16 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
  * @author Matthias Villiger
  * @since 4.2.0
  */
-public class ExtensionValidation {
+public final class ExtensionValidation {
 
   public static final String INVALID_OPERATION_METHOD_CALL_MARKER_ID = "org.eclipse.scout.sdk.extension.operation.call";
 
   private static final Object LOCK = new Object();
   private static IJavaResourceChangedListener listener;
-  private static Map<String /*method name*/, Map<String /*method id*/, Set<String /* owner sig */>>> chainableMethods;
+  private static volatile Map<String /*method name*/, Map<String /*method id*/, Set<String /* owner sig */>>> chainableMethods;
+
+  private ExtensionValidation() {
+  }
 
   public static synchronized void install() {
     if (listener == null) {
@@ -337,11 +340,9 @@ public class ExtensionValidation {
     private void createErrorMarkerIfNecessary(ICompilationUnit icu, IResource resource, P_ProblemCandidates problemCandidate, ITypeHierarchy supertypeHierarchy) throws CoreException {
       for (String ownerSig : problemCandidate.getOwnerSignatures()) {
         IType owner = TypeUtility.getTypeBySignature(ownerSig);
-        if (TypeUtility.exists(owner)) {
-          if (supertypeHierarchy.contains(owner)) {
-            createErrorMarker(resource, problemCandidate.getStart(), problemCandidate.getLength(), icu, problemCandidate.getMethodName());
-            return;
-          }
+        if (TypeUtility.exists(owner) && supertypeHierarchy.contains(owner)) {
+          createErrorMarker(resource, problemCandidate.getStart(), problemCandidate.getLength(), icu, problemCandidate.getMethodName());
+          return;
         }
       }
     }
