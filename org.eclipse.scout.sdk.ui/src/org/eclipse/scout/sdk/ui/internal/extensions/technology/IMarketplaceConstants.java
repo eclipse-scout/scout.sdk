@@ -14,7 +14,7 @@ import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 
 /**
  * <h3>{@link IMarketplaceConstants}</h3>
- * 
+ *
  * @author Matthias Villiger
  * @since 3.8.0 15.02.2012
  */
@@ -25,9 +25,9 @@ public interface IMarketplaceConstants {
   String SCOUT_MYSQL_JDBC_FEATURE = "com.bsiag.scout.rt.server.jdbc.mysql5117.source.feature.group";
   String MY_SQL_JDBC_PLUGIN = "com.bsiag.scout.rt.server.jdbc.mysql5117";
   String MY_SQL_JDBC_FRAGMENT = "com.mysql.jdbc_5117.fragment";
-  String SCOUT_ORACLE_JDBC_FEATURE = "com.bsiag.scout.rt.server.jdbc.oracle11g2.source.feature.group";
-  String ORACLE_JDBC_PLUGIN = "com.bsiag.scout.rt.server.jdbc.oracle11g2";
-  String ORACLE_JDBC_FRAGMENT = "com.oracle.oracle11g2.jdbc.fragment";
+  String SCOUT_ORACLE_JDBC_FEATURE = "com.bsiag.scout.rt.server.jdbc.oracle12c.source.feature.group";
+  String ORACLE_JDBC_PLUGIN = "com.bsiag.scout.rt.server.jdbc.oracle12c";
+  String ORACLE_JDBC_FRAGMENT = "com.oracle.oracle12c.jdbc.fragment";
   String SCOUT_POSTGRES_JDBC_FEATURE = "com.bsiag.scout.rt.server.jdbc.postgresql9.source.feature.group";
   String POSTGRES_JDBC_PLUGIN = "com.bsiag.scout.rt.server.jdbc.postgresql9";
   String POSTGRES_JDBC_FRAGMENT = "org.postgres.postgresql9.jdbc.fragment";
