@@ -25,12 +25,12 @@ import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 
 /**
- * <h3>{@link Oracle11g2JdbcTargetTechnologyHandler}</h3>
+ * <h3>{@link OracleJdbcTargetTechnologyHandler}</h3>
  *
  * @author Matthias Villiger
  * @since 3.10.0 09.04.2014
  */
-public class Oracle11g2JdbcTargetTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {
+public class OracleJdbcTargetTechnologyHandler extends AbstractScoutTechnologyHandler implements IMarketplaceConstants {
 
   @Override
   public boolean preSelectionChanged(Set<IScoutTechnologyResource> resources, boolean selected, IProgressMonitor monitor) throws CoreException {

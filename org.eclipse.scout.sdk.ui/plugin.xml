@@ -1053,20 +1053,20 @@
       </handler>
       <technology
             category="Database Drivers"
-            id="scout.technology.jdbc.oracle11g2"
-            name="Oracle 11g2 JDBC Driver for Eclipse Scout">
+            id="scout.technology.jdbc.oracle12c"
+            name="Oracle 12.1.0.2 JDBC Driver for Eclipse Scout">
       </technology>
       <handler
-            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.Oracle11g2JdbcManifestTechnologyHandler"
-            technology="scout.technology.jdbc.oracle11g2">
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.OracleJdbcManifestTechnologyHandler"
+            technology="scout.technology.jdbc.oracle12c">
       </handler>
       <handler
-            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.Oracle11g2JdbcProdTechnologyHandler"
-            technology="scout.technology.jdbc.oracle11g2">
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.OracleJdbcProdTechnologyHandler"
+            technology="scout.technology.jdbc.oracle12c">
       </handler>
             <handler
-            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.Oracle11g2JdbcTargetTechnologyHandler"
-            technology="scout.technology.jdbc.oracle11g2">
+            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.jdbc.OracleJdbcTargetTechnologyHandler"
+            technology="scout.technology.jdbc.oracle12c">
       </handler>
       <technology
             category="Database Drivers"

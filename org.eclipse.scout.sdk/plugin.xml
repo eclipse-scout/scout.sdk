@@ -1064,6 +1064,9 @@
             symbolicName="com.bsiag.scout.rt.server.jdbc.oracle11g2">
       </bundle>
       <bundle
+            symbolicName="com.bsiag.scout.rt.server.jdbc.oracle12c">
+      </bundle>
+      <bundle
             symbolicName="com.bsiag.scout.rt.server.jdbc.postgresql9">
       </bundle>
       <bundle
