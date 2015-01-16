@@ -88,6 +88,9 @@ public final class ExtensionValidation {
       ScoutSdkCore.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(listener);
       listener = null;
     }
+    synchronized (LOCK) {
+      chainableMethods = null;
+    }
   }
 
   private static Map<String, Map<String, Set<String>>> getChainableMethods() throws CoreException {
