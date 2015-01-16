@@ -33,7 +33,7 @@
       <plugin id="empty.project.shared"/>
       <plugin id="empty.project.ui.swing"/>
       <plugin id="javax.xml"/>
-      <plugin id="jre16.fragment" fragment="true"/>
+      <plugin id="jre17.fragment" fragment="true"/>
       <plugin id="org.apache.batik.bridge"/>
       <plugin id="org.apache.batik.css"/>
       <plugin id="org.apache.batik.dom"/>
