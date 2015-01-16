@@ -84,7 +84,7 @@ public final class DtoUtility {
 
   private static AnnotationSourceBuilder getExtendsAnnotationSourceBuilder(IJavaElement element, ITypeHierarchy modelLocalHierarchy) throws CoreException {
     if (element instanceof IType) {
-      IType extendedType = getExtendedType((IType) element, modelLocalHierarchy);
+      IType extendedType = ScoutTypeUtility.getExtendedType((IType) element, modelLocalHierarchy);
       if (extendedType != null) {
         IType primaryType = TypeUtility.getPrimaryType(extendedType);
         ITypeHierarchy extendedTypeSuperHierarchy = TypeUtility.getSupertypeHierarchy(primaryType);
@@ -115,39 +115,6 @@ public final class DtoUtility {
         }
       }
     }
-    return null;
-  }
-
-  private static IType getExtendedType(IType modelType, ITypeHierarchy localHierarchy) throws CoreException {
-    IType iExtension = TypeUtility.getType(IRuntimeClasses.IExtension);
-    boolean isExtension = TypeUtility.exists(iExtension) && localHierarchy.isSubtype(iExtension, modelType);
-    if (isExtension) {
-      // 1. try to read from generic
-      String ownerSignature = SignatureUtility.resolveTypeParameter(modelType, localHierarchy, IRuntimeClasses.IExtension, IRuntimeClasses.TYPE_PARAM_EXTENSION__OWNER);
-      if (ownerSignature != null) {
-        return TypeUtility.getTypeBySignature(ownerSignature);
-      }
-    }
-
-    // 2. try to read from @Extends annotation
-    String extendsSignature = ScoutTypeUtility.findExtendsAnnotationSignature(modelType, localHierarchy);
-    if (extendsSignature != null) {
-      return TypeUtility.getTypeBySignature(extendsSignature);
-    }
-
-    // 3. try in declaring type
-    IType declaringType = modelType.getDeclaringType();
-    if (TypeUtility.exists(declaringType)) {
-      IType extendsFromDeclaringType = getExtendedType(declaringType, localHierarchy);
-      if (extendsFromDeclaringType != null) {
-        return extendsFromDeclaringType;
-      }
-    }
-
-    // 4. if the model class has no annotation and is not an extension
-    //    this can happen if e.g. a formfield is explicitly registered on the ExtensionRegistry.
-    //    in this case we cannot detect anything
-
     return null;
   }
 
