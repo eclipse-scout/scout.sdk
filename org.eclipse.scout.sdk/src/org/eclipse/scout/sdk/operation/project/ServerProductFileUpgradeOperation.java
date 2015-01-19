@@ -79,7 +79,7 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
         jaxWsFragment = "org.eclipse.scout.jaxws216.jre18.fragment";
       }
       else {
-        jaxWsFragment = "org.eclipse.scout.jaxws216.jre16.fragment";
+        jaxWsFragment = "org.eclipse.scout.jaxws216.jre17.fragment";
       }
 
       // add jaxws fragments
