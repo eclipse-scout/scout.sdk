@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.util.JettyProductFileUpgradeOperation;
 import org.eclipse.scout.sdk.operation.util.OsgiSystemCapabilitiesAddOperation;
-import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 
@@ -63,15 +62,6 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
     }
 
     if (!productFiles.isEmpty()) {
-      // Servlet Plugin
-      String servletPlugin = null;
-      if (JdtUtility.isServlet31OrNewer()) {
-        servletPlugin = "org.eclipse.scout.rt.server.servlet31";
-      }
-      else {
-        servletPlugin = "org.eclipse.scout.rt.server.servlet25";
-      }
-
       // Java 1.8/1.6 fragment for JAX-WS
       boolean isMin18 = isMinJavaVersion(1.8);
       String jaxWsFragment = null;
@@ -85,9 +75,7 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
       // add jaxws fragments
       for (IFile f : productFiles) {
         ProductFileModelHelper h = new ProductFileModelHelper(f);
-        h.ProductFile.addDependency(servletPlugin);
         h.ProductFile.addDependency(jaxWsFragment);
-
         h.save();
       }
 
