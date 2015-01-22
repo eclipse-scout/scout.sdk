@@ -565,12 +565,6 @@ public final class JdtUtility {
     return ResourcesPlugin.getWorkspace().getDescription().isAutoBuilding();
   }
 
-  public static boolean isServlet31OrNewer() {
-    BundleDescription batikUtil = JdtUtility.getNewestBundleInActiveTargetPlatform("javax.servlet");
-    return batikUtil != null
-        && ((batikUtil.getVersion().getMajor() == 3 && batikUtil.getVersion().getMinor() >= 1) || batikUtil.getVersion().getMajor() > 3);
-  }
-
   public static boolean isBatik17OrNewer() {
     BundleDescription batikUtil = JdtUtility.getNewestBundleInActiveTargetPlatform("org.apache.batik.util");
     return batikUtil != null

@@ -1050,12 +1050,6 @@
       <bundle
             symbolicName="org.eclipse.scout.rt.server.jms">
       </bundle>
-      <bundle
-            symbolicName="org.eclipse.scout.rt.server.servlet25">
-      </bundle>
-      <bundle
-            symbolicName="org.eclipse.scout.rt.server.servlet31">
-      </bundle>
       <!-- may be installed from the marketplace. -->
       <bundle
             symbolicName="com.bsiag.scout.rt.server.jdbc.mysql5117">
