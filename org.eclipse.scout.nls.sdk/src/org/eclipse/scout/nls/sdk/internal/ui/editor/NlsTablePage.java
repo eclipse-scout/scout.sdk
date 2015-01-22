@@ -235,9 +235,14 @@ public class NlsTablePage extends Composite {
           INlsEntry e = entries.get(0);
           int colIndex = cursorPos.y;
           String txt = null;
-          Language languageOfColumn = m_tableModel.getLanguageOfColumn(colIndex);
-          if (languageOfColumn != null) {
-            txt = e.getTranslation(languageOfColumn);
+          if (colIndex == 1) {
+            txt = e.getKey();
+          }
+          else if (colIndex > 1) {
+            Language languageOfColumn = m_tableModel.getLanguageOfColumn(colIndex);
+            if (languageOfColumn != null) {
+              txt = e.getTranslation(languageOfColumn);
+            }
           }
           addSingleSelectMenues(menuManager, e, colIndex, txt, e instanceof InheritedNlsEntry);
         }
