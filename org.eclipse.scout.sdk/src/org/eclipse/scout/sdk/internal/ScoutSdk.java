@@ -15,7 +15,6 @@ import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.commons.TuningUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.classid.ClassIdValidationJob;
-import org.eclipse.scout.sdk.extension.ExtensionValidation;
 import org.eclipse.scout.sdk.internal.workspace.ScoutWorkspace;
 import org.eclipse.scout.sdk.internal.workspace.dto.DtoAutoUpdateManager;
 import org.eclipse.scout.sdk.internal.workspace.dto.formdata.FormDataDtoUpdateHandler;
@@ -54,7 +53,6 @@ public class ScoutSdk extends Plugin {
     // start class id validation
     ClassIdValidationJob.install();
     ClassIdValidationJob.executeAsync(5000);
-    ExtensionValidation.install();
 
     // DTO auto update
     m_autoUpdateManager = new DtoAutoUpdateManager();
@@ -68,7 +66,6 @@ public class ScoutSdk extends Plugin {
     TuningUtility.finishAll();
     m_autoUpdateManager.dispose();
     ClassIdValidationJob.uninstall();
-    ExtensionValidation.uninstall();
     ScoutWorkspace.getInstance().dispose();
     ScoutSdkCore.getHierarchyCache().dispose();
     ScoutSdkCore.getTypeCache().dispose();
