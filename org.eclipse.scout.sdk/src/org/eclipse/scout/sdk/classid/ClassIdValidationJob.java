@@ -79,6 +79,7 @@ public final class ClassIdValidationJob extends JobEx {
     setSystem(true);
     setUser(false);
     setRule(new P_SchedulingRule());
+    setPriority(Job.BUILD);
     m_classIdType = classIdType;
     m_formDataBaseType = formDataBaseType;
     m_formFieldDataBaseType = formFieldDataBaseType;
@@ -94,31 +95,31 @@ public final class ClassIdValidationJob extends JobEx {
       e.search(SearchPattern.createPattern(m_classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH),
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
           SearchEngine.createWorkspaceScope(), new SearchRequestor() {
-        @Override
-        public void acceptSearchMatch(SearchMatch match) throws CoreException {
-          if (monitor.isCanceled()) {
-            return;
-          }
-          Object owner = match.getElement();
-          if (owner instanceof IType) {
-            IType ownerType = (IType) owner;
-            if (TypeUtility.exists(ownerType)) {
-              // do not check for annotation duplicates within DTOs.
-              IType toplevelType = ScoutTypeUtility.getPrimaryType(ownerType);
-              if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType) && !formDataHierarchy.contains(toplevelType) && !formFieldDataHierarchy.contains(toplevelType)) {
-                IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
-                if (element == null) {
-                  // e.g. when the annotation is fully qualified. try reading from owner
-                  element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
-                }
-                if (element instanceof IAnnotation && TypeUtility.exists(element)) {
-                  result.add((IAnnotation) element);
+            @Override
+            public void acceptSearchMatch(SearchMatch match) throws CoreException {
+              if (monitor.isCanceled()) {
+                return;
+              }
+              Object owner = match.getElement();
+              if (owner instanceof IType) {
+                IType ownerType = (IType) owner;
+                if (TypeUtility.exists(ownerType)) {
+                  // do not check for annotation duplicates within DTOs.
+                  IType toplevelType = ScoutTypeUtility.getPrimaryType(ownerType);
+                  if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType) && !formDataHierarchy.contains(toplevelType) && !formFieldDataHierarchy.contains(toplevelType)) {
+                    IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
+                    if (element == null) {
+                      // e.g. when the annotation is fully qualified. try reading from owner
+                      element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
+                    }
+                    if (element instanceof IAnnotation && TypeUtility.exists(element)) {
+                      result.add((IAnnotation) element);
+                    }
+                  }
                 }
               }
             }
-          }
-        }
-      }, monitor);
+          }, monitor);
     }
     catch (OperationCanceledException oce) {
       //nop
