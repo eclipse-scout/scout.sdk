@@ -26,15 +26,18 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.ISchedulingRule;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.ElementChangedEvent;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
+import org.eclipse.jdt.core.IElementChangedListener;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.ILocalVariable;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.dom.ASTNode;
-import org.eclipse.jdt.core.dom.ASTVisitor;
 import org.eclipse.jdt.core.dom.CompilationUnit;
 import org.eclipse.jdt.core.dom.IMethodBinding;
 import org.eclipse.jdt.core.dom.ITypeBinding;
@@ -44,12 +47,10 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.job.JobEx;
-import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
-import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
-import org.eclipse.scout.sdk.util.jdt.JdtEvent;
+import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.eclipse.scout.sdk.util.signature.SignatureUtility;
 import org.eclipse.scout.sdk.util.type.IMethodFilter;
@@ -68,9 +69,10 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 public final class ExtensionValidation {
 
   public static final String INVALID_OPERATION_METHOD_CALL_MARKER_ID = "org.eclipse.scout.sdk.extension.operation.call";
+  public static final String EXTENSION_VALIDATION_JOB_FAMILY = "extension.validation.job.family";
 
   private static final Object LOCK = new Object();
-  private static IJavaResourceChangedListener listener;
+  private static IElementChangedListener listener;
   private static volatile Map<String /*method name*/, Map<String /*method id*/, Set<String /* owner sig */>>> chainableMethods;
 
   private ExtensionValidation() {
@@ -79,15 +81,16 @@ public final class ExtensionValidation {
   public static synchronized void install() {
     if (listener == null) {
       listener = new P_ResourceChangeListener();
-      ScoutSdkCore.getJavaResourceChangedEmitter().addJavaResourceChangedListener(listener);
+      JavaCore.addElementChangedListener(listener);
     }
   }
 
   public static synchronized void uninstall() {
     if (listener != null) {
-      ScoutSdkCore.getJavaResourceChangedEmitter().removeJavaResourceChangedListener(listener);
+      JavaCore.removeElementChangedListener(listener);
       listener = null;
     }
+    Job.getJobManager().cancel(EXTENSION_VALIDATION_JOB_FAMILY);
     synchronized (LOCK) {
       chainableMethods = null;
     }
@@ -242,7 +245,7 @@ public final class ExtensionValidation {
     }
 
     @Override
-    protected IStatus run(IProgressMonitor monitor) {
+    protected IStatus run(final IProgressMonitor monitor) {
       try {
         IJavaElement je = m_ast.getJavaElement();
         if (!(je instanceof ICompilationUnit)) {
@@ -254,14 +257,28 @@ public final class ExtensionValidation {
           return Status.OK_STATUS;
         }
         resource.deleteMarkers(INVALID_OPERATION_METHOD_CALL_MARKER_ID, true, IResource.DEPTH_ZERO);
+        if (monitor.isCanceled()) {
+          return Status.CANCEL_STATUS;
+        }
 
         final Map<String, Map<String, Set<String>>> interestingMethods = getChainableMethods();
         final Map<IMethod, P_ProblemCandidates> methodsToCheck = new HashMap<IMethod, P_ProblemCandidates>();
 
-        m_ast.accept(new ASTVisitor() {
+        m_ast.accept(new DefaultAstVisitor() {
+
+          @Override
+          public boolean visitNode(ASTNode node) {
+            if (monitor.isCanceled()) {
+              return false;
+            }
+            return super.visitNode(node);
+          }
 
           @Override
           public boolean visit(MethodInvocation node) {
+            if (monitor.isCanceled()) {
+              return false;
+            }
             String methodName = node.getName().getIdentifier();
             Map<String, Set<String>> map = interestingMethods.get(methodName);
             if (map != null) {
@@ -271,11 +288,17 @@ public final class ExtensionValidation {
                 if (javaElement instanceof IMethod) {
                   IMethod m = (IMethod) javaElement;
                   IType declaringType = getDeclaringTypeOf(node);
+                  if (monitor.isCanceled()) {
+                    return false;
+                  }
                   if (!isLocalExtension(declaringType, m)) {
                     try {
                       String id = SignatureUtility.getMethodIdentifier(m);
                       Set<String> owners = map.get(id);
                       if (owners != null) {
+                        if (monitor.isCanceled()) {
+                          return false;
+                        }
                         P_ProblemCandidates candidate = new P_ProblemCandidates(owners, node.getStartPosition(), node.getLength(), m.getElementName());
                         methodsToCheck.put(m, candidate);
                       }
@@ -290,11 +313,17 @@ public final class ExtensionValidation {
             return super.visit(node);
           }
         });
+        if (monitor.isCanceled()) {
+          return Status.CANCEL_STATUS;
+        }
 
         for (Entry<IMethod, P_ProblemCandidates> entry : methodsToCheck.entrySet()) {
           ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(entry.getKey().getDeclaringType());
           if (supertypeHierarchy != null) {
-            createErrorMarkerIfNecessary(icu, resource, entry.getValue(), supertypeHierarchy);
+            createErrorMarkerIfNecessary(icu, resource, entry.getValue(), supertypeHierarchy, monitor);
+          }
+          if (monitor.isCanceled()) {
+            return Status.CANCEL_STATUS;
           }
         }
       }
@@ -302,6 +331,11 @@ public final class ExtensionValidation {
         ScoutSdk.logWarning("Unable to check for chainable method calls.", e);
       }
       return Status.OK_STATUS;
+    }
+
+    @Override
+    public boolean belongsTo(Object family) {
+      return EXTENSION_VALIDATION_JOB_FAMILY.equals(family);
     }
 
     private IType getDeclaringTypeOf(MethodInvocation mi) {
@@ -340,11 +374,14 @@ public final class ExtensionValidation {
       return declaringTypeOfLocalExtension.equals(methodDeclaration.getDeclaringType());
     }
 
-    private void createErrorMarkerIfNecessary(ICompilationUnit icu, IResource resource, P_ProblemCandidates problemCandidate, ITypeHierarchy supertypeHierarchy) throws CoreException {
+    private void createErrorMarkerIfNecessary(ICompilationUnit icu, IResource resource, P_ProblemCandidates problemCandidate, ITypeHierarchy supertypeHierarchy, IProgressMonitor monitor) throws CoreException {
       for (String ownerSig : problemCandidate.getOwnerSignatures()) {
         IType owner = TypeUtility.getTypeBySignature(ownerSig);
         if (TypeUtility.exists(owner) && supertypeHierarchy.contains(owner)) {
           createErrorMarker(resource, problemCandidate.getStart(), problemCandidate.getLength(), icu, problemCandidate.getMethodName());
+          return;
+        }
+        if (monitor.isCanceled()) {
           return;
         }
       }
@@ -386,13 +423,34 @@ public final class ExtensionValidation {
     }
   }
 
-  private static final class P_ResourceChangeListener implements IJavaResourceChangedListener {
+  private static final class P_ResourceChangeListener implements IElementChangedListener {
     @Override
-    public void handleEvent(JdtEvent event) {
-      CompilationUnit compilationUnitAST = event.getCompilationUnitAST();
+    public void elementChanged(ElementChangedEvent event) {
+      CompilationUnit compilationUnitAST = visitDelta(event.getDelta());
       if (compilationUnitAST != null) {
+        Job.getJobManager().cancel(EXTENSION_VALIDATION_JOB_FAMILY);
         new P_MarkerCreationJob(compilationUnitAST).schedule();
       }
+    }
+
+    private CompilationUnit visitDelta(IJavaElementDelta delta) {
+      CompilationUnit ast = delta.getCompilationUnitAST();
+      if (ast != null) {
+        return ast;
+      }
+
+      if ((delta.getFlags() & IJavaElementDelta.F_CHILDREN) != 0) {
+        IJavaElementDelta[] childDeltas = delta.getAffectedChildren();
+        if (childDeltas != null && childDeltas.length > 0) {
+          for (int i = 0; i < childDeltas.length; i++) {
+            ast = visitDelta(childDeltas[i]);
+            if (ast != null) {
+              return ast;
+            }
+          }
+        }
+      }
+      return null;
     }
   }
 
