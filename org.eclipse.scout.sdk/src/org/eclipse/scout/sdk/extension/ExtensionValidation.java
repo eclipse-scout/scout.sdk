@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.extension;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -69,6 +70,7 @@ import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 public final class ExtensionValidation {
 
   public static final String INVALID_OPERATION_METHOD_CALL_MARKER_ID = "org.eclipse.scout.sdk.extension.operation.call";
+  public static final String INVALID_OPERATION_METHOD_ATTRIB = "org.eclipse.scout.sdk.extension.operation.call.attrib.methodName";
   public static final String EXTENSION_VALIDATION_JOB_FAMILY = "extension.validation.job.family";
 
   private static final Object LOCK = new Object();
@@ -228,19 +230,42 @@ public final class ExtensionValidation {
       m_ast = ast;
     }
 
-    private void createErrorMarker(IResource r, int start, int length, ICompilationUnit icu, String methodName) throws CoreException {
-      IMarker marker = r.createMarker(INVALID_OPERATION_METHOD_CALL_MARKER_ID);
-      marker.setAttribute(IMarker.MESSAGE, Texts.get("ChainableMethodCannotBeCalled", methodName));
-      marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
-      marker.setAttribute(IMarker.CHAR_START, start);
-      marker.setAttribute(IMarker.CHAR_END, start + length);
-      marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
-      try {
-        Document doc = new Document(icu.getSource());
-        marker.setAttribute(IMarker.LINE_NUMBER, doc.getLineOfOffset(start) + 1);
+    private void updateMarkers(ICompilationUnit icu, IResource res, Set<P_MarkerData> markerDatas) throws CoreException {
+      Set<IMarker> existingMarkers = CollectionUtility.hashSet(res.findMarkers(INVALID_OPERATION_METHOD_CALL_MARKER_ID, true, IResource.DEPTH_ZERO));
+      Iterator<IMarker> iterator = existingMarkers.iterator();
+      while (iterator.hasNext()) {
+        IMarker m = iterator.next();
+        int start = m.getAttribute(IMarker.CHAR_START, -1);
+        int end = m.getAttribute(IMarker.CHAR_END, -1);
+        P_MarkerData curMarkerData = new P_MarkerData(start, end - start, m.getAttribute(INVALID_OPERATION_METHOD_ATTRIB, null));
+        boolean removed = markerDatas.remove(curMarkerData);
+        if (removed) {
+          // this marker already exists -> nothing to do
+          iterator.remove();
+        }
       }
-      catch (BadLocationException e) {
-        //nop
+
+      // delete the ones that no longer exist
+      for (IMarker m : existingMarkers) {
+        m.delete();
+      }
+
+      // create the ones that are new
+      for (P_MarkerData data : markerDatas) {
+        IMarker marker = res.createMarker(INVALID_OPERATION_METHOD_CALL_MARKER_ID);
+        marker.setAttribute(IMarker.MESSAGE, Texts.get("ChainableMethodCannotBeCalled", data.m_methodName));
+        marker.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
+        marker.setAttribute(IMarker.CHAR_START, data.m_start);
+        marker.setAttribute(IMarker.CHAR_END, data.m_start + data.m_length);
+        marker.setAttribute(IMarker.SEVERITY, IMarker.SEVERITY_ERROR);
+        marker.setAttribute(INVALID_OPERATION_METHOD_ATTRIB, data.m_methodName);
+        try {
+          Document doc = new Document(icu.getSource());
+          marker.setAttribute(IMarker.LINE_NUMBER, doc.getLineOfOffset(data.m_start) + 1);
+        }
+        catch (BadLocationException e) {
+          //nop
+        }
       }
     }
 
@@ -256,7 +281,6 @@ public final class ExtensionValidation {
         if (!ResourceUtility.exists(resource)) {
           return Status.OK_STATUS;
         }
-        resource.deleteMarkers(INVALID_OPERATION_METHOD_CALL_MARKER_ID, true, IResource.DEPTH_ZERO);
         if (monitor.isCanceled()) {
           return Status.CANCEL_STATUS;
         }
@@ -317,15 +341,22 @@ public final class ExtensionValidation {
           return Status.CANCEL_STATUS;
         }
 
-        for (Entry<IMethod, P_ProblemCandidates> entry : methodsToCheck.entrySet()) {
+        Set<Entry<IMethod, P_ProblemCandidates>> entrySet = methodsToCheck.entrySet();
+        Set<P_MarkerData> markers = new HashSet<ExtensionValidation.P_MarkerData>(entrySet.size());
+        for (Entry<IMethod, P_ProblemCandidates> entry : entrySet) {
           ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(entry.getKey().getDeclaringType());
           if (supertypeHierarchy != null) {
-            createErrorMarkerIfNecessary(icu, resource, entry.getValue(), supertypeHierarchy, monitor);
+            P_MarkerData markerData = createErrorMarkerIfNecessary(entry.getValue(), supertypeHierarchy, monitor);
+            if (markerData != null) {
+              markers.add(markerData);
+            }
           }
           if (monitor.isCanceled()) {
             return Status.CANCEL_STATUS;
           }
         }
+
+        updateMarkers(icu, resource, markers);
       }
       catch (Exception e) {
         ScoutSdk.logWarning("Unable to check for chainable method calls.", e);
@@ -374,17 +405,69 @@ public final class ExtensionValidation {
       return declaringTypeOfLocalExtension.equals(methodDeclaration.getDeclaringType());
     }
 
-    private void createErrorMarkerIfNecessary(ICompilationUnit icu, IResource resource, P_ProblemCandidates problemCandidate, ITypeHierarchy supertypeHierarchy, IProgressMonitor monitor) throws CoreException {
+    private P_MarkerData createErrorMarkerIfNecessary(P_ProblemCandidates problemCandidate, ITypeHierarchy supertypeHierarchy, IProgressMonitor monitor) throws CoreException {
       for (String ownerSig : problemCandidate.getOwnerSignatures()) {
         IType owner = TypeUtility.getTypeBySignature(ownerSig);
         if (TypeUtility.exists(owner) && supertypeHierarchy.contains(owner)) {
-          createErrorMarker(resource, problemCandidate.getStart(), problemCandidate.getLength(), icu, problemCandidate.getMethodName());
-          return;
+          return new P_MarkerData(problemCandidate.getStart(), problemCandidate.getLength(), problemCandidate.getMethodName());
         }
         if (monitor.isCanceled()) {
-          return;
+          return null;
         }
       }
+      return null;
+    }
+  }
+
+  private static final class P_MarkerData {
+    private final int m_start;
+    private final int m_length;
+    private final String m_methodName;
+
+    public P_MarkerData(int start, int length, String methodName) {
+      super();
+      m_start = start;
+      m_length = length;
+      this.m_methodName = methodName;
+    }
+
+    @Override
+    public int hashCode() {
+      final int prime = 31;
+      int result = 1;
+      result = prime * result + m_length;
+      result = prime * result + m_start;
+      result = prime * result + ((m_methodName == null) ? 0 : m_methodName.hashCode());
+      return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+      if (this == obj) {
+        return true;
+      }
+      if (obj == null) {
+        return false;
+      }
+      if (!(obj instanceof P_MarkerData)) {
+        return false;
+      }
+      P_MarkerData other = (P_MarkerData) obj;
+      if (m_length != other.m_length) {
+        return false;
+      }
+      if (m_start != other.m_start) {
+        return false;
+      }
+      if (m_methodName == null) {
+        if (other.m_methodName != null) {
+          return false;
+        }
+      }
+      else if (!m_methodName.equals(other.m_methodName)) {
+        return false;
+      }
+      return true;
     }
   }
 
