@@ -25,7 +25,7 @@
 		<group style-id="content-group" id="scout-tutIntroLink-group" label="Eclipse for Scout Developers">
 			<text>Eclipse Scout is a mature and open framework for modern, service oriented business applications. It substantially boosts developer productivity and is simple to learn.</text>
 			<link label="Scout Tutorials"
-				url="https://wiki.eclipse.org/Scout/Tutorial/4.0"
+				url="https://wiki.eclipse.org/Scout/Tutorial/5.0"
 				id="scout-tutIntroLink"
 				style-id="content-link">
 				<text>
@@ -33,7 +33,7 @@
         		</text>
 			</link>
 			<link label="Scout HowTo's"
-				url="https://wiki.eclipse.org/Scout/HowTo/4.0"
+				url="https://wiki.eclipse.org/Scout/HowTo/5.0"
 				id="scout-howtoIntroLink"
 				style-id="content-link">
 				<text>
@@ -46,7 +46,7 @@
 		<group style-id="content-group" id="scout-newIntroLink-group" label="Eclipse for Scout Developers">
 			<text>Eclipse Scout is a mature and open framework for modern, service oriented business applications. It substantially boosts developer productivity and is simple to learn.</text>
 			<link label="Eclipse Scout New and Noteworthy "
-				url="https://wiki.eclipse.org/Scout/NewAndNoteworthy/4.0"
+				url="https://wiki.eclipse.org/Scout/NewAndNoteworthy/5.0"
 				id="scout-newIntroLink"
 				style-id="content-link">
 				<text>
