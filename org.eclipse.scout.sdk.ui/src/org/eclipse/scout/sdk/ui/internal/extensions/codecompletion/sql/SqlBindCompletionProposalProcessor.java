@@ -69,7 +69,7 @@ public class SqlBindCompletionProposalProcessor {
 
       IType abstractFormFieldData = TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData);
       IType abstractPropertyData = TypeUtility.getType(IRuntimeClasses.AbstractPropertyData);
-      if (TypeUtility.exists(abstractPropertyData) || !TypeUtility.exists(abstractFormFieldData)) {
+      if (!TypeUtility.exists(abstractPropertyData) || !TypeUtility.exists(abstractFormFieldData)) {
         return Collections.emptyList();
       }
 
@@ -148,7 +148,6 @@ public class SqlBindCompletionProposalProcessor {
             if (TypeUtility.exists(candidate)) {
               ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(candidate);
               if (supertypeHierarchy != null && supertypeHierarchy.contains(abstractFormData)) {
-
                 return candidate;
               }
             }
