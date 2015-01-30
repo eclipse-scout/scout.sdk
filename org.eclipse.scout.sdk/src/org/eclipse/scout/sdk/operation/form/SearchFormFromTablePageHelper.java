@@ -40,6 +40,7 @@ import org.eclipse.scout.sdk.util.signature.SignatureCache;
 import org.eclipse.scout.sdk.util.type.TypeFilters;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
+import org.eclipse.scout.sdk.workspace.type.ScoutTypeComparators;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.scout.sdk.workspace.type.config.PropertyMethodSourceUtility;
@@ -114,7 +115,7 @@ public final class SearchFormFromTablePageHelper {
         }
       }
       if (TypeUtility.exists(table)) {
-        Set<IType> columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), tablePageHierarchy));
+        Set<IType> columns = TypeUtility.getInnerTypes(table, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), tablePageHierarchy), ScoutTypeComparators.getOrderAnnotationComparator());
         for (IType column : columns) {
           ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(column, "getConfiguredDisplayable", tablePageHierarchy, ConfigurationMethod.PROPERTY_METHOD, "BOOLEAN");
           String retVal = ScoutUtility.getMethodReturnValue(configurationMethod.peekMethod());
