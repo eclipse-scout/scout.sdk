@@ -54,8 +54,6 @@ import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ICachedTypeHierarchy;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
 /**
  * <h3>{@link ClassIdValidationJob}</h3>
@@ -71,55 +69,47 @@ public final class ClassIdValidationJob extends JobEx {
 
   private static IJavaResourceChangedListener listener;
   private final IType m_classIdType;
-  private final IType m_formDataBaseType;
-  private final IType m_formFieldDataBaseType; // does also include page datas
 
-  private ClassIdValidationJob(IType classIdType, IType formDataBaseType, IType formFieldDataBaseType) {
+  private ClassIdValidationJob(IType classIdType) {
     super(ClassIdValidationJob.class.getName());
     setSystem(true);
     setUser(false);
     setRule(new P_SchedulingRule());
     setPriority(Job.BUILD);
     m_classIdType = classIdType;
-    m_formDataBaseType = formDataBaseType;
-    m_formFieldDataBaseType = formFieldDataBaseType;
   }
 
   private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(final IProgressMonitor monitor) {
-    final ICachedTypeHierarchy formDataHierarchy = TypeUtility.getTypeHierarchy(m_formDataBaseType);
-    final ICachedTypeHierarchy formFieldDataHierarchy = TypeUtility.getTypeHierarchy(m_formFieldDataBaseType);
-
     final HashSet<IAnnotation> result = new HashSet<IAnnotation>();
     try {
       SearchEngine e = new SearchEngine();
       e.search(SearchPattern.createPattern(m_classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH),
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
           SearchEngine.createWorkspaceScope(), new SearchRequestor() {
-            @Override
-            public void acceptSearchMatch(SearchMatch match) throws CoreException {
-              if (monitor.isCanceled()) {
-                return;
+        @Override
+        public void acceptSearchMatch(SearchMatch match) throws CoreException {
+          if (monitor.isCanceled()) {
+            return;
+          }
+          Object owner = match.getElement();
+          if (owner instanceof IType) {
+            IType ownerType = (IType) owner;
+            if (TypeUtility.exists(ownerType)) {
+              IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
+              if (element == null) {
+                // e.g. when the annotation is fully qualified. try reading from owner
+                element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
               }
-              Object owner = match.getElement();
-              if (owner instanceof IType) {
-                IType ownerType = (IType) owner;
-                if (TypeUtility.exists(ownerType)) {
-                  // do not check for annotation duplicates within DTOs.
-                  IType toplevelType = ScoutTypeUtility.getPrimaryType(ownerType);
-                  if (!formDataHierarchy.contains(ownerType) && !formFieldDataHierarchy.contains(ownerType) && !formDataHierarchy.contains(toplevelType) && !formFieldDataHierarchy.contains(toplevelType)) {
-                    IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
-                    if (element == null) {
-                      // e.g. when the annotation is fully qualified. try reading from owner
-                      element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
-                    }
-                    if (element instanceof IAnnotation && TypeUtility.exists(element)) {
-                      result.add((IAnnotation) element);
-                    }
-                  }
-                }
+              if (element instanceof IAnnotation && TypeUtility.exists(element)) {
+                result.add((IAnnotation) element);
               }
             }
-          }, monitor);
+          }
+        }
+      }, monitor);
+    }
+    catch (IllegalStateException ise) {
+      // nop (workspace closed)
     }
     catch (OperationCanceledException oce) {
       //nop
@@ -278,18 +268,14 @@ public final class ClassIdValidationJob extends JobEx {
           // get the class id type outside of the validation job
           // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
           IType classId = TypeUtility.getType(IRuntimeClasses.ClassId);
-          IType abstractFormData = TypeUtility.getType(IRuntimeClasses.AbstractFormData);
-          IType abstractFormFieldData = TypeUtility.getType(IRuntimeClasses.AbstractFormFieldData);
-          if (TypeUtility.exists(classId) && TypeUtility.exists(abstractFormData) && TypeUtility.exists(abstractFormFieldData)) {
+          if (TypeUtility.exists(classId)) {
             // cancel currently running job. we are starting a new one right afterwards
             Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
 
-            // wait until all JDT initializations have been executed.
-            // @see org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob
-            JdtUtility.waitForJobFamily("org.eclipse.jdt.ui"); // from JavaUI.ID_PLUGIN
+            JdtUtility.waitForJdt();
 
             // start the new validation
-            new ClassIdValidationJob(classId, abstractFormData, abstractFormFieldData).schedule(startDelay);
+            new ClassIdValidationJob(classId).schedule(startDelay);
           }
         }
         catch (IllegalStateException e) {
