@@ -485,10 +485,18 @@ public final class JdtUtility {
   }
 
   /**
-   * Waits until all jobs of the given family are finished. This method will block the
-   * calling thread until all such jobs have finished executing, or until this thread is
-   * interrupted. If there are no jobs in the family that are currently waiting, running,
-   * or sleeping, this method returns immediately.
+   * Waits until all JDT initializations have been executed.
+   * 
+   * @see org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob
+   */
+  public static void waitForJdt() {
+    JdtUtility.waitForJobFamily("org.eclipse.jdt.ui");
+  }
+
+  /**
+   * Waits until all jobs of the given family are finished. This method will block the calling thread until all such
+   * jobs have finished executing. If there are no jobs in the family that are currently waiting, running, or sleeping,
+   * this method returns immediately.
    */
   public static void waitForJobFamily(final Object family) {
     boolean wasInterrupted = false;
