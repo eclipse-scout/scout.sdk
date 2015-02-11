@@ -46,6 +46,10 @@ public class TableFieldFormData extends AbstractFormData {
     return getFieldByClass(PersonTable.class);
   }
 
+  public TableFieldWithExternalTable getTableFieldWithExternalTable() {
+    return getFieldByClass(TableFieldWithExternalTable.class);
+  }
+
   public static class CompanyTable extends AbstractCompanyTableFieldData {
 
     private static final long serialVersionUID = 1L;
@@ -219,6 +223,86 @@ public class TableFieldFormData extends AbstractFormData {
         case CUSTOM_COLUMN_ID:
           setCustom(row, (Set<Map<String, Integer>>) value);
           break;
+      }
+    }
+  }
+
+  public static class TableFieldWithExternalTable extends AbstractTableFieldBeanData {
+
+    private static final long serialVersionUID = 1L;
+
+    public TableFieldWithExternalTable() {
+    }
+
+    @Override
+    public TableFieldWithExternalTableRowData addRow() {
+      return (TableFieldWithExternalTableRowData) super.addRow();
+    }
+
+    @Override
+    public TableFieldWithExternalTableRowData addRow(int rowState) {
+      return (TableFieldWithExternalTableRowData) super.addRow(rowState);
+    }
+
+    @Override
+    public TableFieldWithExternalTableRowData createRow() {
+      return new TableFieldWithExternalTableRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return TableFieldWithExternalTableRowData.class;
+    }
+
+    @Override
+    public TableFieldWithExternalTableRowData[] getRows() {
+      return (TableFieldWithExternalTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public TableFieldWithExternalTableRowData rowAt(int index) {
+      return (TableFieldWithExternalTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(TableFieldWithExternalTableRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class TableFieldWithExternalTableRowData extends AbstractTableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String aa = "aa";
+      public static final String xx = "xx";
+      public static final String bb = "bb";
+      private String m_aa;
+      private String m_xx;
+      private String m_bb;
+
+      public TableFieldWithExternalTableRowData() {
+      }
+
+      public String getAa() {
+        return m_aa;
+      }
+
+      public void setAa(String aa) {
+        m_aa = aa;
+      }
+
+      public String getXx() {
+        return m_xx;
+      }
+
+      public void setXx(String xx) {
+        m_xx = xx;
+      }
+
+      public String getBb() {
+        return m_bb;
+      }
+
+      public void setBb(String bb) {
+        m_bb = bb;
       }
     }
   }

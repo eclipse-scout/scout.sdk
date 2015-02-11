@@ -112,7 +112,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     }
 
     // get all columns
-    Set<IType> columns = getColumns(getColumnContainer(), rowDataSuperClassType, getModelLocalHierarchy(), monitor);
+    Set<IType> columns = getColumns(getColumnContainer(), rowDataSuperClassType, monitor);
     if (monitor.isCanceled()) {
       return;
     }
@@ -163,20 +163,23 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     return NamingUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
   }
 
-  protected static Set<IType> getColumns(IType declaringType, IType rowDataSuperType, final ITypeHierarchy fieldHierarchy, IProgressMonitor monitor) throws JavaModelException {
+  protected static Set<IType> getColumns(IType declaringType, IType rowDataSuperType, IProgressMonitor monitor) throws JavaModelException {
+
+    final ITypeHierarchy fieldHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
+
     // the declaring type is a column itself
     if (fieldHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IColumn), declaringType)) {
       return CollectionUtility.hashSet(declaringType);
     }
 
-    // the delcaring type holds columns
+    // the declaring type holds columns
     TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<IType>(ScoutTypeComparators.getOrderAnnotationComparator());
     // do not re-use the fieldHierarchy for the subtype filter!
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn)), new ITypeFilter() {
       @Override
       public boolean accept(IType type) {
         try {
-          SdkColumnCommand command = ScoutTypeUtility.findColumnDataSdkColumnCommand(type, fieldHierarchy);
+          SdkColumnCommand command = ScoutTypeUtility.findColumnDataSdkColumnCommand(type, TypeUtility.getSupertypeHierarchy(type));
           return command == null || command == SdkColumnCommand.CREATE;
         }
         catch (JavaModelException e) {
