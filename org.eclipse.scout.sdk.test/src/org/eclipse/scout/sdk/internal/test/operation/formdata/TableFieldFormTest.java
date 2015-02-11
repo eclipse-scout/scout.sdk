@@ -50,7 +50,7 @@ public class TableFieldFormTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'TableFieldFormData'", 4, tableFieldFormData.getMethods().length);
+    SdkAssert.assertEquals("method count of 'TableFieldFormData'", 5, tableFieldFormData.getMethods().length);
     IMethod tableFieldFormData1 = SdkAssert.assertMethodExist(tableFieldFormData, "TableFieldFormData", new String[]{});
     SdkAssert.assertTrue(tableFieldFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(tableFieldFormData1, "V");
@@ -60,8 +60,10 @@ public class TableFieldFormTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(getConcreteTable, "QConcreteTable;");
     IMethod getPersonTable = SdkAssert.assertMethodExist(tableFieldFormData, "getPersonTable", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getPersonTable, "QPersonTable;");
+    IMethod getTableFieldWithExternalTable = SdkAssert.assertMethodExist(tableFieldFormData, "getTableFieldWithExternalTable", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getTableFieldWithExternalTable, "QTableFieldWithExternalTable;");
 
-    SdkAssert.assertEquals("inner types count of 'TableFieldFormData'", 3, tableFieldFormData.getTypes().length);
+    SdkAssert.assertEquals("inner types count of 'TableFieldFormData'", 4, tableFieldFormData.getTypes().length);
     // type CompanyTable
     IType companyTable = SdkAssert.assertTypeExists(tableFieldFormData, "CompanyTable");
     SdkAssert.assertHasFlags(companyTable, 9);
@@ -216,6 +218,90 @@ public class TableFieldFormTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertAnnotation(setValueAt, "java.lang.SuppressWarnings");
 
     SdkAssert.assertEquals("inner types count of 'PersonTable'", 0, personTable.getTypes().length);
+    // type TableFieldWithExternalTable
+    IType tableFieldWithExternalTable = SdkAssert.assertTypeExists(tableFieldFormData, "TableFieldWithExternalTable");
+    SdkAssert.assertHasFlags(tableFieldWithExternalTable, 9);
+    SdkAssert.assertHasSuperTypeSignature(tableFieldWithExternalTable, "QAbstractTableFieldBeanData;");
+
+    // fields of TableFieldWithExternalTable
+    SdkAssert.assertEquals("field count of 'TableFieldWithExternalTable'", 1, tableFieldWithExternalTable.getFields().length);
+    IField serialVersionUID5 = SdkAssert.assertFieldExist(tableFieldWithExternalTable, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID5, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID5, "J");
+
+    SdkAssert.assertEquals("method count of 'TableFieldWithExternalTable'", 8, tableFieldWithExternalTable.getMethods().length);
+    IMethod tableFieldWithExternalTable1 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "TableFieldWithExternalTable", new String[]{});
+    SdkAssert.assertTrue(tableFieldWithExternalTable1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(tableFieldWithExternalTable1, "V");
+    IMethod addRow2 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "addRow", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(addRow2, "QTableFieldWithExternalTableRowData;");
+    SdkAssert.assertAnnotation(addRow2, "java.lang.Override");
+    IMethod addRow3 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "addRow", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(addRow3, "QTableFieldWithExternalTableRowData;");
+    SdkAssert.assertAnnotation(addRow3, "java.lang.Override");
+    IMethod createRow1 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "createRow", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(createRow1, "QTableFieldWithExternalTableRowData;");
+    SdkAssert.assertAnnotation(createRow1, "java.lang.Override");
+    IMethod getRowType1 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "getRowType", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getRowType1, "QClass<+QAbstractTableRowData;>;");
+    SdkAssert.assertAnnotation(getRowType1, "java.lang.Override");
+    IMethod getRows1 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "getRows", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getRows1, "[QTableFieldWithExternalTableRowData;");
+    SdkAssert.assertAnnotation(getRows1, "java.lang.Override");
+    IMethod rowAt1 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "rowAt", new String[]{"I"});
+    SdkAssert.assertMethodReturnTypeSignature(rowAt1, "QTableFieldWithExternalTableRowData;");
+    SdkAssert.assertAnnotation(rowAt1, "java.lang.Override");
+    IMethod setRows1 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "setRows", new String[]{"[QTableFieldWithExternalTableRowData;"});
+    SdkAssert.assertMethodReturnTypeSignature(setRows1, "V");
+
+    SdkAssert.assertEquals("inner types count of 'TableFieldWithExternalTable'", 1, tableFieldWithExternalTable.getTypes().length);
+    // type TableFieldWithExternalTableRowData
+    IType tableFieldWithExternalTableRowData = SdkAssert.assertTypeExists(tableFieldWithExternalTable, "TableFieldWithExternalTableRowData");
+    SdkAssert.assertHasFlags(tableFieldWithExternalTableRowData, 9);
+    SdkAssert.assertHasSuperTypeSignature(tableFieldWithExternalTableRowData, "QAbstractTableRowData;");
+
+    // fields of TableFieldWithExternalTableRowData
+    SdkAssert.assertEquals("field count of 'TableFieldWithExternalTableRowData'", 7, tableFieldWithExternalTableRowData.getFields().length);
+    IField serialVersionUID6 = SdkAssert.assertFieldExist(tableFieldWithExternalTableRowData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID6, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID6, "J");
+    IField aa = SdkAssert.assertFieldExist(tableFieldWithExternalTableRowData, "aa");
+    SdkAssert.assertHasFlags(aa, 25);
+    SdkAssert.assertFieldSignature(aa, "QString;");
+    IField xx = SdkAssert.assertFieldExist(tableFieldWithExternalTableRowData, "xx");
+    SdkAssert.assertHasFlags(xx, 25);
+    SdkAssert.assertFieldSignature(xx, "QString;");
+    IField bb = SdkAssert.assertFieldExist(tableFieldWithExternalTableRowData, "bb");
+    SdkAssert.assertHasFlags(bb, 25);
+    SdkAssert.assertFieldSignature(bb, "QString;");
+    IField m_aa = SdkAssert.assertFieldExist(tableFieldWithExternalTableRowData, "m_aa");
+    SdkAssert.assertHasFlags(m_aa, 2);
+    SdkAssert.assertFieldSignature(m_aa, "QString;");
+    IField m_xx = SdkAssert.assertFieldExist(tableFieldWithExternalTableRowData, "m_xx");
+    SdkAssert.assertHasFlags(m_xx, 2);
+    SdkAssert.assertFieldSignature(m_xx, "QString;");
+    IField m_bb = SdkAssert.assertFieldExist(tableFieldWithExternalTableRowData, "m_bb");
+    SdkAssert.assertHasFlags(m_bb, 2);
+    SdkAssert.assertFieldSignature(m_bb, "QString;");
+
+    SdkAssert.assertEquals("method count of 'TableFieldWithExternalTableRowData'", 7, tableFieldWithExternalTableRowData.getMethods().length);
+    IMethod tableFieldWithExternalTableRowData1 = SdkAssert.assertMethodExist(tableFieldWithExternalTableRowData, "TableFieldWithExternalTableRowData", new String[]{});
+    SdkAssert.assertTrue(tableFieldWithExternalTableRowData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(tableFieldWithExternalTableRowData1, "V");
+    IMethod getAa = SdkAssert.assertMethodExist(tableFieldWithExternalTableRowData, "getAa", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getAa, "QString;");
+    IMethod setAa = SdkAssert.assertMethodExist(tableFieldWithExternalTableRowData, "setAa", new String[]{"QString;"});
+    SdkAssert.assertMethodReturnTypeSignature(setAa, "V");
+    IMethod getXx = SdkAssert.assertMethodExist(tableFieldWithExternalTableRowData, "getXx", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getXx, "QString;");
+    IMethod setXx = SdkAssert.assertMethodExist(tableFieldWithExternalTableRowData, "setXx", new String[]{"QString;"});
+    SdkAssert.assertMethodReturnTypeSignature(setXx, "V");
+    IMethod getBb = SdkAssert.assertMethodExist(tableFieldWithExternalTableRowData, "getBb", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getBb, "QString;");
+    IMethod setBb = SdkAssert.assertMethodExist(tableFieldWithExternalTableRowData, "setBb", new String[]{"QString;"});
+    SdkAssert.assertMethodReturnTypeSignature(setBb, "V");
+
+    SdkAssert.assertEquals("inner types count of 'TableFieldWithExternalTableRowData'", 0, tableFieldWithExternalTableRowData.getTypes().length);
   }
 
 }

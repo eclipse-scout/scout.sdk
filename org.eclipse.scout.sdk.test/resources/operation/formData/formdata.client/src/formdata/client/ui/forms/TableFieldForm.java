@@ -20,7 +20,9 @@ import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFiel
 
 import formdata.client.ui.forms.TableFieldForm.MainBox.CompanyTableField;
 import formdata.client.ui.forms.TableFieldForm.MainBox.PersonTableField;
+import formdata.client.ui.forms.TableFieldForm.MainBox.TableFieldWithExternalTableField;
 import formdata.client.ui.template.formfield.AbstractCompanyTableField;
+import formdata.client.ui.template.formfield.AbstractLoremTableField;
 import formdata.client.ui.template.formfield.AbstractTableWithExtKey;
 import formdata.shared.services.process.TableFieldFormData;
 
@@ -29,6 +31,10 @@ public class TableFieldForm extends AbstractForm {
 
   public TableFieldForm() throws ProcessingException {
     super();
+  }
+
+  public TableFieldWithExternalTableField getTableFieldWithExternalTableField() {
+    return getFieldByClass(TableFieldWithExternalTableField.class);
   }
 
   public CompanyTableField getCompanyField() {
@@ -121,5 +127,8 @@ public class TableFieldForm extends AbstractForm {
       }
     }
 
+    @Order(2000.0)
+    public class TableFieldWithExternalTableField extends AbstractLoremTableField {
+    }
   }
 }
