@@ -62,7 +62,6 @@ public class ServiceOperationNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-
     ServiceMethod createMethod = new ServiceMethod(getMethodName(), TypeUtility.exists(getServiceInterface()) ? getServiceInterface().getFullyQualifiedName() : null);
     for (ParameterArgument arg : getArguments()) {
       createMethod.addParameter(new MethodParameter(arg.getName(), SignatureCache.createTypeSignature(arg.getType())));
@@ -112,6 +111,11 @@ public class ServiceOperationNewOperation implements IOperation {
   protected void createImports(IImportValidator validator) {
     for (ParameterArgument arg : getArguments()) {
       for (String imp : arg.getFullyQualifiedImports()) {
+        validator.getTypeName(SignatureCache.createTypeSignature(imp));
+      }
+    }
+    if (getReturnType() != null) {
+      for (String imp : getReturnType().getFullyQualifiedImports()) {
         validator.getTypeName(SignatureCache.createTypeSignature(imp));
       }
     }

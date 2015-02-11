@@ -73,7 +73,7 @@ public final class LazyPluginModel {
       throw new IllegalArgumentException("null project not allowed.");
     }
     m_project = project;
-    m_manifestFile = getProject().getFile(ICoreConstants.FRAGMENT_FILENAME_DESCRIPTOR);
+    m_manifestFile = getProject().getFile(ICoreConstants.BUNDLE_FILENAME_DESCRIPTOR);
     IFile pluginManifest = getProject().getFile(ICoreConstants.FRAGMENT_FILENAME_DESCRIPTOR);
     if (!ResourceUtility.exists(pluginManifest)) {
       pluginManifest = getProject().getFile(ICoreConstants.PLUGIN_FILENAME_DESCRIPTOR);
