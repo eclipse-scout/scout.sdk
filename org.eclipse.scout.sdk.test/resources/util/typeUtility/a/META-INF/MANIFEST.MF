@@ -9,4 +9,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.client;bundle-version="3.5.5",
  org.eclipse.core.resources;bundle-version="3.7.101"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

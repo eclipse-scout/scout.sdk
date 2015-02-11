@@ -20,5 +20,5 @@ Export-Package: org.eclipse.scout.nls.sdk.simple.internal,
  org.eclipse.scout.nls.sdk.simple.operations,
  org.eclipse.scout.nls.sdk.simple.ui.dialog.language,
  org.eclipse.scout.nls.sdk.simple.ui.wizard
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

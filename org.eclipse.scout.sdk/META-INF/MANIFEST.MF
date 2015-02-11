@@ -78,5 +78,5 @@ Export-Package: org.eclipse.scout.sdk,
  org.eclipse.scout.sdk.workspace.type.config.parser,
  org.eclipse.scout.sdk.workspace.type.config.property,
  org.eclipse.scout.sdk.workspace.type.validationrule
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

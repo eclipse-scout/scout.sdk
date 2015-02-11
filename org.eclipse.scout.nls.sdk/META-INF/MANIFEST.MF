@@ -40,5 +40,5 @@ Export-Package: org.eclipse.scout.nls.sdk.extension,
  org.eclipse.scout.nls.sdk.ui,
  org.eclipse.scout.nls.sdk.ui.action,
  org.eclipse.scout.nls.sdk.util.concurrent
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

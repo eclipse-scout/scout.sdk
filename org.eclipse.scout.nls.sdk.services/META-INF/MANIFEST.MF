@@ -19,5 +19,5 @@ Export-Package: org.eclipse.scout.nls.sdk.services.internal,
  org.eclipse.scout.nls.sdk.services.ui.page,
  org.eclipse.scout.nls.sdk.services.ui.part,
  org.eclipse.scout.nls.sdk.services.ui.wizard
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

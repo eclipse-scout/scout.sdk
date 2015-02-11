@@ -8,7 +8,7 @@ Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.shared;bundle-version="3.2.2",
  org.eclipse.scout.rt.client;bundle-version="3.5.5"
 Bundle-ActivationPolicy: lazy
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Scout-Project: a.client
 Scout-Project-Alias: a
 Scout-Bundle-Type: client

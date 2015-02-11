@@ -16,4 +16,4 @@ Require-Bundle: org.eclipse.jdt.core,
  org.eclipse.equinox.p2.repository,
  org.eclipse.equinox.p2.ui,
  org.eclipse.equinox.p2.operations;resolution:=optional
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

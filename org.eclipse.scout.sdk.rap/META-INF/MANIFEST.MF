@@ -12,5 +12,5 @@ Export-Package: org.eclipse.scout.sdk.rap,
  org.eclipse.scout.sdk.rap.operations.project,
  org.eclipse.scout.sdk.rap.operations.project.template,
  org.eclipse.scout.sdk.rap.var
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

@@ -187,5 +187,5 @@ Export-Package: org.eclipse.scout.sdk.ui,
  org.eclipse.scout.sdk.ui.wizard.wizard.step,
  org.eclipse.scout.sdk.ui.wizard.workingset,
  org.eclipse.scout.sdk.ui.workingset
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy

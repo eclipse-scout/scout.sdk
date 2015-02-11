@@ -31,5 +31,5 @@ Export-Package: org.eclipse.scout.sdk.util,
  org.eclipse.scout.sdk.util.signature.internal;x-friends:="org.eclipse.scout.sdk.test,org.eclipse.scout.sdk.testing",
  org.eclipse.scout.sdk.util.type,
  org.eclipse.scout.sdk.util.typecache
-Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
