@@ -580,26 +580,25 @@ public class ScoutSdkUi extends AbstractUIPlugin implements SdkIcons {
   private class P_PreferenceStorePropertyListener implements IPropertyChangeListener {
     @Override
     public void propertyChange(PropertyChangeEvent event) {
+      Object newValue = event.getNewValue();
+      if (newValue == null) {
+        return;
+      }
+
       if (IDtoAutoUpdateManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
-        Boolean autoUpdate = (Boolean) event.getNewValue();
-        if (autoUpdate != null) {
-          ScoutSdkCore.getDtoAutoUpdateManager().setEnabled(autoUpdate.booleanValue());
-        }
+        boolean autoUpdate = Boolean.parseBoolean(newValue.toString());
+        ScoutSdkCore.getDtoAutoUpdateManager().setEnabled(autoUpdate);
       }
       else if (DefaultTargetPackage.PROP_USE_LEGACY_TARGET_PACKAGE.equals(event.getProperty())) {
-        Boolean useLegacy = (Boolean) event.getNewValue();
-        if (useLegacy != null) {
-          DefaultTargetPackage.setIsPackageConfigurationEnabled(!useLegacy.booleanValue());
-        }
+        boolean useLegacy = Boolean.parseBoolean(newValue.toString());
+        DefaultTargetPackage.setIsPackageConfigurationEnabled(!useLegacy);
       }
       else if (ClassIdGenerators.PROP_AUTOMATICALLY_CREATE_CLASS_ID_ANNOTATION.equals(event.getProperty())) {
-        Boolean automaticallyCreate = (Boolean) event.getNewValue();
-        if (automaticallyCreate != null) {
-          ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(automaticallyCreate.booleanValue());
-        }
+        boolean automaticallyCreate = Boolean.parseBoolean(newValue.toString());
+        ClassIdGenerators.setAutomaticallyCreateClassIdAnnotation(automaticallyCreate);
       }
       else if (ExecutorExtensionPoint.PROP_CURRENT_CATEGORY.equals(event.getProperty())) {
-        String newCategory = (String) event.getNewValue();
+        String newCategory = newValue.toString();
         if (StringUtility.hasText(newCategory)) {
           ExecutorExtensionPoint.setCurrentCategory(newCategory);
         }
