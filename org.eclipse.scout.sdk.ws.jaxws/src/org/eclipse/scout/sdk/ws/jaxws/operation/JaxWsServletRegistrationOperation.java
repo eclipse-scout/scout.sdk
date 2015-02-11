@@ -21,6 +21,7 @@ import org.eclipse.pde.core.plugin.IPluginAttribute;
 import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
@@ -81,7 +82,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     }
     // ensure servlet registration in build-jaxws.xml
     Document document = buildJaxWsResource.loadXml();
-    Element xml = JaxWsSdkUtility.getFirstChildElementByTagName(document.getDocumentElement(), ServletRegistrationUtility.XML_SERVLET_BUNDLE);
+    Element xml = XmlUtility.getFirstChildElement(document.getDocumentElement(), ServletRegistrationUtility.XML_SERVLET_BUNDLE);
     if (xml == null) {
       xml = document.createElement(ServletRegistrationUtility.XML_SERVLET_BUNDLE);
       document.getDocumentElement().appendChild(xml);
@@ -156,7 +157,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
             List<String> changedEntries = new ArrayList<String>();
             Element root = sunJaxWsXmlDocument.getDocumentElement();
             String tagName = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(root), SunJaxWsBean.XML_ENDPOINT);
-            for (Element sunJaxWsXmlEntry : JaxWsSdkUtility.getChildElements(root.getChildNodes(), tagName)) {
+            for (Element sunJaxWsXmlEntry : XmlUtility.getChildElements(root, tagName)) {
               SunJaxWsBean sunJaxWsEntryBean = new SunJaxWsBean(sunJaxWsXmlEntry);
               changedEntries.add(sunJaxWsEntryBean.getAlias());
 

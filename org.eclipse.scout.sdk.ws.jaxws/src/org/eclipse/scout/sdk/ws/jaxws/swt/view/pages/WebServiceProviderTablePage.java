@@ -19,6 +19,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.ui.action.IScoutHandler;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
 import org.eclipse.scout.sdk.ui.view.outline.pages.IPage;
@@ -110,7 +111,7 @@ public class WebServiceProviderTablePage extends AbstractPage {
       return Collections.emptyList();
     }
     String fqn = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(m_sunJaxWsXml.getDocumentElement()), SunJaxWsBean.XML_ENDPOINT);
-    return JaxWsSdkUtility.getChildElements(m_sunJaxWsXml.getDocumentElement().getChildNodes(), fqn);
+    return XmlUtility.getChildElements(m_sunJaxWsXml.getDocumentElement(), fqn);
   }
 
   private class P_SunJaxWsResourceListener implements IResourceListener {

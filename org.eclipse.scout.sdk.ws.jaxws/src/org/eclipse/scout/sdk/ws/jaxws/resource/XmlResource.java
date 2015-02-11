@@ -11,12 +11,12 @@
 package org.eclipse.scout.sdk.ws.jaxws.resource;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -45,22 +45,11 @@ public class XmlResource extends ManagedResource {
         m_xmlDocument = null;
         m_modificationStamp = m_file.getModificationStamp();
 
-        InputStream is = null;
-        try {
-          is = m_file.getContents();
-          m_xmlDocument = JaxWsSdkUtility.createNewXmlDocument(is);
+        try (InputStream is = m_file.getContents()) {
+          m_xmlDocument = XmlUtility.getXmlDocument(is);
         }
         catch (Exception e) {
           JaxWsSdk.logWarning("Failed to parse XML file '" + m_file.getName() + "'.", e);
-        }
-        finally {
-          if (is != null) {
-            try {
-              is.close();
-            }
-            catch (IOException e) {
-            }
-          }
         }
       }
     }
@@ -94,7 +83,7 @@ public class XmlResource extends ManagedResource {
           throw new CoreException(new ScoutStatus("File must not be null"));
         }
 
-        String xmlContent = JaxWsSdkUtility.getXmlContent(xmlDocument);
+        String xmlContent = XmlUtility.wellformDocument(xmlDocument);
         m_modificationStamp = ManagedResource.API_MODIFICATION_STAMP;
         try {
           JaxWsSdkUtility.ensureFileAccessibleAndRegistered(m_file, true);

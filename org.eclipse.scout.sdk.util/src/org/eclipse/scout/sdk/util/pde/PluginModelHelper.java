@@ -1023,7 +1023,25 @@ public class PluginModelHelper {
   }
 
   public static final class BuildPropertiesPart {
-    private static final String BINARY_BUILD_INCLUDES = "bin.includes";
+    /**
+     * Bin includes entry in the build.properties file
+     */
+    public static final String BINARY_INCLUDES = "bin.includes";
+
+    /**
+     * source entry in the build.properties file
+     */
+    public static final String SOURCE = "source..";
+
+    /**
+     * output entry in the build.properties file
+     */
+    public static final String OUTPUT = "output..";
+
+    /**
+     * source includes entry in the build.properties file
+     */
+    public static final String SOURCE_INCLUDES = "src.includes";
 
     private final LazyPluginModel m_model;
 
@@ -1055,10 +1073,24 @@ public class PluginModelHelper {
      * @throws CoreException
      */
     public void removeBinaryBuildEntry(String token) throws CoreException {
+      removeBuildEntry(BINARY_INCLUDES, token);
+    }
+
+    /**
+     * Removes the given token from the build entry with the given name.<br>
+     * If the token is null or empty, this method does nothing.
+     *
+     * @param name
+     *          The name of the entry (e.g. "bin.includes", "source..", "output..").
+     * @param token
+     *          The token to remove.
+     * @throws CoreException
+     */
+    public void removeBuildEntry(String name, String token) throws CoreException {
       if (token == null || token.length() < 1) {
         return;
       }
-      IBuildEntry entry = m_model.getBuildModel().getBuild().getEntry(BINARY_BUILD_INCLUDES);
+      IBuildEntry entry = m_model.getBuildModel().getBuild().getEntry(name);
       if (entry != null) {
         entry.removeToken(token);
       }
@@ -1070,7 +1102,7 @@ public class PluginModelHelper {
      * @return An array containing all binary build includes of the plugin.
      */
     public List<String> getBinaryBuildEntries() {
-      IBuildEntry entry = m_model.getBuildModel().getBuild().getEntry(BINARY_BUILD_INCLUDES);
+      IBuildEntry entry = m_model.getBuildModel().getBuild().getEntry(BINARY_INCLUDES);
       if (entry != null) {
         return CollectionUtility.arrayList(entry.getTokens());
       }
@@ -1112,10 +1144,25 @@ public class PluginModelHelper {
      * @throws CoreException
      */
     public boolean existsBinaryBuildEntry(String token) throws CoreException {
+      return existsBuildEntry(BINARY_INCLUDES, token);
+    }
+
+    /**
+     * Checks whether the given token exists in the build entry list with given name of the project associated with this
+     * helper.
+     *
+     * @param name
+     *          The name of the entry (e.g. "bin.includes", "source..", "output..").
+     * @param token
+     *          The token to search.
+     * @return true if the given token is already in the entry list, false otherwise.
+     * @throws CoreException
+     */
+    public boolean existsBuildEntry(String name, String token) throws CoreException {
       if (token == null || token.length() < 1) {
         return false;
       }
-      IBuildEntry entry = getBuildEntry(BINARY_BUILD_INCLUDES);
+      IBuildEntry entry = getBuildEntry(name);
       return entry.contains(token);
     }
 
@@ -1140,6 +1187,27 @@ public class PluginModelHelper {
     }
 
     /**
+     * Adds the given resource to the build entry with the given name.<br>
+     * If the entry name does not exist, it is created.<br>
+     * If the resource is null, does not exist or is already in the list, this method does nothing.<br>
+     *
+     * @param name
+     *          The name of the entry (e.g. "bin.includes", "source..", "output..").
+     * @param resource
+     *          The resource entry to add
+     * @throws CoreException
+     */
+    public void addBuildEntry(String name, IResource resource) throws CoreException {
+      if (resource == null) {
+        return;
+      }
+      if (!resource.exists()) {
+        return;
+      }
+      addBuildEntry(name, getProjectRelativeResourcePath(resource));
+    }
+
+    /**
      * Adds the given token to the binary build includes.<br>
      * If no "bin.includes" exists, it is created.<br>
      * If the token is null, empty or is already in the list, this method does nothing.<br>
@@ -1150,11 +1218,26 @@ public class PluginModelHelper {
      * @throws CoreException
      */
     public void addBinaryBuildEntry(String token) throws CoreException {
+      addBuildEntry(BINARY_INCLUDES, token);
+    }
+
+    /**
+     * Adds the given token to the build entry with the given name.<br>
+     * If the entry name does not exist, it is created.<br>
+     * If the token is null, empty or is already in the list, this method does nothing.<br>
+     *
+     * @param name
+     *          The name of the entry (e.g. "bin.includes", "source..", "output..").
+     * @param token
+     *          The token to add.
+     * @throws CoreException
+     */
+    public void addBuildEntry(String name, String token) throws CoreException {
       if (token == null || token.length() < 1) {
         return;
       }
       synchronized (m_model.getProject()) {
-        IBuildEntry entry = getBuildEntry(BINARY_BUILD_INCLUDES);
+        IBuildEntry entry = getBuildEntry(name);
         if (!entry.contains(token)) {
           entry.addToken(token);
         }

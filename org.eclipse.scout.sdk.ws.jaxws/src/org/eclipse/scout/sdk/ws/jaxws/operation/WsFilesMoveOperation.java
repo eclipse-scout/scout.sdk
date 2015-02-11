@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -97,7 +98,7 @@ public class WsFilesMoveOperation implements IOperation {
             Document xmlDocument = xmlResource.loadXml();
             String namespacePrefix = JaxWsSdkUtility.getXmlPrefix(xmlDocument.getOwnerDocument().getDocumentElement());
             String fqn = StringUtility.join(":", namespacePrefix, "bindings");
-            Element xmlBindings = JaxWsSdkUtility.getChildElement(xmlDocument.getDocumentElement().getChildNodes(), fqn);
+            Element xmlBindings = XmlUtility.getFirstChildElement(xmlDocument.getDocumentElement(), fqn);
             if (xmlBindings.hasAttribute("wsdlLocation")) {
               xmlBindings.removeAttribute("wsdlLocation");
               xmlBindings.setAttribute("wsdlLocation", (String) element.getData());

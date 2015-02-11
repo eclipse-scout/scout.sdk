@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.executor;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.ui.executor.AbstractExecutor;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -19,7 +20,6 @@ import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
 import org.eclipse.scout.sdk.ws.jaxws.swt.view.pages.WebServiceProviderHandlerNodePage;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.swt.widgets.Shell;
 import org.w3c.dom.Element;
 
@@ -51,7 +51,7 @@ public class HandlerChainNewExecutor extends AbstractExecutor {
     }
 
     String handlerChainsQName = sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS);
-    Element xmlHandlerChains = JaxWsSdkUtility.getChildElement(sunJaxWsBean.getXml().getChildNodes(), handlerChainsQName);
+    Element xmlHandlerChains = XmlUtility.getFirstChildElement(sunJaxWsBean.getXml(), handlerChainsQName);
     if (xmlHandlerChains == null) {
       xmlHandlerChains = sunJaxWsBean.getXml().getOwnerDocument().createElementNS(SunJaxWsBean.NS_HANDLER_CHAINS, handlerChainsQName);
       sunJaxWsBean.getXml().appendChild(xmlHandlerChains);

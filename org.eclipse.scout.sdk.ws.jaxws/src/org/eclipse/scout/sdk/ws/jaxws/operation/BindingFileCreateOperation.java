@@ -22,6 +22,8 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -58,7 +60,7 @@ public class BindingFileCreateOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     IFile bindingFile = JaxWsSdkUtility.getFile(m_bundle, m_projectRelativePath, true);
 
-    org.w3c.dom.Document xmlDocument = JaxWsSdkUtility.createNewXmlDocument("jaxws:bindings");
+    org.w3c.dom.Document xmlDocument = XmlUtility.createNewXmlDocument("jaxws:bindings");
     Element rootXml = xmlDocument.getDocumentElement();
     rootXml.setAttribute("xmlns:jaxws", "http://java.sun.com/xml/ns/jaxws");
     rootXml.setAttribute("xmlns:jaxb", "http://java.sun.com/xml/ns/jaxb");
@@ -101,10 +103,10 @@ public class BindingFileCreateOperation implements IOperation {
     }
 
     try {
-      InputStream is = new ByteArrayInputStream(JaxWsSdkUtility.getXmlContent(xmlDocument).getBytes("UTF-8"));
+      InputStream is = new ByteArrayInputStream(XmlUtility.wellformDocument(xmlDocument).getBytes("UTF-8"));
       bindingFile.setContents(is, true, false, monitor);
     }
-    catch (UnsupportedEncodingException e) {
+    catch (UnsupportedEncodingException | ProcessingException e) {
       throw new CoreException(new ScoutStatus(IStatus.ERROR, "could not create binding file.", e));
     }
   }

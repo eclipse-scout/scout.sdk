@@ -18,6 +18,7 @@ import org.eclipse.pde.core.plugin.IPluginAttribute;
 import org.eclipse.pde.core.plugin.IPluginElement;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.pde.PluginModelHelper;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -49,7 +50,7 @@ public final class ServletRegistrationUtility {
       return null;
     }
 
-    Element xml = JaxWsSdkUtility.getChildElement(document.getDocumentElement().getChildNodes(), XML_SERVLET_BUNDLE);
+    Element xml = XmlUtility.getFirstChildElement(document.getDocumentElement(), XML_SERVLET_BUNDLE);
     if (xml == null) {
       return null;
     }

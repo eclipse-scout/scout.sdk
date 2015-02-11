@@ -17,6 +17,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.wizard.page.WebserviceEnum;
@@ -81,7 +82,7 @@ public class BuildJaxWsBean {
   public Map<String, List<String>> getPropertiers() {
     Map<String, List<String>> properties = new HashMap<String, List<String>>();
 
-    List<Element> children = JaxWsSdkUtility.getChildElements(m_xml.getChildNodes(), XML_PROPERTY);
+    List<Element> children = XmlUtility.getChildElements(m_xml, XML_PROPERTY);
     for (Element xmlProperty : children) {
       String name = JaxWsSdkUtility.getXmlAttribute(xmlProperty, XML_PROPERTY_NAME, null);
       if (!StringUtility.isNullOrEmpty(name)) {
@@ -142,7 +143,7 @@ public class BuildJaxWsBean {
     else {
       nodeName = BuildJaxWsBean.XML_CONSUMER;
     }
-    List<Element> xml = JaxWsSdkUtility.getChildElementsWithAttributes(rootXml, nodeName, BuildJaxWsBean.XML_ALIAS, getAlias());
+    List<Element> xml = XmlUtility.getChildElementsWithAttributes(rootXml, nodeName, BuildJaxWsBean.XML_ALIAS, getAlias());
     if (xml.size() < 1) {
       return false;
     }
@@ -173,7 +174,7 @@ public class BuildJaxWsBean {
       return null;
     }
 
-    List<Element> xml = JaxWsSdkUtility.getChildElementsWithAttributes(rootXml, nodeName, BuildJaxWsBean.XML_ALIAS, alias);
+    List<Element> xml = XmlUtility.getChildElementsWithAttributes(rootXml, nodeName, BuildJaxWsBean.XML_ALIAS, alias);
     if (xml.size() < 1) {
       return null;
     }

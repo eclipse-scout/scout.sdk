@@ -12,12 +12,12 @@ package org.eclipse.scout.sdk.ws.jaxws.operation;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.w3c.dom.Document;
 
 public class BuildJaxWsFileCreateOperation implements IOperation {
@@ -34,7 +34,7 @@ public class BuildJaxWsFileCreateOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    Document xmlDocument = JaxWsSdkUtility.createNewXmlDocument("webservices");
+    Document xmlDocument = XmlUtility.createNewXmlDocument("webservices");
     ResourceFactory.getBuildJaxWsResource(m_bundle, true).storeXml(xmlDocument, IResourceListener.EVENT_BUILDJAXWS_REPLACED, monitor, IResourceListener.ELEMENT_FILE);
   }
 

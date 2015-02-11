@@ -19,6 +19,7 @@ import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.holders.IntegerHolder;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.ui.view.outline.pages.AbstractPage;
@@ -79,7 +80,7 @@ public class WebServiceProviderHandlerNodePage extends AbstractPage implements I
       String requiredAttributeName = "name";
 
       Element sunJaxWsXml = null;
-      List<Element> childElementsWithAttributes = JaxWsSdkUtility.getChildElementsWithAttributes(xmlRoot, tagName, requiredAttributeName, m_alias);
+      List<Element> childElementsWithAttributes = XmlUtility.getChildElementsWithAttributes(xmlRoot, tagName, requiredAttributeName, m_alias);
       if (childElementsWithAttributes.size() > 0) {
         sunJaxWsXml = childElementsWithAttributes.get(0);
       }

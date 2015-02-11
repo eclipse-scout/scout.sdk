@@ -24,6 +24,7 @@ import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.URIUtil;
 import org.eclipse.jdt.internal.corext.util.JavaConventionsUtil;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizardPage;
@@ -741,7 +742,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
 
     if (m_sunJaxWsXml != null) {
       String fqn = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(m_sunJaxWsXml.getDocumentElement()), SunJaxWsBean.XML_ENDPOINT);
-      for (Element xmlSunJaxWs : JaxWsSdkUtility.getChildElements(m_sunJaxWsXml.getDocumentElement().getChildNodes(), fqn)) {
+      for (Element xmlSunJaxWs : XmlUtility.getChildElements(m_sunJaxWsXml.getDocumentElement(), fqn)) {
         SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(xmlSunJaxWs);
         illegalAliases.add(sunJaxWsBean.getAlias());
         illegalUrlPatterns.add(sunJaxWsBean.getUrlPattern());

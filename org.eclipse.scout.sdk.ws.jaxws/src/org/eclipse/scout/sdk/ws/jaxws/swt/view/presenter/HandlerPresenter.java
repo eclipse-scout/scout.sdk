@@ -20,6 +20,7 @@ import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.ui.view.properties.PropertyViewFormToolkit;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -187,7 +188,7 @@ public class HandlerPresenter extends TypePresenter {
       String fqn = (String) value;
       String handlerClassElementName = m_sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_CLASS);
 
-      Element old = JaxWsSdkUtility.getChildElement(m_xmlHandlerElement.getChildNodes(), handlerClassElementName);
+      Element old = XmlUtility.getFirstChildElement(m_xmlHandlerElement, handlerClassElementName);
       if (old != null) {
         m_xmlHandlerElement.removeChild(old);
       }

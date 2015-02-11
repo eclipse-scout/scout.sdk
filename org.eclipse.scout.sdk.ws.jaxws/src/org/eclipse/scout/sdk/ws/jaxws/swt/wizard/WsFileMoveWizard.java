@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -131,7 +132,7 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
       xmlResource.setFile(bindingFile);
       Document xmlDocument = xmlResource.loadXml();
       String namespacePrefix = JaxWsSdkUtility.getXmlPrefix(xmlDocument.getDocumentElement());
-      Element xmlBindings = JaxWsSdkUtility.getChildElement(xmlDocument.getDocumentElement().getChildNodes(), StringUtility.join(":", namespacePrefix, "bindings"));
+      Element xmlBindings = XmlUtility.getFirstChildElement(xmlDocument.getDocumentElement(), StringUtility.join(":", namespacePrefix, "bindings"));
       if (xmlBindings != null && xmlBindings.hasAttribute("wsdlLocation")) {
         String wsdlLocation = xmlBindings.getAttribute("wsdlLocation");
         String schemaDefiningFileName = new Path(wsdlLocation).toFile().getName();

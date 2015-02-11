@@ -12,9 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.util;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,14 +35,6 @@ import javax.wsdl.extensions.UnknownExtensibilityElement;
 import javax.wsdl.factory.WSDLFactory;
 import javax.wsdl.xml.WSDLReader;
 import javax.xml.namespace.QName;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.OutputKeys;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import javax.xml.ws.WebServiceClient;
 
 import org.eclipse.core.resources.IFile;
@@ -94,6 +84,7 @@ import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.outline.IScoutExplorerPart;
@@ -130,7 +121,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.sun.xml.internal.bind.api.impl.NameConverter;
 
@@ -167,49 +157,6 @@ public final class JaxWsSdkUtility {
     }
   }
 
-  public static org.w3c.dom.Document createNewXmlDocument(InputStream is) throws SAXException, IOException {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    try {
-      DocumentBuilder docBuilder = factory.newDocumentBuilder();
-      org.w3c.dom.Document document = docBuilder.parse(is);
-      return document;
-    }
-    catch (ParserConfigurationException e) {
-      return null;
-    }
-  }
-
-  public static org.w3c.dom.Document createNewXmlDocument(String rootTagName) {
-    DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
-    try {
-      DocumentBuilder docBuilder = factory.newDocumentBuilder();
-      org.w3c.dom.Document document = docBuilder.newDocument();
-      document.appendChild(document.createElement(rootTagName));
-      return document;
-    }
-    catch (ParserConfigurationException e) {
-      return null;
-    }
-  }
-
-  public static List<Element> getChildElementsWithAttributes(Element parent, String tagName, String requiredAttributeName, String requiredAttributeValue) {
-    NodeList endpoints = parent.getElementsByTagName(tagName);
-    LinkedList<Element> result = new LinkedList<Element>();
-    for (int i = 0; i < endpoints.getLength(); i++) {
-      Node n = endpoints.item(i);
-      if (n.getNodeType() == Node.ELEMENT_NODE) {
-        Element e = (Element) n;
-        if (e.hasAttribute(requiredAttributeName)) {
-          String val = e.getAttribute(requiredAttributeName);
-          if (CompareUtility.equals(requiredAttributeValue, val)) {
-            result.add(e);
-          }
-        }
-      }
-    }
-    return result;
-  }
-
   public static Element getParentElement(Node n) {
     Node node = n.getParentNode();
     while (node != null) {
@@ -243,68 +190,10 @@ public final class JaxWsSdkUtility {
     return defaultValue;
   }
 
-  public static Element getFirstChildElementByTagName(Element parent, String tagName) {
-    NodeList children = parent.getElementsByTagName(tagName);
-    for (int i = 0; i < children.getLength(); i++) {
-      Node n = children.item(i);
-      if (n.getNodeType() == Node.ELEMENT_NODE) {
-        return (Element) n;
-      }
-    }
-    return null;
-  }
-
-  public static String getXmlContent(Document xml) {
-    try {
-      TransformerFactory tf = TransformerFactory.newInstance();
-      tf.setAttribute("indent-number", 3);
-      Transformer transformer = tf.newTransformer();
-      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-      StringWriter writer = new StringWriter();
-      transformer.transform(new DOMSource(xml), new StreamResult(writer));
-      return writer.getBuffer().toString();
-    }
-    catch (Exception e) {
-      JaxWsSdk.logError("unable to get xml from DOM document", e);
-      return "";
-    }
-  }
-
-  public static List<Element> getChildElements(NodeList nodeList) {
-    return getChildElements(nodeList, null);
-  }
-
   public static void removeAllChildElements(Element e, String tagName) {
-    for (Element c : getChildElements(e.getChildNodes(), tagName)) {
+    for (Element c : XmlUtility.getChildElements(e, tagName)) {
       e.removeChild(c);
     }
-  }
-
-  public static Element getChildElement(NodeList nodeList, String tagName) {
-    for (int i = 0; i < nodeList.getLength(); i++) {
-      Node item = nodeList.item(i);
-      if (item instanceof Element) {
-        Element e = (Element) item;
-        if (tagName == null || tagName.equals(e.getTagName())) {
-          return e;
-        }
-      }
-    }
-    return null;
-  }
-
-  public static List<Element> getChildElements(NodeList nodeList, String tagName) {
-    ArrayList<Element> elements = new ArrayList<Element>(nodeList.getLength());
-    for (int i = 0; i < nodeList.getLength(); i++) {
-      Node item = nodeList.item(i);
-      if (item instanceof Element) {
-        Element e = (Element) item;
-        if (tagName == null || tagName.equals(e.getTagName())) {
-          elements.add(e);
-        }
-      }
-    }
-    return elements;
   }
 
   public static boolean exists(IResource resource) {
@@ -1164,7 +1053,7 @@ public final class JaxWsSdkUtility {
     try {
       for (XmlResource bindingFileResource : bindingFileResources) {
         Document xmlBindingFile = bindingFileResource.loadXml();
-        for (Element e : getChildElements(xmlBindingFile.getDocumentElement().getChildNodes())) {
+        for (Element e : XmlUtility.getChildElements(xmlBindingFile.getDocumentElement())) {
           if (e.getTagName().endsWith("globalBindings")) {
             String prefix = JaxWsSdkUtility.getXmlPrefix(e);
             String namespace = xmlBindingFile.getDocumentElement().getAttribute("xmlns:" + prefix);

@@ -24,6 +24,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizard;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.ui.executor.AbstractExecutor;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.util.UiUtility;
@@ -132,7 +133,7 @@ public class CleanupPhantomJarFileExecutor extends AbstractExecutor {
     }
 
     String tagName = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(sunJaxWsXmlDocument.getDocumentElement()), SunJaxWsBean.XML_ENDPOINT);
-    List<Element> childElements = JaxWsSdkUtility.getChildElements(sunJaxWsXmlDocument.getDocumentElement().getChildNodes(), tagName);
+    List<Element> childElements = XmlUtility.getChildElements(sunJaxWsXmlDocument.getDocumentElement(), tagName);
     for (Element sunJaxWsXml : childElements) {
       SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);
       BuildJaxWsBean buildJaxWsBean = BuildJaxWsBean.load(bundle, sunJaxWsBean.getAlias(), WebserviceEnum.PROVIDER);

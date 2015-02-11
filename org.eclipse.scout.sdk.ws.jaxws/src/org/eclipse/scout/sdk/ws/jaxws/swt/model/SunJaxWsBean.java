@@ -16,6 +16,7 @@ import java.util.List;
 import javax.xml.namespace.QName;
 
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
@@ -129,15 +130,15 @@ public class SunJaxWsBean {
   }
 
   public List<Element> getHandlerChains() {
-    Element xmlChains = JaxWsSdkUtility.getFirstChildElementByTagName(m_xml, toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS));
+    Element xmlChains = XmlUtility.getFirstChildElement(m_xml, toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS));
     if (xmlChains == null) {
       return Collections.emptyList();
     }
-    return JaxWsSdkUtility.getChildElements(xmlChains.getChildNodes(), toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAIN));
+    return XmlUtility.getChildElements(xmlChains, toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAIN));
   }
 
   public void setHandlerChains(List<Element> xmlHandlerChains) {
-    List<Element> childElements = JaxWsSdkUtility.getChildElements(m_xml.getChildNodes(), toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS));
+    List<Element> childElements = XmlUtility.getChildElements(m_xml, toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS));
     for (Element existing : childElements) {
       m_xml.removeChild(existing);
     }
@@ -160,7 +161,7 @@ public class SunJaxWsBean {
     String handlerXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER);
     String handlerClazzXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER_CLASS);
 
-    List<Element> children = JaxWsSdkUtility.getChildElements(xmlHandlerChain.getChildNodes(), handlerXmlElementName);
+    List<Element> children = XmlUtility.getChildElements(xmlHandlerChain, handlerXmlElementName);
     if (children == null || children.size() == 0) {
       return;
     }
@@ -168,7 +169,7 @@ public class SunJaxWsBean {
     for (int i = 0; i < children.size(); i++) {
       Element xmlHandler = children.get(i);
 
-      Element xmlHandlerClazzElement = JaxWsSdkUtility.getFirstChildElementByTagName(xmlHandler, handlerClazzXmlElementName);
+      Element xmlHandlerClazzElement = XmlUtility.getFirstChildElement(xmlHandler, handlerClazzXmlElementName);
       String fqn = null;
       if (xmlHandlerClazzElement != null) {
         fqn = xmlHandlerClazzElement.getTextContent();
@@ -181,7 +182,7 @@ public class SunJaxWsBean {
 
   public boolean swapHandler(Element xmlHandlerChain, int oldIndex, int newIndex) {
     String handlerXmlElementName = toQualifiedName(SunJaxWsBean.XML_HANDLER);
-    List<Element> handlerChildren = JaxWsSdkUtility.getChildElements(xmlHandlerChain.getChildNodes(), handlerXmlElementName);
+    List<Element> handlerChildren = XmlUtility.getChildElements(xmlHandlerChain, handlerXmlElementName);
     try {
       Collections.swap(handlerChildren, oldIndex, newIndex);
 
@@ -216,12 +217,12 @@ public class SunJaxWsBean {
       return false;
     }
 
-    List<Element> endpoints = JaxWsSdkUtility.getChildElements(rootXml.getChildNodes(), toQualifiedName(SunJaxWsBean.XML_ENDPOINT));
+    List<Element> endpoints = XmlUtility.getChildElements(rootXml, toQualifiedName(SunJaxWsBean.XML_ENDPOINT));
     if (endpoints.size() < 1) {
       return false;
     }
 
-    List<Element> childElementsWithAttributes = JaxWsSdkUtility.getChildElementsWithAttributes(rootXml, toQualifiedName(SunJaxWsBean.XML_ENDPOINT), SunJaxWsBean.XML_ALIAS, getAlias());
+    List<Element> childElementsWithAttributes = XmlUtility.getChildElementsWithAttributes(rootXml, toQualifiedName(SunJaxWsBean.XML_ENDPOINT), SunJaxWsBean.XML_ALIAS, getAlias());
 
     if (childElementsWithAttributes.size() < 1) {
       return false;
@@ -245,7 +246,7 @@ public class SunJaxWsBean {
     }
 
     String xmlEndpoint = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(rootXml), SunJaxWsBean.XML_ENDPOINT);
-    List<Element> xml = JaxWsSdkUtility.getChildElementsWithAttributes(rootXml, xmlEndpoint, SunJaxWsBean.XML_ALIAS, alias);
+    List<Element> xml = XmlUtility.getChildElementsWithAttributes(rootXml, xmlEndpoint, SunJaxWsBean.XML_ALIAS, alias);
     if (xml.size() < 1) {
       return null;
     }

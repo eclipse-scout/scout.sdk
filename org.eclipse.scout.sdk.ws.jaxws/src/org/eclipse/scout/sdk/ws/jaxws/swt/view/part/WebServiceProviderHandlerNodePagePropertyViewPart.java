@@ -18,6 +18,7 @@ import java.util.Set;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.scout.commons.NumberUtility;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ui.view.properties.part.ISection;
@@ -194,7 +195,7 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
           @Override
           public boolean visit(Element xmlHandlerElement, String fullyQualifiedName, int handlerIndex, int handlerCount) {
             String handlerClassElementName = getPage().getSunJaxWsBean().toQualifiedName(SunJaxWsBean.XML_HANDLER_CLASS);
-            Element xmlHandlerClassElement = JaxWsSdkUtility.getChildElement(xmlHandlerElement.getChildNodes(), handlerClassElementName);
+            Element xmlHandlerClassElement = XmlUtility.getFirstChildElement(xmlHandlerElement, handlerClassElementName);
             String handlerClass = null;
             if (xmlHandlerClassElement != null) {
               handlerClass = xmlHandlerClassElement.getTextContent();
@@ -221,13 +222,13 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
   }
 
   private FilterTypeEnum getFilterType(SunJaxWsBean sunJaxWsBean, Element xmlHandlerChain) {
-    if (JaxWsSdkUtility.getChildElement(xmlHandlerChain.getChildNodes(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PROTOCOL)) != null) {
+    if (XmlUtility.getFirstChildElement(xmlHandlerChain, sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PROTOCOL)) != null) {
       return FilterTypeEnum.PROTOCOL_FILTER;
     }
-    else if (JaxWsSdkUtility.getChildElement(xmlHandlerChain.getChildNodes(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_SERVICE)) != null) {
+    else if (XmlUtility.getFirstChildElement(xmlHandlerChain, sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_SERVICE)) != null) {
       return FilterTypeEnum.SERVICE_FILTER;
     }
-    else if (JaxWsSdkUtility.getChildElement(xmlHandlerChain.getChildNodes(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PORT)) != null) {
+    else if (XmlUtility.getFirstChildElement(xmlHandlerChain, sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PORT)) != null) {
       return FilterTypeEnum.PORT_FILTER;
     }
     return FilterTypeEnum.NO_FILTER;

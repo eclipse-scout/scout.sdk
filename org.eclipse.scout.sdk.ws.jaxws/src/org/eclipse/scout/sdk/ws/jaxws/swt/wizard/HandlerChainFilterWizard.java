@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.swt.wizard;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.ui.wizard.AbstractWorkspaceWizard;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
@@ -48,9 +49,9 @@ public class HandlerChainFilterWizard extends AbstractWorkspaceWizard {
     m_sunJaxWsBean = sunJaxWsBean;
     m_xmlHandlerChain = xmlHandlerChain;
 
-    Element xmlFilterProtocol = JaxWsSdkUtility.getChildElement(m_xmlHandlerChain.getChildNodes(), toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PROTOCOL));
-    Element xmlFilterService = JaxWsSdkUtility.getChildElement(m_xmlHandlerChain.getChildNodes(), toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_SERVICE));
-    Element xmlFilterPort = JaxWsSdkUtility.getChildElement(m_xmlHandlerChain.getChildNodes(), toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PORT));
+    Element xmlFilterProtocol = XmlUtility.getFirstChildElement(m_xmlHandlerChain, toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PROTOCOL));
+    Element xmlFilterService = XmlUtility.getFirstChildElement(m_xmlHandlerChain, toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_SERVICE));
+    Element xmlFilterPort = XmlUtility.getFirstChildElement(m_xmlHandlerChain, toQualifiedName(SunJaxWsBean.XML_HANDLER_FILTER_PORT));
 
     if (xmlFilterProtocol != null) {
       m_filterTypeEnum = FilterTypeEnum.PROTOCOL_FILTER;

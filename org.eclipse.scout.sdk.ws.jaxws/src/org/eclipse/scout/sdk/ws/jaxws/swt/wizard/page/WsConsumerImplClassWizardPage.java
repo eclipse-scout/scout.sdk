@@ -33,6 +33,7 @@ import org.eclipse.jdt.ui.JavaUI;
 import org.eclipse.jface.operation.IRunnableContext;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.commons.StringUtility;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.ui.fields.StyledTextField;
 import org.eclipse.scout.sdk.ui.fields.tooltip.JavadocTooltip;
@@ -496,9 +497,9 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
     if (!buildJaxWsResource.existsFile()) {
       return illegalTypeNames;
     }
-    Element consumer = JaxWsSdkUtility.getChildElement(xmlDocument.getChildNodes(), BuildJaxWsBean.XML_CONSUMER);
+    Element consumer = XmlUtility.getFirstChildElement(xmlDocument.getDocumentElement(), BuildJaxWsBean.XML_CONSUMER);
     if (consumer != null) {
-      List<Element> xmlElements = JaxWsSdkUtility.getChildElements(xmlDocument.getDocumentElement().getChildNodes(), BuildJaxWsBean.XML_CONSUMER);
+      List<Element> xmlElements = XmlUtility.getChildElements(xmlDocument.getDocumentElement(), BuildJaxWsBean.XML_CONSUMER);
       for (Element xmlElement : xmlElements) {
         illegalTypeNames.add(xmlElement.getAttribute(BuildJaxWsBean.XML_ALIAS));
       }

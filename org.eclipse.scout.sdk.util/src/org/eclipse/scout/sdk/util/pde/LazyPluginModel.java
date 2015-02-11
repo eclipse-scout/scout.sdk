@@ -28,6 +28,7 @@ import org.eclipse.pde.internal.core.bundle.WorkspaceBundleModel;
 import org.eclipse.pde.internal.core.ibundle.IBundle;
 import org.eclipse.pde.internal.core.ibundle.IBundlePluginModelBase;
 import org.eclipse.pde.internal.core.plugin.WorkspaceExtensionsModel;
+import org.eclipse.scout.sdk.util.resources.ResourceUtility;
 import org.osgi.framework.Version;
 
 /**
@@ -72,8 +73,12 @@ public final class LazyPluginModel {
       throw new IllegalArgumentException("null project not allowed.");
     }
     m_project = project;
-    m_manifestFile = getProject().getFile(ICoreConstants.BUNDLE_FILENAME_DESCRIPTOR);
-    m_pluginXmlFile = getProject().getFile(ICoreConstants.PLUGIN_FILENAME_DESCRIPTOR);
+    m_manifestFile = getProject().getFile(ICoreConstants.FRAGMENT_FILENAME_DESCRIPTOR);
+    IFile pluginManifest = getProject().getFile(ICoreConstants.FRAGMENT_FILENAME_DESCRIPTOR);
+    if (!ResourceUtility.exists(pluginManifest)) {
+      pluginManifest = getProject().getFile(ICoreConstants.PLUGIN_FILENAME_DESCRIPTOR);
+    }
+    m_pluginXmlFile = pluginManifest;
     m_buildPropertiesFile = getProject().getFile(ICoreConstants.BUILD_FILENAME_DESCRIPTOR);
 
     if (!isInteresting()) {

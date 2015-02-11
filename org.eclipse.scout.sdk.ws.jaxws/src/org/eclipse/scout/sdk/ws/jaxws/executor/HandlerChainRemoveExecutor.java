@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ws.jaxws.executor;
 
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.commons.XmlUtility;
 import org.eclipse.scout.sdk.ui.executor.AbstractExecutor;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
 import org.eclipse.scout.sdk.ws.jaxws.Texts;
@@ -19,7 +20,6 @@ import org.eclipse.scout.sdk.ws.jaxws.executor.param.HandlerParams;
 import org.eclipse.scout.sdk.ws.jaxws.resource.IResourceListener;
 import org.eclipse.scout.sdk.ws.jaxws.resource.ResourceFactory;
 import org.eclipse.scout.sdk.ws.jaxws.swt.model.SunJaxWsBean;
-import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -53,7 +53,7 @@ public class HandlerChainRemoveExecutor extends AbstractExecutor {
     messageBox.setMessage(Texts.get("QuestionRemoveHandlerChain"));
     if (messageBox.open() == SWT.YES) {
 
-      Element xmlHandlerChains = JaxWsSdkUtility.getChildElement(sunJaxWsBean.getXml().getChildNodes(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS));
+      Element xmlHandlerChains = XmlUtility.getFirstChildElement(sunJaxWsBean.getXml(), sunJaxWsBean.toQualifiedName(SunJaxWsBean.XML_HANDLER_CHAINS));
       xmlHandlerChains.removeChild(xmlHandlerChain);
 
       // persist
