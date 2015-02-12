@@ -10,15 +10,20 @@
  ******************************************************************************/
 package formdata.client.ui.template.formfield;
 
+import org.eclipse.scout.commons.annotations.FormData;
+import org.eclipse.scout.commons.annotations.FormData.DefaultSubtypeSdkCommand;
+import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 
 import formdata.client.ui.template.formfield.AbstractLoremTableField.Table;
 
 /**
  *
  */
+@FormData(value = AbstractTableFieldBeanData.class, sdkCommand = SdkCommand.USE, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE)
 public abstract class AbstractLoremTableField extends AbstractTableField<Table> {
   public class Table extends AbstractLoremTable {
 
