@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.services;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -135,7 +136,7 @@ public class ProcessServiceNewWizard extends AbstractServiceWizard {
   protected boolean beforeFinish() throws CoreException {
     m_operation = new ProcessServiceNewOperation(m_locationWizardPage.getTextOfNode(TYPE_SERVICE_INTERFACE, true, true), m_locationWizardPage.getTextOfNode(TYPE_SERVICE_IMPLEMENTATION, true, true));
     m_serviceNewWizardPage.fillProcessServiceNewOperation(m_operation);
-    IScoutBundle[] proxyRegBundles = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
+    Set<IScoutBundle> proxyRegBundles = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
     for (IScoutBundle b : proxyRegBundles) {
       m_operation.addProxyRegistrationProject(b.getJavaProject());
     }
@@ -381,7 +382,7 @@ public class ProcessServiceNewWizard extends AbstractServiceWizard {
 
     protected IStatus getStatusServiceRegistrationClient() {
       IScoutBundle serviceInterfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
-      ITreeNode[] serviceRegistrationClientNodes = m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REG_CLIENT, true, true);
+      Set<ITreeNode> serviceRegistrationClientNodes = m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REG_CLIENT, true, true);
       for (ITreeNode serviceRegNode : serviceRegistrationClientNodes) {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
@@ -398,7 +399,7 @@ public class ProcessServiceNewWizard extends AbstractServiceWizard {
 
     protected IStatus getStatusServiceRegistrationServer() {
       IScoutBundle serviceImplementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
-      ITreeNode[] serviceRegistrationServerNodes = m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true);
+      Set<ITreeNode> serviceRegistrationServerNodes = m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true);
       for (ITreeNode serviceRegNode : serviceRegistrationServerNodes) {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {

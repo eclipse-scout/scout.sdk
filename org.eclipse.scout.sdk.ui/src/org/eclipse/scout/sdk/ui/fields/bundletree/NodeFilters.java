@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.bundletree;
 
+import java.util.List;
+
 import org.eclipse.scout.commons.CompareUtility;
 
 /**
@@ -74,7 +76,7 @@ public final class NodeFilters {
     };
   }
 
-  public static ITreeNodeFilter getCombinedFilter(final ITreeNodeFilter[] filters) {
+  public static ITreeNodeFilter getCombinedFilter(final List<ITreeNodeFilter> filters) {
     return new ITreeNodeFilter() {
       @Override
       public boolean accept(ITreeNode node) {

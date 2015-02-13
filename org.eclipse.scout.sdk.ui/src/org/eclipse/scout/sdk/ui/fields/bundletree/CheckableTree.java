@@ -11,10 +11,15 @@
 package org.eclipse.scout.sdk.ui.fields.bundletree;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -70,16 +75,16 @@ public class CheckableTree extends Composite {
   private static final int TEXT_MARGIN = 2;
 
   private final ITreeNode m_rootNode;
-  private final HashMap<ITreeNode, Rectangle> m_checkableNodeBounds = new HashMap<ITreeNode, Rectangle>();
-  private final HashSet<ITreeNode> m_checkedNodes = new HashSet<ITreeNode>();
+  private final Map<ITreeNode, Rectangle> m_checkableNodeBounds = new HashMap<>();
+  private final Set<ITreeNode> m_checkedNodes = new HashSet<>();
   private final Image m_imgCheckboxYes = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxYes);
   private final Image m_imgCheckboxNo = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxNo);
   private final Image m_imgCheckboxYesDisabled = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxYesDisabled);
   private final Image m_imgCheckboxNoDisabled = ScoutSdkUi.getImage(ScoutSdkUi.CheckboxNoDisabled);
   private final EventListenerList m_eventListeners = new EventListenerList();
-  private final ArrayList<ITreeNodeFilter> m_filters = new ArrayList<ITreeNodeFilter>();
-  private final ArrayList<Object> m_tmpExpandedElements = new ArrayList<Object>();
-  private final HashMap<ImageDescriptor, Image> m_icons = new HashMap<ImageDescriptor, Image>();
+  private final List<ITreeNodeFilter> m_filters = new ArrayList<>();
+  private final List<Object> m_tmpExpandedElements = new ArrayList<>();
+  private final Map<ImageDescriptor, Image> m_icons = new HashMap<>();
 
   private Tree m_tree;
   private TreeViewer m_viewer;
@@ -202,8 +207,8 @@ public class CheckableTree extends Composite {
     return m_filters.remove(filter);
   }
 
-  public ITreeNodeFilter[] getTreeNodeFilters() {
-    return m_filters.toArray(new ITreeNodeFilter[m_filters.size()]);
+  public List<ITreeNodeFilter> getTreeNodeFilters() {
+    return CollectionUtility.arrayList(m_filters);
   }
 
   public TreeViewer getTreeViewer() {
@@ -228,17 +233,18 @@ public class CheckableTree extends Composite {
     return m_checkedNodes.contains(node);
   }
 
-  public ITreeNode[] getCheckedNodes() {
-    return m_checkedNodes.toArray(new ITreeNode[m_checkedNodes.size()]);
+  public Set<ITreeNode> getCheckedNodes() {
+    return new HashSet<ITreeNode>(m_checkedNodes);
   }
 
   protected void invertCheckStateFromUi(ITreeNode node) {
     setChecked(node, !isChecked(node));
   }
 
-  public void setChecked(ITreeNode[] nodes) {
-    ArrayList<ITreeNode> nodesToCheck = CollectionUtility.arrayList(nodes);
-    ArrayList<ITreeNode> checkedNodes = new ArrayList<ITreeNode>(m_checkedNodes);
+  public void setChecked(Set<ITreeNode> nodes) {
+    List<ITreeNode> nodesToCheck = CollectionUtility.arrayList(nodes);
+    List<ITreeNode> checkedNodes = new LinkedList<ITreeNode>(m_checkedNodes);
+
     // remove already checked
     for (Iterator<ITreeNode> it = checkedNodes.iterator(); it.hasNext();) {
       ITreeNode n = it.next();
@@ -275,16 +281,16 @@ public class CheckableTree extends Composite {
     return childNode.getParent();
   }
 
-  public ITreeNode[] getChildren(ITreeNode parentNode) {
+  public List<ITreeNode> getChildren(ITreeNode parentNode) {
     return sortChildren(parentNode.getChildren(NodeFilters.getCombinedFilter(getTreeNodeFilters())));
   }
 
-  protected ITreeNode[] sortChildren(ITreeNode[] children) {
-    TreeMap<CompositeObject, ITreeNode> nodes = new TreeMap<CompositeObject, ITreeNode>();
+  protected List<ITreeNode> sortChildren(Collection<ITreeNode> children) {
+    Map<CompositeObject, ITreeNode> nodes = new TreeMap<>();
     for (ITreeNode n : children) {
       nodes.put(new CompositeObject(Long.valueOf(n.getOrderNr()), n.getText(), n), n);
     }
-    return nodes.values().toArray(new ITreeNode[nodes.values().size()]);
+    return CollectionUtility.arrayList(nodes.values());
   }
 
   public class P_TreeModel extends LabelProvider implements ITreeContentProvider, IFontProvider, IColorProvider {
@@ -297,13 +303,13 @@ public class CheckableTree extends Composite {
         return new Object[]{getRootNode()};
       }
       else {
-        return CheckableTree.this.getChildren(getRootNode());
+        return CheckableTree.this.getChildren(getRootNode()).toArray();
       }
     }
 
     @Override
     public Object[] getChildren(Object parentElement) {
-      return CheckableTree.this.getChildren((ITreeNode) parentElement);
+      return CheckableTree.this.getChildren((ITreeNode) parentElement).toArray();
     }
 
     @Override
@@ -313,7 +319,7 @@ public class CheckableTree extends Composite {
 
     @Override
     public boolean hasChildren(Object element) {
-      return CheckableTree.this.getChildren((ITreeNode) element).length > 0;
+      return CollectionUtility.hasElements(CheckableTree.this.getChildren((ITreeNode) element));
     }
 
     @Override
@@ -581,7 +587,7 @@ public class CheckableTree extends Composite {
       else if ((m_lastOperation & DND.DROP_COPY) != 0) {
         selectedNode = new TreeNode(selectedNode);
       }
-      if (newParentNode.getChildren(NodeFilters.getByType(selectedNode.getType())).length == 0) {
+      if (newParentNode.getChildren(NodeFilters.getByType(selectedNode.getType())).size() == 0) {
         newParentNode.addChild(selectedNode);
         selectedNode.setParent(newParentNode);
       }

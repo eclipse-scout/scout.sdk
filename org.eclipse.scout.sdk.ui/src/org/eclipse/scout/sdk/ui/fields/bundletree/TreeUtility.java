@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.fields.bundletree;
 
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -20,6 +20,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.viewers.IDecoration;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleExtensionPoint;
 import org.eclipse.scout.sdk.ui.extensions.bundle.ScoutBundleUiExtension;
@@ -49,12 +50,13 @@ public final class TreeUtility {
   private TreeUtility() {
   }
 
-  public static ITreeNode[] findNodes(ITreeNode startNode, ITreeNodeFilter filter) {
-    ArrayList<ITreeNode> collector = new ArrayList<ITreeNode>(3);
+  public static Set<ITreeNode> findNodes(ITreeNode startNode, ITreeNodeFilter filter) {
+    Set<ITreeNode> collector = new HashSet<>();
     collectNodes(startNode, filter, collector);
-    return collector.toArray(new ITreeNode[collector.size()]);
+    return collector;
   }
 
+  @SafeVarargs
   public static <T> boolean isOneOf(T toSearch, T... listToSearchIn) {
     if (listToSearchIn != null && listToSearchIn.length > 0) {
       for (T t : listToSearchIn) {
@@ -67,15 +69,12 @@ public final class TreeUtility {
   }
 
   public static ITreeNode findNode(ITreeNode startNode, ITreeNodeFilter filter) {
-    ArrayList<ITreeNode> collector = new ArrayList<ITreeNode>(3);
+    Set<ITreeNode> collector = new HashSet<>();
     collectNodes(startNode, filter, collector);
-    if (collector.size() > 0) {
-      return collector.get(0);
-    }
-    return null;
+    return CollectionUtility.firstElement(collector);
   }
 
-  private static void collectNodes(ITreeNode node, ITreeNodeFilter filter, List<ITreeNode> collector) {
+  private static void collectNodes(ITreeNode node, ITreeNodeFilter filter, Set<ITreeNode> collector) {
     if (node != null) {
       if (filter.accept(node)) {
         collector.add(node);

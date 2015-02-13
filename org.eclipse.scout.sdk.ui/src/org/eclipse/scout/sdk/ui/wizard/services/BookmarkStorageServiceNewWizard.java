@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.services;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -137,7 +138,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractServiceWizard {
 
     m_operation.addInterfaceInterfaceSignature(SignatureCache.createTypeSignature(IRuntimeClasses.IBookmarkStorageService));
 
-    IScoutBundle[] regProxyLocations = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
+    Set<IScoutBundle> regProxyLocations = m_locationWizardPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
     for (IScoutBundle cb : regProxyLocations) {
       m_operation.addProxyRegistrationProject(cb.getJavaProject());
     }
@@ -318,7 +319,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractServiceWizard {
 
     protected IStatus getStatusServiceRegistrationClient() {
       IScoutBundle serviceInterfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
-      ITreeNode[] serviceRegistrationClientNodes = m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REG_CLIENT, true, true);
+      Set<ITreeNode> serviceRegistrationClientNodes = m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REG_CLIENT, true, true);
       for (ITreeNode serviceRegNode : serviceRegistrationClientNodes) {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
@@ -335,7 +336,7 @@ public class BookmarkStorageServiceNewWizard extends AbstractServiceWizard {
 
     protected IStatus getStatusServiceRegistrationServer() {
       IScoutBundle serviceImplementationBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
-      ITreeNode[] serviceRegistrationServerNodes = m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true);
+      Set<ITreeNode> serviceRegistrationServerNodes = m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true);
       for (ITreeNode serviceRegNode : serviceRegistrationServerNodes) {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {

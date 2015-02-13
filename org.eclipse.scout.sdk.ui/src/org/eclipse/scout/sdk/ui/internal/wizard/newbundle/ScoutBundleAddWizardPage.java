@@ -10,8 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.newbundle;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ITreeNode;
 import org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.ScoutBundleNodeGroup;
@@ -61,8 +64,9 @@ public class ScoutBundleAddWizardPage extends ScoutProjectNewWizardPage {
     ((GridData) m_eclipseTargetPlatform.getLayoutData()).exclude = true;
 
     // force re-validate and dynamic page add/remove
-    ITreeNode[] backup = m_bundleTree.getCheckedNodes();
-    m_bundleTree.setChecked(new ITreeNode[]{});
+    Set<ITreeNode> backup = m_bundleTree.getCheckedNodes();
+    Set<ITreeNode> emptyHashSet = CollectionUtility.emptyHashSet();
+    m_bundleTree.setChecked(emptyHashSet);
     m_bundleTree.setChecked(backup);
   }
 

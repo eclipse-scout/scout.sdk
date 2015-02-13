@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.ui.dialog;
 
 import java.beans.PropertyChangeListener;
-import java.util.ArrayList;
+import java.util.Set;
 
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.commons.beans.BasicPropertySupport;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
@@ -39,17 +40,17 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class CheckableTreeSelectionDialog extends TitleAreaDialog {
 
-  public static final String PROP_CHECKED_NODES = "checkedNodes"; /*ITreeNode[] */
+  public static final String PROP_CHECKED_NODES = "checkedNodes"; /*Set<ITreeNode> */
   public static final String PROP_SELECTED_NODE = "selectedNodes"; /*ITreeNode */
 
-  private BasicPropertySupport m_propertySupport;
+  private final BasicPropertySupport m_propertySupport;
+  private final OptimisticLock m_uiLock;
+  private final ITreeNode m_rootNode;
+  private final String m_message;
+  private final String m_title;
 
-  private ITreeNode m_rootNode;
   private CheckableTree m_tree;
-  private final OptimisticLock m_uiLock = new OptimisticLock();
   private boolean m_complete;
-
-  private String m_message, m_title;
 
   public CheckableTreeSelectionDialog(Shell parentShell, ITreeNode rootNode) {
     this(parentShell, rootNode, null, null);
@@ -57,13 +58,16 @@ public class CheckableTreeSelectionDialog extends TitleAreaDialog {
 
   public CheckableTreeSelectionDialog(Shell parentShell, ITreeNode rootNode, String dialogTitle, String message) {
     super(parentShell);
+
+    m_propertySupport = new BasicPropertySupport(this);
+    m_uiLock = new OptimisticLock();
+
     m_rootNode = rootNode;
     m_title = dialogTitle;
     m_message = message;
 
     setShellStyle(getShellStyle() | SWT.RESIZE);
     setHelpAvailable(false);
-    m_propertySupport = new BasicPropertySupport(this);
   }
 
   @Override
@@ -92,11 +96,7 @@ public class CheckableTreeSelectionDialog extends TitleAreaDialog {
       public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
         try {
           if (m_uiLock.acquire()) {
-            ArrayList<ITreeNode> checkedNodes = new ArrayList<ITreeNode>();
-            for (ITreeNode n : m_tree.getCheckedNodes()) {
-              checkedNodes.add(n);
-            }
-            setCheckedNodes(checkedNodes.toArray(new ITreeNode[checkedNodes.size()]));
+            setCheckedNodes(m_tree.getCheckedNodes());
           }
         }
         finally {
@@ -156,20 +156,22 @@ public class CheckableTreeSelectionDialog extends TitleAreaDialog {
     return m_rootNode;
   }
 
-  public ITreeNode[] getCheckedNodes() {
-    ITreeNode[] checkedNodes = (ITreeNode[]) m_propertySupport.getProperty(PROP_CHECKED_NODES);
+  @SuppressWarnings("unchecked")
+  public Set<ITreeNode> getCheckedNodes() {
+    Set<ITreeNode> checkedNodes = (Set<ITreeNode>) m_propertySupport.getProperty(PROP_CHECKED_NODES);
     if (checkedNodes == null) {
-      checkedNodes = new ITreeNode[0];
+      return CollectionUtility.emptyHashSet();
     }
-    return checkedNodes;
+    return CollectionUtility.hashSet(checkedNodes);
   }
 
-  public void setCheckedNodes(ITreeNode[] checkedNodes) {
-    m_propertySupport.setProperty(PROP_CHECKED_NODES, checkedNodes);
+  public void setCheckedNodes(Set<ITreeNode> checkedNodes) {
+    Set<ITreeNode> newCheckedNodes = CollectionUtility.hashSet(checkedNodes);
+    m_propertySupport.setProperty(PROP_CHECKED_NODES, newCheckedNodes);
     if (m_tree != null && !m_tree.isDisposed()) {
       try {
         m_uiLock.acquire();
-        m_tree.setChecked(checkedNodes);
+        m_tree.setChecked(newCheckedNodes);
       }
       finally {
         m_uiLock.release();

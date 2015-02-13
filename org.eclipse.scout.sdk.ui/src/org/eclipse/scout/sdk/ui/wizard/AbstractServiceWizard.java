@@ -63,7 +63,7 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
 
   public abstract BundleTreeWizardPage getLocationsPage();
 
-  protected List<ServiceRegistrationDescription> getCheckedServiceRegistrations(ITreeNode[] serviceRegNodes) {
+  protected List<ServiceRegistrationDescription> getCheckedServiceRegistrations(Set<ITreeNode> serviceRegNodes) {
     List<ServiceRegistrationDescription> result = new LinkedList<ServiceRegistrationDescription>();
     for (ITreeNode n : serviceRegNodes) {
       if (getLocationsPage().isNodeChecked(n)) {
@@ -191,12 +191,12 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
       if (node.getType() == TYPE_SERVICE_REG_SESSION) {
         IScoutBundle b = BundleTreeWizardPage.getLocationBundle(node);
         IType curSession = (IType) node.getData();
-        ITreeNode[] siblings = node.getParent().getChildren(NodeFilters.getVisible());
+        List<ITreeNode> siblings = node.getParent().getChildren(NodeFilters.getVisible());
         IType defaultSession = getLastUsedDefaultSession(b);
         boolean defaultSessionFound = false;
-        Set<IType> sessions = new LinkedHashSet<IType>(siblings.length);
-        for (int i = 0; i < siblings.length; i++) {
-          IType session = (IType) siblings[i].getData();
+        Set<IType> sessions = new LinkedHashSet<IType>(siblings.size());
+        for (int i = 0; i < siblings.size(); i++) {
+          IType session = (IType) siblings.get(i).getData();
           sessions.add(session);
           if (!defaultSessionFound && session.equals(defaultSession)) {
             defaultSessionFound = true;

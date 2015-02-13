@@ -82,7 +82,7 @@ public interface ITreeNode {
    * @param filter
    * @return
    */
-  ITreeNode[] getChildren(ITreeNodeFilter filter);
+  List<ITreeNode> getChildren(ITreeNodeFilter filter);
 
   /**
    * @param visible

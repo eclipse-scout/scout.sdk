@@ -10,11 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.wizard.workingset;
 
-import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.wizard.WizardPage;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.TextField;
@@ -81,18 +83,17 @@ public class ScoutWorkingSetWizardPage extends WizardPage implements IWorkingSet
     // init values
     if (!m_createNewSet) {
       m_nameField.setText(getSelection().getName());
-
-      ArrayList<ITreeNode> checked = new ArrayList<ITreeNode>();
+      Set<ITreeNode> checked = new LinkedHashSet<ITreeNode>();
       for (IAdaptable a : getSelection().getElements()) {
-        ITreeNode[] candidates = TreeUtility.findNodes(m_availableBundlesTree.getRootNode(), NodeFilters.getByData(a));
-        if (candidates != null && candidates.length > 0) {
+        Set<ITreeNode> candidates = TreeUtility.findNodes(m_availableBundlesTree.getRootNode(), NodeFilters.getByData(a));
+        if (candidates != null && candidates.size() > 0) {
           for (ITreeNode candidate : candidates) {
             checked.add(candidate);
           }
         }
       }
 
-      m_availableBundlesTree.setChecked(checked.toArray(new ITreeNode[checked.size()]));
+      m_availableBundlesTree.setChecked(checked);
     }
 
     // layout
@@ -127,10 +128,10 @@ public class ScoutWorkingSetWizardPage extends WizardPage implements IWorkingSet
   public void finish() {
     String workingSetName = m_nameField.getText().trim();
 
-    ITreeNode[] checkedNodes = m_availableBundlesTree.getCheckedNodes();
-    IAdaptable[] elements = new IAdaptable[checkedNodes.length];
+    List<ITreeNode> checkedNodes = CollectionUtility.arrayList(m_availableBundlesTree.getCheckedNodes());
+    IAdaptable[] elements = new IAdaptable[checkedNodes.size()];
     for (int i = 0; i < elements.length; i++) {
-      elements[i] = (IAdaptable) checkedNodes[i].getData();
+      elements[i] = (IAdaptable) checkedNodes.get(i).getData();
     }
 
     if (m_createNewSet) {

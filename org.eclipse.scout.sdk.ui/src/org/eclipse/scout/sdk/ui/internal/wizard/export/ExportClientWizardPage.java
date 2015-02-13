@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.export;
 
+import java.util.Set;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -19,6 +21,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -81,11 +84,11 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
     });
     IFile defaultSelection = getProductFileSetting();
     if (defaultSelection == null) {
-      ITreeNode[] clientProductNodes = TreeUtility.findNodes(clientProductTreeRoot, NodeFilters.getByType(TreeUtility.TYPE_PRODUCT_NODE));
-      if (clientProductNodes.length == 1) {
-        defaultSelection = (IFile) clientProductNodes[0].getData();
+      Set<ITreeNode> clientProductNodes = TreeUtility.findNodes(clientProductTreeRoot, NodeFilters.getByType(TreeUtility.TYPE_PRODUCT_NODE));
+      if (clientProductNodes.size() == 1) {
+        defaultSelection = (IFile) CollectionUtility.firstElement(clientProductNodes).getData();
       }
-      else if (clientProductNodes.length == 0) {
+      else if (clientProductNodes.size() == 0) {
         m_clientProductStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoClientToAddAvail"));
       }
       else {
@@ -106,11 +109,11 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
     });
     IFolder defaultFolder = getResourceFolderSetting();
     if (defaultFolder == null) {
-      ITreeNode[] folderNodes = TreeUtility.findNodes(m_resourceFolderField.getRootNode(), NodeFilters.getByType(ResourceServletFolderTree.NODE_TYPE_FOLDER));
-      if (folderNodes.length == 1) {
-        defaultFolder = (IFolder) folderNodes[0].getData();
+      Set<ITreeNode> folderNodes = TreeUtility.findNodes(m_resourceFolderField.getRootNode(), NodeFilters.getByType(ResourceServletFolderTree.NODE_TYPE_FOLDER));
+      if (folderNodes.size() == 1) {
+        defaultFolder = (IFolder) CollectionUtility.firstElement(folderNodes).getData();
       }
-      else if (folderNodes.length == 0) {
+      else if (folderNodes.size() == 0) {
         m_clientExportFolderStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("NoResourceServletFound"));
       }
     }
@@ -244,7 +247,7 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
     return null;
   }
 
-  private IFile getDefaultSelectionProductFile(ITreeNode[] clientProductNodes) {
+  private IFile getDefaultSelectionProductFile(Set<ITreeNode> clientProductNodes) {
     IFile ret = null;
     int lastPrio = -1;
     for (ITreeNode n : clientProductNodes) {

@@ -11,7 +11,9 @@
 package org.eclipse.scout.sdk.ui.wizard;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.DndEvent;
@@ -155,21 +157,21 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
     }
   }
 
-  public IScoutBundle[] getLocationBundles(String type, boolean visibleOnly, boolean checkedOnly) {
-    ITreeNode[] nodes = getTreeNodes(type, visibleOnly, checkedOnly);
-    ArrayList<IScoutBundle> result = new ArrayList<IScoutBundle>();
+  public Set<IScoutBundle> getLocationBundles(String type, boolean visibleOnly, boolean checkedOnly) {
+    Set<ITreeNode> nodes = getTreeNodes(type, visibleOnly, checkedOnly);
+    Set<IScoutBundle> result = new HashSet<>();
     for (ITreeNode node : nodes) {
       if (node != null && node.getParent() != null && node.getParent().getData() instanceof IScoutBundle) {
         result.add((IScoutBundle) node.getParent().getData());
       }
     }
-    return result.toArray(new IScoutBundle[result.size()]);
+    return result;
   }
 
-  public ITreeNode[] getTreeNodes(String type, boolean visibleOnly, boolean checkedOnly) {
-    ArrayList<ITreeNode> result = new ArrayList<ITreeNode>();
+  public Set<ITreeNode> getTreeNodes(String type, boolean visibleOnly, boolean checkedOnly) {
+    Set<ITreeNode> result = new HashSet<ITreeNode>();
     if (isControlCreated()) {
-      ITreeNode[] nodes = TreeUtility.findNodes(m_rootNode, NodeFilters.getByType(type));
+      Set<ITreeNode> nodes = TreeUtility.findNodes(m_rootNode, NodeFilters.getByType(type));
       for (ITreeNode node : nodes) {
         if (node != null && checkedOnly && node.isCheckable()) {
           if (!getTree().isChecked(node)) {
@@ -184,7 +186,7 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
         result.add(node);
       }
     }
-    return result.toArray(new ITreeNode[result.size()]);
+    return result;
   }
 
   public static IScoutBundle getLocationBundle(ITreeNode node) {

@@ -179,8 +179,8 @@ public class FormNewWizard extends AbstractServiceWizard {
       m_operation.setFormDataProject(formDataBundle.getJavaProject());
       m_operation.setFormDataPackage(formDataBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SERVICES)));
     }
-    IScoutBundle[] proxyRegistrationBundles = m_locationPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
-    List<IJavaProject> proxyRegistrationProjects = new ArrayList<IJavaProject>(proxyRegistrationBundles.length);
+    Set<IScoutBundle> proxyRegistrationBundles = m_locationPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
+    List<IJavaProject> proxyRegistrationProjects = new ArrayList<IJavaProject>(proxyRegistrationBundles.size());
     for (IScoutBundle b : proxyRegistrationBundles) {
       proxyRegistrationProjects.add(ScoutUtility.getJavaProject(b));
     }
@@ -534,7 +534,7 @@ public class FormNewWizard extends AbstractServiceWizard {
 
     protected IStatus getStatusServiceRegistrationClient() {
       IScoutBundle serviceInterfaceBundle = m_locationPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
-      ITreeNode[] serviceRegistrationClientNodes = m_locationPage.getTreeNodes(TYPE_SERVICE_REG_CLIENT, true, true);
+      Set<ITreeNode> serviceRegistrationClientNodes = m_locationPage.getTreeNodes(TYPE_SERVICE_REG_CLIENT, true, true);
       for (ITreeNode serviceRegNode : serviceRegistrationClientNodes) {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
@@ -552,7 +552,7 @@ public class FormNewWizard extends AbstractServiceWizard {
 
     protected IStatus getStatusServiceRegistrationServer() {
       IScoutBundle serviceImplementationBundle = m_locationPage.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
-      ITreeNode[] serviceRegistrationServerNodes = m_locationPage.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true);
+      Set<ITreeNode> serviceRegistrationServerNodes = m_locationPage.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true);
       for (ITreeNode serviceRegNode : serviceRegistrationServerNodes) {
         IScoutBundle serviceRegistrationBundle = (IScoutBundle) serviceRegNode.getParent().getData();
         if (serviceImplementationBundle != null) {

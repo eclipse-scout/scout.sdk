@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.wizard.newproject;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -409,8 +410,8 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     properties.setProperty(IScoutProjectNewOperation.PROP_KEEP_CURRENT_TARGET, isKeepCurrentTarget());
 
     // go through all node extensions and put properties which node has been checked
-    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getAcceptAll());
-    HashSet<String> checkedNodeExtensionIds = new HashSet<String>(nodes.length);
+    Set<ITreeNode> nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getAcceptAll());
+    HashSet<String> checkedNodeExtensionIds = new HashSet<String>(nodes.size());
     for (ITreeNode node : nodes) {
       ScoutBundleUiExtension ext = (ScoutBundleUiExtension) node.getData();
       if (ext != null) {
@@ -525,7 +526,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   @Override
   public boolean isBundleNodesSelected(String... extensionIds) {
-    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByExtensionIdFilter(extensionIds));
+    Set<ITreeNode> nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByExtensionIdFilter(extensionIds));
     for (ITreeNode n : nodes) {
       if (!m_bundleTree.isChecked(n)) {
         return false;
@@ -536,7 +537,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   @Override
   public void setBundleNodeSelected(boolean selected, String... extensionIds) {
-    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByExtensionIdFilter(extensionIds));
+    Set<ITreeNode> nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByExtensionIdFilter(extensionIds));
     for (ITreeNode n : nodes) {
       m_bundleTree.setChecked(n, selected);
     }
@@ -544,7 +545,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   @Override
   public void setBundleNodeAvailable(boolean enabled, boolean visible, String... extensionIds) {
-    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByExtensionIdFilter(extensionIds));
+    Set<ITreeNode> nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByExtensionIdFilter(extensionIds));
     for (ITreeNode n : nodes) {
       n.setEnabled(enabled);
       n.setVisible(visible);
@@ -553,7 +554,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   @Override
   public boolean hasSelectedBundle(String... types) {
-    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByBundleTypeFilter(types));
+    Set<ITreeNode> nodes = TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByBundleTypeFilter(types));
     for (ITreeNode n : nodes) {
       if (m_bundleTree.isChecked(n)) {
         return true;

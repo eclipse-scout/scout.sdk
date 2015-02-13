@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.lookupcall;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -390,7 +391,7 @@ public class LookupCallNewWizard extends AbstractServiceWizard {
 
     protected IStatus getStatusServiceRegistrationClient() {
       IScoutBundle serviceInterfaceBundle = m_page2.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
-      ITreeNode[] serviceRegistrationClientNodes = m_page2.getTreeNodes(TYPE_SERVICE_REG_CLIENT, true, true);
+      Set<ITreeNode> serviceRegistrationClientNodes = m_page2.getTreeNodes(TYPE_SERVICE_REG_CLIENT, true, true);
       for (ITreeNode serviceRegNode : serviceRegistrationClientNodes) {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {
@@ -407,7 +408,7 @@ public class LookupCallNewWizard extends AbstractServiceWizard {
 
     protected IStatus getStatusServiceRegistrationServer() {
       IScoutBundle serviceImplementationBundle = m_page2.getLocationBundle(TYPE_SERVICE_IMPLEMENTATION, true, true);
-      ITreeNode[] serviceRegistrationServerNodes = m_page2.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true);
+      Set<ITreeNode> serviceRegistrationServerNodes = m_page2.getTreeNodes(TYPE_SERVICE_REG_SERVER, true, true);
       for (ITreeNode serviceRegNode : serviceRegistrationServerNodes) {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {

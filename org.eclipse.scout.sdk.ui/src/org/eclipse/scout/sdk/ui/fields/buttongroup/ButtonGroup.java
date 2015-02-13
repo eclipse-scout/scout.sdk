@@ -11,10 +11,10 @@
 package org.eclipse.scout.sdk.ui.fields.buttongroup;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.EventListenerList;
 import org.eclipse.scout.commons.OptimisticLock;
 import org.eclipse.scout.sdk.ui.fields.TextField;
@@ -118,14 +118,14 @@ public class ButtonGroup<T> extends Composite {
    * @param val
    *          the button value.
    */
-  public void setValue(T... val) {
-    HashSet<T> values = new HashSet<T>();
-    if (val != null) {
-      values.addAll(Arrays.asList(val));
-    }
+  @SafeVarargs
+  public final void setValue(T... val) {
+    Set<T> values = CollectionUtility.hashSet(val);
+
     if (getType() == BUTTON_TYPE_RADIO && values.size() > 1) {
       throw new IllegalArgumentException("BUTTON_TYPE_RADIO allows only one value to select.");
     }
+
     boolean dirty = false;
     try {
       m_notificationLock.acquire();
@@ -150,7 +150,6 @@ public class ButtonGroup<T> extends Composite {
     if (dirty) {
       fireSelectionChanged();
     }
-
   }
 
   /**

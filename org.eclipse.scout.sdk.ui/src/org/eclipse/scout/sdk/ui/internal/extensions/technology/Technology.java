@@ -105,10 +105,9 @@ public class Technology implements Comparable<Technology> {
       public void propertyChange(PropertyChangeEvent evt) {
         if (CheckableTreeSelectionDialog.PROP_CHECKED_NODES.equals(evt.getPropertyName())) {
           boolean complete = false;
-          if (evt.getNewValue() instanceof ITreeNode[]) {
-            ITreeNode[] checkedNodes = (ITreeNode[]) evt.getNewValue();
-            complete = checkedNodes != null && checkedNodes.length > 0;
-          }
+          @SuppressWarnings("unchecked")
+          Set<ITreeNode> checkedNodes = (Set<ITreeNode>) evt.getNewValue();
+          complete = CollectionUtility.hasElements(checkedNodes);
           dialog.setComplete(complete);
         }
       }
@@ -116,8 +115,8 @@ public class Technology implements Comparable<Technology> {
     dialog.setCheckedNodes(getDefaultSelectedNodes(changesTree));
 
     if (dialog.open() == Dialog.OK) {
-      ITreeNode[] selectedNodes = dialog.getCheckedNodes();
-      if (selectedNodes != null && selectedNodes.length > 0) {
+      Set<ITreeNode> selectedNodes = dialog.getCheckedNodes();
+      if (CollectionUtility.hasElements(selectedNodes)) {
         OperationJob job = new OperationJob(new P_ChangeSelectionOperation(selectedNodes, selected));
         job.schedule();
       }
@@ -126,10 +125,10 @@ public class Technology implements Comparable<Technology> {
     return false;
   }
 
-  private ITreeNode[] getDefaultSelectedNodes(ITreeNode root) {
-    HashSet<ITreeNode> ret = new HashSet<ITreeNode>();
+  private Set<ITreeNode> getDefaultSelectedNodes(ITreeNode root) {
+    Set<ITreeNode> ret = new HashSet<ITreeNode>();
     collectDefaultSelection(root, ret);
-    return ret.toArray(new ITreeNode[ret.size()]);
+    return ret;
   }
 
   private void collectDefaultSelection(ITreeNode node, Set<ITreeNode> collector) {
@@ -274,11 +273,11 @@ public class Technology implements Comparable<Technology> {
   }
 
   private final class P_ChangeSelectionOperation implements IOperation {
-    private final ITreeNode[] m_selectedNodes;
+    private final Iterable<ITreeNode> m_selectedNodes;
     private final boolean m_newSelection;
     private boolean m_success;
 
-    private P_ChangeSelectionOperation(ITreeNode[] selectedNodes, boolean newSelection) {
+    private P_ChangeSelectionOperation(Iterable<ITreeNode> selectedNodes, boolean newSelection) {
       m_selectedNodes = selectedNodes;
       m_newSelection = newSelection;
       m_success = false; // nothing done yet

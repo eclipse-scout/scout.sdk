@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.export;
 
+import java.util.Set;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -18,6 +20,7 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.IProductSelectionListener;
@@ -91,11 +94,11 @@ public abstract class AbstractExportProductWizardPage extends AbstractWorkspaceW
     });
     IFile defaultSelection = getProductFileSetting();
     if (defaultSelection == null) {
-      ITreeNode[] productNodes = TreeUtility.findNodes(productTreeRoot, NodeFilters.getByType(TreeUtility.TYPE_PRODUCT_NODE));
-      if (productNodes.length == 1) {
-        defaultSelection = (IFile) productNodes[0].getData();
+      Set<ITreeNode> productNodes = TreeUtility.findNodes(productTreeRoot, NodeFilters.getByType(TreeUtility.TYPE_PRODUCT_NODE));
+      if (productNodes.size() == 1) {
+        defaultSelection = (IFile) CollectionUtility.firstElement(productNodes).getData();
       }
-      else if (productNodes.length == 0) {
+      else if (productNodes.size() == 0) {
         m_productStatus = new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("WarExportNoServerFound",
             DeployableProductFileNodeFilter.BUNDLE_ID_HTTP_SERVLETBRIDGE,
             DeployableProductFileNodeFilter.BUNDLE_ID_HTTP_REGISTRY));

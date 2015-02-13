@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.ui.wizard.services;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Set;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -274,7 +275,7 @@ public class ClientServiceNewWizard extends AbstractServiceWizard {
     protected IStatus getStatusServiceRegistration() {
       // client bundle
       IScoutBundle serviceInterfaceBundle = m_locationWizardPage.getLocationBundle(TYPE_SERVICE_INTERFACE, true, true);
-      ITreeNode[] registrationNodes = m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REGISTRATION, true, true);
+      Set<ITreeNode> registrationNodes = m_locationWizardPage.getTreeNodes(TYPE_SERVICE_REGISTRATION, true, true);
       for (ITreeNode serviceRegNode : registrationNodes) {
         Object data = serviceRegNode.getParent().getData();
         if (data instanceof IScoutBundle) {

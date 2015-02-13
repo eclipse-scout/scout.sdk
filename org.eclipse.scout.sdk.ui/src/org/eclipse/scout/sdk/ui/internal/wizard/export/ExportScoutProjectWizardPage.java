@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.ui.internal.wizard.export;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
@@ -189,15 +190,15 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
     return (IExportScoutProjectWizard) super.getWizard();
   }
 
-  private ITreeNode[] getNodes(String... entryIds) {
+  private Set<ITreeNode> getNodes(String... entryIds) {
     return TreeUtility.findNodes(m_invisibleRootNode, new P_NodeByIdFilter(entryIds));
   }
 
-  private ITreeNode[] getInitiallyCheckedNodes() {
+  private Set<ITreeNode> getInitiallyCheckedNodes() {
     String[] ids = getDialogSettings().getArray(SETTINGS_SELECTED_ENTRIES);
     if (ids == null) {
       ArrayList<String> defaultSelection = new ArrayList<String>();
-      ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible());
+      Set<ITreeNode> nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible());
       for (ITreeNode n : nodes) {
         ExportScoutProjectEntry e = (ExportScoutProjectEntry) n.getData();
         if (e.getHandler().getDefaultSelection()) {
@@ -210,8 +211,8 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
   }
 
   private void saveTreeSelection() {
-    ITreeNode[] checked = m_entryTree.getCheckedNodes();
-    ArrayList<String> ids = new ArrayList<String>(checked.length);
+    Set<ITreeNode> checked = m_entryTree.getCheckedNodes();
+    ArrayList<String> ids = new ArrayList<String>(checked.size());
     for (ITreeNode n : checked) {
       ExportScoutProjectEntry e = (ExportScoutProjectEntry) n.getData();
       ids.add(e.getId());
@@ -221,7 +222,7 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
 
   @Override
   public boolean isNodesSelected(String... entryIds) {
-    ITreeNode[] nodes = getNodes(entryIds);
+    Set<ITreeNode> nodes = getNodes(entryIds);
     for (ITreeNode n : nodes) {
       if (m_entryTree.isChecked(n)) {
         return true;
@@ -236,7 +237,7 @@ public class ExportScoutProjectWizardPage extends AbstractWorkspaceWizardPage im
       return new ExportScoutProjectEntry[]{};
     }
     ArrayList<ExportScoutProjectEntry> selectedEntries = new ArrayList<ExportScoutProjectEntry>();
-    ITreeNode[] nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible());
+    Set<ITreeNode> nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getVisible());
     for (ITreeNode n : nodes) {
       if (m_entryTree.isChecked(n)) {
         ExportScoutProjectEntry entry = (ExportScoutProjectEntry) n.getData();

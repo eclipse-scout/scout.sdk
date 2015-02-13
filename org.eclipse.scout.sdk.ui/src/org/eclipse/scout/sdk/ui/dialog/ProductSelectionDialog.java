@@ -11,6 +11,8 @@
 package org.eclipse.scout.sdk.ui.dialog;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
@@ -21,6 +23,7 @@ import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreePath;
 import org.eclipse.jface.viewers.TreeSelection;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.fields.bundletree.CheckableTree;
 import org.eclipse.scout.sdk.ui.fields.bundletree.ICheckStateListener;
@@ -154,14 +157,14 @@ public class ProductSelectionDialog extends TitleAreaDialog {
   public void setCheckedProductFiles(IFile[] array) {
     m_checkedFiles = array;
     if (m_tree != null && !m_tree.isDisposed()) {
-      ITreeNode[] treeNodes = TreeUtility.findNodes(m_rootNode, NodeFilters.getByData((Object[]) array));
+      Set<ITreeNode> treeNodes = TreeUtility.findNodes(m_rootNode, NodeFilters.getByData((Object[]) array));
       if (isMultiSelectionMode()) {
         m_tree.setChecked(treeNodes);
       }
       else {
-        if (treeNodes.length > 0) {
-          ArrayList<Object> pathElements = new ArrayList<Object>();
-          ITreeNode n = treeNodes[0];
+        if (treeNodes.size() > 0) {
+          List<Object> pathElements = new ArrayList<Object>();
+          ITreeNode n = CollectionUtility.firstElement(treeNodes);
           while (n != null) {
             pathElements.add(pathElements.size(), n);
             n = n.getParent();

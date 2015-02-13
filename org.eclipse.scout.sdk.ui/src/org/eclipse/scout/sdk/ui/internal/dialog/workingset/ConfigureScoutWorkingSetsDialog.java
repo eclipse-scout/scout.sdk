@@ -145,7 +145,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
       m_lock.acquire();
       m_currentWorkingSet = set;
       if (set != null) {
-        ITreeNode[] checked = TreeUtility.findNodes(m_availableBundlesTree.getRootNode(), NodeFilters.getByData((Object[]) getSelectionFor(set)));
+        Set<ITreeNode> checked = TreeUtility.findNodes(m_availableBundlesTree.getRootNode(), NodeFilters.getByData((Object[]) getSelectionFor(set)));
         m_availableBundlesTree.setChecked(checked);
       }
       for (ITreeNode n : TreeUtility.findNodes(m_availableBundlesTree.getRootNode(), NodeFilters.getAcceptAll())) {

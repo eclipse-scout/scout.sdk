@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.internal.wizard.newbundle;
 
+import java.util.Set;
+
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.Texts;
@@ -65,7 +67,7 @@ public class ProductFileSelectionWizardPage extends AbstractProjectNewWizardPage
     try {
       ITreeNode root = TreeUtility.createProductTree(m_scoutBundle, null, true);
 
-      ITreeNode[] productFileNodes = TreeUtility.findNodes(root, NodeFilters.getByType(TreeUtility.TYPE_PRODUCT_NODE));
+      Set<ITreeNode> productFileNodes = TreeUtility.findNodes(root, NodeFilters.getByType(TreeUtility.TYPE_PRODUCT_NODE));
 
       m_bundleTree = new CheckableTree(parent, root);
       m_bundleTree.addCheckSelectionListener(new ICheckStateListener() {
@@ -81,7 +83,7 @@ public class ProductFileSelectionWizardPage extends AbstractProjectNewWizardPage
       parent.setLayout(new GridLayout(1, true));
       m_bundleTree.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.GRAB_VERTICAL | GridData.FILL_BOTH));
 
-      setExcludePage(productFileNodes.length < 1);
+      setExcludePage(productFileNodes.size() < 1);
     }
     catch (CoreException e) {
       ScoutSdkUi.logError("Unable to create product file tree", e);
