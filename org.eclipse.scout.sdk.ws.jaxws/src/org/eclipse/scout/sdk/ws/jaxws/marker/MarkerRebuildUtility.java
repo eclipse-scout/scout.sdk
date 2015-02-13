@@ -119,7 +119,7 @@ public final class MarkerRebuildUtility {
       }
 
       // validate port type interface types
-      Set<IType> interfacePortTypes = new HashSet<IType>();
+      Set<IType> interfacePortTypes = new HashSet<>();
 
       ITypeHierarchy hierarchy = TypeUtility.getSupertypeHierarchy(portType);
 

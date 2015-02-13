@@ -51,7 +51,7 @@ public final class ClassIdGenerators {
     if (allGeneratorsOrdered == null) {
       synchronized (LOCK) {
         if (allGeneratorsOrdered == null) {
-          Map<CompositeObject, IClassIdGenerator> tmp = new TreeMap<CompositeObject, IClassIdGenerator>();
+          Map<CompositeObject, IClassIdGenerator> tmp = new TreeMap<>();
 
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);

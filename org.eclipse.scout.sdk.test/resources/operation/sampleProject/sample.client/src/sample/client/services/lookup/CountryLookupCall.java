@@ -13,6 +13,6 @@ public class CountryLookupCall extends LocalLookupCall<Long> {
 
   @Override
   protected List<ILookupRow<Long>> execCreateLookupRows() throws ProcessingException {
-    return new ArrayList<ILookupRow<Long>>();
+    return new ArrayList<>();
   }
 }

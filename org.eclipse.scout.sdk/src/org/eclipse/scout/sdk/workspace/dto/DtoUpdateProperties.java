@@ -33,7 +33,7 @@ public class DtoUpdateProperties {
   private final Map<String, Object> m_properties;
 
   public DtoUpdateProperties() {
-    m_properties = new HashMap<String, Object>(4);
+    m_properties = new HashMap<>(4);
   }
 
   public void put(String key, Object value) {

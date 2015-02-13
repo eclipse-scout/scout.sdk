@@ -247,7 +247,7 @@ public final class UiUtility {
     for (IWorkbenchWindow w : PlatformUI.getWorkbench().getWorkbenchWindows()) {
       for (IWorkbenchPage p : w.getPages()) {
         IEditorReference[] editorReferences = p.getEditorReferences();
-        List<IEditorReference> partsToSave = new ArrayList<IEditorReference>(editorReferences.length);
+        List<IEditorReference> partsToSave = new ArrayList<>(editorReferences.length);
         for (IEditorReference r : editorReferences) {
           if (editorId == null || editorId.equals(r.getId())) {
             if (files == null || files.isEmpty() || isEditorInputInFiles(r, files)) {
@@ -349,7 +349,7 @@ public final class UiUtility {
   }
 
   public static Set<IType> getTypesFromSelection(IStructuredSelection selection, ITypeFilter filter) {
-    Set<IType> result = new LinkedHashSet<IType>(selection.size());
+    Set<IType> result = new LinkedHashSet<>(selection.size());
     if (selection.isEmpty()) {
       return result;
     }

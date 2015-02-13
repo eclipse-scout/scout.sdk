@@ -56,7 +56,7 @@ public class Event {
     m_eventType = eventType;
     m_elementType = elementType;
     m_element = element;
-    m_children = new ArrayList<Event>();
+    m_children = new ArrayList<>();
   }
 
   public Type getEventType() {

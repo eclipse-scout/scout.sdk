@@ -39,9 +39,9 @@ public class AnnotationUpdateOperation implements IOperation {
   private Set<String> m_propertyRemoveMap;
 
   public AnnotationUpdateOperation() {
-    m_typePropertyMap = new HashMap<String, IType>();
-    m_stringPropertyMap = new HashMap<String, String>();
-    m_propertyRemoveMap = new HashSet<String>();
+    m_typePropertyMap = new HashMap<>();
+    m_stringPropertyMap = new HashMap<>();
+    m_propertyRemoveMap = new HashSet<>();
   }
 
   public void addTypeProperty(String propertyName, IType type) {
@@ -71,7 +71,7 @@ public class AnnotationUpdateOperation implements IOperation {
     AnnotationNewOperation op = new AnnotationNewOperation(SignatureCache.createTypeSignature(m_annotationType.getFullyQualifiedName()), m_declaringType);
     IAnnotation annotation = JaxWsSdkUtility.getAnnotation(m_declaringType, m_annotationType.getFullyQualifiedName(), false);
 
-    Map<String, String> resolvedTypePropertyMap = new HashMap<String, String>();
+    Map<String, String> resolvedTypePropertyMap = new HashMap<>();
 
     // if annotation is already installed, get properties already set
     if (TypeUtility.exists(annotation)) {

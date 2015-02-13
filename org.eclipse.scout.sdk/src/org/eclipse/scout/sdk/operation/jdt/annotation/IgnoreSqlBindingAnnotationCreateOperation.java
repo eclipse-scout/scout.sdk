@@ -40,7 +40,7 @@ public class IgnoreSqlBindingAnnotationCreateOperation extends AnnotationNewOper
    */
   public IgnoreSqlBindingAnnotationCreateOperation(IMember annotationOwner, String signature, String[] bindVariable) {
     super(signature, annotationOwner);
-    m_ignoredBindings = new HashSet<String>();
+    m_ignoredBindings = new HashSet<>();
     m_ignoredBindings.addAll(Arrays.asList(bindVariable));
   }
 

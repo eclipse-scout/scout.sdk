@@ -44,12 +44,12 @@ public class LabelPositionPresenter extends AbstractProposalPresenter<FieldPrope
   protected static final List<FieldProperty<Integer>> PROPOSALS;
   static {
     IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
-    LABEL_POSITION_DEFAULT = new UiFieldProperty<Integer>(iFormField.getField("LABEL_POSITION_DEFAULT"), "default");
-    LABEL_POSITION_LEFT = new UiFieldProperty<Integer>(iFormField.getField("LABEL_POSITION_LEFT"), "left");
-    LABEL_POSITION_ON_FIELD = new UiFieldProperty<Integer>(iFormField.getField("LABEL_POSITION_ON_FIELD"), "on field");
-    LABEL_POSITION_RIGHT = new UiFieldProperty<Integer>(iFormField.getField("LABEL_POSITION_RIGHT"), "right");
-    LABEL_POSITION_TOP = new UiFieldProperty<Integer>(iFormField.getField("LABEL_POSITION_TOP"), "top");
-    PROPOSALS = new ArrayList<FieldProperty<Integer>>(5);
+    LABEL_POSITION_DEFAULT = new UiFieldProperty<>(iFormField.getField("LABEL_POSITION_DEFAULT"), "default");
+    LABEL_POSITION_LEFT = new UiFieldProperty<>(iFormField.getField("LABEL_POSITION_LEFT"), "left");
+    LABEL_POSITION_ON_FIELD = new UiFieldProperty<>(iFormField.getField("LABEL_POSITION_ON_FIELD"), "on field");
+    LABEL_POSITION_RIGHT = new UiFieldProperty<>(iFormField.getField("LABEL_POSITION_RIGHT"), "right");
+    LABEL_POSITION_TOP = new UiFieldProperty<>(iFormField.getField("LABEL_POSITION_TOP"), "top");
+    PROPOSALS = new ArrayList<>(5);
     PROPOSALS.add(LABEL_POSITION_DEFAULT);
     PROPOSALS.add(LABEL_POSITION_LEFT);
     PROPOSALS.add(LABEL_POSITION_ON_FIELD);
@@ -110,7 +110,7 @@ public class LabelPositionPresenter extends AbstractProposalPresenter<FieldPrope
       value = getDefaultValue();
     }
     try {
-      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<Integer>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

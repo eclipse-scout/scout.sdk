@@ -66,7 +66,7 @@ public class NlsFindKeysJob extends Job {
     }
 
     IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-    ArrayList<IResource> searchScopeRessources = new ArrayList<IResource>();
+    ArrayList<IResource> searchScopeRessources = new ArrayList<>();
     TextSearchScope searchScope = null;
     try {
       for (IProject project : projects) {

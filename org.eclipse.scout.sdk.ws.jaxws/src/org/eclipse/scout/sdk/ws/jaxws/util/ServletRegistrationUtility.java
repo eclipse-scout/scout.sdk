@@ -108,10 +108,10 @@ public final class ServletRegistrationUtility {
    */
   public static Registration[] getJaxWsServletRegistrationsOnClasspath(IScoutBundle bundle) {
     // filter bundles with JAX-WS servlet registration in plugin.xml
-    Set<Registration> bundles = new HashSet<Registration>();
+    Set<Registration> bundles = new HashSet<>();
     for (IScoutBundle candidate : getJaxWsBundlesOnClasspath(bundle)) {
       String extensionPoint = IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS;
-      HashMap<String, String> attributes = new HashMap<String, String>();
+      HashMap<String, String> attributes = new HashMap<>();
       attributes.put("class", TypeUtility.getType(JaxWsRuntimeClasses.JaxWsServlet).getFullyQualifiedName());
       PluginModelHelper h = new PluginModelHelper(candidate.getProject());
       IPluginElement ex = h.PluginXml.getSimpleExtension(extensionPoint, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes);

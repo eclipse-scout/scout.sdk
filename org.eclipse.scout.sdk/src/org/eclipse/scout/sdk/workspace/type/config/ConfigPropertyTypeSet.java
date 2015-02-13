@@ -28,8 +28,8 @@ public class ConfigPropertyTypeSet {
   private final Map<String, ConfigurationMethodSet> m_commonConfigPropertyMethodSets;
 
   public ConfigPropertyTypeSet(List<IType> types) throws CoreException {
-    m_propertyTypes = new HashMap<IType, ConfigPropertyType>();
-    m_commonConfigPropertyMethodSets = new TreeMap<String, ConfigurationMethodSet>();
+    m_propertyTypes = new HashMap<>();
+    m_commonConfigPropertyMethodSets = new TreeMap<>();
     init(types);
   }
 

@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
@@ -50,14 +49,14 @@ public final class ScoutProjectHelper {
 
   public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwt, boolean uiSwing, PropertyMap properties) throws Exception {
     // define settings what to create
-    properties.setProperty(IScoutProjectNewOperation.PROP_CREATED_BUNDLES, new ArrayList<IJavaProject>());
+    properties.setProperty(IScoutProjectNewOperation.PROP_CREATED_BUNDLES, new ArrayList<>());
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, projectName);
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME_POSTFIX, "");
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_ALIAS, "alias");
     properties.setProperty(IScoutProjectNewOperation.PROP_USE_DEFAULT_JDT_PREFS, Boolean.FALSE);
     properties.setProperty(IScoutProjectNewOperation.PROP_KEEP_CURRENT_TARGET, Boolean.TRUE);
     properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, JdtUtility.getTargetPlatformVersion());
-    HashSet<String> nodesToCreate = new HashSet<String>(5);
+    HashSet<String> nodesToCreate = new HashSet<>(5);
     if (client) {
       nodesToCreate.add(CreateClientPluginOperation.BUNDLE_ID);
     }

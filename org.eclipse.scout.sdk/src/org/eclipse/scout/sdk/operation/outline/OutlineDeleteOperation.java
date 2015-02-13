@@ -60,7 +60,7 @@ public class OutlineDeleteOperation extends JavaElementDeleteOperation {
 
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getTypesOnClasspath(outlineType.getJavaProject()), TypeFilters.getInWorkspaceFilter());
 
-    Set<IType> desktopsAndDesktopExtensions = new HashSet<IType>();
+    Set<IType> desktopsAndDesktopExtensions = new HashSet<>();
     for (IType desktop : pth.getAllSubtypes(iDesktop, filter)) {
       desktopsAndDesktopExtensions.add(desktop);
     }

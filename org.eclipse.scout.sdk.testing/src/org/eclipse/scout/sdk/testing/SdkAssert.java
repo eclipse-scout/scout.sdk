@@ -402,7 +402,7 @@ public class SdkAssert extends Assert {
     ISourceRange range = TypeUtility.getContentSourceRange(initValidationRulesMethod);
     String source = initValidationRulesMethod.getOpenable().getBuffer().getText(range.getOffset(), range.getLength());
     assertNotNull(source);
-    Set<String> expectedLines = new HashSet<String>(Arrays.asList(validationRuleLines));
+    Set<String> expectedLines = new HashSet<>(Arrays.asList(validationRuleLines));
     // parse
     BufferedReader reader = null;
     try {

@@ -906,7 +906,7 @@ public class PluginModelHelper {
     }
 
     private List<IPluginExtension> getPluginExtensionPoints(String extensionPointId) {
-      LinkedList<IPluginExtension> result = new LinkedList<IPluginExtension>();
+      LinkedList<IPluginExtension> result = new LinkedList<>();
       for (IPluginExtension extPoint : m_model.getBundlePluginModel().getExtensions(true).getExtensions()) {
         if (extPoint.getPoint().equals(extensionPointId)) {
           result.add(extPoint);
@@ -916,7 +916,7 @@ public class PluginModelHelper {
     }
 
     private List<IPluginElement> getPluginExtensions(String extensionPointId) {
-      LinkedList<IPluginElement> result = new LinkedList<IPluginElement>();
+      LinkedList<IPluginElement> result = new LinkedList<>();
       for (IPluginExtension extPoint : getPluginExtensionPoints(extensionPointId)) {
         for (IPluginObject element : extPoint.getChildren()) {
           if (element instanceof IPluginElement) {

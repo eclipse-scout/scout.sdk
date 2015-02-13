@@ -48,7 +48,7 @@ public final class ScoutSeverityManager {
       public void resourceChanged(IResourceChangeEvent e) {
         IMarkerDelta[] mdeltas = e.findMarkerDeltas(IMarker.PROBLEM, true);
         if (mdeltas != null && mdeltas.length > 0) {
-          HashSet<IResource> changedResorces = new HashSet<IResource>(mdeltas.length);
+          HashSet<IResource> changedResorces = new HashSet<>(mdeltas.length);
           for (IMarkerDelta d : mdeltas) {
             IResource r = d.getMarker().getResource();
             if (r != null) {

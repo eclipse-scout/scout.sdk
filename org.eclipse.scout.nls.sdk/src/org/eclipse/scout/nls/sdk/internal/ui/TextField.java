@@ -44,10 +44,10 @@ public class TextField<T> extends Composite {
 
   private Text m_text;
   private Label m_label;
-  private IInputFormatter<T> m_inputFormatter = new TextInputFormatter<T>();
+  private IInputFormatter<T> m_inputFormatter = new TextInputFormatter<>();
   private IInputValidator m_inputValidator = new TextValidator();
-  private List<IInputChangedListener<T>> m_inputChangedListener = new LinkedList<IInputChangedListener<T>>();
-  private List<IValidationListener> m_validationListener = new LinkedList<IValidationListener>();
+  private List<IInputChangedListener<T>> m_inputChangedListener = new LinkedList<>();
+  private List<IValidationListener> m_validationListener = new LinkedList<>();
   private Object m_input;
   private IStatus m_status;
   private final int m_labelColWidth;

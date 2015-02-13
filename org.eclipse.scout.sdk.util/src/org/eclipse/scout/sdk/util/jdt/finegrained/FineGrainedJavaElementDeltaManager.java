@@ -43,8 +43,8 @@ public final class FineGrainedJavaElementDeltaManager {
 
   private FineGrainedJavaElementDeltaManager() {
     m_cacheLock = new Object();
-    m_deltaCache = new WeakHashMap<IJavaElementDelta, Set<IJavaElement>>();
-    m_sourceCache = new HashMap<String, String>();
+    m_deltaCache = new WeakHashMap<>();
+    m_sourceCache = new HashMap<>();
     m_bufferListener = new IBufferChangedListener() {
       @Override
       public void bufferChanged(BufferChangedEvent e) {

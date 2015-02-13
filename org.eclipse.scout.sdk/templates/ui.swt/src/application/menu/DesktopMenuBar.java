@@ -23,7 +23,7 @@ public class DesktopMenuBar extends CompoundContributionItem {
       if (env.getClientSession() != null && env.getClientSession().getDesktop() != null) {
         List<IMenu> menus = env.getClientSession().getDesktop().getMenus();
         List<IMenu> consolidatedMenus = MenuUtility.consolidateMenus(menus);
-        List<IContributionItem> swtContributionItems = new ArrayList<IContributionItem>();
+        List<IContributionItem> swtContributionItems = new ArrayList<>();
         for (IMenu menu : consolidatedMenus) {
           swtContributionItems.add(new SwtScoutMenuContributionItem(menu, env));
         }

@@ -522,8 +522,8 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
   }
 
   private void loadIllegalValues() {
-    Set<String> illegalAliases = new HashSet<String>();
-    Set<String> illegalUrlPatterns = new HashSet<String>();
+    Set<String> illegalAliases = new HashSet<>();
+    Set<String> illegalUrlPatterns = new HashSet<>();
 
     if (m_sunJaxWsXml != null) {
       String fqn = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(m_sunJaxWsXml.getDocumentElement()), SunJaxWsBean.XML_ENDPOINT);
@@ -560,7 +560,7 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
   private P_ServiceProposal[] getServiceProposals() {
     if (getWsdlDefinition() != null) {
       Collection services = getWsdlDefinition().getServices().values();
-      List<P_ServiceProposal> proposals = new ArrayList<P_ServiceProposal>(services.size());
+      List<P_ServiceProposal> proposals = new ArrayList<>(services.size());
       for (Object service : services) {
         proposals.add(new P_ServiceProposal((Service) service));
       }
@@ -572,7 +572,7 @@ public class WsPropertiesExistingWsdlWizardPage extends AbstractWorkspaceWizardP
   private P_PortProposal[] getPortProposals() {
     if (getService() != null) {
       Collection ports = getService().getPorts().values();
-      List<P_PortProposal> proposals = new ArrayList<P_PortProposal>(ports.size());
+      List<P_PortProposal> proposals = new ArrayList<>(ports.size());
       for (Object port : ports) {
         proposals.add(new P_PortProposal((Port) port));
       }

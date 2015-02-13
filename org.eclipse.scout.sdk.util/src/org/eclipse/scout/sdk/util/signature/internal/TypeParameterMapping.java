@@ -53,13 +53,13 @@ public class TypeParameterMapping implements ITypeParameterMapping {
 
   public TypeParameterMapping(String signature, String superTypeSignature, List<String> superInterfacesSignatures) throws CoreException {
     m_type = null;
-    m_superMappings = new LinkedHashMap<String, TypeParameterMapping>();
-    m_subMappings = new LinkedHashMap<String, TypeParameterMapping>();
+    m_superMappings = new LinkedHashMap<>();
+    m_subMappings = new LinkedHashMap<>();
     m_fullyQualifiedName = Signature.toString(Signature.getTypeErasure(signature));
 
     String[] localParameterSignatures = Signature.getTypeParameters(signature);
-    m_typeParametersByName = new LinkedHashMap<String, ResolvedTypeParameter>(localParameterSignatures.length);
-    m_typeParametersByIndex = new ArrayList<ResolvedTypeParameter>(localParameterSignatures.length);
+    m_typeParametersByName = new LinkedHashMap<>(localParameterSignatures.length);
+    m_typeParametersByIndex = new ArrayList<>(localParameterSignatures.length);
     for (String localParamSig : localParameterSignatures) {
       ResolvedTypeParameter parameter = new ResolvedTypeParameter(this, localParamSig, m_typeParametersByName.size());
       m_typeParametersByName.put(Signature.getSignatureSimpleName(localParamSig), parameter);
@@ -74,8 +74,8 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     m_fullyQualifiedName = t.getFullyQualifiedName();
     ITypeParameter[] typeParameters = getType().getTypeParameters();
 
-    m_typeParametersByName = new LinkedHashMap<String, ResolvedTypeParameter>(typeParameters.length);
-    m_typeParametersByIndex = new ArrayList<ResolvedTypeParameter>(typeParameters.length);
+    m_typeParametersByName = new LinkedHashMap<>(typeParameters.length);
+    m_typeParametersByIndex = new ArrayList<>(typeParameters.length);
     for (int i = 0; i < typeParameters.length; i++) {
       ITypeParameter myTypeParam = typeParameters[i];
 
@@ -89,7 +89,7 @@ public class TypeParameterMapping implements ITypeParameterMapping {
         }
         else {
           // it is a type signature: use as bounds (only single supported by java)
-          childBounds = new LinkedHashSet<String>(1);
+          childBounds = new LinkedHashSet<>(1);
           childBounds.add(curParamNameInSuperTypeDeclaration);
         }
       }
@@ -100,8 +100,8 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     }
 
     m_superParametersByType = getSuperTypeParameters(t.getSuperclassTypeSignature(), CollectionUtility.arrayList(t.getSuperInterfaceTypeSignatures()), declaringTypeParams);
-    m_superMappings = new LinkedHashMap<String, TypeParameterMapping>();
-    m_subMappings = new LinkedHashMap<String, TypeParameterMapping>();
+    m_superMappings = new LinkedHashMap<>();
+    m_subMappings = new LinkedHashMap<>();
 
     // connect mappings
     connectWithChild(child);
@@ -187,7 +187,7 @@ public class TypeParameterMapping implements ITypeParameterMapping {
     if (args.length < 1) {
       return null;
     }
-    List<String> result = new ArrayList<String>(args.length);
+    List<String> result = new ArrayList<>(args.length);
     for (String arg : args) {
       if (Signature.getTypeSignatureKind(arg) == Signature.TYPE_VARIABLE_SIGNATURE) {
         result.add(arg);
@@ -206,7 +206,7 @@ public class TypeParameterMapping implements ITypeParameterMapping {
   }
 
   private static Deque<IType> getDeclaringTypesWithParameters(IType startType) throws JavaModelException {
-    Deque<IType> result = new LinkedList<IType>();
+    Deque<IType> result = new LinkedList<>();
     IType t = startType;
     while (TypeUtility.exists(t)) {
       if (Flags.isStatic(t.getFlags())) {
@@ -246,7 +246,7 @@ public class TypeParameterMapping implements ITypeParameterMapping {
               Map<String, IResolvedTypeParameter> typeParameters = paramMapping.getTypeParameters();
               if (!typeParameters.isEmpty()) {
                 if (declaringTypeParamMappings == null) {
-                  declaringTypeParamMappings = new LinkedHashMap<String, IResolvedTypeParameter>();
+                  declaringTypeParamMappings = new LinkedHashMap<>();
                 }
                 // collect all type parameter that are defined in the children of the declaring types.
                 declaringTypeParamMappings.putAll(typeParameters);
@@ -291,7 +291,7 @@ public class TypeParameterMapping implements ITypeParameterMapping {
   }
 
   private Map<String, List<String>> getSuperTypeParameters(String superclassTypeSignature, List<String> superInterfacesSignatures, Map<String, IResolvedTypeParameter> declaringTypeParams) throws CoreException {
-    LinkedHashMap<String, List<String>> result = new LinkedHashMap<String, List<String>>(CollectionUtility.size(superInterfacesSignatures) + 1);
+    LinkedHashMap<String, List<String>> result = new LinkedHashMap<>(CollectionUtility.size(superInterfacesSignatures) + 1);
     if (superclassTypeSignature != null && !SignatureUtility.SIG_OBJECT.equals(superclassTypeSignature)) {
       List<String> superTypeSigParams = getTypeParametersForTypeSignature(superclassTypeSignature, declaringTypeParams);
       if (CollectionUtility.hasElements(superTypeSigParams)) {
@@ -317,7 +317,7 @@ public class TypeParameterMapping implements ITypeParameterMapping {
       return null;
     }
 
-    List<String> result = new ArrayList<String>(superTypeArgs.length);
+    List<String> result = new ArrayList<>(superTypeArgs.length);
     for (String superSig : superTypeArgs) {
       superSig = SignatureUtility.ensureSourceTypeParametersAreCorrect(superSig, getType());
       if (Signature.getTypeSignatureKind(superSig) == Signature.TYPE_VARIABLE_SIGNATURE) {

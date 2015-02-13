@@ -40,8 +40,8 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
 
   public AbstractAnnotatableSourceBuilder(String elementName) {
     super(elementName);
-    m_annotationSourceBuilders = new ArrayList<IAnnotationSourceBuilder>();
-    m_sortedAnnotationSourceBuilders = new TreeMap<CompositeObject, IAnnotationSourceBuilder>();
+    m_annotationSourceBuilders = new ArrayList<>();
+    m_sortedAnnotationSourceBuilders = new TreeMap<>();
   }
 
   @Override
@@ -55,7 +55,7 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
     List<IAnnotationSourceBuilder> asbs = getAnnotationSourceBuilders();
     if (m_sortedAnnotationSourceBuilders.isEmpty()) {
       // unsorted list: use length of source as order
-      List<StringBuilder> annotSrc = new ArrayList<StringBuilder>(asbs.size());
+      List<StringBuilder> annotSrc = new ArrayList<>(asbs.size());
       for (IAnnotationSourceBuilder sb : asbs) {
         if (sb != null) {
           StringBuilder src = new StringBuilder();
@@ -133,7 +133,7 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
 
   @Override
   public List<IAnnotationSourceBuilder> getAnnotationSourceBuilders() {
-    List<IAnnotationSourceBuilder> ops = new ArrayList<IAnnotationSourceBuilder>(m_annotationSourceBuilders.size() + m_sortedAnnotationSourceBuilders.size());
+    List<IAnnotationSourceBuilder> ops = new ArrayList<>(m_annotationSourceBuilders.size() + m_sortedAnnotationSourceBuilders.size());
     ops.addAll(m_annotationSourceBuilders);
     ops.addAll(m_sortedAnnotationSourceBuilders.values());
     return ops;

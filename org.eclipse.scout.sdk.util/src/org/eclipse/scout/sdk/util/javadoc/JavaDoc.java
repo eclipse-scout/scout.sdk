@@ -32,7 +32,7 @@ public class JavaDoc {
 
   public JavaDoc(IMember member) {
     m_member = member;
-    m_newLines = new ArrayList<String>();
+    m_newLines = new ArrayList<>();
   }
 
   public void appendLine(String commentLine) {

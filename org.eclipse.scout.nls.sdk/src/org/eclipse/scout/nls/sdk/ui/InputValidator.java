@@ -54,7 +54,7 @@ public final class InputValidator {
     private final INlsProject m_project;
 
     public P_KeyEntryValidator(INlsProject project, String[] exceptions) {
-      m_exceptions = new HashSet<String>(exceptions.length);
+      m_exceptions = new HashSet<>(exceptions.length);
       for (String s : exceptions) {
         m_exceptions.add(s);
       }

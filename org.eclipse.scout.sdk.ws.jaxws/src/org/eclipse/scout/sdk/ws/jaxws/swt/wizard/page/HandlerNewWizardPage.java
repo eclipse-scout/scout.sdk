@@ -475,7 +475,7 @@ public class HandlerNewWizardPage extends AbstractWorkspaceWizardPage {
 
   private IJavaSearchScope createSuperTypeSearchScope() {
     // do not use PrimaryTypeHierarchy to get subtypes due to static inner classes
-    List<IType> types = new ArrayList<IType>();
+    List<IType> types = new ArrayList<>();
     types.add(TypeUtility.getType(SOAPHandler.class.getName()));
     types.add(TypeUtility.getType(LogicalHandler.class.getName()));
 

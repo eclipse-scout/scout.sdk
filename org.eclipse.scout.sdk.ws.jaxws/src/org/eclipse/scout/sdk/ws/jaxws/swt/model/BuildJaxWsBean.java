@@ -80,7 +80,7 @@ public class BuildJaxWsBean {
   }
 
   public Map<String, List<String>> getPropertiers() {
-    Map<String, List<String>> properties = new HashMap<String, List<String>>();
+    Map<String, List<String>> properties = new HashMap<>();
 
     List<Element> children = XmlUtility.getChildElements(m_xml, XML_PROPERTY);
     for (Element xmlProperty : children) {

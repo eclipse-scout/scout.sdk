@@ -67,7 +67,7 @@ public final class RapTargetVariable {
     m_listeners = new EventListenerList();
     m_scoutRapTargetVariable = VariablesPlugin.getDefault().getStringVariableManager().getValueVariable(RAP_TARGET_KEY);
     m_oldVal = null;
-    m_resourceChangeEventsToHandle = new ConcurrentLinkedQueue<IResourceChangeEvent>();
+    m_resourceChangeEventsToHandle = new ConcurrentLinkedQueue<>();
     m_resourceChangeJob = new P_ResourceChangeEventHandlerJob();
     m_targetFileListener = new P_TargetFileListener();
     m_valueChangeListener = new RapTargetVariableListenerAdapter() {

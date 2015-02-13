@@ -56,7 +56,7 @@ public class DeleteServiceNlsProjectOperation implements IOperation {
       propertiesFolder.refreshLocal(IResource.DEPTH_INFINITE, monitor);
 
       // collect resources to delete
-      final LinkedList<IResource> filesToDelete = new LinkedList<IResource>();
+      final LinkedList<IResource> filesToDelete = new LinkedList<>();
       if (propertiesFolder.exists()) {
         final boolean[] otherFilesExistInFolder = {false};
         propertiesFolder.accept(new IResourceVisitor() {

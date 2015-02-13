@@ -56,7 +56,7 @@ public class JavaElementAbstractTypeContentProvider extends AbstractJavaElementC
 
       // filter the mostly used
       if (m_mostlyUsed != null) {
-        ArrayList<IType> mu = new ArrayList<IType>(m_mostlyUsed.length);
+        ArrayList<IType> mu = new ArrayList<>(m_mostlyUsed.length);
         for (IType o : m_mostlyUsed) {
           if (TypeUtility.exists(o) && getFilter().accept(o)) {
             mu.add(o);

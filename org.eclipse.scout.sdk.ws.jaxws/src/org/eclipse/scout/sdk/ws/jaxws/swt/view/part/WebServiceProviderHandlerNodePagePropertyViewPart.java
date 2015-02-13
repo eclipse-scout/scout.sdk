@@ -66,8 +66,8 @@ public class WebServiceProviderHandlerNodePagePropertyViewPart extends AbstractS
   @Override
   protected void init() {
     m_bundle = getPage().getScoutBundle();
-    m_sectionsIdentifiers = new HashSet<String>();
-    m_handlerPresenters = new ArrayList<TypePresenter>();
+    m_sectionsIdentifiers = new HashSet<>();
+    m_handlerPresenters = new ArrayList<>();
 
     m_severityListener = new P_ScoutSeverityListener();
     ScoutSeverityManager.getInstance().addQualityManagerListener(m_severityListener);

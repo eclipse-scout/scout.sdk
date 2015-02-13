@@ -32,7 +32,7 @@ import org.eclipse.swt.widgets.Label;
  */
 public abstract class AbstractSinglePageSectionBasedViewPart extends AbstractSectionBasedPart implements ISinglePropertyViewPart {
 
-  private static final HashMap<String, HashMap<String, Boolean>> EXPANSION_SETTINGS = new HashMap<String, HashMap<String, Boolean>>();
+  private static final HashMap<String, HashMap<String, Boolean>> EXPANSION_SETTINGS = new HashMap<>();
 
   private IPage m_page;
 
@@ -71,7 +71,7 @@ public abstract class AbstractSinglePageSectionBasedViewPart extends AbstractSec
     final Section[] sections = getSections();
     HashMap<String, Boolean> pageCache = EXPANSION_SETTINGS.get(getPartKey());
     if (pageCache == null) {
-      pageCache = new HashMap<String, Boolean>(sections.length);
+      pageCache = new HashMap<>(sections.length);
       EXPANSION_SETTINGS.put(getPartKey(), pageCache);
     }
     for (Section s : sections) {

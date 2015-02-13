@@ -26,7 +26,7 @@ import org.eclipse.scout.nls.sdk.model.workspace.translationResource.ITranslatio
 public class NlsResourceProvider {
 
   private List<Language> m_languagesOrdered;
-  private final Map<Language, ITranslationResource> m_resourceMap = new HashMap<Language, ITranslationResource>();
+  private final Map<Language, ITranslationResource> m_resourceMap = new HashMap<>();
 
   public NlsResourceProvider() {
     m_languagesOrdered = CollectionUtility.emptyArrayList();
@@ -44,7 +44,7 @@ public class NlsResourceProvider {
   }
 
   private static List<Language> getOrderedLanguages(Set<Language> languages) {
-    TreeMap<CompositeObject, Language> orderedLanguages = new TreeMap<CompositeObject, Language>();
+    TreeMap<CompositeObject, Language> orderedLanguages = new TreeMap<>();
     for (Language l : languages) {
       int index = 3;
       if (l.equals(Language.LANGUAGE_KEY)) {
@@ -72,7 +72,7 @@ public class NlsResourceProvider {
   }
 
   public List<ITranslationResource> getSortedResources() {
-    List<ITranslationResource> resources = new ArrayList<ITranslationResource>(m_languagesOrdered.size());
+    List<ITranslationResource> resources = new ArrayList<>(m_languagesOrdered.size());
     for (Language lang : m_languagesOrdered) {
       resources.add(m_resourceMap.get(lang));
     }

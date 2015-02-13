@@ -32,7 +32,7 @@ public class SimpleProposal {
   public SimpleProposal(String text, Image image) {
     m_text = text;
     m_image = image;
-    m_data = new HashMap<String, Object>();
+    m_data = new HashMap<>();
   }
 
   public String getText() {
@@ -85,8 +85,8 @@ public class SimpleProposal {
     if (!CompareUtility.equals(getImage(), prop.getImage())) {
       return false;
     }
-    Map<String, Object> localData = new HashMap<String, Object>(getData());
-    Map<String, Object> propData = new HashMap<String, Object>(prop.getData());
+    Map<String, Object> localData = new HashMap<>(getData());
+    Map<String, Object> propData = new HashMap<>(prop.getData());
     for (Entry<String, Object> lEntry : localData.entrySet()) {
       if (!CompareUtility.equals(lEntry.getValue(), propData.remove(lEntry.getKey()))) {
         return false;

@@ -54,7 +54,7 @@ public abstract class AbstractPage implements IPage, IContextMenuHolder {
 
   public AbstractPage() {
     m_pageDirtyListener = new PageDirtyListener(this);
-    m_children = new TreeMap<CompositeObject, IPage>();
+    m_children = new TreeMap<>();
   }
 
   @Override
@@ -164,7 +164,7 @@ public abstract class AbstractPage implements IPage, IContextMenuHolder {
 
   @Override
   public IPage[] getChildArray(IPageFilter filter) {
-    ArrayList<IPage> children = new ArrayList<IPage>(m_children.size());
+    ArrayList<IPage> children = new ArrayList<>(m_children.size());
     synchronized (m_children) {
       for (IPage p : m_children.values()) {
         if (filter == null || filter.accept(p)) {
@@ -178,7 +178,7 @@ public abstract class AbstractPage implements IPage, IContextMenuHolder {
   @Override
   public List<IPage> getChildren() {
     synchronized (m_children) {
-      return new ArrayList<IPage>(m_children.values());
+      return new ArrayList<>(m_children.values());
     }
   }
 
@@ -386,7 +386,7 @@ public abstract class AbstractPage implements IPage, IContextMenuHolder {
     if (handlers == null || handlers.length < 1) {
       return null;
     }
-    Set<Class<? extends IScoutHandler>> result = new HashSet<Class<? extends IScoutHandler>>(handlers.length);
+    Set<Class<? extends IScoutHandler>> result = new HashSet<>(handlers.length);
     for (Class<?> clazz : handlers) {
       if (IScoutHandler.class.isAssignableFrom(clazz)) {
         result.add((Class<? extends IScoutHandler>) clazz);

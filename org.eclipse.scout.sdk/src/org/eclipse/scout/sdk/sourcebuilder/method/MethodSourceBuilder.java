@@ -42,8 +42,8 @@ public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implem
    */
   public MethodSourceBuilder(String elementName) {
     super(elementName);
-    m_parameters = new ArrayList<MethodParameter>();
-    m_exceptionSignatures = new ArrayList<String>();
+    m_parameters = new ArrayList<>();
+    m_exceptionSignatures = new ArrayList<>();
   }
 
   @Override
@@ -139,7 +139,7 @@ public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implem
 
   @Override
   public String getMethodIdentifier() {
-    List<String> methodParamSignatures = new ArrayList<String>(m_parameters.size());
+    List<String> methodParamSignatures = new ArrayList<>(m_parameters.size());
     for (MethodParameter param : m_parameters) {
       methodParamSignatures.add(param.getSignature());
     }

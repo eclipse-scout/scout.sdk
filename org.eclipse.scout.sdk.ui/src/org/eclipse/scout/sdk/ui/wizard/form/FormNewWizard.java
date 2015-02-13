@@ -180,7 +180,7 @@ public class FormNewWizard extends AbstractServiceWizard {
       m_operation.setFormDataPackage(formDataBundle.getPackageName(m_formPage.getTargetPackage(IDefaultTargetPackage.SHARED_SERVICES)));
     }
     Set<IScoutBundle> proxyRegistrationBundles = m_locationPage.getLocationBundles(TYPE_SERVICE_REG_CLIENT, true, true);
-    List<IJavaProject> proxyRegistrationProjects = new ArrayList<IJavaProject>(proxyRegistrationBundles.size());
+    List<IJavaProject> proxyRegistrationProjects = new ArrayList<>(proxyRegistrationBundles.size());
     for (IScoutBundle b : proxyRegistrationBundles) {
       proxyRegistrationProjects.add(ScoutUtility.getJavaProject(b));
     }

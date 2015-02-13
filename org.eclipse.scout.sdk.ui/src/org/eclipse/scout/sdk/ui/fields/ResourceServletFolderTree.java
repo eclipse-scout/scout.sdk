@@ -60,7 +60,7 @@ public class ResourceServletFolderTree {
   }
 
   private void initTree(ITreeNode rootNode) {
-    ArrayList<P_ResourceServletExtension> extensions = new ArrayList<P_ResourceServletExtension>();
+    ArrayList<P_ResourceServletExtension> extensions = new ArrayList<>();
     findServletExtensions(rootNode, extensions);
     TreeUtility.findNodes(rootNode, new P_FolderTreeBuilder(extensions.toArray(new P_ResourceServletExtension[extensions.size()])));
   }
@@ -86,7 +86,7 @@ public class ResourceServletFolderTree {
                           IPluginElement resourceServletPe = (IPluginElement) resourceServletPo;
                           IPluginAttribute[] atts = resourceServletPe.getAttributes();
                           if (atts != null) {
-                            HashMap<String, String> props = new HashMap<String, String>(2);
+                            HashMap<String, String> props = new HashMap<>(2);
                             for (IPluginAttribute at : atts) {
                               props.put(at.getName(), at.getValue());
                             }
@@ -135,7 +135,7 @@ public class ResourceServletFolderTree {
     private HashMap<String, P_ResourceServletExtension> m_extensions;
 
     public P_FolderTreeBuilder(P_ResourceServletExtension[] extensions) {
-      m_extensions = new HashMap<String, P_ResourceServletExtension>();
+      m_extensions = new HashMap<>();
       for (P_ResourceServletExtension e : extensions) {
         m_extensions.put(e.bundleName, e);
       }

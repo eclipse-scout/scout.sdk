@@ -48,8 +48,8 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
     super(BundleTreeWizardPage.class.getName());
     m_treeListenersAttached = false;
     m_rootNode = rootNode;
-    m_tempDndListeners = new ArrayList<ITreeDndListener>();
-    m_tempCheckListeners = new ArrayList<ICheckStateListener>();
+    m_tempDndListeners = new ArrayList<>();
+    m_tempCheckListeners = new ArrayList<>();
 
     setDescription(message);
     setTitle(pageTitle);
@@ -169,7 +169,7 @@ public class BundleTreeWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   public Set<ITreeNode> getTreeNodes(String type, boolean visibleOnly, boolean checkedOnly) {
-    Set<ITreeNode> result = new HashSet<ITreeNode>();
+    Set<ITreeNode> result = new HashSet<>();
     if (isControlCreated()) {
       Set<ITreeNode> nodes = TreeUtility.findNodes(m_rootNode, NodeFilters.getByType(type));
       for (ITreeNode node : nodes) {

@@ -241,7 +241,7 @@ public class NlsTextPresenter extends AbstractMethodPresenter {
   protected synchronized void storeNlsText(final INlsEntry proposal) throws CoreException {
     try {
       if (m_storeValueLock.acquire()) {
-        ConfigPropertyUpdateOperation<INlsEntry> updateOp = new ConfigPropertyUpdateOperation<INlsEntry>(getMethod(), getParser());
+        ConfigPropertyUpdateOperation<INlsEntry> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
         updateOp.setValue(proposal);
         OperationJob job = new OperationJob(updateOp);
         job.setDebug(true);

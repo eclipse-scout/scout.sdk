@@ -26,7 +26,7 @@ public class ResourceDeleteOperation implements IOperation {
   private List<IResource> m_resourcesToDelete;
 
   public ResourceDeleteOperation() {
-    m_resourcesToDelete = new ArrayList<IResource>();
+    m_resourcesToDelete = new ArrayList<>();
   }
 
   public void setMembers(IResource[] resources) {

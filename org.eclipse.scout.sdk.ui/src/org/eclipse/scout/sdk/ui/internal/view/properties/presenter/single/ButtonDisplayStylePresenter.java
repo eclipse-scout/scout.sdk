@@ -44,11 +44,11 @@ public class ButtonDisplayStylePresenter extends AbstractProposalPresenter<Field
   protected static final List<FieldProperty<Integer>> PROPOSALS;
   static {
     IType iButton = TypeUtility.getType(IRuntimeClasses.IButton);
-    DISPLAY_STYLE_DEFAULT = new UiFieldProperty<Integer>(iButton.getField("DISPLAY_STYLE_DEFAULT"), "default");
-    DISPLAY_STYLE_TOGGLE = new UiFieldProperty<Integer>(iButton.getField("DISPLAY_STYLE_TOGGLE"), "toggle");
-    DISPLAY_STYLE_RADIO = new UiFieldProperty<Integer>(iButton.getField("DISPLAY_STYLE_RADIO"), "radio");
-    DISPLAY_STYLE_LINK = new UiFieldProperty<Integer>(iButton.getField("DISPLAY_STYLE_LINK"), "link");
-    PROPOSALS = new ArrayList<FieldProperty<Integer>>(4);
+    DISPLAY_STYLE_DEFAULT = new UiFieldProperty<>(iButton.getField("DISPLAY_STYLE_DEFAULT"), "default");
+    DISPLAY_STYLE_TOGGLE = new UiFieldProperty<>(iButton.getField("DISPLAY_STYLE_TOGGLE"), "toggle");
+    DISPLAY_STYLE_RADIO = new UiFieldProperty<>(iButton.getField("DISPLAY_STYLE_RADIO"), "radio");
+    DISPLAY_STYLE_LINK = new UiFieldProperty<>(iButton.getField("DISPLAY_STYLE_LINK"), "link");
+    PROPOSALS = new ArrayList<>(4);
     PROPOSALS.add(DISPLAY_STYLE_DEFAULT);
     PROPOSALS.add(DISPLAY_STYLE_TOGGLE);
     PROPOSALS.add(DISPLAY_STYLE_RADIO);
@@ -98,7 +98,7 @@ public class ButtonDisplayStylePresenter extends AbstractProposalPresenter<Field
     }
 
     try {
-      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<Integer>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

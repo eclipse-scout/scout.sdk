@@ -72,7 +72,7 @@ public class IntegerPresenter extends AbstractValuePresenter<Integer> {
   @Override
   protected synchronized void storeValue(Integer value) throws CoreException {
     try {
-      ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

@@ -72,7 +72,7 @@ public abstract class AbstractCachedTypeContentProposalProvider extends ContentP
     }
     char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
     Set<?> elements = getElements();
-    ArrayList<Object> collector = new ArrayList<Object>(elements.size());
+    ArrayList<Object> collector = new ArrayList<>(elements.size());
     for (Object proposal : elements) {
       if (CharOperation.match(pattern, m_labelProvider.getText(proposal).toCharArray(), false)) {
         collector.add(proposal);

@@ -127,7 +127,7 @@ public abstract class AbstractNlsProject implements INlsProject {
     if (m_entries == null) {
       m_lock.writeLock().lock();
       try {
-        Map<String, NlsEntry> entries = new HashMap<String, NlsEntry>();
+        Map<String, NlsEntry> entries = new HashMap<>();
 
         // inherited entries
         if (getParent() != null) {
@@ -220,7 +220,7 @@ public abstract class AbstractNlsProject implements INlsProject {
           compareablePrefix = compareablePrefix.toLowerCase();
         }
         Set<Entry<String, NlsEntry>> keySet = m_entries.entrySet();
-        List<INlsEntry> entries = new ArrayList<INlsEntry>(keySet.size());
+        List<INlsEntry> entries = new ArrayList<>(keySet.size());
         for (Entry<String, NlsEntry> entry : keySet) {
           String compareKey = entry.getKey();
           if (!caseSensitive) {
@@ -233,7 +233,7 @@ public abstract class AbstractNlsProject implements INlsProject {
         return entries;
       }
       else {
-        List<INlsEntry> result = new ArrayList<INlsEntry>(m_entries.size());
+        List<INlsEntry> result = new ArrayList<>(m_entries.size());
         for (INlsEntry e : m_entries.values()) {
           result.add(e);
         }
@@ -250,7 +250,7 @@ public abstract class AbstractNlsProject implements INlsProject {
     cache();
     m_lock.readLock().lock();
     try {
-      List<INlsEntry> result = new ArrayList<INlsEntry>(m_entries.size());
+      List<INlsEntry> result = new ArrayList<>(m_entries.size());
       for (INlsEntry e : m_entries.values()) {
         result.add(e);
       }
@@ -621,9 +621,9 @@ public abstract class AbstractNlsProject implements INlsProject {
   private void handleTranlationResourceChanged(TranslationResourceEvent event) {
     try {
       if (m_translationResourceEventLock.acquire()) {
-        Map<INlsEntry, NlsProjectEvent> addEvents = new HashMap<INlsEntry, NlsProjectEvent>();
-        Map<INlsEntry, NlsProjectEvent> modifyEvents = new HashMap<INlsEntry, NlsProjectEvent>();
-        Map<INlsEntry, NlsProjectEvent> removeEvents = new HashMap<INlsEntry, NlsProjectEvent>();
+        Map<INlsEntry, NlsProjectEvent> addEvents = new HashMap<>();
+        Map<INlsEntry, NlsProjectEvent> modifyEvents = new HashMap<>();
+        Map<INlsEntry, NlsProjectEvent> removeEvents = new HashMap<>();
         handleTranslationResourceChangedRec(addEvents, modifyEvents, removeEvents, event);
         // fire
         NlsProjectEvent multiEvent = new NlsProjectEvent(this);

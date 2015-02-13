@@ -34,7 +34,7 @@ public class ScoutResourceFilters extends ResourceFilters {
    * @return
    */
   public static IResourceFilter getProductFileFilter(IScoutBundle bundle) {
-    final HashSet<IProject> projects = new HashSet<IProject>();
+    final HashSet<IProject> projects = new HashSet<>();
     for (IScoutBundle b : bundle.getChildBundles(ScoutBundleFilters.getAllBundlesFilter(), true)) {
       projects.add(b.getProject());
     }

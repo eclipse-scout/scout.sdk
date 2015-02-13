@@ -36,8 +36,8 @@ public class TranslationLocationSmartFieldModel implements ISmartFieldModel {
     m_project = project;
     m_path = path;
 
-    m_folders = new LinkedList<Object>();
-    List<INlsFolder> folds = new LinkedList<INlsFolder>();
+    m_folders = new LinkedList<>();
+    List<INlsFolder> folds = new LinkedList<>();
     try {
       List<IProject> projects = NlsSdkSimple.getProjectGroup(m_project);
       for (IProject toCheck : projects) {

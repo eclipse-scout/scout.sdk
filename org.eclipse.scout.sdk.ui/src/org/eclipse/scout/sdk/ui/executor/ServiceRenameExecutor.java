@@ -93,7 +93,7 @@ public class ServiceRenameExecutor extends AbstractRenameExecutor {
         for (IScoutBundle clientBundle : interfaceBundle.getChildBundles(filter, true)) {
           String attribName = "class";
           PluginModelHelper h = new PluginModelHelper(clientBundle.getProject());
-          Map<String, String> attributes = new HashMap<String, String>(1);
+          Map<String, String> attributes = new HashMap<>(1);
           attributes.put(attribName, oldFqn);
           List<IPluginElement> simpleExtensions = h.PluginXml.getSimpleExtensions(IRuntimeClasses.EXTENSION_POINT_CLIENT_SERVICE_PROXIES, IRuntimeClasses.EXTENSION_ELEMENT_CLIENT_SERVICE_PROXY, attributes);
           for (IPluginElement proxy : simpleExtensions) {

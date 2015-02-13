@@ -36,7 +36,7 @@ public abstract class AbstractQueueManager<T> {
     m_workerLock = new ReentrantLock();
     m_suspendLock = new ReentrantLock();
     m_refuseLock = new ReentrantLock();
-    m_requests = new ConcurrentLinkedQueue<T>();
+    m_requests = new ConcurrentLinkedQueue<>();
     m_suspendCounter = new AtomicInteger();
     m_refuseCounter = new AtomicInteger();
   }

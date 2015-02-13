@@ -59,7 +59,7 @@ public class LookupCallNewOperation extends PrimaryTypeNewOperation {
 
   public LookupCallNewOperation(String lookupCallName, String packageName, IJavaProject project) throws JavaModelException {
     super(lookupCallName, packageName, project);
-    m_serviceRegistrationDescriptions = new ArrayList<ServiceRegistrationDescription>();
+    m_serviceRegistrationDescriptions = new ArrayList<>();
 
     // defaults
     setFlags(Flags.AccPublic);

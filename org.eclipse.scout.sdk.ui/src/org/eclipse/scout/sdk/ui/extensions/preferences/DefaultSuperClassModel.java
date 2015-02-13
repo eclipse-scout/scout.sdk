@@ -86,7 +86,7 @@ public class DefaultSuperClassModel implements Comparable<DefaultSuperClassModel
   }
 
   private static String[] getTypeProposals(IScoutBundle p, String interfaceFqn, String defaultVal) {
-    HashSet<String> ret = new HashSet<String>();
+    HashSet<String> ret = new HashSet<>();
     ret.add(defaultVal);
     IType base = TypeUtility.getType(interfaceFqn);
     ICachedTypeHierarchy typeHierarchy = TypeUtility.getPrimaryTypeHierarchy(base);

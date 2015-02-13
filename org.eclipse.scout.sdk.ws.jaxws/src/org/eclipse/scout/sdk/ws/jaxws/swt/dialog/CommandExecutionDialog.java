@@ -55,7 +55,7 @@ public class CommandExecutionDialog extends TitleAreaDialog {
     m_dialogTitle = dialogTitle;
 
     m_toolkit = new FormToolkit(ScoutSdkUi.getDisplay());
-    m_commandSelectorFields = new HashSet<Button>();
+    m_commandSelectorFields = new HashSet<>();
     setShellStyle(SWT.CLOSE | SWT.TITLE | SWT.BORDER | SWT.APPLICATION_MODAL | SWT.RESIZE | getDefaultOrientation());
   }
 

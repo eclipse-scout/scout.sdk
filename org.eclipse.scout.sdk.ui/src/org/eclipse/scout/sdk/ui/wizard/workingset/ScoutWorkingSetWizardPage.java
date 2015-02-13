@@ -83,7 +83,7 @@ public class ScoutWorkingSetWizardPage extends WizardPage implements IWorkingSet
     // init values
     if (!m_createNewSet) {
       m_nameField.setText(getSelection().getName());
-      Set<ITreeNode> checked = new LinkedHashSet<ITreeNode>();
+      Set<ITreeNode> checked = new LinkedHashSet<>();
       for (IAdaptable a : getSelection().getElements()) {
         Set<ITreeNode> candidates = TreeUtility.findNodes(m_availableBundlesTree.getRootNode(), NodeFilters.getByData(a));
         if (candidates != null && candidates.size() > 0) {

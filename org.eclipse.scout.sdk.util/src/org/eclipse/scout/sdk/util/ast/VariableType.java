@@ -28,7 +28,7 @@ public class VariableType {
 
   public VariableType(String variableName) {
     m_variableName = variableName;
-    m_assignedTypeSignatures = new ArrayList<String>();
+    m_assignedTypeSignatures = new ArrayList<>();
   }
 
   /**

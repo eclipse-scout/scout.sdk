@@ -65,14 +65,14 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
    */
   public TypeSourceBuilder(String elementName) {
     super(elementName);
-    m_typeParameters = new ArrayList<ITypeParameter>();
-    m_interfaceSignatures = new ArrayList<String>();
-    m_fieldSourceBuilders = new ArrayList<IFieldSourceBuilder>();
-    m_sortedFieldSourceBuilders = new TreeMap<CompositeObject, IFieldSourceBuilder>();
-    m_methodSourceBuilders = new ArrayList<IMethodSourceBuilder>();
-    m_sortedMethodSourceBuilders = new TreeMap<CompositeObject, IMethodSourceBuilder>();
-    m_typeSourceBuilders = new ArrayList<ITypeSourceBuilder>();
-    m_sortedTypeSourceBuilders = new TreeMap<CompositeObject, ITypeSourceBuilder>();
+    m_typeParameters = new ArrayList<>();
+    m_interfaceSignatures = new ArrayList<>();
+    m_fieldSourceBuilders = new ArrayList<>();
+    m_sortedFieldSourceBuilders = new TreeMap<>();
+    m_methodSourceBuilders = new ArrayList<>();
+    m_sortedMethodSourceBuilders = new TreeMap<>();
+    m_typeSourceBuilders = new ArrayList<>();
+    m_sortedTypeSourceBuilders = new TreeMap<>();
   }
 
   @Override
@@ -274,7 +274,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
 
   @Override
   public List<IFieldSourceBuilder> getFieldSourceBuilders() {
-    List<IFieldSourceBuilder> ops = new ArrayList<IFieldSourceBuilder>(m_fieldSourceBuilders.size() + m_sortedFieldSourceBuilders.size());
+    List<IFieldSourceBuilder> ops = new ArrayList<>(m_fieldSourceBuilders.size() + m_sortedFieldSourceBuilders.size());
     ops.addAll(m_fieldSourceBuilders);
     ops.addAll(m_sortedFieldSourceBuilders.values());
     return ops;
@@ -320,7 +320,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
 
   @Override
   public List<IMethodSourceBuilder> getMethodSourceBuilders() {
-    List<IMethodSourceBuilder> builders = new ArrayList<IMethodSourceBuilder>(m_methodSourceBuilders.size() + m_sortedMethodSourceBuilders.size());
+    List<IMethodSourceBuilder> builders = new ArrayList<>(m_methodSourceBuilders.size() + m_sortedMethodSourceBuilders.size());
     builders.addAll(m_methodSourceBuilders);
     builders.addAll(m_sortedMethodSourceBuilders.values());
     return builders;
@@ -368,7 +368,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
 
   @Override
   public List<ITypeSourceBuilder> getTypeSourceBuilder() {
-    List<ITypeSourceBuilder> typeBuilders = new ArrayList<ITypeSourceBuilder>(m_typeSourceBuilders.size() + m_sortedTypeSourceBuilders.size());
+    List<ITypeSourceBuilder> typeBuilders = new ArrayList<>(m_typeSourceBuilders.size() + m_sortedTypeSourceBuilders.size());
     typeBuilders.addAll(m_typeSourceBuilders);
     typeBuilders.addAll(m_sortedTypeSourceBuilders.values());
     return typeBuilders;

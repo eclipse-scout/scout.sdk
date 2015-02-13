@@ -39,11 +39,11 @@ public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter
 
   protected static final List<AbstractSourceProperty<Integer>> PROPOSALS;
   static {
-    LEFT = new UiSourceProperty<Integer>(Integer.valueOf(-1), "left");
-    CENTER = new UiSourceProperty<Integer>(Integer.valueOf(0), "center");
-    RIGHT = new UiSourceProperty<Integer>(Integer.valueOf(1), "right");
-    DEFAULT = new UiSourceProperty<Integer>(Integer.valueOf(1000), "default");
-    PROPOSALS = new ArrayList<AbstractSourceProperty<Integer>>(4);
+    LEFT = new UiSourceProperty<>(Integer.valueOf(-1), "left");
+    CENTER = new UiSourceProperty<>(Integer.valueOf(0), "center");
+    RIGHT = new UiSourceProperty<>(Integer.valueOf(1), "right");
+    DEFAULT = new UiSourceProperty<>(Integer.valueOf(1000), "default");
+    PROPOSALS = new ArrayList<>(4);
     PROPOSALS.add(LEFT);
     PROPOSALS.add(CENTER);
     PROPOSALS.add(RIGHT);
@@ -101,7 +101,7 @@ public class LabelHorizontalAlignmentPresenter extends AbstractProposalPresenter
       value = getDefaultValue();
     }
     try {
-      ConfigPropertyUpdateOperation<AbstractSourceProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<AbstractSourceProperty<Integer>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<AbstractSourceProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

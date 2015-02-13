@@ -76,7 +76,7 @@ public class HandlerChainFilterWizardPage extends AbstractWorkspaceWizardPage {
     setTitle(Texts.get("HandlerChainFilter"));
     setDescription(Texts.get("DescriptionHandlerChainFilter"));
 
-    m_radioButtonMap = new HashMap<Button, Composite>();
+    m_radioButtonMap = new HashMap<>();
     m_bundle = bundle;
     m_propertySupport = new BasicPropertySupport(this);
   }

@@ -100,7 +100,7 @@ public abstract class AbstractTypeDndOperation implements IOperation, IFieldPosi
     IJavaElement sibling = findSibling(typeHierarchy);
 
     // collect new imports
-    List<String> imports = new ArrayList<String>();
+    List<String> imports = new ArrayList<>();
     String normalizedTypeElementName = null;
     String normalizedTargetTypeElementName = null;
     if (!getTargetDeclaringType().equals(getType().getDeclaringType())) {

@@ -53,7 +53,7 @@ public class VariableResolveVisitor extends DefaultAstVisitor {
     m_containerElement = containerElement;
     m_rootNode = rootNode;
     m_stopNode = stopNode;
-    m_assignedTypes = new HashSet<String>();
+    m_assignedTypes = new HashSet<>();
   }
 
   @Override
@@ -291,7 +291,7 @@ public class VariableResolveVisitor extends DefaultAstVisitor {
   private class P_Variable {
     public String variableTypeName;
     public String variableName;
-    public HashSet<String> assignedTypeName = new HashSet<String>();
+    public HashSet<String> assignedTypeName = new HashSet<>();
 
     public boolean isAssigned() {
       return variableName != null && (assignedTypeName != null || !variableTypeName.isEmpty());

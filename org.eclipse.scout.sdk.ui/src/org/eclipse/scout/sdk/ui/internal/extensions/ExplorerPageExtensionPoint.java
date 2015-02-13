@@ -46,7 +46,7 @@ public final class ExplorerPageExtensionPoint {
     if (pages == null) {
       synchronized (LOCK) {
         if (pages == null) {
-          Map<String, List<ExplorerPageExtension>> tmp = new HashMap<String, List<ExplorerPageExtension>>();
+          Map<String, List<ExplorerPageExtension>> tmp = new HashMap<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXPLORER_PAGE_EXTENSION_ID);
           IExtension[] extensions = xp.getExtensions();
@@ -84,7 +84,7 @@ public final class ExplorerPageExtensionPoint {
   private static void addExtension(Map<String, List<ExplorerPageExtension>> collector, ExplorerPageExtension page) {
     List<ExplorerPageExtension> childNodes = collector.get(page.getParentPageId());
     if (childNodes == null) {
-      childNodes = new ArrayList<ExplorerPageExtension>();
+      childNodes = new ArrayList<>();
       collector.put(page.getParentPageId(), childNodes);
     }
     childNodes.add(page);

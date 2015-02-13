@@ -42,7 +42,7 @@ public class ImportValidatorTest {
     Assert.assertEquals("MyClass", ownName);
 
     Set<String> importsToCreate = iv.getImportsToCreate();
-    Assert.assertEquals(new TreeSet<String>(CollectionUtility.arrayList(ownClassFqn)), importsToCreate);
+    Assert.assertEquals(new TreeSet<>(CollectionUtility.arrayList(ownClassFqn)), importsToCreate);
   }
 
   @Test
@@ -61,7 +61,7 @@ public class ImportValidatorTest {
     Assert.assertEquals("MyClass2", ownName2);
 
     Set<String> importsToCreate = iv.getImportsToCreate();
-    Assert.assertEquals(new TreeSet<String>(CollectionUtility.arrayList(ownClassFqn)), importsToCreate);
+    Assert.assertEquals(new TreeSet<>(CollectionUtility.arrayList(ownClassFqn)), importsToCreate);
   }
 
   @Test
@@ -72,7 +72,7 @@ public class ImportValidatorTest {
     Assert.assertEquals(Signature.getSignatureSimpleName(Signature.SIG_INT), intName);
 
     Set<String> importsToCreate = iv.getImportsToCreate();
-    Assert.assertEquals(new TreeSet<String>(), importsToCreate);
+    Assert.assertEquals(new TreeSet<>(), importsToCreate);
   }
 
   @Test
@@ -91,7 +91,7 @@ public class ImportValidatorTest {
     Assert.assertEquals("MyClass2", ownName2);
 
     Set<String> importsToCreate = iv.getImportsToCreate();
-    Assert.assertEquals(new TreeSet<String>(CollectionUtility.arrayList(ownClassFqn, ownClassFqn2)), importsToCreate);
+    Assert.assertEquals(new TreeSet<>(CollectionUtility.arrayList(ownClassFqn, ownClassFqn2)), importsToCreate);
   }
 
   @Test
@@ -110,6 +110,6 @@ public class ImportValidatorTest {
     Assert.assertEquals(ownClassFqn2, ownName2);
 
     Set<String> importsToCreate = iv.getImportsToCreate();
-    Assert.assertEquals(new TreeSet<String>(CollectionUtility.arrayList(ownClassFqn)), importsToCreate);
+    Assert.assertEquals(new TreeSet<>(CollectionUtility.arrayList(ownClassFqn)), importsToCreate);
   }
 }

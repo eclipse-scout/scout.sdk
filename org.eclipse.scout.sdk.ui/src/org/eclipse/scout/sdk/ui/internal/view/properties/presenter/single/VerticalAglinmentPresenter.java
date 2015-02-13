@@ -40,10 +40,10 @@ public class VerticalAglinmentPresenter extends AbstractProposalPresenter<Abstra
 
   protected static final List<AbstractSourceProperty<Integer>> PROPOSALS;
   static {
-    TOP = new UiSourceProperty<Integer>(Integer.valueOf(-1), "top");
-    CENTER = new UiSourceProperty<Integer>(Integer.valueOf(0), "center");
-    BOTTOM = new UiSourceProperty<Integer>(Integer.valueOf(1), "bottom");
-    PROPOSALS = new ArrayList<AbstractSourceProperty<Integer>>(3);
+    TOP = new UiSourceProperty<>(Integer.valueOf(-1), "top");
+    CENTER = new UiSourceProperty<>(Integer.valueOf(0), "center");
+    BOTTOM = new UiSourceProperty<>(Integer.valueOf(1), "bottom");
+    PROPOSALS = new ArrayList<>(3);
     PROPOSALS.add(TOP);
     PROPOSALS.add(CENTER);
     PROPOSALS.add(BOTTOM);
@@ -101,7 +101,7 @@ public class VerticalAglinmentPresenter extends AbstractProposalPresenter<Abstra
       value = getDefaultValue();
     }
     try {
-      ConfigPropertyUpdateOperation<AbstractSourceProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<AbstractSourceProperty<Integer>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<AbstractSourceProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

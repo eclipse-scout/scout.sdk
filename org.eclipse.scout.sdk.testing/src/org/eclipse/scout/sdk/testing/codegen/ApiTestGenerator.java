@@ -51,7 +51,7 @@ public class ApiTestGenerator {
 
   public ApiTestGenerator(IJavaElement element) {
     m_element = element;
-    m_usedMemberNames = new HashSet<String>();
+    m_usedMemberNames = new HashSet<>();
   }
 
   public String buildSource() throws JavaModelException {

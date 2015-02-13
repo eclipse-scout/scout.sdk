@@ -74,7 +74,7 @@ public class SourceFolderPresenter extends ProposalPresenter<PathProposal> {
   }
 
   private PathProposal[] createSourceFolderProposals() {
-    List<PathProposal> proposals = new LinkedList<PathProposal>();
+    List<PathProposal> proposals = new LinkedList<>();
     try {
       for (IClasspathEntry classpathEntry : m_bundle.getJavaProject().getRawClasspath()) {
         if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {

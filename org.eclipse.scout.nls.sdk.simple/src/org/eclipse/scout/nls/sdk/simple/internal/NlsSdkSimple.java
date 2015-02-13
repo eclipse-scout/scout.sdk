@@ -69,7 +69,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
    * @throws CoreException
    */
   public static List<IProject> getWorkspaceFragments(String hostPluginId) throws CoreException {
-    List<IProject> fragments = new LinkedList<IProject>();
+    List<IProject> fragments = new LinkedList<>();
     IProject[] allProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
     for (IProject lookAt : allProjects) {
       if (lookAt.isOpen() && lookAt.hasNature(JavaCore.NATURE_ID) && lookAt.hasNature(PDE.PLUGIN_NATURE)) {
@@ -179,7 +179,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
    * @throws CoreException
    */
   public static List<IFile> getAllTranslations(IProject toLookAt, IPath path, String fileNamePrefix) throws CoreException {
-    List<IFolder> folders = new LinkedList<IFolder>();
+    List<IFolder> folders = new LinkedList<>();
     List<INlsFolder> nlsFolders = getFoldersOfProject(toLookAt, path, true);
     for (INlsFolder folder : nlsFolders) {
       folders.add(folder.getFolder());
@@ -189,7 +189,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
   }
 
   public static List<IFile> getAllTranslations(List<IFolder> folders, String fileNamePrefix) throws CoreException {
-    List<IFile> files = new LinkedList<IFile>();
+    List<IFile> files = new LinkedList<>();
     for (IFolder folder : folders) {
       if (folder.exists()) {
         IResource[] resources = folder.members(IResource.NONE);
@@ -204,7 +204,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
   }
 
   public static List<INlsFolder> getFoldersOfProject(IProject project, IPath path, boolean runntimeDir) throws CoreException {
-    List<INlsFolder> folders = new LinkedList<INlsFolder>();
+    List<INlsFolder> folders = new LinkedList<>();
     if (project.isOpen()) {
       if (project.hasNature(JavaCore.NATURE_ID)) {
         // check runtime dir

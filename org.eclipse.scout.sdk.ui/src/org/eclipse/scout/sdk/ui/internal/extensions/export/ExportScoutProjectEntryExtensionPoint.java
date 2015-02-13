@@ -35,7 +35,7 @@ public final class ExportScoutProjectEntryExtensionPoint {
   }
 
   public static ExportScoutProjectEntry[] getEntries() {
-    TreeSet<ExportScoutProjectEntry> ret = new TreeSet<ExportScoutProjectEntry>();
+    TreeSet<ExportScoutProjectEntry> ret = new TreeSet<>();
     IExtensionRegistry reg = Platform.getExtensionRegistry();
     IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_ID);
     IExtension[] extensions = xp.getExtensions();

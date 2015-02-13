@@ -71,7 +71,7 @@ public class RepairExecutor extends AbstractExecutor {
 
     if (dialog.open() == Window.OK) {
       // prepare UI commands
-      List<IMarkerCommand> commandsToBeExecuted = new LinkedList<IMarkerCommand>();
+      List<IMarkerCommand> commandsToBeExecuted = new LinkedList<>();
       for (IMarkerCommand command : markerCommands) {
         if (command.isDoExecute()) {
           try {

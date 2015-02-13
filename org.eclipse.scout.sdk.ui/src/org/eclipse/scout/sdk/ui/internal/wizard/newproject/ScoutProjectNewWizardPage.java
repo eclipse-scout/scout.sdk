@@ -204,7 +204,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   protected SimpleProposal[] getTargetPlatformProposals() {
     final String RECOMMENDED_VERSION = "3.8";
     final String[][] supportedPlatforms = new String[][]{{"Indigo", "3.7"}, {"Juno", "3.8"}, {"Luna", "4.4"}, {"Mars", "4.5"}};
-    ArrayList<SimpleProposal> ret = new ArrayList<SimpleProposal>(supportedPlatforms.length);
+    ArrayList<SimpleProposal> ret = new ArrayList<>(supportedPlatforms.length);
     for (String[] platform : supportedPlatforms) {
       String codeName = platform[0];
       String ver = platform[1];
@@ -411,7 +411,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
     // go through all node extensions and put properties which node has been checked
     Set<ITreeNode> nodes = TreeUtility.findNodes(m_invisibleRootNode, NodeFilters.getAcceptAll());
-    HashSet<String> checkedNodeExtensionIds = new HashSet<String>(nodes.size());
+    HashSet<String> checkedNodeExtensionIds = new HashSet<>(nodes.size());
     for (ITreeNode node : nodes) {
       ScoutBundleUiExtension ext = (ScoutBundleUiExtension) node.getData();
       if (ext != null) {
@@ -674,7 +674,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
   } // end class P_InitialCheckNodesFilter
 
   private class P_NodeByExtensionIdFilter implements ITreeNodeFilter {
-    private final HashSet<String> m_ids = new HashSet<String>();
+    private final HashSet<String> m_ids = new HashSet<>();
 
     public P_NodeByExtensionIdFilter(String... extensionIds) {
       if (extensionIds != null) {
@@ -696,7 +696,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   private class P_NodeByBundleTypeFilter implements ITreeNodeFilter {
 
-    private final HashSet<String> m_types = new HashSet<String>();
+    private final HashSet<String> m_types = new HashSet<>();
 
     public P_NodeByBundleTypeFilter(String... types) {
       if (types != null) {

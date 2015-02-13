@@ -64,7 +64,7 @@ public class WebServiceProviderHandlerNodePage extends AbstractPage implements I
     m_bundle = getScoutBundle();
     m_markerGroupUUID = UUID.randomUUID().toString();
 
-    m_pageLoadedListeners = new HashSet<IPageLoadedListener>();
+    m_pageLoadedListeners = new HashSet<>();
     m_pageLoadedListenerLock = new Object();
 
     m_sunJaxWsResourceListener = new P_SunJaxWsResourceListener();
@@ -163,7 +163,7 @@ public class WebServiceProviderHandlerNodePage extends AbstractPage implements I
         JaxWsSdk.logWarning("failed to update markers", e);
       }
       finally {
-        Set<IResource> resources = new HashSet<IResource>();
+        Set<IResource> resources = new HashSet<>();
         resources.add(ResourceFactory.getSunJaxWsResource(m_bundle).getFile());
         ScoutSeverityManager.getInstance().fireSeverityChanged(resources);
       }

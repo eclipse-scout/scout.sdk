@@ -51,7 +51,7 @@ public class ExportEarOperation implements IOperation {
   private File m_createdEarFile;
 
   public ExportEarOperation() {
-    m_modules = new ArrayList<File>();
+    m_modules = new ArrayList<>();
   }
 
   @Override
@@ -91,7 +91,7 @@ public class ExportEarOperation implements IOperation {
       }
 
       // meta data
-      HashMap<String, String> props = new HashMap<String, String>();
+      HashMap<String, String> props = new HashMap<>();
       props.put("DISPLAY_NAME", cutExtension(new File(getEarFileName()).getName()));
       props.put("MODULE_LIST", moduleXml.toString());
       installTextFile("platform:/plugin/" + ScoutSdk.PLUGIN_ID + "/templates/ear/application.xml", META_INF + "/application.xml", props);

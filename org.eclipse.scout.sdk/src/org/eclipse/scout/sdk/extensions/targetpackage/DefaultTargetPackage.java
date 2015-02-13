@@ -53,8 +53,8 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
   private static boolean isPackageConfigurationEnabled = true;
 
   private static final Object LOCK = new Object();
-  private static final Map<IScoutBundle, Map<String /* packageId */, StringHolder /* configured value */>> CONFIGURED_VALUES = new HashMap<IScoutBundle, Map<String, StringHolder>>();
-  private static final Map<IScoutBundle, IPreferenceChangeListener> REGISTERED_LISTENERS = new HashMap<IScoutBundle, IPreferenceChangeListener>();
+  private static final Map<IScoutBundle, Map<String /* packageId */, StringHolder /* configured value */>> CONFIGURED_VALUES = new HashMap<>();
+  private static final Map<IScoutBundle, IPreferenceChangeListener> REGISTERED_LISTENERS = new HashMap<>();
 
   private DefaultTargetPackage() {
   }
@@ -63,7 +63,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
     if (defaultValues == null) {
       synchronized (LOCK) {
         if (defaultValues == null) {
-          Map<String, TargetPackageEntry> tmp = new HashMap<String, TargetPackageEntry>();
+          Map<String, TargetPackageEntry> tmp = new HashMap<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);
           IExtension[] extensions = xp.getExtensions();
@@ -104,7 +104,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
 
   public static Set<TargetPackageEntry> getAllDefaults() {
     Map<String, TargetPackageEntry> def = getDefaults();
-    HashSet<TargetPackageEntry> ret = new HashSet<TargetPackageEntry>(def.size());
+    HashSet<TargetPackageEntry> ret = new HashSet<>(def.size());
     for (TargetPackageEntry entry : def.values()) {
       ret.add(entry);
     }
@@ -184,7 +184,7 @@ public final class DefaultTargetPackage implements IDefaultTargetPackage {
     synchronized (LOCK) {
       Map<String, StringHolder> projectConfigs = CONFIGURED_VALUES.get(context);
       if (projectConfigs == null) {
-        projectConfigs = new HashMap<String, StringHolder>();
+        projectConfigs = new HashMap<>();
         CONFIGURED_VALUES.put(context, projectConfigs);
 
         // first time we are reading properties for the given project -> we are starting to cache for that project

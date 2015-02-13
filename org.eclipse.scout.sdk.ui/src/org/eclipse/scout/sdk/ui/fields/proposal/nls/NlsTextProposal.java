@@ -69,7 +69,7 @@ public class NlsTextProposal implements Comparable<NlsTextProposal> {
       m_devLangTranslation = m_entry.getTranslation(developmentLanguage, true);
 
       Map<Language, String> allTranslations = entry.getAllTranslations();
-      ArrayList<String> foreignLangTranslations = new ArrayList<String>(allTranslations.size());
+      ArrayList<String> foreignLangTranslations = new ArrayList<>(allTranslations.size());
       for (Entry<Language, String> e : allTranslations.entrySet()) {
         if (!developmentLanguage.equals(e.getKey())) {
           foreignLangTranslations.add(e.getValue());

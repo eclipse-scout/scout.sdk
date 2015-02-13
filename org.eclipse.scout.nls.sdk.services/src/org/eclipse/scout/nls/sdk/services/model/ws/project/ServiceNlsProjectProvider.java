@@ -141,12 +141,12 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         }
       }
     });
-    Map<String, IType> typeMap = new HashMap<String, IType>(serviceImpls.size());
+    Map<String, IType> typeMap = new HashMap<>(serviceImpls.size());
     for (IType t : serviceImpls) {
       typeMap.put(t.getFullyQualifiedName(), t);
     }
 
-    Map<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<TextProviderService, TextProviderServiceDeclaration>(serviceImpls.size());
+    Map<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<>(serviceImpls.size());
     IExtension[] allServiceExtensions = PDECore.getDefault().getExtensionsRegistry().findExtensions(IRuntimeClasses.EXTENSION_POINT_SERVICES, true);
     for (IExtension e : allServiceExtensions) {
       for (IConfigurationElement c : e.getConfigurationElements()) {
@@ -195,7 +195,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     });
 
     // return the types of the services ordered by priority
-    Set<IType> returnValueSorted = new LinkedHashSet<IType>(sortedArrayHighestPrioFirst.length);
+    Set<IType> returnValueSorted = new LinkedHashSet<>(sortedArrayHighestPrioFirst.length);
     for (int i = 0; i < sortedArrayHighestPrioFirst.length; i++) {
       returnValueSorted.add(sortedArrayHighestPrioFirst[i].svc.textProvider);
     }
@@ -329,7 +329,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       return null;
     }
 
-    Set<String> names = new HashSet<String>(scoutBundles.size());
+    Set<String> names = new HashSet<>(scoutBundles.size());
     for (IScoutBundle b : scoutBundles) {
       names.add(b.getSymbolicName());
     }
@@ -357,7 +357,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
 
     String searchString = getTypeIdentifyer(type);
-    Set<IType> filtered = new LinkedHashSet<IType>(nlsProviders.size());
+    Set<IType> filtered = new LinkedHashSet<>(nlsProviders.size());
     boolean minFound = false;
     for (IType t : nlsProviders) {
       if (getTypeIdentifyer(t).equals(searchString) && !minFound) {

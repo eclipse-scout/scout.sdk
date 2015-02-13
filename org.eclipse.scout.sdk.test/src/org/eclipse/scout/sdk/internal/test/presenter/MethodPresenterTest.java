@@ -125,7 +125,7 @@ public class MethodPresenterTest extends AbstractScoutSdkTest {
     Assert.assertNotNull(configPropertyMethods);
     Assert.assertTrue(configPropertyMethods.size() > 0);
 
-    ArrayList<ConfigurationMethod> implementedMethods = new ArrayList<ConfigurationMethod>(configPropertyMethods.size());
+    ArrayList<ConfigurationMethod> implementedMethods = new ArrayList<>(configPropertyMethods.size());
     for (ConfigurationMethod method : configPropertyMethods) {
       if (method != null) {
         if (method.isImplemented()) {

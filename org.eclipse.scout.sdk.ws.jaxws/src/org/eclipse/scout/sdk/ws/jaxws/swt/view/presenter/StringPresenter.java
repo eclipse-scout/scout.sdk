@@ -123,7 +123,7 @@ public class StringPresenter extends AbstractPropertyPresenter<String> {
 
     @Override
     public void lineGetStyle(LineStyleEvent event) {
-      List<StyleRange> styleRanges = new LinkedList<StyleRange>();
+      List<StyleRange> styleRanges = new LinkedList<>();
 
       // color prefix
       if (m_prefix != null && m_styledText.getText().startsWith(m_prefix)) {

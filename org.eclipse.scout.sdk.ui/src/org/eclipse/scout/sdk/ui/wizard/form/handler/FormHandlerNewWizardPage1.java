@@ -81,7 +81,7 @@ public class FormHandlerNewWizardPage1 extends AbstractWorkspaceWizardPage {
 
       }
     });
-    List<HandlerTemplate> templates = new ArrayList<HandlerTemplate>();
+    List<HandlerTemplate> templates = new ArrayList<>();
     IType formHandler = RuntimeClasses.getSuperType(IRuntimeClasses.IFormHandler, m_declaringType.getJavaProject());
     templates.add(new HandlerTemplate(Texts.get("FormHandlerNEW"), formHandler, HandlerTemplate.ID_NEW));
     templates.add(new HandlerTemplate(Texts.get("FormHandlerMODIFY"), formHandler, HandlerTemplate.ID_MODIFY));

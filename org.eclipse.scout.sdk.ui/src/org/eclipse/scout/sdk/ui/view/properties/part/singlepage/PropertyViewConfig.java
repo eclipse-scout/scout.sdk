@@ -167,7 +167,7 @@ public class PropertyViewConfig {
   }
 
   public PropertyViewConfig() {
-    m_typeConfigs = new HashMap<String, Map<String, Config>>(100);
+    m_typeConfigs = new HashMap<>(100);
     load();
   }
 
@@ -233,7 +233,7 @@ public class PropertyViewConfig {
       return;
     }
 
-    HashMap<String, Config> c = new HashMap<String, Config>(20);
+    HashMap<String, Config> c = new HashMap<>(20);
     m_typeConfigs.put(name, c);
 
     NodeList childNodes = type.getChildNodes();

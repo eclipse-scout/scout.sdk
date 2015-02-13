@@ -59,7 +59,7 @@ public final class GlobalBindingRegistrationHelper {
   }
 
   public static SchemaCandidate[] getSchemaCandidates(IFile wsdlFile) {
-    final List<SchemaCandidate> schemaCandidates = new ArrayList<SchemaCandidate>();
+    final List<SchemaCandidate> schemaCandidates = new ArrayList<>();
     SchemaUtility.visitArtifacts(wsdlFile, new SchemaArtifactVisitor<IFile>() {
 
       @Override

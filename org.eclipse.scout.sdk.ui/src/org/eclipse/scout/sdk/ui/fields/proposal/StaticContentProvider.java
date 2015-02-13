@@ -44,7 +44,7 @@ public class StaticContentProvider extends ContentProposalProvider {
       return new Object[]{};
     }
 
-    ArrayList<Object> props = new ArrayList<Object>(elements.length);
+    ArrayList<Object> props = new ArrayList<>(elements.length);
     ISearchRangeConsumer searchRangeLabelProvider = null;
     boolean isFormatConcatString = false;
     if (getLabelProvider() instanceof ISearchRangeConsumer) {

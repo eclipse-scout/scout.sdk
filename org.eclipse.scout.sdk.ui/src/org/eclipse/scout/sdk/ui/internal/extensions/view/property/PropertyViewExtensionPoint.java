@@ -50,7 +50,7 @@ public final class PropertyViewExtensionPoint {
       synchronized (LOCK) {
         if (viewExtensions == null) {
           try {
-            HashMap<Class<? extends IPage>, PropertyViewExtension> tmp = new HashMap<Class<? extends IPage>, PropertyViewExtension>();
+            HashMap<Class<? extends IPage>, PropertyViewExtension> tmp = new HashMap<>();
             IExtensionRegistry reg = Platform.getExtensionRegistry();
             IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, PROPERTY_VIEW_EXTENSION_ID);
             IExtension[] extensions = xp.getExtensions();
@@ -83,7 +83,7 @@ public final class PropertyViewExtensionPoint {
             }
 
             // order extensions
-            TreeMap<CompositeObject, PropertyViewExtension> orderedExtensions = new TreeMap<CompositeObject, PropertyViewExtension>();
+            TreeMap<CompositeObject, PropertyViewExtension> orderedExtensions = new TreeMap<>();
             for (PropertyViewExtension ext : tmp.values()) {
               try {
                 int distanceToIPage = distanceToIPage(ext.getPageClass(), 0);
@@ -184,7 +184,7 @@ public final class PropertyViewExtensionPoint {
       return pages[0].getClass();
     }
     else {
-      ArrayList<Class<? extends IPage>> pageClasses = new ArrayList<Class<? extends IPage>>();
+      ArrayList<Class<? extends IPage>> pageClasses = new ArrayList<>();
       Class<? extends IPage> visClazz = pages[0].getClass();
       while (visClazz != null && !visClazz.equals(Object.class)) {
         pageClasses.add(visClazz);
@@ -194,7 +194,7 @@ public final class PropertyViewExtensionPoint {
         }
       }
       for (int i = 1; i < pages.length; i++) {
-        ArrayList<Class<? extends IPage>> visClasses = new ArrayList<Class<? extends IPage>>();
+        ArrayList<Class<? extends IPage>> visClasses = new ArrayList<>();
         visClazz = pages[i].getClass();
         while (visClazz != null && !visClazz.equals(Object.class)) {
           if (pageClasses.contains(visClazz)) {

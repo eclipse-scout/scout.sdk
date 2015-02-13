@@ -41,7 +41,7 @@ public abstract class AbstractTypeProposalPresenter extends AbstractProposalPres
   @Override
   protected synchronized void storeValue(final IType value) throws CoreException {
     try {
-      ConfigPropertyUpdateOperation<IType> updateOp = new ConfigPropertyUpdateOperation<IType>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<IType> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

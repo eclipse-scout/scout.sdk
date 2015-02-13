@@ -151,7 +151,7 @@ public abstract class AbstractSdkWizardProposal extends AbstractSdkProposal {
     @Override
     public void run(final IProgressMonitor monitor, final IWorkingCopyManager workingCopyManager) throws CoreException {
       final DeleteEdit removePrefix = new DeleteEdit(m_start, m_end - m_start);
-      final IHolder<Exception> exHolder = new Holder<Exception>(Exception.class, null);
+      final IHolder<Exception> exHolder = new Holder<>(Exception.class, null);
       m_display.syncExec(new Runnable() {
         @Override
         public void run() {

@@ -80,7 +80,7 @@ public final class ClassIdValidationJob extends JobEx {
   }
 
   private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(final IProgressMonitor monitor) {
-    final HashSet<IAnnotation> result = new HashSet<IAnnotation>();
+    final HashSet<IAnnotation> result = new HashSet<>();
     try {
       SearchEngine e = new SearchEngine();
       e.search(SearchPattern.createPattern(m_classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH),
@@ -144,7 +144,7 @@ public final class ClassIdValidationJob extends JobEx {
   }
 
   private Map<String /*classid*/, List<IAnnotation>> getClassIdOccurrences(IProgressMonitor monitor) throws CoreException {
-    Map<String, List<IAnnotation>> ids = new HashMap<String, List<IAnnotation>>();
+    Map<String, List<IAnnotation>> ids = new HashMap<>();
     Set<IAnnotation> allClassIdAnnotationsInWorkspace = getAllClassIdAnnotationsInWorkspace(monitor);
     if (monitor.isCanceled()) {
       return null;
@@ -160,7 +160,7 @@ public final class ClassIdValidationJob extends JobEx {
         if (!StringUtility.isNullOrEmpty(id)) {
           List<IAnnotation> files = ids.get(id);
           if (files == null) {
-            files = new LinkedList<IAnnotation>();
+            files = new LinkedList<>();
             ids.put(id, files);
           }
           files.add(r);
@@ -171,7 +171,7 @@ public final class ClassIdValidationJob extends JobEx {
   }
 
   private Set<IAnnotation> getVisibleClassIds(IAnnotation current, List<IAnnotation> matchesById) {
-    Set<IAnnotation> visibleMatches = new HashSet<IAnnotation>(matchesById.size());
+    Set<IAnnotation> visibleMatches = new HashSet<>(matchesById.size());
     for (IAnnotation m : matchesById) {
       if (m != current && TypeUtility.isOnClasspath(m, current.getJavaProject())) {
         visibleMatches.add(m);

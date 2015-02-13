@@ -44,7 +44,7 @@ public class CreateAjaxServletOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     PluginModelHelper h = new PluginModelHelper(getServerProject().getProject());
-    HashMap<String, String> attributes = new HashMap<String, String>();
+    HashMap<String, String> attributes = new HashMap<>();
     attributes.put("alias", "/ajax");
     if (!h.PluginXml.existsSimpleExtension(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes)) {
       attributes.put("class", "org.eclipse.scout.rt.server.ServiceTunnelServlet");

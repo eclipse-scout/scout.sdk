@@ -87,14 +87,14 @@ public class TableColumnWidthsPasteExecutor extends AbstractExecutor {
 
   private void changeColumnWidths(IType tableType, Map<String, Integer> map, Shell shell) throws CoreException {
     // for all columns within the table
-    List<IOperation> updateOps = new LinkedList<IOperation>();
+    List<IOperation> updateOps = new LinkedList<>();
     for (IType innerType : ScoutTypeUtility.getColumns(tableType)) {
       String className = innerType.getFullyQualifiedName();
       Integer columnWidth = map.get(className);
       // there is a corresponding entry in the clipboard for the current column?
       if (columnWidth != null && columnWidth >= 0) {
         ConfigurationMethod configurationMethod = ScoutTypeUtility.getConfigurationMethod(innerType, COLUMN_WIDTH_METHOD_NAME, TypeUtility.getSupertypeHierarchy(innerType), ConfigurationMethod.PROPERTY_METHOD, "INTEGER");
-        ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(configurationMethod, new IntegerPropertySourceParser());
+        ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<>(configurationMethod, new IntegerPropertySourceParser());
         updateOp.setValue(columnWidth);
         updateOps.add(updateOp);
       }
@@ -117,7 +117,7 @@ public class TableColumnWidthsPasteExecutor extends AbstractExecutor {
    * @return List of column names and their width
    */
   private Map<String, Integer> parseContent(String content) {
-    Map<String, Integer> map = new HashMap<String, Integer>();
+    Map<String, Integer> map = new HashMap<>();
     try {
       // clean content
       content = content.replaceAll("\r", "");

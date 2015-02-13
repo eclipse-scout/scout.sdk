@@ -187,7 +187,7 @@ public class ConfigurationMethodSection {
    */
   private Set<ConfigurationMethodEx> getConfigMethods(ConfigPropertyType source, int methodType, ConfigTypes configurationType) {
     List<ConfigurationMethod> allMethods = source.getConfigurationMethods(methodType);
-    TreeSet<ConfigurationMethodEx> result = new TreeSet<ConfigurationMethodEx>();
+    TreeSet<ConfigurationMethodEx> result = new TreeSet<>();
     for (ConfigurationMethod m : allMethods) {
       ConfigurationMethodEx cme = new ConfigurationMethodEx(m);
       if (cme.m_configType.equals(configurationType)) {

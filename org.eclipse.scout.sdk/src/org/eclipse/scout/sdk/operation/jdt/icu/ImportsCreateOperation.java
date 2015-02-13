@@ -33,7 +33,7 @@ public class ImportsCreateOperation implements IOperation {
   private final ICompilationUnit m_icu;
 
   public ImportsCreateOperation(ICompilationUnit icu) {
-    m_importsToCreate = new TreeSet<String>();
+    m_importsToCreate = new TreeSet<>();
     m_icu = icu;
   }
 

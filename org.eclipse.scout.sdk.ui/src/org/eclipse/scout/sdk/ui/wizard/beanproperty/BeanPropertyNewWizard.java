@@ -41,7 +41,7 @@ public class BeanPropertyNewWizard extends AbstractWorkspaceWizard {
     BeanPropertyNewOperation op = new BeanPropertyNewOperation(declaringType);
     beanPropertyWizardPage.setOperation(op);
     // find all used method names
-    HashSet<String> notAllowedMethodNames = new HashSet<String>();
+    HashSet<String> notAllowedMethodNames = new HashSet<>();
     Set<IMethod> methods = TypeUtility.getMethods(declaringType, MethodFilters.getNameRegexFilter(Pattern.compile("^(get|set|is).*")));
     for (IMethod m : methods) {
       notAllowedMethodNames.add(m.getElementName());

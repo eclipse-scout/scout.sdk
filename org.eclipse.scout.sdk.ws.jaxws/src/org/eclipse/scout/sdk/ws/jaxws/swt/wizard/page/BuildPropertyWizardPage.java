@@ -43,7 +43,7 @@ public class BuildPropertyWizardPage extends AbstractWorkspaceWizardPage {
   public BuildPropertyWizardPage() {
     super(BuildPropertyWizardPage.class.getName());
     setTitle(Texts.get("WsBuildDirective"));
-    m_illegalNames = new HashSet<String>();
+    m_illegalNames = new HashSet<>();
     m_propertySupport = new BasicPropertySupport(this);
     setDescription("");
   }

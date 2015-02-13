@@ -98,10 +98,10 @@ public class MultiIntegerPresenter extends AbstractMultiValuePresenter<Integer> 
 
   @Override
   protected synchronized void storeMethods(Collection<MethodBean<Integer>> beans, Integer value) {
-    ArrayList<IOperation> list = new ArrayList<IOperation>(beans.size());
+    ArrayList<IOperation> list = new ArrayList<>(beans.size());
     for (MethodBean<Integer> bean : beans) {
       ConfigurationMethod method = bean.getMethod();
-      ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<Integer>(method, new IntegerPropertySourceParser());
+      ConfigPropertyUpdateOperation<Integer> updateOp = new ConfigPropertyUpdateOperation<>(method, new IntegerPropertySourceParser());
       updateOp.setValue(value);
       list.add(updateOp);
     }

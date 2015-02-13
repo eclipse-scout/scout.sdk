@@ -61,7 +61,7 @@ public class StringPresenter extends AbstractValuePresenter<String> {
   @Override
   protected synchronized void storeValue(String value) throws CoreException {
     try {
-      ConfigPropertyUpdateOperation<String> updateOp = new ConfigPropertyUpdateOperation<String>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<String> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

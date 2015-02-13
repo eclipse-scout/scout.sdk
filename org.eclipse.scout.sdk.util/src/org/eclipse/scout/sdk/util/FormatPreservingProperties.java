@@ -72,7 +72,7 @@ public class FormatPreservingProperties implements Serializable {
 
   public FormatPreservingProperties() {
     m_properties = new Properties();
-    m_lines = new ArrayList<FormatPreservingProperties.P_PropertyLine>();
+    m_lines = new ArrayList<>();
     m_lock = new ReentrantReadWriteLock(true);
   }
 
@@ -257,7 +257,7 @@ public class FormatPreservingProperties implements Serializable {
   public Map<String, String> getEntries() {
     try {
       m_lock.readLock().lock();
-      HashMap<String, String> result = new HashMap<String, String>(m_properties.size());
+      HashMap<String, String> result = new HashMap<>(m_properties.size());
       for (Entry<Object, Object> entry : m_properties.entrySet()) {
         result.put((String) entry.getKey(), (String) entry.getValue());
       }

@@ -205,7 +205,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @throws JavaModelException
    */
   public static Set<IType> getNewTypeOccurencesInMethod(IMethod method) {
-    Set<IType> types = new LinkedHashSet<IType>();
+    Set<IType> types = new LinkedHashSet<>();
     if (TypeUtility.exists(method)) {
       try {
         String src = method.getSource();
@@ -259,7 +259,7 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static List<IType> getTypeOccurenceInMethod(IMethod member) throws JavaModelException {
-    List<IType> types = new ArrayList<IType>();
+    List<IType> types = new ArrayList<>();
     AstUtility.visitMember(member, new MethodBodyAstVisitor(member, getTypeLiteralCollectorVisitor(types)));
     return types;
   }
@@ -275,7 +275,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @throws JavaModelException
    */
   public static List<IType> getTypeOccurenceInAnnotation(IAnnotation annotation, IType declaringType) throws JavaModelException {
-    List<IType> types = new ArrayList<IType>();
+    List<IType> types = new ArrayList<>();
     AstUtility.visitMember(declaringType, new TypeAnnotationAstVisitor(annotation, declaringType, getTypeLiteralCollectorVisitor(types)));
     return types;
   }
@@ -483,7 +483,7 @@ public class ScoutTypeUtility extends TypeUtility {
           if (value instanceof Object[]) {
             Object[] interfaces = (Object[]) value;
             if (interfaces.length > 0) {
-              interfaceSignatures = new ArrayList<String>(interfaces.length);
+              interfaceSignatures = new ArrayList<>(interfaces.length);
               for (Object o : interfaces) {
                 if (o instanceof String && StringUtility.hasText(o.toString())) {
                   String referencedTypeSignature = SignatureUtility.getReferencedTypeSignature(contextType, o.toString(), true);
@@ -497,7 +497,7 @@ public class ScoutTypeUtility extends TypeUtility {
           else if (value instanceof String && StringUtility.hasText(value.toString())) {
             String referencedTypeSignature = SignatureUtility.getReferencedTypeSignature(contextType, value.toString(), true);
             if (StringUtility.hasText(referencedTypeSignature)) {
-              interfaceSignatures = new ArrayList<String>(1);
+              interfaceSignatures = new ArrayList<>(1);
               interfaceSignatures.add(referencedTypeSignature);
             }
           }
@@ -667,7 +667,7 @@ public class ScoutTypeUtility extends TypeUtility {
   public static Set<IType> getPotentialMasterFields(IType field) {
     ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(field.getCompilationUnit());
     IType mainbox = TypeUtility.getAncestor(field, TypeFilters.getRegexSimpleNameFilter("MainBox"));
-    Set<IType> collector = new TreeSet<IType>(TypeComparators.getTypeNameComparator());
+    Set<IType> collector = new TreeSet<>(TypeComparators.getTypeNameComparator());
     if (TypeUtility.exists(mainbox)) {
       collectPotentialMasterFields(mainbox, collector, hierarchy);
     }
@@ -739,7 +739,7 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static Set<IType> getPrimaryKeyColumns(IType table) {
-    Set<IType> ret = new LinkedHashSet<IType>();
+    Set<IType> ret = new LinkedHashSet<>();
     for (IType col : getColumns(table)) {
       try {
         IMethod primKeyMethod = TypeUtility.getMethod(col, "getConfiguredPrimaryKey");
@@ -791,7 +791,7 @@ public class ScoutTypeUtility extends TypeUtility {
   }
 
   public static Set<IType> getCodes(IType declaringType) {
-    Set<IType> collector = new TreeSet<IType>(ScoutTypeComparators.getOrderAnnotationComparator());
+    Set<IType> collector = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     IType iCode = TypeUtility.getType(IRuntimeClasses.ICode);
     ITypeHierarchy typeHierarchy = TypeUtility.getLocalTypeHierarchy(declaringType);
     Deque<IType> superClassStack = typeHierarchy.getSuperClassStack(declaringType);
@@ -888,7 +888,7 @@ public class ScoutTypeUtility extends TypeUtility {
    * @throws JavaModelException
    */
   public static Deque<IType> getDeclaringTypes(IType startType) throws JavaModelException {
-    Deque<IType> result = new LinkedList<IType>();
+    Deque<IType> result = new LinkedList<>();
     IType t = startType;
     while (TypeUtility.exists(t)) {
       result.add(t);

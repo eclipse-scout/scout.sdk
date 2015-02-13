@@ -26,8 +26,8 @@ public class SqlStatement {
   private int m_length;
 
   public SqlStatement() {
-    m_tokens = new ArrayList<ISqlToken>();
-    m_bindBases = new ArrayList<IBindBase>();
+    m_tokens = new ArrayList<>();
+    m_bindBases = new ArrayList<>();
   }
 
   public void addToken(ISqlToken token) {
@@ -61,7 +61,7 @@ public class SqlStatement {
   }
 
   public UnresolvedBindBase[] getUnresolvedBindBases() {
-    ArrayList<UnresolvedBindBase> unresolvedBindBases = new ArrayList<UnresolvedBindBase>(2);
+    ArrayList<UnresolvedBindBase> unresolvedBindBases = new ArrayList<>(2);
     for (IBindBase b : m_bindBases) {
       if (b.getType() == IBindBase.TYPE_UNRESOLVED) {
         unresolvedBindBases.add((UnresolvedBindBase) b);

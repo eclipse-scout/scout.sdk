@@ -254,7 +254,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
     private final HashSet<String> m_shortList;
 
     private P_TableContentProvider() {
-      List<Object> templates = new ArrayList<Object>();
+      List<Object> templates = new ArrayList<>();
       IJavaProject javaProject = m_declaringType.getJavaProject();
 
       IType stringCol = RuntimeClasses.getSuperType(IRuntimeClasses.IStringColumn, javaProject);
@@ -277,7 +277,7 @@ public class TableColumnNewWizardPage1 extends AbstractWorkspaceWizardPage {
       templates.add(bigDecCol);
       templates.add(bigIntCol);
 
-      m_shortList = new HashSet<String>(9);
+      m_shortList = new HashSet<>(9);
       m_shortList.add(stringCol.getFullyQualifiedName());
       m_shortList.add(boolCol.getFullyQualifiedName());
       m_shortList.add(dateCol.getFullyQualifiedName());

@@ -47,10 +47,10 @@ public class ResolvedTypeParameter implements IResolvedTypeParameter {
     m_ordinal = ordinal;
     m_owner = owner;
     m_typeParamName = "?";
-    m_typeParamBounds = new LinkedHashSet<String>(1);
+    m_typeParamBounds = new LinkedHashSet<>(1);
     m_typeParamBounds.add(signature);
-    m_superTypeParamReferences = new LinkedHashMap<String, Set<ResolvedTypeParameter>>();
-    m_subTypeParamReferences = new LinkedHashMap<String, ResolvedTypeParameter>();
+    m_superTypeParamReferences = new LinkedHashMap<>();
+    m_subTypeParamReferences = new LinkedHashMap<>();
   }
 
   protected ResolvedTypeParameter(TypeParameterMapping owner, TypeParameterMapping child, ITypeParameter param, Set<String> childParamBinds, Map<String, ResolvedTypeParameter> ownerParamBinds, int ordinal) throws JavaModelException {
@@ -63,7 +63,7 @@ public class ResolvedTypeParameter implements IResolvedTypeParameter {
       Set<String> b = getTypeParamBounds(param);
       if (CollectionUtility.hasElements(b)) {
         // the type parameter defines bounds itself -> resolve and use
-        bounds = new LinkedHashSet<String>(b.size());
+        bounds = new LinkedHashSet<>(b.size());
         for (String s : b) {
           bounds.add(SignatureUtility.getResolvedSignature(owner.getType(), ownerParamBinds, s));
         }
@@ -72,26 +72,26 @@ public class ResolvedTypeParameter implements IResolvedTypeParameter {
         // there are no bounds on the current type parameter
         if (child == null) {
           // we are the lowest level (focus type). our type parameter defines the resolved name: use type param name as signature.
-          bounds = new LinkedHashSet<String>(1);
+          bounds = new LinkedHashSet<>(1);
           String string = new StringBuilder(m_typeParamName.length() + 2).append(Signature.C_TYPE_VARIABLE).append(m_typeParamName).append(Signature.C_SEMICOLON).toString();
           bounds.add(string);
         }
         else {
           // we are not the lowest level and define a new type parameter which has no bounds.
           // The bounds must be fixed to java.lang.Object as it would not be available on the focus type anyway.
-          bounds = new LinkedHashSet<String>(1);
+          bounds = new LinkedHashSet<>(1);
           bounds.add(SignatureUtility.SIG_OBJECT);
         }
       }
     }
     else {
       // use the bounds from the child
-      bounds = new LinkedHashSet<String>(childParamBinds);
+      bounds = new LinkedHashSet<>(childParamBinds);
     }
 
     m_typeParamBounds = bounds;
-    m_superTypeParamReferences = new LinkedHashMap<String, Set<ResolvedTypeParameter>>();
-    m_subTypeParamReferences = new LinkedHashMap<String, ResolvedTypeParameter>();
+    m_superTypeParamReferences = new LinkedHashMap<>();
+    m_subTypeParamReferences = new LinkedHashMap<>();
   }
 
   /**
@@ -101,7 +101,7 @@ public class ResolvedTypeParameter implements IResolvedTypeParameter {
   private static Set<String> getTypeParamBounds(ITypeParameter param) throws JavaModelException {
     String[] b = param.getBoundsSignatures();
     if (b.length > 0) {
-      LinkedHashSet<String> bounds = new LinkedHashSet<String>(b.length);
+      LinkedHashSet<String> bounds = new LinkedHashSet<>(b.length);
       for (String bound : b) {
         if (!SignatureUtility.SIG_OBJECT.equals(bound)) {
           bounds.add(bound);
@@ -117,7 +117,7 @@ public class ResolvedTypeParameter implements IResolvedTypeParameter {
     String paramOwnerFqn = superParam.getOwnerMapping().getFullyQualifiedName();
     Set<ResolvedTypeParameter> set = m_superTypeParamReferences.get(paramOwnerFqn);
     if (set == null) {
-      set = new LinkedHashSet<ResolvedTypeParameter>();
+      set = new LinkedHashSet<>();
       m_superTypeParamReferences.put(paramOwnerFqn, set);
     }
     set.add(superParam);
@@ -134,7 +134,7 @@ public class ResolvedTypeParameter implements IResolvedTypeParameter {
   public Set<IResolvedTypeParameter> getSuperReferences(String ownerTypeFqn) {
     Set<ResolvedTypeParameter> c = m_superTypeParamReferences.get(ownerTypeFqn);
     if (c == null) {
-      return new LinkedHashSet<IResolvedTypeParameter>(0);
+      return new LinkedHashSet<>(0);
     }
     return new LinkedHashSet<IResolvedTypeParameter>(c);
   }
@@ -181,7 +181,7 @@ public class ResolvedTypeParameter implements IResolvedTypeParameter {
 
   @Override
   public Map<String, Set<IResolvedTypeParameter>> getSuperReferences() {
-    Map<String, Set<IResolvedTypeParameter>> result = new LinkedHashMap<String, Set<IResolvedTypeParameter>>(m_superTypeParamReferences.size());
+    Map<String, Set<IResolvedTypeParameter>> result = new LinkedHashMap<>(m_superTypeParamReferences.size());
     for (Entry<String, Set<ResolvedTypeParameter>> entry : m_superTypeParamReferences.entrySet()) {
       result.put(entry.getKey(), new LinkedHashSet<IResolvedTypeParameter>(entry.getValue()));
     }
@@ -205,7 +205,7 @@ public class ResolvedTypeParameter implements IResolvedTypeParameter {
 
   @Override
   public Set<String> getBoundsSignatures() {
-    return new LinkedHashSet<String>(m_typeParamBounds);
+    return new LinkedHashSet<>(m_typeParamBounds);
   }
 
   @Override

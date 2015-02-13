@@ -77,7 +77,7 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
     m_markerGroupUUID = UUID.randomUUID().toString();
 
     m_sunJaxWsResourceListener = new P_SunJaxWsResourceListener();
-    m_pageLoadedListeners = new HashSet<IPageLoadedListener>();
+    m_pageLoadedListeners = new HashSet<>();
     m_pageLoadedListenerLock = new Object();
 
     // register for events being of interest
@@ -107,7 +107,7 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
 
   @Override
   public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
-    Set<Class<? extends IScoutHandler>> list = new HashSet<Class<? extends IScoutHandler>>();
+    Set<Class<? extends IScoutHandler>> list = new HashSet<>();
     list.addAll(super.getSupportedMenuActions());
     list.add(WsProviderCodeFirstDeleteAction.class);
     return list;
@@ -231,7 +231,7 @@ public class WebServiceProviderCodeFirstNodePage extends AbstractPage implements
         JaxWsSdk.logWarning("failed to update markers", e);
       }
       finally {
-        Set<IResource> resources = new HashSet<IResource>();
+        Set<IResource> resources = new HashSet<>();
         if (JaxWsSdkUtility.exists(getSunJaxWsResource().getFile())) {
           resources.add(getSunJaxWsResource().getFile());
         }

@@ -182,7 +182,7 @@ public class IconPresenter extends AbstractMethodPresenter {
           value = getDefaultValue();
         }
 
-        ConfigPropertyUpdateOperation<ScoutIconDesc> updateOp = new ConfigPropertyUpdateOperation<ScoutIconDesc>(getMethod(), getParser());
+        ConfigPropertyUpdateOperation<ScoutIconDesc> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
         updateOp.setValue(value);
         final OperationJob job = new OperationJob(updateOp);
         job.setDebug(true);

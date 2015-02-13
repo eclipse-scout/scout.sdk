@@ -61,7 +61,7 @@ public class ServiceDeleteExecutor extends AbstractExecutor {
       }
     });
 
-    Set<IMember> members = new LinkedHashSet<IMember>(2);
+    Set<IMember> members = new LinkedHashSet<>(2);
     if (m_serviceIfc != null && !m_serviceIfc.isBinary()) {
       members.add(m_serviceIfc);
     }

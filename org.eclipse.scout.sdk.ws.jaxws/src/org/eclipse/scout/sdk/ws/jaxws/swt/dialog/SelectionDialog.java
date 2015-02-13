@@ -51,7 +51,7 @@ public class SelectionDialog<T> extends TitleAreaDialog {
     super(shell);
     m_dialogTitle = dialogTitle;
     m_dialogMessage = dialogMessage;
-    m_elements = new LinkedList<T>();
+    m_elements = new LinkedList<>();
     setDialogHelpAvailable(false);
     setShellStyle(getShellStyle() | SWT.RESIZE);
   }

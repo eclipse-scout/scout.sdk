@@ -29,7 +29,7 @@ public class CredentialValidationStrategyNewExecutor extends AbstractTypeNewExec
   @Override
   protected void init(IScoutBundle bundle) {
     setPackageFragment(JaxWsSdkUtility.getRecommendedProviderSecurityPackageName(bundle), true);
-    List<String> interfaceTypeSignatures = new ArrayList<String>();
+    List<String> interfaceTypeSignatures = new ArrayList<>();
     interfaceTypeSignatures.add(SignatureCache.createTypeSignature(TypeUtility.getType(JaxWsRuntimeClasses.ICredentialValidationStrategy).getFullyQualifiedName()));
     setInterfaceTypeSignatures(interfaceTypeSignatures, false);
     setSuperTypeSignature(null, false);

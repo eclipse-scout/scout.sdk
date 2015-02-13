@@ -77,8 +77,8 @@ public class FormDeleteExecutor extends AbstractExecutor {
   }
 
   protected void runAsync(final Shell shell, final IStructuredSelection selection, final ExecutionEvent event) {
-    final Set<IMember> members = new LinkedHashSet<IMember>();
-    final Set<IMember> selectedMembers = new LinkedHashSet<IMember>();
+    final Set<IMember> members = new LinkedHashSet<>();
+    final Set<IMember> selectedMembers = new LinkedHashSet<>();
 
     collectAffectedMembers(members, selectedMembers, selection);
 
@@ -135,7 +135,7 @@ public class FormDeleteExecutor extends AbstractExecutor {
     members.addAll(m_processServiceInterface);
 
     // process service implementations
-    m_processServiceImplementation = new HashSet<IType>();
+    m_processServiceImplementation = new HashSet<>();
     for (IType serviceInterface : m_processServiceInterface) {
       Set<IType> implementations = TypeUtility.getPrimaryTypeHierarchy(serviceInterface).getAllSubtypes(serviceInterface, TypeFilters.getClassFilter(), TypeComparators.getTypeNameComparator());
       m_processServiceImplementation.addAll(implementations);

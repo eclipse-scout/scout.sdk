@@ -248,7 +248,7 @@ public class SmartTableColumnNewWizardPage extends AbstractWorkspaceWizardPage {
     g.setLayout(new GridLayout(1, false));
     g.setLayoutData(new GridData(GridData.GRAB_HORIZONTAL | GridData.FILL_HORIZONTAL));
 
-    ButtonGroup<ContinueOperation> nextStepOptions = new ButtonGroup<ContinueOperation>(g, SWT.RADIO);
+    ButtonGroup<ContinueOperation> nextStepOptions = new ButtonGroup<>(g, SWT.RADIO);
     nextStepOptions.createButton(Texts.get("CreateMoreColumn"), ContinueOperation.ADD_OTHER);
     nextStepOptions.createButton(Texts.get("FinishWizard"), ContinueOperation.FINISH);
     nextStepOptions.addButtonGroupListener(new IButtonGroupListener<ContinueOperation>() {

@@ -15,7 +15,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public abstract class AbstractChangeLogModel {
-  private List<IChangeLogListener> m_changeLogListeners = new LinkedList<IChangeLogListener>();
+  private List<IChangeLogListener> m_changeLogListeners = new LinkedList<>();
 
   public void addChangeLogListener(IChangeLogListener listener) {
     m_changeLogListeners.add(listener);
@@ -26,7 +26,7 @@ public abstract class AbstractChangeLogModel {
   }
 
   protected void fireModelChanged() {
-    List<IChangeLogListener> listeners = new ArrayList<IChangeLogListener>(m_changeLogListeners);
+    List<IChangeLogListener> listeners = new ArrayList<>(m_changeLogListeners);
     for (IChangeLogListener listener : listeners) {
       listener.modelChanged();
     }

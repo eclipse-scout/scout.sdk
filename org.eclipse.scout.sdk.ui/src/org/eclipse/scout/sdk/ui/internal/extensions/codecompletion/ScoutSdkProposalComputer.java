@@ -50,7 +50,7 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
       return CollectionUtility.emptyArrayList();
     }
 
-    List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>(4);
+    List<ICompletionProposal> proposals = new ArrayList<>(4);
     try {
       JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
       CompletionContext coreContext = javaContext.getCoreContext();

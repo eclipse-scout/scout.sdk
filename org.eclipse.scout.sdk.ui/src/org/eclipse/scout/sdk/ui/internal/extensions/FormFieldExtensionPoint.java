@@ -102,7 +102,7 @@ public final class FormFieldExtensionPoint {
 
   private static List<IFormFieldExtension> getSortedExtensions(IType modelType, ITypeHierarchy formFieldHierarchy, int maxDistance) {
     List<? extends IFormFieldExtension> allExtensions = getExtensions();
-    List<IFormFieldExtension> ret = new ArrayList<IFormFieldExtension>(allExtensions.size());
+    List<IFormFieldExtension> ret = new ArrayList<>(allExtensions.size());
     for (IFormFieldExtension ext : allExtensions) {
       if (maxDistance < 0) {
         HashSet<IType> allSubTypes = CollectionUtility.hashSet(formFieldHierarchy.getAllSubtypes(ext.getModelType()));
@@ -124,7 +124,7 @@ public final class FormFieldExtensionPoint {
     if (extensions == null) {
       synchronized (LOCK) {
         if (extensions == null) {
-          TreeMap<CompositeObject, FormFieldExtension> formFieldExtensions = new TreeMap<CompositeObject, FormFieldExtension>();
+          TreeMap<CompositeObject, FormFieldExtension> formFieldExtensions = new TreeMap<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, "formField");
           IExtension[] ex = xp.getExtensions();

@@ -50,7 +50,7 @@ public class HandlerNodePage extends AbstractPage implements ITypePage {
       setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsSdk.Handler));
     }
 
-    m_pageLoadedListeners = new HashSet<IPageLoadedListener>();
+    m_pageLoadedListeners = new HashSet<>();
     m_pageLoadedListenerLock = new Object();
 
     m_handlerChangedListener = new P_TypeChangeListener();

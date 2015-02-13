@@ -68,7 +68,7 @@ public class AutoResizeColumnTable extends Table {
     if (!isDisposed()) {
       int totalWidth = getClientArea().width;
       int totalWeight = 0;
-      HashMap<TableColumn, Integer> columnWeights = new HashMap<TableColumn, Integer>();
+      HashMap<TableColumn, Integer> columnWeights = new HashMap<>();
       for (TableColumn col : getColumns()) {
         if (col == null || col.isDisposed()) {
           continue;

@@ -37,7 +37,7 @@ public class TreeNode implements ITreeNode {
   private Color m_background;
   private ITreeNode m_parent;
 
-  private final List<ITreeNode> m_children = new ArrayList<ITreeNode>();
+  private final List<ITreeNode> m_children = new ArrayList<>();
 
   public TreeNode(String type, String text) {
     this(type, text, null);

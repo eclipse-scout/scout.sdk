@@ -44,7 +44,7 @@ public final class DtoUpdateEventFilter {
     if (filters == null) {
       synchronized (LOCK) {
         if (filters == null) {
-          List<IDtoAutoUpdateEventFilter> tmp = new ArrayList<IDtoAutoUpdateEventFilter>();
+          List<IDtoAutoUpdateEventFilter> tmp = new ArrayList<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);
           IExtension[] extensions = xp.getExtensions();

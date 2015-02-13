@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.util.type.TypeUtility;
 
 public class SimpleNlsProjectProvider implements INlsProjectProvider {
 
-  private final HashMap<String, INlsProject> m_projects = new HashMap<String, INlsProject>();
+  private final HashMap<String, INlsProject> m_projects = new HashMap<>();
   private static final Object LOCK = new Object();
 
   public SimpleNlsProjectProvider() {

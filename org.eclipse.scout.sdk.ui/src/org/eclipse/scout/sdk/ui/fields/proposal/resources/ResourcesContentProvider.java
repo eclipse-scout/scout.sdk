@@ -39,7 +39,7 @@ public class ResourcesContentProvider extends ContentProposalProvider implements
 
   public ResourcesContentProvider(ILabelProvider labelProvider, Object[] elements) {
     m_labelProvider = labelProvider;
-    m_elements = new ArrayList<Object>();
+    m_elements = new ArrayList<>();
     if (elements != null) {
       m_elements.addAll(Arrays.asList(elements));
     }
@@ -54,7 +54,7 @@ public class ResourcesContentProvider extends ContentProposalProvider implements
       searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
     }
     char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
-    ArrayList<Object> collector = new ArrayList<Object>();
+    ArrayList<Object> collector = new ArrayList<>();
     for (Object proposal : getElements()) {
       if (CharOperation.match(pattern, getLabelProvider().getText(proposal).toCharArray(), false)) {
         collector.add(proposal);

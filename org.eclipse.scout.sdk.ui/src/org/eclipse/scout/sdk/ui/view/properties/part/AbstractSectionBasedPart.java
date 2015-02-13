@@ -50,7 +50,7 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
   private Composite m_statusArea;
 
   public AbstractSectionBasedPart() {
-    m_stati = new ArrayList<IStatus>();
+    m_stati = new ArrayList<>();
   }
 
   @Override
@@ -84,7 +84,7 @@ public abstract class AbstractSectionBasedPart implements IPropertyViewPart {
       m_sectionContainer.setLayout(layout);
 
       // create sections
-      m_sections = new HashMap<String, Section>();
+      m_sections = new HashMap<>();
       createSections();
 
       m_form.updateToolBar();

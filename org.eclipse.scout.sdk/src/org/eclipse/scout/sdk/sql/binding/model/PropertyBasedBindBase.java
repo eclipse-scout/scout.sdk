@@ -24,7 +24,7 @@ public class PropertyBasedBindBase implements IBindBase {
   private ArrayList<String> m_typeAssignmentSignatures;
 
   public PropertyBasedBindBase() {
-    m_typeAssignmentSignatures = new ArrayList<String>();
+    m_typeAssignmentSignatures = new ArrayList<>();
   }
 
   @Override

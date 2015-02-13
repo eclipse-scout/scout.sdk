@@ -439,7 +439,7 @@ public final class JaxWsSdkUtility {
     if (jarFile == null) {
       return new IType[0];
     }
-    final Set<IType> types = new HashSet<IType>();
+    final Set<IType> types = new HashSet<>();
     try {
       new SearchEngine().search(
           SearchPattern.createPattern("*", IJavaSearchConstants.INTERFACE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_PATTERN_MATCH),
@@ -516,7 +516,7 @@ public final class JaxWsSdkUtility {
    * @return
    */
   public static Set<IType> resolveServiceTypes(final QName serviceQName, IFile jarFile) {
-    final Set<IType> types = new HashSet<IType>();
+    final Set<IType> types = new HashSet<>();
     try {
       new SearchEngine().search(
           SearchPattern.createPattern("*", IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_PATTERN_MATCH),
@@ -821,12 +821,12 @@ public final class JaxWsSdkUtility {
   }
 
   public static Map<String, List<String>> getDefaultBuildProperties() {
-    Map<String, List<String>> map = new HashMap<String, List<String>>();
+    Map<String, List<String>> map = new HashMap<>();
     map.put("Xdebug", null);
     map.put("keep", null);
     map.put("verbose", null);
 
-    List<String> values = new LinkedList<String>();
+    List<String> values = new LinkedList<>();
     values.add("2.1");
     map.put("target", values);
     return map;
@@ -837,7 +837,7 @@ public final class JaxWsSdkUtility {
       return new IFile[0];
     }
 
-    List<IFile> bindingFiles = new LinkedList<IFile>();
+    List<IFile> bindingFiles = new LinkedList<>();
     for (Entry<String, List<String>> property : buildProperties.entrySet()) {
       if (property.getKey() == null || !property.getKey().equals(JaxWsConstants.OPTION_BINDING_FILE) || property.getValue() == null || property.getValue().size() == 0) {
         continue;
@@ -972,7 +972,7 @@ public final class JaxWsSdkUtility {
    * @return
    */
   public static IType[] getJdtSubTypes(IScoutBundle bundle, String fqnSuperType, boolean includeInterfaces, boolean includeAbstractTypes, boolean includeFinalTypes, boolean sameProject) {
-    List<IType> types = new LinkedList<IType>();
+    List<IType> types = new LinkedList<>();
     try {
       Set<IType> superTypes = TypeUtility.getTypes(fqnSuperType);
       for (IType superType : superTypes) {
@@ -1038,7 +1038,7 @@ public final class JaxWsSdkUtility {
   public static boolean containsGlobalBindingSection(IScoutBundle bundle, Map<String, List<String>> propertiers, boolean checkForMultipleOccurences) {
     IFile[] bindingFiles = JaxWsSdkUtility.getBindingFiles(bundle, propertiers);
 
-    List<XmlResource> bindingFileResources = new LinkedList<XmlResource>();
+    List<XmlResource> bindingFileResources = new LinkedList<>();
     for (IFile bindingFile : bindingFiles) {
       XmlResource xmlResource = new XmlResource(bundle);
       xmlResource.setFile(bindingFile);
@@ -1132,7 +1132,7 @@ public final class JaxWsSdkUtility {
 
     // update Java class path in .classpath file
     try {
-      List<IClasspathEntry> cpeList = new ArrayList<IClasspathEntry>();
+      List<IClasspathEntry> cpeList = new ArrayList<>();
       for (IClasspathEntry cpe : javaProject.getRawClasspath()) {
         if (cpe.getEntryKind() == IClasspathEntry.CPE_LIBRARY) {
           if (!cpe.getPath().equals(project.getFullPath().append(jarFilePath))) {
@@ -1291,7 +1291,7 @@ public final class JaxWsSdkUtility {
   }
 
   private static <T> void removeDuplicateEntries(List<T> list) {
-    Set<T> elementsVisited = new HashSet<T>();
+    Set<T> elementsVisited = new HashSet<>();
     Iterator<T> iterator = list.iterator();
     while (iterator.hasNext()) {
       T element = iterator.next();

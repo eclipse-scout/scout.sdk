@@ -45,7 +45,7 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    List<IFile> productFiles = new ArrayList<IFile>(2);
+    List<IFile> productFiles = new ArrayList<>(2);
 
     if (m_serverDevProdFile != null) {
       // Jetty update for DEV product

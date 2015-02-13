@@ -40,8 +40,8 @@ public class ResourceProposalModel extends LabelProvider implements IContentProp
   private IResourceFilter m_filter;
 
   public ResourceProposalModel() {
-    m_proposalSorting = new TreeSet<String>();
-    m_proposals = new HashMap<String, P_ResourceProposal>();
+    m_proposalSorting = new TreeSet<>();
+    m_proposals = new HashMap<>();
     m_filter = null;
   }
 
@@ -58,7 +58,7 @@ public class ResourceProposalModel extends LabelProvider implements IContentProp
     m_proposalSorting.clear();
     for (IProject project : m_projects) {
       try {
-        List<P_ResourceProposal> proposals = new ArrayList<P_ResourceProposal>();
+        List<P_ResourceProposal> proposals = new ArrayList<>();
         getResources(project, proposals);
         for (P_ResourceProposal prop : proposals) {
           m_proposals.put(prop.getContent(), prop);
@@ -109,7 +109,7 @@ public class ResourceProposalModel extends LabelProvider implements IContentProp
 
   @Override
   public IContentProposal[] getProposals(String contents, int position) {
-    ArrayList<P_ResourceProposal> list = new ArrayList<P_ResourceProposal>();
+    ArrayList<P_ResourceProposal> list = new ArrayList<>();
     for (String proptext : m_proposalSorting) {
       if (proptext.startsWith(contents)) {
         list.add(m_proposals.get(proptext));

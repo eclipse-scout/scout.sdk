@@ -56,7 +56,7 @@ public final class TypeCache implements ITypeCache {
   }
 
   private TypeCache() {
-    m_cache = new HashMap<String, TreeSet<IType>>();
+    m_cache = new HashMap<>();
     m_resourceChangeListener = new P_ResourceListener();
     ResourcesPlugin.getWorkspace().addResourceChangeListener(m_resourceChangeListener);
   }
@@ -72,7 +72,7 @@ public final class TypeCache implements ITypeCache {
   }
 
   public synchronized Set<IType> getAllCachedTypes() {
-    Set<IType> types = new HashSet<IType>();
+    Set<IType> types = new HashSet<>();
     for (Set<IType> lists : m_cache.values()) {
       types.addAll(lists);
     }
@@ -92,9 +92,9 @@ public final class TypeCache implements ITypeCache {
   public Set<IType> getTypes(String typeName) {
     TreeSet<IType> types = getTypesInternal(typeName);
     if (types == null) {
-      return new TreeSet<IType>();
+      return new TreeSet<>();
     }
-    return new TreeSet<IType>(types);
+    return new TreeSet<>(types);
   }
 
   private TreeSet<IType> getTypesInternal(String typeName) {
@@ -145,7 +145,7 @@ public final class TypeCache implements ITypeCache {
   private TreeSet<IType> resolveType(final String fqn) throws CoreException {
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
     String fastPat = Signature.getSimpleName(fqn);
-    final TreeSet<IType> matchList = new TreeSet<IType>(COMPARATOR);
+    final TreeSet<IType> matchList = new TreeSet<>(COMPARATOR);
     new SearchEngine().search(
         SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH),
         new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},

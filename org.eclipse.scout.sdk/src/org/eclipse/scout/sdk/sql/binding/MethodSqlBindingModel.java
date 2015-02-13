@@ -27,7 +27,7 @@ public class MethodSqlBindingModel {
 
   public MethodSqlBindingModel(IMethod method) {
     m_method = method;
-    m_statements = new ArrayList<SQLStatement>();
+    m_statements = new ArrayList<>();
   }
 
   /**
@@ -64,7 +64,7 @@ public class MethodSqlBindingModel {
     public SQLStatement(int offset, int length) {
       m_offset = offset;
       m_length = length;
-      m_markers = new HashMap<String, Marker>();
+      m_markers = new HashMap<>();
     }
 
     MethodSqlBindingModel getModel() {

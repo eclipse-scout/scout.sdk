@@ -42,7 +42,7 @@ public class FormFieldApiTest extends AbstractApiTest {
     IFieldFilter labelPositionFIlter = FieldFilters.getCompositeFilter(FieldFilters.getFlagsFilter(Flags.AccFinal | Flags.AccStatic),
         FieldFilters.getNameRegexFilter(Pattern.compile("^LABEL\\_POSITION.*$")));
     Set<IField> fields = TypeUtility.getFields(type, labelPositionFIlter);
-    HashMap<String, IField> fieldMap = new HashMap<String, IField>();
+    HashMap<String, IField> fieldMap = new HashMap<>();
     for (IField f : fields) {
       fieldMap.put(f.getElementName(), f);
     }

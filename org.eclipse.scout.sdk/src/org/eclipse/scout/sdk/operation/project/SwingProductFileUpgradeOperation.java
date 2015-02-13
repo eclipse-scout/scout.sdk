@@ -39,7 +39,7 @@ public class SwingProductFileUpgradeOperation extends AbstractScoutProjectNewOpe
 
   @Override
   public void init() {
-    ArrayList<IFile> productFiles = new ArrayList<IFile>(2);
+    ArrayList<IFile> productFiles = new ArrayList<>(2);
     IFile f = getProperties().getProperty(CreateUiSwingPluginOperation.PROP_PRODUCT_FILE_DEV, IFile.class);
     if (f != null) {
       productFiles.add(f);

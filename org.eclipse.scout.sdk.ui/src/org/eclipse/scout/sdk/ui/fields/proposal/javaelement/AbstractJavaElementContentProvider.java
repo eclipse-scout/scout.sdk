@@ -62,7 +62,7 @@ public abstract class AbstractJavaElementContentProvider extends ContentProposal
       searchPattern = "*";
     }
     NormalizedPattern pattern = createNormalizedSearchPattern(searchPattern);
-    ArrayList<Object> result = new ArrayList<Object>();
+    ArrayList<Object> result = new ArrayList<>();
     // avoid checking for every single entry instanceof ISearchRangeConsumer
     ISearchRangeConsumer searchRangeSupport = null;
     if (getLabelProvider() instanceof ISearchRangeConsumer) {
@@ -84,10 +84,10 @@ public abstract class AbstractJavaElementContentProvider extends ContentProposal
 
   protected List<Object> getProposals(NormalizedPattern pattern, Object[] proposals, ISearchRangeConsumer searchRangeSupport, IProgressMonitor monitor) {
     if (proposals == null) {
-      return new ArrayList<Object>(0);
+      return new ArrayList<>(0);
     }
 
-    List<Object> result = new ArrayList<Object>(proposals.length);
+    List<Object> result = new ArrayList<>(proposals.length);
     for (Object proposal : proposals) {
       int[] matchingRegions = getMatchingRegions(proposal, getLabelProvider().getText(proposal), pattern, searchRangeSupport.isFormatConcatString());
       if (matchingRegions != null) {

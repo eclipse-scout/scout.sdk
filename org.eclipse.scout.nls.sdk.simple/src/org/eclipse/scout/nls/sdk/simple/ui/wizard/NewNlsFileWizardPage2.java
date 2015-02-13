@@ -157,7 +157,7 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
     NlsUi.decorate(m_package, false);
     m_fieldValidator.addField(m_package);
 
-    m_className = new TextField<String>(group);
+    m_className = new TextField<>(group);
     m_fieldValidator.addField(m_className);
     m_className.setLabelText("Class Name");
     m_className.addInputChangedListener(new IInputChangedListener<String>() {
@@ -190,7 +190,7 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
     Group group = new Group(parent, SWT.NONE);
     group.setText("Translation File(s)");
     ResourceProposalModel model = new ResourceProposalModel();
-    List<IProject> projectList = new ArrayList<IProject>();
+    List<IProject> projectList = new ArrayList<>();
     if (m_desc.getPlugin() != null) {
       try {
         projectList = NlsSdkSimple.getProjectGroup(m_desc.getPlugin());
@@ -240,7 +240,7 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
     });
     NlsUi.decorate(m_translationFolderField, false);
 
-    m_translationFileName = new TextField<String>(group, TextField.VALIDATE_ON_MODIFY);
+    m_translationFileName = new TextField<>(group, TextField.VALIDATE_ON_MODIFY);
     m_fieldValidator.addField(m_translationFileName);
     m_translationFileName.setLabelText("Translation File Prefix");
     m_translationFileName.setToolTipText("e.g. messages for messages[_language].properties");
@@ -276,7 +276,7 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
     dialog.addViewerFilter(new ViewerFilter() {
       @Override
       public Object[] filter(Viewer viewer, Object parent, Object[] elements) {
-        List<Object> elList = new LinkedList<Object>();
+        List<Object> elList = new LinkedList<>();
         for (Object e : elements) {
           if (e instanceof IContainer) {
             if (parent instanceof IProject) {
@@ -474,7 +474,7 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
   }
 
   private final class P_RootContainerModifyListener implements ModifyListener {
-    private HashMap<String, IClasspathEntry> m_map = new HashMap<String, IClasspathEntry>();
+    private HashMap<String, IClasspathEntry> m_map = new HashMap<>();
 
     private P_RootContainerModifyListener() {
 

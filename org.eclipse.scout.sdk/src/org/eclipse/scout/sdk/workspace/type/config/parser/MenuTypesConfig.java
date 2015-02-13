@@ -43,7 +43,7 @@ public class MenuTypesConfig implements Cloneable {
   public void add(IType menuType, String val) {
     Set<String> set = m_activeMenuTypes.get(menuType);
     if (set == null) {
-      set = new TreeSet<String>();
+      set = new TreeSet<>();
       m_activeMenuTypes.put(menuType, set);
     }
     set.add(val);
@@ -59,17 +59,17 @@ public class MenuTypesConfig implements Cloneable {
   public Set<String> getValuesFor(IType menuType) {
     Set<String> set = m_activeMenuTypes.get(menuType);
     if (set != null) {
-      return new TreeSet<String>(set);
+      return new TreeSet<>(set);
     }
     else {
-      return new TreeSet<String>();
+      return new TreeSet<>();
     }
   }
 
   public Map<IType, Set<String>> getAll() {
-    Map<IType, Set<String>> ret = new HashMap<IType, Set<String>>(m_activeMenuTypes.size());
+    Map<IType, Set<String>> ret = new HashMap<>(m_activeMenuTypes.size());
     for (Entry<IType, Set<String>> entry : m_activeMenuTypes.entrySet()) {
-      ret.put(entry.getKey(), new TreeSet<String>(entry.getValue()));
+      ret.put(entry.getKey(), new TreeSet<>(entry.getValue()));
     }
     return ret;
   }

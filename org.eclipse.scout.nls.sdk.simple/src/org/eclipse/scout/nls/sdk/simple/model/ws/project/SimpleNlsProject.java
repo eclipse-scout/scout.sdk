@@ -81,7 +81,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
 
   private List<ITranslationResource> loadTranslationFilesWorkspace(NlsType nlsType) throws CoreException {
     // try to find all translation files
-    List<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
+    List<ITranslationResource> translationFiles = new ArrayList<>();
     if (nlsType != null && TypeUtility.exists(nlsType.getType()) && nlsType.getTranslationsFolderName() != null && nlsType.getTranslationsPrefix() != null) {
       Path translationPath = new Path(nlsType.getTranslationsFolderName());
       for (IFile file : NlsSdkSimple.getAllTranslations(nlsType.getJavaProject().getProject(), translationPath, nlsType.getTranslationsPrefix())) {
@@ -98,7 +98,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
   }
 
   private List<ITranslationResource> loadTranslationFilesFromPlatform(NlsType nlsType, IPackageFragmentRoot r) throws CoreException {
-    List<ITranslationResource> translationFiles = new ArrayList<ITranslationResource>();
+    List<ITranslationResource> translationFiles = new ArrayList<>();
     char delim = '.';
     String path = nlsType.getTranslationsFolderName().replace(NlsType.FOLDER_SEGMENT_SEPARATOR, delim);
     String d = "" + delim;

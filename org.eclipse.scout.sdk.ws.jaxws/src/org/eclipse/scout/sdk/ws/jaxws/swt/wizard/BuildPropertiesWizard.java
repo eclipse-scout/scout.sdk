@@ -60,7 +60,7 @@ public class BuildPropertiesWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    Map<String, List<String>> propertyMap = new HashMap<String, List<String>>();
+    Map<String, List<String>> propertyMap = new HashMap<>();
     for (BuildProperty property : m_properties) {
       if (!propertyMap.containsKey(property.getName())) {
         propertyMap.put(property.getName(), new LinkedList<String>());
@@ -79,7 +79,7 @@ public class BuildPropertiesWizard extends AbstractWorkspaceWizard {
   }
 
   private List<BuildProperty> loadProperties(BuildJaxWsBean buildJaxWsBean) {
-    List<BuildProperty> properties = new LinkedList<BuildProperty>();
+    List<BuildProperty> properties = new LinkedList<>();
 
     for (Entry<String, List<String>> entry : buildJaxWsBean.getPropertiers().entrySet()) {
       String name = entry.getKey();

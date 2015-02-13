@@ -59,7 +59,7 @@ public class ClientBundleUpdateFormDataOperation implements IOperation {
     }
 
     // collect types
-    final Set<IType> types = new HashSet<IType>();
+    final Set<IType> types = new HashSet<>();
 
     // forms
     IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);

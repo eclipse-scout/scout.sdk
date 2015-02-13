@@ -50,7 +50,7 @@ public class AuthenticationHandlerNodePage extends AbstractPage implements IType
       setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsSdk.AuthenticationHandler));
     }
 
-    m_pageLoadedListeners = new HashSet<IPageLoadedListener>();
+    m_pageLoadedListeners = new HashSet<>();
     m_pageLoadedListenerLock = new Object();
 
     m_handlerChangedListener = new P_TypeChangeListener();

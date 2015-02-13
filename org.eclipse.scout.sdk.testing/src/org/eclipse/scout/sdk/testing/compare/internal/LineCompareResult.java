@@ -27,7 +27,7 @@ public class LineCompareResult implements ICompareResult<String> {
   private List<ICompareResult.IDifference<String>> m_differences;
 
   public LineCompareResult() {
-    m_differences = new ArrayList<ICompareResult.IDifference<String>>();
+    m_differences = new ArrayList<>();
   }
 
   public void addDifference(IDifference<String> diff) {

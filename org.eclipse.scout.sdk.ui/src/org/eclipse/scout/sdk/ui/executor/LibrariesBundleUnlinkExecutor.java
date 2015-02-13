@@ -38,7 +38,7 @@ public class LibrariesBundleUnlinkExecutor extends AbstractExecutor {
 
   @Override
   public boolean canRun(IStructuredSelection selection) {
-    m_toUnlink = new HashMap<IScoutBundle, List<IPluginModelBase>>(selection.size());
+    m_toUnlink = new HashMap<>(selection.size());
     Iterator it = selection.iterator();
     while (it.hasNext()) {
       Object o = it.next();
@@ -48,7 +48,7 @@ public class LibrariesBundleUnlinkExecutor extends AbstractExecutor {
         if (!scoutBundle.isBinary()) {
           List<IPluginModelBase> list = m_toUnlink.get(scoutBundle);
           if (list == null) {
-            list = new LinkedList<IPluginModelBase>();
+            list = new LinkedList<>();
             m_toUnlink.put(scoutBundle, list);
           }
           list.add(lnp.getPluginModel());

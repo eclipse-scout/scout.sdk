@@ -34,7 +34,7 @@ public class FileOpenLink extends AbstractLink {
 
   private final IFile m_file;
   private final String m_editorId;
-  private ArrayList<Resource> m_allocatedResources = new ArrayList<Resource>();
+  private ArrayList<Resource> m_allocatedResources = new ArrayList<>();
 
   public FileOpenLink(IFile file, int order) {
     this(file, order, null);

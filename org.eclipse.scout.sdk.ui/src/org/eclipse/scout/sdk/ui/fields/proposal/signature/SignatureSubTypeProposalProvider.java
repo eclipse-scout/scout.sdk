@@ -52,7 +52,7 @@ public class SignatureSubTypeProposalProvider extends SignatureProposalProvider 
       return super.collectTypes(searchPattern, maxResultSize, monitor);
     }
 
-    TreeSet<Object> signatures = new TreeSet<Object>();
+    TreeSet<Object> signatures = new TreeSet<>();
     if (TypeUtility.exists(getBaseType())) {
       boolean isFormatConcatString = false;
       if (getLabelProvider() instanceof ISearchRangeConsumer) {

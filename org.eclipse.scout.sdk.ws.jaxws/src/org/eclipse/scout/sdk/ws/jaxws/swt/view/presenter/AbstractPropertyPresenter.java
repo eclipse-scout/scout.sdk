@@ -89,7 +89,7 @@ public abstract class AbstractPropertyPresenter<T> extends AbstractPresenter {
   public AbstractPropertyPresenter(Composite parent, PropertyViewFormToolkit toolkit, int labelWidth, boolean initialize) {
     super(toolkit, parent);
     m_labelWidth = labelWidth;
-    m_valueChangedListeners = new LinkedList<IPresenterValueChangedListener>();
+    m_valueChangedListeners = new LinkedList<>();
     m_resetTooltip = Texts.get("Remove");
     if (initialize) {
       callInitializer();
@@ -404,7 +404,7 @@ public abstract class AbstractPropertyPresenter<T> extends AbstractPresenter {
     String info = null;
     int severity = IMarker.SEVERITY_INFO;
 
-    List<SeverityEntry> statusList = new ArrayList<SeverityEntry>();
+    List<SeverityEntry> statusList = new ArrayList<>();
     statusList.add(new SeverityEntry(NumberUtility.nvl(m_customSeverity, IMarker.SEVERITY_INFO), m_customInfo));
 
     // marker status

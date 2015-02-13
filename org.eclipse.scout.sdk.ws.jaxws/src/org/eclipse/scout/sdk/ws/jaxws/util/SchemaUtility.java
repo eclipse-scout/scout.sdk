@@ -54,10 +54,10 @@ public final class SchemaUtility {
     }
 
     // root WSDL file
-    WsdlArtifact<T> rootWsdlArtifact = new WsdlArtifact<T>(wsdlFileHandle, TypeEnum.ROOT_WSDL, wsdlDefinition);
+    WsdlArtifact<T> rootWsdlArtifact = new WsdlArtifact<>(wsdlFileHandle, TypeEnum.ROOT_WSDL, wsdlDefinition);
     visitor.onRootWsdlArtifact(rootWsdlArtifact);
 
-    Set<WsdlArtifact<T>> wsdlArtifacts = new HashSet<WsdlArtifact<T>>();
+    Set<WsdlArtifact<T>> wsdlArtifacts = new HashSet<>();
     wsdlArtifacts.add(rootWsdlArtifact);
 
     // referenced WSDL files
@@ -76,7 +76,7 @@ public final class SchemaUtility {
 
       Types types = wsdlArtifact.getWsdlDefinition().getTypes();
       if (types != null) {
-        Set<Schema> inlineSchemas = new HashSet<Schema>();
+        Set<Schema> inlineSchemas = new HashSet<>();
         for (Object type : types.getExtensibilityElements()) {
           if (type instanceof Schema) {
             Schema schema = (Schema) type;
@@ -108,7 +108,7 @@ public final class SchemaUtility {
 
     IFileHandle<T> folder = parentWsdlFileHandle.getParent();
 
-    Set<WsdlArtifact<T>> wsdlArtifacts = new HashSet<WsdlArtifact<T>>();
+    Set<WsdlArtifact<T>> wsdlArtifacts = new HashSet<>();
     Map<?, ?> importMap = parentWsdlDefinition.getImports();
 
     for (Object importValue : importMap.values()) {
@@ -122,7 +122,7 @@ public final class SchemaUtility {
             IFileHandle<T> wsdlFileHandle = folder.getChild(new Path(importDirective.getLocationURI()));
 
             if (wsdlFileHandle != null) {
-              wsdlArtifacts.add(new WsdlArtifact<T>(wsdlFileHandle, TypeEnum.REFERENCED_WSDL, wsdlDefinition));
+              wsdlArtifacts.add(new WsdlArtifact<>(wsdlFileHandle, TypeEnum.REFERENCED_WSDL, wsdlDefinition));
 
               // recursion
               wsdlArtifacts.addAll(getReferencedWsdlResourcesRec(wsdlFileHandle, wsdlDefinition));
@@ -157,7 +157,7 @@ public final class SchemaUtility {
         IFileHandle<T> referencedSchemaResource = parentResouce.getChild(new Path(schemaLocationURI));
         if (referencedSchemaResource != null) {
           Schema referencedSchema = schemaInclude.getReferencedSchema();
-          SchemaIncludeArtifact<T> artifact = new SchemaIncludeArtifact<T>(referencedSchemaResource, referencedSchema);
+          SchemaIncludeArtifact<T> artifact = new SchemaIncludeArtifact<>(referencedSchemaResource, referencedSchema);
           visitor.onSchemaIncludeArtifact(artifact);
 
           // recursion
@@ -186,7 +186,7 @@ public final class SchemaUtility {
           IFileHandle<T> referencedSchemaResource = parentResouce.getChild(new Path(schemaLocationURI));
           if (referencedSchemaResource != null) {
             Schema referencedSchema = schemaImport.getReferencedSchema();
-            SchemaImportArtifact<T> artifact = new SchemaImportArtifact<T>(referencedSchemaResource, referencedSchema, schemaImport.getNamespaceURI());
+            SchemaImportArtifact<T> artifact = new SchemaImportArtifact<>(referencedSchemaResource, referencedSchema, schemaImport.getNamespaceURI());
             visitor.onSchemaImportArtifact(artifact);
 
             // recursion

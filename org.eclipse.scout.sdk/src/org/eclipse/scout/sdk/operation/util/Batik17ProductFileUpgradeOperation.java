@@ -30,7 +30,7 @@ public class Batik17ProductFileUpgradeOperation implements IOperation {
   private final ArrayList<IFile> m_prodFiles;
 
   public Batik17ProductFileUpgradeOperation() {
-    m_prodFiles = new ArrayList<IFile>(2);
+    m_prodFiles = new ArrayList<>(2);
   }
 
   public void addProductFile(IFile f) {

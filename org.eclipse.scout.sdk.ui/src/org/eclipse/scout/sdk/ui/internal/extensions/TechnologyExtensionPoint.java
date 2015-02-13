@@ -44,7 +44,7 @@ public final class TechnologyExtensionPoint {
   }
 
   private static Map<String /* tech id */, ArrayList<IScoutTechnologyHandler>> getHandlers() {
-    HashMap<String, ArrayList<IScoutTechnologyHandler>> techHandlers = new HashMap<String, ArrayList<IScoutTechnologyHandler>>();
+    HashMap<String, ArrayList<IScoutTechnologyHandler>> techHandlers = new HashMap<>();
     IExtensionRegistry reg = Platform.getExtensionRegistry();
     IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_ID);
     IExtension[] extensions = xp.getExtensions();
@@ -56,7 +56,7 @@ public final class TechnologyExtensionPoint {
             String techId = element.getAttribute(ATTR_TECH);
             ArrayList<IScoutTechnologyHandler> handlers = techHandlers.get(techId);
             if (handlers == null) {
-              handlers = new ArrayList<IScoutTechnologyHandler>();
+              handlers = new ArrayList<>();
               techHandlers.put(techId, handlers);
             }
             IScoutTechnologyHandler handler = (IScoutTechnologyHandler) element.createExecutableExtension(ATTR_CLASS);
@@ -76,7 +76,7 @@ public final class TechnologyExtensionPoint {
       synchronized (LOCK) {
         if (technologies == null) {
           Map<String, ArrayList<IScoutTechnologyHandler>> handlers = getHandlers();
-          HashSet<Technology> techs = new HashSet<Technology>();
+          HashSet<Technology> techs = new HashSet<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_ID);
           IExtension[] extensions = xp.getExtensions();

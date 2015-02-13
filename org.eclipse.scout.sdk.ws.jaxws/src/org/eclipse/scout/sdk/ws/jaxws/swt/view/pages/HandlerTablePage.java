@@ -48,7 +48,7 @@ public class HandlerTablePage extends AbstractPage {
     setName(Texts.get("Handlers"));
     setImageDescriptor(JaxWsSdk.getImageDescriptor(JaxWsIcons.HandlerFolder));
     m_hierarchyChangedListener = new P_TypeHierarchyChangedListener();
-    m_handlerHierarchyMap = new HashMap<ICachedTypeHierarchy, IType>();
+    m_handlerHierarchyMap = new HashMap<>();
 
     for (IType type : TypeUtility.getTypes(Handler.class.getName())) {
       ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(type);
@@ -93,7 +93,7 @@ public class HandlerTablePage extends AbstractPage {
 
   @Override
   protected void loadChildrenImpl() {
-    List<IType> types = new ArrayList<IType>();
+    List<IType> types = new ArrayList<>();
 
     ITypeFilter filter = new ITypeFilter() {
       @Override

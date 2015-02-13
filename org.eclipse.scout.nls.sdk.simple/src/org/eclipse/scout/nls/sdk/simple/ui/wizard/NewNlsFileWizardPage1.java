@@ -14,7 +14,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -103,7 +102,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
         }
       }
     });
-    m_fileName = new TextField<String>(m_rootPane, TextField.VALIDATE_ON_MODIFY);
+    m_fileName = new TextField<>(m_rootPane, TextField.VALIDATE_ON_MODIFY);
     m_fieldValidator.addField(m_fileName);
     m_fileName.setLabelText("File Name");
     m_fileName.addInputChangedListener(new IInputChangedListener<String>() {
@@ -313,7 +312,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
 
     @Override
     public List<Object> getProposals(String pattern) {
-      List<IFile> files = new LinkedList<IFile>();
+      List<Object> files = new ArrayList<>();
       Assert.isTrue(m_desc.getParentPlugin() != null);
 
       IResource r = m_desc.getParentPlugin().getUnderlyingResource();
@@ -323,7 +322,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
           IJavaProject jp = JavaCore.create(project);
           for (Object o : jp.getNonJavaResources()) {
             if (o instanceof IFile && "nls".equalsIgnoreCase(((IFile) o).getFileExtension())) {
-              files.add((IFile) o);
+              files.add(o);
             }
           }
         }
@@ -331,7 +330,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
           NlsCore.logWarning(e);
         }
       }
-      return new ArrayList<Object>(files);
+      return files;
     }
 
     @Override
@@ -342,7 +341,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
   } // end class P_NlsFileSmartFieldModel
 
   private class P_PluginModifyListener implements ModifyListener {
-    private final Map<String, IProject> m_projects = new HashMap<String, IProject>();
+    private final Map<String, IProject> m_projects = new HashMap<>();
 
     P_PluginModifyListener() {
       // find all plugin projects in workspace
@@ -377,7 +376,7 @@ public class NewNlsFileWizardPage1 extends NewTypeWizardPage {
   } // end class P_PluginModifyListener
 
   private class P_ParentPluginModifyListener implements ModifyListener {
-    private final Map<String, IPluginModelBase> m_projects = new HashMap<String, IPluginModelBase>();
+    private final Map<String, IPluginModelBase> m_projects = new HashMap<>();
 
     P_ParentPluginModifyListener() {
       setPlugin(m_desc.getPlugin());

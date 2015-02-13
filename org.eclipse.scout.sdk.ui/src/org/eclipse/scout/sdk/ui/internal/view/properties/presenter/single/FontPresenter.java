@@ -171,7 +171,7 @@ public class FontPresenter extends AbstractValuePresenter<FontSpec> {
   @Override
   protected synchronized void storeValue(FontSpec value) throws CoreException {
     try {
-      ConfigPropertyUpdateOperation<FontSpec> updateOp = new ConfigPropertyUpdateOperation<FontSpec>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<FontSpec> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

@@ -51,7 +51,7 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
   private Hyperlink m_labelLink;
   private Composite m_body;
   private MethodErrorPresenterContent m_errorContent;
-  private final Map<String, MethodBean<T>> m_methodSources = new HashMap<String, MethodBean<T>>();
+  private final Map<String, MethodBean<T>> m_methodSources = new HashMap<>();
 
   public AbstractMultiMethodPresenter(PropertyViewFormToolkit toolkit, Composite parent) {
     super(toolkit, parent);
@@ -79,7 +79,7 @@ public abstract class AbstractMultiMethodPresenter<T> extends AbstractPresenter 
 
         MethodBean<T> methodBean = m_methodSources.get(key);
         if (methodBean == null) {
-          methodBean = new MethodBean<T>(method, key);
+          methodBean = new MethodBean<>(method, key);
           m_methodSources.put(key, methodBean);
         }
         else {

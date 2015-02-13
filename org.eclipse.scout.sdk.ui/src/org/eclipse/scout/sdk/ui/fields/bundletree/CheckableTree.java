@@ -234,7 +234,7 @@ public class CheckableTree extends Composite {
   }
 
   public Set<ITreeNode> getCheckedNodes() {
-    return new HashSet<ITreeNode>(m_checkedNodes);
+    return new HashSet<>(m_checkedNodes);
   }
 
   protected void invertCheckStateFromUi(ITreeNode node) {
@@ -243,7 +243,7 @@ public class CheckableTree extends Composite {
 
   public void setChecked(Set<ITreeNode> nodes) {
     List<ITreeNode> nodesToCheck = CollectionUtility.arrayList(nodes);
-    List<ITreeNode> checkedNodes = new LinkedList<ITreeNode>(m_checkedNodes);
+    List<ITreeNode> checkedNodes = new LinkedList<>(m_checkedNodes);
 
     // remove already checked
     for (Iterator<ITreeNode> it = checkedNodes.iterator(); it.hasNext();) {

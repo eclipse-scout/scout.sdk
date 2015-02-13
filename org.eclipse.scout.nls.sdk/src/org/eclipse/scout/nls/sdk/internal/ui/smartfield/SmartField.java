@@ -49,7 +49,7 @@ public class SmartField extends Composite {
   private Font m_font;
   private Image m_smartImage;
   private final int m_labelColWidth;
-  private List<ISmartFieldListener> m_smartFieldListenerList = new LinkedList<ISmartFieldListener>();
+  private List<ISmartFieldListener> m_smartFieldListenerList = new LinkedList<>();
 
   public SmartField(Composite parent, int style) {
     this(parent, style, 40);
@@ -169,7 +169,7 @@ public class SmartField extends Composite {
   }
 
   private void fireInputChanged(Object item) {
-    List<ISmartFieldListener> list = new ArrayList<ISmartFieldListener>(m_smartFieldListenerList);
+    List<ISmartFieldListener> list = new ArrayList<>(m_smartFieldListenerList);
     for (ISmartFieldListener listener : list) {
       listener.itemSelected(item);
     }

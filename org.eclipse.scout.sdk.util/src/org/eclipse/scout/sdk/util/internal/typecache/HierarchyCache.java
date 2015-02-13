@@ -43,7 +43,7 @@ public final class HierarchyCache implements IHierarchyCache {
   }
 
   private HierarchyCache() {
-    m_cachedHierarchyResults = new HashMap<Object, ICacheableTypeHierarchyResult>();
+    m_cachedHierarchyResults = new HashMap<>();
   }
 
   @Override

@@ -47,7 +47,7 @@ public class ImportValidator implements IImportValidator {
     else {
       m_initialImports = Collections.unmodifiableMap(initialImports);
     }
-    m_newImports = new HashMap<String, String>();
+    m_newImports = new HashMap<>();
     m_packageName = packageName;
   }
 
@@ -78,7 +78,7 @@ public class ImportValidator implements IImportValidator {
   }
 
   protected static Map<String, String> getUsedImportsFromIcu(ICompilationUnit icu) {
-    Map<String, String> usedImps = new HashMap<String, String>();
+    Map<String, String> usedImps = new HashMap<>();
     collectExistingImportsFromIcu(icu, usedImps);
     collectTypesInPackage(TypeUtility.getPackage(icu), usedImps);
     return usedImps;
@@ -88,7 +88,7 @@ public class ImportValidator implements IImportValidator {
     try {
       IImportDeclaration[] imports = icu.getImports();
       if (imports.length > 0) {
-        Map<String, String> importsFromIcu = new HashMap<String, String>(imports.length);
+        Map<String, String> importsFromIcu = new HashMap<>(imports.length);
         for (IImportDeclaration imp : imports) {
           String fqImp = imp.getElementName();
           String packageName = Signature.getQualifier(fqImp);
@@ -180,7 +180,7 @@ public class ImportValidator implements IImportValidator {
 
   @Override
   public Set<String> getImportsToCreate() {
-    TreeSet<String> importsToCreate = new TreeSet<String>();
+    TreeSet<String> importsToCreate = new TreeSet<>();
     for (Entry<String, String> e : m_newImports.entrySet()) {
       String pck = e.getValue();
       String simpleName = e.getKey();

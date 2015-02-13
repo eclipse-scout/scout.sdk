@@ -67,7 +67,7 @@ public class LibraryBundleLinkExecutor extends AbstractExecutor {
         dialog.create();
         if (dialog.open() == Window.OK) {
           Object[] result = dialog.getResult();
-          Set<IPluginModelBase> libraries = new HashSet<IPluginModelBase>(result.length);
+          Set<IPluginModelBase> libraries = new HashSet<>(result.length);
           for (Object o : result) {
             if (o instanceof IPluginModelBase) {
               libraries.add((IPluginModelBase) o);
@@ -88,14 +88,14 @@ public class LibraryBundleLinkExecutor extends AbstractExecutor {
   }
 
   protected IPluginModelBase[] getPotentialLibraryBundles(IScoutBundle b) {
-    Set<String> alreadyLinkedLibraries = new HashSet<String>();
+    Set<String> alreadyLinkedLibraries = new HashSet<>();
     PluginModelHelper helper = new PluginModelHelper(b.getProject());
     for (IPluginImport imp : helper.Manifest.getAllDependencies()) {
       alreadyLinkedLibraries.add(imp.getId());
     }
 
     IPluginModelBase[] workspaceModels = PluginRegistry.getWorkspaceModels();
-    List<IPluginModelBase> plugins = new ArrayList<IPluginModelBase>(workspaceModels.length);
+    List<IPluginModelBase> plugins = new ArrayList<>(workspaceModels.length);
     for (IPluginModelBase bundle : workspaceModels) {
       if (bundle instanceof IPluginModel) {
         IResource underlyingResource = bundle.getUnderlyingResource();

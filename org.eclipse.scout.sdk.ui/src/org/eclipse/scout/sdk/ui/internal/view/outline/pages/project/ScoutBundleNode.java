@@ -38,7 +38,7 @@ public class ScoutBundleNode {
   public ScoutBundleNode(IScoutBundle bundle, ScoutBundleUiExtension uiExtension) {
     m_scoutBundle = bundle;
     m_symbolicName = bundle.getSymbolicName();
-    m_childNodes = new HashSet<ScoutBundleNode>();
+    m_childNodes = new HashSet<>();
     m_uiExtension = uiExtension;
     if (!ScoutExplorerSettingsSupport.BundlePresentation.FLAT.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
       for (IScoutBundle child : bundle.getDirectChildBundles()) {

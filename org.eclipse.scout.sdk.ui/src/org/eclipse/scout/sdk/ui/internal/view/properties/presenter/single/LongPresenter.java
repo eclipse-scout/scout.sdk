@@ -73,7 +73,7 @@ public class LongPresenter extends AbstractValuePresenter<Long> {
   @Override
   protected synchronized void storeValue(Long value) throws CoreException {
     try {
-      ConfigPropertyUpdateOperation<Long> updateOp = new ConfigPropertyUpdateOperation<Long>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<Long> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

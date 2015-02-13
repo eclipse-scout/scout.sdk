@@ -40,12 +40,12 @@ public class TargetPackagePreferenceScrolledContent implements IScoutProjectScro
   private SimpleScrolledComposite m_scrollArea;
 
   public TargetPackagePreferenceScrolledContent() {
-    m_allEntityTextFields = new ArrayList<EntityTextField>();
+    m_allEntityTextFields = new ArrayList<>();
   }
 
   @Override
   public void loadModel(List<TargetPackageModel> entries, IModelLoadProgressObserver<TargetPackageModel> observer, IProgressMonitor monitor) {
-    m_entries = new ArrayList<TargetPackageModel>(entries);
+    m_entries = new ArrayList<>(entries);
     for (TargetPackageModel model : m_entries) {
       model.load();
       if (observer != null) {
@@ -76,7 +76,7 @@ public class TargetPackagePreferenceScrolledContent implements IScoutProjectScro
 
   @Override
   public void save() {
-    final HashSet<IScoutBundle> modifiedProjects = new HashSet<IScoutBundle>(1);
+    final HashSet<IScoutBundle> modifiedProjects = new HashSet<>(1);
     visitTextfields(new IPackageTextFieldVisitor() {
       @Override
       public void visit(EntityTextField txt, TargetPackageModel model) {

@@ -81,8 +81,8 @@ public class FormStackNewOperation extends FormNewOperation {
 
   public FormStackNewOperation(String formName, String formPackageName, IJavaProject formProject) throws JavaModelException {
     super(formName, formPackageName, formProject);
-    m_serviceRegistrationDescriptions = new ArrayList<ServiceRegistrationDescription>();
-    m_serviceProxyRegistrationProjects = new ArrayList<IJavaProject>();
+    m_serviceRegistrationDescriptions = new ArrayList<>();
+    m_serviceProxyRegistrationProjects = new ArrayList<>();
   }
 
   @Override

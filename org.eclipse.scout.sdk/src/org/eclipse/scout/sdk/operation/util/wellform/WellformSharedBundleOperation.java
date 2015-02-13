@@ -54,7 +54,7 @@ public class WellformSharedBundleOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    HashSet<IType> allTypes = new HashSet<IType>();
+    HashSet<IType> allTypes = new HashSet<>();
     IPackageFragmentRoot[] packageFragmentRoots = getBundle().getJavaProject().getPackageFragmentRoots();
     for (IPackageFragmentRoot pr : packageFragmentRoots) {
       if (!pr.isReadOnly()) {

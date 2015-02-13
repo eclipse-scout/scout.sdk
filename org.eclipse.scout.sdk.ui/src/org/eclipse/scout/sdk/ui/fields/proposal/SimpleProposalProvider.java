@@ -40,7 +40,7 @@ public class SimpleProposalProvider extends ContentProposalProvider {
       searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("").toLowerCase().trim() + "*";
     }
 
-    ArrayList<Object> props = new ArrayList<Object>();
+    ArrayList<Object> props = new ArrayList<>();
     for (SimpleProposal prop : getProposals()) {
       String text = prop.getText();
       if (text != null) {

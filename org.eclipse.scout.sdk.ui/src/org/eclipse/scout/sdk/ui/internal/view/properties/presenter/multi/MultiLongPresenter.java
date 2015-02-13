@@ -93,10 +93,10 @@ public class MultiLongPresenter extends AbstractMultiValuePresenter<Long> {
 
   @Override
   protected synchronized void storeMethods(Collection<MethodBean<Long>> beans, Long value) {
-    ArrayList<IOperation> list = new ArrayList<IOperation>(beans.size());
+    ArrayList<IOperation> list = new ArrayList<>(beans.size());
     for (MethodBean<Long> bean : beans) {
       ConfigurationMethod method = bean.getMethod();
-      ConfigPropertyUpdateOperation<Long> updateOp = new ConfigPropertyUpdateOperation<Long>(method, new LongPropertySourceParser());
+      ConfigPropertyUpdateOperation<Long> updateOp = new ConfigPropertyUpdateOperation<>(method, new LongPropertySourceParser());
       updateOp.setValue(value);
       list.add(updateOp);
     }

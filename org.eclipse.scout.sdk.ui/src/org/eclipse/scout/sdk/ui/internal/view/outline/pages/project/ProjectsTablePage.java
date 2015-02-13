@@ -143,7 +143,7 @@ public class ProjectsTablePage extends AbstractPage {
       uiModel.build();
       if (ScoutExplorerSettingsSupport.BundlePresentation.FLAT_GROUPS.equals(ScoutExplorerSettingsSupport.get().getBundlePresentation())) {
         // flat grouped
-        HashSet<ScoutBundleNodeGroup> collector = new HashSet<ScoutBundleNodeGroup>();
+        HashSet<ScoutBundleNodeGroup> collector = new HashSet<>();
         collectAllBundleGroupsRec(collector, uiModel.getRoots());
         for (ScoutBundleNodeGroup g : collector) {
           new BundleNodeGroupTablePage(this, g);

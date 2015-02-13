@@ -41,7 +41,7 @@ public class ConfigurationMethod {
   private String m_source;
 
   public ConfigurationMethod(IType type, ITypeHierarchy superTypeHierarchy, String methodName, int methodType) {
-    m_methodStack = new LinkedList<IMethod>();
+    m_methodStack = new LinkedList<>();
     m_type = type;
     m_superTypeHierarchy = superTypeHierarchy;
     m_methodName = methodName;
@@ -61,7 +61,7 @@ public class ConfigurationMethod {
   }
 
   public Deque<IMethod> getMethodStack() {
-    return new LinkedList<IMethod>(m_methodStack);
+    return new LinkedList<>(m_methodStack);
   }
 
   public void setConfigAnnotationType(String configAnnotationType) {

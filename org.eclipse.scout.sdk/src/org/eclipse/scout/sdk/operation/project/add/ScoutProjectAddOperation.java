@@ -205,7 +205,7 @@ public class ScoutProjectAddOperation extends ScoutProjectNewOperation {
       String clientPluginName = getProperties().getProperty(CreateClientPluginOperation.PROP_BUNDLE_CLIENT_NAME, String.class);
       IJavaProject client = getCreatedBundle(clientPluginName);
       PluginModelHelper pmh = new PluginModelHelper(client.getProject());
-      Map<String, String> props = new HashMap<String, String>(2);
+      Map<String, String> props = new HashMap<>(2);
       props.put("active", "true");
       props.put("class", clientPluginName + ".ui.desktop.DesktopExtension");
       pmh.PluginXml.addSimpleExtension(IRuntimeClasses.EXTENSION_POINT_DESKTOP_EXTENSIONS, IRuntimeClasses.EXTENSION_ELEMENT_DESKTOP_EXTENSION, props);

@@ -91,7 +91,7 @@ public final class TestUtility {
    */
   @SuppressWarnings("restriction")
   public static void loadRunningOsgiAsTarget(String targetName, IProgressMonitor monitor) throws CoreException {
-    Set<File> dirs = new HashSet<File>();
+    Set<File> dirs = new HashSet<>();
 
     Bundle[] bundles = SdkTestingApi.getContext().getBundles();
     for (Bundle b : bundles) {

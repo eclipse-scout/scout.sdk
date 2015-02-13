@@ -73,7 +73,7 @@ public class BigIntegerPresenter extends AbstractValuePresenter<BigInteger> {
   @Override
   protected synchronized void storeValue(BigInteger value) throws CoreException {
     try {
-      ConfigPropertyUpdateOperation<BigInteger> updateOp = new ConfigPropertyUpdateOperation<BigInteger>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<BigInteger> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

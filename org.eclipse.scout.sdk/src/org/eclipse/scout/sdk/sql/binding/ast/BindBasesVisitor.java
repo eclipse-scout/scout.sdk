@@ -44,7 +44,7 @@ public class BindBasesVisitor extends DefaultAstVisitor {
   public BindBasesVisitor(IMethod serviceMethod, ASTNode rootNode) {
     m_serviceMethod = serviceMethod;
     m_rootNode = rootNode;
-    m_bindBases = new ArrayList<IBindBase>();
+    m_bindBases = new ArrayList<>();
   }
 
   @Override
@@ -79,7 +79,7 @@ public class BindBasesVisitor extends DefaultAstVisitor {
         }
       }
       else {
-        ArrayList<String> resolvedAssignedSignatures = new ArrayList<String>();
+        ArrayList<String> resolvedAssignedSignatures = new ArrayList<>();
         for (String assignedSignature : m_currentBase.getAssignedSignatures()) {
           String resolveReturnValueSignature = AstUtility.resolveReturnValueSignature(assignedSignature, node.getFullyQualifiedName());
           if (!StringUtility.isNullOrEmpty(resolveReturnValueSignature)) {

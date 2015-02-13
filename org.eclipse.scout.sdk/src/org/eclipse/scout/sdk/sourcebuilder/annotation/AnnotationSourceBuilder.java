@@ -33,7 +33,7 @@ public class AnnotationSourceBuilder implements IAnnotationSourceBuilder {
 
   public AnnotationSourceBuilder(String signature) {
     m_signature = signature;
-    m_parameters = new ArrayList<String>();
+    m_parameters = new ArrayList<>();
   }
 
   @Override

@@ -133,7 +133,7 @@ public class MenuTypePresenter extends AbstractValuePresenter<MenuTypesConfig> {
   @Override
   protected void storeValue(MenuTypesConfig value) throws CoreException {
     try {
-      ConfigPropertyUpdateOperation<MenuTypesConfig> updateOp = new ConfigPropertyUpdateOperation<MenuTypesConfig>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<MenuTypesConfig> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

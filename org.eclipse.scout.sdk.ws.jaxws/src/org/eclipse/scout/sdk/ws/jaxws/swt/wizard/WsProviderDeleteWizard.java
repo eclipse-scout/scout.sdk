@@ -63,7 +63,7 @@ public class WsProviderDeleteWizard extends AbstractWorkspaceWizard {
   }
 
   private List<ElementBean> getElementsToBeDeleted() {
-    final List<ElementBean> elements = new LinkedList<ElementBean>();
+    final List<ElementBean> elements = new LinkedList<>();
     // registration
     elements.add(new ElementBean(WsProviderDeleteOperation.ID_REGISTRATION, "Registration entry in sun-jaxws.xml and build-jaxws.xml", JaxWsSdk.getImageDescriptor(JaxWsIcons.SunJaxWsXmlFile), true));
 
@@ -136,7 +136,7 @@ public class WsProviderDeleteWizard extends AbstractWorkspaceWizard {
     m_operation.setSunJaxWsBean(m_sunJaxWsBean);
     m_operation.setBuildJaxWsBean(m_buildJaxWsBean);
 
-    List<ElementBean> elements = new LinkedList<ElementBean>();
+    List<ElementBean> elements = new LinkedList<>();
     for (ElementBean element : m_wizardPage.getElements()) {
       if (element.isChecked() || element.isMandatory()) {
         elements.add(element);

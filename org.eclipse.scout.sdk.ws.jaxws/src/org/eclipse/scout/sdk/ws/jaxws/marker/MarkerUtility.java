@@ -121,7 +121,7 @@ public final class MarkerUtility {
   }
 
   public static IMarker[] getMarkers(IScoutBundle bundle, MarkerType markerType, String groupUUID) {
-    Set<IMarker> markers = new HashSet<IMarker>();
+    Set<IMarker> markers = new HashSet<>();
 
     try {
       IMarker[] candidates = bundle.getJavaProject().getResource().findMarkers(markerType.getId(), true, IResource.DEPTH_INFINITE);
@@ -141,7 +141,7 @@ public final class MarkerUtility {
   }
 
   public static IMarkerCommand[] getMarkerCommands(String markerGroupUUID, IScoutBundle bundle) {
-    List<IMarkerCommand> commands = new LinkedList<IMarkerCommand>();
+    List<IMarkerCommand> commands = new LinkedList<>();
     IMarker[] markers = MarkerUtility.getMarkers(bundle, MarkerType.JaxWs, markerGroupUUID);
     for (IMarker marker : markers) {
       String sourceId = marker.getAttribute(IMarker.SOURCE_ID, null);

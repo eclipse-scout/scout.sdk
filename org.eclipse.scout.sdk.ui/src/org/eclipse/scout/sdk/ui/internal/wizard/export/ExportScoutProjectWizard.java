@@ -70,7 +70,7 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
     ExportScoutProjectEntry[] selectedEntries = m_page1.getSelectedEntries();
 
     // allow each entry to create its artifacts
-    ArrayList<File> artifacts = new ArrayList<File>();
+    ArrayList<File> artifacts = new ArrayList<>();
     for (ExportScoutProjectEntry entry : selectedEntries) {
       File module = entry.getHandler().createModule(this, monitor, workingCopyManager);
       if (module != null && module.exists()) {
@@ -123,7 +123,7 @@ public class ExportScoutProjectWizard extends AbstractWorkspaceWizard implements
 
   private String findProjectAlias() {
     try {
-      HashMap<String, Integer> aliasList = new HashMap<String, Integer>();
+      HashMap<String, Integer> aliasList = new HashMap<>();
 
       // all product files that contain the selected project
       List<IResource> prodFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(false, getProject().getSymbolicName()));

@@ -37,7 +37,7 @@ public final class NlsJdtUtility {
   }
 
   public static List<IClasspathEntry> getSourceLocations(IJavaProject project) throws JavaModelException {
-    List<IClasspathEntry> sourceLocations = new LinkedList<IClasspathEntry>();
+    List<IClasspathEntry> sourceLocations = new LinkedList<>();
     IClasspathEntry[] clEntries = project.getRawClasspath();
     for (IClasspathEntry entry : clEntries) {
       if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
@@ -91,7 +91,7 @@ public final class NlsJdtUtility {
    * @return
    */
   public static List<IPackageFragment> getPluginPackages(IJavaProject jProject) {
-    List<IPackageFragment> proposals = new LinkedList<IPackageFragment>();
+    List<IPackageFragment> proposals = new LinkedList<>();
     try {
       for (IClasspathEntry entry : jProject.getRawClasspath()) {
         if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
@@ -108,7 +108,7 @@ public final class NlsJdtUtility {
     }
     catch (JavaModelException e) {
       NlsCore.logWarning(e);
-      return new LinkedList<IPackageFragment>();
+      return new LinkedList<>();
     }
   }
 }

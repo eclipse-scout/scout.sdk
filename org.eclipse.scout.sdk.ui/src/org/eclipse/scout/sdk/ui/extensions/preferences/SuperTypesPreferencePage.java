@@ -40,7 +40,7 @@ public class SuperTypesPreferencePage extends AbstractScoutProjectPreferencePage
       if (monitor.isCanceled()) {
         return;
       }
-      List<DefaultSuperClassModel> list = new ArrayList<DefaultSuperClassModel>();
+      List<DefaultSuperClassModel> list = new ArrayList<>();
 
       Set<Entry<String, String>> configuredClasses = RuntimeClasses.getAllDefaults(e.getKey()).entrySet();
 

@@ -53,8 +53,8 @@ public final class RuntimeClasses implements IRuntimeClasses {
   private static final String ATTRIB_DEFAULT_CLASS = "class";
 
   private static final Object LOCK = new Object();
-  private static final Map<IScoutBundle, Map<String /* interfaceFqn */, StringHolder /* configured value */>> CONFIGURED_VALUES = new HashMap<IScoutBundle, Map<String, StringHolder>>();
-  private static final Map<IScoutBundle, IPreferenceChangeListener> REGISTERED_LISTENERS = new HashMap<IScoutBundle, IPreferenceChangeListener>();
+  private static final Map<IScoutBundle, Map<String /* interfaceFqn */, StringHolder /* configured value */>> CONFIGURED_VALUES = new HashMap<>();
+  private static final Map<IScoutBundle, IPreferenceChangeListener> REGISTERED_LISTENERS = new HashMap<>();
   private static volatile Map<String /* interfaceFqn */, TreeMap<Double, String> /* default values */> defaultValues = null;
 
   private RuntimeClasses() {
@@ -64,7 +64,7 @@ public final class RuntimeClasses implements IRuntimeClasses {
     if (defaultValues == null) {
       synchronized (LOCK) {
         if (defaultValues == null) {
-          Map<String, TreeMap<Double, String>> tmp = new HashMap<String, TreeMap<Double, String>>();
+          Map<String, TreeMap<Double, String>> tmp = new HashMap<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);
           IExtension[] extensions = xp.getExtensions();
@@ -75,7 +75,7 @@ public final class RuntimeClasses implements IRuntimeClasses {
                 String interf = element.getAttribute(ATTRIB_INTERFACE);
                 TreeMap<Double, String> curDefaults = tmp.get(interf);
                 if (curDefaults == null) {
-                  curDefaults = new TreeMap<Double, String>();
+                  curDefaults = new TreeMap<>();
                   tmp.put(interf, curDefaults);
                 }
 
@@ -116,7 +116,7 @@ public final class RuntimeClasses implements IRuntimeClasses {
     synchronized (LOCK) {
       Map<String, StringHolder> projectConfigs = CONFIGURED_VALUES.get(context);
       if (projectConfigs == null) {
-        projectConfigs = new HashMap<String, StringHolder>();
+        projectConfigs = new HashMap<>();
         CONFIGURED_VALUES.put(context, projectConfigs);
 
         // first time we are reading properties for the given project -> we are starting to cache for that project
@@ -140,7 +140,7 @@ public final class RuntimeClasses implements IRuntimeClasses {
 
   public static Map<String, String> getAllDefaults(IScoutBundle context) {
     Set<String> interfaces = getDefaults().keySet();
-    HashMap<String, String> ret = new HashMap<String, String>(interfaces.size());
+    HashMap<String, String> ret = new HashMap<>(interfaces.size());
     for (String entry : interfaces) {
       String defaultClass = getDefaultSuperType(entry, context);
       if (defaultClass != null) {

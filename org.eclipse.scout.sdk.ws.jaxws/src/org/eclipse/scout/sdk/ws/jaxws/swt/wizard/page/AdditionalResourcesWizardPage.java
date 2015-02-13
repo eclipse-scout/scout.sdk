@@ -182,7 +182,7 @@ public class AdditionalResourcesWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   public void setFiles(File[] files) {
-    m_files = new HashSet<File>(Arrays.asList(files));
+    m_files = new HashSet<>(Arrays.asList(files));
   }
 
   private class P_LabelProvider extends CellLabelProvider {

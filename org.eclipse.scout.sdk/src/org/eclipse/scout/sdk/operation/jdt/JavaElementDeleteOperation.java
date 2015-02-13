@@ -48,7 +48,7 @@ public class JavaElementDeleteOperation implements IOperation {
 
   public JavaElementDeleteOperation(boolean formatSource) {
     m_formatSource = formatSource;
-    m_elementsToDelete = new ArrayList<IJavaElement>();
+    m_elementsToDelete = new ArrayList<>();
   }
 
   public void setMembers(Collection<? extends IJavaElement> members) {
@@ -92,7 +92,7 @@ public class JavaElementDeleteOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    HashSet<ICompilationUnit> icuForOrganizeImports = new HashSet<ICompilationUnit>();
+    HashSet<ICompilationUnit> icuForOrganizeImports = new HashSet<>();
     for (IJavaElement m : m_elementsToDelete) {
       if (TypeUtility.exists(m)) {
         ICompilationUnit icuDoDel = null;

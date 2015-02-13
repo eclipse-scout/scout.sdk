@@ -77,7 +77,7 @@ public class ClassIdNewOperation implements IOperation {
     try {
       monitor.beginTask("Search for classes...", 10);
       Set<? extends IScoutBundle> allBundlesToProcess = m_bundle.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
-      HashSet<String> bundleSymbolicNames = new HashSet<String>(allBundlesToProcess.size());
+      HashSet<String> bundleSymbolicNames = new HashSet<>(allBundlesToProcess.size());
       for (IScoutBundle b : allBundlesToProcess) {
         bundleSymbolicNames.add(b.getSymbolicName());
       }
@@ -97,7 +97,7 @@ public class ClassIdNewOperation implements IOperation {
         hierarchy = null;
         SubProgressMonitor subMonitor = new SubProgressMonitor(monitor, 1);
         subMonitor.beginTask(null, allSubtypes.size());
-        HashMap<ICompilationUnit, HashSet<IType>> typesWithClassId = new HashMap<ICompilationUnit, HashSet<IType>>(1000);
+        HashMap<ICompilationUnit, HashSet<IType>> typesWithClassId = new HashMap<>(1000);
         int numTypes = 0;
         for (IType t : allSubtypes) {
           if (TypeUtility.exists(t) && !t.isBinary() && t.isClass() && !t.isAnonymous() && !t.isReadOnly() && !Flags.isAbstract(t.getFlags())) {
@@ -108,7 +108,7 @@ public class ClassIdNewOperation implements IOperation {
                 ICompilationUnit icu = t.getCompilationUnit();
                 HashSet<IType> listByIcu = typesWithClassId.get(icu);
                 if (listByIcu == null) {
-                  listByIcu = new HashSet<IType>();
+                  listByIcu = new HashSet<>();
                   typesWithClassId.put(icu, listByIcu);
                 }
                 if (listByIcu.add(t)) {

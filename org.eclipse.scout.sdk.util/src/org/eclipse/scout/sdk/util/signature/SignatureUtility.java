@@ -525,7 +525,7 @@ public final class SignatureUtility {
       return CollectionUtility.emptyHashMap();
     }
 
-    Map<String, TypeParameterMapping> collector = new HashMap<String, TypeParameterMapping>();
+    Map<String, TypeParameterMapping> collector = new HashMap<>();
     TypeParameterMapping first = new TypeParameterMapping(signature, superClassSignature, interfaceSignatures);
     collector.put(Signature.toString(signature), first);
 
@@ -597,7 +597,7 @@ public final class SignatureUtility {
     if (!TypeUtility.exists(type) || !StringUtility.hasText(paramDefiningSuperTypeFqn) || paramIndex < 0) {
       return null;
     }
-    Map<String, TypeParameterMapping> collector = new HashMap<String, TypeParameterMapping>();
+    Map<String, TypeParameterMapping> collector = new HashMap<>();
     TypeParameterMapping.buildMapping(type, supertypeHierarchy, collector, declaringChildContextsInToOut);
     ITypeParameterMapping mapping = collector.get(paramDefiningSuperTypeFqn);
     if (mapping == null) {
@@ -660,7 +660,7 @@ public final class SignatureUtility {
       return CollectionUtility.emptyHashMap();
     }
 
-    Map<String, TypeParameterMapping> collector = new HashMap<String, TypeParameterMapping>();
+    Map<String, TypeParameterMapping> collector = new HashMap<>();
     TypeParameterMapping.buildMapping(type, supertypeHierarchy, collector, declaringChildContextsInToOut);
     return new HashMap<String, ITypeParameterMapping>(collector);
   }

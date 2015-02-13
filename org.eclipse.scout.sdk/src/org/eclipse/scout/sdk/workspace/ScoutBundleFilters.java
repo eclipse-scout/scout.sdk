@@ -174,7 +174,7 @@ public final class ScoutBundleFilters {
     if (list == null || list.length < 1) {
       return ALL_BUNDLES;
     }
-    HashSet<IScoutBundle> set = new HashSet<IScoutBundle>(list.length);
+    HashSet<IScoutBundle> set = new HashSet<>(list.length);
     for (IScoutBundle b : list) {
       set.add(b);
     }
@@ -213,7 +213,7 @@ public final class ScoutBundleFilters {
     if (symbolicNames == null || symbolicNames.length < 1) {
       return ALL_BUNDLES;
     }
-    HashSet<String> set = new HashSet<String>(symbolicNames.length);
+    HashSet<String> set = new HashSet<>(symbolicNames.length);
     for (String name : symbolicNames) {
       set.add(name);
     }

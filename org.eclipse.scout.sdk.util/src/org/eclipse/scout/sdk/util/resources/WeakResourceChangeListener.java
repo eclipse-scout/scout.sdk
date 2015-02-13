@@ -27,7 +27,7 @@ public class WeakResourceChangeListener implements IResourceChangeListener {
   private final WeakReference<IResourceChangeListener> m_weakListener;
 
   public WeakResourceChangeListener(IResourceChangeListener referent) {
-    m_weakListener = new WeakReference<IResourceChangeListener>(referent);
+    m_weakListener = new WeakReference<>(referent);
   }
 
   @Override

@@ -19,11 +19,11 @@ import org.eclipse.scout.sdk.Texts;
 
 public class LinksPresenterModel {
 
-  private HashMap<String, LinkGroup> m_groups = new HashMap<String, LinkGroup>();
+  private HashMap<String, LinkGroup> m_groups = new HashMap<>();
   private LinkGroup m_globalLinks = new LinkGroup(Texts.get("Global"), 0);
 
   public LinkGroup[] getOrderedNotEmtyGroups() {
-    TreeSet<LinkGroup> orderedGroups = new TreeSet<LinkGroup>(new P_GroupComparator());
+    TreeSet<LinkGroup> orderedGroups = new TreeSet<>(new P_GroupComparator());
     for (LinkGroup group : m_groups.values()) {
       if (!group.isEmpty()) {
         orderedGroups.add(group);

@@ -46,7 +46,7 @@ public class NlsFilterComponent extends Composite {
 
   public NlsFilterComponent(Composite parent) {
     super(parent, SWT.DOUBLE_BUFFERED);
-    m_filterFields = new HashMap<Language, Text>();
+    m_filterFields = new HashMap<>();
     setBackground(parent.getBackground());
     m_resetButton = new Button(this, SWT.PUSH | SWT.FLAT);
     m_resetButton.setText("Reset");
@@ -78,7 +78,7 @@ public class NlsFilterComponent extends Composite {
   }
 
   protected void updateFilterFields(Composite parent) {
-    HashMap<Language, String> oldContents = new HashMap<Language, String>(m_filterFields.size());
+    HashMap<Language, String> oldContents = new HashMap<>(m_filterFields.size());
     if (!m_filterFields.isEmpty()) {
       // dispose old text fields and backup the filter text to restore it afterwards in the new fields
       for (Entry<Language, Text> entry : m_filterFields.entrySet()) {
@@ -108,7 +108,7 @@ public class NlsFilterComponent extends Composite {
 
   protected void handleFilterModified(int index) {
     // update filters
-    ArrayList<ViewerFilter> filters = new ArrayList<ViewerFilter>();
+    ArrayList<ViewerFilter> filters = new ArrayList<>();
     // backup old filters
     for (ViewerFilter filter : m_tableViewer.getFilters()) {
       if (!(filter instanceof P_ViewerFilter)) {

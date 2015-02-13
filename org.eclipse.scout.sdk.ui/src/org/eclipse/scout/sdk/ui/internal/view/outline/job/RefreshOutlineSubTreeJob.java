@@ -150,7 +150,7 @@ public class RefreshOutlineSubTreeJob extends Job {
 
   private void restoreSelectionInUiThread() {
     TreePath[] paths = m_backupedSelection.getPaths();
-    List<TreePath> newPaths = new ArrayList<TreePath>(paths.length);
+    List<TreePath> newPaths = new ArrayList<>(paths.length);
 
     for (TreePath p : paths) {
       TreePath newPath = getNewPath(p);
@@ -175,7 +175,7 @@ public class RefreshOutlineSubTreeJob extends Job {
    */
   private TreePath getNewPath(TreePath oldPath) {
     TreeItem item = null;
-    ArrayList<Object> newSegments = new ArrayList<Object>(oldPath.getSegmentCount());
+    ArrayList<Object> newSegments = new ArrayList<>(oldPath.getSegmentCount());
     for (int i = 0; i < oldPath.getSegmentCount(); i++) {
       TreeItem[] curItems = null;
       if (item == null) {
@@ -258,7 +258,7 @@ public class RefreshOutlineSubTreeJob extends Job {
   private class P_BackupNode {
     private String m_name;
     private boolean m_expanded;
-    private HashMap<String, P_BackupNode> m_children = new HashMap<String, P_BackupNode>();
+    private HashMap<String, P_BackupNode> m_children = new HashMap<>();
 
     public P_BackupNode(P_BackupNode parent, IPage p) {
       m_name = p.getName();

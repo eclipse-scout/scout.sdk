@@ -139,7 +139,7 @@ public class SignatureProposalProvider extends ContentProposalProvider {
       searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
     }
     int counter = 0;
-    ArrayList<Object> result = new ArrayList<Object>(Math.min(getMaxProposalAmount(), 100));
+    ArrayList<Object> result = new ArrayList<>(Math.min(getMaxProposalAmount(), 100));
     char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
     if (getPrimitivSignatures() != null) {
       for (String sig : getPrimitivSignatures()) {
@@ -207,7 +207,7 @@ public class SignatureProposalProvider extends ContentProposalProvider {
     public P_SearchRequestor(IProgressMonitor monitor, int maxResultSize) {
       m_monitor = monitor;
       m_requestedDecrementCounter = maxResultSize;
-      m_foundTypes = new TreeMap<CompositeObject, Object>();
+      m_foundTypes = new TreeMap<>();
     }
 
     @Override

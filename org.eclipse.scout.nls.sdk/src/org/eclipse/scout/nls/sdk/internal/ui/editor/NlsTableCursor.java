@@ -51,7 +51,7 @@ public class NlsTableCursor {
     m_table = table;
     m_cursor = new TableCursor(m_table, SWT.NONE);
     m_cursor.setBackgroundMode(SWT.INHERIT_FORCE);
-    m_listeners = new ArrayList<INlsTableCursorManangerListener>();
+    m_listeners = new ArrayList<>();
     m_nlsTable = nlsTable;
 
     m_cursor.addFocusListener(new FocusAdapter() {

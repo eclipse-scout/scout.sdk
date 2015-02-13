@@ -31,12 +31,12 @@ public class SystemFonts {
   private Map<String /*font name*/, List<FontData>> m_fonts;
 
   public SystemFonts(FontData[] fontData) {
-    m_fonts = new HashMap<String, List<FontData>>();
+    m_fonts = new HashMap<>();
     if (fontData != null) {
       for (FontData d : fontData) {
         List<FontData> set = m_fonts.get(d.getName());
         if (set == null) {
-          set = new ArrayList<FontData>();
+          set = new ArrayList<>();
           m_fonts.put(d.getName(), set);
         }
         set.add(d);
@@ -45,7 +45,7 @@ public class SystemFonts {
   }
 
   public Collection<String> getAllFontNames() {
-    TreeMap<String, String> fontNames = new TreeMap<String, String>();
+    TreeMap<String, String> fontNames = new TreeMap<>();
     for (String fontName : m_fonts.keySet()) {
       fontNames.put(fontName.toLowerCase(), fontName);
     }
@@ -53,7 +53,7 @@ public class SystemFonts {
   }
 
   public Set<Integer> getFontStyles(String fontName) {
-    Set<Integer> sizes = new TreeSet<Integer>();
+    Set<Integer> sizes = new TreeSet<>();
     List<FontData> set = m_fonts.get(fontName);
     if (set != null) {
       for (FontData d : set) {

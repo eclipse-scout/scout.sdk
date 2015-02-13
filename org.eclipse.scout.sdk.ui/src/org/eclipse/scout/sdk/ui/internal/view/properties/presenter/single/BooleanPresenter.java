@@ -103,7 +103,7 @@ public class BooleanPresenter extends AbstractMethodPresenter {
 
   private synchronized void handleCheckboxSelectionChanged() {
     try {
-      ConfigPropertyUpdateOperation<Boolean> updateOp = new ConfigPropertyUpdateOperation<Boolean>(getMethod(), m_parser);
+      ConfigPropertyUpdateOperation<Boolean> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), m_parser);
       updateOp.setValue(Boolean.valueOf(m_checkbox.getSelection()));
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

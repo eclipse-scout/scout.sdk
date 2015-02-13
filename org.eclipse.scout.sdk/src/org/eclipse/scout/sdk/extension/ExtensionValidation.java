@@ -110,7 +110,7 @@ public final class ExtensionValidation {
   }
 
   private static Deque<String> getOwners(Set<IMethod> constructorsWithParams, IType chain) throws CoreException {
-    Deque<String> owners = new LinkedList<String>();
+    Deque<String> owners = new LinkedList<>();
     for (IMethod constructor : constructorsWithParams) {
       for (ILocalVariable param : constructor.getParameters()) {
         String[] paramArgs = Signature.getTypeArguments(param.getTypeSignature());
@@ -136,7 +136,7 @@ public final class ExtensionValidation {
   }
 
   private static Map<String, Map<String, Set<String>>> calcChainableMethods() throws CoreException {
-    Map<String, Map<String, Set<String>>> result = new HashMap<String, Map<String, Set<String>>>();
+    Map<String, Map<String, Set<String>>> result = new HashMap<>();
     IType abstractExtensionChain = TypeUtility.getType(IRuntimeClasses.AbstractExtensionChain);
     if (!TypeUtility.exists(abstractExtensionChain)) {
       return result;
@@ -189,14 +189,14 @@ public final class ExtensionValidation {
         String methodName = m.getElementName();
         Map<String, Set<String>> map = result.get(methodName);
         if (map == null) {
-          map = new HashMap<String, Set<String>>();
+          map = new HashMap<>();
           result.put(methodName, map);
         }
         String methodId = SignatureUtility.getMethodIdentifier(m);
 
         Set<String> set = map.get(methodId);
         if (set == null) {
-          set = new HashSet<String>();
+          set = new HashSet<>();
           map.put(methodId, set);
         }
         set.add(owners.getLast());
@@ -204,11 +204,11 @@ public final class ExtensionValidation {
     }
 
     // trim maps
-    Map<String, Map<String, Set<String>>> returnResult = new HashMap<String, Map<String, Set<String>>>(result.size());
+    Map<String, Map<String, Set<String>>> returnResult = new HashMap<>(result.size());
     for (Entry<String, Map<String, Set<String>>> a : result.entrySet()) {
-      Map<String, Set<String>> b = new HashMap<String, Set<String>>(a.getValue().size());
+      Map<String, Set<String>> b = new HashMap<>(a.getValue().size());
       for (Entry<String, Set<String>> c : a.getValue().entrySet()) {
-        Set<String> d = new HashSet<String>(c.getValue());
+        Set<String> d = new HashSet<>(c.getValue());
         b.put(c.getKey(), d);
       }
       returnResult.put(a.getKey(), b);
@@ -286,7 +286,7 @@ public final class ExtensionValidation {
         }
 
         final Map<String, Map<String, Set<String>>> interestingMethods = getChainableMethods();
-        final Map<IMethod, P_ProblemCandidates> methodsToCheck = new HashMap<IMethod, P_ProblemCandidates>();
+        final Map<IMethod, P_ProblemCandidates> methodsToCheck = new HashMap<>();
 
         m_ast.accept(new DefaultAstVisitor() {
 
@@ -342,7 +342,7 @@ public final class ExtensionValidation {
         }
 
         Set<Entry<IMethod, P_ProblemCandidates>> entrySet = methodsToCheck.entrySet();
-        Set<P_MarkerData> markers = new HashSet<ExtensionValidation.P_MarkerData>(entrySet.size());
+        Set<P_MarkerData> markers = new HashSet<>(entrySet.size());
         for (Entry<IMethod, P_ProblemCandidates> entry : entrySet) {
           ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(entry.getKey().getDeclaringType());
           if (supertypeHierarchy != null) {

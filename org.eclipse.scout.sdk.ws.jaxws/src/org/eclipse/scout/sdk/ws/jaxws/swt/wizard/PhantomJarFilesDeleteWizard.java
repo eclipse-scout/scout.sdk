@@ -51,7 +51,7 @@ public class PhantomJarFilesDeleteWizard extends AbstractWorkspaceWizard {
   }
 
   private List<ElementBean> getPhantomElements() {
-    List<ElementBean> elements = new LinkedList<ElementBean>();
+    List<ElementBean> elements = new LinkedList<>();
     for (IFile file : m_phantomJarFiles) {
       elements.add(new ElementBean(0, file.getFullPath().toString(), JaxWsSdk.getImageDescriptor(JaxWsIcons.Jar), file, false));
     }
@@ -60,7 +60,7 @@ public class PhantomJarFilesDeleteWizard extends AbstractWorkspaceWizard {
 
   @Override
   protected boolean beforeFinish() throws CoreException {
-    List<IFile> filesToBeDeleted = new LinkedList<IFile>();
+    List<IFile> filesToBeDeleted = new LinkedList<>();
     for (ElementBean candidate : m_wizardPage.getElements()) {
       if (candidate.isChecked() || candidate.isMandatory()) {
         filesToBeDeleted.add((IFile) candidate.getResource());

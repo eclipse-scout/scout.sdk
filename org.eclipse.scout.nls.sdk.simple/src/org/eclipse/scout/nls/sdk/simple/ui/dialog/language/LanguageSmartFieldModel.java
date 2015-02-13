@@ -24,7 +24,7 @@ public class LanguageSmartFieldModel implements ISmartFieldModel {
   private Locale[] m_locales;
 
   public LanguageSmartFieldModel() {
-    ArrayList<Locale> locs = new ArrayList<Locale>();
+    ArrayList<Locale> locs = new ArrayList<>();
     for (String isoLang : Locale.getISOLanguages()) {
       locs.add(new Locale(isoLang));
     }
@@ -38,7 +38,7 @@ public class LanguageSmartFieldModel implements ISmartFieldModel {
 
   @Override
   public List<Object> getProposals(String pattern) {
-    List<Object> props = new LinkedList<Object>();
+    List<Object> props = new LinkedList<>();
     for (Locale l : m_locales) {
       if (l.getDisplayLanguage().toLowerCase().startsWith(pattern.toLowerCase())) {
         props.add(l);

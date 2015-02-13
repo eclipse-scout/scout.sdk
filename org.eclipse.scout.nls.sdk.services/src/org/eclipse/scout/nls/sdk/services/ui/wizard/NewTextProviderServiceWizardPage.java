@@ -99,7 +99,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     setDescription("Creates a new Text Provider Service.");
     setTargetPackage(DefaultTargetPackage.get(bundle, NlsServiceType.TEXT_SERVICE_PACKAGE_ID));
     m_bundle = bundle;
-    m_languagesToCreate = new HashSet<String>();
+    m_languagesToCreate = new HashSet<>();
     m_existingServicesInPlugin = getTextProviderServicesInSamePlugin();
     m_defaultProposal = RuntimeClasses.getSuperType(IRuntimeClasses.ITextProviderService, ScoutUtility.getJavaProject(bundle));
   }
@@ -107,7 +107,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
   private List<NlsServiceType> getTextProviderServicesInSamePlugin() {
     try {
       Set<IType> candidates = ServiceNlsProjectProvider.getRegisteredTextProviderTypes();
-      ArrayList<NlsServiceType> ret = new ArrayList<NlsServiceType>(candidates.size());
+      ArrayList<NlsServiceType> ret = new ArrayList<>(candidates.size());
       for (IType t : candidates) {
         if (m_bundle.getProject().equals(t.getJavaProject().getProject())) {
           NlsServiceType type = new NlsServiceType(t);
@@ -217,7 +217,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
       }
     });
 
-    List<IProject> projectList = new ArrayList<IProject>();
+    List<IProject> projectList = new ArrayList<>();
     if (m_bundle.getProject() != null) {
       try {
         projectList = NlsSdkSimple.getProjectGroup(m_bundle.getProject());
@@ -241,7 +241,7 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
     });
     NlsUi.decorate(m_translationFolderField, false);
 
-    m_translationFileName = new TextField<String>(group, TextField.VALIDATE_ON_MODIFY);
+    m_translationFileName = new TextField<>(group, TextField.VALIDATE_ON_MODIFY);
     m_translationFileName.setLabelText("Translation File Prefix");
     m_translationFileName.setToolTipText("e.g. messages for messages[_language].properties");
     m_translationFileName.addInputChangedListener(new IInputChangedListener<String>() {

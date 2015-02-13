@@ -60,7 +60,7 @@ public class SourceEditOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    final Holder<CoreException> exceptionHolder = new Holder<CoreException>(CoreException.class);
+    final Holder<CoreException> exceptionHolder = new Holder<>(CoreException.class);
     getDisplay().syncExec(new Runnable() {
       @Override
       public void run() {

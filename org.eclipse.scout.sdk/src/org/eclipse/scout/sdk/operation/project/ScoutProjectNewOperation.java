@@ -73,7 +73,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     // collect all registered operations
-    TreeMap<String, P_OperationElement> ops = new TreeMap<String, P_OperationElement>();
+    TreeMap<String, P_OperationElement> ops = new TreeMap<>();
     IExtensionRegistry reg = Platform.getExtensionRegistry();
     IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXT_NAME);
     IExtension[] extensions = xp.getExtensions();
@@ -88,8 +88,8 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
     }
 
     // build graph based on the references and remember invalid nodes
-    ArrayList<P_OperationElement> invalidNodes = new ArrayList<P_OperationElement>();
-    ArrayList<P_OperationElement> validNodes = new ArrayList<P_OperationElement>(ops.size());
+    ArrayList<P_OperationElement> invalidNodes = new ArrayList<>();
+    ArrayList<P_OperationElement> validNodes = new ArrayList<>(ops.size());
     for (P_OperationElement op : ops.values()) {
       if (op.referenceId == null) {
         validNodes.add(op);
@@ -122,7 +122,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
 
     // traverse the tree collecting all items in a level-order-traversal into a flat list
     // if several root nodes have been found (independent trees), the trees are executed in serial order (complete first tree, complete second tree, ...)
-    LinkedHashSet<P_OperationElement> collector = new LinkedHashSet<P_OperationElement>(ops.size());
+    LinkedHashSet<P_OperationElement> collector = new LinkedHashSet<>(ops.size());
     for (P_OperationElement root : roots) {
       breadthFirstTraverse(root, collector);
     }
@@ -139,7 +139,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   }
 
   private Collection<P_OperationElement> getRootOperations(Collection<P_OperationElement> nodes) {
-    ArrayList<P_OperationElement> roots = new ArrayList<P_OperationElement>();
+    ArrayList<P_OperationElement> roots = new ArrayList<>();
     for (P_OperationElement el : nodes) {
       if (el.parent == null) {
         roots.add(el);
@@ -149,7 +149,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
   }
 
   private void breadthFirstTraverse(P_OperationElement root, Collection<P_OperationElement> collector) {
-    Deque<P_OperationElement> deck = new ArrayDeque<P_OperationElement>();
+    Deque<P_OperationElement> deck = new ArrayDeque<>();
     deck.addLast(root);
     while (!deck.isEmpty()) {
       P_OperationElement el = deck.removeFirst();
@@ -279,7 +279,7 @@ public class ScoutProjectNewOperation extends AbstractScoutProjectNewOperation {
       op = (IScoutProjectNewOperation) element.createExecutableExtension(EXT_ATTR_CLASS_NAME);
       id = cleanString(element.getAttribute(EXT_ATTR_ID_NAME));
       referenceId = cleanString(element.getAttribute(EXT_ATTR_REF_NAME));
-      children = new ArrayList<P_OperationElement>();
+      children = new ArrayList<>();
 
       String execAfter = cleanString(element.getAttribute(EXT_ATTR_REF_TYPE_NAME));
       boolean after = true;

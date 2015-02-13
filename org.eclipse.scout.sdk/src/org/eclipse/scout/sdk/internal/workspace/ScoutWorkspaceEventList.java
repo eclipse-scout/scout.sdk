@@ -28,8 +28,8 @@ public class ScoutWorkspaceEventList {
 
   public ScoutWorkspaceEventList(ScoutWorkspace source) {
     m_source = source;
-    m_events = new ArrayList<ScoutWorkspaceEvent>();
-    m_eventElements = new HashSet<IScoutBundle>();
+    m_events = new ArrayList<>();
+    m_eventElements = new HashSet<>();
   }
 
   public ScoutWorkspace getSource() {

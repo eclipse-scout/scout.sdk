@@ -43,7 +43,7 @@ public class ComposerAttributeTypePresenter extends AbstractProposalPresenter<Fi
   protected static final List<FieldProperty<Integer>> PROPOSALS;
   static {
     IType dataModelConstants = TypeUtility.getType(IRuntimeClasses.DataModelConstants);
-    PROPOSALS = new ArrayList<FieldProperty<Integer>>(20);
+    PROPOSALS = new ArrayList<>(20);
     PROPOSALS.add(new UiFieldProperty<Integer>(dataModelConstants.getField("TYPE_INHERITED"), "Inherited"));
     PROPOSALS.add(new UiFieldProperty<Integer>(dataModelConstants.getField("TYPE_NONE"), "None"));
     PROPOSALS.add(new UiFieldProperty<Integer>(dataModelConstants.getField("TYPE_CODE_LIST"), "Code List"));
@@ -109,7 +109,7 @@ public class ComposerAttributeTypePresenter extends AbstractProposalPresenter<Fi
     }
 
     try {
-      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<Integer>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

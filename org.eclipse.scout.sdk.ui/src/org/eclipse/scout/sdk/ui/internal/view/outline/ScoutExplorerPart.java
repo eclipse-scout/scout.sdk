@@ -116,10 +116,10 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
   private LinkWithEditorAction m_linkWithEditorAction;
 
   public ScoutExplorerPart() {
-    m_pageFilterCache = new LRUCache<String, IPageFilter>(1000, -1);
+    m_pageFilterCache = new LRUCache<>(1000, -1);
     m_reloadJob = new P_ReloadNodeJob();
     m_dirtyManager = new DirtyUpdateManager(this);
-    m_debugMenus = new HashSet<IContributionItem>();
+    m_debugMenus = new HashSet<>();
   }
 
   @Override
@@ -201,8 +201,8 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
     }
     try {
       m_viewContentProvider.setLoadSync(true);
-      final Holder<IPage> firstBundleGroup = new Holder<IPage>(IPage.class, null);
-      final ArrayList<IPage> expandedPages = new ArrayList<IPage>();
+      final Holder<IPage> firstBundleGroup = new Holder<>(IPage.class, null);
+      final ArrayList<IPage> expandedPages = new ArrayList<>();
       INodeVisitor visitor = new INodeVisitor() {
         @Override
         public int visit(IPage page) {
@@ -427,7 +427,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
       if (selection.size() == 1) {
         Object firstElement = selection.getFirstElement();
         if (firstElement instanceof AbstractPage) {
-          ArrayList<Action> debugActions = new ArrayList<Action>();
+          ArrayList<Action> debugActions = new ArrayList<>();
           AbstractPage page = (AbstractPage) firstElement;
           page.addDebugMenus(debugActions);
           if (debugActions.size() > 0) {
@@ -650,7 +650,7 @@ public class ScoutExplorerPart extends ViewPart implements IScoutExplorerPart {
         }
         if (filter != null) {
           int size = elements.length;
-          ArrayList<Object> out = new ArrayList<Object>(size);
+          ArrayList<Object> out = new ArrayList<>(size);
           for (int i = 0; i < size; ++i) {
             if (elements[i] instanceof IPage) {
               IPage element = (IPage) elements[i];

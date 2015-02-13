@@ -59,7 +59,7 @@ class FineGrainedAstAnalyzer {
   }
 
   public Set<IJavaElement> calculateDeltas(CompilationUnit oldAst, CompilationUnit newAst) {
-    final HashSet<IJavaElement> set = new HashSet<IJavaElement>();
+    final HashSet<IJavaElement> set = new HashSet<>();
     AbstractFineGrainedAstMatcher matcher = new AbstractFineGrainedAstMatcher() {
       @Override
       protected boolean processDelta(boolean match, ASTNode node, Object other) {

@@ -66,7 +66,7 @@ public class MenuProposalPresenter extends AbstractTypeProposalPresenter {
         searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
       }
       char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
-      ArrayList<IType> collector = new ArrayList<IType>();
+      ArrayList<IType> collector = new ArrayList<>();
       for (IType proposal : m_proposals) {
         if (CharOperation.match(pattern, m_labelProvider.getText(proposal).toCharArray(), false)) {
           collector.add(proposal);
@@ -90,7 +90,7 @@ public class MenuProposalPresenter extends AbstractTypeProposalPresenter {
     private void ensureCache() {
       if (m_proposals == null) {
         if (getMethod() != null) {
-          ArrayList<IType> collector = new ArrayList<IType>();
+          ArrayList<IType> collector = new ArrayList<>();
           collectMenusRec(collector, getMethod().getType());
           m_proposals = collector.toArray(new IType[collector.size()]);
         }

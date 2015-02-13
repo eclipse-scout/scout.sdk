@@ -204,7 +204,7 @@ public class BuildPropertiesWizardPage extends AbstractWorkspaceWizardPage {
       return null;
     }
     // prepare illegal names
-    Set<String> illegalNames = new HashSet<String>();
+    Set<String> illegalNames = new HashSet<>();
     for (BuildProperty prop : m_properties) {
       if (!CompareUtility.equals(property.getName(), prop.getName())) {
         illegalNames.add(prop.getName());

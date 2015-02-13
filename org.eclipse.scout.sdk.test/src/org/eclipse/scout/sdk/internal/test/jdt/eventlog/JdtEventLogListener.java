@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.internal.test.jdt.eventlog.Event.Type;
  */
 public class JdtEventLogListener implements IElementChangedListener {
 
-  private List<P_Flag> m_flagsToLog = new ArrayList<JdtEventLogListener.P_Flag>();
+  private List<P_Flag> m_flagsToLog = new ArrayList<>();
 
   public void addLogFlag(int flag, String text) {
     m_flagsToLog.add(new P_Flag(flag, text));

@@ -38,7 +38,7 @@ public abstract class AbstractWizardExecutor extends AbstractExecutor {
 
   public IOperation addAdditionalPerformFinishOperation(IOperation op, double orderNr) {
     if (m_performFinishOperations == null) {
-      m_performFinishOperations = new TreeMap<Double, IOperation>();
+      m_performFinishOperations = new TreeMap<>();
     }
     return m_performFinishOperations.put(Double.valueOf(orderNr), op);
   }

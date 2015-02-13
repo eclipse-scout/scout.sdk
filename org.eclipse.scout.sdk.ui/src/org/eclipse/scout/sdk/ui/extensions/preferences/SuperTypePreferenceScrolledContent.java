@@ -45,13 +45,13 @@ public class SuperTypePreferenceScrolledContent implements IScoutProjectScrolled
   private SimpleScrolledComposite m_scrollArea;
 
   public SuperTypePreferenceScrolledContent() {
-    m_allSuperTypeCombos = new ArrayList<Combo>();
-    m_allLabels = new ArrayList<Label>();
+    m_allSuperTypeCombos = new ArrayList<>();
+    m_allLabels = new ArrayList<>();
   }
 
   @Override
   public void loadModel(List<DefaultSuperClassModel> entries, IModelLoadProgressObserver<DefaultSuperClassModel> observer, IProgressMonitor monitor) {
-    m_entries = new ArrayList<DefaultSuperClassModel>(entries);
+    m_entries = new ArrayList<>(entries);
     for (DefaultSuperClassModel model : m_entries) {
       if (monitor.isCanceled()) {
         return;
@@ -110,7 +110,7 @@ public class SuperTypePreferenceScrolledContent implements IScoutProjectScrolled
 
   @Override
   public void save() {
-    final HashSet<IScoutBundle> modifiedProjects = new HashSet<IScoutBundle>(1);
+    final HashSet<IScoutBundle> modifiedProjects = new HashSet<>(1);
     visitCombos(new ISuperTypeComboVisitor() {
       @Override
       public void visit(Combo combo, String selectedValue, DefaultSuperClassModel model) {

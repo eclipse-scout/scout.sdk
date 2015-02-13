@@ -44,7 +44,7 @@ public class DragAndDropTypePresenter extends AbstractProposalPresenter<FieldPro
   protected static final List<FieldProperty<Integer>> PROPOSALS;
   static {
     IType iDNDSupport = TypeUtility.getType(IRuntimeClasses.IDNDSupport);
-    PROPOSALS = new ArrayList<FieldProperty<Integer>>(5);
+    PROPOSALS = new ArrayList<>(5);
     PROPOSALS.add(new NoneFieldProperty());
     PROPOSALS.add(new UiFieldProperty<Integer>(iDNDSupport.getField("TYPE_FILE_TRANSFER"), "File Transfer"));
     PROPOSALS.add(new UiFieldProperty<Integer>(iDNDSupport.getField("TYPE_JAVA_ELEMENT_TRANSFER"), "Java Element Transfer"));
@@ -95,7 +95,7 @@ public class DragAndDropTypePresenter extends AbstractProposalPresenter<FieldPro
     }
 
     try {
-      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<Integer>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

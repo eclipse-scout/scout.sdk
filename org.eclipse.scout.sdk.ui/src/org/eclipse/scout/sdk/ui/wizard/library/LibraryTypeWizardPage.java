@@ -106,7 +106,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
     setDescription(Texts.get("NewLibraryBundleDesc"));
     // defaults
     setLibraryType(LibraryType.PLUGIN);
-    TreeSet<IScoutBundle> libraryUserBundles = new TreeSet<IScoutBundle>(new P_JavaProjectComparator());
+    TreeSet<IScoutBundle> libraryUserBundles = new TreeSet<>(new P_JavaProjectComparator());
     if (ownerBundle != null) {
       libraryUserBundles.add(ownerBundle);
     }
@@ -400,7 +400,7 @@ public class LibraryTypeWizardPage extends AbstractWorkspaceWizardPage {
   public Set<IScoutBundle> getLibraryUserBundles() {
     Set<IScoutBundle> libraryUserBundles = (Set<IScoutBundle>) getProperty(PROP_USER_BUNDLES);
     if (libraryUserBundles == null) {
-      libraryUserBundles = new TreeSet<IScoutBundle>();
+      libraryUserBundles = new TreeSet<>();
     }
     return libraryUserBundles;
   }

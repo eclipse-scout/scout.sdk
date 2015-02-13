@@ -63,7 +63,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
 
   private static final String PROJECT_PROD_LAUNCHERS = "pref_scout_project_prod_launcher";
 
-  private final ArrayList<ProductLaunchPresenter> m_launchPresenters = new ArrayList<ProductLaunchPresenter>();
+  private final ArrayList<ProductLaunchPresenter> m_launchPresenters = new ArrayList<>();
 
   @Override
   protected void createSections() {
@@ -94,7 +94,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
     Action action = new Action() {
       @Override
       public void run() {
-        ArrayList<IFile> productFiles = new ArrayList<IFile>();
+        ArrayList<IFile> productFiles = new ArrayList<>();
         for (ProductLaunchPresenter p : m_launchPresenters) {
           productFiles.add(p.getProductFile());
         }
@@ -251,7 +251,7 @@ public class ScoutProjectPropertyPart extends AbstractSinglePageSectionBasedView
   }
 
   public static IFile[] getProjectProductLaunchers(String projectName) {
-    ArrayList<IFile> products = new ArrayList<IFile>();
+    ArrayList<IFile> products = new ArrayList<>();
     IEclipsePreferences node = InstanceScope.INSTANCE.getNode(ScoutSdkUi.getDefault().getBundle().getSymbolicName());
     String mementoProducts = node.get(PROJECT_PROD_LAUNCHERS + "_" + projectName, "");
     if (!StringUtility.isNullOrEmpty(mementoProducts)) {

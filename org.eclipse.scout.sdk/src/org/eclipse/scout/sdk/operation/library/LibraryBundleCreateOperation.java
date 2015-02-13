@@ -130,7 +130,7 @@ public class LibraryBundleCreateOperation implements IOperation {
     helper.save();
     IPluginModelBase model = PluginRegistry.findModel(project);
     ClasspathComputer.setClasspath(project, model);
-    TreeSet<IPackageFragment> packages = new TreeSet<IPackageFragment>(new JavaElementComparator());
+    TreeSet<IPackageFragment> packages = new TreeSet<>(new JavaElementComparator());
     collectPackages(project, packages);
     for (IPackageFragment f : packages) {
       helper.Manifest.addExportPackage(f);
@@ -155,7 +155,7 @@ public class LibraryBundleCreateOperation implements IOperation {
   private void collectPackages(IProject project, Collection<IPackageFragment> collector) throws JavaModelException {
     IJavaProject jp = JavaCore.create(project);
     IPackageFragmentRoot[] roots = jp.getPackageFragmentRoots();
-    HashSet<String> names = new HashSet<String>();
+    HashSet<String> names = new HashSet<>();
     for (int j = 0; j < roots.length; j++) {
       if (roots[j].getKind() == IPackageFragmentRoot.K_SOURCE || (roots[j].getKind() == IPackageFragmentRoot.K_BINARY && !roots[j].isExternal())) {
         IJavaElement[] children = roots[j].getChildren();

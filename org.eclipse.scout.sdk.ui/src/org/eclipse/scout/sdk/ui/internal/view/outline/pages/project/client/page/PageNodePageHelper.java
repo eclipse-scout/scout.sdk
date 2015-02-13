@@ -29,7 +29,7 @@ public final class PageNodePageHelper {
   }
 
   public static List<AbstractPage> createRepresentationFor(AbstractPage parentPage, Set<IType> types, ITypeHierarchy pageTypeHierarchy) {
-    ArrayList<AbstractPage> pages = new ArrayList<AbstractPage>(types.size());
+    ArrayList<AbstractPage> pages = new ArrayList<>(types.size());
     for (IType type : types) {
       if (TypeUtility.exists(type)) {
         if (pageTypeHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IPageWithNodes), type)) {

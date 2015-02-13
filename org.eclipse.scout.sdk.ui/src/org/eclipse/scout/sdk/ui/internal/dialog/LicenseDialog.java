@@ -70,7 +70,7 @@ public class LicenseDialog extends TitleAreaDialog {
       m_iuToLicenses = Collections.emptyMap();
     }
     else {
-      m_iuToLicenses = new LinkedHashMap<String, License[]>(iuToLicenses.size());
+      m_iuToLicenses = new LinkedHashMap<>(iuToLicenses.size());
       for (Entry<String, License[]> entry : iuToLicenses.entrySet()) {
         if (StringUtility.hasText(entry.getKey()) && entry.getValue() != null && entry.getValue().length > 0) {
           m_iuToLicenses.put(entry.getKey(), entry.getValue());

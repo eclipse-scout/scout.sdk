@@ -100,7 +100,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
 
     // get original alias of servlet registration bundle and remove the servlet registration to be registered anew
     PluginModelHelper h = new PluginModelHelper(m_registrationBundle.getProject());
-    HashMap<String, String> attributes = new HashMap<String, String>();
+    HashMap<String, String> attributes = new HashMap<>();
     attributes.put("class", jaxWsServletClass);
     IPluginElement ext = h.PluginXml.getSimpleExtension(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes);
     String originalAlias = null;
@@ -114,19 +114,19 @@ public class JaxWsServletRegistrationOperation implements IOperation {
     // remove old servlet registration if servlet defining bundle is this bundle itself
     if (CompareUtility.equals(oldServletRegBundleName, m_bundle.getSymbolicName())) {
       PluginModelHelper oldPluginHelper = new PluginModelHelper(m_bundle.getProject());
-      attributes = new HashMap<String, String>();
+      attributes = new HashMap<>();
       attributes.put("class", jaxWsServletClass);
       oldPluginHelper.PluginXml.removeSimpleExtension(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes);
       oldPluginHelper.save();
     }
 
     // remove existing registration
-    attributes = new HashMap<String, String>();
+    attributes = new HashMap<>();
     attributes.put("class", jaxWsServletClass);
     h = new PluginModelHelper(m_registrationBundle.getProject());
     h.PluginXml.removeSimpleExtension(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes);
     // add new registration
-    attributes = new HashMap<String, String>();
+    attributes = new HashMap<>();
     attributes.put("class", jaxWsServletClass);
     attributes.put("alias", alias);
     h.PluginXml.addSimpleExtension(IRuntimeClasses.EXTENSION_POINT_EQUINOX_SERVLETS, IRuntimeClasses.EXTENSION_ELEMENT_SERVLET, attributes);
@@ -154,7 +154,7 @@ public class JaxWsServletRegistrationOperation implements IOperation {
             if (sunJaxWsXmlDocument == null) {
               continue;
             }
-            List<String> changedEntries = new ArrayList<String>();
+            List<String> changedEntries = new ArrayList<>();
             Element root = sunJaxWsXmlDocument.getDocumentElement();
             String tagName = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(root), SunJaxWsBean.XML_ENDPOINT);
             for (Element sunJaxWsXmlEntry : XmlUtility.getChildElements(root, tagName)) {

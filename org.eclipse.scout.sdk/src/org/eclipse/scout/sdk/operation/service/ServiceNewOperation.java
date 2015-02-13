@@ -76,8 +76,8 @@ public class ServiceNewOperation implements IOperation {
     m_interfaceBuilder.setFlags(Flags.AccPublic | Flags.AccInterface);
     m_interfaceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesTypeCommentBuilder());
 
-    m_proxyRegistrationProjects = new ArrayList<IJavaProject>();
-    m_serviceRegistrationDescriptions = new ArrayList<ServiceRegistrationDescription>();
+    m_proxyRegistrationProjects = new ArrayList<>();
+    m_serviceRegistrationDescriptions = new ArrayList<>();
   }
 
   @Override

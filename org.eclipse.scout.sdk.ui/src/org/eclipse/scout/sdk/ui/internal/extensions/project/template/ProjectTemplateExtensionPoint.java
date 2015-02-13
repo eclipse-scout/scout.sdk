@@ -44,7 +44,7 @@ public final class ProjectTemplateExtensionPoint {
   }
 
   private static Set<ProjectTemplateExtension> initTemplates() {
-    TreeSet<ProjectTemplateExtension> result = new TreeSet<ProjectTemplateExtension>(new P_ExtensionComparator());
+    TreeSet<ProjectTemplateExtension> result = new TreeSet<>(new P_ExtensionComparator());
     IExtensionRegistry reg = Platform.getExtensionRegistry();
     IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_ID);
     IExtension[] extensions = xp.getExtensions();

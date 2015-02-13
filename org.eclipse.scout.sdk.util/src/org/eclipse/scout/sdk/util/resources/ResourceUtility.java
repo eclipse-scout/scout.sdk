@@ -481,7 +481,7 @@ public final class ResourceUtility {
 
     private P_ResourceTreeVisitor(IResourceFilter filter) {
       m_filter = filter;
-      m_collector = new LinkedList<IResource>();
+      m_collector = new LinkedList<>();
     }
 
     private List<IResource> getResult() {

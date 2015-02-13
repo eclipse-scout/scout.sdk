@@ -43,8 +43,8 @@ public final class CopyAndPasteExtensionPoint {
   private static synchronized void init() {
     if (pasteTargetDelegates == null || copySourceDelegates == null) {
       // temporary lists for delegates
-      List<IPasteTargetDelegator> pasteDelegators = new ArrayList<IPasteTargetDelegator>();
-      List<ICopySourceDelegator> copyDelegators = new ArrayList<ICopySourceDelegator>();
+      List<IPasteTargetDelegator> pasteDelegators = new ArrayList<>();
+      List<ICopySourceDelegator> copyDelegators = new ArrayList<>();
 
       // retrieve the extensions for the extension point
       IExtensionRegistry reg = Platform.getExtensionRegistry();

@@ -51,7 +51,7 @@ public class FormFieldDeleteExecutor extends AbstractExecutor {
 
     if (confirmDialog.open() == Dialog.OK) {
       Set<? extends IMember> selectedMembers = confirmDialog.getSelectedMembers();
-      List<IOperation> deleteOps = new ArrayList<IOperation>(selectedMembers.size());
+      List<IOperation> deleteOps = new ArrayList<>(selectedMembers.size());
       for (IMember m : selectedMembers) {
         deleteOps.add(new BoxDeleteOperation((IType) m));
       }

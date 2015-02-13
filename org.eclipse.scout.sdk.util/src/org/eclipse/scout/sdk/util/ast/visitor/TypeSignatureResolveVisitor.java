@@ -53,7 +53,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
   public TypeSignatureResolveVisitor(ASTNode rootNode, IJavaElement containerElement) {
     m_rootNode = rootNode;
     m_containerElement = containerElement;
-    m_assignedSignatures = new HashSet<String>();
+    m_assignedSignatures = new HashSet<>();
   }
 
   @Override
@@ -109,7 +109,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
     if (m_mode == node.getNodeType()) {
       if (m_methodInvocation != null) {
         List<SimpleName> segments = m_methodInvocation.m_segments;
-        ArrayList<String> fqSignatures = new ArrayList<String>();
+        ArrayList<String> fqSignatures = new ArrayList<>();
         if (segments.size() > 1) {
           VariableType var = AstUtility.getTypeSignature(segments.get(0), m_rootNode, m_containerElement);
           if (var.getAssignedTypeSignatures().length > 0) {
@@ -119,7 +119,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
             fqSignatures.add(var.getTypeSignature());
           }
           for (int i = 1; i < segments.size(); i++) {
-            ArrayList<String> newList = new ArrayList<String>();
+            ArrayList<String> newList = new ArrayList<>();
             for (String sig : fqSignatures) {
               String newSig = AstUtility.resolveReturnValueSignature(sig, segments.get(i).getFullyQualifiedName());
               newList.add(newSig);
@@ -184,7 +184,7 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
         return false;
       default:
         if (!m_assignedSignatures.isEmpty() || m_typeSignature != null) {
-          HashSet<String> newSet = new HashSet<String>();
+          HashSet<String> newSet = new HashSet<>();
           if (!m_assignedSignatures.isEmpty()) {
             for (String s : m_assignedSignatures) {
               newSet.add(AstUtility.resolveReturnValueSignature(s, node.getFullyQualifiedName()));
@@ -229,6 +229,6 @@ public class TypeSignatureResolveVisitor extends DefaultAstVisitor {
   }
 
   private class P_MethodInvocation {
-    private List<SimpleName> m_segments = new ArrayList<SimpleName>();
+    private List<SimpleName> m_segments = new ArrayList<>();
   }
 }

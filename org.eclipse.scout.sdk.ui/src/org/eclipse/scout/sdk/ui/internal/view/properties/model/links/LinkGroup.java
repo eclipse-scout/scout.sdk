@@ -25,7 +25,7 @@ public class LinkGroup {
   private int m_order;
   private String m_name;
 
-  private ArrayList<ILink> m_links = new ArrayList<ILink>();
+  private ArrayList<ILink> m_links = new ArrayList<>();
 
   public LinkGroup(String name, int order) {
     m_name = name;

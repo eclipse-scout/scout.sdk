@@ -162,7 +162,7 @@ public class MethodReturnExpression {
       synchronized (this) {
         result = m_referencedElements;
         if (result == null) {
-          result = new LinkedHashMap<SimpleName, IJavaElement>();
+          result = new LinkedHashMap<>();
           m_referencedElements = result;
         }
       }

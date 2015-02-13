@@ -42,7 +42,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
    */
   public AbstractTranslationResource(Language language) {
     m_language = language;
-    m_entries = new HashMap<String, String>();
+    m_entries = new HashMap<>();
     m_eventListeners = new EventListenerList();
   }
 
@@ -72,7 +72,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
     prop.load(stream);
     Set<Entry<Object, Object>> entrySet = prop.entrySet();
 
-    Map<String, String> newEntries = new HashMap<String, String>(entrySet.size());
+    Map<String, String> newEntries = new HashMap<>(entrySet.size());
     for (Entry<Object, Object> entry : entrySet) {
       if (newEntries.get(entry.getKey()) != null) {
         NlsCore.getDefault().getLog().log(new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, "Doubled entry for key: " + entry.getKey() + " skipping this entry", new Exception()));

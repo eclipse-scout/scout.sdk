@@ -296,7 +296,7 @@ public class TypeFilters {
   public static ITypeFilter getNotInTypes(IType... excludedTypes) {
     Set<IType> excludedSet = null;
     if (excludedTypes != null) {
-      excludedSet = new HashSet<IType>(excludedTypes.length);
+      excludedSet = new HashSet<>(excludedTypes.length);
       for (IType t : excludedTypes) {
         if (t != null) {
           excludedSet.add(t);

@@ -74,9 +74,9 @@ public class LibraryBundleUnlinkOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    Set<IFile> productsToCheck = new HashSet<IFile>();
-    Set<IScoutBundle> checkedScoutProjects = new HashSet<IScoutBundle>();
-    List<IPluginModelBase> allUnlinkedLibraries = new LinkedList<IPluginModelBase>();
+    Set<IFile> productsToCheck = new HashSet<>();
+    Set<IScoutBundle> checkedScoutProjects = new HashSet<>();
+    List<IPluginModelBase> allUnlinkedLibraries = new LinkedList<>();
     IScoutBundle bundle = getBundle();
     PluginModelHelper helper = new PluginModelHelper(bundle.getProject());
     for (IPluginModelBase model : getLibraries()) {

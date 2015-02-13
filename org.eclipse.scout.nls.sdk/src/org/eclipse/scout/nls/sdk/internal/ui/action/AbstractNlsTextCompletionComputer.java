@@ -45,14 +45,14 @@ public abstract class AbstractNlsTextCompletionComputer implements IJavaCompleti
   @Override
   public List<ICompletionProposal> computeCompletionProposals(ContentAssistInvocationContext context, IProgressMonitor monitor) {
     if (!(context instanceof JavaContentAssistInvocationContext)) {
-      return new ArrayList<ICompletionProposal>(0);
+      return new ArrayList<>(0);
     }
     JavaContentAssistInvocationContext javaContext = (JavaContentAssistInvocationContext) context;
     return computeProposals(javaContext);
   }
 
   protected List<ICompletionProposal> computeProposals(JavaContentAssistInvocationContext context) {
-    List<ICompletionProposal> proposals = new ArrayList<ICompletionProposal>();
+    List<ICompletionProposal> proposals = new ArrayList<>();
     int offset = context.getInvocationOffset();
     IDocument doc = context.getDocument();
     if (doc == null || offset > doc.getLength()) {

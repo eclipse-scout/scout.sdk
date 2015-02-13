@@ -103,9 +103,9 @@ public class ScoutBundle implements IScoutBundle {
 
   public ScoutBundle(IPluginModelBase bundle, IProgressMonitor monitor) {
     m_pluginModelBase = bundle;
-    m_parentBundles = new HashSet<ScoutBundle>();
-    m_childBundles = new HashSet<ScoutBundle>();
-    m_dependencyIssues = new HashSet<String>();
+    m_parentBundles = new HashSet<>();
+    m_childBundles = new HashSet<>();
+    m_dependencyIssues = new HashSet<>();
     m_allDependencies = getAllDependenciesImpl(bundle, monitor);
     m_type = RuntimeBundles.getBundleType(this);
     m_javaProject = getJavaProject(bundle);
@@ -296,7 +296,7 @@ public class ScoutBundle implements IScoutBundle {
         if (result == null) {
           try {
             registerNlsServiceListener();
-            result = new Holder<INlsProject>(INlsProject.class, null);
+            result = new Holder<>(INlsProject.class, null);
             INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(IRuntimeClasses.TEXTS), this});
             result.setValue(nlsProject);
             m_nlsProjectHolder = result;
@@ -319,7 +319,7 @@ public class ScoutBundle implements IScoutBundle {
         if (result == null) {
           try {
             registerNlsServiceListener();
-            result = new Holder<INlsProject>(INlsProject.class, null);
+            result = new Holder<>(INlsProject.class, null);
             INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(IRuntimeClasses.IDocumentationTextProviderService), this});
             result.setValue(nlsProject);
             m_docsNlsProjectHolder = result;
@@ -446,7 +446,7 @@ public class ScoutBundle implements IScoutBundle {
   }
 
   private void breadthFirstTraverseNeighbors(IScoutBundleGraphVisitor visitor, boolean up, Set<ScoutBundle> directNeighbors) {
-    Deque<P_TraverseComposite> deck = new LinkedList<P_TraverseComposite>();
+    Deque<P_TraverseComposite> deck = new LinkedList<>();
     for (ScoutBundle start : directNeighbors) {
       deck.addLast(new P_TraverseComposite(start, 1));
     }
@@ -454,7 +454,7 @@ public class ScoutBundle implements IScoutBundle {
   }
 
   private void breadthFirstTraverseFromThis(IScoutBundleGraphVisitor visitor, boolean up) {
-    Deque<P_TraverseComposite> deck = new LinkedList<P_TraverseComposite>();
+    Deque<P_TraverseComposite> deck = new LinkedList<>();
     deck.addLast(new P_TraverseComposite(this, 0));
     breadthFirstTraverse(visitor, up, deck);
   }
@@ -536,9 +536,9 @@ public class ScoutBundle implements IScoutBundle {
   }
 
   private Map<String, IPluginModelBase> getAllDependenciesImpl(IPluginModelBase bundle, IProgressMonitor monitor) {
-    Map<String, IPluginModelBase> collector = new HashMap<String, IPluginModelBase>();
-    Stack<IPluginModelBase> dependencyStack = new Stack<IPluginModelBase>();
-    Set<String> messageCollector = new HashSet<String>();
+    Map<String, IPluginModelBase> collector = new HashMap<>();
+    Stack<IPluginModelBase> dependencyStack = new Stack<>();
+    Set<String> messageCollector = new HashSet<>();
     collectDependencies(bundle, collector, dependencyStack, messageCollector, true, monitor);
     getDependencyIssues().addAll(messageCollector);
     return collector;
@@ -643,7 +643,7 @@ public class ScoutBundle implements IScoutBundle {
     private final IScoutBundleFilter m_filter;
 
     private P_BundleCollector(IScoutBundleFilter filter) {
-      m_collector = new LinkedHashSet<IScoutBundle>();
+      m_collector = new LinkedHashSet<>();
       m_filter = filter;
     }
 
@@ -672,7 +672,7 @@ public class ScoutBundle implements IScoutBundle {
         // but to ensure there is no random behavior we assign one
         comparator = ScoutBundleComparators.getSymbolicNameAscComparator();
       }
-      m_collector = new TreeSet<IScoutBundle>(comparator);
+      m_collector = new TreeSet<>(comparator);
       m_lastLevel = 0; // first traversal level is 0
     }
 

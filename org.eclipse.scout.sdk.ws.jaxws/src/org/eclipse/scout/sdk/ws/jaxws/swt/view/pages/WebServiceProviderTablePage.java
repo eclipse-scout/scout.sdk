@@ -137,8 +137,8 @@ public class WebServiceProviderTablePage extends AbstractPage {
       m_sunJaxWsXml = getSunJaxWsResource().loadXml();
 
       // if endpoint was added or removed, mark structure dirty
-      final Set<String> endpoints = new HashSet<String>();
-      final Set<String> endpointsLoaded = new HashSet<String>();
+      final Set<String> endpoints = new HashSet<>();
+      final Set<String> endpointsLoaded = new HashSet<>();
 
       for (Element sunJaxWsXml : getEndpoints()) {
         SunJaxWsBean sunJaxWsBean = new SunJaxWsBean(sunJaxWsXml);

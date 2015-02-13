@@ -40,7 +40,7 @@ public class ConfigPropertyType {
     m_superTypeHierarchy = TypeUtility.getSupertypeHierarchy(type);
     m_affectedTypes = m_superTypeHierarchy.getSuperClassStack(m_type);
 
-    TreeMap<String, ConfigurationMethod> configurationMethods = new TreeMap<String, ConfigurationMethod>(new P_MethodNameComparator());
+    TreeMap<String, ConfigurationMethod> configurationMethods = new TreeMap<>(new P_MethodNameComparator());
     for (IType t : m_affectedTypes) {
       for (IMethod m : t.getMethods()) {
         if (TypeUtility.exists(m) && !m.isConstructor()) {
@@ -75,7 +75,7 @@ public class ConfigPropertyType {
 
   public List<ConfigurationMethod> getConfigurationMethods(int methodType) {
     Collection<ConfigurationMethod> values = m_configurationMethods.values();
-    List<ConfigurationMethod> result = new ArrayList<ConfigurationMethod>(values.size());
+    List<ConfigurationMethod> result = new ArrayList<>(values.size());
     for (ConfigurationMethod m : values) {
       if (m.getMethodType() == methodType) {
         result.add(m);

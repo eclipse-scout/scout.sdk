@@ -473,7 +473,7 @@ public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
     if (!isRapTargetPluginAvailable) {
       // the rap target plugin is not installed: filter the strategy out if it is in the list
-      ArrayList<TargetStrategy> strategies = new ArrayList<TargetStrategy>(offeredTargetStrategies.length);
+      ArrayList<TargetStrategy> strategies = new ArrayList<>(offeredTargetStrategies.length);
       for (TargetStrategy s : offeredTargetStrategies) {
         if (!TargetStrategy.STRATEGY_LOCAL_EXTRACT.equals(s)) {
           strategies.add(s);

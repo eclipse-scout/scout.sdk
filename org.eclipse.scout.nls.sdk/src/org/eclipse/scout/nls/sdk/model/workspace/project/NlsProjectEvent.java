@@ -53,7 +53,7 @@ public class NlsProjectEvent {
     m_entry = entry;
     m_type = type;
     m_resource = r;
-    m_childEvents = new ArrayList<NlsProjectEvent>();
+    m_childEvents = new ArrayList<>();
   }
 
   public boolean isMultiEvent() {

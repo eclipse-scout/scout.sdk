@@ -138,7 +138,7 @@ public class SourceFolderSelectionDialog extends TitleAreaDialog {
 
     @Override
     public Object[] getElements(Object inputElement) {
-      List<IClasspathEntry> sourceFolderEntries = new LinkedList<IClasspathEntry>();
+      List<IClasspathEntry> sourceFolderEntries = new LinkedList<>();
       try {
         for (IClasspathEntry classpathEntry : m_bundle.getJavaProject().getRawClasspath()) {
           if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {

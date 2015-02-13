@@ -44,8 +44,8 @@ import org.eclipse.ui.services.IServiceLocator;
 @SuppressWarnings("restriction")
 public class ScoutMenuContributionItemFactory extends ExtensionContributionFactory {
 
-  private static final Map<String, KeyBinding> USED_BINDINGS = new HashMap<String, KeyBinding>();
-  private static final Map<String, IHandlerActivation> USED_ACTIVATIONS = new HashMap<String, IHandlerActivation>();
+  private static final Map<String, KeyBinding> USED_BINDINGS = new HashMap<>();
+  private static final Map<String, IHandlerActivation> USED_ACTIVATIONS = new HashMap<>();
 
   @Override
   public void createContributionItems(IServiceLocator serviceLocator, IContributionRoot additions) {

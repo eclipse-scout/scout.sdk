@@ -82,7 +82,7 @@ public class JaxWsServletRegistrationWizardPage extends AbstractWorkspaceWizardP
     m_propertySupport = new BasicPropertySupport(this);
     m_bundle = bundle;
     m_candidateBundles = ServletRegistrationUtility.getJaxWsBundlesOnClasspath(m_bundle);
-    m_servletRegistrationAliasMap = new HashMap<IScoutBundle, String>();
+    m_servletRegistrationAliasMap = new HashMap<>();
     Registration[] registrations = ServletRegistrationUtility.getJaxWsServletRegistrationsOnClasspath(m_bundle);
     for (Registration registration : registrations) {
       m_servletRegistrationAliasMap.put(registration.getBundle(), registration.getAlias());

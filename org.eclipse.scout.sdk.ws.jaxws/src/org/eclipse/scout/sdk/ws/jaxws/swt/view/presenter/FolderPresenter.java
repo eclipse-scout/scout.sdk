@@ -215,7 +215,7 @@ public class FolderPresenter extends AbstractPropertyPresenter<IFolder> {
     private Set<IPath> m_unsupportedFolders;
 
     public FolderFilter(IScoutBundle bundle) {
-      m_unsupportedFolders = new HashSet<IPath>();
+      m_unsupportedFolders = new HashSet<>();
       m_bundle = bundle;
 
       try {

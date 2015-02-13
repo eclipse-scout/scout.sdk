@@ -68,7 +68,7 @@ public class ButtonGroup<T> extends Composite {
       throw new IllegalArgumentException("selection button type not valid");
     }
     m_eventListeners = new EventListenerList();
-    m_buttons = new ArrayList<Button>();
+    m_buttons = new ArrayList<>();
     m_type = type;
     setLayout(new FormLayout());
   }
@@ -178,7 +178,7 @@ public class ButtonGroup<T> extends Composite {
    */
   @SuppressWarnings("unchecked")
   public List<T> getValues() {
-    ArrayList<T> selectedValues = new ArrayList<T>(m_buttons.size());
+    ArrayList<T> selectedValues = new ArrayList<>(m_buttons.size());
     for (Button b : m_buttons) {
       if (b.getSelection()) {
         selectedValues.add((T) b.getData(VALUE));

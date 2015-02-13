@@ -145,7 +145,7 @@ public class MobileDesktopExtensionInstallOperation extends AbstractScoutProject
   }
 
   private void registerDesktopExtension(IType desktopExtension, IScoutBundle mobileClient, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    HashMap<String, String> properties = new HashMap<String, String>(2);
+    HashMap<String, String> properties = new HashMap<>(2);
     properties.put("active", "true");
     properties.put("class", desktopExtension.getFullyQualifiedName());
     PluginModelHelper pmh = new PluginModelHelper(mobileClient.getSymbolicName());

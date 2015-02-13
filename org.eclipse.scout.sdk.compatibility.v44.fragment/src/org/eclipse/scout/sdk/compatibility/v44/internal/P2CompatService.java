@@ -67,7 +67,7 @@ public class P2CompatService implements IP2CompatService {
 
   @Override
   public void installUnits(String[] rootIUs, URI[] p2RepositoryURIs, IProgressMonitor monitor) throws CoreException {
-    ArrayList<IInstallableUnit> toInstall = new ArrayList<IInstallableUnit>(rootIUs.length);
+    ArrayList<IInstallableUnit> toInstall = new ArrayList<>(rootIUs.length);
     for (int i = 0; i < Math.min(rootIUs.length, p2RepositoryURIs.length); i++) {
       IInstallableUnit[] units = getInstallableUnits(new String[]{rootIUs[i]}, getMetadataRepository(p2RepositoryURIs[i], monitor), monitor);
       for (IInstallableUnit iu : units) {
@@ -96,7 +96,7 @@ public class P2CompatService implements IP2CompatService {
 
   @Override
   public Map<String /* IU id */, License[] /*license bodies */> getLicenses(String[] rootIUs, URI[] p2RepositoryURIs, IProgressMonitor monitor) throws CoreException {
-    ArrayList<IInstallableUnit> units = new ArrayList<IInstallableUnit>(rootIUs.length);
+    ArrayList<IInstallableUnit> units = new ArrayList<>(rootIUs.length);
     for (int i = 0; i < Math.min(rootIUs.length, p2RepositoryURIs.length); i++) {
       IInstallableUnit[] ius = getInstallableUnits(new String[]{rootIUs[i]}, getMetadataRepository(p2RepositoryURIs[i], monitor), monitor);
       if (ius != null && ius.length > 0) {
@@ -106,10 +106,10 @@ public class P2CompatService implements IP2CompatService {
       }
     }
 
-    LinkedHashMap<String, License[]> ret = new LinkedHashMap<String, License[]>(units.size());
+    LinkedHashMap<String, License[]> ret = new LinkedHashMap<>(units.size());
     for (IInstallableUnit iu : units) {
       Collection<ILicense> licenses = iu.getLicenses(null);
-      ArrayList<License> licList = new ArrayList<License>(licenses.size());
+      ArrayList<License> licList = new ArrayList<>(licenses.size());
       for (ILicense l : licenses) {
         if (l.getBody() != null && l.getBody().trim().length() > 0) {
           License lic = new License(l.getBody(), iu.getId());

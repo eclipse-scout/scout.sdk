@@ -38,8 +38,8 @@ public class FileChooserField extends Composite {
   private String[] m_extendsionFilter;
   private String m_fileName;
   private String m_title;
-  private List<IInputChangedListener<String>> m_focusOutListener = new LinkedList<IInputChangedListener<String>>();
-  private List<IInputChangedListener<String>> m_modifyListener = new LinkedList<IInputChangedListener<String>>();
+  private List<IInputChangedListener<String>> m_focusOutListener = new LinkedList<>();
+  private List<IInputChangedListener<String>> m_modifyListener = new LinkedList<>();
 
   public FileChooserField(Composite parent, String title) {
     super(parent, SWT.NONE);

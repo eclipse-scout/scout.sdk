@@ -59,7 +59,7 @@ public class SmartDialog {
   private TableViewer m_viewer;
   private Label m_infoLabel;
   private P_SmartFieldTableModel m_smartTableModel;
-  private List<ISmartDialogListener> m_smartDialogListeners = new LinkedList<ISmartDialogListener>();
+  private List<ISmartDialogListener> m_smartDialogListeners = new LinkedList<>();
   private Point m_defaultSize = new Point(200, 250);
   private static final Collator COLLATOR = Collator.getInstance(Locale.getDefault());
 
@@ -262,7 +262,7 @@ public class SmartDialog {
   }
 
   protected void notifyItemSelection(Object item) {
-    List<ISmartDialogListener> listeners = new ArrayList<ISmartDialogListener>(
+    List<ISmartDialogListener> listeners = new ArrayList<>(
         m_smartDialogListeners);
     for (ISmartDialogListener listener : listeners) {
       listener.itemSelected(item);
@@ -271,10 +271,10 @@ public class SmartDialog {
   }
 
   private class P_SmartFieldTableModel implements IStructuredContentProvider, ITableLabelProvider {
-    private TreeSet<P_CompareableSmartItem> m_items = new TreeSet<P_CompareableSmartItem>();
+    private TreeSet<P_CompareableSmartItem> m_items = new TreeSet<>();
 
     public void setItems(List<Object> items) {
-      m_items = new TreeSet<P_CompareableSmartItem>();
+      m_items = new TreeSet<>();
       for (Object object : items) {
         m_items.add(new P_CompareableSmartItem(object));
       }

@@ -43,7 +43,7 @@ public class ButtonApiTest extends AbstractApiTest {
     IFieldFilter filter = FieldFilters.getCompositeFilter(FieldFilters.getFlagsFilter(Flags.AccStatic | Flags.AccFinal),
         FieldFilters.getNameRegexFilter(Pattern.compile("^DISPLAY\\_STYLE.*$")));
     Set<IField> fields = TypeUtility.getFields(type, filter);
-    HashMap<String, IField> fieldMap = new HashMap<String, IField>();
+    HashMap<String, IField> fieldMap = new HashMap<>();
     for (IField f : fields) {
       fieldMap.put(f.getElementName(), f);
     }
@@ -73,7 +73,7 @@ public class ButtonApiTest extends AbstractApiTest {
     IFieldFilter filter = FieldFilters.getCompositeFilter(FieldFilters.getFlagsFilter(Flags.AccStatic | Flags.AccFinal),
         FieldFilters.getNameRegexFilter(Pattern.compile("^SYSTEM\\_TYPE.*$")));
     Set<IField> fields = TypeUtility.getFields(type, filter);
-    HashMap<String, IField> fieldMap = new HashMap<String, IField>();
+    HashMap<String, IField> fieldMap = new HashMap<>();
     for (IField f : fields) {
       fieldMap.put(f.getElementName(), f);
     }

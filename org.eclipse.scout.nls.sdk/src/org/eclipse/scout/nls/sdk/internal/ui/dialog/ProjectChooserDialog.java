@@ -44,8 +44,8 @@ import org.eclipse.ui.ide.IDE;
 public class ProjectChooserDialog extends TitleAreaDialog {
 
   private String m_title;
-  private HashMap<String, IProject> m_selection = new HashMap<String, IProject>();
-  private Collection<IProject> m_workspaceProjects = new LinkedList<IProject>();
+  private HashMap<String, IProject> m_selection = new HashMap<>();
+  private Collection<IProject> m_workspaceProjects = new LinkedList<>();
   private CheckboxTableViewer m_viewer;
 
   public ProjectChooserDialog(Shell parentShell, String title) {

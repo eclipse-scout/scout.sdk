@@ -68,7 +68,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
 
   @Override
   public List<IScoutTechnologyResource> getModifactionResourceCandidates(IScoutBundle project) throws CoreException {
-    ArrayList<IScoutTechnologyResource> ret = new ArrayList<IScoutTechnologyResource>();
+    ArrayList<IScoutTechnologyResource> ret = new ArrayList<>();
     contributeResources(project, ret);
     return ret;
   }
@@ -276,7 +276,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
 
   protected boolean closeTargetEditors(Set<IScoutTechnologyResource> resources) {
     final AtomicBoolean success = new AtomicBoolean(false);
-    final Set<IFile> files = new HashSet<IFile>(resources.size());
+    final Set<IFile> files = new HashSet<>(resources.size());
     for (IScoutTechnologyResource r : resources) {
       files.add(r.getResource());
     }
@@ -368,7 +368,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   }
 
   protected List<ScoutTechnologyResource> getTargetFiles() throws CoreException {
-    final ArrayList<ScoutTechnologyResource> ret = new ArrayList<ScoutTechnologyResource>();
+    final ArrayList<ScoutTechnologyResource> ret = new ArrayList<>();
     for (IResource r : ResourceUtility.getAllResources(ResourceFilters.getTargetFileFilter())) {
       IProject p = r.getProject();
       IScoutBundle sb = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(p);
@@ -379,7 +379,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
   }
 
   protected List<P_TechProductFile> getProductFiles() throws CoreException {
-    ArrayList<P_TechProductFile> list = new ArrayList<P_TechProductFile>();
+    ArrayList<P_TechProductFile> list = new ArrayList<>();
     for (IResource r : ResourceUtility.getAllResources(ResourceFilters.getProductFileFilter())) {
       IProject p = r.getProject();
       IScoutBundle sb = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(p);
@@ -398,7 +398,7 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
 
   protected List<P_TechProductFile> getFilteredProductFiles(String... pluginFilter) throws CoreException {
     List<P_TechProductFile> candidates = getProductFiles();
-    List<P_TechProductFile> ret = new ArrayList<P_TechProductFile>(candidates.size());
+    List<P_TechProductFile> ret = new ArrayList<>(candidates.size());
     for (P_TechProductFile candidate : candidates) {
       if (containsProductDependencies(candidate.productFile, pluginFilter)) {
         ret.add(candidate);
@@ -450,8 +450,8 @@ public abstract class AbstractScoutTechnologyHandler implements IScoutTechnology
    * @throws CoreException
    */
   protected FeatureInstallResult ensureFeaturesInstalled(final String[] featureIds, final String[] featureUrls, final IProgressMonitor monitor, String[]... definingPlugins) throws CoreException {
-    ArrayList<URI> repos = new ArrayList<URI>();
-    ArrayList<String> featureIdsToInstall = new ArrayList<String>();
+    ArrayList<URI> repos = new ArrayList<>();
+    ArrayList<String> featureIdsToInstall = new ArrayList<>();
 
     try {
       int maxNum = Math.min(Math.min(featureIds.length, featureUrls.length), definingPlugins.length);

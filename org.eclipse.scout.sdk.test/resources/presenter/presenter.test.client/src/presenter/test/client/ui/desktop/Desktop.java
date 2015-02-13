@@ -38,7 +38,7 @@ public class Desktop extends AbstractDesktop implements IDesktop {
 
   @Override
   protected List<Class<? extends IOutline>> getConfiguredOutlines() {
-    List<Class<? extends IOutline>> outlines = new ArrayList<Class<? extends IOutline>>();
+    List<Class<? extends IOutline>> outlines = new ArrayList<>();
     outlines.add(TestOutline.class);
     return outlines;
   }

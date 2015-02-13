@@ -23,7 +23,7 @@ public class ProposalPopupEvent {
   public static final String IDENTIFIER_SELECTED_PROPOSAL = "selectedProposal";
 
   private final int m_type;
-  private HashMap<String, Object> m_values = new HashMap<String, Object>();
+  private HashMap<String, Object> m_values = new HashMap<>();
 
   public ProposalPopupEvent(int type) {
     m_type = type;

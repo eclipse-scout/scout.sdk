@@ -54,7 +54,7 @@ public class ProjectVersionPresenter extends AbstractPresenter {
 
   private Map<IProject, PluginModelHelper> getModels() {
     Set<? extends IScoutBundle> scoutBundles = m_project.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
-    Map<IProject, PluginModelHelper> bundles = new HashMap<IProject, PluginModelHelper>(scoutBundles.size());
+    Map<IProject, PluginModelHelper> bundles = new HashMap<>(scoutBundles.size());
     for (IScoutBundle sb : scoutBundles) {
       bundles.put(sb.getProject(), new PluginModelHelper(sb.getProject()));
     }
@@ -115,7 +115,7 @@ public class ProjectVersionPresenter extends AbstractPresenter {
     if (newVersion != null) {
       String newVersionStr = newVersion.toString();
       Map<IProject, PluginModelHelper> models = getModels();
-      LinkedList<String> errPlugins = new LinkedList<String>();
+      LinkedList<String> errPlugins = new LinkedList<>();
       for (Entry<IProject, PluginModelHelper> entry : models.entrySet()) {
         PluginModelHelper mf = entry.getValue();
         if (!newVersionStr.equals(mf.Manifest.getVersionAsString())) {

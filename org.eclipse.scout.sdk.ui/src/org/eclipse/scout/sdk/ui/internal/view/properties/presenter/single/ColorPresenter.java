@@ -181,7 +181,7 @@ public class ColorPresenter extends AbstractValuePresenter<RGB> {
   @Override
   protected synchronized void storeValue(RGB value) throws CoreException {
     try {
-      ConfigPropertyUpdateOperation<RGB> updateOp = new ConfigPropertyUpdateOperation<RGB>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<RGB> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

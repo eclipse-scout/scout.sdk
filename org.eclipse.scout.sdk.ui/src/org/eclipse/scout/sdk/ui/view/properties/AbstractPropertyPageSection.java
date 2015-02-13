@@ -25,7 +25,7 @@ public abstract class AbstractPropertyPageSection implements IPropertyPageSectio
     m_desc = description;
     m_logicalHeight = logicalHeight;
     m_expanded = true;
-    m_properties = new ArrayList<Object>();
+    m_properties = new ArrayList<>();
   }
 
   @Override
@@ -48,7 +48,7 @@ public abstract class AbstractPropertyPageSection implements IPropertyPageSectio
    */
   @Override
   public List<Object> getProperties() {
-    return new ArrayList<Object>(m_properties);
+    return new ArrayList<>(m_properties);
   }
 
   @Override

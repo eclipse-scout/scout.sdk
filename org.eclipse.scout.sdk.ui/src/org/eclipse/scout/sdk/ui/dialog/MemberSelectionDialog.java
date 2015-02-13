@@ -86,19 +86,19 @@ public class MemberSelectionDialog extends TitleAreaDialog {
   }
 
   public void setMembers(Set<? extends IMember> members) {
-    m_members = new LinkedHashSet<IMember>(members);
+    m_members = new LinkedHashSet<>(members);
   }
 
   public Set<? extends IMember> getMembers() {
-    return new LinkedHashSet<IMember>(m_members);
+    return new LinkedHashSet<>(m_members);
   }
 
   public void setSelectedMembers(Set<? extends IMember> selectedMembers) {
     if (selectedMembers == null) {
-      m_selectedMembers = new LinkedHashSet<IMember>(0);
+      m_selectedMembers = new LinkedHashSet<>(0);
     }
     else {
-      m_selectedMembers = new LinkedHashSet<IMember>(selectedMembers);
+      m_selectedMembers = new LinkedHashSet<>(selectedMembers);
     }
 
     if (m_viewer != null && !m_viewer.getTable().isDisposed()) {
@@ -108,7 +108,7 @@ public class MemberSelectionDialog extends TitleAreaDialog {
   }
 
   public Set<? extends IMember> getSelectedMembers() {
-    return new LinkedHashSet<IMember>(m_selectedMembers);
+    return new LinkedHashSet<>(m_selectedMembers);
   }
 
   public Button getOkButton() {
@@ -132,7 +132,7 @@ public class MemberSelectionDialog extends TitleAreaDialog {
       @Override
       public void checkStateChanged(CheckStateChangedEvent event) {
         Object[] checkedElements = m_viewer.getCheckedElements();
-        Set<IMember> newChecked = new LinkedHashSet<IMember>(checkedElements.length);
+        Set<IMember> newChecked = new LinkedHashSet<>(checkedElements.length);
         for (Object m : checkedElements) {
           if (m instanceof IMember) {
             newChecked.add((IMember) m);

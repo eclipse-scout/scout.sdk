@@ -80,7 +80,7 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
   public final synchronized List<IFile> getCreatedProductFiles() {
     List<IFile> list = getProperties().getProperty(PROP_CREATED_PRODUCT_FILES, List.class);
     if (list == null) {
-      list = new ArrayList<IFile>();
+      list = new ArrayList<>();
       getProperties().setProperty(PROP_CREATED_PRODUCT_FILES, list);
     }
     return list;
@@ -178,7 +178,7 @@ public abstract class AbstractScoutProjectNewOperation implements IScoutProjectN
 
   protected final Map<String, String> getStringProperties() {
     Map<String, Object> allProps = getProperties().getPropertiesMap();
-    HashMap<String, String> ret = new HashMap<String, String>();
+    HashMap<String, String> ret = new HashMap<>();
     for (Entry<String, Object> e : allProps.entrySet()) {
       if (e != null && !StringUtility.isNullOrEmpty(e.getKey()) && e.getValue() instanceof String) {
         ret.put(e.getKey(), (String) e.getValue());

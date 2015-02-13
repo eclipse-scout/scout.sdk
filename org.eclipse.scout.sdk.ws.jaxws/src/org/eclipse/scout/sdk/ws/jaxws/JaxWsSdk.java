@@ -55,8 +55,8 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
   private Map<Class<? extends IPage>, Set<IPageReloadNotification>> m_pageRegistry;
 
   public JaxWsSdk() {
-    m_markerCommands = new ConcurrentHashMap<String, IMarkerCommand>();
-    m_pageRegistry = new HashMap<Class<? extends IPage>, Set<IPageReloadNotification>>();
+    m_markerCommands = new ConcurrentHashMap<>();
+    m_pageRegistry = new HashMap<>();
     m_pageRegistryLock = new Object();
   }
 
@@ -199,7 +199,7 @@ public class JaxWsSdk extends AbstractUIPlugin implements JaxWsIcons {
     synchronized (m_pageRegistryLock) {
       Set<IPageReloadNotification> pages = m_pageRegistry.get(pageClazz);
       if (pages == null) {
-        pages = new HashSet<IPageReloadNotification>();
+        pages = new HashSet<>();
         m_pageRegistry.put(pageClazz, pages);
       }
       pages.add(page);

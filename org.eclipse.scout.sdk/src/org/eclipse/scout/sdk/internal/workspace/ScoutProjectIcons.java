@@ -78,12 +78,12 @@ public class ScoutProjectIcons implements IIconProvider {
   protected synchronized void cache() {
     if (m_cachedIcons == null) {
       m_baseUrls = buildBaseUrls();
-      Map<String, ScoutIconDesc> collector = new HashMap<String, ScoutIconDesc>();
+      Map<String, ScoutIconDesc> collector = new HashMap<>();
       collectIconNames(collector);
       for (ScoutIconDesc desc : collector.values()) {
         findIconInProject(desc);
       }
-      m_cachedIcons = new HashMap<String, ScoutIconDesc>(collector);
+      m_cachedIcons = new HashMap<>(collector);
     }
   }
 
@@ -95,7 +95,7 @@ public class ScoutProjectIcons implements IIconProvider {
       }
     }, true);
     List<String> types = RuntimeBundles.getTypes();
-    ArrayList<String> bundles = new ArrayList<String>(childBundles.size() + types.size());
+    ArrayList<String> bundles = new ArrayList<>(childBundles.size() + types.size());
 
     // Project bundles
     for (IScoutBundle parentBundle : childBundles) {

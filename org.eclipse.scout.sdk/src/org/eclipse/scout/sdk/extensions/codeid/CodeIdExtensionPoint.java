@@ -53,7 +53,7 @@ public final class CodeIdExtensionPoint {
     if (codeIdProviderExtensions == null) {
       synchronized (CODE_ID_PROV_LOCK) {
         if (codeIdProviderExtensions == null) {
-          Map<CompositeObject, ICodeIdProvider> providers = new TreeMap<CompositeObject, ICodeIdProvider>();
+          Map<CompositeObject, ICodeIdProvider> providers = new TreeMap<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);
           IExtension[] extensions = xp.getExtensions();
@@ -94,7 +94,7 @@ public final class CodeIdExtensionPoint {
     if (codeIdParsers == null) {
       synchronized (CODE_ID_PARSER_LOCK) {
         if (codeIdParsers == null) {
-          Map<String, Map<CompositeObject, ICodeIdParser>> parsers = new HashMap<String, Map<CompositeObject, ICodeIdParser>>();
+          Map<String, Map<CompositeObject, ICodeIdParser>> parsers = new HashMap<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);
           IExtension[] extensions = xp.getExtensions();
@@ -109,7 +109,7 @@ public final class CodeIdExtensionPoint {
                     ICodeIdParser parser = (ICodeIdParser) parserElememt.createExecutableExtension(ATTRIB_CLASS);
                     Map<CompositeObject, ICodeIdParser> typeParsers = parsers.get(genericTypeSignature);
                     if (typeParsers == null) {
-                      typeParsers = new TreeMap<CompositeObject, ICodeIdParser>();
+                      typeParsers = new TreeMap<>();
                       parsers.put(genericTypeSignature, typeParsers);
                     }
                     typeParsers.put(new CompositeObject(prio, parser.getClass().getName()), parser);

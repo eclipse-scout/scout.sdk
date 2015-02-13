@@ -130,7 +130,7 @@ public class FormPropertyPart extends JdtTypePropertyPart {
 
           IScoutBundle client = getPage().getScoutBundle();
           Set<? extends IScoutBundle> shareds = client.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), false);
-          HashSet<IScoutBundle> serversAndSharedsSet = new HashSet<IScoutBundle>();
+          HashSet<IScoutBundle> serversAndSharedsSet = new HashSet<>();
           for (IScoutBundle shared : shareds) {
             serversAndSharedsSet.add(shared);
             for (IScoutBundle server : shared.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false)) {

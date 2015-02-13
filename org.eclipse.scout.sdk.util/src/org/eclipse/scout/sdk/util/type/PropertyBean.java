@@ -49,7 +49,7 @@ public class PropertyBean implements IPropertyBean {
 
   @Override
   public List<IMember> getAllMembers() {
-    List<IMember> members = new ArrayList<IMember>(3);
+    List<IMember> members = new ArrayList<>(3);
     if (TypeUtility.exists(m_field)) {
       members.add(m_field);
     }

@@ -68,8 +68,8 @@ public class LookupCallDeleteExecutor extends AbstractExecutor {
   public Object run(Shell shell, IStructuredSelection selection, ExecutionEvent event) {
     m_confirmDialog = new MemberSelectionDialog(shell, Texts.get("DeleteLookupCall"));
 
-    Set<IMember> members = new LinkedHashSet<IMember>();
-    Set<IMember> selectedMembers = new LinkedHashSet<IMember>();
+    Set<IMember> members = new LinkedHashSet<>();
+    Set<IMember> selectedMembers = new LinkedHashSet<>();
 
     collectAffectedMembers(members, selectedMembers);
 
@@ -100,7 +100,7 @@ public class LookupCallDeleteExecutor extends AbstractExecutor {
     selectedMembers.add(m_lookupCall);
 
     IType iService = TypeUtility.getType(IRuntimeClasses.ILookupService);
-    Set<IType> types = new HashSet<IType>(); // all types (interfaces and implementations together)
+    Set<IType> types = new HashSet<>(); // all types (interfaces and implementations together)
 
     // find lookup service interfaces that matches the lookup call name
     ICachedTypeHierarchy serviceHierarchy = TypeUtility.getPrimaryTypeHierarchy(iService);

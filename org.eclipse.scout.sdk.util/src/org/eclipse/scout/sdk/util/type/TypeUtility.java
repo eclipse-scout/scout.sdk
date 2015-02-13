@@ -99,7 +99,7 @@ public class TypeUtility {
    * @throws JavaModelException
    */
   public static List<IType> getAllTypes(ICompilationUnit icu, ITypeFilter filter) throws JavaModelException {
-    List<IType> result = new ArrayList<IType>();
+    List<IType> result = new ArrayList<>();
     for (IType t : icu.getTypes()) {
       collectTypesInType(t, result, filter);
     }
@@ -165,10 +165,10 @@ public class TypeUtility {
 
     Set<IType> result = null;
     if (comparator == null) {
-      result = new HashSet<IType>(types.length);
+      result = new HashSet<>(types.length);
     }
     else {
-      result = new TreeSet<IType>(comparator);
+      result = new TreeSet<>(comparator);
     }
 
     for (IType subtype : types) {
@@ -316,7 +316,7 @@ public class TypeUtility {
   }
 
   public static IMethod getMethod(IType declaringType, String methodName, List<String> resolvedParameterSignatures) throws CoreException {
-    List<String> cleanedParameterSignatures = new ArrayList<String>(resolvedParameterSignatures.size());
+    List<String> cleanedParameterSignatures = new ArrayList<>(resolvedParameterSignatures.size());
     for (String sig : resolvedParameterSignatures) {
       cleanedParameterSignatures.add(sig.replaceAll("\\$", "."));
     }
@@ -435,10 +435,10 @@ public class TypeUtility {
 
       Set<IMethod> collector = null;
       if (comparator == null) {
-        collector = new HashSet<IMethod>(methods.length);
+        collector = new HashSet<>(methods.length);
       }
       else {
-        collector = new TreeSet<IMethod>(comparator);
+        collector = new TreeSet<>(comparator);
       }
 
       for (IMethod method : methods) {
@@ -462,7 +462,7 @@ public class TypeUtility {
     parser.setResolveBindings(false);
     parser.setBindingsRecovery(false);
     ASTNode rootNode = parser.createAST(null);
-    final Holder<ISourceRange> rangeHolder = new Holder<ISourceRange>(ISourceRange.class);
+    final Holder<ISourceRange> rangeHolder = new Holder<>(ISourceRange.class);
     rootNode.accept(new ASTVisitor() {
       boolean a = false;
 
@@ -495,7 +495,7 @@ public class TypeUtility {
     if (paramNames.length != resolvedParamSignatures.size()) {
       throw new IllegalArgumentException("Could not resolve method parameters of '" + method.getElementName() + "' in '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
     }
-    List<MethodParameter> params = new ArrayList<MethodParameter>(paramNames.length);
+    List<MethodParameter> params = new ArrayList<>(paramNames.length);
     for (int i = 0; i < paramNames.length; i++) {
       params.add(new MethodParameter(paramNames[i], resolvedParamSignatures.get(i)));
     }
@@ -508,7 +508,7 @@ public class TypeUtility {
     if (paramNames.length != resolvedParamSignatures.size()) {
       throw new IllegalArgumentException("Could not resolve method parameters of '" + method.getElementName() + "' in '" + method.getDeclaringType().getFullyQualifiedName() + "'.");
     }
-    List<MethodParameter> params = new ArrayList<MethodParameter>(paramNames.length);
+    List<MethodParameter> params = new ArrayList<>(paramNames.length);
     for (int i = 0; i < paramNames.length; i++) {
       params.add(new MethodParameter(paramNames[i], resolvedParamSignatures.get(i)));
     }
@@ -543,10 +543,10 @@ public class TypeUtility {
 
       Set<IField> collector = null;
       if (comparator == null) {
-        collector = new HashSet<IField>(fields.length);
+        collector = new HashSet<>(fields.length);
       }
       else {
-        collector = new TreeSet<IField>(comparator);
+        collector = new TreeSet<>(comparator);
       }
 
       for (IField field : fields) {
@@ -915,7 +915,7 @@ public class TypeUtility {
   public static Set<? extends IPropertyBean> getPropertyBeans(IType type, IPropertyBeanFilter propertyFilter, Comparator<IPropertyBean> comparator) {
     IMethodFilter filter = MethodFilters.getMultiMethodFilter(MethodFilters.getFlagsFilter(Flags.AccPublic), MethodFilters.getNameRegexFilter(BEAN_METHOD_NAME));
     Set<IMethod> methods = getMethods(type, filter);
-    Map<String, PropertyBean> beans = new HashMap<String, PropertyBean>(methods.size());
+    Map<String, PropertyBean> beans = new HashMap<>(methods.size());
     for (IMethod m : methods) {
       Matcher matcher = BEAN_METHOD_NAME.matcher(m.getElementName());
       if (matcher.matches()) {
@@ -965,10 +965,10 @@ public class TypeUtility {
     // filter
     Set<PropertyBean> filteredBeans = null;
     if (comparator == null) {
-      filteredBeans = new HashSet<PropertyBean>(beans.size());
+      filteredBeans = new HashSet<>(beans.size());
     }
     else {
-      filteredBeans = new TreeSet<PropertyBean>(comparator);
+      filteredBeans = new TreeSet<>(comparator);
     }
 
     for (PropertyBean bean : beans.values()) {
@@ -979,7 +979,7 @@ public class TypeUtility {
 
     // fields
     Set<IField> fieldCandidates = getFields(type, FieldFilters.getPrivateNotStaticNotFinalNotAbstract(), null);
-    HashMap<String, IField> fields = new HashMap<String, IField>(fieldCandidates.size());
+    HashMap<String, IField> fields = new HashMap<>(fieldCandidates.size());
     for (IField field : fieldCandidates) {
       fields.put(field.getElementName(), field);
     }
@@ -1129,7 +1129,7 @@ public class TypeUtility {
    * @return
    */
   private static Set<String> toStringSet(char[][] arrayOfChars, String... additionalValues) {
-    HashSet<String> result = new HashSet<String>();
+    HashSet<String> result = new HashSet<>();
     if (additionalValues != null) {
       for (String s : additionalValues) {
         result.add(s);

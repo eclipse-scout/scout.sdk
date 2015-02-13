@@ -72,7 +72,7 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
   }
 
   private List<ElementBean> getElementsToBeMoved() {
-    final List<ElementBean> elements = new LinkedList<ElementBean>();
+    final List<ElementBean> elements = new LinkedList<>();
     // WSDL file
     IFile wsdlFile = null;
     if (m_webserviceEnum == WebserviceEnum.PROVIDER) {
@@ -154,7 +154,7 @@ public class WsFileMoveWizard extends AbstractWorkspaceWizard {
     m_operation.setSunJaxWsBean(m_sunJaxWsBean);
     m_operation.setDestination(m_destination);
 
-    List<ElementBean> elements = new LinkedList<ElementBean>();
+    List<ElementBean> elements = new LinkedList<>();
     for (ElementBean element : m_wizardPage.getElements()) {
       if (element.isChecked() || element.isMandatory()) {
         elements.add(element);

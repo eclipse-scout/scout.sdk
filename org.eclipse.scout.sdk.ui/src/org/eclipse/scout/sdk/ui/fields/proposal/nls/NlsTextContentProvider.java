@@ -40,8 +40,8 @@ public class NlsTextContentProvider extends ContentProposalProvider implements I
 
   @Override
   public Object[] getProposals(String searchPattern, IProgressMonitor monitor) {
-    HashSet<NlsTextProposal> firstGroup = new HashSet<NlsTextProposal>();
-    HashSet<NlsTextProposal> secondGroup = new HashSet<NlsTextProposal>();
+    HashSet<NlsTextProposal> firstGroup = new HashSet<>();
+    HashSet<NlsTextProposal> secondGroup = new HashSet<>();
     if (getLabelProvider().getNlsProject() != null) {
       if (!StringUtility.hasText(searchPattern)) {
         searchPattern = "*";

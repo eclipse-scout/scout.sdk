@@ -189,7 +189,7 @@ public abstract class AbstractJavaElementListPresenter extends AbstractMethodPre
 
   private void handleRemoveComponent() {
     IJavaElement toRemove = (IJavaElement) ((StructuredSelection) m_viewer.getSelection()).getFirstElement();
-    List<IJavaElement> props = new ArrayList<IJavaElement>();
+    List<IJavaElement> props = new ArrayList<>();
     for (IJavaElement prop : getSourceProps()) {
       if (!prop.equals(toRemove)) {
         props.add(prop);

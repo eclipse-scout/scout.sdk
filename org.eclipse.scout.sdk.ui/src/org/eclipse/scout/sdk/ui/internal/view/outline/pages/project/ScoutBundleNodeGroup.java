@@ -33,9 +33,9 @@ public class ScoutBundleNodeGroup implements Comparable<ScoutBundleNodeGroup> {
 
   public ScoutBundleNodeGroup(ScoutBundleNode definingBundle) {
     m_definingBundle = definingBundle;
-    m_parentGroups = new HashSet<ScoutBundleNodeGroup>();
-    m_childGroups = new HashSet<ScoutBundleNodeGroup>();
-    m_childBundles = new HashSet<ScoutBundleNode>();
+    m_parentGroups = new HashSet<>();
+    m_childGroups = new HashSet<>();
+    m_childBundles = new HashSet<>();
     m_groupName = getGroupName(definingBundle.getScoutBundle());
     m_childBundles.add(definingBundle);
   }

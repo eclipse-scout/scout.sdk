@@ -59,12 +59,12 @@ public class JdtTypeMultiPropertyPart extends AbstractMultiPageSectionBasedViewP
   private P_DelayedUpdateJob m_updateJob;
 
   public JdtTypeMultiPropertyPart() {
-    m_methodPresenters = new HashMap<String, AbstractMultiMethodPresenter<?>>();
+    m_methodPresenters = new HashMap<>();
   }
 
   @Override
   protected void createSections() {
-    List<IType> types = new ArrayList<IType>(getPages().length);
+    List<IType> types = new ArrayList<>(getPages().length);
     for (IPage p : getPages()) {
       if (p instanceof AbstractScoutTypePage) {
         types.add(((AbstractScoutTypePage) p).getType());

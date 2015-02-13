@@ -43,7 +43,7 @@ public final class NlsExportImportExtensionPoints {
 
   private static synchronized Map<String/*extensionPointID*/, List<WizardExtension> /*extensions*/> getExtensions() {
     if (extensions == null) {
-      Map<String, List<WizardExtension>> tmp = new HashMap<String, List<WizardExtension>>(2);
+      Map<String, List<WizardExtension>> tmp = new HashMap<>(2);
       tmp.put(EXTENSION_POINT_ID_NLS_EXPORTER, loadExtensionPoints(EXTENSION_POINT_ID_NLS_EXPORTER));
       tmp.put(EXTENSION_POINT_ID_NLS_IMPORTER, loadExtensionPoints(EXTENSION_POINT_ID_NLS_IMPORTER));
       extensions = tmp;
@@ -55,7 +55,7 @@ public final class NlsExportImportExtensionPoints {
   private static List<WizardExtension> loadExtensionPoints(String id) {
     IExtensionRegistry reg = Platform.getExtensionRegistry();
     // export
-    List<WizardExtension> wizardExtensions = new ArrayList<WizardExtension>();
+    List<WizardExtension> wizardExtensions = new ArrayList<>();
 
     IExtensionPoint xp = reg.getExtensionPoint(NlsCore.PLUGIN_ID, id);
     IExtension[] exts = xp.getExtensions();

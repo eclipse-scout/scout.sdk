@@ -26,8 +26,8 @@ import org.eclipse.swt.graphics.Image;
 public class PackageProposalModel extends LabelProvider implements IContentProposalProvider {
 
   private LabelProvider m_packageLabelProvider = new JavaElementLabelProvider(JavaElementLabelProvider.SHOW_DEFAULT);
-  private TreeSet<String> m_proposalSorting = new TreeSet<String>();
-  private HashMap<String, PackageProposal> m_proposals = new HashMap<String, PackageProposal>();
+  private TreeSet<String> m_proposalSorting = new TreeSet<>();
+  private HashMap<String, PackageProposal> m_proposals = new HashMap<>();
 
   public PackageProposalModel() {
 
@@ -44,7 +44,7 @@ public class PackageProposalModel extends LabelProvider implements IContentPropo
 
   @Override
   public IContentProposal[] getProposals(String contents, int position) {
-    ArrayList<PackageProposal> list = new ArrayList<PackageProposal>();
+    ArrayList<PackageProposal> list = new ArrayList<>();
     for (String proptext : m_proposalSorting) {
       if (proptext.startsWith(contents)) {
         list.add(m_proposals.get(proptext));

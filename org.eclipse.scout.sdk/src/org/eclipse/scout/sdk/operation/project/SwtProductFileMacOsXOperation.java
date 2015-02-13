@@ -41,7 +41,7 @@ public class SwtProductFileMacOsXOperation extends AbstractScoutProjectNewOperat
 
   @Override
   public void init() {
-    ArrayList<IFile> productFiles = new ArrayList<IFile>(2);
+    ArrayList<IFile> productFiles = new ArrayList<>(2);
     IFile dev = getProperties().getProperty(CreateUiSwtPluginOperation.PROP_PRODUCT_FILE_DEV, IFile.class);
     if (dev != null) {
       productFiles.add(dev);

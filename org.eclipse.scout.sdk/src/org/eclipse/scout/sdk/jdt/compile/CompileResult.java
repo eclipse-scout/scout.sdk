@@ -30,7 +30,7 @@ public class CompileResult implements ICompileResult {
   private int m_severity;
 
   public CompileResult() {
-    m_markers = new TreeMap<CompositeObject, IMarker>();
+    m_markers = new TreeMap<>();
   }
 
   /**
@@ -44,7 +44,7 @@ public class CompileResult implements ICompileResult {
 
   @Override
   public List<IMarker> getErrorMarkers() {
-    List<IMarker> errorMarkers = new ArrayList<IMarker>();
+    List<IMarker> errorMarkers = new ArrayList<>();
     for (IMarker m : m_markers.values()) {
       if (m.getAttribute(IMarker.SEVERITY, -1) >= IMarker.SEVERITY_ERROR) {
         errorMarkers.add(m);

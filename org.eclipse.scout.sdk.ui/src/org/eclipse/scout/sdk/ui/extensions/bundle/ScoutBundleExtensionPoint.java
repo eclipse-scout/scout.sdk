@@ -57,7 +57,7 @@ public final class ScoutBundleExtensionPoint {
     if (allExtensions == null) {
       synchronized (LOCK) {
         if (allExtensions == null) {
-          Map<String, ScoutBundleUiExtension> tmp = new HashMap<String, ScoutBundleUiExtension>();
+          Map<String, ScoutBundleUiExtension> tmp = new HashMap<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_ID);
           IExtension[] extensions = xp.getExtensions();

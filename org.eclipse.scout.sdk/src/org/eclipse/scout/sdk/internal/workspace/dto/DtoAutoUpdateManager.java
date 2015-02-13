@@ -76,10 +76,10 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
 
   public DtoAutoUpdateManager() {
     m_enabled = new AtomicBoolean(true);
-    m_updateHandlers = new ArrayList<IDtoAutoUpdateHandler>();
+    m_updateHandlers = new ArrayList<>();
 
-    m_resourceChangeEventsToCheck = new ArrayBlockingQueue<IResourceChangeEvent>(5000, true);
-    m_dtoUpdateOperations = new ArrayBlockingQueue<IDtoAutoUpdateOperation>(2000, true);
+    m_resourceChangeEventsToCheck = new ArrayBlockingQueue<>(5000, true);
+    m_dtoUpdateOperations = new ArrayBlockingQueue<>(2000, true);
 
     m_autoUpdateJob = new P_AutoUpdateOperationsJob(m_dtoUpdateOperations);
     m_resourceDeltaCheckJob = new P_ResourceChangeEventCheckJob(m_updateHandlers, m_resourceChangeEventsToCheck, m_dtoUpdateOperations, m_autoUpdateJob);
@@ -278,7 +278,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
             IDtoAutoUpdateOperation operation = handler.createUpdateOperation(properties);
             if (operation != null) {
               if (operations == null) {
-                operations = new HashSet<IDtoAutoUpdateOperation>();
+                operations = new HashSet<>();
               }
               operations.add(operation);
             }
@@ -292,7 +292,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     }
 
     private List<ICompilationUnit> getCompilationUnitsFromDelta(IResourceDelta d) {
-      final LinkedList<ICompilationUnit> collector = new LinkedList<ICompilationUnit>();
+      final LinkedList<ICompilationUnit> collector = new LinkedList<>();
       try {
         d.accept(new IResourceDeltaVisitor() {
           @Override

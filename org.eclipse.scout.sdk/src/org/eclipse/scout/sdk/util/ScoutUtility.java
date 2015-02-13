@@ -85,7 +85,7 @@ public final class ScoutUtility {
   private static final Pattern REGEX_COMMENT_REMOVE_2 = Pattern.compile("\\/\\/.*?\\\n");
   private static final Pattern REGEX_COMMENT_REMOVE_3 = Pattern.compile("(?s)\\/\\*.*?\\*\\/");
 
-  private static final ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<String>();
+  private static final ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<>();
 
   private static final IMethodReturnValueParser[] METHOD_RETURN_VALUE_PARSERS = new IMethodReturnValueParser[]{
     SimpleMethodReturnValueParser.INSTANCE,
@@ -184,7 +184,7 @@ public final class ScoutUtility {
 
   public static void registerServiceClass(String extensionPoint, String elemType, String serviceClass, ServiceRegistrationDescription desc) throws CoreException {
     PluginModelHelper h = new PluginModelHelper(desc.targetProject.getProject());
-    HashMap<String, String> attributes = new HashMap<String, String>(3);
+    HashMap<String, String> attributes = new HashMap<>(3);
     attributes.put("class", serviceClass);
     if (desc.session != null) {
       attributes.put("session", desc.session);
@@ -216,7 +216,7 @@ public final class ScoutUtility {
 
   public static void unregisterServiceClass(IProject project, String extensionPoint, String elemType, String className) throws CoreException {
     PluginModelHelper h = new PluginModelHelper(project);
-    HashMap<String, String> attributes = new HashMap<String, String>(1);
+    HashMap<String, String> attributes = new HashMap<>(1);
     attributes.put("class", className);
     h.PluginXml.removeSimpleExtension(extensionPoint, elemType, attributes);
     h.save();
@@ -295,7 +295,7 @@ public final class ScoutUtility {
   }
 
   public static Set<String> getEntities(IScoutBundle p) throws JavaModelException {
-    Set<String> ret = new TreeSet<String>();
+    Set<String> ret = new TreeSet<>();
     Set<? extends IScoutBundle> roots = p.getParentBundles(ScoutBundleFilters.getRootBundlesFilter(), true);
     IScoutBundleFilter workspaceClientSharedServerFilter = ScoutBundleFilters.getMultiFilterAnd(ScoutBundleFilters.getWorkspaceBundlesFilter(),
         ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT, IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_SHARED));
@@ -593,8 +593,8 @@ public final class ScoutUtility {
     if (candidates == null || candidates.size() < 1) {
       return null;
     }
-    final Holder<IType> result = new Holder<IType>(IType.class, null);
-    final Holder<Integer> minDistance = new Holder<Integer>(Integer.class, Integer.valueOf(Integer.MAX_VALUE));
+    final Holder<IType> result = new Holder<>(IType.class, null);
+    final Holder<Integer> minDistance = new Holder<>(Integer.class, Integer.valueOf(Integer.MAX_VALUE));
     for (IType c : candidates) {
       final IType candidate = c;
       reference.visit(new IScoutBundleGraphVisitor() {

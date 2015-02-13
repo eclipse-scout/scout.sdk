@@ -68,7 +68,7 @@ public class MemberListDeleteExecutor extends AbstractExecutor {
   }
 
   protected Set<IMember> collectMembersToDelete(IStructuredSelection selection) {
-    Set<IMember> membersToDelete = new LinkedHashSet<IMember>();
+    Set<IMember> membersToDelete = new LinkedHashSet<>();
     Iterator iterator = selection.iterator();
     while (iterator.hasNext()) {
       Object selObject = iterator.next();

@@ -43,7 +43,7 @@ public abstract class AbstractScoutWizardPage extends WizardPage {
   public AbstractScoutWizardPage(String pageName, String title, ImageDescriptor titleImage) {
     super(pageName, title, titleImage);
     m_fieldToolkit = new FieldToolkit();
-    m_statusProvider = new ArrayList<IStatusProvider>();
+    m_statusProvider = new ArrayList<>();
   }
 
   public AbstractScoutWizardPage(String pageName) {

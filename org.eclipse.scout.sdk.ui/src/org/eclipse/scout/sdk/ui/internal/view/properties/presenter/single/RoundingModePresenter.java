@@ -77,7 +77,7 @@ public class RoundingModePresenter extends AbstractProposalPresenter<RoundingMod
     }
 
     try {
-      ConfigPropertyUpdateOperation<RoundingMode> updateOp = new ConfigPropertyUpdateOperation<RoundingMode>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<RoundingMode> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

@@ -82,7 +82,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     m_title = title;
     m_nlsEntry = row;
     m_rootProject = project;
-    m_translationFields = new HashMap<Language, TextField<String>>();
+    m_translationFields = new HashMap<>();
     m_showProjectList = showProjectList;
   }
 
@@ -155,7 +155,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     });
     m_projectProposalField.setVisible(isShowProjectList());
 
-    m_keyField = new TextField<String>(inputComp, TextField.VALIDATE_ON_MODIFY, "Key Name", 10);
+    m_keyField = new TextField<>(inputComp, TextField.VALIDATE_ON_MODIFY, "Key Name", 10);
     String key = m_nlsEntry.getKey();
     if (key == null) {
       key = "";
@@ -321,7 +321,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
     }
 
     protected TextField<String> create(Composite parent) {
-      m_input = new TextField<String>(parent, TextField.VALIDATE_ON_MODIFY | TextField.MULTI_LINE_TEXT_FIELD, "");
+      m_input = new TextField<>(parent, TextField.VALIDATE_ON_MODIFY | TextField.MULTI_LINE_TEXT_FIELD, "");
       m_input.setLabelVisible(false);
       m_input.addInputChangedListener(new IInputChangedListener<String>() {
         @Override
@@ -366,7 +366,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
   private class P_ProjectSmartfieldModel implements ISmartFieldModel {
     @Override
     public List<Object> getProposals(String pattern) {
-      ArrayList<Object> collector = new ArrayList<Object>();
+      ArrayList<Object> collector = new ArrayList<>();
       INlsProject p = m_rootProject;
       do {
         List<Language> languages = p.getAllLanguages();

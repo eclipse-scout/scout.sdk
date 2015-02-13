@@ -68,7 +68,7 @@ public abstract class AbstractScoutProjectPreferencePage<T extends IScoutProject
         ScoutBundleFilters.getBundlesOfTypeFilter(scoutBundleTypes));
     Set<IScoutBundle> rootProjects = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(projectFilter);
 
-    m_projectSettings = new HashMap<IScoutBundle, T>(rootProjects.size());
+    m_projectSettings = new HashMap<>(rootProjects.size());
     for (IScoutBundle p : rootProjects) {
       try {
         m_projectSettings.put(p, contentClass.newInstance());

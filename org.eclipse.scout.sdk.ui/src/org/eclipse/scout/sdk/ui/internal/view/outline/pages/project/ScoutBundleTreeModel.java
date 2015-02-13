@@ -83,7 +83,7 @@ public class ScoutBundleTreeModel {
   }
 
   private Set<ScoutBundleNodeGroup> buildProjectGraph() {
-    Set<ScoutBundleNodeGroup> scoutProjects = new TreeSet<ScoutBundleNodeGroup>();
+    Set<ScoutBundleNodeGroup> scoutProjects = new TreeSet<>();
     List<String> types = RuntimeBundles.getTypes();
 
     for (int i = types.size() - 1; i >= 0; i--) {

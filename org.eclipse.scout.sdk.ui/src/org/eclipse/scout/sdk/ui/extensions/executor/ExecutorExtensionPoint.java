@@ -68,8 +68,8 @@ public final class ExecutorExtensionPoint {
     if (executors == null) {
       synchronized (LOCK) {
         if (executors == null) {
-          Map<String, Map<String, Class<? extends IExecutor>>> tmp = new HashMap<String, Map<String, Class<? extends IExecutor>>>();
-          Set<String> tmpCats = new HashSet<String>();
+          Map<String, Map<String, Class<? extends IExecutor>>> tmp = new HashMap<>();
+          Set<String> tmpCats = new HashSet<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_POINT_NAME);
           IExtension[] extensions = xp.getExtensions();
@@ -95,7 +95,7 @@ public final class ExecutorExtensionPoint {
                         Class<? extends IExecutor> execClass = (Class<? extends IExecutor>) bundle.loadClass(clazz);
                         Map<String, Class<? extends IExecutor>> map = tmp.get(id);
                         if (map == null) {
-                          map = new HashMap<String, Class<? extends IExecutor>>(3);
+                          map = new HashMap<>(3);
                           tmp.put(id, map);
                         }
                         Class<? extends IExecutor> old = map.put(category, execClass);

@@ -49,7 +49,7 @@ public class ManagedResource {
     m_project = project;
     m_fileLock = new Object();
     m_registrationLock = new Object();
-    m_resourceListeners = new ArrayList<P_ResourceListenerEntry>();
+    m_resourceListeners = new ArrayList<>();
     m_jdtResourceChangedListener = new P_JdtResourceChangedListener();
   }
 
@@ -185,7 +185,7 @@ public class ManagedResource {
       throw new IllegalArgumentException("event must not be null");
     }
 
-    Set<IResourceListener> listenersProcessed = new HashSet<IResourceListener>();
+    Set<IResourceListener> listenersProcessed = new HashSet<>();
 
     for (P_ResourceListenerEntry entry : m_resourceListeners.toArray(new P_ResourceListenerEntry[m_resourceListeners.size()])) {
       if (!listenersProcessed.contains(entry.getListener())

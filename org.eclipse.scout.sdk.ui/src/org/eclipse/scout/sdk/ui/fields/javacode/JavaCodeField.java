@@ -52,7 +52,7 @@ public class JavaCodeField extends Composite {
 
   private JavaCodeFieldContentProvider m_contentProvider;
   private ContentProposalAdapter m_proposalAdapter;
-  private HashMap<String, JavaCodeRange> m_ranges = new HashMap<String, JavaCodeRange>();
+  private HashMap<String, JavaCodeRange> m_ranges = new HashMap<>();
 
   public JavaCodeField(Composite parent, IJavaSearchScope scope) {
     super(parent, SWT.NONE);
@@ -117,7 +117,7 @@ public class JavaCodeField extends Composite {
   }
 
   public String[] getAllImports() {
-    ArrayList<String> imports = new ArrayList<String>();
+    ArrayList<String> imports = new ArrayList<>();
     for (JavaCodeRange range : m_ranges.values()) {
       if (range.getType() == JavaCodeRange.QUALIFIED_TYPE) {
         imports.add(range.getFullyQualifiedName());
@@ -130,7 +130,7 @@ public class JavaCodeField extends Composite {
     // close popup
     int cursorPosition = m_text.getCaretOffset();
 
-    HashMap<String, JavaCodeRange> oldRanges = new HashMap<String, JavaCodeRange>(m_ranges);
+    HashMap<String, JavaCodeRange> oldRanges = new HashMap<>(m_ranges);
     m_ranges.clear();
     Matcher m = Pattern.compile(REGEX_WORD, Pattern.DOTALL).matcher(m_text.getText());
     while (m.find()) {
@@ -175,7 +175,7 @@ public class JavaCodeField extends Composite {
   }
 
   private void updateStyles() {
-    TreeMap<CompositeObject, StyleRange> ranges = new TreeMap<CompositeObject, StyleRange>();
+    TreeMap<CompositeObject, StyleRange> ranges = new TreeMap<>();
     for (JavaCodeRange range : m_ranges.values()) {
       StyleRange stRange = null;
       switch (range.getType()) {

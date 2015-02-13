@@ -232,12 +232,12 @@ public final class ProductFileModelHelper {
 
     private Map<String /*feature id*/, ? extends Set<String /*bundle symbolic name*/>> getBundlesInFeatures() {
       IFeatureModel[] features = PDECore.getDefault().getFeatureModelManager().getModels();
-      HashMap<String, HashSet<String>> allBundlesInFeatures = new HashMap<String, HashSet<String>>(features.length);
+      HashMap<String, HashSet<String>> allBundlesInFeatures = new HashMap<>(features.length);
       for (IFeatureModel feature : features) {
         for (IFeaturePlugin bundle : feature.getFeature().getPlugins()) {
           HashSet<String> bundlesInFeature = allBundlesInFeatures.get(feature.getFeature().getId());
           if (bundlesInFeature == null) {
-            bundlesInFeature = new HashSet<String>();
+            bundlesInFeature = new HashSet<>();
             allBundlesInFeatures.put(feature.getFeature().getId(), bundlesInFeature);
           }
           bundlesInFeature.add(bundle.getId());
@@ -287,7 +287,7 @@ public final class ProductFileModelHelper {
     public List<BundleDescription> getPluginModels() throws CoreException {
       State state = TargetPlatformHelper.getState();
       IProductPlugin[] plugins = m_model.getWorkspaceProductModel().getProduct().getPlugins();
-      ArrayList<BundleDescription> list = new ArrayList<BundleDescription>(plugins.length);
+      ArrayList<BundleDescription> list = new ArrayList<>(plugins.length);
       for (int i = 0; i < plugins.length; i++) {
         BundleDescription bundle = null;
 
@@ -314,7 +314,7 @@ public final class ProductFileModelHelper {
      */
     public List<String> getPluginSymbolicNames() throws CoreException {
       IProductPlugin[] plugins = m_model.getWorkspaceProductModel().getProduct().getPlugins();
-      ArrayList<String> result = new ArrayList<String>(plugins.length);
+      ArrayList<String> result = new ArrayList<>(plugins.length);
       for (int i = 0; i < plugins.length; i++) {
         result.add(plugins[i].getId());
       }

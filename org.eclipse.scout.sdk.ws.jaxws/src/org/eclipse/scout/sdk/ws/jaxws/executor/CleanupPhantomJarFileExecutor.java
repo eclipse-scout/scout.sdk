@@ -90,12 +90,12 @@ public class CleanupPhantomJarFileExecutor extends AbstractExecutor {
     }
 
     // determine referenced JAR files
-    Set<IFile> usedJarFiles = new HashSet<IFile>();
+    Set<IFile> usedJarFiles = new HashSet<>();
     usedJarFiles.addAll(getProviderJarFiles(bundle));
     usedJarFiles.addAll(getConsumerJarFiles(bundle));
 
     // get all JAR files in stub folder
-    Set<IFile> candidates = new HashSet<IFile>();
+    Set<IFile> candidates = new HashSet<>();
     try {
       for (IResource resource : folder.members()) {
         if (!resource.exists() || resource.getType() != IResource.FILE) {
@@ -108,7 +108,7 @@ public class CleanupPhantomJarFileExecutor extends AbstractExecutor {
       }
 
       // determine phantom JAR files
-      Set<IFile> phantomJarFiles = new HashSet<IFile>();
+      Set<IFile> phantomJarFiles = new HashSet<>();
       for (IFile candiate : candidates) {
         if (!usedJarFiles.contains(candiate)) {
           phantomJarFiles.add(candiate);
@@ -123,7 +123,7 @@ public class CleanupPhantomJarFileExecutor extends AbstractExecutor {
   }
 
   private Set<IFile> getProviderJarFiles(IScoutBundle bundle) {
-    Set<IFile> jarFiles = new HashSet<IFile>();
+    Set<IFile> jarFiles = new HashSet<>();
 
     XmlResource sunJaxWsResource = ResourceFactory.getSunJaxWsResource(bundle);
     Document sunJaxWsXmlDocument = sunJaxWsResource.loadXml();
@@ -151,7 +151,7 @@ public class CleanupPhantomJarFileExecutor extends AbstractExecutor {
   }
 
   private Set<IFile> getConsumerJarFiles(IScoutBundle bundle) {
-    Set<IFile> jarFiles = new HashSet<IFile>();
+    Set<IFile> jarFiles = new HashSet<>();
 
     ICachedTypeHierarchy hierarchy = TypeUtility.getPrimaryTypeHierarchy(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient));
     Set<IType> wsConsumerTypes = hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.AbstractWebServiceClient), ScoutTypeFilters.getClassesInScoutBundles(bundle));

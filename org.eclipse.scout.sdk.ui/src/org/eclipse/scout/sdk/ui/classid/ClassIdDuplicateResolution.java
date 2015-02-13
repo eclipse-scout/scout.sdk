@@ -77,7 +77,7 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
         migrateDocumentation = answer == SWT.YES;
       }
 
-      List<IOperation> ops = new LinkedList<IOperation>();
+      List<IOperation> ops = new LinkedList<>();
       if (doMigration) {
         String newId = ClassIdGenerators.generateNewId(new ClassIdGenerationContext(parent));
         ops.add(createUpdateAnnotationInJavaSourceOperation(parent, newId));

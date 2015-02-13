@@ -31,7 +31,7 @@ public class TranslationResourceEvent {
 
   public TranslationResourceEvent(ITranslationResource source) {
     m_source = source;
-    m_subEvents = new ArrayList<TranslationResourceEvent>();
+    m_subEvents = new ArrayList<>();
   }
 
   public TranslationResourceEvent(ITranslationResource source, int type) {

@@ -107,7 +107,7 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
 
   private Set<String> getCheckedWorkingSets() {
     Object[] checked = m_workingSetsViewer.getCheckedElements();
-    HashSet<String> checkedSets = new HashSet<String>(checked.length);
+    HashSet<String> checkedSets = new HashSet<>(checked.length);
     for (Object o : checked) {
       checkedSets.add((String) o);
     }
@@ -184,8 +184,8 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
     // get list of all sets
     IWorkingSet[] scoutWorkingSets = ScoutExplorerSettingsSupport.get().getScoutWorkingSets(true);
     String[] workingSetNames = new String[scoutWorkingSets.length];
-    m_selection = new HashMap<String, IAdaptable[]>();
-    m_initialSets = new HashSet<String>(workingSetNames.length);
+    m_selection = new HashMap<>();
+    m_initialSets = new HashSet<>(workingSetNames.length);
     for (int i = 0; i < workingSetNames.length; i++) {
       workingSetNames[i] = scoutWorkingSets[i].getLabel();
       m_selection.put(scoutWorkingSets[i].getLabel(), scoutWorkingSets[i].getElements());
@@ -448,8 +448,8 @@ public class ConfigureScoutWorkingSetsDialog extends TitleAreaDialog {
     IWorkingSet[] existings = ScoutExplorerSettingsSupport.get().getScoutWorkingSets(true);
 
     Set<String> visibleSets = getCheckedWorkingSets();
-    Set<IWorkingSet> hiddenSets = new HashSet<IWorkingSet>();
-    Set<IWorkingSet> setOrder = new LinkedHashSet<IWorkingSet>();
+    Set<IWorkingSet> hiddenSets = new HashSet<>();
+    Set<IWorkingSet> setOrder = new LinkedHashSet<>();
     for (String workingSet : getAllWorkingSets()) {
       IWorkingSet currentSet = null;
 

@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 @SuppressWarnings("restriction")
 public class WorkingCopyManager implements IWorkingCopyManager {
 
-  private List<ICompilationUnit> m_workingCopies = new ArrayList<ICompilationUnit>();
+  private List<ICompilationUnit> m_workingCopies = new ArrayList<>();
 
   public WorkingCopyManager() {
   }

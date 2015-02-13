@@ -64,7 +64,7 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
   public abstract BundleTreeWizardPage getLocationsPage();
 
   protected List<ServiceRegistrationDescription> getCheckedServiceRegistrations(Set<ITreeNode> serviceRegNodes) {
-    List<ServiceRegistrationDescription> result = new LinkedList<ServiceRegistrationDescription>();
+    List<ServiceRegistrationDescription> result = new LinkedList<>();
     for (ITreeNode n : serviceRegNodes) {
       if (getLocationsPage().isNodeChecked(n)) {
         IScoutBundle b = BundleTreeWizardPage.getLocationBundle(n);
@@ -118,7 +118,7 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
     List<ITreeNode> createdNodes = null;
     Set<IType> sessions = ScoutTypeUtility.getSessionTypes(bundle.getJavaProject());
     if (sessions != null) {
-      createdNodes = new ArrayList<ITreeNode>(sessions.size());
+      createdNodes = new ArrayList<>(sessions.size());
       int pos = 0;
       for (IType session : sessions) {
         boolean isServerSession = TypeUtility.getSupertypeHierarchy(session).contains(TypeUtility.getType(IRuntimeClasses.IServerSession));
@@ -194,7 +194,7 @@ public abstract class AbstractServiceWizard extends AbstractWorkspaceWizard {
         List<ITreeNode> siblings = node.getParent().getChildren(NodeFilters.getVisible());
         IType defaultSession = getLastUsedDefaultSession(b);
         boolean defaultSessionFound = false;
-        Set<IType> sessions = new LinkedHashSet<IType>(siblings.size());
+        Set<IType> sessions = new LinkedHashSet<>(siblings.size());
         for (int i = 0; i < siblings.size(); i++) {
           IType session = (IType) siblings.get(i).getData();
           sessions.add(session);

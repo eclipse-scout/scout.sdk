@@ -76,7 +76,7 @@ public class DoublePresenter extends AbstractValuePresenter<Double> {
   @Override
   protected synchronized void storeValue(Double value) throws CoreException {
     try {
-      ConfigPropertyUpdateOperation<Double> updateOp = new ConfigPropertyUpdateOperation<Double>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<Double> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

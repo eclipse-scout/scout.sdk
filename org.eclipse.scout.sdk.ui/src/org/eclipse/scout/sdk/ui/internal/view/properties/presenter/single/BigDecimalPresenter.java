@@ -74,7 +74,7 @@ public class BigDecimalPresenter extends AbstractValuePresenter<BigDecimal> {
   @Override
   protected synchronized void storeValue(BigDecimal value) throws CoreException {
     try {
-      ConfigPropertyUpdateOperation<BigDecimal> updateOp = new ConfigPropertyUpdateOperation<BigDecimal>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<BigDecimal> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

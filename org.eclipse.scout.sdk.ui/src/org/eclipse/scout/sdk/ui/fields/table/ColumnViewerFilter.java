@@ -118,7 +118,7 @@ public class ColumnViewerFilter extends Composite {
   private void handleFilterModified(int index) {
     if (m_columnProvider != null) {
       // update filters
-      ArrayList<ViewerFilter> filters = new ArrayList<ViewerFilter>();
+      ArrayList<ViewerFilter> filters = new ArrayList<>();
       // backup old filters
       for (ViewerFilter filter : m_columnProvider.getViewer().getFilters()) {
         if (!(filter instanceof P_ViewerFilter)) {
@@ -164,7 +164,7 @@ public class ColumnViewerFilter extends Composite {
     public P_ViewerFilter(String pattern, int columnIndex) {
       m_columnIndex = columnIndex;
       m_pattern = pattern.toLowerCase() + "*";
-      m_visitedNodes = new HashMap<Object, Boolean>();
+      m_visitedNodes = new HashMap<>();
     }
 
     @Override

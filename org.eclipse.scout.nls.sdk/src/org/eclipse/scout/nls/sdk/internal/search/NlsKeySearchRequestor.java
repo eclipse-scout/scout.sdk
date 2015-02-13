@@ -34,7 +34,7 @@ public class NlsKeySearchRequestor extends TextSearchRequestor {
 
   @Override
   public void beginReporting() {
-    m_matches = new HashMap<String, List<Match>>();
+    m_matches = new HashMap<>();
     for (INlsKeySearchListener l : m_eventListeners.getListeners(INlsKeySearchListener.class)) {
       try {
         l.beginReporting();
@@ -57,7 +57,7 @@ public class NlsKeySearchRequestor extends TextSearchRequestor {
   protected void acceptNlsKeyMatch(String nlsKey, Match match) {
     List<Match> list = m_matches.get(nlsKey);
     if (list == null) {
-      list = new ArrayList<Match>();
+      list = new ArrayList<>();
       m_matches.put(nlsKey, list);
     }
     list.add(match);
@@ -94,12 +94,12 @@ public class NlsKeySearchRequestor extends TextSearchRequestor {
   public Match[] getMatches(String nlsKey) {
     List<Match> list = m_matches.get(nlsKey);
     if (list == null) {
-      list = new ArrayList<Match>();
+      list = new ArrayList<>();
     }
     return list.toArray(new Match[list.size()]);
   }
 
   public Map<String, List<Match>> getAllMatches() {
-    return new HashMap<String, List<Match>>(m_matches);
+    return new HashMap<>(m_matches);
   }
 }

@@ -40,7 +40,7 @@ public class TableColumnRelocateAction extends Action {
   @Override
   public void run() {
     String fieldName = getColumnToMove().getElementName();
-    HashSet<String> usedNames = new HashSet<String>();
+    HashSet<String> usedNames = new HashSet<>();
     try {
       for (IType t : m_targetDeclaringType.getCompilationUnit().getAllTypes()) {
         usedNames.add(t.getElementName());

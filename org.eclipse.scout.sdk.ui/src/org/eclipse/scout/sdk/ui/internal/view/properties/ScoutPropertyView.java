@@ -177,7 +177,7 @@ public class ScoutPropertyView extends ViewPart {
   }
 
   private IPage[] getPagesOfSelection(ISelection selection) {
-    List<IPage> pages = new ArrayList<IPage>(3);
+    List<IPage> pages = new ArrayList<>(3);
     if (selection instanceof StructuredSelection) {
       StructuredSelection sel = (StructuredSelection) selection;
       for (Object element : sel.toList()) {

@@ -49,7 +49,7 @@ public class NewNlsFileOperationDesc {
     try {
       if (value != null) {
         IJavaProject jp = JavaCore.create(value);
-        List<IClasspathEntry> possibleEntries = new ArrayList<IClasspathEntry>();
+        List<IClasspathEntry> possibleEntries = new ArrayList<>();
         for (IClasspathEntry entry : NlsJdtUtility.getSourceLocations(jp)) {
           if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
             possibleEntries.add(entry);

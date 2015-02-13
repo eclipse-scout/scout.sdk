@@ -47,7 +47,7 @@ public class ResourceDialog extends TitleAreaDialog {
   private IContainer m_root;
   private String m_dialogTitle;
   private TreeViewer m_viewer;
-  private List<ViewerFilter> m_filters = new LinkedList<ViewerFilter>();
+  private List<ViewerFilter> m_filters = new LinkedList<>();
   private IResource[] m_result;
   private IResource[] m_initialSelection;
   private IResource[] m_initialExpansion;

@@ -84,7 +84,7 @@ public class GroupBoxBodyGridPresenter extends AbstractTypeProposalPresenter {
         searchPattern = IRegEx.STAR_END.matcher(searchPattern).replaceAll("") + "*";
       }
       char[] pattern = CharOperation.toLowerCase(searchPattern.toCharArray());
-      ArrayList<Object> collector = new ArrayList<Object>();
+      ArrayList<Object> collector = new ArrayList<>();
       for (Object proposal : m_proposals) {
         if (CharOperation.match(pattern, m_labelProvider.getText(proposal).toCharArray(), false)) {
           collector.add(proposal);

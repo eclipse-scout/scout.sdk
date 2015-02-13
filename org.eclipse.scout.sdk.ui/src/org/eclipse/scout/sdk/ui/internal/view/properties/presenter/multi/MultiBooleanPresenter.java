@@ -112,10 +112,10 @@ public class MultiBooleanPresenter extends AbstractMultiMethodPresenter<Boolean>
   }
 
   protected synchronized void storeMethods(Collection<MethodBean<Boolean>> beans) {
-    ArrayList<IOperation> list = new ArrayList<IOperation>(beans.size());
+    ArrayList<IOperation> list = new ArrayList<>(beans.size());
     for (MethodBean<Boolean> bean : beans) {
       ConfigurationMethod method = bean.getMethod();
-      ConfigPropertyUpdateOperation<Boolean> updateOp = new ConfigPropertyUpdateOperation<Boolean>(method, new BooleanPropertySourceParser());
+      ConfigPropertyUpdateOperation<Boolean> updateOp = new ConfigPropertyUpdateOperation<>(method, new BooleanPropertySourceParser());
       updateOp.setValue(m_checkbox.getSelection());
       list.add(updateOp);
     }

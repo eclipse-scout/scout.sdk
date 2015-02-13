@@ -157,7 +157,7 @@ public final class AnnotationSourceBuilderFactory {
       public void createSource(StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
         String formDataTypeRef = SignatureUtility.getTypeReference(getSignature(), validator);
         source.append("@").append(formDataTypeRef);
-        ArrayList<String> args = new ArrayList<String>(3);
+        ArrayList<String> args = new ArrayList<>(3);
         if (formDataSignature != null) {
           args.add("value = " + SignatureUtility.getTypeReference(formDataSignature, validator) + ".class");
         }

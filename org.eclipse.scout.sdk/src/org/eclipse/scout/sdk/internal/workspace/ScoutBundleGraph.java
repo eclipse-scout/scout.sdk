@@ -50,7 +50,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
   private volatile Map<IPath, IPluginModelBase> m_targetPlatformBundles;
 
   ScoutBundleGraph() {
-    m_dependencyIssues = new HashSet<String>();
+    m_dependencyIssues = new HashSet<>();
     m_lock = new ReentrantReadWriteLock(true);
   }
 
@@ -98,7 +98,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
         };
       }
 
-      Set<String> issueCollector = new HashSet<String>();
+      Set<String> issueCollector = new HashSet<>();
       Map<String, ScoutBundle> newGraph = getAllScoutBundles(issueCollector, monitor);
       if (monitor.isCanceled()) {
         return false;
@@ -184,10 +184,10 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
 
       Set<IScoutBundle> ret = null;
       if (comparator == null) {
-        ret = new HashSet<IScoutBundle>(m_bundleGraph.size());
+        ret = new HashSet<>(m_bundleGraph.size());
       }
       else {
-        ret = new TreeSet<IScoutBundle>(comparator);
+        ret = new TreeSet<>(comparator);
       }
 
       if (filter == null) {
@@ -269,7 +269,7 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
 
   private static Map<IPath, IPluginModelBase> getTargetPlatformBundles() {
     IPluginModelBase[] models = PDECore.getDefault().getModelManager().getExternalModels();
-    Map<IPath, IPluginModelBase> result = new HashMap<IPath, IPluginModelBase>(models.length);
+    Map<IPath, IPluginModelBase> result = new HashMap<>(models.length);
     for (IPluginModelBase p : models) {
       result.put(new Path(p.getInstallLocation()), p);
     }
@@ -286,8 +286,8 @@ public class ScoutBundleGraph implements IScoutBundleGraph {
    * @return the bundle set
    */
   private static Map<String, ScoutBundle> getAllScoutBundles(Set<String> dependencyCollector, IProgressMonitor monitor) {
-    Map<String, ScoutBundle> allScoutBundles = new HashMap<String, ScoutBundle>();
-    HashSet<String> messageCollector = new HashSet<String>();
+    Map<String, ScoutBundle> allScoutBundles = new HashMap<>();
+    HashSet<String> messageCollector = new HashSet<>();
 
     monitor.beginTask(Texts.get("WaitingForEclipsePDE") + "...", 1);
     PDECore pdeCore = PDECore.getDefault();

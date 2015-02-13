@@ -89,12 +89,12 @@ public class FormFieldSelectionWizardPage extends AbstractWorkspaceWizardPage {
 
   @Override
   protected void createContent(Composite parent) {
-    m_modelTypeShortList = new HashSet<IType>();
+    m_modelTypeShortList = new HashSet<>();
 
     IType iFormField = TypeUtility.getType(IRuntimeClasses.IFormField);
     Set<IType> abstractFormFields = TypeUtility.getAbstractTypesOnClasspath(iFormField, m_declaringType.getJavaProject(), TypeFilters.getPrimaryTypeFilter());
 
-    ArrayList<Object> elements = new ArrayList<Object>(abstractFormFields.size() + 1);
+    ArrayList<Object> elements = new ArrayList<>(abstractFormFields.size() + 1);
     elements.add(new ISeparator() {
     });
 

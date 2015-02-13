@@ -132,7 +132,7 @@ public class WebServiceProviderNodePagePropertyViewPart extends AbstractSinglePa
     m_pageLoadedListener = new P_PageLoadedListener();
     ScoutSeverityManager.getInstance().addQualityManagerListener(m_severityListener);
     getPage().addPageLoadedListener(m_pageLoadedListener);
-    m_bindingFilePresenters = new LinkedList<BindingFilePresenter>();
+    m_bindingFilePresenters = new LinkedList<>();
   }
 
   @Override

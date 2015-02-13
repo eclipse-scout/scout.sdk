@@ -104,7 +104,7 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
     m_bundle = bundle;
     m_propertySupport = new BasicPropertySupport(this);
     m_sunJaxWsXml = ResourceFactory.getSunJaxWsResource(bundle).loadXml();
-    m_wsdlStyleRadioButtons = new LinkedList<Button>();
+    m_wsdlStyleRadioButtons = new LinkedList<>();
     m_jaxWsServletAlias = JaxWsConstants.JAX_WS_ALIAS;
 
     loadIllegalValues();
@@ -737,8 +737,8 @@ public class WsPropertiesNewWsdlWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   private void loadIllegalValues() {
-    Set<String> illegalAliases = new HashSet<String>();
-    Set<String> illegalUrlPatterns = new HashSet<String>();
+    Set<String> illegalAliases = new HashSet<>();
+    Set<String> illegalUrlPatterns = new HashSet<>();
 
     if (m_sunJaxWsXml != null) {
       String fqn = StringUtility.join(":", JaxWsSdkUtility.getXmlPrefix(m_sunJaxWsXml.getDocumentElement()), SunJaxWsBean.XML_ENDPOINT);

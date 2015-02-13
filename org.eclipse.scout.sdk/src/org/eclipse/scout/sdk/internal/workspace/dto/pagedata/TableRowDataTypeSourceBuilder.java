@@ -173,7 +173,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     }
 
     // the declaring type holds columns
-    TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<IType>(ScoutTypeComparators.getOrderAnnotationComparator());
+    TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     // do not re-use the fieldHierarchy for the subtype filter!
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn)), new ITypeFilter() {
       @Override
@@ -205,7 +205,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     }
 
     // collect all columns that exist in the row data and all of its super classes
-    Set<String> usedColumnBeanNames = new HashSet<String>();
+    Set<String> usedColumnBeanNames = new HashSet<>();
     ITypeHierarchy rowDataHierarchy = TypeUtility.getSupertypeHierarchy(rowDataSuperType);
     Deque<IType> rowDataSuperClasses = rowDataHierarchy.getSuperClassStack(rowDataSuperType, true, IRuntimeClasses.AbstractTableRowData);
     for (IType currentRowDataSuperType : rowDataSuperClasses) {

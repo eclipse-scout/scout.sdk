@@ -105,7 +105,7 @@ public class ProductSelectionDialog extends TitleAreaDialog {
     m_tree.addCheckSelectionListener(new ICheckStateListener() {
       @Override
       public void fireNodeCheckStateChanged(ITreeNode node, boolean checkState) {
-        ArrayList<IFile> checkedFiles = new ArrayList<IFile>();
+        ArrayList<IFile> checkedFiles = new ArrayList<>();
         for (ITreeNode n : m_tree.getCheckedNodes()) {
           if (n.getType() == TreeUtility.TYPE_PRODUCT_NODE) {
             checkedFiles.add((IFile) n.getData());
@@ -163,7 +163,7 @@ public class ProductSelectionDialog extends TitleAreaDialog {
       }
       else {
         if (treeNodes.size() > 0) {
-          List<Object> pathElements = new ArrayList<Object>();
+          List<Object> pathElements = new ArrayList<>();
           ITreeNode n = CollectionUtility.firstElement(treeNodes);
           while (n != null) {
             pathElements.add(pathElements.size(), n);

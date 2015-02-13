@@ -490,7 +490,7 @@ public class WsConsumerImplClassWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   private Set<String> getIllegalTypeNames() {
-    Set<String> illegalTypeNames = new HashSet<String>();
+    Set<String> illegalTypeNames = new HashSet<>();
 
     XmlResource buildJaxWsResource = ResourceFactory.getBuildJaxWsResource(m_bundle);
     Document xmlDocument = buildJaxWsResource.loadXml();

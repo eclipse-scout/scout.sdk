@@ -19,8 +19,8 @@ import org.eclipse.scout.sdk.ws.jaxws.util.JaxWsSdkUtility;
 
 public final class ResourceFactory {
 
-  private static final Map<IScoutBundle, XmlResource> SM_SUN_JAX_WS_RESOURCE_MAP = new HashMap<IScoutBundle, XmlResource>();
-  private static final Map<IScoutBundle, XmlResource> SM_BUILD_JAXWS_RESOURCE_MAP = new HashMap<IScoutBundle, XmlResource>();
+  private static final Map<IScoutBundle, XmlResource> SM_SUN_JAX_WS_RESOURCE_MAP = new HashMap<>();
+  private static final Map<IScoutBundle, XmlResource> SM_BUILD_JAXWS_RESOURCE_MAP = new HashMap<>();
 
   private ResourceFactory() {
   }

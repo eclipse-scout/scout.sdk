@@ -48,15 +48,15 @@ public class ButtonSystemTypePresenter extends AbstractProposalPresenter<FieldPr
   protected static final List<FieldProperty<Integer>> PROPOSALS;
   static {
     IType iButton = TypeUtility.getType(IRuntimeClasses.IButton);
-    SYSTEM_TYPE_NONE = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_NONE"), "none");
-    SYSTEM_TYPE_CANCEL = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_CANCEL"), "cancel");
-    SYSTEM_TYPE_CLOSE = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_CLOSE"), "close");
-    SYSTEM_TYPE_OK = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_OK"), "ok");
-    SYSTEM_TYPE_RESET = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_RESET"), "ok");
-    SYSTEM_TYPE_SAVE = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_SAVE"), "ok");
-    SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE = new UiFieldProperty<Integer>(iButton.getField("SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE"), "save without change marker");
+    SYSTEM_TYPE_NONE = new UiFieldProperty<>(iButton.getField("SYSTEM_TYPE_NONE"), "none");
+    SYSTEM_TYPE_CANCEL = new UiFieldProperty<>(iButton.getField("SYSTEM_TYPE_CANCEL"), "cancel");
+    SYSTEM_TYPE_CLOSE = new UiFieldProperty<>(iButton.getField("SYSTEM_TYPE_CLOSE"), "close");
+    SYSTEM_TYPE_OK = new UiFieldProperty<>(iButton.getField("SYSTEM_TYPE_OK"), "ok");
+    SYSTEM_TYPE_RESET = new UiFieldProperty<>(iButton.getField("SYSTEM_TYPE_RESET"), "ok");
+    SYSTEM_TYPE_SAVE = new UiFieldProperty<>(iButton.getField("SYSTEM_TYPE_SAVE"), "ok");
+    SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE = new UiFieldProperty<>(iButton.getField("SYSTEM_TYPE_SAVE_WITHOUT_MARKER_CHANGE"), "save without change marker");
 
-    PROPOSALS = new ArrayList<FieldProperty<Integer>>(7);
+    PROPOSALS = new ArrayList<>(7);
     PROPOSALS.add(SYSTEM_TYPE_NONE);
     PROPOSALS.add(SYSTEM_TYPE_CANCEL);
     PROPOSALS.add(SYSTEM_TYPE_CLOSE);
@@ -110,7 +110,7 @@ public class ButtonSystemTypePresenter extends AbstractProposalPresenter<FieldPr
     }
 
     try {
-      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<Integer>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<FieldProperty<Integer>> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

@@ -63,7 +63,7 @@ public class LogStatus extends Status {
     try {
       StackTraceElement[] trace = new Exception().getStackTrace();
       int traceIndex = 0;
-      HashSet<String> ignoredPackagePrefixes = new HashSet<String>();
+      HashSet<String> ignoredPackagePrefixes = new HashSet<>();
       ignoredPackagePrefixes.add(LogStatus.class.getName());
       ignoredPackagePrefixes.add(SdkLogManager.class.getName());
       if (wrapperClass != null) {

@@ -21,7 +21,7 @@ public class Application implements IApplication {
   public Object start(final IApplicationContext context) throws Exception {
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal(System.getProperty("user.name")));
-    return Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
+    return Subject.doAs(subject, new PrivilegedExceptionAction<>() {
       @Override
       public Object run() throws Exception {
         return startSecure(context);

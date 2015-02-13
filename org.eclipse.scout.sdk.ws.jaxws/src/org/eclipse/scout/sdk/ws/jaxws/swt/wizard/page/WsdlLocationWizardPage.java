@@ -188,7 +188,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
           setPath(path);
 
           // help the user by determing the referenced files
-          final Set<WsdlArtifact<File>> referencedWsdlArtifacts = new HashSet<WsdlArtifact<File>>();
+          final Set<WsdlArtifact<File>> referencedWsdlArtifacts = new HashSet<>();
           final Set<SchemaIncludeArtifact<File>> schemaIncludeArtifacts = new HashSet<SchemaIncludeArtifact<File>>();
           final Set<SchemaImportArtifact<File>> schemaImportArtifacts = new HashSet<SchemaImportArtifact<File>>();
 
@@ -758,7 +758,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
     public void addPages() {
       m_wizardPage = new ResourceSelectionWizardPage(Texts.get("ReferencedFilesFound"), Texts.get("QuestionReferencedFilesFound"));
 
-      List<ElementBean> elements = new ArrayList<ElementBean>();
+      List<ElementBean> elements = new ArrayList<>();
       for (WsdlArtifact<File> artifact : m_referencedWsdlArtifacts) {
         elements.add(toElement(artifact, "referenced WSDL file", JaxWsIcons.WsdlFile));
       }
@@ -774,7 +774,7 @@ public class WsdlLocationWizardPage extends AbstractWorkspaceWizardPage {
 
     @Override
     protected boolean beforeFinish() throws CoreException {
-      List<File> files = new LinkedList<File>();
+      List<File> files = new LinkedList<>();
       for (ElementBean element : m_wizardPage.getElements()) {
         if (element.isChecked() || element.isMandatory()) {
           files.add((File) element.getData());

@@ -119,7 +119,7 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
 
   @Override
   public Deque<IType> getSuperClassStack(IType startType, boolean includeStartType, String stopTypeFqn) {
-    LinkedList<IType> result = new LinkedList<IType>();
+    LinkedList<IType> result = new LinkedList<>();
     if (startType == null) {
       return result;
     }
@@ -339,10 +339,10 @@ public class TypeHierarchy implements org.eclipse.scout.sdk.util.typecache.IType
   protected Set<IType> getTypesFilteredAndSorted(IType[] types, ITypeFilter filter, Comparator<IType> comparator) {
     Set<IType> result = null;
     if (comparator == null) {
-      result = new HashSet<IType>(types.length);
+      result = new HashSet<>(types.length);
     }
     else {
-      result = new TreeSet<IType>(comparator);
+      result = new TreeSet<>(comparator);
     }
 
     if (filter == null) {

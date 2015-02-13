@@ -189,7 +189,7 @@ public class LookupCallNewWizardPage extends AbstractWorkspaceWizardPage {
         @Override
         protected Object[][] computeProposals() {
           IType abstractLookupService = TypeUtility.getType(IRuntimeClasses.AbstractLookupService);
-          List<Object> proposals = new ArrayList<Object>();
+          List<Object> proposals = new ArrayList<>();
           proposals.add(abstractLookupService);
           if (m_abstractSqlLookupService != null) {
             proposals.add(m_abstractSqlLookupService);

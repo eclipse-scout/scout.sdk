@@ -63,8 +63,8 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
   @Override
   protected void handleAddComponent() {
     IType iOutline = TypeUtility.getType(IRuntimeClasses.IOutline);
-    HashSet<IJavaElement> sourceProposals = new HashSet<IJavaElement>(getSourceProps());
-    List<IJavaElement> candidates = new ArrayList<IJavaElement>();
+    HashSet<IJavaElement> sourceProposals = new HashSet<>(getSourceProps());
+    List<IJavaElement> candidates = new ArrayList<>();
 
     Set<IType> outlineTypes = TypeUtility.getClassesOnClasspath(iOutline, getMethod().getType().getJavaProject(), null);
     for (IType t : outlineTypes) {
@@ -94,7 +94,7 @@ public class OutlinesPresenter extends AbstractJavaElementListPresenter {
     // cast
     List<IType> types = null;
     if (proposals != null) {
-      types = new ArrayList<IType>(proposals.size());
+      types = new ArrayList<>(proposals.size());
       for (IJavaElement e : proposals) {
         types.add((IType) e);
       }

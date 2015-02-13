@@ -22,7 +22,6 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.scout.commons.StringUtility;
@@ -99,7 +98,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements IScoutProje
     protected IStatus run(IProgressMonitor monitor) {
       // prepare the property container
       PropertyMap properties = new PropertyMap();
-      properties.setProperty(IScoutProjectNewOperation.PROP_CREATED_BUNDLES, new ArrayList<IJavaProject>());
+      properties.setProperty(IScoutProjectNewOperation.PROP_CREATED_BUNDLES, new ArrayList<>());
 
       // collect UI properties over all pages of the wizard
       for (IWizardPage p : getPages()) {

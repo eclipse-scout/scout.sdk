@@ -103,7 +103,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
     m_bindingFileResources = new XmlResource[0];
     m_bindingFileResourceListener = new P_BindingFileResourceListener();
 
-    m_pageLoadedListeners = new HashSet<IPageLoadedListener>();
+    m_pageLoadedListeners = new HashSet<>();
     m_pageLoadedListenerLock = new Object();
 
     // register for events being of interest
@@ -134,7 +134,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
 
   @Override
   public Set<Class<? extends IScoutHandler>> getSupportedMenuActions() {
-    Set<Class<? extends IScoutHandler>> list = new HashSet<Class<? extends IScoutHandler>>();
+    Set<Class<? extends IScoutHandler>> list = new HashSet<>();
     list.addAll(super.getSupportedMenuActions());
 
     if (getBuildJaxWsBean() != null
@@ -256,7 +256,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
         JaxWsSdk.logWarning("failed to update markers", e);
       }
       finally {
-        Set<IResource> resources = new HashSet<IResource>();
+        Set<IResource> resources = new HashSet<>();
         if (JaxWsSdkUtility.exists(getBuildJaxWsResource().getFile())) {
           resources.add(getBuildJaxWsResource().getFile());
         }
@@ -295,7 +295,7 @@ public class WebServiceConsumerNodePage extends AbstractScoutTypePage implements
       resource.removeResourceListener(m_bindingFileResourceListener);
     }
 
-    List<XmlResource> bindingFileResources = new LinkedList<XmlResource>();
+    List<XmlResource> bindingFileResources = new LinkedList<>();
 
     if (m_buildJaxWsBean != null) {
       IFile[] bindingFiles = JaxWsSdkUtility.getBindingFiles(m_bundle, m_buildJaxWsBean.getPropertiers());

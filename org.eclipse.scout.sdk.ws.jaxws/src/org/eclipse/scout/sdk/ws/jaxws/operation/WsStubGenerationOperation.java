@@ -69,7 +69,7 @@ public class WsStubGenerationOperation implements IOperation {
   private Set<IOperationFinishedListener> m_operationFinishedListeners;
 
   public WsStubGenerationOperation() {
-    m_operationFinishedListeners = new HashSet<IOperationFinishedListener>();
+    m_operationFinishedListeners = new HashSet<>();
   }
 
   public void addOperationFinishedListener(IOperationFinishedListener listener) {
@@ -286,7 +286,7 @@ public class WsStubGenerationOperation implements IOperation {
   }
 
   private List<String> getClasspathEntries() throws CoreException {
-    List<String> mementoList = new LinkedList<String>();
+    List<String> mementoList = new LinkedList<>();
 
     // add runtime classes to the classpath
     for (IRuntimeClasspathEntry classpathEntry : JavaRuntime.computeUnresolvedRuntimeClasspath(m_bundle.getJavaProject())) {

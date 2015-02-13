@@ -137,8 +137,8 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
   private IStatus m_icuNotSyncStatus;
 
   public JdtTypePropertyPart() {
-    m_methodsToUpdate = new HashMap<String, ConfigurationMethod>();
-    m_methodPresenters = new HashMap<String, AbstractMethodPresenter>();
+    m_methodsToUpdate = new HashMap<>();
+    m_methodPresenters = new HashMap<>();
     m_methodUpdateLock = new Object();
     m_markDirtyJob = new P_MarkDirtyJob();
     m_markDirtyLock = new Object();

@@ -139,10 +139,10 @@ public final class ProjectContextTypeHierarchyResult implements ICacheableTypeHi
 
     Set<IType> result = null;
     if (comparator == null) {
-      result = new HashSet<IType>(types.size());
+      result = new HashSet<>(types.size());
     }
     else {
-      result = new TreeSet<IType>(comparator);
+      result = new TreeSet<>(comparator);
     }
 
     if (filter == null) {
@@ -163,7 +163,7 @@ public final class ProjectContextTypeHierarchyResult implements ICacheableTypeHi
   private Set<IType> getTypesCached(IProgressMonitor monitor) {
     if (m_cachedTypes == null) {
       try {
-        final Set<IType> collector = new HashSet<IType>();
+        final Set<IType> collector = new HashSet<>();
         SearchEngine e = new SearchEngine(JavaCore.getWorkingCopies(null));
         e.searchAllTypeNames(null, SearchPattern.R_EXACT_MATCH, null, SearchPattern.R_EXACT_MATCH, m_constraints.getSearchFor(),
             SearchEngine.createStrictHierarchyScope(m_constraints.getClasspath(), getBaseType(), true, m_constraints.isIncludeBaseType(), null),

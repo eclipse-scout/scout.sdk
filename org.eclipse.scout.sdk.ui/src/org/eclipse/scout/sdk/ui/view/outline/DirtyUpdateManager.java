@@ -33,7 +33,7 @@ public class DirtyUpdateManager {
   private Job m_currentRefreshLabelsProcess;
 
   public DirtyUpdateManager(IDirtyManageable view) {
-    m_structureRoots = new LinkedList<IPage>();
+    m_structureRoots = new LinkedList<>();
     m_view = view;
     m_currentRefreshSubTreeProcess = new RefreshOutlineSubTreeJob(m_view, this, Texts.get("Refreshing"));
     // add quality listener

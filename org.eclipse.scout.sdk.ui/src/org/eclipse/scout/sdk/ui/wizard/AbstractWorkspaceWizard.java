@@ -42,11 +42,11 @@ public abstract class AbstractWorkspaceWizard extends AbstractWizard implements 
   }
 
   public AbstractWorkspaceWizard() {
-    m_performFinishOperations = new TreeMap<Double, IOperation>();
+    m_performFinishOperations = new TreeMap<>();
   }
 
   public Map<Double, IOperation> getPerformFinishOperations() {
-    return new TreeMap<Double, IOperation>(m_performFinishOperations);
+    return new TreeMap<>(m_performFinishOperations);
   }
 
   protected Map<Double, IOperation> getPerformFinishOperationsInternal() {

@@ -74,7 +74,7 @@ public class SqlBindCompletionProposalProcessor {
       }
 
       String prefix = getPrefix(context.getViewer(), context.getInvocationOffset());
-      HashSet<ICompletionProposal> collector = new HashSet<ICompletionProposal>();
+      HashSet<ICompletionProposal> collector = new HashSet<>();
       ITypeHierarchy hierarchy = TypeUtility.getLocalTypeHierarchy(formData);
       for (IType t : TypeUtility.getInnerTypes(formData, TypeFilters.getSubtypeFilter(abstractFormFieldData, hierarchy))) {
         String propName = FastBeanUtility.decapitalize(NamingUtility.ensureStartWithUpperCase(t.getElementName()));
@@ -89,7 +89,7 @@ public class SqlBindCompletionProposalProcessor {
         collector.add(prop);
       }
 
-      TreeMap<String, ICompletionProposal> sorted = new TreeMap<String, ICompletionProposal>();
+      TreeMap<String, ICompletionProposal> sorted = new TreeMap<>();
       for (ICompletionProposal p : collector) {
         if (p.getDisplayString().toLowerCase().startsWith(prefix.toLowerCase())) {
           sorted.put(p.getDisplayString(), p);

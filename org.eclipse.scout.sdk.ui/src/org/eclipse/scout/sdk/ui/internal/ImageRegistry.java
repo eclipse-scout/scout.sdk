@@ -18,7 +18,7 @@ import org.eclipse.swt.widgets.Display;
 
 public class ImageRegistry extends org.eclipse.jface.resource.ImageRegistry {
 
-  private HashMap<ImageDescriptor, Image> m_registry = new HashMap<ImageDescriptor, Image>();
+  private HashMap<ImageDescriptor, Image> m_registry = new HashMap<>();
   private final Display m_device;
 
   public ImageRegistry(Display device) {

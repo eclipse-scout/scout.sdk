@@ -57,7 +57,7 @@ public class ResourceSelectionWizardPage extends AbstractWorkspaceWizardPage {
     m_tableViewer.setInput(m_elements);
 
     // preselect elements
-    List<ElementBean> checkedElements = new LinkedList<ElementBean>();
+    List<ElementBean> checkedElements = new LinkedList<>();
     for (ElementBean element : m_elements) {
       if (element.isChecked()) {
         checkedElements.add(element);

@@ -123,8 +123,8 @@ public class EditorSelectionVisitor implements INodeVisitor {
   private ArrayList<IJavaElement> m_elements;
 
   public EditorSelectionVisitor(IJavaElement element) {
-    m_typeHierarchyCache = new HashMap<IJavaElement, ITypeHierarchy>();
-    m_visitedNodes = new HashSet<IPage>();
+    m_typeHierarchyCache = new HashMap<>();
+    m_visitedNodes = new HashSet<>();
     IMethod declaringMethod = null;
     if (element.getElementType() == IJavaElement.METHOD) {
       declaringMethod = (IMethod) element;
@@ -132,7 +132,7 @@ public class EditorSelectionVisitor implements INodeVisitor {
     else {
       declaringMethod = (IMethod) element.getAncestor(IJavaElement.METHOD);
     }
-    ArrayList<IJavaElement> collector = new ArrayList<IJavaElement>();
+    ArrayList<IJavaElement> collector = new ArrayList<>();
     IType declaringType = null;
     if (declaringMethod != null) {
       collector.add(declaringMethod);

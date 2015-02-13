@@ -38,7 +38,7 @@ public abstract class AbstractEquinoxSecurityInstallOperation extends AbstractSc
 
   @Override
   public void init() {
-    ArrayList<IFile> productFiles = new ArrayList<IFile>(2);
+    ArrayList<IFile> productFiles = new ArrayList<>(2);
     contributeProductFiles(productFiles);
     m_productFiles = productFiles.toArray(new IFile[productFiles.size()]);
   }

@@ -113,7 +113,7 @@ public abstract class AbstractTypeNewExecutor extends AbstractExecutor {
       page.setSuperClass(stripSignatureToFQN(m_superTypeSignature, false), m_allowModifySuperType);
     }
     if (m_interfaceTypeSignatures != null && m_interfaceTypeSignatures.size() > 0) {
-      List<String> interfaceTypeNames = new LinkedList<String>();
+      List<String> interfaceTypeNames = new LinkedList<>();
       for (String signature : m_interfaceTypeSignatures) {
         interfaceTypeNames.add(stripSignatureToFQN(signature, false));
       }

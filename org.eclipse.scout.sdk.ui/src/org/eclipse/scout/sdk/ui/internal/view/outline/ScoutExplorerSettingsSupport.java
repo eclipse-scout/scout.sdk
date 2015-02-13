@@ -135,7 +135,7 @@ public final class ScoutExplorerSettingsSupport {
   }
 
   private static Set<String> toSet(String[] elements) {
-    Set<String> items = new LinkedHashSet<String>();
+    Set<String> items = new LinkedHashSet<>();
     if (elements != null && elements.length > 0) {
       for (String s : elements) {
         if (StringUtility.hasText(s)) {
@@ -257,7 +257,7 @@ public final class ScoutExplorerSettingsSupport {
   }
 
   public synchronized void addHiddenBundleType(String type) {
-    Set<String> old = new HashSet<String>(m_hiddenBundleTypes);
+    Set<String> old = new HashSet<>(m_hiddenBundleTypes);
     boolean added = m_hiddenBundleTypes.add(type);
     if (added) {
       storeListProperty(old, m_hiddenBundleTypes, PREF_HIDDEN_BUNDLES_TYPES);
@@ -265,7 +265,7 @@ public final class ScoutExplorerSettingsSupport {
   }
 
   public synchronized void removeHiddenBundleType(String type) {
-    Set<String> old = new HashSet<String>(m_hiddenBundleTypes);
+    Set<String> old = new HashSet<>(m_hiddenBundleTypes);
     boolean removed = m_hiddenBundleTypes.remove(type);
     if (removed) {
       storeListProperty(old, m_hiddenBundleTypes, PREF_HIDDEN_BUNDLES_TYPES);
@@ -286,7 +286,7 @@ public final class ScoutExplorerSettingsSupport {
   }
 
   private static <T> List<T> toList(T[] elements) {
-    ArrayList<T> result = new ArrayList<T>();
+    ArrayList<T> result = new ArrayList<>();
     if (elements != null && elements.length > 0) {
       for (T e : elements) {
         result.add(e);
@@ -305,8 +305,8 @@ public final class ScoutExplorerSettingsSupport {
   }
 
   public synchronized void setHiddenScoutWorkingSets(IWorkingSet[] hiddenSets) {
-    Set<String> old = new HashSet<String>(m_hiddenWorkingSets);
-    Set<String> newHidden = new HashSet<String>(hiddenSets.length);
+    Set<String> old = new HashSet<>(m_hiddenWorkingSets);
+    Set<String> newHidden = new HashSet<>(hiddenSets.length);
     for (IWorkingSet s : hiddenSets) {
       newHidden.add(s.getName());
     }
@@ -320,8 +320,8 @@ public final class ScoutExplorerSettingsSupport {
   public synchronized IWorkingSet[] getScoutWorkingSets(boolean includeHidden) {
     IWorkingSetManager workingSetManager = PlatformUI.getWorkbench().getWorkingSetManager();
     IWorkingSet[] allWorkingSets = workingSetManager.getAllWorkingSets();
-    HashSet<IWorkingSet> result = new HashSet<IWorkingSet>(allWorkingSets.length + 1);
-    HashSet<IScoutBundle> bundlesThatBelongToASet = new HashSet<IScoutBundle>();
+    HashSet<IWorkingSet> result = new HashSet<>(allWorkingSets.length + 1);
+    HashSet<IScoutBundle> bundlesThatBelongToASet = new HashSet<>();
     for (IWorkingSet ws : allWorkingSets) {
       IWorkingSet fws = filterWorkingSet(ws, includeHidden);
       if (fws != null) {

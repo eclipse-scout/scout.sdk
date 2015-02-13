@@ -214,7 +214,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
    * @param interfaceTypes
    */
   public void setInterfaceTypes(IType[] interfaceTypes) {
-    List<String> signatures = new ArrayList<String>();
+    List<String> signatures = new ArrayList<>();
     for (IType type : interfaceTypes) {
       signatures.add(SignatureCache.createTypeSignature(type.getFullyQualifiedName()));
     }
@@ -263,7 +263,7 @@ public class TypePresenter extends AbstractPropertyPresenter<String> {
       page.setSuperClass(m_superType.getFullyQualifiedName(), false);
     }
     if (m_interfaceSignatures != null && m_interfaceSignatures.length > 0) {
-      List<String> interfaceTypeNames = new LinkedList<String>();
+      List<String> interfaceTypeNames = new LinkedList<>();
       for (String signature : m_interfaceSignatures) {
         interfaceTypeNames.add(stripSignatureToFQN(signature, false));
       }

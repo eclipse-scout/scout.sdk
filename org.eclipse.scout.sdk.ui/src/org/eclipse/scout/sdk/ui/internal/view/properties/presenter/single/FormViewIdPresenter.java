@@ -54,22 +54,22 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<FieldProperty
   protected static final List<FieldProperty<String>> PROPOSALS;
   static {
     IType iForm = TypeUtility.getType(IRuntimeClasses.IForm);
-    VIEW_ID_N = new UiFieldProperty<String>(iForm.getField("VIEW_ID_N"), "north");
-    VIEW_ID_NE = new UiFieldProperty<String>(iForm.getField("VIEW_ID_NE"), "north-east");
-    VIEW_ID_E = new UiFieldProperty<String>(iForm.getField("VIEW_ID_E"), "east");
-    VIEW_ID_SE = new UiFieldProperty<String>(iForm.getField("VIEW_ID_SE"), "south-east");
-    VIEW_ID_S = new UiFieldProperty<String>(iForm.getField("VIEW_ID_S"), "south");
-    VIEW_ID_SW = new UiFieldProperty<String>(iForm.getField("VIEW_ID_SW"), "south-west");
-    VIEW_ID_W = new UiFieldProperty<String>(iForm.getField("VIEW_ID_W"), "west");
-    VIEW_ID_NW = new UiFieldProperty<String>(iForm.getField("VIEW_ID_NW"), "north-west");
-    VIEW_ID_CENTER = new UiFieldProperty<String>(iForm.getField("VIEW_ID_CENTER"), "center");
-    VIEW_ID_OUTLINE = new UiFieldProperty<String>(iForm.getField("VIEW_ID_OUTLINE"), "outline");
-    VIEW_ID_OUTLINE_SELECTOR = new UiFieldProperty<String>(iForm.getField("VIEW_ID_OUTLINE_SELECTOR"), "outline-selector");
-    VIEW_ID_PAGE_DETAIL = new UiFieldProperty<String>(iForm.getField("VIEW_ID_PAGE_DETAIL"), "page-detail");
-    VIEW_ID_PAGE_SEARCH = new UiFieldProperty<String>(iForm.getField("VIEW_ID_PAGE_SEARCH"), "page-search");
-    VIEW_ID_PAGE_TABLE = new UiFieldProperty<String>(iForm.getField("VIEW_ID_PAGE_TABLE"), "page-table");
+    VIEW_ID_N = new UiFieldProperty<>(iForm.getField("VIEW_ID_N"), "north");
+    VIEW_ID_NE = new UiFieldProperty<>(iForm.getField("VIEW_ID_NE"), "north-east");
+    VIEW_ID_E = new UiFieldProperty<>(iForm.getField("VIEW_ID_E"), "east");
+    VIEW_ID_SE = new UiFieldProperty<>(iForm.getField("VIEW_ID_SE"), "south-east");
+    VIEW_ID_S = new UiFieldProperty<>(iForm.getField("VIEW_ID_S"), "south");
+    VIEW_ID_SW = new UiFieldProperty<>(iForm.getField("VIEW_ID_SW"), "south-west");
+    VIEW_ID_W = new UiFieldProperty<>(iForm.getField("VIEW_ID_W"), "west");
+    VIEW_ID_NW = new UiFieldProperty<>(iForm.getField("VIEW_ID_NW"), "north-west");
+    VIEW_ID_CENTER = new UiFieldProperty<>(iForm.getField("VIEW_ID_CENTER"), "center");
+    VIEW_ID_OUTLINE = new UiFieldProperty<>(iForm.getField("VIEW_ID_OUTLINE"), "outline");
+    VIEW_ID_OUTLINE_SELECTOR = new UiFieldProperty<>(iForm.getField("VIEW_ID_OUTLINE_SELECTOR"), "outline-selector");
+    VIEW_ID_PAGE_DETAIL = new UiFieldProperty<>(iForm.getField("VIEW_ID_PAGE_DETAIL"), "page-detail");
+    VIEW_ID_PAGE_SEARCH = new UiFieldProperty<>(iForm.getField("VIEW_ID_PAGE_SEARCH"), "page-search");
+    VIEW_ID_PAGE_TABLE = new UiFieldProperty<>(iForm.getField("VIEW_ID_PAGE_TABLE"), "page-table");
 
-    PROPOSALS = new ArrayList<FieldProperty<String>>(14);
+    PROPOSALS = new ArrayList<>(14);
     PROPOSALS.add(VIEW_ID_N);
     PROPOSALS.add(VIEW_ID_NE);
     PROPOSALS.add(VIEW_ID_E);
@@ -129,7 +129,7 @@ public class FormViewIdPresenter extends AbstractProposalPresenter<FieldProperty
     }
 
     try {
-      ConfigPropertyUpdateOperation<FieldProperty<String>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<String>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<FieldProperty<String>> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

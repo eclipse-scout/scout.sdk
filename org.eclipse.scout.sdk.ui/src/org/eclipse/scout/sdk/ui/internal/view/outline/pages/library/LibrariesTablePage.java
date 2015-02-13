@@ -90,11 +90,11 @@ public class LibrariesTablePage extends AbstractPage {
     }
     try {
       // find library projects
-      List<IPluginModelBase> libraries = new ArrayList<IPluginModelBase>();
+      List<IPluginModelBase> libraries = new ArrayList<>();
       if (getScoutBundle() != null && !getScoutBundle().isBinary()) {
         PluginModelHelper helper = new PluginModelHelper(getScoutBundle().getProject());
         List<IPluginImport> allDependencies = helper.Manifest.getAllDependencies();
-        Set<String> dependencyIds = new HashSet<String>(allDependencies.size());
+        Set<String> dependencyIds = new HashSet<>(allDependencies.size());
         for (IPluginImport dependency : allDependencies) {
           dependencyIds.add(dependency.getId());
         }
@@ -119,7 +119,7 @@ public class LibrariesTablePage extends AbstractPage {
 
   private Collection<IPluginModelBase> getAllLibrariesInWorkspace() throws CoreException {
     IPluginModelBase[] workspaceModels = PluginRegistry.getWorkspaceModels();
-    List<IPluginModelBase> libraries = new ArrayList<IPluginModelBase>();
+    List<IPluginModelBase> libraries = new ArrayList<>();
     for (IPluginModelBase model : workspaceModels) {
       IProject project = model.getUnderlyingResource().getProject();
       if (project != null && project.exists() && project.isOpen() && project.hasNature(ScoutSdk.LIBRARY_NATURE_ID)) {

@@ -45,8 +45,8 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   public CompilationUnitSourceBuilder(String elementName, String packageName) {
     super(elementName);
     m_packageName = packageName;
-    m_typeSourceBuilders = new ArrayList<ITypeSourceBuilder>();
-    m_sortedTypeSourceBuilders = new TreeMap<CompositeObject, ITypeSourceBuilder>();
+    m_typeSourceBuilders = new ArrayList<>();
+    m_sortedTypeSourceBuilders = new TreeMap<>();
   }
 
   @Override
@@ -135,7 +135,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
 
   @Override
   public List<ITypeSourceBuilder> getTypeSourceBuilder() {
-    List<ITypeSourceBuilder> builders = new ArrayList<ITypeSourceBuilder>(m_typeSourceBuilders.size() + m_sortedTypeSourceBuilders.size());
+    List<ITypeSourceBuilder> builders = new ArrayList<>(m_typeSourceBuilders.size() + m_sortedTypeSourceBuilders.size());
     builders.addAll(m_typeSourceBuilders);
     builders.addAll(m_sortedTypeSourceBuilders.values());
     return builders;

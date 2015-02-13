@@ -40,7 +40,7 @@ public class RapProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
 
   @Override
   public void init() {
-    ArrayList<IFile> productFiles = new ArrayList<IFile>(2);
+    ArrayList<IFile> productFiles = new ArrayList<>(2);
     IFile f = getProperties().getProperty(CreateUiRapPluginOperation.PROP_PRODUCT_FILE_DEV, IFile.class);
     if (f != null) {
       productFiles.add(f);

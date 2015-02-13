@@ -179,7 +179,7 @@ public class ScoutProjectTemplateWizardPage extends AbstractProjectNewWizardPage
     private final ArrayList<ProjectTemplateExtension> m_activeExtensions;
 
     private P_ContentProvider() {
-      m_activeExtensions = new ArrayList<ProjectTemplateExtension>(m_extensions.size());
+      m_activeExtensions = new ArrayList<>(m_extensions.size());
     }
 
     public ProjectTemplateExtension revalidate() {

@@ -43,13 +43,13 @@ public class NlsEntry implements INlsEntry {
   public NlsEntry(INlsEntry row, INlsProject project) {
     m_lock = new ReentrantReadWriteLock(true);
     m_project = project;
-    m_translations = new HashMap<Language, String>();
+    m_translations = new HashMap<>();
     update(row);
   }
 
   public NlsEntry(String key, INlsProject project) {
     m_lock = new ReentrantReadWriteLock(true);
-    m_translations = new HashMap<Language, String>();
+    m_translations = new HashMap<>();
     m_project = project;
     m_key = key;
   }
@@ -106,7 +106,7 @@ public class NlsEntry implements INlsEntry {
     try {
       m_lock.writeLock().lock();
       Map<Language, String> allTranslations = refEntry.getAllTranslations();
-      m_translations = new HashMap<Language, String>(allTranslations.size());
+      m_translations = new HashMap<>(allTranslations.size());
       m_key = refEntry.getKey();
       for (Entry<Language, String> entry : allTranslations.entrySet()) {
         addTranslationInternal(entry.getKey(), entry.getValue());
@@ -126,7 +126,7 @@ public class NlsEntry implements INlsEntry {
   public Map<Language, String> getAllTranslations() {
     try {
       m_lock.readLock().lock();
-      return new HashMap<Language, String>(m_translations);
+      return new HashMap<>(m_translations);
     }
     finally {
       m_lock.readLock().unlock();

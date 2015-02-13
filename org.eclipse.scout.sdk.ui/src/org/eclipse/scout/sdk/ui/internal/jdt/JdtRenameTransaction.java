@@ -40,8 +40,8 @@ public class JdtRenameTransaction {
   private final Set<ICompilationUnit> m_touchedCompilationUntis;
 
   public JdtRenameTransaction() {
-    m_list = new ArrayList<RenameSupport>();
-    m_touchedCompilationUntis = new HashSet<ICompilationUnit>();
+    m_list = new ArrayList<>();
+    m_touchedCompilationUntis = new HashSet<>();
   }
 
   public static int getDefaultFlags() {

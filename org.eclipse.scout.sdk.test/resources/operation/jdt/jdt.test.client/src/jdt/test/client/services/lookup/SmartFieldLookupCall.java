@@ -13,7 +13,7 @@ public class SmartFieldLookupCall extends LocalLookupCall {
 
   @Override
   protected List<LookupRow> execCreateLookupRows() throws ProcessingException {
-    ArrayList<LookupRow> rows = new ArrayList<LookupRow>();
+    ArrayList<LookupRow> rows = new ArrayList<>();
     //TODO [aho] create lookup rows here.
     return rows;
   }

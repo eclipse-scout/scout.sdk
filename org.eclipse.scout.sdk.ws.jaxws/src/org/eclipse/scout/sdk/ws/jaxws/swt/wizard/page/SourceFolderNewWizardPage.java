@@ -107,7 +107,7 @@ public class SourceFolderNewWizardPage extends AbstractWorkspaceWizardPage {
   }
 
   private Set<IPath> getExistingSourcePaths() {
-    Set<IPath> sourceFolders = new HashSet<IPath>();
+    Set<IPath> sourceFolders = new HashSet<>();
     try {
       for (IClasspathEntry classpathEntry : m_bundle.getJavaProject().getRawClasspath()) {
         if (classpathEntry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {

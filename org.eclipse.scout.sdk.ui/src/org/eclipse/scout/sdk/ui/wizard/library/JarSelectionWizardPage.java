@@ -65,7 +65,7 @@ public class JarSelectionWizardPage extends AbstractWorkspaceWizardPage {
   public JarSelectionWizardPage() {
     super(JarSelectionWizardPage.class.getName());
     setTitle(Texts.get("NewLibraryBundle"));
-    setJarFilesInternal(new TreeSet<File>(new P_FileComparator()));
+    setJarFilesInternal(new TreeSet<>(new P_FileComparator()));
   }
 
   @Override

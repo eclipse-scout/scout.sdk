@@ -50,7 +50,7 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
     if (searchText == null) {
       return new IContentProposal[]{};
     }
-    ArrayList<IContentProposal> collector = new ArrayList<IContentProposal>();
+    ArrayList<IContentProposal> collector = new ArrayList<>();
     collectTypes(searchText, collector, SearchPattern.R_PATTERN_MATCH, null);
     return collector.toArray(new IContentProposal[collector.size()]);
   }
@@ -63,7 +63,7 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
     }
     searchText = searchText + "*";
     // SearchPattern.R_PATTERN_MATCH
-    ArrayList<IContentProposal> proposals = new ArrayList<IContentProposal>();
+    ArrayList<IContentProposal> proposals = new ArrayList<>();
     collectTypes(searchText, proposals, SearchPattern.R_PATTERN_MATCH, null);
     return proposals.toArray(new IContentProposal[proposals.size()]);
   }
@@ -102,7 +102,7 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
         return;
       }
     }
-    ArrayList<IContentProposal> props = new ArrayList<IContentProposal>(searchRequestor.getResult());
+    ArrayList<IContentProposal> props = new ArrayList<>(searchRequestor.getResult());
     if (props.size() > 0) {
       if (props.get(0) instanceof ISeparatorProposal) {
         props.remove(0);
@@ -115,7 +115,7 @@ public class JavaCodeFieldContentProvider implements IContentProposalProvider {
   }
 
   private class P_SearchRequestor extends org.eclipse.jdt.core.search.SearchRequestor {
-    private TreeMap<CompositeObject, IContentProposal> m_foundTypes = new TreeMap<CompositeObject, IContentProposal>();
+    private TreeMap<CompositeObject, IContentProposal> m_foundTypes = new TreeMap<>();
     private int m_counter = 0;
 
     public P_SearchRequestor(IProgressMonitor monitor) {

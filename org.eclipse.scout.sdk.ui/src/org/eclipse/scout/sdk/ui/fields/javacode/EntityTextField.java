@@ -240,7 +240,7 @@ public class EntityTextField extends Composite {
     }
 
     private Set<P_EntityProposal> getAllEntities() {
-      TreeSet<P_EntityProposal> ret = new TreeSet<P_EntityProposal>();
+      TreeSet<P_EntityProposal> ret = new TreeSet<>();
       Set<String> entities;
       try {
         entities = ScoutUtility.getEntities(m_project);

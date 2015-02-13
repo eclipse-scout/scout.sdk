@@ -59,7 +59,7 @@ public class WellformClientBundleOperation implements IOperation {
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     for (IScoutBundle bundle : m_bundles) {
       if (bundle.hasType(IScoutBundle.TYPE_CLIENT) && !bundle.isBinary()) {
-        HashSet<IType> allTypes = new HashSet<IType>();
+        HashSet<IType> allTypes = new HashSet<>();
         IPackageFragmentRoot[] packageFragmentRoots = bundle.getJavaProject().getPackageFragmentRoots();
         for (IPackageFragmentRoot pr : packageFragmentRoots) {
           if (!pr.isReadOnly()) {

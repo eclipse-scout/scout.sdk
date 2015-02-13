@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
 public abstract class AbstractCreateEclipseProjectOperation extends AbstractScoutProjectNewOperation {
 
   private String m_symbolicName;
-  private HashSet<String> m_natures = new HashSet<String>();
+  private HashSet<String> m_natures = new HashSet<>();
   private IProject m_createdProject;
 
   public AbstractCreateEclipseProjectOperation() {

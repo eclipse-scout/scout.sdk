@@ -48,11 +48,11 @@ public class BorderDecorationPresenter extends AbstractProposalPresenter<FieldPr
   protected static final List<FieldProperty<String>> PROPOSALS;
   static {
     IType iGroupBox = TypeUtility.getType(IRuntimeClasses.IGroupBox);
-    BORDER_DECORATION_EMPTY = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_EMPTY"), "empty");
-    BORDER_DECORATION_LINE = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_LINE"), "line");
-    BORDER_DECORATION_SECTION = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_SECTION"), "section");
-    BORDER_DECORATION_AUTO = new UiFieldProperty<String>(iGroupBox.getField("BORDER_DECORATION_AUTO"), "auto");
-    PROPOSALS = new ArrayList<FieldProperty<String>>(4);
+    BORDER_DECORATION_EMPTY = new UiFieldProperty<>(iGroupBox.getField("BORDER_DECORATION_EMPTY"), "empty");
+    BORDER_DECORATION_LINE = new UiFieldProperty<>(iGroupBox.getField("BORDER_DECORATION_LINE"), "line");
+    BORDER_DECORATION_SECTION = new UiFieldProperty<>(iGroupBox.getField("BORDER_DECORATION_SECTION"), "section");
+    BORDER_DECORATION_AUTO = new UiFieldProperty<>(iGroupBox.getField("BORDER_DECORATION_AUTO"), "auto");
+    PROPOSALS = new ArrayList<>(4);
     PROPOSALS.add(BORDER_DECORATION_EMPTY);
     PROPOSALS.add(BORDER_DECORATION_LINE);
     PROPOSALS.add(BORDER_DECORATION_SECTION);
@@ -103,7 +103,7 @@ public class BorderDecorationPresenter extends AbstractProposalPresenter<FieldPr
     }
 
     try {
-      ConfigPropertyUpdateOperation<FieldProperty<String>> updateOp = new ConfigPropertyUpdateOperation<FieldProperty<String>>(getMethod(), getParser());
+      ConfigPropertyUpdateOperation<FieldProperty<String>> updateOp = new ConfigPropertyUpdateOperation<>(getMethod(), getParser());
       updateOp.setValue(value);
       OperationJob job = new OperationJob(updateOp);
       job.setDebug(true);

@@ -91,7 +91,7 @@ public class SessionFactoryTablePage extends AbstractPage {
     }
 
     // Scout SDK hierarchy (IPrimaryTypeTypeHierarchy) cannot be used as type creation events are not propagates because they are created by JDT NewClassWizardPage.
-    List<IType> types = new ArrayList<IType>();
+    List<IType> types = new ArrayList<>();
     try {
       for (IType type : m_hierarchy.getAllSubtypes(TypeUtility.getType(JaxWsRuntimeClasses.IServerSessionFactory))) {
         if (TypeUtility.isOnClasspath(type, getScoutBundle().getJavaProject())

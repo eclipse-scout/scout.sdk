@@ -51,7 +51,7 @@ public class SharedContextBeanPropertyNewWizard extends AbstractWorkspaceWizard 
       beanPropertyWizardPage.setOperation(op);
 
       // find all used method names
-      HashSet<String> notAllowedMethodNames = new HashSet<String>();
+      HashSet<String> notAllowedMethodNames = new HashSet<>();
       collectMethodNames(serverSessionType, notAllowedMethodNames);
       if (clientSessionType != null) {
         collectMethodNames(clientSessionType, notAllowedMethodNames);

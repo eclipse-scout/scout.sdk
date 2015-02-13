@@ -55,7 +55,7 @@ public class ContextMenuContributorExtensionPoint {
 
   public static List<IContextMenuContributor> getContextMenuContributors(Object o) {
     List<MenuContributionInfo> contributors = getContributors();
-    ArrayList<IContextMenuContributor> ret = new ArrayList<IContextMenuContributor>(contributors.size());
+    ArrayList<IContextMenuContributor> ret = new ArrayList<>(contributors.size());
     for (MenuContributionInfo i : contributors) {
       if (o == null || i.pageClassFilter == null || i.pageClassFilter.isAssignableFrom(o.getClass())) {
         ret.add(i.contributor);
@@ -68,7 +68,7 @@ public class ContextMenuContributorExtensionPoint {
     if (contextMenuContributorExtensions == null) {
       synchronized (LOCK) {
         if (contextMenuContributorExtensions == null) {
-          final List<MenuContributionInfo> list = new ArrayList<MenuContributionInfo>();
+          final List<MenuContributionInfo> list = new ArrayList<>();
           visitExtensions("contextMenuContributor", "contributor", new IExtensionVisitor() {
             @SuppressWarnings("unchecked")
             @Override
@@ -132,7 +132,7 @@ public class ContextMenuContributorExtensionPoint {
     if (contextMenuExtensions == null) {
       synchronized (LOCK) {
         if (contextMenuExtensions == null) {
-          final ArrayList<IScoutHandler> list = new ArrayList<IScoutHandler>();
+          final ArrayList<IScoutHandler> list = new ArrayList<>();
           visitExtensions("contextMenu", "contextMenu", new IExtensionVisitor() {
             @Override
             public boolean visit(IConfigurationElement element) {
@@ -157,19 +157,18 @@ public class ContextMenuContributorExtensionPoint {
     if (contextMenuByCat == null) {
       synchronized (LOCK) {
         if (contextMenuByCat == null) {
-          TreeMap<IScoutHandler.Category, List<IScoutHandler>> sorted =
-              new TreeMap<IScoutHandler.Category, List<IScoutHandler>>(new Comparator<IScoutHandler.Category>() {
-                @Override
-                public int compare(IScoutHandler.Category o1, IScoutHandler.Category o2) {
-                  return Integer.valueOf(o1.getOrder()).compareTo(o2.getOrder());
-                }
-              });
+          TreeMap<IScoutHandler.Category, List<IScoutHandler>> sorted = new TreeMap<>(new Comparator<IScoutHandler.Category>() {
+            @Override
+            public int compare(IScoutHandler.Category o1, IScoutHandler.Category o2) {
+              return Integer.valueOf(o1.getOrder()).compareTo(o2.getOrder());
+            }
+          });
 
           // group and sort all actions by category
           for (IScoutHandler a : getAllRegisteredContextMenus()) {
             List<IScoutHandler> listOfCurCat = sorted.get(a.getCategory());
             if (listOfCurCat == null) {
-              listOfCurCat = new LinkedList<IScoutHandler>();
+              listOfCurCat = new LinkedList<>();
               sorted.put(a.getCategory(), listOfCurCat);
             }
             listOfCurCat.add(a);

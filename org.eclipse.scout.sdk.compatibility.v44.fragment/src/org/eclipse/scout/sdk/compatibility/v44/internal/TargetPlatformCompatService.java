@@ -89,7 +89,7 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
     ITargetDefinition targetDef = tpService.newTarget();
     targetDef.setName(targetName);
 
-    List<ITargetLocation> bundleContainers = new ArrayList<ITargetLocation>();
+    List<ITargetLocation> bundleContainers = new ArrayList<>();
     for (File dir : absolutePaths) {
       bundleContainers.add(tpService.newDirectoryLocation(dir.getAbsolutePath()));
     }
@@ -176,7 +176,7 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
           if (container == null) {
             URI uri = URIUtil.fromString(repository);
             IUBundleContainer newIULocation = (IUBundleContainer) svc.newIULocation(new String[]{unitId}, new String[]{ver}, new URI[]{uri}, 0);
-            Set<FeatureDefinition> set = new HashSet<FeatureDefinition>(1);
+            Set<FeatureDefinition> set = new HashSet<>(1);
             set.add(fd);
             features.put(newIULocation, set);
           }
@@ -200,7 +200,7 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
       DocumentBuilder docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
       Document document = docBuilder.parse(new ByteArrayInputStream(xml.getBytes("UTF-8")));
       NodeList childNodes = document.getDocumentElement().getChildNodes();
-      ArrayList<NameVersionDescriptor> result = new ArrayList<NameVersionDescriptor>(childNodes.getLength());
+      ArrayList<NameVersionDescriptor> result = new ArrayList<>(childNodes.getLength());
       for (int i = 0; i < childNodes.getLength(); i++) {
         Node n = childNodes.item(i);
         if (n.getNodeType() == Node.ELEMENT_NODE && INSTALLABLE_UNIT.equals(n.getNodeName())) {
@@ -241,8 +241,8 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
       size += features.length;
     }
 
-    Map<IUBundleContainer, Set<FeatureDefinition>> p2FeatureMap = new HashMap<IUBundleContainer, Set<FeatureDefinition>>(size);
-    List<ITargetLocation> locations = new ArrayList<ITargetLocation>(size);
+    Map<IUBundleContainer, Set<FeatureDefinition>> p2FeatureMap = new HashMap<>(size);
+    List<ITargetLocation> locations = new ArrayList<>(size);
     if (features != null) {
       for (ITargetLocation container : features) {
         if (container instanceof IUBundleContainer) {
@@ -251,7 +251,7 @@ public class TargetPlatformCompatService implements ITargetPlatformCompatService
 
           Set<FeatureDefinition> featureSet = getValueOf(p2FeatureMap, iubc);
           if (featureSet == null) {
-            featureSet = new HashSet<FeatureDefinition>(fs.size());
+            featureSet = new HashSet<>(fs.size());
             p2FeatureMap.put(iubc, featureSet);
           }
 

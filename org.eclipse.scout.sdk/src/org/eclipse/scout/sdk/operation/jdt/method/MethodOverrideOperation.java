@@ -44,7 +44,7 @@ public class MethodOverrideOperation extends MethodNewOperation {
   @Override
   public void validate() {
     List<MethodParameter> parameters = getParameters();
-    List<String> parameterSignatures = new ArrayList<String>(parameters.size());
+    List<String> parameterSignatures = new ArrayList<>(parameters.size());
     for (MethodParameter methodParameter : parameters) {
       parameterSignatures.add(methodParameter.getSignature());
     }

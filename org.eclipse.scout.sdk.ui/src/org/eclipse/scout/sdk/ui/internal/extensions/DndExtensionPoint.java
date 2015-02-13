@@ -38,8 +38,8 @@ public final class DndExtensionPoint {
 
   private static synchronized void init() {
     if (dragSourceDelegates == null || dropTargetDelegates == null) {
-      List<IDragSourceDelegator> dragDelegators = new ArrayList<IDragSourceDelegator>();
-      List<IDropTargetDelegator> dropDelegators = new ArrayList<IDropTargetDelegator>();
+      List<IDragSourceDelegator> dragDelegators = new ArrayList<>();
+      List<IDropTargetDelegator> dropDelegators = new ArrayList<>();
       IExtensionRegistry reg = Platform.getExtensionRegistry();
       IExtensionPoint xp = reg.getExtensionPoint(ScoutSdkUi.PLUGIN_ID, EXTENSION_NAME);
       IExtension[] extensions = xp.getExtensions();

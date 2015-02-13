@@ -124,7 +124,7 @@ public final class DtoUtility {
       return;
     }
 
-    Set<IType> allSuperInterfaces = new HashSet<IType>();
+    Set<IType> allSuperInterfaces = new HashSet<>();
     for (String ifcSig : interfaceSignatures) {
       IType ifcType = TypeUtility.getTypeBySignature(ifcSig);
 
@@ -133,7 +133,7 @@ public final class DtoUtility {
         allSuperInterfaces.addAll(TypeUtility.getSupertypeHierarchy(ifcType).getAllInterfaces());
       }
     }
-    Set<String> allSuperInterfaceMethods = new HashSet<String>();
+    Set<String> allSuperInterfaceMethods = new HashSet<>();
     try {
       for (IType t : allSuperInterfaces) {
         for (IMethod m : t.getMethods()) {
@@ -302,7 +302,7 @@ public final class DtoUtility {
 
   public static List<ValidationRuleMethod> getValidationRuleMethods(IType declaringType, ITypeHierarchy superTypeHierarchy, IProgressMonitor monitor) throws JavaModelException {
     IType validationRuleType = TypeUtility.getType(IRuntimeClasses.ValidationRule);
-    TreeMap<String, ValidationRuleMethod> ruleMap = new TreeMap<String, ValidationRuleMethod>();
+    TreeMap<String, ValidationRuleMethod> ruleMap = new TreeMap<>();
     if (superTypeHierarchy == null) {
       superTypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
       if (superTypeHierarchy == null) {
@@ -321,7 +321,7 @@ public final class DtoUtility {
       return null;
     }
 
-    HashSet<String> visitedMethodNames = new HashSet<String>();
+    HashSet<String> visitedMethodNames = new HashSet<>();
     for (int i = 0; i < targetTypes.length; i++) {
       for (IMethod annotatedMethod : targetMethods[i]) {
         if (monitor.isCanceled()) {
@@ -438,7 +438,7 @@ public final class DtoUtility {
       }
     }
 
-    ArrayList<ValidationRuleMethod> list = new ArrayList<ValidationRuleMethod>(ruleMap.size());
+    ArrayList<ValidationRuleMethod> list = new ArrayList<>(ruleMap.size());
     for (ValidationRuleMethod v : ruleMap.values()) {
       if (v != null) {
         list.add(v);

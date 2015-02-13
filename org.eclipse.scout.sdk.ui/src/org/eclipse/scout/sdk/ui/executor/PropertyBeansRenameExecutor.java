@@ -57,7 +57,7 @@ public class PropertyBeansRenameExecutor extends AbstractRenameExecutor {
     }
 
     Object selectedElement = selection.getFirstElement();
-    m_beans = new LinkedList<IPropertyBean>();
+    m_beans = new LinkedList<>();
     if (selectedElement instanceof SharedContextPropertyNodePage) {
       SharedContextPropertyNodePage scpnp = (SharedContextPropertyNodePage) selectedElement;
       if (scpnp.getClientDesc() != null) {

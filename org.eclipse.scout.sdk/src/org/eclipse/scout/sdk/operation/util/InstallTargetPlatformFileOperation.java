@@ -46,7 +46,7 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
 
   public InstallTargetPlatformFileOperation(IProject dstProject, String targetFileName, Map<String, String> properties) {
     super("templates/all/template.target", targetFileName, ScoutSdk.getDefault().getBundle(), dstProject, properties);
-    m_entryList = new LinkedList<ITargetEntryContributor>();
+    m_entryList = new LinkedList<>();
   }
 
   public void addEclipseHomeEntry() {
@@ -61,7 +61,7 @@ public class InstallTargetPlatformFileOperation extends InstallTextFileOperation
   }
 
   public static Set<String> getRunningEclipseEntries() {
-    HashSet<String> folders = new HashSet<String>();
+    HashSet<String> folders = new HashSet<>();
     for (BundleDescription bundle : Platform.getPlatformAdmin().getState().getBundles()) {
       File bundleContainer = getBundleContainer(bundle);
       if (bundleContainer != null) {

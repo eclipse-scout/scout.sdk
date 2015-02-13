@@ -108,7 +108,7 @@ public final class MethodSourceBuilderFactory {
   }
 
   private static IMethod getMethodToOverride(ITypeSourceBuilder typeSourceBuilder, String methodName, IMethodFilter methodFilter) {
-    LinkedList<String> superSignatures = new LinkedList<String>(typeSourceBuilder.getInterfaceSignatures());
+    LinkedList<String> superSignatures = new LinkedList<>(typeSourceBuilder.getInterfaceSignatures());
     superSignatures.addFirst(typeSourceBuilder.getSuperTypeSignature());
     return getMethodToOverride(superSignatures, methodName, methodFilter);
   }

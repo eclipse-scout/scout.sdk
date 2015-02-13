@@ -50,7 +50,7 @@ public class IconContentProvider extends ContentProposalProvider implements IStr
     }
 
     char[] pattern = searchPattern.toCharArray();
-    ArrayList<Object> accepted = new ArrayList<Object>();
+    ArrayList<Object> accepted = new ArrayList<>();
     for (Object element : getElements(this)) {
       String iconName = m_labelProvider.getText(element);
       if (iconName != null && CharOperation.match(pattern, iconName.toCharArray(), false)) {

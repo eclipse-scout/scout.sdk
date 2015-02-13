@@ -25,7 +25,7 @@ public class ConfigurationMethodSet {
   public ConfigurationMethodSet(String methodName, String configAnnotationType) {
     m_methodName = methodName;
     m_configAnnotationType = configAnnotationType;
-    m_methods = new ArrayList<ConfigurationMethod>();
+    m_methods = new ArrayList<>();
   }
 
   public void add(ConfigurationMethod m) {

@@ -24,7 +24,7 @@ public class CountrySmartFieldModel implements ISmartFieldModel {
   private Locale[] m_locales;
 
   public CountrySmartFieldModel() {
-    ArrayList<Locale> locs = new ArrayList<Locale>();
+    ArrayList<Locale> locs = new ArrayList<>();
     for (String isoCountry : Locale.getISOCountries()) {
       locs.add(new Locale("", isoCountry));
     }
@@ -38,7 +38,7 @@ public class CountrySmartFieldModel implements ISmartFieldModel {
 
   @Override
   public List<Object> getProposals(String pattern) {
-    List<Object> props = new LinkedList<Object>();
+    List<Object> props = new LinkedList<>();
     for (Locale l : m_locales) {
       if (l.getDisplayCountry().toLowerCase().startsWith(pattern.toLowerCase())) {
         props.add(l);

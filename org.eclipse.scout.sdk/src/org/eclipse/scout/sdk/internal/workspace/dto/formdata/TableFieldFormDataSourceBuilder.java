@@ -98,7 +98,7 @@ public class TableFieldFormDataSourceBuilder extends AbstractDtoTypeSourceBuilde
     }
 
     final String[] colunmSignatures = new String[columns.size()];
-    final Map<Integer, String> columnIdMap = new HashMap<Integer, String>();
+    final Map<Integer, String> columnIdMap = new HashMap<>();
 
     int i = 0;
     for (IType column : columns) {

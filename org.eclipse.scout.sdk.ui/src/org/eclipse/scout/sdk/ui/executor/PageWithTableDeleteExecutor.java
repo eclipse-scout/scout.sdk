@@ -64,8 +64,8 @@ public class PageWithTableDeleteExecutor extends AbstractExecutor {
   }
 
   protected void runAsync(final Shell shell, final IStructuredSelection selection, final ExecutionEvent event) {
-    final Set<IMember> members = new LinkedHashSet<IMember>();
-    final Set<IMember> selectedMembers = new LinkedHashSet<IMember>();
+    final Set<IMember> members = new LinkedHashSet<>();
+    final Set<IMember> selectedMembers = new LinkedHashSet<>();
 
     collectAffectedMembers(members, selectedMembers, selection);
 

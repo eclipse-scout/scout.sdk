@@ -127,7 +127,7 @@ public class ServiceOperationNewWizardPage extends AbstractWorkspaceWizardPage {
   @Override
   public boolean performFinish(IProgressMonitor monitor, IWorkingCopyManager manager) throws CoreException {
     ServiceOperationNewOperation op = new ServiceOperationNewOperation();
-    ArrayList<ParameterArgument> args = new ArrayList<ParameterArgument>();
+    ArrayList<ParameterArgument> args = new ArrayList<>();
     if (m_parameterArg1 != null && !StringUtility.isNullOrEmpty(m_parameterArg1.getName()) && !StringUtility.isNullOrEmpty(m_parameterArg1.getType())) {
       args.add(m_parameterArg1);
     }

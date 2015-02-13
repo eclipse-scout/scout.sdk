@@ -97,7 +97,7 @@ public class WsdlLocationWizard extends AbstractWorkspaceWizard {
     m_wsdlFolder = m_wsdlLocationWizardPage.getWsdlFolder();
     m_wsdlFileName = wsdlFile.getName();
 
-    List<ExternalFileCopyOperation> copyOperations = new LinkedList<ExternalFileCopyOperation>();
+    List<ExternalFileCopyOperation> copyOperations = new LinkedList<>();
     if (!JaxWsSdkUtility.existsFileInProject(m_bundle, m_wsdlFolder, wsdlFile)) {
       ExternalFileCopyOperation op = new ExternalFileCopyOperation();
       op.setBundle(m_bundle);

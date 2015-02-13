@@ -99,7 +99,7 @@ public class SharedContextPropertyTablePage extends AbstractPage {
   }
 
   private class P_PropertyMethodFilter implements IMethodFilter {
-    TreeMap<String, PropertyBean> m_beans = new TreeMap<String, PropertyBean>();
+    TreeMap<String, PropertyBean> m_beans = new TreeMap<>();
 
     @Override
     public boolean accept(IMethod candidate) {

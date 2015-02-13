@@ -16,8 +16,8 @@ import java.util.List;
 import org.eclipse.swt.widgets.Control;
 
 public class FieldValidator {
-  private List<Control> m_allFields = new LinkedList<Control>();
-  private List<Control> m_disabledFields = new LinkedList<Control>();
+  private List<Control> m_allFields = new LinkedList<>();
+  private List<Control> m_disabledFields = new LinkedList<>();
 
   public void addField(Control field) {
     m_allFields.add(field);

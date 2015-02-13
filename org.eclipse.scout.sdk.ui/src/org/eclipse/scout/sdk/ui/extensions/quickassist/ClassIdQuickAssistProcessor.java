@@ -72,7 +72,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
   public IJavaCompletionProposal[] getAssists(final IInvocationContext context, IProblemLocation[] locations) throws CoreException {
     final ClassIdTarget selectedType = getTarget(context.getCoveringNode());
     if (selectedType != null) {
-      ArrayList<IJavaCompletionProposal> proposals = new ArrayList<IJavaCompletionProposal>(2);
+      ArrayList<IJavaCompletionProposal> proposals = new ArrayList<>(2);
       if (!TypeUtility.exists(selectedType.annotation)) {
         CompilationUnitRewrite rewrite = createRewrite(selectedType.type, selectedType.td);
         proposals.add(new ClassIdAddProposal(rewrite));
@@ -131,7 +131,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
   }
 
   private ASTNode getSibling(final TypeDeclaration td, String newAnnotValue, SingleMemberAnnotation newAnnotation) {
-    final ArrayList<Annotation> annotations = new ArrayList<Annotation>();
+    final ArrayList<Annotation> annotations = new ArrayList<>();
     td.accept(new DefaultAstVisitor() {
       @Override
       public boolean visitNode(ASTNode node) {

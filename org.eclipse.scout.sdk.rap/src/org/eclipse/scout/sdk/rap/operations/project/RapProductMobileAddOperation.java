@@ -27,7 +27,7 @@ import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
  */
 public class RapProductMobileAddOperation extends AbstractScoutProjectNewOperation {
 
-  private final ArrayList<IFile> m_productFiles = new ArrayList<IFile>(2);
+  private final ArrayList<IFile> m_productFiles = new ArrayList<>(2);
 
   @Override
   public boolean isRelevant() {

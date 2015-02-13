@@ -65,9 +65,9 @@ public final class RuntimeBundles {
     if (allScoutRtBundles == null || bundleToTypeMap == null || typeToBundleMap == null) {
       synchronized (LOCK) {
         if (allScoutRtBundles == null || bundleToTypeMap == null || typeToBundleMap == null) {
-          Set<String> all = new HashSet<String>();
-          Map<Integer, String[]> typeDefOrdered = new TreeMap<Integer, String[]>();
-          Map<String, Set<String>> refBundles = new HashMap<String, Set<String>>();
+          Set<String> all = new HashSet<>();
+          Map<Integer, String[]> typeDefOrdered = new TreeMap<>();
+          Map<String, Set<String>> refBundles = new HashMap<>();
 
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(ScoutSdk.PLUGIN_ID, EXTENSION_POINT_NAME);
@@ -94,7 +94,7 @@ public final class RuntimeBundles {
                         if (StringUtility.hasText(refType)) {
                           Set<String> list = refBundles.get(type);
                           if (list == null) {
-                            list = new HashSet<String>(2);
+                            list = new HashSet<>(2);
                             refBundles.put(type, list);
                           }
                           list.add(refType);
@@ -110,8 +110,8 @@ public final class RuntimeBundles {
             }
           }
 
-          LinkedHashMap<String, String> tmpBundleToTypeMap = new LinkedHashMap<String, String>(typeDefOrdered.size());
-          HashMap<String, String> tmpTypeToBundleMap = new HashMap<String, String>(typeDefOrdered.size());
+          LinkedHashMap<String, String> tmpBundleToTypeMap = new LinkedHashMap<>(typeDefOrdered.size());
+          HashMap<String, String> tmpTypeToBundleMap = new HashMap<>(typeDefOrdered.size());
           for (String[] items : typeDefOrdered.values()) {
             tmpBundleToTypeMap.put(items[0], items[1]);
             tmpTypeToBundleMap.put(items[1], items[0]);

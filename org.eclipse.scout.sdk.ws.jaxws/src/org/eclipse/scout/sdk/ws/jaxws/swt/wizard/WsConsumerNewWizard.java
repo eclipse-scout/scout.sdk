@@ -119,7 +119,7 @@ public class WsConsumerNewWizard extends AbstractWorkspaceWizard {
     File wsdlFile = m_wsdlLocationWizardPage.getWsdlFile();
     m_wsdlFileName = wsdlFile.getName();
 
-    List<ExternalFileCopyOperation> copyOperations = new LinkedList<ExternalFileCopyOperation>();
+    List<ExternalFileCopyOperation> copyOperations = new LinkedList<>();
     if (!JaxWsSdkUtility.existsFileInProject(m_bundle, wsdlFolder, wsdlFile)) {
       ExternalFileCopyOperation op = new ExternalFileCopyOperation();
       op.setBundle(m_bundle);

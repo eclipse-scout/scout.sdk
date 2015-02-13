@@ -42,7 +42,7 @@ public class JdtEventCollector {
   JdtEventCollector(ICompilationUnit icu) {
     m_icu = icu;
     m_lastModification = icu.getResource().getModificationStamp();
-    m_events = new HashMap<IJavaElement, JdtEvent>();
+    m_events = new HashMap<>();
     m_ast = createAst();
   }
 
@@ -56,7 +56,7 @@ public class JdtEventCollector {
 
   public Set<IJavaElement> updateAst() {
     final CompilationUnit newAst = createAst();
-    final Set<IJavaElement> set = new HashSet<IJavaElement>();
+    final Set<IJavaElement> set = new HashSet<>();
     AbstractFineGrainedAstMatcher matcher = new AbstractFineGrainedAstMatcher() {
       @Override
       protected boolean processDelta(boolean match, ASTNode node, Object other) {

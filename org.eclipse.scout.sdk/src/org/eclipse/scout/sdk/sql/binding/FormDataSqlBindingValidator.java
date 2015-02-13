@@ -67,7 +67,7 @@ public class FormDataSqlBindingValidator {
 
   public FormDataSqlBindingValidator(Set<IType> processServices) {
     m_processServices = processServices;
-    m_astCache = new HashMap<ICompilationUnit, CompilationUnit>();
+    m_astCache = new HashMap<>();
   }
 
   public void run(IProgressMonitor monitor) throws InvocationTargetException, InterruptedException {
@@ -99,7 +99,7 @@ public class FormDataSqlBindingValidator {
   }
 
   protected MethodSqlBindingModel processServiceMethod(IMethod serviceMethod, IProgressMonitor monitor) throws JavaModelException {
-    HashMap<String, IBindBase> globalBindings = new HashMap<String, IBindBase>();
+    HashMap<String, IBindBase> globalBindings = new HashMap<>();
     globalBindings.putAll(resolveServerSessionBindBases(serviceMethod.getJavaProject()));
     IAnnotation ignoreBindAnnotation = JdtUtility.getAnnotation(serviceMethod, SqlBindingIgnoreValidation.class.getName());
     if (TypeUtility.exists(ignoreBindAnnotation)) {
@@ -138,7 +138,7 @@ public class FormDataSqlBindingValidator {
           unresolvedBindings.append(", ");
         }
       }
-      HashMap<String, IBindBase> bindBases = new HashMap<String, IBindBase>(globalBindings);
+      HashMap<String, IBindBase> bindBases = new HashMap<>(globalBindings);
       bindBases.putAll(resolveBindBases(s));
 
       boolean hasUnresolvedBindBases = unresolvedBindBases.length > 0;
@@ -192,10 +192,10 @@ public class FormDataSqlBindingValidator {
   }
 
   protected HashMap<String, IBindBase> resolveServerSessionBindBases(IJavaProject context) {
-    HashMap<String, IBindBase> bindBases = new HashMap<String, IBindBase>();
+    HashMap<String, IBindBase> bindBases = new HashMap<>();
     // server sessions
     for (IType serverSession : ScoutTypeUtility.getServerSessionTypes(context)) {
-      HashSet<String> binds = new HashSet<String>();
+      HashSet<String> binds = new HashSet<>();
       collectPropertyBinds(binds, serverSession, TypeUtility.getSupertypeHierarchy(serverSession));
       for (String s : binds) {
         bindBases.put(s, new ServerSessionBindBase(s, serverSession));
@@ -205,7 +205,7 @@ public class FormDataSqlBindingValidator {
   }
 
   protected HashMap<String, IBindBase> resolveBindBases(SqlStatement statement) {
-    HashMap<String, IBindBase> bindBases = new HashMap<String, IBindBase>();
+    HashMap<String, IBindBase> bindBases = new HashMap<>();
     for (IBindBase b : statement.getBindBases()) {
       switch (b.getType()) {
         case IBindBase.TYPE_NVPAIR:
@@ -226,12 +226,12 @@ public class FormDataSqlBindingValidator {
     if (keyPrefix == null) {
       keyPrefix = "";
     }
-    HashMap<String, IBindBase> bindBases = new HashMap<String, IBindBase>();
+    HashMap<String, IBindBase> bindBases = new HashMap<>();
     for (String assignedSignature : assignedSignatures) {
       HashSet<String> vars = getPropertyBindVars(TypeUtility.getTypeBySignature(assignedSignature));
       if (!bindBases.isEmpty()) {
         HashMap<String, IBindBase> existingVars = bindBases;
-        bindBases = new HashMap<String, IBindBase>();
+        bindBases = new HashMap<>();
         for (String s : vars) {
           if (existingVars.containsKey(s)) {
             bindBases.put(keyPrefix + s, bindBase);
@@ -249,7 +249,7 @@ public class FormDataSqlBindingValidator {
   }
 
   protected HashMap<String, IBindBase> loadInnerTypeProperties(String typeSignature, final String propertyName, IBindBase bindbase) {
-    HashMap<String, IBindBase> bindBases = new HashMap<String, IBindBase>();
+    HashMap<String, IBindBase> bindBases = new HashMap<>();
     try {
       IType propertyObject = TypeUtility.getTypeBySignature(typeSignature);
       if (TypeUtility.exists(propertyObject)) {
@@ -287,11 +287,11 @@ public class FormDataSqlBindingValidator {
         return resolveBindVariables(new String[]{var.getTypeSignature()}, bindBase, bindBase.getBindVar() + ".");
       }
     }
-    return new HashMap<String, IBindBase>(0);
+    return new HashMap<>(0);
   }
 
   protected HashSet<String> getPropertyBindVars(IType type) {
-    HashSet<String> bindVars = new HashSet<String>();
+    HashSet<String> bindVars = new HashSet<>();
     if (TypeUtility.exists(type)) {
       ITypeHierarchy supertypeHierarchy = null;
       supertypeHierarchy = TypeUtility.getSupertypeHierarchy(type);

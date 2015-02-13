@@ -55,7 +55,7 @@ public class Technology implements Comparable<Technology> {
   private final EventListenerList m_eventListeners;
 
   public Technology(String id, String name, String category) {
-    m_handlers = new ArrayList<IScoutTechnologyHandler>();
+    m_handlers = new ArrayList<>();
     m_eventListeners = new EventListenerList();
     m_id = id;
     m_name = name;
@@ -83,7 +83,7 @@ public class Technology implements Comparable<Technology> {
 
   public boolean setSelection(IScoutBundle project, boolean selected) throws CoreException {
     // collect all resources from all handlers
-    HashSet<IScoutTechnologyResource> allResources = new HashSet<IScoutTechnologyResource>();
+    HashSet<IScoutTechnologyResource> allResources = new HashSet<>();
     for (IScoutTechnologyHandler handler : getHandlers(project)) {
       List<IScoutTechnologyResource> resources = handler.getModifactionResourceCandidates(project);
       if (resources.size() > 0) {
@@ -126,7 +126,7 @@ public class Technology implements Comparable<Technology> {
   }
 
   private Set<ITreeNode> getDefaultSelectedNodes(ITreeNode root) {
-    Set<ITreeNode> ret = new HashSet<ITreeNode>();
+    Set<ITreeNode> ret = new HashSet<>();
     collectDefaultSelection(root, ret);
     return ret;
   }
@@ -146,11 +146,11 @@ public class Technology implements Comparable<Technology> {
   }
 
   private ITreeNode getModificationResourcesTree(IScoutTechnologyResource[] resources) {
-    HashMap<String, ArrayList<IScoutTechnologyResource>> mapping = new HashMap<String, ArrayList<IScoutTechnologyResource>>();
+    HashMap<String, ArrayList<IScoutTechnologyResource>> mapping = new HashMap<>();
     for (IScoutTechnologyResource res : resources) {
       ArrayList<IScoutTechnologyResource> list = mapping.get(res.getResource().getProject().getName());
       if (list == null) {
-        list = new ArrayList<IScoutTechnologyResource>();
+        list = new ArrayList<>();
         mapping.put(res.getResource().getProject().getName(), list);
       }
       list.add(res);
@@ -182,7 +182,7 @@ public class Technology implements Comparable<Technology> {
   }
 
   private List<IScoutTechnologyHandler> getHandlers(IScoutBundle project) {
-    ArrayList<IScoutTechnologyHandler> ret = new ArrayList<IScoutTechnologyHandler>(m_handlers.size());
+    ArrayList<IScoutTechnologyHandler> ret = new ArrayList<>(m_handlers.size());
     for (IScoutTechnologyHandler h : m_handlers) {
       if (h.isActive(project)) {
         ret.add(h);
@@ -288,13 +288,13 @@ public class Technology implements Comparable<Technology> {
       try {
 
         // map the checked resources to the contributing handler
-        HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> resourcesToModify = new HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>>();
+        HashMap<IScoutTechnologyHandler, HashSet<IScoutTechnologyResource>> resourcesToModify = new HashMap<>();
         for (ITreeNode selectedNode : m_selectedNodes) {
           if (selectedNode.isVisible() && selectedNode.getData() instanceof IScoutTechnologyResource) {
             IScoutTechnologyResource res = (IScoutTechnologyResource) selectedNode.getData();
             HashSet<IScoutTechnologyResource> set = resourcesToModify.get(res.getHandler());
             if (set == null) {
-              set = new HashSet<IScoutTechnologyResource>();
+              set = new HashSet<>();
               resourcesToModify.put(res.getHandler(), set);
             }
             set.add(res);

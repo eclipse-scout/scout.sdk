@@ -39,7 +39,7 @@ public class TechnologyPresenter extends AbstractPresenter {
   public TechnologyPresenter(PropertyViewFormToolkit toolkit, Composite parent, IScoutBundle scoutProject) {
     super(toolkit, parent);
     m_scoutProject = scoutProject;
-    m_techModels = new LinkedList<P_TechnologyUiModel>();
+    m_techModels = new LinkedList<>();
 
     // define layout
     GridLayout layout = new GridLayout(1, false);
@@ -50,7 +50,7 @@ public class TechnologyPresenter extends AbstractPresenter {
 
   public void loadModel() {
     // sort all technologies
-    TreeSet<Technology> technologies = new TreeSet<Technology>();
+    TreeSet<Technology> technologies = new TreeSet<>();
     for (Technology t : TechnologyExtensionPoint.getTechnologyExtensions()) {
       technologies.add(t);
     }
