@@ -37,12 +37,12 @@ public class PackageFragmentNewOperationTest extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("resources/operation/method", "test.client", "test.shared");
+    setupWorkspace("resources/operation/method", "testMethod.client", "testMethod.shared");
   }
 
   @Test
   public void createPackageTest() throws Exception {
-    IProject clientProject = getProject("test.client");
+    IProject clientProject = getProject("testMethod.client");
     Assert.assertNotNull(clientProject);
     IJavaProject javaProject = JavaCore.create(clientProject);
     String packageName = "abc.def";
@@ -61,7 +61,7 @@ public class PackageFragmentNewOperationTest extends AbstractScoutSdkTest {
 
   @Test
   public void tryToCreateAnExistingPackage() throws Exception {
-    IProject clientProject = getProject("test.client");
+    IProject clientProject = getProject("testMethod.client");
     Assert.assertNotNull(clientProject);
     IJavaProject javaProject = JavaCore.create(clientProject);
     String packageName = "test.client";
@@ -77,7 +77,7 @@ public class PackageFragmentNewOperationTest extends AbstractScoutSdkTest {
 
   @Test
   public void createPackageWithIcu() throws Exception {
-    IProject clientProject = getProject("test.client");
+    IProject clientProject = getProject("testMethod.client");
     Assert.assertNotNull(clientProject);
     IJavaProject javaProject = JavaCore.create(clientProject);
     String packageName = "abc.def01";

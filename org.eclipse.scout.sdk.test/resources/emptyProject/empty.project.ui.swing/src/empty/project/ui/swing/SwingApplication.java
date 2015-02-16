@@ -24,7 +24,7 @@ public class SwingApplication extends AbstractSwingApplication {
   public Object start(final IApplicationContext context) throws Exception {
     Subject subject = new Subject();
     subject.getPrincipals().add(new SimplePrincipal(System.getProperty("user.name")));
-    return Subject.doAs(subject, new PrivilegedExceptionAction<>() {
+    return Subject.doAs(subject, new PrivilegedExceptionAction<Object>() {
       @Override
       public Object run() throws Exception {
         return startSecure(context);

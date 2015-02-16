@@ -36,7 +36,7 @@ public class FieldNewOperationTest extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("resources/operation/method", "test.client", "test.shared");
+    setupWorkspace("resources/operation/method", "testMethod.client", "testMethod.shared");
   }
 
   @Test

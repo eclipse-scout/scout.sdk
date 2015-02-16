@@ -44,7 +44,7 @@ public class Bug87400Test extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("resources/bugsBeforeOpensource/87400", "a", "a.client");
+    setupWorkspace("resources/bugsBeforeOpensource/87400", "a87400", "a87400.client");
   }
 
   @Test
@@ -55,8 +55,8 @@ public class Bug87400Test extends AbstractScoutSdkTest {
     IType mainBox = form.getType("MainBox");
     Assert.assertNotNull(mainBox);
 
-    Assert.assertEquals("a.client", ScoutTypeUtility.getScoutBundle(form).getSymbolicName());
-    Assert.assertEquals("a.client", ScoutTypeUtility.getScoutBundle(mainBox).getSymbolicName());
+    Assert.assertEquals("a87400.client", ScoutTypeUtility.getScoutBundle(form).getSymbolicName());
+    Assert.assertEquals("a87400.client", ScoutTypeUtility.getScoutBundle(mainBox).getSymbolicName());
   }
 
   @Test
@@ -98,7 +98,7 @@ public class Bug87400Test extends AbstractScoutSdkTest {
     Assert.assertTrue(TypeUtility.exists(method));
     IScoutBundle scoutBundle = ScoutTypeUtility.getScoutBundle(method);
     Assert.assertNotNull(scoutBundle);
-    Assert.assertEquals("a.client", scoutBundle.getSymbolicName());
+    Assert.assertEquals("a87400.client", scoutBundle.getSymbolicName());
   }
 
   private IMethod getScoutMethod(String methodName, IType type) throws JavaModelException {

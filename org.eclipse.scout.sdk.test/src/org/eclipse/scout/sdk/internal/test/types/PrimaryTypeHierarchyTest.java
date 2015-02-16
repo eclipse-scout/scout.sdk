@@ -23,9 +23,9 @@ import org.junit.Test;
 
 public class PrimaryTypeHierarchyTest extends AbstractScoutSdkTest {
 
-  private static final String BUNDLE_NAME_CLIENT = "test.client";
-  private static final String BUNDLE_NAME_SHARED = "test.shared";
-  private static final String BUNDLE_NAME_SERVER = "test.server";
+  private static final String BUNDLE_NAME_CLIENT = "testTypeCache.client";
+  private static final String BUNDLE_NAME_SHARED = "testTypeCache.shared";
+  private static final String BUNDLE_NAME_SERVER = "testTypeCache.server";
 
   private static ITypeHierarchy iGroupBoxHierarchy;
   private static ITypeHierarchy iGroupBoxPrimaryHierarchy;

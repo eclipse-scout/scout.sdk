@@ -37,8 +37,8 @@ import org.junit.Test;
  */
 public class RecreateTypeTest extends AbstractScoutSdkTest {
 
-  private static final String CLIENT_BUNDLE_NAME = "test.client";
-  private static final String SHARED_BUNDLE_NAME = "test.shared";
+  private static final String CLIENT_BUNDLE_NAME = "testTypeCache.client";
+  private static final String SHARED_BUNDLE_NAME = "testTypeCache.shared";
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
@@ -53,7 +53,7 @@ public class RecreateTypeTest extends AbstractScoutSdkTest {
     CachedTypeHierarchy formFieldHierarchy = (CachedTypeHierarchy) TypeUtility.getTypeHierarchy(iformField);
     Assert.assertFalse(formFieldHierarchy.isCreated());
 
-    IProject clientProject = getProject("test.client");
+    IProject clientProject = getProject(CLIENT_BUNDLE_NAME);
     IScoutBundle clientBundle = ScoutTypeUtility.getScoutBundle(clientProject);
     // ensure created
     // create new MyAbstractFormField

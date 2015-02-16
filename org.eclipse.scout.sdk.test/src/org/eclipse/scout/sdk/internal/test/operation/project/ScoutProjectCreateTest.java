@@ -12,17 +12,15 @@ package org.eclipse.scout.sdk.internal.test.operation.project;
 
 import java.util.Set;
 
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.extensions.runtime.classes.RuntimeClasses;
 import org.eclipse.scout.sdk.helper.ScoutProjectHelper;
 import org.eclipse.scout.sdk.internal.test.AbstractScoutSdkTest;
-import org.eclipse.scout.sdk.jdt.compile.ScoutSeverityManager;
 import org.eclipse.scout.sdk.operation.project.template.OutlineTemplateOperation;
 import org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation;
+import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
 import org.eclipse.scout.sdk.util.PropertyMap;
 import org.eclipse.scout.sdk.util.internal.typecache.JavaResourceChangedEmitter;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
@@ -52,8 +50,7 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
     try {
       ScoutSdkCore.getScoutWorkspace();
       IScoutBundle project = ScoutProjectHelper.setupNewProject("org.eclipse.testapp", true, true, true, true, false);
-      int severity = ScoutSeverityManager.getInstance().getSeverityOf(ResourcesPlugin.getWorkspace().getRoot());
-      Assert.assertTrue(severity < IMarker.SEVERITY_ERROR);
+      TestWorkspaceUtility.assertNoCompileErrors();
       Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false));
       Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true));
       Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false));

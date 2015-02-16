@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: test.client
+Bundle-SymbolicName: testMethod.client;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: test.client.Activator
+Bundle-Vendor: Eclipse Scout Project
+Bundle-ActivationPolicy: lazy
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.scout.rt.client;visibility:=reexport,
+ testMethod.shared
+Export-Package: test.client,
+ test.client.ui.desktop,
+ test.client.ui.forms
+Import-Package: javax.activation;resolution:=optional,
+ javax.mail;resolution:=optional,
+ javax.mail.event;resolution:=optional,
+ javax.mail.internet;resolution:=optional,
+ javax.mail.search;resolution:=optional,
+ javax.mail.util;resolution:=optional
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7

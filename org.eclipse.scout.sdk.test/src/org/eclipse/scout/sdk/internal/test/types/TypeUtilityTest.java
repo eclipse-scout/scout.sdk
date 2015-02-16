@@ -38,7 +38,7 @@ public class TypeUtilityTest extends AbstractScoutSdkTest {
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("resources/util/typeUtility", "a");
+    setupWorkspace("resources/util/typeUtility", "b");
   }
 
   @Before
