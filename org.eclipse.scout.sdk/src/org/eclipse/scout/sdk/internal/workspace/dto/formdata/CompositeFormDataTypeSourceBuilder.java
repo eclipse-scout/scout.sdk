@@ -42,11 +42,6 @@ import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
  */
 public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilder {
 
-  /**
-   * @param modelType
-   * @param elementName
-   * @param formDataAnnotation
-   */
   public CompositeFormDataTypeSourceBuilder(IType modelType, ITypeHierarchy modelLocalTypeHierarchy, String elementName, FormDataAnnotation formDataAnnotation, ICompilationUnit derivedCu, IProgressMonitor monitor) {
     super(modelType, modelLocalTypeHierarchy, elementName, formDataAnnotation, derivedCu, monitor);
   }
@@ -132,6 +127,11 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           createCompositeFieldFormData(formField, declaringTypeHierarchy, monitor);
         }
       }
+    }
+
+    // step into extensions
+    for (IType formFieldExtension : TypeUtility.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ICompositeFieldExtension), declaringTypeHierarchy))) {
+      createCompositeFieldFormData(formFieldExtension, declaringTypeHierarchy, monitor);
     }
   }
 }

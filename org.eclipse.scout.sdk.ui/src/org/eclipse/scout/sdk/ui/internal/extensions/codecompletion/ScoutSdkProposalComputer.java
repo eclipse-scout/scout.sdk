@@ -58,34 +58,37 @@ public class ScoutSdkProposalComputer implements IJavaCompletionProposalComputer
         IJavaElement element = coreContext.getEnclosingElement();
         if (TypeUtility.exists(element)) {
           if (element.getElementType() == IJavaElement.TYPE) {
-            IType declaringType = TypeUtility.getType(((IType) element).getFullyQualifiedName());
-            int startOffset = coreContext.getTokenStart();
-
             // don't directly use the element (AssistSourceType) because it has invalid source ranges!
-            ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
-            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode))) {
-              proposals.add(new CodeNewProposal(declaringType, startOffset));
-            }
-            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))) {
-              proposals.add(new ColumnNewProposal(declaringType, startOffset));
-            }
-            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeField))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm))) {
-              proposals.add(new FormFieldNewProposal(declaringType, startOffset));
-            }
-            if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IMenu))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktop))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithNodes))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITree))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITreeNode))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IButton))
-                || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IImageField))) {
-              proposals.add(new MenuNewProposal(declaringType, startOffset));
+            IType declaringType = TypeUtility.getType(((IType) element).getFullyQualifiedName());
+            if (TypeUtility.exists(declaringType)) {
+              ITypeHierarchy supertypeHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
+              if (supertypeHierarchy != null) {
+                int startOffset = coreContext.getTokenStart();
+                if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeType)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeTypeExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICode)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICodeExtension))) {
+                  proposals.add(new CodeNewProposal(declaringType, startOffset));
+                }
+                if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITableExtension))) {
+                  proposals.add(new ColumnNewProposal(declaringType, startOffset));
+                }
+                if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeField)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICompositeFieldExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IForm)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IFormExtension))) {
+                  proposals.add(new FormFieldNewProposal(declaringType, startOffset));
+                }
+                if (supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IMenu)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IMenuExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktop)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtensionExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IDesktopExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ICalendarItemProviderExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithNodes)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithNodesExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITree)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITreeExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITable)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITableExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITreeNode)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITreeNodeExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueField)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IValueFieldExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IButton)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IButtonExtension))
+                    || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IImageField)) || supertypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IImageFieldExtension))) {
+                  proposals.add(new MenuNewProposal(declaringType, startOffset));
+                }
+              }
             }
           }
         }
