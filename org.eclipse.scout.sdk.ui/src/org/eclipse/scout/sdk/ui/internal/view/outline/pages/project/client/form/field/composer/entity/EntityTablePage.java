@@ -68,8 +68,7 @@ public class EntityTablePage extends AbstractPage {
   @Override
   protected void loadChildrenImpl() {
     if (m_entityChangedListener == null) {
-      @SuppressWarnings("deprecation")
-      IType iComposerEntity = TypeUtility.getType(IRuntimeClasses.IComposerEntity);
+      IType iComposerEntity = TypeUtility.getType(IRuntimeClasses.IDataModelEntity);
       m_entityChangedListener = new InnerTypePageDirtyListener(this, iComposerEntity);
       ScoutSdkCore.getJavaResourceChangedEmitter().addInnerTypeChangedListener(getDeclaringType(), m_entityChangedListener);
     }

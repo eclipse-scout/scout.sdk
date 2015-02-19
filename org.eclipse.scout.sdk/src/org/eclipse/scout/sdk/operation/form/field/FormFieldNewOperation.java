@@ -66,6 +66,11 @@ public class FormFieldNewOperation extends OrderedInnerTypeNewOperation {
         TypeFilters.getPrimaryTypeFilter()));
 
     if (TypeUtility.exists(form)) {
+      if (hierarchy.getAllSupertypes(form).contains(TypeUtility.getType(IRuntimeClasses.IExtension))) {
+        // no getters for extensions
+        return;
+      }
+
       InnerTypeGetterCreateOperation getterMethodOp = new InnerTypeGetterCreateOperation(createdType, form, false /* do not pass the formatting in -> performance */);
       IStructuredType sourceHelper = ScoutTypeUtility.createStructuredForm(form, hierarchy);
       IJavaElement sibling = sourceHelper.getSiblingMethodFieldGetter("get" + getElementName());

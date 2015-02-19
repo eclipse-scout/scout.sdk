@@ -145,10 +145,12 @@ public interface IRuntimeClasses {
   String IBookmarkStorageService = "org.eclipse.scout.rt.shared.services.common.bookmark.IBookmarkStorageService"; // NO_UCD
   String IBooleanField = "org.eclipse.scout.rt.client.ui.form.fields.booleanfield.IBooleanField"; // NO_UCD
   String IButton = "org.eclipse.scout.rt.client.ui.form.fields.button.IButton"; // NO_UCD
+  String IButtonExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.button.IButtonExtension"; // NO_UCD
   String ICalendar = "org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar"; // NO_UCD
   String ICalendarField = "org.eclipse.scout.rt.client.ui.form.fields.calendarfield.ICalendarField"; // NO_UCD
   String ICalendarItem = "org.eclipse.scout.rt.shared.services.common.calendar.ICalendarItem"; // NO_UCD
   String ICalendarItemProvider = "org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider"; // NO_UCD
+  String ICalendarItemProviderExtension = "org.eclipse.scout.rt.client.extension.ui.basic.calendar.provider.ICalendarItemProviderExtension"; // NO_UCD
   String ICalendarService = "org.eclipse.scout.rt.shared.services.common.calendar.ICalendarService"; // NO_UCD
   String IChartBox = "org.eclipse.scout.rt.client.ui.form.fields.chartbox.IChartBox"; // NO_UCD
   String ICheckBox = "org.eclipse.scout.rt.client.ui.form.fields.checkbox.ICheckBox"; // NO_UCD
@@ -156,30 +158,24 @@ public interface IRuntimeClasses {
   String ICode = "org.eclipse.scout.rt.shared.services.common.code.ICode"; // NO_UCD
   String ICodeType = "org.eclipse.scout.rt.shared.services.common.code.ICodeType"; // NO_UCD
   String IColumn = "org.eclipse.scout.rt.client.ui.basic.table.columns.IColumn"; // NO_UCD
-  /**
-   * @deprecated use {@link IRuntimeClasses#IDataModelAttribute}
-   */
-  @Deprecated
-  String IComposerAttribute = "org.eclipse.scout.rt.client.ui.form.fields.composer.attribute.IComposerAttribute"; // NO_UCD
-  /**
-   * @deprecated use {@link IRuntimeClasses#IDataModelEntity}
-   */
-  @Deprecated
-  String IComposerEntity = "org.eclipse.scout.rt.client.ui.form.fields.composer.entity.IComposerEntity"; // NO_UCD
   String IComposerField = "org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField"; // NO_UCD
   String ICompositeField = "org.eclipse.scout.rt.client.ui.form.fields.ICompositeField"; // NO_UCD
+  String ICompositeFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.ICompositeFieldExtension"; // NO_UCD
   String ICustomField = "org.eclipse.scout.rt.client.ui.form.fields.customfield.ICustomField"; // NO_UCD
   String IDataModelAttribute = "org.eclipse.scout.rt.shared.data.model.IDataModelAttribute";// NO_UCD
   String IDataModelEntity = "org.eclipse.scout.rt.shared.data.model.IDataModelEntity";// NO_UCD
   String IDateField = "org.eclipse.scout.rt.client.ui.form.fields.datefield.IDateField"; // NO_UCD
   String IDesktop = "org.eclipse.scout.rt.client.ui.desktop.IDesktop"; // NO_UCD
   String IDesktopExtension = "org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension"; // NO_UCD
+  String IDesktopExtensionExtension = "org.eclipse.scout.rt.client.extension.ui.desktop.IDesktopExtension"; // NO_UCD
   String IDoubleField = "org.eclipse.scout.rt.client.ui.form.fields.doublefield.IDoubleField"; // NO_UCD
   String IDNDSupport = "org.eclipse.scout.rt.client.ui.IDNDSupport"; // NO_UCD
   String IExtension = "org.eclipse.scout.rt.shared.extension.IExtension"; // NO_UCD
+  String ICodeTypeExtension = "org.eclipse.scout.rt.shared.extension.services.common.code.ICodeTypeExtension"; // NO_UCD
   String IFileChooserField = "org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.IFileChooserField"; // NO_UCD
   String IForm = "org.eclipse.scout.rt.client.ui.form.IForm"; // NO_UCD
   String IFormExtension = "org.eclipse.scout.rt.client.extension.ui.form.IFormExtension"; // NO_UCD
+  String ICodeExtension = "org.eclipse.scout.rt.shared.extension.services.common.code.ICodeExtension"; // NO_UCD
   String IFormField = "org.eclipse.scout.rt.client.ui.form.fields.IFormField"; // NO_UCD
   String IFormFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension"; // NO_UCD
   String IFormHandler = "org.eclipse.scout.rt.client.ui.form.IFormHandler"; // NO_UCD
@@ -187,6 +183,7 @@ public interface IRuntimeClasses {
   String IGroupBoxBodyGrid = "org.eclipse.scout.rt.client.ui.form.fields.groupbox.IGroupBoxBodyGrid"; // NO_UCD
   String IHtmlField = "org.eclipse.scout.rt.client.ui.form.fields.htmlfield.IHtmlField"; // NO_UCD
   String IImageField = "org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField"; // NO_UCD
+  String IImageFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.imagebox.IImageFieldExtension"; // NO_UCD
   String IIntegerField = "org.eclipse.scout.rt.client.ui.form.fields.integerfield.IIntegerField"; // NO_UCD
   String IKeyStroke = "org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke"; // NO_UCD
   String ILabelField = "org.eclipse.scout.rt.client.ui.form.fields.labelfield.ILabelField"; // NO_UCD
@@ -199,10 +196,12 @@ public interface IRuntimeClasses {
   String ITextProviderService = "org.eclipse.scout.rt.shared.services.common.text.ITextProviderService"; // NO_UCD
   String IDocumentationTextProviderService = "org.eclipse.scout.rt.shared.services.common.text.IDocumentationTextProviderService"; // NO_UCD
   String IMenu = "org.eclipse.scout.rt.client.ui.action.menu.IMenu"; // NO_UCD
+  String IMenuExtension = "org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension"; // NO_UCD
   String IMenuType = "org.eclipse.scout.rt.client.ui.action.menu.IMenuType"; // NO_UCD
   String IOutline = "org.eclipse.scout.rt.client.ui.desktop.outline.IOutline"; // NO_UCD
   String IPage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"; // NO_UCD
   String IPageWithNodes = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes"; // NO_UCD
+  String IPageWithNodesExtension = "org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithNodesExtension"; // NO_UCD
   String IPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable"; // NO_UCD
   String IPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField"; // NO_UCD
   String IPropertyObserver = "org.eclipse.scout.commons.beans.IPropertyObserver"; // NO_UCD
@@ -227,11 +226,14 @@ public interface IRuntimeClasses {
   String ITableField = "org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField"; // NO_UCD
   String IToolButton = "org.eclipse.scout.rt.client.ui.action.tool.IToolButton"; // NO_UCD
   String ITree = "org.eclipse.scout.rt.client.ui.basic.tree.ITree"; // NO_UCD
+  String ITreeExtension = "org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeExtension"; // NO_UCD
   String ITreeBox = "org.eclipse.scout.rt.client.ui.form.fields.treebox.ITreeBox"; // NO_UCD
   String ITreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField"; // NO_UCD
   String ITreeNode = "org.eclipse.scout.rt.client.ui.basic.tree.ITreeNode"; // NO_UCD
+  String ITreeNodeExtension = "org.eclipse.scout.rt.client.extension.ui.basic.tree.ITreeNodeExtension"; // NO_UCD
   String ITypeWithClassId = "org.eclipse.scout.commons.ITypeWithClassId"; // NO_UCD
   String IValueField = "org.eclipse.scout.rt.client.ui.form.fields.IValueField"; // NO_UCD
+  String IValueFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.IValueFieldExtension"; // NO_UCD
   String IViewButton = "org.eclipse.scout.rt.client.ui.action.view.IViewButton"; // NO_UCD
   String IWizard = "org.eclipse.scout.rt.client.ui.wizard.IWizard"; // NO_UCD
   String IWizardStep = "org.eclipse.scout.rt.client.ui.wizard.IWizardStep"; // NO_UCD

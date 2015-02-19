@@ -266,8 +266,8 @@ public class ScoutStructuredType implements IStructuredType {
   protected final void cache(CATEGORIES category) {
     if (m_enabledCategories.contains(category) && !m_visitedCategories.contains(category)) {
       try {
-        ArrayList<IJavaElement> unknownMethods = CollectionUtility.arrayList(m_elements.get(CATEGORIES.METHOD_UNCATEGORIZED));
-        ArrayList<IJavaElement> unknownTypes = CollectionUtility.arrayList(m_elements.get(CATEGORIES.TYPE_UNCATEGORIZED));
+        List<IJavaElement> unknownMethods = CollectionUtility.arrayList(m_elements.get(CATEGORIES.METHOD_UNCATEGORIZED));
+        List<IJavaElement> unknownTypes = CollectionUtility.arrayList(m_elements.get(CATEGORIES.TYPE_UNCATEGORIZED));
         switch (category) {
           case FIELD_LOGGER:
           case FIELD_STATIC:
@@ -429,7 +429,7 @@ public class ScoutStructuredType implements IStructuredType {
    * @param workingSet
    * @throws JavaModelException
    */
-  protected void visitFields(ArrayList<IJavaElement> workingSet) throws JavaModelException {
+  protected void visitFields(List<IJavaElement> workingSet) throws JavaModelException {
     List<IJavaElement> loggers = new ArrayList<>(2);
     List<IJavaElement> statics = new ArrayList<>();
     List<IJavaElement> members = new ArrayList<>();
@@ -473,7 +473,7 @@ public class ScoutStructuredType implements IStructuredType {
     return null;
   }
 
-  protected void visitMethodConstructors(ArrayList<IJavaElement> workingSet) throws JavaModelException {
+  protected void visitMethodConstructors(List<IJavaElement> workingSet) throws JavaModelException {
     TreeMap<CompositeObject, IJavaElement> constructors = new TreeMap<>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
@@ -486,7 +486,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.METHOD_CONSTRUCTOR, CollectionUtility.arrayList(constructors.values()));
   }
 
-  protected void visitMethodConfigExec(ArrayList<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws CoreException {
+  protected void visitMethodConfigExec(List<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws CoreException {
     TreeMap<CompositeObject, IJavaElement> execMethods = new TreeMap<>();
     IMethodFilter execMethodFilter = MethodFilters.getFilterWithAnnotation(TypeUtility.getType(IRuntimeClasses.ConfigOperation));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -506,7 +506,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.METHOD_CONFIG_EXEC, CollectionUtility.arrayList(execMethods.values()));
   }
 
-  protected void visitMethodConfigProperty(ArrayList<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws CoreException {
+  protected void visitMethodConfigProperty(List<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws CoreException {
     TreeMap<CompositeObject, IJavaElement> methods = new TreeMap<>();
     IMethodFilter configPropertyMethodFilter = MethodFilters.getFilterWithAnnotation(TypeUtility.getType(IRuntimeClasses.ConfigProperty));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -525,7 +525,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.METHOD_CONFIG_PROPERTY, CollectionUtility.arrayList(methods.values()));
   }
 
-  protected void visitMethodFormDataBean(ArrayList<IJavaElement> workingSet) throws JavaModelException {
+  protected void visitMethodFormDataBean(List<IJavaElement> workingSet) throws JavaModelException {
     TreeMap<CompositeObject, IJavaElement> methods = new TreeMap<>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
@@ -543,7 +543,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.METHOD_FORM_DATA_BEAN, CollectionUtility.arrayList(methods.values()));
   }
 
-  protected void visitMethodOverridden(ArrayList<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
+  protected void visitMethodOverridden(List<IJavaElement> workingSet, ITypeHierarchy superTypeHierarchy) throws JavaModelException {
     TreeMap<CompositeObject, IJavaElement> overriddenMethods = new TreeMap<>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
@@ -556,7 +556,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.METHOD_OVERRIDDEN, CollectionUtility.arrayList(overriddenMethods.values()));
   }
 
-  protected void visitMethodStartHandler(ArrayList<IJavaElement> workingSet) throws JavaModelException {
+  protected void visitMethodStartHandler(List<IJavaElement> workingSet) throws JavaModelException {
     TreeMap<CompositeObject, IJavaElement> startHandlerMethods = new TreeMap<>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
@@ -573,7 +573,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.METHOD_START_HANDLER, CollectionUtility.arrayList(startHandlerMethods.values()));
   }
 
-  protected void visitMethodInnerTypeGetter(ArrayList<IJavaElement> workingSet) throws JavaModelException {
+  protected void visitMethodInnerTypeGetter(List<IJavaElement> workingSet) throws JavaModelException {
     TreeMap<CompositeObject, IJavaElement> fieldGetterMethods = new TreeMap<>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
@@ -590,7 +590,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.METHOD_INNER_TYPE_GETTER, CollectionUtility.arrayList(fieldGetterMethods.values()));
   }
 
-  protected void visitMethodLocalBean(ArrayList<IJavaElement> workingSet) throws JavaModelException {
+  protected void visitMethodLocalBean(List<IJavaElement> workingSet) throws JavaModelException {
     TreeMap<CompositeObject, IJavaElement> localPropertyMethods = new TreeMap<>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
@@ -604,7 +604,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.METHOD_LOCAL_BEAN, CollectionUtility.arrayList(localPropertyMethods.values()));
   }
 
-  protected void visitMethodUncategorized(ArrayList<IMethod> workingSet) throws JavaModelException {
+  protected void visitMethodUncategorized(List<IMethod> workingSet) throws JavaModelException {
     TreeMap<CompositeObject, IJavaElement> methods = new TreeMap<>();
     for (Iterator<IMethod> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = it.next();
@@ -616,7 +616,7 @@ public class ScoutStructuredType implements IStructuredType {
 
   }
 
-  protected void visitTypeFormFields(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeFormFields(List<IJavaElement> workingSet) {
     TreeSet<IType> formFields = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IFormField), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -629,7 +629,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_FORM_FIELD, CollectionUtility.arrayList(formFields));
   }
 
-  protected void visitTypeColumns(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeColumns(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IColumn), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -642,7 +642,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_COLUMN, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeCodes(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeCodes(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ICode), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -655,7 +655,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_CODE, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeForms(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeForms(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IForm), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -668,7 +668,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_FORM, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeTables(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeTables(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITable), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -684,7 +684,7 @@ public class ScoutStructuredType implements IStructuredType {
   /**
    * @param workingSet
    */
-  private void visitTypeActivityMaps(ArrayList<IJavaElement> workingSet) {
+  private void visitTypeActivityMaps(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(TypeComparators.getTypeNameComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IActivityMap), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -697,7 +697,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_ACTIVITY_MAP, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeTrees(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeTrees(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ITree), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -710,7 +710,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_TREE, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeCalendar(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeCalendar(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ICalendar), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -723,7 +723,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_CALENDAR, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeCalendarItemProvider(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeCalendarItemProvider(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.ICalendarItemProvider), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -736,7 +736,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_CALENDAR_ITEM_PROVIDER, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeWizards(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeWizards(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IWizard), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -749,7 +749,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_WIZARD, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeWizardSteps(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeWizardSteps(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IWizardStep), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -762,7 +762,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_WIZARD_STEP, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeMenus(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeMenus(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IMenu), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -775,7 +775,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_MENU, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeViewbuttons(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeViewbuttons(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IViewButton), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -788,7 +788,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_VIEW_BUTTON, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeToolbuttons(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeToolbuttons(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IToolButton), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -801,7 +801,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_TOOL_BUTTON, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeKeystrokes(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeKeystrokes(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(TypeComparators.getTypeNameComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IKeyStroke), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -814,10 +814,9 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_KEYSTROKE, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeComposerAttribute(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeComposerAttribute(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(TypeComparators.getTypeNameComparator());
-    @SuppressWarnings("deprecation")
-    ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IComposerAttribute), m_typeHierarchy));
+    ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IDataModelAttribute), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
       if (filter.accept(candidate)) {
@@ -828,7 +827,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_COMPOSER_ATTRIBUTE, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeDataModelEntry(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeDataModelEntry(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(TypeComparators.getTypeNameComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IDataModelEntity), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
@@ -841,7 +840,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements.put(CATEGORIES.TYPE_COMPOSER_ENTRY, CollectionUtility.arrayList(types));
   }
 
-  protected void visitTypeFormHandlers(ArrayList<IJavaElement> workingSet) {
+  protected void visitTypeFormHandlers(List<IJavaElement> workingSet) {
     TreeSet<IType> types = new TreeSet<>(TypeComparators.getTypeNameComparator());
     ITypeFilter filter = TypeFilters.getMultiTypeFilterAnd(TypeFilters.getClassFilter(), TypeFilters.getSubtypeFilter(TypeUtility.getType(IRuntimeClasses.IFormHandler), m_typeHierarchy));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
