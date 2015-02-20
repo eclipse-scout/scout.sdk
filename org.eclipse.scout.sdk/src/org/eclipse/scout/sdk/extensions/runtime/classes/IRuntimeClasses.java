@@ -126,10 +126,8 @@ public interface IRuntimeClasses {
   String AbstractSearchButton = "org.eclipse.scout.rt.client.ui.form.fields.button.AbstractSearchButton"; // NO_UCD
   String AbstractCalendarField = "org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendarField"; // NO_UCD
   String AbstractPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable"; // NO_UCD
-  String AbstractExtensiblePageWithTable = "org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithTable";// NO_UCD
   String AbstractWizardStep = "org.eclipse.scout.rt.client.ui.wizard.AbstractWizardStep";// NO_UCD
   String AbstractPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.AbstractPlannerField";// NO_UCD
-  String AbstractExtensibleActivityMap = "org.eclipse.scout.rt.extension.client.ui.basic.activitymap.AbstractExtensibleActivityMap";// NO_UCD
   String AbstractActivityMap = "org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap";// NO_UCD
   String AbstractTableField = "org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField";// NO_UCD
   String AbstractTabBox = "org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox";// NO_UCD

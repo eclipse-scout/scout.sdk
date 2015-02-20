@@ -11,10 +11,10 @@
 package formdata.client.ui.template.formfield;
 
 import org.eclipse.scout.commons.annotations.Order;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractColumn;
-import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
 
-public class AbstractTableWithExtKey<KEY_TYPE> extends AbstractExtensibleTable {
+public class AbstractTableWithExtKey<KEY_TYPE> extends AbstractTable {
 
   public ExtKeyColumn getExtKeyColumn() {
     @SuppressWarnings("unchecked")

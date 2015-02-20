@@ -122,7 +122,7 @@ public class PageNewOperation extends AbstractPageOperation {
     }
 
     // table inner type
-    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractPageWithTable) || CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractExtensiblePageWithTable)) {
+    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractPageWithTable)) {
       ITypeSourceBuilder tableSourceBuilder = new TypeSourceBuilder(SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE);
       tableSourceBuilder.setFlags(Flags.AccPublic);
       tableSourceBuilder.setSuperTypeSignature(RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.ITable, getPageJavaProject()));

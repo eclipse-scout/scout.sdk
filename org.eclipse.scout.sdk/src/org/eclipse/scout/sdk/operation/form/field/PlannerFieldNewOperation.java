@@ -134,8 +134,7 @@ public class PlannerFieldNewOperation implements IOperation {
     activityMapBuilder.setFlags(Flags.AccPublic);
     String activityMapSuperTypeSig = RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IActivityMap, getDeclaringType().getJavaProject());
     String superTypeFqn = SignatureUtility.getFullyQualifiedName(activityMapSuperTypeSig);
-    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractActivityMap)
-        || CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractExtensibleActivityMap)) {
+    if (CompareUtility.equals(superTypeFqn, IRuntimeClasses.AbstractActivityMap)) {
       // super type sig
       StringBuilder superTypeSigBuilder = new StringBuilder(superTypeFqn);
       superTypeSigBuilder.append(Signature.C_GENERIC_START).append(Long.class.getName()).append(',');

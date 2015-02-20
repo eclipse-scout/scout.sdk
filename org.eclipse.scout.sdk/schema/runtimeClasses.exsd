@@ -121,7 +121,7 @@ These classes will then be used by default when creating new scout elements usin
                class=&quot;org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap&quot;&gt;
          &lt;/default&gt;
          &lt;default
-               class=&quot;org.eclipse.scout.rt.extension.client.ui.basic.activitymap.AbstractExtensibleActivityMap&quot;
+               class=&quot;org.eclipse.scout.rt.extension.client.ui.basic.activitymap.AbstractMyOtherActivityMap&quot;
                priority=&quot;10&quot;&gt;
          &lt;/default&gt;
       &lt;/element&gt;

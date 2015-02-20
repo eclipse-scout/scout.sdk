@@ -14,7 +14,6 @@ Export-Package: sample.client,
  sample.client.ui.wizards
 Require-Bundle: org.eclipse.core.runtime,
  org.eclipse.scout.rt.client;visibility:=reexport,
- org.eclipse.scout.rt.extension.client;visibility:=reexport,
  sample.shared,
  org.eclipse.scout.svg.client
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7

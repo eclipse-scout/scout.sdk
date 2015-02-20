@@ -5,14 +5,14 @@ import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
+import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.AbstractBookmarkMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
-import org.eclipse.scout.rt.extension.client.ui.desktop.AbstractExtensibleDesktop;
 import @@BUNDLE_CLIENT_NAME@@.ClientSession;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-public class Desktop extends AbstractExtensibleDesktop {
+public class Desktop extends AbstractDesktop {
 
   public Desktop() {
   }

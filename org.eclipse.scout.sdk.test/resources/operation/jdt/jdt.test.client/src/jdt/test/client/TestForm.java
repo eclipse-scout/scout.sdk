@@ -14,6 +14,7 @@ import jdt.test.client.TestForm.MainBox.TableField;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.datefield.AbstractDateField;
 import org.eclipse.scout.rt.client.ui.form.fields.doublefield.AbstractDoubleField;
@@ -26,7 +27,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.radiobuttongroup.AbstractRadio
 import org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
 
 public class TestForm extends AbstractForm {
 
@@ -129,7 +129,7 @@ public class TestForm extends AbstractForm {
     public class TableField extends AbstractTableField<TableField.Table> {
 
       @Order(10.0)
-      public class Table extends AbstractExtensibleTable {
+      public class Table extends AbstractTable {
       }
     }
 

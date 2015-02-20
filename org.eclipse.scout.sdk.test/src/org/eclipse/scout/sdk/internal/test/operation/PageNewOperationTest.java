@@ -50,24 +50,6 @@ public class PageNewOperationTest extends AbstractSdkTestWithSampleProject {
   }
 
   @Test
-  public void testNewPageWithTableExtendsible() throws Exception {
-    PageNewOperation newOp = new PageNewOperation("Test01Page", getClientJavaProject().getElementName() + ".page.output", getSharedJavaProject().getElementName() + ".page.output", getClientJavaProject(), getSharedJavaProject());
-    newOp.setSuperTypeSignature(SignatureCache.createTypeSignature(RuntimeClasses.AbstractExtensiblePageWithTable));
-    newOp.setFormatSource(true);
-
-    TestWorkspaceUtility.executeAndBuildWorkspace(newOp);
-    PageDataDtoUpdateOperation updateDto = new PageDataDtoUpdateOperation(newOp.getCreatedPage(), ScoutTypeUtility.findDataAnnotation(newOp.getCreatedPage(), ScoutTypeUtility.getSupertypeHierarchy(newOp.getCreatedPage())));
-    executeBuildAssertNoCompileErrors(updateDto);
-
-    IType page = newOp.getCreatedPage();
-    SdkAssert.assertExist(page);
-    SdkAssert.assertPublic(page).assertNoMoreFlags();
-    SdkAssert.assertTypeExists(page, SdkProperties.TYPE_NAME_OUTLINE_WITH_TABLE_TABLE);
-    SdkAssert.assertHasSuperType(page, RuntimeClasses.IPageWithTable);
-    SdkAssert.assertAnnotation(page, IRuntimeClasses.PageData);
-  }
-
-  @Test
   public void testNewPageWithNodes() throws Exception {
     PageNewOperation newOp = new PageNewOperation("Test01Page", getClientJavaProject().getElementName() + ".page.output", null, getClientJavaProject(), null);
     newOp.setSuperTypeSignature(SignatureCache.createTypeSignature("org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes"));

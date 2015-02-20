@@ -314,10 +314,6 @@
          <default
                class="org.eclipse.scout.rt.client.ui.basic.activitymap.AbstractActivityMap">
          </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.basic.activitymap.AbstractExtensibleActivityMap"
-               priority="10">
-         </default>
       </element>
       <element
             interface="org.eclipse.scout.rt.client.ui.form.fields.bigdecimalfield.IBigDecimalField">
@@ -354,19 +350,11 @@
          <default
                class="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractButton">
          </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.form.fields.button.AbstractExtensibleButton"
-               priority="10">
-         </default>
       </element>
       <element
             interface="org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar">
          <default
                class="org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar">
-         </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.basic.calendar.AbstractExtensibleCalendar"
-               priority="10">
          </default>
       </element>
       <element
@@ -379,10 +367,6 @@
             interface="org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider">
          <default
                class="org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider">
-         </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.basic.calendar.provider.AbstractExtensibleCalendarItemProvider"
-               priority="10">
          </default>
       </element>
       <element
@@ -511,10 +495,6 @@
          <default
                class="org.eclipse.scout.rt.client.ui.form.fields.filechooserfield.AbstractFileChooserField">
          </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.form.fields.filechooserfield.AbstractExtensibleFileChooserField"
-               priority="10">
-         </default>
       </element>
       <element
             interface="org.eclipse.scout.rt.client.ui.form.IForm">
@@ -550,10 +530,6 @@
             interface="org.eclipse.scout.rt.client.ui.form.fields.imagebox.IImageField">
          <default
                class="org.eclipse.scout.rt.client.ui.form.fields.imagebox.AbstractImageField">
-         </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.form.fields.imagebox.AbstractExtensibleImageField"
-               priority="10">
          </default>
       </element>
       <element
@@ -597,10 +573,6 @@
          <default
                class="org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu">
          </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.action.menu.AbstractExtensibleMenu"
-               priority="10">
-         </default>
       </element>
       <element
             interface="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton">
@@ -612,10 +584,6 @@
             interface="org.eclipse.scout.rt.client.ui.desktop.outline.IOutline">
          <default
                class="org.eclipse.scout.rt.client.ui.desktop.outline.AbstractOutline">
-         </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.desktop.outline.AbstractExtensibleOutline"
-               priority="10">
          </default>
       </element>
       <element
@@ -629,19 +597,11 @@
          <default
                class="org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithNodes">
          </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithNodes"
-               priority="10">
-         </default>
       </element>
       <element
             interface="org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable">
          <default
                class="org.eclipse.scout.rt.client.ui.desktop.outline.pages.AbstractPageWithTable">
-         </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.desktop.outline.pages.AbstractExtensiblePageWithTable"
-               priority="10">
          </default>
       </element>
       <element
@@ -654,10 +614,6 @@
             interface="org.eclipse.scout.rt.client.ui.form.fields.button.IRadioButton">
          <default
                class="org.eclipse.scout.rt.client.ui.form.fields.button.AbstractRadioButton">
-         </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.form.fields.button.AbstractExtensibleRadioButton"
-               priority="10">
          </default>
       </element>
       <element
@@ -701,19 +657,11 @@
          <default
                class="org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractSmartField">
          </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.form.fields.smartfield.AbstractExtensibleSmartField"
-               priority="10">
-         </default>
       </element>
       <element
             interface="org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField">
          <default
                class="org.eclipse.scout.rt.client.ui.form.fields.smartfield.AbstractProposalField">
-         </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.form.fields.smartfield.AbstractExtensibleProposalField"
-               priority="10">
          </default>
       </element>
       <element
@@ -757,10 +705,6 @@
          <default
                class="org.eclipse.scout.rt.client.ui.basic.table.AbstractTable">
          </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable"
-               priority="10">
-         </default>
       </element>
       <element
             interface="org.eclipse.scout.rt.client.ui.form.fields.tablefield.ITableField">
@@ -778,10 +722,6 @@
             interface="org.eclipse.scout.rt.client.ui.basic.tree.ITree">
          <default
                class="org.eclipse.scout.rt.client.ui.basic.tree.AbstractTree">
-         </default>
-         <default
-               class="org.eclipse.scout.rt.extension.client.ui.basic.tree.AbstractExtensibleTree"
-               priority="10">
          </default>
       </element>
       <element
@@ -1004,9 +944,6 @@
       </bundle>
       <bundle
             symbolicName="org.eclipse.scout.rt.client.mobile">
-      </bundle>
-      <bundle
-            symbolicName="org.eclipse.scout.rt.extension.client">
       </bundle>
       <bundle
             symbolicName="org.eclipse.scout.jaxws22y">

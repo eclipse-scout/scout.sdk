@@ -4,12 +4,12 @@ import jdt.test.client.TableTestForm.MainBox.TableField;
 
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDateColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractIntegerColumn;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
 
 public class TableTestForm extends AbstractForm {
 
@@ -32,7 +32,7 @@ public class TableTestForm extends AbstractForm {
     public class TableField extends AbstractTableField<TableField.Table> {
 
       @Order(10.0)
-      public class Table extends AbstractExtensibleTable {
+      public class Table extends AbstractTable {
 
         public DateColumn getDateColumn() {
           return getColumnSet().getColumnByClass(DateColumn.class);

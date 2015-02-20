@@ -30,64 +30,14 @@ public class BaseWithExtendedTableTablePageData extends AbstractTablePageData {
   }
 
   @Override
-  public BaseWithExtendedTableTableRowData addRow() {
-    return (BaseWithExtendedTableTableRowData) super.addRow();
-  }
-
-  @Override
-  public BaseWithExtendedTableTableRowData addRow(int rowState) {
-    return (BaseWithExtendedTableTableRowData) super.addRow(rowState);
-  }
-
-  @Override
-  public BaseWithExtendedTableTableRowData createRow() {
-    return new BaseWithExtendedTableTableRowData();
+  public AbstractTableRowData createRow() {
+    return new AbstractTableRowData() {
+      private static final long serialVersionUID = 1L;
+    };
   }
 
   @Override
   public Class<? extends AbstractTableRowData> getRowType() {
-    return BaseWithExtendedTableTableRowData.class;
-  }
-
-  @Override
-  public BaseWithExtendedTableTableRowData[] getRows() {
-    return (BaseWithExtendedTableTableRowData[]) super.getRows();
-  }
-
-  @Override
-  public BaseWithExtendedTableTableRowData rowAt(int index) {
-    return (BaseWithExtendedTableTableRowData) super.rowAt(index);
-  }
-
-  public void setRows(BaseWithExtendedTableTableRowData[] rows) {
-    super.setRows(rows);
-  }
-
-  public static class BaseWithExtendedTableTableRowData extends AbstractTableRowData {
-
-    private static final long serialVersionUID = 1L;
-    public static final String colInAbstractTable = "colInAbstractTable";
-    public static final String colInTable = "colInTable";
-    private String m_colInAbstractTable;
-    private String m_colInTable;
-
-    public BaseWithExtendedTableTableRowData() {
-    }
-
-    public String getColInAbstractTable() {
-      return m_colInAbstractTable;
-    }
-
-    public void setColInAbstractTable(String colInAbstractTable) {
-      m_colInAbstractTable = colInAbstractTable;
-    }
-
-    public String getColInTable() {
-      return m_colInTable;
-    }
-
-    public void setColInTable(String colInTable) {
-      m_colInTable = colInTable;
-    }
+    return AbstractTableRowData.class;
   }
 }

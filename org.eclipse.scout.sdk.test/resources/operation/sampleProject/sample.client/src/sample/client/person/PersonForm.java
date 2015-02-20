@@ -4,6 +4,9 @@ import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.rt.client.ui.basic.calendar.AbstractCalendar;
+import org.eclipse.scout.rt.client.ui.basic.calendar.provider.AbstractCalendarItemProvider;
+import org.eclipse.scout.rt.client.ui.basic.table.AbstractTable;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractDoubleColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractLongColumn;
 import org.eclipse.scout.rt.client.ui.basic.table.columns.AbstractStringColumn;
@@ -15,9 +18,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.calendarfield.AbstractCalendar
 import org.eclipse.scout.rt.client.ui.form.fields.composer.AbstractComposerField;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
-import org.eclipse.scout.rt.extension.client.ui.basic.calendar.AbstractExtensibleCalendar;
-import org.eclipse.scout.rt.extension.client.ui.basic.calendar.provider.AbstractExtensibleCalendarItemProvider;
-import org.eclipse.scout.rt.extension.client.ui.basic.table.AbstractExtensibleTable;
 import org.eclipse.scout.rt.shared.TEXTS;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelAttribute;
 import org.eclipse.scout.rt.shared.data.model.AbstractDataModelEntity;
@@ -116,10 +116,10 @@ public class PersonForm extends AbstractForm {
       }
 
       @Order(10.0)
-      public class Calendar extends AbstractExtensibleCalendar {
+      public class Calendar extends AbstractCalendar {
 
         @Order(10.0)
-        public class FirstItemProvider extends AbstractExtensibleCalendarItemProvider {
+        public class FirstItemProvider extends AbstractCalendarItemProvider {
         }
       }
     }
@@ -147,7 +147,7 @@ public class PersonForm extends AbstractForm {
     public class EmptyTableField extends AbstractTableField<EmptyTableField.Table> {
 
       @Order(10.0)
-      public class Table extends AbstractExtensibleTable {
+      public class Table extends AbstractTable {
       }
     }
 
@@ -155,7 +155,7 @@ public class PersonForm extends AbstractForm {
     public class TableField extends AbstractTableField<TableField.Table> {
 
       @Order(10.0)
-      public class Table extends AbstractExtensibleTable {
+      public class Table extends AbstractTable {
 
         public LongColumn getLongColumn() {
           return getColumnSet().getColumnByClass(LongColumn.class);
