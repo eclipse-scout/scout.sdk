@@ -84,7 +84,7 @@ public class OutlineNewOperationTest extends AbstractSdkTestWithSampleProject {
     // type Test01Outline
     IType test01Outline = SdkAssert.assertTypeExists("sample.client.outline.output.Test01Outline");
     SdkAssert.assertHasFlags(test01Outline, 1);
-    SdkAssert.assertHasSuperTypeSignature(test01Outline, "QAbstractExtensibleOutline;");
+    SdkAssert.assertHasSuperTypeSignature(test01Outline, "QAbstractOutline;");
 
     // fields of Test01Outline
     SdkAssert.assertEquals("field count of 'Test01Outline'", 0, test01Outline.getFields().length);
@@ -101,7 +101,7 @@ public class OutlineNewOperationTest extends AbstractSdkTestWithSampleProject {
     // type Test02Outline
     IType test02Outline = SdkAssert.assertTypeExists("sample.client.outline.output.Test02Outline");
     SdkAssert.assertHasFlags(test02Outline, 1);
-    SdkAssert.assertHasSuperTypeSignature(test02Outline, "QAbstractExtensibleOutline;");
+    SdkAssert.assertHasSuperTypeSignature(test02Outline, "QAbstractOutline;");
 
     // fields of Test02Outline
     SdkAssert.assertEquals("field count of 'Test02Outline'", 0, test02Outline.getFields().length);

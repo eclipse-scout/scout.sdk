@@ -105,7 +105,7 @@ public class CalendarFieldNewOperationTest extends AbstractSdkTestWithSampleProj
     // type Calendar
     IType calendar = SdkAssert.assertTypeExists(testField01, "Calendar");
     SdkAssert.assertHasFlags(calendar, 1);
-    SdkAssert.assertHasSuperTypeSignature(calendar, "QAbstractExtensibleCalendar;");
+    SdkAssert.assertHasSuperTypeSignature(calendar, "QAbstractCalendar;");
     SdkAssert.assertAnnotation(calendar, "org.eclipse.scout.commons.annotations.Order");
 
     // fields of Calendar

@@ -192,7 +192,6 @@ public interface IRuntimeClasses {
   String ILookupService = "org.eclipse.scout.rt.shared.services.lookup.ILookupService"; // NO_UCD
   String IMailField = "org.eclipse.scout.rt.client.ui.form.fields.mailfield.IMailField"; // NO_UCD
   String ITextProviderService = "org.eclipse.scout.rt.shared.services.common.text.ITextProviderService"; // NO_UCD
-  String IDocumentationTextProviderService = "org.eclipse.scout.rt.shared.services.common.text.IDocumentationTextProviderService"; // NO_UCD
   String IMenu = "org.eclipse.scout.rt.client.ui.action.menu.IMenu"; // NO_UCD
   String IMenuExtension = "org.eclipse.scout.rt.client.extension.ui.action.menu.IMenuExtension"; // NO_UCD
   String IMenuType = "org.eclipse.scout.rt.client.ui.action.menu.IMenuType"; // NO_UCD

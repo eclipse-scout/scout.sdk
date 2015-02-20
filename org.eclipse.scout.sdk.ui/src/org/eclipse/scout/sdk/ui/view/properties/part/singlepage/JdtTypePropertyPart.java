@@ -24,19 +24,15 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMethod;
-import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.commons.RunnableWithData;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
-import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.operation.util.CompilationUnitSaveOperation;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.DocumentationPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecMethodPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.ExecResetSearchFilterMethodPresenter;
 import org.eclipse.scout.sdk.ui.internal.view.properties.presenter.PageFilterPresenter;
@@ -84,7 +80,6 @@ import org.eclipse.scout.sdk.ui.view.properties.presenter.single.AbstractMethodP
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigPropertyType;
 import org.eclipse.scout.sdk.workspace.type.config.ConfigurationMethod;
 import org.eclipse.swt.SWT;
@@ -100,8 +95,6 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.forms.events.ExpansionAdapter;
-import org.eclipse.ui.forms.events.ExpansionEvent;
 import org.eclipse.ui.forms.events.HyperlinkAdapter;
 import org.eclipse.ui.forms.events.HyperlinkEvent;
 import org.eclipse.ui.forms.widgets.Hyperlink;
@@ -116,7 +109,6 @@ import org.eclipse.ui.forms.widgets.ScrolledForm;
  */
 public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart {
   protected static final String SECTION_ID_FILTER = "section.filter";
-  protected static final String SECTION_ID_DOCUMENTATION = "section.documentation";
   protected static final String SECTION_ID_PROPS_IMPORTANT = "section.properties.important";
   protected static final String SECTION_ID_PROPS_ADVANCED = "section.properties.advanced";
   protected static final String SECTION_ID_OPS_IMPORTANT = "section.operations.important";
@@ -234,13 +226,6 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
     return headArea;
   }
 
-  protected void createDocumentationSectionContent(ISection docSection) {
-    DocumentationPresenter docPresenter = new DocumentationPresenter(getFormToolkit(), docSection.getSectionClient(), getPage());
-    GridData layoutData = new GridData(GridData.FILL_HORIZONTAL | GridData.GRAB_HORIZONTAL);
-    layoutData.widthHint = 200;
-    docPresenter.getContainer().setLayoutData(layoutData);
-  }
-
   @Override
   protected void createSections() {
     if (m_updateJob == null) {
@@ -255,36 +240,6 @@ public class JdtTypePropertyPart extends AbstractSinglePageSectionBasedViewPart 
       layoutData.widthHint = 200;
       filterPresenter.getContainer().setLayoutData(layoutData);
       filterSection.setExpanded(wasSectionExpanded(SECTION_ID_FILTER, false));
-    }
-
-    // documentation
-    IScoutBundle bundle = getPage().getScoutBundle();
-    if (bundle != null) {
-      INlsProject docsNlsProject = bundle.getDocsNlsProject();
-      if (docsNlsProject != null) {
-        IType iTypeWithClassId = TypeUtility.getType(IRuntimeClasses.ITypeWithClassId);
-        if (TypeUtility.exists(iTypeWithClassId) && TypeUtility.exists(getPage().getType())) {
-          if (TypeUtility.getSupertypeHierarchy(getPage().getType()).contains(iTypeWithClassId)) {
-            // documentation is supported
-            final ISection docSection = createSection(SECTION_ID_DOCUMENTATION, Texts.get("Documentation"));
-            docSection.setExpanded(wasSectionExpanded(SECTION_ID_DOCUMENTATION, false));
-            if (docSection.isExpanded()) {
-              createDocumentationSectionContent(docSection);
-            }
-            else {
-              docSection.addExpansionListener(new ExpansionAdapter() {
-                @Override
-                public void expansionStateChanging(ExpansionEvent e) {
-                  if (e.getState()) {
-                    createDocumentationSectionContent(docSection);
-                    docSection.removeExpansionListener(this);
-                  }
-                }
-              });
-            }
-          }
-        }
-      }
     }
 
     try {

@@ -97,7 +97,6 @@ public class ScoutBundle implements IScoutBundle {
   private ITypeHierarchyChangedListener m_textProvidersChangedListener;
   private IEclipsePreferences m_projectPreferences;
   private volatile Holder<INlsProject> m_nlsProjectHolder;
-  private volatile Holder<INlsProject> m_docsNlsProjectHolder;
   private volatile IIconProvider m_iconProvider;
   private volatile IPackageFragmentRoot m_rootPackage;
 
@@ -118,7 +117,6 @@ public class ScoutBundle implements IScoutBundle {
     m_hash = m_id.hashCode();
 
     m_nlsProjectHolder = null;
-    m_docsNlsProjectHolder = null;
     m_projectPreferences = null;
     m_iconProvider = null;
     m_rootPackage = null;
@@ -300,29 +298,6 @@ public class ScoutBundle implements IScoutBundle {
             INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(IRuntimeClasses.TEXTS), this});
             result.setValue(nlsProject);
             m_nlsProjectHolder = result;
-          }
-          catch (CoreException e) {
-            ScoutSdk.logError("error loading NLS project for: '" + getSymbolicName() + "'.", e);
-          }
-        }
-      }
-    }
-    return result.getValue();
-  }
-
-  @Override
-  public INlsProject getDocsNlsProject() {
-    Holder<INlsProject> result = m_docsNlsProjectHolder;
-    if (result == null) {
-      synchronized (this) {
-        result = m_docsNlsProjectHolder;
-        if (result == null) {
-          try {
-            registerNlsServiceListener();
-            result = new Holder<>(INlsProject.class, null);
-            INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(IRuntimeClasses.IDocumentationTextProviderService), this});
-            result.setValue(nlsProject);
-            m_docsNlsProjectHolder = result;
           }
           catch (CoreException e) {
             ScoutSdk.logError("error loading NLS project for: '" + getSymbolicName() + "'.", e);
@@ -546,7 +521,6 @@ public class ScoutBundle implements IScoutBundle {
 
   private synchronized void clearNlsCache() {
     m_nlsProjectHolder = null;
-    m_docsNlsProjectHolder = null;
     if (m_textProvidersChangedListener != null) {
       IType abstractDynamicNlsTextProviderService = TypeUtility.getType(IRuntimeClasses.AbstractDynamicNlsTextProviderService);
       if (TypeUtility.exists(abstractDynamicNlsTextProviderService)) {

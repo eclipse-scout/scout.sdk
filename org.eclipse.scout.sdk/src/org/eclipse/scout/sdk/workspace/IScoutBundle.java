@@ -321,14 +321,6 @@ public interface IScoutBundle extends IAdaptable {
   INlsProject getNlsProject();
 
   /**
-   * gets the documentation NLS project tree for this bundle.
-   *
-   * @return the documentation NLS project
-   * @see INlsProject
-   */
-  INlsProject getDocsNlsProject();
-
-  /**
    * gets the icon provider for this bundle
    *
    * @return the icon provider for this bundle

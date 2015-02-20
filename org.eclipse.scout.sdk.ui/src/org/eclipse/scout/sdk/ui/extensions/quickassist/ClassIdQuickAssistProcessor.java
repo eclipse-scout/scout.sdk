@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.extensions.quickassist;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.core.runtime.CoreException;
@@ -40,22 +41,15 @@ import org.eclipse.jdt.ui.text.java.IJavaCompletionProposal;
 import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IQuickAssistProcessor;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.scout.nls.sdk.model.INlsEntry;
-import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.extensions.classidgenerators.ClassIdGenerators;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.ui.internal.ScoutSdkUi;
-import org.eclipse.scout.sdk.ui.internal.SdkIcons;
 import org.eclipse.scout.sdk.ui.util.proposal.CUCorrectionProposal;
 import org.eclipse.scout.sdk.util.ast.visitor.DefaultAstVisitor;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.widgets.Shell;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
 
@@ -72,23 +66,10 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
   public IJavaCompletionProposal[] getAssists(final IInvocationContext context, IProblemLocation[] locations) throws CoreException {
     final ClassIdTarget selectedType = getTarget(context.getCoveringNode());
     if (selectedType != null) {
-      ArrayList<IJavaCompletionProposal> proposals = new ArrayList<>(2);
+      List<IJavaCompletionProposal> proposals = new ArrayList<>(1);
       if (!TypeUtility.exists(selectedType.annotation)) {
         CompilationUnitRewrite rewrite = createRewrite(selectedType.type, selectedType.td);
         proposals.add(new ClassIdAddProposal(rewrite));
-      }
-
-      ClassIdDocumentationSupport support = new ClassIdDocumentationSupport(selectedType.type);
-      if (support.getNlsProject() != null) {
-        proposals.add(new EditDocumentationProposal(support));
-        support.addModifiedListener(new IClassIdDocumentationListener() {
-          @Override
-          public void modified(int eventType, INlsEntry entry, IType owner) {
-            if (eventType == IClassIdDocumentationListener.TYPE_NLS_VALUE_CREATED_NEW_CLASS_ID) {
-              ScoutSdkUi.showJavaElementInEditor(selectedType.type, false);
-            }
-          }
-        });
       }
 
       if (proposals.size() > 0) {
@@ -247,53 +228,6 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
       if (m_rewrite.getImportRewrite().hasRecordedChanges()) {
         editRoot.addChild(m_rewrite.getImportRewrite().rewriteImports(null));
       }
-    }
-  }
-
-  private static final class EditDocumentationProposal implements IJavaCompletionProposal {
-
-    private final ClassIdDocumentationSupport m_support;
-
-    private EditDocumentationProposal(ClassIdDocumentationSupport support) {
-      m_support = support;
-    }
-
-    @Override
-    public void apply(IDocument document) {
-      Shell shell = ScoutSdkUi.getShell();
-      if (shell != null) {
-        m_support.editDocumentation(shell);
-      }
-    }
-
-    @Override
-    public Point getSelection(IDocument document) {
-      return null;
-    }
-
-    @Override
-    public String getAdditionalProposalInfo() {
-      return Texts.get("EditDocumentationForClass", m_support.getType().getFullyQualifiedName().replace('$', '.'));
-    }
-
-    @Override
-    public String getDisplayString() {
-      return Texts.get("EditDocumentation");
-    }
-
-    @Override
-    public Image getImage() {
-      return ScoutSdkUi.getImage(SdkIcons.Text);
-    }
-
-    @Override
-    public IContextInformation getContextInformation() {
-      return null;
-    }
-
-    @Override
-    public int getRelevance() {
-      return 0;
     }
   }
 

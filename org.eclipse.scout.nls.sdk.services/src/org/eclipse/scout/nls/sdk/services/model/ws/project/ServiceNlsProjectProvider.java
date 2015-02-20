@@ -40,7 +40,6 @@ import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.IScoutBundle;
 import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
@@ -56,7 +55,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
    * @throws JavaModelException
    */
   public static Set<IType> getRegisteredTextProviderTypes() throws JavaModelException {
-    Set<IType> registeredTextProviderTypes = getRegisteredTextProviderTypes(null, null);
+    Set<IType> registeredTextProviderTypes = getRegisteredTextProviderTypes(null);
     if (registeredTextProviderTypes != null) {
       return registeredTextProviderTypes;
     }
@@ -77,7 +76,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
    * @return
    * @throws JavaModelException
    */
-  private static Set<IType> getRegisteredTextProviderTypes(Boolean returnDocServices, final Set<String> projectFilter) throws JavaModelException {
+  private static Set<IType> getRegisteredTextProviderTypes(final Set<String> projectFilter) throws JavaModelException {
 
     final class TextProviderService {
       private final IType textProvider;
@@ -153,7 +152,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         if (IRuntimeClasses.EXTENSION_ELEMENT_SERVICE.equals(c.getName())) {
           String serviceClassDef = c.getAttribute("class");
           IType serviceImpl = typeMap.get(serviceClassDef);
-          if (acceptsFilter(returnDocServices, projectFilter, serviceImpl)) {
+          if (acceptsFilter(projectFilter, serviceImpl)) {
             TextProviderService s = new TextProviderService(serviceImpl);
             TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(s, getPriority(serviceImpl, c));
 
@@ -215,33 +214,19 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return -1;
   }
 
-  private static boolean acceptsFilter(Boolean returnDocServices, Set<String> projects, IType candidate) throws JavaModelException {
+  private static boolean acceptsFilter(Set<String> projects, IType candidate) throws JavaModelException {
     if (candidate == null) {
       return false;
     }
-    boolean acceptsDocPart = returnDocServices == null || returnDocServices == isDocsService(candidate);
-    if (acceptsDocPart) {
-      if (candidate.isReadOnly()) {
-        return true; // always include all text services from the platform
-      }
-      if (projects == null) {
-        return true; // no project filter and doc filter is valid -> filter matches
-      }
-
-      // check project filter
-      return projects.contains(candidate.getJavaProject().getProject().getName());
+    if (candidate.isReadOnly()) {
+      return true; // always include all text services from the platform
     }
-    return false;
-  }
-
-  private static boolean isDocsService(IType service) throws JavaModelException {
-    ITypeHierarchy th = TypeUtility.getSupertypeHierarchy(service);
-    for (IType ifs : th.getAllSuperInterfaces(service)) {
-      if (IRuntimeClasses.IDocumentationTextProviderService.equals(ifs.getFullyQualifiedName())) {
-        return true;
-      }
+    if (projects == null) {
+      return true; // no project filter and doc filter is valid -> filter matches
     }
-    return false;
+
+    // check project filter
+    return projects.contains(candidate.getJavaProject().getProject().getName());
   }
 
   private static float getPriority(IType registration, IConfigurationElement config) {
@@ -288,8 +273,8 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return new ServiceNlsProject(type);
   }
 
-  private INlsProject getNlsProjectTree(boolean returnDocServices, Set<String> projectFilter) throws CoreException {
-    Set<IType> registeredTextProviderTypes = getRegisteredTextProviderTypes(returnDocServices, projectFilter);
+  private INlsProject getNlsProjectTreeProjectName(Set<String> projectFilter) throws CoreException {
+    Set<IType> registeredTextProviderTypes = getRegisteredTextProviderTypes(projectFilter);
     if (registeredTextProviderTypes == null) {
       return null;
     }
@@ -351,7 +336,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   }
 
   private INlsProject getNlsProjectTree(IType type) throws CoreException {
-    Set<IType> nlsProviders = getRegisteredTextProviderTypes(isDocsService(type), getProjectNames(getScoutBundlesForType(type)));
+    Set<IType> nlsProviders = getRegisteredTextProviderTypes(getProjectNames(getScoutBundlesForType(type)));
     if (nlsProviders == null) {
       return null;
     }
@@ -390,25 +375,22 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         }
       }
       else if (args.length == 2 && args[0] instanceof IType) {
-        IType t1 = (IType) args[0];
-        boolean returnDocServices = !(IRuntimeClasses.TEXTS.equals(t1.getFullyQualifiedName()));
-
         if (args[1] instanceof IScoutBundle || args[1] == null) {
           // all text services in the given project with given kind (texts or normal)
-          return getAllProjects(returnDocServices, getParentSharedBundlesFor((IScoutBundle) args[1]));
+          return getAllProjects(getParentSharedBundlesFor((IScoutBundle) args[1]));
         }
         else if (args[1] instanceof IType) {
           // all text services with given kind available in the plugins defining the given type
-          return getAllProjects(returnDocServices, getScoutBundlesForType((IType) args[1]));
+          return getAllProjects(getScoutBundlesForType((IType) args[1]));
         }
       }
     }
     return null;
   }
 
-  private INlsProject getAllProjects(boolean returnDocServices, Set<? extends IScoutBundle> wsBundles) {
+  private INlsProject getAllProjects(Set<? extends IScoutBundle> wsBundles) {
     try {
-      return getNlsProjectTree(returnDocServices, getProjectNames(wsBundles));
+      return getNlsProjectTreeProjectName(getProjectNames(wsBundles));
     }
     catch (CoreException e) {
       NlsCore.logWarning("Could not load full text provider service tree.", e);

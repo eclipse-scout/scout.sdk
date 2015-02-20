@@ -66,7 +66,6 @@ public class FillSharedPluginOperation extends AbstractScoutProjectNewOperation 
     new InstallJavaFileOperation("templates/shared/src/Activator.java", destPathPref + "Activator.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/shared/src/Icons.java", destPathPref + "Icons.java", m_project, props).run(monitor, workingCopyManager);
     new InstallJavaFileOperation("templates/shared/src/DefaultTextProviderService.java", destPathPref + "services/common/text/" + txtSvcName + "TextProviderService.java", m_project, props).run(monitor, workingCopyManager);
-    new InstallJavaFileOperation("templates/shared/src/DocumentationTextProviderService.java", destPathPref + "services/common/text/" + docSvcName + "TextProviderService.java", m_project, props).run(monitor, workingCopyManager);
     m_project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
   }
 }
