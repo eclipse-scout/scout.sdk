@@ -24,7 +24,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
@@ -180,7 +179,7 @@ public class NlsSdkSimple extends AbstractUIPlugin {
    */
   public static List<IFile> getAllTranslations(IProject toLookAt, IPath path, String fileNamePrefix) throws CoreException {
     List<IFolder> folders = new LinkedList<>();
-    List<INlsFolder> nlsFolders = getFoldersOfProject(toLookAt, path, true);
+    List<INlsFolder> nlsFolders = getFoldersOfProject(toLookAt, path);
     for (INlsFolder folder : nlsFolders) {
       folders.add(folder.getFolder());
     }
@@ -203,29 +202,27 @@ public class NlsSdkSimple extends AbstractUIPlugin {
     return files;
   }
 
-  public static List<INlsFolder> getFoldersOfProject(IProject project, IPath path, boolean runntimeDir) throws CoreException {
+  public static List<INlsFolder> getFoldersOfProject(IProject project, IPath path) throws CoreException {
     List<INlsFolder> folders = new LinkedList<>();
-    if (project.isOpen()) {
-      if (project.hasNature(JavaCore.NATURE_ID)) {
-        // check runtime dir
-        if (runntimeDir) {
-          IJavaProject jp = JavaCore.create(project);
-          IClasspathEntry[] clEntries = jp.getRawClasspath();
-          for (IClasspathEntry entry : clEntries) {
-            if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
-              IPath toCheck = new Path(entry.getPath().lastSegment()).append(path);
-              if (project.getFolder(toCheck).exists()) {
-                folders.add(new NlsFolder(project.getFolder(toCheck), INlsFolder.TYPE_PACKAGE_FOLDER));
-              }
-            }
+    if (project.isOpen() && project.hasNature(JavaCore.NATURE_ID)) {
+      // check runtime dir
+      IJavaProject jp = JavaCore.create(project);
+      IClasspathEntry[] clEntries = jp.getRawClasspath();
+      for (IClasspathEntry entry : clEntries) {
+        if (entry.getEntryKind() == IClasspathEntry.CPE_SOURCE) {
+          IPath toCheck = entry.getPath().append(path);
+          IFolder folder = ResourcesPlugin.getWorkspace().getRoot().getFolder(toCheck);
+          if (folder.exists()) {
+            folders.add(new NlsFolder(folder, INlsFolder.TYPE_PACKAGE_FOLDER));
           }
-        }
-        IFolder foundFolder = project.getFolder(path);
-        if (foundFolder != null && foundFolder.exists()) {
-          folders.add(new NlsFolder(foundFolder, INlsFolder.TYPE_SIMPLE_FOLDER));
         }
       }
 
+      // check path relative to project
+      IFolder foundFolder = project.getFolder(path);
+      if (foundFolder != null && foundFolder.exists()) {
+        folders.add(new NlsFolder(foundFolder, INlsFolder.TYPE_SIMPLE_FOLDER));
+      }
     }
     return folders;
   }

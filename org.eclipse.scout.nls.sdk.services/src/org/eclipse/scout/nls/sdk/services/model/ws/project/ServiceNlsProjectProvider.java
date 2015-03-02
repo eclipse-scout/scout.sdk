@@ -23,6 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.IExtension;
 import org.eclipse.jdt.core.IAnnotation;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
@@ -35,6 +36,7 @@ import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.sdk.ScoutSdkCore;
+import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
@@ -309,30 +311,38 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return root;
   }
 
-  private static Set<String> getProjectNames(Set<? extends IScoutBundle> scoutBundles) {
+  private static Set<String> getProjectNames(Set<? extends IJavaProject> scoutBundles) {
     if (scoutBundles == null || scoutBundles.size() < 1) {
       return null;
     }
 
     Set<String> names = new HashSet<>(scoutBundles.size());
-    for (IScoutBundle b : scoutBundles) {
-      names.add(b.getSymbolicName());
+    for (IJavaProject p : scoutBundles) {
+      names.add(p.getElementName());
     }
     return names;
   }
 
-  private static Set<? extends IScoutBundle> getScoutBundlesForType(IType type) {
-    IScoutBundle b = ScoutTypeUtility.getScoutBundle(type.getJavaProject());
+  private static Set<? extends IJavaProject> getScoutBundlesForType(IType type) {
+    IJavaProject javaProject = type.getJavaProject();
+    IScoutBundle b = ScoutTypeUtility.getScoutBundle(javaProject);
+    if (b == null && RuntimeBundles.contains(javaProject.getElementName())) {
+      // it is an RT bundle: directly return the bundle
+      return CollectionUtility.hashSet(javaProject);
+    }
     return getParentSharedBundlesFor(b);
   }
 
-  private static Set<? extends IScoutBundle> getParentSharedBundlesFor(IScoutBundle b) {
-    if (b != null) {
-      return b.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
-    }
-    else {
+  private static Set<? extends IJavaProject> getParentSharedBundlesFor(IScoutBundle b) {
+    if (b == null) {
       return null;
     }
+    Set<? extends IScoutBundle> parentBundles = b.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
+    Set<IJavaProject> parentProjects = new HashSet<>(parentBundles.size());
+    for (IScoutBundle sb : parentBundles) {
+      parentProjects.add(sb.getJavaProject());
+    }
+    return parentProjects;
   }
 
   private INlsProject getNlsProjectTree(IType type) throws CoreException {
@@ -388,7 +398,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return null;
   }
 
-  private INlsProject getAllProjects(Set<? extends IScoutBundle> wsBundles) {
+  private INlsProject getAllProjects(Set<? extends IJavaProject> wsBundles) {
     try {
       return getNlsProjectTreeProjectName(getProjectNames(wsBundles));
     }
