@@ -43,11 +43,11 @@ import org.eclipse.jdt.core.search.TypeReferenceMatch;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.scout.commons.StringUtility;
-import org.eclipse.scout.commons.job.JobEx;
 import org.eclipse.scout.sdk.ScoutSdkCore;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.ScoutSdk;
+import org.eclipse.scout.sdk.jobs.JobEx;
 import org.eclipse.scout.sdk.jobs.OperationJob;
 import org.eclipse.scout.sdk.util.jdt.IJavaResourceChangedListener;
 import org.eclipse.scout.sdk.util.jdt.JdtEvent;
@@ -86,27 +86,27 @@ public final class ClassIdValidationJob extends JobEx {
       e.search(SearchPattern.createPattern(m_classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH),
           new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
           SearchEngine.createWorkspaceScope(), new SearchRequestor() {
-        @Override
-        public void acceptSearchMatch(SearchMatch match) throws CoreException {
-          if (monitor.isCanceled()) {
-            return;
-          }
-          Object owner = match.getElement();
-          if (owner instanceof IType) {
-            IType ownerType = (IType) owner;
-            if (TypeUtility.exists(ownerType)) {
-              IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
-              if (element == null) {
-                // e.g. when the annotation is fully qualified. try reading from owner
-                element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
+            @Override
+            public void acceptSearchMatch(SearchMatch match) throws CoreException {
+              if (monitor.isCanceled()) {
+                return;
               }
-              if (element instanceof IAnnotation && TypeUtility.exists(element)) {
-                result.add((IAnnotation) element);
+              Object owner = match.getElement();
+              if (owner instanceof IType) {
+                IType ownerType = (IType) owner;
+                if (TypeUtility.exists(ownerType)) {
+                  IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
+                  if (element == null) {
+                    // e.g. when the annotation is fully qualified. try reading from owner
+                    element = JdtUtility.getAnnotation(ownerType, IRuntimeClasses.ClassId);
+                  }
+                  if (element instanceof IAnnotation && TypeUtility.exists(element)) {
+                    result.add((IAnnotation) element);
+                  }
+                }
               }
             }
-          }
-        }
-      }, monitor);
+          }, monitor);
     }
     catch (IllegalStateException ise) {
       // nop (workspace closed)
