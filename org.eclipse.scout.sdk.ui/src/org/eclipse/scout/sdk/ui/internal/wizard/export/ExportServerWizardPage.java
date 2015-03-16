@@ -56,7 +56,7 @@ public class ExportServerWizardPage extends AbstractExportProductWizardPage {
 
   private String findServerWarName() {
     try {
-      List<IResource> swingOrSwtProductFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(true, IRuntimeClasses.ScoutUiSwingBundleId, IRuntimeClasses.ScoutUiSwtBundleId));
+      List<IResource> swingOrSwtProductFiles = ResourceUtility.getAllResources(ResourceFilters.getProductFileByContentFilter(true, IRuntimeClasses.ScoutUiSwingBundleId));
       for (IResource r : swingOrSwtProductFiles) {
         ProductFileModelHelper pfmh = new ProductFileModelHelper((IFile) r);
         String serverUrl = pfmh.ConfigurationFile.getEntry("server.url");

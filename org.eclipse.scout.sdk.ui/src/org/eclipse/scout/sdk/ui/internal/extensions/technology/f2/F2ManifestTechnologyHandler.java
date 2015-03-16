@@ -43,7 +43,7 @@ public class F2ManifestTechnologyHandler extends AbstractScoutTechnologyHandler 
 
   @Override
   public boolean isActive(IScoutBundle project) {
-    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), false) != null;
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), false) != null;
   }
 
   @Override
@@ -52,7 +52,7 @@ public class F2ManifestTechnologyHandler extends AbstractScoutTechnologyHandler 
   }
 
   private Set<? extends IScoutBundle> getUiBundlesBelow(IScoutBundle start) {
-    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), true);
+    return start.getChildBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true);
   }
 
 }

@@ -16,9 +16,6 @@
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.debug"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.help"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.parent"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.rap"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.rap-feature"/>
-<project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.rap.ui"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.team-project-set"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.test"/>
 <project reference="1.0,git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git,develop,org.eclipse.scout.sdk.test-feature"/>
@@ -39,9 +36,6 @@
 <item elementID="=org.eclipse.scout.sdk.debug" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.sdk.help" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.sdk.parent" type="4"/>
-<item elementID="=org.eclipse.scout.sdk.rap" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
-<item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.sdk.rap-feature" type="4"/>
-<item elementID="=org.eclipse.scout.sdk.rap.ui" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item factoryID="org.eclipse.ui.internal.model.ResourceFactory" path="/org.eclipse.scout.sdk.team-project-set" type="4"/>
 <item elementID="=org.eclipse.scout.sdk.util" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>
 <item elementID="=org.eclipse.scout.sdk.ws.jaxws" factoryID="org.eclipse.jdt.ui.PersistableJavaElementFactory"/>

@@ -49,13 +49,12 @@ public class ScoutProjectCreateTest extends AbstractScoutSdkTest {
   public void testCreateBundles() throws Exception {
     try {
       ScoutSdkCore.getScoutWorkspace();
-      IScoutBundle project = ScoutProjectHelper.setupNewProject("org.eclipse.testapp", true, true, true, true, false);
+      IScoutBundle project = ScoutProjectHelper.setupNewProject("org.eclipse.testapp", true, true, true, true);
       TestWorkspaceUtility.assertNoCompileErrors();
       Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT), false));
       Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true));
       Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER), false));
-      Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWT), false));
-      Assert.assertNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), false));
+      Assert.assertNotNull(project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), false));
     }
     finally {
       clearWorkspace();

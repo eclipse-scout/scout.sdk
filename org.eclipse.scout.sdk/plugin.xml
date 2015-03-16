@@ -204,11 +204,6 @@
             referenceId="create.client">
       </operation>
       <operation
-            class="org.eclipse.scout.sdk.operation.project.CreateUiSwtPluginOperation"
-            id="create.ui.swt"
-            referenceId="create.client">
-      </operation>
-      <operation
             class="org.eclipse.scout.sdk.operation.project.FillClientPluginOperation"
             id="fill.client"
             referenceId="create.client">
@@ -229,11 +224,6 @@
             referenceId="create.ui.swing">
       </operation>
       <operation
-            class="org.eclipse.scout.sdk.operation.project.FillUiSwtPluginOperation"
-            id="fill.ui.swt"
-            referenceId="create.ui.swt">
-      </operation>
-      <operation
             class="org.eclipse.scout.sdk.operation.project.template.SingleFormTemplateOperation"
             id="template.singleform"
             referenceId="fill.client">
@@ -249,21 +239,6 @@
             referenceId="fill.server">
       </operation>
       <operation
-            class="org.eclipse.scout.sdk.operation.project.SwtPluginXmlUpgradeOperation"
-            id="finalize.ui.swt.plugin.xml"
-            referenceId="fill.ui.swt">
-      </operation>
-      <operation
-            class="org.eclipse.scout.sdk.operation.project.SwtProductFileMacOsXOperation"
-            id="finalize.ui.swt.product.macosx"
-            referenceId="fill.ui.swt">
-      </operation>
-      <operation
-            class="org.eclipse.scout.sdk.operation.project.SwtProductFileUpgradeOperation"
-            id="finalize.ui.swt.products"
-            referenceId="fill.ui.swt">
-      </operation>
-      <operation
             class="org.eclipse.scout.sdk.operation.project.SwingProductFileUpgradeOperation"
             id="finalize.ui.swing.products"
             referenceId="fill.ui.swing">
@@ -277,12 +252,6 @@
             class="org.eclipse.scout.sdk.operation.project.SwingProductFileFillOperation"
             id="fill.ui.swing.product"
             referenceId="fill.ui.swing">
-      </operation>
-      <operation
-            class="org.eclipse.scout.sdk.operation.project.SwtProductFileFillOperation"
-            execAfterReference="true"
-            id="fill.ui.swt.product"
-            referenceId="fill.ui.swt">
       </operation>
    </extension>
    <extension

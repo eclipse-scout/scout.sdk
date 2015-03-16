@@ -1,19 +1,20 @@
 package @@BUNDLE_SWING_NAME@@;
 
 import java.security.PrivilegedExceptionAction;
+
 import javax.security.auth.Subject;
+
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.net.NetActivator;
-import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
 import org.eclipse.scout.commons.security.SimplePrincipal;
+import org.eclipse.scout.rt.client.IClientSession;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.ui.swing.AbstractSwingApplication;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
-import org.eclipse.scout.service.SERVICES;
-import @@BUNDLE_CLIENT_NAME@@.ClientSession;
-
 
 public class SwingApplication extends AbstractSwingApplication{
   private static final IScoutLogger LOG = ScoutLogManager.getLogger(SwingApplication.class);
@@ -31,23 +32,22 @@ public class SwingApplication extends AbstractSwingApplication{
   }
 
   @Override
-  protected ISwingEnvironment createSwingEnvironment(){
+  protected ISwingEnvironment createSwingEnvironment() {
     return new SwingEnvironment();
   }
 
-  private Object startSecure(IApplicationContext context) throws Exception{
-    try{
-      NetActivator.install();
-    }
-    catch(Throwable t){
-      // no net handler found
-      LOG.warn("NetActivator is not available", t);
-    }
+  private Object startSecure(IApplicationContext context) throws Exception {
     return super.start(context);
   }
 
   @Override
   protected IClientSession getClientSession() {
-    return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(ClientSession.class, initUserAgent());
+    try {
+      return OBJ.one(ClientSessionProvider.class).provide(ClientJobInput.defaults().userAgent(initUserAgent()));
+    }
+    catch (ProcessingException e) {
+      LOG.error("Unable to create client session.", e);
+      return null;
+    }
   }
 }

@@ -3,8 +3,8 @@ package @@BUNDLE_SERVER_NAME@@;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.server.ServerJob;
 import org.eclipse.scout.rt.server.AbstractServerSession;
+import org.eclipse.scout.rt.server.session.ServerSessionProvider;
 
 public class ServerSession extends AbstractServerSession{
   private static final long serialVersionUID = 1L;
@@ -18,7 +18,7 @@ public class ServerSession extends AbstractServerSession{
    * @return session in current ThreadContext
    */
   public static ServerSession get(){
-    return ServerJob.getCurrentSession(ServerSession.class);
+    return ServerSessionProvider.currentSession(ServerSession.class);
   }
 
   @Override

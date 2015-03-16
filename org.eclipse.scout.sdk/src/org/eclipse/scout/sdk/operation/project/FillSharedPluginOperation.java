@@ -52,14 +52,9 @@ public class FillSharedPluginOperation extends AbstractScoutProjectNewOperation 
     return getProperties().getProperty(CreateSharedPluginOperation.PROP_TEXT_SERVICE_NAME, String.class);
   }
 
-  private String getDocTextProviderServiceName() {
-    return getProperties().getProperty(CreateSharedPluginOperation.PROP_DOC_TEXT_SERVICE_NAME, String.class);
-  }
-
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     String txtSvcName = getTextProviderServiceName();
-    String docSvcName = getDocTextProviderServiceName();
 
     String destPathPref = TypeUtility.DEFAULT_SOURCE_FOLDER_NAME + "/" + m_project.getName().replace('.', '/') + "/";
     Map<String, String> props = getStringProperties();

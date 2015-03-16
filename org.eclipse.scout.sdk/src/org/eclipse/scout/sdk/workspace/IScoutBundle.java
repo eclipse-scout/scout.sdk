@@ -50,7 +50,6 @@ public interface IScoutBundle extends IAdaptable {
   String TYPE_SHARED = "SHARED";
   String TYPE_SERVER = "SERVER";
   String TYPE_UI_SWING = "UI_SWING";
-  String TYPE_UI_SWT = "UI_SWT";
 
   /**
    * Gets the type of this Scout bundle. <br>

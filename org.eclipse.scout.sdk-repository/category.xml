@@ -6,12 +6,6 @@
    <feature url="features/org.eclipse.scout.sdk.source_0.0.0.qualifier.jar" id="org.eclipse.scout.sdk.source" version="0.0.0">
       <category name="Eclipse Scout SDK"/>
    </feature>
-   <feature url="features/org.eclipse.scout.sdk.rap.source_0.0.0.qualifier.jar" id="org.eclipse.scout.sdk.rap.source" version="0.0.0">
-      <category name="Eclipse Scout SDK"/>
-   </feature>
-   <feature url="features/org.eclipse.scout.sdk.rap_0.0.0.qualifier.jar" id="org.eclipse.scout.sdk.rap" version="0.0.0">
-      <category name="Eclipse Scout SDK"/>
-   </feature>
    <feature url="features/org.eclipse.scout.sdk.testing_0.0.0.qualifier.jar" id="org.eclipse.scout.sdk.testing" version="0.0.0">
       <category name="Eclipse Scout SDK"/>
    </feature>

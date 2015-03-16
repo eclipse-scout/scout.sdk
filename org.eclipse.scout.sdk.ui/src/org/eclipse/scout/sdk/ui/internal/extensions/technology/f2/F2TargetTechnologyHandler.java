@@ -55,7 +55,7 @@ public class F2TargetTechnologyHandler extends AbstractScoutTechnologyHandler im
 
   @Override
   public boolean isActive(IScoutBundle project) {
-    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), false) != null;
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), false) != null;
   }
 
   @Override

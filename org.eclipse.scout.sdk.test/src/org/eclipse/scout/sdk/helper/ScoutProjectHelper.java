@@ -20,7 +20,6 @@ import org.eclipse.scout.sdk.operation.project.CreateClientPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateServerPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateSharedPluginOperation;
 import org.eclipse.scout.sdk.operation.project.CreateUiSwingPluginOperation;
-import org.eclipse.scout.sdk.operation.project.CreateUiSwtPluginOperation;
 import org.eclipse.scout.sdk.operation.project.IScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.project.ScoutProjectNewOperation;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
@@ -36,18 +35,18 @@ import org.junit.Assert;
  */
 public final class ScoutProjectHelper {
   public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server, PropertyMap properties) throws Exception {
-    return setupNewProject(projectName, client, shared, server, false, false, properties);
+    return setupNewProject(projectName, client, shared, server, false, properties);
   }
 
   public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server) throws Exception {
-    return setupNewProject(projectName, client, shared, server, false, false);
+    return setupNewProject(projectName, client, shared, server, false);
   }
 
-  public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwt, boolean uiSwing) throws Exception {
-    return setupNewProject(projectName, client, shared, server, uiSwt, uiSwing, new PropertyMap());
+  public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwing) throws Exception {
+    return setupNewProject(projectName, client, shared, server, uiSwing, new PropertyMap());
   }
 
-  public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwt, boolean uiSwing, PropertyMap properties) throws Exception {
+  public static IScoutBundle setupNewProject(String projectName, boolean client, boolean shared, boolean server, boolean uiSwing, PropertyMap properties) throws Exception {
     // define settings what to create
     properties.setProperty(IScoutProjectNewOperation.PROP_CREATED_BUNDLES, new ArrayList<>());
     properties.setProperty(IScoutProjectNewOperation.PROP_PROJECT_NAME, projectName);
@@ -65,9 +64,6 @@ public final class ScoutProjectHelper {
     }
     if (server) {
       nodesToCreate.add(CreateServerPluginOperation.BUNDLE_ID);
-    }
-    if (uiSwt) {
-      nodesToCreate.add(CreateUiSwtPluginOperation.BUNDLE_ID);
     }
     if (uiSwing) {
       nodesToCreate.add(CreateUiSwingPluginOperation.BUNDLE_ID);

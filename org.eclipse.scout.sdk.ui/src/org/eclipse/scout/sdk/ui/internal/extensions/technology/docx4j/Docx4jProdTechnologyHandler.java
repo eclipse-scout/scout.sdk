@@ -58,13 +58,12 @@ public class Docx4jProdTechnologyHandler extends AbstractScoutTechnologyHandler 
 
   @Override
   public boolean isActive(IScoutBundle project) {
-    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), true) != null;
+    return project.getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SERVER, IScoutBundle.TYPE_UI_SWING), true) != null;
   }
 
   @Override
   protected void contributeResources(IScoutBundle project, List<IScoutTechnologyResource> list) throws CoreException {
     contributeProductFiles(list, IRuntimeClasses.ScoutSharedBundleId, IRuntimeClasses.ScoutUiSwingBundleId);
-    contributeProductFiles(list, IRuntimeClasses.ScoutSharedBundleId, IRuntimeClasses.ScoutUiSwtBundleId);
     contributeProductFiles(list, IRuntimeClasses.ScoutSharedBundleId, IRuntimeClasses.ScoutServerBundleId);
   }
 }

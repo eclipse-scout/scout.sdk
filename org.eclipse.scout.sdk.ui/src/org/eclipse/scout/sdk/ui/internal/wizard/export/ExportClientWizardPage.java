@@ -275,7 +275,7 @@ public class ExportClientWizardPage extends AbstractWorkspaceWizardPage {
         IFile productFile = (IFile) node.getData();
         try {
           ProductFileModelHelper pfmh = new ProductFileModelHelper(productFile);
-          return pfmh.ProductFile.existsDependency(IRuntimeClasses.ScoutUiSwingBundleId) || pfmh.ProductFile.existsDependency(IRuntimeClasses.ScoutUiSwtBundleId);
+          return pfmh.ProductFile.existsDependency(IRuntimeClasses.ScoutUiSwingBundleId);
         }
         catch (CoreException e) {
           ScoutSdkUi.logError("Unable to parse product file '" + productFile.getFullPath().toOSString() + "'.", e);

@@ -27,7 +27,6 @@ public interface IRuntimeClasses {
   String ScoutSharedBundleId = RuntimeBundles.getBundleSymbolicName(IScoutBundle.TYPE_SHARED);
   String ScoutClientBundleId = RuntimeBundles.getBundleSymbolicName(IScoutBundle.TYPE_CLIENT);
   String ScoutServerBundleId = RuntimeBundles.getBundleSymbolicName(IScoutBundle.TYPE_SERVER);
-  String ScoutUiSwtBundleId = RuntimeBundles.getBundleSymbolicName(IScoutBundle.TYPE_UI_SWT);
   String ScoutUiSwingBundleId = RuntimeBundles.getBundleSymbolicName(IScoutBundle.TYPE_UI_SWING);
 
   // generic names

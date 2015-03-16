@@ -1,16 +1,18 @@
 package @@BUNDLE_CLIENT_NAME@@.ui.desktop;
 
+import @@BUNDLE_CLIENT_NAME@@.ClientSession;
+
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.keystroke.AbstractKeyStroke;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.bookmark.menu.AbstractBookmarkMenu;
 import org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage;
 import org.eclipse.scout.rt.client.ui.form.ScoutInfoForm;
-import @@BUNDLE_CLIENT_NAME@@.ClientSession;
 import org.eclipse.scout.rt.shared.TEXTS;
+import org.eclipse.scout.rt.shared.ui.UserAgentUtility;
 
 public class Desktop extends AbstractDesktop {
 
@@ -40,7 +42,7 @@ public class Desktop extends AbstractDesktop {
 
       @Override
       public void execAction() throws ProcessingException {
-        ClientSyncJob.getCurrentSession(ClientSession.class).stopSession();
+        ClientSessionProvider.currentSession(ClientSession.class).stopSession();
       }
     }
   }

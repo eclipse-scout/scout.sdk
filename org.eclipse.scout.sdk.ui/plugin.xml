@@ -841,12 +841,6 @@
          </singlePart>
       </part>
       <part
-            page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.UiSwtNodePage">
-         <singlePart
-               viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ProductLaunchPropertyPart">
-         </singlePart>
-      </part>
-      <part
             page="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.UiSwingNodePage">
          <singlePart
                viewPart="org.eclipse.scout.sdk.ui.view.properties.part.singlepage.ProductLaunchPropertyPart">
@@ -930,16 +924,6 @@
             id="org.eclipse.scout.sdk.ui.UiSwingBundle"
             launcherIcon="resources/icons/swingLauncher.gif"
             orderNumber="-510">
-      </bundleNode>
-      <bundleNode
-            bundleName="ui.swt"
-            bundleNewHandler="org.eclipse.scout.sdk.ui.internal.extensions.bundle.SwtScoutBundleExtension"
-            bundlePage="org.eclipse.scout.sdk.ui.internal.view.outline.pages.project.client.UiSwtNodePage"
-            bundleType="UI_SWT"
-            icon="resources/icons/uiBundle.png"
-            id="org.eclipse.scout.sdk.ui.UiSwtBundle"
-            launcherIcon="resources/icons/swtLauncher.gif"
-            orderNumber="-500">
       </bundleNode>
       <bundleNode
             bundleName="client"
@@ -1028,10 +1012,6 @@
       </handler>
       <handler
             class="org.eclipse.scout.sdk.ui.internal.extensions.technology.svg.SvgUiSwingTechnologyHandler"
-            technology="scout.technology.svg">
-      </handler>
-      <handler
-            class="org.eclipse.scout.sdk.ui.internal.extensions.technology.svg.SvgUiSwtTechnologyHandler"
             technology="scout.technology.svg">
       </handler>
       <technology

@@ -230,8 +230,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
     // keep current target
     if (JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutClientBundleId) != null && JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutServerBundleId) != null
-        && JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutSharedBundleId) != null && JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutUiSwingBundleId) != null
-        && JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutUiSwtBundleId) != null) {
+        && JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutSharedBundleId) != null && JdtUtility.getNewestBundleInActiveTargetPlatform(IRuntimeClasses.ScoutUiSwingBundleId) != null) {
       String ver = null;
       Version targetPlatformVersion = JdtUtility.getTargetPlatformVersion();
       if (targetPlatformVersion == null) {

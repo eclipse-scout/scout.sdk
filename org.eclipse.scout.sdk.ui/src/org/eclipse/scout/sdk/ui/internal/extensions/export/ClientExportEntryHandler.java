@@ -68,7 +68,7 @@ public class ClientExportEntryHandler implements IExportScoutProjectEntryHandler
 
   @Override
   public boolean isAvailable(IExportScoutProjectWizard wizard) {
-    return wizard.getProject().getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING, IScoutBundle.TYPE_UI_SWT), true) != null;
+    return wizard.getProject().getChildBundle(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_UI_SWING), true) != null;
   }
 
   @Override
