@@ -23,7 +23,6 @@ import java.util.Date;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriter;
 
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.commons.DateUtility;
 import org.eclipse.scout.commons.IOUtility;
 import org.eclipse.scout.commons.StringUtility;
@@ -35,7 +34,6 @@ import org.eclipse.scout.commons.dnd.TransferObject;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
 import org.eclipse.scout.rt.client.ui.IDNDSupport;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.action.menu.IMenu;
@@ -64,7 +62,6 @@ import org.eclipse.scout.rt.client.ui.form.fields.tabbox.AbstractTabBox;
 import org.eclipse.scout.rt.client.ui.form.fields.tablefield.AbstractTableField;
 import org.eclipse.scout.rt.shared.TEXTS;
 
-import com.bsiag.miniapp.client.ClientSession;
 import com.bsiag.miniapp.client.ui.forms.CompanyForm.MainBox.AlreadyExists_Button;
 import com.bsiag.miniapp.client.ui.forms.CompanyForm.MainBox.CancelButton;
 import com.bsiag.miniapp.client.ui.forms.CompanyForm.MainBox.DetailBox;
@@ -463,19 +460,6 @@ public class CompanyForm extends AbstractForm {
         }
 
         public void updateImageLater() {
-          new ClientSyncJob("load image for company", ClientSession.get()) {
-            private int laterCount = 2;
-
-            @Override
-            protected void runVoid(IProgressMonitor monitor) throws Throwable {
-              if (laterCount > 0) {
-                laterCount--;
-                this.schedule();
-              }
-              else {
-              }
-            }
-          }.schedule();
         }
 
         public void insertImage(BufferedImage image) throws ProcessingException {

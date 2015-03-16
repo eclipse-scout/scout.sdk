@@ -14,10 +14,10 @@ import java.util.Map;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.services.common.session.IJobRunnable;
 
 import formdata.shared.SharedAnnotation;
 
@@ -39,7 +39,7 @@ public class AnnotationCopyTestFormData extends AbstractFormData {
     return getFieldByClass(First.class);
   }
 
-  @SharedAnnotation(type = IJobRunnable.class)
+  @SharedAnnotation(type = IRunnable.class)
   public static class First extends AbstractValueFieldData<String> {
 
     private static final long serialVersionUID = 1L;

@@ -16,10 +16,11 @@ import java.util.Set;
 
 import javax.annotation.Generated;
 
+import org.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;
 import org.eclipse.scout.rt.shared.data.form.AbstractFormData;
 import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
-import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldData;
+import org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;
 import org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData;
 
 /**
@@ -156,335 +157,332 @@ public class CompanyFormData extends AbstractFormData {
     }
   }
 
-  public static class AdditionalInformationTable extends AbstractTableFieldData {
+  public static class AdditionalInformationTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-    public static final int ADDITIONAL_INFORMATION_COLUMN_ID = 0;
-    public static final int DISPLAY_COLUMN_ID = 1;
-    public static final int TEXT_COLUMN_ID = 2;
-    public static final int NUMBER_COLUMN_ID = 3;
-    public static final int DATE_COLUMN_ID = 4;
 
     public AdditionalInformationTable() {
     }
 
-    public Long getAdditionalInformation(int row) {
-      return (Long) getValueInternal(row, ADDITIONAL_INFORMATION_COLUMN_ID);
-    }
-
-    public void setAdditionalInformation(int row, Long additionalInformation) {
-      setValueInternal(row, ADDITIONAL_INFORMATION_COLUMN_ID, additionalInformation);
-    }
-
-    public Date getDate(int row) {
-      return (Date) getValueInternal(row, DATE_COLUMN_ID);
-    }
-
-    public void setDate(int row, Date date) {
-      setValueInternal(row, DATE_COLUMN_ID, date);
-    }
-
-    public String getDisplay(int row) {
-      return (String) getValueInternal(row, DISPLAY_COLUMN_ID);
-    }
-
-    public void setDisplay(int row, String display) {
-      setValueInternal(row, DISPLAY_COLUMN_ID, display);
-    }
-
-    public Double getNumber(int row) {
-      return (Double) getValueInternal(row, NUMBER_COLUMN_ID);
-    }
-
-    public void setNumber(int row, Double number) {
-      setValueInternal(row, NUMBER_COLUMN_ID, number);
-    }
-
-    public String getText(int row) {
-      return (String) getValueInternal(row, TEXT_COLUMN_ID);
-    }
-
-    public void setText(int row, String text) {
-      setValueInternal(row, TEXT_COLUMN_ID, text);
+    @Override
+    public AdditionalInformationTableRowData addRow() {
+      return (AdditionalInformationTableRowData) super.addRow();
     }
 
     @Override
-    public int getColumnCount() {
-      return 5;
+    public AdditionalInformationTableRowData addRow(int rowState) {
+      return (AdditionalInformationTableRowData) super.addRow(rowState);
     }
 
     @Override
-    public Object getValueAt(int row, int column) {
-      switch (column) {
-        case ADDITIONAL_INFORMATION_COLUMN_ID:
-          return getAdditionalInformation(row);
-        case DISPLAY_COLUMN_ID:
-          return getDisplay(row);
-        case TEXT_COLUMN_ID:
-          return getText(row);
-        case NUMBER_COLUMN_ID:
-          return getNumber(row);
-        case DATE_COLUMN_ID:
-          return getDate(row);
-        default:
-          return null;
+    public AdditionalInformationTableRowData createRow() {
+      return new AdditionalInformationTableRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return AdditionalInformationTableRowData.class;
+    }
+
+    @Override
+    public AdditionalInformationTableRowData[] getRows() {
+      return (AdditionalInformationTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public AdditionalInformationTableRowData rowAt(int index) {
+      return (AdditionalInformationTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(AdditionalInformationTableRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class AdditionalInformationTableRowData extends AbstractTableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String additionalInformation = "additionalInformation";
+      public static final String display = "display";
+      public static final String text = "text";
+      public static final String number = "number";
+      public static final String date = "date";
+      private Long m_additionalInformation;
+      private String m_display;
+      private String m_text;
+      private Double m_number;
+      private Date m_date;
+
+      public AdditionalInformationTableRowData() {
       }
-    }
 
-    @Override
-    public void setValueAt(int row, int column, Object value) {
-      switch (column) {
-        case ADDITIONAL_INFORMATION_COLUMN_ID:
-          setAdditionalInformation(row, (Long) value);
-          break;
-        case DISPLAY_COLUMN_ID:
-          setDisplay(row, (String) value);
-          break;
-        case TEXT_COLUMN_ID:
-          setText(row, (String) value);
-          break;
-        case NUMBER_COLUMN_ID:
-          setNumber(row, (Double) value);
-          break;
-        case DATE_COLUMN_ID:
-          setDate(row, (Date) value);
-          break;
+      public Long getAdditionalInformation() {
+        return m_additionalInformation;
+      }
+
+      public void setAdditionalInformation(Long additionalInformation) {
+        m_additionalInformation = additionalInformation;
+      }
+
+      public String getDisplay() {
+        return m_display;
+      }
+
+      public void setDisplay(String display) {
+        m_display = display;
+      }
+
+      public String getText() {
+        return m_text;
+      }
+
+      public void setText(String text) {
+        m_text = text;
+      }
+
+      public Double getNumber() {
+        return m_number;
+      }
+
+      public void setNumber(Double number) {
+        m_number = number;
+      }
+
+      public Date getDate() {
+        return m_date;
+      }
+
+      public void setDate(Date date) {
+        m_date = date;
       }
     }
   }
 
-  public static class AddressTable extends AbstractTableFieldData {
+  public static class AddressTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-    public static final int ADDRESS_TYPE_COLUMN_ID = 0;
-    public static final int ADDITIONAL_NAME_COLUMN_ID = 1;
-    public static final int STREET_COLUMN_ID = 2;
-    public static final int PO_BOX_COLUMN_ID = 3;
-    public static final int CITY_COLUMN_ID = 4;
-    public static final int PHONE_COLUMN_ID = 5;
-    public static final int FAX_COLUMN_ID = 6;
-    public static final int E_MAIL_COLUMN_ID = 7;
-    public static final int WWW_COLUMN_ID = 8;
 
     public AddressTable() {
     }
 
-    public String getAdditionalName(int row) {
-      return (String) getValueInternal(row, ADDITIONAL_NAME_COLUMN_ID);
-    }
-
-    public void setAdditionalName(int row, String additionalName) {
-      setValueInternal(row, ADDITIONAL_NAME_COLUMN_ID, additionalName);
-    }
-
-    public Long getAddressType(int row) {
-      return (Long) getValueInternal(row, ADDRESS_TYPE_COLUMN_ID);
-    }
-
-    public void setAddressType(int row, Long addressType) {
-      setValueInternal(row, ADDRESS_TYPE_COLUMN_ID, addressType);
-    }
-
-    public Long getCity(int row) {
-      return (Long) getValueInternal(row, CITY_COLUMN_ID);
-    }
-
-    public void setCity(int row, Long city) {
-      setValueInternal(row, CITY_COLUMN_ID, city);
-    }
-
-    public String getEMail(int row) {
-      return (String) getValueInternal(row, E_MAIL_COLUMN_ID);
-    }
-
-    public void setEMail(int row, String eMail) {
-      setValueInternal(row, E_MAIL_COLUMN_ID, eMail);
-    }
-
-    public String getFax(int row) {
-      return (String) getValueInternal(row, FAX_COLUMN_ID);
-    }
-
-    public void setFax(int row, String fax) {
-      setValueInternal(row, FAX_COLUMN_ID, fax);
-    }
-
-    public String getPOBox(int row) {
-      return (String) getValueInternal(row, PO_BOX_COLUMN_ID);
-    }
-
-    public void setPOBox(int row, String pOBox) {
-      setValueInternal(row, PO_BOX_COLUMN_ID, pOBox);
-    }
-
-    public String getPhone(int row) {
-      return (String) getValueInternal(row, PHONE_COLUMN_ID);
-    }
-
-    public void setPhone(int row, String phone) {
-      setValueInternal(row, PHONE_COLUMN_ID, phone);
-    }
-
-    public String getStreet(int row) {
-      return (String) getValueInternal(row, STREET_COLUMN_ID);
-    }
-
-    public void setStreet(int row, String street) {
-      setValueInternal(row, STREET_COLUMN_ID, street);
-    }
-
-    public String getWww(int row) {
-      return (String) getValueInternal(row, WWW_COLUMN_ID);
-    }
-
-    public void setWww(int row, String www) {
-      setValueInternal(row, WWW_COLUMN_ID, www);
+    @Override
+    public AddressTableRowData addRow() {
+      return (AddressTableRowData) super.addRow();
     }
 
     @Override
-    public int getColumnCount() {
-      return 9;
+    public AddressTableRowData addRow(int rowState) {
+      return (AddressTableRowData) super.addRow(rowState);
     }
 
     @Override
-    public Object getValueAt(int row, int column) {
-      switch (column) {
-        case ADDRESS_TYPE_COLUMN_ID:
-          return getAddressType(row);
-        case ADDITIONAL_NAME_COLUMN_ID:
-          return getAdditionalName(row);
-        case STREET_COLUMN_ID:
-          return getStreet(row);
-        case PO_BOX_COLUMN_ID:
-          return getPOBox(row);
-        case CITY_COLUMN_ID:
-          return getCity(row);
-        case PHONE_COLUMN_ID:
-          return getPhone(row);
-        case FAX_COLUMN_ID:
-          return getFax(row);
-        case E_MAIL_COLUMN_ID:
-          return getEMail(row);
-        case WWW_COLUMN_ID:
-          return getWww(row);
-        default:
-          return null;
+    public AddressTableRowData createRow() {
+      return new AddressTableRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return AddressTableRowData.class;
+    }
+
+    @Override
+    public AddressTableRowData[] getRows() {
+      return (AddressTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public AddressTableRowData rowAt(int index) {
+      return (AddressTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(AddressTableRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class AddressTableRowData extends AbstractTableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String addressType = "addressType";
+      public static final String additionalName = "additionalName";
+      public static final String street = "street";
+      public static final String pOBox = "pOBox";
+      public static final String city = "city";
+      public static final String phone = "phone";
+      public static final String fax = "fax";
+      public static final String eMail = "eMail";
+      public static final String www = "www";
+      private Long m_addressType;
+      private String m_additionalName;
+      private String m_street;
+      private String m_pOBox;
+      private Long m_city;
+      private String m_phone;
+      private String m_fax;
+      private String m_eMail;
+      private String m_www;
+
+      public AddressTableRowData() {
       }
-    }
 
-    @Override
-    public void setValueAt(int row, int column, Object value) {
-      switch (column) {
-        case ADDRESS_TYPE_COLUMN_ID:
-          setAddressType(row, (Long) value);
-          break;
-        case ADDITIONAL_NAME_COLUMN_ID:
-          setAdditionalName(row, (String) value);
-          break;
-        case STREET_COLUMN_ID:
-          setStreet(row, (String) value);
-          break;
-        case PO_BOX_COLUMN_ID:
-          setPOBox(row, (String) value);
-          break;
-        case CITY_COLUMN_ID:
-          setCity(row, (Long) value);
-          break;
-        case PHONE_COLUMN_ID:
-          setPhone(row, (String) value);
-          break;
-        case FAX_COLUMN_ID:
-          setFax(row, (String) value);
-          break;
-        case E_MAIL_COLUMN_ID:
-          setEMail(row, (String) value);
-          break;
-        case WWW_COLUMN_ID:
-          setWww(row, (String) value);
-          break;
+      public Long getAddressType() {
+        return m_addressType;
+      }
+
+      public void setAddressType(Long addressType) {
+        m_addressType = addressType;
+      }
+
+      public String getAdditionalName() {
+        return m_additionalName;
+      }
+
+      public void setAdditionalName(String additionalName) {
+        m_additionalName = additionalName;
+      }
+
+      public String getStreet() {
+        return m_street;
+      }
+
+      public void setStreet(String street) {
+        m_street = street;
+      }
+
+      public String getPOBox() {
+        return m_pOBox;
+      }
+
+      public void setPOBox(String pOBox) {
+        m_pOBox = pOBox;
+      }
+
+      public Long getCity() {
+        return m_city;
+      }
+
+      public void setCity(Long city) {
+        m_city = city;
+      }
+
+      public String getPhone() {
+        return m_phone;
+      }
+
+      public void setPhone(String phone) {
+        m_phone = phone;
+      }
+
+      public String getFax() {
+        return m_fax;
+      }
+
+      public void setFax(String fax) {
+        m_fax = fax;
+      }
+
+      public String getEMail() {
+        return m_eMail;
+      }
+
+      public void setEMail(String eMail) {
+        m_eMail = eMail;
+      }
+
+      public String getWww() {
+        return m_www;
+      }
+
+      public void setWww(String www) {
+        m_www = www;
       }
     }
   }
 
-  public static class ChangesTable extends AbstractTableFieldData {
+  public static class ChangesTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-    public static final int TYPE_COLUMN_ID = 0;
-    public static final int PERSON_COLUMN_ID = 1;
-    public static final int DATE_COLUMN_ID = 2;
-    public static final int MAIN_ACCOUNT_MANAGER_COLUMN_ID = 3;
 
     public ChangesTable() {
     }
 
-    public Date getDate(int row) {
-      return (Date) getValueInternal(row, DATE_COLUMN_ID);
-    }
-
-    public void setDate(int row, Date date) {
-      setValueInternal(row, DATE_COLUMN_ID, date);
-    }
-
-    public String getMainAccountManager(int row) {
-      return (String) getValueInternal(row, MAIN_ACCOUNT_MANAGER_COLUMN_ID);
-    }
-
-    public void setMainAccountManager(int row, String mainAccountManager) {
-      setValueInternal(row, MAIN_ACCOUNT_MANAGER_COLUMN_ID, mainAccountManager);
-    }
-
-    public String getPerson(int row) {
-      return (String) getValueInternal(row, PERSON_COLUMN_ID);
-    }
-
-    public void setPerson(int row, String person) {
-      setValueInternal(row, PERSON_COLUMN_ID, person);
-    }
-
-    public Long getType(int row) {
-      return (Long) getValueInternal(row, TYPE_COLUMN_ID);
-    }
-
-    public void setType(int row, Long type) {
-      setValueInternal(row, TYPE_COLUMN_ID, type);
+    @Override
+    public ChangesTableRowData addRow() {
+      return (ChangesTableRowData) super.addRow();
     }
 
     @Override
-    public int getColumnCount() {
-      return 4;
+    public ChangesTableRowData addRow(int rowState) {
+      return (ChangesTableRowData) super.addRow(rowState);
     }
 
     @Override
-    public Object getValueAt(int row, int column) {
-      switch (column) {
-        case TYPE_COLUMN_ID:
-          return getType(row);
-        case PERSON_COLUMN_ID:
-          return getPerson(row);
-        case DATE_COLUMN_ID:
-          return getDate(row);
-        case MAIN_ACCOUNT_MANAGER_COLUMN_ID:
-          return getMainAccountManager(row);
-        default:
-          return null;
+    public ChangesTableRowData createRow() {
+      return new ChangesTableRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return ChangesTableRowData.class;
+    }
+
+    @Override
+    public ChangesTableRowData[] getRows() {
+      return (ChangesTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public ChangesTableRowData rowAt(int index) {
+      return (ChangesTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(ChangesTableRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class ChangesTableRowData extends AbstractTableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String type = "type";
+      public static final String person = "person";
+      public static final String date = "date";
+      public static final String mainAccountManager = "mainAccountManager";
+      private Long m_type;
+      private String m_person;
+      private Date m_date;
+      private String m_mainAccountManager;
+
+      public ChangesTableRowData() {
       }
-    }
 
-    @Override
-    public void setValueAt(int row, int column, Object value) {
-      switch (column) {
-        case TYPE_COLUMN_ID:
-          setType(row, (Long) value);
-          break;
-        case PERSON_COLUMN_ID:
-          setPerson(row, (String) value);
-          break;
-        case DATE_COLUMN_ID:
-          setDate(row, (Date) value);
-          break;
-        case MAIN_ACCOUNT_MANAGER_COLUMN_ID:
-          setMainAccountManager(row, (String) value);
-          break;
+      public Long getType() {
+        return m_type;
+      }
+
+      public void setType(Long type) {
+        m_type = type;
+      }
+
+      public String getPerson() {
+        return m_person;
+      }
+
+      public void setPerson(String person) {
+        m_person = person;
+      }
+
+      public Date getDate() {
+        return m_date;
+      }
+
+      public void setDate(Date date) {
+        m_date = date;
+      }
+
+      public String getMainAccountManager() {
+        return m_mainAccountManager;
+      }
+
+      public void setMainAccountManager(String mainAccountManager) {
+        m_mainAccountManager = mainAccountManager;
       }
     }
   }
@@ -548,168 +546,182 @@ public class CompanyFormData extends AbstractFormData {
     }
   }
 
-  public static class FiguresTable extends AbstractTableFieldData {
+  public static class FiguresTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-    public static final int YEAR_COLUMN_ID = 0;
-    public static final int POTENTIAL_COLUMN_ID = 1;
-    public static final int BUDGET_COLUMN_ID = 2;
-    public static final int TURNOVER_COLUMN_ID = 3;
 
     public FiguresTable() {
     }
 
-    public Long getBudget(int row) {
-      return (Long) getValueInternal(row, BUDGET_COLUMN_ID);
-    }
-
-    public void setBudget(int row, Long budget) {
-      setValueInternal(row, BUDGET_COLUMN_ID, budget);
-    }
-
-    public Long getPotential(int row) {
-      return (Long) getValueInternal(row, POTENTIAL_COLUMN_ID);
-    }
-
-    public void setPotential(int row, Long potential) {
-      setValueInternal(row, POTENTIAL_COLUMN_ID, potential);
-    }
-
-    public Long getTurnover(int row) {
-      return (Long) getValueInternal(row, TURNOVER_COLUMN_ID);
-    }
-
-    public void setTurnover(int row, Long turnover) {
-      setValueInternal(row, TURNOVER_COLUMN_ID, turnover);
-    }
-
-    public Long getYear(int row) {
-      return (Long) getValueInternal(row, YEAR_COLUMN_ID);
-    }
-
-    public void setYear(int row, Long year) {
-      setValueInternal(row, YEAR_COLUMN_ID, year);
+    @Override
+    public FiguresTableRowData addRow() {
+      return (FiguresTableRowData) super.addRow();
     }
 
     @Override
-    public int getColumnCount() {
-      return 4;
+    public FiguresTableRowData addRow(int rowState) {
+      return (FiguresTableRowData) super.addRow(rowState);
     }
 
     @Override
-    public Object getValueAt(int row, int column) {
-      switch (column) {
-        case YEAR_COLUMN_ID:
-          return getYear(row);
-        case POTENTIAL_COLUMN_ID:
-          return getPotential(row);
-        case BUDGET_COLUMN_ID:
-          return getBudget(row);
-        case TURNOVER_COLUMN_ID:
-          return getTurnover(row);
-        default:
-          return null;
+    public FiguresTableRowData createRow() {
+      return new FiguresTableRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return FiguresTableRowData.class;
+    }
+
+    @Override
+    public FiguresTableRowData[] getRows() {
+      return (FiguresTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public FiguresTableRowData rowAt(int index) {
+      return (FiguresTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(FiguresTableRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class FiguresTableRowData extends AbstractTableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String year = "year";
+      public static final String potential = "potential";
+      public static final String budget = "budget";
+      public static final String turnover = "turnover";
+      private Long m_year;
+      private Long m_potential;
+      private Long m_budget;
+      private Long m_turnover;
+
+      public FiguresTableRowData() {
       }
-    }
 
-    @Override
-    public void setValueAt(int row, int column, Object value) {
-      switch (column) {
-        case YEAR_COLUMN_ID:
-          setYear(row, (Long) value);
-          break;
-        case POTENTIAL_COLUMN_ID:
-          setPotential(row, (Long) value);
-          break;
-        case BUDGET_COLUMN_ID:
-          setBudget(row, (Long) value);
-          break;
-        case TURNOVER_COLUMN_ID:
-          setTurnover(row, (Long) value);
-          break;
+      public Long getYear() {
+        return m_year;
+      }
+
+      public void setYear(Long year) {
+        m_year = year;
+      }
+
+      public Long getPotential() {
+        return m_potential;
+      }
+
+      public void setPotential(Long potential) {
+        m_potential = potential;
+      }
+
+      public Long getBudget() {
+        return m_budget;
+      }
+
+      public void setBudget(Long budget) {
+        m_budget = budget;
+      }
+
+      public Long getTurnover() {
+        return m_turnover;
+      }
+
+      public void setTurnover(Long turnover) {
+        m_turnover = turnover;
       }
     }
   }
 
-  public static class FiguresYtDTable extends AbstractTableFieldData {
+  public static class FiguresYtDTable extends AbstractTableFieldBeanData {
 
     private static final long serialVersionUID = 1L;
-    public static final int YEAR_COLUMN_ID = 0;
-    public static final int POTENTIAL_COLUMN_ID = 1;
-    public static final int BUDGET_COLUMN_ID = 2;
-    public static final int TURNOVER_COLUMN_ID = 3;
 
     public FiguresYtDTable() {
     }
 
-    public Long getBudget(int row) {
-      return (Long) getValueInternal(row, BUDGET_COLUMN_ID);
-    }
-
-    public void setBudget(int row, Long budget) {
-      setValueInternal(row, BUDGET_COLUMN_ID, budget);
-    }
-
-    public Long getPotential(int row) {
-      return (Long) getValueInternal(row, POTENTIAL_COLUMN_ID);
-    }
-
-    public void setPotential(int row, Long potential) {
-      setValueInternal(row, POTENTIAL_COLUMN_ID, potential);
-    }
-
-    public Long getTurnover(int row) {
-      return (Long) getValueInternal(row, TURNOVER_COLUMN_ID);
-    }
-
-    public void setTurnover(int row, Long turnover) {
-      setValueInternal(row, TURNOVER_COLUMN_ID, turnover);
-    }
-
-    public Long getYear(int row) {
-      return (Long) getValueInternal(row, YEAR_COLUMN_ID);
-    }
-
-    public void setYear(int row, Long year) {
-      setValueInternal(row, YEAR_COLUMN_ID, year);
+    @Override
+    public FiguresYtDTableRowData addRow() {
+      return (FiguresYtDTableRowData) super.addRow();
     }
 
     @Override
-    public int getColumnCount() {
-      return 4;
+    public FiguresYtDTableRowData addRow(int rowState) {
+      return (FiguresYtDTableRowData) super.addRow(rowState);
     }
 
     @Override
-    public Object getValueAt(int row, int column) {
-      switch (column) {
-        case YEAR_COLUMN_ID:
-          return getYear(row);
-        case POTENTIAL_COLUMN_ID:
-          return getPotential(row);
-        case BUDGET_COLUMN_ID:
-          return getBudget(row);
-        case TURNOVER_COLUMN_ID:
-          return getTurnover(row);
-        default:
-          return null;
+    public FiguresYtDTableRowData createRow() {
+      return new FiguresYtDTableRowData();
+    }
+
+    @Override
+    public Class<? extends AbstractTableRowData> getRowType() {
+      return FiguresYtDTableRowData.class;
+    }
+
+    @Override
+    public FiguresYtDTableRowData[] getRows() {
+      return (FiguresYtDTableRowData[]) super.getRows();
+    }
+
+    @Override
+    public FiguresYtDTableRowData rowAt(int index) {
+      return (FiguresYtDTableRowData) super.rowAt(index);
+    }
+
+    public void setRows(FiguresYtDTableRowData[] rows) {
+      super.setRows(rows);
+    }
+
+    public static class FiguresYtDTableRowData extends AbstractTableRowData {
+
+      private static final long serialVersionUID = 1L;
+      public static final String year = "year";
+      public static final String potential = "potential";
+      public static final String budget = "budget";
+      public static final String turnover = "turnover";
+      private Long m_year;
+      private Long m_potential;
+      private Long m_budget;
+      private Long m_turnover;
+
+      public FiguresYtDTableRowData() {
       }
-    }
 
-    @Override
-    public void setValueAt(int row, int column, Object value) {
-      switch (column) {
-        case YEAR_COLUMN_ID:
-          setYear(row, (Long) value);
-          break;
-        case POTENTIAL_COLUMN_ID:
-          setPotential(row, (Long) value);
-          break;
-        case BUDGET_COLUMN_ID:
-          setBudget(row, (Long) value);
-          break;
-        case TURNOVER_COLUMN_ID:
-          setTurnover(row, (Long) value);
-          break;
+      public Long getYear() {
+        return m_year;
+      }
+
+      public void setYear(Long year) {
+        m_year = year;
+      }
+
+      public Long getPotential() {
+        return m_potential;
+      }
+
+      public void setPotential(Long potential) {
+        m_potential = potential;
+      }
+
+      public Long getBudget() {
+        return m_budget;
+      }
+
+      public void setBudget(Long budget) {
+        m_budget = budget;
+      }
+
+      public Long getTurnover() {
+        return m_turnover;
+      }
+
+      public void setTurnover(Long turnover) {
+        m_turnover = turnover;
       }
     }
   }

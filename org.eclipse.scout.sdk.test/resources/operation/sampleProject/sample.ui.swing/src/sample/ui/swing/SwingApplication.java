@@ -5,20 +5,19 @@ import java.security.PrivilegedExceptionAction;
 import javax.security.auth.Subject;
 
 import org.eclipse.equinox.app.IApplicationContext;
+import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
 import org.eclipse.scout.commons.security.SimplePrincipal;
-import org.eclipse.scout.net.NetActivator;
 import org.eclipse.scout.rt.client.IClientSession;
-import org.eclipse.scout.rt.client.services.common.session.IClientSessionRegistryService;
+import org.eclipse.scout.rt.client.job.ClientJobInput;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
+import org.eclipse.scout.rt.platform.cdi.OBJ;
 import org.eclipse.scout.rt.ui.swing.AbstractSwingApplication;
 import org.eclipse.scout.rt.ui.swing.ISwingEnvironment;
-import org.eclipse.scout.service.SERVICES;
-
-import sample.client.ClientSession;
 
 public class SwingApplication extends AbstractSwingApplication {
-  private static IScoutLogger logger = ScoutLogManager.getLogger(SwingApplication.class);
+  private static IScoutLogger LOG = ScoutLogManager.getLogger(SwingApplication.class);
 
   @Override
   public Object start(final IApplicationContext context) throws Exception {
@@ -38,18 +37,17 @@ public class SwingApplication extends AbstractSwingApplication {
   }
 
   private Object startSecure(IApplicationContext context) throws Exception {
-    try {
-      NetActivator.install();
-    }
-    catch (Throwable t) {
-      // no net handler found
-      logger.warn("NetActivator is not available", t);
-    }
     return super.start(context);
   }
 
   @Override
   protected IClientSession getClientSession() {
-    return SERVICES.getService(IClientSessionRegistryService.class).newClientSession(ClientSession.class, initUserAgent());
+    try {
+      return OBJ.one(ClientSessionProvider.class).provide(ClientJobInput.empty().userAgent(initUserAgent()));
+    }
+    catch (ProcessingException e) {
+      LOG.error("unable to load session", e);
+      return null;
+    }
   }
 }

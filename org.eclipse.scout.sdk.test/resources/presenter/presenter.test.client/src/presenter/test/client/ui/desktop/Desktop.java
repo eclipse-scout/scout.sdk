@@ -17,7 +17,7 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.commons.logger.IScoutLogger;
 import org.eclipse.scout.commons.logger.ScoutLogManager;
-import org.eclipse.scout.rt.client.ClientSyncJob;
+import org.eclipse.scout.rt.client.session.ClientSessionProvider;
 import org.eclipse.scout.rt.client.ui.action.menu.AbstractMenu;
 import org.eclipse.scout.rt.client.ui.desktop.AbstractDesktop;
 import org.eclipse.scout.rt.client.ui.desktop.IDesktop;
@@ -68,7 +68,7 @@ public class Desktop extends AbstractDesktop implements IDesktop {
 
       @Override
       public void execAction() throws ProcessingException {
-        ClientSyncJob.getCurrentSession(ClientSession.class).stopSession();
+        ClientSessionProvider.currentSession(ClientSession.class).stopSession();
       }
     }
   }

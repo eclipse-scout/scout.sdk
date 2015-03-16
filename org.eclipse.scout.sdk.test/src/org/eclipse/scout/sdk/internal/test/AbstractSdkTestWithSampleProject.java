@@ -24,22 +24,17 @@ import org.junit.BeforeClass;
 public abstract class AbstractSdkTestWithSampleProject extends AbstractScoutSdkTest {
 
   public static final String UI_SWING_NAME = "sample.ui.swing";
-  public static final String UI_SWT_NAME = "sample.ui.swt";
   public static final String CLIENT_NAME = "sample.client";
   public static final String SHARED_NAME = "sample.shared";
   public static final String SERVER_NAME = "sample.server";
 
   @BeforeClass
   public static void setUpWorkspace() throws Exception {
-    setupWorkspace("resources/operation/sampleProject/", UI_SWING_NAME, UI_SWT_NAME, CLIENT_NAME, SHARED_NAME, SERVER_NAME);
+    setupWorkspace("resources/operation/sampleProject/", UI_SWING_NAME, CLIENT_NAME, SHARED_NAME, SERVER_NAME);
   }
 
   protected IProject getUiSwingProject() {
     return getProject(UI_SWING_NAME);
-  }
-
-  protected IProject getUiSwtProject() {
-    return getProject(UI_SWT_NAME);
   }
 
   protected IProject getClientProject() {
@@ -56,10 +51,6 @@ public abstract class AbstractSdkTestWithSampleProject extends AbstractScoutSdkT
 
   protected IJavaProject getUiSwingJavaProject() {
     return JavaCore.create(getProject(UI_SWING_NAME));
-  }
-
-  protected IJavaProject getUiSwtJavaProject() {
-    return JavaCore.create(getProject(UI_SWT_NAME));
   }
 
   protected IJavaProject getClientJavaProject() {

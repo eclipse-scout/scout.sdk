@@ -13,13 +13,13 @@ package formdata.client.ui.forms;
 import org.eclipse.scout.commons.annotations.FormData;
 import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
+import org.eclipse.scout.commons.job.IRunnable;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.AbstractFormHandler;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractCancelButton;
 import org.eclipse.scout.rt.client.ui.form.fields.button.AbstractOkButton;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.shared.services.common.session.IJobRunnable;
 
 import formdata.client.ClientAnnotation;
 import formdata.client.ui.forms.AnnotationCopyTestForm.MainBox.CancelButton;
@@ -69,7 +69,7 @@ public class AnnotationCopyTestForm extends AbstractForm {
 
     @Order(10.0)
     @ClientAnnotation
-    @SharedAnnotation(type = IJobRunnable.class)
+    @SharedAnnotation(type = IRunnable.class)
     public class FirstField extends AbstractStringField {
     }
 
