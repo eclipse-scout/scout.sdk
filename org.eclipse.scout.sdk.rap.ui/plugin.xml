@@ -41,19 +41,6 @@
             class="org.eclipse.scout.sdk.rap.ui.internal.extensions.technology.SvgUiRapTechnologyHandler"
             technology="scout.technology.svg">
       </handler>
-      <technology
-            category="UI Features"
-            id="scout.technology.rap.filechooser"
-            name="RAP FileChooser Support (Incubation)">
-      </technology>
-      <handler
-            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.technology.FileChooserRapTargetTechnologyHandler"
-            technology="scout.technology.rap.filechooser">
-      </handler>
-      <handler
-            class="org.eclipse.scout.sdk.rap.ui.internal.extensions.technology.FileChooserRapProductTechnologyHandler"
-            technology="scout.technology.rap.filechooser">
-      </handler>
       <handler
             class="org.eclipse.scout.sdk.rap.ui.internal.extensions.technology.Docx4jRapProductTechnologyHandler"
             technology="scout.technology.common.docx4j">
