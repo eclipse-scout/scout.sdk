@@ -98,22 +98,24 @@ public class TableColumnNewOperation implements IOperation {
     columnOp.validate();
     columnOp.run(monitor, workingCopyManager);
     m_createdColumn = columnOp.getCreatedType();
-    // getter on declaring table
 
-    InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(getCreatedColumn(), getDeclaringType(), true);
-    getterOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+    if (!TypeUtility.getSupertypeHierarchy(getDeclaringType()).contains(TypeUtility.getType(IRuntimeClasses.IExtension))) { // no getters for extensions
+      // getter on declaring table
+      InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(getCreatedColumn(), getDeclaringType(), true);
+      getterOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
-      @Override
-      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-        source.append("return getColumnSet().getColumnByClass(");
-        source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getCreatedColumn().getFullyQualifiedName()), validator) + ".class");
-        source.append(");");
-      }
-    });
-    IStructuredType structuredType = ScoutTypeUtility.createStructuredTable(getDeclaringType());
-    getterOp.setSibling(structuredType.getSiblingMethodFieldGetter(getterOp.getElementName()));
-    getterOp.validate();
-    getterOp.run(monitor, workingCopyManager);
+        @Override
+        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
+          source.append("return getColumnSet().getColumnByClass(");
+          source.append(SignatureUtility.getTypeReference(SignatureCache.createTypeSignature(getCreatedColumn().getFullyQualifiedName()), validator) + ".class");
+          source.append(");");
+        }
+      });
+      IStructuredType structuredType = ScoutTypeUtility.createStructuredTable(getDeclaringType());
+      getterOp.setSibling(structuredType.getSiblingMethodFieldGetter(getterOp.getElementName()));
+      getterOp.validate();
+      getterOp.run(monitor, workingCopyManager);
+    }
   }
 
   protected void appendToColumnBuilder(ITypeSourceBuilder columnBuilder, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {

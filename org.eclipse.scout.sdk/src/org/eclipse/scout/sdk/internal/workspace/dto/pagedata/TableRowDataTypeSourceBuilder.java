@@ -112,7 +112,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     }
 
     // get all columns
-    Set<IType> columns = getColumns(getColumnContainer(), rowDataSuperClassType, monitor);
+    Set<IType> columns = getColumns(getColumnContainer(), rowDataSuperClassType, getModelLocalHierarchy(), monitor);
     if (monitor.isCanceled()) {
       return;
     }
@@ -163,13 +163,22 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     return NamingUtility.ensureStartWithLowerCase(ScoutUtility.removeFieldSuffix(column.getElementName()));
   }
 
-  protected static Set<IType> getColumns(IType declaringType, IType rowDataSuperType, IProgressMonitor monitor) throws JavaModelException {
+  protected static Set<IType> getColumns(IType declaringType, IType rowDataSuperType, ITypeHierarchy modelLocalHierarchy, IProgressMonitor monitor) throws JavaModelException {
 
     final ITypeHierarchy fieldHierarchy = TypeUtility.getSupertypeHierarchy(declaringType);
 
     // the declaring type is a column itself
     if (fieldHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IColumn), declaringType)) {
       return CollectionUtility.hashSet(declaringType);
+    }
+
+    // the declaring type is a IPageWithTableExtension -> search the inner table extension
+    if (fieldHierarchy.isSubtype(TypeUtility.getType(IRuntimeClasses.IPageWithTableExtension), declaringType)) {
+      Set<IType> innerTableExtensions = TypeUtility.getInnerTypesOrdered(declaringType, TypeUtility.getType(IRuntimeClasses.ITableExtension), ScoutTypeComparators.getSourceRangeComparator(), modelLocalHierarchy);
+      IType tableExtension = CollectionUtility.firstElement(innerTableExtensions);
+      if (TypeUtility.exists(tableExtension)) {
+        declaringType = tableExtension; // switch to the table as column holder
+      }
     }
 
     // the declaring type holds columns
