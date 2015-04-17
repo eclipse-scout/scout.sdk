@@ -14,12 +14,14 @@ import org.eclipse.jdt.core.IField;
 import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.internal.test.operation.formdata.AbstractSdkTestWithFormDataProject;
+import org.eclipse.scout.sdk.operation.IOperation;
 import org.eclipse.scout.sdk.testing.SdkAssert;
 import org.eclipse.scout.sdk.testing.TestWorkspaceUtility;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
 import org.eclipse.scout.sdk.util.typecache.ITypeHierarchy;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.DataAnnotation;
 import org.eclipse.scout.sdk.workspace.dto.pagedata.PageDataDtoUpdateOperation;
+import org.eclipse.scout.sdk.workspace.dto.pagedata.RowDataDtoUpdateOperation;
 import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 import org.junit.Test;
 
@@ -36,50 +38,61 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
   public static final String ExtendedTablePageWithoutExtendedTableFqn = "formdata.client.ui.desktop.outline.pages.ExtendedTablePageWithoutExtendedTable";
   public static final String BaseWithExtendedTableTablePage = "formdata.client.ui.desktop.outline.pages.BaseWithExtendedTableTablePage";
   public static final String ExtendedExtendedTablePageWithExtendedTable = "formdata.client.ui.desktop.outline.pages.ExtendedExtendedTablePageWithExtendedTable";
+  public static final String PageWithTableExtension = "formdata.client.ui.desktop.outline.pages.PageWithTableExtension";
 
-  private IType createPageData(String typeName) throws Exception {
+  private void createPageData(String typeName, boolean rowData) throws Exception {
     IType field = SdkAssert.assertTypeExists(typeName);
 
     ITypeHierarchy superTypeHierarchy = TypeUtility.getSupertypeHierarchy(field);
     DataAnnotation annotation = ScoutTypeUtility.findDataAnnotation(field, superTypeHierarchy);
-    PageDataDtoUpdateOperation op = new PageDataDtoUpdateOperation(field, annotation);
+    IOperation op = null;
+    if (rowData) {
+      op = new RowDataDtoUpdateOperation(field, annotation);
+    }
+    else {
+      op = new PageDataDtoUpdateOperation(field, annotation);
+    }
     TestWorkspaceUtility.executeAndBuildWorkspace(op);
+  }
 
-    IType pageData = op.getDerivedType();
-    return pageData;
+  @Test
+  public void testPageWithTableExtensionData() throws Exception {
+    createPageData(PageWithTableExtension, true);
+    TestWorkspaceUtility.assertNoCompileErrors();
+    testApiOfPageWithTableExtensionData();
   }
 
   @Test
   public void testAbstractTableField() throws Exception {
-    createPageData(BaseTablePage);
+    createPageData(BaseTablePage, false);
     TestWorkspaceUtility.assertNoCompileErrors();
     testApiOfBaseTablePageData();
   }
 
   @Test
   public void testExtendedTablePage() throws Exception {
-    createPageData(ExtendedTablePage);
+    createPageData(ExtendedTablePage, false);
     TestWorkspaceUtility.assertNoCompileErrors();
     testApiOfExtendedTablePageData();
   }
 
   @Test
   public void testExtendedTablePageWithoutExtendedTable() throws Exception {
-    createPageData(ExtendedTablePageWithoutExtendedTableFqn);
+    createPageData(ExtendedTablePageWithoutExtendedTableFqn, false);
     TestWorkspaceUtility.assertNoCompileErrors();
     testApiOfExtendedTablePageWithoutExtendedTableData();
   }
 
   @Test
   public void testBaseWithExtendedTableTablePage() throws Exception {
-    createPageData(BaseWithExtendedTableTablePage);
+    createPageData(BaseWithExtendedTableTablePage, false);
     TestWorkspaceUtility.assertNoCompileErrors();
     testApiOfBaseWithExtendedTableTablePageData();
   }
 
   @Test
   public void testExtendedExtendedTablePageWithExtendedTable() throws Exception {
-    createPageData(ExtendedExtendedTablePageWithExtendedTable);
+    createPageData(ExtendedExtendedTablePageWithExtendedTable, false);
     TestWorkspaceUtility.assertNoCompileErrors();
     testApiOfExtendedExtendedTablePageWithExtendedTableData();
   }
@@ -453,6 +466,41 @@ public class PageBeanDataTest extends AbstractSdkTestWithFormDataProject {
     SdkAssert.assertMethodReturnTypeSignature(setBoolean, "V");
 
     SdkAssert.assertEquals("inner types count of 'ExtendedExtendedTablePageWithExtendedTableRowData'", 0, extendedExtendedTablePageWithExtendedTableRowData.getTypes().length);
+  }
+
+  /**
+   * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
+   */
+  private void testApiOfPageWithTableExtensionData() throws Exception {
+    // type PageWithTableExtensionData
+    IType pageWithTableExtensionData = SdkAssert.assertTypeExists("formdata.shared.services.pages.PageWithTableExtensionData");
+    SdkAssert.assertHasFlags(pageWithTableExtensionData, 1);
+    SdkAssert.assertHasSuperIntefaceSignatures(pageWithTableExtensionData, new String[]{"QSerializable;"});
+    SdkAssert.assertAnnotation(pageWithTableExtensionData, "org.eclipse.scout.commons.annotations.Extends");
+    SdkAssert.assertAnnotation(pageWithTableExtensionData, "javax.annotation.Generated");
+
+    // fields of PageWithTableExtensionData
+    SdkAssert.assertEquals("field count of 'PageWithTableExtensionData'", 3, pageWithTableExtensionData.getFields().length);
+    IField serialVersionUID = SdkAssert.assertFieldExist(pageWithTableExtensionData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+    IField bigDecimalTest = SdkAssert.assertFieldExist(pageWithTableExtensionData, "bigDecimalTest");
+    SdkAssert.assertHasFlags(bigDecimalTest, 25);
+    SdkAssert.assertFieldSignature(bigDecimalTest, "QString;");
+    IField m_bigDecimalTest = SdkAssert.assertFieldExist(pageWithTableExtensionData, "m_bigDecimalTest");
+    SdkAssert.assertHasFlags(m_bigDecimalTest, 2);
+    SdkAssert.assertFieldSignature(m_bigDecimalTest, "QBigDecimal;");
+
+    SdkAssert.assertEquals("method count of 'PageWithTableExtensionData'", 3, pageWithTableExtensionData.getMethods().length);
+    IMethod pageWithTableExtensionData1 = SdkAssert.assertMethodExist(pageWithTableExtensionData, "PageWithTableExtensionData", new String[]{});
+    SdkAssert.assertTrue(pageWithTableExtensionData1.isConstructor());
+    SdkAssert.assertMethodReturnTypeSignature(pageWithTableExtensionData1, "V");
+    IMethod getBigDecimalTest = SdkAssert.assertMethodExist(pageWithTableExtensionData, "getBigDecimalTest", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getBigDecimalTest, "QBigDecimal;");
+    IMethod setBigDecimalTest = SdkAssert.assertMethodExist(pageWithTableExtensionData, "setBigDecimalTest", new String[]{"QBigDecimal;"});
+    SdkAssert.assertMethodReturnTypeSignature(setBigDecimalTest, "V");
+
+    SdkAssert.assertEquals("inner types count of 'PageWithTableExtensionData'", 0, pageWithTableExtensionData.getTypes().length);
   }
 
 }

@@ -10,7 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.internal.workspace.dto.pagedata;
 
+import java.util.Set;
+
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.scout.commons.CollectionUtility;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.internal.workspace.dto.AbstractDtoUpdateHandler;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
@@ -30,9 +34,21 @@ public class RowDataAutoUpdateHandler extends AbstractDtoUpdateHandler {
 
   private boolean checkType(DtoUpdateProperties properties) throws CoreException {
     ITypeHierarchy superTypeHierarchy = ensurePropertySuperTypeHierarchy(properties);
+
+    // direct column or table extension
     if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IColumn)) || superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.ITableExtension))) {
       DataAnnotation dataAnnotation = ensurePropertyDataAnnotation(properties);
       return dataAnnotation != null;
+    }
+
+    // check for table extension in IPageWithTableExtension
+    if (superTypeHierarchy.contains(TypeUtility.getType(IRuntimeClasses.IPageWithTableExtension))) {
+      Set<IType> innerTableExtensions = TypeUtility.getInnerTypesOrdered(properties.getType(), TypeUtility.getType(IRuntimeClasses.ITableExtension), null);
+      IType tableExtension = CollectionUtility.firstElement(innerTableExtensions);
+      if (TypeUtility.exists(tableExtension)) {
+        DataAnnotation dataAnnotation = ensurePropertyDataAnnotation(properties);
+        return dataAnnotation != null;
+      }
     }
     return false;
   }

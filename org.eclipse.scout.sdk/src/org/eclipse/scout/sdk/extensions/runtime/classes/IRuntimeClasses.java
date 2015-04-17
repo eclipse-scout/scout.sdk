@@ -212,6 +212,7 @@ public interface IRuntimeClasses {
   String IPage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage"; // NO_UCD
   String IPageWithNodes = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes"; // NO_UCD
   String IPageWithNodesExtension = "org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithNodesExtension"; // NO_UCD
+  String IPageWithTableExtension = "org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension"; // NO_UCD
   String IPageWithTable = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithTable"; // NO_UCD
   String IPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField"; // NO_UCD
   String IPropertyObserver = "org.eclipse.scout.commons.beans.IPropertyObserver"; // NO_UCD
