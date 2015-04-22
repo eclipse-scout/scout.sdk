@@ -61,7 +61,7 @@ public interface IRuntimeClasses {
 
   // Runtime classes
   String ACCESS = "org.eclipse.scout.rt.shared.services.common.security.ACCESS"; // NO_UCD
-  String SERVICES = "org.eclipse.scout.service.SERVICES"; // NO_UCD
+  String SERVICES = "org.eclipse.scout.service.SERVICES"; // NO_UCD   //TODO has been deleted in Scout RT
   String TEXTS = "org.eclipse.scout.rt.shared.TEXTS"; // NO_UCD
 
   String BasicHierarchyPermission = "org.eclipse.scout.rt.shared.security.BasicHierarchyPermission"; // NO_UCD
@@ -76,21 +76,21 @@ public interface IRuntimeClasses {
   String Extends = "org.eclipse.scout.commons.annotations.Extends"; // NO_UCD
   String DtoRelevant = "org.eclipse.scout.commons.annotations.DtoRelevant"; // NO_UCD
   String InjectFieldTo = "org.eclipse.scout.commons.annotations.InjectFieldTo"; // NO_UCD
-  String ClientProxyServiceFactory = "org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"; // NO_UCD
-  String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory"; // NO_UCD
+  String ClientProxyServiceFactory = "org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"; // NO_UCD    //TODO has been deleted in Scout RT
+  String ClientServiceFactory = "org.eclipse.scout.rt.client.services.ClientServiceFactory"; // NO_UCD   //TODO has been deleted in Scout RT
   String ConfigProperty = "org.eclipse.scout.commons.annotations.ConfigProperty"; // NO_UCD
   String ConfigOperation = "org.eclipse.scout.commons.annotations.ConfigOperation"; // NO_UCD
   String DataModelConstants = "org.eclipse.scout.rt.shared.data.model.DataModelConstants"; // NO_UCD
   String DefaultOutlineTableForm = "org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTableForm"; // NO_UCD
   String DefaultOutlineTreeForm = "org.eclipse.scout.rt.client.ui.form.outline.DefaultOutlineTreeForm"; // NO_UCD
-  String DefaultServiceFactory = "org.eclipse.scout.service.DefaultServiceFactory"; // NO_UCD
+  String DefaultServiceFactory = "org.eclipse.scout.service.DefaultServiceFactory"; // NO_UCD   //TODO has been deleted in Scout RT
   String CopyWidthsOfColumnsMenu = "org.eclipse.scout.rt.client.ui.basic.table.menus.CopyWidthsOfColumnsMenu"; // NO_UCD
   String LocalLookupCall = "org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall"; // NO_UCD
   String CodeLookupCall = "org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall"; // NO_UCD
   String Order = "org.eclipse.scout.commons.annotations.Order"; // NO_UCD
-  String Ranking = "org.eclipse.scout.commons.annotations.Priority"; // NO_UCD
+  String Ranking = "org.eclipse.scout.commons.annotations.Priority"; // NO_UCD   //TODO has been deleted in Scout RT
   String SearchFilter = "org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter"; // NO_UCD
-  String ServerServiceFactory = "org.eclipse.scout.rt.server.services.ServerServiceFactory"; // NO_UCD
+  String ServerServiceFactory = "org.eclipse.scout.rt.server.services.ServerServiceFactory"; // NO_UCD   //TODO has been deleted in Scout RT
   String ProcessingException = "org.eclipse.scout.commons.exception.ProcessingException"; // NO_UCD
   String ValidationRule = "org.eclipse.scout.rt.shared.data.form.ValidationRule"; // NO_UCD
   String InputValidation = "org.eclipse.scout.rt.shared.validate.InputValidation"; // NO_UCD
@@ -208,7 +208,7 @@ public interface IRuntimeClasses {
   String ISearchForm = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.ISearchForm"; // NO_UCD
   String ISequenceBox = "org.eclipse.scout.rt.client.ui.form.fields.sequencebox.ISequenceBox"; // NO_UCD
   String IServerSession = "org.eclipse.scout.rt.server.IServerSession"; // NO_UCD
-  String IService = "org.eclipse.scout.service.IService"; // NO_UCD
+  String IService = "org.eclipse.scout.rt.platform.service.IService"; // NO_UCD
   String ISmartField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.ISmartField"; // NO_UCD
   String IProposalField = "org.eclipse.scout.rt.client.ui.form.fields.smartfield.IProposalField"; // NO_UCD
   String ISMTPService = "org.eclipse.scout.rt.server.services.common.smtp.ISMTPService"; // NO_UCD
