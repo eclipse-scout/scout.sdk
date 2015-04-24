@@ -86,6 +86,17 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
       osgiCapAddOperation.validate();
       osgiCapAddOperation.run(monitor, workingCopyManager);
     }
+
+    if (PlatformVersionUtility.isMarsOrLater(getTargetPlatformVersion())) {
+      String[] additionalMarsSwtPlugins = new String[]{"org.eclipse.e4.core.di.annotations", "org.eclipse.e4.emf.xpath", "org.apache.commons.jxpath"};
+      for (IFile f : m_swtProdFiles) {
+        ProductFileModelHelper pfmh = new ProductFileModelHelper(f);
+        for (String additionalMarsPlugin : additionalMarsSwtPlugins) {
+          pfmh.ProductFile.addDependency(additionalMarsPlugin);
+        }
+        pfmh.save();
+      }
+    }
   }
 
   private void upgradeToBatik17(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
