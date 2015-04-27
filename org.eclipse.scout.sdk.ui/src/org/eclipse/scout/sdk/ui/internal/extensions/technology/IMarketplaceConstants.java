@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.operation.project.add.ScoutProjectAddOperation;
 public interface IMarketplaceConstants {
 
   // db drivers
-  String SCOUT_JDBC_FEATURE_URL = "http://tools.bsiag.com/marketplace/jdbc/4.3";
+  String SCOUT_JDBC_FEATURE_URL = "http://tools.bsiag.com/marketplace/jdbc/5.0";
   String SCOUT_MYSQL_JDBC_FEATURE = "com.bsiag.scout.rt.server.jdbc.mysql5117.source.feature.group";
   String MY_SQL_JDBC_PLUGIN = "com.bsiag.scout.rt.server.jdbc.mysql5117";
   String MY_SQL_JDBC_FRAGMENT = "com.mysql.jdbc_5117.fragment";
@@ -35,13 +35,13 @@ public interface IMarketplaceConstants {
   String DERBY_JDBC_FRAGMENT = "org.apache.derby.jdbc_1091.fragment";
 
   // rayo swing look and feel
-  String SCOUT_RAYO_FEATURE_URL = "http://tools.bsiag.com/marketplace/rayo/4.3";
+  String SCOUT_RAYO_FEATURE_URL = "http://tools.bsiag.com/marketplace/rayo/5.0";
   String SCOUT_RAYO_LAF_FEATURE = "com.bsiag.scout.rt.ui.swing.laf.rayo.source.feature.group";
   String RAYO_LAF_PLUGIN = "com.bsiag.scout.rt.ui.swing.rayo";
   String RAYO_LAF_FRAGMENT = "com.bsiag.scout.rt.ui.swing.laf.rayo.fragment";
 
   // docx4j support
-  String SCOUT_DOCX4J_FEATURE_URL = "http://tools.bsiag.com/marketplace/docx4j/4.3";
+  String SCOUT_DOCX4J_FEATURE_URL = "http://tools.bsiag.com/marketplace/docx4j/5.0";
   String DOCX4J_CORE_FEATURE = "org.eclipse.scout.docx4j.core.source.feature.group";
   String DOCX4J_CLIENT_FEATURE = "org.eclipse.scout.rt.docx4j.client.source.feature.group";
   String DOCX4J_LIBS_FEATURE = "org.eclipse.scout.docx4j.libs.source.feature.group";
@@ -52,12 +52,12 @@ public interface IMarketplaceConstants {
   String DOCX4J_SDK_PLUGIN = "org.eclipse.scout.sdk.docx4j";
 
   // logging bridge
-  String SCOUT_LOGGING_BRIDGE_FEATURE_URL = "http://tools.bsiag.com/marketplace/logging_bridge/4.3";
+  String SCOUT_LOGGING_BRIDGE_FEATURE_URL = "http://tools.bsiag.com/marketplace/logging_bridge/5.0";
   String LOGGING_BRIDGE_FEATURE = "org.eclipse.scout.logging.bridges.source.feature.group";
   String LOGGING_BRIDGE_LOG4J_FRAGMENT = "org.eclipse.scout.commons.log4j.bridge.fragment";
 
   // f2
-  String F2_FEATURE_URL = "http://tools.bsiag.com/marketplace/f2/4.3";
+  String F2_FEATURE_URL = "http://tools.bsiag.com/marketplace/f2/5.0";
   String F2_FEATURE = "org.eclipse.update-f2.source.feature.group";
   String F2_PLUGIN = "org.eclipse.update.f2";
 }

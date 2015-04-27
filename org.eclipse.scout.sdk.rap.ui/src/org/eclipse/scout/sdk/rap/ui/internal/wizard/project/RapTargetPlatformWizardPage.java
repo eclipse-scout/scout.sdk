@@ -49,7 +49,7 @@ import org.eclipse.swt.widgets.Group;
 
 public class RapTargetPlatformWizardPage extends AbstractProjectNewWizardPage {
 
-  private static final String[] RAP_PLUGIN_DETECTION_PREFIXES = new String[]{"org.eclipse.rap.rwt_3", "org.eclipse.scout.rt.ui.rap_4.3", "org.eclipse.scout.rt.ui.rap.mobile_4.3"};
+  private static final String[] RAP_PLUGIN_DETECTION_PREFIXES = new String[]{"org.eclipse.rap.rwt_3", "org.eclipse.scout.rt.ui.rap_5.0", "org.eclipse.scout.rt.ui.rap.mobile_5.0"};
   private static final String RAP_TARGET_DEFAULT_SUB_FOLDER = "rap_target";
 
   private static final String PROP_TARGET_STRATEGY = "propTargetStrategy";
