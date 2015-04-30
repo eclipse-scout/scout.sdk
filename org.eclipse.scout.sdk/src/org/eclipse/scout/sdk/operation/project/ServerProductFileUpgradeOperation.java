@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.util.JettyProductFileUpgradeOperation;
+import org.eclipse.scout.sdk.operation.util.MarsProductFileUpgradeOperation;
 import org.eclipse.scout.sdk.operation.util.OsgiSystemCapabilitiesAddOperation;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -70,6 +71,12 @@ public class ServerProductFileUpgradeOperation extends AbstractScoutProjectNewOp
       }
       else {
         jaxWsFragment = "org.eclipse.scout.jaxws216.jre17.fragment";
+      }
+
+      if (PlatformVersionUtility.isMarsOrLater(getTargetPlatformVersion())) {
+        MarsProductFileUpgradeOperation marsUpdateOp = new MarsProductFileUpgradeOperation(productFiles);
+        marsUpdateOp.validate();
+        marsUpdateOp.run(monitor, workingCopyManager);
       }
 
       // add jaxws fragments
