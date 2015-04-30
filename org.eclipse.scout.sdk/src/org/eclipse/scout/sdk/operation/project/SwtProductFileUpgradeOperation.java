@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.util.Batik17ProductFileUpgradeOperation;
+import org.eclipse.scout.sdk.operation.util.MarsProductFileUpgradeOperation;
 import org.eclipse.scout.sdk.operation.util.OsgiSystemCapabilitiesAddOperation;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.pde.ProductFileModelHelper;
@@ -85,6 +86,12 @@ public class SwtProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
       OsgiSystemCapabilitiesAddOperation osgiCapAddOperation = new OsgiSystemCapabilitiesAddOperation(m_swtProdFiles, javaVersionStr);
       osgiCapAddOperation.validate();
       osgiCapAddOperation.run(monitor, workingCopyManager);
+    }
+
+    if (PlatformVersionUtility.isMarsOrLater(getTargetPlatformVersion())) {
+      MarsProductFileUpgradeOperation marsUpdateOp = new MarsProductFileUpgradeOperation(m_swtProdFiles);
+      marsUpdateOp.validate();
+      marsUpdateOp.run(monitor, workingCopyManager);
     }
 
     if (PlatformVersionUtility.isMarsOrLater(getTargetPlatformVersion())) {

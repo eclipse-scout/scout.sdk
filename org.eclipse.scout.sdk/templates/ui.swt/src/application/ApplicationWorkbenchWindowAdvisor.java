@@ -33,6 +33,5 @@ public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor {
 		configurer.setShowProgressIndicator(true);
 		configurer.setShowMenuBar(true);
 		configurer.setShowPerspectiveBar(false);
-		configurer.setShowFastViewBars(false);
 	}
 }
