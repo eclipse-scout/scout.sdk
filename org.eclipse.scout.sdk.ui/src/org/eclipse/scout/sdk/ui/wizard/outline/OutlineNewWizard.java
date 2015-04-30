@@ -32,7 +32,7 @@ public class OutlineNewWizard extends AbstractWorkspaceWizard {
     setWindowTitle(Texts.get("NewOutline"));
 
     IScoutBundle clientBundle = UiUtility.getScoutBundleFromSelection(selection, ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
-    IType desktopType = UiUtility.getTypeFromSelection(selection, TypeFilters.getSubtypeFilter(IRuntimeClasses.IDesktop));
+    IType desktopType = UiUtility.getTypeFromSelection(selection, TypeFilters.getMultiTypeFilterOr(TypeFilters.getSubtypeFilter(IRuntimeClasses.IDesktop), TypeFilters.getSubtypeFilter(IRuntimeClasses.IDesktopExtension)));
 
     m_page1 = new OutlineNewWizardPage(clientBundle, desktopType);
     addPage(m_page1);
