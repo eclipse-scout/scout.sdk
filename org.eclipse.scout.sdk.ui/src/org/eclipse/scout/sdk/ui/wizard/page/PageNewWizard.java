@@ -89,7 +89,9 @@ public class PageNewWizard extends AbstractWorkspaceWizard {
       m_locationWizardPage.setExcludePage(true);
 
       String pck = UiUtility.getPackageSuffix(selection);
-      m_pageAttributePage.setTargetPackage(pck);
+      if (StringUtility.hasText(pck)) {
+        m_pageAttributePage.setTargetPackage(pck);
+      }
     }
   }
 
