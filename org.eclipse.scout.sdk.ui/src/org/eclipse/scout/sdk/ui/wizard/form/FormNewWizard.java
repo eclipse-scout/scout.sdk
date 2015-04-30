@@ -88,7 +88,9 @@ public class FormNewWizard extends AbstractServiceWizard {
 
     m_formPage = new FormNewWizardPage(m_clientBundle);
     m_formPage.addPropertyChangeListener(new P_LocationPropertyListener());
-    m_formPage.setTargetPackage(pck);
+    if (StringUtility.hasText(pck)) {
+      m_formPage.setTargetPackage(pck);
+    }
     addPage(m_formPage);
 
     if (m_clientBundle != null) {
