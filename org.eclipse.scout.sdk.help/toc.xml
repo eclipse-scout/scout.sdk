@@ -1,0 +1,12 @@
+<?xml version='1.0' encoding='utf-8' ?>
+<toc topic="html/scout_user_guide.html" label="Eclipse Scout User Guide">
+	<topic href="html/tutorial.html" label="Getting Started">
+		<topic href="html/tutorial_helloworld.html" label="Hello world Tutorial">
+			<topic href="html/tutorial_helloworld.html#create-a-scout-project" label="Create a Scout Project"></topic>
+			<topic href="html/tutorial_helloworld.html#run-the-application" label="Run the Application"></topic>
+			<topic href="html/tutorial_helloworld.html#add-the-user-interface-widgets" label="Add the User Interface Widgets"></topic>
+			<topic href="html/tutorial_helloworld.html#implement-the-server-service" label="Implement the Server Service"></topic>
+			<topic href="html/tutorial_helloworld.html#run-the-final-application" label="Run the Final Application"></topic>
+		</topic>
+	</topic>
+</toc>
