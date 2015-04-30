@@ -96,7 +96,9 @@ public class LookupCallNewWizard extends AbstractServiceWizard {
 
       // init
       String pck = UiUtility.getPackageSuffix(selection);
-      m_page1.setTargetPackage(pck);
+      if (StringUtility.hasText(pck)) {
+        m_page1.setTargetPackage(pck);
+      }
       m_page1.addPropertyChangeListener(new P_LocationPropertyListener());
     }
   }

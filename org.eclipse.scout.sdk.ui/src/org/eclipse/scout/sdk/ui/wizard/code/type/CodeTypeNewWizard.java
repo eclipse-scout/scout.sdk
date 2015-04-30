@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.ui.wizard.code.type;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.scout.commons.StringUtility;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.ui.action.create.CodeTypeNewAction;
 import org.eclipse.scout.sdk.ui.executor.AbstractWizardExecutor;
@@ -37,7 +38,9 @@ public class CodeTypeNewWizard extends AbstractWorkspaceWizard {
       String pck = UiUtility.getPackageSuffix(selection);
 
       m_page1 = new CodeTypeNewWizardPage(sharedBundle);
-      m_page1.setTargetPackage(pck);
+      if (StringUtility.hasText(pck)) {
+        m_page1.setTargetPackage(pck);
+      }
       addPage(m_page1);
     }
     else {

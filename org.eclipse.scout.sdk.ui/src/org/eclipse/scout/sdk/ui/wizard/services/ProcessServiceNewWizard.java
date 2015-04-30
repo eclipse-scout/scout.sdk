@@ -69,7 +69,9 @@ public class ProcessServiceNewWizard extends AbstractServiceWizard {
 
     m_serviceNewWizardPage = new ProcessServiceNewWizardPage(serverBundle);
     m_serviceNewWizardPage.addPropertyChangeListener(new P_LocationPropertyListener());
-    m_serviceNewWizardPage.setTargetPackage(pck);
+    if (StringUtility.hasText(pck)) {
+      m_serviceNewWizardPage.setTargetPackage(pck);
+    }
     addPage(m_serviceNewWizardPage);
 
     if (serverBundle != null) {

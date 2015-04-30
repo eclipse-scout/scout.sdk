@@ -86,7 +86,9 @@ public class SearchFormNewWizard extends AbstractWorkspaceWizard {
 
     P_StatusRevalidator statusProvider = new P_StatusRevalidator();
     m_page1 = new SearchFormNewWizardPage(clientBundle);
-    m_page1.setTargetPackage(pck);
+    if (StringUtility.hasText(pck)) {
+      m_page1.setTargetPackage(pck);
+    }
     m_page1.addStatusProvider(statusProvider);
     m_page1.setTablePageType(tablePageType);
     m_page1.setNlsName(nlsEntry);
