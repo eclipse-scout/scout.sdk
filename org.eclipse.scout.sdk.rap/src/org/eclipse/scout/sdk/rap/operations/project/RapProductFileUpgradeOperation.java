@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.compatibility.PlatformVersionUtility;
 import org.eclipse.scout.sdk.operation.project.AbstractScoutProjectNewOperation;
 import org.eclipse.scout.sdk.operation.util.Batik17ProductFileUpgradeOperation;
+import org.eclipse.scout.sdk.operation.util.MarsProductFileUpgradeOperation;
 import org.eclipse.scout.sdk.operation.util.OsgiSystemCapabilitiesAddOperation;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.typecache.IWorkingCopyManager;
@@ -76,6 +77,12 @@ public class RapProductFileUpgradeOperation extends AbstractScoutProjectNewOpera
       }
       op.validate();
       op.run(monitor, workingCopyManager);
+    }
+
+    if (PlatformVersionUtility.isMarsOrLater(getTargetPlatformVersion())) {
+      MarsProductFileUpgradeOperation marsUpdateOp = new MarsProductFileUpgradeOperation(m_prodFiles);
+      marsUpdateOp.validate();
+      marsUpdateOp.run(monitor, workingCopyManager);
     }
 
     boolean isMin18 = isMinJavaVersion(1.8);
