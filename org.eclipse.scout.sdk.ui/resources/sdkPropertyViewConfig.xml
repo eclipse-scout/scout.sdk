@@ -585,7 +585,7 @@
 		<config name="getConfiguredTextWrap" type="Advanced" category="Behavior" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.AbstractBasicField">
-		<config name="getConfiguredValidateOnAnyKey" type="Advanced" category="Behavior" />
+		<config name="getConfiguredUpdateDisplayTextOnModify" type="Advanced" category="Behavior" />
 	</type>
 	<type name="org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField">
 		<config name="getConfiguredGridW" type="Normal" category="Layout" />
