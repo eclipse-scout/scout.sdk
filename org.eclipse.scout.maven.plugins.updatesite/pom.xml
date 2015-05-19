@@ -55,7 +55,7 @@
         <artifactId>maven-compiler-plugin</artifactId>
         <version>2.5.1</version>
         <configuration>
-          <compiler-version>1.6</compiler-version>
+          <compiler-version>1.7</compiler-version>
         </configuration>
       </plugin>
       <plugin>
