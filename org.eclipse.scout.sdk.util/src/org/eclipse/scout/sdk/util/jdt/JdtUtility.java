@@ -59,7 +59,7 @@ import org.osgi.framework.Version;
 public final class JdtUtility {
 
   private static final String EXEC_ENV_PREFIX = "JavaSE-";
-  private static final String MIN_JVM_VERSION = "1.6";
+  private static final String MIN_JVM_VERSION = "1.7";
 
   private JdtUtility() {
   }
@@ -128,9 +128,8 @@ public final class JdtUtility {
 
   /**
    * Takes an java execution environment (e.g. "JavaSE-1.8") and parses the version as double (in this example 1.8).<br>
-   * If an invalid value is passed, always 1.6 is returned as minimal version.<br>
-   * Use {@link #getDefaultJvmExecutionEnvironment(Version)} to get the default execution environment in the current
-   * workspace.
+   * If an invalid value is passed, always 1.7 is returned as minimal version.<br>
+   * Use {@link #getDefaultJvmExecutionEnvironment()} to get the default execution environment in the current workspace.
    *
    * @param executionEnvId
    *          The execution environment to parse.
@@ -149,7 +148,7 @@ public final class JdtUtility {
         }
       }
     }
-    return 1.6;
+    return Double.parseDouble(MIN_JVM_VERSION);
   }
 
   public static String getAnnotationValueString(IAnnotation annotation, String name) throws JavaModelException {
@@ -336,7 +335,7 @@ public final class JdtUtility {
       return null;
     }
 
-    PublicScanner scanner = (PublicScanner) ToolFactory.createScanner(true, true, false, "1.7", "1.7");
+    PublicScanner scanner = (PublicScanner) ToolFactory.createScanner(true, true, false, MIN_JVM_VERSION, MIN_JVM_VERSION);
 
     char[] source = s.toCharArray();
     scanner.setSource(source);
@@ -486,7 +485,7 @@ public final class JdtUtility {
 
   /**
    * Waits until all JDT initializations have been executed.
-   * 
+   *
    * @see org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob
    */
   public static void waitForJdt() {
