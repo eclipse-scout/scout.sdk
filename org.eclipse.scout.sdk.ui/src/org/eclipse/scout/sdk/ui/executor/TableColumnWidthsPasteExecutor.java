@@ -200,7 +200,7 @@ public class TableColumnWidthsPasteExecutor extends AbstractExecutor {
   private String getStringFromClipboard() {
     try {
       Clipboard clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
-      Reader reader = DataFlavor.stringFlavor.getReaderForText(clipboard.getContents(null));
+      Reader reader = DataFlavor.getTextPlainUnicodeFlavor().getReaderForText(clipboard.getContents(null));
       return IOUtility.getContent(reader, true);
     }
     catch (Exception e) {
