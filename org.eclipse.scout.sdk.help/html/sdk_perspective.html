@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+ <head> 
+  <meta charset="UTF-8" /> 
+  <!--[if IE]><meta http-equiv="X-UA-Compatible" content="IE=edge"><![endif]--> 
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" /> 
+  <meta name="generator" content="Asciidoctor 1.5.2" /> 
+  <title>Scout Perspective</title> 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Open+Sans:300,300italic,400,400italic,600,600italic%7CNoto+Serif:400,400italic,700,700italic%7CDroid+Sans+Mono:400" /> 
+  <link rel="stylesheet" href="css/eclipse.css" /> 
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.2.0/css/font-awesome.min.css" /> 
+  <link rel="stylesheet" href="css/coderay-eclipse.css" /> 
+ </head> 
+ <body class="article">
+  <table border="0" class="navigation" style="width: 100%;" summary="navigation">
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk_view.html" shape="rect" title="Scout Views"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+   </tr>
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%">Scout Tooling</td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%">Scout Views</td>
+   </tr>
+  </table> 
+  <div id="header"> 
+  </div> 
+  <div id="content"> 
+   <div class="sect2"> 
+    <h3 id="scout-perspective"><a class="anchor" href="#scout-perspective"></a>Scout Perspective</h3> 
+    <div class="paragraph"> 
+     <p>The Scout SDK is added to the Eclipse IDE in the form of the Scout perspective</p> 
+    </div> 
+    <div class="paragraph"> 
+     <p>The Scout perspective contains two view parts: the <a href="sdk_view_explorer.html">Scout Explorer View</a> and <a href="sdk_view_object_properties.html">Scout Object Properties View</a>. Additionally, the Scout SDK contains a comprehensive set of wizards that support the developer in creating Scout application components.</p> 
+    </div> 
+    <div class="paragraph"> 
+     <p>The Scout Explorer view allows the developer to navigate the Scout application model. Once an element in the Scout Explorer is selected, the Scout Object properties view allows to validate and change properties of the selected element. Depending on the selection in the Scout Explorer, the Scout SDK offers appropriate context menus to start the related wizards.</p> 
+    </div> 
+    <div id="img-scout_sdk_perspective" class="imageblock"> 
+     <div class="content"> 
+      <img src="images/scout_sdk_perspective.png" alt="scout sdk perspective" /> 
+     </div> 
+     <div class="title">
+      Figure 1. The Scout SDK perspective. On the left hand side the Scout Explorer and the Scout Object Properties views are visible.
+     </div> 
+    </div> 
+    <div class="paragraph"> 
+     <p><a href="#img-scout_sdk_perspective">Figure 1</a> provides a screenshot of the Scout SDK perspective. In the Scout Explorer shown in the upper left part of the screenshot, the message field in the DesktopForm of the &#x201c;Hello World&#x201d; application is selected. In the Scout Object Properties located below, the message field&#x2019;s appearance, layout and behavior properties are displayed. On the right hand side, the corresponding source code is loaded in a Java editor.</p> 
+    </div> 
+    <div class="paragraph"> 
+     <p>When the developer changes a property of the selected element, the Java code is updated accordingly and vice versa. For example clicking the <em class="property">Mandatory</em> property in the Scout Object Properties of the message field will insert the method <span class="java">getConfiguredMandatory</span> to the message field&#x2019;s class. This demonstrates how the Scout SDK directly works on the Java source code. In fact, the Java source code is almost the only artifact relevant for the Scout SDK to &#x2018;understand&#x2019; the Scout application model. Taking advantage of this setup, the Scout SDK implements a full round-trip-engineering from creating the Java code for Scout application components, parsing code changes in the background, and displaying the current implementation of the Scout application in the Scout Explorer and the Scout Object Properties.</p> 
+    </div> 
+    <div class="paragraph"> 
+     <p>Thanks to the round-trip-engineering provided by the Scout SDK, the information presented in the Scout Explorer and the Scout Object Properties always stay in sync with the Java code of the Scout application. Start the Eclipse IDE with the workspace containing an &#x201c;Hello World&#x201d; application. Then, navigate to method <span class="java">getConfiguredLabel</span> as shown in <a href="#img-scout_sdk_perspective">Figure 1</a>, and add the java snippet shown below to the class <span class="java">MessageField</span>.</p> 
+    </div> 
+    <div class="listingblock"> 
+     <div class="content"> 
+      <pre class="CodeRay highlight"><code data-lang="java"><span class="annotation">@Override</span>
+<span class="directive">protected</span> <span class="type">boolean</span> getConfiguredMandatory() {
+  <span class="keyword">return</span> <span class="predefined-constant">true</span>;
+}</code></pre> 
+     </div> 
+    </div> 
+    <div class="paragraph"> 
+     <p>After having saved the code change, you can observe that the <em class="property">Mandatory</em> property in the section Behavior of the message field&#x2019;s Scout Object properties has changed its state. The font of its label is now presented in bold face and underlined, the checkbox is ticked and a red minus icon is shown on the right side of the property. Obviously, the Scout SDK is directly operating on the project&#x2019;s source code and does not rely or need any external meta data. This provides the flexibility to develop Scout applications with or without the support of the Scout SDK. And this choice offered to the Scout developer is one of the most important features provided by the Scout SDK. The Scout developer may take advantage of the development support provided by the Scout SDK without being restricted by the Scout tooling in any way.</p> 
+    </div> 
+    <div class="paragraph"> 
+     <p>Technically, the Scout SDK is a set of Eclipse plugins that operate on top of the Eclipse JDT and the Eclipse PDE projects. The Java Development Tools (JDT) <span class="footnote">[<a id="_footnoteref_1" class="footnote" href="#_footnote_1" title="View footnote.">1</a>]</span> contain the tooling to support the development of any Java applications, and the Plugin Development Environment (PDE) <span class="footnote">[<a id="_footnoteref_2" class="footnote" href="#_footnote_2" title="View footnote.">2</a>]</span> provides tools to create, develop, test, debug, build and deploy Eclipse plugins, and additional artifacts relevant for Eclipse based applications. As in the case of the Scout Runtime, the plugins representing the Scout SDK, the JDT and the PDE are all located in the <span class="filename">plugins</span> directory of your Eclipse installation and named <span class="filename">org.eclipse.scout.sdk.*</span>, <span class="filename">org.eclipse.jdt.*</span> and <span class="filename">org.eclipse.pde.*</span> .</p> 
+    </div> 
+   </div> 
+  </div> 
+  <div id="footnotes"> 
+   <hr /> 
+   <div class="footnote" id="_footnote_1"> 
+    <a href="#_footnoteref_1">1</a>. See the Eclipse JDT project page for details: 
+    <a href="http://www.eclipse.org/jdt/" class="bare">http://www.eclipse.org/jdt/</a>. 
+   </div> 
+   <div class="footnote" id="_footnote_2"> 
+    <a href="#_footnoteref_2">2</a>. See the Eclipse PDE project page for details: 
+    <a href="http://www.eclipse.org/pde/" class="bare">http://www.eclipse.org/pde/</a>. 
+   </div> 
+  </div> 
+  <table border="0" class="navigation" style="width: 100%;" summary="navigation">
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%"><a href="sdk.html" shape="rect" title="Scout Tooling"><img alt="Previous" border="0" src="images/prev.gif" /></a></td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"><a href="scout_user_guide.html" shape="rect" title="Eclipse Scout User Guide"><img alt="Eclipse Scout User Guide" border="0" src="images/home.gif" /></a></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%"><a href="sdk_view.html" shape="rect" title="Scout Views"><img alt="Next" border="0" src="images/next.gif" /></a></td>
+   </tr>
+   <tr>
+    <td align="left" colspan="1" rowspan="1" style="width: 30%">Scout Tooling</td>
+    <td align="center" colspan="1" rowspan="1" style="width: 40%"></td>
+    <td align="right" colspan="1" rowspan="1" style="width: 30%">Scout Views</td>
+   </tr>
+  </table>
+  <div id="footer"> 
+   <div id="footer-text">
+     Version 5.0.0-SNAPSHOT
+    <br /> Last updated 2015-06-08 15:18:50 CEST 
+   </div> 
+  </div>  
+ </body>
+</html>

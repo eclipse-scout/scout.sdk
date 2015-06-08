@@ -9,4 +9,11 @@
 			<topic href="html/tutorial_helloworld.html#run-the-final-application" label="Run the Final Application"></topic>
 		</topic>
 	</topic>
+	<topic href="html/sdk.html" label="Scout Tooling">
+		<topic href="html/sdk_perspective.html" label="Scout Perspective"></topic>
+		<topic href="html/sdk_view.html" label="Scout Views">
+			<topic href="html/sdk_view_explorer.html" label="Scout Explorer View"></topic>
+			<topic href="html/sdk_view_object_properties.html" label="Scout Object Properties View"></topic>
+		</topic>
+	</topic>
 </toc>
