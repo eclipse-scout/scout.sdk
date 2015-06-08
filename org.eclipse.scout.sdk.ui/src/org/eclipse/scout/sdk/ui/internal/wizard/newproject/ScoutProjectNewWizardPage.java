@@ -202,7 +202,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
 
   protected SimpleProposal[] getTargetPlatformProposals() {
     final String RECOMMENDED_VERSION = "3.8";
-    final String[][] supportedPlatforms = new String[][]{{"Indigo", "3.7"}, {"Juno", "3.8"}, {"Luna", "4.4"}, {"Mars", "4.5"}};
+    final String[][] supportedPlatforms = new String[][]{{"Indigo", "3.7"}, {"Juno", "3.8"}, {"Mars", "4.5"}};
     ArrayList<SimpleProposal> ret = new ArrayList<SimpleProposal>(supportedPlatforms.length);
     for (String[] platform : supportedPlatforms) {
       String codeName = platform[0];
