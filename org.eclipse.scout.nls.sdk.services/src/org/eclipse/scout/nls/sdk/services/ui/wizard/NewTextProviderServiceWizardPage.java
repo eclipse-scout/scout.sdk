@@ -39,7 +39,6 @@ import org.eclipse.scout.nls.sdk.model.util.Language;
 import org.eclipse.scout.nls.sdk.services.internal.NlsSdkService;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
 import org.eclipse.scout.nls.sdk.services.model.ws.project.ServiceNlsProjectProvider;
-import org.eclipse.scout.nls.sdk.simple.internal.NlsSdkSimple;
 import org.eclipse.scout.nls.sdk.simple.ui.wizard.ResourceProposalModel;
 import org.eclipse.scout.sdk.Texts;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
@@ -217,16 +216,12 @@ public class NewTextProviderServiceWizardPage extends AbstractWorkspaceWizardPag
       }
     });
 
-    List<IProject> projectList = new ArrayList<>();
     if (m_bundle.getProject() != null) {
-      try {
-        projectList = NlsSdkSimple.getProjectGroup(m_bundle.getProject());
-      }
-      catch (Exception e) {
-        NlsCore.logWarning(e);
-      }
+      model.setProjects(new IProject[]{m_bundle.getProject()});
     }
-    model.setProjects(projectList.toArray(new IProject[projectList.size()]));
+    else {
+      model.setProjects(new IProject[]{});
+    }
 
     KeyStroke stoke = KeyStroke.getInstance(SWT.CONTROL, ' ');
     m_translationFolderField = new TextProposalField(group, model, stoke);

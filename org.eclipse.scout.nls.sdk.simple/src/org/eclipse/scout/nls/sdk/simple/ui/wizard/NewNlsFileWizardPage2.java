@@ -12,8 +12,6 @@ package org.eclipse.scout.nls.sdk.simple.ui.wizard;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.FileNotFoundException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,7 +22,6 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceProxy;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -190,17 +187,9 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
     Group group = new Group(parent, SWT.NONE);
     group.setText("Translation File(s)");
     ResourceProposalModel model = new ResourceProposalModel();
-    List<IProject> projectList = new ArrayList<>();
+    IProject project = null;
     if (m_desc.getPlugin() != null) {
-      try {
-        projectList = NlsSdkSimple.getProjectGroup(m_desc.getPlugin());
-      }
-      catch (FileNotFoundException e) {
-        NlsCore.logWarning(e);
-      }
-      catch (CoreException e) {
-        NlsCore.logWarning(e);
-      }
+      project = m_desc.getPlugin();
     }
 
     model.setResourceFilter(new IResourceFilter() {
@@ -226,7 +215,7 @@ public class NewNlsFileWizardPage2 extends NewTypeWizardPage {
         return false;
       }
     });
-    model.setProjects(projectList.toArray(new IProject[projectList.size()]));
+    model.setProjects(new IProject[]{project});
 
     KeyStroke stoke = KeyStroke.getInstance(SWT.CONTROL, ' ');
     m_translationFolderField = new TextProposalField(group, model, stoke);

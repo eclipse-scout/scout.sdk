@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.simple.internal;
 
-import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
@@ -27,11 +26,6 @@ import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.core.IClasspathEntry;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.osgi.service.resolver.BundleDescription;
-import org.eclipse.osgi.service.resolver.HostSpecification;
-import org.eclipse.pde.core.plugin.IPluginModelBase;
-import org.eclipse.pde.core.plugin.PluginRegistry;
-import org.eclipse.pde.internal.core.natures.PDE;
 import org.eclipse.scout.nls.sdk.internal.jdt.INlsFolder;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsFolder;
 import org.eclipse.scout.nls.sdk.model.util.Language;
@@ -42,7 +36,6 @@ import org.osgi.framework.BundleContext;
 /**
  * The activator class controls the plug-in life cycle
  */
-@SuppressWarnings("restriction")
 public class NlsSdkSimple extends AbstractUIPlugin {
 
   // The plug-in ID
@@ -57,54 +50,6 @@ public class NlsSdkSimple extends AbstractUIPlugin {
    * The constructor
    */
   public NlsSdkSimple() {
-  }
-
-  /**
-   * Returns a list of all fragments of the host plugin specified by the hostPluginId. If no plugins are found
-   * an empty list is returned.
-   *
-   * @param hostPluginId
-   * @return all fragments of the passed host plugin id found in the workspace
-   * @throws CoreException
-   */
-  public static List<IProject> getWorkspaceFragments(String hostPluginId) throws CoreException {
-    List<IProject> fragments = new LinkedList<>();
-    IProject[] allProjects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-    for (IProject lookAt : allProjects) {
-      if (lookAt.isOpen() && lookAt.hasNature(JavaCore.NATURE_ID) && lookAt.hasNature(PDE.PLUGIN_NATURE)) {
-        IPluginModelBase b = PluginRegistry.findModel(lookAt);
-        if (b != null) {
-          HostSpecification hspec = b.getBundleDescription().getHost();
-          if (hspec != null) {
-            BundleDescription[] hosts = hspec.getHosts();
-            if (hosts != null && hosts.length > 0) {
-              if (hosts[0].getName().equals(hostPluginId)) {
-                fragments.add(lookAt);
-              }
-            }
-          }
-        }
-      }
-    }
-    return fragments;
-  }
-
-  public static List<IProject> getWorkspaceFragments(IProject project) throws CoreException {
-    return getWorkspaceFragments(project.getName());
-  }
-
-  /**
-   * finds all fragments to a cretain plugin project
-   *
-   * @param project
-   * @return
-   * @throws FileNotFoundException
-   * @throws CoreException
-   */
-  public static List<IProject> getProjectGroup(IProject project) throws FileNotFoundException, CoreException {
-    List<IProject> anesters = getWorkspaceFragments(project);
-    anesters.add(project);
-    return anesters;
   }
 
   public static Language getLanguage(String simpleFileName) {

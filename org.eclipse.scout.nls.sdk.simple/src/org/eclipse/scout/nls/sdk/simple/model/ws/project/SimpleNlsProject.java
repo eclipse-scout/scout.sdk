@@ -18,7 +18,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -86,12 +85,6 @@ public class SimpleNlsProject extends AbstractNlsProject {
       Path translationPath = new Path(nlsType.getTranslationsFolderName());
       for (IFile file : NlsSdkSimple.getAllTranslations(nlsType.getJavaProject().getProject(), translationPath, nlsType.getTranslationsPrefix())) {
         translationFiles.add(new WorkspaceTranslationFile(file));
-      }
-      List<IProject> workspaceFragments = NlsSdkSimple.getWorkspaceFragments(nlsType.getHostPluginId());
-      for (IProject fragment : workspaceFragments) {
-        for (IFile file : NlsSdkSimple.getAllTranslations(fragment, translationPath, nlsType.getTranslationsPrefix())) {
-          translationFiles.add(new WorkspaceTranslationFile(file));
-        }
       }
     }
     return translationFiles;

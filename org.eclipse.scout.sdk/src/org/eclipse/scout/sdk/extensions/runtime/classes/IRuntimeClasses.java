@@ -88,7 +88,6 @@ public interface IRuntimeClasses {
   String LocalLookupCall = "org.eclipse.scout.rt.shared.services.lookup.LocalLookupCall"; // NO_UCD
   String CodeLookupCall = "org.eclipse.scout.rt.shared.services.lookup.CodeLookupCall"; // NO_UCD
   String Order = "org.eclipse.scout.commons.annotations.Order"; // NO_UCD
-  String Ranking = "org.eclipse.scout.commons.annotations.Priority"; // NO_UCD   //TODO has been deleted in Scout RT
   String SearchFilter = "org.eclipse.scout.rt.shared.services.common.jdbc.SearchFilter"; // NO_UCD
   String ServerServiceFactory = "org.eclipse.scout.rt.server.services.ServerServiceFactory"; // NO_UCD   //TODO has been deleted in Scout RT
   String ProcessingException = "org.eclipse.scout.commons.exception.ProcessingException"; // NO_UCD

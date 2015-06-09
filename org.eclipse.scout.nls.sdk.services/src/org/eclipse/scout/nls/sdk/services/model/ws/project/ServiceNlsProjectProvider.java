@@ -20,33 +20,24 @@ import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IConfigurationElement;
-import org.eclipse.core.runtime.IExtension;
+import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.pde.internal.core.PDECore;
 import org.eclipse.scout.commons.CollectionUtility;
-import org.eclipse.scout.commons.CompareUtility;
 import org.eclipse.scout.nls.sdk.extension.INlsProjectProvider;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.internal.jdt.NlsJdtUtility;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
 import org.eclipse.scout.nls.sdk.services.model.ws.NlsServiceType;
-import org.eclipse.scout.sdk.ScoutSdkCore;
-import org.eclipse.scout.sdk.extensions.runtime.bundles.RuntimeBundles;
 import org.eclipse.scout.sdk.extensions.runtime.classes.IRuntimeClasses;
 import org.eclipse.scout.sdk.util.jdt.JdtUtility;
 import org.eclipse.scout.sdk.util.log.ScoutStatus;
 import org.eclipse.scout.sdk.util.type.ITypeFilter;
 import org.eclipse.scout.sdk.util.type.TypeUtility;
-import org.eclipse.scout.sdk.workspace.IScoutBundle;
-import org.eclipse.scout.sdk.workspace.ScoutBundleFilters;
-import org.eclipse.scout.sdk.workspace.type.ScoutTypeUtility;
 
-@SuppressWarnings("restriction")
 public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   public ServiceNlsProjectProvider() {
@@ -80,42 +71,11 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
    */
   private static Set<IType> getRegisteredTextProviderTypes(final Set<String> projectFilter) throws JavaModelException {
 
-    final class TextProviderService {
-      private final IType textProvider;
-      private final String contributingBundleName;
-
-      private TextProviderService(IType t) {
-        textProvider = t;
-        IScoutBundle b = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundle(t);
-        contributingBundleName = b == null ? "" : b.getSymbolicName();
-      }
-
-      @Override
-      public int hashCode() {
-        int ret = 1;
-        ret = ret * 27 + textProvider.getFullyQualifiedName().hashCode();
-        ret = ret * 19 + contributingBundleName.hashCode();
-        return ret;
-      }
-
-      @Override
-      public boolean equals(Object obj) {
-        if (obj instanceof TextProviderService) {
-          TextProviderService o = (TextProviderService) obj;
-          return textProvider.getFullyQualifiedName().equals(o.textProvider.getFullyQualifiedName())
-              && contributingBundleName.equals(o.contributingBundleName);
-        }
-        else {
-          return false;
-        }
-      }
-    }
-
     final class TextProviderServiceDeclaration {
-      private final TextProviderService svc;
+      private final IType svc;
       private final double prio;
 
-      private TextProviderServiceDeclaration(TextProviderService s, double p) {
+      private TextProviderServiceDeclaration(IType s, double p) {
         svc = s;
         prio = p;
       }
@@ -130,6 +90,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       @Override
       public boolean accept(IType type) {
         try {
+          if (Flags.isAbstract(type.getFlags())) {
+            return false;
+          }
+
           // only accept nls providers where source code is available. otherwise we cannot parse it anyway.
           ISourceRange range = type.getSourceRange();
           return range != null && range.getOffset() != -1;
@@ -142,78 +106,46 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         }
       }
     });
-    Map<String, IType> typeMap = new HashMap<>(serviceImpls.size());
-    for (IType t : serviceImpls) {
-      typeMap.put(t.getFullyQualifiedName(), t);
-    }
 
-    Map<TextProviderService, TextProviderServiceDeclaration> result = new HashMap<>(serviceImpls.size());
-    IExtension[] allServiceExtensions = PDECore.getDefault().getExtensionsRegistry().findExtensions(IRuntimeClasses.EXTENSION_POINT_SERVICES, true);
-    for (IExtension e : allServiceExtensions) {
-      for (IConfigurationElement c : e.getConfigurationElements()) {
-        if (IRuntimeClasses.EXTENSION_ELEMENT_SERVICE.equals(c.getName())) {
-          String serviceClassDef = c.getAttribute("class");
-          IType serviceImpl = typeMap.get(serviceClassDef);
-          if (acceptsFilter(projectFilter, serviceImpl)) {
-            TextProviderService s = new TextProviderService(serviceImpl);
-            TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(s, getPriority(serviceImpl, c));
+    Map<IType, TextProviderServiceDeclaration> result = new HashMap<>(serviceImpls.size());
+    for (IType serviceImpl : serviceImpls) {
+      if (acceptsFilter(projectFilter, serviceImpl)) {
+        TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(serviceImpl, getPriority(serviceImpl));
 
-            // if the same service is registered more than once with different priorities: use always the one with the higher priority
-            // meaning: if we have the current service with a higher prio in the list already -> do not overwrite with the new one.
-            TextProviderServiceDeclaration existing = result.get(s);
-            if (existing == null || existing.prio < d.prio) {
-              // we do not have this service or we have a service with lower prio -> overwrite
-              result.put(s, d);
-            }
-          }
+        // if the same service is registered more than once with different priorities: use always the one with the higher priority
+        // meaning: if we have the current service with a higher prio in the list already -> do not overwrite with the new one.
+        TextProviderServiceDeclaration existing = result.get(serviceImpl);
+        if (existing == null || existing.prio < d.prio) {
+          // we do not have this service or we have a service with lower prio -> overwrite
+          result.put(serviceImpl, d);
         }
       }
     }
 
     // we have ensured that every service is registered with its highest prio -> sort all services by prio
-    // use the level distance as second criteria
-    TextProviderServiceDeclaration[] sortedArrayHighestPrioFirst = result.values().toArray(new TextProviderServiceDeclaration[result.size()]);
-    Arrays.sort(sortedArrayHighestPrioFirst, new Comparator<TextProviderServiceDeclaration>() {
+    TextProviderServiceDeclaration[] sortedArrayLowestOrderFirst = result.values().toArray(new TextProviderServiceDeclaration[result.size()]);
+    Arrays.sort(sortedArrayLowestOrderFirst, new Comparator<TextProviderServiceDeclaration>() {
       @Override
       public int compare(TextProviderServiceDeclaration o1, TextProviderServiceDeclaration o2) {
         if (o2.prio != o1.prio) {
-          return Double.valueOf(o2.prio).compareTo(Double.valueOf(o1.prio));
+          return Double.valueOf(o1.prio).compareTo(Double.valueOf(o2.prio));
         }
 
-        int i1 = getIndexOf(o1.svc.contributingBundleName, projectFilter);
-        int i2 = getIndexOf(o2.svc.contributingBundleName, projectFilter);
-        if (i1 != i2) {
-          return Integer.valueOf(i1).compareTo(Integer.valueOf(i2));
-        }
-
-        if (o1.svc.textProvider.isBinary() != o2.svc.textProvider.isBinary()) {
+        if (o1.svc.isBinary() != o2.svc.isBinary()) {
           // prefer source types
-          return Boolean.valueOf(o1.svc.textProvider.isBinary()).compareTo(Boolean.valueOf(o2.svc.textProvider.isBinary()));
+          return Boolean.valueOf(o1.svc.isBinary()).compareTo(Boolean.valueOf(o2.svc.isBinary()));
         }
 
-        return o1.svc.textProvider.getElementName().compareTo(o2.svc.textProvider.getElementName());
+        return o1.svc.getElementName().compareTo(o2.svc.getElementName());
       }
     });
 
     // return the types of the services ordered by priority
-    Set<IType> returnValueSorted = new LinkedHashSet<>(sortedArrayHighestPrioFirst.length);
-    for (int i = 0; i < sortedArrayHighestPrioFirst.length; i++) {
-      returnValueSorted.add(sortedArrayHighestPrioFirst[i].svc.textProvider);
+    Set<IType> returnValueSorted = new LinkedHashSet<>(sortedArrayLowestOrderFirst.length);
+    for (int i = 0; i < sortedArrayLowestOrderFirst.length; i++) {
+      returnValueSorted.add(sortedArrayLowestOrderFirst[i].svc);
     }
     return returnValueSorted;
-  }
-
-  private static int getIndexOf(String searchEleemnt, Set<String> list) {
-    if (list != null && list.size() > 0) {
-      int i = 0;
-      for (String name : list) {
-        if (CompareUtility.equals(searchEleemnt, name)) {
-          return i;
-        }
-        i++;
-      }
-    }
-    return -1;
   }
 
   private static boolean acceptsFilter(Set<String> projects, IType candidate) throws JavaModelException {
@@ -231,21 +163,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return projects.contains(candidate.getJavaProject().getProject().getName());
   }
 
-  private static float getPriority(IType registration, IConfigurationElement config) {
-    // first check plugin.xml definition for ranking
-    String xmlRank = config.getAttribute(IRuntimeClasses.EXTENSION_SERVICE_RANKING);
-    if (xmlRank != null && xmlRank.length() > 0) {
-      try {
-        return Float.parseFloat(xmlRank);
-      }
-      catch (NumberFormatException e) {
-        //nop
-      }
-    }
-
-    // second check class annotation
+  private static float getPriority(IType registration) {
+    // check class annotation
     try {
-      IAnnotation a = JdtUtility.getAnnotation(registration, IRuntimeClasses.Ranking);
+      IAnnotation a = JdtUtility.getAnnotation(registration, IRuntimeClasses.Order);
       Double val = JdtUtility.getAnnotationValueNumeric(a, "value");
       if (val != null) {
         return val.floatValue();
@@ -311,42 +232,23 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return root;
   }
 
-  private static Set<String> getProjectNames(Set<? extends IJavaProject> scoutBundles) {
-    if (scoutBundles == null || scoutBundles.size() < 1) {
-      return null;
+  private static Set<String> getScoutBundleNamesForProject(IJavaProject p) throws JavaModelException {
+    String[] requiredProjectNames = p.getRequiredProjectNames();
+    Set<String> result = new HashSet<>(requiredProjectNames.length + 1);
+    result.add(p.getElementName());
+    for (String s : requiredProjectNames) {
+      result.add(s);
     }
-
-    Set<String> names = new HashSet<>(scoutBundles.size());
-    for (IJavaProject p : scoutBundles) {
-      names.add(p.getElementName());
-    }
-    return names;
+    return result;
   }
 
-  private static Set<? extends IJavaProject> getScoutBundlesForType(IType type) {
+  private static Set<String> getScoutBundleNamesForType(IType type) throws JavaModelException {
     IJavaProject javaProject = type.getJavaProject();
-    IScoutBundle b = ScoutTypeUtility.getScoutBundle(javaProject);
-    if (b == null && RuntimeBundles.contains(javaProject.getElementName())) {
-      // it is an RT bundle: directly return the bundle
-      return CollectionUtility.hashSet(javaProject);
-    }
-    return getParentSharedBundlesFor(b);
-  }
-
-  private static Set<? extends IJavaProject> getParentSharedBundlesFor(IScoutBundle b) {
-    if (b == null) {
-      return null;
-    }
-    Set<? extends IScoutBundle> parentBundles = b.getParentBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_SHARED), true);
-    Set<IJavaProject> parentProjects = new HashSet<>(parentBundles.size());
-    for (IScoutBundle sb : parentBundles) {
-      parentProjects.add(sb.getJavaProject());
-    }
-    return parentProjects;
+    return getScoutBundleNamesForProject(javaProject);
   }
 
   private INlsProject getNlsProjectTree(IType type) throws CoreException {
-    Set<IType> nlsProviders = getRegisteredTextProviderTypes(getProjectNames(getScoutBundlesForType(type)));
+    Set<IType> nlsProviders = getRegisteredTextProviderTypes(getScoutBundleNamesForType(type));
     if (nlsProviders == null) {
       return null;
     }
@@ -385,22 +287,32 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         }
       }
       else if (args.length == 2 && args[0] instanceof IType) {
-        if (args[1] instanceof IScoutBundle || args[1] == null) {
+        if (args[1] instanceof IJavaProject || args[1] == null) {
           // all text services in the given project with given kind (texts or normal)
-          return getAllProjects(getParentSharedBundlesFor((IScoutBundle) args[1]));
+          try {
+            return getAllProjects(getScoutBundleNamesForProject((IJavaProject) args[1]));
+          }
+          catch (CoreException e) {
+            NlsCore.logWarning("Could not load text provider services.", e);
+          }
         }
         else if (args[1] instanceof IType) {
-          // all text services with given kind available in the plugins defining the given type
-          return getAllProjects(getScoutBundlesForType((IType) args[1]));
+          try {
+            // all text services with given kind available in the plugins defining the given type
+            return getAllProjects(getScoutBundleNamesForType((IType) args[1]));
+          }
+          catch (CoreException e) {
+            NlsCore.logWarning("Could not load text provider services for type '" + args[1].toString() + "'.", e);
+          }
         }
       }
     }
     return null;
   }
 
-  private INlsProject getAllProjects(Set<? extends IJavaProject> wsBundles) {
+  private INlsProject getAllProjects(Set<String> wsBundles) {
     try {
-      return getNlsProjectTreeProjectName(getProjectNames(wsBundles));
+      return getNlsProjectTreeProjectName(wsBundles);
     }
     catch (CoreException e) {
       NlsCore.logWarning("Could not load full text provider service tree.", e);

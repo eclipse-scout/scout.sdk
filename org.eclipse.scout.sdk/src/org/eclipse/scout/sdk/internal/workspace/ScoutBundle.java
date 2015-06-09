@@ -295,7 +295,7 @@ public class ScoutBundle implements IScoutBundle {
           try {
             registerNlsServiceListener();
             result = new Holder<>(INlsProject.class, null);
-            INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(IRuntimeClasses.TEXTS), this});
+            INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{TypeUtility.getType(IRuntimeClasses.TEXTS), getJavaProject()});
             result.setValue(nlsProject);
             m_nlsProjectHolder = result;
           }

@@ -15,7 +15,6 @@ import java.util.HashMap;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.pde.core.plugin.PluginRegistry;
 import org.eclipse.scout.nls.sdk.extension.INlsProjectProvider;
 import org.eclipse.scout.nls.sdk.internal.NlsCore;
 import org.eclipse.scout.nls.sdk.model.workspace.project.INlsProject;
@@ -70,7 +69,7 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
         if (f.getName().toLowerCase().endsWith(".nls")) {
           try {
             AbstractNlsFile nlsFile = AbstractNlsFile.loadNlsFile(f);
-            if (PluginRegistry.findModel(nlsFile.getProject()) != null && nlsFile.getNlsTypeName() != null) {
+            if (nlsFile.getNlsTypeName() != null) {
               IType type = TypeUtility.getType(nlsFile.getNlsTypeName());
               INlsProject simpleProj = getNlsProject(type);
               if (simpleProj != null) {

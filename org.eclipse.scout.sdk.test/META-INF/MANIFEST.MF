@@ -7,7 +7,6 @@ Bundle-Activator: org.eclipse.scout.sdk.internal.test.Activator
 Bundle-Vendor: Eclipse Scout Project
 Require-Bundle: org.eclipse.scout.sdk;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
  org.eclipse.scout.sdk.ui;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
- org.eclipse.scout.rt.testing.shared;bundle-version="[5.1.0,5.2.0)";visibility:=reexport,
  org.eclipse.scout.sdk.testing;bundle-version="[5.1.0,5.2.0)"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.7
 Bundle-ActivationPolicy: lazy
@@ -38,8 +37,7 @@ Export-Package: org.eclipse.scout.sdk,
  org.eclipse.scout.sdk.internal.test.types,
  org.eclipse.scout.sdk.internal.test.util,
  org.eclipse.scout.sdk.internal.test.util.signature,
- org.eclipse.scout.sdk.internal.test.workspace,
- org.eclipse.scout.sdk.test
+ org.eclipse.scout.sdk.internal.test.workspace
 Import-Package: org.hamcrest.core;version="[1.1.0,2.0.0)",
  org.junit;version="[4.9.0,5.0.0)",
  org.junit.runner;version="[4.9.0,5.0.0)",

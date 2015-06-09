@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.nls.sdk.simple.ui.wizard;
 
-import java.io.FileNotFoundException;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,16 +38,10 @@ public class TranslationLocationSmartFieldModel implements ISmartFieldModel {
     m_folders = new LinkedList<>();
     List<INlsFolder> folds = new LinkedList<>();
     try {
-      List<IProject> projects = NlsSdkSimple.getProjectGroup(m_project);
-      for (IProject toCheck : projects) {
-        folds.addAll(NlsSdkSimple.getFoldersOfProject(toCheck, m_path));
-      }
+      folds.addAll(NlsSdkSimple.getFoldersOfProject(m_project, m_path));
       for (INlsFolder folder : folds) {
         m_folders.add(folder);
       }
-    }
-    catch (FileNotFoundException e) {
-      NlsCore.logWarning(e);
     }
     catch (CoreException e) {
       NlsCore.logWarning(e);
