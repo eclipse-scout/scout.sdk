@@ -32,12 +32,12 @@
   <properties>
     <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</tycho.scmUrl>
     <target-platform>eclipse-indigo</target-platform>
-    
+
     <!-- exclude the unit tests from sonar -->
     <sonar.exclusions>
       file:**/org.eclipse.scout.sdk.test/**
     </sonar.exclusions>
-    
+
     <!-- exclude the unit tests and UI (we have no UI tests anyway) from sonar -->
     <sonar.coverage.exclusions>
       file:**/org.eclipse.scout.sdk.test/**,
@@ -85,17 +85,319 @@
   </modules>
 
   <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-compiler-plugin</artifactId>
-        <configuration>
-          <compilerArguments>
-            <properties>${project.basedir}/../org.eclipse.scout.sdk-feature/.settings/org.eclipse.jdt.core.prefs</properties>
-          </compilerArguments>
-        </configuration>
-      </plugin>
-    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>target-platform-configuration</artifactId>
+          <version>${tycho.version}</version>
+          <configuration>
+            <filters>
+              <!-- work around Equinox bug 348045 -->
+              <filter>
+                <type>p2-installable-unit</type>
+                <id>org.eclipse.equinox.servletbridge.extensionbundle</id>
+                <removeAll />
+              </filter>
+            </filters>
+            <resolver>p2</resolver>
+            <pomDependencies>consider</pomDependencies>
+            <target>
+              <artifact>
+                <groupId>org.eclipse.scout.sdk</groupId>
+                <artifactId>org.eclipse.scout.sdk.target</artifactId>
+                <version>${scout.version}</version>
+                <classifier>${target-platform}</classifier>
+              </artifact>
+            </target>
+            <environments>
+              <environment>
+                <os>linux</os>
+                <ws>gtk</ws>
+                <arch>x86</arch>
+              </environment>
+              <environment>
+                <os>linux</os>
+                <ws>gtk</ws>
+                <arch>x86_64</arch>
+              </environment>
+              <environment>
+                <os>linux</os>
+                <ws>gtk</ws>
+                <arch>ppc64</arch>
+              </environment>
+              <environment>
+                <os>linux</os>
+                <ws>gtk</ws>
+                <arch>s390</arch>
+              </environment>
+              <environment>
+                <os>linux</os>
+                <ws>gtk</ws>
+                <arch>s390x</arch>
+              </environment>
+              <environment>
+                <os>win32</os>
+                <ws>win32</ws>
+                <arch>x86</arch>
+              </environment>
+              <environment>
+                <os>win32</os>
+                <ws>win32</ws>
+                <arch>x86_64</arch>
+              </environment>
+              <environment>
+                <os>macosx</os>
+                <ws>cocoa</ws>
+                <arch>x86_64</arch>
+              </environment>
+              <environment>
+                <os>solaris</os>
+                <ws>gtk</ws>
+                <arch>sparc</arch>
+              </environment>
+              <environment>
+                <os>solaris</os>
+                <ws>gtk</ws>
+                <arch>x86</arch>
+              </environment>
+            </environments>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <!-- Used for attaching target-files to the artifact in org.eclipse.scout.target -->
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.7</version>
+        </plugin>
+
+        <plugin>
+          <!-- Activates Tycho so Maven knows the new packaging types eclipse-plugin... -->
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-maven-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <extensions>true</extensions>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.cbi.maven.plugins</groupId>
+          <artifactId>eclipse-cbi-plugin</artifactId>
+          <version>${cbi-plugins.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-compiler-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.eclipse.jdt</groupId>
+              <artifactId>org.eclipse.jdt.core</artifactId>
+              <version>${cbi-jdt-version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <source>${compileSource}</source>
+            <encoding>${project.build.sourceEncoding}</encoding>
+            <showWarnings>true</showWarnings>
+            <showDeprecation>true</showDeprecation>
+            <extraClasspathElements>
+              <extraClasspathElement>
+                <groupId>javax.mail</groupId>
+                <artifactId>mail</artifactId>
+                <version>1.4.3</version>
+              </extraClasspathElement>
+              <extraClasspathElement>
+                <groupId>javax.jms</groupId>
+                <artifactId>jms-api</artifactId>
+                <version>1.1-rev-1</version>
+              </extraClasspathElement>
+              <extraClasspathElement>
+                <groupId>jdk</groupId>
+                <artifactId>tools.jar</artifactId>
+                <version>1.0.0</version>
+                <scope>system</scope>
+                <systemPath>${tools-jar}</systemPath>
+              </extraClasspathElement>
+            </extraClasspathElements>
+            <compilerArgument>-warn:-deprecation,raw,unchecked</compilerArgument>
+            <compilerArguments>
+              <properties>${project.basedir}/../org.eclipse.scout.sdk-feature/.settings/org.eclipse.jdt.core.prefs</properties>
+              <inlineJSR />
+              <enableJavadoc />
+              <encoding>${project.build.sourceEncoding}</encoding>
+              <log>${project.build.directory}/@dot.xml</log>
+            </compilerArguments>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-packaging-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <dependencies>
+            <dependency>
+              <groupId>org.eclipse.tycho.extras</groupId>
+              <artifactId>tycho-buildtimestamp-jgit</artifactId>
+              <version>${tycho-extras.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.eclipse.tycho.extras</groupId>
+              <artifactId>tycho-sourceref-jgit</artifactId>
+              <version>${tycho-extras.version}</version>
+            </dependency>
+          </dependencies>
+          <configuration>
+            <strictBinIncludes>false</strictBinIncludes>
+            <format>yyyyMMdd-HHmm</format>
+            <timestampProvider>jgit</timestampProvider>
+            <!-- Prevent build from failing due to a dirty git working tree -->
+            <jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
+            <jgit.ignore>
+              pom.xml
+            </jgit.ignore>
+            <sourceReferences>
+              <generate>true</generate>
+            </sourceReferences>
+            <archive>
+              <addMavenDescriptor>false</addMavenDescriptor>
+            </archive>
+            <additionalFileSets>
+              <fileSet>
+                <directory>${project.build.directory}</directory>
+                <includes>
+                  <include>.api_description</include>
+                </includes>
+              </fileSet>
+            </additionalFileSets>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-surefire-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <configuration>
+            <!-- <debugPort>5050</debugPort> -->
+            <!-- don't run tests in UI thread and harness per default (i.e., run them headless) -->
+            <!-- see http://wiki.eclipse.org/Minerva#Headless_Tests -->
+            <!-- see http://wiki.eclipse.org/Tycho/Packaging_Types#eclipse-test-plugin for semantics of useUIHarness etc. -->
+            <useUIHarness>false</useUIHarness>
+            <useUIThread>false</useUIThread>
+            <!-- Convention: We don't use test suites. All Test classes should end with "*Test.java". Everything else is not executed by default. -->
+            <includes>
+              <include>**/*Test.java</include>
+            </includes>
+            <excludes>
+              <!-- test mojo matches TestProject be default and treats it as PojoTest -->
+              <exclude>**/Test*.class</exclude>
+            </excludes>
+            <!-- Kill test JVM if tests take more than 5 minutes (300 seconds) to finish -->
+            <forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
+            <!-- do not abort on test failures -->
+            <failIfNoTests>false</failIfNoTests>
+            <testFailureIgnore>true</testFailureIgnore>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-source-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <configuration>
+            <archive>
+              <addMavenDescriptor>false</addMavenDescriptor>
+            </archive>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-p2-director-plugin</artifactId>
+          <version>${tycho.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-p2-repository-plugin</artifactId>
+          <version>${tycho.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.tycho.extras</groupId>
+          <artifactId>tycho-source-feature-plugin</artifactId>
+          <version>${tycho-extras.version}</version>
+          <configuration>
+            <archive>
+              <addMavenDescriptor>false</addMavenDescriptor>
+            </archive>
+          </configuration>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.tycho.extras</groupId>
+          <artifactId>tycho-custom-bundle-plugin</artifactId>
+          <version>${tycho-extras.version}</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-p2-plugin</artifactId>
+          <version>${tycho.version}</version>
+          <configuration>
+            <baselineMode>warn</baselineMode>
+            <baselineReplace>none</baselineReplace>
+            <baselineRepositories>
+              <repository>
+                <url>${comparator.repo}</url>
+              </repository>
+            </baselineRepositories>
+          </configuration>
+        </plugin>
+        <!--This plugin's configuration is used to store Eclipse m2e settings
+          only. It has no influence on the Maven build itself. -->
+        <plugin>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
+          <configuration>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>
+                      org.eclipse.cbi.maven.plugins
+                    </groupId>
+                    <artifactId>
+                      eclipse-cbi-plugin
+                    </artifactId>
+                    <versionRange>
+                      [1.0.1-SNAPSHOT,)
+                    </versionRange>
+                    <goals>
+                      <goal>
+                        generate-api-build-xml
+                      </goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
+          </configuration>
+        </plugin>
+
+        <!--Use this plugin to set the version to a release or snapshot in Manifests, poms, repositories-->
+        <plugin>
+          <groupId>org.eclipse.tycho</groupId>
+          <artifactId>tycho-versions-plugin</artifactId>
+          <version>${tycho.version}</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
   </build>
 
   <profiles>
@@ -109,14 +411,14 @@
             <configuration>
               <target>
                 <artifact>
-                  <groupId>org.eclipse.scout</groupId>
-                  <artifactId>org.eclipse.scout.target</artifactId>
+                  <groupId>org.eclipse.scout.sdk</groupId>
+                  <artifactId>org.eclipse.scout.sdk.target</artifactId>
                   <version>${scout.version}</version>
                   <classifier>${target-platform}</classifier>
                 </artifact>
                 <artifact>
-                  <groupId>org.eclipse.scout</groupId>
-                  <artifactId>org.eclipse.scout.target</artifactId>
+                  <groupId>org.eclipse.scout.sdk</groupId>
+                  <artifactId>org.eclipse.scout.sdk.target</artifactId>
                   <version>${scout.version}</version>
                   <classifier>only-scout-rt</classifier>
                 </artifact>
@@ -126,6 +428,146 @@
         </plugins>
       </build>
     </profile>
-  </profiles>
 
+    <profile>
+      <id>eclipse-sign</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>target-platform-configuration</artifactId>
+            <version>${tycho.version}</version>
+            <configuration>
+              <includePackedArtifacts>false</includePackedArtifacts>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-pack200a-plugin</artifactId>
+            <version>${tycho-extras.version}</version>
+            <executions>
+              <execution>
+                <id>pack200-normalize</id>
+                <goals>
+                  <goal>normalize</goal>
+                </goals>
+                <phase>verify</phase>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.cbi.maven.plugins</groupId>
+            <artifactId>eclipse-jarsigner-plugin</artifactId>
+            <version>${jarsigner.version}</version>
+            <executions>
+              <execution>
+                <id>sign</id>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+                <phase>verify</phase>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-pack200b-plugin</artifactId>
+            <version>${tycho-extras.version}</version>
+            <executions>
+              <execution>
+                <id>pack200-pack</id>
+                <goals>
+                  <goal>pack</goal>
+                </goals>
+                <phase>verify</phase>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-p2-plugin</artifactId>
+            <version>${tycho.version}</version>
+            <executions>
+              <execution>
+                <id>p2-metadata</id>
+                <goals>
+                  <goal>p2-metadata</goal>
+                </goals>
+                <phase>verify</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <defaultP2Metadata>false</defaultP2Metadata>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>eclipse-pack</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>target-platform-configuration</artifactId>
+            <version>${tycho.version}</version>
+            <configuration>
+              <includePackedArtifacts>true</includePackedArtifacts>
+            </configuration>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-pack200a-plugin</artifactId>
+            <version>${tycho-extras.version}</version>
+            <executions>
+              <execution>
+                <id>pack200-normalize</id>
+                <goals>
+                  <goal>normalize</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho.extras</groupId>
+            <artifactId>tycho-pack200b-plugin</artifactId>
+            <version>${tycho-extras.version}</version>
+            <executions>
+              <execution>
+                <id>pack200-pack</id>
+                <goals>
+                  <goal>pack</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.eclipse.tycho</groupId>
+            <artifactId>tycho-p2-plugin</artifactId>
+            <version>${tycho.version}</version>
+            <executions>
+              <execution>
+                <id>p2-metadata</id>
+                <goals>
+                  <goal>p2-metadata</goal>
+                </goals>
+                <phase>package</phase>
+              </execution>
+            </executions>
+            <configuration>
+              <defaultP2Metadata>false</defaultP2Metadata>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

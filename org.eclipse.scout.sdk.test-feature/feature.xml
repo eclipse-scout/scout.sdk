@@ -27,7 +27,7 @@
    <requires>
       <import feature="org.eclipse.scout.sdk" version="5.1.0" match="greaterOrEqual"/>
       <import feature="org.eclipse.scout.sdk.source" version="5.1.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.scout.rt.testing.shared" version="5.1.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.scout.rt.testing.shared" version="5.0.0" match="greaterOrEqual"/>
    </requires>
 
    <plugin
