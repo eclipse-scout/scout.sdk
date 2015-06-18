@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout SDK Help content
+Bundle-SymbolicName: org.eclipse.scout.sdk.doc;singleton:=true
+Bundle-Version: 5.0.0.qualifier
+Bundle-Vendor: Eclipse Scout Project
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
