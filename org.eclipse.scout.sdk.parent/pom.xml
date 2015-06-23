@@ -1,56 +1,33 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-   Copyright (c) 2012,2013 BSI Business Systems Integration AG.
-   All rights reserved. This program and the accompanying materials
-   are made available under the terms of the Eclipse Public License v1.0
-   which accompanies this distribution, and is available at
-   http://www.eclipse.org/legal/epl-v10.html
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  Contributors:
-     Stephan Leicht Vogt - initial implementation
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>scout.sdk</groupId>
+	<artifactId>org.eclipse.scout.sdk.parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
 
-  <parent>
-    <groupId>org.eclipse.scout</groupId>
-    <artifactId>org.eclipse.scout.sdk</artifactId>
-    <version>5.1.0-SNAPSHOT</version>
-  </parent>
-
-  <groupId>org.eclipse.scout.sdk</groupId>
-  <artifactId>org.eclipse.scout.sdk.parent</artifactId>
-  <packaging>pom</packaging>
-
-  <modules>
-    <module>../org.eclipse.scout.sdk.target</module>
-
-    <module>../org.eclipse.scout.sdk.compatibility</module>
-    <module>../org.eclipse.scout.sdk.compatibility.v37v41.fragment</module>
-    <module>../org.eclipse.scout.sdk.compatibility.v38v42.fragment</module>
-    <module>../org.eclipse.scout.sdk.compatibility.v43.fragment</module>
-    <module>../org.eclipse.scout.sdk.compatibility.v44.fragment</module>
-    <module>../org.eclipse.scout.sdk.compatibility.v45.fragment</module>
-    <module>../org.eclipse.scout.sdk.util</module>
-    <module>../org.eclipse.scout.nls.sdk</module>
-    <module>../org.eclipse.scout.nls.sdk.simple</module>
-    <module>../org.eclipse.scout.nls.sdk.services</module>
-    <module>../org.eclipse.scout.sdk</module>
-    <module>../org.eclipse.scout.sdk.ui</module>
-    <module>../org.eclipse.scout.sdk.debug</module>
-    <module>../org.eclipse.scout.sdk.help</module>
-    <module>../org.eclipse.scout.sdk.ws.jaxws</module>
-
-    <module>../org.eclipse.scout.sdk.test</module>
-    <module>../org.eclipse.scout.sdk.test-feature</module>
-
-    <module>../org.eclipse.scout.sdk.testing</module>
-    <module>../org.eclipse.scout.sdk.testing-feature</module>
-
-    <module>../org.eclipse.scout.sdk-feature</module>
-
-    <module>../org.eclipse.scout.sdk-repository</module>
-  </modules>
+	<build>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-compiler-plugin</artifactId>
+					<version>3.2</version>
+					<configuration>
+						<compilerId>eclipse</compilerId>
+						<source>1.7</source>
+						<target>1.7</target>
+					</configuration>
+					<dependencies>
+						<dependency>
+							<groupId>org.codehaus.plexus</groupId>
+							<artifactId>plexus-compiler-eclipse</artifactId>
+							<version>2.5</version>
+						</dependency>
+					</dependencies>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
 </project>

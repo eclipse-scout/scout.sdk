@@ -1,8 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<plugin>
-  <extension point="org.eclipse.scout.service.services">
-    <proxy class="test.shared.services.process.ICompanyProcessService" factory="org.eclipse.scout.rt.client.services.ClientProxyServiceFactory"/>
-  </extension>
-  <extension point="org.eclipse.scout.service.services">
-  </extension>
-</plugin>

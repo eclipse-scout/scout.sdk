@@ -1,0 +1,113 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>scout.sdk.s2e</groupId>
+		<artifactId>org.eclipse.scout.sdk.s2e.parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<artifactId>org.eclipse.scout.sdk.s2e</artifactId>
+	<packaging>bundle</packaging>
+
+	<properties>
+		<bundle.symbolicName>org.eclipse.scout.sdk.s2e</bundle.symbolicName>
+		<package.namespace>org.eclipse.scout.sdk.s2e</package.namespace>
+		<package.version>0.0.1</package.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<artifactId>org.eclipse.scout.sdk.core.s</artifactId>
+			<groupId>scout.sdk</groupId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.core</groupId>
+			<artifactId>org.eclipse.core.runtime</artifactId>
+			<version>[3.7.0,4.0.0)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.core</groupId>
+			<artifactId>org.eclipse.core.resources</artifactId>
+			<version>[3.7.100,4.0.0)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.core</groupId>
+			<artifactId>org.eclipse.core.jobs</artifactId>
+			<version>[3.5.100,4.0.0)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.core</groupId>
+			<artifactId>org.eclipse.core.jobs</artifactId>
+			<version>[3.5.100,4.0.0)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.osgi</groupId>
+			<artifactId>org.eclipse.osgi</artifactId>
+			<version>3.7.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>org.eclipse.jdt.core</artifactId>
+			<version>3.7.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.equinox</groupId>
+			<artifactId>preferences</artifactId>
+			<version>3.5.200-v20140224-1527</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+						<Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
+						<Import-Package>
+							!org.apache.tools.*,
+							!javax.*,
+							!org.eclipse.core.runtime.*,
+							!org.eclipse.jdt.core.*,
+							!org.osgi.framework.*,
+							!org.w3c.dom
+						</Import-Package>
+						<Export-Package>
+							${package.namespace}.internal.*;version="${package.version}";x-friends:="${bundle.symbolicName}.test",
+							${package.namespace}.*;version="${package.version}"
+						</Export-Package>
+						<_exportcontents>
+							!about.html,
+							!ecj.1,
+							!org.apache.commons.io.*,
+							!org.eclipse.jdt.*,
+							org.eclipse.jdt.*;version="4.4.2",
+							*
+						</_exportcontents>
+						<Require-Bundle>
+							org.eclipse.core.runtime;bundle-version="[3.7.0,4.0.0)";visibility:=reexport,
+							org.eclipse.core.resources;bundle-version="[3.7.100,4.0.0)";visibility:=reexport,
+							org.eclipse.jdt.core;bundle-version="[3.7.1,4.0.0)";visibility:=reexport,
+							org.eclipse.text;bundle-version="[3.5.0,4.0.0)";visibility:=reexport
+						</Require-Bundle>
+						<Bundle-Activator>org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator</Bundle-Activator>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+
+
+</project>

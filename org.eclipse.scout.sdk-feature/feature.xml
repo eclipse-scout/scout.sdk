@@ -4,7 +4,7 @@
       label="%featureName"
       version="5.1.0.qualifier"
       provider-name="%providerName"
-      plugin="org.eclipse.scout.sdk"
+      plugin="org.eclipse.scout.sdk.s2e"
       license-feature="org.eclipse.license"
       license-feature-version="0.0.0">
 
@@ -26,111 +26,25 @@
    </url>
 
    <requires>
-      <import feature="org.eclipse.pde" version="3.7.2" match="greaterOrEqual"/>
       <import feature="org.eclipse.platform" version="3.7.2" match="greaterOrEqual"/>
       <import feature="org.eclipse.jdt" version="3.7.2" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.scout.commons" version="5.0.0" match="greaterOrEqual"/>
-      <import plugin="javax.wsdl" version="1.5.1" match="greaterOrEqual"/>
    </requires>
 
    <plugin
-         id="org.eclipse.scout.nls.sdk"
+         id="org.eclipse.scout.sdk.s2e"
+         download-size="0"
+         install-size="0"
+         version="0.0.0"/>
+
+   <plugin
+         id="org.eclipse.scout.sdk.s2e.nls"
          download-size="0"
          install-size="0"
          version="0.0.0"
          unpack="false"/>
 
    <plugin
-         id="org.eclipse.scout.sdk"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.sdk.ui"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.nls.sdk.services"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.nls.sdk.simple"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.sdk.util"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.sdk.ws.jaxws"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.sdk.compatibility"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.sdk.compatibility.v37v41.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.sdk.compatibility.v38v42.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.sdk.compatibility.v43.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.sdk.compatibility.v44.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.sdk.compatibility.v45.fragment"
-         download-size="0"
-         install-size="0"
-         version="0.0.0"
-         fragment="true"
-         unpack="false"/>
-
-   <plugin
-         id="org.eclipse.scout.sdk.help"
+         id="org.eclipse.scout.sdk.s2e.ui"
          download-size="0"
          install-size="0"
          version="0.0.0"

@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="nlsImporter" name="NLS Importer" schema="schema/nlsImporter.exsd"/>
+   <extension-point id="nlsExporter" name="NLS Exporter" schema="schema/nlsExporter.exsd"/>
+   <extension-point id="nlsProvider" name="NLS Provider" schema="schema/nlsProvider.exsd"/>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="org.eclipse.scout.sdk.s2e.nls.internal.ui.editor.NlsEditor"
+            icon="resources/icons/view_nls.gif"
+            extensions="nls"
+            default="false"
+            id="org.eclipse.scout.sdk.s2e.nlsEditor"
+            name="NLS Editor">
+      </editor>
+   </extension>
+   <extension point="org.eclipse.scout.sdk.s2e.nls.nlsProvider">
+      <provider class="org.eclipse.scout.sdk.s2e.nls.internal.simpleProject.SimpleNlsProjectProvider"></provider>
+      <provider class="org.eclipse.scout.sdk.s2e.nls.internal.serviceProject.ServiceNlsProjectProvider"></provider>
+   </extension>
+</plugin>

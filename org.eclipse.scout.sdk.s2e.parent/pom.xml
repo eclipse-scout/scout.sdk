@@ -1,0 +1,139 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>scout.sdk</groupId>
+		<artifactId>org.eclipse.scout.sdk.parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
+
+	<groupId>scout.sdk.s2e</groupId>
+	<artifactId>org.eclipse.scout.sdk.s2e.parent</artifactId>
+	<packaging>pom</packaging>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-jar-plugin</artifactId>
+				<version>2.6</version>
+				<configuration>
+					<archive>
+						<manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+					</archive>
+				</configuration>
+			</plugin>
+
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<version>2.5.4</version>
+				<extensions>true</extensions>
+				<!-- the following instructions build a simple set of public/private classes into an OSGi bundle -->
+				<configuration>
+					<manifestLocation>META-INF</manifestLocation>
+					<instructions>
+						<Bundle-SymbolicName>${bundle.symbolicName};singleton:=true</Bundle-SymbolicName>
+						<Bundle-Version>${project.version}</Bundle-Version>
+
+						<!-- embed compile/runtime dependencies using path that matches the copied dependency folder -->
+						<Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
+						<Embed-Transitive>true</Embed-Transitive>
+
+						<Embed-StripVersion>false</Embed-StripVersion>
+						<Embed-StripGroup>true</Embed-StripGroup>
+						<Embed-Directory>lib</Embed-Directory>
+
+						<Eclipse-BundleShape>dir</Eclipse-BundleShape>
+						<Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
+					</instructions>
+				</configuration>
+			</plugin>
+
+			<!-- Build helper maven plugin sets the parsedVersion.osgiVersion property -->
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.codehaus.mojo</groupId> -->
+<!-- 				<artifactId>build-helper-maven-plugin</artifactId> -->
+<!-- 				<version>1.9.1</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>set-osgi-version</id> -->
+<!-- 						<phase>verify</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>parse-version</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+
+<!-- 					<execution> -->
+<!-- 						<id>add-source-libs</id> -->
+<!-- 						before package phase  -->
+<!-- 						<phase>test</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>add-source</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<sources> -->
+<!-- 								<source>${libsSourceDir}</source> -->
+<!-- 							</sources> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
+
+			<!-- source maven plugin creates the source bundle and adds manifest -->
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-source-plugin</artifactId> -->
+<!-- 				<version>2.4</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>attach-sources</id> -->
+<!-- 						<phase>verify</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>jar</goal> -->
+<!-- 						</goals> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 				<configuration> -->
+<!-- 					<archive> -->
+<!-- 						<manifestEntries> -->
+<!-- 							<Bundle-ManifestVersion>2</Bundle-ManifestVersion> -->
+<!-- 							<Bundle-Name>${project.name}</Bundle-Name> -->
+<!-- 							<Bundle-SymbolicName>${bundle.symbolicName}.source</Bundle-SymbolicName> -->
+
+<!-- 							<Bundle-Version>${parsedVersion.osgiVersion}</Bundle-Version> -->
+<!-- 							<Eclipse-SourceBundle>${bundle.symbolicName};version="${parsedVersion.osgiVersion}";roots:="."</Eclipse-SourceBundle> -->
+<!-- 						</manifestEntries> -->
+<!-- 					</archive> -->
+<!-- 				</configuration> -->
+<!-- 			</plugin> -->
+
+<!-- 					This execution downloads and extracts the dependency source bundles -->
+<!-- 			<plugin> -->
+<!-- 				<groupId>org.apache.maven.plugins</groupId> -->
+<!-- 				<artifactId>maven-dependency-plugin</artifactId> -->
+<!-- 				<version>2.8</version> -->
+<!-- 				<executions> -->
+<!-- 					<execution> -->
+<!-- 						<id>unpack-dependency-sources</id> -->
+<!-- 						<phase>process-resources</phase> -->
+<!-- 						<goals> -->
+<!-- 							<goal>unpack-dependencies</goal> -->
+<!-- 						</goals> -->
+<!-- 						<configuration> -->
+<!-- 							<classifier>sources</classifier> -->
+<!-- 							<includes>**/*.java</includes> -->
+<!-- 							<excludes>**/*.properties</excludes> -->
+<!-- 							<outputDirectory>${libsSourceDir}</outputDirectory> -->
+<!-- 							<overWriteReleases>false</overWriteReleases> -->
+<!-- 							<overWriteSnapshots>true</overWriteSnapshots> -->
+<!-- 						</configuration> -->
+<!-- 					</execution> -->
+<!-- 				</executions> -->
+<!-- 			</plugin> -->
+
+		</plugins>
+	</build>
+
+</project>
