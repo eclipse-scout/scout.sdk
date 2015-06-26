@@ -1,23 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   Copyright (c) 2012,2013 BSI Business Systems Integration AG.
-   All rights reserved. This program and the accompanying materials
-   are made available under the terms of the Eclipse Public License v1.0
-   which accompanies this distribution, and is available at
-   http://www.eclipse.org/legal/epl-v10.html
+  Copyright (c) 2015 BSI Business Systems Integration AG.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
 
   Contributors:
-     Stephan Leicht Vogt - initial implementation
+  BSI Business Systems Integration AG - initial API and implementation
 -->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
-    <artifactId>org.eclipse.scout.sdk.parent</artifactId>
+    <artifactId>org.eclipse.scout.sdk.p2-build</artifactId>
     <version>5.1.0-SNAPSHOT</version>
-    <relativePath>../org.eclipse.scout.sdk.parent</relativePath>
+    <relativePath>../org.eclipse.scout.sdk.p2-build</relativePath>
   </parent>
 
   <artifactId>org.eclipse.scout.sdk-repository</artifactId>
@@ -28,6 +27,36 @@
   <properties>
     <p2repo-zip-path>${project.build.directory}/org.eclipse.scout.sdk-repository-${project.version}.zip</p2repo-zip-path>
   </properties>
+
+  <dependencies>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
+        <classifier>sources</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
+        <classifier>sources</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
+        <classifier>sources</classifier>
+      </dependency>
+  </dependencies>
 
   <build>
     <extensions>
@@ -43,7 +72,6 @@
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-p2-publisher-plugin</artifactId>
-        <version>${tycho.version}</version>
         <configuration>
           <publishArtifacts>true</publishArtifacts>
         </configuration>

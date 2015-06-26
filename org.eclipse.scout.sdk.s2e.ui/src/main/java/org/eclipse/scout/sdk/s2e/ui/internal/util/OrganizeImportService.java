@@ -26,7 +26,6 @@ import org.eclipse.scout.sdk.s2e.IOrganizeImportService;
  * @author Matthias Villiger
  * @since 3.9.0 23.05.2013
  */
-@SuppressWarnings("restriction")
 public class OrganizeImportService implements IOrganizeImportService {
 
   @Override

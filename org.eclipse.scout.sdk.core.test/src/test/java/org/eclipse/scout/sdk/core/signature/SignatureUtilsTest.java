@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.signature;
 
 import java.util.Set;
 
+import org.eclipse.scout.sdk.core.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
@@ -29,7 +30,7 @@ public class SignatureUtilsTest {
 
   @Test
   public void testGetResolvedSignature() {
-    IType type = TestingUtils.getType(ChildClass.class.getName());
+    IType type = TestingUtils.getType(ChildClass.class.getName(), CoreTestingUtils.SOURCE_FOLDER);
     Assert.assertNotNull(type);
 
     String expected = Signature.createTypeSignature("java.util.Set<java.util.HashMap<org.eclipse.scout.sdk.core.fixture.Long, java.util.List<java.lang.Object>[]>>[][][]");

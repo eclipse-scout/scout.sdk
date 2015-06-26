@@ -62,7 +62,6 @@ import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
  * @author Andreas Hoegger
  * @since 3.10.0 12.07.2013
  */
-@SuppressWarnings("restriction")
 public class JdtSettingsCommentBuilder implements IJavaElementCommentBuilder {
   private static final String[] EMPTY = new String[0];
   private static final String UNDEFINED_VAR_VALUE = "undefined";
@@ -471,8 +470,7 @@ public class JdtSettingsCommentBuilder implements IJavaElementCommentBuilder {
     return null;
   }
 
-  private static void insertTag(IDocument textBuffer, int offset, int length, String[] paramNames, String[] exceptionNames, String returnType, String[] typeParameterNames, boolean isDeprecated,
-      String lineDelimiter) throws BadLocationException {
+  private static void insertTag(IDocument textBuffer, int offset, int length, String[] paramNames, String[] exceptionNames, String returnType, String[] typeParameterNames, boolean isDeprecated, String lineDelimiter) throws BadLocationException {
     IRegion region = textBuffer.getLineInformationOfOffset(offset);
     if (region == null) {
       return;

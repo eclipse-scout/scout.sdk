@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
+import org.eclipse.scout.sdk.core.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.fixture.PropertyTestClass;
 import org.eclipse.scout.sdk.core.testing.TestingUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
@@ -26,7 +27,7 @@ import org.junit.Test;
 public class PropertyBeanTest {
   @Test
   public void testPropertyBean() {
-    IType propTestClass = TestingUtils.getType(PropertyTestClass.class.getName());
+    IType propTestClass = TestingUtils.getType(PropertyTestClass.class.getName(), CoreTestingUtils.SOURCE_FOLDER);
     Assert.assertNotNull(propTestClass);
 
     List<IPropertyBean> propertyBeans = new ArrayList<>(CoreUtils.getPropertyBeans(propTestClass, null, new Comparator<IPropertyBean>() {

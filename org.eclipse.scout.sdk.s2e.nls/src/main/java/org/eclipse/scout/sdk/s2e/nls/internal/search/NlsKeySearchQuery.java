@@ -18,8 +18,9 @@ import org.eclipse.search.internal.ui.text.FileSearchQuery;
 import org.eclipse.search.internal.ui.text.FileSearchResult;
 import org.eclipse.search.ui.text.Match;
 
-/** <h4>NlsKeySearchQuery</h4> */
-@SuppressWarnings("restriction")
+/**
+ * <h4>NlsKeySearchQuery</h4>
+ */
 public class NlsKeySearchQuery extends FileSearchQuery {
 
   private final String m_nlsKey;

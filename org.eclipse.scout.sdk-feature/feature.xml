@@ -21,13 +21,13 @@
    </license>
 
    <url>
-      <update label="%updateSiteName" url="http://download.eclipse.org/releases/mars"/>
-      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/mars"/>
+      <update label="%updateSiteName" url="http://download.eclipse.org/releases/neon"/>
+      <discovery label="%updateSiteName" url="http://download.eclipse.org/releases/neon"/>
    </url>
 
    <requires>
-      <import feature="org.eclipse.platform" version="3.7.2" match="greaterOrEqual"/>
-      <import feature="org.eclipse.jdt" version="3.7.2" match="greaterOrEqual"/>
+      <import feature="org.eclipse.platform" version="4.4.2" match="greaterOrEqual"/>
+      <import feature="org.eclipse.jdt" version="3.10.1" match="greaterOrEqual"/>
    </requires>
 
    <plugin

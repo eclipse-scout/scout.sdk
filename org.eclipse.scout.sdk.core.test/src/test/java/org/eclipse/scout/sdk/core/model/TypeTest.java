@@ -83,7 +83,7 @@ public class TypeTest {
 
   @Test
   public void testWildcard() {
-    IType wildcardType = TestingUtils.getType(WildcardChildClass.class.getName());
+    IType wildcardType = TestingUtils.getType(WildcardChildClass.class.getName(), CoreTestingUtils.SOURCE_FOLDER);
     IType returnType = wildcardType.getMethods().get(1).getReturnType();
     IType firstArg = returnType.getTypeArguments().get(0);
     Assert.assertTrue(firstArg.isWildcardType());
@@ -153,7 +153,7 @@ public class TypeTest {
 
   @Test
   public void testInnerTypeDirectly() {
-    IType innerClass2 = TestingUtils.getType("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2");
+    IType innerClass2 = TestingUtils.getType("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", CoreTestingUtils.SOURCE_FOLDER);
     testInnerType(innerClass2);
   }
 

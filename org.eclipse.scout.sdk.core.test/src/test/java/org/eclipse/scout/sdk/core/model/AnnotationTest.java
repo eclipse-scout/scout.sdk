@@ -60,7 +60,7 @@ public class AnnotationTest {
 
   @Test
   public void testAnnotationsWithAnnotationValues() {
-    IType wildcardBaseClass = TestingUtils.getType("org.eclipse.scout.sdk.core.fixture.WildcardBaseClass");
+    IType wildcardBaseClass = TestingUtils.getType("org.eclipse.scout.sdk.core.fixture.WildcardBaseClass", CoreTestingUtils.SOURCE_FOLDER);
     IAnnotation testAnnot = wildcardBaseClass.getAnnotations().get(0);
     IAnnotationValue value = testAnnot.getValue("inner");
     Assert.assertNotNull(value);
@@ -127,7 +127,7 @@ public class AnnotationTest {
   @Test
   @SuppressWarnings("deprecation")
   public void testDeprecatedAnnotations() {
-    IType deprChildType = TestingUtils.getType(org.eclipse.scout.sdk.core.fixture.DeprecatedChildClass.class.getName());
+    IType deprChildType = TestingUtils.getType(org.eclipse.scout.sdk.core.fixture.DeprecatedChildClass.class.getName(), CoreTestingUtils.SOURCE_FOLDER);
     Assert.assertNotNull(deprChildType);
 
     IType deprBaseType = deprChildType.getSuperClass();
