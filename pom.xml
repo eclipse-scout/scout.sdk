@@ -1,170 +1,92 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-   Copyright (c) 2012,2013 BSI Business Systems Integration AG.
-   All rights reserved. This program and the accompanying materials
-   are made available under the terms of the Eclipse Public License v1.0
-   which accompanies this distribution, and is available at
-   http://www.eclipse.org/legal/epl-v10.html
+  Copyright (c) 2012,2013 BSI Business Systems Integration AG.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
 
   Contributors:
-     Stephan Leicht Vogt - initial implementation
+  Stephan Leicht Vogt - initial implementation
 -->
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.eclipse.scout</groupId>
-    <artifactId>org.eclipse.scout.parent</artifactId>
-    <version>5.1.0-SNAPSHOT</version>
-    <relativePath>../org.eclipse.scout.parent</relativePath>
-  </parent>
-
+  <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk</artifactId>
   <version>5.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <scm>
-    <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
-    <connection>${tycho.scmUrl}</connection>
-  </scm>
+  <modules>
+<!--     <module>org.eclipse.scout.sdk.parent</module> -->
+  </modules>
 
   <properties>
-    <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</tycho.scmUrl>
-    <target-platform>eclipse-indigo</target-platform>
-
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jdk.source.version>1.7</jdk.source.version>
+    <scout.rt.version>5.1.0-SNAPSHOT</scout.rt.version>
     <!-- exclude the unit tests from sonar -->
-    <sonar.exclusions>
-      file:**/org.eclipse.scout.sdk.test/**
-    </sonar.exclusions>
+    <sonar.exclusions>file:**/org.eclipse.scout.sdk.test/**</sonar.exclusions>
 
     <!-- exclude the unit tests and UI (we have no UI tests anyway) from sonar -->
-    <sonar.coverage.exclusions>
-      file:**/org.eclipse.scout.sdk.test/**,
+    <sonar.coverage.exclusions>file:**/org.eclipse.scout.sdk.test/**,
       file:**/org.eclipse.scout.sdk.ui/**,
-      file:**/org.eclipse.scout.sdk.rap.ui/**
-    </sonar.coverage.exclusions>
+      file:**/org.eclipse.scout.sdk.rap.ui/**</sonar.coverage.exclusions>
+
+    <!-- dependencies to Eclipse artifacts deployed by org.eclipse.scout.sdk.core.releng/ -->
+    <osgiVersion>3.10.2.v20150203-1939</osgiVersion>
+    <osgiVersionMaven>${osgiVersion}-SNAPSHOT</osgiVersionMaven>
+    <equinoxVersion>3.6.200.v20130402-1505</equinoxVersion>
+    <equinoxVersionMaven>${equinoxVersion}-SNAPSHOT</equinoxVersionMaven>
+    <equinoxRegistryVersion>3.5.400.v20140428-1507</equinoxRegistryVersion>
+    <equinoxRegistryVersionMaven>${equinoxRegistryVersion}-SNAPSHOT</equinoxRegistryVersionMaven>
+    <equinoxPreferencesVersion>3.5.200.v20140224-1527</equinoxPreferencesVersion>
+    <equinoxPreferencesVersionMaven>${equinoxPreferencesVersion}-SNAPSHOT</equinoxPreferencesVersionMaven>
+    <eclipseResourcesVersion>3.9.1.v20140825-1431</eclipseResourcesVersion>
+    <eclipseResourcesVersionMaven>${eclipseResourcesVersion}-SNAPSHOT</eclipseResourcesVersionMaven>
+    <eclipseCommandsVersion>3.6.100.v20140528-1422</eclipseCommandsVersion>
+    <eclipseCommandsVersionMaven>${eclipseCommandsVersion}-SNAPSHOT</eclipseCommandsVersionMaven>
+    <eclipseContenttypeVersion>3.4.200.v20140207-1251</eclipseContenttypeVersion>
+    <eclipseContenttypeVersionMaven>${eclipseContenttypeVersion}-SNAPSHOT</eclipseContenttypeVersionMaven>
+    <eclipseExpressionsVersion>3.4.600.v20140128-0851</eclipseExpressionsVersion>
+    <eclipseExpressionsVersionMaven>${eclipseExpressionsVersion}-SNAPSHOT</eclipseExpressionsVersionMaven>
+    <eclipseFilesystemVersion>1.4.100.v20140514-1614</eclipseFilesystemVersion>
+    <eclipseFilesystemVersionMaven>${eclipseFilesystemVersion}-SNAPSHOT</eclipseFilesystemVersionMaven>
+    <eclipseRuntimeVersion>3.10.0.v20140318-2214</eclipseRuntimeVersion>
+    <eclipseRuntimeVersionMaven>${eclipseRuntimeVersion}-SNAPSHOT</eclipseRuntimeVersionMaven>
+    <eclipseJobsVersion>3.6.1.v20141014-1248</eclipseJobsVersion>
+    <eclipseJobsVersionMaven>${eclipseJobsVersion}-SNAPSHOT</eclipseJobsVersionMaven>
+    <eclipseTextVersion>3.5.300.v20130515-1451</eclipseTextVersion>
+    <eclipseTextVersionMaven>${eclipseTextVersion}-SNAPSHOT</eclipseTextVersionMaven>
+    <eclipseSearchVersion>3.9.100.v20140226-1637</eclipseSearchVersion>
+    <eclipseSearchVersionMaven>${eclipseSearchVersion}-SNAPSHOT</eclipseSearchVersionMaven>
+    <jdtVersion>3.10.2.v20150120-1634</jdtVersion>
+    <jdtVersionMaven>${jdtVersion}-SNAPSHOT</jdtVersionMaven>
+    <jdtUiVersion>3.10.2.v20141014-1419</jdtUiVersion>
+    <jdtUiVersionMaven>${jdtUiVersion}-SNAPSHOT</jdtUiVersionMaven>
+    <uiWorkbenchVersion>3.106.2.v20150204-1030</uiWorkbenchVersion>
+    <uiWorkbenchVersionMaven>${uiWorkbenchVersion}-SNAPSHOT</uiWorkbenchVersionMaven>
+    <uiJfaceVersion>3.10.2.v20141021-1035</uiJfaceVersion>
+    <uiJfaceVersionMaven>${uiJfaceVersion}-SNAPSHOT</uiJfaceVersionMaven>
+    <uiJfaceTextVersion>3.9.2.v20141003-1326</uiJfaceTextVersion>
+    <uiJfaceTextVersionMaven>${uiJfaceTextVersion}-SNAPSHOT</uiJfaceTextVersionMaven>
+    <uiSwtVersion>3.103.2.v20150203-1351</uiSwtVersion>
+    <uiSwtVersionMaven>${uiSwtVersion}-SNAPSHOT</uiSwtVersionMaven>
+    <uiIdeVersion>3.10.2.v20141118-1227</uiIdeVersion>
+    <uiIdeVersionMaven>${uiIdeVersion}-SNAPSHOT</uiIdeVersionMaven>
+    <uiEditorsVersion>3.8.200.v20140401-1310</uiEditorsVersion>
+    <uiEditorsVersionMaven>${uiEditorsVersion}-SNAPSHOT</uiEditorsVersionMaven>
+    <uiViewsVersion>3.7.0.v20140408-0703</uiViewsVersion>
+    <uiViewsVersionMaven>${uiViewsVersion}-SNAPSHOT</uiViewsVersionMaven>
+    <uiFormsVersion>3.6.100.v20140422-1825</uiFormsVersion>
+    <uiFormsVersionMaven>${uiFormsVersion}-SNAPSHOT</uiFormsVersionMaven>
+    <!-- version of Tycho used by org.eclipse.scout.sdk.core.releng build -->
+    <tychoBootstrapVersion>0.22.0</tychoBootstrapVersion>
   </properties>
-
-  <repositories>
-    <repository>
-      <id>eclipse.release</id>
-      <name>eclipse-release-repo</name>
-      <url>https://repo.eclipse.org/content/groups/releases/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>eclipse.snapshot</id>
-      <name>eclipse-snapshot-repo</name>
-      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
-      <snapshots />
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>eclipse.release</id>
-      <name>eclipse-release-repo</name>
-      <url>https://repo.eclipse.org/content/groups/releases/</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </pluginRepository>
-    <pluginRepository>
-      <id>eclipse.snapshot</id>
-      <name>eclipse-snapshot-repo</name>
-      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
-      <snapshots />
-    </pluginRepository>
-  </pluginRepositories>
-
-  <modules>
-    <module>org.eclipse.scout.sdk.parent</module>
-  </modules>
 
   <build>
     <pluginManagement>
       <plugins>
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>target-platform-configuration</artifactId>
-          <version>${tycho.version}</version>
-          <configuration>
-            <filters>
-              <!-- work around Equinox bug 348045 -->
-              <filter>
-                <type>p2-installable-unit</type>
-                <id>org.eclipse.equinox.servletbridge.extensionbundle</id>
-                <removeAll />
-              </filter>
-            </filters>
-            <resolver>p2</resolver>
-            <pomDependencies>consider</pomDependencies>
-            <target>
-              <artifact>
-                <groupId>org.eclipse.scout.sdk</groupId>
-                <artifactId>org.eclipse.scout.sdk.target</artifactId>
-                <version>${scout.version}</version>
-                <classifier>${target-platform}</classifier>
-              </artifact>
-            </target>
-            <environments>
-              <environment>
-                <os>linux</os>
-                <ws>gtk</ws>
-                <arch>x86</arch>
-              </environment>
-              <environment>
-                <os>linux</os>
-                <ws>gtk</ws>
-                <arch>x86_64</arch>
-              </environment>
-              <environment>
-                <os>linux</os>
-                <ws>gtk</ws>
-                <arch>ppc64</arch>
-              </environment>
-              <environment>
-                <os>linux</os>
-                <ws>gtk</ws>
-                <arch>s390</arch>
-              </environment>
-              <environment>
-                <os>linux</os>
-                <ws>gtk</ws>
-                <arch>s390x</arch>
-              </environment>
-              <environment>
-                <os>win32</os>
-                <ws>win32</ws>
-                <arch>x86</arch>
-              </environment>
-              <environment>
-                <os>win32</os>
-                <ws>win32</ws>
-                <arch>x86_64</arch>
-              </environment>
-              <environment>
-                <os>macosx</os>
-                <ws>cocoa</ws>
-                <arch>x86_64</arch>
-              </environment>
-              <environment>
-                <os>solaris</os>
-                <ws>gtk</ws>
-                <arch>sparc</arch>
-              </environment>
-              <environment>
-                <os>solaris</os>
-                <ws>gtk</ws>
-                <arch>x86</arch>
-              </environment>
-            </environments>
-          </configuration>
-        </plugin>
-
         <plugin>
           <!-- Used for attaching target-files to the artifact in org.eclipse.scout.target -->
           <groupId>org.codehaus.mojo</groupId>
@@ -173,11 +95,24 @@
         </plugin>
 
         <plugin>
-          <!-- Activates Tycho so Maven knows the new packaging types eclipse-plugin... -->
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-maven-plugin</artifactId>
-          <version>${tycho.version}</version>
-          <extensions>true</extensions>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.2</version>
+          <configuration>
+            <compilerId>jdt</compilerId>
+            <source>${jdk.source.version}</source>
+            <target>${jdk.source.version}</target>
+            <compilerArgs>
+              <arg>-proc:none</arg>
+            </compilerArgs>
+          </configuration>
+          <dependencies>
+            <dependency>
+              <groupId>org.eclipse.tycho</groupId>
+              <artifactId>tycho-compiler-jdt</artifactId>
+              <version>0.23.0</version>
+            </dependency>
+          </dependencies>
         </plugin>
 
         <plugin>
@@ -185,250 +120,65 @@
           <artifactId>eclipse-cbi-plugin</artifactId>
           <version>${cbi-plugins.version}</version>
         </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-compiler-plugin</artifactId>
-          <version>${tycho.version}</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.eclipse.jdt</groupId>
-              <artifactId>org.eclipse.jdt.core</artifactId>
-              <version>${cbi-jdt-version}</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <source>${compileSource}</source>
-            <encoding>${project.build.sourceEncoding}</encoding>
-            <showWarnings>true</showWarnings>
-            <showDeprecation>true</showDeprecation>
-            <extraClasspathElements>
-              <extraClasspathElement>
-                <groupId>javax.mail</groupId>
-                <artifactId>mail</artifactId>
-                <version>1.4.3</version>
-              </extraClasspathElement>
-              <extraClasspathElement>
-                <groupId>javax.jms</groupId>
-                <artifactId>jms-api</artifactId>
-                <version>1.1-rev-1</version>
-              </extraClasspathElement>
-              <extraClasspathElement>
-                <groupId>jdk</groupId>
-                <artifactId>tools.jar</artifactId>
-                <version>1.0.0</version>
-                <scope>system</scope>
-                <systemPath>${tools-jar}</systemPath>
-              </extraClasspathElement>
-            </extraClasspathElements>
-            <compilerArgument>-warn:-deprecation,raw,unchecked</compilerArgument>
-            <compilerArguments>
-              <properties>${project.basedir}/../org.eclipse.scout.sdk-feature/.settings/org.eclipse.jdt.core.prefs</properties>
-              <inlineJSR />
-              <enableJavadoc />
-              <encoding>${project.build.sourceEncoding}</encoding>
-              <log>${project.build.directory}/@dot.xml</log>
-            </compilerArguments>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-packaging-plugin</artifactId>
-          <version>${tycho.version}</version>
-          <dependencies>
-            <dependency>
-              <groupId>org.eclipse.tycho.extras</groupId>
-              <artifactId>tycho-buildtimestamp-jgit</artifactId>
-              <version>${tycho-extras.version}</version>
-            </dependency>
-            <dependency>
-              <groupId>org.eclipse.tycho.extras</groupId>
-              <artifactId>tycho-sourceref-jgit</artifactId>
-              <version>${tycho-extras.version}</version>
-            </dependency>
-          </dependencies>
-          <configuration>
-            <strictBinIncludes>false</strictBinIncludes>
-            <format>yyyyMMdd-HHmm</format>
-            <timestampProvider>jgit</timestampProvider>
-            <!-- Prevent build from failing due to a dirty git working tree -->
-            <jgit.dirtyWorkingTree>warning</jgit.dirtyWorkingTree>
-            <jgit.ignore>
-              pom.xml
-            </jgit.ignore>
-            <sourceReferences>
-              <generate>true</generate>
-            </sourceReferences>
-            <archive>
-              <addMavenDescriptor>false</addMavenDescriptor>
-            </archive>
-            <additionalFileSets>
-              <fileSet>
-                <directory>${project.build.directory}</directory>
-                <includes>
-                  <include>.api_description</include>
-                </includes>
-              </fileSet>
-            </additionalFileSets>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-surefire-plugin</artifactId>
-          <version>${tycho.version}</version>
-          <configuration>
-            <!-- <debugPort>5050</debugPort> -->
-            <!-- don't run tests in UI thread and harness per default (i.e., run them headless) -->
-            <!-- see http://wiki.eclipse.org/Minerva#Headless_Tests -->
-            <!-- see http://wiki.eclipse.org/Tycho/Packaging_Types#eclipse-test-plugin for semantics of useUIHarness etc. -->
-            <useUIHarness>false</useUIHarness>
-            <useUIThread>false</useUIThread>
-            <!-- Convention: We don't use test suites. All Test classes should end with "*Test.java". Everything else is not executed by default. -->
-            <includes>
-              <include>**/*Test.java</include>
-            </includes>
-            <excludes>
-              <!-- test mojo matches TestProject be default and treats it as PojoTest -->
-              <exclude>**/Test*.class</exclude>
-            </excludes>
-            <!-- Kill test JVM if tests take more than 5 minutes (300 seconds) to finish -->
-            <forkedProcessTimeoutInSeconds>300</forkedProcessTimeoutInSeconds>
-            <!-- do not abort on test failures -->
-            <failIfNoTests>false</failIfNoTests>
-            <testFailureIgnore>true</testFailureIgnore>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-source-plugin</artifactId>
-          <version>${tycho.version}</version>
-          <configuration>
-            <archive>
-              <addMavenDescriptor>false</addMavenDescriptor>
-            </archive>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-p2-director-plugin</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-p2-repository-plugin</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho.extras</groupId>
-          <artifactId>tycho-source-feature-plugin</artifactId>
-          <version>${tycho-extras.version}</version>
-          <configuration>
-            <archive>
-              <addMavenDescriptor>false</addMavenDescriptor>
-            </archive>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho.extras</groupId>
-          <artifactId>tycho-custom-bundle-plugin</artifactId>
-          <version>${tycho-extras.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-p2-plugin</artifactId>
-          <version>${tycho.version}</version>
-          <configuration>
-            <baselineMode>warn</baselineMode>
-            <baselineReplace>none</baselineReplace>
-            <baselineRepositories>
-              <repository>
-                <url>${comparator.repo}</url>
-              </repository>
-            </baselineRepositories>
-          </configuration>
-        </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings
-          only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>
-                      org.eclipse.cbi.maven.plugins
-                    </groupId>
-                    <artifactId>
-                      eclipse-cbi-plugin
-                    </artifactId>
-                    <versionRange>
-                      [1.0.1-SNAPSHOT,)
-                    </versionRange>
-                    <goals>
-                      <goal>
-                        generate-api-build-xml
-                      </goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore />
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-
-        <!--Use this plugin to set the version to a release or snapshot in Manifests, poms, repositories-->
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-versions-plugin</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
       </plugins>
     </pluginManagement>
   </build>
 
-  <profiles>
-    <profile>
-      <id>useScoutRTTarget</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>target-platform-configuration</artifactId>
-            <configuration>
-              <target>
-                <artifact>
-                  <groupId>org.eclipse.scout.sdk</groupId>
-                  <artifactId>org.eclipse.scout.sdk.target</artifactId>
-                  <version>${scout.version}</version>
-                  <classifier>${target-platform}</classifier>
-                </artifact>
-                <artifact>
-                  <groupId>org.eclipse.scout.sdk</groupId>
-                  <artifactId>org.eclipse.scout.sdk.target</artifactId>
-                  <version>${scout.version}</version>
-                  <classifier>only-scout-rt</classifier>
-                </artifact>
-              </target>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
+  <mailingLists>
+    <mailingList>
+      <name>scout-dev Mailing List</name>
+      <subscribe>https://dev.eclipse.org/mailman/listinfo/scout-dev</subscribe>
+      <unsubscribe>https://dev.eclipse.org/mailman/listinfo/scout-dev</unsubscribe>
+      <post>scout-dev@eclipse.org</post>
+      <archive>http://dev.eclipse.org/mhonarc/lists/scout-dev</archive>
+    </mailingList>
+  </mailingLists>
 
+  <scm>
+    <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
+    <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
+  </scm>
+
+  <issueManagement>
+    <system>Bugzilla</system>
+    <url>https://bugs.eclipse.org/bugs/buglist.cgi?classification=Technology;component=Scout SDK;product=Scout;query_format=advanced</url>
+  </issueManagement>
+
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>eclipse.release</id>
+      <name>eclipse-release-repo</name>
+      <url>https://repo.eclipse.org/content/groups/releases/</url>
+    </repository>
+    <repository>
+      <snapshots></snapshots>
+      <id>eclipse.snapshot</id>
+      <name>eclipse-snapshot-repo</name>
+      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>eclipse.release</id>
+      <name>eclipse-release-repo</name>
+      <url>https://repo.eclipse.org/content/groups/releases/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <snapshots></snapshots>
+      <id>eclipse.snapshot</id>
+      <name>eclipse-snapshot-repo</name>
+      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
+    </pluginRepository>
+  </pluginRepositories>
+
+  <profiles>
     <profile>
       <id>eclipse-sign</id>
       <build>
@@ -491,6 +241,9 @@
             <groupId>org.eclipse.tycho</groupId>
             <artifactId>tycho-p2-plugin</artifactId>
             <version>${tycho.version}</version>
+            <configuration>
+              <defaultP2Metadata>false</defaultP2Metadata>
+            </configuration>
             <executions>
               <execution>
                 <id>p2-metadata</id>
@@ -500,9 +253,6 @@
                 <phase>verify</phase>
               </execution>
             </executions>
-            <configuration>
-              <defaultP2Metadata>false</defaultP2Metadata>
-            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -553,6 +303,9 @@
             <groupId>org.eclipse.tycho</groupId>
             <artifactId>tycho-p2-plugin</artifactId>
             <version>${tycho.version}</version>
+            <configuration>
+              <defaultP2Metadata>false</defaultP2Metadata>
+            </configuration>
             <executions>
               <execution>
                 <id>p2-metadata</id>
@@ -562,9 +315,6 @@
                 <phase>package</phase>
               </execution>
             </executions>
-            <configuration>
-              <defaultP2Metadata>false</defaultP2Metadata>
-            </configuration>
           </plugin>
         </plugins>
       </build>

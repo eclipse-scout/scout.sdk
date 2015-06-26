@@ -1,0 +1,959 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Copyright (c) 2015 BSI Business Systems Integration AG.
+  All rights reserved. This program and the accompanying materials
+  are made available under the terms of the Eclipse Public License v1.0
+  which accompanies this distribution, and is available at
+  http://www.eclipse.org/legal/epl-v10.html
+
+  Contributors:
+  BSI Business Systems Integration AG - initial API and implementation
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <parent>
+    <groupId>org.eclipse.scout.sdk</groupId>
+    <artifactId>org.eclipse.scout.sdk</artifactId>
+    <version>5.1.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>org.eclipse.scout.sdk.s2e.releng</artifactId>
+  <packaging>pom</packaging>
+
+  <!--
+    To update the Eclipse artifacts needed by the Maven class-loader side of Eclipse Scout SDK:
+
+    1. If needed, update the source p2 repository below
+    2. Update Equinox and JDT/APT versions in the parent POM:
+    ${osgiVersion[Maven]}, ${equinoxVersion[Maven]}, ${jdtVersion[Maven]}, ...
+    3a. For deploying snapshots (to be used by Eclipse Scout SDK snapshots)
+    - In org.eclipse.scout.sdl.core.releng/, execute
+    mvn clean deploy -DforgeSnapshotUrl=https://scout.bsiag.com/repository/org.eclipse.scout-snapshot-local -DforgeSnapshotId=bsi-tools-snapshot
+    3b. For deploying releases (to be used by Tycho releases):
+    - Prerequisite: you need to have GPG properly set up, see https://docs.sonatype.org/display/Repository/How+To+Generate+PGP+Signatures+With+Maven
+    - Make sure that ${jdtVersionMaven}, ${equinoxVersionMaven}, ${osgiVersionMaven},... in the parent POM don't have a '-SNAPSHOT' suffix
+    - In org.eclipse.scout.sdl.core.releng/, execute
+    mvn clean deploy -Pdeploy-releases -DforgeReleaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DforgeReleaseId=forge-releases -Dgpg.passphrase=<your_passphrase>
+    - Close and release staged artifacts into repository 'Releases'
+  -->
+  <properties>
+    <downloaded>${project.build.directory}/repository/plugins/</downloaded>
+    <!-- don't deploy this helper pom -->
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
+  <build>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/*.pom</include>
+        </includes>
+      </resource>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>false</filtering>
+        <excludes>
+          <exclude>**/*.pom</exclude>
+        </excludes>
+      </resource>
+    </resources>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.7</version>
+        <executions>
+          <execution>
+            <id>filter-resources</id>
+            <goals>
+              <goal>resources</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.eclipse.tycho.extras</groupId>
+        <artifactId>tycho-p2-extras-plugin</artifactId>
+        <version>${tychoBootstrapVersion}</version>
+        <executions>
+          <execution>
+            <phase>validate</phase>
+            <goals>
+              <goal>mirror</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <includePacked>false</includePacked>
+          <includeOptional>false</includeOptional>
+          <source>
+            <repository>
+              <id>eclipse_luna</id>
+              <!-- <url>http://download.eclipse.org/releases/luna</url> -->
+              <url>https://scout.bsiag.com/repository/eclipse.releases.luna</url>
+              <layout>p2</layout>
+            </repository>
+          </source>
+          <ius>
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.osgi</id> -->
+            <!-- <version>${osgiVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.osgi.source</id> -->
+            <!-- <version>${osgiVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.equinox.common</id> -->
+            <!-- <version>${equinoxVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.equinox.common.source</id> -->
+            <!-- <version>${equinoxVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.equinox.registry</id> -->
+            <!-- <version>${equinoxRegistryVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.equinox.registry.source</id> -->
+            <!-- <version>${equinoxRegistryVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.equinox.preferences</id> -->
+            <!-- <version>${equinoxPreferencesVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.equinox.preferences.source</id> -->
+            <!-- <version>${equinoxPreferencesVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.resources</id> -->
+            <!-- <version>${eclipseResourcesVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.resources.source</id> -->
+            <!-- <version>${eclipseResourcesVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.commands</id> -->
+            <!-- <version>${eclipseCommandsVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.commands.source</id> -->
+            <!-- <version>${eclipseCommandsVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.contenttype</id> -->
+            <!-- <version>${eclipseContenttypeVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.contenttype.source</id> -->
+            <!-- <version>${eclipseContenttypeVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.expressions</id> -->
+            <!-- <version>${eclipseExpressionsVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.expressions.source</id> -->
+            <!-- <version>${eclipseExpressionsVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.filesystem</id> -->
+            <!-- <version>${eclipseFilesystemVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.filesystem.source</id> -->
+            <!-- <version>${eclipseFilesystemVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.runtime</id> -->
+            <!-- <version>${eclipseRuntimeVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.runtime.source</id> -->
+            <!-- <version>${eclipseRuntimeVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.jobs</id> -->
+            <!-- <version>${eclipseJobsVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.core.jobs.source</id> -->
+            <!-- <version>${eclipseJobsVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.text</id> -->
+            <!-- <version>${eclipseTextVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.text.source</id> -->
+            <!-- <version>${eclipseTextVersion}</version> -->
+            <!-- </iu> -->
+            <iu>
+              <id>org.eclipse.search</id>
+              <version>${eclipseSearchVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.search.source</id>
+              <version>${eclipseSearchVersion}</version>
+            </iu>
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.jdt.core</id> -->
+            <!-- <version>${jdtVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.jdt.core.source</id> -->
+            <!-- <version>${jdtVersion}</version> -->
+            <!-- </iu> -->
+            <iu>
+              <id>org.eclipse.jdt.ui</id>
+              <version>${jdtUiVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jdt.ui.source</id>
+              <version>${jdtUiVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.workbench</id>
+              <version>${uiWorkbenchVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.workbench.source</id>
+              <version>${uiWorkbenchVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jface</id>
+              <version>${uiJfaceVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jface.source</id>
+              <version>${uiJfaceVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jface.text</id>
+              <version>${uiJfaceTextVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jface.text.source</id>
+              <version>${uiJfaceTextVersion}</version>
+            </iu>
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.swt.win32.win32.x86</id> -->
+            <!-- <version>${uiSwtVersion}</version> -->
+            <!-- </iu> -->
+            <!-- <iu> -->
+            <!-- <id>org.eclipse.swt.win32.win32.x86.source</id> -->
+            <!-- <version>${uiSwtVersion}</version> -->
+            <!-- </iu> -->
+            <iu>
+              <id>org.eclipse.ui.ide</id>
+              <version>${uiIdeVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.ide.source</id>
+              <version>${uiIdeVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.editors</id>
+              <version>${uiEditorsVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.editors.source</id>
+              <version>${uiEditorsVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.views</id>
+              <version>${uiViewsVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.views.source</id>
+              <version>${uiViewsVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.forms</id>
+              <version>${uiFormsVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.forms.source</id>
+              <version>${uiFormsVersion}</version>
+            </iu>
+          </ius>
+          <followStrictOnly>true</followStrictOnly>
+        </configuration>
+      </plugin>
+    </plugins>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.1</version>
+          <configuration>
+            <url>${forgeSnapshotUrl}</url>
+            <repositoryId>${forgeSnapshotId}</repositoryId>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
+  <profiles>
+    <profile>
+      <id>deploy-equinox-snapshots</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <executions>
+              <!-- <execution> -->
+              <!-- <id>deploy-osgi</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.osgi_${osgiVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.osgi.source_${osgiVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.osgi.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <!-- <execution> -->
+              <!-- <id>deploy-equinox-common</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.equinox.common_${equinoxVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.equinox.common.source_${equinoxVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.common.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <!-- <execution> -->
+              <!-- <id>deploy-equinox-registry</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.equinox.registry_${equinoxRegistryVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.equinox.registry.source_${equinoxRegistryVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.registry.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <!-- <execution> -->
+              <!-- <id>deploy-equinox-preferences</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.equinox.preferences_${equinoxPreferencesVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.equinox.preferences.source_${equinoxPreferencesVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.preferences.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>deploy-eclipse-core-snapshots</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <executions>
+              <!-- <execution> -->
+              <!-- <id>deploy-core-resources</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.core.resources_${eclipseResourcesVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.core.resources.source_${eclipseResourcesVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.core.resources.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <!-- <execution> -->
+              <!-- <id>deploy-core-commands</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.core.commands_${eclipseCommandsVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.core.commands.source_${eclipseCommandsVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.core.commands.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <!-- <execution> -->
+              <!-- <id>deploy-core-contenttype</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.core.contenttype_${eclipseContenttypeVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.core.contenttype.source_${eclipseContenttypeVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.core.contenttype.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <!-- <execution> -->
+              <!-- <id>deploy-core-contenttype</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.core.expressions_${eclipseExpressionsVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.core.expressions.source_${eclipseExpressionsVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.core.expressions.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <!-- <execution> -->
+              <!-- <id>deploy-core-filesystems</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.core.filesystem_${eclipseFilesystemVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.core.filesystem.source_${eclipseFilesystemVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.core.filesystem.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <!-- <execution> -->
+              <!-- <id>deploy-core-runtime</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.core.runtime_${eclipseRuntimeVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.core.runtime.source_${eclipseRuntimeVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.core.runtime.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <!-- <execution> -->
+              <!-- <id>deploy-core-jobs</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.core.jobs_${eclipseJobsVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.core.jobs.source_${eclipseJobsVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.core.jobs.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <!-- <execution> -->
+              <!-- <id>deploy-eclipse-text</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.text_${eclipseTextVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.text.source_${eclipseTextVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.text.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <execution>
+                <id>deploy-eclipse-search</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.search_${eclipseSearchVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.search.source_${eclipseSearchVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.search.pom</pomFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>deploy-jdt-snapshots</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <executions>
+              <!-- <execution> -->
+              <!-- <id>deploy-jdt-core</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.jdt.core_${jdtVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.jdt.core.source_${jdtVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.core.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <execution>
+                <id>deploy-jdt-ui</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.ui_${jdtUiVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.ui.source_${jdtUiVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.ui.pom</pomFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>deploy-ui-snapshots</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>deploy-ui-workbench</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.workbench_${uiWorkbenchVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.workbench.source_${uiWorkbenchVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-jface</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jface_${uiJfaceVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jface.source_${uiJfaceVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jface.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-jface-text</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jface.text_${uiJfaceTextVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jface.text.source_${uiJfaceTextVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jface.text.pom</pomFile>
+                </configuration>
+              </execution>
+              <!-- <execution> -->
+              <!-- <id>deploy-ui-swt</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.swt.win32.win32.x86_${uiSwtVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.swt.win32.win32.x86.source_${uiSwtVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.swt.win32.win32.x86.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <execution>
+                <id>deploy-ui-ide</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.ide_${uiIdeVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.ide.source_${uiIdeVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.ide.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-editors</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.editors_${uiEditorsVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.editors.source_${uiEditorsVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.editors.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-views</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.views_${uiViewsVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.views.source_${uiViewsVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.views.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-forms</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.forms_${uiFormsVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.forms.source_${uiFormsVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.forms.pom</pomFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>deploy-releases</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.4</version>
+            <configuration>
+              <repositoryId>${forgeReleaseId}</repositoryId>
+              <url>${forgeReleaseUrl}</url>
+            </configuration>
+            <executions>
+              <execution>
+                <id>deploy-jdt-core</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.core_${jdtVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.core.source_${jdtVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.core.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-jdt-ui</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.ui_${jdtUiVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.ui.source_${jdtUiVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.ui.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-workbench</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.workbench_${uiWorkbenchVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.workbench.source_${uiWorkbenchVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-jface</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jface_${uiJfaceVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jface.source_${uiJfaceVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jface.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-jface-text</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jface.text_${uiJfaceTextVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jface.text.source_${uiJfaceTextVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jface.text.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-swt</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.swt.win32.win32.x86_${uiSwtVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.swt.win32.win32.x86.source_${uiSwtVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.swt.win32.win32.x86.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-ide</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.ide_${uiIdeVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.ide.source_${uiIdeVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.ide.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-editors</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.editors_${uiEditorsVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.editors.source_${uiEditorsVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.editors.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-views</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.views_${uiViewsVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.views.source_${uiViewsVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.views.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-forms</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.forms_${uiFormsVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.forms.source_${uiFormsVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.forms.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-osgi</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.osgi_${osgiVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.osgi.source_${osgiVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.osgi.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-equinox-common</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.equinox.common_${equinoxVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.common.source_${equinoxVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.common.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-equinox-registry</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.equinox.registry_${equinoxRegistryVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.registry.source_${equinoxRegistryVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.registry.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-equinox-preferences</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.equinox.preferences_${equinoxPreferencesVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.preferences.source_${equinoxPreferencesVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.preferences.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-core-resources</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.resources_${eclipseResourcesVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.resources.source_${eclipseResourcesVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.resources.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-core-commands</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.commands_${eclipseCommandsVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.commands.source_${eclipseCommandsVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.commands.pom</pomFile>
+                </configuration>
+              </execution>
+              <!-- <execution> -->
+              <!-- <id>deploy-core-contenttype</id> -->
+              <!-- <phase>deploy</phase> -->
+              <!-- <goals> -->
+              <!-- <goal>sign-and-deploy-file</goal> -->
+              <!-- </goals> -->
+              <!-- <configuration> -->
+              <!-- <file>${downloaded}/org.eclipse.core.contenttype_${eclipseContenttypeVersion}.jar</file> -->
+              <!-- <sources>${downloaded}/org.eclipse.core.contenttype.source_${eclipseContenttypeVersion}.jar</sources> -->
+              <!-- <pomFile>${project.build.outputDirectory}/org.eclipse.core.contenttype.pom</pomFile> -->
+              <!-- </configuration> -->
+              <!-- </execution> -->
+              <execution>
+                <id>deploy-core-contenttype</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.expressions_${eclipseExpressionsVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.expressions.source_${eclipseExpressionsVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.expressions.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-core-filesystems</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.filesystem_${eclipseFilesystemVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.filesystem.source_${eclipseFilesystemVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.filesystem.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-core-runtime</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.runtime_${eclipseRuntimeVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.runtime.source_${eclipseRuntimeVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.runtime.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-core-jobs</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.core.jobs_${eclipseJobsVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.jobs.source_${eclipseJobsVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.core.jobs.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-eclipse-text</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.text_${eclipseTextVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.text.source_${eclipseTextVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.text.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-eclipse-search</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.search_${eclipseSearchVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.search.source_${eclipseSearchVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.search.pom</pomFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
+
+  <distributionManagement>
+    <site>
+      <id>eclipse.scout.sdk.site</id>
+      <name>Eclipse Scout SDK Site</name>
+      <!-- >workaround for http://jira.codehaus.org/browse/MSITE-671 -->
+      <url>http://staging</url>
+    </site>
+    <repository>
+      <id>${forgeReleaseId}</id>
+      <url>${forgeReleaseUrl}</url>
+    </repository>
+    <snapshotRepository>
+      <id>${forgeSnapshotId}</id>
+      <url>${forgeSnapshotUrl}</url>
+    </snapshotRepository>
+  </distributionManagement>
+</project>

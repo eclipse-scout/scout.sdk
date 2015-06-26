@@ -52,7 +52,6 @@ import org.eclipse.scout.sdk.s2e.nls.resource.ITranslationResource;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.swt.widgets.Shell;
 
-@SuppressWarnings("restriction")
 public class SimpleNlsProject extends AbstractNlsProject {
   private NlsType m_nlsClass;
   private PropertyChangeListener m_nlsClassPropertyListener;
