@@ -17,6 +17,7 @@ import java.util.TreeSet;
 
 import org.apache.commons.collections4.set.ListOrderedSet;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
@@ -36,6 +37,7 @@ import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.s2e.job.JobEx;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
 
 /**
@@ -83,6 +85,11 @@ public final class JdtUtils {
         null
         );
     return ListOrderedSet.listOrderedSet(matchList);
+  }
+
+  public static void waitForBuild() {
+    JobEx.waitForJobFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
+    JobEx.waitForJobFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
   }
 
   private static final class P_TypeMatchComparator implements Comparator<IType>, Serializable {
