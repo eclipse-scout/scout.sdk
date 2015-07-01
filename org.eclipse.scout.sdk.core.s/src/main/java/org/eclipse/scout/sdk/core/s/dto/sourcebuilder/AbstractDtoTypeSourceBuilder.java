@@ -28,6 +28,7 @@ import org.eclipse.scout.sdk.core.model.IPropertyBean;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.SortedMemberKeyFactory;
@@ -55,7 +56,7 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
 public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
 
   private static final Pattern ENDING_SEMICOLON_PATTERN = Pattern.compile("\\;$");
-  protected static final String SIG_FOR_IS_METHOD_NAME = Signature.SIG_BOOLEAN;
+  protected static final String SIG_FOR_IS_METHOD_NAME = ISignatureConstants.SIG_BOOLEAN;
 
   private final IType m_modelType;
   private final ILookupEnvironment m_lookupEnv;
@@ -232,7 +233,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
       TypeSourceBuilder propertyTypeBuilder = new TypeSourceBuilder(propName);
       propertyTypeBuilder.setFlags(Flags.AccPublic | Flags.AccStatic);
       String superTypeSig = Signature.createTypeSignature(IRuntimeClasses.AbstractPropertyData);
-      superTypeSig = ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll(Signature.C_GENERIC_START + Matcher.quoteReplacement(unboxedSignature) + Signature.C_GENERIC_END + Signature.C_SEMICOLON);
+      superTypeSig = ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll(ISignatureConstants.C_GENERIC_START + Matcher.quoteReplacement(unboxedSignature) + ISignatureConstants.C_GENERIC_END + ISignatureConstants.C_SEMICOLON);
       propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
       IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
       propertyTypeBuilder.addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
@@ -268,40 +269,40 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
       IMethodSourceBuilder legacyPropertySetterBuilder = new MethodSourceBuilder("set" + upperCaseBeanName);
       legacyPropertySetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
       legacyPropertySetterBuilder.setFlags(Flags.AccPublic);
-      legacyPropertySetterBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+      legacyPropertySetterBuilder.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
       legacyPropertySetterBuilder.addParameter(new MethodParameterDescription(lowerCaseBeanName, resolvedSignature));
       legacyPropertySetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("get" + propName + "().setValue(" + lowerCaseBeanName + ");"));
       addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertySetterBuilder), legacyPropertySetterBuilder);
     }
   }
 
-  private String getLegacyGetterMethodBody(String propertySignature, String propertyName) {
+  private static String getLegacyGetterMethodBody(String propertySignature, String propertyName) {
     String nonArraySig = propertySignature;
 
     StringBuilder source = new StringBuilder();
     source.append("return ");
-    if (Signature.SIG_BOOLEAN.equals(nonArraySig)) {
+    if (ISignatureConstants.SIG_BOOLEAN.equals(nonArraySig)) {
       source.append("(get" + propertyName + "().getValue() == null) ? (false) : (get" + propertyName + "().getValue());");
     }
-    else if (Signature.SIG_BYTE.equals(nonArraySig)) {
+    else if (ISignatureConstants.SIG_BYTE.equals(nonArraySig)) {
       source.append("(get" + propertyName + "().getValue() == null) ? (0) : (get" + propertyName + "().getValue());");
     }
-    else if (Signature.SIG_CHAR.equals(nonArraySig)) {
+    else if (ISignatureConstants.SIG_CHAR.equals(nonArraySig)) {
       source.append("(get" + propertyName + "().getValue() == null) ? ('\u0000') : (get" + propertyName + "().getValue());");
     }
-    else if (Signature.SIG_DOUBLE.equals(nonArraySig)) {
+    else if (ISignatureConstants.SIG_DOUBLE.equals(nonArraySig)) {
       source.append("(get" + propertyName + "().getValue() == null) ? (0.0d) : (get" + propertyName + "().getValue());");
     }
-    else if (Signature.SIG_FLOAT.equals(nonArraySig)) {
+    else if (ISignatureConstants.SIG_FLOAT.equals(nonArraySig)) {
       source.append("(get" + propertyName + "().getValue() == null) ? (0.0f) : (get" + propertyName + "().getValue());");
     }
-    else if (Signature.SIG_INT.equals(nonArraySig)) {
+    else if (ISignatureConstants.SIG_INT.equals(nonArraySig)) {
       source.append("(get" + propertyName + "().getValue() == null) ? (0) : (get" + propertyName + "().getValue());");
     }
-    else if (Signature.SIG_LONG.equals(nonArraySig)) {
+    else if (ISignatureConstants.SIG_LONG.equals(nonArraySig)) {
       source.append("(get" + propertyName + "().getValue() == null) ? (0L) : (get" + propertyName + "().getValue());");
     }
-    else if (Signature.SIG_SHORT.equals(nonArraySig)) {
+    else if (ISignatureConstants.SIG_SHORT.equals(nonArraySig)) {
       source.append("(get" + propertyName + "().getValue() == null) ? (0) : (get" + propertyName + "().getValue());");
     }
     else {

@@ -25,7 +25,7 @@ import org.junit.Test;
  */
 public class PropertyBeanTest {
   @Test
-  public void testPropertyBean() throws Exception {
+  public void testPropertyBean() {
     IType propTestClass = TestingUtils.getType(PropertyTestClass.class.getName());
     Assert.assertNotNull(propTestClass);
 

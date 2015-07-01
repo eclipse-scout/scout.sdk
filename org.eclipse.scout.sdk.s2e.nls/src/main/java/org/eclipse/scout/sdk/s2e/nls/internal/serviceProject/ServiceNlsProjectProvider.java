@@ -102,7 +102,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return returnValueSorted;
   }
 
-  private static boolean acceptsFilter(Set<String> projects, IType candidate) throws JavaModelException {
+  private static boolean acceptsFilter(Set<String> projects, IType candidate) {
     if (candidate == null) {
       return false;
     }
@@ -134,7 +134,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return 0.0;
   }
 
-  private ServiceNlsProject getServiceNlsProject(IType serviceType) throws JavaModelException {
+  private static ServiceNlsProject getServiceNlsProject(IType serviceType) throws JavaModelException {
     if (serviceType == null) {
       NlsCore.logError("nls service type cannot be null.");
       return null;
@@ -153,7 +153,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return new ServiceNlsProject(type);
   }
 
-  private INlsProject getNlsProjectTreeProjectName(Set<String> projectFilter) throws CoreException {
+  private static INlsProject getNlsProjectTreeProjectName(Set<String> projectFilter) throws CoreException {
     Set<IType> registeredTextProviderTypes = getRegisteredTextProviderTypes(projectFilter);
     if (registeredTextProviderTypes == null) {
       return null;
@@ -161,7 +161,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return getNlsProjectTree(registeredTextProviderTypes);
   }
 
-  private INlsProject getNlsProjectTree(Set<IType> textProviderServices) throws CoreException {
+  private static INlsProject getNlsProjectTree(Set<IType> textProviderServices) throws CoreException {
     ServiceNlsProject previous = null;
     ServiceNlsProject root = null;
     for (IType type : textProviderServices) {
@@ -204,7 +204,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return getScoutBundleNamesForProject(javaProject);
   }
 
-  private INlsProject getNlsProjectTree(IType type) throws CoreException {
+  private static INlsProject getNlsProjectTree(IType type) throws CoreException {
     Set<IType> nlsProviders = getRegisteredTextProviderTypes(getScoutBundleNamesForType(type));
     if (nlsProviders == null) {
       return null;
@@ -267,7 +267,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return null;
   }
 
-  private INlsProject getAllProjects(Set<String> wsBundles) {
+  private static INlsProject getAllProjects(Set<String> wsBundles) {
     try {
       return getNlsProjectTreeProjectName(wsBundles);
     }
@@ -277,7 +277,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     }
   }
 
-  private INlsProject getProjectByTextServiceFile(IFile f) {
+  private static INlsProject getProjectByTextServiceFile(IFile f) {
     try {
       IType type = getITypeForFile(f);
       if (type != null) {
@@ -307,7 +307,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return null;
   }
 
-  private INlsProject getProjectByTextServiceType(IType textservice) {
+  private static INlsProject getProjectByTextServiceType(IType textservice) {
     try {
       return getNlsProjectTree(textservice);
     }

@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
  */
 public class PageDataAutoUpdateHandler implements IDtoAutoUpdateHandler {
 
-  private DataAnnotation getDataAnnotationForType(IType model) {
+  private static DataAnnotation getDataAnnotationForType(IType model) {
     if (CoreUtils.isInstanceOf(model, IRuntimeClasses.IPageWithTable)) {
       return DtoUtils.findDataAnnotation(model);
     }

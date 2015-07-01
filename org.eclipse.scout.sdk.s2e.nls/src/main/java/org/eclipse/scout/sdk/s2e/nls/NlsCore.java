@@ -188,12 +188,10 @@ public class NlsCore extends AbstractUIPlugin {
       }
       return highestSeverity;
     }
-    else {
-      if (highestSeverity.getSeverity() < status.getSeverity()) {
-        highestSeverity = status;
-      }
-      return highestSeverity;
+    if (highestSeverity.getSeverity() < status.getSeverity()) {
+      highestSeverity = status;
     }
+    return highestSeverity;
   }
 
   public IDialogSettings getDialogSettingsSection(String name) {

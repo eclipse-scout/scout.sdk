@@ -71,7 +71,7 @@ public class WorkingCopyManager implements IWorkingCopyManager {
   public void discardAll(IProgressMonitor monitor) {
   }
 
-  private void releaseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor) {
+  private static void releaseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor) {
     try {
       if (!monitor.isCanceled()) {
         icu.commitWorkingCopy(true, monitor);
@@ -91,7 +91,7 @@ public class WorkingCopyManager implements IWorkingCopyManager {
     }
   }
 
-  private void indexCompilationUnitSync(ICompilationUnit icu) {
+  private static void indexCompilationUnitSync(ICompilationUnit icu) {
     IJavaProject jp = icu.getJavaProject();
     IndexManager im = JavaModelManager.getIndexManager();
     IPath containerPath = jp.getProject().getFullPath();

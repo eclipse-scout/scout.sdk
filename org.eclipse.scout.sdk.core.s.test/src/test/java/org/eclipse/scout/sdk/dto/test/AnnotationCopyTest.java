@@ -15,6 +15,7 @@ import org.eclipse.scout.sdk.core.model.IMethod;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
 import org.eclipse.scout.sdk.dto.test.util.CoreScoutTestingUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -25,7 +26,7 @@ import org.junit.Test;
  */
 public class AnnotationCopyTest {
   @Test
-  public void testCreateFormData() throws Exception {
+  public void testCreateFormData() {
     IType dto = CoreScoutTestingUtils.createFormDataAssertNoCompileErrors("formdata.client.ui.forms.AnnotationCopyTestForm");
     testApiOfAnnotationCopyTestFormData(dto);
   }
@@ -33,26 +34,26 @@ public class AnnotationCopyTest {
   /**
    * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
    */
-  private void testApiOfAnnotationCopyTestFormData(IType annotationCopyTestFormData) throws Exception {
+  private static void testApiOfAnnotationCopyTestFormData(IType annotationCopyTestFormData) {
     // type AnnotationCopyTestFormData
     SdkAssert.assertHasFlags(annotationCopyTestFormData, 1);
     SdkAssert.assertHasSuperTypeSignature(annotationCopyTestFormData, "QAbstractFormData;");
     SdkAssert.assertAnnotation(annotationCopyTestFormData, "javax.annotation.Generated");
 
     // fields of AnnotationCopyTestFormData
-    SdkAssert.assertEquals("field count of 'AnnotationCopyTestFormData'", 1, annotationCopyTestFormData.getFields().size());
+    Assert.assertEquals("field count of 'AnnotationCopyTestFormData'", 1, annotationCopyTestFormData.getFields().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(annotationCopyTestFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'AnnotationCopyTestFormData'", 2, annotationCopyTestFormData.getMethods().size());
+    Assert.assertEquals("method count of 'AnnotationCopyTestFormData'", 2, annotationCopyTestFormData.getMethods().size());
     IMethod annotationCopyTestFormData1 = SdkAssert.assertMethodExist(annotationCopyTestFormData, "AnnotationCopyTestFormData", new String[]{});
-    SdkAssert.assertTrue(annotationCopyTestFormData1.isConstructor());
+    Assert.assertTrue(annotationCopyTestFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(annotationCopyTestFormData1, null);
     IMethod getFirst = SdkAssert.assertMethodExist(annotationCopyTestFormData, "getFirst", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getFirst, "QFirst;");
 
-    SdkAssert.assertEquals("inner types count of 'AnnotationCopyTestFormData'", 1, annotationCopyTestFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'AnnotationCopyTestFormData'", 1, annotationCopyTestFormData.getTypes().size());
     // type First
     IType first = SdkAssert.assertTypeExists(annotationCopyTestFormData, "First");
     SdkAssert.assertHasFlags(first, 9);
@@ -60,17 +61,17 @@ public class AnnotationCopyTest {
     SdkAssert.assertAnnotation(first, "formdata.shared.SharedAnnotation");
 
     // fields of First
-    SdkAssert.assertEquals("field count of 'First'", 1, first.getFields().size());
+    Assert.assertEquals("field count of 'First'", 1, first.getFields().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(first, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    SdkAssert.assertEquals("method count of 'First'", 1, first.getMethods().size());
+    Assert.assertEquals("method count of 'First'", 1, first.getMethods().size());
     IMethod first1 = SdkAssert.assertMethodExist(first, "First", new String[]{});
-    SdkAssert.assertTrue(first1.isConstructor());
+    Assert.assertTrue(first1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(first1, null);
 
-    SdkAssert.assertEquals("inner types count of 'First'", 0, first.getTypes().size());
+    Assert.assertEquals("inner types count of 'First'", 0, first.getTypes().size());
   }
 
 }

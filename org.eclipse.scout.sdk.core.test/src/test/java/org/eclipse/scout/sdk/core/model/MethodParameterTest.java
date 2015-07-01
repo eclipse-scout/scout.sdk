@@ -23,7 +23,7 @@ import org.junit.Test;
 public class MethodParameterTest {
 
   @Test
-  public void testDeclaringMethodParameters() throws Exception {
+  public void testDeclaringMethodParameters() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
     Assert.assertEquals(3, childClassType.getMethods().size());
@@ -45,7 +45,7 @@ public class MethodParameterTest {
   }
 
   @Test
-  public void testToString() throws Exception {
+  public void testToString() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
     Assert.assertFalse(StringUtils.isBlank(childClassType.getMethods().get(1).getParameters().get(1).toString()));
@@ -56,7 +56,7 @@ public class MethodParameterTest {
   }
 
   @Test
-  public void testBindingMethodParameters() throws Exception {
+  public void testBindingMethodParameters() {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
     Assert.assertEquals(3, baseClassType.getMethods().size());

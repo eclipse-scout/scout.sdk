@@ -15,12 +15,13 @@ import org.eclipse.scout.sdk.core.model.IMethod;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
 import org.eclipse.scout.sdk.dto.test.util.CoreScoutTestingUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ExternalCheckboxFieldTest {
 
   @Test
-  public void testCreateFormData() throws Exception {
+  public void testCreateFormData() {
     String templateName = "AbstractTestCheckboxField";
     IType dto = CoreScoutTestingUtils.createFormDataAssertNoCompileErrors("formdata.client.ui.template.formfield." + templateName);
     testApiOfAbstractTestCheckboxFieldData(dto);
@@ -29,23 +30,23 @@ public class ExternalCheckboxFieldTest {
   /**
    * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
    */
-  private void testApiOfAbstractTestCheckboxFieldData(IType abstractTestCheckboxFieldData) throws Exception {
+  private static void testApiOfAbstractTestCheckboxFieldData(IType abstractTestCheckboxFieldData) {
     // type AbstractTestCheckboxFieldData
     SdkAssert.assertHasFlags(abstractTestCheckboxFieldData, 1025);
     SdkAssert.assertHasSuperTypeSignature(abstractTestCheckboxFieldData, "QAbstractValueFieldData<QBoolean;>;");
 
     // fields of AbstractTestCheckboxFieldData
-    SdkAssert.assertEquals("field count of 'AbstractTestCheckboxFieldData'", 1, abstractTestCheckboxFieldData.getFields().size());
+    Assert.assertEquals("field count of 'AbstractTestCheckboxFieldData'", 1, abstractTestCheckboxFieldData.getFields().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(abstractTestCheckboxFieldData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'AbstractTestCheckboxFieldData'", 1, abstractTestCheckboxFieldData.getMethods().size());
+    Assert.assertEquals("method count of 'AbstractTestCheckboxFieldData'", 1, abstractTestCheckboxFieldData.getMethods().size());
     IMethod abstractTestCheckboxFieldData1 = SdkAssert.assertMethodExist(abstractTestCheckboxFieldData, "AbstractTestCheckboxFieldData", new String[]{});
-    SdkAssert.assertTrue(abstractTestCheckboxFieldData1.isConstructor());
+    Assert.assertTrue(abstractTestCheckboxFieldData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(abstractTestCheckboxFieldData1, null);
 
-    SdkAssert.assertEquals("inner types count of 'AbstractTestCheckboxFieldData'", 0, abstractTestCheckboxFieldData.getTypes().size());
+    Assert.assertEquals("inner types count of 'AbstractTestCheckboxFieldData'", 0, abstractTestCheckboxFieldData.getTypes().size());
   }
 
 }

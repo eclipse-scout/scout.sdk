@@ -31,7 +31,7 @@ public class BasicPropertySupport {
   public static final Double DEFAULT_DOUBLE = Double.valueOf(DEFAULT_DOUBLE_VALUE);
   public static final long DEFAULT_LONG_VALUE = DEFAULT_INT_VALUE;
   public static final Long DEFAULT_LONG = Long.valueOf(DEFAULT_LONG_VALUE);
-  private static final Boolean DEFAULT_BOOL = Boolean.FALSE;
+  public static final Boolean DEFAULT_BOOL = Boolean.FALSE;
 
   private final Map<String, Object> m_props;
   private final Object m_source;
@@ -90,7 +90,10 @@ public class BasicPropertySupport {
 
   public int getPropertyInt(String name) {
     Number n = (Number) getProperty(name);
-    return n != null ? n.intValue() : 0;
+    if (n == null) {
+      return DEFAULT_INT_VALUE;
+    }
+    return n.intValue();
   }
 
   public void setPropertyDouble(String name, double d) {
@@ -99,7 +102,10 @@ public class BasicPropertySupport {
 
   public double getPropertyDouble(String name) {
     Number n = (Number) getProperty(name);
-    return n != null ? n.doubleValue() : 0;
+    if (n == null) {
+      return DEFAULT_DOUBLE_VALUE;
+    }
+    return n.doubleValue();
   }
 
   public void setPropertyLong(String name, long i) {
@@ -108,7 +114,10 @@ public class BasicPropertySupport {
 
   public long getPropertyLong(String name) {
     Number n = (Number) getProperty(name);
-    return n != null ? n.longValue() : DEFAULT_LONG.longValue();
+    if (n == null) {
+      return DEFAULT_LONG_VALUE;
+    }
+    return n.longValue();
   }
 
   public boolean setPropertyBool(String name, boolean b) {
@@ -117,7 +126,10 @@ public class BasicPropertySupport {
 
   public boolean getPropertyBool(String name) {
     Boolean b = (Boolean) getProperty(name);
-    return b != null ? b.booleanValue() : DEFAULT_BOOL.booleanValue();
+    if (b == null) {
+      return DEFAULT_BOOL.booleanValue();
+    }
+    return b.booleanValue();
   }
 
   public void setPropertyString(String name, String s) {
@@ -145,14 +157,13 @@ public class BasicPropertySupport {
     return setPropertyList(name, newValue, true);
   }
 
-  @SuppressWarnings("unchecked")
   private <T> boolean setPropertyList(String name, List<T> newValue, boolean alwaysFire) {
     Object oldValue = m_props.get(name);
     boolean propChanged = setPropertyNoFire(name, newValue);
     if (propChanged || alwaysFire) {
       Object eventOldValue = null;
       if (oldValue instanceof List) {
-        eventOldValue = new ArrayList<>((List) oldValue);
+        eventOldValue = new ArrayList<>((List<?>) oldValue);
       }
       // fire a copy
       List<T> eventNewValue = null;
@@ -178,14 +189,13 @@ public class BasicPropertySupport {
     return setPropertySet(name, newValue, true);
   }
 
-  @SuppressWarnings("unchecked")
   private <T> boolean setPropertySet(String name, Set<T> newValue, boolean alwaysFire) {
     Object oldValue = m_props.get(name);
     boolean propChanged = setPropertyNoFire(name, newValue);
     if (propChanged || alwaysFire) {
       Object eventOldValue = null;
       if (oldValue instanceof Set) {
-        eventOldValue = new HashSet<>((Set) oldValue);
+        eventOldValue = new HashSet<>((Set<?>) oldValue);
       }
       // fire a copy
       Set<T> eventNewValue = null;
@@ -227,10 +237,9 @@ public class BasicPropertySupport {
       // no change
       return false;
     }
-    else {
-      firePropertyChangeImpl(name, oldValue, newValue);
-      return true;
-    }
+
+    firePropertyChangeImpl(name, oldValue, newValue);
+    return true;
   }
 
   public void setPropertyAlwaysFire(String name, Object newValue) {
@@ -247,7 +256,7 @@ public class BasicPropertySupport {
     if (listener instanceof PropertyChangeListenerProxy) {
       PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy) listener;
       // Call two argument add method.
-      addPropertyChangeListener(proxy.getPropertyName(), (PropertyChangeListener) proxy.getListener());
+      addPropertyChangeListener(proxy.getPropertyName(), proxy.getListener());
     }
     else {
       synchronized (m_listenerLock) {
@@ -268,13 +277,13 @@ public class BasicPropertySupport {
     if (listener instanceof PropertyChangeListenerProxy) {
       PropertyChangeListenerProxy proxy = (PropertyChangeListenerProxy) listener;
       // Call two argument remove method.
-      removePropertyChangeListener(proxy.getPropertyName(), (PropertyChangeListener) proxy.getListener());
+      removePropertyChangeListener(proxy.getPropertyName(), proxy.getListener());
     }
     else {
       synchronized (m_listenerLock) {
         removeFromListNoLock(m_listeners, listener);
         if (m_childListeners != null) {
-          for (List childList : m_childListeners.values()) {
+          for (List<Object> childList : m_childListeners.values()) {
             removeFromListNoLock(childList, listener);
           }
         }
@@ -304,7 +313,7 @@ public class BasicPropertySupport {
   public void removePropertyChangeListener(String propertyName, PropertyChangeListener listener) {
     synchronized (m_listenerLock) {
       if (m_childListeners != null) {
-        List childList = m_childListeners.get(propertyName);
+        List<Object> childList = m_childListeners.get(propertyName);
         if (childList != null) {
           removeFromListNoLock(childList, listener);
         }
@@ -312,7 +321,7 @@ public class BasicPropertySupport {
     }
   }
 
-  private void removeFromListNoLock(List listeners, PropertyChangeListener listener) {
+  private static void removeFromListNoLock(List<Object> listeners, PropertyChangeListener listener) {
     if (listeners == null) {
       return;
     }
@@ -320,7 +329,7 @@ public class BasicPropertySupport {
       for (int i = 0, n = listeners.size(); i < n; i++) {
         Object o = listeners.get(i);
         if (o instanceof WeakReference) {
-          if (((WeakReference) o).get() == listener) {
+          if (((WeakReference<?>) o).get() == listener) {
             listeners.remove(i);
             break;
           }
@@ -331,7 +340,7 @@ public class BasicPropertySupport {
       listeners.remove(listener);
     }
     if (listeners.size() == 0 && listeners instanceof ArrayList) {
-      ((ArrayList) listeners).trimToSize();
+      ((ArrayList<?>) listeners).trimToSize();
     }
   }
 
@@ -361,8 +370,8 @@ public class BasicPropertySupport {
   }
 
   private void firePropertyChangeImpl(String propertyName, Object oldValue, Object newValue) {
-    List l = m_listeners;
-    Map m = m_childListeners;
+    List<Object> l = m_listeners;
+    Map<String, List<Object>> m = m_childListeners;
     if ((l != null && l.size() > 0) || (m != null && m.size() > 0)) {
       PropertyChangeEvent e = new PropertyChangeEvent(m_source, propertyName, oldValue, newValue);
       firePropertyChangeImpl(e);
@@ -389,7 +398,7 @@ public class BasicPropertySupport {
         if (m_listeners != null) {
           for (Object o : m_listeners) {
             if (o instanceof WeakReference) {
-              o = ((WeakReference) o).get();
+              o = ((WeakReference<?>) o).get();
             }
             if (o != null) {
               targets.add((PropertyChangeListener) o);
@@ -398,11 +407,11 @@ public class BasicPropertySupport {
         }
         String propertyName = e.getPropertyName();
         if (propertyName != null && m_childListeners != null) {
-          List childListeners = m_childListeners.get(propertyName);
+          List<Object> childListeners = m_childListeners.get(propertyName);
           if (childListeners != null) {
             for (Object o : childListeners) {
               if (o instanceof WeakReference) {
-                o = ((WeakReference) o).get();
+                o = ((WeakReference<?>) o).get();
               }
               if (o != null) {
                 targets.add((PropertyChangeListener) o);
@@ -450,8 +459,8 @@ public class BasicPropertySupport {
 
   public boolean hasListeners(String propertyName) {
     synchronized (m_listenerLock) {
-      List l0 = m_listeners;
-      List l1 = null;
+      List<Object> l0 = m_listeners;
+      List<Object> l1 = null;
       if (propertyName != null) {
         l1 = m_childListeners.get(propertyName);
       }

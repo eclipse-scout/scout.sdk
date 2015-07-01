@@ -385,9 +385,7 @@ public abstract class AbstractNlsEntryDialog extends TitleAreaDialog {
       if (item instanceof INlsProject) {
         return ((INlsProject) item).getName();
       }
-      else {
-        return null;
-      }
+      return null;
     }
 
     @Override

@@ -39,9 +39,7 @@ public class SdkLogManager {
     if (log instanceof LogStatus) {
       return log;
     }
-    else {
-      return createStatus(log.getSeverity(), log.getMessage(), log.getException());
-    }
+    return createStatus(log.getSeverity(), log.getMessage(), log.getException());
   }
 
   protected IStatus createStatus(int severity, String message, Throwable t) {
@@ -133,9 +131,7 @@ public class SdkLogManager {
     if (context == null) {
       return null;
     }
-    else {
-      return context.getProperty(context.getBundle().getSymbolicName() + LOG_LEVEL_SUFFIX);
-    }
+    return context.getProperty(context.getBundle().getSymbolicName() + LOG_LEVEL_SUFFIX);
   }
 
   private static int parseLogLevel(String loglevel) {

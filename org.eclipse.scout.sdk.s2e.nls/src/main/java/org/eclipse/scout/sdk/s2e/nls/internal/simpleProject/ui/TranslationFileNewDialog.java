@@ -166,7 +166,7 @@ public class TranslationFileNewDialog extends TitleAreaDialog {
     }
   }
 
-  private void attachGridData(Control c) {
+  private static void attachGridData(Control c) {
     GridData d = new GridData();
     d.grabExcessHorizontalSpace = true;
     d.horizontalAlignment = SWT.FILL;

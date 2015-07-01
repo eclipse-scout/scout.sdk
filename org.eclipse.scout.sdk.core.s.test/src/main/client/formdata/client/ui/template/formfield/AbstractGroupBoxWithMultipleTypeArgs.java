@@ -17,6 +17,8 @@ import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
 import org.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData;
 
 @FormData(value = AbstractValueFieldData.class, defaultSubtypeSdkCommand = DefaultSubtypeSdkCommand.CREATE, sdkCommand = SdkCommand.USE, genericOrdinal = 1)
+@SuppressWarnings("unused")
 public abstract class AbstractGroupBoxWithMultipleTypeArgs<T extends Number, U extends Runnable> extends AbstractGroupBox {
-
+  private U m_param;
+  private T m_param2;
 }

@@ -15,6 +15,7 @@ import org.eclipse.scout.sdk.core.model.IMethod;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
 import org.eclipse.scout.sdk.dto.test.util.CoreScoutTestingUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 /**
@@ -32,47 +33,45 @@ public class PageBeanDataTest {
   public static final String ExtendedExtendedTablePageWithExtendedTable = "formdata.client.ui.desktop.outline.pages.ExtendedExtendedTablePageWithExtendedTable";
   public static final String PageWithTableExtension = "formdata.client.ui.desktop.outline.pages.PageWithTableExtension";
 
-  private IType createDto(String typeName, boolean rowData) throws Exception {
+  private static IType createDto(String typeName, boolean rowData) {
     if (rowData) {
       return CoreScoutTestingUtils.createRowDataAssertNoCompileErrors(typeName);
     }
-    else {
-      return CoreScoutTestingUtils.createPageDataAssertNoCompileErrors(typeName);
-    }
+    return CoreScoutTestingUtils.createPageDataAssertNoCompileErrors(typeName);
   }
 
   @Test
-  public void testPageWithTableExtensionData() throws Exception {
+  public void testPageWithTableExtensionData() {
     IType dto = createDto(PageWithTableExtension, true);
     testApiOfPageWithTableExtensionData(dto);
   }
 
   @Test
-  public void testAbstractTableField() throws Exception {
+  public void testAbstractTableField() {
     IType dto = createDto(BaseTablePage, false);
     testApiOfBaseTablePageData(dto);
   }
 
   @Test
-  public void testExtendedTablePage() throws Exception {
+  public void testExtendedTablePage() {
     IType dto = createDto(ExtendedTablePage, false);
     testApiOfExtendedTablePageData(dto);
   }
 
   @Test
-  public void testExtendedTablePageWithoutExtendedTable() throws Exception {
+  public void testExtendedTablePageWithoutExtendedTable() {
     IType dto = createDto(ExtendedTablePageWithoutExtendedTableFqn, false);
     testApiOfExtendedTablePageWithoutExtendedTableData(dto);
   }
 
   @Test
-  public void testBaseWithExtendedTableTablePage() throws Exception {
+  public void testBaseWithExtendedTableTablePage() {
     IType dto = createDto(BaseWithExtendedTableTablePage, false);
     testApiOfBaseWithExtendedTableTablePageData(dto);
   }
 
   @Test
-  public void testExtendedExtendedTablePageWithExtendedTable() throws Exception {
+  public void testExtendedExtendedTablePageWithExtendedTable() {
     IType dto = createDto(ExtendedExtendedTablePageWithExtendedTable, false);
     testApiOfExtendedExtendedTablePageWithExtendedTableData(dto);
   }
@@ -80,20 +79,20 @@ public class PageBeanDataTest {
   /**
    * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
    */
-  private void testApiOfBaseTablePageData(IType baseTablePageData) throws Exception {
+  private static void testApiOfBaseTablePageData(IType baseTablePageData) {
     // type BaseTablePageData
     SdkAssert.assertHasFlags(baseTablePageData, 1);
     SdkAssert.assertHasSuperTypeSignature(baseTablePageData, "QAbstractTablePageData;");
 
     // fields of BaseTablePageData
-    SdkAssert.assertEquals("field count of 'BaseTablePageData'", 1, baseTablePageData.getFields().size());
+    Assert.assertEquals("field count of 'BaseTablePageData'", 1, baseTablePageData.getFields().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(baseTablePageData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'BaseTablePageData'", 8, baseTablePageData.getMethods().size());
+    Assert.assertEquals("method count of 'BaseTablePageData'", 8, baseTablePageData.getMethods().size());
     IMethod baseTablePageData1 = SdkAssert.assertMethodExist(baseTablePageData, "BaseTablePageData", new String[]{});
-    SdkAssert.assertTrue(baseTablePageData1.isConstructor());
+    Assert.assertTrue(baseTablePageData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(baseTablePageData1, null);
     IMethod addRow = SdkAssert.assertMethodExist(baseTablePageData, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QBaseTableRowData;");
@@ -116,14 +115,14 @@ public class PageBeanDataTest {
     IMethod setRows = SdkAssert.assertMethodExist(baseTablePageData, "setRows", new String[]{"[QBaseTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    SdkAssert.assertEquals("inner types count of 'BaseTablePageData'", 1, baseTablePageData.getTypes().size());
+    Assert.assertEquals("inner types count of 'BaseTablePageData'", 1, baseTablePageData.getTypes().size());
     // type BaseTableRowData
     IType baseTableRowData = SdkAssert.assertTypeExists(baseTablePageData, "BaseTableRowData");
     SdkAssert.assertHasFlags(baseTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(baseTableRowData, "QAbstractTableRowData;");
 
     // fields of BaseTableRowData
-    SdkAssert.assertEquals("field count of 'BaseTableRowData'", 5, baseTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'BaseTableRowData'", 5, baseTableRowData.getFields().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(baseTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
@@ -140,9 +139,9 @@ public class PageBeanDataTest {
     SdkAssert.assertHasFlags(m_second, 2);
     SdkAssert.assertFieldSignature(m_second, "QDate;");
 
-    SdkAssert.assertEquals("method count of 'BaseTableRowData'", 5, baseTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'BaseTableRowData'", 5, baseTableRowData.getMethods().size());
     IMethod baseTableRowData1 = SdkAssert.assertMethodExist(baseTableRowData, "BaseTableRowData", new String[]{});
-    SdkAssert.assertTrue(baseTableRowData1.isConstructor());
+    Assert.assertTrue(baseTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(baseTableRowData1, null);
     IMethod getFirst = SdkAssert.assertMethodExist(baseTableRowData, "getFirst", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getFirst, "QString;");
@@ -153,27 +152,27 @@ public class PageBeanDataTest {
     IMethod setSecond = SdkAssert.assertMethodExist(baseTableRowData, "setSecond", new String[]{"QDate;"});
     SdkAssert.assertMethodReturnTypeSignature(setSecond, "V");
 
-    SdkAssert.assertEquals("inner types count of 'BaseTableRowData'", 0, baseTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'BaseTableRowData'", 0, baseTableRowData.getTypes().size());
   }
 
   /**
    * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
    */
-  private void testApiOfExtendedTablePageData(IType extendedTablePageData) throws Exception {
+  private static void testApiOfExtendedTablePageData(IType extendedTablePageData) {
     // type ExtendedTablePageData
     SdkAssert.assertHasFlags(extendedTablePageData, 1);
     SdkAssert.assertHasSuperTypeSignature(extendedTablePageData, "QBaseTablePageData;");
     SdkAssert.assertAnnotation(extendedTablePageData, "javax.annotation.Generated");
 
     // fields of ExtendedTablePageData
-    SdkAssert.assertEquals("field count of 'ExtendedTablePageData'", 1, extendedTablePageData.getFields().size());
+    Assert.assertEquals("field count of 'ExtendedTablePageData'", 1, extendedTablePageData.getFields().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(extendedTablePageData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'ExtendedTablePageData'", 8, extendedTablePageData.getMethods().size());
+    Assert.assertEquals("method count of 'ExtendedTablePageData'", 8, extendedTablePageData.getMethods().size());
     IMethod extendedTablePageData1 = SdkAssert.assertMethodExist(extendedTablePageData, "ExtendedTablePageData", new String[]{});
-    SdkAssert.assertTrue(extendedTablePageData1.isConstructor());
+    Assert.assertTrue(extendedTablePageData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedTablePageData1, null);
     IMethod addRow = SdkAssert.assertMethodExist(extendedTablePageData, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QExtendedTableRowData;");
@@ -196,14 +195,14 @@ public class PageBeanDataTest {
     IMethod setRows = SdkAssert.assertMethodExist(extendedTablePageData, "setRows", new String[]{"[QExtendedTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    SdkAssert.assertEquals("inner types count of 'ExtendedTablePageData'", 1, extendedTablePageData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExtendedTablePageData'", 1, extendedTablePageData.getTypes().size());
     // type ExtendedTableRowData
     IType extendedTableRowData = SdkAssert.assertTypeExists(extendedTablePageData, "ExtendedTableRowData");
     SdkAssert.assertHasFlags(extendedTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(extendedTableRowData, "QBaseTableRowData;");
 
     // fields of ExtendedTableRowData
-    SdkAssert.assertEquals("field count of 'ExtendedTableRowData'", 5, extendedTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'ExtendedTableRowData'", 5, extendedTableRowData.getFields().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(extendedTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
@@ -220,9 +219,9 @@ public class PageBeanDataTest {
     SdkAssert.assertHasFlags(m_ignoredColumnEx, 2);
     SdkAssert.assertFieldSignature(m_ignoredColumnEx, "QDate;");
 
-    SdkAssert.assertEquals("method count of 'ExtendedTableRowData'", 5, extendedTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'ExtendedTableRowData'", 5, extendedTableRowData.getMethods().size());
     IMethod extendedTableRowData1 = SdkAssert.assertMethodExist(extendedTableRowData, "ExtendedTableRowData", new String[]{});
-    SdkAssert.assertTrue(extendedTableRowData1.isConstructor());
+    Assert.assertTrue(extendedTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedTableRowData1, null);
     IMethod getIntermediate = SdkAssert.assertMethodExist(extendedTableRowData, "getIntermediate", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getIntermediate, "QBigDecimal;");
@@ -233,26 +232,26 @@ public class PageBeanDataTest {
     IMethod setIgnoredColumnEx = SdkAssert.assertMethodExist(extendedTableRowData, "setIgnoredColumnEx", new String[]{"QDate;"});
     SdkAssert.assertMethodReturnTypeSignature(setIgnoredColumnEx, "V");
 
-    SdkAssert.assertEquals("inner types count of 'ExtendedTableRowData'", 0, extendedTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExtendedTableRowData'", 0, extendedTableRowData.getTypes().size());
   }
 
   /**
    * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
    */
-  private void testApiOfExtendedTablePageWithoutExtendedTableData(IType extendedTablePageWithoutExtendedTableData) throws Exception {
+  private static void testApiOfExtendedTablePageWithoutExtendedTableData(IType extendedTablePageWithoutExtendedTableData) {
     // type ExtendedTablePageWithoutExtendedTableData
     SdkAssert.assertHasFlags(extendedTablePageWithoutExtendedTableData, 1);
     SdkAssert.assertHasSuperTypeSignature(extendedTablePageWithoutExtendedTableData, "QBaseTablePageData;");
 
     // fields of ExtendedTablePageWithoutExtendedTableData
-    SdkAssert.assertEquals("field count of 'ExtendedTablePageWithoutExtendedTableData'", 1, extendedTablePageWithoutExtendedTableData.getFields().size());
+    Assert.assertEquals("field count of 'ExtendedTablePageWithoutExtendedTableData'", 1, extendedTablePageWithoutExtendedTableData.getFields().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(extendedTablePageWithoutExtendedTableData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'ExtendedTablePageWithoutExtendedTableData'", 8, extendedTablePageWithoutExtendedTableData.getMethods().size());
+    Assert.assertEquals("method count of 'ExtendedTablePageWithoutExtendedTableData'", 8, extendedTablePageWithoutExtendedTableData.getMethods().size());
     IMethod extendedTablePageWithoutExtendedTableData1 = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "ExtendedTablePageWithoutExtendedTableData", new String[]{});
-    SdkAssert.assertTrue(extendedTablePageWithoutExtendedTableData1.isConstructor());
+    Assert.assertTrue(extendedTablePageWithoutExtendedTableData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedTablePageWithoutExtendedTableData1, null);
     IMethod addRow = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QExtendedTablePageWithoutExtendedTableRowData;");
@@ -275,43 +274,43 @@ public class PageBeanDataTest {
     IMethod setRows = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableData, "setRows", new String[]{"[QExtendedTablePageWithoutExtendedTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    SdkAssert.assertEquals("inner types count of 'ExtendedTablePageWithoutExtendedTableData'", 1, extendedTablePageWithoutExtendedTableData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExtendedTablePageWithoutExtendedTableData'", 1, extendedTablePageWithoutExtendedTableData.getTypes().size());
     // type ExtendedTablePageWithoutExtendedTableRowData
     IType extendedTablePageWithoutExtendedTableRowData = SdkAssert.assertTypeExists(extendedTablePageWithoutExtendedTableData, "ExtendedTablePageWithoutExtendedTableRowData");
     SdkAssert.assertHasFlags(extendedTablePageWithoutExtendedTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(extendedTablePageWithoutExtendedTableRowData, "QBaseTableRowData;");
 
     // fields of ExtendedTablePageWithoutExtendedTableRowData
-    SdkAssert.assertEquals("field count of 'ExtendedTablePageWithoutExtendedTableRowData'", 1, extendedTablePageWithoutExtendedTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'ExtendedTablePageWithoutExtendedTableRowData'", 1, extendedTablePageWithoutExtendedTableRowData.getFields().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(extendedTablePageWithoutExtendedTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    SdkAssert.assertEquals("method count of 'ExtendedTablePageWithoutExtendedTableRowData'", 1, extendedTablePageWithoutExtendedTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'ExtendedTablePageWithoutExtendedTableRowData'", 1, extendedTablePageWithoutExtendedTableRowData.getMethods().size());
     IMethod extendedTablePageWithoutExtendedTableRowData1 = SdkAssert.assertMethodExist(extendedTablePageWithoutExtendedTableRowData, "ExtendedTablePageWithoutExtendedTableRowData", new String[]{});
-    SdkAssert.assertTrue(extendedTablePageWithoutExtendedTableRowData1.isConstructor());
+    Assert.assertTrue(extendedTablePageWithoutExtendedTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedTablePageWithoutExtendedTableRowData1, null);
 
-    SdkAssert.assertEquals("inner types count of 'ExtendedTablePageWithoutExtendedTableRowData'", 0, extendedTablePageWithoutExtendedTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExtendedTablePageWithoutExtendedTableRowData'", 0, extendedTablePageWithoutExtendedTableRowData.getTypes().size());
   }
 
   /**
    * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
    */
-  private void testApiOfBaseWithExtendedTableTablePageData(IType baseWithExtendedTableTablePageData) throws Exception {
+  private static void testApiOfBaseWithExtendedTableTablePageData(IType baseWithExtendedTableTablePageData) {
     // type BaseWithExtendedTableTablePageData
     SdkAssert.assertHasFlags(baseWithExtendedTableTablePageData, 1);
     SdkAssert.assertHasSuperTypeSignature(baseWithExtendedTableTablePageData, "QAbstractTablePageData;");
 
     // fields of BaseWithExtendedTableTablePageData
-    SdkAssert.assertEquals("field count of 'BaseWithExtendedTableTablePageData'", 1, baseWithExtendedTableTablePageData.getFields().size());
+    Assert.assertEquals("field count of 'BaseWithExtendedTableTablePageData'", 1, baseWithExtendedTableTablePageData.getFields().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(baseWithExtendedTableTablePageData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'BaseWithExtendedTableTablePageData'", 8, baseWithExtendedTableTablePageData.getMethods().size());
+    Assert.assertEquals("method count of 'BaseWithExtendedTableTablePageData'", 8, baseWithExtendedTableTablePageData.getMethods().size());
     IMethod baseWithExtendedTableTablePageData1 = SdkAssert.assertMethodExist(baseWithExtendedTableTablePageData, "BaseWithExtendedTableTablePageData", new String[]{});
-    SdkAssert.assertTrue(baseWithExtendedTableTablePageData1.isConstructor());
+    Assert.assertTrue(baseWithExtendedTableTablePageData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(baseWithExtendedTableTablePageData1, null);
     IMethod addRow = SdkAssert.assertMethodExist(baseWithExtendedTableTablePageData, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QBaseWithExtendedTableTableRowData;");
@@ -334,14 +333,14 @@ public class PageBeanDataTest {
     IMethod setRows = SdkAssert.assertMethodExist(baseWithExtendedTableTablePageData, "setRows", new String[]{"[QBaseWithExtendedTableTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    SdkAssert.assertEquals("inner types count of 'BaseWithExtendedTableTablePageData'", 1, baseWithExtendedTableTablePageData.getTypes().size());
+    Assert.assertEquals("inner types count of 'BaseWithExtendedTableTablePageData'", 1, baseWithExtendedTableTablePageData.getTypes().size());
     // type BaseWithExtendedTableTableRowData
     IType baseWithExtendedTableTableRowData = SdkAssert.assertTypeExists(baseWithExtendedTableTablePageData, "BaseWithExtendedTableTableRowData");
     SdkAssert.assertHasFlags(baseWithExtendedTableTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(baseWithExtendedTableTableRowData, "QAbstractTableRowData;");
 
     // fields of BaseWithExtendedTableTableRowData
-    SdkAssert.assertEquals("field count of 'BaseWithExtendedTableTableRowData'", 5, baseWithExtendedTableTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'BaseWithExtendedTableTableRowData'", 5, baseWithExtendedTableTableRowData.getFields().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(baseWithExtendedTableTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
@@ -358,9 +357,9 @@ public class PageBeanDataTest {
     SdkAssert.assertHasFlags(m_colInTable, 2);
     SdkAssert.assertFieldSignature(m_colInTable, "QString;");
 
-    SdkAssert.assertEquals("method count of 'BaseWithExtendedTableTableRowData'", 5, baseWithExtendedTableTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'BaseWithExtendedTableTableRowData'", 5, baseWithExtendedTableTableRowData.getMethods().size());
     IMethod baseWithExtendedTableTableRowData1 = SdkAssert.assertMethodExist(baseWithExtendedTableTableRowData, "BaseWithExtendedTableTableRowData", new String[]{});
-    SdkAssert.assertTrue(baseWithExtendedTableTableRowData1.isConstructor());
+    Assert.assertTrue(baseWithExtendedTableTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(baseWithExtendedTableTableRowData1, null);
     IMethod getColInAbstractTable = SdkAssert.assertMethodExist(baseWithExtendedTableTableRowData, "getColInAbstractTable", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getColInAbstractTable, "QString;");
@@ -371,26 +370,26 @@ public class PageBeanDataTest {
     IMethod setColInTable = SdkAssert.assertMethodExist(baseWithExtendedTableTableRowData, "setColInTable", new String[]{"QString;"});
     SdkAssert.assertMethodReturnTypeSignature(setColInTable, "V");
 
-    SdkAssert.assertEquals("inner types count of 'BaseWithExtendedTableTableRowData'", 0, baseWithExtendedTableTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'BaseWithExtendedTableTableRowData'", 0, baseWithExtendedTableTableRowData.getTypes().size());
   }
 
   /**
    * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
    */
-  private void testApiOfExtendedExtendedTablePageWithExtendedTableData(IType extendedExtendedTablePageWithExtendedTableData) throws Exception {
+  private static void testApiOfExtendedExtendedTablePageWithExtendedTableData(IType extendedExtendedTablePageWithExtendedTableData) {
     // type ExtendedExtendedTablePageWithExtendedTableData
     SdkAssert.assertHasFlags(extendedExtendedTablePageWithExtendedTableData, 1);
     SdkAssert.assertHasSuperTypeSignature(extendedExtendedTablePageWithExtendedTableData, "QExtendedTablePageWithoutExtendedTableData;");
 
     // fields of ExtendedExtendedTablePageWithExtendedTableData
-    SdkAssert.assertEquals("field count of 'ExtendedExtendedTablePageWithExtendedTableData'", 1, extendedExtendedTablePageWithExtendedTableData.getFields().size());
+    Assert.assertEquals("field count of 'ExtendedExtendedTablePageWithExtendedTableData'", 1, extendedExtendedTablePageWithExtendedTableData.getFields().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(extendedExtendedTablePageWithExtendedTableData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'ExtendedExtendedTablePageWithExtendedTableData'", 8, extendedExtendedTablePageWithExtendedTableData.getMethods().size());
+    Assert.assertEquals("method count of 'ExtendedExtendedTablePageWithExtendedTableData'", 8, extendedExtendedTablePageWithExtendedTableData.getMethods().size());
     IMethod extendedExtendedTablePageWithExtendedTableData1 = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "ExtendedExtendedTablePageWithExtendedTableData", new String[]{});
-    SdkAssert.assertTrue(extendedExtendedTablePageWithExtendedTableData1.isConstructor());
+    Assert.assertTrue(extendedExtendedTablePageWithExtendedTableData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedExtendedTablePageWithExtendedTableData1, null);
     IMethod addRow = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "addRow", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(addRow, "QExtendedExtendedTablePageWithExtendedTableRowData;");
@@ -413,14 +412,14 @@ public class PageBeanDataTest {
     IMethod setRows = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableData, "setRows", new String[]{"[QExtendedExtendedTablePageWithExtendedTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    SdkAssert.assertEquals("inner types count of 'ExtendedExtendedTablePageWithExtendedTableData'", 1, extendedExtendedTablePageWithExtendedTableData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExtendedExtendedTablePageWithExtendedTableData'", 1, extendedExtendedTablePageWithExtendedTableData.getTypes().size());
     // type ExtendedExtendedTablePageWithExtendedTableRowData
     IType extendedExtendedTablePageWithExtendedTableRowData = SdkAssert.assertTypeExists(extendedExtendedTablePageWithExtendedTableData, "ExtendedExtendedTablePageWithExtendedTableRowData");
     SdkAssert.assertHasFlags(extendedExtendedTablePageWithExtendedTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(extendedExtendedTablePageWithExtendedTableRowData, "QExtendedTablePageWithoutExtendedTableRowData;");
 
     // fields of ExtendedExtendedTablePageWithExtendedTableRowData
-    SdkAssert.assertEquals("field count of 'ExtendedExtendedTablePageWithExtendedTableRowData'", 3, extendedExtendedTablePageWithExtendedTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'ExtendedExtendedTablePageWithExtendedTableRowData'", 3, extendedExtendedTablePageWithExtendedTableRowData.getFields().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(extendedExtendedTablePageWithExtendedTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
@@ -431,22 +430,22 @@ public class PageBeanDataTest {
     SdkAssert.assertHasFlags(m_boolean, 2);
     SdkAssert.assertFieldSignature(m_boolean, "QBoolean;");
 
-    SdkAssert.assertEquals("method count of 'ExtendedExtendedTablePageWithExtendedTableRowData'", 3, extendedExtendedTablePageWithExtendedTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'ExtendedExtendedTablePageWithExtendedTableRowData'", 3, extendedExtendedTablePageWithExtendedTableRowData.getMethods().size());
     IMethod extendedExtendedTablePageWithExtendedTableRowData1 = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableRowData, "ExtendedExtendedTablePageWithExtendedTableRowData", new String[]{});
-    SdkAssert.assertTrue(extendedExtendedTablePageWithExtendedTableRowData1.isConstructor());
+    Assert.assertTrue(extendedExtendedTablePageWithExtendedTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedExtendedTablePageWithExtendedTableRowData1, null);
     IMethod getBoolean = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableRowData, "getBoolean", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getBoolean, "QBoolean;");
     IMethod setBoolean = SdkAssert.assertMethodExist(extendedExtendedTablePageWithExtendedTableRowData, "setBoolean", new String[]{"QBoolean;"});
     SdkAssert.assertMethodReturnTypeSignature(setBoolean, "V");
 
-    SdkAssert.assertEquals("inner types count of 'ExtendedExtendedTablePageWithExtendedTableRowData'", 0, extendedExtendedTablePageWithExtendedTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExtendedExtendedTablePageWithExtendedTableRowData'", 0, extendedExtendedTablePageWithExtendedTableRowData.getTypes().size());
   }
 
   /**
    * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
    */
-  private void testApiOfPageWithTableExtensionData(IType pageWithTableExtensionData) throws Exception {
+  private static void testApiOfPageWithTableExtensionData(IType pageWithTableExtensionData) {
     // type PageWithTableExtensionData
     SdkAssert.assertHasFlags(pageWithTableExtensionData, 1);
     SdkAssert.assertHasSuperIntefaceSignatures(pageWithTableExtensionData, new String[]{"QSerializable;"});
@@ -454,7 +453,7 @@ public class PageBeanDataTest {
     SdkAssert.assertAnnotation(pageWithTableExtensionData, "javax.annotation.Generated");
 
     // fields of PageWithTableExtensionData
-    SdkAssert.assertEquals("field count of 'PageWithTableExtensionData'", 3, pageWithTableExtensionData.getFields().size());
+    Assert.assertEquals("field count of 'PageWithTableExtensionData'", 3, pageWithTableExtensionData.getFields().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(pageWithTableExtensionData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
@@ -465,16 +464,16 @@ public class PageBeanDataTest {
     SdkAssert.assertHasFlags(m_bigDecimalTest, 2);
     SdkAssert.assertFieldSignature(m_bigDecimalTest, "QBigDecimal;");
 
-    SdkAssert.assertEquals("method count of 'PageWithTableExtensionData'", 3, pageWithTableExtensionData.getMethods().size());
+    Assert.assertEquals("method count of 'PageWithTableExtensionData'", 3, pageWithTableExtensionData.getMethods().size());
     IMethod pageWithTableExtensionData1 = SdkAssert.assertMethodExist(pageWithTableExtensionData, "PageWithTableExtensionData", new String[]{});
-    SdkAssert.assertTrue(pageWithTableExtensionData1.isConstructor());
+    Assert.assertTrue(pageWithTableExtensionData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(pageWithTableExtensionData1, null);
     IMethod getBigDecimalTest = SdkAssert.assertMethodExist(pageWithTableExtensionData, "getBigDecimalTest", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getBigDecimalTest, "QBigDecimal;");
     IMethod setBigDecimalTest = SdkAssert.assertMethodExist(pageWithTableExtensionData, "setBigDecimalTest", new String[]{"QBigDecimal;"});
     SdkAssert.assertMethodReturnTypeSignature(setBigDecimalTest, "V");
 
-    SdkAssert.assertEquals("inner types count of 'PageWithTableExtensionData'", 0, pageWithTableExtensionData.getTypes().size());
+    Assert.assertEquals("inner types count of 'PageWithTableExtensionData'", 0, pageWithTableExtensionData.getTypes().size());
   }
 
 }

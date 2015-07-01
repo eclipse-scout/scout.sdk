@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.core.sourcebuilder.field;
 
 import org.eclipse.scout.sdk.core.model.Flags;
-import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 
 /**
  * <h3>{@link FieldSourceBuilderFactory}</h3>
@@ -24,7 +24,7 @@ public final class FieldSourceBuilderFactory {
   }
 
   public static IFieldSourceBuilder createSerialVersionUidBuilder() {
-    return createFieldSourceBuilder("serialVersionUID", Signature.SIG_LONG, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal, "1L");
+    return createFieldSourceBuilder("serialVersionUID", ISignatureConstants.SIG_LONG, Flags.AccPrivate | Flags.AccStatic | Flags.AccFinal, "1L");
   }
 
   /**

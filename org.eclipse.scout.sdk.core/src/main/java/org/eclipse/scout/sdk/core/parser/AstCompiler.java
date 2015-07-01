@@ -29,6 +29,7 @@ import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
  */
 public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
 
+  @SuppressWarnings("resource")
   public AstCompiler(INameEnvironment env) {
     super(env, DefaultErrorHandlingPolicies.proceedWithAllProblems(), createDefaultOptions(), new P_EmptyCompilerRequestor(), new CollectProblemFactory(), new P_EmptyPrintWriter(), null /*progress*/);
     lookupEnvironment.completeTypeBindings(); // must be called once so that the initial state is ready
@@ -104,6 +105,7 @@ public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
   }
 
   private static final class P_EmptyPrintWriter extends PrintWriter {
+    @SuppressWarnings("resource")
     public P_EmptyPrintWriter() {
       super(new P_EmptyWriter());
     }

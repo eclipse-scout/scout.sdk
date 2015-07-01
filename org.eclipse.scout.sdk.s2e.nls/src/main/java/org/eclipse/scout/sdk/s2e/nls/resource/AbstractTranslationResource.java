@@ -61,10 +61,9 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
    *
    * @param stream
    * @throws IOException
-   * @throws InvalidTranslationResourceException
    *           once a key is used twice.
    */
-  protected void parseResource(InputStream stream) throws IOException, InvalidTranslationResourceException {
+  protected void parseResource(InputStream stream) throws IOException {
     TranslationResourceEvent multiEvent = new TranslationResourceEvent(this);
 
     // load items

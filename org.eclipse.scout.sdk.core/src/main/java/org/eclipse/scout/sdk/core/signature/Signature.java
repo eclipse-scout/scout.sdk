@@ -572,55 +572,54 @@ public final class Signature implements ISignatureConstants {
           throw new IllegalArgumentException(); // a var args is an array type
       }
     }
-    else {
-      switch (c) {
-        case C_ARRAY:
-          return appendArrayTypeSignature(string, start, fullyQualifyTypeNames, buffer);
-        case C_RESOLVED:
-        case C_UNRESOLVED:
-          return appendClassTypeSignature(string, start, fullyQualifyTypeNames, buffer);
-        case C_TYPE_VARIABLE:
-          int e = Util.scanTypeVariableSignature(string, start);
-          buffer.append(string, start + 1, e - start - 1);
-          return e;
-        case C_BOOLEAN:
-          buffer.append(BOOLEAN);
-          return start;
-        case C_BYTE:
-          buffer.append(BYTE);
-          return start;
-        case C_CHAR:
-          buffer.append(CHAR);
-          return start;
-        case C_DOUBLE:
-          buffer.append(DOUBLE);
-          return start;
-        case C_FLOAT:
-          buffer.append(FLOAT);
-          return start;
-        case C_INT:
-          buffer.append(INT);
-          return start;
-        case C_LONG:
-          buffer.append(LONG);
-          return start;
-        case C_SHORT:
-          buffer.append(SHORT);
-          return start;
-        case C_VOID:
-          buffer.append(VOID);
-          return start;
-        case C_CAPTURE:
-          return appendCaptureTypeSignature(string, start, fullyQualifyTypeNames, buffer);
-        case C_INTERSECTION:
-          return appendIntersectionTypeSignature(string, start, fullyQualifyTypeNames, buffer);
-        case C_STAR:
-        case C_EXTENDS:
-        case C_SUPER:
-          return appendTypeArgumentSignature(string, start, fullyQualifyTypeNames, buffer);
-        default:
-          throw new IllegalArgumentException();
-      }
+
+    switch (c) {
+      case C_ARRAY:
+        return appendArrayTypeSignature(string, start, fullyQualifyTypeNames, buffer);
+      case C_RESOLVED:
+      case C_UNRESOLVED:
+        return appendClassTypeSignature(string, start, fullyQualifyTypeNames, buffer);
+      case C_TYPE_VARIABLE:
+        int e = Util.scanTypeVariableSignature(string, start);
+        buffer.append(string, start + 1, e - start - 1);
+        return e;
+      case C_BOOLEAN:
+        buffer.append(BOOLEAN);
+        return start;
+      case C_BYTE:
+        buffer.append(BYTE);
+        return start;
+      case C_CHAR:
+        buffer.append(CHAR);
+        return start;
+      case C_DOUBLE:
+        buffer.append(DOUBLE);
+        return start;
+      case C_FLOAT:
+        buffer.append(FLOAT);
+        return start;
+      case C_INT:
+        buffer.append(INT);
+        return start;
+      case C_LONG:
+        buffer.append(LONG);
+        return start;
+      case C_SHORT:
+        buffer.append(SHORT);
+        return start;
+      case C_VOID:
+        buffer.append(VOID);
+        return start;
+      case C_CAPTURE:
+        return appendCaptureTypeSignature(string, start, fullyQualifyTypeNames, buffer);
+      case C_INTERSECTION:
+        return appendIntersectionTypeSignature(string, start, fullyQualifyTypeNames, buffer);
+      case C_STAR:
+      case C_EXTENDS:
+      case C_SUPER:
+        return appendTypeArgumentSignature(string, start, fullyQualifyTypeNames, buffer);
+      default:
+        throw new IllegalArgumentException();
     }
   }
 
@@ -785,10 +784,10 @@ public final class Signature implements ISignatureConstants {
    */
   public static String createIntersectionTypeSignature(char[][] typeSignatures) {
     StringBuilder buffer = new StringBuilder();
-    buffer.append(Signature.C_INTERSECTION);
+    buffer.append(ISignatureConstants.C_INTERSECTION);
     for (int i = 0, max = typeSignatures.length; i < max; i++) {
       if (i > 0) {
-        buffer.append(Signature.C_COLON);
+        buffer.append(ISignatureConstants.C_COLON);
       }
       buffer.append(typeSignatures[i]);
     }
@@ -1127,18 +1126,18 @@ public final class Signature implements ISignatureConstants {
           buffer.append(C_CHAR);
           return pos;
         }
-        else {
-          checkPos = checkName(CAPTURE, typeName, pos, length);
-          if (checkPos > 0) {
-            pos = consumeWhitespace(typeName, checkPos, length);
-            if (typeName[pos] != C_QUESTION_MARK) {
-              break;
-            }
-          }
-          else {
+
+        checkPos = checkName(CAPTURE, typeName, pos, length);
+        if (checkPos > 0) {
+          pos = consumeWhitespace(typeName, checkPos, length);
+          if (typeName[pos] != C_QUESTION_MARK) {
             break;
           }
         }
+        else {
+          break;
+        }
+
         buffer.append(C_CAPTURE);
         //$FALL-THROUGH$ for wildcard part of capture typecheckPos
       case C_QUESTION_MARK:
@@ -1366,9 +1365,8 @@ public final class Signature implements ISignatureConstants {
       if (i < 0) {
         throw new IllegalArgumentException();
       }
-      else {
-        i++;
-      }
+
+      i++;
       for (;;) {
         if (methodSignature[i] == C_PARAM_END) {
           return count;
@@ -1377,9 +1375,7 @@ public final class Signature implements ISignatureConstants {
         if (e < 0) {
           throw new IllegalArgumentException();
         }
-        else {
-          i = e + 1;
-        }
+        i = e + 1;
         count++;
       }
     }
@@ -1424,9 +1420,7 @@ public final class Signature implements ISignatureConstants {
       if (i < 0) {
         throw new IllegalArgumentException();
       }
-      else {
-        i++;
-      }
+      i++;
       int t = 0;
       for (;;) {
         if (methodSignature[i] == C_PARAM_END) {
@@ -2597,7 +2591,7 @@ public final class Signature implements ISignatureConstants {
     int max = pts.length;
     int index = max - 1;
     loop: for (int i = index; i >= 0; i--) {
-      if (pts[i][0] == Signature.C_ARRAY) {
+      if (pts[i][0] == ISignatureConstants.C_ARRAY) {
         break loop;
       }
       index--;

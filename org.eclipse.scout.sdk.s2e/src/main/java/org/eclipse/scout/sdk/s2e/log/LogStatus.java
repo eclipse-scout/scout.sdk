@@ -59,7 +59,7 @@ public class LogStatus extends Status {
     }
   }
 
-  private StackTraceElement getCallerLine(Class<?> wrapperClass) {
+  private static StackTraceElement getCallerLine(Class<?> wrapperClass) {
     try {
       StackTraceElement[] trace = new Exception().getStackTrace();
       int traceIndex = 0;

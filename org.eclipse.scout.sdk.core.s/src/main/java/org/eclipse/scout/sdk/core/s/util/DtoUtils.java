@@ -42,6 +42,7 @@ import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableBeanDataSourceB
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableFieldBeanFormDataSourceBuilder;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableRowDataTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilder;
@@ -210,7 +211,7 @@ public final class DtoUtils {
           IType genericType = computeDtoGenericType(formField, genericOrdinalDefinitionType, formDataAnnotation.getGenericOrdinal());
           if (genericType != null) {
             String genericTypeName = SignatureUtils.toFullyQualifiedName(SignatureUtils.getResolvedSignature(genericType));
-            return Signature.createTypeSignature(superType.getName() + Signature.C_GENERIC_START + genericTypeName + Signature.C_GENERIC_END);
+            return Signature.createTypeSignature(superType.getName() + ISignatureConstants.C_GENERIC_START + genericTypeName + ISignatureConstants.C_GENERIC_END);
           }
         }
       }

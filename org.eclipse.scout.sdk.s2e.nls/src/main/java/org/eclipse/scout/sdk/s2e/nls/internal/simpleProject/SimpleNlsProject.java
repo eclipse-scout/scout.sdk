@@ -39,7 +39,7 @@ import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.core.JarEntryFile;
-import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.core.util.WeakEventListener;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleProject.model.TranslationFileNewModel;
@@ -76,12 +76,10 @@ public class SimpleNlsProject extends AbstractNlsProject {
       }
       return loadTranslationFilesFromPlatform(getNlsType(), r);
     }
-    else {
-      return loadTranslationFilesWorkspace(getNlsType());
-    }
+    return loadTranslationFilesWorkspace(getNlsType());
   }
 
-  private List<ITranslationResource> loadTranslationFilesWorkspace(NlsType nlsType) throws CoreException {
+  private static List<ITranslationResource> loadTranslationFilesWorkspace(NlsType nlsType) throws CoreException {
     // try to find all translation files
     List<ITranslationResource> translationFiles = new ArrayList<>();
     if (nlsType != null && JdtUtils.exists(nlsType.getType()) && nlsType.getTranslationsFolderName() != null && nlsType.getTranslationsPrefix() != null) {
@@ -93,7 +91,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
     return translationFiles;
   }
 
-  private List<ITranslationResource> loadTranslationFilesFromPlatform(NlsType nlsType, IPackageFragmentRoot r) throws CoreException {
+  private static List<ITranslationResource> loadTranslationFilesFromPlatform(NlsType nlsType, IPackageFragmentRoot r) throws CoreException {
     List<ITranslationResource> translationFiles = new ArrayList<>();
     char delim = '.';
     String path = nlsType.getTranslationsFolderName().replace(NlsType.FOLDER_SEGMENT_SEPARATOR, delim);
@@ -110,22 +108,11 @@ public class SimpleNlsProject extends AbstractNlsProject {
       for (Object o : textFolder.getNonJavaResources()) {
         if (o instanceof JarEntryFile) {
           JarEntryFile f = (JarEntryFile) o;
-          InputStream is = null;
-          try {
-            is = f.getContents();
+          try (InputStream is = f.getContents()) {
             translationFiles.add(new PlatformTranslationFile(is, getLanguage(f.getName())));
           }
           catch (Exception e) {
             NlsCore.logError("Could not load NLS files of bundle '" + r.getElementName() + "'.", e);
-          }
-          finally {
-            if (is != null) {
-              try {
-                is.close();
-              }
-              catch (Exception e) {
-              }
-            }
           }
         }
       }
@@ -150,7 +137,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
       @Override
       public boolean interactWithUi(Shell s) {
         TranslationFileNewDialog dialog = new TranslationFileNewDialog(s, m_model);
-        return dialog.open() == Dialog.OK;
+        return dialog.open() == Window.OK;
       }
 
       @Override
@@ -255,21 +242,19 @@ public class SimpleNlsProject extends AbstractNlsProject {
         // default
         return Language.LANGUAGE_DEFAULT;
       }
-      else {
-        String languageIso = matcher.group(2);
-        if (languageIso == null) {
-          languageIso = "";
-        }
-        String countryIso = matcher.group(4);
-        if (countryIso == null) {
-          countryIso = "";
-        }
-        String variantIso = matcher.group(5);
-        if (variantIso == null) {
-          variantIso = "";
-        }
-        return new Language(new Locale(languageIso, countryIso, variantIso));
+      String languageIso = matcher.group(2);
+      if (languageIso == null) {
+        languageIso = "";
       }
+      String countryIso = matcher.group(4);
+      if (countryIso == null) {
+        countryIso = "";
+      }
+      String variantIso = matcher.group(5);
+      if (variantIso == null) {
+        variantIso = "";
+      }
+      return new Language(new Locale(languageIso, countryIso, variantIso));
     }
     return null;
   }

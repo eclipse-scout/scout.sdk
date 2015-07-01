@@ -25,6 +25,7 @@ import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.Flags;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.model.ITypeParameter;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.AbstractAnnotatableSourceBuilder;
@@ -111,7 +112,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
     source.append(getElementName());
     // parameter types
     if (getTypeParameters().size() > 0) {
-      source.append(Signature.C_GENERIC_START);
+      source.append(ISignatureConstants.C_GENERIC_START);
       Iterator<ITypeParameter> it = getTypeParameters().iterator();
       // first
       ITypeParameter tp = it.next();
@@ -122,7 +123,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
         tp = it.next();
         source.append(typeParamToSource(tp, validator));
       }
-      source.append(Signature.C_GENERIC_END);
+      source.append(ISignatureConstants.C_GENERIC_END);
     }
     validator.getTypeName(Signature.createTypeSignature(getFullyQualifiedName()));
 

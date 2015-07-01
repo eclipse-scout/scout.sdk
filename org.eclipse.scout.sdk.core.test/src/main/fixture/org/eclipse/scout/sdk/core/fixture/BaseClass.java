@@ -31,6 +31,12 @@ public class BaseClass<T, Z> implements InterfaceLevel1<Z> {
     }
   };
 
+  /**
+   * @param runnableParam
+   * @return
+   * @throws IOError
+   * @throws FileNotFoundException
+   */
   @TestAnnotation(values = {Serializable.class, Runnable.class})
   @MarkerAnnotation
   protected Long[][] methodInBaseClass(final Double[] runnableParam) throws IOError, FileNotFoundException {

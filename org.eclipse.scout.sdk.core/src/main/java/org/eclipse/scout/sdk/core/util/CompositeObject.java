@@ -96,7 +96,7 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
   }
 
   @SuppressWarnings("unchecked")
-  private int compareImpl(Object a, Object b) {
+  private static int compareImpl(Object a, Object b) {
     if (a == null && b == null) {
       return 0;
     }

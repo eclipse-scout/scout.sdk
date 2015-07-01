@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -31,7 +31,7 @@ import formdata.client.ui.forms.MasterFieldTestForm.MainBox.TopBox.MySlaveField;
 import formdata.shared.services.MasterFieldTestFormData;
 
 /**
- * 
+ *
  */
 @FormData(value = MasterFieldTestFormData.class, sdkCommand = SdkCommand.CREATE)
 public class MasterFieldTestForm extends AbstractForm {
@@ -96,7 +96,7 @@ public class MasterFieldTestForm extends AbstractForm {
       public class MySlaveField extends AbstractStringField {
 
         @Override
-        protected Class<? extends IValueField> getConfiguredMasterField() {
+        protected Class<? extends IValueField<?>> getConfiguredMasterField() {
           return MasterFieldTestForm.MainBox.TopBox.InnerBox.MyMasterField.class;
         }
       }

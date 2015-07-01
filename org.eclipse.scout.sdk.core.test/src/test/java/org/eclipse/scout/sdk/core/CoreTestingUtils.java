@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core;
 
-import java.io.IOException;
-
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.model.ICompilationUnit;
@@ -31,17 +29,17 @@ public final class CoreTestingUtils {
   private CoreTestingUtils() {
   }
 
-  public static IType getBaseClassType() throws IOException {
+  public static IType getBaseClassType() {
     ICompilationUnit icu = getChildClassIcu(); // do not get from getBaseClassIcu()
     return icu.getTypes().get(0).getSuperClass();
   }
 
-  public static IType getChildClassType() throws IOException {
+  public static IType getChildClassType() {
     ICompilationUnit icu = getChildClassIcu();
     return icu.getTypes().get(0);
   }
 
-  public static ICompilationUnit getChildClassIcu() throws IOException {
+  public static ICompilationUnit getChildClassIcu() {
     if (childClassIcu == null) {
       synchronized (TestingUtils.class) {
         if (childClassIcu == null) {
@@ -52,7 +50,7 @@ public final class CoreTestingUtils {
     return childClassIcu;
   }
 
-  public static ICompilationUnit getBaseClassIcu() throws IOException {
+  public static ICompilationUnit getBaseClassIcu() {
     if (baseClassIcu == null) {
       synchronized (TestingUtils.class) {
         if (baseClassIcu == null) {

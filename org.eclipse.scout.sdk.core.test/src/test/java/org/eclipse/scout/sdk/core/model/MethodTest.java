@@ -26,7 +26,7 @@ import org.junit.Test;
 public class MethodTest {
 
   @Test
-  public void testChildClassMethods() throws Exception {
+  public void testChildClassMethods() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
@@ -69,14 +69,14 @@ public class MethodTest {
   }
 
   @Test
-  public void testToString() throws Exception {
+  public void testToString() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
     Assert.assertFalse(StringUtils.isBlank(childClassType.getMethods().get(1).toString()));
   }
 
   @Test
-  public void testBaseClassMethods() throws Exception {
+  public void testBaseClassMethods() {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 

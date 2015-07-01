@@ -27,9 +27,8 @@ public class WorkspaceNlsFile extends AbstractNlsFile {
 
   /**
    * @param stream
-   * @throws CoreException
    */
-  public WorkspaceNlsFile(IFile file) throws CoreException {
+  public WorkspaceNlsFile(IFile file) {
     super(file);
     m_file = file;
     m_translationFileChangedListener = new P_NlsFileChangeListener();

@@ -81,9 +81,7 @@ public abstract class JobEx extends Job {
     if (m_runNowStatus == null) {
       return getResult();
     }
-    else {
-      return m_runNowStatus;
-    }
+    return m_runNowStatus;
   }
 
   public IProgressMonitor getMonitor() {

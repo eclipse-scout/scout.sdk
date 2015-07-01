@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.model.CompilationUnit;
 import org.eclipse.scout.sdk.core.model.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.model.JavaModelUtils;
-import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 
 public class JavaParser implements ILookupEnvironment {
@@ -117,7 +117,7 @@ public class JavaParser implements ILookupEnvironment {
     }
 
     // it is an inner type: step into
-    StringTokenizer st = new StringTokenizer(parts[1], String.valueOf(Signature.C_DOLLAR), false);
+    StringTokenizer st = new StringTokenizer(parts[1], String.valueOf(ISignatureConstants.C_DOLLAR), false);
     while (st.hasMoreTokens()) {
       String name = st.nextToken();
       result = CoreUtils.getInnerType(result, name);
@@ -130,7 +130,7 @@ public class JavaParser implements ILookupEnvironment {
 
   protected String[] splitToPrimaryType(String fqn) {
     // check for inner types
-    int firstDollarPos = fqn.indexOf(Signature.C_DOLLAR);
+    int firstDollarPos = fqn.indexOf(ISignatureConstants.C_DOLLAR);
     if (firstDollarPos > 0) {
       String primaryType = fqn.substring(0, firstDollarPos);
       String innerTypePart = fqn.substring(firstDollarPos + 1);

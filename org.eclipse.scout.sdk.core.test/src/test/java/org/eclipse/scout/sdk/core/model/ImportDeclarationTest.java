@@ -23,7 +23,7 @@ import org.junit.Test;
  */
 public class ImportDeclarationTest {
   @Test
-  public void testImportDeclaration() throws Exception {
+  public void testImportDeclaration() {
     ICompilationUnit childClassIcu = CoreTestingUtils.getChildClassIcu();
     Assert.assertNotNull(childClassIcu);
 
@@ -36,7 +36,7 @@ public class ImportDeclarationTest {
   }
 
   @Test
-  public void testToString() throws Exception {
+  public void testToString() {
     ICompilationUnit childClassIcu = CoreTestingUtils.getChildClassIcu();
     Assert.assertNotNull(childClassIcu);
 

@@ -22,7 +22,7 @@ import org.junit.Test;
  */
 public class CompilationUnitTest {
   @Test
-  public void testIcu() throws Exception {
+  public void testIcu() {
     ICompilationUnit baseClassIcu = CoreTestingUtils.getBaseClassIcu();
     Assert.assertNotNull(baseClassIcu);
     Assert.assertNotNull(baseClassIcu.getLookupEnvironment());
@@ -34,7 +34,7 @@ public class CompilationUnitTest {
   }
 
   @Test
-  public void testFindTypeBySimpleName() throws Exception {
+  public void testFindTypeBySimpleName() {
     ICompilationUnit baseClassIcu = CoreTestingUtils.getBaseClassIcu();
     IType sdkLong = baseClassIcu.findTypeBySimpleName(Long.class.getSimpleName());
 
@@ -43,7 +43,7 @@ public class CompilationUnitTest {
   }
 
   @Test
-  public void testToString() throws Exception {
+  public void testToString() {
     ICompilationUnit baseClassIcu = CoreTestingUtils.getBaseClassIcu();
     Assert.assertFalse(StringUtils.isBlank(baseClassIcu.toString()));
   }

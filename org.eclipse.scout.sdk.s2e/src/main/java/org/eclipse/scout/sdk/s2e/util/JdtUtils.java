@@ -108,9 +108,7 @@ public final class JdtUtils {
         if (b1) {
           return 1;
         }
-        else {
-          return -1;
-        }
+        return -1;
       }
 
       String path1 = buildPath(o1);
@@ -120,7 +118,7 @@ public final class JdtUtils {
       return path2.compareTo(path1);
     }
 
-    private String buildPath(IType t) {
+    private static String buildPath(IType t) {
       String fqn = t.getFullyQualifiedName();
       String portableString = t.getPath().toPortableString();
 

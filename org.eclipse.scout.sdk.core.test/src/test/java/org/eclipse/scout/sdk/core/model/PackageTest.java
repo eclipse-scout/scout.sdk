@@ -25,7 +25,7 @@ public class PackageTest {
   private static final String FIXTURE_PACKAGE = Signature.getQualifier(ChildClass.class.getName());
 
   @Test
-  public void testPackageName() throws Exception {
+  public void testPackageName() {
     ICompilationUnit childClassIcu = CoreTestingUtils.getChildClassIcu();
     Assert.assertNotNull(childClassIcu);
 
@@ -37,7 +37,7 @@ public class PackageTest {
   }
 
   @Test
-  public void testToString() throws Exception {
+  public void testToString() {
     ICompilationUnit childClassIcu = CoreTestingUtils.getChildClassIcu();
     Assert.assertNotNull(childClassIcu);
 
@@ -46,7 +46,7 @@ public class PackageTest {
   }
 
   @Test
-  public void testPackageNameFromType() throws Exception {
+  public void testPackageNameFromType() {
     IType childClass = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClass);
 
@@ -58,7 +58,7 @@ public class PackageTest {
   }
 
   @Test
-  public void testPackageNameFromSuperType() throws Exception {
+  public void testPackageNameFromSuperType() {
     IType childClass = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(childClass);
 

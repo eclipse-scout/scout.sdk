@@ -65,7 +65,7 @@ public abstract class AbstractWorkspaceBlockingJob extends JobEx {
         if (e.getCause() == e || e.getCause() == null) {
           e.initCause(m_callerTrace);
         }
-        Status errorStatus = new Status(Status.ERROR, S2ESdkActivator.PLUGIN_ID, e.getMessage(), e);
+        Status errorStatus = new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, e.getMessage(), e);
         S2ESdkActivator.log(errorStatus);
         monitor.setCanceled(true);
         return errorStatus;

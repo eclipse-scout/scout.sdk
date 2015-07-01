@@ -29,7 +29,7 @@ import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
-import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 
 /**
  *
@@ -77,7 +77,7 @@ public class BindingType implements IType {
 
   private static char[] getArrUniqueKey(int arrayDim) {
     char[] arr = new char[arrayDim];
-    Arrays.fill(arr, Signature.C_ARRAY);
+    Arrays.fill(arr, ISignatureConstants.C_ARRAY);
     return arr;
   }
 

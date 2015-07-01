@@ -15,12 +15,13 @@ import org.eclipse.scout.sdk.core.model.IMethod;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
 import org.eclipse.scout.sdk.dto.test.util.CoreScoutTestingUtils;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class FormPropertiesTest {
 
   @Test
-  public void testCreateFormData() throws Exception {
+  public void testCreateFormData() {
     IType dto = CoreScoutTestingUtils.createFormDataAssertNoCompileErrors("formdata.client.ui.forms.PropertyTestForm");
     testApiOfPropertyTestFormData(dto);
   }
@@ -28,20 +29,20 @@ public class FormPropertiesTest {
   /**
    * @Generated with org.eclipse.scout.sdk.testing.codegen.ApiTestGenerator
    */
-  private void testApiOfPropertyTestFormData(IType propertyTestFormData) throws Exception {
+  private static void testApiOfPropertyTestFormData(IType propertyTestFormData) {
     // type PropertyTestFormData
     SdkAssert.assertHasFlags(propertyTestFormData, 1);
     SdkAssert.assertHasSuperTypeSignature(propertyTestFormData, "QAbstractFormData;");
 
     // fields of PropertyTestFormData
-    SdkAssert.assertEquals("field count of 'PropertyTestFormData'", 1, propertyTestFormData.getFields().size());
+    Assert.assertEquals("field count of 'PropertyTestFormData'", 1, propertyTestFormData.getFields().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(propertyTestFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    SdkAssert.assertEquals("method count of 'PropertyTestFormData'", 35, propertyTestFormData.getMethods().size());
+    Assert.assertEquals("method count of 'PropertyTestFormData'", 35, propertyTestFormData.getMethods().size());
     IMethod propertyTestFormData1 = SdkAssert.assertMethodExist(propertyTestFormData, "PropertyTestFormData", new String[]{});
-    SdkAssert.assertTrue(propertyTestFormData1.isConstructor());
+    Assert.assertTrue(propertyTestFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(propertyTestFormData1, null);
     IMethod getBoolObject = SdkAssert.assertMethodExist(propertyTestFormData, "getBoolObject", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getBoolObject, "QBoolean;");
@@ -112,140 +113,140 @@ public class FormPropertiesTest {
     IMethod getWizardsProperty = SdkAssert.assertMethodExist(propertyTestFormData, "getWizardsProperty", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getWizardsProperty, "QWizardsProperty;");
 
-    SdkAssert.assertEquals("inner types count of 'PropertyTestFormData'", 12, propertyTestFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'PropertyTestFormData'", 12, propertyTestFormData.getTypes().size());
     // type BoolObjectProperty
     IType boolObjectProperty = SdkAssert.assertTypeExists(propertyTestFormData, "BoolObjectProperty");
     SdkAssert.assertHasFlags(boolObjectProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(boolObjectProperty, "QAbstractPropertyData<QBoolean;>;");
 
     // fields of BoolObjectProperty
-    SdkAssert.assertEquals("field count of 'BoolObjectProperty'", 1, boolObjectProperty.getFields().size());
+    Assert.assertEquals("field count of 'BoolObjectProperty'", 1, boolObjectProperty.getFields().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(boolObjectProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    SdkAssert.assertEquals("method count of 'BoolObjectProperty'", 1, boolObjectProperty.getMethods().size());
+    Assert.assertEquals("method count of 'BoolObjectProperty'", 1, boolObjectProperty.getMethods().size());
     IMethod boolObjectProperty1 = SdkAssert.assertMethodExist(boolObjectProperty, "BoolObjectProperty", new String[]{});
-    SdkAssert.assertTrue(boolObjectProperty1.isConstructor());
+    Assert.assertTrue(boolObjectProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(boolObjectProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'BoolObjectProperty'", 0, boolObjectProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'BoolObjectProperty'", 0, boolObjectProperty.getTypes().size());
     // type BoolPrimitiveProperty
     IType boolPrimitiveProperty = SdkAssert.assertTypeExists(propertyTestFormData, "BoolPrimitiveProperty");
     SdkAssert.assertHasFlags(boolPrimitiveProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(boolPrimitiveProperty, "QAbstractPropertyData<QBoolean;>;");
 
     // fields of BoolPrimitiveProperty
-    SdkAssert.assertEquals("field count of 'BoolPrimitiveProperty'", 1, boolPrimitiveProperty.getFields().size());
+    Assert.assertEquals("field count of 'BoolPrimitiveProperty'", 1, boolPrimitiveProperty.getFields().size());
     IField serialVersionUID2 = SdkAssert.assertFieldExist(boolPrimitiveProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    SdkAssert.assertEquals("method count of 'BoolPrimitiveProperty'", 1, boolPrimitiveProperty.getMethods().size());
+    Assert.assertEquals("method count of 'BoolPrimitiveProperty'", 1, boolPrimitiveProperty.getMethods().size());
     IMethod boolPrimitiveProperty1 = SdkAssert.assertMethodExist(boolPrimitiveProperty, "BoolPrimitiveProperty", new String[]{});
-    SdkAssert.assertTrue(boolPrimitiveProperty1.isConstructor());
+    Assert.assertTrue(boolPrimitiveProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(boolPrimitiveProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'BoolPrimitiveProperty'", 0, boolPrimitiveProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'BoolPrimitiveProperty'", 0, boolPrimitiveProperty.getTypes().size());
     // type ByteArrayProperty
     IType byteArrayProperty = SdkAssert.assertTypeExists(propertyTestFormData, "ByteArrayProperty");
     SdkAssert.assertHasFlags(byteArrayProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(byteArrayProperty, "QAbstractPropertyData<[B>;");
 
     // fields of ByteArrayProperty
-    SdkAssert.assertEquals("field count of 'ByteArrayProperty'", 1, byteArrayProperty.getFields().size());
+    Assert.assertEquals("field count of 'ByteArrayProperty'", 1, byteArrayProperty.getFields().size());
     IField serialVersionUID3 = SdkAssert.assertFieldExist(byteArrayProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    SdkAssert.assertEquals("method count of 'ByteArrayProperty'", 1, byteArrayProperty.getMethods().size());
+    Assert.assertEquals("method count of 'ByteArrayProperty'", 1, byteArrayProperty.getMethods().size());
     IMethod byteArrayProperty1 = SdkAssert.assertMethodExist(byteArrayProperty, "ByteArrayProperty", new String[]{});
-    SdkAssert.assertTrue(byteArrayProperty1.isConstructor());
+    Assert.assertTrue(byteArrayProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(byteArrayProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'ByteArrayProperty'", 0, byteArrayProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'ByteArrayProperty'", 0, byteArrayProperty.getTypes().size());
     // type ComplexArrayProperty
     IType complexArrayProperty = SdkAssert.assertTypeExists(propertyTestFormData, "ComplexArrayProperty");
     SdkAssert.assertHasFlags(complexArrayProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(complexArrayProperty, "QAbstractPropertyData<[QArrayList<QList<QString;>;>;>;");
 
     // fields of ComplexArrayProperty
-    SdkAssert.assertEquals("field count of 'ComplexArrayProperty'", 1, complexArrayProperty.getFields().size());
+    Assert.assertEquals("field count of 'ComplexArrayProperty'", 1, complexArrayProperty.getFields().size());
     IField serialVersionUID4 = SdkAssert.assertFieldExist(complexArrayProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
-    SdkAssert.assertEquals("method count of 'ComplexArrayProperty'", 1, complexArrayProperty.getMethods().size());
+    Assert.assertEquals("method count of 'ComplexArrayProperty'", 1, complexArrayProperty.getMethods().size());
     IMethod complexArrayProperty1 = SdkAssert.assertMethodExist(complexArrayProperty, "ComplexArrayProperty", new String[]{});
-    SdkAssert.assertTrue(complexArrayProperty1.isConstructor());
+    Assert.assertTrue(complexArrayProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(complexArrayProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'ComplexArrayProperty'", 0, complexArrayProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'ComplexArrayProperty'", 0, complexArrayProperty.getTypes().size());
     // type ComplexInnerArrayProperty
     IType complexInnerArrayProperty = SdkAssert.assertTypeExists(propertyTestFormData, "ComplexInnerArrayProperty");
     SdkAssert.assertHasFlags(complexInnerArrayProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(complexInnerArrayProperty, "QAbstractPropertyData<QArrayList<QList<[QString;>;>;>;");
 
     // fields of ComplexInnerArrayProperty
-    SdkAssert.assertEquals("field count of 'ComplexInnerArrayProperty'", 1, complexInnerArrayProperty.getFields().size());
+    Assert.assertEquals("field count of 'ComplexInnerArrayProperty'", 1, complexInnerArrayProperty.getFields().size());
     IField serialVersionUID5 = SdkAssert.assertFieldExist(complexInnerArrayProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID5, 26);
     SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
-    SdkAssert.assertEquals("method count of 'ComplexInnerArrayProperty'", 1, complexInnerArrayProperty.getMethods().size());
+    Assert.assertEquals("method count of 'ComplexInnerArrayProperty'", 1, complexInnerArrayProperty.getMethods().size());
     IMethod complexInnerArrayProperty1 = SdkAssert.assertMethodExist(complexInnerArrayProperty, "ComplexInnerArrayProperty", new String[]{});
-    SdkAssert.assertTrue(complexInnerArrayProperty1.isConstructor());
+    Assert.assertTrue(complexInnerArrayProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(complexInnerArrayProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'ComplexInnerArrayProperty'", 0, complexInnerArrayProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'ComplexInnerArrayProperty'", 0, complexInnerArrayProperty.getTypes().size());
     // type DoubleArrayPropertyProperty
     IType doubleArrayPropertyProperty = SdkAssert.assertTypeExists(propertyTestFormData, "DoubleArrayPropertyProperty");
     SdkAssert.assertHasFlags(doubleArrayPropertyProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(doubleArrayPropertyProperty, "QAbstractPropertyData<[[QString;>;");
 
     // fields of DoubleArrayPropertyProperty
-    SdkAssert.assertEquals("field count of 'DoubleArrayPropertyProperty'", 1, doubleArrayPropertyProperty.getFields().size());
+    Assert.assertEquals("field count of 'DoubleArrayPropertyProperty'", 1, doubleArrayPropertyProperty.getFields().size());
     IField serialVersionUID6 = SdkAssert.assertFieldExist(doubleArrayPropertyProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID6, 26);
     SdkAssert.assertFieldSignature(serialVersionUID6, "J");
 
-    SdkAssert.assertEquals("method count of 'DoubleArrayPropertyProperty'", 1, doubleArrayPropertyProperty.getMethods().size());
+    Assert.assertEquals("method count of 'DoubleArrayPropertyProperty'", 1, doubleArrayPropertyProperty.getMethods().size());
     IMethod doubleArrayPropertyProperty1 = SdkAssert.assertMethodExist(doubleArrayPropertyProperty, "DoubleArrayPropertyProperty", new String[]{});
-    SdkAssert.assertTrue(doubleArrayPropertyProperty1.isConstructor());
+    Assert.assertTrue(doubleArrayPropertyProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(doubleArrayPropertyProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'DoubleArrayPropertyProperty'", 0, doubleArrayPropertyProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'DoubleArrayPropertyProperty'", 0, doubleArrayPropertyProperty.getTypes().size());
     // type IntPrimitiveProperty
     IType intPrimitiveProperty = SdkAssert.assertTypeExists(propertyTestFormData, "IntPrimitiveProperty");
     SdkAssert.assertHasFlags(intPrimitiveProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(intPrimitiveProperty, "QAbstractPropertyData<QInteger;>;");
 
     // fields of IntPrimitiveProperty
-    SdkAssert.assertEquals("field count of 'IntPrimitiveProperty'", 1, intPrimitiveProperty.getFields().size());
+    Assert.assertEquals("field count of 'IntPrimitiveProperty'", 1, intPrimitiveProperty.getFields().size());
     IField serialVersionUID7 = SdkAssert.assertFieldExist(intPrimitiveProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID7, 26);
     SdkAssert.assertFieldSignature(serialVersionUID7, "J");
 
-    SdkAssert.assertEquals("method count of 'IntPrimitiveProperty'", 1, intPrimitiveProperty.getMethods().size());
+    Assert.assertEquals("method count of 'IntPrimitiveProperty'", 1, intPrimitiveProperty.getMethods().size());
     IMethod intPrimitiveProperty1 = SdkAssert.assertMethodExist(intPrimitiveProperty, "IntPrimitiveProperty", new String[]{});
-    SdkAssert.assertTrue(intPrimitiveProperty1.isConstructor());
+    Assert.assertTrue(intPrimitiveProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(intPrimitiveProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'IntPrimitiveProperty'", 0, intPrimitiveProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'IntPrimitiveProperty'", 0, intPrimitiveProperty.getTypes().size());
     // type Name
     IType name = SdkAssert.assertTypeExists(propertyTestFormData, "Name");
     SdkAssert.assertHasFlags(name, 9);
     SdkAssert.assertHasSuperTypeSignature(name, "QAbstractValueFieldData<QString;>;");
 
     // fields of Name
-    SdkAssert.assertEquals("field count of 'Name'", 1, name.getFields().size());
+    Assert.assertEquals("field count of 'Name'", 1, name.getFields().size());
     IField serialVersionUID8 = SdkAssert.assertFieldExist(name, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID8, 26);
     SdkAssert.assertFieldSignature(serialVersionUID8, "J");
 
-    SdkAssert.assertEquals("method count of 'Name'", 4, name.getMethods().size());
+    Assert.assertEquals("method count of 'Name'", 4, name.getMethods().size());
     IMethod name1 = SdkAssert.assertMethodExist(name, "Name", new String[]{});
-    SdkAssert.assertTrue(name1.isConstructor());
+    Assert.assertTrue(name1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(name1, null);
     IMethod getIntProperty = SdkAssert.assertMethodExist(name, "getIntProperty", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getIntProperty, "I");
@@ -254,92 +255,92 @@ public class FormPropertiesTest {
     IMethod getIntPropertyProperty = SdkAssert.assertMethodExist(name, "getIntPropertyProperty", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getIntPropertyProperty, "QIntPropertyProperty;");
 
-    SdkAssert.assertEquals("inner types count of 'Name'", 1, name.getTypes().size());
+    Assert.assertEquals("inner types count of 'Name'", 1, name.getTypes().size());
     // type IntPropertyProperty
     IType intPropertyProperty = SdkAssert.assertTypeExists(name, "IntPropertyProperty");
     SdkAssert.assertHasFlags(intPropertyProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(intPropertyProperty, "QAbstractPropertyData<QInteger;>;");
 
     // fields of IntPropertyProperty
-    SdkAssert.assertEquals("field count of 'IntPropertyProperty'", 1, intPropertyProperty.getFields().size());
+    Assert.assertEquals("field count of 'IntPropertyProperty'", 1, intPropertyProperty.getFields().size());
     IField serialVersionUID9 = SdkAssert.assertFieldExist(intPropertyProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID9, 26);
     SdkAssert.assertFieldSignature(serialVersionUID9, "J");
 
-    SdkAssert.assertEquals("method count of 'IntPropertyProperty'", 1, intPropertyProperty.getMethods().size());
+    Assert.assertEquals("method count of 'IntPropertyProperty'", 1, intPropertyProperty.getMethods().size());
     IMethod intPropertyProperty1 = SdkAssert.assertMethodExist(intPropertyProperty, "IntPropertyProperty", new String[]{});
-    SdkAssert.assertTrue(intPropertyProperty1.isConstructor());
+    Assert.assertTrue(intPropertyProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(intPropertyProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'IntPropertyProperty'", 0, intPropertyProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'IntPropertyProperty'", 0, intPropertyProperty.getTypes().size());
     // type ObjectPropertyProperty
     IType objectPropertyProperty = SdkAssert.assertTypeExists(propertyTestFormData, "ObjectPropertyProperty");
     SdkAssert.assertHasFlags(objectPropertyProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(objectPropertyProperty, "QAbstractPropertyData<QObject;>;");
 
     // fields of ObjectPropertyProperty
-    SdkAssert.assertEquals("field count of 'ObjectPropertyProperty'", 1, objectPropertyProperty.getFields().size());
+    Assert.assertEquals("field count of 'ObjectPropertyProperty'", 1, objectPropertyProperty.getFields().size());
     IField serialVersionUID10 = SdkAssert.assertFieldExist(objectPropertyProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID10, 26);
     SdkAssert.assertFieldSignature(serialVersionUID10, "J");
 
-    SdkAssert.assertEquals("method count of 'ObjectPropertyProperty'", 1, objectPropertyProperty.getMethods().size());
+    Assert.assertEquals("method count of 'ObjectPropertyProperty'", 1, objectPropertyProperty.getMethods().size());
     IMethod objectPropertyProperty1 = SdkAssert.assertMethodExist(objectPropertyProperty, "ObjectPropertyProperty", new String[]{});
-    SdkAssert.assertTrue(objectPropertyProperty1.isConstructor());
+    Assert.assertTrue(objectPropertyProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(objectPropertyProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'ObjectPropertyProperty'", 0, objectPropertyProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'ObjectPropertyProperty'", 0, objectPropertyProperty.getTypes().size());
     // type PropertyTestNrProperty
     IType propertyTestNrProperty = SdkAssert.assertTypeExists(propertyTestFormData, "PropertyTestNrProperty");
     SdkAssert.assertHasFlags(propertyTestNrProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(propertyTestNrProperty, "QAbstractPropertyData<QLong;>;");
 
     // fields of PropertyTestNrProperty
-    SdkAssert.assertEquals("field count of 'PropertyTestNrProperty'", 1, propertyTestNrProperty.getFields().size());
+    Assert.assertEquals("field count of 'PropertyTestNrProperty'", 1, propertyTestNrProperty.getFields().size());
     IField serialVersionUID11 = SdkAssert.assertFieldExist(propertyTestNrProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID11, 26);
     SdkAssert.assertFieldSignature(serialVersionUID11, "J");
 
-    SdkAssert.assertEquals("method count of 'PropertyTestNrProperty'", 1, propertyTestNrProperty.getMethods().size());
+    Assert.assertEquals("method count of 'PropertyTestNrProperty'", 1, propertyTestNrProperty.getMethods().size());
     IMethod propertyTestNrProperty1 = SdkAssert.assertMethodExist(propertyTestNrProperty, "PropertyTestNrProperty", new String[]{});
-    SdkAssert.assertTrue(propertyTestNrProperty1.isConstructor());
+    Assert.assertTrue(propertyTestNrProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(propertyTestNrProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'PropertyTestNrProperty'", 0, propertyTestNrProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'PropertyTestNrProperty'", 0, propertyTestNrProperty.getTypes().size());
     // type SingleArrayPropertyProperty
     IType singleArrayPropertyProperty = SdkAssert.assertTypeExists(propertyTestFormData, "SingleArrayPropertyProperty");
     SdkAssert.assertHasFlags(singleArrayPropertyProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(singleArrayPropertyProperty, "QAbstractPropertyData<[QString;>;");
 
     // fields of SingleArrayPropertyProperty
-    SdkAssert.assertEquals("field count of 'SingleArrayPropertyProperty'", 1, singleArrayPropertyProperty.getFields().size());
+    Assert.assertEquals("field count of 'SingleArrayPropertyProperty'", 1, singleArrayPropertyProperty.getFields().size());
     IField serialVersionUID12 = SdkAssert.assertFieldExist(singleArrayPropertyProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID12, 26);
     SdkAssert.assertFieldSignature(serialVersionUID12, "J");
 
-    SdkAssert.assertEquals("method count of 'SingleArrayPropertyProperty'", 1, singleArrayPropertyProperty.getMethods().size());
+    Assert.assertEquals("method count of 'SingleArrayPropertyProperty'", 1, singleArrayPropertyProperty.getMethods().size());
     IMethod singleArrayPropertyProperty1 = SdkAssert.assertMethodExist(singleArrayPropertyProperty, "SingleArrayPropertyProperty", new String[]{});
-    SdkAssert.assertTrue(singleArrayPropertyProperty1.isConstructor());
+    Assert.assertTrue(singleArrayPropertyProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(singleArrayPropertyProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'SingleArrayPropertyProperty'", 0, singleArrayPropertyProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'SingleArrayPropertyProperty'", 0, singleArrayPropertyProperty.getTypes().size());
     // type WizardsProperty
     IType wizardsProperty = SdkAssert.assertTypeExists(propertyTestFormData, "WizardsProperty");
     SdkAssert.assertHasFlags(wizardsProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(wizardsProperty, "QAbstractPropertyData<QHashMap<QString;QList<QIService;>;>;>;");
 
     // fields of WizardsProperty
-    SdkAssert.assertEquals("field count of 'WizardsProperty'", 1, wizardsProperty.getFields().size());
+    Assert.assertEquals("field count of 'WizardsProperty'", 1, wizardsProperty.getFields().size());
     IField serialVersionUID13 = SdkAssert.assertFieldExist(wizardsProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID13, 26);
     SdkAssert.assertFieldSignature(serialVersionUID13, "J");
 
-    SdkAssert.assertEquals("method count of 'WizardsProperty'", 1, wizardsProperty.getMethods().size());
+    Assert.assertEquals("method count of 'WizardsProperty'", 1, wizardsProperty.getMethods().size());
     IMethod wizardsProperty1 = SdkAssert.assertMethodExist(wizardsProperty, "WizardsProperty", new String[]{});
-    SdkAssert.assertTrue(wizardsProperty1.isConstructor());
+    Assert.assertTrue(wizardsProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(wizardsProperty1, null);
 
-    SdkAssert.assertEquals("inner types count of 'WizardsProperty'", 0, wizardsProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'WizardsProperty'", 0, wizardsProperty.getTypes().size());
   }
 
 }

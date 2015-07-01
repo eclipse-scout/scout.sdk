@@ -23,7 +23,7 @@ import org.junit.Test;
  */
 public class AnnotationValueTest {
   @Test
-  public void testChildClassAnnotationValues() throws Exception {
+  public void testChildClassAnnotationValues() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
@@ -69,7 +69,7 @@ public class AnnotationValueTest {
   }
 
   @Test
-  public void testToString() throws Exception {
+  public void testToString() {
     IAnnotationValue methodInChildClassValue1 = CoreTestingUtils.getChildClassType().getMethods().get(1).getAnnotations().get(0).getValues().valueList().get(0);
     Assert.assertFalse(StringUtils.isBlank(methodInChildClassValue1.toString()));
 
@@ -78,7 +78,7 @@ public class AnnotationValueTest {
   }
 
   @Test
-  public void testBaseClassAnnotationValues() throws Exception {
+  public void testBaseClassAnnotationValues() {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 

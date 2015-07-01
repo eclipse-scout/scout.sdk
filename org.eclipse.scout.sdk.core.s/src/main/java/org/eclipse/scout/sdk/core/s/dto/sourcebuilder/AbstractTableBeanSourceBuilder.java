@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.core.model.TypeFilters;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableRowDataTypeSourceBuilder;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.SortedMemberKeyFactory;
@@ -84,7 +85,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     // setRows
     IMethodSourceBuilder setRowsMethodBuilder = new MethodSourceBuilder("setRows");
     setRowsMethodBuilder.setFlags(Flags.AccPublic);
-    setRowsMethodBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    setRowsMethodBuilder.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
     setRowsMethodBuilder.addParameter(new MethodParameterDescription("rows", Signature.createArraySignature(tableRowSignature, 1)));
     setRowsMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
       @Override
@@ -185,7 +186,7 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(createRowSourceBuilder), createRowSourceBuilder);
 
     IMethodSourceBuilder getRowTypeSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), "getRowType");
-    getRowTypeSourceBuilder.setReturnTypeSignature(Signature.createTypeSignature(Class.class.getName() + Signature.C_GENERIC_START + "? extends " + IRuntimeClasses.AbstractTableRowData + Signature.C_GENERIC_END));
+    getRowTypeSourceBuilder.setReturnTypeSignature(Signature.createTypeSignature(Class.class.getName() + ISignatureConstants.C_GENERIC_START + "? extends " + IRuntimeClasses.AbstractTableRowData + ISignatureConstants.C_GENERIC_END));
     getRowTypeSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
 
       @Override

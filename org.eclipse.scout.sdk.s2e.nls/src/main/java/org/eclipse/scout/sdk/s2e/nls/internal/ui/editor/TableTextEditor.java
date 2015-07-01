@@ -47,7 +47,7 @@ public class TableTextEditor {
     m_text.setBackground(m_text.getDisplay().getSystemColor(SWT.COLOR_LIST_BACKGROUND));
   }
 
-  private Rectangle computeBounds(TableCursor cursor, int style) {
+  private static Rectangle computeBounds(TableCursor cursor, int style) {
     Rectangle bounds = new Rectangle(0, 0, 0, 0);
     Point size = null;
     if ((style & SWT.MULTI) != 0) {

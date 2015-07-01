@@ -21,7 +21,7 @@ import org.junit.Test;
  */
 public class FieldTest {
   @Test
-  public void testStringConstantField() throws Exception {
+  public void testStringConstantField() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
@@ -36,7 +36,7 @@ public class FieldTest {
   }
 
   @Test
-  public void testToString() throws Exception {
+  public void testToString() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
@@ -47,7 +47,7 @@ public class FieldTest {
   }
 
   @Test
-  public void testNullArrayField() throws Exception {
+  public void testNullArrayField() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
@@ -63,7 +63,7 @@ public class FieldTest {
   }
 
   @Test
-  public void testAnnotationOnFieldChild() throws Exception {
+  public void testAnnotationOnFieldChild() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
@@ -76,7 +76,7 @@ public class FieldTest {
   }
 
   @Test
-  public void testAnnotationOnFieldBase() throws Exception {
+  public void testAnnotationOnFieldBase() {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
@@ -87,7 +87,7 @@ public class FieldTest {
   }
 
   @Test
-  public void testLongConstantField() throws Exception {
+  public void testLongConstantField() {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
@@ -101,7 +101,7 @@ public class FieldTest {
   }
 
   @Test
-  public void testAnonymousTypeField() throws Exception {
+  public void testAnonymousTypeField() {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 

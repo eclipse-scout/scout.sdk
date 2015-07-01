@@ -111,8 +111,6 @@ public class NlsFindKeysJob extends Job {
       }
       return Pattern.compile(patternBuilder.toString());
     }
-    else {
-      return null;
-    }
+    return null;
   }
 }

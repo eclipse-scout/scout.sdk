@@ -35,41 +35,41 @@ import org.junit.Test;
  */
 public class CoreUtilsTest {
   @Test
-  public void testGetInnerTypes() throws Exception {
+  public void testGetInnerTypes() {
     ListOrderedSet<IType> innerTypes = CoreUtils.getInnerTypes(CoreTestingUtils.getBaseClassType(), TypeFilters.getFlagsFilter(Flags.AccStatic), TypeComparators.getTypeNameComparator());
     Assert.assertEquals(1, innerTypes.size());
   }
 
   @Test
-  public void testToStringLiteral() throws Exception {
+  public void testToStringLiteral() {
     Assert.assertEquals("\"a\\nb\"", CoreUtils.toStringLiteral("a\nb"));
     Assert.assertEquals("\"a\\\"b\"", CoreUtils.toStringLiteral("a\"b"));
   }
 
   @Test
-  public void testFindInnerType() throws Exception {
+  public void testFindInnerType() {
     Assert.assertEquals(CoreTestingUtils.getBaseClassType().getTypes().get(0), CoreUtils.findInnerType(CoreTestingUtils.getBaseClassType(), "InnerClass1"));
   }
 
   @Test
-  public void testGetAllSuperInterfaces() throws Exception {
+  public void testGetAllSuperInterfaces() {
     Assert.assertEquals(2, CoreUtils.getAllSuperInterfaces(CoreTestingUtils.getBaseClassType()).size());
   }
 
   @Test
-  public void testIsGenericType() throws Exception {
+  public void testIsGenericType() {
     Assert.assertTrue(CoreUtils.isGenericType(CoreTestingUtils.getChildClassType()));
     Assert.assertTrue(CoreUtils.isGenericType(CoreTestingUtils.getBaseClassType()));
     Assert.assertFalse(CoreUtils.isGenericType(CoreTestingUtils.getBaseClassType().getTypes().get(0)));
   }
 
   @Test
-  public void testGetFields() throws Exception {
+  public void testGetFields() {
     Assert.assertEquals(1, CoreUtils.getFields(CoreTestingUtils.getChildClassType(), FieldFilters.getNameFilter("m_test")).size());
   }
 
   @Test
-  public void testGetResolvedTypeParamValueSignature() throws Exception {
+  public void testGetResolvedTypeParamValueSignature() {
     ListOrderedSet<String> resolvedTypeParamValueSignature = CoreUtils.getResolvedTypeParamValueSignature(CoreTestingUtils.getChildClassType(), InterfaceLevel1.class.getName(), 0);
     Assert.assertEquals(1, resolvedTypeParamValueSignature.size());
     Assert.assertEquals(Signature.createTypeSignature(org.eclipse.scout.sdk.core.fixture.Long.class.getName()), resolvedTypeParamValueSignature.get(0));
@@ -82,21 +82,21 @@ public class CoreUtilsTest {
   }
 
   @Test
-  public void testFindMethodInSuperHierarchy() throws Exception {
+  public void testFindMethodInSuperHierarchy() {
     IMethod methodInBaseClass = CoreUtils.findMethodInSuperHierarchy(CoreTestingUtils.getChildClassType(), MethodFilters.getFilterWithAnnotation(MarkerAnnotation.class.getName()));
     Assert.assertNotNull(methodInBaseClass);
     Assert.assertEquals("methodInBaseClass", methodInBaseClass.getName());
   }
 
   @Test
-  public void testFindInnerTypeInSuperHierarchy() throws Exception {
+  public void testFindInnerTypeInSuperHierarchy() {
     IType innerTypeInSuperClass = CoreUtils.findInnerTypeInSuperHierarchy(CoreTestingUtils.getChildClassType(), TypeFilters.getElementNameFilter("InnerClass2"));
     Assert.assertNotNull(innerTypeInSuperClass);
     Assert.assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerTypeInSuperClass.getName());
   }
 
   @Test
-  public void testEnsureStartWithLowerCase() throws Exception {
+  public void testEnsureStartWithLowerCase() {
     Assert.assertEquals(null, CoreUtils.ensureStartWithLowerCase(null));
     Assert.assertEquals("", CoreUtils.ensureStartWithLowerCase(""));
     Assert.assertEquals("  ", CoreUtils.ensureStartWithLowerCase("  "));
@@ -108,7 +108,7 @@ public class CoreUtilsTest {
   }
 
   @Test
-  public void testEnsureStartWithUpperCase() throws Exception {
+  public void testEnsureStartWithUpperCase() {
     Assert.assertEquals(null, CoreUtils.ensureStartWithUpperCase(null));
     Assert.assertEquals("", CoreUtils.ensureStartWithUpperCase(""));
     Assert.assertEquals("  ", CoreUtils.ensureStartWithUpperCase("  "));
@@ -122,7 +122,7 @@ public class CoreUtilsTest {
   }
 
   @Test
-  public void testEnsureValidParameterName() throws Exception {
+  public void testEnsureValidParameterName() {
     Assert.assertEquals(null, CoreUtils.ensureValidParameterName(null));
     Assert.assertEquals("", CoreUtils.ensureValidParameterName(""));
     Assert.assertEquals("  ", CoreUtils.ensureValidParameterName("  "));
@@ -134,7 +134,7 @@ public class CoreUtilsTest {
   }
 
   @Test
-  public void testGetAnnotation() throws Exception {
+  public void testGetAnnotation() {
     Assert.assertNotNull(CoreUtils.getAnnotation(CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getName()));
     Assert.assertNotNull(CoreUtils.getAnnotation(CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getSimpleName()));
     Assert.assertEquals(1, CoreUtils.getAnnotations(CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getSimpleName()).size());
@@ -142,14 +142,14 @@ public class CoreUtilsTest {
   }
 
   @Test
-  public void testIsOnClasspath() throws Exception {
+  public void testIsOnClasspath() {
     Assert.assertTrue(CoreUtils.isOnClasspath(Long.class.getName(), CoreTestingUtils.getChildClassIcu().getLookupEnvironment()));
     Assert.assertTrue(CoreUtils.isOnClasspath(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), CoreTestingUtils.getChildClassIcu().getLookupEnvironment()));
     Assert.assertFalse(CoreUtils.isOnClasspath("not.existing.Type", CoreTestingUtils.getChildClassIcu().getLookupEnvironment()));
   }
 
   @Test
-  public void testIsInstanceOf() throws Exception {
+  public void testIsInstanceOf() {
     Assert.assertTrue(CoreUtils.isInstanceOf(CoreTestingUtils.getChildClassType(), BaseClass.class.getName()));
     Assert.assertTrue(CoreUtils.isInstanceOf(CoreTestingUtils.getChildClassType(), InterfaceLevel2.class.getName()));
     Assert.assertFalse(CoreUtils.isInstanceOf(CoreTestingUtils.getChildClassType(), org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
@@ -157,13 +157,13 @@ public class CoreUtilsTest {
   }
 
   @Test
-  public void testGetMethod() throws Exception {
+  public void testGetMethod() {
     Assert.assertNotNull(CoreUtils.getMethod(CoreTestingUtils.getBaseClassType(), "method2InBaseClass"));
     Assert.assertNull(CoreUtils.getMethod(CoreTestingUtils.getBaseClassType(), "method2InBaseclass"));
   }
 
   @Test
-  public void testGetMethods() throws Exception {
+  public void testGetMethods() {
     ListOrderedSet<IMethod> methods = CoreUtils.getMethods(CoreTestingUtils.getBaseClassType(), MethodFilters.getFlagsFilter(Flags.AccSynchronized));
     Assert.assertEquals(1, methods.size());
 

@@ -229,13 +229,11 @@ public abstract class AbstractNlsProject implements INlsProject {
         }
         return entries;
       }
-      else {
-        List<INlsEntry> result = new ArrayList<>(m_entries.size());
-        for (INlsEntry e : m_entries.values()) {
-          result.add(e);
-        }
-        return result;
+      List<INlsEntry> result = new ArrayList<>(m_entries.size());
+      for (INlsEntry e : m_entries.values()) {
+        result.add(e);
       }
+      return result;
     }
     finally {
       m_lock.readLock().unlock();
@@ -287,64 +285,63 @@ public abstract class AbstractNlsProject implements INlsProject {
     if (baseText == null || baseText.length() < 1) {
       return null;
     }
-    else {
-      StringBuilder ret = new StringBuilder(baseText.length());
 
-      // remove not allowed characters
-      baseText = baseText.replaceAll("[^a-zA-Z0-9_\\.\\- ]*", "").trim();
+    StringBuilder ret = new StringBuilder(baseText.length());
 
-      // camel case multiple words
-      String[] split = baseText.split(" ");
-      for (int i = 0; i < split.length; i++) {
-        String splitValue = split[i];
-        if (splitValue.length() > 0) {
-          char first = splitValue.charAt(0);
-          if (split.length > 1) {
-            first = Character.toUpperCase(first);
-          }
-          ret.append(first);
-          if (splitValue.length() > 1) {
-            ret.append(splitValue.substring(1));
-          }
+    // remove not allowed characters
+    baseText = baseText.replaceAll("[^a-zA-Z0-9_\\.\\- ]*", "").trim();
+
+    // camel case multiple words
+    String[] split = baseText.split(" ");
+    for (int i = 0; i < split.length; i++) {
+      String splitValue = split[i];
+      if (splitValue.length() > 0) {
+        char first = splitValue.charAt(0);
+        if (split.length > 1) {
+          first = Character.toUpperCase(first);
+        }
+        ret.append(first);
+        if (splitValue.length() > 1) {
+          ret.append(splitValue.substring(1));
         }
       }
-
-      // remove not allowed characters from the start
-      while (ret.length() > 0 && (ret.charAt(0) == '.' || ret.charAt(0) == '_' || ret.charAt(0) == '-')) {
-        ret.deleteCharAt(0);
-      }
-
-      // remove not allowed characters from the end
-      while (ret.length() > 0 && (ret.charAt(ret.length() - 1) == '.' || ret.charAt(ret.length() - 1) == '-')) {
-        ret.deleteCharAt(ret.length() - 1);
-      }
-
-      // ensure max length
-      int maxLength = 190;
-      String newKey;
-      if (ret.length() > maxLength) {
-        newKey = ret.substring(0, maxLength);
-      }
-      else {
-        newKey = ret.toString();
-      }
-
-      // add unique ending number if requested
-      String result = newKey;
-      if (appendFreeNumSuffix) {
-        int i = 0;
-        m_lock.readLock().lock();
-        try {
-          while (m_entries.containsKey(result)) {
-            result = newKey + i++;
-          }
-        }
-        finally {
-          m_lock.readLock().unlock();
-        }
-      }
-      return result;
     }
+
+    // remove not allowed characters from the start
+    while (ret.length() > 0 && (ret.charAt(0) == '.' || ret.charAt(0) == '_' || ret.charAt(0) == '-')) {
+      ret.deleteCharAt(0);
+    }
+
+    // remove not allowed characters from the end
+    while (ret.length() > 0 && (ret.charAt(ret.length() - 1) == '.' || ret.charAt(ret.length() - 1) == '-')) {
+      ret.deleteCharAt(ret.length() - 1);
+    }
+
+    // ensure max length
+    int maxLength = 190;
+    String newKey;
+    if (ret.length() > maxLength) {
+      newKey = ret.substring(0, maxLength);
+    }
+    else {
+      newKey = ret.toString();
+    }
+
+    // add unique ending number if requested
+    String result = newKey;
+    if (appendFreeNumSuffix) {
+      int i = 0;
+      m_lock.readLock().lock();
+      try {
+        while (m_entries.containsKey(result)) {
+          result = newKey + i++;
+        }
+      }
+      finally {
+        m_lock.readLock().unlock();
+      }
+    }
+    return result;
   }
 
   protected void setParent(INlsProject newParent) {

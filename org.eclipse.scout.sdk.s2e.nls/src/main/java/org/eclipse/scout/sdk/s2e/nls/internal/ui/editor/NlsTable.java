@@ -317,28 +317,26 @@ public class NlsTable extends Composite {
       m_viewer.refresh(false);
       return true;
     }
-    else {
-      // update translation
-      final NlsEntry copy = new NlsEntry(row);
-      copy.addTranslation(getLanguageOfTableColumn(column), newText);
-      Job job = new Job("update text") {
-        @Override
-        protected IStatus run(IProgressMonitor monitor) {
-          m_tableModel.getProjects().updateRow(copy, monitor);
-          return Status.OK_STATUS;
-        }
-      };
-      job.setSystem(false);
-      job.schedule();
-      try {
-        job.join();
+    // update translation
+    final NlsEntry copy = new NlsEntry(row);
+    copy.addTranslation(getLanguageOfTableColumn(column), newText);
+    Job job = new Job("update text") {
+      @Override
+      protected IStatus run(IProgressMonitor monitor) {
+        m_tableModel.getProjects().updateRow(copy, monitor);
+        return Status.OK_STATUS;
       }
-      catch (InterruptedException e) {
-        NlsCore.logWarning(e);
-      }
-      m_viewer.refresh(false);
-      return job.getResult().isOK();
+    };
+    job.setSystem(false);
+    job.schedule();
+    try {
+      job.join();
     }
+    catch (InterruptedException e) {
+      NlsCore.logWarning(e);
+    }
+    m_viewer.refresh(false);
+    return job.getResult().isOK();
   }
 
   public void asyncRefresh(final INlsEntry row) {

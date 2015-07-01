@@ -191,7 +191,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
       m_eventCollector = eventCollector;
     }
 
-    private boolean acceptUpdateEvent(ElementChangedEvent icu) {
+    private static boolean acceptUpdateEvent(ElementChangedEvent icu) {
       final String[] EXCLUDED_JOB_NAME_PREFIXES = new String[]{
           "org.eclipse.team.", // excludes svn updates
           "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates

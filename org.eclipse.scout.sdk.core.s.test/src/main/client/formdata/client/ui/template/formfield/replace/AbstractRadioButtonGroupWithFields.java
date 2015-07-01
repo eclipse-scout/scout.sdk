@@ -4,7 +4,7 @@
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
  * http://www.eclipse.org/legal/epl-v10.html
- * 
+ *
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
@@ -39,7 +39,7 @@ public abstract class AbstractRadioButtonGroupWithFields extends AbstractRadioBu
   }
 
   @Order(10)
-  public class OptionOneButton extends AbstractRadioButton {
+  public class OptionOneButton extends AbstractRadioButton<Long> {
 
     @Override
     protected Long getConfiguredRadioValue() {
@@ -48,7 +48,7 @@ public abstract class AbstractRadioButtonGroupWithFields extends AbstractRadioBu
   }
 
   @Order(20)
-  public class OptionTwoButton extends AbstractRadioButton {
+  public class OptionTwoButton extends AbstractRadioButton<Long> {
 
     @Override
     protected Long getConfiguredRadioValue() {

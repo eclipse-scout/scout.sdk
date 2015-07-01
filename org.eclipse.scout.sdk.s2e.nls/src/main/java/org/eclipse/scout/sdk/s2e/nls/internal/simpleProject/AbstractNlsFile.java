@@ -15,7 +15,6 @@ import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 
 public abstract class AbstractNlsFile {
@@ -32,7 +31,7 @@ public abstract class AbstractNlsFile {
 
   public abstract boolean isReadOnly();
 
-  public static AbstractNlsFile loadNlsFile(IFile file) throws CoreException {
+  public static AbstractNlsFile loadNlsFile(IFile file) {
     if (file == null || !file.exists()) {
       return null;
     }

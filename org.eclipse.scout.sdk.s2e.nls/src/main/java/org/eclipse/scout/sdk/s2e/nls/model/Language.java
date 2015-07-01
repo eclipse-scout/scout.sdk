@@ -83,21 +83,19 @@ public class Language {
         // default
         return Language.LANGUAGE_DEFAULT;
       }
-      else {
-        String languageIso = matcher.group(2);
-        if (languageIso == null) {
-          languageIso = "";
-        }
-        String countryIso = matcher.group(4);
-        if (countryIso == null) {
-          countryIso = "";
-        }
-        String variantIso = matcher.group(5);
-        if (variantIso == null) {
-          variantIso = "";
-        }
-        return new Language(new Locale(languageIso, countryIso, variantIso));
+      String languageIso = matcher.group(2);
+      if (languageIso == null) {
+        languageIso = "";
       }
+      String countryIso = matcher.group(4);
+      if (countryIso == null) {
+        countryIso = "";
+      }
+      String variantIso = matcher.group(5);
+      if (variantIso == null) {
+        variantIso = "";
+      }
+      return new Language(new Locale(languageIso, countryIso, variantIso));
     }
     return null;
   }

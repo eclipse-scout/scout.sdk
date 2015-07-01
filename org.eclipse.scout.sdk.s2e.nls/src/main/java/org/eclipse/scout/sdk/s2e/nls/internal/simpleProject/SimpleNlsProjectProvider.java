@@ -31,7 +31,7 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
   public SimpleNlsProjectProvider() {
   }
 
-  protected INlsProject getNlsProject(IType type) throws CoreException {
+  protected INlsProject getNlsProject(IType type) {
     if (type == null) {
       NlsCore.logError("NLS type cannot be null.");
       return null;
@@ -62,12 +62,7 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
     if (args != null && args.length == 1) {
       if (args[0] instanceof IType) {
         IType t = (IType) args[0];
-        try {
-          return getNlsProject(t);
-        }
-        catch (CoreException e) {
-          NlsCore.logWarning("Could not load NlsType: " + t.getFullyQualifiedName(), e);
-        }
+        return getNlsProject(t);
       }
       else if (args[0] instanceof IFile) {
         IFile f = (IFile) args[0];
@@ -87,9 +82,7 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
                   // also give the other providers a chance to parse
                   return NlsCore.getNlsWorkspace().getNlsProject(new Object[]{type});
                 }
-                else {
-                  NlsCore.logWarning("Could not find type '" + nlsFile.getNlsTypeName() + "'.");
-                }
+                NlsCore.logWarning("Could not find type '" + nlsFile.getNlsTypeName() + "'.");
               }
             }
           }

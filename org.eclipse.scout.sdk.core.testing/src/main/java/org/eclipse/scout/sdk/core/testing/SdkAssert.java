@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.core.model.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.model.JavaModelUtils;
 import org.eclipse.scout.sdk.core.model.MethodFilters;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
@@ -113,7 +114,7 @@ public class SdkAssert extends Assert {
    * @return the type if found.
    */
   public static IType assertTypeExists(String message, IType declaringType, String typeName) {
-    SdkAssert.assertNotNull(declaringType);
+    Assert.assertNotNull(declaringType);
 
     IType type = CoreUtils.getInnerType(declaringType, typeName);
     if (type == null) {
@@ -835,23 +836,23 @@ public class SdkAssert extends Assert {
 
   private static void getResolvedSignature(String unresolvedSignature, IType context, StringBuilder sigBuilder) {
     switch (Signature.getTypeSignatureKind(unresolvedSignature)) {
-      case Signature.WILDCARD_TYPE_SIGNATURE:
+      case ISignatureConstants.WILDCARD_TYPE_SIGNATURE:
         sigBuilder.append(unresolvedSignature.charAt(0));
         if (unresolvedSignature.length() > 1) {
           sigBuilder.append(resolveSignature(unresolvedSignature.substring(1), context));
         }
         break;
-      case Signature.ARRAY_TYPE_SIGNATURE:
-        sigBuilder.append(Signature.C_ARRAY);
+      case ISignatureConstants.ARRAY_TYPE_SIGNATURE:
+        sigBuilder.append(ISignatureConstants.C_ARRAY);
         getResolvedSignature(unresolvedSignature.substring(1), context, sigBuilder);
         break;
-      case Signature.BASE_TYPE_SIGNATURE:
-        if (endsWith(unresolvedSignature, Signature.C_NAME_END)) {
+      case ISignatureConstants.BASE_TYPE_SIGNATURE:
+        if (endsWith(unresolvedSignature, ISignatureConstants.C_NAME_END)) {
           unresolvedSignature = unresolvedSignature.substring(0, unresolvedSignature.length() - 1);
         }
         sigBuilder.append(unresolvedSignature);
         break;
-      case Signature.CLASS_TYPE_SIGNATURE:
+      case ISignatureConstants.CLASS_TYPE_SIGNATURE:
         String[] typeArguments = Signature.getTypeArguments(unresolvedSignature);
         unresolvedSignature = Signature.getTypeErasure(unresolvedSignature);
 
@@ -859,18 +860,18 @@ public class SdkAssert extends Assert {
           unresolvedSignature = resolveSignature(unresolvedSignature, context);
         }
 
-        if (endsWith(unresolvedSignature, Signature.C_NAME_END)) {
+        if (endsWith(unresolvedSignature, ISignatureConstants.C_NAME_END)) {
           unresolvedSignature = unresolvedSignature.substring(0, unresolvedSignature.length() - 1);
         }
         sigBuilder.append(unresolvedSignature);
         if (typeArguments.length > 0) {
-          sigBuilder.append(Signature.C_GENERIC_START);
+          sigBuilder.append(ISignatureConstants.C_GENERIC_START);
           for (int i = 0; i < typeArguments.length; i++) {
             getResolvedSignature(typeArguments[i], context, sigBuilder);
           }
-          sigBuilder.append(Signature.C_GENERIC_END);
+          sigBuilder.append(ISignatureConstants.C_GENERIC_END);
         }
-        sigBuilder.append(Signature.C_NAME_END);
+        sigBuilder.append(ISignatureConstants.C_NAME_END);
         break;
     }
   }

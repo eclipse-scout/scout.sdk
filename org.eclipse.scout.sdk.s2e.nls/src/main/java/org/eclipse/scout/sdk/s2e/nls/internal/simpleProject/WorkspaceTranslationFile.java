@@ -130,7 +130,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
           builder.append(nl);
         }
 
-        m_file.setContents(new ByteArrayInputStream(builder.toString().getBytes()), IFile.KEEP_HISTORY, monitor);
+        m_file.setContents(new ByteArrayInputStream(builder.toString().getBytes()), IResource.KEEP_HISTORY, monitor);
         m_file.refreshLocal(IResource.DEPTH_ONE, monitor);
       }
       catch (IOException e1) {

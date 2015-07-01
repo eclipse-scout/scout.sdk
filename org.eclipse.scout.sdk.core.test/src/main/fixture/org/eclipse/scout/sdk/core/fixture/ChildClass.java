@@ -33,6 +33,12 @@ public class ChildClass<X extends AbstractList<String> & Runnable & Serializable
   public ChildClass() {
   }
 
+  /**
+   * @param firstParam
+   * @param secondParam
+   * @return
+   * @throws IOException
+   */
   @TestAnnotation(values = Long.class, en = TestEnum.A)
   protected synchronized boolean[] methodInChildClass(final String firstParam, final List<Runnable> secondParam) throws IOException {
     return null;

@@ -28,7 +28,7 @@ import org.junit.Test;
 public class SignatureUtilsTest {
 
   @Test
-  public void testGetResolvedSignature() throws Exception {
+  public void testGetResolvedSignature() {
     IType type = TestingUtils.getType(ChildClass.class.getName());
     Assert.assertNotNull(type);
 
@@ -41,27 +41,27 @@ public class SignatureUtilsTest {
   }
 
   @Test
-  public void testSimpleSignature() throws Exception {
+  public void testSimpleSignature() {
     String signature = "Ljava.lang.String;";
     IImportValidator validator = new ImportValidator();
     Assert.assertEquals(SignatureUtils.getTypeReference(signature, validator), "String");
   }
 
   @Test
-  public void testGetResolvedSignature_Long() throws Exception {
+  public void testGetResolvedSignature_Long() {
     ImportValidator importValidator = new ImportValidator();
     Assert.assertEquals("Long", SignatureUtils.getTypeReference(Signature.createTypeSignature(Long.class.getName()), importValidator));
   }
 
   @Test
-  public void testGetSimpleTypeSignature_LongArray() throws Exception {
+  public void testGetSimpleTypeSignature_LongArray() {
     ImportValidator importValidator = new ImportValidator();
     String signature = Signature.createArraySignature(Signature.createTypeSignature(Long.class.getName()), 1);
     Assert.assertEquals("Long[]", SignatureUtils.getTypeReference(signature, importValidator));
   }
 
   @Test
-  public void testGetSimpleTypeSignature_ArrayOfStringSets() throws Exception {
+  public void testGetSimpleTypeSignature_ArrayOfStringSets() {
     ImportValidator importValidator = new ImportValidator();
     String signature = Signature.createTypeSignature("java.util.Set<java.lang.String>[]");
     Assert.assertEquals("Set<String>[]", SignatureUtils.getTypeReference(signature, importValidator));
@@ -70,14 +70,14 @@ public class SignatureUtilsTest {
   }
 
   @Test
-  public void testObjectSignatureSlashBased() throws Exception {
+  public void testObjectSignatureSlashBased() {
     ImportValidator importValidator = new ImportValidator();
     String signature = "Ljava/lang/Object;";
     Assert.assertEquals("java/lang/Object", SignatureUtils.getTypeReference(signature, importValidator));
   }
 
   @Test
-  public void testGetSimpleTypeSignature_3dimArrayOfLongArrayOfObjectListsArrayMapSets() throws Exception {
+  public void testGetSimpleTypeSignature_3dimArrayOfLongArrayOfObjectListsArrayMapSets() {
     ImportValidator importValidator = new ImportValidator();
     String signature = Signature.createTypeSignature("java.util.Set<java.util.HashMap<java.lang.Long, java.util.List<java.lang.Object>[]>>[][][]");
     Assert.assertEquals("Set<HashMap<Long, List<Object>[]>>[][][]", SignatureUtils.getTypeReference(signature, importValidator));
@@ -88,7 +88,7 @@ public class SignatureUtilsTest {
   }
 
   @Test
-  public void testClassParameterized() throws Exception {
+  public void testClassParameterized() {
     String signature = "[Ljava.lang.Class<+[Lcom.bsiag.scout.client.ui.desktop.outline.IOutline;>;";
     ImportValidator validator = new ImportValidator();
 
@@ -97,7 +97,7 @@ public class SignatureUtilsTest {
   }
 
   @Test
-  public void testComplexNestedArrayListHashMapArray() throws Exception {
+  public void testComplexNestedArrayListHashMapArray() {
     String signature = "[Ljava.util.HashMap<Ljava.util.ArrayList<[[Ljava.lang.String;>;Lorg.eclipse.scout.sdk.workspace.member.IScoutType;>;";
     ImportValidator validator = new ImportValidator();
     String result = SignatureUtils.getTypeReference(signature, validator);
@@ -105,7 +105,7 @@ public class SignatureUtilsTest {
   }
 
   @Test
-  public void testGenericExtendsWithArray() throws Exception {
+  public void testGenericExtendsWithArray() {
     String signature = "[Ljava.lang.Class<+[Lcom.bsiag.scout.client.ui.desktop.outline.IOutline;>;";
     IImportValidator validator = new ImportValidator();
     Assert.assertEquals(SignatureUtils.getTypeReference(signature, validator), "Class<? extends IOutline[]>[]");

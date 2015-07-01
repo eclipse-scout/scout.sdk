@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.model.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.model.MethodFilters;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
-import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
@@ -170,7 +170,7 @@ public final class MethodSourceBuilderFactory {
 
   public static IMethodSourceBuilder createGetter(String fieldName, String signature) {
     StringBuilder methodName = new StringBuilder();
-    if (Signature.SIG_BOOLEAN.equals(signature)) {
+    if (ISignatureConstants.SIG_BOOLEAN.equals(signature)) {
       methodName.append("is");
     }
     else {
@@ -203,7 +203,7 @@ public final class MethodSourceBuilderFactory {
     methodName.append(CoreUtils.ensureStartWithUpperCase(field));
     IMethodSourceBuilder setterBuilder = new MethodSourceBuilder(methodName.toString());
     setterBuilder.setFlags(Flags.AccPublic);
-    setterBuilder.setReturnTypeSignature(Signature.SIG_VOID);
+    setterBuilder.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
     setterBuilder.addParameter(new MethodParameterDescription(paramName, signature));
     setterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesMethodSetterCommentBuilder());
     setterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(fieldName + " = " + paramName + ";"));

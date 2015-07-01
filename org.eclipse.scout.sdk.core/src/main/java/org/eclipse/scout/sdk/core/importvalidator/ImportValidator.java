@@ -22,6 +22,7 @@ import org.apache.commons.lang3.Validate;
 import org.eclipse.scout.sdk.core.model.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.IImportDeclaration;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 
@@ -73,7 +74,7 @@ public class ImportValidator implements IImportValidator {
 
     // handle primitive and void types
     int kind = Signature.getTypeSignatureKind(signature);
-    if (kind == Signature.BASE_TYPE_SIGNATURE) {
+    if (kind == ISignatureConstants.BASE_TYPE_SIGNATURE) {
       return Signature.getSignatureSimpleName(signature);
     }
 
@@ -85,7 +86,7 @@ public class ImportValidator implements IImportValidator {
     // handle normal signature
     StringBuilder result = new StringBuilder(signature.length());
 
-    String sigWithoutDollar = signature.replace(Signature.C_DOLLAR, Signature.C_DOT); // e.g. a.b.c.MyClass$InnerClass$SecondInner -> a.b.c.MyClass.InnerClass.SecondInner
+    String sigWithoutDollar = signature.replace(ISignatureConstants.C_DOLLAR, ISignatureConstants.C_DOT); // e.g. a.b.c.MyClass$InnerClass$SecondInner -> a.b.c.MyClass.InnerClass.SecondInner
     String fullQualification = Signature.getSignatureQualifier(sigWithoutDollar); // e.g. a.b.c.MyClass$InnerClass$SecondInner -> a.b.c.MyClass.InnerClass
     String packageName = Signature.getSignatureQualifier(signature);
     String lastSegment = Signature.getSignatureSimpleName(sigWithoutDollar); // e.g. a.b.c.MyClass$InnerClass$SecondInner -> SecondInner

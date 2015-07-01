@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2e.nls.internal.ui.dialog;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.MultiStatus;
-import org.eclipse.jface.dialogs.Dialog;
+import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.fields.TextField;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.formatter.IValidationListener;
@@ -57,6 +57,6 @@ public class NlsEntryModifyDialog extends AbstractNlsEntryDialog {
     else {
       setMessage(highestSeverity);
     }
-    getButton(Dialog.OK).setEnabled(highestSeverity.getSeverity() != IStatus.ERROR);
+    getButton(Window.OK).setEnabled(highestSeverity.getSeverity() != IStatus.ERROR);
   }
 }

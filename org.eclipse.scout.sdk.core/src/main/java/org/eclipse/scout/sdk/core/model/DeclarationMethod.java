@@ -72,7 +72,7 @@ public class DeclarationMethod implements IMethod {
     return uniqueKey;
   }
 
-  private void appendArgument(StringBuilder sig, Argument m) {
+  private static void appendArgument(StringBuilder sig, Argument m) {
     char[][] nameParts = m.type.getTypeName();
     if (nameParts != null && nameParts.length > 0) {
       for (char[] part : nameParts) {

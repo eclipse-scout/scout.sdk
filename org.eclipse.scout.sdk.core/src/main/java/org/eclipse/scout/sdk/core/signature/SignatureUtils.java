@@ -39,10 +39,10 @@ public final class SignatureUtils {
     if (signature == null) {
       return false;
     }
-    if (startsWith(signature, Signature.C_EXTENDS)) {
+    if (startsWith(signature, ISignatureConstants.C_EXTENDS)) {
       signature = signature.substring(1);
     }
-    return startsWith(signature, Signature.C_UNRESOLVED);
+    return startsWith(signature, ISignatureConstants.C_UNRESOLVED);
   }
 
   private static boolean startsWith(String stringToSearchIn, char charToFind) {
@@ -50,35 +50,35 @@ public final class SignatureUtils {
   }
 
   public static String toFullyQualifiedName(String sig) {
-    String nameUpToPrimaryType = Signature.getSignatureSimpleName(sig).replace(Signature.C_DOT, Signature.C_DOLLAR); // ensure to keep $ for inner types.
+    String nameUpToPrimaryType = Signature.getSignatureSimpleName(sig).replace(ISignatureConstants.C_DOT, ISignatureConstants.C_DOLLAR); // ensure to keep $ for inner types.
     String pck = Signature.getSignatureQualifier(sig);
     return new StringBuilder(nameUpToPrimaryType.length() + 1 + pck.length()).append(pck).append('.').append(nameUpToPrimaryType).toString();
   }
 
   public static String unboxPrimitiveSignature(String signature) {
-    if (Signature.getTypeSignatureKind(signature) == Signature.BASE_TYPE_SIGNATURE) {
-      if (Signature.SIG_BOOLEAN.equals(signature)) {
+    if (Signature.getTypeSignatureKind(signature) == ISignatureConstants.BASE_TYPE_SIGNATURE) {
+      if (ISignatureConstants.SIG_BOOLEAN.equals(signature)) {
         signature = Signature.createTypeSignature(Boolean.class.getName());
       }
-      else if (Signature.SIG_BYTE.equals(signature)) {
+      else if (ISignatureConstants.SIG_BYTE.equals(signature)) {
         signature = Signature.createTypeSignature(Byte.class.getName());
       }
-      else if (Signature.SIG_CHAR.equals(signature)) {
+      else if (ISignatureConstants.SIG_CHAR.equals(signature)) {
         signature = Signature.createTypeSignature(Character.class.getName());
       }
-      else if (Signature.SIG_DOUBLE.equals(signature)) {
+      else if (ISignatureConstants.SIG_DOUBLE.equals(signature)) {
         signature = Signature.createTypeSignature(Double.class.getName());
       }
-      else if (Signature.SIG_FLOAT.equals(signature)) {
+      else if (ISignatureConstants.SIG_FLOAT.equals(signature)) {
         signature = Signature.createTypeSignature(Float.class.getName());
       }
-      else if (Signature.SIG_INT.equals(signature)) {
+      else if (ISignatureConstants.SIG_INT.equals(signature)) {
         signature = Signature.createTypeSignature(Integer.class.getName());
       }
-      else if (Signature.SIG_LONG.equals(signature)) {
+      else if (ISignatureConstants.SIG_LONG.equals(signature)) {
         signature = Signature.createTypeSignature(Long.class.getName());
       }
-      else if (Signature.SIG_SHORT.equals(signature)) {
+      else if (ISignatureConstants.SIG_SHORT.equals(signature)) {
         signature = Signature.createTypeSignature(Short.class.getName());
       }
     }
@@ -116,18 +116,18 @@ public final class SignatureUtils {
     // generics
     List<IType> typeArgs = type.getTypeArguments();
     if (typeArgs.size() > 0) {
-      builder.append(Signature.C_GENERIC_START);
+      builder.append(ISignatureConstants.C_GENERIC_START);
       getResolvedSignatureRec(typeArgs.get(0), builder);
       for (int i = 1; i < typeArgs.size(); i++) {
         builder.append(Signature.C_COMMA);
         getResolvedSignatureRec(typeArgs.get(i), builder);
       }
-      builder.append(Signature.C_GENERIC_END);
+      builder.append(ISignatureConstants.C_GENERIC_END);
     }
 
     // arrays
     for (int i = 0; i < type.getArrayDimension(); i++) {
-      builder.append(Signature.C_ARRAY).append(Signature.C_ARRAY_END);
+      builder.append(ISignatureConstants.C_ARRAY).append(Signature.C_ARRAY_END);
     }
   }
 
@@ -143,21 +143,21 @@ public final class SignatureUtils {
     StringBuilder sigBuilder = new StringBuilder();
     int arrayCount = 0;
     switch (Signature.getTypeSignatureKind(signature)) {
-      case Signature.WILDCARD_TYPE_SIGNATURE:
+      case ISignatureConstants.WILDCARD_TYPE_SIGNATURE:
         sigBuilder.append("?");
         if (signature.length() > 1) {
           sigBuilder.append(" extends ");
           sigBuilder.append(getTypeReference(signature.substring(1), validator));
         }
         break;
-      case Signature.ARRAY_TYPE_SIGNATURE:
+      case ISignatureConstants.ARRAY_TYPE_SIGNATURE:
         arrayCount = Signature.getArrayCount(signature);
         sigBuilder.append(getTypeReference(signature.substring(arrayCount), validator));
         break;
-      case Signature.BASE_TYPE_SIGNATURE:
+      case ISignatureConstants.BASE_TYPE_SIGNATURE:
         sigBuilder.append(Signature.getSignatureSimpleName(signature));
         break;
-      case Signature.TYPE_VARIABLE_SIGNATURE:
+      case ISignatureConstants.TYPE_VARIABLE_SIGNATURE:
         sigBuilder.append(toFullyQualifiedName(signature));
         break;
       default:
@@ -165,13 +165,13 @@ public final class SignatureUtils {
         signature = Signature.getTypeErasure(signature);
         sigBuilder.append(validator.getTypeName(signature));
         if (typeArguments != null && typeArguments.length > 0) {
-          sigBuilder.append(Signature.C_GENERIC_START);
+          sigBuilder.append(ISignatureConstants.C_GENERIC_START);
           sigBuilder.append(getTypeReference(typeArguments[0], validator));
           for (int i = 1; i < typeArguments.length; i++) {
             sigBuilder.append(", ");
             sigBuilder.append(getTypeReference(typeArguments[i], validator));
           }
-          sigBuilder.append(Signature.C_GENERIC_END);
+          sigBuilder.append(ISignatureConstants.C_GENERIC_END);
         }
         break;
     }

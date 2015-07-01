@@ -72,9 +72,7 @@ public class NlsProjectEvent {
     if (m_childEvents == null) {
       return new NlsProjectEvent[0];
     }
-    else {
-      return m_childEvents.toArray(new NlsProjectEvent[m_childEvents.size()]);
-    }
+    return m_childEvents.toArray(new NlsProjectEvent[m_childEvents.size()]);
   }
 
   public INlsProject getSource() {

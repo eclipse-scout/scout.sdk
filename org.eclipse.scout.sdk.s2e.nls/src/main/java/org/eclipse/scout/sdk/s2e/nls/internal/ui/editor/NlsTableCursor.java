@@ -145,9 +145,7 @@ public class NlsTableCursor {
     if (row == null) {
       return null;
     }
-    else {
-      return new NlsTableSelection(row, m_cursor.getColumn());
-    }
+    return new NlsTableSelection(row, m_cursor.getColumn());
   }
 
   /**

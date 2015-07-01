@@ -311,26 +311,22 @@ public final class JavaModelUtils {
     if (annots == null || annots.length < 1) {
       return ListOrderedSet.listOrderedSet(new HashSet<IAnnotation>(0));
     }
-    else {
-      List<IAnnotation> result = new ArrayList<>(annots.length);
-      for (int i = 0; i < annots.length; i++) {
-        result.add(new BindingAnnotation(annots[i], owner, null, i, env));
-      }
-      return ListOrderedSet.listOrderedSet(result);
+    List<IAnnotation> result = new ArrayList<>(annots.length);
+    for (int i = 0; i < annots.length; i++) {
+      result.add(new BindingAnnotation(annots[i], owner, null, i, env));
     }
+    return ListOrderedSet.listOrderedSet(result);
   }
 
   static ListOrderedSet<IAnnotation> annotationsToIAnnotations(Annotation[] annotations, ClassScope scope, IAnnotatable owner, ILookupEnvironment env) {
     if (annotations == null || annotations.length < 1) {
       return ListOrderedSet.listOrderedSet(new HashSet<IAnnotation>(0));
     }
-    else {
-      List<IAnnotation> result = new ArrayList<>(annotations.length);
-      for (int i = 0; i < annotations.length; i++) {
-        result.add(new org.eclipse.scout.sdk.core.model.Annotation(annotations[i], scope, owner, i, env));
-      }
-      return ListOrderedSet.listOrderedSet(result);
+    List<IAnnotation> result = new ArrayList<>(annotations.length);
+    for (int i = 0; i < annotations.length; i++) {
+      result.add(new org.eclipse.scout.sdk.core.model.Annotation(annotations[i], scope, owner, i, env));
     }
+    return ListOrderedSet.listOrderedSet(result);
   }
 
   static boolean hasDeprecatedAnnotation(AnnotationBinding[] annotations) {

@@ -118,14 +118,12 @@ public final class TypeFilters {
         }
       };
     }
-    else {
-      return new Predicate<IType>() {
-        @Override
-        public boolean evaluate(IType type) {
-          return typeName.equalsIgnoreCase(type.getSimpleName());
-        }
-      };
-    }
+    return new Predicate<IType>() {
+      @Override
+      public boolean evaluate(IType type) {
+        return typeName.equalsIgnoreCase(type.getSimpleName());
+      }
+    };
   }
 
   /**

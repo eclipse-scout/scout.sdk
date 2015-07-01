@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
  */
 public class RowDataAutoUpdateHandler implements IDtoAutoUpdateHandler {
 
-  private DataAnnotation getDataAnnotationForType(IType model) {
+  private static DataAnnotation getDataAnnotationForType(IType model) {
 
     // direct column or table extension
     if (CoreUtils.isInstanceOf(model, IRuntimeClasses.IColumn) || CoreUtils.isInstanceOf(model, IRuntimeClasses.ITableExtension)) {

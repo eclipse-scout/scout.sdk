@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.dto.test.util;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -27,6 +26,7 @@ import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.s.util.ScoutUtils;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
 import org.eclipse.scout.sdk.core.testing.TestingUtils;
+import org.junit.Assert;
 
 /**
  *
@@ -39,15 +39,15 @@ public final class CoreScoutTestingUtils {
   private CoreScoutTestingUtils() {
   }
 
-  public static IType createPageDataAssertNoCompileErrors(String modelFqn) throws IOException {
+  public static IType createPageDataAssertNoCompileErrors(String modelFqn) {
     return createDtoAssertNoCompileErrors(modelFqn, false);
   }
 
-  public static IType createRowDataAssertNoCompileErrors(String modelFqn) throws IOException {
+  public static IType createRowDataAssertNoCompileErrors(String modelFqn) {
     return createDtoAssertNoCompileErrors(modelFqn, true);
   }
 
-  private static IType createDtoAssertNoCompileErrors(String modelFqn, boolean rowData) throws IOException {
+  private static IType createDtoAssertNoCompileErrors(String modelFqn, boolean rowData) {
     // get model type
     IType modelType = TestingUtils.getType(modelFqn, SOURCE_FOLDERS);
     DataAnnotation dataAnnotation = DtoUtils.findDataAnnotation(modelType);
@@ -71,7 +71,7 @@ public final class CoreScoutTestingUtils {
     return dtoIcu.getMainType();
   }
 
-  public static IType createFormDataAssertNoCompileErrors(String modelFqn) throws IOException {
+  public static IType createFormDataAssertNoCompileErrors(String modelFqn) {
     // get model type
     IType modelType = TestingUtils.getType(modelFqn, SOURCE_FOLDERS);
 
@@ -108,10 +108,10 @@ public final class CoreScoutTestingUtils {
         messageBuilder.append(" is '").append(memberOrderNr).append("'!");
         message = messageBuilder.toString();
       }
-      SdkAssert.fail(message);
+      Assert.fail(message);
     }
 
-    SdkAssert.assertEquals(message, memberOrderNr, orderNr);
+    Assert.assertEquals(message, memberOrderNr, orderNr);
   }
 
   /**

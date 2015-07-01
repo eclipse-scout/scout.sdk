@@ -60,11 +60,6 @@ public class FieldSourceBuilder extends AbstractAnnotatableSourceBuilder impleme
    * Use {@link SignatureUtils#getTypeReference(String, IImportValidator)} to determ class references (fully
    * qualified vs. simple name).
    *
-   * @param sourceBuilder
-   * @param lineDelimiter
-   * @param ownerProject
-   * @param validator
-   *          * validator can be used to determ class references (fully qualified vs. simple name).
    * @throws JavaModelException
    */
   protected void createInitValue(StringBuilder sourceBuilder, String lineDelimiter, PropertyMap context, IImportValidator validator) {

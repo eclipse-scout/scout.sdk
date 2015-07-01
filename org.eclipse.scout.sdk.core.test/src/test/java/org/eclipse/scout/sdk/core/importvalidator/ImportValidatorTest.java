@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.ImportTestClass;
 import org.eclipse.scout.sdk.core.model.ICompilationUnit;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.testing.TestingUtils;
 import org.junit.Assert;
@@ -30,7 +31,7 @@ import org.junit.Test;
 public class ImportValidatorTest {
 
   @Test
-  public void testJavaLangPackage() throws Exception {
+  public void testJavaLangPackage() {
     ImportValidator iv = new ImportValidator("test");
     String longName = iv.getTypeName(Signature.createTypeSignature(Long.class.getName()));
     Assert.assertEquals(Long.class.getSimpleName(), longName);
@@ -47,7 +48,7 @@ public class ImportValidatorTest {
   }
 
   @Test
-  public void testOwnPackage() throws Exception {
+  public void testOwnPackage() {
     ImportValidator iv = new ImportValidator("test.own.pck");
 
     String longName = iv.getTypeName(Signature.createTypeSignature(Long.class.getName()));
@@ -66,18 +67,18 @@ public class ImportValidatorTest {
   }
 
   @Test
-  public void testPrimitives() throws Exception {
+  public void testPrimitives() {
     ImportValidator iv = new ImportValidator("test");
 
-    String intName = iv.getTypeName(Signature.SIG_INT);
-    Assert.assertEquals(Signature.getSignatureSimpleName(Signature.SIG_INT), intName);
+    String intName = iv.getTypeName(ISignatureConstants.SIG_INT);
+    Assert.assertEquals(Signature.getSignatureSimpleName(ISignatureConstants.SIG_INT), intName);
 
     Set<String> importsToCreate = iv.getImportsToCreate();
     Assert.assertEquals(new TreeSet<>(), importsToCreate);
   }
 
   @Test
-  public void testNullPackage() throws Exception {
+  public void testNullPackage() {
     ImportValidator iv = new ImportValidator();
 
     String longName = iv.getTypeName(Signature.createTypeSignature(Long.class.getName()));
@@ -96,7 +97,7 @@ public class ImportValidatorTest {
   }
 
   @Test
-  public void testQualifiedPackage() throws Exception {
+  public void testQualifiedPackage() {
     ImportValidator iv = new ImportValidator("test");
 
     String longName = iv.getTypeName(Signature.createTypeSignature(Long.class.getName()));
@@ -115,7 +116,7 @@ public class ImportValidatorTest {
   }
 
   @Test
-  public void testWithInnerClasses() throws Exception {
+  public void testWithInnerClasses() {
     String sig = "La.b.c.MyClass$InnerClass$SecondInner;";
     ImportValidator iv = new ImportValidator("a.b.c");
     Assert.assertEquals("SecondInner", iv.getTypeName(sig));
@@ -123,7 +124,7 @@ public class ImportValidatorTest {
   }
 
   @Test
-  public void testIcuWithInnerClassesThatAlsoExistInOwnPackage() throws Exception {
+  public void testIcuWithInnerClassesThatAlsoExistInOwnPackage() {
     ICompilationUnit importTest = TestingUtils.getType(ImportTestClass.class.getName(), CoreTestingUtils.SOURCE_FOLDER).getCompilationUnit();
     ImportValidator iv = new ImportValidator(importTest);
 
@@ -132,7 +133,7 @@ public class ImportValidatorTest {
   }
 
   @Test
-  public void testWithDuplicateInOwnPackage() throws Exception {
+  public void testWithDuplicateInOwnPackage() {
     ImportValidator iv = new ImportValidator(CoreTestingUtils.getBaseClassIcu());
 
     // long on foreign package

@@ -33,7 +33,7 @@ import org.junit.Test;
  */
 public class TypeTest {
   @Test
-  public void testPrimaryType() throws Exception {
+  public void testPrimaryType() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
@@ -74,7 +74,7 @@ public class TypeTest {
   }
 
   @Test
-  public void testToString() throws Exception {
+  public void testToString() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
@@ -82,7 +82,7 @@ public class TypeTest {
   }
 
   @Test
-  public void testWildcard() throws Exception {
+  public void testWildcard() {
     IType wildcardType = TestingUtils.getType(WildcardChildClass.class.getName());
     IType returnType = wildcardType.getMethods().get(1).getReturnType();
     IType firstArg = returnType.getTypeArguments().get(0);
@@ -93,7 +93,7 @@ public class TypeTest {
   }
 
   @Test
-  public void testPrimaryTypeSuper() throws Exception {
+  public void testPrimaryTypeSuper() {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
@@ -152,13 +152,13 @@ public class TypeTest {
   }
 
   @Test
-  public void testInnerTypeDirectly() throws Exception {
+  public void testInnerTypeDirectly() {
     IType innerClass2 = TestingUtils.getType("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2");
     testInnerType(innerClass2);
   }
 
   @Test
-  public void testInnerTypeFromDeclaringType() throws Exception {
+  public void testInnerTypeFromDeclaringType() {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
@@ -166,7 +166,7 @@ public class TypeTest {
     testInnerType(innerClass2);
   }
 
-  private void testInnerType(IType innerClass2) throws Exception {
+  private void testInnerType(IType innerClass2) {
     Assert.assertNotNull(innerClass2);
 
     Assert.assertEquals(0, innerClass2.getArrayDimension());

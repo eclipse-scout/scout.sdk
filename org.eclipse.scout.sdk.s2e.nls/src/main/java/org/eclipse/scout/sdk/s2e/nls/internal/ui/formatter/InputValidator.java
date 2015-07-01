@@ -41,9 +41,7 @@ public final class InputValidator {
         if (value.length() > 0) {
           return Status.OK_STATUS;
         }
-        else {
-          return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, SWT.OK, "The default translation must be set.", null);
-        }
+        return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, SWT.OK, "The default translation must be set.", null);
       }
     };
   }
@@ -85,9 +83,7 @@ public final class InputValidator {
           if (e.getType() == INlsEntry.TYPE_LOCAL) {
             return new Status(IStatus.ERROR, NlsCore.PLUGIN_ID, SWT.OK, "A key '" + value + "' already exists!", null);
           }
-          else {
-            return new Status(IStatus.WARNING, NlsCore.PLUGIN_ID, SWT.OK, "The key '" + value + "' overrides an inherited entry.", null);
-          }
+          return new Status(IStatus.WARNING, NlsCore.PLUGIN_ID, SWT.OK, "The key '" + value + "' overrides an inherited entry.", null);
         }
       }
 

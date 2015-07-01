@@ -25,7 +25,7 @@ import org.junit.Test;
  */
 public class TypeParameterTest {
   @Test
-  public void testChildClassTypeParams() throws Exception {
+  public void testChildClassTypeParams() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
@@ -47,7 +47,7 @@ public class TypeParameterTest {
   }
 
   @Test
-  public void testToString() throws Exception {
+  public void testToString() {
     ITypeParameter childTypeParam = CoreTestingUtils.getChildClassType().getTypeParameters().get(0);
     Assert.assertFalse(StringUtils.isBlank(childTypeParam.toString()));
 
@@ -56,7 +56,7 @@ public class TypeParameterTest {
   }
 
   @Test
-  public void testBaseClassTypeParams() throws Exception {
+  public void testBaseClassTypeParams() {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 

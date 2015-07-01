@@ -72,7 +72,7 @@ public class AllDtoUpdateOperation implements IOperation {
     }
   }
 
-  private void processType(org.eclipse.jdt.core.IType jdtType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+  private void processType(org.eclipse.jdt.core.IType jdtType, IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) {
     try {
       IType t = jdtTypeToScoutType(jdtType);
       if (t == null) {

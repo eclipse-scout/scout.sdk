@@ -44,6 +44,7 @@ import org.eclipse.scout.sdk.core.model.MethodFilters;
 import org.eclipse.scout.sdk.core.model.PropertyBean;
 import org.eclipse.scout.sdk.core.model.TypeFilters;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 
@@ -216,23 +217,23 @@ public final class CoreUtils {
   public static String getDefaultValueOf(String parameter) {
     if (parameter.length() == 1) {
       switch (parameter.charAt(0)) {
-        case Signature.C_BOOLEAN:
+        case ISignatureConstants.C_BOOLEAN:
           return "true";
-        case Signature.C_BYTE:
+        case ISignatureConstants.C_BYTE:
           return "0";
-        case Signature.C_CHAR:
+        case ISignatureConstants.C_CHAR:
           return "0";
-        case Signature.C_DOUBLE:
+        case ISignatureConstants.C_DOUBLE:
           return "0";
-        case Signature.C_FLOAT:
+        case ISignatureConstants.C_FLOAT:
           return "0.0f";
-        case Signature.C_INT:
+        case ISignatureConstants.C_INT:
           return "0";
-        case Signature.C_LONG:
+        case ISignatureConstants.C_LONG:
           return "0";
-        case Signature.C_SHORT:
+        case ISignatureConstants.C_SHORT:
           return "0";
-        case Signature.C_VOID:
+        case ISignatureConstants.C_VOID:
           return null;
       }
     }

@@ -66,9 +66,7 @@ public class TranslationResourceEvent {
     if (m_subEvents == null) {
       return new TranslationResourceEvent[0];
     }
-    else {
-      return m_subEvents.toArray(new TranslationResourceEvent[m_subEvents.size()]);
-    }
+    return m_subEvents.toArray(new TranslationResourceEvent[m_subEvents.size()]);
   }
 
   public int getType() {
