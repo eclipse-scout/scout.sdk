@@ -1,86 +1,113 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Copyright (c) 2015 BSI Business Systems Integration AG.
-  All rights reserved. This program and the accompanying materials
-  are made available under the terms of the Eclipse Public License v1.0
-  which accompanies this distribution, and is available at
-  http://www.eclipse.org/legal/epl-v10.html
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-  Contributors:
-  BSI Business Systems Integration AG - initial API and implementation
--->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+	<modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.eclipse.scout.sdk.s2e</groupId>
-    <artifactId>org.eclipse.scout.sdk.s2e.parent</artifactId>
-    <version>5.1.0-SNAPSHOT</version>
-    <relativePath>../org.eclipse.scout.sdk.s2e.parent</relativePath>
-  </parent>
+	<parent>
+		<groupId>scout.sdk.s2e</groupId>
+		<artifactId>org.eclipse.scout.sdk.s2e.parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+	</parent>
 
-  <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-  <packaging>bundle</packaging>
+	<artifactId>org.eclipse.scout.sdk.s2e</artifactId>
+	<packaging>bundle</packaging>
 
-  <properties>
-    <bundle.symbolicName>${pom.artifactId}</bundle.symbolicName>
-    <bundle.namespace>${pom.artifactId}</bundle.namespace>
-    <bundle.version>5.1.0</bundle.version>
-  </properties>
+	<properties>
+		<bundle.symbolicName>org.eclipse.scout.sdk.s2e</bundle.symbolicName>
+		<package.namespace>org.eclipse.scout.sdk.s2e</package.namespace>
+		<package.version>0.0.1</package.version>
+	</properties>
 
-  <dependencies>
-    <!-- Build Dependencies -->
-    <!-- Build Dependencies (Provided) -->
-    <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.jdt.core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
+	<dependencies>
+		<dependency>
+			<artifactId>org.eclipse.scout.sdk.core.s</artifactId>
+			<groupId>scout.sdk</groupId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.core</groupId>
+			<artifactId>org.eclipse.core.runtime</artifactId>
+			<version>[3.7.0,4.0.0)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.core</groupId>
+			<artifactId>org.eclipse.core.resources</artifactId>
+			<version>[3.7.100,4.0.0)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.core</groupId>
+			<artifactId>org.eclipse.core.jobs</artifactId>
+			<version>[3.5.100,4.0.0)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.core</groupId>
+			<artifactId>org.eclipse.core.jobs</artifactId>
+			<version>[3.5.100,4.0.0)</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.osgi</groupId>
+			<artifactId>org.eclipse.osgi</artifactId>
+			<version>3.7.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.jdt</groupId>
+			<artifactId>org.eclipse.jdt.core</artifactId>
+			<version>3.7.1</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse.equinox</groupId>
+			<artifactId>preferences</artifactId>
+			<version>3.5.200-v20140224-1527</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <configuration>
-          <instructions>
-            <Import-Package>
-              !javax.*,
-              org.eclipse.jdt.*;version="[3.10,4)",
-              org.eclipse.core.resources.*;version="[3.9,4)",
-              org.eclipse.core.runtime.jobs.*;version="[3.10,4)",
-              org.eclipse.jface.*;version="[3.10,4)",
-              org.eclipse.text.*;version="[3.5,4)",
-              *
-            </Import-Package>
-            <Bundle-Activator>org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator</Bundle-Activator>
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.felix</groupId>
+				<artifactId>maven-bundle-plugin</artifactId>
+				<configuration>
+					<instructions>
+						<Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
+						<Import-Package>
+							!org.apache.tools.*,
+							!javax.*,
+							!org.eclipse.core.runtime.*,
+							!org.eclipse.jdt.core.*,
+							!org.osgi.framework.*,
+							!org.w3c.dom
+						</Import-Package>
+						<Export-Package>
+							${package.namespace}.internal.*;version="${package.version}";x-friends:="${bundle.symbolicName}.test",
+							${package.namespace}.*;version="${package.version}"
+						</Export-Package>
+						<_exportcontents>
+							!about.html,
+							!ecj.1,
+							!org.apache.commons.io.*,
+							!org.eclipse.jdt.*,
+							org.eclipse.jdt.*;version="4.4.2",
+							*
+						</_exportcontents>
+						<Require-Bundle>
+							org.eclipse.core.runtime;bundle-version="[3.7.0,4.0.0)";visibility:=reexport,
+							org.eclipse.core.resources;bundle-version="[3.7.100,4.0.0)";visibility:=reexport,
+							org.eclipse.jdt.core;bundle-version="[3.7.1,4.0.0)";visibility:=reexport,
+							org.eclipse.text;bundle-version="[3.5.0,4.0.0)";visibility:=reexport
+						</Require-Bundle>
+						<Bundle-Activator>org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator</Bundle-Activator>
+					</instructions>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 
-            <!-- embed compile/runtime dependencies using path that matches the copied dependency folder -->
-            <Embed-Dependency>*;scope=compile|runtime</Embed-Dependency>
-            <Embed-Transitive>false</Embed-Transitive>
-            <_exportcontents>
-              !org.apache.commons.*,
-              org.eclipse.scout.sdk.core.*;version="${bundle.version}",
-              *
-            </_exportcontents>
 
-            <Embed-StripVersion>false</Embed-StripVersion>
-            <Embed-StripGroup>true</Embed-StripGroup>
-            <Embed-Directory>lib</Embed-Directory>
-
-            <Eclipse-BundleShape>dir</Eclipse-BundleShape>
-          </instructions>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 </project>

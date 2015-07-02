@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Scout SDK
+Bundle-SymbolicName: org.eclipse.scout.sdk.s2e.ui;singleton:=true
+Bundle-Version: 0.0.1.SNAPSHOT
+Bundle-Activator: org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator
+Require-Bundle: org.eclipse.scout.sdk.s2e;bundle-version="[0.0.1,1.0.0)";visibility:=reexport,
+ org.eclipse.ui;bundle-version="[3.7.0,4.0.0)";visibility:=reexport,
+ org.eclipse.jface.text;bundle-version="[3.7.2,4.0.0)";visibility:=reexport,
+ org.eclipse.jdt.ui;bundle-version="[3.7.2,4.0.0)";visibility:=reexport
+Bundle-RequiredExecutionEnvironment: JavaSE-1.7
+Export-Package: org.eclipse.scout.sdk.s2e.ui.internal;version="0.0.1";x-friends:="org.eclipse.scout.sdk.s2e.ui.test",
+ org.eclipse.scout.sdk.s2e.ui.internal.preference;version="0.0.1";x-friends:="org.eclipse.scout.sdk.s2e.ui.test",
+ org.eclipse.scout.sdk.s2e.ui.internal.util;version="0.0.1";x-friends:="org.eclipse.scout.sdk.s2e.ui.test"
+Bundle-ActivationPolicy: lazy

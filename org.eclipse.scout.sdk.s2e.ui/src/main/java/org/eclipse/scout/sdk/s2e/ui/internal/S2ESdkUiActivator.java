@@ -253,6 +253,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     }
 
     @Override
+    @SuppressWarnings("restriction")
     protected IStatus run(IProgressMonitor monitor) {
       Job[] dtoUpdateJobs = null;
       while (!monitor.isCanceled()) {
