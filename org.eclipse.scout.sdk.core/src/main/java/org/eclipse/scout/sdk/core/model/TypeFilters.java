@@ -10,15 +10,13 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
-import java.util.HashSet;
-import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.apache.commons.collections4.Predicate;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 
 /**
- *
+ * Contains {@link Predicate}s for {@link IType}s.
  */
 public final class TypeFilters {
 
@@ -64,15 +62,14 @@ public final class TypeFilters {
   private TypeFilters() {
   }
 
-  public static Predicate<IType> invertFilter(final Predicate<IType> filter) {
-    return new Predicate<IType>() {
-      @Override
-      public boolean evaluate(IType type) {
-        return !filter.evaluate(type);
-      }
-    };
-  }
-
+  /**
+   * Creates and gets a {@link Predicate} that evaluates to <code>true</code> for all {@link IType}s that are
+   * <code>instanceof</code> the given fully qualified name.
+   *
+   * @param type
+   *          The fully qualified type name the candidates must be <code>instanceof</code>.
+   * @return The created {@link Predicate}
+   */
   public static Predicate<IType> getSubtypeFilter(final String type) {
     return new Predicate<IType>() {
       @Override
@@ -82,14 +79,21 @@ public final class TypeFilters {
     };
   }
 
+  /**
+   * Creates and gets a {@link Predicate} that evaluates to <code>true</code> for all {@link IType}s that are
+   * <code>instanceof</code> the given {@link IType}.
+   *
+   * @param type
+   *          The super {@link IType}.
+   * @return The created {@link Predicate}
+   */
   public static Predicate<IType> getSubtypeFilter(IType type) {
     return getSubtypeFilter(type.getName());
   }
 
   /**
-   * Creates a new {@link Predicate<IType>} that only returns {@link IType}s where the simple name exactly matches the
-   * given
-   * typeName.
+   * Creates a new {@link Predicate} that only returns {@link IType}s where the simple name exactly matches the
+   * given typeName.
    *
    * @param typeName
    *          The simple name the types must have.
@@ -100,14 +104,14 @@ public final class TypeFilters {
   }
 
   /**
-   * Creates a new {@link Predicate<IType>} that only returns {@link IType}s where the simple name matches the given
+   * Creates a new {@link Predicate} that only returns {@link IType}s where the simple name matches the given
    * typeName.
    *
    * @param typeName
    *          The simple name the types must have.
    * @param caseSensitive
    *          {@code true} if case-sensitive comparison should be performed, {@code false} otherwise.
-   * @return The newly created {@link Predicate<IType>}
+   * @return The newly created {@link Predicate}
    */
   public static Predicate<IType> getElementNameFilter(final String typeName, boolean caseSensitive) {
     if (caseSensitive) {
@@ -127,8 +131,8 @@ public final class TypeFilters {
   }
 
   /**
-   * Creates and gets a new type filter that accepts all types where the simple name matches the given regex with the
-   * given regex flags.
+   * Creates and gets a new {@link Predicate} that accepts all types where the simple name matches the given regular
+   * expression with the given expression flags.
    *
    * @param regex
    *          The expression to use
@@ -137,6 +141,7 @@ public final class TypeFilters {
    *          {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ},
    *          {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL} and {@link Pattern#COMMENTS}
    * @return the created filter
+   * @see Pattern
    */
   public static Predicate<IType> getRegexSimpleNameFilter(final String regex, int regexFlags) {
     final Pattern pat = Pattern.compile(regex, regexFlags);
@@ -149,34 +154,31 @@ public final class TypeFilters {
   }
 
   /**
-   * Creates and gets a new type filter that accepts all types where the simple name matches the given regex pattern.<br>
+   * Creates and gets a new {@link Predicate} that accepts all types where the simple name matches the given regular
+   * expression.
+   * <br>
    * <b>Note: The given regex uses case-insensitive matching!</b>
    *
    * @param regex
    *          The regex to use for the matching.
    * @return the created filter
+   * @see Pattern#CASE_INSENSITIVE
    */
   public static Predicate<IType> getRegexSimpleNameFilter(final String regex) {
     return getRegexSimpleNameFilter(regex, Pattern.CASE_INSENSITIVE);
   }
 
+  /**
+   * Gets a {@link Predicate} that only accepts primary types (having {@link IType#getDeclaringType()} == null).
+   * 
+   * @return The primary type {@link Predicate}.
+   */
   public static Predicate<IType> getPrimaryTypeFilter() {
     return TOP_LEVEL_FILTER;
   }
 
-  public static Predicate<IType> getInnerClasses(final IType declaringType) {
-    return new Predicate<IType>() {
-      @Override
-      public boolean evaluate(IType candidate) {
-        IType candidateDeclaringType = candidate.getDeclaringType();
-        return candidateDeclaringType != null && candidateDeclaringType.equals(declaringType) && isClass(candidate);
-      }
-    };
-  }
-
   /**
-   * Creates a new {@link Predicate<IType>} that accepts all {@link IType}s that have at least all of the given flags
-   * set.
+   * Creates a new {@link Predicate} that accepts all {@link IType}s that have at least all of the given flags.
    *
    * @param flags
    *          The flags of the types.
@@ -193,31 +195,19 @@ public final class TypeFilters {
   }
 
   /**
-   * Gets a filter that accepts only types that are classes.<br>
-   * A class is defined as a type that is neither abstract, an interface or deprecated.
+   * Gets a {@link Predicate} that accepts only types that are classes.<br>
+   * A class is defined as a type that is neither anonymous, abstract, an interface or deprecated.
    *
-   * @return The filter that only accepts classes.
+   * @return The {@link Predicate} that only accepts classes.
    * @see #isClass(IType)
    */
   public static Predicate<IType> getClassFilter() {
     return CLASS_FILTER;
   }
 
-  public static Predicate<IType> getNotInTypes(IType... excludedTypes) {
-    Set<IType> excludedSet = null;
-    if (excludedTypes != null) {
-      excludedSet = new HashSet<>(excludedTypes.length);
-      for (IType t : excludedTypes) {
-        if (t != null) {
-          excludedSet.add(t);
-        }
-      }
-    }
-    return getNotInTypes(excludedSet);
-  }
-
   /**
-   * Returns an {@link Predicate<IType>} that accepts all {@link IType}s that have no surrounding context {@link IType}.<br>
+   * Returns an {@link Predicate} that accepts all {@link IType}s that have no surrounding context {@link IType}.
+   * <br>
    * More formally: Accepts all {@link IType}s that are either static or primary types (= have no declaring type).
    *
    * @return an {@link Predicate<IType>} that accepts all {@link IType}s that have no surrounding context {@link IType}.
@@ -226,30 +216,23 @@ public final class TypeFilters {
     return NO_SURROUNDING_CONTEXT_TYPE_FILTER;
   }
 
-  public static Predicate<IType> getNotInTypes(final Set<IType> excludedTypes) {
-    if (excludedTypes == null || excludedTypes.size() < 1) {
-      return null; // no filter required
-    }
-
-    return new Predicate<IType>() {
-      @Override
-      public boolean evaluate(IType type) {
-        return !excludedTypes.contains(type);
-      }
-    };
-  }
-
+  /**
+   * Gets a {@link Predicate} that only accepts interface {@link IType}s.
+   * 
+   * @return The {@link Predicate} only accepting interfaces.
+   */
   public static Predicate<IType> getInterfaceFilter() {
     return INTERFACE_FILTER;
   }
 
   /**
    * Gets if the given type is a class.<br>
-   * A class is defined as a type that is neither an anonymous, abstract, interface or deprecated type.
+   * A class is defined as a type that is neither an anonymous, abstract, interface or a deprecated type.
    *
    * @param type
    *          The type to check
-   * @return true if the given type has none of the following flags: abstract, interface, deprecated
+   * @return true if the given type is not anonymous and has none of the following flags: abstract, interface,
+   *         deprecated
    * @see Flags#isAbstract(int)
    * @see Flags#isInterface(int)
    * @see Flags#isDeprecated(int)
@@ -264,7 +247,7 @@ public final class TypeFilters {
   }
 
   /**
-   * @return An {@link Predicate<IType>} that only accepts {@link IType}s that are not parameterized (have not
+   * @return An {@link Predicate} that only accepts {@link IType}s that are not parameterized (have not
    *         generics).
    */
   public static Predicate<IType> getNoGenericTypesFilter() {
@@ -272,7 +255,7 @@ public final class TypeFilters {
   }
 
   /**
-   * @return An {@link Predicate<IType>} that accepts all non-abstract and non-deprecated {@link Enum}s.
+   * @return An {@link Predicate} that accepts all non-abstract and non-deprecated {@link Enum}s.
    */
   public static Predicate<IType> getEnumTypesFilter() {
     return ENUM_TYPE_FILTER;
@@ -303,11 +286,27 @@ public final class TypeFilters {
     };
   }
 
+  /**
+   * Gets a {@link Predicate} which evaluates to <code>true</code> if at least one of the given not-null
+   * {@link Predicate}s evaluates to <code>true</code>.
+   * 
+   * @param filters
+   *          The {@link Predicate}s to evaluate.
+   * @return The created {@link Predicate}.
+   */
   @SafeVarargs
   public static Predicate<IType> getMultiFilterOr(final Predicate<IType>... filters) {
     return getMultiFilter(true, filters);
   }
 
+  /**
+   * Gets a {@link Predicate} which evaluates to <code>true</code> if all the given not-null {@link Predicate}s evaluate
+   * to <code>true</code>.
+   * 
+   * @param filters
+   *          The {@link Predicate}s to evaluate.
+   * @return The created {@link Predicate}.
+   */
   @SafeVarargs
   public static Predicate<IType> getMultiFilterAnd(final Predicate<IType>... filters) {
     return getMultiFilter(false, filters);

@@ -32,7 +32,7 @@ public final class UniqueIdExtensionPoint {
   private static final String ATTRIB_PRIO = "priority";
 
   private static final Object CODE_ID_PROV_LOCK = new Object();
-  private static volatile List<ICodeIdProvider> codeIdProviderExtensions;
+  private static volatile List<IUniqueIdProvider> codeIdProviderExtensions;
 
   private UniqueIdExtensionPoint() {
   }
@@ -40,11 +40,11 @@ public final class UniqueIdExtensionPoint {
   /**
    * @return all extensions in the prioritized order.
    */
-  private static List<ICodeIdProvider> getCodeIdProviderExtensions() {
+  private static List<IUniqueIdProvider> getCodeIdProviderExtensions() {
     if (codeIdProviderExtensions == null) {
       synchronized (CODE_ID_PROV_LOCK) {
         if (codeIdProviderExtensions == null) {
-          Map<CompositeObject, ICodeIdProvider> providers = new TreeMap<>();
+          Map<CompositeObject, IUniqueIdProvider> providers = new TreeMap<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(S2ESdkActivator.PLUGIN_ID, EXTENSION_POINT_NAME);
           IExtension[] extensions = xp.getExtensions();
@@ -53,7 +53,7 @@ public final class UniqueIdExtensionPoint {
             for (IConfigurationElement providerElememt : providerElememts) {
               if (CODE_ID_PROVIDER_EXT_NAME.equals(providerElememt.getName())) {
                 try {
-                  ICodeIdProvider provider = (ICodeIdProvider) providerElememt.createExecutableExtension(ATTRIB_CLASS);
+                  IUniqueIdProvider provider = (IUniqueIdProvider) providerElememt.createExecutableExtension(ATTRIB_CLASS);
                   providers.put(new CompositeObject(getPriority(providerElememt), provider.getClass().getName()), provider);
                 }
                 catch (Exception t) {
@@ -81,8 +81,18 @@ public final class UniqueIdExtensionPoint {
     return priority;
   }
 
+  /**
+   * Gets the next unique id from the first {@link IUniqueIdProvider} which provides a non-null value for the given
+   * input.
+   * 
+   * @param context
+   *          Properties describing the calling context.
+   * @param genericSignature
+   *          Signature describing the requested data type.
+   * @return The unique id or <code>null</code>.
+   */
   public static String getNextUniqueId(PropertyMap context, String genericSignature) {
-    for (ICodeIdProvider p : getCodeIdProviderExtensions()) {
+    for (IUniqueIdProvider p : getCodeIdProviderExtensions()) {
       try {
         String value = p.getNextId(context, genericSignature);
         if (value != null) {

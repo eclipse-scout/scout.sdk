@@ -17,13 +17,20 @@ import org.apache.commons.collections4.functors.TruePredicate;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 
 /**
- *
+ * Contains {@link Predicate}s for {@link IMethod}s.
  */
 public final class MethodFilters {
 
   private MethodFilters() {
   }
 
+  /**
+   * Creates and gets a filter accepting all {@link IMethod}s having an annotation with given annotation name.
+   * 
+   * @param annotationTypeFqn
+   *          The fully qualified annotation name.
+   * @return The new created {@link Predicate}.
+   */
   public static Predicate<IMethod> getFilterWithAnnotation(final String annotationTypeFqn) {
     return new Predicate<IMethod>() {
       @Override
@@ -41,8 +48,11 @@ public final class MethodFilters {
   }
 
   /**
+   * Creates and gets a filter accepting all {@link IMethod}s having the given method name.
+   * 
    * @param methodName
-   * @return a filter stop iterating after the first method name match
+   *          The method name
+   * @return The new created {@link Predicate}.
    */
   public static Predicate<IMethod> getNameFilter(final String methodName) {
     return new Predicate<IMethod>() {
@@ -63,6 +73,14 @@ public final class MethodFilters {
     };
   }
 
+  /**
+   * Creates and gets a filter accepting all {@link IMethod}s whose method name matches the given regular expression.
+   * 
+   * @param regex
+   *          The regular expression pattern
+   * @return The new created {@link Predicate}.
+   * @see Pattern
+   */
   public static Predicate<IMethod> getNameRegexFilter(final Pattern regex) {
     return new Predicate<IMethod>() {
       @Override
@@ -83,11 +101,11 @@ public final class MethodFilters {
   }
 
   /**
-   * Gets and creates a method filter that accepts all methods having ALL of the given flags
+   * Creates and gets a method filter that accepts all methods having ALL of the given flags
    *
    * @param flags
    *          The flags that each accepted method must have.
-   * @return
+   * @return The new created {@link Predicate}.
    */
   public static Predicate<IMethod> getFlagsFilter(final int flags) {
     return new Predicate<IMethod>() {
@@ -108,10 +126,11 @@ public final class MethodFilters {
   }
 
   /**
-   * creates and gets a filter that accepts all methods that fulfill all the given filters (AND).
+   * Creates and gets a filter that accepts all methods that fulfill all the given filters (AND).
    *
    * @param filters
-   * @return
+   *          The filters that all must be accepted.
+   * @return The new created {@link Predicate}.
    */
   @SafeVarargs
   public static Predicate<IMethod> getMultiMethodFilter(final Predicate<IMethod>... filters) {

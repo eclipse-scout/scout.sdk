@@ -11,13 +11,27 @@
 package org.eclipse.scout.sdk.core.s;
 
 /**
- *
+ * Defaults used for scout objects
  */
 public interface ISdkProperties {
   String SUFFIX_FORM_FIELD = "Field";
   String SUFFIX_BUTTON = "Button";
   String SUFFIX_TABLE_COLUMN = "Column";
   String SUFFIX_OUTLINE_PAGE = "Page";
+  String SUFFIX_FORM_HANDLER = "Handler";
 
   String CONTEXT_PROPERTY_JAVA_PROJECT = "JavaProject";
+
+  /**
+   * The default order of scout elements.
+   * <p>
+   * The value of this constant is "rather large, but not <i>that</i> large". For most projects it is the biggest of all
+   * orders. But it is not as big that precision is lost during calculations due to the IEEE floating point arithmetic.
+   * In particular, subtracting {@link #DEFAULT_ORDER_STEP} from this value must result in a different number (which,
+   * for example, would not be the case for {@link Double#MAX_VALUE}). As a rule of thumb, this number should be smaller
+   * than {@link Long#MAX_VALUE}.<br>
+   * Must match the default order number used in the Scout runtime. See
+   * org.eclipse.scout.commons.annotations.IOrdered.DEFAULT_ORDER
+   */
+  double DEFAULT_ORDER = 98765432123456789d;
 }

@@ -21,7 +21,7 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 
 /**
- * Extended job
+ * Extended job which adds the following features:
  * <ul>
  * <li>access to canceled property</li>
  * <li>access to progress monitor</li>
@@ -103,7 +103,7 @@ public abstract class JobEx extends Job {
   }
 
   /**
-   * @return {@link #isCanceled()} property iff the current job is of instance {@link ClientJob}
+   * @return {@link #isCanceled()} property if the current job is of instance {@link JobEx}
    */
   public static boolean isCurrentJobCanceled() {
     Job job = getJobManager().currentJob();

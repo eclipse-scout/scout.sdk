@@ -15,7 +15,10 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * used in sorted maps and sets when dealing with composite sorting criteria
+ * <h3>{@link CompositeObject}</h3>
+ * Composite object used to sort and compare compositions of objects.
+ *
+ * @since 5.1.0
  */
 public class CompositeObject implements Comparable<CompositeObject>, Serializable {
   private static final long serialVersionUID = 0L;

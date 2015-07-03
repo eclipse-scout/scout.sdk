@@ -11,27 +11,43 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
+ * <h3>{@link IAnnotationValue}</h3>
  *
+ * @author Matthias Villiger
+ * @since 5.1.0
  */
 public interface IAnnotationValue {
 
   /**
-   * @return
+   * Gets the name of the annotation attribute this {@link IAnnotationValue} belongs to.
+   *
+   * @return The name of the annotation attribute this {@link IAnnotationValue} belongs to. Never returns
+   *         <code>null</code>.
    */
   String getName();
 
   /**
-   * @return
+   * Gets the value of the annotation attribute. The data type of the value returned is defined by
+   * {@link #getValueType()}.
+   *
+   * @return The real value of the annotation attribute or <code>null</code> if the value cannot be parsed.
+   * @see ExpressionValueType
+   * @see #getValueType()
    */
   Object getValue();
 
   /**
-   * @return
+   * Gets the data type of this {@link IAnnotationValue}. If the data type cannot be determined, this method returns
+   * {@link ExpressionValueType#Unknown}.
+   *
+   * @return The data type of this {@link IAnnotationValue}. Never returns <code>null</code>.
    */
   ExpressionValueType getValueType();
 
   /**
-   * @return
+   * Gets the {@link IAnnotation} this {@link IAnnotationValue} belongs to.
+   * 
+   * @return The owner {@link IAnnotation}
    */
   IAnnotation getOwnerAnnotation();
 

@@ -23,6 +23,12 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * <h3>{@link BasicPropertySupport}</h3>
+ * Property map supporting property change event listeners.
+ *
+ * @since 5.1.0
+ */
 public class BasicPropertySupport {
 
   public static final int DEFAULT_INT_VALUE = 0;
@@ -217,7 +223,7 @@ public class BasicPropertySupport {
     return setProperty(name, newValue, null);
   }
 
-  public boolean/* changed */setPropertyNoFire(String name, Object newValue) {
+  public boolean/* changed */ setPropertyNoFire(String name, Object newValue) {
     Object oldValue = m_props.get(name);
     m_props.put(name, newValue);
     return !Objects.equals(oldValue, newValue);

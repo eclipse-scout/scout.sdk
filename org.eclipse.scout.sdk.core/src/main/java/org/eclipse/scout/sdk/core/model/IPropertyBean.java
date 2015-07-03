@@ -10,31 +10,42 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
-import java.beans.PropertyDescriptor;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 
 /**
- * Description of a Java bean property. This is a dual class to Java's {@link PropertyDescriptor}.
+ * <h3>{@link IPropertyBean}</h3>
+ * Description of a Java bean property.<br>
+ * <br>
+ * Use {@link CoreUtils#getPropertyBeans(IType, org.apache.commons.collections4.Predicate, java.util.Comparator)} to get
+ * {@link IPropertyBean}s.
+ *
+ * @author Andreas Hoegger
+ * @since 3.0.0
+ * @see CoreUtils#getPropertyBeans(IType, org.apache.commons.collections4.Predicate, java.util.Comparator)
  */
 public interface IPropertyBean {
   /**
-   * @return Returns the declaring type that is hosting this property bean.
+   * @return The declaring type that is hosting this property bean.
    */
   IType getDeclaringType();
 
   /**
-   * @return Returns the property's getter method or <code>null</code> if it is write-only.
+   * @return The property's getter method or <code>null</code> if it is write-only.
    */
   IMethod getReadMethod();
 
   /**
-   * @return Returns the property's setter method or <code>null</code> if it is read-only.
+   * @return The property's setter method or <code>null</code> if it is read-only.
    */
   IMethod getWriteMethod();
 
   /**
-   * @return Returns the bean's name.
+   * @return The bean's name.
    */
   String getBeanName();
 
+  /**
+   * @return The data type of the bean.
+   */
   IType getBeanType();
 }

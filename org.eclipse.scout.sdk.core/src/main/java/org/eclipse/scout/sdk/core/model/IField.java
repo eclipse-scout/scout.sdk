@@ -11,17 +11,26 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
+ * <h3>{@link IField}</h3>
+ * Represents a field in a java type.
  *
+ * @author Matthias Villiger
+ * @since 5.1.0
  */
 public interface IField extends IMember {
 
   /**
-   * @return
+   * Gets the constant value of this {@link IField}.<br>
+   * Please note: The field must be initialized with a constant value so that it can be retrieved using this method.
+   *
+   * @return The constant value of this {@link IField} if it can be computed or <code>null</code> otherwise.
    */
   Object getValue();
 
   /**
-   * @return
+   * Gets the data type of this {@link IField}.
+   * 
+   * @return The {@link IType} describing the data type of this {@link IField}. Never returns <code>null</code>.
    */
   IType getDataType();
 

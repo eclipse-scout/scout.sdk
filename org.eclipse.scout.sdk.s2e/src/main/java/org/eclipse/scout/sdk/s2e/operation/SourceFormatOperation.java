@@ -73,7 +73,6 @@ public class SourceFormatOperation implements IOperation {
     if (getDocument() == null) {
       throw new IllegalArgumentException("document can not be null.");
     }
-
   }
 
   @Override

@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.core.s;
 
 /**
- *
+ * Enums used in annotations of the scout runtime.
  */
 public final class AnnotationEnums {
   private AnnotationEnums() {

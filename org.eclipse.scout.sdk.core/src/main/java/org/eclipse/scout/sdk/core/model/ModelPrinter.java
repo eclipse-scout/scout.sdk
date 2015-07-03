@@ -16,7 +16,7 @@ import org.apache.commons.collections4.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
 
 /**
- *
+ * Helper class to print the model objects
  */
 public final class ModelPrinter {
   private ModelPrinter() {

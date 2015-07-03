@@ -13,10 +13,11 @@ package org.eclipse.scout.sdk.core.s.model;
 import java.util.Comparator;
 
 import org.eclipse.scout.sdk.core.model.IType;
+import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.util.ScoutUtils;
 
 /**
- *
+ * Holds scout {@link Comparator}s comparing {@link IType}s
  */
 public final class ScoutTypeComparators {
   private ScoutTypeComparators() {
@@ -25,26 +26,31 @@ public final class ScoutTypeComparators {
   protected static final Comparator<IType> ORDER_ANNOTATION_COMPARATOR = new Comparator<IType>() {
     @Override
     public int compare(IType t1, IType t2) {
-      Double val1 = getOrderAnnotationValue(t1);
-      Double val2 = getOrderAnnotationValue(t2);
-      int result = val1.compareTo(val2);
+      double val1 = getOrderAnnotationValue(t1);
+      double val2 = getOrderAnnotationValue(t2);
+      int result = Double.compare(val1, val2);
       if (result != 0) {
         return result;
       }
       return t1.getName().compareTo(t2.getName());
     }
 
-    private Double getOrderAnnotationValue(IType type) {
+    private double getOrderAnnotationValue(IType type) {
       if (type != null) {
         Double order = ScoutUtils.getOrderAnnotationValue(type);
         if (order != null) {
-          return order;
+          return order.doubleValue();
         }
       }
-      return Double.MAX_VALUE; // scout runtime returns max_value when no order annotation can be found.
+      return ISdkProperties.DEFAULT_ORDER; // default order of the scout runtime
     }
   };
 
+  /**
+   * Gets a {@link Comparator} that sorts {@link IType}s by their @Order annotation value.
+   *
+   * @return The order annotation value comparator.
+   */
   public static Comparator<IType> getOrderAnnotationComparator() {
     return ORDER_ANNOTATION_COMPARATOR;
   }

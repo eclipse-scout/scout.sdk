@@ -11,14 +11,23 @@
 package org.eclipse.scout.sdk.core.util;
 
 /**
- * Optimistic locking with one accepted writer in critical section usage for
- * writers with access check is as follows: try{ if(lock.acquire()){ ... } }
- * finally{ lock.release(); } usage for writers with no access check is as
- * follows: try{ lock.acquire() ... } finally{ lock.release(); } usage for
- * tester is as follows: if(lock.isAcquired()){ ... } or if(lock.isReleased()){
- * ... }
+ * Optimistic locking with one accepted writer in critical section.<br>
+ * <br>
+ * Usage for writers with access check is as follows:<br>
+ * <code>
+ * try{ if(lock.acquire()){ ... } }<br>
+ * finally{ lock.release(); }
+ * </code><br>
+ * <br>
+ * Usage for writers with no access check is as follows:<br>
+ * <code>try{ lock.acquire() ... } finally{ lock.release(); }</code>
+ * <br>
+ * Usage for tester is as follows:<br>
+ * <code>
+ *  if(lock.isAcquired()){ ... } or if(lock.isReleased()){ ... }
+ * </code>
  */
-public class OptimisticLock {
+public final class OptimisticLock {
   private int m_lockCount = 0;
 
   /**
@@ -33,15 +42,15 @@ public class OptimisticLock {
     return false;
   }
 
-  public void release() {
+  public synchronized void release() {
     m_lockCount--;
   }
 
-  public boolean isAcquired() {
+  public synchronized boolean isAcquired() {
     return m_lockCount > 0;
   }
 
-  public boolean isReleased() {
+  public synchronized boolean isReleased() {
     return m_lockCount <= 0;
   }
 

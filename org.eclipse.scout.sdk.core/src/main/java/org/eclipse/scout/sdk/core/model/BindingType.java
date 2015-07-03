@@ -120,7 +120,13 @@ public class BindingType implements IType {
   @Override
   public IPackage getPackage() {
     if (m_package == null) {
-      m_package = new Package(new String(m_tb.qualifiedPackageName()));
+      char[] qualifiedPackageName = m_tb.qualifiedPackageName();
+      if (qualifiedPackageName == null || qualifiedPackageName.length < 1) {
+        m_package = IPackage.DEFAULT_PACKAGE;
+      }
+      else {
+        m_package = new Package(new String(qualifiedPackageName));
+      }
     }
     return m_package;
   }

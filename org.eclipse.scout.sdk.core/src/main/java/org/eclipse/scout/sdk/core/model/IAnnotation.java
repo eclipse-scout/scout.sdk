@@ -13,28 +13,44 @@ package org.eclipse.scout.sdk.core.model;
 import org.apache.commons.collections4.map.ListOrderedMap;
 
 /**
+ * <h3>{@link IAnnotation}</h3>
  *
+ * @author Matthias Villiger
+ * @since 5.1.0
  */
 public interface IAnnotation {
 
   /**
-   * @return
+   * Gets all attributes of this {@link IAnnotation}.<br>
+   * The {@link ListOrderedMap} iterates over the attributes in the order as they appear in the source or class file.
+   *
+   * @return A {@link ListOrderedMap} containing the attribute name ({@link IAnnotationValue#getName()}) as key and the
+   *         {@link IAnnotationValue} as value. Never returns <code>null</code>.
    */
   ListOrderedMap<String, IAnnotationValue> getValues();
 
   /**
+   * Gets the {@link IAnnotationValue} of the annotation attribute with the given name.
+   *
    * @param name
-   * @return
+   *          The name of the {@link IAnnotationValue} to return.
+   * @return The {@link IAnnotationValue} with the given name or <code>null</code> if no attribute with given name
+   *         exists.
    */
   IAnnotationValue getValue(String name);
 
   /**
-   * @return
+   * Gets the object on which this {@link IAnnotation} is defined.
+   *
+   * @return The owner {@link IAnnotatable} of this {@link IAnnotation}. Never returns <code>null</code>.
    */
   IAnnotatable getOwner();
 
   /**
-   * @return
+   * Gets the annotation definition {@link IType}.<br>
+   * Returns e.g. the type {@link Override}.
+   *
+   * @return The annotation definition type. Never returns <code>null</code>.
    */
   IType getType();
 }

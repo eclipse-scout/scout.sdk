@@ -49,10 +49,17 @@ import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 
 /**
+ * <h3>{@link CoreUtils}</h3>
+ * Holds core utilities.
  *
+ * @author Matthias Villiger
+ * @since 5.1.0
  */
 public final class CoreUtils {
 
+  /**
+   * Regular expression matching bean method names (is..., get..., set...)
+   */
   public static final Pattern BEAN_METHOD_NAME = Pattern.compile("(get|set|is)([A-Z].*)");
   private static final ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<>();
   private static volatile Set<String> javaKeyWords = null;
@@ -61,7 +68,7 @@ public final class CoreUtils {
   }
 
   /**
-   * converts the given string into a string literal with leading and ending double-quotes including escaping of the
+   * Converts the given string into a string literal with leading and ending double-quotes including escaping of the
    * given string.<br>
    *
    * @param s
@@ -184,6 +191,13 @@ public final class CoreUtils {
     return sb.toString();
   }
 
+  /**
+   * Gets a one line comment block with given text
+   *
+   * @param content
+   *          The text content
+   * @return The comment line.
+   */
   public static String getCommentBlock(String content) {
     StringBuilder builder = new StringBuilder();
     builder.append("// TODO ");
@@ -214,32 +228,45 @@ public final class CoreUtils {
     return name;
   }
 
+  /**
+   * Gets the default value for the given signature data type.
+   *
+   * @param parameter
+   *          The signature data type for which the default return value should be returned.
+   * @return A {@link String} or <code>null</code> (for the void signature) holding the default value for the given data
+   *         type.
+   */
   public static String getDefaultValueOf(String parameter) {
-    if (parameter.length() == 1) {
-      switch (parameter.charAt(0)) {
-        case ISignatureConstants.C_BOOLEAN:
-          return "true";
-        case ISignatureConstants.C_BYTE:
-          return "0";
-        case ISignatureConstants.C_CHAR:
-          return "0";
-        case ISignatureConstants.C_DOUBLE:
-          return "0";
-        case ISignatureConstants.C_FLOAT:
-          return "0.0f";
-        case ISignatureConstants.C_INT:
-          return "0";
-        case ISignatureConstants.C_LONG:
-          return "0";
-        case ISignatureConstants.C_SHORT:
-          return "0";
-        case ISignatureConstants.C_VOID:
-          return null;
-      }
+    if (parameter.length() != 1) {
+      // not a primitive type
+      return "null";
     }
-    return "null";
+
+    switch (parameter.charAt(0)) {
+      case ISignatureConstants.C_BOOLEAN:
+        return "true";
+      case ISignatureConstants.C_BYTE:
+      case ISignatureConstants.C_CHAR:
+      case ISignatureConstants.C_DOUBLE:
+      case ISignatureConstants.C_INT:
+      case ISignatureConstants.C_LONG:
+      case ISignatureConstants.C_SHORT:
+        return "0";
+      case ISignatureConstants.C_FLOAT:
+        return "0.0f";
+      default: // e.g. void
+        return null;
+    }
   }
 
+  /**
+   * If the given name is a reserved java keyword a suffix is added to ensure it is a valid name to use e.g. for
+   * variables or parameters.
+   *
+   * @param parameterName
+   *          The original name.
+   * @return The new value which probably has a suffix appended.
+   */
   public static String ensureValidParameterName(String parameterName) {
     if (isReservedJavaKeyword(parameterName)) {
       return parameterName + "Value";
@@ -248,9 +275,7 @@ public final class CoreUtils {
   }
 
   /**
-   * @return Returns <code>true</code> if the given word is a reserved java keyword. Otherwise <code>false</code>.
-   * @throws NullPointerException
-   *           if the given word is <code>null</code>.
+   * @return <code>true</code> if the given word is a reserved java keyword. Otherwise <code>false</code>.
    * @since 3.8.3
    */
   public static boolean isReservedJavaKeyword(String word) {
@@ -260,13 +285,16 @@ public final class CoreUtils {
     return getJavaKeyWords().contains(word.toLowerCase());
   }
 
+  /**
+   * Gets all reserved java keywords.
+   *
+   * @return An unmodifiable {@link Set} holding all reserved java keywords.
+   */
   public static Set<String> getJavaKeyWords() {
     if (javaKeyWords == null) {
       synchronized (CoreUtils.class) {
         if (javaKeyWords == null) {
-          String[] keyWords = new String[]{"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum",
-              "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected",
-              "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true"};
+          String[] keyWords = new String[]{"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true"};
           Set<String> tmp = new HashSet<>(keyWords.length);
           for (String s : keyWords) {
             tmp.add(s);
@@ -278,6 +306,18 @@ public final class CoreUtils {
     return javaKeyWords;
   }
 
+  /**
+   * Gets all type parameter arguments as resolved type signatures.
+   *
+   * @param focusType
+   *          The origin focus type that defines the type argument.
+   * @param levelFqn
+   *          The level on which the value of a type parameter should be extracted.
+   * @param typeParamIndex
+   *          The index of the type parameter on the given level type whose value should be extracted.
+   * @return A {@link ListOrderedSet} holding all type argument signatures of the given type parameter.
+   * @see #getResolvedTypeParamValue(IType, String, int)
+   */
   public static ListOrderedSet<String> getResolvedTypeParamValueSignature(IType focusType, String levelFqn, int typeParamIndex) {
     ListOrderedSet<IType> typeParamsValue = getResolvedTypeParamValue(focusType, levelFqn, typeParamIndex);
     List<String> result = new ArrayList<>(typeParamsValue.size());
@@ -297,6 +337,15 @@ public final class CoreUtils {
     CURRENT_USER_NAME.set(newUsernameForCurrentThread);
   }
 
+  /**
+   * Gets the first direct member {@link IType} of the given declaring type which matches the given {@link Predicate}.
+   *
+   * @param declaringType
+   *          The declaring {@link IType}.
+   * @param filter
+   *          The {@link Predicate} choosing the member {@link IType}.
+   * @return The first inner {@link IType} or <code>null</code> if it cannot be found.
+   */
   public static IType getInnerType(IType declaringType, Predicate<IType> filter) {
     if (declaringType == null) {
       return null;
@@ -304,21 +353,37 @@ public final class CoreUtils {
     return CollectionUtils.find(declaringType.getTypes(), filter);
   }
 
+  /**
+   * Gets the first direct member {@link IType} with the given simple name.
+   *
+   * @param declaringType
+   *          The declaring {@link IType}.
+   * @param typeName
+   *          The simple name of the member {@link IType} to search.
+   * @return The member {@link IType} with the given name or <code>null</code> if it cannot be found.
+   */
   public static IType getInnerType(IType declaringType, String typeName) {
     return getInnerType(declaringType, TypeFilters.getElementNameFilter(typeName));
   }
 
-  public static ListOrderedSet<IType> getInnerTypes(IType type) {
-    return getInnerTypes(type, null);
-  }
-
+  /**
+   * Gets the immediate member {@link IType}s of the given {@link IType} which matches the given {@link Predicate} in
+   * the order as it is defined in the source or class file.
+   *
+   * @param type
+   *          The declaring {@link IType} holding the member {@link IType}s.
+   * @param filter
+   *          The {@link Predicate} to filter the member {@link IType}s.
+   * @return A {@link ListOrderedSet} holding the selected member {@link IType}.
+   */
   public static ListOrderedSet<IType> getInnerTypes(IType type, Predicate<IType> filter) {
     return getInnerTypes(type, filter, null);
   }
 
   /**
-   * Returns the immediate member types declared by the given type. The results is filtered using the given filter and
-   * sorted using the given comparator.
+   * Returns the immediate member types declared by the given type. The results is filtered using the given
+   * {@link Predicate} and
+   * sorted using the given {@link Comparator}.
    *
    * @param type
    *          The type whose immediate inner types should be returned.
@@ -348,7 +413,8 @@ public final class CoreUtils {
   }
 
   /**
-   * Searches for an {@link IType} with a specific name within the given type recursively checking all inner types. The
+   * Searches for an {@link IType} with given simple name within the given type recursively checking all inner types.
+   * The
    * given {@link IType} itself is checked as well.
    *
    * @param type
@@ -357,7 +423,6 @@ public final class CoreUtils {
    *          The simple name (case sensitive) to search for.
    * @return The first {@link IType} found in the nested {@link IType} tree below the given start type that has the
    *         given simple name or <code>null</code> if nothing could be found.
-   * @throws JavaModelException
    */
   public static IType findInnerType(IType type, String innerTypeName) {
     if (type == null) {
@@ -377,8 +442,15 @@ public final class CoreUtils {
     return null;
   }
 
+  /**
+   * Gets all interfaces implemented by the given {@link IType} (recursively checking the super hierarchy).
+   *
+   * @param type
+   *          The {@link IType} for which all interfaces should be returned.
+   * @return A {@link Set} holding all super interfaces of the given {@link IType}.
+   */
   public static Set<IType> getAllSuperInterfaces(IType type) {
-    HashSet<IType> collector = new HashSet<>();
+    Set<IType> collector = new HashSet<>();
     for (IType t : type.getSuperInterfaces()) {
       getAllSuperInterfaces(t, collector);
     }
@@ -389,12 +461,23 @@ public final class CoreUtils {
     if (t == null) {
       return;
     }
-    collector.add(t);
+    if (Flags.isInterface(t.getFlags())) {
+      collector.add(t);
+    }
+    getAllSuperInterfaces(t.getSuperClass(), collector);
     for (IType superIfc : t.getSuperInterfaces()) {
       getAllSuperInterfaces(superIfc, collector);
     }
   }
 
+  /**
+   * <code>null</code> safe check for parameterized types.
+   *
+   * @param type
+   *          The {@link IType} to check or <code>null</code>.
+   * @return <code>true</code> if the given {@link IType} is not <code>null</code> and has at least one type parameter.
+   *         <code>false</code> otherwise.
+   */
   public static boolean isGenericType(IType type) {
     if (type == null) {
       return false;
@@ -402,6 +485,15 @@ public final class CoreUtils {
     return type.hasTypeParameters();
   }
 
+  /**
+   * Gets the first {@link IField} with given name.
+   *
+   * @param declaringType
+   *          The declaring {@link IType}.
+   * @param fieldName
+   *          The field name.
+   * @return The {@link IField} with given name or <code>null</code> if it could not be found.
+   */
   public static IField getField(IType declaringType, String fieldName) {
     if (declaringType == null) {
       return null;
@@ -409,14 +501,33 @@ public final class CoreUtils {
     return CollectionUtils.find(declaringType.getFields(), FieldFilters.getNameFilter(fieldName));
   }
 
-  public static ListOrderedSet<IField> getFields(IType declaringType) {
-    return getFields(declaringType, null);
-  }
-
+  /**
+   * Gets all {@link IField} of the given declaring {@link IType} that matches the given {@link Predicate} in the order
+   * as they appear in the source or class file.
+   *
+   * @param declaringType
+   *          The declaring {@link IType}.
+   * @param filter
+   *          The {@link Predicate} selecting the {@link IField}s.
+   * @return A {@link ListOrderedSet} holding the {@link IField}s accepted by the {@link Predicate}.
+   */
   public static ListOrderedSet<IField> getFields(IType declaringType, Predicate<IField> filter) {
     return getFields(declaringType, filter, null);
   }
 
+  /**
+   * Gets all {@link IField}s of the given declaring {@link IType} that matches the given {@link Predicate} sorted by
+   * the given {@link Comparator}.
+   *
+   * @param declaringType
+   *          The declaring {@link IType}.
+   * @param filter
+   *          The {@link Predicate} selecting the {@link IField}s.
+   * @param comparator
+   *          The {@link Comparator} to sort the {@link IField}s.
+   * @return A {@link ListOrderedSet} holding the {@link IField}s accepted by the {@link Predicate} sorted by the given
+   *         {@link Comparator}.
+   */
   public static ListOrderedSet<IField> getFields(IType declaringType, Predicate<IField> filter, Comparator<IField> comparator) {
     ListOrderedSet<IField> fields = declaringType.getFields();
 
@@ -436,6 +547,18 @@ public final class CoreUtils {
     return ListOrderedSet.listOrderedSet(result);
   }
 
+  /**
+   * Gets all type parameter arguments.
+   *
+   * @param focusType
+   *          The origin focus type that defines the type argument.
+   * @param levelFqn
+   *          The fully qualified name of the class on which the value of a type parameter should be extracted.
+   * @param typeParamIndex
+   *          The index of the type parameter on the given level type whose value should be extracted.
+   * @return A {@link ListOrderedSet} holding all type arguments of the given type parameter.
+   * @see #getResolvedTypeParamValueSignature(IType, String, int)
+   */
   public static ListOrderedSet<IType> getResolvedTypeParamValue(IType focusType, String levelFqn, int typeParamIndex) {
     IType levelType = findSuperType(focusType, levelFqn);
     if (levelType == null) {
@@ -444,6 +567,17 @@ public final class CoreUtils {
     return getResolvedTypeParamValue(focusType, levelType, typeParamIndex);
   }
 
+  /**
+   * Gets all type parameter arguments.
+   *
+   * @param focusType
+   *          The origin focus type that defines the type argument.
+   * @param levelType
+   *          The {@link IType} on which the value of a type parameter should be extracted.
+   * @param typeParamIndex
+   *          The index of the type parameter on the given level type whose value should be extracted.
+   * @return A {@link ListOrderedSet} holding all type arguments of the given type parameter.
+   */
   public static ListOrderedSet<IType> getResolvedTypeParamValue(IType focusType, IType levelType, int typeParamIndex) {
     if (levelType == null) {
       return null;
@@ -472,6 +606,16 @@ public final class CoreUtils {
     return ListOrderedSet.listOrderedSet(result);
   }
 
+  /**
+   * Searches for the first {@link IMethod} in the super hierarchy of the given {@link IType} matching the given
+   * {@link Predicate}.
+   *
+   * @param startType
+   *          The start {@link IType}.
+   * @param filter
+   *          The {@link Predicate} to select the {@link IMethod}.
+   * @return The first {@link IMethod} or <code>null</code> if it cannot be found.
+   */
   public static IMethod findMethodInSuperHierarchy(IType startType, Predicate<IMethod> filter) {
     if (startType == null) {
       return null;
@@ -496,6 +640,16 @@ public final class CoreUtils {
     return null;
   }
 
+  /**
+   * Searches for the first direct inner {@link IType} matching the given {@link Predicate} checking the entire super
+   * hierarchy of the given {@link IType}.
+   *
+   * @param declaringType
+   *          The {@link IType} to start searching
+   * @param filter
+   *          The {@link Predicate} to select the member {@link IType}.
+   * @return The first member {@link IType} or <code>null</code> if it cannot be found.
+   */
   public static IType findInnerTypeInSuperHierarchy(IType declaringType, Predicate<IType> filter) {
     if (declaringType == null) {
       return null;
@@ -522,19 +676,14 @@ public final class CoreUtils {
    * <pre>
    * public boolean is<em>&lt;PropertyName&gt;</em>();
    * </pre>
-   * <p>
-   * This implementation tries to determine the field by using the JDT code style settings stored in the Eclipse
-   * preferences. Prefixes and suffixes used for fields must be declared. The default prefix Scout uses for fields (
-   * <code>m_</code>) is added by default.
    *
    * @param type
    *          the type within properties are searched
    * @param propertyFilter
-   *          optional property bean filter used to filter the result
+   *          optional property bean {@link Predicate} used to filter the result
    * @param comparator
-   *          optional property bean comparator used to sort the result
-   * @return Returns an array of property bean descriptions. The array is empty if the given class does not contain any
-   *         bean properties.
+   *          optional property bean {@link Comparator} used to sort the result
+   * @return Returns a {@link Set} of property bean descriptions.
    * @see <a href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">JavaBeans Spec</a>
    */
   public static Set<IPropertyBean> getPropertyBeans(IType type, Predicate<IPropertyBean> propertyFilter, Comparator<IPropertyBean> comparator) {
@@ -601,6 +750,16 @@ public final class CoreUtils {
     return ListOrderedSet.listOrderedSet(result);
   }
 
+  /**
+   * Gets the first {@link IAnnotation} on the given {@link IAnnotatable} having the given name.
+   *
+   * @param annotatable
+   *          The {@link IAnnotation} holder.
+   * @param name
+   *          Simple or fully qualified name of the annotation type.
+   * @return The first {@link IAnnotation} on the given {@link IAnnotatable} having the given name or <code>null</code>
+   *         if it could not be found.
+   */
   public static IAnnotation getAnnotation(IAnnotatable annotatable, String name) {
     if (annotatable == null) {
       return null;
@@ -612,6 +771,15 @@ public final class CoreUtils {
     return annotations.get(0);
   }
 
+  /**
+   * Gets all {@link IAnnotation}s on the given {@link IAnnotatable} having the given name.
+   *
+   * @param annotatable
+   *          The {@link IAnnotation} holder.
+   * @param name
+   *          Simple or fully qualified name of the annotation type.
+   * @return A {@link ListOrderedSet} holding all {@link IAnnotation}s having the given name.
+   */
   public static ListOrderedSet<IAnnotation> getAnnotations(IAnnotatable annotatable, String name) {
     return getAnnotations(annotatable, name, false);
   }
@@ -638,6 +806,16 @@ public final class CoreUtils {
     return ListOrderedSet.listOrderedSet(result);
   }
 
+  /**
+   * Checks if a type with given name exists in the given {@link ILookupEnvironment} (classpath).
+   *
+   * @param typeToSearchFqn
+   *          The fully qualified name to search. See {@link ILookupEnvironment#existsType(String)} for detailed
+   *          constraints on the name.
+   * @param context
+   *          The context to search in.
+   * @return <code>true</code> if the given type exists, <code>false</code> otherwise.
+   */
   public static boolean isOnClasspath(String typeToSearchFqn, ILookupEnvironment context) {
     if (StringUtils.isBlank(typeToSearchFqn)) {
       return false;
@@ -646,6 +824,15 @@ public final class CoreUtils {
 
   }
 
+  /**
+   * Checks if the given {@link IType} exists in the given {@link ILookupEnvironment} (classpath).
+   *
+   * @param typeToSearch
+   *          The {@link IType} to search
+   * @param context
+   *          The context to search in.
+   * @return <code>true</code> if the given type exists, <code>false</code> otherwise.
+   */
   public static boolean isOnClasspath(IType typeToSearch, ILookupEnvironment context) {
     if (typeToSearch == null) {
       return false;
@@ -653,6 +840,16 @@ public final class CoreUtils {
     return isOnClasspath(typeToSearch.getName(), context);
   }
 
+  /**
+   * Finds the super {@link IType} of the given start {@link IType} having the given name.
+   *
+   * @param typeToCheck
+   *          The start {@link IType}
+   * @param queryType
+   *          The fully qualified name of the super {@link IType} to find.
+   * @return The {@link IType} having the given name if found in the super hierarchy of the given {@link IType} or
+   *         <code>null</code> if it could not be found.
+   */
   public static IType findSuperType(IType typeToCheck, String queryType) {
     if (queryType == null) {
       return null;
@@ -679,10 +876,29 @@ public final class CoreUtils {
     return null;
   }
 
+  /**
+   * Checks if the given {@link IType} has the given queryType in its super hierarchy.
+   *
+   * @param typeToCheck
+   *          The {@link IType} to check.
+   * @param queryType
+   *          The fully qualified name of the super type to check.
+   * @return
+   */
   public static boolean isInstanceOf(IType typeToCheck, String queryType) {
     return findSuperType(typeToCheck, queryType) != null;
   }
 
+  /**
+   * Gets the first {@link IMethod} which is directly in the given {@link IType} and accepts the given {@link Predicate}
+   * .
+   *
+   * @param type
+   *          The {@link IType} to search in.
+   * @param filter
+   *          The {@link Predicate} to select the {@link IMethod}.
+   * @return The first {@link IMethod} or <code>null</code>.
+   */
   public static IMethod getMethod(IType type, Predicate<IMethod> filter) {
     if (type == null) {
       return null;
@@ -765,8 +981,11 @@ public final class CoreUtils {
   }
 
   /**
-   * @param extendedType
-   * @return
+   * Gets the primary {@link IType} of the given {@link IType}.
+   *
+   * @param t
+   *          The {@link IType} for which the primary {@link IType} should be returned.
+   * @return The primary {@link IType} of t or <code>null</code>.
    */
   public static IType getPrimaryType(IType t) {
     IType result = null;
@@ -779,6 +998,16 @@ public final class CoreUtils {
     return result;
   }
 
+  /**
+   * Gets the value of the given attribute in the given {@link IAnnotation} as a {@link String}.
+   * 
+   * @param annotation
+   *          The {@link IAnnotation} in which the attribute should be searched.
+   * @param name
+   *          The name of the attribute.
+   * @return The value of the attribute with given name in the given {@link IAnnotation} or <code>null</code> if there
+   *         is not such attribute or no value.
+   */
   public static String getAnnotationValueString(IAnnotation annotation, String name) {
     if (annotation == null) {
       return null;
@@ -797,6 +1026,16 @@ public final class CoreUtils {
     return rawVal.toString();
   }
 
+  /**
+   * Gets the value of the given attribute in the given {@link IAnnotation} as a {@link BigDecimal}.
+   * 
+   * @param annotation
+   *          The {@link IAnnotation} in which the attribute should be searched.
+   * @param name
+   *          The name of the attribute.
+   * @return The value of the attribute with given name in the given {@link IAnnotation} or <code>null</code> if there
+   *         is not such attribute or no value or it is not numeric.
+   */
   public static BigDecimal getAnnotationValueNumeric(IAnnotation annotation, String name) {
     if (annotation == null) {
       return null;

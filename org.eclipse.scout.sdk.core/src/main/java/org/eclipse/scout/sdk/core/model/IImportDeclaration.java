@@ -11,27 +11,33 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
+ * <h3>{@link IImportDeclaration}</h3>
+ * Represents an import declaration in an {@link ICompilationUnit}
  *
+ * @author Matthias Villiger
+ * @since 5.1.0
  */
 public interface IImportDeclaration {
 
   /**
-   * @return
+   * Gets the {@link ICompilationUnit} this import belongs to.
+   * 
+   * @return the {@link ICompilationUnit} this import belongs to.
    */
   ICompilationUnit getCompilationUnit();
 
   /**
-   * @return
+   * @return the fully qualified name of the type imported.
    */
   String getName();
 
   /**
-   * @return
+   * @return the simple name of the imported type.
    */
   String getSimpleName();
 
   /**
-   * @return
+   * @return the qualifier of the imported type.
    */
   String getQualifier();
 

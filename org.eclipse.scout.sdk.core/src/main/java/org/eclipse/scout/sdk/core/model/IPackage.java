@@ -11,7 +11,11 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
+ * <h3>{@link IPackage}</h3>
+ * Represents a package
  *
+ * @author Matthias Villiger
+ * @since 5.1.0
  */
 public interface IPackage {
 
@@ -20,7 +24,10 @@ public interface IPackage {
    */
   String getName();
 
-  IPackage EMPTY_PACKAGE = new IPackage() {
+  /**
+   * The shared instance representing the default package.
+   */
+  IPackage DEFAULT_PACKAGE = new IPackage() {
     @Override
     public String getName() {
       return null;

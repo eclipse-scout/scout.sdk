@@ -11,21 +11,29 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
+ * <h3>{@link IMember}</h3>
+ * Represents Java elements that are members.
  *
+ * @author Matthias Villiger
+ * @since 5.1.0
  */
 public interface IMember extends IAnnotatable {
+
   /**
-   * @return
+   * Gets the flags of this {@link IMember}. Use the {@link Flags} to access the value in this {@link Integer}.
+   *
+   * @return The flags of this {@link IMember}.
+   * @see Flags
    */
   int getFlags();
 
   /**
-   * @return the fully qualified name
+   * @return the name of this {@link IMember}. Never returns <code>null</code>.
    */
   String getName();
 
   /**
-   * @return
+   * @return The {@link IType} this member is defined in. Never returns <code>null</code>.
    */
   IType getDeclaringType();
 }

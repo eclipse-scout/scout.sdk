@@ -14,7 +14,10 @@ import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 
 /**
+ * <h3>{@link StringCompilationUnit}</h3>
  *
+ * @author mvi
+ * @since 5.1.0
  */
 class StringCompilationUnit implements ICompilationUnit {
 

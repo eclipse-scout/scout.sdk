@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.s2e.job;
+package org.eclipse.scout.sdk.s2e.internal;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,7 +25,7 @@ import org.eclipse.jdt.internal.compiler.SourceElementParser;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.scout.sdk.s2e.IWorkingCopyManager;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.s2e.job.JobEx;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
 
 /**

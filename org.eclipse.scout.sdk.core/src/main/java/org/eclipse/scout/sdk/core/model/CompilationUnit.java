@@ -80,7 +80,13 @@ public class CompilationUnit implements ICompilationUnit {
     if (m_package == null) {
       ImportReference currentPackage = m_ast.currentPackage;
       if (currentPackage != null) {
-        m_package = new Package(CharOperation.toString(currentPackage.getImportName()));
+        char[][] importName = currentPackage.getImportName();
+        if (importName != null && importName.length > 0) {
+          m_package = new Package(CharOperation.toString(importName));
+        }
+      }
+      if (m_package == null) {
+        m_package = IPackage.DEFAULT_PACKAGE;
       }
     }
     return m_package;

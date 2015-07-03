@@ -52,7 +52,7 @@ public class PropertyBean implements IPropertyBean {
       return m_readMethod.getReturnType();
     }
 
-    if (m_writeMethod != null) {
+    if (m_writeMethod != null && m_writeMethod.getParameters().size() > 0) {
       return m_writeMethod.getParameters().get(0).getType();
     }
 

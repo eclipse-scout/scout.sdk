@@ -19,4 +19,51 @@
             icon="resources/icons/eclipse_scout.gif">
       </proposalCategory>
    </extension>
+   <extension
+      point="org.eclipse.ui.menus">
+      <menuContribution locationURI="menu:org.eclipse.ui.main.menu?after=additions">
+         <menu id="org.eclipse.scout.sdk.s2e.ui.menu" label="Scout">
+            <command
+               commandId="org.eclipse.scout.sdk.s2e.ui.commands.updateDto"
+               id="org.eclipse.scout.sdk.s2e.ui.menu.updateDto"
+               style="push">
+            </command>
+            <separator
+               name="org.eclipse.scout.sdk.s2e.ui.menu.separator01"
+               visible="true">
+            </separator>
+            <command
+               commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
+               id="org.eclipse.scout.sdk.s2e.ui.menu.wellform"
+               style="push">
+            </command>
+         </menu>
+      </menuContribution>
+   </extension>
+   <extension point="org.eclipse.ui.commands">
+      <category
+            name="Scout Tools"
+            id="org.eclipse.scout.sdk.s2e.ui.commands.category">
+      </category>
+      <command
+            name="Update all DTO classes..."
+            id="org.eclipse.scout.sdk.s2e.ui.commands.updateDto"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+      </command>
+      <command
+            name="Wellform all Scout classes..."
+            id="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+      </command>
+   </extension>
+   <extension point="org.eclipse.ui.handlers">
+      <handler
+            commandId="org.eclipse.scout.sdk.s2e.ui.commands.updateDto"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.UpdateAllDtoHandler">
+      </handler>
+      <handler
+            commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.WellformAllHandler">
+      </handler>
+   </extension>
 </plugin>

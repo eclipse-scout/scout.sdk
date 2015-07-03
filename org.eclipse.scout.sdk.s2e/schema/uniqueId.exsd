@@ -55,7 +55,7 @@
                   
                </documentation>
                <appInfo>
-                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.sdk.s2e.id.ICodeIdProvider"/>
+                  <meta.attribute kind="java" basedOn=":org.eclipse.scout.sdk.s2e.id.IUniqueIdProvider"/>
                </appInfo>
             </annotation>
          </attribute>

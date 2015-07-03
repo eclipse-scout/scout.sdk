@@ -20,7 +20,13 @@ import org.eclipse.scout.sdk.core.model.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.IType;
 
 /**
+ * <h3>{@link SignatureUtils}</h3>
+ * Helper methods to deal with Signatures.
  *
+ * @author Matthias Villiger
+ * @since 5.1.0
+ * @see Signature
+ * @see ISignatureConstants
  */
 public final class SignatureUtils {
 
@@ -49,42 +55,66 @@ public final class SignatureUtils {
     return stringToSearchIn != null && !stringToSearchIn.isEmpty() && stringToSearchIn.charAt(0) == charToFind;
   }
 
+  /**
+   * Same as {@link Signature#toString()} but it preserves the dollar sign ($) for inner types.
+   *
+   * @param sig
+   *          The signature to convert to a fully qualified name.
+   * @return The fully qualified name of the given signature.
+   */
   public static String toFullyQualifiedName(String sig) {
     String nameUpToPrimaryType = Signature.getSignatureSimpleName(sig).replace(ISignatureConstants.C_DOT, ISignatureConstants.C_DOLLAR); // ensure to keep $ for inner types.
     String pck = Signature.getSignatureQualifier(sig);
     return new StringBuilder(nameUpToPrimaryType.length() + 1 + pck.length()).append(pck).append('.').append(nameUpToPrimaryType).toString();
   }
 
-  public static String unboxPrimitiveSignature(String signature) {
-    if (Signature.getTypeSignatureKind(signature) == ISignatureConstants.BASE_TYPE_SIGNATURE) {
-      if (ISignatureConstants.SIG_BOOLEAN.equals(signature)) {
-        signature = Signature.createTypeSignature(Boolean.class.getName());
-      }
-      else if (ISignatureConstants.SIG_BYTE.equals(signature)) {
-        signature = Signature.createTypeSignature(Byte.class.getName());
-      }
-      else if (ISignatureConstants.SIG_CHAR.equals(signature)) {
-        signature = Signature.createTypeSignature(Character.class.getName());
-      }
-      else if (ISignatureConstants.SIG_DOUBLE.equals(signature)) {
-        signature = Signature.createTypeSignature(Double.class.getName());
-      }
-      else if (ISignatureConstants.SIG_FLOAT.equals(signature)) {
-        signature = Signature.createTypeSignature(Float.class.getName());
-      }
-      else if (ISignatureConstants.SIG_INT.equals(signature)) {
-        signature = Signature.createTypeSignature(Integer.class.getName());
-      }
-      else if (ISignatureConstants.SIG_LONG.equals(signature)) {
-        signature = Signature.createTypeSignature(Long.class.getName());
-      }
-      else if (ISignatureConstants.SIG_SHORT.equals(signature)) {
-        signature = Signature.createTypeSignature(Short.class.getName());
-      }
+  /**
+   * Converts the given base type signature (primitive types) to the corresponding wrapper class signature.
+   *
+   * @param signature
+   *          The primitive signature.
+   * @return The boxed version of the given primitive signature or the input.
+   */
+  public static String boxPrimitiveSignature(String signature) {
+    if (Signature.getTypeSignatureKind(signature) != ISignatureConstants.BASE_TYPE_SIGNATURE) {
+      return signature;
+    }
+
+    if (ISignatureConstants.SIG_BOOLEAN.equals(signature)) {
+      return Signature.createTypeSignature(Boolean.class.getName());
+    }
+    if (ISignatureConstants.SIG_BYTE.equals(signature)) {
+      return Signature.createTypeSignature(Byte.class.getName());
+    }
+    if (ISignatureConstants.SIG_CHAR.equals(signature)) {
+      return Signature.createTypeSignature(Character.class.getName());
+    }
+    if (ISignatureConstants.SIG_DOUBLE.equals(signature)) {
+      return Signature.createTypeSignature(Double.class.getName());
+    }
+    if (ISignatureConstants.SIG_FLOAT.equals(signature)) {
+      return Signature.createTypeSignature(Float.class.getName());
+    }
+    if (ISignatureConstants.SIG_INT.equals(signature)) {
+      return Signature.createTypeSignature(Integer.class.getName());
+    }
+    if (ISignatureConstants.SIG_LONG.equals(signature)) {
+      return Signature.createTypeSignature(Long.class.getName());
+    }
+    if (ISignatureConstants.SIG_SHORT.equals(signature)) {
+      return Signature.createTypeSignature(Short.class.getName());
     }
     return signature;
   }
 
+  /**
+   * Converts the given {@link IType} to a resolved type signature including all type arguments of the given
+   * {@link IType}.
+   * 
+   * @param t
+   *          The {@link IType} to convert to a signature.
+   * @return The resolved type signature matching the given {@link IType}.
+   */
   public static String getResolvedSignature(IType t) {
     if (t == null) {
       return null;

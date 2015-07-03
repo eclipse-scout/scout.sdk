@@ -24,15 +24,30 @@ public final class ScoutUtils {
   private ScoutUtils() {
   }
 
+  /**
+   * Gets the value of the @Order annotation of the given {@link IAnnotatable}.
+   * 
+   * @param a
+   *          The {@link IAnnotatable} for which to return the @Order annotation value
+   * @return The order annotation value or <code>null</code> if there is no order {@link IAnnotation} on the given
+   *         element.
+   */
   public static Double getOrderAnnotationValue(IAnnotatable a) {
     IAnnotation annotation = CoreUtils.getAnnotation(a, IRuntimeClasses.Order);
-    BigDecimal orderValue = CoreUtils.getAnnotationValueNumeric(annotation, "value");
+    BigDecimal orderValue = CoreUtils.getAnnotationValueNumeric(annotation, IRuntimeClasses.ORDER_ANNOTATION_VALUE);
     if (orderValue == null) {
       return null;
     }
-    return orderValue.doubleValue();
+    return Double.valueOf(orderValue.doubleValue());
   }
 
+  /**
+   * Checks whether an @Replace annotation exists on the given element.
+   * 
+   * @param element
+   *          The element to check.
+   * @return <code>true</code> if a @Replace annotation exists on the given element, <code>false</code> otherwise.
+   */
   public static boolean existsReplaceAnnotation(IAnnotatable element) {
     return CoreUtils.getAnnotation(element, IRuntimeClasses.Replace) != null;
   }

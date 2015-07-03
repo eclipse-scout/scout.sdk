@@ -14,11 +14,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jdt.core.compiler.CategorizedProblem;
+import org.eclipse.jdt.internal.compiler.IProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.DefaultProblemFactory;
 import org.eclipse.jdt.internal.compiler.problem.ProblemSeverities;
 
 /**
- *
+ * {@link IProblemFactory} that collects all problems for later use.
  */
 class CollectProblemFactory extends DefaultProblemFactory {
 

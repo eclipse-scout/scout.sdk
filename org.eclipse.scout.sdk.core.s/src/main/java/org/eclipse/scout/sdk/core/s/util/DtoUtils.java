@@ -64,8 +64,7 @@ public final class DtoUtils {
 
   /**
    * Parses the possible available {@link IRuntimeClasses#ColumnData} annotation on the given type. If the type is
-   * not
-   * annotated, <code>null</code> is returned.
+   * not annotated, <code>null</code> is returned.
    *
    * @throws JavaModelException
    * @since 3.10.0-M5
@@ -688,7 +687,7 @@ public final class DtoUtils {
     return null;
   }
 
-  public static IType findExtendsAnnotationValue(IType element) {
+  private static IType findExtendsAnnotationValue(IType element) {
     IType curType = element;
     while (curType != null) {
       IAnnotation extendsAnnotation = CoreUtils.getAnnotation(curType, IRuntimeClasses.Extends);

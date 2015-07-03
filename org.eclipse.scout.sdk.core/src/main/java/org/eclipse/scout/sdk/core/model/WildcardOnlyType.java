@@ -18,7 +18,10 @@ import org.apache.commons.collections4.set.ListOrderedSet;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 
 /**
+ * <h3>{@link WildcardOnlyType}</h3>
  *
+ * @author Matthias Villiger
+ * @since 5.1.0
  */
 public class WildcardOnlyType implements IType {
 
@@ -45,7 +48,7 @@ public class WildcardOnlyType implements IType {
 
   @Override
   public IPackage getPackage() {
-    return null;
+    return IPackage.DEFAULT_PACKAGE;
   }
 
   @Override

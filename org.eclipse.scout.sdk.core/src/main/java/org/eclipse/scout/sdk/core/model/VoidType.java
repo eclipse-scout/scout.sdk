@@ -59,7 +59,7 @@ final class VoidType implements IType {
 
   @Override
   public IPackage getPackage() {
-    return IPackage.EMPTY_PACKAGE;
+    return IPackage.DEFAULT_PACKAGE;
   }
 
   @Override

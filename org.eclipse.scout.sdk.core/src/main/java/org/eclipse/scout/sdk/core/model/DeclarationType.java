@@ -100,6 +100,9 @@ public class DeclarationType implements IType {
       if (qualifiedPackageName != null && qualifiedPackageName.length > 0) {
         m_package = new Package(new String(qualifiedPackageName));
       }
+      else {
+        m_package = IPackage.DEFAULT_PACKAGE;
+      }
     }
     return m_package;
   }

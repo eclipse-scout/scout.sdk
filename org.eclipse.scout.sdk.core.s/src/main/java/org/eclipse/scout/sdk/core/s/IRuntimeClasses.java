@@ -11,9 +11,12 @@
 package org.eclipse.scout.sdk.core.s;
 
 /**
- *
+ * Classes indices and values used in the scout runtime.
  */
 public interface IRuntimeClasses {
+
+  // annotation attribute names
+  String ORDER_ANNOTATION_VALUE = "value";
 
   // type parameter positions
   int TYPE_PARAM_EXTENSION__OWNER = 0;
@@ -29,6 +32,8 @@ public interface IRuntimeClasses {
   String Replace = "org.eclipse.scout.commons.annotations.Replace";
   String ColumnData = "org.eclipse.scout.commons.annotations.ColumnData";
   String Extends = "org.eclipse.scout.commons.annotations.Extends";
+  String ConfigOperation = "org.eclipse.scout.commons.annotations.ConfigOperation";
+  String ConfigProperty = "org.eclipse.scout.commons.annotations.ConfigProperty";
 
   // abstract implementations
   String AbstractPropertyData = "org.eclipse.scout.rt.shared.data.form.properties.AbstractPropertyData";
@@ -38,6 +43,8 @@ public interface IRuntimeClasses {
   String AbstractTableFieldBeanData = "org.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData";
 
   // interfaces
+  String IClientSession = "org.eclipse.scout.rt.client.IClientSession";
+  String ICodeType = "org.eclipse.scout.rt.shared.services.common.code.ICodeType";
   String IForm = "org.eclipse.scout.rt.client.ui.form.IForm";
   String IPageWithTableExtension = "org.eclipse.scout.rt.client.extension.ui.desktop.outline.pages.IPageWithTableExtension";
   String ITableExtension = "org.eclipse.scout.rt.client.extension.ui.basic.table.ITableExtension";
@@ -52,4 +59,29 @@ public interface IRuntimeClasses {
   String IExtension = "org.eclipse.scout.rt.shared.extension.IExtension";
   String IFormExtension = "org.eclipse.scout.rt.client.extension.ui.form.IFormExtension";
   String IFormFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension";
+  String IScoutLogger = "org.eclipse.scout.commons.logger.IScoutLogger";
+  String ITreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField";
+  String IPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField";
+  String IComposerField = "org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField";
+  String IDataModelAttribute = "org.eclipse.scout.rt.shared.data.model.IDataModelAttribute";
+  String IDataModelEntity = "org.eclipse.scout.rt.shared.data.model.IDataModelEntity";
+  String ICalendar = "org.eclipse.scout.rt.client.ui.basic.calendar.ICalendar";
+  String ICode = "org.eclipse.scout.rt.shared.services.common.code.ICode";
+  String IDesktop = "org.eclipse.scout.rt.client.ui.desktop.IDesktop";
+  String IDesktopExtension = "org.eclipse.scout.rt.client.ui.desktop.IDesktopExtension";
+  String IOutline = "org.eclipse.scout.rt.client.ui.desktop.outline.IOutline";
+  String IPageWithNodes = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPageWithNodes";
+  String IWizard = "org.eclipse.scout.rt.client.ui.wizard.IWizard";
+  String IWizardStep = "org.eclipse.scout.rt.client.ui.wizard.IWizardStep";
+  String IMenu = "org.eclipse.scout.rt.client.ui.action.menu.IMenu";
+  String IActivityMap = "org.eclipse.scout.rt.client.ui.basic.activitymap.IActivityMap";
+  String IFormHandler = "org.eclipse.scout.rt.client.ui.form.IFormHandler";
+  String IKeyStroke = "org.eclipse.scout.rt.client.ui.action.keystroke.IKeyStroke";
+  String IButton = "org.eclipse.scout.rt.client.ui.form.fields.button.IButton";
+  String ILookupCall = "org.eclipse.scout.rt.shared.services.lookup.ILookupCall";
+  String IViewButton = "org.eclipse.scout.rt.client.ui.action.view.IViewButton";
+  String IToolButton = "org.eclipse.scout.rt.client.ui.action.tool.IToolButton";
+  String ITree = "org.eclipse.scout.rt.client.ui.basic.tree.ITree";
+  String ICalendarItemProvider = "org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider";
+  String IPage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage";
 }

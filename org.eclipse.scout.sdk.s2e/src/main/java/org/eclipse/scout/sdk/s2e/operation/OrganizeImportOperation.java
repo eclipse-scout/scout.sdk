@@ -29,7 +29,6 @@ public class OrganizeImportOperation implements IOperation {
 
   public OrganizeImportOperation(ICompilationUnit icu) {
     m_icu = icu;
-
   }
 
   @Override

@@ -23,18 +23,35 @@ import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 import org.eclipse.scout.sdk.core.parser.JavaParser;
 import org.eclipse.scout.sdk.s2e.dto.IDtoAutoUpdateManager;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.s2e.internal.WorkingCopyManager;
 
 /**
- *
+ * Main class to access Scout2Eclipse core components.
  */
 public final class ScoutSdkCore {
   private ScoutSdkCore() {
   }
 
+  /**
+   * Gets the {@link IDtoAutoUpdateManager} responsible for automatically update Scout DTOs in the Eclipse IDE.
+   *
+   * @return
+   */
   public static IDtoAutoUpdateManager getDtoAutoUpdateManager() {
     return S2ESdkActivator.getDefault().getAutoUpdateManager();
   }
 
+  /**
+   * Creates an {@link ILookupEnvironment} based on an Eclipse {@link IJavaProject} and its classpath.
+   *
+   * @param javaProject
+   *          The {@link IJavaProject} to create the {@link ILookupEnvironment} for.
+   * @param allowErrors
+   *          <code>true</code> if the resulting environment should be lenient with compile errors. If
+   *          <code>false</code> the lookup environment will throw exceptions as soon as compile errors are found.
+   * @return The new created {@link ILookupEnvironment}.
+   * @throws CoreException
+   */
   public static ILookupEnvironment createLookupEnvironment(IJavaProject javaProject, boolean allowErrors) throws CoreException {
     Validate.notNull(javaProject);
     IPackageFragmentRoot[] allPackageFragmentRoots = javaProject.getAllPackageFragmentRoots();
@@ -50,4 +67,10 @@ public final class ScoutSdkCore {
     return JavaParser.create(cp, allowErrors);
   }
 
+  /**
+   * @return A new created {@link IWorkingCopyManager}.
+   */
+  public static IWorkingCopyManager createWorkingCopyManager() {
+    return new WorkingCopyManager();
+  }
 }

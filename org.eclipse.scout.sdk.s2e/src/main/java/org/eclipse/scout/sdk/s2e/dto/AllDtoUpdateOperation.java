@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.s2e.internal.dto;
+package org.eclipse.scout.sdk.s2e.dto;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -28,8 +28,6 @@ import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.s2e.IOperation;
 import org.eclipse.scout.sdk.s2e.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
-import org.eclipse.scout.sdk.s2e.dto.IDtoAutoUpdateHandler;
-import org.eclipse.scout.sdk.s2e.dto.IDtoAutoUpdateOperation;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 

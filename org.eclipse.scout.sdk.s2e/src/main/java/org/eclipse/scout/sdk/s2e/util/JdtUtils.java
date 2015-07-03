@@ -12,9 +12,14 @@ package org.eclipse.scout.sdk.s2e.util;
 
 import java.io.Serializable;
 import java.nio.charset.Charset;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 import java.util.TreeSet;
 
+import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.set.ListOrderedSet;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -24,8 +29,12 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMemberValuePair;
+import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.ITypeHierarchy;
+import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -49,11 +58,19 @@ public final class JdtUtils {
   private JdtUtils() {
   }
 
-  public static org.eclipse.scout.sdk.core.model.IType jdtTypeToScoutType(org.eclipse.jdt.core.IType jdtType) throws CoreException {
+  /**
+   * Converts the {@link org.eclipse.jdt.core.IType} to {@link org.eclipse.scout.sdk.core.model.IType}
+   *
+   * @param jdtType
+   *          The input jdt {@link IType}
+   * @return The resulting {@link org.eclipse.scout.sdk.core.model.IType}
+   * @throws CoreException
+   */
+  public static org.eclipse.scout.sdk.core.model.IType jdtTypeToScoutType(IType jdtType) throws CoreException {
     return jdtTypeToScoutType(jdtType, ScoutSdkCore.createLookupEnvironment(jdtType.getJavaProject(), true));
   }
 
-  public static org.eclipse.scout.sdk.core.model.IType jdtTypeToScoutType(org.eclipse.jdt.core.IType jdtType, ILookupEnvironment lookupEnv) throws CoreException {
+  public static org.eclipse.scout.sdk.core.model.IType jdtTypeToScoutType(IType jdtType, ILookupEnvironment lookupEnv) throws CoreException {
     IFile resource = (IFile) jdtType.getResource();
     String charsetName = resource.getCharset();
     if (!Charset.isSupported(charsetName)) {
@@ -62,28 +79,61 @@ public final class JdtUtils {
     return lookupEnv.findType(jdtType.getFullyQualifiedName('$'));
   }
 
+  public static IMethod getFirstMethod(IType type, Predicate<IMethod> filter) throws JavaModelException {
+    for (IMethod method : type.getMethods()) {
+      if (filter == null || filter.evaluate(method)) {
+        return method;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Searches for an {@link IType} with a specific name within the given type recursively checking all inner types. The
+   * given {@link IType} itself is checked as well.
+   *
+   * @param type
+   *          The {@link IType} to start searching. All nested inner {@link IType}s are visited recursively.
+   * @param innerTypeName
+   *          The simple name (case sensitive) to search for.
+   * @return The first {@link IType} found in the nested {@link IType} tree below the given start type that has the
+   *         given simple name or <code>null</code> if nothing could be found.
+   * @throws JavaModelException
+   */
+  public static IType findInnerType(IType type, String innerTypeName) throws JavaModelException {
+    if (!exists(type)) {
+      return null;
+    }
+    else if (Objects.equals(type.getElementName(), innerTypeName)) {
+      return type;
+    }
+    else {
+      for (IType innerType : type.getTypes()) {
+        IType found = findInnerType(innerType, innerTypeName);
+        if (found != null) {
+          return found;
+        }
+      }
+    }
+    return null;
+  }
+
   public static ListOrderedSet<IType> resolveJdtTypes(final String fqn) throws CoreException {
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
     String fastPat = Signature.getSimpleName(fqn);
     final TreeSet<IType> matchList = new TreeSet<>(COMPARATOR);
-    new SearchEngine().search(
-        SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH),
-        new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
-        SearchEngine.createWorkspaceScope(),
-        new SearchRequestor() {
-          @Override
-          public void acceptSearchMatch(SearchMatch match) throws CoreException {
-            Object element = match.getElement();
-            if (element instanceof IType) {
-              IType t = (IType) element;
-              if (t.getFullyQualifiedName('$').indexOf(fqn) >= 0) {
-                matchList.add(t);
-              }
-            }
+    new SearchEngine().search(SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH), new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, SearchEngine.createWorkspaceScope(), new SearchRequestor() {
+      @Override
+      public void acceptSearchMatch(SearchMatch match) throws CoreException {
+        Object element = match.getElement();
+        if (element instanceof IType) {
+          IType t = (IType) element;
+          if (t.getFullyQualifiedName('$').indexOf(fqn) >= 0) {
+            matchList.add(t);
           }
-        },
-        null
-        );
+        }
+      }
+    }, null);
     return ListOrderedSet.listOrderedSet(matchList);
   }
 
@@ -235,5 +285,66 @@ public final class JdtUtils {
       }
     }
     return null;
+  }
+
+  /**
+   * To get a type hierarchy with the given elements as scope.
+   *
+   * @param elements
+   * @return
+   * @throws JavaModelException
+   */
+  public static ITypeHierarchy getLocalTypeHierarchy(Collection<? extends IJavaElement> elements) throws JavaModelException {
+    IRegion region = JavaCore.newRegion();
+    if (elements != null) {
+      for (IJavaElement e : elements) {
+        if (exists(e)) {
+          if (e.getElementType() == IJavaElement.TYPE) {
+            IType t = (IType) e;
+            if (t.isBinary()) {
+              // binary types do not include their inner types because these inner types belong to their own class file
+              // solution: add them manually
+              addBinaryInnerTypesToRegionRec(t, region);
+            }
+          }
+          region.add(e);
+        }
+      }
+    }
+    return getLocalTypeHierarchy(region);
+  }
+
+  private static void addBinaryInnerTypesToRegionRec(IType declaringType, IRegion region) {
+    try {
+      for (IType child : declaringType.getTypes()) {
+        region.add(child);
+        addBinaryInnerTypesToRegionRec(child, region);
+      }
+    }
+    catch (JavaModelException e) {
+      S2ESdkActivator.logError("Unable to get inner types of type '" + declaringType.getFullyQualifiedName() + "'.", e);
+    }
+  }
+
+  /**
+   * To get a type hierarchy with the given elements as scope.
+   *
+   * @param elements
+   * @return
+   * @throws JavaModelException
+   */
+  public static ITypeHierarchy getLocalTypeHierarchy(IJavaElement... elements) throws JavaModelException {
+    if (elements == null || elements.length < 1) {
+      return null;
+    }
+    Set<IJavaElement> el = new HashSet<>(elements.length);
+    for (IJavaElement e : elements) {
+      el.add(e);
+    }
+    return getLocalTypeHierarchy(el);
+  }
+
+  public static ITypeHierarchy getLocalTypeHierarchy(IRegion region) throws JavaModelException {
+    return JavaCore.newTypeHierarchy(region, null, null);
   }
 }
