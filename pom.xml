@@ -176,7 +176,7 @@
             <execution>
               <id>attach-sources</id>
               <goals>
-                <goal>jar-nofork</goal>
+                <goal>jar-no-fork</goal>
               </goals>
             </execution>
           </executions>
