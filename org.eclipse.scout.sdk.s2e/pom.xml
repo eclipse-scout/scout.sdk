@@ -34,12 +34,10 @@
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.scout.sdk.core</artifactId>
-<!--       <optional>true</optional> -->
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
-<!--       <optional>true</optional> -->
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>

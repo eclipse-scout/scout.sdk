@@ -23,7 +23,6 @@
 
   <name>Eclipse Scout SDK P2 Build Target</name>
 
-
   <build>
     <plugins>
       <plugin>
@@ -32,10 +31,10 @@
         <executions>
           <execution>
             <id>attach-artifacts</id>
-            <phase>package</phase>
             <goals>
               <goal>attach-artifact</goal>
             </goals>
+            <phase>package</phase>
             <configuration>
               <artifacts>
                 <artifact>

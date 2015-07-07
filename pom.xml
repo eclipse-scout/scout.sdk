@@ -84,7 +84,7 @@
     <uiFormsVersion>3.6.100.v20140422-1825</uiFormsVersion>
     <uiFormsVersionMaven>${uiFormsVersion}-SNAPSHOT</uiFormsVersionMaven>
 
-    <!-- version of Tycho used by org.eclipse.scout.sdk.core.releng build -->
+    <!-- version of Tycho used by org.eclipse.scout.sdk.core.releng build and profiles eclipse-sign and eclipse-pack-->
     <tycho.version>0.23.0</tycho.version>
     <tycho-extras.version>0.23.0</tycho-extras.version>
     <cbi-plugins.version>1.1.2</cbi-plugins.version>
@@ -188,10 +188,10 @@
           <version>${cbi-plugins.version}</version>
         </plugin>
 
-         <plugin>
-           <artifactId>maven-clean-plugin</artifactId>
-           <version>2.6.1</version>
-         </plugin>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>2.6.1</version>
+        </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
@@ -292,11 +292,11 @@
 
   <repositories>
 
-<!--     <repository> -->
+    <repository>
       <!-- TODO remove this before releasing -->
-<!--       <id>eclipse-scout-snapshots</id> -->
-<!--       <url>https://repo.eclipse.org/content/repositories/scout-snapshots/</url> -->
-<!--     </repository> -->
+      <id>eclipse-scout-snapshots</id>
+      <url>https://repo.eclipse.org/content/repositories/scout-snapshots/</url>
+    </repository>
 
     <repository>
       <snapshots>

@@ -29,6 +29,44 @@
     <module>../org.eclipse.scout.sdk-repository</module>
   </modules>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk.s2e</groupId>
+        <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
+        <version>${project.version}</version>
+        <classifier>sources</classifier>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <build>
     <pluginManagement>
       <plugins>
@@ -48,7 +86,7 @@
               <filter>
                 <type>p2-installable-unit</type>
                 <id>org.eclipse.equinox.servletbridge.extensionbundle</id>
-                <removeAll />
+                <removeAll></removeAll>
               </filter>
             </filters>
             <resolver>p2</resolver>
@@ -158,42 +196,4 @@
       </plugin>
     </plugins>
   </build>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <version>${project.version}</version>
-        <classifier>sources</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-        <version>${project.version}</version>
-        <classifier>sources</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <version>${project.version}</version>
-        <classifier>sources</classifier>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 </project>

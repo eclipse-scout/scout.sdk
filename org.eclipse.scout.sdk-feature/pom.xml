@@ -62,11 +62,11 @@
         <artifactId>tycho-source-feature-plugin</artifactId>
         <executions>
           <execution>
-            <phase>package</phase>
             <id>source-feature</id>
             <goals>
               <goal>source-feature</goal>
             </goals>
+            <phase>package</phase>
             <configuration>
               <excludes>
                 <!-- <plugin id="org.eclipse.scout.sdk.compatibility.v37v41.fragment" /> -->
@@ -81,10 +81,10 @@
         <executions>
           <execution>
             <id>attached-p2-metadata</id>
-            <phase>package</phase>
             <goals>
               <goal>p2-metadata</goal>
             </goals>
+            <phase>package</phase>
           </execution>
         </executions>
       </plugin>

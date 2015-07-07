@@ -29,44 +29,36 @@
   </properties>
 
   <dependencies>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-        <classifier>sources</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-        <classifier>sources</classifier>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk.s2e</groupId>
-        <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-        <classifier>sources</classifier>
-      </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.s2e</groupId>
+      <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.s2e</groupId>
+      <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
+      <classifier>sources</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.s2e</groupId>
+      <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.s2e</groupId>
+      <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
+      <classifier>sources</classifier>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.s2e</groupId>
+      <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.s2e</groupId>
+      <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
+      <classifier>sources</classifier>
+    </dependency>
   </dependencies>
 
   <build>
-    <extensions>
-      <!-- Enabling the use of FTP -->
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ftp</artifactId>
-        <version>1.0-beta-6</version>
-      </extension>
-    </extensions>
 
     <plugins>
       <plugin>
@@ -77,5 +69,13 @@
         </configuration>
       </plugin>
     </plugins>
+    <extensions>
+      <!-- Enabling the use of FTP -->
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ftp</artifactId>
+        <version>1.0-beta-6</version>
+      </extension>
+    </extensions>
   </build>
 </project>
