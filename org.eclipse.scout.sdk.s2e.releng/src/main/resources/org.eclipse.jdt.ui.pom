@@ -95,6 +95,11 @@
       <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
       <version>[3.5.0,4.0.0)</version>
     </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui.workbench.texteditor</artifactId>
+      <version>[3.8.0,4.0.0)</version>
+    </dependency>
 
     <!-- com.ibm.icu;bundle-version="4.4.2", -->
     <!-- org.eclipse.compare;bundle-version="[3.5.0,4.0.0)", -->
@@ -111,7 +116,6 @@
     <!-- org.eclipse.ui.console;bundle-version="[3.4.0,4.0.0)", -->
     <!-- org.eclipse.ui.navigator.resources;bundle-version="[3.4.0,4.0.0)", -->
     <!-- org.eclipse.ui.navigator;bundle-version="[3.3.200,4.0.0)", -->
-    <!-- org.eclipse.ui.workbench.texteditor;bundle-version="[3.8.0,4.0.0)", -->
     <!-- org.eclipse.ui;bundle-version="[3.5.0,4.0.0)", -->
   </dependencies>
 </project>

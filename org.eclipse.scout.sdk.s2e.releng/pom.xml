@@ -98,8 +98,8 @@
           <source>
             <repository>
               <id>eclipse_luna</id>
-              <url>http://download.eclipse.org/releases/luna</url>
-              <!-- <url>https://scout.bsiag.com/repository/eclipse.releases.luna</url> -->
+<!--               <url>http://download.eclipse.org/releases/luna</url> -->
+              <url>https://scout.bsiag.com/repository/eclipse.releases.luna</url>
               <layout>p2</layout>
             </repository>
           </source>
@@ -239,6 +239,14 @@
             <iu>
               <id>org.eclipse.ui.workbench.source</id>
               <version>${uiWorkbenchVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.workbench.texteditor</id>
+              <version>${uiWorkbenchTexteditorVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.workbench.texteditor.source</id>
+              <version>${uiWorkbenchTexteditorVersion}</version>
             </iu>
             <iu>
               <id>org.eclipse.jface</id>
@@ -593,6 +601,18 @@
                 </configuration>
               </execution>
               <execution>
+                <id>deploy-ui-workbench-texteditor</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.workbench.texteditor_${uiWorkbenchTexteditorVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.workbench.texteditor.source_${uiWorkbenchTexteditorVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.texteditor.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
                 <id>deploy-ui-jface</id>
                 <goals>
                   <goal>deploy-file</goal>
@@ -728,6 +748,18 @@
                   <file>${downloaded}/org.eclipse.ui.workbench_${uiWorkbenchVersion}.jar</file>
                   <sources>${downloaded}/org.eclipse.ui.workbench.source_${uiWorkbenchVersion}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-workbench-texteditor</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.workbench.texteditor_${uiWorkbenchTexteditorVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.workbench.texteditor.source_${uiWorkbenchTexteditorVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.texteditor.pom</pomFile>
                 </configuration>
               </execution>
               <execution>

@@ -71,6 +71,8 @@
     <jdtUiVersionMaven>${jdtUiVersion}-SNAPSHOT</jdtUiVersionMaven>
     <uiWorkbenchVersion>3.106.2.v20150204-1030</uiWorkbenchVersion>
     <uiWorkbenchVersionMaven>${uiWorkbenchVersion}-SNAPSHOT</uiWorkbenchVersionMaven>
+    <uiWorkbenchTexteditorVersion>3.9.0.v20140411-1521</uiWorkbenchTexteditorVersion>
+    <uiWorkbenchTexteditorVersionMaven>${uiWorkbenchTexteditorVersion}-SNAPSHOT</uiWorkbenchTexteditorVersionMaven>
     <uiJfaceVersion>3.10.2.v20141021-1035</uiJfaceVersion>
     <uiJfaceVersionMaven>${uiJfaceVersion}-SNAPSHOT</uiJfaceVersionMaven>
     <uiJfaceTextVersion>3.9.2.v20141003-1326</uiJfaceTextVersion>
