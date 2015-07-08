@@ -63,6 +63,8 @@
     <eclipseTextVersionMaven>${eclipseTextVersion}-SNAPSHOT</eclipseTextVersionMaven>
     <eclipseSearchVersion>3.9.100.v20140226-1637</eclipseSearchVersion>
     <eclipseSearchVersionMaven>${eclipseSearchVersion}-SNAPSHOT</eclipseSearchVersionMaven>
+    <eclipseLtkRefactoringVersion>3.6.101.v20140817-1500</eclipseLtkRefactoringVersion>
+    <eclipseLtkRefactoringVersionMaven>${eclipseLtkRefactoringVersion}-SNAPSHOT</eclipseLtkRefactoringVersionMaven>
     <jdtVersion>3.10.2.v20150120-1634</jdtVersion>
     <jdtVersionMaven>${jdtVersion}-SNAPSHOT</jdtVersionMaven>
     <jdtUiVersion>3.10.2.v20141014-1419</jdtUiVersion>

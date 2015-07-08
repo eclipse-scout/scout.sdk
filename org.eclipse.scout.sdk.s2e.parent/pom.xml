@@ -39,12 +39,12 @@
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core</artifactId>
-        <version>${scout.rt.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
-        <version>${scout.rt.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <!-- Build Dependencies (Provided) -->
       <dependency>
@@ -131,7 +131,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
-        <version>2.4</version>
         <configuration>
           <excludeResources>true</excludeResources>
           <excludes>

@@ -209,6 +209,14 @@
               <version>${eclipseSearchVersion}</version>
             </iu>
             <iu>
+              <id>org.eclipse.ltk.core.refactoring</id>
+              <version>${eclipseLtkRefactoringVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ltk.core.refactoring.source</id>
+              <version>${eclipseLtkRefactoringVersion}</version>
+            </iu>
+            <iu>
               <id>org.eclipse.jdt.core</id>
               <version>${jdtVersion}</version>
             </iu>
@@ -502,6 +510,18 @@
                   <file>${downloaded}/org.eclipse.search_${eclipseSearchVersion}.jar</file>
                   <sources>${downloaded}/org.eclipse.search.source_${eclipseSearchVersion}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.search.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-eclipse-ltk-refactoring</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ltk.core.refactoring_${eclipseLtkRefactoringVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ltk.core.refactoring.source_${eclipseLtkRefactoringVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ltk.core.refactoring.pom</pomFile>
                 </configuration>
               </execution>
             </executions>
@@ -948,6 +968,18 @@
                   <file>${downloaded}/org.eclipse.search_${eclipseSearchVersion}.jar</file>
                   <sources>${downloaded}/org.eclipse.search.source_${eclipseSearchVersion}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.search.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-eclipse-ltk-refactoring</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ltk.core.refactoring_${eclipseLtkRefactoringVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ltk.core.refactoring.source_${eclipseLtkRefactoringVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ltk.core.refactoring.pom</pomFile>
                 </configuration>
               </execution>
             </executions>
