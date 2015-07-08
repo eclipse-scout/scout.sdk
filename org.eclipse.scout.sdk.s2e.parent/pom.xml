@@ -100,8 +100,7 @@
             <Bundle-Name>${project.name}</Bundle-Name>
             <Bundle-Version>${project.version}</Bundle-Version>
             <Bundle-RequiredExecutionEnvironment>JavaSE-1.7</Bundle-RequiredExecutionEnvironment>
-            <Export-Package>${bundle.namespace}.internal.*;version="${bundle.version}";x-friends:="${bundle.symbolicName}.test",
-              ${bundle.namespace}.*;version="${bundle.version}"</Export-Package>
+            <Export-Package>${bundle.namespace}.*;version="${bundle.version}"</Export-Package>
             <Bundle-ActivationPolicy>lazy</Bundle-ActivationPolicy>
             <!-- Do not calculate the uses: directive. -->
             <_nouses>true</_nouses>

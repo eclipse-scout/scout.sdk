@@ -59,15 +59,7 @@
         <configuration>
           <instructions>
             <Import-Package>
-              !javax.*,
-              <!-- org.eclipse.scout.sdk.*;version="[5.1,5.2)", -->
-              <!-- org.eclipse.jdt.*;version="[3.10,4)", -->
-              <!-- org.eclipse.core.resources.*;version="[3.9,4)", -->
-              <!-- org.eclipse.core.runtime.jobs.*;version="[3.10,4)", -->
-              <!-- org.eclipse.search.*;version="[3.9.100,4)", -->
-              <!-- org.eclipse.jface.*;version="[3.10,4)", -->
-              <!-- org.eclipse.swt.*;version="[3.103,4)", -->
-              <!-- org.eclipse.ui.*;version="[3.5,4)", -->
+              !javax.*
               *
             </Import-Package>
             <Require-Bundle>org.eclipse.scout.sdk.s2e;bundle-version="[5.1,5.2)",
