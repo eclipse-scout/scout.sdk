@@ -98,8 +98,8 @@
           <source>
             <repository>
               <id>eclipse_luna</id>
-<!--               <url>http://download.eclipse.org/releases/luna</url> -->
-              <url>https://scout.bsiag.com/repository/eclipse.releases.luna</url>
+              <url>http://download.eclipse.org/releases/luna</url>
+<!--               <url>https://scout.bsiag.com/repository/eclipse.releases.luna</url> -->
               <layout>p2</layout>
             </repository>
           </source>
