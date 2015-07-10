@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.Flags;
@@ -171,6 +171,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
     }
   }
 
+  @SuppressWarnings("unchecked")
   protected static void copyAnnotations(IAnnotatable annotationOwner, final IType declaringType, ITypeSourceBuilder sourceBuilder, final ILookupEnvironment lookupEnv) {
     Set<IAnnotation> annotations = annotationOwner.getAnnotations();
     for (IAnnotation a : annotations) {
@@ -178,10 +179,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
       final IType annotationDeclarationType = annotation.getType();
       final String elementName = annotationDeclarationType.getName();
 
-      if (!IRuntimeClasses.FormData.equals(elementName)
-          && !IRuntimeClasses.Order.equals(elementName)
-          && !IRuntimeClasses.PageData.equals(elementName)
-          && !IRuntimeClasses.Data.equals(elementName)) {
+      if (!IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName) && !IRuntimeClasses.Data.equals(elementName)) {
 
         if (isAnnotationDtoRelevant(annotationDeclarationType)) {
           if (CoreUtils.isOnClasspath(annotationDeclarationType, lookupEnv)) {
@@ -315,21 +313,21 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
     return m_lookupEnv;
   }
 
-  protected static final Predicate<IPropertyBean> DTO_PROPERTY_FILTER = new Predicate<IPropertyBean>() {
+  protected static final Predicate/*<IPropertyBean>*/ DTO_PROPERTY_FILTER = new Predicate/*<IPropertyBean>*/() {
     @Override
-    public boolean evaluate(IPropertyBean property) {
+    public boolean evaluate(Object property) {
       // read and write method must exist
-      boolean readAndWriteMethodsExist = property.getReadMethod() != null && property.getWriteMethod() != null;
+      boolean readAndWriteMethodsExist = ((IPropertyBean) property).getReadMethod() != null && ((IPropertyBean) property).getWriteMethod() != null;
       if (!readAndWriteMethodsExist) {
         return false;
       }
 
       // @FormData or @Data annotation must exist
-      boolean isReadMethodDtoRelevant = CoreUtils.getAnnotation(property.getReadMethod(), IRuntimeClasses.FormData) != null || CoreUtils.getAnnotation(property.getReadMethod(), IRuntimeClasses.Data) != null;
+      boolean isReadMethodDtoRelevant = CoreUtils.getAnnotation(((IPropertyBean) property).getReadMethod(), IRuntimeClasses.FormData) != null || CoreUtils.getAnnotation(((IPropertyBean) property).getReadMethod(), IRuntimeClasses.Data) != null;
       if (!isReadMethodDtoRelevant) {
         return false;
       }
-      return CoreUtils.getAnnotation(property.getWriteMethod(), IRuntimeClasses.FormData) != null || CoreUtils.getAnnotation(property.getWriteMethod(), IRuntimeClasses.Data) != null;
+      return CoreUtils.getAnnotation(((IPropertyBean) property).getWriteMethod(), IRuntimeClasses.FormData) != null || CoreUtils.getAnnotation(((IPropertyBean) property).getWriteMethod(), IRuntimeClasses.Data) != null;
     }
   };
 

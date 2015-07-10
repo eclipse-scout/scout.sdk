@@ -25,10 +25,10 @@ import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.functors.TruePredicate;
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.functors.TruePredicate;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.model.FieldFilters;
 import org.eclipse.scout.sdk.core.model.Flags;
@@ -318,13 +318,13 @@ public final class CoreUtils {
    * @return A {@link ListOrderedSet} holding all type argument signatures of the given type parameter.
    * @see #getResolvedTypeParamValue(IType, String, int)
    */
-  public static ListOrderedSet<String> getResolvedTypeParamValueSignature(IType focusType, String levelFqn, int typeParamIndex) {
-    ListOrderedSet<IType> typeParamsValue = getResolvedTypeParamValue(focusType, levelFqn, typeParamIndex);
+  public static ListOrderedSet/*<String>*/ getResolvedTypeParamValueSignature(IType focusType, String levelFqn, int typeParamIndex) {
+    ListOrderedSet/*<IType>*/ typeParamsValue = getResolvedTypeParamValue(focusType, levelFqn, typeParamIndex);
     List<String> result = new ArrayList<>(typeParamsValue.size());
-    for (IType t : typeParamsValue) {
-      result.add(SignatureUtils.getResolvedSignature(t));
+    for (Object t : typeParamsValue) {
+      result.add(SignatureUtils.getResolvedSignature((IType) t));
     }
-    return ListOrderedSet.listOrderedSet(result);
+    return ListOrderedSet.decorate(result);
   }
 
   /**
@@ -346,11 +346,11 @@ public final class CoreUtils {
    *          The {@link Predicate} choosing the member {@link IType}.
    * @return The first inner {@link IType} or <code>null</code> if it cannot be found.
    */
-  public static IType getInnerType(IType declaringType, Predicate<IType> filter) {
+  public static IType getInnerType(IType declaringType, Predicate/*<IType>*/ filter) {
     if (declaringType == null) {
       return null;
     }
-    return CollectionUtils.find(declaringType.getTypes(), filter);
+    return (IType) CollectionUtils.find(declaringType.getTypes(), filter);
   }
 
   /**
@@ -376,7 +376,7 @@ public final class CoreUtils {
    *          The {@link Predicate} to filter the member {@link IType}s.
    * @return A {@link ListOrderedSet} holding the selected member {@link IType}.
    */
-  public static ListOrderedSet<IType> getInnerTypes(IType type, Predicate<IType> filter) {
+  public static ListOrderedSet/*<IType>*/ getInnerTypes(IType type, Predicate/*<IType>*/ filter) {
     return getInnerTypes(type, filter, null);
   }
 
@@ -393,23 +393,23 @@ public final class CoreUtils {
    *          the comparator to sort the result or null
    * @return the immediate inner types declared in the given type.
    */
-  public static ListOrderedSet<IType> getInnerTypes(IType type, Predicate<IType> filter, Comparator<IType> comparator) {
-    ListOrderedSet<IType> types = type.getTypes();
+  public static ListOrderedSet/*<IType>*/ getInnerTypes(IType type, Predicate/*<IType>*/ filter, Comparator<IType> comparator) {
+    ListOrderedSet/*<IType>*/ types = type.getTypes();
 
     if (filter == null) {
-      filter = TruePredicate.truePredicate();
+      filter = TruePredicate.getInstance();
     }
 
     if (comparator == null) {
       // no special order requested. keep order as it comes from the declaring type
       List<IType> l = new ArrayList<>(types.size());
       CollectionUtils.select(types, filter, l);
-      return ListOrderedSet.listOrderedSet(l);
+      return ListOrderedSet.decorate(l);
     }
 
     Set<IType> result = new TreeSet<>(comparator);
     CollectionUtils.select(types, filter, result);
-    return ListOrderedSet.listOrderedSet(result);
+    return ListOrderedSet.decorate(result);
   }
 
   /**
@@ -432,8 +432,8 @@ public final class CoreUtils {
       return type;
     }
     else {
-      for (IType innerType : type.getTypes()) {
-        IType found = findInnerType(innerType, innerTypeName);
+      for (Object innerType : type.getTypes()) {
+        IType found = findInnerType((IType) innerType, innerTypeName);
         if (found != null) {
           return found;
         }
@@ -451,8 +451,8 @@ public final class CoreUtils {
    */
   public static Set<IType> getAllSuperInterfaces(IType type) {
     Set<IType> collector = new HashSet<>();
-    for (IType t : type.getSuperInterfaces()) {
-      getAllSuperInterfaces(t, collector);
+    for (Object t : type.getSuperInterfaces()) {
+      getAllSuperInterfaces((IType) t, collector);
     }
     return collector;
   }
@@ -465,8 +465,8 @@ public final class CoreUtils {
       collector.add(t);
     }
     getAllSuperInterfaces(t.getSuperClass(), collector);
-    for (IType superIfc : t.getSuperInterfaces()) {
-      getAllSuperInterfaces(superIfc, collector);
+    for (Object superIfc : t.getSuperInterfaces()) {
+      getAllSuperInterfaces((IType) superIfc, collector);
     }
   }
 
@@ -498,7 +498,7 @@ public final class CoreUtils {
     if (declaringType == null) {
       return null;
     }
-    return CollectionUtils.find(declaringType.getFields(), FieldFilters.getNameFilter(fieldName));
+    return (IField) CollectionUtils.find(declaringType.getFields(), FieldFilters.getNameFilter(fieldName));
   }
 
   /**
@@ -511,7 +511,7 @@ public final class CoreUtils {
    *          The {@link Predicate} selecting the {@link IField}s.
    * @return A {@link ListOrderedSet} holding the {@link IField}s accepted by the {@link Predicate}.
    */
-  public static ListOrderedSet<IField> getFields(IType declaringType, Predicate<IField> filter) {
+  public static ListOrderedSet/*<IField>*/ getFields(IType declaringType, Predicate/*<IField>*/ filter) {
     return getFields(declaringType, filter, null);
   }
 
@@ -528,23 +528,23 @@ public final class CoreUtils {
    * @return A {@link ListOrderedSet} holding the {@link IField}s accepted by the {@link Predicate} sorted by the given
    *         {@link Comparator}.
    */
-  public static ListOrderedSet<IField> getFields(IType declaringType, Predicate<IField> filter, Comparator<IField> comparator) {
-    ListOrderedSet<IField> fields = declaringType.getFields();
+  public static ListOrderedSet/*<IField>*/ getFields(IType declaringType, Predicate/*<IField>*/ filter, Comparator<IField> comparator) {
+    ListOrderedSet/*<IField>*/ fields = declaringType.getFields();
 
     if (filter == null) {
-      filter = TruePredicate.truePredicate();
+      filter = TruePredicate.getInstance();
     }
 
     if (comparator == null) {
       // no special order requested. keep order as it comes from the declaring type
       List<IField> l = new ArrayList<>(fields.size());
       CollectionUtils.select(fields, filter, l);
-      return ListOrderedSet.listOrderedSet(l);
+      return ListOrderedSet.decorate(l);
     }
 
     Set<IField> result = new TreeSet<>(comparator);
     CollectionUtils.select(fields, filter, result);
-    return ListOrderedSet.listOrderedSet(result);
+    return ListOrderedSet.decorate(result);
   }
 
   /**
@@ -559,7 +559,7 @@ public final class CoreUtils {
    * @return A {@link ListOrderedSet} holding all type arguments of the given type parameter.
    * @see #getResolvedTypeParamValueSignature(IType, String, int)
    */
-  public static ListOrderedSet<IType> getResolvedTypeParamValue(IType focusType, String levelFqn, int typeParamIndex) {
+  public static ListOrderedSet/*<IType>*/ getResolvedTypeParamValue(IType focusType, String levelFqn, int typeParamIndex) {
     IType levelType = findSuperType(focusType, levelFqn);
     if (levelType == null) {
       return null;
@@ -578,18 +578,18 @@ public final class CoreUtils {
    *          The index of the type parameter on the given level type whose value should be extracted.
    * @return A {@link ListOrderedSet} holding all type arguments of the given type parameter.
    */
-  public static ListOrderedSet<IType> getResolvedTypeParamValue(IType focusType, IType levelType, int typeParamIndex) {
+  public static ListOrderedSet/*<IType>*/ getResolvedTypeParamValue(IType focusType, IType levelType, int typeParamIndex) {
     if (levelType == null) {
       return null;
     }
     IType item = levelType.getTypeArguments().get(typeParamIndex);
     if (!item.isAnonymous()) {
       // direct bind
-      return ListOrderedSet.listOrderedSet(Arrays.asList(item));
+      return ListOrderedSet.decorate(Arrays.asList(item));
     }
 
     IType superClassGeneric = item.getSuperClass();
-    ListOrderedSet<IType> superIfcGenerics = item.getSuperInterfaces();
+    ListOrderedSet/*<IType>*/ superIfcGenerics = item.getSuperInterfaces();
     List<IType> result = null;
     if (superClassGeneric != null) {
       result = new ArrayList<>(superIfcGenerics.size() + 1);
@@ -599,11 +599,11 @@ public final class CoreUtils {
       result = new ArrayList<>(superIfcGenerics.size());
     }
 
-    for (IType ifcGeneric : superIfcGenerics) {
-      result.add(ifcGeneric);
+    for (Object ifcGeneric : superIfcGenerics) {
+      result.add((IType) ifcGeneric);
     }
 
-    return ListOrderedSet.listOrderedSet(result);
+    return ListOrderedSet.decorate(result);
   }
 
   /**
@@ -616,7 +616,7 @@ public final class CoreUtils {
    *          The {@link Predicate} to select the {@link IMethod}.
    * @return The first {@link IMethod} or <code>null</code> if it cannot be found.
    */
-  public static IMethod findMethodInSuperHierarchy(IType startType, Predicate<IMethod> filter) {
+  public static IMethod findMethodInSuperHierarchy(IType startType, Predicate/*<IMethod>*/ filter) {
     if (startType == null) {
       return null;
     }
@@ -631,8 +631,8 @@ public final class CoreUtils {
       return method;
     }
 
-    for (IType ifc : startType.getSuperInterfaces()) {
-      method = findMethodInSuperHierarchy(ifc, filter);
+    for (Object ifc : startType.getSuperInterfaces()) {
+      method = findMethodInSuperHierarchy((IType) ifc, filter);
       if (method != null) {
         return method;
       }
@@ -650,14 +650,14 @@ public final class CoreUtils {
    *          The {@link Predicate} to select the member {@link IType}.
    * @return The first member {@link IType} or <code>null</code> if it cannot be found.
    */
-  public static IType findInnerTypeInSuperHierarchy(IType declaringType, Predicate<IType> filter) {
+  public static IType findInnerTypeInSuperHierarchy(IType declaringType, Predicate/*<IType>*/ filter) {
     if (declaringType == null) {
       return null;
     }
 
-    ListOrderedSet<IType> innerTypes = getInnerTypes(declaringType, filter);
+    ListOrderedSet/*<IType>*/ innerTypes = getInnerTypes(declaringType, filter);
     if (!innerTypes.isEmpty()) {
-      return innerTypes.get(0);
+      return (IType) innerTypes.get(0);
     }
     return findInnerTypeInSuperHierarchy(declaringType.getSuperClass(), filter);
   }
@@ -686,18 +686,19 @@ public final class CoreUtils {
    * @return Returns a {@link Set} of property bean descriptions.
    * @see <a href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">JavaBeans Spec</a>
    */
-  public static Set<IPropertyBean> getPropertyBeans(IType type, Predicate<IPropertyBean> propertyFilter, Comparator<IPropertyBean> comparator) {
-    Predicate<IMethod> filter = MethodFilters.getMultiMethodFilter(MethodFilters.getFlagsFilter(Flags.AccPublic), MethodFilters.getNameRegexFilter(BEAN_METHOD_NAME));
-    ListOrderedSet<IMethod> methods = getMethods(type, filter);
+  @SuppressWarnings("unchecked")
+  public static Set<IPropertyBean> getPropertyBeans(IType type, Predicate/*<IPropertyBean>*/ propertyFilter, Comparator<IPropertyBean> comparator) {
+    Predicate/*<IMethod>*/ filter = MethodFilters.getMultiMethodFilter(MethodFilters.getFlagsFilter(Flags.AccPublic), MethodFilters.getNameRegexFilter(BEAN_METHOD_NAME));
+    ListOrderedSet/*<IMethod>*/ methods = getMethods(type, filter);
     Map<String, PropertyBean> beans = new HashMap<>(methods.size());
-    for (IMethod m : methods) {
-      Matcher matcher = BEAN_METHOD_NAME.matcher(m.getName());
+    for (Object m : methods) {
+      Matcher matcher = BEAN_METHOD_NAME.matcher(((IMethod) m).getName());
       if (matcher.matches()) {
         String kind = matcher.group(1);
         String name = matcher.group(2);
 
-        List<IMethodParameter> parameterTypes = m.getParameters();
-        IType returnType = m.getReturnType();
+        List<IMethodParameter> parameterTypes = ((IMethod) m).getParameters();
+        IType returnType = ((IMethod) m).getReturnType();
         if ("get".equals(kind) && parameterTypes.size() == 0 && !returnType.equals(IType.VOID)) {
           PropertyBean desc = beans.get(name);
           if (desc == null) {
@@ -705,7 +706,7 @@ public final class CoreUtils {
             beans.put(name, desc);
           }
           if (desc.getReadMethod() == null) {
-            desc.setReadMethod(m);
+            desc.setReadMethod((IMethod) m);
           }
         }
         else {
@@ -717,7 +718,7 @@ public final class CoreUtils {
               beans.put(name, desc);
             }
             if (desc.getReadMethod() == null) {
-              desc.setReadMethod(m);
+              desc.setReadMethod((IMethod) m);
             }
           }
           else if ("set".equals(kind) && parameterTypes.size() == 1 && returnType.equals(IType.VOID)) {
@@ -727,7 +728,7 @@ public final class CoreUtils {
               beans.put(name, desc);
             }
             if (desc.getWriteMethod() == null) {
-              desc.setWriteMethod(m);
+              desc.setWriteMethod((IMethod) m);
             }
           }
         }
@@ -736,18 +737,18 @@ public final class CoreUtils {
 
     // filter
     if (propertyFilter == null) {
-      propertyFilter = TruePredicate.truePredicate();
+      propertyFilter = TruePredicate.getInstance();
     }
 
     if (comparator == null) {
       List<IPropertyBean> l = new ArrayList<>(beans.size());
       CollectionUtils.select(beans.values(), propertyFilter, l);
-      return ListOrderedSet.listOrderedSet(l);
+      return ListOrderedSet.decorate(l);
     }
 
     Set<IPropertyBean> result = new TreeSet<>(comparator);
     CollectionUtils.select(beans.values(), propertyFilter, result);
-    return ListOrderedSet.listOrderedSet(result);
+    return ListOrderedSet.decorate(result);
   }
 
   /**
@@ -764,11 +765,11 @@ public final class CoreUtils {
     if (annotatable == null) {
       return null;
     }
-    ListOrderedSet<IAnnotation> annotations = getAnnotations(annotatable, name, true);
+    ListOrderedSet/*<IAnnotation>*/ annotations = getAnnotations(annotatable, name, true);
     if (CollectionUtils.isEmpty(annotations)) {
       return null;
     }
-    return annotations.get(0);
+    return (IAnnotation) annotations.get(0);
   }
 
   /**
@@ -780,30 +781,30 @@ public final class CoreUtils {
    *          Simple or fully qualified name of the annotation type.
    * @return A {@link ListOrderedSet} holding all {@link IAnnotation}s having the given name.
    */
-  public static ListOrderedSet<IAnnotation> getAnnotations(IAnnotatable annotatable, String name) {
+  public static ListOrderedSet/*<IAnnotation>*/ getAnnotations(IAnnotatable annotatable, String name) {
     return getAnnotations(annotatable, name, false);
   }
 
-  private static ListOrderedSet<IAnnotation> getAnnotations(IAnnotatable annotatable, String name, boolean onlyFirst) {
+  private static ListOrderedSet/*<IAnnotation>*/ getAnnotations(IAnnotatable annotatable, String name, boolean onlyFirst) {
     if (annotatable == null) {
       return null;
     }
-    ListOrderedSet<IAnnotation> candidates = annotatable.getAnnotations();
+    ListOrderedSet/*<IAnnotation>*/ candidates = annotatable.getAnnotations();
     if (name == null || candidates.size() == 0) {
       return candidates;
     }
     String simpleName = Signature.getSimpleName(name);
 
     List<IAnnotation> result = new ArrayList<>(onlyFirst ? 1 : candidates.size());
-    for (IAnnotation candidate : candidates) {
-      if (name.equals(candidate.getType().getName()) || simpleName.equals(candidate.getType().getSimpleName())) {
-        result.add(candidate);
+    for (Object candidate : candidates) {
+      if (name.equals(((IAnnotation) candidate).getType().getName()) || simpleName.equals(((IAnnotation) candidate).getType().getSimpleName())) {
+        result.add((IAnnotation) candidate);
         if (onlyFirst) {
-          return ListOrderedSet.listOrderedSet(result); // cancel after first
+          return ListOrderedSet.decorate(result); // cancel after first
         }
       }
     }
-    return ListOrderedSet.listOrderedSet(result);
+    return ListOrderedSet.decorate(result);
   }
 
   /**
@@ -867,8 +868,8 @@ public final class CoreUtils {
       return result;
     }
 
-    for (IType superInterface : typeToCheck.getSuperInterfaces()) {
-      result = findSuperType(superInterface, queryType);
+    for (Object superInterface : typeToCheck.getSuperInterfaces()) {
+      result = findSuperType((IType) superInterface, queryType);
       if (result != null) {
         return result;
       }
@@ -899,14 +900,14 @@ public final class CoreUtils {
    *          The {@link Predicate} to select the {@link IMethod}.
    * @return The first {@link IMethod} or <code>null</code>.
    */
-  public static IMethod getMethod(IType type, Predicate<IMethod> filter) {
+  public static IMethod getMethod(IType type, Predicate/*<IMethod>*/ filter) {
     if (type == null) {
       return null;
     }
     if (filter == null) {
-      filter = TruePredicate.truePredicate();
+      filter = TruePredicate.getInstance();
     }
-    return CollectionUtils.find(type.getMethods(), filter);
+    return (IMethod) CollectionUtils.find(type.getMethods(), filter);
   }
 
   /**
@@ -931,7 +932,7 @@ public final class CoreUtils {
    *          The type to get all methods of.
    * @return A {@link Set} of all methods of the given type. Never returns null.
    */
-  public static ListOrderedSet<IMethod> getMethods(IType type) {
+  public static ListOrderedSet/*<IMethod>*/ getMethods(IType type) {
     return getMethods(type, null);
   }
 
@@ -945,7 +946,7 @@ public final class CoreUtils {
    *          The filter.
    * @return A {@link Set} of all methods of the given type matching the given filter. Never returns null.
    */
-  public static ListOrderedSet<IMethod> getMethods(IType type, Predicate<IMethod> filter) {
+  public static ListOrderedSet/*<IMethod>*/ getMethods(IType type, Predicate/*<IMethod>*/ filter) {
     return getMethods(type, filter, null);
   }
 
@@ -962,22 +963,23 @@ public final class CoreUtils {
    *          The comparator to use or null to get the methods in undefined order.
    * @return an {@link Set} of all methods of the given type matching the given filter. Never returns null.
    */
-  public static ListOrderedSet<IMethod> getMethods(IType type, Predicate<IMethod> filter, Comparator<IMethod> comparator) {
+  public static ListOrderedSet/*<IMethod>*/ getMethods(IType type, Predicate/*<IMethod>*/ filter, Comparator<IMethod> comparator) {
+    @SuppressWarnings("unchecked")
     Set<IMethod> methods = type.getMethods();
 
     if (filter == null) {
-      filter = TruePredicate.truePredicate();
+      filter = TruePredicate.getInstance();
     }
 
     if (comparator == null) {
       List<IMethod> l = new ArrayList<>(methods.size());
       CollectionUtils.select(methods, filter, l);
-      return ListOrderedSet.listOrderedSet(l);
+      return ListOrderedSet.decorate(l);
     }
 
     Set<IMethod> result = new TreeSet<>(comparator);
     CollectionUtils.select(methods, filter, result);
-    return ListOrderedSet.listOrderedSet(result);
+    return ListOrderedSet.decorate(result);
   }
 
   /**
@@ -1000,7 +1002,7 @@ public final class CoreUtils {
 
   /**
    * Gets the value of the given attribute in the given {@link IAnnotation} as a {@link String}.
-   * 
+   *
    * @param annotation
    *          The {@link IAnnotation} in which the attribute should be searched.
    * @param name
@@ -1028,7 +1030,7 @@ public final class CoreUtils {
 
   /**
    * Gets the value of the given attribute in the given {@link IAnnotation} as a {@link BigDecimal}.
-   * 
+   *
    * @param annotation
    *          The {@link IAnnotation} in which the attribute should be searched.
    * @param name

@@ -112,8 +112,8 @@ public class AllDtoUpdateOperation implements IOperation {
     String[] baseTypes = new String[]{IRuntimeClasses.IFormField, IRuntimeClasses.ITableExtension, IRuntimeClasses.IForm, IRuntimeClasses.IPageWithTable, IRuntimeClasses.IPageWithTableExtension};
     Map<CompositeObject, org.eclipse.jdt.core.IType> result = new TreeMap<>();
     for (int i = 0; i < baseTypes.length; i++) {
-      for (org.eclipse.jdt.core.IType baseType : JdtUtils.resolveJdtTypes(baseTypes[i])) {
-        ITypeHierarchy typeHierarchy = baseType.newTypeHierarchy(null);
+      for (Object baseType : JdtUtils.resolveJdtTypes(baseTypes[i])) {
+        ITypeHierarchy typeHierarchy = ((org.eclipse.jdt.core.IType) baseType).newTypeHierarchy(null);
         for (org.eclipse.jdt.core.IType candidate : typeHierarchy.getAllClasses()) {
           if (acceptType(candidate)) {
             result.put(new CompositeObject(i, candidate.getElementName(), candidate.getFullyQualifiedName(), Integer.valueOf(candidate.hashCode())), candidate);

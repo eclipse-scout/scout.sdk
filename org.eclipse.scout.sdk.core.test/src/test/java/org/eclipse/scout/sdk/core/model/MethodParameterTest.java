@@ -27,7 +27,7 @@ public class MethodParameterTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
     Assert.assertEquals(3, childClassType.getMethods().size());
-    IMethod method = childClassType.getMethods().get(1);
+    IMethod method = (IMethod) childClassType.getMethods().get(1);
     List<IMethodParameter> methodInChildClassParams = method.getParameters();
     Assert.assertEquals(2, methodInChildClassParams.size());
 
@@ -48,11 +48,11 @@ public class MethodParameterTest {
   public void testToString() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
-    Assert.assertFalse(StringUtils.isBlank(childClassType.getMethods().get(1).getParameters().get(1).toString()));
+    Assert.assertFalse(StringUtils.isBlank(((IMethod) childClassType.getMethods().get(1)).getParameters().get(1).toString()));
 
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
-    Assert.assertFalse(StringUtils.isBlank(baseClassType.getMethods().get(2).getParameters().get(0).toString()));
+    Assert.assertFalse(StringUtils.isBlank(((IMethod) baseClassType.getMethods().get(2)).getParameters().get(0).toString()));
   }
 
   @Test
@@ -60,7 +60,7 @@ public class MethodParameterTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
     Assert.assertEquals(3, baseClassType.getMethods().size());
-    IMethod method = baseClassType.getMethods().get(2);
+    IMethod method = (IMethod) baseClassType.getMethods().get(2);
     List<IMethodParameter> methodInBaseClassParams = method.getParameters();
     Assert.assertEquals(1, methodInBaseClassParams.size());
 

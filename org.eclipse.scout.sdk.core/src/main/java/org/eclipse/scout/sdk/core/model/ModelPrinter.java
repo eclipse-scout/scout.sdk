@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.model;
 
 import java.util.List;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -24,16 +24,17 @@ public final class ModelPrinter {
 
   protected static void printAnnotations(IAnnotatable anotatable, StringBuilder sb) {
     if (anotatable.getAnnotations().size() > 0) {
-      print(anotatable.getAnnotations().get(0), sb);
+      print((IAnnotation) anotatable.getAnnotations().get(0), sb);
       for (int i = 1; i < anotatable.getAnnotations().size(); i++) {
         sb.append('\n');
-        print(anotatable.getAnnotations().get(i), sb);
+        print((IAnnotation) anotatable.getAnnotations().get(i), sb);
       }
     }
   }
 
   public static void print(IAnnotation a, StringBuilder sb) {
     sb.append('@').append(a.getType().getName());
+    @SuppressWarnings("unchecked")
     List<IAnnotationValue> values = a.getValues().valueList();
     if (values.size() > 0) {
       sb.append('(');
@@ -61,12 +62,12 @@ public final class ModelPrinter {
   public static void print(ICompilationUnit icu, StringBuilder sb) {
     print(icu.getPackage(), sb);
     sb.append('\n');
-    for (IImportDeclaration id : icu.getImports().values()) {
-      print(id, sb);
+    for (Object id : icu.getImports().values()) {
+      print((IImportDeclaration) id, sb);
       sb.append('\n');
     }
-    for (IType t : icu.getTypes()) {
-      print(t, sb);
+    for (Object t : icu.getTypes()) {
+      print((IType) t, sb);
       sb.append('\n');
     }
   }
@@ -75,10 +76,10 @@ public final class ModelPrinter {
     sb.append(tp.getName());
     if (tp.getBounds().size() > 0) {
       sb.append(" extends ");
-      sb.append(tp.getBounds().get(0).getName());
+      sb.append(((IType) tp.getBounds().get(0)).getName());
       for (int i = 1; i < tp.getBounds().size(); i++) {
         sb.append(" & ");
-        sb.append(tp.getBounds().get(i).getName());
+        sb.append(((IType) tp.getBounds().get(i)).getName());
       }
     }
   }
@@ -114,10 +115,10 @@ public final class ModelPrinter {
     }
     if (t.getSuperInterfaces().size() > 0) {
       sb.append(" implements ");
-      sb.append(t.getSuperInterfaces().get(0).getName());
+      sb.append(((IType) t.getSuperInterfaces().get(0)).getName());
       for (int i = 1; i < t.getSuperInterfaces().size(); i++) {
         sb.append(", ");
-        sb.append(t.getSuperInterfaces().get(i).getName());
+        sb.append(((IType) t.getSuperInterfaces().get(i)).getName());
       }
     }
     boolean needsBody = t.getFields().size() > 0 || t.getMethods().size() > 0;
@@ -125,16 +126,16 @@ public final class ModelPrinter {
       sb.append(" {\n");
     }
     if (t.getFields().size() > 0) {
-      for (IField f : t.getFields()) {
+      for (Object f : t.getFields()) {
         sb.append('\n');
-        print(f, sb);
+        print((IField) f, sb);
         sb.append('\n');
       }
     }
     if (t.getMethods().size() > 0) {
-      for (IMethod m : t.getMethods()) {
+      for (Object m : t.getMethods()) {
         sb.append('\n');
-        print(m, sb);
+        print((IMethod) m, sb);
         sb.append('\n');
       }
     }
@@ -168,13 +169,13 @@ public final class ModelPrinter {
       }
     }
     sb.append(')');
-    ListOrderedSet<IType> exceptionTypes = m.getExceptionTypes();
+    ListOrderedSet/*<IType>*/ exceptionTypes = m.getExceptionTypes();
     if (exceptionTypes.size() > 0) {
       sb.append(" throws ");
-      sb.append(exceptionTypes.get(0).getName());
+      sb.append(((IType) exceptionTypes.get(0)).getName());
       for (int i = 1; i < exceptionTypes.size(); i++) {
         sb.append(", ");
-        sb.append(exceptionTypes.get(i).getName());
+        sb.append(((IType) exceptionTypes.get(i)).getName());
       }
     }
   }

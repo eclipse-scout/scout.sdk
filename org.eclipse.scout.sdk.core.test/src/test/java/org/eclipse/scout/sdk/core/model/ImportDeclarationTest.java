@@ -27,7 +27,7 @@ public class ImportDeclarationTest {
     ICompilationUnit childClassIcu = CoreTestingUtils.getChildClassIcu();
     Assert.assertNotNull(childClassIcu);
 
-    IImportDeclaration imp = childClassIcu.getImports().valueList().get(0);
+    IImportDeclaration imp = (IImportDeclaration) childClassIcu.getImports().valueList().get(0);
     Assert.assertNotNull(imp);
     Assert.assertEquals(childClassIcu, imp.getCompilationUnit());
     Assert.assertEquals(Signature.getQualifier(IOException.class.getName()), imp.getQualifier());
@@ -40,7 +40,7 @@ public class ImportDeclarationTest {
     ICompilationUnit childClassIcu = CoreTestingUtils.getChildClassIcu();
     Assert.assertNotNull(childClassIcu);
 
-    IImportDeclaration imp = childClassIcu.getImports().valueList().get(0);
+    IImportDeclaration imp = (IImportDeclaration) childClassIcu.getImports().valueList().get(0);
     Assert.assertFalse(StringUtils.isBlank(imp.toString()));
   }
 }

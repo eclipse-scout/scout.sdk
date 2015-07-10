@@ -19,7 +19,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.Flags;
@@ -153,7 +153,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
    * @param icu
    * @param lineDelimiter
    * @param validator
-   *          @
+   * @
    */
   protected void createTypeContent(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     // fields

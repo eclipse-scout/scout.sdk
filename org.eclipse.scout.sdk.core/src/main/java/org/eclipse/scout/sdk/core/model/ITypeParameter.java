@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.set.ListOrderedSet;
 
 /**
  * <h3>{@link ITypeParameter}</h3>
@@ -39,7 +39,7 @@ public interface ITypeParameter {
    *
    * @return A {@link ListOrderedSet} containing all bounds of this {@link ITypeParameter}.
    */
-  ListOrderedSet<IType> getBounds();
+  ListOrderedSet/*<IType>*/ getBounds();
 
   /**
    * Gets the {@link IType} this {@link ITypeParameter} belongs to.

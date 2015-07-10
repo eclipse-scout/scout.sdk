@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.util;
 import java.io.Serializable;
 import java.util.AbstractList;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.scout.sdk.core.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.InterfaceLevel1;
@@ -36,7 +36,7 @@ import org.junit.Test;
 public class CoreUtilsTest {
   @Test
   public void testGetInnerTypes() {
-    ListOrderedSet<IType> innerTypes = CoreUtils.getInnerTypes(CoreTestingUtils.getBaseClassType(), TypeFilters.getFlagsFilter(Flags.AccStatic), TypeComparators.getTypeNameComparator());
+    ListOrderedSet/*<IType>*/ innerTypes = CoreUtils.getInnerTypes(CoreTestingUtils.getBaseClassType(), TypeFilters.getFlagsFilter(Flags.AccStatic), TypeComparators.getTypeNameComparator());
     Assert.assertEquals(1, innerTypes.size());
   }
 
@@ -60,7 +60,7 @@ public class CoreUtilsTest {
   public void testIsGenericType() {
     Assert.assertTrue(CoreUtils.isGenericType(CoreTestingUtils.getChildClassType()));
     Assert.assertTrue(CoreUtils.isGenericType(CoreTestingUtils.getBaseClassType()));
-    Assert.assertFalse(CoreUtils.isGenericType(CoreTestingUtils.getBaseClassType().getTypes().get(0)));
+    Assert.assertFalse(CoreUtils.isGenericType((IType) CoreTestingUtils.getBaseClassType().getTypes().get(0)));
   }
 
   @Test
@@ -70,7 +70,7 @@ public class CoreUtilsTest {
 
   @Test
   public void testGetResolvedTypeParamValueSignature() {
-    ListOrderedSet<String> resolvedTypeParamValueSignature = CoreUtils.getResolvedTypeParamValueSignature(CoreTestingUtils.getChildClassType(), InterfaceLevel1.class.getName(), 0);
+    ListOrderedSet/*<String>*/ resolvedTypeParamValueSignature = CoreUtils.getResolvedTypeParamValueSignature(CoreTestingUtils.getChildClassType(), InterfaceLevel1.class.getName(), 0);
     Assert.assertEquals(1, resolvedTypeParamValueSignature.size());
     Assert.assertEquals(Signature.createTypeSignature(org.eclipse.scout.sdk.core.fixture.Long.class.getName()), resolvedTypeParamValueSignature.get(0));
 
@@ -135,10 +135,10 @@ public class CoreUtilsTest {
 
   @Test
   public void testGetAnnotation() {
-    Assert.assertNotNull(CoreUtils.getAnnotation(CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getName()));
-    Assert.assertNotNull(CoreUtils.getAnnotation(CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getSimpleName()));
-    Assert.assertEquals(1, CoreUtils.getAnnotations(CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getSimpleName()).size());
-    Assert.assertEquals(1, CoreUtils.getAnnotations(CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getName()).size());
+    Assert.assertNotNull(CoreUtils.getAnnotation((IMethod) CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getName()));
+    Assert.assertNotNull(CoreUtils.getAnnotation((IMethod) CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getSimpleName()));
+    Assert.assertEquals(1, CoreUtils.getAnnotations((IMethod) CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getSimpleName()).size());
+    Assert.assertEquals(1, CoreUtils.getAnnotations((IMethod) CoreTestingUtils.getBaseClassType().getMethods().get(2), MarkerAnnotation.class.getName()).size());
   }
 
   @Test
@@ -164,7 +164,7 @@ public class CoreUtilsTest {
 
   @Test
   public void testGetMethods() {
-    ListOrderedSet<IMethod> methods = CoreUtils.getMethods(CoreTestingUtils.getBaseClassType(), MethodFilters.getFlagsFilter(Flags.AccSynchronized));
+    ListOrderedSet/*<IMethod>*/ methods = CoreUtils.getMethods(CoreTestingUtils.getBaseClassType(), MethodFilters.getFlagsFilter(Flags.AccSynchronized));
     Assert.assertEquals(1, methods.size());
 
     methods = CoreUtils.getMethods(CoreTestingUtils.getBaseClassType(), MethodFilters.getFlagsFilter(Flags.AccPrivate));

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 
 /**
@@ -28,8 +28,8 @@ final class VoidType implements IType {
   }
 
   @Override
-  public ListOrderedSet<IAnnotation> getAnnotations() {
-    return ListOrderedSet.listOrderedSet(new HashSet<IAnnotation>(0));
+  public ListOrderedSet/*<IAnnotation>*/ getAnnotations() {
+    return ListOrderedSet.decorate(new HashSet<IAnnotation>(0));
   }
 
   @Override
@@ -98,18 +98,18 @@ final class VoidType implements IType {
   }
 
   @Override
-  public ListOrderedSet<IType> getSuperInterfaces() {
-    return ListOrderedSet.listOrderedSet(new HashSet<IType>(0));
+  public ListOrderedSet/*<IType>*/ getSuperInterfaces() {
+    return ListOrderedSet.decorate(new HashSet<IType>(0));
   }
 
   @Override
-  public ListOrderedSet<IType> getTypes() {
-    return ListOrderedSet.listOrderedSet(new HashSet<IType>(0));
+  public ListOrderedSet/*<IType>*/ getTypes() {
+    return ListOrderedSet.decorate(new HashSet<IType>(0));
   }
 
   @Override
-  public ListOrderedSet<IMethod> getMethods() {
-    return ListOrderedSet.listOrderedSet(new HashSet<IMethod>(0));
+  public ListOrderedSet/*<IMethod>*/ getMethods() {
+    return ListOrderedSet.decorate(new HashSet<IMethod>(0));
   }
 
   @Override
@@ -123,8 +123,8 @@ final class VoidType implements IType {
   }
 
   @Override
-  public ListOrderedSet<IField> getFields() {
-    return ListOrderedSet.listOrderedSet(new HashSet<IField>(0));
+  public ListOrderedSet/*<IField>*/ getFields() {
+    return ListOrderedSet.decorate(new HashSet<IField>(0));
   }
 
   @Override

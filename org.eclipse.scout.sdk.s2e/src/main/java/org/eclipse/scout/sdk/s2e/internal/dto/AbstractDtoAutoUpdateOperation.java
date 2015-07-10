@@ -135,7 +135,7 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
     }
 
     try (InputStream is = targetFile.getContents()) {
-      return IOUtils.toString(is, Charset.forName(charsetName));
+      return IOUtils.toString(is, charsetName);
     }
     catch (IOException e) {
       throw new CoreException(new ScoutStatus("Unable to read file '" + targetFile.getFullPath().toOSString() + "'.", e));

@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
-import org.apache.commons.collections4.map.ListOrderedMap;
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.map.ListOrderedMap;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 
 /**
@@ -38,7 +38,7 @@ public interface ICompilationUnit {
    * @return A {@link ListOrderedMap} with the import simple name as key and the corresponding
    *         {@link IImportDeclaration} as value.
    */
-  ListOrderedMap<String, IImportDeclaration> getImports();
+  ListOrderedMap/*<String, IImportDeclaration>*/ getImports();
 
   /**
    * Gets all {@link IType}s that are defined in this {@link ICompilationUnit} in the order as they are defined in the
@@ -46,7 +46,7 @@ public interface ICompilationUnit {
    *
    * @return A {@link ListOrderedSet} with all {@link IType}s of this {@link ICompilationUnit}.
    */
-  ListOrderedSet<IType> getTypes();
+  ListOrderedSet/*<IType>*/ getTypes();
 
   /**
    * Gets the main {@link IType} of this {@link ICompilationUnit}. This is the {@link IType} whose name matches the name

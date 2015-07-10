@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.scout.sdk.core.model.Flags;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.model.TypeFilters;
@@ -48,18 +48,18 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
   }
 
   private void createCompositeFieldFormData(IType compositeType) {
-    ListOrderedSet<IType> innerTypes = CoreUtils.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(IRuntimeClasses.IFormField));
-    for (IType formField : innerTypes) {
+    ListOrderedSet/*<IType>*/ innerTypes = CoreUtils.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(IRuntimeClasses.IFormField));
+    for (Object formField : innerTypes) {
       boolean fieldExtendsTemplateField = false;
 
-      if (Flags.isPublic(formField.getFlags())) {
-        FormDataAnnotation fieldAnnotation = DtoUtils.findFormDataAnnotation(formField);
+      if (Flags.isPublic(((IType) formField).getFlags())) {
+        FormDataAnnotation fieldAnnotation = DtoUtils.findFormDataAnnotation((IType) formField);
 
         if (FormDataAnnotation.isCreate(fieldAnnotation)) {
           IType formDataType = fieldAnnotation.getFormDataType();
           String formDataTypeName = null;
           if (formDataType == null) {
-            formDataTypeName = DtoUtils.removeFieldSuffix(formField.getSimpleName());
+            formDataTypeName = DtoUtils.removeFieldSuffix(((IType) formField).getSimpleName());
           }
           else {
             formDataTypeName = formDataType.getSimpleName();
@@ -68,15 +68,15 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           ITypeSourceBuilder fieldSourceBuilder = null;
           if (CoreUtils.isInstanceOf(fieldAnnotation.getSuperType(), IRuntimeClasses.AbstractTableFieldBeanData)) {
             // fill table bean
-            fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, fieldAnnotation, formDataTypeName, getLookupEnvironment());
+            fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder((IType) formField, fieldAnnotation, formDataTypeName, getLookupEnvironment());
           }
-          else if (CoreUtils.isInstanceOf(formField, IRuntimeClasses.ICompositeField) && !CoreUtils.isInstanceOf(formField, IRuntimeClasses.IValueField)) {
+          else if (CoreUtils.isInstanceOf((IType) formField, IRuntimeClasses.ICompositeField) && !CoreUtils.isInstanceOf((IType) formField, IRuntimeClasses.IValueField)) {
             // field extends a field template.
             fieldExtendsTemplateField = true;
-            fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder(formField, fieldAnnotation, formDataTypeName, getLookupEnvironment());
+            fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder((IType) formField, fieldAnnotation, formDataTypeName, getLookupEnvironment());
           }
           else {
-            fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, fieldAnnotation, formDataTypeName, getLookupEnvironment());
+            fieldSourceBuilder = new FormDataTypeSourceBuilder((IType) formField, fieldAnnotation, formDataTypeName, getLookupEnvironment());
 
             // special case if a boolean (primitive!) property has the same name as a form field -> show warning
             for (IMethodSourceBuilder msb : getMethodSourceBuilders()) {
@@ -104,15 +104,15 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           continue;
         }
 
-        if (CoreUtils.isInstanceOf(formField, IRuntimeClasses.ICompositeField) && !fieldExtendsTemplateField) {
-          createCompositeFieldFormData(formField);
+        if (CoreUtils.isInstanceOf((IType) formField, IRuntimeClasses.ICompositeField) && !fieldExtendsTemplateField) {
+          createCompositeFieldFormData((IType) formField);
         }
       }
     }
 
     // step into extensions
-    for (IType formFieldExtension : CoreUtils.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(IRuntimeClasses.ICompositeFieldExtension))) {
-      createCompositeFieldFormData(formFieldExtension);
+    for (Object formFieldExtension : CoreUtils.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(IRuntimeClasses.ICompositeFieldExtension))) {
+      createCompositeFieldFormData((IType) formFieldExtension);
     }
   }
 }

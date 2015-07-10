@@ -16,12 +16,12 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
  * <h3>{@link IPropertyBean}</h3>
  * Description of a Java bean property.<br>
  * <br>
- * Use {@link CoreUtils#getPropertyBeans(IType, org.apache.commons.collections4.Predicate, java.util.Comparator)} to get
+ * Use {@link CoreUtils#getPropertyBeans(IType, org.apache.commons.collections.Predicate, java.util.Comparator)} to get
  * {@link IPropertyBean}s.
  *
  * @author Andreas Hoegger
  * @since 3.0.0
- * @see CoreUtils#getPropertyBeans(IType, org.apache.commons.collections4.Predicate, java.util.Comparator)
+ * @see CoreUtils#getPropertyBeans(IType, org.apache.commons.collections.Predicate, java.util.Comparator)
  */
 public interface IPropertyBean {
   /**

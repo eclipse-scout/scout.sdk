@@ -16,10 +16,12 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
+import org.eclipse.core.runtime.CoreException;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.ExpressionValueType;
@@ -115,11 +117,11 @@ public final class DtoUtils {
   }
 
   public static String getColumnValueTypeSignature(IType columnContainer) {
-    ListOrderedSet<String> resolvedTypeParamValues = CoreUtils.getResolvedTypeParamValueSignature(columnContainer, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
+    ListOrderedSet/*<String>*/ resolvedTypeParamValues = CoreUtils.getResolvedTypeParamValueSignature(columnContainer, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
     if (CollectionUtils.isEmpty(resolvedTypeParamValues)) {
       return null;
     }
-    return resolvedTypeParamValues.get(0); // only use first
+    return (String) resolvedTypeParamValues.get(0); // only use first
   }
 
   public static String removeFieldSuffix(String fieldName) {
@@ -228,11 +230,11 @@ public final class DtoUtils {
       throw new RuntimeException("Invalid genericOrdinal value on class '" + annotationOwnerType.getName() + "'.");
     }
 
-    ListOrderedSet<IType> resolvedTypeParamValue = CoreUtils.getResolvedTypeParamValue(contextType, annotationOwnerType, genericOrdinal);
+    ListOrderedSet/*<IType>*/ resolvedTypeParamValue = CoreUtils.getResolvedTypeParamValue(contextType, annotationOwnerType, genericOrdinal);
     if (CollectionUtils.isEmpty(resolvedTypeParamValue)) {
       return null;
     }
-    return resolvedTypeParamValue.get(0);
+    return (IType) resolvedTypeParamValue.get(0);
   }
 
   public static FormDataAnnotation findFormDataAnnotation(IType type) {
@@ -361,8 +363,8 @@ public final class DtoUtils {
       IType superType = type.getSuperClass();
 
       parseFormDataAnnotationRec(annotation, superType, replaceAnnotationPresent);
-      for (IType superInterface : type.getSuperInterfaces()) {
-        parseFormDataAnnotationRec(annotation, superInterface, replaceAnnotationPresent);
+      for (Object superInterface : type.getSuperInterfaces()) {
+        parseFormDataAnnotationRec(annotation, (IType) superInterface, replaceAnnotationPresent);
       }
 
       if (replaceAnnotationPresent && superType != null && !ScoutUtils.existsReplaceAnnotation(superType)) {
@@ -511,8 +513,8 @@ public final class DtoUtils {
     }
     Set<String> allSuperInterfaceMethods = new HashSet<>();
     for (IType t : allSuperInterfaces) {
-      for (IMethod m : t.getMethods()) {
-        allSuperInterfaceMethods.add(SignatureUtils.getMethodIdentifier(m));
+      for (Object m : t.getMethods()) {
+        allSuperInterfaceMethods.add(SignatureUtils.getMethodIdentifier((IMethod) m));
       }
     }
     for (IMethodSourceBuilder msb : sourceBuilder.getMethodSourceBuilders()) {
@@ -663,10 +665,10 @@ public final class DtoUtils {
         else if (CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IPageWithTable)) {
           IType pageDto = findDtoForPage(primaryType);
 
-          ListOrderedSet<IType> rowDataInPageDto = CoreUtils.getInnerTypes(pageDto, TypeFilters.getSubtypeFilter(IRuntimeClasses.AbstractTableRowData));
+          ListOrderedSet/*<IType>*/ rowDataInPageDto = CoreUtils.getInnerTypes(pageDto, TypeFilters.getSubtypeFilter(IRuntimeClasses.AbstractTableRowData));
           extendedDto = null;
           if (CollectionUtils.isNotEmpty(rowDataInPageDto)) {
-            extendedDto = rowDataInPageDto.get(0);
+            extendedDto = (IType) rowDataInPageDto.get(0);
           }
         }
 
@@ -723,9 +725,9 @@ public final class DtoUtils {
     // 2. try to read from generic
     boolean isExtension = CoreUtils.isInstanceOf(modelType, IRuntimeClasses.IExtension);
     if (isExtension) {
-      ListOrderedSet<IType> owner = CoreUtils.getResolvedTypeParamValue(modelType, IRuntimeClasses.IExtension, IRuntimeClasses.TYPE_PARAM_EXTENSION__OWNER);
+      ListOrderedSet/*<IType>*/ owner = CoreUtils.getResolvedTypeParamValue(modelType, IRuntimeClasses.IExtension, IRuntimeClasses.TYPE_PARAM_EXTENSION__OWNER);
       if (CollectionUtils.isNotEmpty(owner)) {
-        return owner.get(0);
+        return (IType) owner.get(0);
       }
     }
 

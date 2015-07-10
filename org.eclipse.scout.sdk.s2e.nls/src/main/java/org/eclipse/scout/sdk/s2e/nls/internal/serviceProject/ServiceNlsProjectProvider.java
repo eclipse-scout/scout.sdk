@@ -16,7 +16,7 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IStatus;
@@ -76,10 +76,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     };
 
     Set<TextProviderServiceDeclaration> result = new TreeSet<>(comparator);
-    ListOrderedSet<IType> baseTypes = JdtUtils.resolveJdtTypes("org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService");
-    for (IType t : baseTypes) {
-      ITypeHierarchy typeHierarchy = t.newTypeHierarchy(null);
-      for (IType candidate : typeHierarchy.getAllSubtypes(t)) {
+    ListOrderedSet/*<IType>*/ baseTypes = JdtUtils.resolveJdtTypes("org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService");
+    for (Object t : baseTypes) {
+      ITypeHierarchy typeHierarchy = ((IType) t).newTypeHierarchy(null);
+      for (IType candidate : typeHierarchy.getAllSubtypes((IType) t)) {
         try {
           if (!Flags.isAbstract(candidate.getFlags()) && SourceRange.isAvailable(candidate.getSourceRange()) && acceptsFilter(projectFilter, candidate)) {
             // only accept non-abstract types with source available and fulfills the given project filter

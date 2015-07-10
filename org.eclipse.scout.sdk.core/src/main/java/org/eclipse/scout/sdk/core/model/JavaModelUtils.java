@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.ASTNode;
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
@@ -307,26 +307,26 @@ public final class JavaModelUtils {
     return getAnnotationValue(computeExpressionValue(expression, scope), name, scope, owner, env);
   }
 
-  static ListOrderedSet<IAnnotation> annotationBindingsToIAnnotations(AnnotationBinding[] annots, IAnnotatable owner, ILookupEnvironment env) {
+  static ListOrderedSet/*<IAnnotation>*/ annotationBindingsToIAnnotations(AnnotationBinding[] annots, IAnnotatable owner, ILookupEnvironment env) {
     if (annots == null || annots.length < 1) {
-      return ListOrderedSet.listOrderedSet(new HashSet<IAnnotation>(0));
+      return ListOrderedSet.decorate(new HashSet<IAnnotation>(0));
     }
     List<IAnnotation> result = new ArrayList<>(annots.length);
     for (int i = 0; i < annots.length; i++) {
       result.add(new BindingAnnotation(annots[i], owner, null, i, env));
     }
-    return ListOrderedSet.listOrderedSet(result);
+    return ListOrderedSet.decorate(result);
   }
 
-  static ListOrderedSet<IAnnotation> annotationsToIAnnotations(Annotation[] annotations, ClassScope scope, IAnnotatable owner, ILookupEnvironment env) {
+  static ListOrderedSet/*<IAnnotation>*/ annotationsToIAnnotations(Annotation[] annotations, ClassScope scope, IAnnotatable owner, ILookupEnvironment env) {
     if (annotations == null || annotations.length < 1) {
-      return ListOrderedSet.listOrderedSet(new HashSet<IAnnotation>(0));
+      return ListOrderedSet.decorate(new HashSet<IAnnotation>(0));
     }
     List<IAnnotation> result = new ArrayList<>(annotations.length);
     for (int i = 0; i < annotations.length; i++) {
       result.add(new org.eclipse.scout.sdk.core.model.Annotation(annotations[i], scope, owner, i, env));
     }
-    return ListOrderedSet.listOrderedSet(result);
+    return ListOrderedSet.decorate(result);
   }
 
   static boolean hasDeprecatedAnnotation(AnnotationBinding[] annotations) {

@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections.Predicate;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.Flags;
 import org.eclipse.scout.sdk.core.model.IMethod;
@@ -97,11 +97,11 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
 
     // addRow
     final String addRowMethodName = "addRow";
-    IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), addRowMethodName, new Predicate<IMethod>() {
+    IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), addRowMethodName, new Predicate/*<IMethod>*/() {
       @Override
-      public boolean evaluate(IMethod candidate) {
+      public boolean evaluate(Object candidate) {
         // choose the narrowed overload from the abstract super class instead of the method defined in the interface
-        return candidate.getParameters().size() == 0;
+        return ((IMethod) candidate).getParameters().size() == 0;
       }
     });
     addRowMethodBuilder.setReturnTypeSignature(tableRowSignature);
@@ -114,10 +114,10 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(addRowMethodBuilder), addRowMethodBuilder);
 
     // addRow(int state)
-    IMethodSourceBuilder addRowWithStateMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), addRowMethodName, new Predicate<IMethod>() {
+    IMethodSourceBuilder addRowWithStateMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), addRowMethodName, new Predicate/*<IMethod>*/() {
       @Override
-      public boolean evaluate(IMethod candidate) {
-        return candidate.getParameters().size() == 1;
+      public boolean evaluate(Object candidate) {
+        return ((IMethod) candidate).getParameters().size() == 1;
       }
     });
     addRowWithStateMethodBuilder.getParameters().get(0).setName("rowState"); // in case the param name cannot be parsed from the class file

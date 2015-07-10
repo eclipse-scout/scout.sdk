@@ -53,7 +53,7 @@ public class TypeTest {
 
     // super interfaces
     Assert.assertEquals(1, childClassType.getSuperInterfaces().size());
-    Assert.assertEquals(InterfaceLevel0.class.getName(), childClassType.getSuperInterfaces().get(0).getName());
+    Assert.assertEquals(InterfaceLevel0.class.getName(), ((IType) childClassType.getSuperInterfaces().get(0)).getName());
 
     // type parameters
     Assert.assertEquals(1, childClassType.getTypeParameters().size());
@@ -62,9 +62,9 @@ public class TypeTest {
     Assert.assertEquals(childClassType, firstTypeParam.getType());
     Assert.assertEquals("X", firstTypeParam.getName());
     Assert.assertEquals(3, firstTypeParam.getBounds().size());
-    Assert.assertEquals(AbstractList.class.getName(), firstTypeParam.getBounds().get(0).getName());
-    Assert.assertEquals(Runnable.class.getName(), firstTypeParam.getBounds().get(1).getName());
-    Assert.assertEquals(Serializable.class.getName(), firstTypeParam.getBounds().get(2).getName());
+    Assert.assertEquals(AbstractList.class.getName(), ((IType) firstTypeParam.getBounds().get(0)).getName());
+    Assert.assertEquals(Runnable.class.getName(), ((IType) firstTypeParam.getBounds().get(1)).getName());
+    Assert.assertEquals(Serializable.class.getName(), ((IType) firstTypeParam.getBounds().get(2)).getName());
 
     // member types
     Assert.assertEquals(0, childClassType.getTypes().size());
@@ -84,7 +84,7 @@ public class TypeTest {
   @Test
   public void testWildcard() {
     IType wildcardType = TestingUtils.getType(WildcardChildClass.class.getName(), CoreTestingUtils.SOURCE_FOLDER);
-    IType returnType = wildcardType.getMethods().get(1).getReturnType();
+    IType returnType = ((IMethod) wildcardType.getMethods().get(1)).getReturnType();
     IType firstArg = returnType.getTypeArguments().get(0);
     Assert.assertTrue(firstArg.isWildcardType());
     Assert.assertEquals(BaseClass.class.getName(), firstArg.getName());
@@ -113,7 +113,7 @@ public class TypeTest {
 
     // super interfaces
     Assert.assertEquals(1, baseClassType.getSuperInterfaces().size());
-    Assert.assertEquals(InterfaceLevel1.class.getName(), baseClassType.getSuperInterfaces().get(0).getName());
+    Assert.assertEquals(InterfaceLevel1.class.getName(), ((IType) baseClassType.getSuperInterfaces().get(0)).getName());
 
     // type parameters
     Assert.assertEquals(2, baseClassType.getTypeParameters().size());
@@ -131,10 +131,10 @@ public class TypeTest {
 
     // member types
     Assert.assertEquals(2, baseClassType.getTypes().size());
-    Assert.assertEquals(Flags.AccStatic, baseClassType.getTypes().get(0).getFlags());
-    Assert.assertEquals(baseClassType, baseClassType.getTypes().get(0).getDeclaringType());
-    Assert.assertEquals(Flags.AccProtected, baseClassType.getTypes().get(1).getFlags());
-    Assert.assertEquals(baseClassType, baseClassType.getTypes().get(1).getDeclaringType());
+    Assert.assertEquals(Flags.AccStatic, ((IMember) baseClassType.getTypes().get(0)).getFlags());
+    Assert.assertEquals(baseClassType, ((IMember) baseClassType.getTypes().get(0)).getDeclaringType());
+    Assert.assertEquals(Flags.AccProtected, ((IMember) baseClassType.getTypes().get(1)).getFlags());
+    Assert.assertEquals(baseClassType, ((IMember) baseClassType.getTypes().get(1)).getDeclaringType());
 
     // type arguments
     List<IType> typeArguments = baseClassType.getTypeArguments();
@@ -143,8 +143,8 @@ public class TypeTest {
     Assert.assertTrue(firstTypeArg.isAnonymous());
     Assert.assertEquals(AbstractList.class.getName(), firstTypeArg.getSuperClass().getName());
     Assert.assertEquals(2, firstTypeArg.getSuperInterfaces().size());
-    Assert.assertEquals(Runnable.class.getName(), firstTypeArg.getSuperInterfaces().get(0).getName());
-    Assert.assertEquals(Serializable.class.getName(), firstTypeArg.getSuperInterfaces().get(1).getName());
+    Assert.assertEquals(Runnable.class.getName(), ((IType) firstTypeArg.getSuperInterfaces().get(0)).getName());
+    Assert.assertEquals(Serializable.class.getName(), ((IType) firstTypeArg.getSuperInterfaces().get(1)).getName());
 
     IType secondTypeArg = typeArguments.get(1);
     Assert.assertFalse(secondTypeArg.isAnonymous());
@@ -162,11 +162,12 @@ public class TypeTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IType innerClass2 = baseClassType.getTypes().get(1);
+    IType innerClass2 = (IType) baseClassType.getTypes().get(1);
     testInnerType(innerClass2);
   }
 
-  private void testInnerType(IType innerClass2) {
+  @Test
+  public void testInnerType(IType innerClass2) {
     Assert.assertNotNull(innerClass2);
 
     Assert.assertEquals(0, innerClass2.getArrayDimension());

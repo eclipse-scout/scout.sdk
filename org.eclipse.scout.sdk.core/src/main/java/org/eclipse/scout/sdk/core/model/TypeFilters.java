@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.model;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections.Predicate;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 
 /**
@@ -20,42 +20,42 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
  */
 public final class TypeFilters {
 
-  private static final Predicate<IType> INTERFACE_FILTER = new Predicate<IType>() {
+  private static final Predicate/*<IType>*/ INTERFACE_FILTER = new Predicate/*<IType>*/() {
     @Override
-    public boolean evaluate(IType candidate) {
-      int flags = candidate.getFlags();
+    public boolean evaluate(Object candidate) {
+      int flags = ((IType) candidate).getFlags();
       return Flags.isInterface(flags) && !Flags.isDeprecated(flags);
     }
   };
-  private static final Predicate<IType> CLASS_FILTER = new Predicate<IType>() {
+  private static final Predicate/*<IType>*/ CLASS_FILTER = new Predicate/*<IType>*/() {
     @Override
-    public boolean evaluate(IType candidate) {
-      return isClass(candidate);
+    public boolean evaluate(Object candidate) {
+      return isClass((IType) candidate);
     }
   };
-  private static final Predicate<IType> TOP_LEVEL_FILTER = new Predicate<IType>() {
+  private static final Predicate/*<IType>*/ TOP_LEVEL_FILTER = new Predicate/*<IType>*/() {
     @Override
-    public boolean evaluate(IType type) {
-      return type != null && type.getDeclaringType() == null;
+    public boolean evaluate(Object type) {
+      return type != null && ((IType) type).getDeclaringType() == null;
     }
   };
-  private static final Predicate<IType> NO_GENERIC_FILTER = new Predicate<IType>() {
+  private static final Predicate/*<IType>*/ NO_GENERIC_FILTER = new Predicate/*<IType>*/() {
     @Override
-    public boolean evaluate(IType type) {
-      return !type.hasTypeParameters();
+    public boolean evaluate(Object type) {
+      return !((IType) type).hasTypeParameters();
     }
   };
-  private static final Predicate<IType> ENUM_TYPE_FILTER = new Predicate<IType>() {
+  private static final Predicate/*<IType>*/ ENUM_TYPE_FILTER = new Predicate/*<IType>*/() {
     @Override
-    public boolean evaluate(IType type) {
-      int flags = type.getFlags();
+    public boolean evaluate(Object type) {
+      int flags = ((IType) type).getFlags();
       return Flags.isEnum(flags) && !Flags.isDeprecated(flags) && !Flags.isAbstract(flags);
     }
   };
-  private static final Predicate<IType> NO_SURROUNDING_CONTEXT_TYPE_FILTER = new Predicate<IType>() {
+  private static final Predicate/*<IType>*/ NO_SURROUNDING_CONTEXT_TYPE_FILTER = new Predicate/*<IType>*/() {
     @Override
-    public boolean evaluate(IType type) {
-      return type != null && !type.isAnonymous() && (type.getDeclaringType() == null || Flags.isStatic(type.getFlags()));
+    public boolean evaluate(Object type) {
+      return type != null && !((IType) type).isAnonymous() && (((IType) type).getDeclaringType() == null || Flags.isStatic(((IType) type).getFlags()));
     }
   };
 
@@ -70,11 +70,11 @@ public final class TypeFilters {
    *          The fully qualified type name the candidates must be <code>instanceof</code>.
    * @return The created {@link Predicate}
    */
-  public static Predicate<IType> getSubtypeFilter(final String type) {
-    return new Predicate<IType>() {
+  public static Predicate/*<IType>*/ getSubtypeFilter(final String type) {
+    return new Predicate/*<IType>*/() {
       @Override
-      public boolean evaluate(IType candidate) {
-        return CoreUtils.isInstanceOf(candidate, type);
+      public boolean evaluate(Object candidate) {
+        return CoreUtils.isInstanceOf((IType) candidate, type);
       }
     };
   }
@@ -87,7 +87,7 @@ public final class TypeFilters {
    *          The super {@link IType}.
    * @return The created {@link Predicate}
    */
-  public static Predicate<IType> getSubtypeFilter(IType type) {
+  public static Predicate/*<IType>*/ getSubtypeFilter(IType type) {
     return getSubtypeFilter(type.getName());
   }
 
@@ -97,9 +97,9 @@ public final class TypeFilters {
    *
    * @param typeName
    *          The simple name the types must have.
-   * @return The newly created {@link Predicate<IType>}
+   * @return The newly created {@link Predicate}
    */
-  public static Predicate<IType> getElementNameFilter(final String typeName) {
+  public static Predicate/*<IType>*/ getElementNameFilter(final String typeName) {
     return getElementNameFilter(typeName, true);
   }
 
@@ -113,19 +113,19 @@ public final class TypeFilters {
    *          {@code true} if case-sensitive comparison should be performed, {@code false} otherwise.
    * @return The newly created {@link Predicate}
    */
-  public static Predicate<IType> getElementNameFilter(final String typeName, boolean caseSensitive) {
+  public static Predicate/*<IType>*/ getElementNameFilter(final String typeName, boolean caseSensitive) {
     if (caseSensitive) {
-      return new Predicate<IType>() {
+      return new Predicate/*<IType>*/() {
         @Override
-        public boolean evaluate(IType type) {
-          return typeName.equals(type.getSimpleName());
+        public boolean evaluate(Object type) {
+          return typeName.equals(((IType) type).getSimpleName());
         }
       };
     }
-    return new Predicate<IType>() {
+    return new Predicate/*<IType>*/() {
       @Override
-      public boolean evaluate(IType type) {
-        return typeName.equalsIgnoreCase(type.getSimpleName());
+      public boolean evaluate(Object type) {
+        return typeName.equalsIgnoreCase(((IType) type).getSimpleName());
       }
     };
   }
@@ -143,12 +143,12 @@ public final class TypeFilters {
    * @return the created filter
    * @see Pattern
    */
-  public static Predicate<IType> getRegexSimpleNameFilter(final String regex, int regexFlags) {
+  public static Predicate/*<IType>*/ getRegexSimpleNameFilter(final String regex, int regexFlags) {
     final Pattern pat = Pattern.compile(regex, regexFlags);
-    return new Predicate<IType>() {
+    return new Predicate/*<IType>*/() {
       @Override
-      public boolean evaluate(IType type) {
-        return pat.matcher(type.getSimpleName()).matches();
+      public boolean evaluate(Object type) {
+        return pat.matcher(((IType) type).getSimpleName()).matches();
       }
     };
   }
@@ -164,16 +164,16 @@ public final class TypeFilters {
    * @return the created filter
    * @see Pattern#CASE_INSENSITIVE
    */
-  public static Predicate<IType> getRegexSimpleNameFilter(final String regex) {
+  public static Predicate/*<IType>*/ getRegexSimpleNameFilter(final String regex) {
     return getRegexSimpleNameFilter(regex, Pattern.CASE_INSENSITIVE);
   }
 
   /**
    * Gets a {@link Predicate} that only accepts primary types (having {@link IType#getDeclaringType()} == null).
-   * 
+   *
    * @return The primary type {@link Predicate}.
    */
-  public static Predicate<IType> getPrimaryTypeFilter() {
+  public static Predicate/*<IType>*/ getPrimaryTypeFilter() {
     return TOP_LEVEL_FILTER;
   }
 
@@ -182,13 +182,13 @@ public final class TypeFilters {
    *
    * @param flags
    *          The flags of the types.
-   * @return The newly created {@link Predicate<IType>}.
+   * @return The newly created {@link Predicate}.
    */
-  public static Predicate<IType> getFlagsFilter(final int flags) {
-    return new Predicate<IType>() {
+  public static Predicate/*<IType>*/ getFlagsFilter(final int flags) {
+    return new Predicate/*<IType>*/() {
       @Override
-      public boolean evaluate(IType type) {
-        int typeFlags = type.getFlags();
+      public boolean evaluate(Object type) {
+        int typeFlags = ((IType) type).getFlags();
         return ((typeFlags & flags) == flags);
       }
     };
@@ -201,7 +201,7 @@ public final class TypeFilters {
    * @return The {@link Predicate} that only accepts classes.
    * @see #isClass(IType)
    */
-  public static Predicate<IType> getClassFilter() {
+  public static Predicate/*<IType>*/ getClassFilter() {
     return CLASS_FILTER;
   }
 
@@ -210,18 +210,18 @@ public final class TypeFilters {
    * <br>
    * More formally: Accepts all {@link IType}s that are either static or primary types (= have no declaring type).
    *
-   * @return an {@link Predicate<IType>} that accepts all {@link IType}s that have no surrounding context {@link IType}.
+   * @return an {@link Predicate} that accepts all {@link IType}s that have no surrounding context {@link IType}.
    */
-  public static Predicate<IType> getNoSurroundingContextTypeFilter() {
+  public static Predicate/*<IType>*/ getNoSurroundingContextTypeFilter() {
     return NO_SURROUNDING_CONTEXT_TYPE_FILTER;
   }
 
   /**
    * Gets a {@link Predicate} that only accepts interface {@link IType}s.
-   * 
+   *
    * @return The {@link Predicate} only accepting interfaces.
    */
-  public static Predicate<IType> getInterfaceFilter() {
+  public static Predicate/*<IType>*/ getInterfaceFilter() {
     return INTERFACE_FILTER;
   }
 
@@ -250,19 +250,19 @@ public final class TypeFilters {
    * @return An {@link Predicate} that only accepts {@link IType}s that are not parameterized (have not
    *         generics).
    */
-  public static Predicate<IType> getNoGenericTypesFilter() {
+  public static Predicate/*<IType>*/ getNoGenericTypesFilter() {
     return NO_GENERIC_FILTER;
   }
 
   /**
    * @return An {@link Predicate} that accepts all non-abstract and non-deprecated {@link Enum}s.
    */
-  public static Predicate<IType> getEnumTypesFilter() {
+  public static Predicate/*<IType>*/ getEnumTypesFilter() {
     return ENUM_TYPE_FILTER;
   }
 
   @SafeVarargs
-  private static Predicate<IType> getMultiFilter(final boolean or, final Predicate<IType>... filters) {
+  private static Predicate/*<IType>*/ getMultiFilter(final boolean or, final Predicate/*<IType>*/... filters) {
     if (filters == null || filters.length < 1) {
       return null;
     }
@@ -270,10 +270,10 @@ public final class TypeFilters {
       return filters[0];
     }
 
-    return new Predicate<IType>() {
+    return new Predicate/*<IType>*/() {
       @Override
-      public boolean evaluate(IType candidate) {
-        for (Predicate<IType> f : filters) {
+      public boolean evaluate(Object candidate) {
+        for (Predicate f : filters) {
           if (f != null) {
             boolean accepted = f.evaluate(candidate);
             if (or == accepted) {
@@ -289,26 +289,26 @@ public final class TypeFilters {
   /**
    * Gets a {@link Predicate} which evaluates to <code>true</code> if at least one of the given not-null
    * {@link Predicate}s evaluates to <code>true</code>.
-   * 
+   *
    * @param filters
    *          The {@link Predicate}s to evaluate.
    * @return The created {@link Predicate}.
    */
   @SafeVarargs
-  public static Predicate<IType> getMultiFilterOr(final Predicate<IType>... filters) {
+  public static Predicate/*<IType>*/ getMultiFilterOr(final Predicate/*<IType>*/... filters) {
     return getMultiFilter(true, filters);
   }
 
   /**
    * Gets a {@link Predicate} which evaluates to <code>true</code> if all the given not-null {@link Predicate}s evaluate
    * to <code>true</code>.
-   * 
+   *
    * @param filters
    *          The {@link Predicate}s to evaluate.
    * @return The created {@link Predicate}.
    */
   @SafeVarargs
-  public static Predicate<IType> getMultiFilterAnd(final Predicate<IType>... filters) {
+  public static Predicate/*<IType>*/ getMultiFilterAnd(final Predicate/*<IType>*/... filters) {
     return getMultiFilter(false, filters);
   }
 }

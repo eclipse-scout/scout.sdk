@@ -31,12 +31,12 @@ public final class CoreTestingUtils {
 
   public static IType getBaseClassType() {
     ICompilationUnit icu = getChildClassIcu(); // do not get from getBaseClassIcu()
-    return icu.getTypes().get(0).getSuperClass();
+    return ((IType) icu.getTypes().get(0)).getSuperClass();
   }
 
   public static IType getChildClassType() {
     ICompilationUnit icu = getChildClassIcu();
-    return icu.getTypes().get(0);
+    return (IType) icu.getTypes().get(0);
   }
 
   public static ICompilationUnit getChildClassIcu() {

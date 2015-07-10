@@ -14,9 +14,10 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.compiler.ASTVisitor;
 import org.eclipse.jdt.internal.compiler.ast.CompilationUnitDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.QualifiedTypeReference;
@@ -173,15 +174,15 @@ public class SdkAssert extends Assert {
    * @return the method if found
    */
   public static IMethod assertMethodExist(String message, IType type, final String methodName, final String[] parameterSignatures) {
-    IMethod method = CoreUtils.getMethod(type, new Predicate<IMethod>() {
+    IMethod method = CoreUtils.getMethod(type, new Predicate/*<IMethod>*/() {
       @Override
-      public boolean evaluate(IMethod candidate) {
-        if (Objects.equals(methodName, candidate.getName())) {
-          List<IMethodParameter> refParameterSignatures = candidate.getParameters();
+      public boolean evaluate(Object candidate) {
+        if (Objects.equals(methodName, ((IMethod) candidate).getName())) {
+          List<IMethodParameter> refParameterSignatures = ((IMethod) candidate).getParameters();
           if (parameterSignatures.length == refParameterSignatures.size()) {
             boolean matches = true;
             for (int i = 0; i < parameterSignatures.length; i++) {
-              if (!equalSignature(getResolvedSignature(parameterSignatures[i], candidate.getDeclaringType()), SignatureUtils.getResolvedSignature(refParameterSignatures.get(i).getType()))) {
+              if (!equalSignature(getResolvedSignature(parameterSignatures[i], ((IMethod) candidate).getDeclaringType()), SignatureUtils.getResolvedSignature(refParameterSignatures.get(i).getType()))) {
                 matches = false;
                 break;
               }
@@ -355,13 +356,13 @@ public class SdkAssert extends Assert {
   }
 
   public static void assertHasSuperIntefaceSignatures(String message, IType type, String[] interfaceSignatures) {
-    ListOrderedSet<IType> refInterfaces = type.getSuperInterfaces();
+    ListOrderedSet/*<IType>*/ refInterfaces = type.getSuperInterfaces();
     if (refInterfaces.size() == interfaceSignatures.length) {
       String[] refInterfaceSignatures = new String[refInterfaces.size()];
       // resolve
       for (int i = 0; i < interfaceSignatures.length; i++) {
         interfaceSignatures[i] = getResolvedSignature(interfaceSignatures[i], type);
-        refInterfaceSignatures[i] = SignatureUtils.getResolvedSignature(refInterfaces.get(i));
+        refInterfaceSignatures[i] = SignatureUtils.getResolvedSignature((IType) refInterfaces.get(i));
       }
       // sort
       Arrays.sort(interfaceSignatures);
@@ -911,8 +912,8 @@ public class SdkAssert extends Assert {
     }
 
     // also search in raw type args
-    for (IMethod m : context.getMethods()) {
-      IType rawDefType = findRawType(m.getReturnType(), signatureSimpleName);
+    for (Object m : context.getMethods()) {
+      IType rawDefType = findRawType(((IMethod) m).getReturnType(), signatureSimpleName);
       if (rawDefType != null) {
         return SignatureUtils.getResolvedSignature(rawDefType);
       }

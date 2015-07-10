@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.set.ListOrderedSet;
 
 /**
  * <h3>{@link IAnnotatable}</h3>Represents a Java element that can be annotated.
@@ -28,5 +28,5 @@ public interface IAnnotatable {
    * @return A {@link ListOrderedSet} containing all {@link IAnnotation}s of the receiver object. Never returns
    *         <code>null</code>.
    */
-  ListOrderedSet<IAnnotation> getAnnotations();
+  ListOrderedSet/*<IAnnotation>*/ getAnnotations();
 }

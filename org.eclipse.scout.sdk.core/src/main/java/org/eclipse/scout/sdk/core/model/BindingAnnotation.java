@@ -15,7 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.apache.commons.collections4.map.ListOrderedMap;
+import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.jdt.internal.compiler.lookup.AnnotationBinding;
@@ -35,7 +35,7 @@ public class BindingAnnotation implements IAnnotation {
   private final char[] m_id;
   private final int m_hash;
   private final ILookupEnvironment m_env;
-  private ListOrderedMap<String, IAnnotationValue> m_values;
+  private ListOrderedMap/*<String, IAnnotationValue>*/ m_values;
   private IType m_type;
 
   public BindingAnnotation(AnnotationBinding annotation, IAnnotatable owner, ClassScope scope, int ordinal, ILookupEnvironment lookupEnvironment) {
@@ -57,11 +57,11 @@ public class BindingAnnotation implements IAnnotation {
   }
 
   @Override
-  public ListOrderedMap<String, IAnnotationValue> getValues() {
+  public ListOrderedMap/*<String, IAnnotationValue>*/ getValues() {
     if (m_values == null) {
       ElementValuePair[] memberValuePairs = m_annotation.getElementValuePairs();
       if (memberValuePairs == null || memberValuePairs.length < 1) {
-        m_values = ListOrderedMap.listOrderedMap(new HashMap<String, IAnnotationValue>(0));
+        m_values = (ListOrderedMap) ListOrderedMap.decorate(new HashMap<String, IAnnotationValue>(0));
       }
       else {
         Map<String, IAnnotationValue> result = new HashMap<>(memberValuePairs.length);
@@ -69,7 +69,7 @@ public class BindingAnnotation implements IAnnotation {
           ElementAnnotationValue v = new ElementAnnotationValue(p, m_scope, this, m_env);
           result.put(v.getName(), v);
         }
-        m_values = ListOrderedMap.listOrderedMap(result);
+        m_values = (ListOrderedMap) ListOrderedMap.decorate(result);
       }
     }
     return m_values;
@@ -77,7 +77,7 @@ public class BindingAnnotation implements IAnnotation {
 
   @Override
   public IAnnotationValue getValue(String name) {
-    return getValues().get(name);
+    return (IAnnotationValue) getValues().get(name);
   }
 
   @Override

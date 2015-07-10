@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.model;
 
 import java.util.List;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 
 /**
@@ -112,7 +112,7 @@ public interface IType extends IMember {
    *
    * @return A {@link ListOrderedSet} containing all direct super interfaces of this {@link IType}.
    */
-  ListOrderedSet<IType> getSuperInterfaces();
+  ListOrderedSet/*<IType>*/ getSuperInterfaces();
 
   /**
    * Gets all direct member {@link IType}s of this {@link IType} in the order as they appear in the source or class
@@ -120,7 +120,7 @@ public interface IType extends IMember {
    *
    * @return A {@link ListOrderedSet} holding all member {@link IType}s.
    */
-  ListOrderedSet<IType> getTypes();
+  ListOrderedSet/*<IType>*/ getTypes();
 
   /**
    * Gets all direct member {@link IMethod}s of this {@link IType} in the order as they appear in the source or class
@@ -128,7 +128,7 @@ public interface IType extends IMember {
    *
    * @return A {@link ListOrderedSet} holding all member {@link IMethod}s.
    */
-  ListOrderedSet<IMethod> getMethods();
+  ListOrderedSet/*<IMethod>*/ getMethods();
 
   /**
    * Gets all arguments passed to the type parameters of this {@link IType}.<br>
@@ -167,21 +167,21 @@ public interface IType extends IMember {
 
   /**
    * Gets the {@link IField}s of this {@link IType} in the order as they are defined in the source or class file.
-   * 
+   *
    * @return A {@link ListOrderedSet} holding all {@link IField}s of this {@link IType}.
    */
-  ListOrderedSet<IField> getFields();
+  ListOrderedSet/*<IField>*/ getFields();
 
   /**
    * Gets if this {@link IType} represents a wildcard type ("?").
-   * 
+   *
    * @return <code>true</code> if this {@link IType} represents a wildcard type, <code>false</code> otherwise.
    */
   boolean isWildcardType();
 
   /**
    * Gets the {@link ILookupEnvironment} (classpath) this {@link IType} belongs to.
-   * 
+   *
    * @return The {@link ILookupEnvironment} this {@link IType} belongs to.
    */
   ILookupEnvironment getLookupEnvironment();

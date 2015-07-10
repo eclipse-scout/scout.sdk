@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.model;
 
 import java.util.List;
 
-import org.apache.commons.collections4.set.ListOrderedSet;
+import org.apache.commons.collections.set.ListOrderedSet;
 
 /**
  * <h3>{@link IMethod}</h3>
@@ -41,7 +41,7 @@ public interface IMethod extends IMember {
    * 
    * @return a {@link ListOrderedSet} containing all thrown {@link IType}s of this {@link IMethod}.
    */
-  ListOrderedSet<IType> getExceptionTypes();
+  ListOrderedSet/*<IType>*/ getExceptionTypes();
 
   /**
    * Gets if this method is a constructor.
