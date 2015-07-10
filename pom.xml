@@ -283,6 +283,52 @@
           </execution>
         </executions>
       </plugin>
+
+      <plugin>
+        <groupId>org.basepom.maven</groupId>
+        <artifactId>duplicate-finder-maven-plugin</artifactId>
+        <version>1.2.0</version>
+        <executions>
+          <execution>
+            <id>default</id>
+            <phase>verify</phase>
+            <goals>
+              <goal>check</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <printEqualFiles>false</printEqualFiles>
+          <failBuildInCaseOfDifferentContentConflict>true</failBuildInCaseOfDifferentContentConflict>
+          <failBuildInCaseOfEqualContentConflict>true</failBuildInCaseOfEqualContentConflict>
+          <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
+          <checkCompileClasspath>true</checkCompileClasspath>
+          <checkRuntimeClasspath>true</checkRuntimeClasspath>
+          <checkTestClasspath>true</checkTestClasspath>
+          <skip>false</skip>
+          <quiet>false</quiet>
+          <preferLocal>true</preferLocal>
+          <useResultFile>false</useResultFile>
+          <includePomProjects>true</includePomProjects>
+          <ignoredResourcePatterns>
+            <ignoredResourcePattern>.*ico$</ignoredResourcePattern>
+            <ignoredResourcePattern>.*gif$</ignoredResourcePattern>
+            <ignoredResourcePattern>.*png$</ignoredResourcePattern>
+            <ignoredResourcePattern>.*html$</ignoredResourcePattern>
+            <ignoredResourcePattern>.*xml$</ignoredResourcePattern>
+            <ignoredResourcePattern>.*properties$</ignoredResourcePattern>
+            <ignoredResourcePattern>.*txt$</ignoredResourcePattern>
+            <ignoredResourcePattern>.api_description$</ignoredResourcePattern>
+            <ignoredResourcePattern>.options$</ignoredResourcePattern>
+          </ignoredResourcePatterns>
+          <ignoredDependencies>
+            <dependency>
+              <groupId>log4j</groupId>
+              <artifactId>log4j</artifactId>
+            </dependency>
+          </ignoredDependencies>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
