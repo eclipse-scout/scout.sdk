@@ -27,18 +27,29 @@
     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>
+        <artifactId>target-platform-configuration</artifactId>
+        <configuration>
+          <dependency-resolution>
+            <extraRequirements>
+              <requirement>
+                <type>eclipse-feature</type>
+                <id>org.eclipse.scout.sdk</id>
+                <versionRange>0.0.0</versionRange>
+              </requirement>
+              <requirement>
+                <type>eclipse-feature</type>
+                <id>org.eclipse.scout.rt.source</id>
+                <versionRange>0.0.0</versionRange>
+              </requirement>
+            </extraRequirements>
+          </dependency-resolution>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.eclipse.tycho</groupId>
         <artifactId>tycho-surefire-plugin</artifactId>
         <configuration>
-          <dependencies>
-            <dependency>
-              <type>eclipse-feature</type>
-              <artifactId>org.eclipse.scout.sdk</artifactId>
-            </dependency>
-            <dependency>
-              <type>p2-installable-unit</type>
-              <artifactId>org.eclipse.scout.rt.source.feature.group</artifactId>
-            </dependency>
-          </dependencies>
           <forkedProcessTimeoutInSeconds>0</forkedProcessTimeoutInSeconds>
           <testClass>org.eclipse.scout.sdk._SuiteAllTests</testClass>
           <!--<testClass>org.eclipse.scout.sdk.internal.test.operation.lookupcall.LookupCallNewOperationTest</testClass> -->

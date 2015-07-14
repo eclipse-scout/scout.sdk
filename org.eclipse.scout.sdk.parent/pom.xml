@@ -43,14 +43,14 @@
     <module>../org.eclipse.scout.sdk.rap</module>
     <module>../org.eclipse.scout.sdk.rap.ui</module>
 
-    <module>../org.eclipse.scout.sdk.test</module>
-    <module>../org.eclipse.scout.sdk.test-feature</module>
-
-    <module>../org.eclipse.scout.sdk.testing</module>
-    <module>../org.eclipse.scout.sdk.testing-feature</module>
-
     <module>../org.eclipse.scout.sdk-feature</module>
     <module>../org.eclipse.scout.sdk.rap-feature</module>
+
+    <module>../org.eclipse.scout.sdk.testing-feature</module>
+    <module>../org.eclipse.scout.sdk.testing</module>
+
+    <module>../org.eclipse.scout.sdk.test-feature</module>
+    <module>../org.eclipse.scout.sdk.test</module>
 
     <module>../org.eclipse.scout.sdk-repository</module>
   </modules>
