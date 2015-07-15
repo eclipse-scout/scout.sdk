@@ -481,5 +481,12 @@
         </plugins>
       </build>
     </profile>
+    <profile>
+      <id>sonar</id>
+      <modules>
+        <module>org.eclipse.scout.sdk.parent</module>
+        <module>org.eclipse.scout.sdk.p2-build</module>
+      </modules>
+    </profile>
   </profiles>
 </project>
