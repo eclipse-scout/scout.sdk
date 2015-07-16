@@ -17,10 +17,6 @@
   <version>5.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <modules>
-    <module>org.eclipse.scout.sdk.parent</module>
-  </modules>
-
   <properties>
     <scout.rt.version>5.1.0-SNAPSHOT</scout.rt.version>
     <jdk.source.version>1.7</jdk.source.version>
@@ -485,6 +481,28 @@
       <id>sonar</id>
       <modules>
         <module>org.eclipse.scout.sdk.parent</module>
+      </modules>
+    </profile>
+
+    <profile>
+      <id>default</id>
+      <activation>
+        <property>
+          <name>!p2</name>
+        </property>
+      </activation>
+      <modules>
+        <module>org.eclipse.scout.sdk.parent</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>p2-build</id>
+      <activation>
+        <property>
+          <name>p2</name>
+        </property>
+      </activation>
+      <modules>
         <module>org.eclipse.scout.sdk.p2-build</module>
       </modules>
     </profile>
