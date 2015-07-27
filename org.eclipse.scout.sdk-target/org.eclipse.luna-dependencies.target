@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <?pde?>
 <!-- generated with https://github.com/mbarbero/fr.obeo.releng.targetplatform -->
-<target name="Scoud SDK Eclipse Luna Dependencies" sequenceNumber="1436946941">
+<target name="Scout SDK Eclipse Luna Dependencies" sequenceNumber="1436946941">
   <locations>
     <location includeMode="slicer" includeAllPlatforms="false" includeSource="true" includeConfigurePhase="false" type="InstallableUnit">
       <unit id="org.eclipse.platform.feature.group" version="4.4.2.v20150204-1700"/>

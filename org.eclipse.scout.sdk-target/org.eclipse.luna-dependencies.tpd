@@ -1,4 +1,4 @@
-target "Scoud SDK Eclipse Luna Dependencies"
+target "Scout SDK Eclipse Luna Dependencies"
 
 with source
 
