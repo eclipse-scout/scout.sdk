@@ -22,7 +22,7 @@ import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 /**
  * <h3>{@link InputStreamCompilationUnit}</h3>
  *
- * @author mvi
+ * @author Matthias Villiger
  * @since 5.1.0
  */
 class InputStreamCompilationUnit implements ICompilationUnit {
