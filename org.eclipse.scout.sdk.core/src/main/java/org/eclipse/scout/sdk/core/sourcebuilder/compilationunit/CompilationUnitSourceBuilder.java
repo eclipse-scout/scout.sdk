@@ -85,6 +85,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
     }
     source.append(headerSourceBuilder);
     source.append(typeSourceBuilder);
+    source.append(lineDelimiter);
   }
 
   @Override
