@@ -12,12 +12,11 @@ package org.eclipse.scout.sdk.core.model;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.functors.TruePredicate;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
- * Contains {@link Predicate}s for {@link IMethod}s.
+ * Contains {@link IFilter}s for {@link IMethod}s.
  */
 public final class MethodFilters {
 
@@ -29,13 +28,13 @@ public final class MethodFilters {
    *
    * @param annotationTypeFqn
    *          The fully qualified annotation name.
-   * @return The new created {@link Predicate}.
+   * @return The new created {@link IFilter}.
    */
-  public static Predicate/*<IMethod>*/ getFilterWithAnnotation(final String annotationTypeFqn) {
-    return new Predicate/*<IMethod>*/() {
+  public static IFilter<IMethod> getFilterWithAnnotation(final String annotationTypeFqn) {
+    return new IFilter<IMethod>() {
       @Override
-      public boolean evaluate(Object method) {
-        return CoreUtils.getAnnotation((IMethod) method, annotationTypeFqn) != null;
+      public boolean evaluate(IMethod method) {
+        return CoreUtils.getAnnotation(method, annotationTypeFqn) != null;
       }
 
       @Override
@@ -52,13 +51,13 @@ public final class MethodFilters {
    *
    * @param methodName
    *          The method name
-   * @return The new created {@link Predicate}.
+   * @return The new created {@link IFilter}.
    */
-  public static Predicate/*<IMethod>*/ getNameFilter(final String methodName) {
-    return new Predicate/*<IMethod>*/() {
+  public static IFilter<IMethod> getNameFilter(final String methodName) {
+    return new IFilter<IMethod>() {
       @Override
-      public boolean evaluate(Object method) {
-        return ((IMethod) method).getName().equals(methodName);
+      public boolean evaluate(IMethod method) {
+        return method.getName().equals(methodName);
       }
 
       @Override
@@ -78,14 +77,14 @@ public final class MethodFilters {
    *
    * @param regex
    *          The regular expression pattern
-   * @return The new created {@link Predicate}.
+   * @return The new created {@link IFilter}.
    * @see Pattern
    */
-  public static Predicate/*<IMethod>*/ getNameRegexFilter(final Pattern regex) {
-    return new Predicate/*<IMethod>*/() {
+  public static IFilter<IMethod> getNameRegexFilter(final Pattern regex) {
+    return new IFilter<IMethod>() {
       @Override
-      public boolean evaluate(Object method) {
-        return regex.matcher(((IMethod) method).getName()).matches();
+      public boolean evaluate(IMethod method) {
+        return regex.matcher(method.getName()).matches();
       }
 
       @Override
@@ -105,13 +104,13 @@ public final class MethodFilters {
    *
    * @param flags
    *          The flags that each accepted method must have.
-   * @return The new created {@link Predicate}.
+   * @return The new created {@link IFilter}.
    */
-  public static Predicate/*<IMethod>*/ getFlagsFilter(final int flags) {
-    return new Predicate/*<IMethod>*/() {
+  public static IFilter<IMethod> getFlagsFilter(final int flags) {
+    return new IFilter<IMethod>() {
       @Override
-      public boolean evaluate(Object method) {
-        return (((IMethod) method).getFlags() & flags) == flags;
+      public boolean evaluate(IMethod method) {
+        return (method.getFlags() & flags) == flags;
       }
 
       @Override
@@ -130,18 +129,18 @@ public final class MethodFilters {
    *
    * @param filters
    *          The filters that all must be accepted.
-   * @return The new created {@link Predicate}.
+   * @return The new created {@link IFilter}.
    */
   @SafeVarargs
-  public static Predicate/*<IMethod>*/ getMultiMethodFilter(final Predicate/*<IMethod>*/... filters) {
+  public static IFilter<IMethod> getMultiMethodFilter(final IFilter<IMethod>... filters) {
     if (filters == null || filters.length < 1) {
-      return TruePredicate.getInstance();
+      return null;
     }
 
-    return new Predicate/*<IMethod>*/() {
+    return new IFilter<IMethod>() {
       @Override
-      public boolean evaluate(Object method) {
-        for (Predicate/*<IMethod>*/ f : filters) {
+      public boolean evaluate(IMethod method) {
+        for (IFilter<IMethod> f : filters) {
           if (!f.evaluate(method)) {
             return false;
           }

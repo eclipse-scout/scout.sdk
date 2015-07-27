@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
 
-import org.apache.commons.collections.set.ListOrderedSet;
+import java.util.List;
+
 import org.eclipse.scout.sdk.core.model.Flags;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.model.TypeFilters;
@@ -48,7 +49,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
   }
 
   private void createCompositeFieldFormData(IType compositeType) {
-    ListOrderedSet/*<IType>*/ innerTypes = CoreUtils.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(IRuntimeClasses.IFormField));
+    List<IType> innerTypes = CoreUtils.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(IRuntimeClasses.IFormField));
     for (Object formField : innerTypes) {
       boolean fieldExtendsTemplateField = false;
 

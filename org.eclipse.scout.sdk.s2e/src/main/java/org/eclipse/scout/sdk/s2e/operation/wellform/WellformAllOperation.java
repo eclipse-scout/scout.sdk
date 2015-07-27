@@ -13,7 +13,6 @@ package org.eclipse.scout.sdk.s2e.operation.wellform;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
@@ -50,7 +49,7 @@ public class WellformAllOperation implements IOperation {
     Set<IType> types = new HashSet<>();
     String[] roots = new String[]{IRuntimeClasses.ICodeType, IRuntimeClasses.IDesktop, IRuntimeClasses.IDesktopExtension, IRuntimeClasses.IForm, IRuntimeClasses.IWizard, IRuntimeClasses.IPage, IRuntimeClasses.IOutline};
     for (String root : roots) {
-      ListOrderedSet/*<IType>*/ rootTypes = JdtUtils.resolveJdtTypes(root);
+      Set<IType> rootTypes = JdtUtils.resolveJdtTypes(root);
       for (Object t : rootTypes) {
         ITypeHierarchy codeTypeHierarchy = ((IType) t).newTypeHierarchy(null);
         for (IType candidate : codeTypeHierarchy.getAllClasses()) {

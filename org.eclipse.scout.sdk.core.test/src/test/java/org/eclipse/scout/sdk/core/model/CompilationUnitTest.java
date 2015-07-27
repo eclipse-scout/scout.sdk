@@ -30,7 +30,7 @@ public class CompilationUnitTest {
 
     Assert.assertEquals(5, baseClassIcu.getImports().size());
     Assert.assertEquals(1, baseClassIcu.getTypes().size());
-    Assert.assertEquals(2, ((IType) baseClassIcu.getTypes().get(0)).getTypes().size());
+    Assert.assertEquals(2, baseClassIcu.getTypes().get(0).getTypes().size());
   }
 
   @Test

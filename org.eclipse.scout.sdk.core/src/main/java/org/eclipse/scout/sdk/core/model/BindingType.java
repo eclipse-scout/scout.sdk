@@ -12,10 +12,8 @@ package org.eclipse.scout.sdk.core.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.lookup.CompilationUnitScope;
@@ -48,14 +46,14 @@ public class BindingType implements IType {
   private IType m_superClass;
   private String m_simpleName;
   private String m_name;
-  private ListOrderedSet/*<IType>*/ m_memberTypes;
-  private ListOrderedSet/*<IType>*/ m_superInterfaces;
+  private List<IType> m_memberTypes;
+  private List<IType> m_superInterfaces;
   private List<ITypeParameter> m_typeParameters;
   private List<IType> m_typeArguments;
   private int m_flags;
-  private ListOrderedSet/*<IAnnotation>*/ m_annotations;
-  private ListOrderedSet/*<IMethod>*/ m_methods;
-  private ListOrderedSet/*<IField>*/ m_fields;
+  private List<IAnnotation> m_annotations;
+  private List<IMethod> m_methods;
+  private List<IField> m_fields;
   private boolean m_sourceTypeInitialized;
   private ICompilationUnit m_unit;
 
@@ -146,7 +144,7 @@ public class BindingType implements IType {
   }
 
   @Override
-  public ListOrderedSet/*<IMethod>*/ getMethods() {
+  public List<IMethod> getMethods() {
     if (m_methods == null) {
       ensureTypeBuild();
       ReferenceBinding actualType = m_tb.actualType();
@@ -158,7 +156,7 @@ public class BindingType implements IType {
         methods = m_tb.methods();
       }
       if (methods == null || methods.length < 1) {
-        m_methods = ListOrderedSet.decorate(new HashSet<IMethod>(0));
+        m_methods = new ArrayList<>(0);
       }
       else {
         List<IMethod> result = new ArrayList<>(methods.length);
@@ -167,7 +165,7 @@ public class BindingType implements IType {
             result.add(new BindingMethod(a, this));
           }
         }
-        m_methods = ListOrderedSet.decorate(result);
+        m_methods = result;
       }
     }
     return m_methods;
@@ -203,12 +201,12 @@ public class BindingType implements IType {
   }
 
   @Override
-  public ListOrderedSet/*<IField>*/ getFields() {
+  public List<IField> getFields() {
     if (m_fields == null) {
       ensureTypeBuild();
       FieldBinding[] fields = m_tb.fields();
       if (fields == null || fields.length < 1) {
-        m_fields = ListOrderedSet.decorate(new HashSet<IField>(0));
+        m_fields = new ArrayList<>(0);
       }
       else {
         List<IField> result = new ArrayList<>(fields.length);
@@ -217,19 +215,19 @@ public class BindingType implements IType {
             result.add(new BindingField(fd, this));
           }
         }
-        m_fields = ListOrderedSet.decorate(result);
+        m_fields = result;
       }
     }
     return m_fields;
   }
 
   @Override
-  public ListOrderedSet/*<IType>*/ getTypes() {
+  public List<IType> getTypes() {
     if (m_memberTypes == null) {
       ensureTypeBuild();
       ReferenceBinding[] memberTypes = m_tb.memberTypes();
       if (memberTypes == null || memberTypes.length < 1) {
-        m_memberTypes = ListOrderedSet.decorate(new HashSet<IType>(0));
+        m_memberTypes = new ArrayList<>(0);
       }
       else {
         List<IType> result = new ArrayList<>(memberTypes.length);
@@ -239,19 +237,19 @@ public class BindingType implements IType {
             result.add(t);
           }
         }
-        m_memberTypes = ListOrderedSet.decorate(result);
+        m_memberTypes = result;
       }
     }
     return m_memberTypes;
   }
 
   @Override
-  public ListOrderedSet/*<IType>*/ getSuperInterfaces() {
+  public List<IType> getSuperInterfaces() {
     if (m_superInterfaces == null) {
       ensureTypeBuild();
       ReferenceBinding[] superInterfaces = m_tb.superInterfaces();
       if (superInterfaces == null || superInterfaces.length < 1) {
-        m_superInterfaces = ListOrderedSet.decorate(new HashSet<IType>(0));
+        m_superInterfaces = new ArrayList<>(0);
       }
       else {
         List<IType> result = new ArrayList<>(superInterfaces.length);
@@ -261,7 +259,7 @@ public class BindingType implements IType {
             result.add(t);
           }
         }
-        m_superInterfaces = ListOrderedSet.decorate(result);
+        m_superInterfaces = result;
       }
     }
     return m_superInterfaces;
@@ -319,7 +317,7 @@ public class BindingType implements IType {
   }
 
   @Override
-  public ListOrderedSet/*<IAnnotation>*/ getAnnotations() {
+  public List<IAnnotation> getAnnotations() {
     if (m_annotations == null) {
       ensureTypeBuild();
       ReferenceBinding actualType = m_tb.actualType();

@@ -14,7 +14,6 @@ import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.List;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.CoreTestingUtils;
 import org.junit.Assert;
@@ -36,13 +35,13 @@ public class TypeParameterTest {
     Assert.assertEquals("X", param.getName());
     Assert.assertEquals(childClassType, param.getType());
 
-    ListOrderedSet/*<IType>*/ bounds = param.getBounds();
+    List<IType> bounds = param.getBounds();
     Assert.assertEquals(3, bounds.size());
-    Assert.assertEquals(AbstractList.class.getName(), ((IType) bounds.get(0)).getName());
-    Assert.assertEquals(Runnable.class.getName(), ((IType) bounds.get(1)).getName());
-    Assert.assertEquals(Serializable.class.getName(), ((IType) bounds.get(2)).getName());
+    Assert.assertEquals(AbstractList.class.getName(), bounds.get(0).getName());
+    Assert.assertEquals(Runnable.class.getName(), bounds.get(1).getName());
+    Assert.assertEquals(Serializable.class.getName(), bounds.get(2).getName());
 
-    IType abstractListBound = (IType) bounds.get(0);
+    IType abstractListBound = bounds.get(0);
     Assert.assertEquals(String.class.getName(), abstractListBound.getTypeArguments().get(0).getName());
   }
 

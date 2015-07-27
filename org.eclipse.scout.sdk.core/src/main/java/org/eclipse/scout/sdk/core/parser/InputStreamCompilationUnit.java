@@ -15,9 +15,9 @@ import java.io.InputStream;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 
 /**
  * <h3>{@link InputStreamCompilationUnit}</h3>
@@ -56,7 +56,10 @@ class InputStreamCompilationUnit implements ICompilationUnit {
   @Override
   public char[] getContents() {
     try {
-      return IOUtils.toCharArray(m_src, m_charset.name());
+      StringBuilder content = CoreUtils.inputStreamToString(m_src, m_charset.name());
+      char[] result = new char[content.length()];
+      content.getChars(0, content.length(), result, 0);
+      return result;
     }
     catch (IOException e) {
       throw new RuntimeException("Unable to read content.", e);

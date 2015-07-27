@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.s2e.structuredType;
 
 import java.util.EnumSet;
+import java.util.Set;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
@@ -34,7 +34,7 @@ public final class StructuredTypeFactory {
   }
 
   private static boolean hierarchyContains(ITypeHierarchy h, String fqn, JdtTypeCache typeCache) throws CoreException {
-    ListOrderedSet/*<IType>*/ jdtTypes = typeCache.getTypes(fqn);
+    Set<IType> jdtTypes = typeCache.getTypes(fqn);
     for (Object t : jdtTypes) {
       if (h.contains((IType) t)) {
         return true;

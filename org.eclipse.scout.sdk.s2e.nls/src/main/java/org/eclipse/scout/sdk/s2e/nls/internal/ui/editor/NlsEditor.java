@@ -27,7 +27,6 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.part.FileEditorInput;
 import org.eclipse.ui.part.MultiPageEditorPart;
 
-@SuppressWarnings("restriction")
 public class NlsEditor extends MultiPageEditorPart {
 
   private int m_tablePageIndex = -1;

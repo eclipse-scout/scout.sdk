@@ -13,13 +13,10 @@ package org.eclipse.scout.sdk.core.model;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.ast.CompilationUnitDeclaration;
@@ -42,8 +39,8 @@ public class CompilationUnit implements ICompilationUnit {
 
   private IPackage m_package;
   private IType m_mainType;
-  private ListOrderedSet/*<IType>*/ m_types;
-  private ListOrderedMap/*<String, IImportDeclaration>*/ m_imports;
+  private List<IType> m_types;
+  private Map<String, IImportDeclaration> m_imports;
 
   public CompilationUnit(CompilationUnitDeclaration ast, ILookupEnvironment env) {
     m_env = env;
@@ -142,30 +139,30 @@ public class CompilationUnit implements ICompilationUnit {
   }
 
   @Override
-  public ListOrderedSet/*<IType>*/ getTypes() {
+  public List<IType> getTypes() {
     if (m_types == null) {
       TypeDeclaration[] types = m_ast.types;
 
       if (types == null || types.length < 1) {
-        m_types = ListOrderedSet.decorate(new HashSet<IType>(0));
+        m_types = new ArrayList<>(0);
       }
       else {
         List<IType> result = new ArrayList<>(types.length);
         for (TypeDeclaration td : types) {
           result.add(new DeclarationType(td, this, null, m_env));
         }
-        m_types = ListOrderedSet.decorate(result);
+        m_types = result;
       }
     }
     return m_types;
   }
 
   @Override
-  public ListOrderedMap/*<String, IImportDeclaration>*/ getImports() {
+  public Map<String, IImportDeclaration> getImports() {
     if (m_imports == null) {
       ImportReference[] imports = m_ast.imports;
       if (imports == null || imports.length < 1) {
-        m_imports = (ListOrderedMap) ListOrderedMap.decorate(new HashMap<String, IImportDeclaration>(0));
+        m_imports = new HashMap<>(0);
       }
       else {
         Map<String, IImportDeclaration> result = new LinkedHashMap<>(imports.length);
@@ -173,7 +170,7 @@ public class CompilationUnit implements ICompilationUnit {
           ImportDeclaration importDeclaration = new ImportDeclaration(imp, this);
           result.put(importDeclaration.getSimpleName(), importDeclaration);
         }
-        m_imports = (ListOrderedMap) ListOrderedMap.decorate(result);
+        m_imports = result;
       }
     }
     return m_imports;

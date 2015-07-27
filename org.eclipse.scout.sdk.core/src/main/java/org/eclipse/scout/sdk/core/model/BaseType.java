@@ -11,10 +11,8 @@
 package org.eclipse.scout.sdk.core.model;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.jdt.internal.compiler.lookup.BaseTypeBinding;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
@@ -30,13 +28,13 @@ public class BaseType implements IType {
   private final int m_hash;
   private final ILookupEnvironment m_env;
 
-  private ListOrderedSet/*<IAnnotation>*/ m_annotations;
+  private List<IAnnotation> m_annotations;
   private List<ITypeParameter> m_typeParameters;
-  private ListOrderedSet/*<IType>*/ m_superInterfaces;
-  private ListOrderedSet/*<IType>*/ m_memberTypes;
-  private ListOrderedSet/*<IMethod>*/ m_methods;
+  private List<IType> m_superInterfaces;
+  private List<IType> m_memberTypes;
+  private List<IMethod> m_methods;
   private List<IType> m_typeArguments;
-  private ListOrderedSet/*<IField>*/ m_fields;
+  private List<IField> m_fields;
 
   public BaseType(BaseTypeBinding btb, int arrayDim, ILookupEnvironment lookupEnvironment) {
     m_btb = btb;
@@ -47,9 +45,9 @@ public class BaseType implements IType {
   }
 
   @Override
-  public ListOrderedSet/*<IAnnotation>*/ getAnnotations() {
+  public List<IAnnotation> getAnnotations() {
     if (m_annotations == null) {
-      m_annotations = ListOrderedSet.decorate(new HashSet<IAnnotation>(0));
+      m_annotations = new ArrayList<>(0);
     }
     return m_annotations;
   }
@@ -123,25 +121,25 @@ public class BaseType implements IType {
   }
 
   @Override
-  public ListOrderedSet/*<IType>*/ getSuperInterfaces() {
+  public List<IType> getSuperInterfaces() {
     if (m_superInterfaces == null) {
-      m_superInterfaces = ListOrderedSet.decorate(new HashSet<IType>(0));
+      m_superInterfaces = new ArrayList<>(0);
     }
     return m_superInterfaces;
   }
 
   @Override
-  public ListOrderedSet/*<IType>*/ getTypes() {
+  public List<IType> getTypes() {
     if (m_memberTypes == null) {
-      m_memberTypes = ListOrderedSet.decorate(new HashSet<IType>(0));
+      m_memberTypes = new ArrayList<>(0);
     }
     return m_memberTypes;
   }
 
   @Override
-  public ListOrderedSet/*<IMethod>*/ getMethods() {
+  public List<IMethod> getMethods() {
     if (m_methods == null) {
-      m_methods = ListOrderedSet.decorate(new HashSet<IMethod>(0));
+      m_methods = new ArrayList<>(0);
     }
     return m_methods;
   }
@@ -155,9 +153,9 @@ public class BaseType implements IType {
   }
 
   @Override
-  public ListOrderedSet/*<IField>*/ getFields() {
+  public List<IField> getFields() {
     if (m_fields == null) {
-      m_fields = ListOrderedSet.decorate(new HashSet<IField>(0));
+      m_fields = new ArrayList<>(0);
     }
     return m_fields;
   }

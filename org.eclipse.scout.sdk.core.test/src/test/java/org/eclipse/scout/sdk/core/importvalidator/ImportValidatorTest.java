@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.ImportTestClass;
 import org.eclipse.scout.sdk.core.model.ICompilationUnit;
-import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.testing.TestingUtils;
@@ -129,7 +128,7 @@ public class ImportValidatorTest {
     ICompilationUnit importTest = TestingUtils.getType(ImportTestClass.class.getName(), CoreTestingUtils.SOURCE_FOLDER).getCompilationUnit();
     ImportValidator iv = new ImportValidator(importTest);
 
-    Assert.assertEquals(ImportTestClass.Long.class.getSimpleName(), iv.getTypeName(Signature.createTypeSignature(((IType) ((IType) importTest.getTypes().get(0)).getTypes().get(0)).getName())));
+    Assert.assertEquals(ImportTestClass.Long.class.getSimpleName(), iv.getTypeName(Signature.createTypeSignature(importTest.getTypes().get(0).getTypes().get(0).getName())));
     Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), iv.getTypeName(Signature.createTypeSignature(org.eclipse.scout.sdk.core.fixture.Long.class.getName())));
   }
 

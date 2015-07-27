@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.core.model;
 
 import java.util.Arrays;
+import java.util.List;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.ast.Expression;
 import org.eclipse.jdt.internal.compiler.impl.Constant;
@@ -35,7 +35,7 @@ public class BindingField implements IField {
   private String m_name;
   private Object m_constantValue;
   private IType m_type;
-  private ListOrderedSet/*<IAnnotation>*/ m_annotations;
+  private List<IAnnotation> m_annotations;
 
   public BindingField(FieldBinding fd, IType declaringType) {
     m_fb = Validate.notNull(fd);
@@ -62,7 +62,7 @@ public class BindingField implements IField {
   }
 
   @Override
-  public ListOrderedSet/*<IAnnotation>*/ getAnnotations() {
+  public List<IAnnotation> getAnnotations() {
     if (m_annotations == null) {
       m_annotations = JavaModelUtils.annotationBindingsToIAnnotations(m_fb.getAnnotations(), this, m_declaringType.getLookupEnvironment());
     }

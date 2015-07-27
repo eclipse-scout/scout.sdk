@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
 
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.Predicate;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.Flags;
 import org.eclipse.scout.sdk.core.model.IMethod;
@@ -32,6 +31,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
 /**
@@ -97,11 +97,11 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
 
     // addRow
     final String addRowMethodName = "addRow";
-    IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), addRowMethodName, new Predicate/*<IMethod>*/() {
+    IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), addRowMethodName, new IFilter<IMethod>() {
       @Override
-      public boolean evaluate(Object candidate) {
+      public boolean evaluate(IMethod candidate) {
         // choose the narrowed overload from the abstract super class instead of the method defined in the interface
-        return ((IMethod) candidate).getParameters().size() == 0;
+        return candidate.getParameters().size() == 0;
       }
     });
     addRowMethodBuilder.setReturnTypeSignature(tableRowSignature);
@@ -114,10 +114,10 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
     addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(addRowMethodBuilder), addRowMethodBuilder);
 
     // addRow(int state)
-    IMethodSourceBuilder addRowWithStateMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), addRowMethodName, new Predicate/*<IMethod>*/() {
+    IMethodSourceBuilder addRowWithStateMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), addRowMethodName, new IFilter<IMethod>() {
       @Override
-      public boolean evaluate(Object candidate) {
-        return ((IMethod) candidate).getParameters().size() == 1;
+      public boolean evaluate(IMethod candidate) {
+        return candidate.getParameters().size() == 1;
       }
     });
     addRowWithStateMethodBuilder.getParameters().get(0).setName("rowState"); // in case the param name cannot be parsed from the class file

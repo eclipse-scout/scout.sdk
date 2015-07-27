@@ -13,11 +13,10 @@ package org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.FieldFilters;
 import org.eclipse.scout.sdk.core.model.Flags;
@@ -41,6 +40,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
 /**
@@ -142,7 +142,6 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     return CoreUtils.ensureStartWithLowerCase(DtoUtils.removeFieldSuffix(column.getSimpleName()));
   }
 
-  @SuppressWarnings("unchecked")
   protected static Set<IType> getColumns(IType declaringType, IType rowDataSuperType) {
 
     // the declaring type is a column itself
@@ -163,10 +162,10 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     // the declaring type holds columns
     TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     // do not re-use the fieldHierarchy for the subtype filter!
-    Predicate/*<IType>*/ filter = TypeFilters.getMultiFilterAnd(TypeFilters.getSubtypeFilter(IRuntimeClasses.IColumn), new Predicate/*<IType>*/() {
+    IFilter<IType> filter = TypeFilters.getMultiFilterAnd(TypeFilters.getSubtypeFilter(IRuntimeClasses.IColumn), new IFilter<IType>() {
       @Override
-      public boolean evaluate(Object type) {
-        SdkColumnCommand command = DtoUtils.findColumnDataSdkColumnCommand((IType) type);
+      public boolean evaluate(IType type) {
+        SdkColumnCommand command = DtoUtils.findColumnDataSdkColumnCommand(type);
         return command == null || command == SdkColumnCommand.CREATE;
       }
     });
@@ -174,7 +173,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     // collect all columns that exist in the table and all of its super classes
     IType curTableType = declaringType;
     while (curTableType != null) {
-      ListOrderedSet/*<IType>*/ columns = CoreUtils.getInnerTypes(curTableType, filter);
+      List<IType> columns = CoreUtils.getInnerTypes(curTableType, filter);
       allColumnsUpTheHierarchy.addAll(columns);
       curTableType = curTableType.getSuperClass();
     }
@@ -188,7 +187,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     Set<String> usedColumnBeanNames = new HashSet<>();
     IType currentRowDataSuperType = rowDataSuperType;
     while (currentRowDataSuperType != null && !IRuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getName())) {
-      Set<IField> columnFields = CoreUtils.getFields(currentRowDataSuperType, FieldFilters.getFlagsFilter(ROW_DATA_FIELD_FLAGS));
+      List<IField> columnFields = CoreUtils.getFields(currentRowDataSuperType, FieldFilters.getFlagsFilter(ROW_DATA_FIELD_FLAGS));
       for (IField column : columnFields) {
         Object val = column.getValue();
         if (val instanceof String) {

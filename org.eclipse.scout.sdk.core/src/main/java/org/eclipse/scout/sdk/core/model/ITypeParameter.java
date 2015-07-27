@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
-import org.apache.commons.collections.set.ListOrderedSet;
+import java.util.List;
 
 /**
  * <h3>{@link ITypeParameter}</h3>
@@ -37,9 +37,9 @@ public interface ITypeParameter {
    * <b>Example: </b>
    * <code>ChildClass&lt;X extends AbstractList&lt;String&gt; & Runnable & Serializable&gt;: .getBounds() = {AbstractList&lt;String&gt;, Runnable, Serializable}</code>
    *
-   * @return A {@link ListOrderedSet} containing all bounds of this {@link ITypeParameter}.
+   * @return A {@link List} containing all bounds of this {@link ITypeParameter}.
    */
-  ListOrderedSet/*<IType>*/ getBounds();
+  List<IType> getBounds();
 
   /**
    * Gets the {@link IType} this {@link ITypeParameter} belongs to.

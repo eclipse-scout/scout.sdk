@@ -14,7 +14,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
@@ -79,11 +78,11 @@ public class ApiTestGenerator {
       source.append(sdkAssertRef).append(".assertHasSuperTypeSignature(").append(typeVarName).append(", \"").append(superClassSig).append("\");").append(NL);
     }
     // interfaces
-    ListOrderedSet/*<IType>*/ interfaces = type.getSuperInterfaces();
+    List<IType> interfaces = type.getSuperInterfaces();
     if (interfaces.size() > 0) {
       source.append(sdkAssertRef).append(".assertHasSuperIntefaceSignatures(").append(typeVarName).append(", new String[]{");
       for (int i = 0; i < interfaces.size(); i++) {
-        source.append("\"").append(SignatureUtils.getResolvedSignature((IType) interfaces.get(i))).append("\"");
+        source.append("\"").append(SignatureUtils.getResolvedSignature(interfaces.get(i))).append("\"");
         if (i < interfaces.size() - 1) {
           source.append(", ");
         }
@@ -96,7 +95,7 @@ public class ApiTestGenerator {
     // fields
     source.append("// fields of ").append(type.getSimpleName()).append(NL);
     String iFieldRef = validator.getTypeName(Signature.createTypeSignature(IField.class.getName(), true));
-    ListOrderedSet/*<IField>*/ fields = type.getFields();
+    List<IField> fields = type.getFields();
     source.append(assertRef).append(".assertEquals(\"field count of '").append(type.getName()).append("'\", ").append(Integer.toString(fields.size())).append(", ").append(typeVarName).append(".getFields().size());").append(NL);
     for (Object f : fields) {
       String fieldVarName = getMemberName(((IType) f).getName());
@@ -107,7 +106,7 @@ public class ApiTestGenerator {
 
     // methods
     String iMethodRef = validator.getTypeName(Signature.createTypeSignature(IMethod.class.getName(), true));
-    ListOrderedSet/*<IMethod>*/ methods = type.getMethods();
+    List<IMethod> methods = type.getMethods();
     source.append(assertRef).append(".assertEquals(\"method count of '").append(type.getName()).append("'\", ").append(Integer.toString(methods.size())).append(", ").append(typeVarName).append(".getMethods().size());").append(NL);
     for (Object method : methods) {
       String methodVarName = getMemberName(((IMethod) method).getName());
@@ -117,7 +116,7 @@ public class ApiTestGenerator {
     source.append(NL);
 
     // inner types
-    ListOrderedSet/*<IType>*/ innerTypes = type.getTypes();
+    List<IType> innerTypes = type.getTypes();
     source.append(assertRef).append(".assertEquals(\"inner types count of '").append(type.getSimpleName()).append("'\", ").append(Integer.toString(innerTypes.size())).append(", ").append(typeVarName).append(".getTypes().size());").append(NL);
     for (Object innerType : innerTypes) {
       String innerTypeVarName = getMemberName(((IType) innerType).getSimpleName());

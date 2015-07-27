@@ -33,7 +33,7 @@ public class MethodTest {
     Assert.assertEquals(3, childClassType.getMethods().size());
 
     // constructor
-    IMethod constr = (IMethod) childClassType.getMethods().get(0);
+    IMethod constr = childClassType.getMethods().get(0);
     Assert.assertEquals(childClassType, constr.getDeclaringType());
     Assert.assertEquals(0, constr.getExceptionTypes().size());
     Assert.assertEquals(Flags.AccPublic, constr.getFlags());
@@ -44,10 +44,10 @@ public class MethodTest {
     Assert.assertEquals(0, constr.getAnnotations().size());
 
     // methodInChildClass
-    IMethod methodInChildClass = (IMethod) childClassType.getMethods().get(1);
+    IMethod methodInChildClass = childClassType.getMethods().get(1);
     Assert.assertEquals(childClassType, methodInChildClass.getDeclaringType());
     Assert.assertEquals(1, methodInChildClass.getExceptionTypes().size());
-    Assert.assertEquals(IOException.class.getName(), ((IType) methodInChildClass.getExceptionTypes().get(0)).getName());
+    Assert.assertEquals(IOException.class.getName(), methodInChildClass.getExceptionTypes().get(0).getName());
     Assert.assertEquals(Flags.AccProtected | Flags.AccSynchronized, methodInChildClass.getFlags());
     Assert.assertEquals("methodInChildClass", methodInChildClass.getName());
     Assert.assertEquals(2, methodInChildClass.getParameters().size());
@@ -57,7 +57,7 @@ public class MethodTest {
     Assert.assertEquals(1, methodInChildClass.getAnnotations().size());
 
     // firstCase
-    IMethod firstCase = (IMethod) childClassType.getMethods().get(2);
+    IMethod firstCase = childClassType.getMethods().get(2);
     Assert.assertEquals(childClassType, firstCase.getDeclaringType());
     Assert.assertEquals(0, firstCase.getExceptionTypes().size());
     Assert.assertEquals(Flags.AccPrivate, firstCase.getFlags());
@@ -83,7 +83,7 @@ public class MethodTest {
     Assert.assertEquals(3, baseClassType.getMethods().size());
 
     // constructor
-    IMethod constr = (IMethod) baseClassType.getMethods().get(0);
+    IMethod constr = baseClassType.getMethods().get(0);
     Assert.assertEquals(baseClassType, constr.getDeclaringType());
     Assert.assertEquals(0, constr.getExceptionTypes().size());
     Assert.assertEquals(Flags.AccPublic, constr.getFlags());
@@ -94,11 +94,11 @@ public class MethodTest {
     Assert.assertEquals(0, constr.getAnnotations().size());
 
     // methodInBaseClass
-    IMethod methodInBaseClass = (IMethod) baseClassType.getMethods().get(2);
+    IMethod methodInBaseClass = baseClassType.getMethods().get(2);
     Assert.assertEquals(baseClassType, methodInBaseClass.getDeclaringType());
     Assert.assertEquals(2, methodInBaseClass.getExceptionTypes().size());
-    Assert.assertEquals(IOError.class.getName(), ((IType) methodInBaseClass.getExceptionTypes().get(0)).getName());
-    Assert.assertEquals(FileNotFoundException.class.getName(), ((IType) methodInBaseClass.getExceptionTypes().get(1)).getName());
+    Assert.assertEquals(IOError.class.getName(), methodInBaseClass.getExceptionTypes().get(0).getName());
+    Assert.assertEquals(FileNotFoundException.class.getName(), methodInBaseClass.getExceptionTypes().get(1).getName());
     Assert.assertEquals(Flags.AccProtected, methodInBaseClass.getFlags());
     Assert.assertEquals("methodInBaseClass", methodInBaseClass.getName());
     Assert.assertEquals(1, methodInBaseClass.getParameters().size());
@@ -109,7 +109,7 @@ public class MethodTest {
     Assert.assertEquals(2, methodInBaseClass.getAnnotations().size());
 
     // method2InBaseClass
-    IMethod method2InBaseClass = (IMethod) baseClassType.getMethods().get(1);
+    IMethod method2InBaseClass = baseClassType.getMethods().get(1);
     Assert.assertEquals(baseClassType, method2InBaseClass.getDeclaringType());
     Assert.assertEquals(0, method2InBaseClass.getExceptionTypes().size());
     Assert.assertEquals(Flags.AccPublic | Flags.AccSynchronized | Flags.AccFinal, method2InBaseClass.getFlags());

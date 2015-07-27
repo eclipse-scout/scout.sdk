@@ -11,10 +11,7 @@
 package org.eclipse.scout.sdk.s2e.internal.dto;
 
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.Charset;
 
-import org.apache.commons.io.IOUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -130,12 +127,9 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
   private String getDerivedFileContent() throws CoreException {
     IFile targetFile = getDerivedFile();
     String charsetName = targetFile.getCharset();
-    if (!Charset.isSupported(charsetName)) {
-      throw new CoreException(new ScoutStatus("Charset '" + charsetName + "' is not supported."));
-    }
 
-    try (InputStream is = targetFile.getContents()) {
-      return IOUtils.toString(is, charsetName);
+    try {
+      return CoreUtils.inputStreamToString(targetFile.getContents(), charsetName).toString();
     }
     catch (IOException e) {
       throw new CoreException(new ScoutStatus("Unable to read file '" + targetFile.getFullPath().toOSString() + "'.", e));

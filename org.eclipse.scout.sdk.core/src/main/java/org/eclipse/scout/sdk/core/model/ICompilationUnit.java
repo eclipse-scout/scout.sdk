@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
-import org.apache.commons.collections.map.ListOrderedMap;
-import org.apache.commons.collections.set.ListOrderedSet;
+import java.util.List;
+import java.util.Map;
+
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 
 /**
@@ -32,21 +33,21 @@ public interface ICompilationUnit {
   IPackage getPackage();
 
   /**
-   * Gets a {@link ListOrderedMap} that contains all imports. The {@link ListOrderedMap} iterates over the imports in
+   * Gets a {@link Map} that contains all imports. The {@link Map} iterates over the imports in
    * the order as they appear in the source.
    *
-   * @return A {@link ListOrderedMap} with the import simple name as key and the corresponding
+   * @return A {@link Map} with the import simple name as key and the corresponding
    *         {@link IImportDeclaration} as value.
    */
-  ListOrderedMap/*<String, IImportDeclaration>*/ getImports();
+  Map<String, IImportDeclaration> getImports();
 
   /**
    * Gets all {@link IType}s that are defined in this {@link ICompilationUnit} in the order as they are defined in the
    * java source file.
    *
-   * @return A {@link ListOrderedSet} with all {@link IType}s of this {@link ICompilationUnit}.
+   * @return A {@link List} with all {@link IType}s of this {@link ICompilationUnit}.
    */
-  ListOrderedSet/*<IType>*/ getTypes();
+  List<IType> getTypes();
 
   /**
    * Gets the main {@link IType} of this {@link ICompilationUnit}. This is the {@link IType} whose name matches the name

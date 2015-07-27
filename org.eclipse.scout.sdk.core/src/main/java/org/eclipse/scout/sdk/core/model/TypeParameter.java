@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.jdt.internal.compiler.ast.TypeReference;
@@ -33,7 +32,7 @@ public class TypeParameter implements ITypeParameter {
   private final IType m_type;
   private final char[] m_id;
   private final int m_hash;
-  private ListOrderedSet/*<IType>*/ m_bounds;
+  private List<IType> m_bounds;
 
   public TypeParameter(org.eclipse.jdt.internal.compiler.ast.TypeParameter typeParam, IType type) {
     m_typeParam = Validate.notNull(typeParam);
@@ -54,7 +53,7 @@ public class TypeParameter implements ITypeParameter {
   }
 
   @Override
-  public ListOrderedSet/*<IType>*/ getBounds() {
+  public List<IType> getBounds() {
     if (m_bounds == null) {
       boolean hasType = m_typeParam.type != null && m_typeParam.type.resolvedType != null;
       boolean hasBounds = m_typeParam.bounds != null && m_typeParam.bounds.length > 0;
@@ -83,7 +82,7 @@ public class TypeParameter implements ITypeParameter {
           }
         }
       }
-      m_bounds = ListOrderedSet.decorate(result);
+      m_bounds = result;
     }
     return m_bounds;
   }

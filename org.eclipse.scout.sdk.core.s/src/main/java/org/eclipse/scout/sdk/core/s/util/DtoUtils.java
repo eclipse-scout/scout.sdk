@@ -16,8 +16,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.runtime.CoreException;
@@ -117,11 +115,11 @@ public final class DtoUtils {
   }
 
   public static String getColumnValueTypeSignature(IType columnContainer) {
-    ListOrderedSet/*<String>*/ resolvedTypeParamValues = CoreUtils.getResolvedTypeParamValueSignature(columnContainer, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
-    if (CollectionUtils.isEmpty(resolvedTypeParamValues)) {
+    List<String> resolvedTypeParamValues = CoreUtils.getResolvedTypeParamValueSignature(columnContainer, IRuntimeClasses.IColumn, IRuntimeClasses.TYPE_PARAM_COLUMN_VALUE_TYPE);
+    if (resolvedTypeParamValues == null || resolvedTypeParamValues.isEmpty()) {
       return null;
     }
-    return (String) resolvedTypeParamValues.get(0); // only use first
+    return resolvedTypeParamValues.get(0); // only use first
   }
 
   public static String removeFieldSuffix(String fieldName) {
@@ -230,11 +228,11 @@ public final class DtoUtils {
       throw new RuntimeException("Invalid genericOrdinal value on class '" + annotationOwnerType.getName() + "'.");
     }
 
-    ListOrderedSet/*<IType>*/ resolvedTypeParamValue = CoreUtils.getResolvedTypeParamValue(contextType, annotationOwnerType, genericOrdinal);
-    if (CollectionUtils.isEmpty(resolvedTypeParamValue)) {
+    List<IType> resolvedTypeParamValue = CoreUtils.getResolvedTypeParamValue(contextType, annotationOwnerType, genericOrdinal);
+    if (resolvedTypeParamValue == null || resolvedTypeParamValue.isEmpty()) {
       return null;
     }
-    return (IType) resolvedTypeParamValue.get(0);
+    return resolvedTypeParamValue.get(0);
   }
 
   public static FormDataAnnotation findFormDataAnnotation(IType type) {
@@ -481,7 +479,7 @@ public final class DtoUtils {
 
     // always add cumulative attributes
     formDataAnnotation.setAnnotationOwner(element);
-    if (CollectionUtils.isNotEmpty(interfaceSignatures)) {
+    if (interfaceSignatures != null && !interfaceSignatures.isEmpty()) {
       formDataAnnotation.addInterfaces(interfaceSignatures);
     }
 
@@ -665,10 +663,10 @@ public final class DtoUtils {
         else if (CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IPageWithTable)) {
           IType pageDto = findDtoForPage(primaryType);
 
-          ListOrderedSet/*<IType>*/ rowDataInPageDto = CoreUtils.getInnerTypes(pageDto, TypeFilters.getSubtypeFilter(IRuntimeClasses.AbstractTableRowData));
+          List<IType> rowDataInPageDto = CoreUtils.getInnerTypes(pageDto, TypeFilters.getSubtypeFilter(IRuntimeClasses.AbstractTableRowData));
           extendedDto = null;
-          if (CollectionUtils.isNotEmpty(rowDataInPageDto)) {
-            extendedDto = (IType) rowDataInPageDto.get(0);
+          if (rowDataInPageDto != null && !rowDataInPageDto.isEmpty()) {
+            extendedDto = rowDataInPageDto.get(0);
           }
         }
 
@@ -725,9 +723,9 @@ public final class DtoUtils {
     // 2. try to read from generic
     boolean isExtension = CoreUtils.isInstanceOf(modelType, IRuntimeClasses.IExtension);
     if (isExtension) {
-      ListOrderedSet/*<IType>*/ owner = CoreUtils.getResolvedTypeParamValue(modelType, IRuntimeClasses.IExtension, IRuntimeClasses.TYPE_PARAM_EXTENSION__OWNER);
-      if (CollectionUtils.isNotEmpty(owner)) {
-        return (IType) owner.get(0);
+      List<IType> owner = CoreUtils.getResolvedTypeParamValue(modelType, IRuntimeClasses.IExtension, IRuntimeClasses.TYPE_PARAM_EXTENSION__OWNER);
+      if (owner != null && !owner.isEmpty()) {
+        return owner.get(0);
       }
     }
 

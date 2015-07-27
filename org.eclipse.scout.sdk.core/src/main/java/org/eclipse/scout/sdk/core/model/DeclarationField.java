@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.core.model;
 
 import java.util.Arrays;
+import java.util.List;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
@@ -37,7 +37,7 @@ public class DeclarationField implements IField {
   private String m_nameS;
   private Object m_constantValue;
   private IType m_type;
-  private ListOrderedSet/*<IAnnotation>*/ m_annotations;
+  private List<IAnnotation> m_annotations;
 
   public DeclarationField(FieldDeclaration fd, IType declaringType, ClassScope scope) {
     m_fd = Validate.notNull(fd);
@@ -75,7 +75,7 @@ public class DeclarationField implements IField {
   }
 
   @Override
-  public ListOrderedSet/*<IAnnotation>*/ getAnnotations() {
+  public List<IAnnotation> getAnnotations() {
     if (m_annotations == null) {
       Annotation[] annots = m_fd.annotations;
       m_annotations = JavaModelUtils.annotationsToIAnnotations(annots, m_scope, this, m_declaringType.getLookupEnvironment());

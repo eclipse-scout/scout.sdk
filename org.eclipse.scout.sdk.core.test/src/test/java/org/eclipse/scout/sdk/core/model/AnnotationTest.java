@@ -10,7 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
-import org.apache.commons.collections.set.ListOrderedSet;
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.fixture.MarkerAnnotation;
@@ -30,18 +31,18 @@ public class AnnotationTest {
     Assert.assertNotNull(childClassType);
 
     // type annotation
-    ListOrderedSet/*<IAnnotation>*/ annotations = childClassType.getAnnotations();
+    List<IAnnotation> annotations = childClassType.getAnnotations();
     Assert.assertEquals(1, annotations.size());
-    IAnnotation annotation = (IAnnotation) annotations.get(0);
+    IAnnotation annotation = annotations.get(0);
     Assert.assertEquals(1, annotation.getValues().size());
     Assert.assertNotNull(annotation.getValue("values"));
     Assert.assertEquals(childClassType, annotation.getOwner());
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
 
     // methodInChildClass annotation
-    IMethod methodInChildClass = (IMethod) childClassType.getMethods().get(1);
+    IMethod methodInChildClass = childClassType.getMethods().get(1);
     Assert.assertEquals(1, methodInChildClass.getAnnotations().size());
-    annotation = (IAnnotation) methodInChildClass.getAnnotations().get(0);
+    annotation = methodInChildClass.getAnnotations().get(0);
     Assert.assertEquals(2, annotation.getValues().size());
     Assert.assertNotNull(annotation.getValue("values"));
     Assert.assertNotNull(annotation.getValue("en"));
@@ -49,9 +50,9 @@ public class AnnotationTest {
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
 
     // firstCase annotation
-    IMethod firstCase = (IMethod) childClassType.getMethods().get(2);
+    IMethod firstCase = childClassType.getMethods().get(2);
     Assert.assertEquals(1, firstCase.getAnnotations().size());
-    annotation = (IAnnotation) firstCase.getAnnotations().get(0);
+    annotation = firstCase.getAnnotations().get(0);
     Assert.assertEquals(1, annotation.getValues().size());
     Assert.assertNotNull(annotation.getValue("value"));
     Assert.assertEquals(firstCase, annotation.getOwner());
@@ -61,7 +62,7 @@ public class AnnotationTest {
   @Test
   public void testAnnotationsWithAnnotationValues() {
     IType wildcardBaseClass = TestingUtils.getType("org.eclipse.scout.sdk.core.fixture.WildcardBaseClass", CoreTestingUtils.SOURCE_FOLDER);
-    IAnnotation testAnnot = (IAnnotation) wildcardBaseClass.getAnnotations().get(0);
+    IAnnotation testAnnot = wildcardBaseClass.getAnnotations().get(0);
     IAnnotationValue value = testAnnot.getValue("inner");
     Assert.assertNotNull(value);
     Assert.assertTrue(value.getValue() instanceof IAnnotationValue[]);
@@ -86,10 +87,10 @@ public class AnnotationTest {
 
   @Test
   public void testToString() {
-    IAnnotation annotation = (IAnnotation) ((IMethod) CoreTestingUtils.getChildClassType().getMethods().get(2)).getAnnotations().get(0);
+    IAnnotation annotation = CoreTestingUtils.getChildClassType().getMethods().get(2).getAnnotations().get(0);
     Assert.assertFalse(StringUtils.isBlank(annotation.toString()));
 
-    annotation = (IAnnotation) CoreTestingUtils.getBaseClassType().getAnnotations().get(0);
+    annotation = CoreTestingUtils.getBaseClassType().getAnnotations().get(0);
     Assert.assertFalse(StringUtils.isBlank(annotation.toString()));
   }
 
@@ -99,26 +100,26 @@ public class AnnotationTest {
     Assert.assertNotNull(baseClassType);
 
     // type annotation
-    ListOrderedSet/*<IAnnotation>*/ annotations = baseClassType.getAnnotations();
+    List<IAnnotation> annotations = baseClassType.getAnnotations();
     Assert.assertEquals(1, annotations.size());
-    IAnnotation annotation = (IAnnotation) annotations.get(0);
+    IAnnotation annotation = annotations.get(0);
     Assert.assertEquals(1, annotation.getValues().size());
     Assert.assertNotNull(annotation.getValue("values"));
     Assert.assertEquals(baseClassType, annotation.getOwner());
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
 
     // methodInBaseClass annotation
-    IMethod methodInBaseClass = (IMethod) baseClassType.getMethods().get(2);
+    IMethod methodInBaseClass = baseClassType.getMethods().get(2);
     Assert.assertEquals(2, methodInBaseClass.getAnnotations().size());
 
-    annotation = (IAnnotation) methodInBaseClass.getAnnotations().get(0);
+    annotation = methodInBaseClass.getAnnotations().get(0);
     Assert.assertEquals(1, annotation.getValues().size());
     Assert.assertNotNull(annotation.getValue("values"));
     Assert.assertNull(annotation.getValue("en"));
     Assert.assertEquals(methodInBaseClass, annotation.getOwner());
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
 
-    annotation = (IAnnotation) methodInBaseClass.getAnnotations().get(1);
+    annotation = methodInBaseClass.getAnnotations().get(1);
     Assert.assertEquals(0, annotation.getValues().size());
     Assert.assertEquals(methodInBaseClass, annotation.getOwner());
     Assert.assertEquals(MarkerAnnotation.class.getName(), annotation.getType().getName());

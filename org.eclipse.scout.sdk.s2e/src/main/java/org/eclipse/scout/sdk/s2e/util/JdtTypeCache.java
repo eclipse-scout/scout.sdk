@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.s2e.util;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 
@@ -27,7 +27,7 @@ import org.eclipse.jdt.core.IType;
  * @since 5.1.0
  */
 public final class JdtTypeCache {
-  private final Map<String /*fqn*/, ListOrderedSet/*<IType>*/> m_types;
+  private final Map<String /*fqn*/, Set<IType>> m_types;
 
   public JdtTypeCache() {
     m_types = new HashMap<>();
@@ -35,16 +35,16 @@ public final class JdtTypeCache {
 
   /**
    * Finds all types accessible in the current workspace that have the given fully qualified name.
-   * 
+   *
    * @param fqn
    *          The fully qualified name to search.
-   * @return A {@link ListOrderedSet} containing all the {@link IType}s with the given name.
+   * @return A {@link Set} containing all the {@link IType}s with the given name.
    * @throws CoreException
    */
-  public ListOrderedSet/*<IType>*/ getTypes(String fqn) throws CoreException {
-    ListOrderedSet/*<IType>*/ result = m_types.get(fqn);
+  public Set<IType> getTypes(String fqn) throws CoreException {
+    Set<IType> result = m_types.get(fqn);
     if (result == null) {
-      ListOrderedSet/*<IType>*/ candidates = JdtUtils.resolveJdtTypes(fqn);
+      Set<IType> candidates = JdtUtils.resolveJdtTypes(fqn);
       m_types.put(fqn, candidates);
       result = candidates;
     }

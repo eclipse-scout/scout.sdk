@@ -16,10 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.Flags;
@@ -79,8 +77,8 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
   }
 
   protected String typeParamToSource(ITypeParameter param, IImportValidator validator) {
-    Set<IType> boundsSignatures = param.getBounds();
-    boolean hasBounds = CollectionUtils.isNotEmpty(boundsSignatures);
+    List<IType> boundsSignatures = param.getBounds();
+    boolean hasBounds = !boundsSignatures.isEmpty();
 
     StringBuilder fqnBuilder = new StringBuilder();
     if (StringUtils.isNotBlank(param.getName())) {

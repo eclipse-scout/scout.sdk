@@ -7,7 +7,6 @@ import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.StringTokenizer;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.core.compiler.CharOperation;
@@ -151,7 +150,7 @@ public class JavaParser implements ILookupEnvironment {
   }
 
   private static INameEnvironment createClasspath(List<File> cp) {
-    if (CollectionUtils.isEmpty(cp)) {
+    if (cp == null || cp.isEmpty()) {
       return null;
     }
 

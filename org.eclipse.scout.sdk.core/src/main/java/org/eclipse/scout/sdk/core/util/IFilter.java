@@ -8,25 +8,15 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.core.model;
-
-import java.util.List;
+package org.eclipse.scout.sdk.core.util;
 
 /**
- * <h3>{@link IAnnotatable}</h3>Represents a Java element that can be annotated.
+ * <h3>{@link IFilter}</h3>
  *
  * @author Matthias Villiger
  * @since 5.1.0
- * @see IAnnotation
  */
-public interface IAnnotatable {
-  /**
-   * Gets all the {@link IAnnotation}s that are defined for the receiver.<br>
-   * The {@link List} iterates over the {@link IAnnotation}s in the order as they appear in the source or
-   * class file.
-   *
-   * @return A {@link List} containing all {@link IAnnotation}s of the receiver object. Never returns
-   *         <code>null</code>.
-   */
-  List<IAnnotation> getAnnotations();
+public interface IFilter<E> {
+
+  boolean evaluate(E method);
 }

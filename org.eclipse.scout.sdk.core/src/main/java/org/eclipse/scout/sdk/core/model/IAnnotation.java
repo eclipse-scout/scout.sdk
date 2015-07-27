@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
-import org.apache.commons.collections.map.ListOrderedMap;
+import java.util.Map;
 
 /**
  * <h3>{@link IAnnotation}</h3>
@@ -22,12 +22,12 @@ public interface IAnnotation {
 
   /**
    * Gets all attributes of this {@link IAnnotation}.<br>
-   * The {@link ListOrderedMap} iterates over the attributes in the order as they appear in the source or class file.
+   * The {@link Map} iterates over the attributes in the order as they appear in the source or class file.
    *
-   * @return A {@link ListOrderedMap} containing the attribute name ({@link IAnnotationValue#getName()}) as key and the
+   * @return A {@link Map} containing the attribute name ({@link IAnnotationValue#getName()}) as key and the
    *         {@link IAnnotationValue} as value. Never returns <code>null</code>.
    */
-  ListOrderedMap/*<String, IAnnotationValue>*/ getValues();
+  Map<String, IAnnotationValue> getValues();
 
   /**
    * Gets the {@link IAnnotationValue} of the annotation attribute with the given name.

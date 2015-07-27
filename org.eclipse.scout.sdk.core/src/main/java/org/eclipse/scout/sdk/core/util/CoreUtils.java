@@ -10,9 +10,15 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.math.BigDecimal;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -21,14 +27,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.functors.TruePredicate;
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.model.FieldFilters;
 import org.eclipse.scout.sdk.core.model.Flags;
@@ -65,6 +66,54 @@ public final class CoreUtils {
   private static volatile Set<String> javaKeyWords = null;
 
   private CoreUtils() {
+  }
+
+  /**
+   * Reads all bytes from the given {@link InputStream} and converts them into a {@link StringBuilder} using the given
+   * charset name.<br>
+   * <br>
+   * <b>Note:</b> The {@link InputStream} is automatically closed after reading.
+   *
+   * @param is
+   *          The data source. Must not be <code>null</code>.
+   * @param charsetName
+   *          The name of the {@link Charset} to use. Must be supported by the platform.
+   * @return A {@link StringBuilder} holding the contents.
+   * @throws IOException
+   *           While reading data from the stream or if the given charsetName does not exist on this platform.
+   * @see Charset#isSupported(String)
+   */
+  public static StringBuilder inputStreamToString(InputStream is, String charsetName) throws IOException {
+    if (!Charset.isSupported(charsetName)) {
+      throw new IOException("Charset '" + charsetName + "' is not supported.");
+    }
+    return inputStreamToString(is, Charset.forName(charsetName));
+  }
+
+  /**
+   * Reads all bytes from the given {@link InputStream} and converts them into a {@link StringBuilder} using the given
+   * {@link Charset}.<br>
+   * <br>
+   * <b>Note:</b> The {@link InputStream} is automatically closed after reading.
+   *
+   * @param is
+   *          The data source. Must not be <code>null</code>.
+   * @param charset
+   *          The {@link Charset} to use for the byte-to-char conversion.
+   * @return A {@link StringBuilder} holding the contents.
+   * @throws IOException
+   *           While reading data from the stream.
+   */
+  public static StringBuilder inputStreamToString(InputStream is, Charset charset) throws IOException {
+    final char[] buffer = new char[8192];
+    final StringBuilder out = new StringBuilder();
+    int length = 0;
+    try (Reader in = new InputStreamReader(is, charset)) {
+      while ((length = in.read(buffer)) != -1) {
+        out.append(buffer, 0, length);
+      }
+      return out;
+    }
   }
 
   /**
@@ -315,16 +364,16 @@ public final class CoreUtils {
    *          The level on which the value of a type parameter should be extracted.
    * @param typeParamIndex
    *          The index of the type parameter on the given level type whose value should be extracted.
-   * @return A {@link ListOrderedSet} holding all type argument signatures of the given type parameter.
+   * @return A {@link List} holding all type argument signatures of the given type parameter.
    * @see #getResolvedTypeParamValue(IType, String, int)
    */
-  public static ListOrderedSet/*<String>*/ getResolvedTypeParamValueSignature(IType focusType, String levelFqn, int typeParamIndex) {
-    ListOrderedSet/*<IType>*/ typeParamsValue = getResolvedTypeParamValue(focusType, levelFqn, typeParamIndex);
+  public static List<String> getResolvedTypeParamValueSignature(IType focusType, String levelFqn, int typeParamIndex) {
+    List<IType> typeParamsValue = getResolvedTypeParamValue(focusType, levelFqn, typeParamIndex);
     List<String> result = new ArrayList<>(typeParamsValue.size());
     for (Object t : typeParamsValue) {
       result.add(SignatureUtils.getResolvedSignature((IType) t));
     }
-    return ListOrderedSet.decorate(result);
+    return result;
   }
 
   /**
@@ -338,19 +387,77 @@ public final class CoreUtils {
   }
 
   /**
-   * Gets the first direct member {@link IType} of the given declaring type which matches the given {@link Predicate}.
+   * Finds the first element of the given {@link Collections} for which the given {@link IFilter} evaluates to
+   * <code>true</code>.
+   *
+   * @param collection
+   *          The collection to search in.
+   * @param filter
+   *          The filter or <code>null</code> if the first element should be returned.
+   * @return The first element that matches the given filter or <code>null</code> if the given collection is
+   *         <code>null</code> or no element is accepted by the given filter.
+   */
+  public static <E> E findFirst(Collection<E> collection, IFilter<E> filter) {
+    if (collection == null || collection.isEmpty()) {
+      return null;
+    }
+    if (filter == null) {
+      return collection.iterator().next();
+    }
+
+    for (E element : collection) {
+      if (filter.evaluate(element)) {
+        return element;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Selects all items from the source {@link Collection} for which the given {@link IFilter} evaluates to
+   * <code>true</code> and inserts them into the given result {@link Collection}.
+   *
+   * @param source
+   *          The source {@link Collection}
+   * @param filter
+   *          The {@link IFilter} to decide which elements to select. If the filter is <code>null</code> all elements
+   *          are copied into the resulting {@link Collection}.
+   * @param result
+   *          The {@link Collection} holding the resulting elements
+   */
+  public static <E> void filter(Collection<? extends E> source, IFilter<E> filter, Collection<E> result) {
+    if (source == null) {
+      return;
+    }
+    if (result == null) {
+      return;
+    }
+    if (filter == null) {
+      result.addAll(source);
+      return;
+    }
+
+    for (E element : source) {
+      if (filter.evaluate(element)) {
+        result.add(element);
+      }
+    }
+  }
+
+  /**
+   * Gets the first direct member {@link IType} of the given declaring type which matches the given {@link IFilter}.
    *
    * @param declaringType
    *          The declaring {@link IType}.
    * @param filter
-   *          The {@link Predicate} choosing the member {@link IType}.
+   *          The {@link IFilter} choosing the member {@link IType}.
    * @return The first inner {@link IType} or <code>null</code> if it cannot be found.
    */
-  public static IType getInnerType(IType declaringType, Predicate/*<IType>*/ filter) {
+  public static IType getInnerType(IType declaringType, IFilter<IType> filter) {
     if (declaringType == null) {
       return null;
     }
-    return (IType) CollectionUtils.find(declaringType.getTypes(), filter);
+    return findFirst(declaringType.getTypes(), filter);
   }
 
   /**
@@ -367,22 +474,22 @@ public final class CoreUtils {
   }
 
   /**
-   * Gets the immediate member {@link IType}s of the given {@link IType} which matches the given {@link Predicate} in
+   * Gets the immediate member {@link IType}s of the given {@link IType} which matches the given {@link IFilter} in
    * the order as it is defined in the source or class file.
    *
    * @param type
    *          The declaring {@link IType} holding the member {@link IType}s.
    * @param filter
-   *          The {@link Predicate} to filter the member {@link IType}s.
-   * @return A {@link ListOrderedSet} holding the selected member {@link IType}.
+   *          The {@link IFilter} to filter the member {@link IType}s.
+   * @return A {@link List} holding the selected member {@link IType}.
    */
-  public static ListOrderedSet/*<IType>*/ getInnerTypes(IType type, Predicate/*<IType>*/ filter) {
+  public static List<IType> getInnerTypes(IType type, IFilter<IType> filter) {
     return getInnerTypes(type, filter, null);
   }
 
   /**
    * Returns the immediate member types declared by the given type. The results is filtered using the given
-   * {@link Predicate} and
+   * {@link IFilter} and
    * sorted using the given {@link Comparator}.
    *
    * @param type
@@ -393,23 +500,15 @@ public final class CoreUtils {
    *          the comparator to sort the result or null
    * @return the immediate inner types declared in the given type.
    */
-  public static ListOrderedSet/*<IType>*/ getInnerTypes(IType type, Predicate/*<IType>*/ filter, Comparator<IType> comparator) {
-    ListOrderedSet/*<IType>*/ types = type.getTypes();
+  public static List<IType> getInnerTypes(IType type, IFilter<IType> filter, Comparator<IType> comparator) {
+    List<IType> types = type.getTypes();
 
-    if (filter == null) {
-      filter = TruePredicate.getInstance();
+    List<IType> l = new ArrayList<>(types.size());
+    filter(types, filter, l);
+    if (comparator != null && !l.isEmpty()) {
+      Collections.sort(l, comparator);
     }
-
-    if (comparator == null) {
-      // no special order requested. keep order as it comes from the declaring type
-      List<IType> l = new ArrayList<>(types.size());
-      CollectionUtils.select(types, filter, l);
-      return ListOrderedSet.decorate(l);
-    }
-
-    Set<IType> result = new TreeSet<>(comparator);
-    CollectionUtils.select(types, filter, result);
-    return ListOrderedSet.decorate(result);
+    return l;
   }
 
   /**
@@ -498,53 +597,45 @@ public final class CoreUtils {
     if (declaringType == null) {
       return null;
     }
-    return (IField) CollectionUtils.find(declaringType.getFields(), FieldFilters.getNameFilter(fieldName));
+    return findFirst(declaringType.getFields(), FieldFilters.getNameFilter(fieldName));
   }
 
   /**
-   * Gets all {@link IField} of the given declaring {@link IType} that matches the given {@link Predicate} in the order
+   * Gets all {@link IField} of the given declaring {@link IType} that matches the given {@link IFilter} in the order
    * as they appear in the source or class file.
    *
    * @param declaringType
    *          The declaring {@link IType}.
    * @param filter
-   *          The {@link Predicate} selecting the {@link IField}s.
-   * @return A {@link ListOrderedSet} holding the {@link IField}s accepted by the {@link Predicate}.
+   *          The {@link IFilter} selecting the {@link IField}s.
+   * @return A {@link List} holding the {@link IField}s accepted by the {@link IFilter}.
    */
-  public static ListOrderedSet/*<IField>*/ getFields(IType declaringType, Predicate/*<IField>*/ filter) {
+  public static List<IField> getFields(IType declaringType, IFilter<IField> filter) {
     return getFields(declaringType, filter, null);
   }
 
   /**
-   * Gets all {@link IField}s of the given declaring {@link IType} that matches the given {@link Predicate} sorted by
+   * Gets all {@link IField}s of the given declaring {@link IType} that matches the given {@link IFilter} sorted by
    * the given {@link Comparator}.
    *
    * @param declaringType
    *          The declaring {@link IType}.
    * @param filter
-   *          The {@link Predicate} selecting the {@link IField}s.
+   *          The {@link IFilter} selecting the {@link IField}s.
    * @param comparator
    *          The {@link Comparator} to sort the {@link IField}s.
-   * @return A {@link ListOrderedSet} holding the {@link IField}s accepted by the {@link Predicate} sorted by the given
+   * @return A {@link List} holding the {@link IField}s accepted by the {@link IFilter} sorted by the given
    *         {@link Comparator}.
    */
-  public static ListOrderedSet/*<IField>*/ getFields(IType declaringType, Predicate/*<IField>*/ filter, Comparator<IField> comparator) {
-    ListOrderedSet/*<IField>*/ fields = declaringType.getFields();
+  public static List<IField> getFields(IType declaringType, IFilter<IField> filter, Comparator<IField> comparator) {
+    List<IField> fields = declaringType.getFields();
 
-    if (filter == null) {
-      filter = TruePredicate.getInstance();
+    List<IField> l = new ArrayList<>(fields.size());
+    filter(fields, filter, l);
+    if (comparator != null && !l.isEmpty()) {
+      Collections.sort(l, comparator);
     }
-
-    if (comparator == null) {
-      // no special order requested. keep order as it comes from the declaring type
-      List<IField> l = new ArrayList<>(fields.size());
-      CollectionUtils.select(fields, filter, l);
-      return ListOrderedSet.decorate(l);
-    }
-
-    Set<IField> result = new TreeSet<>(comparator);
-    CollectionUtils.select(fields, filter, result);
-    return ListOrderedSet.decorate(result);
+    return l;
   }
 
   /**
@@ -556,10 +647,11 @@ public final class CoreUtils {
    *          The fully qualified name of the class on which the value of a type parameter should be extracted.
    * @param typeParamIndex
    *          The index of the type parameter on the given level type whose value should be extracted.
-   * @return A {@link ListOrderedSet} holding all type arguments of the given type parameter.
+   * @return A {@link List} holding all type arguments of the given type parameter or <code>null</code> if the given
+   *         levelFqn could not be found in the super hierarchy.
    * @see #getResolvedTypeParamValueSignature(IType, String, int)
    */
-  public static ListOrderedSet/*<IType>*/ getResolvedTypeParamValue(IType focusType, String levelFqn, int typeParamIndex) {
+  public static List<IType> getResolvedTypeParamValue(IType focusType, String levelFqn, int typeParamIndex) {
     IType levelType = findSuperType(focusType, levelFqn);
     if (levelType == null) {
       return null;
@@ -576,20 +668,20 @@ public final class CoreUtils {
    *          The {@link IType} on which the value of a type parameter should be extracted.
    * @param typeParamIndex
    *          The index of the type parameter on the given level type whose value should be extracted.
-   * @return A {@link ListOrderedSet} holding all type arguments of the given type parameter.
+   * @return A {@link List} holding all type arguments of the given type parameter.
    */
-  public static ListOrderedSet/*<IType>*/ getResolvedTypeParamValue(IType focusType, IType levelType, int typeParamIndex) {
+  public static List<IType> getResolvedTypeParamValue(IType focusType, IType levelType, int typeParamIndex) {
     if (levelType == null) {
       return null;
     }
     IType item = levelType.getTypeArguments().get(typeParamIndex);
     if (!item.isAnonymous()) {
       // direct bind
-      return ListOrderedSet.decorate(Arrays.asList(item));
+      return Arrays.asList(item);
     }
 
     IType superClassGeneric = item.getSuperClass();
-    ListOrderedSet/*<IType>*/ superIfcGenerics = item.getSuperInterfaces();
+    List<IType> superIfcGenerics = item.getSuperInterfaces();
     List<IType> result = null;
     if (superClassGeneric != null) {
       result = new ArrayList<>(superIfcGenerics.size() + 1);
@@ -603,20 +695,20 @@ public final class CoreUtils {
       result.add((IType) ifcGeneric);
     }
 
-    return ListOrderedSet.decorate(result);
+    return result;
   }
 
   /**
    * Searches for the first {@link IMethod} in the super hierarchy of the given {@link IType} matching the given
-   * {@link Predicate}.
+   * {@link IFilter}.
    *
    * @param startType
    *          The start {@link IType}.
    * @param filter
-   *          The {@link Predicate} to select the {@link IMethod}.
+   *          The {@link IFilter} to select the {@link IMethod}.
    * @return The first {@link IMethod} or <code>null</code> if it cannot be found.
    */
-  public static IMethod findMethodInSuperHierarchy(IType startType, Predicate/*<IMethod>*/ filter) {
+  public static IMethod findMethodInSuperHierarchy(IType startType, IFilter<IMethod> filter) {
     if (startType == null) {
       return null;
     }
@@ -641,23 +733,23 @@ public final class CoreUtils {
   }
 
   /**
-   * Searches for the first direct inner {@link IType} matching the given {@link Predicate} checking the entire super
+   * Searches for the first direct inner {@link IType} matching the given {@link IFilter} checking the entire super
    * hierarchy of the given {@link IType}.
    *
    * @param declaringType
    *          The {@link IType} to start searching
    * @param filter
-   *          The {@link Predicate} to select the member {@link IType}.
+   *          The {@link IFilter} to select the member {@link IType}.
    * @return The first member {@link IType} or <code>null</code> if it cannot be found.
    */
-  public static IType findInnerTypeInSuperHierarchy(IType declaringType, Predicate/*<IType>*/ filter) {
+  public static IType findInnerTypeInSuperHierarchy(IType declaringType, IFilter<IType> filter) {
     if (declaringType == null) {
       return null;
     }
 
-    ListOrderedSet/*<IType>*/ innerTypes = getInnerTypes(declaringType, filter);
+    List<IType> innerTypes = getInnerTypes(declaringType, filter);
     if (!innerTypes.isEmpty()) {
-      return (IType) innerTypes.get(0);
+      return innerTypes.get(0);
     }
     return findInnerTypeInSuperHierarchy(declaringType.getSuperClass(), filter);
   }
@@ -680,16 +772,15 @@ public final class CoreUtils {
    * @param type
    *          the type within properties are searched
    * @param propertyFilter
-   *          optional property bean {@link Predicate} used to filter the result
+   *          optional property bean {@link IFilter} used to filter the result
    * @param comparator
    *          optional property bean {@link Comparator} used to sort the result
    * @return Returns a {@link Set} of property bean descriptions.
    * @see <a href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">JavaBeans Spec</a>
    */
-  @SuppressWarnings("unchecked")
-  public static Set<IPropertyBean> getPropertyBeans(IType type, Predicate/*<IPropertyBean>*/ propertyFilter, Comparator<IPropertyBean> comparator) {
-    Predicate/*<IMethod>*/ filter = MethodFilters.getMultiMethodFilter(MethodFilters.getFlagsFilter(Flags.AccPublic), MethodFilters.getNameRegexFilter(BEAN_METHOD_NAME));
-    ListOrderedSet/*<IMethod>*/ methods = getMethods(type, filter);
+  public static List<IPropertyBean> getPropertyBeans(IType type, IFilter<IPropertyBean> propertyFilter, Comparator<IPropertyBean> comparator) {
+    IFilter<IMethod> filter = MethodFilters.getMultiMethodFilter(MethodFilters.getFlagsFilter(Flags.AccPublic), MethodFilters.getNameRegexFilter(BEAN_METHOD_NAME));
+    List<IMethod> methods = getMethods(type, filter);
     Map<String, PropertyBean> beans = new HashMap<>(methods.size());
     for (Object m : methods) {
       Matcher matcher = BEAN_METHOD_NAME.matcher(((IMethod) m).getName());
@@ -736,19 +827,13 @@ public final class CoreUtils {
     }
 
     // filter
-    if (propertyFilter == null) {
-      propertyFilter = TruePredicate.getInstance();
-    }
+    List<IPropertyBean> l = new ArrayList<>(beans.size());
+    filter(beans.values(), propertyFilter, l);
 
-    if (comparator == null) {
-      List<IPropertyBean> l = new ArrayList<>(beans.size());
-      CollectionUtils.select(beans.values(), propertyFilter, l);
-      return ListOrderedSet.decorate(l);
+    if (comparator != null && !l.isEmpty()) {
+      Collections.sort(l, comparator);
     }
-
-    Set<IPropertyBean> result = new TreeSet<>(comparator);
-    CollectionUtils.select(beans.values(), propertyFilter, result);
-    return ListOrderedSet.decorate(result);
+    return l;
   }
 
   /**
@@ -765,11 +850,11 @@ public final class CoreUtils {
     if (annotatable == null) {
       return null;
     }
-    ListOrderedSet/*<IAnnotation>*/ annotations = getAnnotations(annotatable, name, true);
-    if (CollectionUtils.isEmpty(annotations)) {
+    List<IAnnotation> annotations = getAnnotations(annotatable, name, true);
+    if (annotations == null || annotations.isEmpty()) {
       return null;
     }
-    return (IAnnotation) annotations.get(0);
+    return annotations.get(0);
   }
 
   /**
@@ -779,17 +864,18 @@ public final class CoreUtils {
    *          The {@link IAnnotation} holder.
    * @param name
    *          Simple or fully qualified name of the annotation type.
-   * @return A {@link ListOrderedSet} holding all {@link IAnnotation}s having the given name.
+   * @return A {@link List} holding all {@link IAnnotation}s having the given name or <code>null</code> if no such
+   *         annotation can be found.
    */
-  public static ListOrderedSet/*<IAnnotation>*/ getAnnotations(IAnnotatable annotatable, String name) {
+  public static List<IAnnotation> getAnnotations(IAnnotatable annotatable, String name) {
     return getAnnotations(annotatable, name, false);
   }
 
-  private static ListOrderedSet/*<IAnnotation>*/ getAnnotations(IAnnotatable annotatable, String name, boolean onlyFirst) {
+  private static List<IAnnotation> getAnnotations(IAnnotatable annotatable, String name, boolean onlyFirst) {
     if (annotatable == null) {
       return null;
     }
-    ListOrderedSet/*<IAnnotation>*/ candidates = annotatable.getAnnotations();
+    List<IAnnotation> candidates = annotatable.getAnnotations();
     if (name == null || candidates.size() == 0) {
       return candidates;
     }
@@ -800,11 +886,11 @@ public final class CoreUtils {
       if (name.equals(((IAnnotation) candidate).getType().getName()) || simpleName.equals(((IAnnotation) candidate).getType().getSimpleName())) {
         result.add((IAnnotation) candidate);
         if (onlyFirst) {
-          return ListOrderedSet.decorate(result); // cancel after first
+          return result; // cancel after first
         }
       }
     }
-    return ListOrderedSet.decorate(result);
+    return result;
   }
 
   /**
@@ -891,23 +977,20 @@ public final class CoreUtils {
   }
 
   /**
-   * Gets the first {@link IMethod} which is directly in the given {@link IType} and accepts the given {@link Predicate}
+   * Gets the first {@link IMethod} which is directly in the given {@link IType} and accepts the given {@link IFilter}
    * .
    *
    * @param type
    *          The {@link IType} to search in.
    * @param filter
-   *          The {@link Predicate} to select the {@link IMethod}.
+   *          The {@link IFilter} to select the {@link IMethod}.
    * @return The first {@link IMethod} or <code>null</code>.
    */
-  public static IMethod getMethod(IType type, Predicate/*<IMethod>*/ filter) {
+  public static IMethod getMethod(IType type, IFilter<IMethod> filter) {
     if (type == null) {
       return null;
     }
-    if (filter == null) {
-      filter = TruePredicate.getInstance();
-    }
-    return (IMethod) CollectionUtils.find(type.getMethods(), filter);
+    return findFirst(type.getMethods(), filter);
   }
 
   /**
@@ -932,7 +1015,7 @@ public final class CoreUtils {
    *          The type to get all methods of.
    * @return A {@link Set} of all methods of the given type. Never returns null.
    */
-  public static ListOrderedSet/*<IMethod>*/ getMethods(IType type) {
+  public static List<IMethod> getMethods(IType type) {
     return getMethods(type, null);
   }
 
@@ -946,7 +1029,7 @@ public final class CoreUtils {
    *          The filter.
    * @return A {@link Set} of all methods of the given type matching the given filter. Never returns null.
    */
-  public static ListOrderedSet/*<IMethod>*/ getMethods(IType type, Predicate/*<IMethod>*/ filter) {
+  public static List<IMethod> getMethods(IType type, IFilter<IMethod> filter) {
     return getMethods(type, filter, null);
   }
 
@@ -963,23 +1046,14 @@ public final class CoreUtils {
    *          The comparator to use or null to get the methods in undefined order.
    * @return an {@link Set} of all methods of the given type matching the given filter. Never returns null.
    */
-  public static ListOrderedSet/*<IMethod>*/ getMethods(IType type, Predicate/*<IMethod>*/ filter, Comparator<IMethod> comparator) {
-    @SuppressWarnings("unchecked")
-    Set<IMethod> methods = type.getMethods();
-
-    if (filter == null) {
-      filter = TruePredicate.getInstance();
+  public static List<IMethod> getMethods(IType type, IFilter<IMethod> filter, Comparator<IMethod> comparator) {
+    List<IMethod> methods = type.getMethods();
+    List<IMethod> l = new ArrayList<>(methods.size());
+    filter(methods, filter, l);
+    if (comparator != null && !l.isEmpty()) {
+      Collections.sort(l, comparator);
     }
-
-    if (comparator == null) {
-      List<IMethod> l = new ArrayList<>(methods.size());
-      CollectionUtils.select(methods, filter, l);
-      return ListOrderedSet.decorate(l);
-    }
-
-    Set<IMethod> result = new TreeSet<>(comparator);
-    CollectionUtils.select(methods, filter, result);
-    return ListOrderedSet.decorate(result);
+    return l;
   }
 
   /**

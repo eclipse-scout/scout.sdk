@@ -14,7 +14,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.collections.map.ListOrderedMap;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
@@ -33,7 +32,7 @@ public class Annotation implements IAnnotation {
   private final int m_ordinal;
   private final int m_hash;
   private final ILookupEnvironment m_env;
-  private ListOrderedMap/*<String, IAnnotationValue>*/ m_values;
+  private Map<String, IAnnotationValue> m_values;
   private IType m_type;
 
   public Annotation(org.eclipse.jdt.internal.compiler.ast.Annotation annotation, ClassScope scope, IAnnotatable owner, int ordinal, ILookupEnvironment lookupEnvironment) {
@@ -57,15 +56,15 @@ public class Annotation implements IAnnotation {
 
   @Override
   public IAnnotationValue getValue(String name) {
-    return (IAnnotationValue) getValues().get(name);
+    return getValues().get(name);
   }
 
   @Override
-  public ListOrderedMap/*<String, IAnnotationValue>*/ getValues() {
+  public Map<String, IAnnotationValue> getValues() {
     if (m_values == null) {
       MemberValuePair[] memberValuePairs = m_annotation.memberValuePairs();
       if (memberValuePairs == null || memberValuePairs.length < 1) {
-        m_values = (ListOrderedMap) ListOrderedMap.decorate(new HashMap<String, IAnnotationValue>(0));
+        m_values = new HashMap<>(0);
       }
       else {
         Map<String, IAnnotationValue> result = new HashMap<>(memberValuePairs.length);
@@ -73,7 +72,7 @@ public class Annotation implements IAnnotation {
           AnnotationValue v = new AnnotationValue(p, m_scope, this, m_env);
           result.put(v.getName(), v);
         }
-        m_values = (ListOrderedMap) ListOrderedMap.decorate(result);
+        m_values = result;
       }
     }
     return m_values;

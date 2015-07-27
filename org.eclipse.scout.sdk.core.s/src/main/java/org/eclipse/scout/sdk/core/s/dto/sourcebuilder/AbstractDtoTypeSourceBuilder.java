@@ -12,11 +12,10 @@ package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
 
 import java.util.Collection;
 import java.util.Comparator;
-import java.util.Set;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.collections.Predicate;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.Flags;
@@ -45,6 +44,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
 /**
@@ -171,9 +171,8 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
     }
   }
 
-  @SuppressWarnings("unchecked")
   protected static void copyAnnotations(IAnnotatable annotationOwner, final IType declaringType, ITypeSourceBuilder sourceBuilder, final ILookupEnvironment lookupEnv) {
-    Set<IAnnotation> annotations = annotationOwner.getAnnotations();
+    List<IAnnotation> annotations = annotationOwner.getAnnotations();
     for (IAnnotation a : annotations) {
       final IAnnotation annotation = a;
       final IType annotationDeclarationType = annotation.getType();
@@ -217,7 +216,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
   }
 
   protected void collectProperties() {
-    Set<? extends IPropertyBean> beanPropertyDescriptors = CoreUtils.getPropertyBeans(getModelType(), DTO_PROPERTY_FILTER, BEAN_NAME_COMPARATOR);
+    List<IPropertyBean> beanPropertyDescriptors = CoreUtils.getPropertyBeans(getModelType(), DTO_PROPERTY_FILTER, BEAN_NAME_COMPARATOR);
     for (IPropertyBean desc : beanPropertyDescriptors) {
       String beanName = CoreUtils.ensureValidParameterName(desc.getBeanName());
       String lowerCaseBeanName = CoreUtils.ensureStartWithLowerCase(beanName);
@@ -313,21 +312,21 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
     return m_lookupEnv;
   }
 
-  protected static final Predicate/*<IPropertyBean>*/ DTO_PROPERTY_FILTER = new Predicate/*<IPropertyBean>*/() {
+  protected static final IFilter<IPropertyBean> DTO_PROPERTY_FILTER = new IFilter<IPropertyBean>() {
     @Override
-    public boolean evaluate(Object property) {
+    public boolean evaluate(IPropertyBean property) {
       // read and write method must exist
-      boolean readAndWriteMethodsExist = ((IPropertyBean) property).getReadMethod() != null && ((IPropertyBean) property).getWriteMethod() != null;
+      boolean readAndWriteMethodsExist = property.getReadMethod() != null && property.getWriteMethod() != null;
       if (!readAndWriteMethodsExist) {
         return false;
       }
 
       // @FormData or @Data annotation must exist
-      boolean isReadMethodDtoRelevant = CoreUtils.getAnnotation(((IPropertyBean) property).getReadMethod(), IRuntimeClasses.FormData) != null || CoreUtils.getAnnotation(((IPropertyBean) property).getReadMethod(), IRuntimeClasses.Data) != null;
+      boolean isReadMethodDtoRelevant = CoreUtils.getAnnotation(property.getReadMethod(), IRuntimeClasses.FormData) != null || CoreUtils.getAnnotation(property.getReadMethod(), IRuntimeClasses.Data) != null;
       if (!isReadMethodDtoRelevant) {
         return false;
       }
-      return CoreUtils.getAnnotation(((IPropertyBean) property).getWriteMethod(), IRuntimeClasses.FormData) != null || CoreUtils.getAnnotation(((IPropertyBean) property).getWriteMethod(), IRuntimeClasses.Data) != null;
+      return CoreUtils.getAnnotation(property.getWriteMethod(), IRuntimeClasses.FormData) != null || CoreUtils.getAnnotation(property.getWriteMethod(), IRuntimeClasses.Data) != null;
     }
   };
 

@@ -16,7 +16,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
-import org.apache.commons.collections.Predicate;
 import org.eclipse.scout.sdk.core.model.Flags;
 import org.eclipse.scout.sdk.core.model.IMethod;
 import org.eclipse.scout.sdk.core.model.IMethodParameter;
@@ -30,6 +29,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFact
 import org.eclipse.scout.sdk.core.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link MethodSourceBuilderFactory}</h3>
@@ -58,7 +58,7 @@ public final class MethodSourceBuilderFactory {
     return constructorSourceBuilder;
   }
 
-  private static IMethod getMethodToOverride(ITypeSourceBuilder typeSourceBuilder, ILookupEnvironment lookupContext, Predicate/*<IMethod>*/ methodFilter) {
+  private static IMethod getMethodToOverride(ITypeSourceBuilder typeSourceBuilder, ILookupEnvironment lookupContext, IFilter<IMethod> methodFilter) {
     List<String> interfaceSignatures = typeSourceBuilder.getInterfaceSignatures();
 
     List<String> superSignatures = new ArrayList<>(interfaceSignatures.size() + 1);
@@ -68,7 +68,7 @@ public final class MethodSourceBuilderFactory {
     return getMethodToOverride(superSignatures, lookupContext, methodFilter);
   }
 
-  private static IMethod getMethodToOverride(List<String> superSignatures, ILookupEnvironment lookupContext, Predicate/*<IMethod>*/ filter) {
+  private static IMethod getMethodToOverride(List<String> superSignatures, ILookupEnvironment lookupContext, IFilter<IMethod> filter) {
     for (String superCandidate : superSignatures) {
       if (superCandidate != null) {
         IType superType = lookupContext.findType(SignatureUtils.toFullyQualifiedName(superCandidate));
@@ -87,8 +87,8 @@ public final class MethodSourceBuilderFactory {
     return createOverrideMethodSourceBuilder(typeSourceBuilder, lookupContext, methodName, null);
   }
 
-  public static IMethodSourceBuilder createOverrideMethodSourceBuilder(ITypeSourceBuilder typeSourceBuilder, ILookupEnvironment lookupContext, String methodName, Predicate/*<IMethod>*/ methodFilter) {
-    Predicate/*<IMethod>*/ filter = null;
+  public static IMethodSourceBuilder createOverrideMethodSourceBuilder(ITypeSourceBuilder typeSourceBuilder, ILookupEnvironment lookupContext, String methodName, IFilter<IMethod> methodFilter) {
+    IFilter<IMethod> filter = null;
     if (methodFilter == null) {
       filter = MethodFilters.getNameFilter(methodName);
     }
@@ -127,7 +127,7 @@ public final class MethodSourceBuilderFactory {
     builder.setReturnTypeSignature(SignatureUtils.getResolvedSignature(method.getReturnType()));
 
     // exceptions
-    Set<IType> excpetions = method.getExceptionTypes();
+    List<IType> excpetions = method.getExceptionTypes();
     List<String> resolvedExceptionSignatures = new ArrayList<>(excpetions.size());
     for (IType t : excpetions) {
       resolvedExceptionSignatures.add(SignatureUtils.getResolvedSignature(t));

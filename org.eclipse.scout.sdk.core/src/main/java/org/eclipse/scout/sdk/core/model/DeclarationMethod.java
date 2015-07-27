@@ -12,10 +12,8 @@ package org.eclipse.scout.sdk.core.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
@@ -35,11 +33,11 @@ public class DeclarationMethod implements IMethod {
   private final char[] m_id;
   private final int m_hash;
   private IType m_returnType;
-  private ListOrderedSet/*<IAnnotation>*/ m_annotations;
+  private List<IAnnotation> m_annotations;
   private int m_flags;
   private List<IMethodParameter> m_arguments;
   private String m_name;
-  private ListOrderedSet/*<IType>*/ m_exceptions;
+  private List<IType> m_exceptions;
 
   public DeclarationMethod(AbstractMethodDeclaration md, ClassScope scope, IType declaringType) {
     m_declaringType = Validate.notNull(declaringType);
@@ -100,7 +98,7 @@ public class DeclarationMethod implements IMethod {
   }
 
   @Override
-  public ListOrderedSet/*<IAnnotation>*/ getAnnotations() {
+  public List<IAnnotation> getAnnotations() {
     if (m_annotations == null) {
       Annotation[] annots = m_md.annotations;
       m_annotations = JavaModelUtils.annotationsToIAnnotations(annots, m_scope, this, m_declaringType.getLookupEnvironment());
@@ -165,11 +163,11 @@ public class DeclarationMethod implements IMethod {
   }
 
   @Override
-  public ListOrderedSet/*<IType>*/ getExceptionTypes() {
+  public List<IType> getExceptionTypes() {
     if (m_exceptions == null) {
       TypeReference[] exceptions = m_md.thrownExceptions;
       if (exceptions == null || exceptions.length < 1) {
-        m_exceptions = ListOrderedSet.decorate(new HashSet<IType>(0));
+        m_exceptions = new ArrayList<>(0);
       }
       else {
         List<IType> result = new ArrayList<>(exceptions.length);
@@ -182,7 +180,7 @@ public class DeclarationMethod implements IMethod {
             result.add(t);
           }
         }
-        m_exceptions = ListOrderedSet.decorate(result);
+        m_exceptions = result;
       }
     }
     return m_exceptions;

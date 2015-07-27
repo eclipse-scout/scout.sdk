@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
@@ -31,7 +30,7 @@ public class BindingTypeParameter implements ITypeParameter {
   private final char[] m_id;
   private final int m_hash;
   private String m_name;
-  private ListOrderedSet/*<IType>*/ m_bounds;
+  private List<IType> m_bounds;
 
   public BindingTypeParameter(TypeVariableBinding binding, IType type) {
     m_binding = Validate.notNull(binding);
@@ -50,7 +49,7 @@ public class BindingTypeParameter implements ITypeParameter {
 
   @Override
   @SuppressWarnings("null")
-  public ListOrderedSet/*<IType>*/ getBounds() {
+  public List<IType> getBounds() {
     if (m_bounds == null) {
       ReferenceBinding superclass = m_binding.superclass();
       ReferenceBinding[] superInterfaces = m_binding.superInterfaces();
@@ -80,7 +79,7 @@ public class BindingTypeParameter implements ITypeParameter {
           }
         }
       }
-      m_bounds = ListOrderedSet.decorate(bounds);
+      m_bounds = bounds;
     }
     return m_bounds;
   }

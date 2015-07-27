@@ -12,10 +12,10 @@ package org.eclipse.scout.sdk.s2e.util;
 
 import java.util.Objects;
 
-import org.apache.commons.collections.Predicate;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
+import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 
 /**
@@ -28,11 +28,11 @@ public final class JdtTypeFilters {
   private JdtTypeFilters() {
   }
 
-  public static Predicate/*<IType>*/ getClassFilter() {
-    return new Predicate/*<IType>*/() {
+  public static IFilter<IType> getClassFilter() {
+    return new IFilter<IType>() {
       @Override
-      public boolean evaluate(Object candidate) {
-        return isClass((IType) candidate);
+      public boolean evaluate(IType candidate) {
+        return isClass(candidate);
       }
     };
   }
@@ -66,19 +66,19 @@ public final class JdtTypeFilters {
     }
   }
 
-  public static Predicate/*<IType>*/ getSubtypeFilter(final String typeFqn) {
-    return new Predicate/*<IType>*/() {
+  public static IFilter<IType> getSubtypeFilter(final String typeFqn) {
+    return new IFilter<IType>() {
       @Override
-      public boolean evaluate(Object candidate) {
-        if (!JdtUtils.exists((IType) candidate)) {
+      public boolean evaluate(IType candidate) {
+        if (!JdtUtils.exists(candidate)) {
           return false;
         }
-        if (Objects.equals(((IType) candidate).getFullyQualifiedName(), typeFqn)) {
+        if (Objects.equals(candidate.getFullyQualifiedName(), typeFqn)) {
           return true;
         }
 
         try {
-          IType[] supertypes = ((IType) candidate).newSupertypeHierarchy(null).getAllTypes();
+          IType[] supertypes = candidate.newSupertypeHierarchy(null).getAllTypes();
           for (IType t : supertypes) {
             if (Objects.equals(t.getFullyQualifiedName(), typeFqn)) {
               return true;
@@ -86,7 +86,7 @@ public final class JdtTypeFilters {
           }
         }
         catch (JavaModelException e) {
-          S2ESdkActivator.logWarning("Unable to gets uper hierarchy for type '" + ((IType) candidate).getFullyQualifiedName() + "'.", e);
+          S2ESdkActivator.logWarning("Unable to gets uper hierarchy for type '" + candidate.getFullyQualifiedName() + "'.", e);
         }
 
         return false;
@@ -95,7 +95,7 @@ public final class JdtTypeFilters {
   }
 
   @SafeVarargs
-  private static Predicate/*<IType>*/ getMultiFilter(final boolean or, final Predicate/*<IType>*/... filters) {
+  private static IFilter<IType> getMultiFilter(final boolean or, final IFilter<IType>... filters) {
     if (filters == null || filters.length < 1) {
       return null;
     }
@@ -103,10 +103,10 @@ public final class JdtTypeFilters {
       return filters[0];
     }
 
-    return new Predicate/*<IType>*/() {
+    return new IFilter<IType>() {
       @Override
-      public boolean evaluate(Object candidate) {
-        for (Predicate/*<IType>*/ f : filters) {
+      public boolean evaluate(IType candidate) {
+        for (IFilter<IType> f : filters) {
           if (f != null) {
             boolean accepted = f.evaluate(candidate);
             if (or == accepted) {
@@ -120,12 +120,12 @@ public final class JdtTypeFilters {
   }
 
   @SafeVarargs
-  public static Predicate/*<IType>*/ getMultiFilterOr(final Predicate/*<IType>*/... filters) {
+  public static IFilter<IType> getMultiFilterOr(final IFilter<IType>... filters) {
     return getMultiFilter(true, filters);
   }
 
   @SafeVarargs
-  public static Predicate/*<IType>*/ getMultiFilterAnd(final Predicate/*<IType>*/... filters) {
+  public static IFilter<IType> getMultiFilterAnd(final IFilter<IType>... filters) {
     return getMultiFilter(false, filters);
   }
 }

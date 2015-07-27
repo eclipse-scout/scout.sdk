@@ -12,8 +12,6 @@ package org.eclipse.scout.sdk.core.model;
 
 import java.util.List;
 
-import org.apache.commons.collections.set.ListOrderedSet;
-
 /**
  * <h3>{@link IMethod}</h3>
  * Represents a method declaration.
@@ -39,9 +37,9 @@ public interface IMethod extends IMember {
   /**
    * Gets all exception declarations of this {@link IMethod} in the order as they appear in the source or class file.
    * 
-   * @return a {@link ListOrderedSet} containing all thrown {@link IType}s of this {@link IMethod}.
+   * @return a {@link List} containing all thrown {@link IType}s of this {@link IMethod}.
    */
-  ListOrderedSet/*<IType>*/ getExceptionTypes();
+  List<IType> getExceptionTypes();
 
   /**
    * Gets if this method is a constructor.

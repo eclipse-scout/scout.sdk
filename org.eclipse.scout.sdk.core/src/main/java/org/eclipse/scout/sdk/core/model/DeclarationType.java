@@ -12,12 +12,10 @@ package org.eclipse.scout.sdk.core.model;
 
 import java.util.ArrayList;
 import java.util.Deque;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.ast.AbstractMethodDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.Annotation;
@@ -41,12 +39,12 @@ public class DeclarationType implements IType {
   private IPackage m_package;
   private String m_simpleName;
   private IType m_superType;
-  private ListOrderedSet/*<IType>*/ m_memberTypes;
-  private ListOrderedSet/*<IType>*/ m_superInterfaces;
+  private List<IType> m_memberTypes;
+  private List<IType> m_superInterfaces;
   private List<ITypeParameter> m_typeParameters;
-  private ListOrderedSet/*<IAnnotation>*/ m_annotations;
-  private ListOrderedSet/*<IMethod>*/ m_methods;
-  private ListOrderedSet/*<IField>*/ m_fields;
+  private List<IAnnotation> m_annotations;
+  private List<IMethod> m_methods;
+  private List<IField> m_fields;
   private int m_flags;
 
   public DeclarationType(TypeDeclaration td, ICompilationUnit owner, IType declaringType, ILookupEnvironment lookupEnvironment) {
@@ -108,7 +106,7 @@ public class DeclarationType implements IType {
   }
 
   @Override
-  public ListOrderedSet/*<IAnnotation>*/ getAnnotations() {
+  public List<IAnnotation> getAnnotations() {
     if (m_annotations == null) {
       Annotation[] annots = m_td.annotations;
       m_annotations = JavaModelUtils.annotationsToIAnnotations(annots, m_td.scope, this, m_env);
@@ -117,11 +115,11 @@ public class DeclarationType implements IType {
   }
 
   @Override
-  public ListOrderedSet/*<IMethod>*/ getMethods() {
+  public List<IMethod> getMethods() {
     if (m_methods == null) {
       AbstractMethodDeclaration[] methods = m_td.methods;
       if (methods == null || methods.length < 1) {
-        m_methods = ListOrderedSet.decorate(new HashSet<IMethod>(0));
+        m_methods = new ArrayList<>(0);
       }
       else {
         List<IMethod> result = new ArrayList<>(methods.length);
@@ -130,7 +128,7 @@ public class DeclarationType implements IType {
             result.add(new DeclarationMethod(a, m_td.scope, this));
           }
         }
-        m_methods = ListOrderedSet.decorate(result);
+        m_methods = result;
       }
     }
     return m_methods;
@@ -156,29 +154,29 @@ public class DeclarationType implements IType {
   }
 
   @Override
-  public ListOrderedSet/*<IType>*/ getTypes() {
+  public List<IType> getTypes() {
     if (m_memberTypes == null) {
       TypeDeclaration[] memberTypes = m_td.memberTypes;
       if (memberTypes == null || memberTypes.length < 1) {
-        m_memberTypes = ListOrderedSet.decorate(new HashSet<IType>(0));
+        m_memberTypes = new ArrayList<>(0);
       }
       else {
         List<IType> result = new ArrayList<>(memberTypes.length);
         for (TypeDeclaration d : memberTypes) {
           result.add(new DeclarationType(d, m_icu, this, m_env));
         }
-        m_memberTypes = ListOrderedSet.decorate(result);
+        m_memberTypes = result;
       }
     }
     return m_memberTypes;
   }
 
   @Override
-  public ListOrderedSet/*<IType>*/ getSuperInterfaces() {
+  public List<IType> getSuperInterfaces() {
     if (m_superInterfaces == null) {
       TypeReference[] refs = m_td.superInterfaces;
       if (refs == null || refs.length < 1) {
-        m_superInterfaces = ListOrderedSet.decorate(new HashSet<IType>(0));
+        m_superInterfaces = new ArrayList<>(0);
       }
       else {
         List<IType> result = new ArrayList<>(refs.length);
@@ -191,7 +189,7 @@ public class DeclarationType implements IType {
             }
           }
         }
-        m_superInterfaces = ListOrderedSet.decorate(result);
+        m_superInterfaces = result;
       }
     }
     return m_superInterfaces;
@@ -245,18 +243,18 @@ public class DeclarationType implements IType {
   }
 
   @Override
-  public ListOrderedSet/*<IField>*/ getFields() {
+  public List<IField> getFields() {
     if (m_fields == null) {
       FieldDeclaration[] fields = m_td.fields;
       if (fields == null || fields.length < 1) {
-        m_fields = ListOrderedSet.decorate(new HashSet<IField>(0));
+        m_fields = new ArrayList<>(0);
       }
       else {
         List<IField> result = new ArrayList<>(fields.length);
         for (FieldDeclaration fd : fields) {
           result.add(new DeclarationField(fd, this, m_td.scope));
         }
-        m_fields = ListOrderedSet.decorate(result);
+        m_fields = result;
       }
     }
     return m_fields;

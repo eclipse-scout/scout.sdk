@@ -25,7 +25,7 @@ public class FieldTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    IField myStringField = (IField) childClassType.getFields().get(0);
+    IField myStringField = childClassType.getFields().get(0);
     Assert.assertNotNull(myStringField);
 
     Assert.assertEquals("myStringValue", myStringField.getValue());
@@ -40,7 +40,7 @@ public class FieldTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    IField myStringField = (IField) childClassType.getFields().get(0);
+    IField myStringField = childClassType.getFields().get(0);
     Assert.assertNotNull(myStringField);
 
     Assert.assertFalse(StringUtils.isBlank(myStringField.toString()));
@@ -51,7 +51,7 @@ public class FieldTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    IField mTestField = (IField) childClassType.getFields().get(1);
+    IField mTestField = childClassType.getFields().get(1);
     Assert.assertNotNull(mTestField);
 
     Assert.assertNull(mTestField.getValue());
@@ -67,12 +67,12 @@ public class FieldTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    IField mTestField = (IField) childClassType.getFields().get(1);
+    IField mTestField = childClassType.getFields().get(1);
     Assert.assertNotNull(mTestField);
 
     Assert.assertEquals(1, mTestField.getAnnotations().size());
-    Assert.assertEquals(mTestField, ((IAnnotation) mTestField.getAnnotations().get(0)).getOwner());
-    Assert.assertEquals(TestAnnotation.class.getName(), ((IAnnotation) mTestField.getAnnotations().get(0)).getType().getName());
+    Assert.assertEquals(mTestField, mTestField.getAnnotations().get(0).getOwner());
+    Assert.assertEquals(TestAnnotation.class.getName(), mTestField.getAnnotations().get(0).getType().getName());
   }
 
   @Test
@@ -80,10 +80,10 @@ public class FieldTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IField myLongField = (IField) baseClassType.getFields().get(1);
+    IField myLongField = baseClassType.getFields().get(1);
     Assert.assertEquals(1, myLongField.getAnnotations().size());
-    Assert.assertEquals(myLongField, ((IAnnotation) myLongField.getAnnotations().get(0)).getOwner());
-    Assert.assertEquals(TestAnnotation.class.getName(), ((IAnnotation) myLongField.getAnnotations().get(0)).getType().getName());
+    Assert.assertEquals(myLongField, myLongField.getAnnotations().get(0).getOwner());
+    Assert.assertEquals(TestAnnotation.class.getName(), myLongField.getAnnotations().get(0).getType().getName());
   }
 
   @Test
@@ -91,7 +91,7 @@ public class FieldTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IField myLongField = (IField) baseClassType.getFields().get(1);
+    IField myLongField = baseClassType.getFields().get(1);
     Assert.assertNotNull(myLongField);
 
     Assert.assertEquals(Long.class.getName(), myLongField.getDataType().getName());
@@ -105,7 +105,7 @@ public class FieldTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IField anonymousClassField = (IField) baseClassType.getFields().get(0);
+    IField anonymousClassField = baseClassType.getFields().get(0);
     Assert.assertNotNull(anonymousClassField);
 
     Assert.assertNull(anonymousClassField.getValue());

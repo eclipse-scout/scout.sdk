@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,7 +29,7 @@ public class AnnotationValueTest {
     Assert.assertNotNull(childClassType);
 
     // ChildClass Annotation
-    IAnnotationValue testAnnotValues = ((IAnnotation) childClassType.getAnnotations().get(0)).getValue("values");
+    IAnnotationValue testAnnotValues = childClassType.getAnnotations().get(0).getValue("values");
     Assert.assertEquals("values", testAnnotValues.getName());
     Assert.assertEquals(ExpressionValueType.Array, testAnnotValues.getValueType());
     Assert.assertEquals(childClassType.getAnnotations().get(0), testAnnotValues.getOwnerAnnotation());
@@ -47,34 +48,34 @@ public class AnnotationValueTest {
     Assert.assertEquals(Runnable.class.getName(), ((IType) arr[1].getValue()).getName());
 
     // methodInChildClass annotation values
-    @SuppressWarnings("unchecked")
-    List<IAnnotationValue> methodInChildClassValues = ((IAnnotation) ((IMethod) childClassType.getMethods().get(1)).getAnnotations().get(0)).getValues().valueList();
+    List<IAnnotationValue> methodInChildClassValues = new ArrayList<>(childClassType.getMethods().get(1).getAnnotations().get(0).getValues().values());
     IAnnotationValue methodInChildClassValue1 = methodInChildClassValues.get(1);
     Assert.assertEquals("values", methodInChildClassValue1.getName());
     Assert.assertEquals(ExpressionValueType.Type, methodInChildClassValue1.getValueType());
-    Assert.assertEquals(((IMethod) childClassType.getMethods().get(1)).getAnnotations().get(0), methodInChildClassValue1.getOwnerAnnotation());
+    Assert.assertEquals(childClassType.getMethods().get(1).getAnnotations().get(0), methodInChildClassValue1.getOwnerAnnotation());
     Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), ((IType) methodInChildClassValue1.getValue()).getName());
 
     IAnnotationValue methodInChildClassValue2 = methodInChildClassValues.get(0);
     Assert.assertEquals("en", methodInChildClassValue2.getName());
     Assert.assertEquals(ExpressionValueType.String, methodInChildClassValue2.getValueType());
-    Assert.assertEquals(((IMethod) childClassType.getMethods().get(1)).getAnnotations().get(0), methodInChildClassValue2.getOwnerAnnotation());
+    Assert.assertEquals(childClassType.getMethods().get(1).getAnnotations().get(0), methodInChildClassValue2.getOwnerAnnotation());
     Assert.assertEquals("TestEnum.A", methodInChildClassValue2.getValue().toString());
 
     // firstCase annotation value
-    IAnnotationValue suppressWarningValue = ((IAnnotation) ((IMethod) childClassType.getMethods().get(2)).getAnnotations().get(0)).getValue("value");
+    IAnnotationValue suppressWarningValue = childClassType.getMethods().get(2).getAnnotations().get(0).getValue("value");
     Assert.assertEquals("value", suppressWarningValue.getName());
     Assert.assertEquals(ExpressionValueType.String, suppressWarningValue.getValueType());
-    Assert.assertEquals(((IMethod) childClassType.getMethods().get(2)).getAnnotations().get(0), suppressWarningValue.getOwnerAnnotation());
+    Assert.assertEquals(childClassType.getMethods().get(2).getAnnotations().get(0), suppressWarningValue.getOwnerAnnotation());
     Assert.assertEquals("unused", suppressWarningValue.getValue().toString());
   }
 
   @Test
   public void testToString() {
-    IAnnotationValue methodInChildClassValue1 = (IAnnotationValue) ((IAnnotation) ((IMethod) CoreTestingUtils.getChildClassType().getMethods().get(1)).getAnnotations().get(0)).getValues().valueList().get(0);
+    List<IAnnotationValue> values = new ArrayList<>(CoreTestingUtils.getChildClassType().getMethods().get(1).getAnnotations().get(0).getValues().values());
+    IAnnotationValue methodInChildClassValue1 = values.get(0);
     Assert.assertFalse(StringUtils.isBlank(methodInChildClassValue1.toString()));
 
-    IAnnotationValue testAnnotValues = ((IAnnotation) CoreTestingUtils.getBaseClassType().getAnnotations().get(0)).getValue("values");
+    IAnnotationValue testAnnotValues = CoreTestingUtils.getBaseClassType().getAnnotations().get(0).getValue("values");
     Assert.assertFalse(StringUtils.isBlank(testAnnotValues.toString()));
   }
 
@@ -84,7 +85,7 @@ public class AnnotationValueTest {
     Assert.assertNotNull(baseClassType);
 
     // BaseClass annotation
-    IAnnotationValue testAnnotValues = ((IAnnotation) baseClassType.getAnnotations().get(0)).getValue("values");
+    IAnnotationValue testAnnotValues = baseClassType.getAnnotations().get(0).getValue("values");
     Assert.assertEquals("values", testAnnotValues.getName());
     Assert.assertEquals(ExpressionValueType.Array, testAnnotValues.getValueType());
     Assert.assertEquals(baseClassType.getAnnotations().get(0), testAnnotValues.getOwnerAnnotation());
@@ -103,8 +104,8 @@ public class AnnotationValueTest {
     Assert.assertEquals(Runnable.class.getName(), ((IType) arr[1].getValue()).getName());
 
     // methodInBaseClass annotation
-    IAnnotatable methodInBaseClass = (IMethod) baseClassType.getMethods().get(2);
-    testAnnotValues = ((IAnnotation) methodInBaseClass.getAnnotations().get(0)).getValue("values");
+    IAnnotatable methodInBaseClass = baseClassType.getMethods().get(2);
+    testAnnotValues = methodInBaseClass.getAnnotations().get(0).getValue("values");
     Assert.assertEquals("values", testAnnotValues.getName());
     Assert.assertEquals(ExpressionValueType.Array, testAnnotValues.getValueType());
     Assert.assertEquals(methodInBaseClass.getAnnotations().get(0), testAnnotValues.getOwnerAnnotation());

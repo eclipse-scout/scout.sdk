@@ -19,8 +19,6 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.set.ListOrderedSet;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -44,6 +42,7 @@ import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.job.JobEx;
@@ -79,7 +78,7 @@ public final class JdtUtils {
     return lookupEnv.findType(jdtType.getFullyQualifiedName('$'));
   }
 
-  public static IMethod getFirstMethod(IType type, Predicate/*<IMethod>*/ filter) throws JavaModelException {
+  public static IMethod getFirstMethod(IType type, IFilter<IMethod> filter) throws JavaModelException {
     for (IMethod method : type.getMethods()) {
       if (filter == null || filter.evaluate(method)) {
         return method;
@@ -118,7 +117,7 @@ public final class JdtUtils {
     return null;
   }
 
-  public static ListOrderedSet/*<org.eclipse.jdt.core.IType>*/ resolveJdtTypes(final String fqn) throws CoreException {
+  public static Set<org.eclipse.jdt.core.IType> resolveJdtTypes(final String fqn) throws CoreException {
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
     String fastPat = Signature.getSimpleName(fqn);
     final TreeSet<IType> matchList = new TreeSet<>(COMPARATOR);
@@ -134,7 +133,7 @@ public final class JdtUtils {
         }
       }
     }, null);
-    return ListOrderedSet.decorate(matchList);
+    return matchList;
   }
 
   public static void waitForBuild() {
