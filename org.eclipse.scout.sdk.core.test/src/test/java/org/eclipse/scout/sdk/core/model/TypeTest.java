@@ -153,7 +153,7 @@ public class TypeTest {
 
   @Test
   public void testInnerTypeDirectly() {
-    IType innerClass2 = TestingUtils.getType("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", CoreTestingUtils.SOURCE_FOLDER);
+    IType innerClass2 = TestingUtils.getType("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2");
     testInnerType(innerClass2);
   }
 
@@ -166,8 +166,7 @@ public class TypeTest {
     testInnerType(innerClass2);
   }
 
-  @Test
-  public void testInnerType(IType innerClass2) {
+  private static void testInnerType(IType innerClass2) {
     Assert.assertNotNull(innerClass2);
 
     Assert.assertEquals(0, innerClass2.getArrayDimension());
