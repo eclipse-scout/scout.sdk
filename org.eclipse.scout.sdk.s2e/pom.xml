@@ -58,7 +58,6 @@
               !javax.*,
               *
             </Import-Package>
-            <Require-Bundle>org.eclipse.jdt.core;bundle-version="[3.10,4)";visibility:=reexport</Require-Bundle>
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator</Bundle-Activator>
 
             <!-- embed compile/runtime dependencies using path that matches the copied dependency folder -->
