@@ -36,7 +36,6 @@ import org.eclipse.scout.sdk.s2e.dto.IDtoAutoUpdateManager;
 import org.eclipse.scout.sdk.s2e.dto.IDtoAutoUpdateOperation;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.job.JobEx;
-import org.eclipse.scout.sdk.s2e.job.OperationJob;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
@@ -192,13 +191,13 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     }
 
     private static boolean acceptUpdateEvent(ElementChangedEvent icu) {
-      final String[] EXCLUDED_JOB_NAME_PREFIXES = new String[]{
-          "org.eclipse.team.", // excludes svn updates
-          "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
-          "org.eclipse.egit.", // excludes git updates
-          "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
-          "org.eclipse.m2e.", // maven updates
-          "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob" // refresh of external folders after svn update
+      final String[] EXCLUDED_JOB_NAME_PREFIXES = new String[]{"org.eclipse.team.", // excludes svn updates
+      "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
+      "org.eclipse.egit.", // excludes git updates
+      "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
+      "org.eclipse.m2e.", // maven updates
+      "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob", // refresh of external folders after svn update
+      "org.eclipse.core.internal.refresh.RefreshJob" // refresh after git import
       };
 
       Job curJob = Job.getJobManager().currentJob();
@@ -206,7 +205,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
         return false;
       }
 
-      if (curJob instanceof OperationJob || curJob instanceof P_AutoUpdateOperationsJob) {
+      if (curJob instanceof JobEx || curJob instanceof P_AutoUpdateOperationsJob) {
         return false;
       }
 
@@ -214,6 +213,17 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
       for (String excludedPrefix : EXCLUDED_JOB_NAME_PREFIXES) {
         if (jobFqn.startsWith(excludedPrefix)) {
           return false;
+        }
+      }
+
+      if ("org.eclipse.core.internal.jobs.ThreadJob".equals(jobFqn)) {
+        StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
+        for (int i = stackTrace.length - 1; i >= 0; i--) {
+          for (String excludedPrefix : EXCLUDED_JOB_NAME_PREFIXES) {
+            if (stackTrace[i].getClassName().startsWith(excludedPrefix)) {
+              return false;
+            }
+          }
         }
       }
 
