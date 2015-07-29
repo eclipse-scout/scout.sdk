@@ -86,6 +86,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
           logError(e);
         }
         catch (NoClassDefFoundError er) {
+          // can happen if the workbench is so far in shutdown, that no more classes are loaded for bundles.
         }
         return true;
       }

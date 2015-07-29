@@ -32,8 +32,8 @@ import org.eclipse.scout.sdk.s2e.IOperation;
 import org.eclipse.scout.sdk.s2e.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.operation.SourceFormatOperation;
-import org.eclipse.scout.sdk.s2e.structuredType.IStructuredType;
-import org.eclipse.scout.sdk.s2e.structuredType.StructuredTypeFactory;
+import org.eclipse.scout.sdk.s2e.structuredtype.IStructuredType;
+import org.eclipse.scout.sdk.s2e.structuredtype.StructuredTypeFactory;
 import org.eclipse.scout.sdk.s2e.util.JdtTypeCache;
 import org.eclipse.text.edits.ReplaceEdit;
 

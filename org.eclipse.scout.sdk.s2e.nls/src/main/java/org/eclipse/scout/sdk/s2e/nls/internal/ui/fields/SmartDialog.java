@@ -107,10 +107,8 @@ public class SmartDialog {
     m_table.addKeyListener(new KeyAdapter() {
       @Override
       public void keyPressed(KeyEvent e) {
-        if (e.keyCode == SWT.ARROW_UP) {
-          if (m_table.getSelectionIndex() == 0) {
-            m_table.traverse(SWT.TRAVERSE_TAB_PREVIOUS);
-          }
+        if (e.keyCode == SWT.ARROW_UP && m_table.getSelectionIndex() == 0) {
+          m_table.traverse(SWT.TRAVERSE_TAB_PREVIOUS);
         }
       }
     });
@@ -193,8 +191,7 @@ public class SmartDialog {
     }
     else {
       Rectangle bounds = Display.getDefault().getBounds();
-      open(
-          new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2), text);
+      open(new Point(bounds.x + bounds.width / 2, bounds.y + bounds.height / 2), text);
     }
   }
 
@@ -262,8 +259,7 @@ public class SmartDialog {
   }
 
   protected void notifyItemSelection(Object item) {
-    List<ISmartDialogListener> listeners = new ArrayList<>(
-        m_smartDialogListeners);
+    List<ISmartDialogListener> listeners = new ArrayList<>(m_smartDialogListeners);
     for (ISmartDialogListener listener : listeners) {
       listener.itemSelected(item);
     }

@@ -12,6 +12,7 @@ import java.nio.file.Paths;
 
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
+import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
  * <h3>{@link FileCompilationUnit}</h3>
@@ -55,7 +56,7 @@ class FileCompilationUnit implements ICompilationUnit {
       return chars.array();
     }
     catch (IOException e) {
-      throw new RuntimeException("Unable to read contents of file '" + m_javaFile.getAbsolutePath() + "'.", e);
+      throw new SdkException("Unable to read contents of file '" + m_javaFile.getAbsolutePath() + "'.", e);
     }
   }
 

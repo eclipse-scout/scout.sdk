@@ -52,6 +52,7 @@ import org.eclipse.jdt.internal.compiler.lookup.TypeIds;
 import org.eclipse.jdt.internal.compiler.lookup.VoidTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.WildcardBinding;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
  *
@@ -109,7 +110,7 @@ public final class JavaModelUtils {
   }
 
   static ExpressionValueDesc getConstantValue(Constant c) {
-    if (c == null || c == Constant.NotAConstant) {
+    if (c == null || Constant.NotAConstant.equals(c)) {
       return null;
     }
 
@@ -133,7 +134,7 @@ public final class JavaModelUtils {
       case TypeIds.T_JavaLangString:
         return new ExpressionValueDesc(ExpressionValueType.String, c.stringValue());
       default:
-        throw new RuntimeException("Unknown constant type: " + c.typeID() + ", name: " + c.typeName());
+        throw new SdkException("Unknown constant type: " + c.typeID() + ", name: " + c.typeName());
     }
   }
 
@@ -239,7 +240,7 @@ public final class JavaModelUtils {
 
   static Object computeExpressionValue(Expression expression, ClassScope scope) {
     Object val = null;
-    if (expression.constant != null && expression.constant != Constant.NotAConstant) {
+    if (expression.constant != null && !Constant.NotAConstant.equals(expression.constant)) {
       val = expression.constant;
     }
     else if (expression instanceof Literal) {
@@ -294,7 +295,7 @@ public final class JavaModelUtils {
           return StringConstant.fromValue(str);
         }
       }
-      if (fieldBinding != null && (fieldBinding.modifiers & ClassFileConstants.AccEnum) > 0) {
+      if (fieldBinding != null && (fieldBinding.modifiers & ClassFileConstants.AccEnum) != 0) {
         val = fieldBinding;
       }
     }

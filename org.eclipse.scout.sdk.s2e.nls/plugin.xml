@@ -16,7 +16,7 @@
       </editor>
    </extension>
    <extension point="org.eclipse.scout.sdk.s2e.nls.nlsProvider">
-      <provider class="org.eclipse.scout.sdk.s2e.nls.internal.simpleProject.SimpleNlsProjectProvider"></provider>
-      <provider class="org.eclipse.scout.sdk.s2e.nls.internal.serviceProject.ServiceNlsProjectProvider"></provider>
+      <provider class="org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.SimpleNlsProjectProvider"></provider>
+      <provider class="org.eclipse.scout.sdk.s2e.nls.internal.serviceproject.ServiceNlsProjectProvider"></provider>
    </extension>
 </plugin>

@@ -18,6 +18,7 @@ import java.nio.charset.StandardCharsets;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
  * <h3>{@link InputStreamCompilationUnit}</h3>
@@ -62,7 +63,7 @@ class InputStreamCompilationUnit implements ICompilationUnit {
       return result;
     }
     catch (IOException e) {
-      throw new RuntimeException("Unable to read content.", e);
+      throw new SdkException("Unable to read content.", e);
     }
   }
 

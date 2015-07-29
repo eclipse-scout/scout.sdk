@@ -897,11 +897,9 @@ public class SdkAssert extends Assert {
       public boolean visit(QualifiedTypeReference qualifiedTypeReference, ClassScope scope) {
         char[][] tokens = qualifiedTypeReference.tokens;
         char[] simpleName = tokens[tokens.length - 1];
-        if (holder[0] == null && Arrays.equals(signatureSimpleNameChar, simpleName)) {
-          if (qualifiedTypeReference.resolvedType instanceof ReferenceBinding) {
-            holder[0] = SignatureUtils.getResolvedSignature(JavaModelUtils.bindingToType(qualifiedTypeReference.resolvedType, context.getLookupEnvironment()));
-            return false;
-          }
+        if (holder[0] == null && Arrays.equals(signatureSimpleNameChar, simpleName) && qualifiedTypeReference.resolvedType instanceof ReferenceBinding) {
+          holder[0] = SignatureUtils.getResolvedSignature(JavaModelUtils.bindingToType(qualifiedTypeReference.resolvedType, context.getLookupEnvironment()));
+          return false;
         }
         return true;
       }

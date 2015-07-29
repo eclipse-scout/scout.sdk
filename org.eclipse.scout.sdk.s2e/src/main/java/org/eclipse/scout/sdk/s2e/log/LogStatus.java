@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.log;
 
 import java.util.HashSet;
+import java.util.Set;
 
 import org.eclipse.core.runtime.Status;
 
@@ -39,10 +40,6 @@ public class LogStatus extends Status {
     setWrapperClass(wrapperClazz);
   }
 
-  /*
-   * (non-Javadoc)
-   * @see org.eclipse.core.runtime.Status#getMessage()
-   */
   @Override
   public String getMessage() {
     StringBuilder message = new StringBuilder();
@@ -60,35 +57,30 @@ public class LogStatus extends Status {
   }
 
   private static StackTraceElement getCallerLine(Class<?> wrapperClass) {
-    try {
-      StackTraceElement[] trace = new Exception().getStackTrace();
-      int traceIndex = 0;
-      HashSet<String> ignoredPackagePrefixes = new HashSet<>();
-      ignoredPackagePrefixes.add(LogStatus.class.getName());
-      ignoredPackagePrefixes.add(SdkLogManager.class.getName());
-      if (wrapperClass != null) {
-        ignoredPackagePrefixes.add(wrapperClass.getName());
-      }
-      while (traceIndex < trace.length) {
-        boolean found = true;
-        for (String prefix : ignoredPackagePrefixes) {
-          if (trace[traceIndex].getClassName().startsWith(prefix)) {
-            found = false;
-            break;
-          }
-        }
-        if (found) {
+    StackTraceElement[] trace = Thread.currentThread().getStackTrace();
+    int traceIndex = 0;
+    Set<String> ignoredPackagePrefixes = new HashSet<>();
+    ignoredPackagePrefixes.add(LogStatus.class.getName());
+    ignoredPackagePrefixes.add(SdkLogManager.class.getName());
+    if (wrapperClass != null) {
+      ignoredPackagePrefixes.add(wrapperClass.getName());
+    }
+    while (traceIndex < trace.length) {
+      boolean found = true;
+      for (String prefix : ignoredPackagePrefixes) {
+        if (trace[traceIndex].getClassName().startsWith(prefix)) {
+          found = false;
           break;
         }
-        traceIndex++;
       }
-      if (traceIndex >= trace.length) {
-        traceIndex = trace.length - 1;
+      if (found) {
+        break;
       }
-      return trace[traceIndex];
+      traceIndex++;
     }
-    catch (Exception t) {
-      return null;
+    if (traceIndex >= trace.length) {
+      traceIndex = trace.length - 1;
     }
+    return trace[traceIndex];
   }
 }

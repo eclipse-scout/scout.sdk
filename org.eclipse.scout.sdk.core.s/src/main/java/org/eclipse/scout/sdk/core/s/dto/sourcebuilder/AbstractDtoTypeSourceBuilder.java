@@ -178,27 +178,23 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
       final IType annotationDeclarationType = annotation.getType();
       final String elementName = annotationDeclarationType.getName();
 
-      if (!IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName) && !IRuntimeClasses.Data.equals(elementName)) {
-
-        if (isAnnotationDtoRelevant(annotationDeclarationType)) {
-          if (CoreUtils.isOnClasspath(annotationDeclarationType, lookupEnv)) {
-            AnnotationSourceBuilder asb = new AnnotationSourceBuilder(Signature.createTypeSignature(elementName)) {
-              @Override
-              public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-                // copy over all params
-                Collection<IAnnotationValue> annotValues = annotation.getValues().values();
-                for (IAnnotationValue v : annotValues) {
-                  String param = getAnnotationValueSource(v, validator, annotValues.size());
-                  if (StringUtils.isNotEmpty(param)) {
-                    super.addParameter(param);
-                  }
-                }
-                super.createSource(source, lineDelimiter, context, validator);
+      boolean mustCopyAnnotation = !IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName) && !IRuntimeClasses.Data.equals(elementName) && isAnnotationDtoRelevant(annotationDeclarationType) && CoreUtils.isOnClasspath(annotationDeclarationType, lookupEnv);
+      if (mustCopyAnnotation) {
+        AnnotationSourceBuilder asb = new AnnotationSourceBuilder(Signature.createTypeSignature(elementName)) {
+          @Override
+          public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+            // copy over all params
+            Collection<IAnnotationValue> annotValues = annotation.getValues().values();
+            for (IAnnotationValue v : annotValues) {
+              String param = getAnnotationValueSource(v, validator, annotValues.size());
+              if (StringUtils.isNotEmpty(param)) {
+                super.addParameter(param);
               }
-            };
-            sourceBuilder.addAnnotationSourceBuilder(asb);
+            }
+            super.createSource(source, lineDelimiter, context, validator);
           }
-        }
+        };
+        sourceBuilder.addAnnotationSourceBuilder(asb);
       }
     }
   }

@@ -20,6 +20,7 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.model.IType;
 import org.eclipse.scout.sdk.core.parser.JavaParser;
+import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
  *
@@ -70,7 +71,7 @@ public final class TestingUtils {
             }
           }
           catch (URISyntaxException e) {
-            //nop
+            throw new SdkException("Invalid URI: '" + u.toString() + "'.", e);
           }
         }
       }

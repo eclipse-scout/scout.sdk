@@ -753,8 +753,7 @@ public final class Signature implements ISignatureConstants {
    * @see #createTypeSignature(java.lang.String,boolean)
    */
   public static char[] createCharArrayTypeSignature(char[] typeName, boolean isResolved) {
-    if (typeName == null)
-    {
+    if (typeName == null) {
       throw new IllegalArgumentException("null");
     }
     int length = typeName.length;
@@ -952,7 +951,6 @@ public final class Signature implements ISignatureConstants {
    * createTypeSignature("int []", false) -> "[I"
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param typeName
@@ -981,7 +979,6 @@ public final class Signature implements ISignatureConstants {
    * createTypeSignature("java.lang.String", true) -> "Ljava.lang.String;"
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param typeName
@@ -1056,7 +1053,7 @@ public final class Signature implements ISignatureConstants {
     int checkPos;
     char currentChar = typeName[pos];
     switch (currentChar) {
-    // primitive type?
+      // primitive type?
       case 'b':
         checkPos = checkName(BOOLEAN, typeName, pos, length);
         if (checkPos > 0) {
@@ -1196,8 +1193,7 @@ public final class Signature implements ISignatureConstants {
       }
     }
     buffer.append(C_NAME_END);
-    if (end > 0)
-    {
+    if (end > 0) {
       pos = end; // skip array dimension which were preprocessed
     }
     return pos;
@@ -1213,7 +1209,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is not syntactically
    *              correct
    */
-  public static int getArrayCount(char[] typeSignature) throws IllegalArgumentException {
+  public static int getArrayCount(char[] typeSignature) {
     try {
       int count = 0;
       while (typeSignature[count] == C_ARRAY) {
@@ -1222,7 +1218,7 @@ public final class Signature implements ISignatureConstants {
       return count;
     }
     catch (ArrayIndexOutOfBoundsException e) { // signature is syntactically incorrect if last character is C_ARRAY
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException(e);
     }
   }
 
@@ -1236,7 +1232,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is not syntactically
    *              correct
    */
-  public static int getArrayCount(String typeSignature) throws IllegalArgumentException {
+  public static int getArrayCount(String typeSignature) {
     return getArrayCount(typeSignature.toCharArray());
   }
 
@@ -1250,7 +1246,6 @@ public final class Signature implements ISignatureConstants {
    * getElementType({'[', '[', 'I'}) --> {'I'}.
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param typeSignature
@@ -1260,7 +1255,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is not syntactically
    *              correct
    */
-  public static char[] getElementType(char[] typeSignature) throws IllegalArgumentException {
+  public static char[] getElementType(char[] typeSignature) {
     int count = getArrayCount(typeSignature);
     if (count == 0) {
       return typeSignature;
@@ -1281,7 +1276,6 @@ public final class Signature implements ISignatureConstants {
    * getElementType("[[I") --> "I".
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param typeSignature
@@ -1291,7 +1285,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is not syntactically
    *              correct
    */
-  public static String getElementType(String typeSignature) throws IllegalArgumentException {
+  public static String getElementType(String typeSignature) {
     char[] signature = typeSignature.toCharArray();
     char[] elementType = getElementType(signature);
     return signature == elementType ? typeSignature : new String(elementType);
@@ -1307,7 +1301,7 @@ public final class Signature implements ISignatureConstants {
    * @exception IllegalArgumentException
    *              if the signature is syntactically incorrect
    */
-  public static char[][] getIntersectionTypeBounds(char[] intersectionTypeSignature) throws IllegalArgumentException {
+  public static char[][] getIntersectionTypeBounds(char[] intersectionTypeSignature) {
     if (getTypeSignatureKind(intersectionTypeSignature) != INTERSECTION_TYPE_SIGNATURE) {
       return CharOperation.NO_CHAR_CHAR;
     }
@@ -1343,7 +1337,7 @@ public final class Signature implements ISignatureConstants {
    * @exception IllegalArgumentException
    *              if the signature is syntactically incorrect
    */
-  public static String[] getIntersectionTypeBounds(String intersectionTypeSignature) throws IllegalArgumentException {
+  public static String[] getIntersectionTypeBounds(String intersectionTypeSignature) {
     char[][] args = getIntersectionTypeBounds(intersectionTypeSignature.toCharArray());
     return CharOperation.toStrings(args);
   }
@@ -1358,7 +1352,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is not syntactically
    *              correct
    */
-  public static int getParameterCount(char[] methodSignature) throws IllegalArgumentException {
+  public static int getParameterCount(char[] methodSignature) {
     try {
       int count = 0;
       int i = CharOperation.indexOf(C_PARAM_START, methodSignature);
@@ -1380,7 +1374,7 @@ public final class Signature implements ISignatureConstants {
       }
     }
     catch (ArrayIndexOutOfBoundsException e) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException(e);
     }
   }
 
@@ -1394,7 +1388,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is not syntactically
    *              correct
    */
-  public static int getParameterCount(String methodSignature) throws IllegalArgumentException {
+  public static int getParameterCount(String methodSignature) {
     return getParameterCount(methodSignature.toCharArray());
   }
 
@@ -1409,7 +1403,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static char[][] getParameterTypes(char[] methodSignature) throws IllegalArgumentException {
+  public static char[][] getParameterTypes(char[] methodSignature) {
     try {
       int count = getParameterCount(methodSignature);
       char[][] result = new char[count][];
@@ -1436,7 +1430,7 @@ public final class Signature implements ISignatureConstants {
       }
     }
     catch (ArrayIndexOutOfBoundsException e) {
-      throw new IllegalArgumentException();
+      throw new IllegalArgumentException(e);
     }
   }
 
@@ -1451,7 +1445,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static String[] getParameterTypes(String methodSignature) throws IllegalArgumentException {
+  public static String[] getParameterTypes(String methodSignature) {
     char[][] parameterTypes = getParameterTypes(methodSignature.toCharArray());
     return CharOperation.toStrings(parameterTypes);
   }
@@ -1461,6 +1455,7 @@ public final class Signature implements ISignatureConstants {
    * dot-separated qualified name. Returns the empty char array if it is not qualified.
    * <p>
    * For example:
+   *
    * <pre>
    * <code>
    * getQualifier({'j', 'a', 'v', 'a', '.', 'l', 'a', 'n', 'g', '.', 'O', 'b', 'j', 'e', 'c', 't'}) -> {'j', 'a', 'v', 'a', '.', 'l', 'a', 'n', 'g'}
@@ -1470,10 +1465,12 @@ public final class Signature implements ISignatureConstants {
    * </pre>
    * </p>
    *
-   * @param name the name
+   * @param name
+   *          the name
    * @return the qualifier prefix, or the empty char array if the name contains no
-   *   dots
-   * @exception NullPointerException if name is null
+   *         dots
+   * @exception NullPointerException
+   *              if name is null
    */
   public static char[] getQualifier(char[] name) {
     int firstGenericStart = CharOperation.indexOf(C_GENERIC_START, name);
@@ -1497,7 +1494,6 @@ public final class Signature implements ISignatureConstants {
    * getQualifier("java.util.List&lt;java.lang.String&gt;") -&gt; "java.util"
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param name
@@ -1526,7 +1522,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static char[] getReturnType(char[] methodSignature) throws IllegalArgumentException {
+  public static char[] getReturnType(char[] methodSignature) {
     // skip type parameters
     int paren = CharOperation.lastIndexOf(C_PARAM_END, methodSignature);
     if (paren == -1) {
@@ -1548,7 +1544,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static String getReturnType(String methodSignature) throws IllegalArgumentException {
+  public static String getReturnType(String methodSignature) {
     return new String(getReturnType(methodSignature.toCharArray()));
   }
 
@@ -1563,7 +1559,6 @@ public final class Signature implements ISignatureConstants {
    * getSignatureQualifier({'L', 'j', 'a', 'v', 'a', '.', 'u', 't', 'i', 'l', '.', 'M', 'a', 'p', '$', 'E', 'n', 't', 'r', 'y', ';'}) -> {'j', 'a', 'v', 'a', '.', 'u', 't', 'i', 'l'}
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param typeSignature
@@ -1614,7 +1609,6 @@ public final class Signature implements ISignatureConstants {
    * getSignatureQualifier("Ljava.util.Map$Entry") -> "java.util"
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param typeSignature
@@ -1636,7 +1630,6 @@ public final class Signature implements ISignatureConstants {
    * getSignatureSimpleName({'L', 'j', 'a', 'v', 'a', '.', 'u', 't', 'i', 'l', '.', 'M', 'a', 'p', '$', 'E', 'n', 't', 'r', 'y', ';'}) -> {'M', 'a', 'p', '.', 'E', 'n', 't', 'r', 'y'}
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param typeSignature
@@ -1687,7 +1680,6 @@ public final class Signature implements ISignatureConstants {
    * getSignatureSimpleName("Ljava.util.Map$Entry") -> "Map.Entry"
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param typeSignature
@@ -1709,7 +1701,6 @@ public final class Signature implements ISignatureConstants {
    * getSimpleName({'j', 'a', 'v', 'a', '.', 'l', 'a', 'n', 'g', '.', 'O', 'b', 'j', 'e', 'c', 't'}) -> {'O', 'b', 'j', 'e', 'c', 't'}
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param name
@@ -1775,7 +1766,6 @@ public final class Signature implements ISignatureConstants {
    * getSimpleName("java.util.Map&lt;java.lang.String, java.lang.Object&gt;") -&gt; "Map&lt;String,Object&gt;"
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param name
@@ -1825,12 +1815,13 @@ public final class Signature implements ISignatureConstants {
     return buffer.toString();
   }
 
-/**
+  /**
    * Returns all segments of the given dot-separated qualified name.
    * Returns an array with only the given name if it is not qualified.
    * Returns an empty array if the name is empty.
    * <p>
    * For example:
+   *
    * <pre>
    * <code>
    * getSimpleNames({'j', 'a', 'v', 'a', '.', 'l', 'a', 'n', 'g', '.', 'O', 'b', 'j', 'e', 'c', 't'}) -> {{'j', 'a', 'v', 'a'}, {'l', 'a', 'n', 'g'}, {'O', 'b', 'j', 'e', 'c', 't'}}
@@ -1840,7 +1831,8 @@ public final class Signature implements ISignatureConstants {
    * </code>
    * </pre>
    *
-   * @param name the name
+   * @param name
+   *          the name
    * @return the list of simple names, possibly empty
    */
   public static char[][] getSimpleNames(char[] name) {
@@ -1917,7 +1909,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static char[][] getThrownExceptionTypes(char[] methodSignature) throws IllegalArgumentException {
+  public static char[][] getThrownExceptionTypes(char[] methodSignature) {
     // skip type parameters
     int exceptionStart = CharOperation.indexOf(C_EXCEPTION_START, methodSignature);
     if (exceptionStart == -1) {
@@ -1964,7 +1956,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static String[] getThrownExceptionTypes(String methodSignature) throws IllegalArgumentException {
+  public static String[] getThrownExceptionTypes(String methodSignature) {
     char[][] parameterTypes = getThrownExceptionTypes(methodSignature.toCharArray());
     return CharOperation.toStrings(parameterTypes);
   }
@@ -1979,7 +1971,7 @@ public final class Signature implements ISignatureConstants {
    * @exception IllegalArgumentException
    *              if the signature is syntactically incorrect
    */
-  public static char[][] getTypeArguments(char[] parameterizedTypeSignature) throws IllegalArgumentException {
+  public static char[][] getTypeArguments(char[] parameterizedTypeSignature) {
     int length = parameterizedTypeSignature.length;
     if (length < 2 || parameterizedTypeSignature[length - 2] != C_GENERIC_END) {
       // cannot have type arguments otherwise signature would end by ">;"
@@ -2029,7 +2021,7 @@ public final class Signature implements ISignatureConstants {
    * @exception IllegalArgumentException
    *              if the signature is syntactically incorrect
    */
-  public static String[] getTypeArguments(String parameterizedTypeSignature) throws IllegalArgumentException {
+  public static String[] getTypeArguments(String parameterizedTypeSignature) {
     char[][] args = getTypeArguments(parameterizedTypeSignature.toCharArray());
     return CharOperation.toStrings(args);
   }
@@ -2045,7 +2037,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static char[] getTypeErasure(char[] parameterizedTypeSignature) throws IllegalArgumentException {
+  public static char[] getTypeErasure(char[] parameterizedTypeSignature) {
     int end = CharOperation.indexOf(C_GENERIC_START, parameterizedTypeSignature);
     if (end == -1) {
       return parameterizedTypeSignature;
@@ -2098,7 +2090,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static String getTypeErasure(String parameterizedTypeSignature) throws IllegalArgumentException {
+  public static String getTypeErasure(String parameterizedTypeSignature) {
     char[] signature = parameterizedTypeSignature.toCharArray();
     char[] erasure = getTypeErasure(signature);
     return signature == erasure ? parameterizedTypeSignature : new String(erasure);
@@ -2116,7 +2108,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static char[][] getTypeParameterBounds(char[] formalTypeParameterSignature) throws IllegalArgumentException {
+  public static char[][] getTypeParameterBounds(char[] formalTypeParameterSignature) {
     int p1 = CharOperation.indexOf(C_COLON, formalTypeParameterSignature);
     if (p1 < 0) {
       // no ":" means can't be a formal type parameter signature
@@ -2163,7 +2155,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static String[] getTypeParameterBounds(String formalTypeParameterSignature) throws IllegalArgumentException {
+  public static String[] getTypeParameterBounds(String formalTypeParameterSignature) {
     char[][] bounds = getTypeParameterBounds(formalTypeParameterSignature.toCharArray());
     return CharOperation.toStrings(bounds);
   }
@@ -2179,7 +2171,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static char[][] getTypeParameters(char[] methodOrTypeSignature) throws IllegalArgumentException {
+  public static char[][] getTypeParameters(char[] methodOrTypeSignature) {
     try {
       int length = methodOrTypeSignature.length;
       if (length == 0) {
@@ -2241,7 +2233,7 @@ public final class Signature implements ISignatureConstants {
                 // not a type variable signature -> it is a new type parameter
               }
               break;
-          // default: another type parameter is starting
+            // default: another type parameter is starting
           }
         }
         paramList.add(CharOperation.subarray(methodOrTypeSignature, paramStart, i));
@@ -2265,7 +2257,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static String[] getTypeParameters(String methodOrTypeSignature) throws IllegalArgumentException {
+  public static String[] getTypeParameters(String methodOrTypeSignature) {
     char[][] params = getTypeParameters(methodOrTypeSignature.toCharArray());
     return CharOperation.toStrings(params);
   }
@@ -2365,7 +2357,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static char[] getTypeVariable(char[] formalTypeParameterSignature) throws IllegalArgumentException {
+  public static char[] getTypeVariable(char[] formalTypeParameterSignature) {
     int p = CharOperation.indexOf(C_COLON, formalTypeParameterSignature);
     if (p < 0) {
       // no ":" means can't be a formal type parameter signature
@@ -2385,7 +2377,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is syntactically
    *              incorrect
    */
-  public static String getTypeVariable(String formalTypeParameterSignature) throws IllegalArgumentException {
+  public static String getTypeVariable(String formalTypeParameterSignature) {
     return new String(getTypeVariable(formalTypeParameterSignature.toCharArray()));
   }
 
@@ -2403,7 +2395,6 @@ public final class Signature implements ISignatureConstants {
    * will return: "LTest&lt;+Ljava.lang.Throwable;&gt;;"
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param methodOrTypeSignature
@@ -2431,7 +2422,6 @@ public final class Signature implements ISignatureConstants {
    * will return: "LTest&lt;+Ljava.lang.Throwable;&gt;;"
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param methodOrTypeSignature
@@ -2463,7 +2453,6 @@ public final class Signature implements ISignatureConstants {
    * toString({'+', 'L', 'O', 'b', 'j', 'e', 'c', 't', ';'}) -> {'?', ' ', 'e', 'x', 't', 'e', 'n', 'd', 's', ' ', 'O', 'b', 'j', 'e', 'c', 't'}
    * </code>
    * </pre>
-   *
    * </p>
    * <p>
    * Note: This method assumes that a type signature containing a <code>'$'</code> is an inner type signature. While
@@ -2477,7 +2466,7 @@ public final class Signature implements ISignatureConstants {
    * @exception IllegalArgumentException
    *              if the signature is syntactically incorrect
    */
-  public static char[] toCharArray(char[] signature) throws IllegalArgumentException {
+  public static char[] toCharArray(char[] signature) {
     int sigLength = signature.length;
     if (sigLength == 0) {
       throw new IllegalArgumentException();
@@ -2504,7 +2493,6 @@ public final class Signature implements ISignatureConstants {
    * toString("([Ljava.lang.String;)V", "main", new String[] {"args"}, false, true) -> "void main(String[] args)"
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param methodSignature
@@ -2522,8 +2510,8 @@ public final class Signature implements ISignatureConstants {
    *          <code>true</code> if the return type is to be
    *          included
    * @return the char array representation of the method signature
-   * @throws IllegalArgumentException
-   *           if the method signature is syntactically incorrect
+   * @
+   * if the method signature is syntactically incorrect
    */
   public static char[] toCharArray(char[] methodSignature, char[] methodName, char[][] parameterNames, boolean fullyQualifyTypeNames, boolean includeReturnType) {
     return toCharArray(methodSignature, methodName, parameterNames, fullyQualifyTypeNames, includeReturnType, false);
@@ -2540,7 +2528,6 @@ public final class Signature implements ISignatureConstants {
    * toString("([Ljava.lang.String;)V", "main", new String[] {"args"}, false, true) -> "void main(String[] args)"
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param methodSignature
@@ -2561,8 +2548,8 @@ public final class Signature implements ISignatureConstants {
    *          <code>true</code> if the last argument should be displayed as a
    *          variable argument, <code>false</code> otherwise.
    * @return the char array representation of the method signature
-   * @throws IllegalArgumentException
-   *           if the method signature is syntactically incorrect
+   * @
+   * if the method signature is syntactically incorrect
    */
   public static char[] toCharArray(char[] methodSignature, char[] methodName, char[][] parameterNames, boolean fullyQualifyTypeNames, boolean includeReturnType, boolean isVargArgs) {
     int firstParen = CharOperation.indexOf(C_PARAM_START, methodSignature);
@@ -2630,7 +2617,6 @@ public final class Signature implements ISignatureConstants {
    * toQualifiedName({{}}) -> {}
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param segments
@@ -2677,7 +2663,6 @@ public final class Signature implements ISignatureConstants {
    * toQualifiedName(new String[0]) -> ""
    * </code>
    * </pre>
-   *
    * </p>
    *
    * @param segments
@@ -2706,7 +2691,6 @@ public final class Signature implements ISignatureConstants {
    * toString("+QObject;") -> "? extends Object"
    * </code>
    * </pre>
-   *
    * </p>
    * <p>
    * Note: This method assumes that a type signature containing a <code>'$'</code> is an inner type signature. While
@@ -2721,7 +2705,7 @@ public final class Signature implements ISignatureConstants {
    *              if the signature is not syntactically
    *              correct
    */
-  public static String toString(String signature) throws IllegalArgumentException {
+  public static String toString(String signature) {
     return new String(toCharArray(signature.toCharArray()));
   }
 

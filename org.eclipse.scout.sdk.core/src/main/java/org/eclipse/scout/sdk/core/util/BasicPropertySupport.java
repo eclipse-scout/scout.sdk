@@ -334,11 +334,9 @@ public class BasicPropertySupport {
     if (listener instanceof WeakEventListener) {
       for (int i = 0, n = listeners.size(); i < n; i++) {
         Object o = listeners.get(i);
-        if (o instanceof WeakReference) {
-          if (((WeakReference<?>) o).get() == listener) {
-            listeners.remove(i);
-            break;
-          }
+        if (o instanceof WeakReference && ((WeakReference<?>) o).get() == listener) {
+          listeners.remove(i);
+          break;
         }
       }
     }

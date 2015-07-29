@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.core.model.JavaModelUtils;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 
-public class JavaParser implements ILookupEnvironment {
+public final class JavaParser implements ILookupEnvironment {
 
   private final AstCompiler m_compiler;
   private final boolean m_allowErrors;

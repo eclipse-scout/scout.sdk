@@ -28,6 +28,9 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  */
 public final class ScoutAnnotationSourceBuilderFactory {
 
+  private ScoutAnnotationSourceBuilderFactory() {
+  }
+
   public static IAnnotationSourceBuilder createOrderAnnotation(double orderNr) {
     AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(Signature.createTypeSignature(IRuntimeClasses.Order));
     orderAnnoation.addParameter(Double.toString(orderNr));

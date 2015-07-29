@@ -91,12 +91,10 @@ public class BindingType implements IType {
 
   @Override
   public ICompilationUnit getCompilationUnit() {
-    if (m_unit == null) {
-      if (m_tb instanceof SourceTypeBinding) {// no compilation unit for binary bindings
-        CompilationUnitScope icuScope = ((SourceTypeBinding) m_tb).scope.compilationUnitScope();
-        if (icuScope != null) {
-          m_unit = new CompilationUnit(icuScope.referenceContext, getLookupEnvironment());
-        }
+    if (m_unit == null && m_tb instanceof SourceTypeBinding) { // no compilation unit for binary bindings
+      CompilationUnitScope icuScope = ((SourceTypeBinding) m_tb).scope.compilationUnitScope();
+      if (icuScope != null) {
+        m_unit = new CompilationUnit(icuScope.referenceContext, getLookupEnvironment());
       }
     }
     return m_unit;

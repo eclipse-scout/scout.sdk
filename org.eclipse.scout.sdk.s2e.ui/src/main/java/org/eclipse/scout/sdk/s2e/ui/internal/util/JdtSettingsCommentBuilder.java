@@ -54,6 +54,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodParameterDescriptio
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 
 /**
@@ -125,10 +126,10 @@ public class JdtSettingsCommentBuilder implements IJavaElementCommentBuilder {
         buffer = context.evaluate(template);
       }
       catch (BadLocationException e) {
-        throw new RuntimeException(e);
+        throw new SdkException(e);
       }
       catch (TemplateException e) {
-        throw new RuntimeException(e);
+        throw new SdkException(e);
       }
       String str = buffer.getString();
       if (Strings.containsOnlyWhitespaces(str)) {
@@ -150,7 +151,7 @@ public class JdtSettingsCommentBuilder implements IJavaElementCommentBuilder {
           insertTag(document, tagOffsets[i], position.getLength(), EMPTY, EMPTY, null, EMPTY, false, lineDelimiter);
         }
         catch (BadLocationException e) {
-          throw new RuntimeException(e);
+          throw new SdkException(e);
         }
       }
 
@@ -322,10 +323,10 @@ public class JdtSettingsCommentBuilder implements IJavaElementCommentBuilder {
           buffer = context.evaluate(template);
         }
         catch (BadLocationException e) {
-          throw new RuntimeException(e);
+          throw new SdkException(e);
         }
         catch (TemplateException e) {
-          throw new RuntimeException(e);
+          throw new SdkException(e);
         }
         if (buffer == null) {
           return;
@@ -355,7 +356,7 @@ public class JdtSettingsCommentBuilder implements IJavaElementCommentBuilder {
             insertTag(document, tagOffsets[i], position.getLength(), paramNames, exceptionNames, returnType, EMPTY, false, lineDelimiter);
           }
           catch (BadLocationException e) {
-            throw new RuntimeException(e);
+            throw new SdkException(e);
           }
         }
         String comment = document.get();
@@ -429,10 +430,10 @@ public class JdtSettingsCommentBuilder implements IJavaElementCommentBuilder {
       buffer = context.evaluate(template);
     }
     catch (BadLocationException e) {
-      throw new RuntimeException(e);
+      throw new SdkException(e);
     }
     catch (TemplateException e) {
-      throw new RuntimeException(e);
+      throw new SdkException(e);
     }
     if (buffer == null) {
       return null;

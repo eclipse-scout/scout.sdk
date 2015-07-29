@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.nls.internal.ui.editor;
 
 import java.util.List;
+import java.util.Objects;
 
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.jface.viewers.IStructuredContentProvider;
@@ -146,7 +147,7 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
     String a = getColumnText(first, index);
     String b = getColumnText(second, index);
 
-    if (a == b) {
+    if (Objects.equals(a, b)) {
       return 0;
     }
     if (a == null) {

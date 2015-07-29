@@ -198,10 +198,8 @@ public class NlsTableCursor {
     if (m_cursor.getColumn() < NlsTable.AMOUNT_UTILITY_COLS) {
       return;
     }
-    if (m_nlsTable.getModel() != null && m_nlsTable.getModel().getProjects() != null) {
-      if (m_nlsTable.getModel().getProjects().isReadOnly()) {
-        return;
-      }
+    if (m_nlsTable.getModel() != null && m_nlsTable.getModel().getProjects() != null && m_nlsTable.getModel().getProjects().isReadOnly()) {
+      return;
     }
     createEditableTextInternal(input);
   }

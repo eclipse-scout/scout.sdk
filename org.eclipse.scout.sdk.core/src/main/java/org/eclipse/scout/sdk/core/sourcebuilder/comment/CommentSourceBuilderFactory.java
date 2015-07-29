@@ -19,6 +19,7 @@ import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.sourcebuilder.ICommentSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
  * <h3>{@link CommentSourceBuilderFactory}</h3>
@@ -128,7 +129,7 @@ public final class CommentSourceBuilderFactory {
           source.append(formattedComment);
         }
         catch (IOException e) {
-          throw new RuntimeException("Unable to format comment.", e);
+          throw new SdkException("Unable to format comment.", e);
         }
       }
     };

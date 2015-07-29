@@ -23,6 +23,7 @@ import org.eclipse.jdt.internal.compiler.classfmt.ClassFileConstants;
 import org.eclipse.jdt.internal.compiler.env.ICompilationUnit;
 import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.impl.CompilerOptions;
+import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
  *
@@ -57,7 +58,7 @@ public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
       for (int i = 1; i < errors.size(); i++) {
         sb.append('\n').append(errors.get(i));
       }
-      throw new RuntimeException(sb.toString());
+      throw new SdkException(sb.toString());
     }
   }
 

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.util;
 
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.util.Collection;
 import java.util.Comparator;
@@ -45,7 +46,7 @@ import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
-import org.eclipse.scout.sdk.s2e.job.JobEx;
+import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
 
 /**
@@ -69,6 +70,16 @@ public final class JdtUtils {
     return jdtTypeToScoutType(jdtType, ScoutSdkCore.createLookupEnvironment(jdtType.getJavaProject(), true));
   }
 
+  /**
+   * Converts the given {@link org.eclipse.jdt.core.IType} to {@link org.eclipse.scout.sdk.core.model.IType}
+   *
+   * @param jdtType
+   *          The jdt {@link IType} to convert.
+   * @param lookupEnv
+   *          The {@link ILookupEnvironment} to use to find the matching {@link org.eclipse.scout.sdk.core.model.IType}.
+   * @return The {@link org.eclipse.scout.sdk.core.model.IType} matching the given JDT {@link IType}.
+   * @throws CoreException
+   */
   public static org.eclipse.scout.sdk.core.model.IType jdtTypeToScoutType(IType jdtType, ILookupEnvironment lookupEnv) throws CoreException {
     IFile resource = (IFile) jdtType.getResource();
     String charsetName = resource.getCharset();
@@ -78,6 +89,17 @@ public final class JdtUtils {
     return lookupEnv.findType(jdtType.getFullyQualifiedName('$'));
   }
 
+  /**
+   * Gets the first {@link IMethod} for which the given {@link IFilter} evaluates to <code>true</code>.<br>
+   * <b>Note:</b> Inner Types are not searched.
+   *
+   * @param type
+   *          The {@link IType} in which the {@link IMethod} should be searched.
+   * @param filter
+   *          The {@link IFilter}.
+   * @return The first {@link IMethod} found in the given type or <code>null</code> if it could not be found.
+   * @throws JavaModelException
+   */
   public static IMethod getFirstMethod(IType type, IFilter<IMethod> filter) throws JavaModelException {
     for (IMethod method : type.getMethods()) {
       if (filter == null || filter.evaluate(method)) {
@@ -117,6 +139,15 @@ public final class JdtUtils {
     return null;
   }
 
+  /**
+   * Gets all {@link IType}s that are accessible in the current workspace having the given fully qualified name.
+   *
+   * @param fqn
+   *          The fully qualified name of the types to search. Inner types must use the '$' enclosing type separator
+   *          (e.g. <code>org.eclipse.scout.TestClass$InnerClass$NextLevelInnerClass</code>).
+   * @return
+   * @throws CoreException
+   */
   public static Set<org.eclipse.jdt.core.IType> resolveJdtTypes(final String fqn) throws CoreException {
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
     String fastPat = Signature.getSimpleName(fqn);
@@ -136,9 +167,12 @@ public final class JdtUtils {
     return matchList;
   }
 
+  /**
+   * Blocks the calling thread until all Eclipse builds have been completed.
+   */
   public static void waitForBuild() {
-    JobEx.waitForJobFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
-    JobEx.waitForJobFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
+    AbstractJob.waitForJobFamily(ResourcesPlugin.FAMILY_MANUAL_BUILD);
+    AbstractJob.waitForJobFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
   }
 
   private static final class P_TypeMatchComparator implements Comparator<IType>, Serializable {
@@ -178,6 +212,15 @@ public final class JdtUtils {
     }
   }
 
+  /**
+   * Gets the {@link IAnnotation} with the given fully qualified name.
+   *
+   * @param element
+   *          The owner for which the {@link IAnnotation} should be searched.
+   * @param fullyQualifiedAnnotation
+   *          The fully qualified class name of the annotation (e.g. <code>java.lang.SuppressWarnings</code>).
+   * @return The {@link IAnnotation} on the given element or <code>null</code> if it could not be found.
+   */
   public static IAnnotation getAnnotation(IAnnotatable element, String fullyQualifiedAnnotation) {
     if (element == null) {
       return null;
@@ -187,48 +230,37 @@ public final class JdtUtils {
     String startSimple = '@' + simpleName;
     String startFq = '@' + fullyQualifiedAnnotation;
 
+    IAnnotation result = getAnnotation(element, simpleName, startSimple, startFq);
+    if (result != null) {
+      return result;
+    }
+    return getAnnotation(element, fullyQualifiedAnnotation, startSimple, startFq);
+  }
+
+  private static IAnnotation getAnnotation(IAnnotatable element, String name, String startSimple, String startFq) {
     String annotSource = null;
-    IAnnotation annotation = element.getAnnotation(simpleName);
-    if (exists(annotation)) {
-      try {
-        annotSource = annotation.getSource();
-        if (annotSource != null) {
-          annotSource = annotSource.trim();
-        }
-      }
-      catch (Exception e) {
-        S2ESdkActivator.logWarning("Could not get source of annotation '" + fullyQualifiedAnnotation + "' in element '" + element.toString() + "'.", e);
-      }
-      if (annotSource == null || annotSource.startsWith(startSimple) || annotSource.startsWith(startFq)) {
-        return annotation;
-      }
-      else if (element instanceof IMember) {
-        annotSource = getAnnotationSourceFixed((IMember) element, annotation, startSimple);
-        if (annotSource != null && (annotSource.startsWith(startSimple) || annotSource.startsWith(startFq))) {
-          return annotation;
-        }
-      }
+    IAnnotation annotation = element.getAnnotation(name);
+    if (!exists(annotation)) {
+      return null;
     }
 
-    annotation = element.getAnnotation(fullyQualifiedAnnotation);
-    if (exists(annotation)) {
-      try {
-        annotSource = annotation.getSource();
-        if (annotSource != null) {
-          annotSource = annotSource.trim();
-        }
+    try {
+      annotSource = annotation.getSource();
+      if (annotSource != null) {
+        annotSource = annotSource.trim();
       }
-      catch (Exception e) {
-        S2ESdkActivator.logWarning("Could not get source of annotation '" + fullyQualifiedAnnotation + "' in element '" + element.toString() + "'.", e);
-      }
-      if (annotSource == null || annotSource.startsWith(startSimple) || annotSource.startsWith(startFq)) {
+    }
+    catch (Exception e) {
+      S2ESdkActivator.logWarning("Could not get source of annotation '" + name + "' in element '" + element.toString() + "'.", e);
+    }
+
+    if (annotSource == null || annotSource.startsWith(startSimple) || annotSource.startsWith(startFq)) {
+      return annotation;
+    }
+    else if (element instanceof IMember) {
+      annotSource = getAnnotationSourceFixed((IMember) element, annotation, startSimple);
+      if (annotSource != null && (annotSource.startsWith(startSimple) || annotSource.startsWith(startFq))) {
         return annotation;
-      }
-      else if (element instanceof IMember) {
-        annotSource = getAnnotationSourceFixed((IMember) element, annotation, startSimple);
-        if (annotSource != null && (annotSource.startsWith(startSimple) || annotSource.startsWith(startFq))) {
-          return annotation;
-        }
       }
     }
     return null;
@@ -238,18 +270,16 @@ public final class JdtUtils {
     try {
       ISourceRange annotSourceRange = annotation.getSourceRange();
       ISourceRange ownerSourceRange = member.getSourceRange();
-      if (annotSourceRange != null && ownerSourceRange != null) {
-        if (annotSourceRange.getOffset() >= 0 && ownerSourceRange.getOffset() >= 0 && ownerSourceRange.getOffset() > annotSourceRange.getOffset()) {
-          String icuSource = member.getCompilationUnit().getSource();
-          if (icuSource != null && icuSource.length() >= ownerSourceRange.getOffset()) {
-            String diff = icuSource.substring(annotSourceRange.getOffset(), ownerSourceRange.getOffset());
-            int offset = diff.lastIndexOf(startSimple);
-            if (offset >= 0) {
-              offset += annotSourceRange.getOffset();
-              int end = offset + annotSourceRange.getLength();
-              if (icuSource.length() >= end) {
-                return icuSource.substring(offset, end);
-              }
+      if (annotSourceRange != null && ownerSourceRange != null && annotSourceRange.getOffset() >= 0 && ownerSourceRange.getOffset() >= 0 && ownerSourceRange.getOffset() > annotSourceRange.getOffset()) {
+        String icuSource = member.getCompilationUnit().getSource();
+        if (icuSource != null && icuSource.length() >= ownerSourceRange.getOffset()) {
+          String diff = icuSource.substring(annotSourceRange.getOffset(), ownerSourceRange.getOffset());
+          int offset = diff.lastIndexOf(startSimple);
+          if (offset >= 0) {
+            offset += annotSourceRange.getOffset();
+            int end = offset + annotSourceRange.getLength();
+            if (icuSource.length() >= end) {
+              return icuSource.substring(offset, end);
             }
           }
         }
@@ -261,11 +291,29 @@ public final class JdtUtils {
     return null;
   }
 
+  /**
+   * Checks if the given {@link IJavaElement} is not <code>null</code> and exists.
+   *
+   * @param element
+   *          The element to check.
+   * @return <code>true</code> if the given element is not <code>null</code> and exists.
+   */
   public static boolean exists(IJavaElement element) {
     return element != null && element.exists();
   }
 
-  public static Double getAnnotationValueNumeric(IAnnotation annotation, String name) throws JavaModelException {
+  /**
+   * Gets the value of the given annotation attribute as {@link BigDecimal}.
+   *
+   * @param annotation
+   *          The {@link IAnnotation} for which the attribute should be converted.
+   * @param name
+   *          The name of attribute.
+   * @return A {@link BigDecimal} with the numeric value of the given attribute or <code>null</code> if the attribute
+   *         could not be found or is not numeric.
+   * @throws JavaModelException
+   */
+  public static BigDecimal getAnnotationValueNumeric(IAnnotation annotation, String name) throws JavaModelException {
     if (!exists(annotation)) {
       return null;
     }
@@ -274,11 +322,10 @@ public final class JdtUtils {
       if (name.equals(p.getMemberName())) {
         switch (p.getValueKind()) {
           case IMemberValuePair.K_DOUBLE:
-            return (Double) p.getValue();
           case IMemberValuePair.K_FLOAT:
-            return ((Float) p.getValue()).doubleValue();
+            return new BigDecimal(((Double) p.getValue()).doubleValue());
           case IMemberValuePair.K_INT:
-            return ((Integer) p.getValue()).doubleValue();
+            return new BigDecimal(((Integer) p.getValue()).intValue());
         }
         break;
       }
@@ -295,7 +342,7 @@ public final class JdtUtils {
    */
   public static ITypeHierarchy getLocalTypeHierarchy(Collection<? extends IJavaElement> elements) throws JavaModelException {
     IRegion region = JavaCore.newRegion();
-    if (elements != null) {
+    if (elements != null && !elements.isEmpty()) {
       for (IJavaElement e : elements) {
         if (exists(e)) {
           if (e.getElementType() == IJavaElement.TYPE) {
@@ -310,7 +357,7 @@ public final class JdtUtils {
         }
       }
     }
-    return getLocalTypeHierarchy(region);
+    return JavaCore.newTypeHierarchy(region, null, null);
   }
 
   private static void addBinaryInnerTypesToRegionRec(IType declaringType, IRegion region) {
@@ -341,9 +388,5 @@ public final class JdtUtils {
       el.add(e);
     }
     return getLocalTypeHierarchy(el);
-  }
-
-  public static ITypeHierarchy getLocalTypeHierarchy(IRegion region) throws JavaModelException {
-    return JavaCore.newTypeHierarchy(region, null, null);
   }
 }

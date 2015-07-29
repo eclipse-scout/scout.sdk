@@ -35,7 +35,7 @@ import org.eclipse.scout.sdk.s2e.dto.IDtoAutoUpdateHandler;
 import org.eclipse.scout.sdk.s2e.dto.IDtoAutoUpdateManager;
 import org.eclipse.scout.sdk.s2e.dto.IDtoAutoUpdateOperation;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
-import org.eclipse.scout.sdk.s2e.job.JobEx;
+import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
@@ -85,7 +85,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
 
     // wait until all form datas have been generated. otherwise the user ends up with invalid form datas.
     // the user still can cancel the job if desired.
-    JobEx.waitForJobFamily(AUTO_UPDATE_JOB_FAMILY);
+    AbstractJob.waitForJobFamily(AUTO_UPDATE_JOB_FAMILY);
   }
 
   @Override
@@ -191,7 +191,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
     }
 
     private static boolean acceptUpdateEvent(ElementChangedEvent icu) {
-      final String[] EXCLUDED_JOB_NAME_PREFIXES = new String[]{"org.eclipse.team.", // excludes svn updates
+      final String[] excludedJobNamePrefixes = new String[]{"org.eclipse.team.", // excludes svn updates
       "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
       "org.eclipse.egit.", // excludes git updates
       "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
@@ -205,12 +205,12 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
         return false;
       }
 
-      if (curJob instanceof JobEx || curJob instanceof P_AutoUpdateOperationsJob) {
+      if (curJob instanceof AbstractJob || curJob instanceof P_AutoUpdateOperationsJob) {
         return false;
       }
 
       String jobFqn = curJob.getClass().getName().replace('$', '.');
-      for (String excludedPrefix : EXCLUDED_JOB_NAME_PREFIXES) {
+      for (String excludedPrefix : excludedJobNamePrefixes) {
         if (jobFqn.startsWith(excludedPrefix)) {
           return false;
         }
@@ -219,7 +219,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
       if ("org.eclipse.core.internal.jobs.ThreadJob".equals(jobFqn)) {
         StackTraceElement[] stackTrace = Thread.currentThread().getStackTrace();
         for (int i = stackTrace.length - 1; i >= 0; i--) {
-          for (String excludedPrefix : EXCLUDED_JOB_NAME_PREFIXES) {
+          for (String excludedPrefix : excludedJobNamePrefixes) {
             if (stackTrace[i].getClassName().startsWith(excludedPrefix)) {
               return false;
             }
@@ -232,11 +232,9 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
 
     @Override
     public void elementChanged(ElementChangedEvent event) {
-      if (event != null && acceptUpdateEvent(event)) {
-        if (!addElementToQueueSecure(m_eventCollector, event, 10, TimeUnit.SECONDS)) {
-          // element could not be added within the given timeout
-          S2ESdkActivator.logWarning("No more space in the Scout DTO auto update event queue. Skipping event.");
-        }
+      if (event != null && acceptUpdateEvent(event) && !addElementToQueueSecure(m_eventCollector, event, 10, TimeUnit.SECONDS)) {
+        // element could not be added within the given timeout
+        S2ESdkActivator.logWarning("No more space in the Scout DTO auto update event queue. Skipping event.");
       }
     }
   }
@@ -244,7 +242,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
   /**
    * Job that iterates over all java change events and checks if they require a DTO update.
    */
-  private static final class P_JavaChangeEventCheckJob extends JobEx {
+  private static final class P_JavaChangeEventCheckJob extends AbstractJob {
 
     private final List<IDtoAutoUpdateHandler> m_handlers;
     private final ArrayBlockingQueue<ElementChangedEvent> m_queueToConsume;
@@ -304,17 +302,15 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
             try {
               for (IType t : icu.getTypes()) {
                 IDtoAutoUpdateOperation operation = createAutoUpdateOperation(t);
-                if (operation != null) {
-                  if (!m_operationCollector.contains(operation)) {
-                    if (addElementToQueueSecure(m_operationCollector, operation, -1, null)) {
-                      // do the scheduling after the first icu is parsed (not parsing all and then scheduling)
-                      // this way the user has a faster response time and we can already start in parallel (even though we may abort again).
-                      m_dtoUpdateJob.abort();
-                      m_dtoUpdateJob.schedule(1000); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
-                    }
-                    else {
-                      S2ESdkActivator.logWarning("To many thread interrupts while waiting for space in the Scout DTO auto update event queue. Skipping type '" + t.getFullyQualifiedName('$') + "'.");
-                    }
+                if (operation != null && !m_operationCollector.contains(operation)) {
+                  if (addElementToQueueSecure(m_operationCollector, operation, -1, null)) {
+                    // do the scheduling after the first icu is parsed (not parsing all and then scheduling)
+                    // this way the user has a faster response time and we can already start in parallel (even though we may abort again).
+                    m_dtoUpdateJob.abort();
+                    m_dtoUpdateJob.schedule(1000); // wait a little to give other follow-up events time so that they don't trigger another re-calculation job
+                  }
+                  else {
+                    S2ESdkActivator.logWarning("To many thread interrupts while waiting for space in the Scout DTO auto update event queue. Skipping type '" + t.getFullyQualifiedName('$') + "'.");
                   }
                 }
               }
@@ -340,7 +336,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
       }
 
       boolean hasChildren = (delta.getFlags() & IJavaElementDelta.F_CHILDREN) != 0;
-      boolean processChildren = hasChildren && (curElement == null || curElement.getElementType() < IJavaElement.COMPILATION_UNIT); // stop at compilation unit level
+      boolean processChildren = hasChildren && curElement.getElementType() < IJavaElement.COMPILATION_UNIT; // stop at compilation unit level
       if (processChildren) {
         IJavaElementDelta[] affectedChildren = delta.getAffectedChildren();
         for (IJavaElementDelta childDelta : affectedChildren) {

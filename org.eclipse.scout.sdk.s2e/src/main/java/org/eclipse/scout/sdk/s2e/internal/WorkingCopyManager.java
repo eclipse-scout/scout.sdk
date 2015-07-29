@@ -25,7 +25,7 @@ import org.eclipse.jdt.internal.compiler.SourceElementParser;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.scout.sdk.s2e.IWorkingCopyManager;
-import org.eclipse.scout.sdk.s2e.job.JobEx;
+import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
 
 /**
@@ -98,7 +98,7 @@ public class WorkingCopyManager implements IWorkingCopyManager {
 
     SourceElementParser parser = im.getSourceElementParser(jp, null/*requestor will be set by indexer*/);
     im.addSource((IFile) icu.getResource(), containerPath, parser);
-    JobEx.waitForJobFamily(containerPath.toString());
+    AbstractJob.waitForJobFamily(containerPath.toString());
   }
 
   @Override

@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
  *
  * @since 5.1.0
  */
-public abstract class AbstractWorkspaceBlockingJob extends JobEx {
+public abstract class AbstractWorkspaceBlockingJob extends AbstractJob {
 
   private boolean m_debug;
   private Exception m_callerTrace;

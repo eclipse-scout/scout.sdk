@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.util;
 
+import java.math.BigDecimal;
 import java.util.Comparator;
 
 import org.eclipse.jdt.core.IAnnotation;
@@ -67,7 +68,7 @@ public final class ScoutJdtTypeComparators {
           IAnnotation annotation = JdtUtils.getAnnotation(type, IRuntimeClasses.Order);
           if (JdtUtils.exists(annotation)) {
             try {
-              Double val = JdtUtils.getAnnotationValueNumeric(annotation, IRuntimeClasses.ORDER_ANNOTATION_VALUE);
+              BigDecimal val = JdtUtils.getAnnotationValueNumeric(annotation, IRuntimeClasses.ORDER_ANNOTATION_VALUE);
               if (val != null) {
                 return val.doubleValue();
               }
