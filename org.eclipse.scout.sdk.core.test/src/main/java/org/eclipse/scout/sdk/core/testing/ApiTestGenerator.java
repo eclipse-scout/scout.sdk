@@ -97,10 +97,10 @@ public class ApiTestGenerator {
     String iFieldRef = validator.getTypeName(Signature.createTypeSignature(IField.class.getName(), true));
     List<IField> fields = type.getFields();
     source.append(assertRef).append(".assertEquals(\"field count of '").append(type.getName()).append("'\", ").append(Integer.toString(fields.size())).append(", ").append(typeVarName).append(".getFields().size());").append(NL);
-    for (Object f : fields) {
-      String fieldVarName = getMemberName(((IType) f).getName());
-      source.append(iFieldRef).append(" ").append(fieldVarName).append(" = ").append(sdkAssertRef).append(".assertFieldExist(").append(typeVarName).append(", \"").append(((IType) f).getName()).append("\");").append(NL);
-      buildField((IField) f, fieldVarName, source, validator, sdkAssertRef);
+    for (IField f : fields) {
+      String fieldVarName = getMemberName(f.getName());
+      source.append(iFieldRef).append(" ").append(fieldVarName).append(" = ").append(sdkAssertRef).append(".assertFieldExist(").append(typeVarName).append(", \"").append(f.getName()).append("\");").append(NL);
+      buildField(f, fieldVarName, source, validator, sdkAssertRef);
     }
     source.append(NL);
 
@@ -108,22 +108,22 @@ public class ApiTestGenerator {
     String iMethodRef = validator.getTypeName(Signature.createTypeSignature(IMethod.class.getName(), true));
     List<IMethod> methods = type.getMethods();
     source.append(assertRef).append(".assertEquals(\"method count of '").append(type.getName()).append("'\", ").append(Integer.toString(methods.size())).append(", ").append(typeVarName).append(".getMethods().size());").append(NL);
-    for (Object method : methods) {
-      String methodVarName = getMemberName(((IMethod) method).getName());
-      source.append(iMethodRef).append(" ").append(methodVarName).append(" = ").append(sdkAssertRef).append(".assertMethodExist(").append(typeVarName).append(", \"").append(((IMethod) method).getName()).append("\", new String[]{");
-      buildMethod((IMethod) method, methodVarName, source, validator, sdkAssertRef, assertRef);
+    for (IMethod method : methods) {
+      String methodVarName = getMemberName(method.getName());
+      source.append(iMethodRef).append(" ").append(methodVarName).append(" = ").append(sdkAssertRef).append(".assertMethodExist(").append(typeVarName).append(", \"").append(method.getName()).append("\", new String[]{");
+      buildMethod(method, methodVarName, source, validator, sdkAssertRef, assertRef);
     }
     source.append(NL);
 
     // inner types
     List<IType> innerTypes = type.getTypes();
     source.append(assertRef).append(".assertEquals(\"inner types count of '").append(type.getSimpleName()).append("'\", ").append(Integer.toString(innerTypes.size())).append(", ").append(typeVarName).append(".getTypes().size());").append(NL);
-    for (Object innerType : innerTypes) {
-      String innerTypeVarName = getMemberName(((IType) innerType).getSimpleName());
-      source.append("// type ").append(((IType) innerType).getSimpleName()).append(NL);
+    for (IType innerType : innerTypes) {
+      String innerTypeVarName = getMemberName(innerType.getSimpleName());
+      source.append("// type ").append(innerType.getSimpleName()).append(NL);
       source.append(iTypeRef).append(" ").append(innerTypeVarName).append(" = ");
-      source.append(sdkAssertRef).append(".assertTypeExists(").append(typeVarName).append(", \"").append(((IType) innerType).getSimpleName()).append("\");").append(NL);
-      buildType((IType) innerType, innerTypeVarName, source, validator, sdkAssertRef, assertRef, iTypeRef);
+      source.append(sdkAssertRef).append(".assertTypeExists(").append(typeVarName).append(", \"").append(innerType.getSimpleName()).append("\");").append(NL);
+      buildType(innerType, innerTypeVarName, source, validator, sdkAssertRef, assertRef, iTypeRef);
     }
   }
 
@@ -168,8 +168,8 @@ public class ApiTestGenerator {
   }
 
   public void createAnnotationsAsserts(IAnnotatable annotatable, IType resolveContext, StringBuilder source, String annotatableRef, String sdkAssertRef) {
-    for (Object a : annotatable.getAnnotations()) {
-      String annotationSignature = SignatureUtils.getResolvedSignature(((IAnnotation) a).getType());
+    for (IAnnotation a : annotatable.getAnnotations()) {
+      String annotationSignature = SignatureUtils.getResolvedSignature((a).getType());
       source.append(sdkAssertRef).append(".assertAnnotation(").append(annotatableRef).append(", \"").append(Signature.toString(annotationSignature)).append("\");").append(NL);
     }
   }

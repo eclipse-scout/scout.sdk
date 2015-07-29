@@ -131,10 +131,10 @@ public class TypeTest {
 
     // member types
     Assert.assertEquals(2, baseClassType.getTypes().size());
-    Assert.assertEquals(Flags.AccStatic, ((IMember) baseClassType.getTypes().get(0)).getFlags());
-    Assert.assertEquals(baseClassType, ((IMember) baseClassType.getTypes().get(0)).getDeclaringType());
-    Assert.assertEquals(Flags.AccProtected, ((IMember) baseClassType.getTypes().get(1)).getFlags());
-    Assert.assertEquals(baseClassType, ((IMember) baseClassType.getTypes().get(1)).getDeclaringType());
+    Assert.assertEquals(Flags.AccStatic, baseClassType.getTypes().get(0).getFlags());
+    Assert.assertEquals(baseClassType, baseClassType.getTypes().get(0).getDeclaringType());
+    Assert.assertEquals(Flags.AccProtected, baseClassType.getTypes().get(1).getFlags());
+    Assert.assertEquals(baseClassType, baseClassType.getTypes().get(1).getDeclaringType());
 
     // type arguments
     List<IType> typeArguments = baseClassType.getTypeArguments();

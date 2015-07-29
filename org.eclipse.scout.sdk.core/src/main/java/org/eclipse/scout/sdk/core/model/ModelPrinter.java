@@ -61,12 +61,12 @@ public final class ModelPrinter {
   public static void print(ICompilationUnit icu, StringBuilder sb) {
     print(icu.getPackage(), sb);
     sb.append('\n');
-    for (Object id : icu.getImports().values()) {
-      print((IImportDeclaration) id, sb);
+    for (IImportDeclaration id : icu.getImports().values()) {
+      print(id, sb);
       sb.append('\n');
     }
-    for (Object t : icu.getTypes()) {
-      print((IType) t, sb);
+    for (IType t : icu.getTypes()) {
+      print(t, sb);
       sb.append('\n');
     }
   }
@@ -125,16 +125,16 @@ public final class ModelPrinter {
       sb.append(" {\n");
     }
     if (t.getFields().size() > 0) {
-      for (Object f : t.getFields()) {
+      for (IField f : t.getFields()) {
         sb.append('\n');
-        print((IField) f, sb);
+        print(f, sb);
         sb.append('\n');
       }
     }
     if (t.getMethods().size() > 0) {
-      for (Object m : t.getMethods()) {
+      for (IMethod m : t.getMethods()) {
         sb.append('\n');
-        print((IMethod) m, sb);
+        print(m, sb);
         sb.append('\n');
       }
     }

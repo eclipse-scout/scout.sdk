@@ -50,8 +50,8 @@ public class WellformAllOperation implements IOperation {
     String[] roots = new String[]{IRuntimeClasses.ICodeType, IRuntimeClasses.IDesktop, IRuntimeClasses.IDesktopExtension, IRuntimeClasses.IForm, IRuntimeClasses.IWizard, IRuntimeClasses.IPage, IRuntimeClasses.IOutline};
     for (String root : roots) {
       Set<IType> rootTypes = JdtUtils.resolveJdtTypes(root);
-      for (Object t : rootTypes) {
-        ITypeHierarchy codeTypeHierarchy = ((IType) t).newTypeHierarchy(null);
+      for (IType t : rootTypes) {
+        ITypeHierarchy codeTypeHierarchy = t.newTypeHierarchy(null);
         for (IType candidate : codeTypeHierarchy.getAllClasses()) {
           if (JdtUtils.exists(candidate) && !candidate.isInterface() && !candidate.isBinary() && !candidate.isAnonymous() && candidate.getDeclaringType() == null) {
             types.add(candidate);

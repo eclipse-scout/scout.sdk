@@ -911,8 +911,8 @@ public class SdkAssert extends Assert {
     }
 
     // also search in raw type args
-    for (Object m : context.getMethods()) {
-      IType rawDefType = findRawType(((IMethod) m).getReturnType(), signatureSimpleName);
+    for (IMethod m : context.getMethods()) {
+      IType rawDefType = findRawType(m.getReturnType(), signatureSimpleName);
       if (rawDefType != null) {
         return SignatureUtils.getResolvedSignature(rawDefType);
       }

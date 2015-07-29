@@ -35,8 +35,8 @@ public final class StructuredTypeFactory {
 
   private static boolean hierarchyContains(ITypeHierarchy h, String fqn, JdtTypeCache typeCache) throws CoreException {
     Set<IType> jdtTypes = typeCache.getTypes(fqn);
-    for (Object t : jdtTypes) {
-      if (h.contains((IType) t)) {
+    for (IType t : jdtTypes) {
+      if (h.contains(t)) {
         return true;
       }
     }

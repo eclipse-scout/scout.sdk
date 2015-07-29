@@ -15,6 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.model.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.IMember;
@@ -102,7 +103,7 @@ public final class CoreScoutTestingUtils {
     if (!Objects.equals(orderNr, memberOrderNr)) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Order annotation not equal: exptected '").append(orderNr).append("'; found on member");
-        if (annotatable != null && annotatable instanceof IMember) {
+        if (annotatable instanceof IMember) {
           messageBuilder.append(" '").append(((IMember) annotatable).getName()).append("'");
         }
         messageBuilder.append(" is '").append(memberOrderNr).append("'!");

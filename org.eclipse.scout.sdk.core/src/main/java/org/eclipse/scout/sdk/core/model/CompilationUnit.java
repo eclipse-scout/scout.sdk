@@ -128,9 +128,9 @@ public class CompilationUnit implements ICompilationUnit {
   public IType getMainType() {
     if (m_mainType == null) {
       String mainTypeName = new String(m_ast.getMainTypeName());
-      for (Object t : getTypes()) {
-        if (mainTypeName.equals(((IType) t).getSimpleName())) {
-          m_mainType = (IType) t;
+      for (IType t : getTypes()) {
+        if (mainTypeName.equals(t.getSimpleName())) {
+          m_mainType = t;
           break;
         }
       }

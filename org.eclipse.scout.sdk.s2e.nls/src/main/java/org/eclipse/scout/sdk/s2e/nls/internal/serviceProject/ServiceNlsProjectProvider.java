@@ -76,9 +76,9 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
     Set<TextProviderServiceDeclaration> result = new TreeSet<>(comparator);
     Set<IType> baseTypes = JdtUtils.resolveJdtTypes("org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService");
-    for (Object t : baseTypes) {
-      ITypeHierarchy typeHierarchy = ((IType) t).newTypeHierarchy(null);
-      for (IType candidate : typeHierarchy.getAllSubtypes((IType) t)) {
+    for (IType t : baseTypes) {
+      ITypeHierarchy typeHierarchy = t.newTypeHierarchy(null);
+      for (IType candidate : typeHierarchy.getAllSubtypes(t)) {
         try {
           if (!Flags.isAbstract(candidate.getFlags()) && SourceRange.isAvailable(candidate.getSourceRange()) && acceptsFilter(projectFilter, candidate)) {
             // only accept non-abstract types with source available and fulfills the given project filter

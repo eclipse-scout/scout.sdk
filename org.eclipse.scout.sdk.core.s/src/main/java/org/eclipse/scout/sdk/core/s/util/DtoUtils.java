@@ -224,8 +224,17 @@ public final class DtoUtils {
     }
 
     if (annotationOwnerType.getTypeArguments().size() <= genericOrdinal) {
-      // invalid index in annotation
-      throw new RuntimeException("Invalid genericOrdinal value on class '" + annotationOwnerType.getName() + "'.");
+      // cannot be found in arguments. check parameters
+      if (annotationOwnerType.getTypeParameters().size() > genericOrdinal) {
+        List<IType> params = annotationOwnerType.getTypeParameters().get(genericOrdinal).getBounds();
+        if (!params.isEmpty()) {
+          return params.get(0);
+        }
+      }
+      else {
+        // invalid index in annotation
+        throw new RuntimeException("Invalid genericOrdinal value on class '" + annotationOwnerType.getName() + "'.");
+      }
     }
 
     List<IType> resolvedTypeParamValue = CoreUtils.getResolvedTypeParamValue(contextType, annotationOwnerType, genericOrdinal);
@@ -361,8 +370,8 @@ public final class DtoUtils {
       IType superType = type.getSuperClass();
 
       parseFormDataAnnotationRec(annotation, superType, replaceAnnotationPresent);
-      for (Object superInterface : type.getSuperInterfaces()) {
-        parseFormDataAnnotationRec(annotation, (IType) superInterface, replaceAnnotationPresent);
+      for (IType superInterface : type.getSuperInterfaces()) {
+        parseFormDataAnnotationRec(annotation, superInterface, replaceAnnotationPresent);
       }
 
       if (replaceAnnotationPresent && superType != null && !ScoutUtils.existsReplaceAnnotation(superType)) {
@@ -511,8 +520,8 @@ public final class DtoUtils {
     }
     Set<String> allSuperInterfaceMethods = new HashSet<>();
     for (IType t : allSuperInterfaces) {
-      for (Object m : t.getMethods()) {
-        allSuperInterfaceMethods.add(SignatureUtils.getMethodIdentifier((IMethod) m));
+      for (IMethod m : t.getMethods()) {
+        allSuperInterfaceMethods.add(SignatureUtils.getMethodIdentifier(m));
       }
     }
     for (IMethodSourceBuilder msb : sourceBuilder.getMethodSourceBuilders()) {

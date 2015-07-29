@@ -136,7 +136,7 @@ public class AnnotationTest {
     Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.getFlags());
     Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.getFlags());
 
-    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, ((IMember) deprChildType.getMethods().get(1)).getFlags());
-    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, ((IMember) deprBaseType.getMethods().get(1)).getFlags());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.getMethods().get(1).getFlags());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.getMethods().get(1).getFlags());
   }
 }

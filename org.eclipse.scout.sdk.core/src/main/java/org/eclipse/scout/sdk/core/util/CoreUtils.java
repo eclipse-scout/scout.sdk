@@ -370,8 +370,8 @@ public final class CoreUtils {
   public static List<String> getResolvedTypeParamValueSignature(IType focusType, String levelFqn, int typeParamIndex) {
     List<IType> typeParamsValue = getResolvedTypeParamValue(focusType, levelFqn, typeParamIndex);
     List<String> result = new ArrayList<>(typeParamsValue.size());
-    for (Object t : typeParamsValue) {
-      result.add(SignatureUtils.getResolvedSignature((IType) t));
+    for (IType t : typeParamsValue) {
+      result.add(SignatureUtils.getResolvedSignature(t));
     }
     return result;
   }
@@ -531,8 +531,8 @@ public final class CoreUtils {
       return type;
     }
     else {
-      for (Object innerType : type.getTypes()) {
-        IType found = findInnerType((IType) innerType, innerTypeName);
+      for (IType innerType : type.getTypes()) {
+        IType found = findInnerType(innerType, innerTypeName);
         if (found != null) {
           return found;
         }
@@ -550,8 +550,8 @@ public final class CoreUtils {
    */
   public static Set<IType> getAllSuperInterfaces(IType type) {
     Set<IType> collector = new HashSet<>();
-    for (Object t : type.getSuperInterfaces()) {
-      getAllSuperInterfaces((IType) t, collector);
+    for (IType t : type.getSuperInterfaces()) {
+      getAllSuperInterfaces(t, collector);
     }
     return collector;
   }
@@ -564,8 +564,8 @@ public final class CoreUtils {
       collector.add(t);
     }
     getAllSuperInterfaces(t.getSuperClass(), collector);
-    for (Object superIfc : t.getSuperInterfaces()) {
-      getAllSuperInterfaces((IType) superIfc, collector);
+    for (IType superIfc : t.getSuperInterfaces()) {
+      getAllSuperInterfaces(superIfc, collector);
     }
   }
 
@@ -691,8 +691,8 @@ public final class CoreUtils {
       result = new ArrayList<>(superIfcGenerics.size());
     }
 
-    for (Object ifcGeneric : superIfcGenerics) {
-      result.add((IType) ifcGeneric);
+    for (IType ifcGeneric : superIfcGenerics) {
+      result.add(ifcGeneric);
     }
 
     return result;
@@ -723,8 +723,8 @@ public final class CoreUtils {
       return method;
     }
 
-    for (Object ifc : startType.getSuperInterfaces()) {
-      method = findMethodInSuperHierarchy((IType) ifc, filter);
+    for (IType ifc : startType.getSuperInterfaces()) {
+      method = findMethodInSuperHierarchy(ifc, filter);
       if (method != null) {
         return method;
       }
@@ -782,14 +782,14 @@ public final class CoreUtils {
     IFilter<IMethod> filter = MethodFilters.getMultiMethodFilter(MethodFilters.getFlagsFilter(Flags.AccPublic), MethodFilters.getNameRegexFilter(BEAN_METHOD_NAME));
     List<IMethod> methods = getMethods(type, filter);
     Map<String, PropertyBean> beans = new HashMap<>(methods.size());
-    for (Object m : methods) {
-      Matcher matcher = BEAN_METHOD_NAME.matcher(((IMethod) m).getName());
+    for (IMethod m : methods) {
+      Matcher matcher = BEAN_METHOD_NAME.matcher(m.getName());
       if (matcher.matches()) {
         String kind = matcher.group(1);
         String name = matcher.group(2);
 
-        List<IMethodParameter> parameterTypes = ((IMethod) m).getParameters();
-        IType returnType = ((IMethod) m).getReturnType();
+        List<IMethodParameter> parameterTypes = m.getParameters();
+        IType returnType = m.getReturnType();
         if ("get".equals(kind) && parameterTypes.size() == 0 && !returnType.equals(IType.VOID)) {
           PropertyBean desc = beans.get(name);
           if (desc == null) {
@@ -797,7 +797,7 @@ public final class CoreUtils {
             beans.put(name, desc);
           }
           if (desc.getReadMethod() == null) {
-            desc.setReadMethod((IMethod) m);
+            desc.setReadMethod(m);
           }
         }
         else {
@@ -809,7 +809,7 @@ public final class CoreUtils {
               beans.put(name, desc);
             }
             if (desc.getReadMethod() == null) {
-              desc.setReadMethod((IMethod) m);
+              desc.setReadMethod(m);
             }
           }
           else if ("set".equals(kind) && parameterTypes.size() == 1 && returnType.equals(IType.VOID)) {
@@ -819,7 +819,7 @@ public final class CoreUtils {
               beans.put(name, desc);
             }
             if (desc.getWriteMethod() == null) {
-              desc.setWriteMethod((IMethod) m);
+              desc.setWriteMethod(m);
             }
           }
         }
@@ -882,9 +882,9 @@ public final class CoreUtils {
     String simpleName = Signature.getSimpleName(name);
 
     List<IAnnotation> result = new ArrayList<>(onlyFirst ? 1 : candidates.size());
-    for (Object candidate : candidates) {
-      if (name.equals(((IAnnotation) candidate).getType().getName()) || simpleName.equals(((IAnnotation) candidate).getType().getSimpleName())) {
-        result.add((IAnnotation) candidate);
+    for (IAnnotation candidate : candidates) {
+      if (name.equals(candidate.getType().getName()) || simpleName.equals(candidate.getType().getSimpleName())) {
+        result.add(candidate);
         if (onlyFirst) {
           return result; // cancel after first
         }
@@ -954,8 +954,8 @@ public final class CoreUtils {
       return result;
     }
 
-    for (Object superInterface : typeToCheck.getSuperInterfaces()) {
-      result = findSuperType((IType) superInterface, queryType);
+    for (IType superInterface : typeToCheck.getSuperInterfaces()) {
+      result = findSuperType(superInterface, queryType);
       if (result != null) {
         return result;
       }
