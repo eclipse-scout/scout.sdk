@@ -49,6 +49,7 @@ public final class TestingUtils {
       }
     }
 
+    // add source folders
     if (sourceFolders != null && sourceFolders.length > 0) {
       File curDir = new File("").getAbsoluteFile();
       for (String s : sourceFolders) {
@@ -59,6 +60,20 @@ public final class TestingUtils {
       }
     }
 
+    // add running java classpath
+    String javaClassPathRaw = System.getProperty("java.class.path");
+    if (javaClassPathRaw != null && !javaClassPathRaw.isEmpty()) {
+      String separator = System.getProperty("path.separator");
+      String[] elements = javaClassPathRaw.split(separator);
+      for (String cpElement : elements) {
+        File f = new File(cpElement);
+        if (f.exists()) {
+          cp.add(f);
+        }
+      }
+    }
+
+    // add current classloader URIs
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     if (contextClassLoader instanceof URLClassLoader) {
       URL[] urls = ((URLClassLoader) contextClassLoader).getURLs();
@@ -76,6 +91,7 @@ public final class TestingUtils {
         }
       }
     }
+
     return cp;
   }
 
