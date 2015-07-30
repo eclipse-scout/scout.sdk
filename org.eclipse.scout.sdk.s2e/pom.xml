@@ -56,8 +56,13 @@
           <instructions>
             <Import-Package>
               !javax.*,
+              !org.eclipse.jface.text*,
               *
             </Import-Package>
+            <Require-Bundle>
+              org.eclipse.jface.text;bundle-version="[3.7.2,4)"
+            </Require-Bundle>
+
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator</Bundle-Activator>
 
             <!-- embed compile/runtime dependencies using path that matches the copied dependency folder -->
