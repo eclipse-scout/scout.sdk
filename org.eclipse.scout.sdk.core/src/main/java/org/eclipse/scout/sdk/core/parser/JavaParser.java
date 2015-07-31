@@ -127,7 +127,7 @@ public final class JavaParser implements ILookupEnvironment {
     return result;
   }
 
-  protected String[] splitToPrimaryType(String fqn) {
+  protected static String[] splitToPrimaryType(String fqn) {
     // check for inner types
     int firstDollarPos = fqn.indexOf(ISignatureConstants.C_DOLLAR);
     if (firstDollarPos > 0) {
