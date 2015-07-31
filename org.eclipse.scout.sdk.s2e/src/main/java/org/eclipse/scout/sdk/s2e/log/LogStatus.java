@@ -59,12 +59,15 @@ public class LogStatus extends Status {
   private static StackTraceElement getCallerLine(Class<?> wrapperClass) {
     StackTraceElement[] trace = Thread.currentThread().getStackTrace();
     int traceIndex = 0;
-    Set<String> ignoredPackagePrefixes = new HashSet<>();
+    int maxNumPrefixes = 4;
+    Set<String> ignoredPackagePrefixes = new HashSet<>(maxNumPrefixes);
+    ignoredPackagePrefixes.add(Thread.class.getName());
     ignoredPackagePrefixes.add(LogStatus.class.getName());
     ignoredPackagePrefixes.add(SdkLogManager.class.getName());
     if (wrapperClass != null) {
       ignoredPackagePrefixes.add(wrapperClass.getName());
     }
+
     while (traceIndex < trace.length) {
       boolean found = true;
       for (String prefix : ignoredPackagePrefixes) {
@@ -78,6 +81,7 @@ public class LogStatus extends Status {
       }
       traceIndex++;
     }
+
     if (traceIndex >= trace.length) {
       traceIndex = trace.length - 1;
     }
