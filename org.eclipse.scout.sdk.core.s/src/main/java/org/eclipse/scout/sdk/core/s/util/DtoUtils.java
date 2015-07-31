@@ -668,6 +668,9 @@ public final class DtoUtils {
         if (CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IForm) || CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IFormField)) {
           extendedDto = findDtoForForm(primaryType);
         }
+        else if (CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IExtension)) {
+          extendedDto = findDtoForPage(primaryType);
+        }
         else if (CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IPageWithTable)) {
           IType pageDto = findDtoForPage(primaryType);
 
