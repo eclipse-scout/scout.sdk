@@ -331,7 +331,7 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
       }
 
       int elementType = curElement.getElementType();
-      if (elementType == IJavaElement.COMPILATION_UNIT) {
+      if (elementType == IJavaElement.COMPILATION_UNIT && curElement.exists()) {
         collector.add((ICompilationUnit) curElement);
       }
 

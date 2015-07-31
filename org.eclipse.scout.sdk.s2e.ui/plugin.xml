@@ -16,7 +16,7 @@
          name="Scout Items"
          point="org.eclipse.jdt.ui.javaCompletionProposalComputer">
       <proposalCategory
-            icon="resources/icons/eclipse_scout.gif">
+            icon="icons/eclipse_scout.gif">
       </proposalCategory>
    </extension>
    <extension

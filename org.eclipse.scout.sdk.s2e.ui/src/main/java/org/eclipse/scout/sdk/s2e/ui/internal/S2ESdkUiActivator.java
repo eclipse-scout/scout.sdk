@@ -42,7 +42,7 @@ import org.osgi.framework.ServiceRegistration;
 public class S2ESdkUiActivator extends AbstractUIPlugin {
 
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.s2e.ui";
-  private static final String IMAGE_PATH = "resources/icons/";
+  private static final String IMAGE_PATH = "icons/";
 
   private static S2ESdkUiActivator plugin;
 

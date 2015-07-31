@@ -45,7 +45,7 @@ public class NlsCore extends AbstractUIPlugin {
 
   // The shared instance
   private static NlsCore plugin;
-  private static String imagePath = "resources/icons/";
+  private static String imagePath = "icons/";
 
   private ColorRegistry m_colorRegistry;
   private INlsWorkspace m_nlsWorkspace;

@@ -8,7 +8,7 @@
          point="org.eclipse.ui.editors">
       <editor
             class="org.eclipse.scout.sdk.s2e.nls.internal.ui.editor.NlsEditor"
-            icon="resources/icons/view_nls.gif"
+            icon="icons/view_nls.gif"
             extensions="nls"
             default="false"
             id="org.eclipse.scout.sdk.s2e.nlsEditor"

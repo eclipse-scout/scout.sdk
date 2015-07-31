@@ -89,7 +89,7 @@ public class ApiTestGenerator {
       }
       source.append("});").append(NL);
     }
-    createAnnotationsAsserts(type, type, source, typeVarName, sdkAssertRef);
+    createAnnotationsAsserts(type, type, source, typeVarName, sdkAssertRef, assertRef);
     source.append(NL);
 
     // fields
@@ -100,7 +100,7 @@ public class ApiTestGenerator {
     for (IField f : fields) {
       String fieldVarName = getMemberName(f.getName());
       source.append(iFieldRef).append(" ").append(fieldVarName).append(" = ").append(sdkAssertRef).append(".assertFieldExist(").append(typeVarName).append(", \"").append(f.getName()).append("\");").append(NL);
-      buildField(f, fieldVarName, source, validator, sdkAssertRef);
+      buildField(f, fieldVarName, source, validator, sdkAssertRef, assertRef);
     }
     source.append(NL);
 
@@ -152,22 +152,22 @@ public class ApiTestGenerator {
     if (StringUtils.isNotEmpty(returnTypeSig)) {
       source.append(sdkAssertRef).append(".assertMethodReturnTypeSignature(").append(methodVarName).append(", \"").append(returnTypeSig).append("\");").append(NL);
     }
-    createAnnotationsAsserts(method, method.getDeclaringType(), source, methodVarName, sdkAssertRef);
+    createAnnotationsAsserts(method, method.getDeclaringType(), source, methodVarName, sdkAssertRef, assertRef);
   }
 
-  protected void buildField(IField field, StringBuilder source, IImportValidator validator) {
-    String sdkAssertRef = validator.getTypeName(Signature.createTypeSignature(SdkAssert.class.getName(), true));
+  protected void buildField(IField field, StringBuilder source, IImportValidator validator, String sdkAssertRef, String assertRef) {
     String fieldVarName = getMemberName(field.getName());
-    buildField(field, fieldVarName, source, validator, sdkAssertRef);
+    buildField(field, fieldVarName, source, validator, sdkAssertRef, assertRef);
   }
 
-  protected void buildField(IField field, String fieldVarName, StringBuilder source, IImportValidator validator, String sdkAssertRef) {
+  protected void buildField(IField field, String fieldVarName, StringBuilder source, IImportValidator validator, String sdkAssertRef, String assertRef) {
     source.append(sdkAssertRef).append(".assertHasFlags(").append(fieldVarName).append(", ").append(field.getFlags()).append(");").append(NL);
     source.append(sdkAssertRef).append(".assertFieldSignature(").append(fieldVarName).append(", ").append("\"").append(SignatureUtils.getResolvedSignature(field.getDataType())).append("\");").append(NL);
-    createAnnotationsAsserts(field, field.getDeclaringType(), source, fieldVarName, sdkAssertRef);
+    createAnnotationsAsserts(field, field.getDeclaringType(), source, fieldVarName, sdkAssertRef, assertRef);
   }
 
-  public void createAnnotationsAsserts(IAnnotatable annotatable, IType resolveContext, StringBuilder source, String annotatableRef, String sdkAssertRef) {
+  public void createAnnotationsAsserts(IAnnotatable annotatable, IType resolveContext, StringBuilder source, String annotatableRef, String sdkAssertRef, String assertRef) {
+    source.append(assertRef).append(".assertEquals(\"annotation count\", ").append(Integer.toString(annotatable.getAnnotations().size())).append(", ").append(annotatableRef).append(".getAnnotations().size());").append(NL);
     for (IAnnotation a : annotatable.getAnnotations()) {
       String annotationSignature = SignatureUtils.getResolvedSignature((a).getType());
       source.append(sdkAssertRef).append(".assertAnnotation(").append(annotatableRef).append(", \"").append(Signature.toString(annotationSignature)).append("\");").append(NL);

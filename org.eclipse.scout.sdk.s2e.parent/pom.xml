@@ -75,6 +75,10 @@
         <directory>.</directory>
         <includes>
           <include>plugin.xml</include>
+          <include>about.html</include>
+          <include>epl-v10.html</include>
+          <include>schema/**</include>
+          <include>icons/**</include>
         </includes>
       </resource>
     </resources>
