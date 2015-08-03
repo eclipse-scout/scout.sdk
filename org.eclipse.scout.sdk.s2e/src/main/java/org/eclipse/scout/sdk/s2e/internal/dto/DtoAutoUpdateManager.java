@@ -18,6 +18,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -206,6 +207,12 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
       }
 
       if (curJob instanceof AbstractJob || curJob instanceof P_AutoUpdateOperationsJob) {
+        // do not automatically update on Scout SDK changes. We expect the SDK to trigger the dto update manually where required.
+        return false;
+      }
+
+      if (curJob.belongsTo(ResourcesPlugin.FAMILY_AUTO_BUILD) || curJob.belongsTo(ResourcesPlugin.FAMILY_MANUAL_BUILD)) {
+        // ignore build changes (annotation processing)
         return false;
       }
 
