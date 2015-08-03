@@ -34,33 +34,48 @@ public final class TestingUtils {
     return getRunningClasspath(new String[]{});
   }
 
-  public static List<File> getRunningClasspath(String... sourceFolders) {
-    List<File> cp = new ArrayList<>();
-
-    // bootstrap: locate rt.jar only for now
-    String javaHome = System.getProperty("java.home");
-    if (StringUtils.isNotBlank(javaHome)) {
-      File javaLocation = new File(javaHome);
-      if (javaLocation.isDirectory()) {
-        File rtJar = new File(javaLocation, "lib/rt.jar");
-        if (rtJar.isFile()) {
-          cp.add(rtJar);
+  private static void collectBootstrapClassPath(List<File> collector) {
+    try {
+      Class<?> launcher = Class.forName("sun.misc.Launcher");
+      Object urlClassPath = launcher.getMethod("getBootstrapClassPath").invoke(null);
+      URL[] urls = (URL[]) urlClassPath.getClass().getMethod("getURLs").invoke(urlClassPath);
+      for (URL url : urls) {
+        File f = new File(url.toURI());
+        if (f.exists()) {
+          collector.add(f);
         }
       }
     }
+    catch (Exception e) {
+      System.out.println("Unable to read running bootstrap classpath. Fallback to minimal bootstrap classpath. Nested exception: ");
+      e.printStackTrace(System.out);
 
-    // add source folders
+      String javaHome = System.getProperty("java.home");
+      if (StringUtils.isNotBlank(javaHome)) {
+        File javaLocation = new File(javaHome);
+        if (javaLocation.isDirectory()) {
+          File rtJar = new File(javaLocation, "lib/rt.jar");
+          if (rtJar.isFile()) {
+            collector.add(rtJar);
+          }
+        }
+      }
+    }
+  }
+
+  private static void collectSourceFolders(List<File> collector, String... sourceFolders) {
     if (sourceFolders != null && sourceFolders.length > 0) {
       File curDir = new File("").getAbsoluteFile();
       for (String s : sourceFolders) {
         File f = new File(curDir, s);
         if (f.exists()) {
-          cp.add(f);
+          collector.add(f);
         }
       }
     }
+  }
 
-    // add running java classpath
+  private static void collectRunningClassPath(List<File> collector) {
     String javaClassPathRaw = System.getProperty("java.class.path");
     if (javaClassPathRaw != null && !javaClassPathRaw.isEmpty()) {
       String separator = System.getProperty("path.separator");
@@ -68,12 +83,13 @@ public final class TestingUtils {
       for (String cpElement : elements) {
         File f = new File(cpElement);
         if (f.exists()) {
-          cp.add(f);
+          collector.add(f);
         }
       }
     }
+  }
 
-    // add current classloader URIs
+  private static void collectCurrentClassLoaderUrls(List<File> collector) {
     ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
     if (contextClassLoader instanceof URLClassLoader) {
       URL[] urls = ((URLClassLoader) contextClassLoader).getURLs();
@@ -82,7 +98,7 @@ public final class TestingUtils {
           try {
             File f = new File(u.toURI());
             if (f.exists()) {
-              cp.add(f);
+              collector.add(f);
             }
           }
           catch (URISyntaxException e) {
@@ -91,7 +107,14 @@ public final class TestingUtils {
         }
       }
     }
+  }
 
+  public static List<File> getRunningClasspath(String... sourceFolders) {
+    List<File> cp = new ArrayList<>();
+    collectBootstrapClassPath(cp);
+    collectSourceFolders(cp, sourceFolders);
+    collectRunningClassPath(cp);
+    collectCurrentClassLoaderUrls(cp);
     return cp;
   }
 
