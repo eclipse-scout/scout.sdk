@@ -16,12 +16,12 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>org.eclipse.scout.parent</artifactId>
-    <version>5.0.0-SNAPSHOT</version>
+    <version>5.0.100-SNAPSHOT</version>
     <relativePath>../org.eclipse.scout.parent</relativePath>
   </parent>
 
   <artifactId>org.eclipse.scout.sdk</artifactId>
-  <version>5.0.0-SNAPSHOT</version>
+  <version>5.0.100-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <scm>
@@ -31,13 +31,13 @@
 
   <properties>
     <tycho.scmUrl>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</tycho.scmUrl>
-    <target-platform>eclipse-indigo</target-platform>
-    
+    <target-platform>eclipse-luna</target-platform>
+
     <!-- exclude the unit tests from sonar -->
     <sonar.exclusions>
       file:**/org.eclipse.scout.sdk.test/**
     </sonar.exclusions>
-    
+
     <!-- exclude the unit tests and UI (we have no UI tests anyway) from sonar -->
     <sonar.coverage.exclusions>
       file:**/org.eclipse.scout.sdk.test/**,
