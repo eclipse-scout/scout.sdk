@@ -15,7 +15,7 @@
 
   <groupId>org.eclipse.scout.maven.plugins</groupId>
   <artifactId>org.eclipse.scout.maven.plugins.updatesite</artifactId>
-  <version>5.0.0-SNAPSHOT</version>
+  <version>5.0.100-SNAPSHOT</version>
   <packaging>maven-plugin</packaging>
 
   <dependencies>
