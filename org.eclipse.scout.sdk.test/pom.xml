@@ -23,6 +23,14 @@
   <artifactId>org.eclipse.scout.sdk.test</artifactId>
   <packaging>eclipse-test-plugin</packaging>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.feature</groupId>
+      <artifactId>org.eclipse.scout.sdk</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
+
   <build>
     <plugins>
       <plugin>
