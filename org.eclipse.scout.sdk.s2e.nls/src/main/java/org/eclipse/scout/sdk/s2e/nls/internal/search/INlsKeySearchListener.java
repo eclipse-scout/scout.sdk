@@ -14,7 +14,9 @@ import java.util.EventListener;
 
 import org.eclipse.search.ui.text.Match;
 
-/** <h4>INlsFindReferencesListener</h4> */
+/**
+ * <h4>INlsFindReferencesListener</h4>
+ */
 public interface INlsKeySearchListener extends EventListener {
   void beginReporting();
 

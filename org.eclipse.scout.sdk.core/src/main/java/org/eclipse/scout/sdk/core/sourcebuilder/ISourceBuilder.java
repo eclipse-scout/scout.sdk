@@ -23,8 +23,6 @@ public interface ISourceBuilder {
 
   /**
    * validates the receiver source builder.
-   *
-   * @throws
    */
   void validate();
 
@@ -38,7 +36,7 @@ public interface ISourceBuilder {
    * @param context
    *          context information in which the source is being created.
    * @param validator
-   *          the import validator to use.
+   *          the {@link IImportValidator} to use.
    */
   void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator);
 

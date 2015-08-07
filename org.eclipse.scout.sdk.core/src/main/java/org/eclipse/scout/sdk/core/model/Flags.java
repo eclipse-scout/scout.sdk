@@ -126,34 +126,30 @@ public final class Flags {
   public static final int AccDeprecated = ClassFileConstants.AccDeprecated;
 
   /**
-   * Bridge method property flag (added in J2SE 1.5). Used to flag a compiler-generated
-   * bridge methods.
-   * See The Java Virtual Machine Specification for more details.
+   * Bridge method property flag (added in J2SE 1.5). Used to flag a compiler-generated bridge methods. See The Java
+   * Virtual Machine Specification for more details.
    *
    * @since 3.0
    */
   public static final int AccBridge = ClassFileConstants.AccBridge;
 
   /**
-   * Varargs method property flag (added in J2SE 1.5).
-   * Used to flag variable arity method declarations.
-   * See The Java Virtual Machine Specification for more details.
+   * Varargs method property flag (added in J2SE 1.5). Used to flag variable arity method declarations. See The Java
+   * Virtual Machine Specification for more details.
    *
    * @since 3.0
    */
   public static final int AccVarargs = ClassFileConstants.AccVarargs;
 
   /**
-   * Enum property flag (added in J2SE 1.5).
-   * See The Java Virtual Machine Specification for more details.
+   * Enum property flag (added in J2SE 1.5). See The Java Virtual Machine Specification for more details.
    *
    * @since 3.0
    */
   public static final int AccEnum = ClassFileConstants.AccEnum;
 
   /**
-   * Annotation property flag (added in J2SE 1.5).
-   * See The Java Virtual Machine Specification for more details.
+   * Annotation property flag (added in J2SE 1.5). See The Java Virtual Machine Specification for more details.
    *
    * @since 3.0
    */
@@ -170,8 +166,7 @@ public final class Flags {
   public static final int AccDefaultMethod = ExtraCompilerModifiers.AccDefaultMethod;
 
   /**
-   * Annotation method default property flag.
-   * Used to flag annotation type methods that declare a default value.
+   * Annotation method default property flag. Used to flag annotation type methods that declare a default value.
    * <p>
    * Note that this flag's value is internal and is not defined in the Virtual Machine specification.
    * </p>
@@ -199,8 +194,8 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer includes the indication that the
-   * element is deprecated (<code>@deprecated</code> tag in Javadoc comment).
+   * Returns whether the given integer includes the indication that the element is deprecated (<code>@deprecated</code>
+   * tag in Javadoc comment).
    *
    * @param flags
    *          the flags
@@ -336,8 +331,7 @@ public final class Flags {
   }
 
   /**
-   * Returns whether the given integer includes the indication that the
-   * element is synthetic.
+   * Returns whether the given integer includes the indication that the element is synthetic.
    *
    * @param flags
    *          the flags
@@ -423,9 +417,8 @@ public final class Flags {
 
   /**
    * Returns whether the given integer has the <code>AccDefaultMethod</code> bit set. Note that this flag represents the
-   * usage of the 'default' keyword
-   * on a method and should not be confused with the 'package' access visibility (which used to be called 'default
-   * access').
+   * usage of the 'default' keyword on a method and should not be confused with the 'package' access visibility (which
+   * used to be called 'default access').
    *
    * @return <code>true</code> if the <code>AccDefaultMethod</code> flag is included
    * @see #AccDefaultMethod
@@ -447,9 +440,8 @@ public final class Flags {
   }
 
   /**
-   * Returns a standard string describing the given modifier flags.
-   * Only modifier flags are included in the output; deprecated,
-   * synthetic, bridge, etc. flags are ignored.
+   * Returns a standard string describing the given modifier flags. Only modifier flags are included in the output;
+   * deprecated, synthetic, bridge, etc. flags are ignored.
    * <p>
    * The flags are output in the following order:
    *
@@ -471,7 +463,6 @@ public final class Flags {
    * int flags = method.getFlags() & ~Flags.AccVarargs;
    * return Flags.toString(flags);
    * </pre>
-   *
    * </p>
    * <p>
    * Examples results:
@@ -480,7 +471,6 @@ public final class Flags {
    *    <code>"public static final"</code>
    *    <code>"private native"</code>
    * </pre>
-   *
    * </p>
    *
    * @param flags

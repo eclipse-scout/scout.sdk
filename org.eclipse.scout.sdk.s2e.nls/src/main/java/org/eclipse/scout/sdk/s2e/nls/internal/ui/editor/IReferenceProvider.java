@@ -13,7 +13,9 @@ package org.eclipse.scout.sdk.s2e.nls.internal.ui.editor;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.search.ui.text.Match;
 
-/** <h4>IReferenceProvider</h4> */
+/**
+ * <h4>IReferenceProvider</h4>
+ */
 public interface IReferenceProvider {
   Match[] getReferences(INlsEntry entry);
 

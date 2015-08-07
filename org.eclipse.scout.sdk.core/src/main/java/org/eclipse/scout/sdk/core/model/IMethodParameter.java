@@ -11,8 +11,7 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
- * <h3>{@link IMethodParameter}</h3>
- * Represents a parameter of an {@link IMethod}.
+ * <h3>{@link IMethodParameter}</h3> Represents a parameter of an {@link IMethod}.
  *
  * @author Matthias Villiger
  * @since 5.1.0

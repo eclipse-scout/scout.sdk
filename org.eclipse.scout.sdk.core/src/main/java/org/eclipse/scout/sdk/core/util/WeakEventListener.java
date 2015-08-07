@@ -13,8 +13,7 @@ package org.eclipse.scout.sdk.core.util;
 import java.util.EventListener;
 
 /**
- * <h3>{@link WeakEventListener}</h3>
- * Weak event listener used by {@link BasicPropertySupport}.
+ * <h3>{@link WeakEventListener}</h3> Weak event listener used by {@link BasicPropertySupport}.
  *
  * @since 5.1.0
  */

@@ -18,8 +18,8 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 
 /**
- * <h3>{@link JdtTypeCache}</h3>
- * Helper class to cache {@link IType}s over several calls. This class ensures that each type is only resolved once.<br>
+ * <h3>{@link JdtTypeCache}</h3> Helper class to cache {@link IType}s over several calls. This class ensures that each
+ * type is only resolved once.<br>
  * <b>Note: </b>Do not hold references of this class to long because the {@link IType} handles may become invalid over
  * time!<br>
  *

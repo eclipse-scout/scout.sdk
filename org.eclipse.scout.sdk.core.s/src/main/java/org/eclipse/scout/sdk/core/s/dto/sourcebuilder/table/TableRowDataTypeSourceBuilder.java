@@ -219,7 +219,8 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     }
 
     String superTypeOfSurroundingTableBeanSourceBuilder = surroundingTableBeanSourceBuilder.getSuperTypeSignature();
-    if (!Signature.createTypeSignature(IRuntimeClasses.AbstractTablePageData).equals(superTypeOfSurroundingTableBeanSourceBuilder) && !Signature.createTypeSignature(IRuntimeClasses.AbstractTableFieldBeanData).equals(superTypeOfSurroundingTableBeanSourceBuilder)) {
+    if (!Signature.createTypeSignature(IRuntimeClasses.AbstractTablePageData).equals(superTypeOfSurroundingTableBeanSourceBuilder)
+        && !Signature.createTypeSignature(IRuntimeClasses.AbstractTableFieldBeanData).equals(superTypeOfSurroundingTableBeanSourceBuilder)) {
       // use the row data in the super page data.
       IType superType = m_lookpEnvironment.findType(SignatureUtils.toFullyQualifiedName(superTypeOfSurroundingTableBeanSourceBuilder));
 

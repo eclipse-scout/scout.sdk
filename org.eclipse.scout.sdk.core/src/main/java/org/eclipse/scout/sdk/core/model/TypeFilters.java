@@ -92,8 +92,8 @@ public final class TypeFilters {
   }
 
   /**
-   * Creates a new {@link IFilter} that only returns {@link IType}s where the simple name exactly matches the
-   * given typeName.
+   * Creates a new {@link IFilter} that only returns {@link IType}s where the simple name exactly matches the given
+   * typeName.
    *
    * @param typeName
    *          The simple name the types must have.
@@ -104,8 +104,7 @@ public final class TypeFilters {
   }
 
   /**
-   * Creates a new {@link IFilter} that only returns {@link IType}s where the simple name matches the given
-   * typeName.
+   * Creates a new {@link IFilter} that only returns {@link IType}s where the simple name matches the given typeName.
    *
    * @param typeName
    *          The simple name the types must have.
@@ -155,8 +154,7 @@ public final class TypeFilters {
 
   /**
    * Creates and gets a new {@link IFilter} that accepts all types where the simple name matches the given regular
-   * expression.
-   * <br>
+   * expression. <br>
    * <b>Note: The given regex uses case-insensitive matching!</b>
    *
    * @param regex
@@ -206,8 +204,7 @@ public final class TypeFilters {
   }
 
   /**
-   * Returns an {@link IFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}.
-   * <br>
+   * Returns an {@link IFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}. <br>
    * More formally: Accepts all {@link IType}s that are either static or primary types (= have no declaring type).
    *
    * @return an {@link IFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}.
@@ -247,8 +244,7 @@ public final class TypeFilters {
   }
 
   /**
-   * @return An {@link IFilter} that only accepts {@link IType}s that are not parameterized (have not
-   *         generics).
+   * @return An {@link IFilter} that only accepts {@link IType}s that are not parameterized (have not generics).
    */
   public static IFilter<IType> getNoGenericTypesFilter() {
     return NO_GENERIC_FILTER;
@@ -287,8 +283,8 @@ public final class TypeFilters {
   }
 
   /**
-   * Gets a {@link IFilter} which evaluates to <code>true</code> if at least one of the given not-null
-   * {@link IFilter}s evaluates to <code>true</code>.
+   * Gets a {@link IFilter} which evaluates to <code>true</code> if at least one of the given not-null {@link IFilter}s
+   * evaluates to <code>true</code>.
    *
    * @param filters
    *          The {@link IFilter}s to evaluate.
@@ -300,8 +296,8 @@ public final class TypeFilters {
   }
 
   /**
-   * Gets a {@link IFilter} which evaluates to <code>true</code> if all the given not-null {@link IFilter}s evaluate
-   * to <code>true</code>.
+   * Gets a {@link IFilter} which evaluates to <code>true</code> if all the given not-null {@link IFilter}s evaluate to
+   * <code>true</code>.
    *
    * @param filters
    *          The {@link IFilter}s to evaluate.

@@ -146,7 +146,8 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
     NlsServiceType type = new NlsServiceType(serviceType);
     if (type.getTranslationsFolderName() == null) {
-      NlsCore.logWarning("The NLS Service for Type '" + serviceType.getFullyQualifiedName() + "' could not be parsed. Ensure that the method '" + NlsServiceType.DYNAMIC_NLS_BASE_NAME_GETTER + "' is available and returns a String literal like \"resources.texts.Texts\" directly.");
+      NlsCore.logWarning("The NLS Service for Type '" + serviceType.getFullyQualifiedName() + "' could not be parsed. Ensure that the method '" + NlsServiceType.DYNAMIC_NLS_BASE_NAME_GETTER
+          + "' is available and returns a String literal like \"resources.texts.Texts\" directly.");
       return null;
     }
 

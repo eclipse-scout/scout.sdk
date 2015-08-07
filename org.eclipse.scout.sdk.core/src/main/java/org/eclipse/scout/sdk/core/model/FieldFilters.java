@@ -41,9 +41,8 @@ public final class FieldFilters {
   }
 
   /**
-   * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a field has all of the given
-   * flags (
-   * {@link IField#getFlags()}).
+   * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a field has all of the given flags
+   * ( {@link IField#getFlags()}).
    *
    * @param flags
    *          The flags for which the {@link IFilter} should evaluate to <code>true</code>

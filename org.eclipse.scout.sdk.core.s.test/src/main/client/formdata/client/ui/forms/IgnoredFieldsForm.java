@@ -1,8 +1,8 @@
 package formdata.client.ui.forms;
 
 import org.eclipse.scout.commons.annotations.FormData;
-import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.FormData.SdkCommand;
+import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.AbstractForm;
 import org.eclipse.scout.rt.client.ui.form.fields.groupbox.AbstractGroupBox;
@@ -10,9 +10,9 @@ import org.eclipse.scout.rt.client.ui.form.fields.integerfield.AbstractIntegerFi
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
 
 import formdata.client.ui.forms.IgnoredFieldsForm.MainBox.AGroupBox;
-import formdata.client.ui.forms.IgnoredFieldsForm.MainBox.IgnoredGroupBox;
 import formdata.client.ui.forms.IgnoredFieldsForm.MainBox.AGroupBox.IgnoredIntegerField;
 import formdata.client.ui.forms.IgnoredFieldsForm.MainBox.AGroupBox.NotIgnoredField;
+import formdata.client.ui.forms.IgnoredFieldsForm.MainBox.IgnoredGroupBox;
 import formdata.client.ui.forms.IgnoredFieldsForm.MainBox.IgnoredGroupBox.InheritedIgnoredField;
 import formdata.shared.services.process.IgnoredFieldsFormData;
 

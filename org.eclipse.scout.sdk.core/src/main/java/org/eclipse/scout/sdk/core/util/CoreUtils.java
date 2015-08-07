@@ -50,8 +50,7 @@ import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 
 /**
- * <h3>{@link CoreUtils}</h3>
- * Holds core utilities.
+ * <h3>{@link CoreUtils}</h3> Holds core utilities.
  *
  * @author Matthias Villiger
  * @since 5.1.0
@@ -343,7 +342,9 @@ public final class CoreUtils {
     if (javaKeyWords == null) {
       synchronized (CoreUtils.class) {
         if (javaKeyWords == null) {
-          String[] keyWords = new String[]{"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true"};
+          String[] keyWords = new String[]{"abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for",
+              "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this",
+              "throw", "throws", "transient", "try", "void", "volatile", "while", "false", "null", "true"};
           Set<String> tmp = new HashSet<>(keyWords.length);
           for (String s : keyWords) {
             tmp.add(s);
@@ -474,8 +475,8 @@ public final class CoreUtils {
   }
 
   /**
-   * Gets the immediate member {@link IType}s of the given {@link IType} which matches the given {@link IFilter} in
-   * the order as it is defined in the source or class file.
+   * Gets the immediate member {@link IType}s of the given {@link IType} which matches the given {@link IFilter} in the
+   * order as it is defined in the source or class file.
    *
    * @param type
    *          The declaring {@link IType} holding the member {@link IType}s.
@@ -489,8 +490,7 @@ public final class CoreUtils {
 
   /**
    * Returns the immediate member types declared by the given type. The results is filtered using the given
-   * {@link IFilter} and
-   * sorted using the given {@link Comparator}.
+   * {@link IFilter} and sorted using the given {@link Comparator}.
    *
    * @param type
    *          The type whose immediate inner types should be returned.
@@ -513,8 +513,7 @@ public final class CoreUtils {
 
   /**
    * Searches for an {@link IType} with given simple name within the given type recursively checking all inner types.
-   * The
-   * given {@link IType} itself is checked as well.
+   * The given {@link IType} itself is checked as well.
    *
    * @param type
    *          The {@link IType} to start searching. All nested inner {@link IType}s are visited recursively.
@@ -601,8 +600,8 @@ public final class CoreUtils {
   }
 
   /**
-   * Gets all {@link IField} of the given declaring {@link IType} that matches the given {@link IFilter} in the order
-   * as they appear in the source or class file.
+   * Gets all {@link IField} of the given declaring {@link IType} that matches the given {@link IFilter} in the order as
+   * they appear in the source or class file.
    *
    * @param declaringType
    *          The declaring {@link IType}.
@@ -615,8 +614,8 @@ public final class CoreUtils {
   }
 
   /**
-   * Gets all {@link IField}s of the given declaring {@link IType} that matches the given {@link IFilter} sorted by
-   * the given {@link Comparator}.
+   * Gets all {@link IField}s of the given declaring {@link IType} that matches the given {@link IFilter} sorted by the
+   * given {@link Comparator}.
    *
    * @param declaringType
    *          The declaring {@link IType}.
@@ -977,8 +976,7 @@ public final class CoreUtils {
   }
 
   /**
-   * Gets the first {@link IMethod} which is directly in the given {@link IType} and accepts the given {@link IFilter}
-   * .
+   * Gets the first {@link IMethod} which is directly in the given {@link IType} and accepts the given {@link IFilter} .
    *
    * @param type
    *          The {@link IType} to search in.

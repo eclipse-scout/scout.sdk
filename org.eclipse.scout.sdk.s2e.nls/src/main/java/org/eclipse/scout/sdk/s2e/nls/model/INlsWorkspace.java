@@ -13,12 +13,14 @@ package org.eclipse.scout.sdk.s2e.nls.model;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 
-/** <h4>INlsWorkspace</h4> */
+/**
+ * <h4>INlsWorkspace</h4>
+ */
 public interface INlsWorkspace {
 
   /**
-   * Gets a NLS hierarchy for the given input parameters.
-   * If no extension for the given parameters is available, this method returns null.
+   * Gets a NLS hierarchy for the given input parameters. If no extension for the given parameters is available, this
+   * method returns null.
    *
    * @param args
    *          The arguments to be used when trying to find a INlsProject.

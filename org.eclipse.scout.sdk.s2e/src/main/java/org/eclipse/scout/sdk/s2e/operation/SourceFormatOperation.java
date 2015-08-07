@@ -29,8 +29,7 @@ import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
 /**
- * <h3>SourceFormatOperation</h3> equivalent to CONT-SHIFT-F in Eclipse
- * ...
+ * <h3>SourceFormatOperation</h3> equivalent to CONT-SHIFT-F in Eclipse ...
  */
 public class SourceFormatOperation implements IOperation {
   private final IJavaProject m_project;

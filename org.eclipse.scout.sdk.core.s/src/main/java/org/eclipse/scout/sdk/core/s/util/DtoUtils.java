@@ -67,8 +67,8 @@ public final class DtoUtils {
   }
 
   /**
-   * Parses the possible available {@link IRuntimeClasses#ColumnData} annotation on the given type. If the type is
-   * not annotated, <code>null</code> is returned.
+   * Parses the possible available {@link IRuntimeClasses#ColumnData} annotation on the given type. If the type is not
+   * annotated, <code>null</code> is returned.
    *
    * @throws JavaModelException
    * @since 3.10.0-M5
@@ -341,8 +341,8 @@ public final class DtoUtils {
   }
 
   /**
-   * Checks whether the given type is annotated with a {@link IRuntimeClasses#Data} annotation and if so, this
-   * method returns its <code>value()</code> as resolved type signature. Otherwise <code>null</code>.
+   * Checks whether the given type is annotated with a {@link IRuntimeClasses#Data} annotation and if so, this method
+   * returns its <code>value()</code> as resolved type signature. Otherwise <code>null</code>.
    *
    * @since 3.10.0-M1
    */

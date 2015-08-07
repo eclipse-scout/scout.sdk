@@ -20,8 +20,7 @@ import org.eclipse.scout.sdk.core.model.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.IType;
 
 /**
- * <h3>{@link SignatureUtils}</h3>
- * Helper methods to deal with Signatures.
+ * <h3>{@link SignatureUtils}</h3> Helper methods to deal with Signatures.
  *
  * @author Matthias Villiger
  * @since 5.1.0
@@ -217,7 +216,6 @@ public final class SignatureUtils {
    * @param method
    *          The method for which the identifier should be created
    * @return The created identifier
-   * @throws CoreException
    */
   public static String getMethodIdentifier(IMethod method) {
     List<IMethodParameter> parameters = method.getParameters();

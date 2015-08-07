@@ -178,7 +178,8 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
       final IType annotationDeclarationType = annotation.getType();
       final String elementName = annotationDeclarationType.getName();
 
-      boolean mustCopyAnnotation = !IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName) && !IRuntimeClasses.Data.equals(elementName) && isAnnotationDtoRelevant(annotationDeclarationType) && CoreUtils.isOnClasspath(annotationDeclarationType, lookupEnv);
+      boolean mustCopyAnnotation = !IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName) && !IRuntimeClasses.Data.equals(elementName)
+          && isAnnotationDtoRelevant(annotationDeclarationType) && CoreUtils.isOnClasspath(annotationDeclarationType, lookupEnv);
       if (mustCopyAnnotation) {
         AnnotationSourceBuilder asb = new AnnotationSourceBuilder(Signature.createTypeSignature(elementName)) {
           @Override

@@ -13,8 +13,7 @@ package org.eclipse.scout.sdk.core.model;
 import java.util.List;
 
 /**
- * <h3>{@link IMethod}</h3>
- * Represents a method declaration.
+ * <h3>{@link IMethod}</h3> Represents a method declaration.
  *
  * @author Matthias Villiger
  * @since 5.1.0

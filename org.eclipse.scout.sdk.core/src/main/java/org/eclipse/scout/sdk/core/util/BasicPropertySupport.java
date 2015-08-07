@@ -24,8 +24,7 @@ import java.util.Objects;
 import java.util.Set;
 
 /**
- * <h3>{@link BasicPropertySupport}</h3>
- * Property map supporting property change event listeners.
+ * <h3>{@link BasicPropertySupport}</h3> Property map supporting property change event listeners.
  *
  * @since 5.1.0
  */
@@ -230,8 +229,7 @@ public class BasicPropertySupport {
   }
 
   /**
-   * DESIGN: should remove property if set to null - see hasProperty() as well
-   * (tha, 16.2.6)
+   * DESIGN: should remove property if set to null - see hasProperty() as well (tha, 16.2.6)
    */
   public boolean setProperty(String name, Object newValue, Object defaultOldValueWhenNull) {
     Object oldValue = m_props.get(name);

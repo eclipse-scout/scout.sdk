@@ -11,8 +11,7 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
- * <h3>{@link IField}</h3>
- * Represents a field in a java type.
+ * <h3>{@link IField}</h3> Represents a field in a java type.
  *
  * @author Matthias Villiger
  * @since 5.1.0

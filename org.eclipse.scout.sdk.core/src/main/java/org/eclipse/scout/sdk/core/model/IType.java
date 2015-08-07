@@ -15,9 +15,8 @@ import java.util.List;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 
 /**
- * <h3>{@link IType}</h3>
- * Represents a java data type. This includes classes, interfaces, enums, primitives, the void-type ({@link #VOID}) &
- * the wildcard-type ("?").
+ * <h3>{@link IType}</h3> Represents a java data type. This includes classes, interfaces, enums, primitives, the
+ * void-type ({@link #VOID}) & the wildcard-type ("?").
  *
  * @author Matthias Villiger
  * @since 5.1.0
@@ -39,8 +38,8 @@ public interface IType extends IMember {
   IPackage getPackage();
 
   /**
-   * Gets the {@link ICompilationUnit} of this {@link IType}.
-   * For binary {@link IType}s, primitives, the void-type and wildcard-types this method returns <code>null</code>.
+   * Gets the {@link ICompilationUnit} of this {@link IType}. For binary {@link IType}s, primitives, the void-type and
+   * wildcard-types this method returns <code>null</code>.
    *
    * @return The {@link ICompilationUnit} that belongs to this {@link IType} or <code>null</code>.
    */

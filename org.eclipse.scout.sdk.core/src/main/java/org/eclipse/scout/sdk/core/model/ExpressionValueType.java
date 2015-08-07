@@ -11,9 +11,9 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
- * <h3>{@link ExpressionValueType}</h3>
- * Defines the data type of an annotation attribute value. For the specific types (all except {@link #Unknown}) it is
- * safe to cast them to the corresponding java data type (see description of the specific values below).
+ * <h3>{@link ExpressionValueType}</h3> Defines the data type of an annotation attribute value. For the specific types
+ * (all except {@link #Unknown}) it is safe to cast them to the corresponding java data type (see description of the
+ * specific values below).
  *
  * @author Matthias Villiger
  * @since 5.1.0

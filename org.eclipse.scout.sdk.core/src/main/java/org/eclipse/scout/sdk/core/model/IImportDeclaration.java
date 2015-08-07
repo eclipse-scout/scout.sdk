@@ -11,8 +11,7 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
- * <h3>{@link IImportDeclaration}</h3>
- * Represents an import declaration in an {@link ICompilationUnit}
+ * <h3>{@link IImportDeclaration}</h3> Represents an import declaration in an {@link ICompilationUnit}
  *
  * @author Matthias Villiger
  * @since 5.1.0

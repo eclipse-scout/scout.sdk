@@ -21,7 +21,9 @@ import org.eclipse.scout.sdk.s2e.nls.internal.ui.editor.NlsTableModel;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.search.ui.text.Match;
 
-/** <h4>UpdateReferenceCountAction</h4> */
+/**
+ * <h4>UpdateReferenceCountAction</h4>
+ */
 public class UpdateKeyUsageCountAction extends Action {
   private final INlsProject m_project;
   private final NlsTable m_table;

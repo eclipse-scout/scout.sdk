@@ -24,8 +24,7 @@ import org.eclipse.scout.sdk.s2e.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 
 /**
- * <h3>OperationJob</h3>
- * Use this class to ensure an operation is executed with the scheduling rule of workspace root.
+ * <h3>OperationJob</h3> Use this class to ensure an operation is executed with the scheduling rule of workspace root.
  * This scheduling rule ensures not having simultaneously modifications on Java Types.
  */
 public class OperationJob extends AbstractWorkspaceBlockingJob {

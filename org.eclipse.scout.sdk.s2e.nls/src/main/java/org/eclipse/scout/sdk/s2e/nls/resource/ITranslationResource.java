@@ -16,7 +16,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 
-/** <h4>ITranslationResource</h4> */
+/**
+ * <h4>ITranslationResource</h4>
+ */
 public interface ITranslationResource {
 
   void addTranslationResourceListener(ITranslationResourceListener listener);

@@ -26,9 +26,8 @@ import org.eclipse.jdt.core.JavaModelException;
 public interface IWorkingCopyManager {
 
   /**
-   * Register compilation unit BEFORE doing changes on it.
-   * Creates a working copy on the first registration.
-   * Compilation unit may be registered multiple times
+   * Register compilation unit BEFORE doing changes on it. Creates a working copy on the first registration. Compilation
+   * unit may be registered multiple times
    *
    * @param icu
    *          The compilation unit to register
@@ -44,8 +43,7 @@ public interface IWorkingCopyManager {
   boolean register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException;
 
   /**
-   * Unregister compilation unit AFTER doing changes on it.
-   * Commits and discards working copy at the first invocation.
+   * Unregister compilation unit AFTER doing changes on it. Commits and discards working copy at the first invocation.
    * Compilation unit may be unregistered multiple times
    *
    * @param icu
@@ -77,8 +75,8 @@ public interface IWorkingCopyManager {
    *          a progress monitor used to report progress while opening this compilation unit or null if no progress
    *          should be reported
    * @throws CoreException
-   *           if the contents of the original element cannot be accessed. Reasons include:
-   *           The original Java element does not exist or the given compilation unit is not registered in this manager.
+   *           if the contents of the original element cannot be accessed. Reasons include: The original Java element
+   *           does not exist or the given compilation unit is not registered in this manager.
    */
   void reconcile(ICompilationUnit icu, IProgressMonitor monitor) throws CoreException;
 

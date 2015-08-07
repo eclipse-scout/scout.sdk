@@ -11,8 +11,7 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
- * <h3>{@link IPackage}</h3>
- * Represents a package
+ * <h3>{@link IPackage}</h3> Represents a package
  *
  * @author Matthias Villiger
  * @since 5.1.0

@@ -15,8 +15,7 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * <h3>{@link CompositeObject}</h3>
- * Composite object used to sort and compare compositions of objects.
+ * <h3>{@link CompositeObject}</h3> Composite object used to sort and compare compositions of objects.
  *
  * @since 5.1.0
  */

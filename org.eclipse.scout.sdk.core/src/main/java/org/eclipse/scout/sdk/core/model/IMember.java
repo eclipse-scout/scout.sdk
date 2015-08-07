@@ -11,8 +11,7 @@
 package org.eclipse.scout.sdk.core.model;
 
 /**
- * <h3>{@link IMember}</h3>
- * Represents Java elements that are members.
+ * <h3>{@link IMember}</h3> Represents Java elements that are members.
  *
  * @author Matthias Villiger
  * @since 5.1.0

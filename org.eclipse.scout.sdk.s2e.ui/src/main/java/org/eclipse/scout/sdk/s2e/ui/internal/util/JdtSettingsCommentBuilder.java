@@ -471,7 +471,8 @@ public class JdtSettingsCommentBuilder implements IJavaElementCommentBuilder {
     return null;
   }
 
-  private static void insertTag(IDocument textBuffer, int offset, int length, String[] paramNames, String[] exceptionNames, String returnType, String[] typeParameterNames, boolean isDeprecated, String lineDelimiter) throws BadLocationException {
+  private static void insertTag(IDocument textBuffer, int offset, int length, String[] paramNames, String[] exceptionNames, String returnType, String[] typeParameterNames,
+      boolean isDeprecated, String lineDelimiter) throws BadLocationException {
     IRegion region = textBuffer.getLineInformationOfOffset(offset);
     if (region == null) {
       return;

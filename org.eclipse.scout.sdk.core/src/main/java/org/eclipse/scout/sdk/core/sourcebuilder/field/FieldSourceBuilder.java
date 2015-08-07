@@ -56,11 +56,9 @@ public class FieldSourceBuilder extends AbstractAnnotatableSourceBuilder impleme
   }
 
   /**
-   * can be overridden to assign a specific value to the field.
-   * Use {@link SignatureUtils#getTypeReference(String, IImportValidator)} to determ class references (fully
-   * qualified vs. simple name).
-   *
-   * @throws JavaModelException
+   * can be overridden to assign a specific value to the field. Use
+   * {@link SignatureUtils#getTypeReference(String, IImportValidator)} to determ class references (fully qualified vs.
+   * simple name).
    */
   protected void createInitValue(StringBuilder sourceBuilder, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     if (!StringUtils.isEmpty(getValue())) {

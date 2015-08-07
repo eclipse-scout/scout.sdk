@@ -14,8 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * <h3>{@link PropertyMap}</h3>
- * Property Map with typed getter.
+ * <h3>{@link PropertyMap}</h3> Property Map with typed getter.
  *
  * @since 5.1.0
  */

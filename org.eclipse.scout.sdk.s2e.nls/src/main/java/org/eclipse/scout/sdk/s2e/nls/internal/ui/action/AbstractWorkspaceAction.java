@@ -18,7 +18,9 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Display;
 
-/** <h4>AbstractWorkspaceOperation</h4> */
+/**
+ * <h4>AbstractWorkspaceOperation</h4>
+ */
 public abstract class AbstractWorkspaceAction extends Action {
 
   private Job m_job;

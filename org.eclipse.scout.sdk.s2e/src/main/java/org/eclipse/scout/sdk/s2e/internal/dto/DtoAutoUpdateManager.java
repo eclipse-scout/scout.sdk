@@ -193,12 +193,12 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
 
     private static boolean acceptUpdateEvent(ElementChangedEvent icu) {
       final String[] excludedJobNamePrefixes = new String[]{"org.eclipse.team.", // excludes svn updates
-      "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
-      "org.eclipse.egit.", // excludes git updates
-      "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
-      "org.eclipse.m2e.", // maven updates
-      "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob", // refresh of external folders after svn update
-      "org.eclipse.core.internal.refresh.RefreshJob" // refresh after git import
+          "org.eclipse.core.internal.events.NotificationManager.NotifyJob", // excludes annotation processing updates
+          "org.eclipse.egit.", // excludes git updates
+          "org.eclipse.core.internal.events.AutoBuildJob", // exclude annotation processing updates
+          "org.eclipse.m2e.", // maven updates
+          "org.eclipse.jdt.internal.core.ExternalFoldersManager.RefreshJob", // refresh of external folders after svn update
+          "org.eclipse.core.internal.refresh.RefreshJob" // refresh after git import
       };
 
       Job curJob = Job.getJobManager().currentJob();

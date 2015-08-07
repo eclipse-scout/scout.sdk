@@ -13,8 +13,8 @@ package org.eclipse.scout.sdk.core.parser;
 import org.eclipse.scout.sdk.core.model.IType;
 
 /**
- * <h3>{@link ILookupEnvironment}</h3>
- * Represents a lookup environment (classpath) capable to resolve {@link IType}s by name.
+ * <h3>{@link ILookupEnvironment}</h3> Represents a lookup environment (classpath) capable to resolve {@link IType}s by
+ * name.
  *
  * @author Matthias Villiger
  * @since 5.1.0

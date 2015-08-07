@@ -17,7 +17,9 @@ import org.eclipse.scout.sdk.s2e.nls.internal.ui.editor.IReferenceProvider;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.search.ui.text.Match;
 
-/** <h4>NlsReferenceProvider</h4> */
+/**
+ * <h4>NlsReferenceProvider</h4>
+ */
 public class NlsReferenceProvider implements IReferenceProvider {
   private final Map<String, List<Match>> m_matches;
 

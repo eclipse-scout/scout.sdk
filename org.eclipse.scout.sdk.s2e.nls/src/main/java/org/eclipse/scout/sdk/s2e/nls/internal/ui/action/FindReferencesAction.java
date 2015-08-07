@@ -18,7 +18,9 @@ import org.eclipse.scout.sdk.s2e.nls.internal.search.NlsKeySearchQuery;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.search.ui.NewSearchUI;
 
-/** <h4>FindReferencesAction</h4> */
+/**
+ * <h4>FindReferencesAction</h4>
+ */
 public class FindReferencesAction extends Action {
 
   private final INlsProject m_project;

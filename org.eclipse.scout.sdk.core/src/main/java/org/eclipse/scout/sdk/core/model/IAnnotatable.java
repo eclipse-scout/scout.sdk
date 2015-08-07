@@ -22,11 +22,9 @@ import java.util.List;
 public interface IAnnotatable {
   /**
    * Gets all the {@link IAnnotation}s that are defined for the receiver.<br>
-   * The {@link List} iterates over the {@link IAnnotation}s in the order as they appear in the source or
-   * class file.
+   * The {@link List} iterates over the {@link IAnnotation}s in the order as they appear in the source or class file.
    *
-   * @return A {@link List} containing all {@link IAnnotation}s of the receiver object. Never returns
-   *         <code>null</code>.
+   * @return A {@link List} containing all {@link IAnnotation}s of the receiver object. Never returns <code>null</code>.
    */
   List<IAnnotation> getAnnotations();
 }

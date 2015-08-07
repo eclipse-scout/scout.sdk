@@ -12,7 +12,9 @@ package org.eclipse.scout.sdk.s2e.nls.internal.simpleproject;
 
 import org.eclipse.jdt.core.IType;
 
-/** <h4>INlsType</h4> */
+/**
+ * <h4>INlsType</h4>
+ */
 public interface INlsType {
 
   /**

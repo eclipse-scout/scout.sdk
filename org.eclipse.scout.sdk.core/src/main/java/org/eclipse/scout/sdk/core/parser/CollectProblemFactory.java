@@ -35,7 +35,8 @@ class CollectProblemFactory extends DefaultProblemFactory {
   }
 
   @Override
-  public CategorizedProblem createProblem(char[] originatingFileName, int problemId, String[] problemArguments, int elaborationId, String[] messageArguments, int severity, int startPosition, int endPosition, int lineNumber, int columnNumber) {
+  public CategorizedProblem createProblem(char[] originatingFileName, int problemId, String[] problemArguments,
+      int elaborationId, String[] messageArguments, int severity, int startPosition, int endPosition, int lineNumber, int columnNumber) {
     if ((severity & (ProblemSeverities.Error | ProblemSeverities.Fatal | ProblemSeverities.InternalError)) != 0) {
       StringBuilder msg = new StringBuilder();
       if (originatingFileName != null) {

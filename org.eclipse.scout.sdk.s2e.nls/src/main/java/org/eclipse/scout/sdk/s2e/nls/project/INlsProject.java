@@ -24,16 +24,14 @@ import org.eclipse.scout.sdk.s2e.nls.resource.ITranslationResource;
 
 /**
  * The <b>INlsProject</b> is the basis class of an NLS support in a plugin. Each plugin may have more than one
- * NlsProject. A NlsProject may have a parent and each translated text is inherited by the child project or may
- * be overwritten.
- * Furthermore all translations should be edited in the NLS Editor.
+ * NlsProject. A NlsProject may have a parent and each translated text is inherited by the child project or may be
+ * overwritten. Furthermore all translations should be edited in the NLS Editor.
  */
 public interface INlsProject {
 
   /**
-   * Adds an event listener to this project.
-   * The last listener added is the first to be called.
-   * If a listener is added that already exists in the list, the listener is added an additional time.
+   * Adds an event listener to this project. The last listener added is the first to be called. If a listener is added
+   * that already exists in the list, the listener is added an additional time.
    *
    * @param projectListener
    *          The new listener.
@@ -41,8 +39,7 @@ public interface INlsProject {
   void addProjectListener(INlsProjectListener projectListener);
 
   /**
-   * Removes all registrations of the given listener.
-   * the listeners are identified using reference equality (==).
+   * Removes all registrations of the given listener. the listeners are identified using reference equality (==).
    *
    * @param projectListener
    */
@@ -118,8 +115,7 @@ public interface INlsProject {
   boolean containsLanguage(Language languge);
 
   /**
-   * Updates (or creates if not existing) the given row.
-   * If the key is inherited, this method does nothing.
+   * Updates (or creates if not existing) the given row. If the key is inherited, this method does nothing.
    *
    * @param row
    *          The row to update or create.
@@ -128,8 +124,7 @@ public interface INlsProject {
   void updateRow(INlsEntry row, IProgressMonitor monitor);
 
   /**
-   * Updates (or creates if not existing) the given row.
-   * If the key is inherited, this method does nothing.
+   * Updates (or creates if not existing) the given row. If the key is inherited, this method does nothing.
    *
    * @param row
    *          The row to update or create.
@@ -170,7 +165,6 @@ public interface INlsProject {
    * INPUT: de_de OUTPUT: de
    * INPUT: it OUTPUT: default
    * </pre>
-   *
    * </p>
    *
    * @param language

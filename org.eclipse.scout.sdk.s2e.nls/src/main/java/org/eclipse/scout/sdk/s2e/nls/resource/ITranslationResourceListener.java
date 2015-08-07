@@ -12,7 +12,9 @@ package org.eclipse.scout.sdk.s2e.nls.resource;
 
 import java.util.EventListener;
 
-/** <h4>ITranslationResourceListener</h4> */
+/**
+ * <h4>ITranslationResourceListener</h4>
+ */
 public interface ITranslationResourceListener extends EventListener {
   void translationResourceChanged(TranslationResourceEvent event);
 }

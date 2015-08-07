@@ -302,7 +302,8 @@ public class SdkAssert extends Assert {
     expectedSignature = getResolvedSignature(expectedSignature, field.getDeclaringType());
     if (!equalSignature(resolvedSignature, expectedSignature)) {
       if (message == null) {
-        StringBuilder messageBuilder = new StringBuilder("Field '").append(field.getName()).append("' does not have the expected type signature! [expected:'").append(expectedSignature).append("', actual:'").append(resolvedSignature).append("']");
+        StringBuilder messageBuilder = new StringBuilder("Field '").append(field.getName()).append("' does not have the expected type signature! [expected:'")
+            .append(expectedSignature).append("', actual:'").append(resolvedSignature).append("']");
         message = messageBuilder.toString();
       }
       fail(message);
@@ -380,7 +381,8 @@ public class SdkAssert extends Assert {
     }
     else {
       if (message == null) {
-        StringBuilder messageBuilder = new StringBuilder("Type '").append(type.getName()).append("' does not have the same same amount of interfaces! [expected: ").append(interfaceSignatures.length).append(", actual: ").append(refInterfaces.size()).append("]");
+        StringBuilder messageBuilder = new StringBuilder("Type '").append(type.getName()).append("' does not have the same same amount of interfaces! [expected: ")
+            .append(interfaceSignatures.length).append(", actual: ").append(refInterfaces.size()).append("]");
         message = messageBuilder.toString();
       }
       fail(message);

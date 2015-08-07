@@ -20,8 +20,7 @@ package org.eclipse.scout.sdk.core.util;
  * </code><br>
  * <br>
  * Usage for writers with no access check is as follows:<br>
- * <code>try{ lock.acquire() ... } finally{ lock.release(); }</code>
- * <br>
+ * <code>try{ lock.acquire() ... } finally{ lock.release(); }</code> <br>
  * Usage for tester is as follows:<br>
  * <code>
  *  if(lock.isAcquired()){ ... } or if(lock.isReleased()){ ... }

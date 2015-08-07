@@ -19,7 +19,9 @@ import org.eclipse.scout.sdk.s2e.nls.model.NlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.swt.widgets.Shell;
 
-/** <h4>NlsEntryNewAction</h4> */
+/**
+ * <h4>NlsEntryNewAction</h4>
+ */
 public class NlsEntryModifyAction extends AbstractWorkspaceAction {
 
   private NlsEntry m_entry;

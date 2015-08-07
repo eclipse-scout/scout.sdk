@@ -117,7 +117,8 @@ public class ApiTestGenerator {
 
     // inner types
     List<IType> innerTypes = type.getTypes();
-    source.append(assertRef).append(".assertEquals(\"inner types count of '").append(type.getSimpleName()).append("'\", ").append(Integer.toString(innerTypes.size())).append(", ").append(typeVarName).append(".getTypes().size());").append(NL);
+    source.append(assertRef).append(".assertEquals(\"inner types count of '").append(type.getSimpleName()).append("'\", ").append(Integer.toString(innerTypes.size())).append(", ")
+        .append(typeVarName).append(".getTypes().size());").append(NL);
     for (IType innerType : innerTypes) {
       String innerTypeVarName = getMemberName(innerType.getSimpleName());
       source.append("// type ").append(innerType.getSimpleName()).append(NL);

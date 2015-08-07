@@ -20,7 +20,9 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 
-/** <h4>NlsEntryNewAction</h4> */
+/**
+ * <h4>NlsEntryNewAction</h4>
+ */
 public class NlsEntryNewAction extends AbstractWorkspaceAction {
 
   private NlsEntry m_entry;

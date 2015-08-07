@@ -13,8 +13,7 @@ package org.eclipse.scout.sdk.core.model;
 import java.util.List;
 
 /**
- * <h3>{@link ITypeParameter}</h3>
- * Represents a type parameter.
+ * <h3>{@link ITypeParameter}</h3> Represents a type parameter.
  *
  * @author Andreas Hoegger
  * @since 4.1.0 09.11.2014

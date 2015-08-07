@@ -16,7 +16,9 @@ import java.util.List;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.resource.ITranslationResource;
 
-/** <h4>NlsProjectEvent</h4> */
+/**
+ * <h4>NlsProjectEvent</h4>
+ */
 public class NlsProjectEvent {
   public static final int TYPE_ENTRY_ADDED = 1 << 0;
   public static final int TYPE_ENTRY_REMOVED = 1 << 1;

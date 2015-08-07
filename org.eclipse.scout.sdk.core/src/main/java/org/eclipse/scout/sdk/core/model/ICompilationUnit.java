@@ -16,8 +16,7 @@ import java.util.Map;
 import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
 
 /**
- * <h3>{@link ICompilationUnit}</h3>
- * Represents a compilation unit usually defined by a .java file.
+ * <h3>{@link ICompilationUnit}</h3> Represents a compilation unit usually defined by a .java file.
  *
  * @author Matthias Villiger
  * @since 5.1.0
@@ -33,11 +32,10 @@ public interface ICompilationUnit {
   IPackage getPackage();
 
   /**
-   * Gets a {@link Map} that contains all imports. The {@link Map} iterates over the imports in
-   * the order as they appear in the source.
+   * Gets a {@link Map} that contains all imports. The {@link Map} iterates over the imports in the order as they appear
+   * in the source.
    *
-   * @return A {@link Map} with the import simple name as key and the corresponding
-   *         {@link IImportDeclaration} as value.
+   * @return A {@link Map} with the import simple name as key and the corresponding {@link IImportDeclaration} as value.
    */
   Map<String, IImportDeclaration> getImports();
 

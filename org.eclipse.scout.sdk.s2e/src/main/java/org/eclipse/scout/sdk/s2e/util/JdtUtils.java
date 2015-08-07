@@ -152,18 +152,19 @@ public final class JdtUtils {
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
     String fastPat = Signature.getSimpleName(fqn);
     final TreeSet<IType> matchList = new TreeSet<>(COMPARATOR);
-    new SearchEngine().search(SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH), new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, SearchEngine.createWorkspaceScope(), new SearchRequestor() {
-      @Override
-      public void acceptSearchMatch(SearchMatch match) throws CoreException {
-        Object element = match.getElement();
-        if (element instanceof IType) {
-          IType t = (IType) element;
-          if (t.getFullyQualifiedName('$').indexOf(fqn) >= 0) {
-            matchList.add(t);
+    new SearchEngine().search(SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH), new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
+        SearchEngine.createWorkspaceScope(), new SearchRequestor() {
+          @Override
+          public void acceptSearchMatch(SearchMatch match) throws CoreException {
+            Object element = match.getElement();
+            if (element instanceof IType) {
+              IType t = (IType) element;
+              if (t.getFullyQualifiedName('$').indexOf(fqn) >= 0) {
+                matchList.add(t);
+              }
+            }
           }
-        }
-      }
-    }, null);
+        }, null);
     return matchList;
   }
 

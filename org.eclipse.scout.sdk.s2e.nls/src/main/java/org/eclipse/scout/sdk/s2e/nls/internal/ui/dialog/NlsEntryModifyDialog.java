@@ -21,7 +21,9 @@ import org.eclipse.scout.sdk.s2e.nls.model.NlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.swt.widgets.Shell;
 
-/** <h4>NlsEntryModifyDialog</h4> */
+/**
+ * <h4>NlsEntryModifyDialog</h4>
+ */
 public class NlsEntryModifyDialog extends AbstractNlsEntryDialog {
 
   public NlsEntryModifyDialog(Shell parentShell, NlsEntry row, INlsProject project) {

@@ -221,7 +221,7 @@ public class NlsTablePage extends Composite {
       }
       MenuManager menuManager = (MenuManager) manager;
       if (entries.size() == 1) {
-        Point cursorPos /* row, column */= m_table.getCursorLocation();
+        Point cursorPos /* row, column */ = m_table.getCursorLocation();
         if (cursorPos.y < 0) {
           cursorPos.y = -1;
         }
