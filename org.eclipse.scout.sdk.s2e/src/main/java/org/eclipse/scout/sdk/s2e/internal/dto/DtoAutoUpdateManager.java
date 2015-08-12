@@ -90,8 +90,13 @@ public class DtoAutoUpdateManager implements IDtoAutoUpdateManager {
   }
 
   @Override
-  public void addModelDataUpdateHandler(IDtoAutoUpdateHandler factory) {
-    m_updateHandlers.add(factory);
+  public void addModelDataUpdateHandler(IDtoAutoUpdateHandler handler) {
+    m_updateHandlers.add(handler);
+  }
+
+  @Override
+  public void removeModelDataUpdateHandler(IDtoAutoUpdateHandler handler) {
+    m_updateHandlers.remove(handler);
   }
 
   @Override

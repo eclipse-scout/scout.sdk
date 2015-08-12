@@ -46,9 +46,16 @@ public interface IDtoAutoUpdateManager {
   /**
    * Adds an update handler to resolve the necessary operations for a compilation unit candidate.
    *
-   * @param factory
+   * @param handler
    */
-  void addModelDataUpdateHandler(IDtoAutoUpdateHandler factory);
+  void addModelDataUpdateHandler(IDtoAutoUpdateHandler handler);
+
+  /**
+   * Removes an update handler
+   *
+   * @param handler
+   */
+  void removeModelDataUpdateHandler(IDtoAutoUpdateHandler handler);
 
   /**
    * @return
