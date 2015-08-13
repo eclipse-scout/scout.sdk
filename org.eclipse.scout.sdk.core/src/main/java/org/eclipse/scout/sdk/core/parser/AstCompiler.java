@@ -93,6 +93,7 @@ public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
     opts.ignoreSourceFolderWarningOption = true;
     opts.analyseResourceLeaks = false;
     opts.ignoreMethodBodies = true;
+    opts.docCommentSupport = true; //we want javadoc start and end positions
 
     opts.isAnnotationBasedNullAnalysisEnabled = true;
     opts.storeAnnotations = true; // also parse annotations
