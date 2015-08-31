@@ -61,10 +61,32 @@ public final class CoreUtils {
    * Regular expression matching bean method names (is..., get..., set...)
    */
   public static final Pattern BEAN_METHOD_NAME = Pattern.compile("(get|set|is)([A-Z].*)");
+  private static final Pattern REGEX_COMMENT_REMOVE_1 = Pattern.compile("\\/\\/.*?\\\r\\\n");
+  private static final Pattern REGEX_COMMENT_REMOVE_2 = Pattern.compile("\\/\\/.*?\\\n");
+  private static final Pattern REGEX_COMMENT_REMOVE_3 = Pattern.compile("(?s)\\/\\*.*?\\*\\/");
+
   private static final ThreadLocal<String> CURRENT_USER_NAME = new ThreadLocal<>();
   private static volatile Set<String> javaKeyWords = null;
 
   private CoreUtils() {
+  }
+
+  /**
+   * Removes all comments in the given java source.
+   *
+   * @param methodBody
+   *          The java source
+   * @return The source with all comments (single line & multi line) removed.
+   */
+  public static String removeComments(String methodBody) {
+    if (methodBody == null) {
+      return null;
+    }
+    String retVal = methodBody;
+    retVal = REGEX_COMMENT_REMOVE_1.matcher(retVal).replaceAll("");
+    retVal = REGEX_COMMENT_REMOVE_2.matcher(retVal).replaceAll("");
+    retVal = REGEX_COMMENT_REMOVE_3.matcher(retVal).replaceAll("");
+    return retVal;
   }
 
   /**

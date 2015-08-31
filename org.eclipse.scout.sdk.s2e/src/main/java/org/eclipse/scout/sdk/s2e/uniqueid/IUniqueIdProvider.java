@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.s2e.id;
+package org.eclipse.scout.sdk.s2e.uniqueid;
 
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 

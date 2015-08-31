@@ -170,4 +170,12 @@ public class CoreUtilsTest {
     methods = CoreUtils.getMethods(CoreTestingUtils.getBaseClassType(), MethodFilters.getFlagsFilter(Flags.AccPrivate));
     Assert.assertEquals(0, methods.size());
   }
+
+  @Test
+  public void testRemoveComments() {
+    Assert.assertNull(CoreUtils.removeComments(null));
+    Assert.assertEquals("int a = 4;", CoreUtils.removeComments("// my comment\nint a = 4;"));
+    Assert.assertEquals(" int a = 4; ", CoreUtils.removeComments("/* my comment*/ int a = 4; "));
+    Assert.assertEquals("int a = 4;", CoreUtils.removeComments("/** my comment*/int a = 4;"));
+  }
 }

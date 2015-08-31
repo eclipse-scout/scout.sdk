@@ -26,6 +26,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
@@ -176,6 +177,15 @@ public final class JdtUtils {
     AbstractJob.waitForJobFamily(ResourcesPlugin.FAMILY_AUTO_BUILD);
   }
 
+  /**
+   * Waits until all JDT initializations have been executed.
+   *
+   * @see org.eclipse.jdt.internal.ui.InitializeAfterLoadJob.RealJob
+   */
+  public static void waitForJdt() {
+    AbstractJob.waitForJobFamily("org.eclipse.jdt.ui");
+  }
+
   private static final class P_TypeMatchComparator implements Comparator<IType>, Serializable {
     private static final long serialVersionUID = 1L;
 
@@ -304,6 +314,40 @@ public final class JdtUtils {
   }
 
   /**
+   * checks whether the given {@link IJavaElement} is on the classpath of the given {@link IJavaProject}.
+   *
+   * @param element
+   *          the {@link IJavaElement} to search
+   * @param project
+   *          the project classpath to search in
+   * @return <code>true</code> if element was found in the classpath of project, <code>false</code> otherwise.
+   */
+  public static boolean isOnClasspath(IJavaElement element, IJavaProject project) {
+    if (!exists(element)) {
+      return false;
+    }
+    if (!exists(project)) {
+      return false;
+    }
+
+    if (element instanceof IMember) {
+      IMember member = (IMember) element;
+      if (member.isBinary()) {
+        return project.isOnClasspath(member);
+      }
+    }
+
+    IJavaProject elemenProject = element.getJavaProject();
+    if (elemenProject != null) {
+      if (project.equals(elemenProject)) {
+        return true;
+      }
+      return project.isOnClasspath(elemenProject);
+    }
+    return project.isOnClasspath(element);
+  }
+
+  /**
    * Gets the value of the given annotation attribute as {@link BigDecimal}.
    *
    * @param annotation
@@ -320,15 +364,50 @@ public final class JdtUtils {
     }
     IMemberValuePair[] memberValues = annotation.getMemberValuePairs();
     for (IMemberValuePair p : memberValues) {
-      if (name.equals(p.getMemberName())) {
+      if (Objects.equals(name, p.getMemberName())) {
         switch (p.getValueKind()) {
           case IMemberValuePair.K_DOUBLE:
-          case IMemberValuePair.K_FLOAT:
             return new BigDecimal(((Double) p.getValue()).doubleValue());
+          case IMemberValuePair.K_FLOAT:
+            return new BigDecimal(((Float) p.getValue()).doubleValue());
           case IMemberValuePair.K_INT:
             return new BigDecimal(((Integer) p.getValue()).intValue());
+          case IMemberValuePair.K_BYTE:
+            return new BigDecimal(((Byte) p.getValue()).intValue());
+          case IMemberValuePair.K_LONG:
+            return new BigDecimal(((Long) p.getValue()).longValue());
+          case IMemberValuePair.K_SHORT:
+            return new BigDecimal(((Short) p.getValue()).intValue());
         }
         break;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Gets teh value of the given annotation attribute as {@link String}.
+   *
+   * @param annotation
+   *          The {@link IAnnotation} for which the attribute should be converted.
+   * @param name
+   *          The name of attribute.
+   * @return A {@link String} with the value of the given attribute or <code>null</code> if the value is
+   *         <code>null</code> or could not be found.
+   * @throws JavaModelException
+   */
+  public static String getAnnotationValueString(IAnnotation annotation, String name) throws JavaModelException {
+    if (!exists(annotation)) {
+      return null;
+    }
+
+    IMemberValuePair[] memberValues = annotation.getMemberValuePairs();
+    for (IMemberValuePair p : memberValues) {
+      if (Objects.equals(name, p.getMemberName())) {
+        Object val = p.getValue();
+        if (val != null) {
+          return val.toString();
+        }
       }
     }
     return null;

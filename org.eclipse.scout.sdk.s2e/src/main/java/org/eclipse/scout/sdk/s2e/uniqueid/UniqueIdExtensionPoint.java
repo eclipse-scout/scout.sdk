@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.s2e.id;
+package org.eclipse.scout.sdk.s2e.uniqueid;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +32,7 @@ public final class UniqueIdExtensionPoint {
   private static final String ATTRIB_PRIO = "priority";
 
   private static final Object CODE_ID_PROV_LOCK = new Object();
-  private static volatile List<IUniqueIdProvider> codeIdProviderExtensions;
+  private static volatile List<IUniqueIdProvider> uniqueIdProviderExtensions;
 
   private UniqueIdExtensionPoint() {
   }
@@ -41,9 +41,9 @@ public final class UniqueIdExtensionPoint {
    * @return all extensions in the prioritized order.
    */
   private static List<IUniqueIdProvider> getCodeIdProviderExtensions() {
-    if (codeIdProviderExtensions == null) {
+    if (uniqueIdProviderExtensions == null) {
       synchronized (CODE_ID_PROV_LOCK) {
-        if (codeIdProviderExtensions == null) {
+        if (uniqueIdProviderExtensions == null) {
           Map<CompositeObject, IUniqueIdProvider> providers = new TreeMap<>();
           IExtensionRegistry reg = Platform.getExtensionRegistry();
           IExtensionPoint xp = reg.getExtensionPoint(S2ESdkActivator.PLUGIN_ID, EXTENSION_POINT_NAME);
@@ -62,11 +62,11 @@ public final class UniqueIdExtensionPoint {
               }
             }
           }
-          codeIdProviderExtensions = new ArrayList<>(providers.values());
+          uniqueIdProviderExtensions = new ArrayList<>(providers.values());
         }
       }
     }
-    return codeIdProviderExtensions;
+    return uniqueIdProviderExtensions;
   }
 
   private static int getPriority(IConfigurationElement element) {

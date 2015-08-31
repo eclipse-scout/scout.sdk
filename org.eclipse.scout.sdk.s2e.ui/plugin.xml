@@ -40,6 +40,22 @@
          </menu>
       </menuContribution>
    </extension>
+   <extension
+         point="org.eclipse.jdt.ui.quickAssistProcessors">
+      <quickAssistProcessor
+            class="org.eclipse.scout.sdk.s2e.ui.internal.classid.ClassIdQuickAssistProcessor"
+            id="org.eclipse.scout.sdk.s2e.ui.classIdGenerationProcessor"
+            name="Generate Class Id"
+            requiredSourceLevel="1.6">
+      </quickAssistProcessor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.ide.markerResolution">
+      <markerResolutionGenerator
+            class="org.eclipse.scout.sdk.s2e.ui.internal.classid.ClassIdDuplicateResolutionGenerator"
+            markerType="org.eclipse.scout.sdk.classid.duplicate">
+      </markerResolutionGenerator>
+   </extension>
    <extension point="org.eclipse.ui.commands">
       <category
             name="Scout Tools"

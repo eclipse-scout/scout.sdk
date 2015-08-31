@@ -84,4 +84,5 @@ public interface IRuntimeClasses {
   String ITree = "org.eclipse.scout.rt.client.ui.basic.tree.ITree";
   String ICalendarItemProvider = "org.eclipse.scout.rt.client.ui.basic.calendar.provider.ICalendarItemProvider";
   String IPage = "org.eclipse.scout.rt.client.ui.desktop.outline.pages.IPage";
+  String ITypeWithClassId = "org.eclipse.scout.commons.ITypeWithClassId";
 }

@@ -21,6 +21,7 @@ import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.s2e.IOrganizeImportService;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
+import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
 import org.eclipse.scout.sdk.s2e.dto.IDtoAutoUpdateManager;
 import org.eclipse.scout.sdk.s2e.log.SdkLogManager;
 import org.eclipse.scout.sdk.s2e.ui.internal.util.JdtSettingsCommentBuilder;
@@ -75,6 +76,10 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     getPreferenceStore().setDefault(IDtoAutoUpdateManager.PROP_AUTO_UPDATE, true);
     ScoutSdkCore.getDtoAutoUpdateManager().setEnabled(getPreferenceStore().getBoolean(IDtoAutoUpdateManager.PROP_AUTO_UPDATE));
 
+    // start class id validation
+    ClassIdValidationJob.install();
+    ClassIdValidationJob.executeAsync(15000);
+
     // listener for workspace shutdown (to wait for DTO updates to complete)
     m_shutdownListener = new IWorkbenchListener() {
       @Override
@@ -101,6 +106,8 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   @Override
   public void stop(BundleContext context) throws Exception {
     PlatformUI.getWorkbench().removeWorkbenchListener(m_shutdownListener);
+
+    ClassIdValidationJob.uninstall();
 
     if (m_preferencesPropertyListener != null) {
       getPreferenceStore().removePropertyChangeListener(m_preferencesPropertyListener);
