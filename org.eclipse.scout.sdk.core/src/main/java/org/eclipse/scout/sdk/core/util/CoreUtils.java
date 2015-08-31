@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -138,8 +139,55 @@ public final class CoreUtils {
   }
 
   /**
+   * Converts the given input string literal into the representing original string.<br>
+   * This is the inverse function of {@link #toStringLiteral(String)}.
+   *
+   * @param s
+   *          The literal with leading and ending double-quotes
+   * @return the original (un-escaped) string. if it is no valid literal string, <code>null</code> is returned.
+   */
+  public static String fromStringLiteral(String s) {
+    if (s == null) {
+      return null;
+    }
+
+    int len = s.length();
+    if (len < 2 || s.charAt(0) != '"' || s.charAt(len - 1) != '"') {
+      return null;
+    }
+
+    String result = s.substring(1, len - 1);
+    for (Entry<Character, String> a : getLiteralEscapeMap().entrySet()) {
+      result = result.replace(a.getValue(), a.getKey().toString());
+    }
+
+    return result;
+  }
+
+  private static Map<Character, String> getLiteralEscapeMap() {
+    Map<Character, String> escapeMap = new HashMap<>(15);
+    escapeMap.put(Character.valueOf('\b'), "\\b");
+    escapeMap.put(Character.valueOf('\t'), "\\t");
+    escapeMap.put(Character.valueOf('\n'), "\\n");
+    escapeMap.put(Character.valueOf('\f'), "\\f");
+    escapeMap.put(Character.valueOf('\r'), "\\r");
+    escapeMap.put(Character.valueOf('"'), "\\\"");
+    escapeMap.put(Character.valueOf('\\'), "\\\\");
+    escapeMap.put(Character.valueOf('\0'), "\\0");
+    escapeMap.put(Character.valueOf('\1'), "\\1");
+    escapeMap.put(Character.valueOf('\2'), "\\2");
+    escapeMap.put(Character.valueOf('\3'), "\\3");
+    escapeMap.put(Character.valueOf('\4'), "\\4");
+    escapeMap.put(Character.valueOf('\5'), "\\5");
+    escapeMap.put(Character.valueOf('\6'), "\\6");
+    escapeMap.put(Character.valueOf('\7'), "\\7");
+    return escapeMap;
+  }
+
+  /**
    * Converts the given string into a string literal with leading and ending double-quotes including escaping of the
    * given string.<br>
+   * This is the inverse function of {@link #fromStringLiteral(String)}.
    *
    * @param s
    *          the string to convert.
@@ -151,59 +199,17 @@ public final class CoreUtils {
     }
 
     int len = s.length();
-    StringBuilder b = new StringBuilder(len + 2);
+    Map<Character, String> literalEscapeMap = getLiteralEscapeMap();
+    StringBuilder b = new StringBuilder(len * 2);
     b.append('"'); // opening delimiter
     for (int i = 0; i < len; i++) {
-      char c = s.charAt(i);
-      switch (c) {
-        case '\b':
-          b.append("\\b");
-          break;
-        case '\t':
-          b.append("\\t");
-          break;
-        case '\n':
-          b.append("\\n");
-          break;
-        case '\f':
-          b.append("\\f");
-          break;
-        case '\r':
-          b.append("\\r");
-          break;
-        case '\"':
-          b.append("\\\"");
-          break;
-        case '\\':
-          b.append("\\\\");
-          break;
-        case '\0':
-          b.append("\\0");
-          break;
-        case '\1':
-          b.append("\\1");
-          break;
-        case '\2':
-          b.append("\\2");
-          break;
-        case '\3':
-          b.append("\\3");
-          break;
-        case '\4':
-          b.append("\\4");
-          break;
-        case '\5':
-          b.append("\\5");
-          break;
-        case '\6':
-          b.append("\\6");
-          break;
-        case '\7':
-          b.append("\\7");
-          break;
-        default:
-          b.append(c);
-          break;
+      Character c = Character.valueOf(s.charAt(i));
+      String replacement = literalEscapeMap.get(c);
+      if (replacement != null) {
+        b.append(replacement);
+      }
+      else {
+        b.append(c.charValue());
       }
     }
     b.append('"'); // closing delimiter

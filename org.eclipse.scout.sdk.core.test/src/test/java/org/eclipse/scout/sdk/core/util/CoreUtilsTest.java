@@ -47,6 +47,14 @@ public class CoreUtilsTest {
   }
 
   @Test
+  public void testFromStringLiteral() {
+    Assert.assertNull(CoreUtils.fromStringLiteral(null));
+    Assert.assertNull(CoreUtils.fromStringLiteral("a"));
+    Assert.assertEquals("a\nb", CoreUtils.fromStringLiteral("\"a\\nb\""));
+    Assert.assertEquals("a\"b", CoreUtils.fromStringLiteral("\"a\\\"b\""));
+  }
+
+  @Test
   public void testFindInnerType() {
     Assert.assertEquals(CoreTestingUtils.getBaseClassType().getTypes().get(0), CoreUtils.findInnerType(CoreTestingUtils.getBaseClassType(), "InnerClass1"));
   }

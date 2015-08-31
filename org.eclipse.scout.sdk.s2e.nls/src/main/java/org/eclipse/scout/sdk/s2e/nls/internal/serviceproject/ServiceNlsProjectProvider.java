@@ -187,7 +187,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return root;
   }
 
-  private static Set<String> getScoutBundleNamesForProject(IJavaProject p) throws JavaModelException {
+  private static Set<String> getScoutProjectNamesForProject(IJavaProject p) throws JavaModelException {
     String[] requiredProjectNames = p.getRequiredProjectNames();
     Set<String> result = new HashSet<>(requiredProjectNames.length + 1);
     result.add(p.getElementName());
@@ -197,13 +197,13 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return result;
   }
 
-  private static Set<String> getScoutBundleNamesForType(IType type) throws JavaModelException {
+  private static Set<String> getScoutProjectNamesForType(IType type) throws JavaModelException {
     IJavaProject javaProject = type.getJavaProject();
-    return getScoutBundleNamesForProject(javaProject);
+    return getScoutProjectNamesForProject(javaProject);
   }
 
   private static INlsProject getNlsProjectTree(IType type) throws CoreException {
-    Set<IType> nlsProviders = getRegisteredTextProviderTypes(getScoutBundleNamesForType(type));
+    Set<IType> nlsProviders = getRegisteredTextProviderTypes(getScoutProjectNamesForType(type));
     String searchString = getTypeIdentifyer(type);
     Set<IType> filtered = new LinkedHashSet<>(nlsProviders.size());
     boolean minFound = false;
@@ -241,7 +241,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         if (args[1] instanceof IJavaProject || args[1] == null) {
           // all text services in the given project with given kind (texts or normal)
           try {
-            return getAllProjects(getScoutBundleNamesForProject((IJavaProject) args[1]));
+            return getAllProjects(getScoutProjectNamesForProject((IJavaProject) args[1]));
           }
           catch (CoreException e) {
             NlsCore.logWarning("Could not load text provider services.", e);
@@ -250,7 +250,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         else if (args[1] instanceof IType) {
           try {
             // all text services with given kind available in the plugins defining the given type
-            return getAllProjects(getScoutBundleNamesForType((IType) args[1]));
+            return getAllProjects(getScoutProjectNamesForType((IType) args[1]));
           }
           catch (CoreException e) {
             NlsCore.logWarning("Could not load text provider services for type '" + args[1].toString() + "'.", e);
