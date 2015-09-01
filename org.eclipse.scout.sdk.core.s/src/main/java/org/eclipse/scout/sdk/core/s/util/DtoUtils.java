@@ -143,17 +143,23 @@ public final class DtoUtils {
   }
 
   /**
-   * @return Returns the form field data for the given form field or <code>null</code> if it does not have one.
+   * @return Returns the form field data/form data for the given form field/form or <code>null</code> if it does not
+   *         have one.
    * @since 3.8.2
    */
-  public static IType getFormDataType(IType formField) {
-    IType primaryType = getFormFieldDataPrimaryTypeRec(formField);
+  private static IType getFormDataType(IType modelType) {
+    IType primaryType = getFormFieldDataPrimaryTypeRec(modelType);
     if (primaryType == null) {
       return null;
     }
 
+    if (primaryType != null && CoreUtils.isInstanceOf(modelType, IRuntimeClasses.IForm)) {
+      // model type is a form and we have a corresponding DTO type (a form data).
+      return primaryType;
+    }
+
     // check if the primary type itself is the correct type
-    String formDataName = removeFieldSuffix(formField.getSimpleName());
+    String formDataName = removeFieldSuffix(modelType.getSimpleName());
     if (primaryType.getSimpleName().equals(formDataName)) {
       return primaryType;
     }
@@ -163,8 +169,9 @@ public final class DtoUtils {
   }
 
   /**
-   * @return Returns the form field data for the given form field or <code>null</code> if it does not have one. The
-   *         method walks recursively through the list of declaring classes until it has reached a primary type.
+   * @return Returns the form field data/form data for the given form field/form or <code>null</code> if it does not
+   *         have one. The method walks recursively through the list of declaring classes until it has reached a primary
+   *         type.
    * @since 3.8.2
    */
   private static IType getFormFieldDataPrimaryTypeRec(IType recursiveDeclaringType) {
@@ -392,7 +399,8 @@ public final class DtoUtils {
       // An exception are attributes that are cumulative and may be added on any level. Those may be added even though the @Replace annotation is available.
       // A field that is once marked so that a DTO should be created, can never be set to ignore again. But an ignored field may be changed to create. Afterwards it can never be set to ignore again.
       // Therefore ignored fields may define all attributes and they are inherited from the first level that declares it to be created.
-      boolean cumulativeAttribsOnly = replaceAnnotationPresent && !FormDataAnnotation.isIgnore(annotation);
+      // Forms are excluded from this rule: If a form has a @Replace annotation, it even though may define a different dto.
+      boolean cumulativeAttribsOnly = replaceAnnotationPresent && !FormDataAnnotation.isIgnore(annotation) && !CoreUtils.isInstanceOf(type, IRuntimeClasses.IForm);
 
       fillFormDataAnnotation(type, annotation, isOwner, cumulativeAttribsOnly);
     }
