@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.ui.executor;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.eclipse.core.commands.ExecutionEvent;
@@ -56,7 +58,7 @@ import org.eclipse.swt.widgets.Shell;
  */
 public class WellformExecutor extends AbstractExecutor {
 
-  private IOperation m_operation;
+  private List<IOperation> m_operations;
 
   @Override
   public boolean canRun(IStructuredSelection selection) {
@@ -64,43 +66,69 @@ public class WellformExecutor extends AbstractExecutor {
     IScoutBundle scoutBundle = UiUtility.getScoutBundleFromSelection(selection);
     if (selectedElement instanceof BundleNodeGroupTablePage) {
       Set<? extends IScoutBundle> childBundles = scoutBundle.getChildBundles(ScoutBundleFilters.getWorkspaceBundlesFilter(), true);
-      m_operation = new WellformClientBundleOperation(childBundles);
+      m_operations = getWellformOperationsFor(childBundles);
     }
     else if (selectedElement instanceof ProjectsTablePage) {
-      Set<IScoutBundle> clients = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getBundlesOfTypeFilter(IScoutBundle.TYPE_CLIENT));
-      m_operation = new WellformClientBundleOperation(clients);
+      Set<IScoutBundle> workspaceBundles = ScoutSdkCore.getScoutWorkspace().getBundleGraph().getBundles(ScoutBundleFilters.getWorkspaceBundlesFilter());
+      m_operations = getWellformOperationsFor(workspaceBundles);
     }
     else if (selectedElement instanceof ClientLookupCallTablePage) {
-      m_operation = new WellformLookupCallsOperation(scoutBundle);
+      m_operations = new ArrayList<IOperation>(1);
+      m_operations.add(new WellformLookupCallsOperation(scoutBundle));
     }
     else if (selectedElement instanceof ClientNodePage) {
-      m_operation = new WellformClientBundleOperation(CollectionUtility.hashSet(scoutBundle));
+      m_operations = new ArrayList<IOperation>(1);
+      m_operations.add(new WellformClientBundleOperation(CollectionUtility.hashSet(scoutBundle)));
     }
     else if (selectedElement instanceof OutlineTablePage) {
-      m_operation = new WellformOutlinesOperation(scoutBundle);
+      m_operations = new ArrayList<IOperation>(1);
+      m_operations.add(new WellformOutlinesOperation(scoutBundle));
     }
     else if (selectedElement instanceof FormTablePage) {
-      m_operation = new WellformFormsOperation(scoutBundle);
+      m_operations = new ArrayList<IOperation>(1);
+      m_operations.add(new WellformFormsOperation(scoutBundle));
     }
     else if (selectedElement instanceof SearchFormTablePage) {
-      m_operation = new WellformSearchFormsOperation(scoutBundle);
+      m_operations = new ArrayList<IOperation>(1);
+      m_operations.add(new WellformSearchFormsOperation(scoutBundle));
     }
     else if (selectedElement instanceof AllPagesTablePage) {
-      m_operation = new WellformPagesOperation(scoutBundle);
+      m_operations = new ArrayList<IOperation>(1);
+      m_operations.add(new WellformPagesOperation(scoutBundle));
     }
     else if (selectedElement instanceof WizardTablePage) {
-      m_operation = new WellformWizardsOperation(scoutBundle);
+      m_operations = new ArrayList<IOperation>(1);
+      m_operations.add(new WellformWizardsOperation(scoutBundle));
     }
     else if (selectedElement instanceof ServerNodePage) {
-      m_operation = new WellformServerBundleOperation(scoutBundle);
+      m_operations = new ArrayList<IOperation>(1);
+      m_operations.add(new WellformServerBundleOperation(scoutBundle));
     }
     else if (selectedElement instanceof CodeTypeTablePage) {
-      m_operation = new WellformCodeTypesOperation(scoutBundle);
+      m_operations = new ArrayList<IOperation>(1);
+      m_operations.add(new WellformCodeTypesOperation(scoutBundle));
     }
     else if (selectedElement instanceof SharedNodePage) {
-      m_operation = new WellformSharedBundleOperation(scoutBundle);
+      m_operations = new ArrayList<IOperation>(1);
+      m_operations.add(new WellformSharedBundleOperation(scoutBundle));
     }
-    return m_operation != null && isEditable(scoutBundle);
+    return CollectionUtility.hasElements(m_operations) && isEditable(scoutBundle);
+  }
+
+  protected List<IOperation> getWellformOperationsFor(Set<? extends IScoutBundle> bundles) {
+    List<IOperation> operations = new ArrayList<IOperation>(bundles.size());
+    for (IScoutBundle b : bundles) {
+      if (IScoutBundle.TYPE_CLIENT.equals(b.getType())) {
+        operations.add(new WellformClientBundleOperation(CollectionUtility.hashSet(b)));
+      }
+      else if (IScoutBundle.TYPE_SERVER.equals(b.getType())) {
+        operations.add(new WellformServerBundleOperation(b));
+      }
+      else if (IScoutBundle.TYPE_SHARED.equals(b.getType())) {
+        operations.add(new WellformSharedBundleOperation(b));
+      }
+    }
+    return operations;
   }
 
   @Override
@@ -109,7 +137,7 @@ public class WellformExecutor extends AbstractExecutor {
     MessageBox box = new MessageBox(shell, SWT.ICON_QUESTION | SWT.OK | SWT.CANCEL);
     box.setMessage(Texts.get("WellformConfirmationMessage"));
     if (box.open() == SWT.OK) {
-      new OperationJob(m_operation).schedule();
+      new OperationJob(m_operations).schedule();
     }
     return null;
   }

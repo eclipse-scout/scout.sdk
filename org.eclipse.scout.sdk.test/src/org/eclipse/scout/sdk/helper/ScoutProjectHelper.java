@@ -57,7 +57,7 @@ public final class ScoutProjectHelper {
     properties.setProperty(IScoutProjectNewOperation.PROP_USE_DEFAULT_JDT_PREFS, Boolean.FALSE);
     properties.setProperty(IScoutProjectNewOperation.PROP_KEEP_CURRENT_TARGET, Boolean.TRUE);
     properties.setProperty(IScoutProjectNewOperation.PROP_TARGET_PLATFORM_VERSION, JdtUtility.getTargetPlatformVersion());
-    HashSet<String> nodesToCreate = new HashSet<String>(5);
+    Set<String> nodesToCreate = new HashSet<String>(5);
     if (client) {
       nodesToCreate.add(CreateClientPluginOperation.BUNDLE_ID);
     }
