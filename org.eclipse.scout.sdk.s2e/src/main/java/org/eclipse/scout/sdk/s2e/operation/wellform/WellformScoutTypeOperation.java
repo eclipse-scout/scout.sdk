@@ -144,7 +144,7 @@ public class WellformScoutTypeOperation implements IOperation {
         String classHeader = typeSource.substring(0, start);
         // remove leading spaces
         classHeader = LEADING_SPACES_REGEX.matcher(classHeader).replaceAll("");
-        builder.append(classHeader + m_lineDelimiter);
+        builder.append(classHeader).append(m_lineDelimiter);
 
         IStructuredType structureHelper = StructuredTypeFactory.createStructuredType(type, m_typeCache);
         appendFields(structureHelper.getElements(IStructuredType.Categories.FIELD_LOGGER, IField.class), builder);
@@ -191,24 +191,24 @@ public class WellformScoutTypeOperation implements IOperation {
 
   protected void appendFields(List<IField> fields, StringBuilder builder) throws JavaModelException {
     for (IField f : fields) {
-      builder.append(m_lineDelimiter + f.getSource());
+      builder.append(m_lineDelimiter).append(f.getSource());
     }
   }
 
   protected void appendMethods(List<IMethod> methods, StringBuilder builder) throws JavaModelException {
     for (IMethod m : methods) {
-      builder.append(m_lineDelimiter + m.getSource());
+      builder.append(m_lineDelimiter).append(m.getSource());
     }
   }
 
   protected void appendTypes(List<IType> types, StringBuilder builder, boolean recursive) throws CoreException {
     for (IType t : types) {
       if (recursive) {
-        builder.append(m_lineDelimiter + m_lineDelimiter);
+        builder.append(m_lineDelimiter).append(m_lineDelimiter);
         buildSource(t, builder);
       }
       else {
-        builder.append(m_lineDelimiter + t.getSource());
+        builder.append(m_lineDelimiter).append(t.getSource());
       }
     }
   }

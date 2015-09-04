@@ -41,6 +41,20 @@
       </menuContribution>
    </extension>
    <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.eclipse.scout.sdk.s2e"
+            name="Scout"/>
+      <wizard
+            category="org.eclipse.scout.sdk.s2e"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.wizard.newproject.ScoutProjectNewWizard"
+            hasPages="true"
+            icon="icons/eclipse_scout.gif"
+            id="org.eclipse.scout.sdk.s2e.ui.newScoutProjectWizard"
+            name="Scout Project"
+            project="true"/>
+   </extension>
+   <extension
          point="org.eclipse.jdt.ui.quickAssistProcessors">
       <quickAssistProcessor
             class="org.eclipse.scout.sdk.s2e.ui.internal.classid.ClassIdQuickAssistProcessor"

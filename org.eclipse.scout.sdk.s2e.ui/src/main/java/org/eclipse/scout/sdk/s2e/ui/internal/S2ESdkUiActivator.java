@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -43,7 +44,7 @@ import org.osgi.framework.ServiceRegistration;
 public class S2ESdkUiActivator extends AbstractUIPlugin {
 
   public static final String PLUGIN_ID = "org.eclipse.scout.sdk.s2e.ui";
-  private static final String IMAGE_PATH = "icons/";
+  public static final String IMAGE_PATH = "icons/";
 
   private static S2ESdkUiActivator plugin;
 
@@ -203,10 +204,10 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   }
 
   /**
-   * To get a cached image with one of the extensions [gif | png | jpg]
+   * To get a cached image
    *
    * @param name
-   *          the name without extension located under resources/icons e.g. "person"
+   *          The full file name of the image located under {@value #IMAGE_PATH} inside this plug-in.
    * @return the cached image
    */
   public static Image getImage(String name) {
@@ -216,39 +217,31 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
   private Image getImageImpl(String name) {
     Image image = getImageRegistry().get(name);
     if (image == null) {
-      loadImage(name);
+      ImageDescriptor desc = getImageDescriptor(name);
+      getImageRegistry().put(name, desc);
       image = getImageRegistry().get(name);
     }
     return image;
   }
 
-  private void loadImage(String name) {
-    ImageDescriptor desc = null;
-    if (name.startsWith(IMAGE_PATH)) {
-      desc = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, name);
+  /**
+   * Creates a new {@link ImageDescriptor} for the given image
+   *
+   * @param fileName
+   *          The full file name of the image located under {@value #IMAGE_PATH} inside this plug-in.
+   * @return The new image descriptor
+   */
+  public static ImageDescriptor getImageDescriptor(String fileName) {
+    return AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, IMAGE_PATH + fileName);
+  }
+
+  public IDialogSettings getDialogSettingsSection(String name, boolean createIfNotExist) {
+    IDialogSettings dialogSettings = getDialogSettings();
+    IDialogSettings section = dialogSettings.getSection(name);
+    if (section == null) {
+      section = dialogSettings.addNewSection(name);
     }
-    if (desc == null) {
-      // try already extension
-      desc = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, IMAGE_PATH + name);
-    }
-    // gif
-    if (desc == null) {
-      desc = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, IMAGE_PATH + name + ".gif");
-    }
-    // png
-    if (desc == null) {
-      desc = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, IMAGE_PATH + name + ".png");
-    }
-    // jpg
-    if (desc == null) {
-      desc = AbstractUIPlugin.imageDescriptorFromPlugin(PLUGIN_ID, IMAGE_PATH + name + ".jpg");
-    }
-    if (desc == null) {
-      logWarning("could not find image for plugin: '" + PLUGIN_ID + "' under: '" + IMAGE_PATH + name + "'.");
-    }
-    else {
-      getImageRegistry().put(name, desc);
-    }
+    return section;
   }
 
   private static final class P_AutoUpdateOperationsShutdownJob extends Job {

@@ -16,6 +16,13 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
+import java.security.KeyPair;
+import java.security.KeyPairGenerator;
+import java.security.SecureRandom;
+import java.security.spec.ECGenParameterSpec;
+import java.security.spec.PKCS8EncodedKeySpec;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -30,6 +37,8 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.model.FieldFilters;
@@ -73,6 +82,29 @@ public final class CoreUtils {
   }
 
   /**
+   * Creates a new key pair (private and public key) compatible with the Scout Runtime.<br>
+   * <b>This method must behave exactly like the one implemented in
+   * org.eclipse.scout.commons.SecurityUtility.generateKeyPair().</b>
+   *
+   * @return A {@link String} array of length=2 containing the base64 encoded private key at index zero and the base64
+   *         encoded public key at index 1.
+   * @throws GeneralSecurityException
+   *           When no keys could be generated
+   */
+  public static String[] generateKeyPair() throws GeneralSecurityException {
+    KeyPairGenerator keyGen = KeyPairGenerator.getInstance("EC", "SunEC");
+    SecureRandom random = SecureRandom.getInstance("SHA1PRNG", "SUN");
+    ECGenParameterSpec spec = new ECGenParameterSpec("secp256k1");
+    keyGen.initialize(spec, random);
+    KeyPair keyPair = keyGen.generateKeyPair();
+
+    X509EncodedKeySpec x509EncodedKeySpec = new X509EncodedKeySpec(keyPair.getPublic().getEncoded());
+    PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyPair.getPrivate().getEncoded());
+
+    return new String[]{DatatypeConverter.printBase64Binary(pkcs8EncodedKeySpec.getEncoded()) /*private key*/, DatatypeConverter.printBase64Binary(x509EncodedKeySpec.getEncoded()) /* public key*/};
+  }
+
+  /**
    * Removes all comments in the given java source.
    *
    * @param methodBody
@@ -93,8 +125,6 @@ public final class CoreUtils {
   /**
    * Reads all bytes from the given {@link InputStream} and converts them into a {@link StringBuilder} using the given
    * charset name.<br>
-   * <br>
-   * <b>Note:</b> The {@link InputStream} is automatically closed after reading.
    *
    * @param is
    *          The data source. Must not be <code>null</code>.
@@ -115,8 +145,6 @@ public final class CoreUtils {
   /**
    * Reads all bytes from the given {@link InputStream} and converts them into a {@link StringBuilder} using the given
    * {@link Charset}.<br>
-   * <br>
-   * <b>Note:</b> The {@link InputStream} is automatically closed after reading.
    *
    * @param is
    *          The data source. Must not be <code>null</code>.
@@ -130,12 +158,11 @@ public final class CoreUtils {
     final char[] buffer = new char[8192];
     final StringBuilder out = new StringBuilder();
     int length = 0;
-    try (Reader in = new InputStreamReader(is, charset)) {
-      while ((length = in.read(buffer)) != -1) {
-        out.append(buffer, 0, length);
-      }
-      return out;
+    Reader in = new InputStreamReader(is, charset);
+    while ((length = in.read(buffer)) != -1) {
+      out.append(buffer, 0, length);
     }
+    return out;
   }
 
   /**

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.internal.dto;
 
 import java.io.IOException;
+import java.io.InputStream;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -128,8 +129,8 @@ public abstract class AbstractDtoAutoUpdateOperation implements IDtoAutoUpdateOp
     IFile targetFile = getDerivedFile();
     String charsetName = targetFile.getCharset();
 
-    try {
-      return CoreUtils.inputStreamToString(targetFile.getContents(), charsetName).toString();
+    try (InputStream contents = targetFile.getContents()) {
+      return CoreUtils.inputStreamToString(contents, charsetName).toString();
     }
     catch (IOException e) {
       throw new CoreException(new ScoutStatus("Unable to read file '" + targetFile.getFullPath().toOSString() + "'.", e));

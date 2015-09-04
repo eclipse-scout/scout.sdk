@@ -19,4 +19,5 @@ public interface ISdkIcons {
   String FieldProtected = "field_protected_obj.gif";
   String DoubleFieldAdd = "doublefield_add.gif";
   String File = "file.gif";
+  String ScoutProjectNewWizBanner = "newscoutprj_wiz.png";
 }
