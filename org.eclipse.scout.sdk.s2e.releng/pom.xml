@@ -28,12 +28,12 @@
     2. Update Equinox and JDT/APT versions in the parent POM:
     ${osgiVersion[Maven]}, ${equinoxVersion[Maven]}, ${jdtVersion[Maven]}, ...
     3a. For deploying snapshots (to be used by Eclipse Scout SDK snapshots)
-    - In org.eclipse.scout.sdl.core.releng/, execute
+    - In org.eclipse.scout.sdk.s2e.releng/, execute
     mvn clean deploy -DforgeSnapshotUrl=https://scout.bsiag.com/repository/org.eclipse.scout-snapshot-local -DforgeSnapshotId=bsi-tools-snapshot
     3b. For deploying releases (to be used by Tycho releases):
     - Prerequisite: you need to have GPG properly set up, see https://docs.sonatype.org/display/Repository/How+To+Generate+PGP+Signatures+With+Maven
     - Make sure that ${jdtVersionMaven}, ${equinoxVersionMaven}, ${osgiVersionMaven},... in the parent POM don't have a '-SNAPSHOT' suffix
-    - In org.eclipse.scout.sdl.core.releng/, execute
+    - In org.eclipse.scout.sdk.s2e.releng/, execute
     mvn clean deploy -Pdeploy-releases -DforgeReleaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DforgeReleaseId=forge-releases -Dgpg.passphrase=<your_passphrase>
     - Close and release staged artifacts into repository 'Releases'
   -->
@@ -304,6 +304,22 @@
               <id>org.eclipse.ui.forms.source</id>
               <version>${uiFormsVersion}</version>
             </iu>
+            <iu>
+              <id>org.eclipse.m2e.core</id>
+              <version>${eclipseM2eCoreVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.m2e.core.source</id>
+              <version>${eclipseM2eCoreVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jdt.launching</id>
+              <version>${jdtLaunchingVersion}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jdt.launching.source</id>
+              <version>${jdtLaunchingVersion}</version>
+            </iu>
           </ius>
           <followStrictOnly>true</followStrictOnly>
         </configuration>
@@ -538,6 +554,34 @@
       </build>
     </profile>
     <profile>
+      <id>deploy-m2e-snapshots</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>deploy-m2e-core</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.m2e.core_${eclipseM2eCoreVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.m2e.core.source_${eclipseM2eCoreVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.pom</pomFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>deploy-jdt-snapshots</id>
       <activation>
         <activeByDefault>true</activeByDefault>
@@ -570,6 +614,18 @@
                   <file>${downloaded}/org.eclipse.jdt.ui_${jdtUiVersion}.jar</file>
                   <sources>${downloaded}/org.eclipse.jdt.ui.source_${jdtUiVersion}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.ui.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-jdt-launching</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.launching_${jdtLaunchingVersion}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.launching.source_${jdtLaunchingVersion}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.launching.pom</pomFile>
                 </configuration>
               </execution>
             </executions>

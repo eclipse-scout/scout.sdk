@@ -23,6 +23,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
+	<maven.model.dependency.version>3.3.3</maven.model.dependency.version>
 
     <!-- exclude the unit tests from sonar -->
     <sonar.exclusions>file:**/org.eclipse.scout.sdk.test/**</sonar.exclusions>
@@ -83,6 +84,10 @@
     <uiViewsVersionMaven>${uiViewsVersion}-SNAPSHOT</uiViewsVersionMaven>
     <uiFormsVersion>3.6.100.v20140422-1825</uiFormsVersion>
     <uiFormsVersionMaven>${uiFormsVersion}-SNAPSHOT</uiFormsVersionMaven>
+	<jdtLaunchingVersion>3.7.102.v20141111-0953</jdtLaunchingVersion>
+	<jdtLaunchingVersionMaven>${jdtLaunchingVersion}-SNAPSHOT</jdtLaunchingVersionMaven>
+	<eclipseM2eCoreVersion>1.5.1.20150109-1820</eclipseM2eCoreVersion>
+	<eclipseM2eCoreVersionMaven>${eclipseM2eCoreVersion}-SNAPSHOT</eclipseM2eCoreVersionMaven>
 
     <!-- version of Tycho used by org.eclipse.scout.sdk.core.releng build and profiles eclipse-sign and eclipse-pack -->
     <tycho.version>0.23.0</tycho.version>

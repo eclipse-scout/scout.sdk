@@ -62,6 +62,21 @@
         <artifactId>org.eclipse.ui.workbench</artifactId>
         <version>${uiWorkbenchVersionMaven}</version>
       </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk</groupId>
+        <artifactId>org.eclipse.jdt.launching</artifactId>
+        <version>${jdtLaunchingVersionMaven}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-model</artifactId>
+        <version>${maven.model.dependency.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk</groupId>
+        <artifactId>org.eclipse.m2e.core</artifactId>
+        <version>${eclipseM2eCoreVersionMaven}</version>
+      </dependency>
       <!-- Test Dependencies -->
     </dependencies>
   </dependencyManagement>
