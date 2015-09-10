@@ -41,20 +41,18 @@ import java.util.regex.Pattern;
 import javax.xml.bind.DatatypeConverter;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.model.FieldFilters;
-import org.eclipse.scout.sdk.core.model.Flags;
-import org.eclipse.scout.sdk.core.model.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.IAnnotation;
-import org.eclipse.scout.sdk.core.model.IAnnotationValue;
-import org.eclipse.scout.sdk.core.model.IField;
-import org.eclipse.scout.sdk.core.model.IMethod;
-import org.eclipse.scout.sdk.core.model.IMethodParameter;
-import org.eclipse.scout.sdk.core.model.IPropertyBean;
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.model.MethodFilters;
-import org.eclipse.scout.sdk.core.model.PropertyBean;
-import org.eclipse.scout.sdk.core.model.TypeFilters;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
+import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
+import org.eclipse.scout.sdk.core.model.api.IPropertyBean;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.PropertyBean;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
@@ -427,7 +425,7 @@ public final class CoreUtils {
     List<IType> typeParamsValue = getResolvedTypeParamValue(focusType, levelFqn, typeParamIndex);
     List<String> result = new ArrayList<>(typeParamsValue.size());
     for (IType t : typeParamsValue) {
-      result.add(SignatureUtils.getResolvedSignature(t));
+      result.add(SignatureUtils.getTypeSignature(t));
     }
     return result;
   }
@@ -453,7 +451,7 @@ public final class CoreUtils {
    * @return The first element that matches the given filter or <code>null</code> if the given collection is
    *         <code>null</code> or no element is accepted by the given filter.
    */
-  public static <E> E findFirst(Collection<E> collection, IFilter<E> filter) {
+  public static <E> E findFirst(Collection<? extends E> collection, IFilter<E> filter) {//TODO imo refactor all these to use new fluent api on type and method
     if (collection == null || collection.isEmpty()) {
       return null;
     }
@@ -526,7 +524,7 @@ public final class CoreUtils {
    * @return The member {@link IType} with the given name or <code>null</code> if it cannot be found.
    */
   public static IType getInnerType(IType declaringType, String typeName) {
-    return getInnerType(declaringType, TypeFilters.getElementNameFilter(typeName));
+    return getInnerType(declaringType, TypeFilters.simpleName(typeName));
   }
 
   /**
@@ -640,6 +638,8 @@ public final class CoreUtils {
 
   /**
    * Gets the first {@link IField} with given name.
+   * <p>
+   * The static { } section is the field with an empty name
    *
    * @param declaringType
    *          The declaring {@link IType}.
@@ -651,7 +651,7 @@ public final class CoreUtils {
     if (declaringType == null) {
       return null;
     }
-    return findFirst(declaringType.getFields(), FieldFilters.getNameFilter(fieldName));
+    return findFirst(declaringType.getFields(), FieldFilters.name(fieldName));
   }
 
   /**
@@ -753,14 +753,63 @@ public final class CoreUtils {
   }
 
   /**
-   * Searches for the first {@link IMethod} in the super hierarchy of the given {@link IType} matching the given
-   * {@link IFilter}.
+   * Collects inner {@link IType} matching the given {@link IFilter} checking the entire super hierarchy of the given
+   * {@link IType}. Stops when {@link IFilter#evaluate(Object)} returns false.
+   *
+   * @param declaringType
+   *          The {@link IType} to start searching
+   * @param filter
+   *          The {@link IFilter} to select the member {@link IType}.
+   * @return The first member {@link IType} on which {@link IFilter#evaluate(Object)} returns true
+   */
+  public static IType findInnerTypeInSuperHierarchy(IType declaringType, IFilter<IType> filter) {
+    if (declaringType == null) {
+      return null;
+    }
+
+    IType innerType = getInnerType(declaringType, filter);
+    if (innerType != null) {
+      return innerType;
+    }
+    return findInnerTypeInSuperHierarchy(declaringType.getSuperClass(), filter);
+  }
+
+  /**
+   * Collects {@link IType} in the super hierarchy of the given {@link IType} matching the given {@link IFilter}. This
+   * includes the startType. Stops when {@link IFilter#evaluate(Object)} returns false.
+   *
+   * @param startType
+   *          The start {@link IType}.
+   * @param filter
+   *          The {@link IFilter} to select the {@link IType}.
+   * @return The first {@link IType} on which {@link IFilter#evaluate(Object)} returns true
+   */
+  public static IType findTypeInSuperHierarchy(IType startType, IFilter<IType> filter) {
+    if (startType == null) {
+      return null;
+    }
+
+    IType type = filter.evaluate(startType) ? startType : null;
+    if (type != null) {
+      return type;
+    }
+
+    type = findTypeInSuperHierarchy(startType.getSuperClass(), filter);
+    if (type != null) {
+      return type;
+    }
+    return null;
+  }
+
+  /**
+   * Collects {@link IMethod} in the super hierarchy of the given {@link IType} matching the given {@link IFilter}.
+   * Stops when {@link IFilter#evaluate(Object)} returns false.
    *
    * @param startType
    *          The start {@link IType}.
    * @param filter
    *          The {@link IFilter} to select the {@link IMethod}.
-   * @return The first {@link IMethod} or <code>null</code> if it cannot be found.
+   * @return The first {@link IMethod} on which {@link IFilter#evaluate(Object)} returns true
    */
   public static IMethod findMethodInSuperHierarchy(IType startType, IFilter<IMethod> filter) {
     if (startType == null) {
@@ -787,25 +836,74 @@ public final class CoreUtils {
   }
 
   /**
-   * Searches for the first direct inner {@link IType} matching the given {@link IFilter} checking the entire super
-   * hierarchy of the given {@link IType}.
+   * Collects {@link IAnnotation} on type level in the super hierarchy of the given {@link IType} matching the given
+   * {@link IFilter}. Stops when {@link IFilter#evaluate(Object)} returns false.
    *
-   * @param declaringType
-   *          The {@link IType} to start searching
+   * @param startType
+   *          The start {@link IType}.
    * @param filter
-   *          The {@link IFilter} to select the member {@link IType}.
-   * @return The first member {@link IType} or <code>null</code> if it cannot be found.
+   *          The {@link IFilter} to select the {@link IAnnotation}.
+   * @return The first {@link IAnnotation} on which {@link IFilter#evaluate(Object)} returns true
    */
-  public static IType findInnerTypeInSuperHierarchy(IType declaringType, IFilter<IType> filter) {
-    if (declaringType == null) {
+  public static IAnnotation findTypeAnnotationInSuperHierarchy(IType startType, IFilter<IAnnotation> filter) {
+    if (startType == null) {
       return null;
     }
 
-    List<IType> innerTypes = getInnerTypes(declaringType, filter);
-    if (!innerTypes.isEmpty()) {
-      return innerTypes.get(0);
+    IAnnotation annotation = getAnnotation(startType, filter);
+    if (annotation != null) {
+      return annotation;
     }
-    return findInnerTypeInSuperHierarchy(declaringType.getSuperClass(), filter);
+
+    annotation = findTypeAnnotationInSuperHierarchy(startType.getSuperClass(), filter);
+    if (annotation != null) {
+      return annotation;
+    }
+
+    for (IType ifc : startType.getSuperInterfaces()) {
+      annotation = findTypeAnnotationInSuperHierarchy(ifc, filter);
+      if (annotation != null) {
+        return annotation;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Collects {@link IAnnotation} on methods in the super hierarchy of the given {@link IType} matching the given
+   * {@link IFilter}. Only methods that matche the methodFilter are visited. Stops when {@link IFilter#evaluate(Object)}
+   * returns true.
+   *
+   * @param startType
+   *          The start {@link IType}.
+   * @param filter
+   *          The {@link IFilter} to select the {@link IAnnotation}.
+   * @return The first {@link IAnnotation} on which {@link IFilter#evaluate(Object)} returns true
+   */
+  public static IAnnotation findMethodAnnotationInSuperHierarchy(IType startType, IFilter<IMethod> methodFilter, IFilter<IAnnotation> annotationFilter) {
+    if (startType == null) {
+      return null;
+    }
+
+    IMethod m = getMethod(startType, methodFilter);
+
+    IAnnotation annotation = getAnnotation(m, annotationFilter);
+    if (annotation != null) {
+      return annotation;
+    }
+
+    annotation = findMethodAnnotationInSuperHierarchy(startType.getSuperClass(), methodFilter, annotationFilter);
+    if (annotation != null) {
+      return annotation;
+    }
+
+    for (IType ifc : startType.getSuperInterfaces()) {
+      annotation = findMethodAnnotationInSuperHierarchy(ifc, methodFilter, annotationFilter);
+      if (annotation != null) {
+        return annotation;
+      }
+    }
+    return null;
   }
 
   /**
@@ -833,18 +931,18 @@ public final class CoreUtils {
    * @see <a href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">JavaBeans Spec</a>
    */
   public static List<IPropertyBean> getPropertyBeans(IType type, IFilter<IPropertyBean> propertyFilter, Comparator<IPropertyBean> comparator) {
-    IFilter<IMethod> filter = MethodFilters.getMultiMethodFilter(MethodFilters.getFlagsFilter(Flags.AccPublic), MethodFilters.getNameRegexFilter(BEAN_METHOD_NAME));
+    IFilter<IMethod> filter = Filters.and(MethodFilters.flags(Flags.AccPublic), MethodFilters.nameRegex(BEAN_METHOD_NAME));
     List<IMethod> methods = getMethods(type, filter);
     Map<String, PropertyBean> beans = new HashMap<>(methods.size());
     for (IMethod m : methods) {
-      Matcher matcher = BEAN_METHOD_NAME.matcher(m.getName());
+      Matcher matcher = BEAN_METHOD_NAME.matcher(m.getElementName());
       if (matcher.matches()) {
         String kind = matcher.group(1);
         String name = matcher.group(2);
 
         List<IMethodParameter> parameterTypes = m.getParameters();
         IType returnType = m.getReturnType();
-        if ("get".equals(kind) && parameterTypes.size() == 0 && !returnType.equals(IType.VOID)) {
+        if ("get".equals(kind) && parameterTypes.size() == 0 && !returnType.isVoid()) {
           PropertyBean desc = beans.get(name);
           if (desc == null) {
             desc = new PropertyBean(type, name);
@@ -855,7 +953,7 @@ public final class CoreUtils {
           }
         }
         else {
-          boolean isBool = Boolean.class.getName().equals(returnType.getName()) || "boolean".equals(returnType.getName());
+          boolean isBool = TypeNames.java_lang_Boolean.equals(returnType.getName()) || TypeNames._boolean.equals(returnType.getName());
           if ("is".equals(kind) && parameterTypes.size() == 0 && isBool) {
             PropertyBean desc = beans.get(name);
             if (desc == null) {
@@ -866,7 +964,7 @@ public final class CoreUtils {
               desc.setReadMethod(m);
             }
           }
-          else if ("set".equals(kind) && parameterTypes.size() == 1 && returnType.equals(IType.VOID)) {
+          else if ("set".equals(kind) && parameterTypes.size() == 1 && returnType.isVoid()) {
             PropertyBean desc = beans.get(name);
             if (desc == null) {
               desc = new PropertyBean(type, name);
@@ -901,84 +999,71 @@ public final class CoreUtils {
    *         if it could not be found.
    */
   public static IAnnotation getAnnotation(IAnnotatable annotatable, String name) {
-    if (annotatable == null) {
+    if (annotatable == null || name == null) {
       return null;
     }
-    List<IAnnotation> annotations = getAnnotations(annotatable, name, true);
-    if (annotations == null || annotations.isEmpty()) {
+    List<? extends IAnnotation> candidates = annotatable.getAnnotations();
+    if (candidates.size() == 0) {
       return null;
-    }
-    return annotations.get(0);
-  }
-
-  /**
-   * Gets all {@link IAnnotation}s on the given {@link IAnnotatable} having the given name.
-   *
-   * @param annotatable
-   *          The {@link IAnnotation} holder.
-   * @param name
-   *          Simple or fully qualified name of the annotation type.
-   * @return A {@link List} holding all {@link IAnnotation}s having the given name or <code>null</code> if no such
-   *         annotation can be found.
-   */
-  public static List<IAnnotation> getAnnotations(IAnnotatable annotatable, String name) {
-    return getAnnotations(annotatable, name, false);
-  }
-
-  private static List<IAnnotation> getAnnotations(IAnnotatable annotatable, String name, boolean onlyFirst) {
-    if (annotatable == null) {
-      return null;
-    }
-    List<IAnnotation> candidates = annotatable.getAnnotations();
-    if (name == null || candidates.size() == 0) {
-      return candidates;
     }
     String simpleName = Signature.getSimpleName(name);
-
-    List<IAnnotation> result = new ArrayList<>(onlyFirst ? 1 : candidates.size());
     for (IAnnotation candidate : candidates) {
       if (name.equals(candidate.getType().getName()) || simpleName.equals(candidate.getType().getSimpleName())) {
-        result.add(candidate);
-        if (onlyFirst) {
-          return result; // cancel after first
-        }
+        return candidate;
       }
     }
-    return result;
+    return null;
   }
 
   /**
-   * Checks if a type with given name exists in the given {@link ILookupEnvironment} (classpath).
+   * Gets the first {@link IAnnotation} which is directly in the given {@link IAnnotatable} and accepts the given
+   * {@link IFilter} .
    *
-   * @param typeToSearchFqn
-   *          The fully qualified name to search. See {@link ILookupEnvironment#existsType(String)} for detailed
-   *          constraints on the name.
-   * @param context
+   * @param element
+   *          The {@link IAnnotatable} to search in.
+   * @param filter
+   *          The {@link IFilter} to select the {@link IAnnotation}.
+   * @return The first {@link IAnnotation} or <code>null</code>.
+   */
+  public static IAnnotation getAnnotation(IAnnotatable element, IFilter<IAnnotation> filter) {
+    if (element == null) {
+      return null;
+    }
+    return findFirst(element.getAnnotations(), filter);
+  }
+
+  /**
+   * Checks if a type with given name exists in the given {@link IJavaEnvironment} (classpath).
+   *
+   * @param env
    *          The context to search in.
+   * @param typeToSearchFqn
+   *          The fully qualified name to search. See {@link IJavaEnvironment#existsType(String)} for detailed
+   *          constraints on the name.
    * @return <code>true</code> if the given type exists, <code>false</code> otherwise.
    */
-  public static boolean isOnClasspath(String typeToSearchFqn, ILookupEnvironment context) {
+  public static boolean isOnClasspath(IJavaEnvironment env, String typeToSearchFqn) {
     if (StringUtils.isBlank(typeToSearchFqn)) {
       return false;
     }
-    return context.existsType(typeToSearchFqn);
+    return env.findType(typeToSearchFqn) != null;
 
   }
 
   /**
-   * Checks if the given {@link IType} exists in the given {@link ILookupEnvironment} (classpath).
+   * Checks if the given {@link IType} exists in the given {@link IJavaEnvironment} (classpath).
    *
+   * @param env
+   *          The context to search in.
    * @param typeToSearch
    *          The {@link IType} to search
-   * @param context
-   *          The context to search in.
    * @return <code>true</code> if the given type exists, <code>false</code> otherwise.
    */
-  public static boolean isOnClasspath(IType typeToSearch, ILookupEnvironment context) {
+  public static boolean isOnClasspath(IJavaEnvironment env, IType typeToSearch) {
     if (typeToSearch == null) {
       return false;
     }
-    return isOnClasspath(typeToSearch.getName(), context);
+    return isOnClasspath(env, typeToSearch.getName());
   }
 
   /**
@@ -1024,10 +1109,32 @@ public final class CoreUtils {
    *          The {@link IType} to check.
    * @param queryType
    *          The fully qualified name of the super type to check.
-   * @return
+   * @return TODO mvi (imo) deprecate this and use ClassX, AnnotationX and {@link #isAssignableFrom(IType, IType)}
    */
   public static boolean isInstanceOf(IType typeToCheck, String queryType) {
     return findSuperType(typeToCheck, queryType) != null;
+  }
+
+  private static final Pattern PRIMITIVE_TYPE_ASSIGNABLE_PAT =
+      Pattern.compile("("
+          + "char=(char|Character)|byte=(byte|Byte)|short=(short|Short)|int=(int|Integer)|long=(long|Long)"
+          + "|float=(float|Float)|double=(double|Double)|Character=(char|Character)|Byte=(byte|Byte)"
+          + "|Short=(short|Short)|Integer=(int|Integer)|Long=(long|Long)|Float=(float|Float)|Double=(double|Double)"
+          + ")");
+
+  /**
+   * see {@link Class#isAssignableFrom(Class)}
+   *
+   * @return true if a declaration BaseClass b = (SpecificClass)s; is valid
+   */
+  public static boolean isAssignableFrom(IType baseClass, IType specificClass) {
+    if ((baseClass.isPrimitive() || specificClass.isPrimitive())) {
+      return PRIMITIVE_TYPE_ASSIGNABLE_PAT.matcher(baseClass.getSimpleName() + "=" + specificClass.getSimpleName()).matches();
+    }
+    if ((baseClass.isArray() || specificClass.isArray())) {
+      return baseClass.getName().equals(specificClass.getName());
+    }
+    return findSuperType(baseClass, specificClass.getName()) != null;
   }
 
   /**
@@ -1057,7 +1164,7 @@ public final class CoreUtils {
    * @return The first method found or null.
    */
   public static IMethod getMethod(IType type, final String methodName) {
-    return getMethod(type, MethodFilters.getNameFilter(methodName));
+    return getMethod(type, MethodFilters.name(methodName));
   }
 
   /**
@@ -1134,22 +1241,27 @@ public final class CoreUtils {
    *          The {@link IAnnotation} in which the attribute should be searched.
    * @param name
    *          The name of the attribute.
-   * @return The value of the attribute with given name in the given {@link IAnnotation} or <code>null</code> if there
-   *         is not such attribute or no value.
+   * @return The value of the attribute with given name in the given {@link IAnnotation} (the default value is ignored!)
+   *         or <code>null</code> if there is not such attribute or no value.
    */
+//TODO mvi, imo maybe fix here : callers of annotation values should use {@link IAnnotationValue#isSyntheticDefaultValue()}
   public static String getAnnotationValueString(IAnnotation annotation, String name) {
     if (annotation == null) {
       return null;
     }
 
     IAnnotationValue value = annotation.getValue(name);
-    if (value == null) {
+    if (value == null || value.isSyntheticDefaultValue()) {
       return null;
     }
 
-    Object rawVal = value.getValue();
+    Object rawVal = value.getMetaValue().getObject(Object.class);
     if (rawVal == null) {
       return null;
+    }
+    //enum
+    if (rawVal instanceof IField) {
+      return ((IField) rawVal).getElementName();
     }
 
     return rawVal.toString();
@@ -1162,36 +1274,34 @@ public final class CoreUtils {
    *          The {@link IAnnotation} in which the attribute should be searched.
    * @param name
    *          The name of the attribute.
-   * @return The value of the attribute with given name in the given {@link IAnnotation} or <code>null</code> if there
-   *         is not such attribute or no value or it is not numeric.
+   * @return The value of the attribute with given name in the given {@link IAnnotation} (the default value is ignored)
+   *         or <code>null</code> if there is not such attribute or no value or it is not numeric.
    */
+//TODO mvi, imo maybe fix here : callers of annotation values should use {@link IAnnotationValue#isSyntheticDefaultValue()}
   public static BigDecimal getAnnotationValueNumeric(IAnnotation annotation, String name) {
     if (annotation == null) {
       return null;
     }
 
     IAnnotationValue value = annotation.getValue(name);
-    if (value == null) {
+    if (value == null || value.isSyntheticDefaultValue()) {
       return null;
     }
 
-    Object rawVal = value.getValue();
+    Object rawVal = value.getMetaValue().getObject(Object.class);
     if (rawVal == null) {
       return null;
     }
 
-    switch (value.getValueType()) {
-      case Int:
-      case Byte:
-      case Short:
-        return new BigDecimal(((Number) rawVal).intValue());
-      case Long:
-        return new BigDecimal(((Long) rawVal).longValue());
-      case Float:
-      case Double:
-        return new BigDecimal(((Number) rawVal).doubleValue());
-      default:
-        return null;
+    if (rawVal instanceof Integer || rawVal instanceof Byte || rawVal instanceof Short) {
+      return new BigDecimal(((Number) rawVal).intValue());
     }
+    if (rawVal instanceof Long) {
+      return new BigDecimal(((Long) rawVal).longValue());
+    }
+    if (rawVal instanceof Float || rawVal instanceof Double) {
+      return new BigDecimal(((Number) rawVal).doubleValue());
+    }
+    return null;
   }
 }

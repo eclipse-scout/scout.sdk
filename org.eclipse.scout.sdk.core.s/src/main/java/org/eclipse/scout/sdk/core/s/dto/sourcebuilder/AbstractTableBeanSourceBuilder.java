@@ -13,26 +13,26 @@ package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.model.Flags;
-import org.eclipse.scout.sdk.core.model.IMethod;
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.model.TypeFilters;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableRowDataTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.SortedMemberKeyFactory;
-import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodBodySourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodParameterDescription;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.MethodParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.TypeFilters;
 
 /**
  * <h3>{@link AbstractTableBeanSourceBuilder}</h3>
@@ -47,14 +47,14 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
   /**
    * @param elementName
    */
-  public AbstractTableBeanSourceBuilder(IType modelType, String typeName, ILookupEnvironment lookupEnv, boolean setup) {
-    super(modelType, typeName, lookupEnv, setup);
+  public AbstractTableBeanSourceBuilder(IType modelType, String typeName, IJavaEnvironment env, boolean setup) {
+    super(modelType, typeName, env, setup);
   }
 
   @Override
   protected void createContent() {
     super.createContent();
-    IType table = CoreUtils.findInnerTypeInSuperHierarchy(getModelType(), TypeFilters.getSubtypeFilter(IRuntimeClasses.ITable));
+    IType table = CoreUtils.findInnerTypeInSuperHierarchy(getModelType(), TypeFilters.subtypeOf(IRuntimeClasses.ITable));
     if (table != null) {
       visitTableBean(table);
     }
@@ -66,38 +66,38 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
   protected void visitTableBean(IType table) {
     // inner row data class
     String rowDataName = DATA_SUFFIX_PATTERN.matcher(getElementName()).replaceAll("") + "RowData";
-    ITypeSourceBuilder tableRowDataBuilder = new TableRowDataTypeSourceBuilder(rowDataName, table, getModelType(), getLookupEnvironment());
-    addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeTableKey(tableRowDataBuilder), tableRowDataBuilder);
+    ITypeSourceBuilder tableRowDataBuilder = new TableRowDataTypeSourceBuilder(rowDataName, table, getModelType(), getJavaEnvironment());
+    addSortedType(SortedMemberKeyFactory.createTypeTableKey(tableRowDataBuilder), tableRowDataBuilder);
 
     // row access methods
     final String tableRowSignature = Signature.createTypeSignature(rowDataName, false);
     // getRows
-    IMethodSourceBuilder getRowsMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), "getRows");
+    IMethodSourceBuilder getRowsMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "getRows");
     getRowsMethodBuilder.setReturnTypeSignature(Signature.createArraySignature(tableRowSignature, 1));
-    getRowsMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+    getRowsMethodBuilder.setBody(new ISourceBuilder() {
       @Override
-      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return (").append(SignatureUtils.getTypeReference(Signature.createArraySignature(tableRowSignature, 1), validator)).append(") super.getRows();");
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append("return (").append(SignatureUtils.useSignature(Signature.createArraySignature(tableRowSignature, 1), validator)).append(") super.getRows();");
       }
     });
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getRowsMethodBuilder), getRowsMethodBuilder);
+    addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(getRowsMethodBuilder), getRowsMethodBuilder);
 
     // setRows
     IMethodSourceBuilder setRowsMethodBuilder = new MethodSourceBuilder("setRows");
     setRowsMethodBuilder.setFlags(Flags.AccPublic);
     setRowsMethodBuilder.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
-    setRowsMethodBuilder.addParameter(new MethodParameterDescription("rows", Signature.createArraySignature(tableRowSignature, 1)));
-    setRowsMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+    setRowsMethodBuilder.addParameter(new MethodParameterSourceBuilder("rows", Signature.createArraySignature(tableRowSignature, 1)));
+    setRowsMethodBuilder.setBody(new ISourceBuilder() {
       @Override
-      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         source.append("super.setRows(rows);");
       }
     });
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(setRowsMethodBuilder), setRowsMethodBuilder);
+    addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(setRowsMethodBuilder), setRowsMethodBuilder);
 
     // addRow
     final String addRowMethodName = "addRow";
-    IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), addRowMethodName, new IFilter<IMethod>() {
+    IMethodSourceBuilder addRowMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), addRowMethodName, new IFilter<IMethod>() {
       @Override
       public boolean evaluate(IMethod candidate) {
         // choose the narrowed overload from the abstract super class instead of the method defined in the interface
@@ -105,96 +105,96 @@ public abstract class AbstractTableBeanSourceBuilder extends AbstractDtoTypeSour
       }
     });
     addRowMethodBuilder.setReturnTypeSignature(tableRowSignature);
-    addRowMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+    addRowMethodBuilder.setBody(new ISourceBuilder() {
       @Override
-      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return (").append(SignatureUtils.getTypeReference(tableRowSignature, validator)).append(") super.addRow();");
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append("return (").append(SignatureUtils.useSignature(tableRowSignature, validator)).append(") super.addRow();");
       }
     });
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(addRowMethodBuilder), addRowMethodBuilder);
+    addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(addRowMethodBuilder), addRowMethodBuilder);
 
     // addRow(int state)
-    IMethodSourceBuilder addRowWithStateMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), addRowMethodName, new IFilter<IMethod>() {
+    final IMethodSourceBuilder addRowWithStateMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), addRowMethodName, new IFilter<IMethod>() {
       @Override
       public boolean evaluate(IMethod candidate) {
         return candidate.getParameters().size() == 1;
       }
     });
-    addRowWithStateMethodBuilder.getParameters().get(0).setName("rowState"); // in case the param name cannot be parsed from the class file
+    addRowWithStateMethodBuilder.getParameters().get(0).setElementName("rowState"); // in case the param name cannot be parsed from the class file
     addRowWithStateMethodBuilder.setReturnTypeSignature(tableRowSignature);
-    addRowWithStateMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+    addRowWithStateMethodBuilder.setBody(new ISourceBuilder() {
       @Override
-      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return (").append(SignatureUtils.getTypeReference(tableRowSignature, validator)).append(") super.addRow(");
-        source.append(methodBuilder.getParameters().get(0).getName()).append(");");
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append("return (").append(SignatureUtils.useSignature(tableRowSignature, validator)).append(") super.addRow(");
+        source.append(addRowWithStateMethodBuilder.getParameters().get(0).getElementName()).append(");");
       }
     });
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(addRowWithStateMethodBuilder), addRowWithStateMethodBuilder);
+    addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(addRowWithStateMethodBuilder), addRowWithStateMethodBuilder);
 
     // rowAt
-    IMethodSourceBuilder rowAtMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), "rowAt");
+    final IMethodSourceBuilder rowAtMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "rowAt");
     rowAtMethodBuilder.setReturnTypeSignature(tableRowSignature);
-    rowAtMethodBuilder.getParameters().get(0).setName("index"); // in case the param name cannot be parsed from the class file
-    rowAtMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+    rowAtMethodBuilder.getParameters().get(0).setElementName("index"); // in case the param name cannot be parsed from the class file
+    rowAtMethodBuilder.setBody(new ISourceBuilder() {
       @Override
-      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return (").append(SignatureUtils.getTypeReference(tableRowSignature, validator)).append(") super.rowAt(").append(methodBuilder.getParameters().get(0).getName()).append(");");
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append("return (").append(SignatureUtils.useSignature(tableRowSignature, validator)).append(") super.rowAt(").append(rowAtMethodBuilder.getParameters().get(0).getElementName()).append(");");
       }
     });
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(rowAtMethodBuilder), rowAtMethodBuilder);
+    addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(rowAtMethodBuilder), rowAtMethodBuilder);
 
     // createRow
-    IMethodSourceBuilder createRowMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), "createRow");
+    IMethodSourceBuilder createRowMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "createRow");
     createRowMethodBuilder.setReturnTypeSignature(tableRowSignature);
     if (Flags.isAbstract(table.getFlags()) || Flags.isAbstract(getModelType().getFlags())) {
       createRowMethodBuilder.setFlags(createRowMethodBuilder.getFlags() | Flags.AccAbstract);
     }
     else {
-      createRowMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      createRowMethodBuilder.setBody(new ISourceBuilder() {
         @Override
-        public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-          source.append("return new ").append(SignatureUtils.getTypeReference(tableRowSignature, validator)).append("();");
+        public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+          source.append("return new ").append(SignatureUtils.useSignature(tableRowSignature, validator)).append("();");
         }
       });
     }
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(createRowMethodBuilder), createRowMethodBuilder);
+    addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(createRowMethodBuilder), createRowMethodBuilder);
 
     // getRowType
-    IMethodSourceBuilder getRowTypeMethodBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), "getRowType");
-    getRowTypeMethodBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+    IMethodSourceBuilder getRowTypeMethodBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "getRowType");
+    getRowTypeMethodBuilder.setBody(new ISourceBuilder() {
       @Override
-      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return ").append(SignatureUtils.getTypeReference(tableRowSignature, validator)).append(".class;");
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append("return ").append(SignatureUtils.useSignature(tableRowSignature, validator)).append(".class;");
       }
     });
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getRowTypeMethodBuilder), getRowTypeMethodBuilder);
+    addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(getRowTypeMethodBuilder), getRowTypeMethodBuilder);
   }
 
   protected void addAbstractMethodImplementations() {
     // createRow
-    IMethodSourceBuilder createRowSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), "createRow");
+    IMethodSourceBuilder createRowSourceBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "createRow");
 
     createRowSourceBuilder.setReturnTypeSignature(Signature.createTypeSignature(IRuntimeClasses.AbstractTableRowData));
-    createRowSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+    createRowSourceBuilder.setBody(new ISourceBuilder() {
 
       @Override
-      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return new ").append(SignatureUtils.getTypeReference(Signature.createTypeSignature(IRuntimeClasses.AbstractTableRowData), validator));
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append("return new ").append(SignatureUtils.useName(IRuntimeClasses.AbstractTableRowData, validator));
         source.append("(){").append(lineDelimiter).append("private static final long serialVersionUID = 1L;").append(lineDelimiter).append("};");
       }
     });
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(createRowSourceBuilder), createRowSourceBuilder);
+    addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(createRowSourceBuilder), createRowSourceBuilder);
 
-    IMethodSourceBuilder getRowTypeSourceBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(this, getLookupEnvironment(), "getRowType");
+    IMethodSourceBuilder getRowTypeSourceBuilder = MethodSourceBuilderFactory.createOverride(this, getJavaEnvironment(), "getRowType");
     getRowTypeSourceBuilder.setReturnTypeSignature(Signature.createTypeSignature(Class.class.getName() + ISignatureConstants.C_GENERIC_START + "? extends " + IRuntimeClasses.AbstractTableRowData + ISignatureConstants.C_GENERIC_END));
-    getRowTypeSourceBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+    getRowTypeSourceBuilder.setBody(new ISourceBuilder() {
 
       @Override
-      public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return ").append(SignatureUtils.getTypeReference(Signature.createTypeSignature(IRuntimeClasses.AbstractTableRowData), validator)).append(".class;");
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+        source.append("return ").append(SignatureUtils.useName(IRuntimeClasses.AbstractTableRowData, validator)).append(".class;");
       }
     });
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodAnyKey(getRowTypeSourceBuilder), getRowTypeSourceBuilder);
+    addSortedMethod(SortedMemberKeyFactory.createMethodAnyKey(getRowTypeSourceBuilder), getRowTypeSourceBuilder);
   }
 
 }

@@ -15,9 +15,11 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.model.IMethod;
-import org.eclipse.scout.sdk.core.model.IMethodParameter;
-import org.eclipse.scout.sdk.core.model.IType;
+import org.eclipse.scout.sdk.core.importvalidator.ImportElementCandidate;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 
 /**
  * <h3>{@link SignatureUtils}</h3> Helper methods to deal with Signatures.
@@ -55,159 +57,17 @@ public final class SignatureUtils {
   }
 
   /**
-   * Same as {@link Signature#toString()} but it preserves the dollar sign ($) for inner types.
-   *
-   * @param sig
-   *          The signature to convert to a fully qualified name.
-   * @return The fully qualified name of the given signature.
+   * Convenience for t!=null? {@link IType#getSignature()} : null
    */
-  public static String toFullyQualifiedName(String sig) {
-    String nameUpToPrimaryType = Signature.getSignatureSimpleName(sig).replace(ISignatureConstants.C_DOT, ISignatureConstants.C_DOLLAR); // ensure to keep $ for inner types.
-    String pck = Signature.getSignatureQualifier(sig);
-    return new StringBuilder(nameUpToPrimaryType.length() + 1 + pck.length()).append(pck).append('.').append(nameUpToPrimaryType).toString();
+  public static String getTypeSignature(IType t) {
+    return t != null ? t.getSignature() : null;
   }
 
   /**
-   * Converts the given base type signature (primitive types) to the corresponding wrapper class signature.
-   *
-   * @param signature
-   *          The primitive signature.
-   * @return The boxed version of the given primitive signature or the input.
+   * Convenience for p!=null? {@link ITypeParameter#getSignature()} : null
    */
-  public static String boxPrimitiveSignature(String signature) {
-    if (Signature.getTypeSignatureKind(signature) != ISignatureConstants.BASE_TYPE_SIGNATURE) {
-      return signature;
-    }
-
-    if (ISignatureConstants.SIG_BOOLEAN.equals(signature)) {
-      return Signature.createTypeSignature(Boolean.class.getName());
-    }
-    if (ISignatureConstants.SIG_BYTE.equals(signature)) {
-      return Signature.createTypeSignature(Byte.class.getName());
-    }
-    if (ISignatureConstants.SIG_CHAR.equals(signature)) {
-      return Signature.createTypeSignature(Character.class.getName());
-    }
-    if (ISignatureConstants.SIG_DOUBLE.equals(signature)) {
-      return Signature.createTypeSignature(Double.class.getName());
-    }
-    if (ISignatureConstants.SIG_FLOAT.equals(signature)) {
-      return Signature.createTypeSignature(Float.class.getName());
-    }
-    if (ISignatureConstants.SIG_INT.equals(signature)) {
-      return Signature.createTypeSignature(Integer.class.getName());
-    }
-    if (ISignatureConstants.SIG_LONG.equals(signature)) {
-      return Signature.createTypeSignature(Long.class.getName());
-    }
-    if (ISignatureConstants.SIG_SHORT.equals(signature)) {
-      return Signature.createTypeSignature(Short.class.getName());
-    }
-    return signature;
-  }
-
-  /**
-   * Converts the given {@link IType} to a resolved type signature including all type arguments of the given
-   * {@link IType}.
-   * 
-   * @param t
-   *          The {@link IType} to convert to a signature.
-   * @return The resolved type signature matching the given {@link IType}.
-   */
-  public static String getResolvedSignature(IType t) {
-    if (t == null) {
-      return null;
-    }
-
-    StringBuilder builder = new StringBuilder();
-    getResolvedSignatureRec(t, builder);
-
-    int len = builder.length();
-    char[] expr = new char[len];
-    builder.getChars(0, len, expr, 0);
-    return Signature.createTypeSignature(expr, true);
-  }
-
-  protected static void getResolvedSignatureRec(IType type, StringBuilder builder) {
-    String name = type.getName();
-    boolean isWildCardOnly = name == null; // name may be null for wildcard only types (<?>)
-    if (type.isWildcardType()) {
-      builder.append('?');
-      if (isWildCardOnly) {
-        return; // no further processing needed.
-      }
-      builder.append(" extends ");
-    }
-    if (!isWildCardOnly) {
-      builder.append(name);
-    }
-
-    // generics
-    List<IType> typeArgs = type.getTypeArguments();
-    if (typeArgs.size() > 0) {
-      builder.append(ISignatureConstants.C_GENERIC_START);
-      getResolvedSignatureRec(typeArgs.get(0), builder);
-      for (int i = 1; i < typeArgs.size(); i++) {
-        builder.append(Signature.C_COMMA);
-        getResolvedSignatureRec(typeArgs.get(i), builder);
-      }
-      builder.append(ISignatureConstants.C_GENERIC_END);
-    }
-
-    // arrays
-    for (int i = 0; i < type.getArrayDimension(); i++) {
-      builder.append(ISignatureConstants.C_ARRAY).append(Signature.C_ARRAY_END);
-    }
-  }
-
-  /**
-   * @param signature
-   *          fully parameterized signature
-   * @param validator
-   *          an import validator to decide simple name vs. fully qualified name.
-   * @return the type reference
-   * @see {@link IImportValidator}
-   */
-  public static String getTypeReference(String signature, IImportValidator validator) {
-    StringBuilder sigBuilder = new StringBuilder();
-    int arrayCount = 0;
-    switch (Signature.getTypeSignatureKind(signature)) {
-      case ISignatureConstants.WILDCARD_TYPE_SIGNATURE:
-        sigBuilder.append("?");
-        if (signature.length() > 1) {
-          sigBuilder.append(" extends ");
-          sigBuilder.append(getTypeReference(signature.substring(1), validator));
-        }
-        break;
-      case ISignatureConstants.ARRAY_TYPE_SIGNATURE:
-        arrayCount = Signature.getArrayCount(signature);
-        sigBuilder.append(getTypeReference(signature.substring(arrayCount), validator));
-        break;
-      case ISignatureConstants.BASE_TYPE_SIGNATURE:
-        sigBuilder.append(Signature.getSignatureSimpleName(signature));
-        break;
-      case ISignatureConstants.TYPE_VARIABLE_SIGNATURE:
-        sigBuilder.append(toFullyQualifiedName(signature));
-        break;
-      default:
-        String[] typeArguments = Signature.getTypeArguments(signature);
-        signature = Signature.getTypeErasure(signature);
-        sigBuilder.append(validator.getTypeName(signature));
-        if (typeArguments != null && typeArguments.length > 0) {
-          sigBuilder.append(ISignatureConstants.C_GENERIC_START);
-          sigBuilder.append(getTypeReference(typeArguments[0], validator));
-          for (int i = 1; i < typeArguments.length; i++) {
-            sigBuilder.append(", ");
-            sigBuilder.append(getTypeReference(typeArguments[i], validator));
-          }
-          sigBuilder.append(ISignatureConstants.C_GENERIC_END);
-        }
-        break;
-    }
-    for (int i = 0; i < arrayCount; i++) {
-      sigBuilder.append("[]");
-    }
-    return sigBuilder.toString();
+  public static String getTypeParameterSignature(ITypeParameter p) {
+    return p != null ? p.getSignature() : null;
   }
 
   /**
@@ -221,9 +81,9 @@ public final class SignatureUtils {
     List<IMethodParameter> parameters = method.getParameters();
     List<String> signatures = new ArrayList<>(parameters.size());
     for (IMethodParameter mp : parameters) {
-      signatures.add(getResolvedSignature(mp.getType()));
+      signatures.add(getTypeSignature(mp.getDataType()));
     }
-    return getMethodIdentifier(method.getName(), signatures);
+    return createMethodIdentifier(method.getElementName(), signatures);
   }
 
   /**
@@ -236,7 +96,7 @@ public final class SignatureUtils {
    *          The parameter signatures of the method.
    * @return The created identifier
    */
-  public static String getMethodIdentifier(String methodName, List<String> resolvedParamSignatures) {
+  public static String createMethodIdentifier(String methodName, List<String> resolvedParamSignatures) {
     StringBuilder methodIdBuilder = new StringBuilder();
     methodIdBuilder.append(methodName);
     methodIdBuilder.append('(');
@@ -253,4 +113,144 @@ public final class SignatureUtils {
     methodIdBuilder.append(')');
     return methodIdBuilder.toString();
   }
+
+  /**
+   * Same as {@link Signature#toString()} but it preserves the dollar sign ($) for inner types.
+   *
+   * @param sig
+   *          The signature to convert to a fully qualified name.
+   * @return The fully qualified name of the given signature.
+   */
+  public static String toFullyQualifiedName(String sig) {
+    String nameUpToPrimaryType = Signature.getSignatureSimpleName(sig).replace(ISignatureConstants.C_DOT, ISignatureConstants.C_DOLLAR); // ensure to keep $ for inner types.
+    String pck = Signature.getSignatureQualifier(sig);
+    StringBuilder buf = new StringBuilder(nameUpToPrimaryType.length() + 1 + pck.length());
+    if (pck.length() > 0) {
+      buf.append(pck);
+      buf.append('.');
+    }
+    buf.append(nameUpToPrimaryType);
+    return buf.toString();
+  }
+
+  /**
+   * Converts the given base type signature (primitive types) to the corresponding wrapper class signature.
+   *
+   * @param signature
+   *          The primitive signature.
+   * @return The boxed version of the given primitive signature or the input.
+   */
+  public static String boxPrimitiveSignature(String signature) {
+    if (Signature.getTypeSignatureKind(signature) != ISignatureConstants.BASE_TYPE_SIGNATURE) {
+      return signature;
+    }
+
+    if (ISignatureConstants.SIG_BOOLEAN.equals(signature)) {
+      return ISignatureConstants.SIG_JAVA_LANG_BOOLEAN;
+    }
+    if (ISignatureConstants.SIG_BYTE.equals(signature)) {
+      return ISignatureConstants.SIG_JAVA_LANG_BYTE;
+    }
+    if (ISignatureConstants.SIG_CHAR.equals(signature)) {
+      return ISignatureConstants.SIG_JAVA_LANG_CHARACTER;
+    }
+    if (ISignatureConstants.SIG_DOUBLE.equals(signature)) {
+      return ISignatureConstants.SIG_JAVA_LANG_DOUBLE;
+    }
+    if (ISignatureConstants.SIG_FLOAT.equals(signature)) {
+      return ISignatureConstants.SIG_JAVA_LANG_FLOAT;
+    }
+    if (ISignatureConstants.SIG_INT.equals(signature)) {
+      return ISignatureConstants.SIG_JAVA_LANG_INTEGER;
+    }
+    if (ISignatureConstants.SIG_LONG.equals(signature)) {
+      return ISignatureConstants.SIG_JAVA_LANG_LONG;
+    }
+    if (ISignatureConstants.SIG_SHORT.equals(signature)) {
+      return ISignatureConstants.SIG_JAVA_LANG_SHORT;
+    }
+    return signature;
+  }
+
+  /**
+   * @param type
+   * @param validator
+   *          an import validator to decide simple name vs. fully qualified name.
+   * @return the type reference that can be used in the source code
+   */
+  public static String useType(IType type, IImportValidator validator) {
+    return useSignature(SignatureUtils.getTypeSignature(type), validator);
+  }
+
+  /**
+   * @param fullyQualifiedName
+   *          for example java.lang.Long or java.util.List<java.lang.String>
+   * @param validator
+   *          an import validator to decide simple name vs. fully qualified name.
+   * @return the type reference that can be used in the source code
+   */
+  public static String useName(String fullyQualifiedName, IImportValidator validator) {
+    return useSignature(Signature.createTypeSignature(fullyQualifiedName), validator);
+  }
+
+  /**
+   * @param signature
+   *          fully parameterized signature
+   * @param validator
+   *          an import validator to decide simple name vs. fully qualified name.
+   * @return the type reference that can be used in the source code
+   */
+  public static String useSignature(String signature, IImportValidator validator) {
+    StringBuilder sigBuilder = new StringBuilder();
+    int arrayCount = 0;
+    switch (Signature.getTypeSignatureKind(signature)) {
+      case ISignatureConstants.WILDCARD_TYPE_SIGNATURE:
+        sigBuilder.append("?");
+        if (signature.length() > 1) {
+          sigBuilder.append(" extends ");
+          sigBuilder.append(useSignature(signature.substring(1), validator));
+        }
+        break;
+      case ISignatureConstants.ARRAY_TYPE_SIGNATURE:
+        arrayCount = Signature.getArrayCount(signature);
+        sigBuilder.append(useSignature(signature.substring(arrayCount), validator));
+        break;
+      case ISignatureConstants.BASE_TYPE_SIGNATURE:
+        sigBuilder.append(Signature.getSignatureSimpleName(signature));
+        break;
+      case ISignatureConstants.TYPE_VARIABLE_SIGNATURE:
+        sigBuilder.append(toFullyQualifiedName(signature));
+        break;
+      default:
+        String[] typeArguments = Signature.getTypeArguments(signature);
+        signature = Signature.getTypeErasure(signature);
+
+        //check and register
+        ImportElementCandidate cand = new ImportElementCandidate(signature);
+        String use = validator.checkExistingImports(cand);
+        if (use == null) {
+          use = validator.checkCurrentScope(cand);
+        }
+        if (use == null) {
+          use = validator.registerElement(cand);
+        }
+        sigBuilder.append(use);
+
+        if (typeArguments != null && typeArguments.length > 0) {
+          sigBuilder.append(ISignatureConstants.C_GENERIC_START);
+          sigBuilder.append(useSignature(typeArguments[0], validator));
+          for (int i = 1; i < typeArguments.length; i++) {
+            sigBuilder.append(", ");
+            sigBuilder.append(useSignature(typeArguments[i], validator));
+          }
+          sigBuilder.append(ISignatureConstants.C_GENERIC_END);
+        }
+        break;
+    }
+    for (int i = 0; i < arrayCount; i++) {
+      sigBuilder.append("[]");
+    }
+    return sigBuilder.toString();
+  }
+
 }

@@ -12,7 +12,9 @@ package org.eclipse.scout.sdk.core.fixture;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.LOCAL_VARIABLE;
 import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
@@ -23,7 +25,7 @@ import java.util.List;
 /**
  *
  */
-@Target({TYPE, ANNOTATION_TYPE, METHOD, FIELD})
+@Target({TYPE, ANNOTATION_TYPE, METHOD, FIELD, LOCAL_VARIABLE, PARAMETER})
 @Retention(RUNTIME)
 @MarkerAnnotation
 public @interface TestAnnotation {
@@ -33,9 +35,9 @@ public @interface TestAnnotation {
     B
   }
 
-  Class<?>[] values() default {List.class};
+  Class<?>[]values() default {List.class};
 
   TestEnum en() default TestEnum.A;
 
-  ValueAnnot[] inner() default {};
+  ValueAnnot[]inner() default {};
 }

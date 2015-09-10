@@ -20,13 +20,13 @@ import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
-import org.eclipse.scout.sdk.s2e.IOrganizeImportService;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
-import org.eclipse.scout.sdk.s2e.dto.IDtoAutoUpdateManager;
 import org.eclipse.scout.sdk.s2e.log.SdkLogManager;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.JdtSettingsCommentBuilder;
+import org.eclipse.scout.sdk.s2e.trigger.ITypeChangedManager;
+import org.eclipse.scout.sdk.s2e.ui.internal.util.JdtSettingsCommentSourceBuilderDelegate;
 import org.eclipse.scout.sdk.s2e.ui.internal.util.OrganizeImportService;
+import org.eclipse.scout.sdk.s2e.util.IOrganizeImportService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.graphics.Image;
@@ -65,7 +65,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
 
     // organize import service
     m_organizeImportServiceRegistration = context.registerService(IOrganizeImportService.class.getName(), new OrganizeImportService(), null);
-    CommentSourceBuilderFactory.javaElementCommentBuilder = new JdtSettingsCommentBuilder();
+    CommentSourceBuilderFactory.commentSourceBuilderDelegate = new JdtSettingsCommentSourceBuilderDelegate();
 
     // property change listener (scout preferences)
     if (m_preferencesPropertyListener == null) {
@@ -74,8 +74,8 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
 
     // start DTO auto-update manager if required
-    getPreferenceStore().setDefault(IDtoAutoUpdateManager.PROP_AUTO_UPDATE, true);
-    ScoutSdkCore.getDtoAutoUpdateManager().setEnabled(getPreferenceStore().getBoolean(IDtoAutoUpdateManager.PROP_AUTO_UPDATE));
+    getPreferenceStore().setDefault(ITypeChangedManager.PROP_AUTO_UPDATE, true);
+    ScoutSdkCore.getTypeChangedManager().setEnabled(getPreferenceStore().getBoolean(ITypeChangedManager.PROP_AUTO_UPDATE));
 
     // start class id validation
     ClassIdValidationJob.install();
@@ -115,7 +115,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
       m_preferencesPropertyListener = null;
     }
 
-    CommentSourceBuilderFactory.javaElementCommentBuilder = null;
+    CommentSourceBuilderFactory.commentSourceBuilderDelegate = null;
 
     if (m_organizeImportServiceRegistration != null) {
       m_organizeImportServiceRegistration.unregister();
@@ -255,10 +255,10 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
 
     @Override
     protected IStatus run(IProgressMonitor monitor) {
-      Job[] dtoUpdateJobs = null;
+      Job[] triggerJobs = null;
       while (!monitor.isCanceled()) {
-        dtoUpdateJobs = getJobManager().find(org.eclipse.scout.sdk.s2e.internal.dto.DtoAutoUpdateManager.AUTO_UPDATE_JOB_FAMILY);
-        if (dtoUpdateJobs.length < 1) {
+        triggerJobs = getJobManager().find(org.eclipse.scout.sdk.s2e.internal.trigger.TypeChangedManager.TYPE_CHANGED_TRIGGER_JOB_FAMILY);
+        if (triggerJobs.length < 1) {
           // no job is running -> finish
           return Status.OK_STATUS;
         }
@@ -269,9 +269,9 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
         }
       }
 
-      // the dto job should be cancelled
-      if (dtoUpdateJobs != null && dtoUpdateJobs.length > 0) {
-        for (Job j : dtoUpdateJobs) {
+      // the trigger job should be cancelled
+      if (triggerJobs != null && triggerJobs.length > 0) {
+        for (Job j : triggerJobs) {
           j.cancel(); // will cancel as soon as possible
         }
       }
@@ -288,9 +288,9 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
         return;
       }
 
-      if (IDtoAutoUpdateManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
+      if (ITypeChangedManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
         boolean autoUpdate = Boolean.parseBoolean(newValue.toString());
-        ScoutSdkCore.getDtoAutoUpdateManager().setEnabled(autoUpdate);
+        ScoutSdkCore.getTypeChangedManager().setEnabled(autoUpdate);
       }
     }
   }

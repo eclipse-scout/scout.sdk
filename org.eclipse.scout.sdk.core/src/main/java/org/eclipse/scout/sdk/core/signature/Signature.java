@@ -16,6 +16,7 @@ import java.util.List;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.parser.ScannerHelper;
 import org.eclipse.jdt.internal.compiler.util.Util;
+import org.eclipse.scout.sdk.core.TypeNames;
 
 /**
  * Basic signature operations
@@ -24,8 +25,8 @@ import org.eclipse.jdt.internal.compiler.util.Util;
  */
 public final class Signature implements ISignatureConstants {
 
-  static final char C_COMMA = ',';
-  static final char C_ARRAY_END = ']';
+  public static final char C_COMMA = ',';
+  public static final char C_ARRAY_END = ']';
 
   private static final char C_SPACE = ' ';
   private static final char C_SLASH = '/';
@@ -35,15 +36,15 @@ public final class Signature implements ISignatureConstants {
   private static final char[] EXTENDS = "extends".toCharArray();
   private static final char[] SUPER = "super".toCharArray();
 
-  private static final char[] BOOLEAN = "boolean".toCharArray();
-  private static final char[] BYTE = "byte".toCharArray();
-  private static final char[] CHAR = "char".toCharArray();
-  private static final char[] DOUBLE = "double".toCharArray();
-  private static final char[] FLOAT = "float".toCharArray();
-  private static final char[] INT = "int".toCharArray();
-  private static final char[] LONG = "long".toCharArray();
-  private static final char[] SHORT = "short".toCharArray();
-  private static final char[] VOID = "void".toCharArray();
+  private static final char[] BOOLEAN = TypeNames._boolean.toCharArray();
+  private static final char[] BYTE = TypeNames._byte.toCharArray();
+  private static final char[] CHAR = TypeNames._char.toCharArray();
+  private static final char[] DOUBLE = TypeNames._double.toCharArray();
+  private static final char[] FLOAT = TypeNames._float.toCharArray();
+  private static final char[] INT = TypeNames._int.toCharArray();
+  private static final char[] LONG = TypeNames._long.toCharArray();
+  private static final char[] SHORT = TypeNames._short.toCharArray();
+  private static final char[] VOID = TypeNames._void.toCharArray();
 
   private Signature() {
   }
@@ -917,7 +918,7 @@ public final class Signature implements ISignatureConstants {
    *
    * <pre>
    * <code>
-   * createTypeSignature("int", hucairz) -> "I"
+   * createTypeSignature(TypeNames._int, hucairz) -> "I"
    * createTypeSignature("java.lang.String", true) -> "Ljava.lang.String;"
    * createTypeSignature("String", false) -> "QString;"
    * createTypeSignature("java.lang.String", false) -> "Qjava.lang.String;"
@@ -947,7 +948,7 @@ public final class Signature implements ISignatureConstants {
    *
    * <pre>
    * <code>
-   * createTypeSignature("int", hucairz) -> "I"
+   * createTypeSignature(TypeNames._int, hucairz) -> "I"
    * createTypeSignature("java.lang.String", true) -> "Ljava.lang.String;"
    * </code>
    * </pre>
@@ -2611,7 +2612,7 @@ public final class Signature implements ISignatureConstants {
    * <pre>
    * <code>
    * toString("[Ljava.lang.String;") -> "java.lang.String[]"
-   * toString("I") -> "int"
+   * toString("I") -> TypeNames._int
    * toString("+QObject;") -> "? extends Object"
    * </code>
    * </pre>

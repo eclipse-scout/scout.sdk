@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.dto.test;
 
-import org.eclipse.scout.sdk.core.model.IField;
-import org.eclipse.scout.sdk.core.model.IMethod;
-import org.eclipse.scout.sdk.core.model.IType;
+import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
 import org.eclipse.scout.sdk.dto.test.util.CoreScoutTestingUtils;
 import org.junit.Assert;

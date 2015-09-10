@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.core.sourcebuilder.compilationunit;
 
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.sourcebuilder.ICommentSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.IJavaElementSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
@@ -25,32 +24,49 @@ import org.eclipse.scout.sdk.core.util.CompositeObject;
  */
 public interface ICompilationUnitSourceBuilder extends IJavaElementSourceBuilder {
 
-  String getPackageFragmentName();
+  String getPackageName();
+
+  void addDeclaredImport(String name);
+
+  void addDeclaredStaticImport(String name);
+
+  /**
+   * Add an error message that is appended to the end of the comopilation unit as triple-X comment
+   * <p>
+   * Typically this is a code generation error or semantic check issue
+   *
+   * @param taskType
+   *          such as TODO, FIXME, ...
+   * @param msg
+   * @param exceptions
+   */
+  void addErrorMessage(String taskType, String msg, Throwable... exceptions);
+
+  List<String> getDeclaredImports();
+
+  List<String> getDeclaredStaticImports();
+
+  ITypeSourceBuilder getMainType();
 
   /**
    * @return
    */
-  List<ITypeSourceBuilder> getTypeSourceBuilder();
-
-  /**
-   * @param commentSourceBuilder
-   */
-  void setCommentSourceBuilder(ICommentSourceBuilder commentSourceBuilder);
+  List<ITypeSourceBuilder> getTypes();
 
   /**
    * @param builder
    */
-  void addTypeSourceBuilder(ITypeSourceBuilder builder);
+  void addType(ITypeSourceBuilder builder);
 
   /**
    * @param sortKey
    * @param builder
    */
-  void addSortedTypeSourceBuilder(CompositeObject sortKey, ITypeSourceBuilder builder);
+  void addSortedType(CompositeObject sortKey, ITypeSourceBuilder builder);
 
   /**
    * @param builder
    * @return
    */
-  boolean removeTypeSourceBuilder(ITypeSourceBuilder builder);
+  boolean removeType(String elementName);
 }

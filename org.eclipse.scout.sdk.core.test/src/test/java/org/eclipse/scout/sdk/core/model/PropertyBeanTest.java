@@ -14,9 +14,11 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.CoreTestingUtils;
+import org.eclipse.scout.sdk.core.TypeNames;
 import org.eclipse.scout.sdk.core.fixture.PropertyTestClass;
-import org.eclipse.scout.sdk.core.testing.TestingUtils;
+import org.eclipse.scout.sdk.core.model.api.IPropertyBean;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -27,7 +29,7 @@ import org.junit.Test;
 public class PropertyBeanTest {
   @Test
   public void testPropertyBean() {
-    IType propTestClass = TestingUtils.getType(PropertyTestClass.class.getName(), CoreTestingUtils.SOURCE_FOLDER);
+    IType propTestClass = CoreTestingUtils.createJavaEnvironment().findType(PropertyTestClass.class.getName());
     Assert.assertNotNull(propTestClass);
 
     List<IPropertyBean> propertyBeans = new ArrayList<>(CoreUtils.getPropertyBeans(propTestClass, null, new Comparator<IPropertyBean>() {
@@ -47,14 +49,14 @@ public class PropertyBeanTest {
 
     IPropertyBean falseProp = propertyBeans.get(1);
     Assert.assertEquals("False", falseProp.getBeanName());
-    Assert.assertEquals(Boolean.class.getName(), falseProp.getBeanType().getName());
+    Assert.assertEquals(TypeNames.java_lang_Boolean, falseProp.getBeanType().getName());
     Assert.assertEquals(propTestClass, falseProp.getDeclaringType());
     Assert.assertNotNull(falseProp.getReadMethod());
     Assert.assertNotNull(falseProp.getWriteMethod());
 
     IPropertyBean onlyProp = propertyBeans.get(2);
     Assert.assertEquals("Only", onlyProp.getBeanName());
-    Assert.assertEquals(Integer.class.getName(), onlyProp.getBeanType().getName());
+    Assert.assertEquals(TypeNames.java_lang_Integer, onlyProp.getBeanType().getName());
     Assert.assertEquals(propTestClass, onlyProp.getDeclaringType());
     Assert.assertNotNull(onlyProp.getReadMethod());
     Assert.assertNull(onlyProp.getWriteMethod());

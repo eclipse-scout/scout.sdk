@@ -13,11 +13,18 @@ package org.eclipse.scout.sdk.core.model;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.fixture.MarkerAnnotation;
 import org.eclipse.scout.sdk.core.fixture.TestAnnotation;
 import org.eclipse.scout.sdk.core.fixture.ValueAnnot;
-import org.eclipse.scout.sdk.core.testing.TestingUtils;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IArrayMetaValue;
+import org.eclipse.scout.sdk.core.model.api.IMetaValue;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.MetaValueType;
+import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -31,10 +38,16 @@ public class AnnotationTest {
     Assert.assertNotNull(childClassType);
 
     // type annotation
-    List<IAnnotation> annotations = childClassType.getAnnotations();
+    List<? extends IAnnotation> annotations = childClassType.getAnnotations();
     Assert.assertEquals(1, annotations.size());
     IAnnotation annotation = annotations.get(0);
-    Assert.assertEquals(1, annotation.getValues().size());
+    int nreal = 0, nsynth = 0;
+    for (IAnnotationValue v : annotation.getValues().values()) {
+      nreal += (v.isSyntheticDefaultValue() ? 0 : 1);
+      nsynth += (v.isSyntheticDefaultValue() ? 1 : 0);
+    }
+    Assert.assertEquals(1, nreal);
+    Assert.assertEquals(2, nsynth);
     Assert.assertNotNull(annotation.getValue("values"));
     Assert.assertEquals(childClassType, annotation.getOwner());
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
@@ -43,7 +56,14 @@ public class AnnotationTest {
     IMethod methodInChildClass = childClassType.getMethods().get(1);
     Assert.assertEquals(1, methodInChildClass.getAnnotations().size());
     annotation = methodInChildClass.getAnnotations().get(0);
-    Assert.assertEquals(2, annotation.getValues().size());
+    nreal = 0;
+    nsynth = 0;
+    for (IAnnotationValue v : annotation.getValues().values()) {
+      nreal += (v.isSyntheticDefaultValue() ? 0 : 1);
+      nsynth += (v.isSyntheticDefaultValue() ? 1 : 0);
+    }
+    Assert.assertEquals(2, nreal);
+    Assert.assertEquals(1, nsynth);
     Assert.assertNotNull(annotation.getValue("values"));
     Assert.assertNotNull(annotation.getValue("en"));
     Assert.assertEquals(methodInChildClass, annotation.getOwner());
@@ -61,28 +81,24 @@ public class AnnotationTest {
 
   @Test
   public void testAnnotationsWithAnnotationValues() {
-    IType wildcardBaseClass = TestingUtils.getType("org.eclipse.scout.sdk.core.fixture.WildcardBaseClass", CoreTestingUtils.SOURCE_FOLDER);
+    IType wildcardBaseClass = CoreTestingUtils.createJavaEnvironment().findType("org.eclipse.scout.sdk.core.fixture.WildcardBaseClass");
     IAnnotation testAnnot = wildcardBaseClass.getAnnotations().get(0);
     IAnnotationValue value = testAnnot.getValue("inner");
     Assert.assertNotNull(value);
-    Assert.assertTrue(value.getValue() instanceof IAnnotationValue[]);
+    Assert.assertTrue(value.getMetaValue().getType() == MetaValueType.Array);
 
-    IAnnotationValue[] vals = (IAnnotationValue[]) value.getValue();
-    Assert.assertEquals(2, vals.length);
+    IMetaValue[] arr = ((IArrayMetaValue) value.getMetaValue()).getMetaValueArray();
+    Assert.assertEquals(2, arr.length);
 
-    Object value0 = vals[0].getValue();
-    Assert.assertTrue(value0 instanceof IAnnotation);
-    IAnnotation annot0 = (IAnnotation) value0;
+    IAnnotation annot0 = arr[0].getObject(IAnnotation.class);
     Assert.assertEquals(wildcardBaseClass, annot0.getOwner());
     Assert.assertEquals(ValueAnnot.class.getName(), annot0.getType().getName());
-    Assert.assertEquals("a", annot0.getValue("value").getValue());
+    Assert.assertEquals("a", annot0.getValue("value").getMetaValue().getObject(String.class));
 
-    Object value1 = vals[1].getValue();
-    Assert.assertTrue(value1 instanceof IAnnotation);
-    IAnnotation annot1 = (IAnnotation) value1;
+    IAnnotation annot1 = arr[1].getObject(IAnnotation.class);
     Assert.assertEquals(wildcardBaseClass, annot1.getOwner());
     Assert.assertEquals(ValueAnnot.class.getName(), annot1.getType().getName());
-    Assert.assertEquals("b", annot1.getValue("value").getValue());
+    Assert.assertEquals("b", annot1.getValue("value").getMetaValue().getObject(String.class));
   }
 
   @Test
@@ -100,22 +116,35 @@ public class AnnotationTest {
     Assert.assertNotNull(baseClassType);
 
     // type annotation
-    List<IAnnotation> annotations = baseClassType.getAnnotations();
+    List<? extends IAnnotation> annotations = baseClassType.getAnnotations();
     Assert.assertEquals(1, annotations.size());
     IAnnotation annotation = annotations.get(0);
-    Assert.assertEquals(1, annotation.getValues().size());
+    int nreal = 0, nsynth = 0;
+    for (IAnnotationValue v : annotation.getValues().values()) {
+      nreal += (v.isSyntheticDefaultValue() ? 0 : 1);
+      nsynth += (v.isSyntheticDefaultValue() ? 1 : 0);
+    }
+    Assert.assertEquals(1, nreal);
+    Assert.assertEquals(2, nsynth);
     Assert.assertNotNull(annotation.getValue("values"));
     Assert.assertEquals(baseClassType, annotation.getOwner());
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
 
     // methodInBaseClass annotation
-    IMethod methodInBaseClass = baseClassType.getMethods().get(2);
+    IMethod methodInBaseClass = baseClassType.getMethods().get(0);
     Assert.assertEquals(2, methodInBaseClass.getAnnotations().size());
 
     annotation = methodInBaseClass.getAnnotations().get(0);
-    Assert.assertEquals(1, annotation.getValues().size());
+    nreal = 0;
+    nsynth = 0;
+    for (IAnnotationValue v : annotation.getValues().values()) {
+      nreal += (v.isSyntheticDefaultValue() ? 0 : 1);
+      nsynth += (v.isSyntheticDefaultValue() ? 1 : 0);
+    }
+    Assert.assertEquals(1, nreal);
+    Assert.assertEquals(2, nsynth);
     Assert.assertNotNull(annotation.getValue("values"));
-    Assert.assertNull(annotation.getValue("en"));
+    Assert.assertNotNull(annotation.getValue("en"));//default value TestEnum.A
     Assert.assertEquals(methodInBaseClass, annotation.getOwner());
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
 
@@ -128,7 +157,7 @@ public class AnnotationTest {
   @Test
   @SuppressWarnings("deprecation")
   public void testDeprecatedAnnotations() {
-    IType deprChildType = TestingUtils.getType(org.eclipse.scout.sdk.core.fixture.DeprecatedChildClass.class.getName(), CoreTestingUtils.SOURCE_FOLDER);
+    IType deprChildType = CoreTestingUtils.createJavaEnvironment().findType(org.eclipse.scout.sdk.core.fixture.DeprecatedChildClass.class.getName());
     Assert.assertNotNull(deprChildType);
 
     IType deprBaseType = deprChildType.getSuperClass();
@@ -136,7 +165,7 @@ public class AnnotationTest {
     Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.getFlags());
     Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.getFlags());
 
-    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.getMethods().get(1).getFlags());
-    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.getMethods().get(1).getFlags());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.getMethods().get(0).getFlags());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.getMethods().get(0).getFlags());
   }
 }

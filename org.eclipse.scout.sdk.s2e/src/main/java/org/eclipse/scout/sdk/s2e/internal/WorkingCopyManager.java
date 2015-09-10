@@ -24,9 +24,9 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.compiler.SourceElementParser;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
-import org.eclipse.scout.sdk.s2e.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
+import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
 
 /**
  * <h3>WorkingCopyManager</h3>

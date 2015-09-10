@@ -28,38 +28,7 @@
     <p2repo-zip-path>${project.build.directory}/org.eclipse.scout.sdk-repository-${project.version}.zip</p2repo-zip-path>
   </properties>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-  </dependencies>
-
   <build>
-
     <plugins>
       <plugin>
         <groupId>org.eclipse.tycho</groupId>

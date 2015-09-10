@@ -23,8 +23,8 @@
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>org.eclipse.jdt.core</artifactId>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>ecj</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.commons</groupId>

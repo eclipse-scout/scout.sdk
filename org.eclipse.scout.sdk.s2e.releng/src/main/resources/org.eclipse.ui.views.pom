@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.ui.views</artifactId>
-  <version>${uiViewsVersionMaven}</version>
+  <version>${org.eclipse.ui.views-maven}</version>
 
   <name>Scout SDK org.eclipse.ui.views dependency (Incubation)</name>
   <description>This is org.eclipse.ui.views jar used by Scout SDK</description>
@@ -33,17 +33,13 @@
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
-      <version>[3.2.0,4.0.0)</version>
+      <version>${org.eclipse.core.runtime-range}</version>
     </dependency>
-<!--     <dependency> -->
-<!--       <groupId>org.eclipse.scout.sdk</groupId> -->
-<!--       <artifactId>org.eclipse.help</artifactId> -->
-<!--       <version>[3.2.0,4.0.0)</version> -->
-<!--     </dependency> -->
-<!--     <dependency> -->
-<!--       <groupId>org.eclipse.scout.sdk</groupId> -->
-<!--       <artifactId>org.eclipse.ui</artifactId> -->
-<!--       <version>[3.5.0,4.0.0)</version> -->
-<!--     </dependency> -->
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui</artifactId>
+      <version>${org.eclipse.ui-range}</version>
+    </dependency>
+<!-- org.eclipse.help;bundle-version="[3.2.0,4.0.0)", -->
   </dependencies>
 </project>

@@ -10,12 +10,20 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder.annotation;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
+import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
+import org.eclipse.scout.sdk.core.sourcebuilder.AbstractJavaElementSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.ExpressionSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
 /**
@@ -24,54 +32,89 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
-public class AnnotationSourceBuilder implements IAnnotationSourceBuilder {
+public class AnnotationSourceBuilder extends AbstractJavaElementSourceBuilder implements IAnnotationSourceBuilder {
 
-  private final String m_signature;
-  private final List<String> m_parameters;
+  private final String m_name;
+  private final LinkedHashMap<String, ISourceBuilder> m_values = new LinkedHashMap<>();
 
-  public AnnotationSourceBuilder(String signature) {
-    m_signature = signature;
-    m_parameters = new ArrayList<>();
+  public AnnotationSourceBuilder(IAnnotation element) {
+    super(element);
+    m_name = element.getType().getName();
+    for (IAnnotationValue av : element.getValues().values()) {
+      if (av.isSyntheticDefaultValue()) {
+        continue;
+      }
+      putValue(av.getElementName(), ExpressionSourceBuilderFactory.createFromMetaValue(av.getMetaValue()));
+    }
   }
 
-  @Override
-  public void validate() {
-    if (StringUtils.isEmpty(getSignature())) {
-      throw new IllegalArgumentException("Signature required!");
-    }
+  /**
+   * @param name
+   *          is the fully qualified name of the annotation type
+   */
+  public AnnotationSourceBuilder(String name) {
+    super(Signature.getSimpleName(name));
+    m_name = name;
   }
 
   @Override
   public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-    source.append("@" + SignatureUtils.getTypeReference(getSignature(), validator));
-    if (m_parameters.size() > 0) {
+    super.createSource(source, lineDelimiter, context, validator);
+    if (StringUtils.isEmpty(getName())) {
+      throw new IllegalArgumentException("name required!");
+    }
+
+    source.append("@" + SignatureUtils.useName(getName(), validator));
+    if (m_values.size() > 0) {
       source.append('(');
-      source.append(m_parameters.get(0));
-      for (int i = 1; i < m_parameters.size(); i++) {
-        source.append(", ");
-        source.append(m_parameters.get(i));
+      if (m_values.size() == 1 && m_values.containsKey("value")) {
+        //single value annotation
+        ISourceBuilder v = m_values.values().iterator().next();
+        v.createSource(source, lineDelimiter, context, validator);
+      }
+      else {
+        for (Map.Entry<String, ISourceBuilder> e : m_values.entrySet()) {
+          source.append(e.getKey());
+          source.append(" = ");
+          e.getValue().createSource(source, lineDelimiter, context, validator);
+          source.append(", ");
+        }
+        source.setLength(source.length() - 2);
       }
       source.append(')');
     }
   }
 
   @Override
-  public String getSignature() {
-    return m_signature;
+  public String getName() {
+    return m_name;
   }
 
   @Override
-  public boolean addParameter(String parameter) {
-    return m_parameters.add(parameter);
+  public IAnnotationSourceBuilder putValue(String name, String javaSource) {
+    putValue(name, new RawSourceBuilder(javaSource));
+    return this;
   }
 
   @Override
-  public boolean removeParameter(String parameter) {
-    return m_parameters.remove(parameter);
+  public IAnnotationSourceBuilder putValue(String name, ISourceBuilder value) {
+    m_values.put(name, value);
+    return this;
   }
 
   @Override
-  public List<String> getParameters() {
-    return new ArrayList<>(m_parameters);
+  public boolean removeValue(String name) {
+    return m_values.remove(name) != null;
   }
+
+  @Override
+  public ISourceBuilder getValue(String name) {
+    return m_values.get(name);
+  }
+
+  @Override
+  public Map<String, ISourceBuilder> getValues() {
+    return Collections.unmodifiableMap(m_values);
+  }
+
 }

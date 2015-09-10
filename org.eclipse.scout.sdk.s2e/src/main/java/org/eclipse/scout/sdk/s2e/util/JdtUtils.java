@@ -13,16 +13,24 @@ package org.eclipse.scout.sdk.s2e.util;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
@@ -37,18 +45,24 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.util.IFilter;
+import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
+import org.eclipse.scout.sdk.s2e.job.WorkspaceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
+import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
+import org.eclipse.scout.sdk.s2e.workspace.ResourceWriteOperation;
 
 /**
  *
@@ -60,34 +74,35 @@ public final class JdtUtils {
   }
 
   /**
-   * Converts the {@link org.eclipse.jdt.core.IType} to {@link org.eclipse.scout.sdk.core.model.IType}
+   * Converts the {@link org.eclipse.jdt.core.IType} to {@link org.eclipse.scout.sdk.core.model.api.IType}
    *
    * @param jdtType
    *          The input jdt {@link IType}
-   * @return The resulting {@link org.eclipse.scout.sdk.core.model.IType}
+   * @return The resulting {@link org.eclipse.scout.sdk.core.model.api.IType}
    * @throws CoreException
    */
-  public static org.eclipse.scout.sdk.core.model.IType jdtTypeToScoutType(IType jdtType) throws CoreException {
-    return jdtTypeToScoutType(jdtType, ScoutSdkCore.createLookupEnvironment(jdtType.getJavaProject(), true));
+  public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType) throws CoreException {
+    return jdtTypeToScoutType(jdtType, ScoutSdkCore.createLookupEnvironment(jdtType.getJavaProject()));
   }
 
   /**
-   * Converts the given {@link org.eclipse.jdt.core.IType} to {@link org.eclipse.scout.sdk.core.model.IType}
+   * Converts the given {@link org.eclipse.jdt.core.IType} to {@link org.eclipse.scout.sdk.core.model.api.IType}
    *
    * @param jdtType
    *          The jdt {@link IType} to convert.
-   * @param lookupEnv
-   *          The {@link ILookupEnvironment} to use to find the matching {@link org.eclipse.scout.sdk.core.model.IType}.
-   * @return The {@link org.eclipse.scout.sdk.core.model.IType} matching the given JDT {@link IType}.
+   * @param env
+   *          The {@link IJavaEnvironment} to use to find the matching
+   *          {@link org.eclipse.scout.sdk.core.model.api.IType}.
+   * @return The {@link org.eclipse.scout.sdk.core.model.api.IType} matching the given JDT {@link IType}.
    * @throws CoreException
    */
-  public static org.eclipse.scout.sdk.core.model.IType jdtTypeToScoutType(IType jdtType, ILookupEnvironment lookupEnv) throws CoreException {
+  public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType, IJavaEnvironment env) throws CoreException {
     IFile resource = (IFile) jdtType.getResource();
     String charsetName = resource.getCharset();
     if (!Charset.isSupported(charsetName)) {
       throw new CoreException(new ScoutStatus("Unsupported charset '" + charsetName + "' for resource '" + resource.getLocation().toOSString() + "'. Skipping.", new Exception("origin")));
     }
-    return lookupEnv.findType(jdtType.getFullyQualifiedName('$'));
+    return env.findType(jdtType.getFullyQualifiedName('$'));
   }
 
   /**
@@ -223,6 +238,40 @@ public final class JdtUtils {
     }
   }
 
+  public static IAnnotation getFirstAnnotationInSupertypeHierarchy(IType type, String... fullyQualifiedAnnotations) throws CoreException {
+    if (type == null) {
+      return null;
+    }
+    IAnnotation ann = getFirstDeclaredAnnotation(type, fullyQualifiedAnnotations);
+    if (ann != null) {
+      return ann;
+    }
+    ITypeHierarchy h = type.newSupertypeHierarchy(null);
+    for (IType t : h.getAllSuperclasses(type)) {
+      ann = getFirstDeclaredAnnotation(t, fullyQualifiedAnnotations);
+      if (ann != null && ann.exists()) {
+        return ann;
+      }
+    }
+    for (IType t : h.getAllSuperInterfaces(type)) {
+      ann = getFirstDeclaredAnnotation(t, fullyQualifiedAnnotations);
+      if (ann != null && ann.exists()) {
+        return ann;
+      }
+    }
+    return null;
+  }
+
+  public static IAnnotation getFirstDeclaredAnnotation(IAnnotatable element, String... fullyQualifiedAnnotations) {
+    for (String fqn : fullyQualifiedAnnotations) {
+      IAnnotation ann = getAnnotation(element, fqn);
+      if (ann != null) {
+        return ann;
+      }
+    }
+    return null;
+  }
+
   /**
    * Gets the {@link IAnnotation} with the given fully qualified name.
    *
@@ -300,6 +349,34 @@ public final class JdtUtils {
       S2ESdkActivator.logWarning("Unable to find source for annotation '" + annotation.getElementName() + "' in '" + member.getElementName() + "'.", e);
     }
     return null;
+  }
+
+  /**
+   * Find all types annotated with this annotation
+   *
+   * @param annotationName
+   *          fully qualified name of annotation
+   * @param scope
+   *          SearchEngine.createJavaSearchScope
+   * @param monitor
+   * @throws CoreException
+   */
+  public static Set<IType> findAllTypesAnnotatedWith(String annotationName, IJavaSearchScope scope, IProgressMonitor monitor) throws CoreException {
+    final LinkedHashSet<IType> result = new LinkedHashSet<>();
+    SearchRequestor collector = new SearchRequestor() {
+      @Override
+      public void acceptSearchMatch(SearchMatch match) throws CoreException {
+        if (match.getElement() instanceof IType) {
+          IType t = (IType) match.getElement();
+          result.add(t);
+        }
+      }
+    };
+    for (IType annotationType : resolveJdtTypes(annotationName)) {
+      SearchPattern pattern = SearchPattern.createPattern(annotationType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE);
+      new SearchEngine().search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, scope, collector, monitor);
+    }
+    return result;
   }
 
   /**
@@ -469,4 +546,55 @@ public final class JdtUtils {
     }
     return getLocalTypeHierarchy(el);
   }
+
+  public static String lineSeparator(IJavaProject p) {
+    IScopeContext[] scopeContext = new IScopeContext[]{new ProjectScope(p.getProject())};
+    String lineSeparator = Platform.getPreferencesService().getString(Platform.PI_RUNTIME, Platform.PREF_LINE_SEPARATOR, "\n", scopeContext);
+    return lineSeparator;
+  }
+
+  public static PropertyMap propertyMap(IJavaProject p) {
+    PropertyMap context = new PropertyMap();
+    context.setProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, p);
+    return context;
+  }
+
+  /**
+   * @param ops
+   * @param monitor
+   * @return the main types of the modified compilation units
+   * @throws CoreException
+   */
+  public static List<IType> writeTypes(List<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+    WorkspaceBlockingOperationJob job = new WorkspaceBlockingOperationJob(ops);
+    job.schedule();
+    try {
+      job.join(0L, monitor);
+      ArrayList<IType> result = new ArrayList<>(ops.size());
+      for (CompilationUnitWriteOperation op : ops) {
+        result.add(op.getCompilationUnit().getTypes()[0]);
+      }
+      return result;
+    }
+    catch (OperationCanceledException | InterruptedException e) {
+      throw new CoreException(new ScoutStatus(e));
+    }
+  }
+
+  public static List<IFile> writeResources(List<ResourceWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+    WorkspaceBlockingOperationJob job = new WorkspaceBlockingOperationJob(ops);
+    job.schedule();
+    try {
+      job.join(0L, monitor);
+      ArrayList<IFile> result = new ArrayList<>(ops.size());
+      for (ResourceWriteOperation op : ops) {
+        result.add(op.getFile());
+      }
+      return result;
+    }
+    catch (OperationCanceledException | InterruptedException e) {
+      throw new CoreException(new ScoutStatus(e));
+    }
+  }
+
 }

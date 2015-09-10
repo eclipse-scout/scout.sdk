@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
 
-import org.eclipse.scout.sdk.core.model.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.IType;
+import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
 
 /**

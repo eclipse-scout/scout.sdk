@@ -11,8 +11,12 @@
 package org.eclipse.scout.sdk.core.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.CoreTestingUtils;
+import org.eclipse.scout.sdk.core.TypeNames;
 import org.eclipse.scout.sdk.core.fixture.TestAnnotation;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -28,11 +32,11 @@ public class FieldTest {
     IField myStringField = childClassType.getFields().get(0);
     Assert.assertNotNull(myStringField);
 
-    Assert.assertEquals("myStringValue", myStringField.getValue());
+    Assert.assertEquals("myStringValue", myStringField.getConstantValue().getObject(String.class));
     Assert.assertEquals(String.class.getName(), myStringField.getDataType().getName());
     Assert.assertEquals(childClassType, myStringField.getDeclaringType());
     Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myStringField.getFlags());
-    Assert.assertEquals("myString", myStringField.getName());
+    Assert.assertEquals("myString", myStringField.getElementName());
   }
 
   @Test
@@ -54,12 +58,12 @@ public class FieldTest {
     IField mTestField = childClassType.getFields().get(1);
     Assert.assertNotNull(mTestField);
 
-    Assert.assertNull(mTestField.getValue());
-    Assert.assertEquals(int.class.getName(), mTestField.getDataType().getName());
+    Assert.assertNull(mTestField.getConstantValue());
+    Assert.assertEquals(int.class.getName(), mTestField.getDataType().getLeafComponentType().getName());
     Assert.assertEquals(2, mTestField.getDataType().getArrayDimension());
     Assert.assertEquals(childClassType, mTestField.getDeclaringType());
     Assert.assertEquals(Flags.AccProtected | Flags.AccFinal, mTestField.getFlags());
-    Assert.assertEquals("m_test", mTestField.getName());
+    Assert.assertEquals("m_test", mTestField.getElementName());
   }
 
   @Test
@@ -80,7 +84,7 @@ public class FieldTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IField myLongField = baseClassType.getFields().get(1);
+    IField myLongField = baseClassType.getFields().get(0);
     Assert.assertEquals(1, myLongField.getAnnotations().size());
     Assert.assertEquals(myLongField, myLongField.getAnnotations().get(0).getOwner());
     Assert.assertEquals(TestAnnotation.class.getName(), myLongField.getAnnotations().get(0).getType().getName());
@@ -91,13 +95,13 @@ public class FieldTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IField myLongField = baseClassType.getFields().get(1);
+    IField myLongField = baseClassType.getFields().get(0);
     Assert.assertNotNull(myLongField);
 
-    Assert.assertEquals(Long.class.getName(), myLongField.getDataType().getName());
+    Assert.assertEquals(TypeNames.java_lang_Long, myLongField.getDataType().getName());
     Assert.assertEquals(baseClassType, myLongField.getDeclaringType());
     Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myLongField.getFlags());
-    Assert.assertEquals("myLong", myLongField.getName());
+    Assert.assertEquals("myLong", myLongField.getElementName());
   }
 
   @Test
@@ -105,14 +109,14 @@ public class FieldTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IField anonymousClassField = baseClassType.getFields().get(0);
+    IField anonymousClassField = baseClassType.getFields().get(1);
     Assert.assertNotNull(anonymousClassField);
 
-    Assert.assertNull(anonymousClassField.getValue());
+    Assert.assertNull(anonymousClassField.getConstantValue());
     Assert.assertEquals(Runnable.class.getName(), anonymousClassField.getDataType().getName());
     Assert.assertEquals(0, anonymousClassField.getDataType().getArrayDimension());
     Assert.assertEquals(baseClassType, anonymousClassField.getDeclaringType());
     Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, anonymousClassField.getFlags());
-    Assert.assertEquals("ANONYMOUS_CLASS", anonymousClassField.getName());
+    Assert.assertEquals("ANONYMOUS_CLASS", anonymousClassField.getElementName());
   }
 }

@@ -10,8 +10,10 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder.annotation;
 
-import java.util.List;
+import java.util.Map;
 
+import org.eclipse.scout.sdk.core.sourcebuilder.ExpressionSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.IJavaElementSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 
 /**
@@ -20,28 +22,33 @@ import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
-public interface IAnnotationSourceBuilder extends ISourceBuilder {
+public interface IAnnotationSourceBuilder extends IJavaElementSourceBuilder {
 
   /**
-   * @return
+   * @return the fully qualified name
    */
-  String getSignature();
+  String getName();
 
   /**
-   * @param parameter
-   * @return
+   * see {@link ExpressionSourceBuilderFactory}
+   * 
+   * @return this
    */
-  boolean addParameter(String parameter);
+  IAnnotationSourceBuilder putValue(String name, String value);
 
   /**
-   * @param parameter
-   * @return
+   * see {@link ExpressionSourceBuilderFactory}
+   *
+   * @param name
+   * @param value
+   * @return this
    */
-  boolean removeParameter(String parameter);
+  IAnnotationSourceBuilder putValue(String name, ISourceBuilder value);
 
-  /**
-   * @return
-   */
-  List<String> getParameters();
+  ISourceBuilder getValue(String name);
+
+  Map<String, ISourceBuilder> getValues();
+
+  boolean removeValue(String name);
 
 }

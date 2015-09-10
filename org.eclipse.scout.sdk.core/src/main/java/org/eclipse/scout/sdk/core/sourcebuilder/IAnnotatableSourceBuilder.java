@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.sourcebuilder;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
+import org.eclipse.scout.sdk.core.util.CompositeObject;
 
 /**
  * <h3>{@link IAnnotatableSourceBuilder}</h3>
@@ -23,8 +24,25 @@ import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuil
 public interface IAnnotatableSourceBuilder extends IJavaElementSourceBuilder {
 
   /**
+   * @param builder
+   */
+  void addAnnotation(IAnnotationSourceBuilder builder);
+
+  /**
+   * @param sortKey
+   * @param builder
+   */
+  void addSortedAnnotation(CompositeObject sortKey, IAnnotationSourceBuilder builder);
+
+  /**
+   * @param childOp
    * @return
    */
-  List<IAnnotationSourceBuilder> getAnnotationSourceBuilders();
+  boolean removeAnnotation(String elementName);
+
+  /**
+   * @return
+   */
+  List<IAnnotationSourceBuilder> getAnnotations();
 
 }

@@ -1,0 +1,38 @@
+/*
+ * Copyright (c) BSI Business Systems Integration AG. All rights reserved.
+ * http://www.bsiag.com/
+ */
+package org.eclipse.scout.sdk.core.fixture;
+
+import java.math.RoundingMode;
+
+import javax.annotation.Generated;
+
+/**
+ * Example with array values
+ */
+@AnnotationWithArrayValues(
+    nums = {1, 2},
+    enumValues = {RoundingMode.HALF_UP, RoundingMode.HALF_DOWN},
+    strings = {"alpha", ClassWithAnnotationConstants.ALPHA},
+    types = {String.class, String.class},
+    annos = {
+        @AnnotationWithSingleValues(type = Integer.class, enumValue = RoundingMode.HALF_UP, num = 11, string = "beta", anno = @Generated("g1") ),
+        @AnnotationWithSingleValues(type = Integer.class, enumValue = RoundingMode.HALF_DOWN, num = 12, string = ClassWithAnnotationConstants.BETA, anno = @Generated("g2") ),
+    })
+public class ClassWithAnnotationWithArrayValues {
+
+  @AnnotationWithArrayValues(
+      nums = {21, 22},
+      enumValues = {RoundingMode.HALF_EVEN, RoundingMode.HALF_EVEN},
+      strings = {"gamma", ClassWithAnnotationConstants.GAMMA},
+      types = {Float.class, Float.class},
+      annos = {
+          @AnnotationWithSingleValues(type = Double.class, enumValue = RoundingMode.HALF_EVEN, num = 31, string = "delta", anno = @Generated("g3") ),
+          @AnnotationWithSingleValues(type = Double.class, enumValue = RoundingMode.HALF_EVEN, num = 32, string = ClassWithAnnotationConstants.DELTA, anno = @Generated("g4") ),
+      })
+  public void run(String a) {
+    System.out.println(a);
+  }
+
+}

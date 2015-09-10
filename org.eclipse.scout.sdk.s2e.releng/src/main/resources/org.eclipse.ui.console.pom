@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.eclipse.scout.sdk</groupId>
+  <artifactId>org.eclipse.ui.console</artifactId>
+  <version>${org.eclipse.ui.console-maven}</version>
+
+  <name>Scout SDK org.eclipse.ui.console dependency (Incubation)</name>
+  <description>This is org.eclipse.ui.console jar used by Scout SDK</description>
+  <url>http://www.eclipse.org/scout/</url>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>scout-dev@eclipse.org</id>
+      <name>Scout Development Team</name>
+    </developer>
+  </developers>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui</artifactId>
+      <version>${org.eclipse.ui-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.jface.text</artifactId>
+      <version>${org.eclipse.jface.text-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui.workbench.texteditor</artifactId>
+      <version>${org.eclipse.ui.workbench.texteditor-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.core.runtime</artifactId>
+      <version>${org.eclipse.core.runtime-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.core.expressions</artifactId>
+      <version>${org.eclipse.core.expressions-range}</version>
+    </dependency>
+<!-- org.eclipse.core.variables;bundle-version="[3.2.800,4.0.0)" -->
+  </dependencies>
+</project>

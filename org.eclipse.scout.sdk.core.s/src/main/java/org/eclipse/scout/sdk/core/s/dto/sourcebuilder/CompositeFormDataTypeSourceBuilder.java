@@ -12,23 +12,23 @@ package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
 
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.model.Flags;
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.model.TypeFilters;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataAnnotation;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableFieldBeanFormDataSourceBuilder;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodBodySourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.TypeFilters;
 
 /**
  * <h3>{@link CompositeFormDataTypeSourceBuilder}</h3>
@@ -38,8 +38,8 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
  */
 public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilder {
 
-  public CompositeFormDataTypeSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, String typeName, ILookupEnvironment lookupEnv) {
-    super(modelType, formDataAnnotation, typeName, lookupEnv);
+  public CompositeFormDataTypeSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, String typeName, IJavaEnvironment env) {
+    super(modelType, formDataAnnotation, typeName, env);
   }
 
   @Override
@@ -49,7 +49,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
   }
 
   private void createCompositeFieldFormData(IType compositeType) {
-    List<IType> innerTypes = CoreUtils.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(IRuntimeClasses.IFormField));
+    List<IType> innerTypes = CoreUtils.getInnerTypes(compositeType, TypeFilters.subtypeOf(IRuntimeClasses.IFormField));
     for (IType formField : innerTypes) {
       boolean fieldExtendsTemplateField = false;
 
@@ -69,37 +69,37 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           ITypeSourceBuilder fieldSourceBuilder = null;
           if (CoreUtils.isInstanceOf(fieldAnnotation.getSuperType(), IRuntimeClasses.AbstractTableFieldBeanData)) {
             // fill table bean
-            fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, fieldAnnotation, formDataTypeName, getLookupEnvironment());
+            fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, fieldAnnotation, formDataTypeName, getJavaEnvironment());
           }
           else if (CoreUtils.isInstanceOf(formField, IRuntimeClasses.ICompositeField) && !CoreUtils.isInstanceOf(formField, IRuntimeClasses.IValueField)) {
             // field extends a field template.
             fieldExtendsTemplateField = true;
-            fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder(formField, fieldAnnotation, formDataTypeName, getLookupEnvironment());
+            fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder(formField, fieldAnnotation, formDataTypeName, getJavaEnvironment());
           }
           else {
-            fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, fieldAnnotation, formDataTypeName, getLookupEnvironment());
+            fieldSourceBuilder = new FormDataTypeSourceBuilder(formField, fieldAnnotation, formDataTypeName, getJavaEnvironment());
 
             // special case if a boolean (primitive!) property has the same name as a form field -> show warning
-            for (IMethodSourceBuilder msb : getMethodSourceBuilders()) {
+            for (IMethodSourceBuilder msb : getMethods()) {
               if (SIG_FOR_IS_METHOD_NAME.equals(msb.getReturnTypeSignature()) && ("is" + formDataTypeName).equals(msb.getElementName())) {
-                fieldSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("TODO [everyone] Duplicate names '" + formDataTypeName + "'. Rename property or form field."));
+                fieldSourceBuilder.setComment(CommentSourceBuilderFactory.createCustomCommentBuilder("TODO [everyone] Duplicate names '" + formDataTypeName + "'. Rename property or form field."));
                 break;
               }
             }
           }
           fieldSourceBuilder.setFlags(fieldSourceBuilder.getFlags() | Flags.AccStatic);
-          addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormDataPropertyKey(fieldSourceBuilder), fieldSourceBuilder);
+          addSortedType(SortedMemberKeyFactory.createTypeFormDataPropertyKey(fieldSourceBuilder), fieldSourceBuilder);
 
           // add interfaces specified on the formdata annotation
-          DtoUtils.addFormDataAdditionalInterfaces(fieldAnnotation, fieldSourceBuilder, getLookupEnvironment());
+          DtoUtils.addFormDataAdditionalInterfaces(fieldAnnotation, fieldSourceBuilder, getJavaEnvironment());
 
           // getter for field
           String methodName = CoreUtils.ensureStartWithUpperCase(formDataTypeName); // Scout RT requires the first char to be upper-case for a getter. See org.eclipse.scout.commons.beans.FastBeanUtility.BEAN_METHOD_PAT.
           IMethodSourceBuilder getterBuilder = new MethodSourceBuilder("get" + methodName);
           getterBuilder.setFlags(Flags.AccPublic);
           getterBuilder.setReturnTypeSignature(Signature.createTypeSignature(formDataTypeName, false));
-          getterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return getFieldByClass(" + formDataTypeName + ".class);"));
-          addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(getterBuilder), getterBuilder);
+          getterBuilder.setBody(new RawSourceBuilder("return getFieldByClass(" + formDataTypeName + ".class);"));
+          addSortedMethod(SortedMemberKeyFactory.createMethodPropertyKey(getterBuilder), getterBuilder);
         }
         else if (FormDataAnnotation.isIgnore(fieldAnnotation)) {
           continue;
@@ -112,7 +112,7 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
     }
 
     // step into extensions
-    for (IType formFieldExtension : CoreUtils.getInnerTypes(compositeType, TypeFilters.getSubtypeFilter(IRuntimeClasses.ICompositeFieldExtension))) {
+    for (IType formFieldExtension : CoreUtils.getInnerTypes(compositeType, TypeFilters.subtypeOf(IRuntimeClasses.ICompositeFieldExtension))) {
       createCompositeFieldFormData(formFieldExtension);
     }
   }

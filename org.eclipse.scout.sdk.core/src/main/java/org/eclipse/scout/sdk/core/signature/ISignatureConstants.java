@@ -216,9 +216,51 @@ public interface ISignatureConstants {
   String SIG_VOID = "V";
 
   /**
-   * String constant for the resolved signature of java.lang.Object.
+   * String constant for the resolved signature of java.lang.String
    */
-  String SIG_OBJECT = Signature.createTypeSignature(Object.class.getName());
+  String SIG_JAVA_LANG_STRING = "Ljava.lang.String;";
+
+  /**
+   * String constant for the resolved signature of java.lang.Object
+   */
+  String SIG_JAVA_LANG_OBJECT = "Ljava.lang.Object;";
+
+  /**
+   * String constant for the resolved signature of java.lang.Boolean
+   */
+  String SIG_JAVA_LANG_BOOLEAN = "Ljava.lang.Boolean;";
+  /**
+   * String constant for the resolved signature of java.lang.Byte
+   */
+  String SIG_JAVA_LANG_BYTE = "Ljava.lang.Byte;";
+  /**
+   * String constant for the resolved signature of java.lang.Character
+   */
+  String SIG_JAVA_LANG_CHARACTER = "Ljava.lang.Character;";
+  /**
+   * String constant for the resolved signature of java.lang.Double
+   */
+  String SIG_JAVA_LANG_DOUBLE = "Ljava.lang.Double;";
+  /**
+   * String constant for the resolved signature of java.lang.Float
+   */
+  String SIG_JAVA_LANG_FLOAT = "Ljava.lang.Float;";
+  /**
+   * String constant for the resolved signature of java.lang.Integer
+   */
+  String SIG_JAVA_LANG_INTEGER = "Ljava.lang.Integer;";
+  /**
+   * String constant for the resolved signature of java.lang.Long
+   */
+  String SIG_JAVA_LANG_LONG = "Ljava.lang.Long;";
+  /**
+   * String constant for the resolved signature of java.lang.Short
+   */
+  String SIG_JAVA_LANG_SHORT = "Ljava.lang.Short;";
+  /**
+   * String constant for the resolved signature of java.lang.Void
+   */
+  String SIG_JAVA_LANG_VOID = "Ljava.lang.Void;";
 
   /**
    * Kind constant for a class type signature.

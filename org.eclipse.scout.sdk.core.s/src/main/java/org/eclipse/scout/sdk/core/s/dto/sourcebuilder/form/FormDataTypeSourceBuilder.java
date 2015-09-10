@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form;
 
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.AbstractDtoTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 
@@ -29,8 +29,8 @@ public class FormDataTypeSourceBuilder extends AbstractDtoTypeSourceBuilder {
    * @param modelType
    * @param elementName
    */
-  public FormDataTypeSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, String typeName, ILookupEnvironment lookupEnv) {
-    super(modelType, typeName, lookupEnv, false);
+  public FormDataTypeSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, String typeName, IJavaEnvironment env) {
+    super(modelType, typeName, env, false);
     m_formDataAnnotation = formDataAnnotation;
     setup();
   }

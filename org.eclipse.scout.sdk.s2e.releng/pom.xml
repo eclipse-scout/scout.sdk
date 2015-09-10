@@ -26,13 +26,13 @@
 
     1. If needed, update the source p2 repository below
     2. Update Equinox and JDT/APT versions in the parent POM:
-    ${osgiVersion[Maven]}, ${equinoxVersion[Maven]}, ${jdtVersion[Maven]}, ...
+    ${org.eclipse.osgi[-maven]}, ${org.eclipse.equinox.common[-maven]}, ${org.eclipse.jdt.core[-maven]}, ...
     3a. For deploying snapshots (to be used by Eclipse Scout SDK snapshots)
     - In org.eclipse.scout.sdk.s2e.releng/, execute
     mvn clean deploy -DforgeSnapshotUrl=https://scout.bsiag.com/repository/org.eclipse.scout-snapshot-local -DforgeSnapshotId=bsi-tools-snapshot
     3b. For deploying releases (to be used by Tycho releases):
     - Prerequisite: you need to have GPG properly set up, see https://docs.sonatype.org/display/Repository/How+To+Generate+PGP+Signatures+With+Maven
-    - Make sure that ${jdtVersionMaven}, ${equinoxVersionMaven}, ${osgiVersionMaven},... in the parent POM don't have a '-SNAPSHOT' suffix
+    - Make sure that ${org.eclipse.jdt.core-maven}, ${org.eclipse.equinox.common-maven}, ${org.eclipse.osgi-maven},... in the parent POM don't have a '-SNAPSHOT' suffix
     - In org.eclipse.scout.sdk.s2e.releng/, execute
     mvn clean deploy -Pdeploy-releases -DforgeReleaseUrl=https://oss.sonatype.org/service/local/staging/deploy/maven2/ -DforgeReleaseId=forge-releases -Dgpg.passphrase=<your_passphrase>
     - Close and release staged artifacts into repository 'Releases'
@@ -64,6 +64,21 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.7</version>
+        </plugin>
+        <plugin>
+          <groupId>org.eclipse.tycho.extras</groupId>
+          <artifactId>tycho-p2-extras-plugin</artifactId>
+          <version>${tycho-extras.version}</version>
+        </plugin>
+        <plugin>
+          <groupId>com.googlecode.maven-download-plugin</groupId>
+          <artifactId>download-maven-plugin</artifactId>
+          <version>1.2.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <version>2.8.1</version>
           <configuration>
@@ -78,7 +93,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.7</version>
         <executions>
           <execution>
             <id>filter-resources</id>
@@ -87,238 +101,328 @@
             </goals>
           </execution>
         </executions>
+        <configuration>
+          <resources>
+            <resource>
+              <directory>${project.source.dircetory}</directory>
+              <filtering>true</filtering>
+              <includes>
+                <include>*.pom</include>
+              </includes>
+            </resource>
+          </resources>
+        </configuration>
       </plugin>
       <plugin>
         <groupId>org.eclipse.tycho.extras</groupId>
         <artifactId>tycho-p2-extras-plugin</artifactId>
-        <version>${tycho-extras.version}</version>
         <configuration>
           <includePacked>false</includePacked>
           <includeOptional>false</includeOptional>
           <source>
             <repository>
-              <id>eclipse_luna</id>
-              <url>http://download.eclipse.org/releases/luna</url>
-<!--               <url>https://scout.bsiag.com/repository/eclipse.releases.luna</url> -->
+              <id>eclipse_mars</id>
+              <url>http://download.eclipse.org/releases/mars/</url>
+<!--               <url>https://scout.bsiag.com/repository/eclipse.releases.mars</url> -->
               <layout>p2</layout>
             </repository>
           </source>
           <ius>
             <iu>
               <id>org.eclipse.osgi</id>
-              <version>${osgiVersion}</version>
+              <version>${org.eclipse.osgi}</version>
             </iu>
             <iu>
               <id>org.eclipse.osgi.source</id>
-              <version>${osgiVersion}</version>
+              <version>${org.eclipse.osgi}</version>
             </iu>
             <iu>
               <id>org.eclipse.equinox.common</id>
-              <version>${equinoxVersion}</version>
+              <version>${org.eclipse.equinox.common}</version>
             </iu>
             <iu>
               <id>org.eclipse.equinox.common.source</id>
-              <version>${equinoxVersion}</version>
+              <version>${org.eclipse.equinox.common}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.equinox.security</id>
+              <version>${org.eclipse.equinox.security}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.equinox.security.source</id>
+              <version>${org.eclipse.equinox.security}</version>
             </iu>
             <iu>
               <id>org.eclipse.equinox.registry</id>
-              <version>${equinoxRegistryVersion}</version>
+              <version>${org.eclipse.equinox.registry}</version>
             </iu>
             <iu>
               <id>org.eclipse.equinox.registry.source</id>
-              <version>${equinoxRegistryVersion}</version>
+              <version>${org.eclipse.equinox.registry}</version>
             </iu>
             <iu>
               <id>org.eclipse.equinox.preferences</id>
-              <version>${equinoxPreferencesVersion}</version>
+              <version>${org.eclipse.equinox.preferences}</version>
             </iu>
             <iu>
               <id>org.eclipse.equinox.preferences.source</id>
-              <version>${equinoxPreferencesVersion}</version>
+              <version>${org.eclipse.equinox.preferences}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.resources</id>
-              <version>${eclipseResourcesVersion}</version>
+              <version>${org.eclipse.core.resources}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.resources.source</id>
-              <version>${eclipseResourcesVersion}</version>
+              <version>${org.eclipse.core.resources}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.commands</id>
-              <version>${eclipseCommandsVersion}</version>
+              <version>${org.eclipse.core.commands}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.commands.source</id>
-              <version>${eclipseCommandsVersion}</version>
+              <version>${org.eclipse.core.commands}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.contenttype</id>
-              <version>${eclipseContenttypeVersion}</version>
+              <version>${org.eclipse.core.contenttype}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.contenttype.source</id>
-              <version>${eclipseContenttypeVersion}</version>
+              <version>${org.eclipse.core.contenttype}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.expressions</id>
-              <version>${eclipseExpressionsVersion}</version>
+              <version>${org.eclipse.core.expressions}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.expressions.source</id>
-              <version>${eclipseExpressionsVersion}</version>
+              <version>${org.eclipse.core.expressions}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.filesystem</id>
-              <version>${eclipseFilesystemVersion}</version>
+              <version>${org.eclipse.core.filesystem}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.filesystem.source</id>
-              <version>${eclipseFilesystemVersion}</version>
+              <version>${org.eclipse.core.filesystem}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.runtime</id>
-              <version>${eclipseRuntimeVersion}</version>
+              <version>${org.eclipse.core.runtime}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.runtime.source</id>
-              <version>${eclipseRuntimeVersion}</version>
+              <version>${org.eclipse.core.runtime}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.jobs</id>
-              <version>${eclipseJobsVersion}</version>
+              <version>${org.eclipse.core.jobs}</version>
             </iu>
             <iu>
               <id>org.eclipse.core.jobs.source</id>
-              <version>${eclipseJobsVersion}</version>
+              <version>${org.eclipse.core.jobs}</version>
             </iu>
             <iu>
               <id>org.eclipse.text</id>
-              <version>${eclipseTextVersion}</version>
+              <version>${org.eclipse.text}</version>
             </iu>
             <iu>
               <id>org.eclipse.text.source</id>
-              <version>${eclipseTextVersion}</version>
+              <version>${org.eclipse.text}</version>
             </iu>
             <iu>
               <id>org.eclipse.search</id>
-              <version>${eclipseSearchVersion}</version>
+              <version>${org.eclipse.search}</version>
             </iu>
             <iu>
               <id>org.eclipse.search.source</id>
-              <version>${eclipseSearchVersion}</version>
+              <version>${org.eclipse.search}</version>
             </iu>
             <iu>
               <id>org.eclipse.ltk.core.refactoring</id>
-              <version>${eclipseLtkRefactoringVersion}</version>
+              <version>${org.eclipse.ltk.core.refactoring}</version>
             </iu>
             <iu>
               <id>org.eclipse.ltk.core.refactoring.source</id>
-              <version>${eclipseLtkRefactoringVersion}</version>
+              <version>${org.eclipse.ltk.core.refactoring}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ltk.ui.refactoring</id>
+              <version>${org.eclipse.ltk.ui.refactoring}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ltk.ui.refactoring.source</id>
+              <version>${org.eclipse.ltk.ui.refactoring}</version>
             </iu>
             <iu>
               <id>org.eclipse.jdt.core</id>
-              <version>${jdtVersion}</version>
+              <version>${org.eclipse.jdt.core}</version>
             </iu>
             <iu>
               <id>org.eclipse.jdt.core.source</id>
-              <version>${jdtVersion}</version>
+              <version>${org.eclipse.jdt.core}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jdt.core.manipulation</id>
+              <version>${org.eclipse.jdt.core.manipulation}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jdt.core.manipulation.source</id>
+              <version>${org.eclipse.jdt.core.manipulation}</version>
             </iu>
             <iu>
               <id>org.eclipse.jdt.ui</id>
-              <version>${jdtUiVersion}</version>
+              <version>${org.eclipse.jdt.ui}</version>
             </iu>
             <iu>
               <id>org.eclipse.jdt.ui.source</id>
-              <version>${jdtUiVersion}</version>
+              <version>${org.eclipse.jdt.ui}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jdt.debug.ui</id>
+              <version>${org.eclipse.jdt.debug.ui}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.jdt.debug.ui.source</id>
+              <version>${org.eclipse.jdt.debug.ui}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.workbench</id>
-              <version>${uiWorkbenchVersion}</version>
+              <version>${org.eclipse.ui.workbench}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.workbench.source</id>
-              <version>${uiWorkbenchVersion}</version>
+              <version>${org.eclipse.ui.workbench}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.workbench.texteditor</id>
-              <version>${uiWorkbenchTexteditorVersion}</version>
+              <version>${org.eclipse.ui.workbench.texteditor}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.workbench.texteditor.source</id>
-              <version>${uiWorkbenchTexteditorVersion}</version>
+              <version>${org.eclipse.ui.workbench.texteditor}</version>
             </iu>
             <iu>
               <id>org.eclipse.jface</id>
-              <version>${uiJfaceVersion}</version>
+              <version>${org.eclipse.jface}</version>
             </iu>
             <iu>
               <id>org.eclipse.jface.source</id>
-              <version>${uiJfaceVersion}</version>
+              <version>${org.eclipse.jface}</version>
             </iu>
             <iu>
               <id>org.eclipse.jface.text</id>
-              <version>${uiJfaceTextVersion}</version>
+              <version>${org.eclipse.jface.text}</version>
             </iu>
             <iu>
               <id>org.eclipse.jface.text.source</id>
-              <version>${uiJfaceTextVersion}</version>
+              <version>${org.eclipse.jface.text}</version>
             </iu>
             <iu>
               <id>org.eclipse.swt.win32.win32.x86</id>
-              <version>${uiSwtVersion}</version>
+              <version>${org.eclipse.swt.win32.win32.x86}</version>
             </iu>
             <iu>
               <id>org.eclipse.swt.win32.win32.x86.source</id>
-              <version>${uiSwtVersion}</version>
+              <version>${org.eclipse.swt.win32.win32.x86}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.ide</id>
-              <version>${uiIdeVersion}</version>
+              <version>${org.eclipse.ui.ide}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.ide.source</id>
-              <version>${uiIdeVersion}</version>
+              <version>${org.eclipse.ui.ide}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.editors</id>
-              <version>${uiEditorsVersion}</version>
+              <version>${org.eclipse.ui.editors}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.editors.source</id>
-              <version>${uiEditorsVersion}</version>
+              <version>${org.eclipse.ui.editors}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.console</id>
+              <version>${org.eclipse.ui.console}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.console.source</id>
+              <version>${org.eclipse.ui.console}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui</id>
+              <version>${org.eclipse.ui}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.ui.source</id>
+              <version>${org.eclipse.ui}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.views</id>
-              <version>${uiViewsVersion}</version>
+              <version>${org.eclipse.ui.views}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.views.source</id>
-              <version>${uiViewsVersion}</version>
+              <version>${org.eclipse.ui.views}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.forms</id>
-              <version>${uiFormsVersion}</version>
+              <version>${org.eclipse.ui.forms}</version>
             </iu>
             <iu>
               <id>org.eclipse.ui.forms.source</id>
-              <version>${uiFormsVersion}</version>
+              <version>${org.eclipse.ui.forms}</version>
             </iu>
             <iu>
-              <id>org.eclipse.m2e.core</id>
-              <version>${eclipseM2eCoreVersion}</version>
+              <id>org.eclipse.pde.core</id>
+              <version>${org.eclipse.pde.core}</version>
             </iu>
             <iu>
-              <id>org.eclipse.m2e.core.source</id>
-              <version>${eclipseM2eCoreVersion}</version>
+              <id>org.eclipse.pde.core.source</id>
+              <version>${org.eclipse.pde.core}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.pde.ui</id>
+              <version>${org.eclipse.pde.ui}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.pde.ui.source</id>
+              <version>${org.eclipse.pde.ui}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.pde.core</id>
+              <version>${org.eclipse.pde.core}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.pde.core.source</id>
+              <version>${org.eclipse.pde.core}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.pde.ui</id>
+              <version>${org.eclipse.pde.ui}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.pde.ui.source</id>
+              <version>${org.eclipse.pde.ui}</version>
             </iu>
             <iu>
               <id>org.eclipse.jdt.launching</id>
-              <version>${jdtLaunchingVersion}</version>
+              <version>${org.eclipse.jdt.launching}</version>
             </iu>
             <iu>
               <id>org.eclipse.jdt.launching.source</id>
-              <version>${jdtLaunchingVersion}</version>
+              <version>${org.eclipse.jdt.launching}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.m2e.core</id>
+              <version>${org.eclipse.m2e.core}</version>
+            </iu>
+            <iu>
+              <id>org.eclipse.m2e.core.source</id>
+              <version>${org.eclipse.m2e.core}</version>
             </iu>
           </ius>
           <followStrictOnly>true</followStrictOnly>
@@ -332,8 +436,53 @@
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>com.googlecode.maven-download-plugin</groupId>
+        <artifactId>download-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>get-ecj</id>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <url>http://mirror.switch.ch/eclipse/eclipse/downloads/drops4/R-4.5-201506032000/ecj-${ecj}.jar</url>
+              <outputDirectory>${downloaded}</outputDirectory>
+              <outputFileName>ecj_${ecj}.jar</outputFileName>
+              <sha512>fece651e07351cc65655474d03cd141747bf9d49f955c96bf280b51408468a485666faf00df432d5b87c08938cbf243d6a0bf932ee09a80dcdc7bbfe04dc24f9</sha512>
+            </configuration>
+          </execution>
+          <execution>
+            <id>get-ecj-src</id>
+            <goals>
+              <goal>wget</goal>
+            </goals>
+            <phase>validate</phase>
+            <configuration>
+              <url>http://mirror.switch.ch/eclipse/eclipse/downloads/drops4/R-4.5-201506032000/ecjsrc-${ecj}.jar</url>
+              <outputDirectory>${downloaded}</outputDirectory>
+              <outputFileName>ecj.source_${ecj}.jar</outputFileName>
+              <sha512>1c21248fe2c624ce9314ae8828402ecfc2a157af59e9f4ef517b8bbc12836457adac8939fd7eaabb0112ab3e2d114c2ce545be73f615a8d93ce16e3f6e9b6d01</sha512>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>sonatype-public-repository</id>
+      <url>https://oss.sonatype.org/content/groups/public</url>
+    </pluginRepository>
+  </pluginRepositories>
 
   <distributionManagement>
     <repository>
@@ -354,6 +503,34 @@
 
   <profiles>
     <profile>
+      <id>deploy-ecj-snapshots</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-deploy-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>deploy-ecj</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/ecj_${ecj}.jar</file>
+                  <sources>${downloaded}/ecj.source_${ecj}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/ecj.pom</pomFile>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>deploy-equinox-snapshots</id>
       <activation>
         <activeByDefault>true</activeByDefault>
@@ -371,8 +548,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.osgi_${osgiVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.osgi.source_${osgiVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.osgi_${org.eclipse.osgi}.jar</file>
+                  <sources>${downloaded}/org.eclipse.osgi.source_${org.eclipse.osgi}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.osgi.pom</pomFile>
                 </configuration>
               </execution>
@@ -383,9 +560,21 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.equinox.common_${equinoxVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.equinox.common.source_${equinoxVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.equinox.common_${org.eclipse.equinox.common}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.common.source_${org.eclipse.equinox.common}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.common.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-equinox-security</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.equinox.security_${org.eclipse.equinox.security}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.security.source_${org.eclipse.equinox.security}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.security.pom</pomFile>
                 </configuration>
               </execution>
               <execution>
@@ -395,8 +584,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.equinox.registry_${equinoxRegistryVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.equinox.registry.source_${equinoxRegistryVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.equinox.registry_${org.eclipse.equinox.registry}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.registry.source_${org.eclipse.equinox.registry}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.registry.pom</pomFile>
                 </configuration>
               </execution>
@@ -407,8 +596,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.equinox.preferences_${equinoxPreferencesVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.equinox.preferences.source_${equinoxPreferencesVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.equinox.preferences_${org.eclipse.equinox.preferences}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.preferences.source_${org.eclipse.equinox.preferences}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.preferences.pom</pomFile>
                 </configuration>
               </execution>
@@ -435,8 +624,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.resources_${eclipseResourcesVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.resources.source_${eclipseResourcesVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.resources_${org.eclipse.core.resources}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.resources.source_${org.eclipse.core.resources}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.resources.pom</pomFile>
                 </configuration>
               </execution>
@@ -447,8 +636,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.commands_${eclipseCommandsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.commands.source_${eclipseCommandsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.commands_${org.eclipse.core.commands}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.commands.source_${org.eclipse.core.commands}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.commands.pom</pomFile>
                 </configuration>
               </execution>
@@ -459,8 +648,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.contenttype_${eclipseContenttypeVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.contenttype.source_${eclipseContenttypeVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.contenttype_${org.eclipse.core.contenttype}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.contenttype.source_${org.eclipse.core.contenttype}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.contenttype.pom</pomFile>
                 </configuration>
               </execution>
@@ -471,8 +660,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.expressions_${eclipseExpressionsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.expressions.source_${eclipseExpressionsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.expressions_${org.eclipse.core.expressions}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.expressions.source_${org.eclipse.core.expressions}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.expressions.pom</pomFile>
                 </configuration>
               </execution>
@@ -483,8 +672,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.filesystem_${eclipseFilesystemVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.filesystem.source_${eclipseFilesystemVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.filesystem_${org.eclipse.core.filesystem}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.filesystem.source_${org.eclipse.core.filesystem}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.filesystem.pom</pomFile>
                 </configuration>
               </execution>
@@ -495,8 +684,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.runtime_${eclipseRuntimeVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.runtime.source_${eclipseRuntimeVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.runtime_${org.eclipse.core.runtime}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.runtime.source_${org.eclipse.core.runtime}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.runtime.pom</pomFile>
                 </configuration>
               </execution>
@@ -507,8 +696,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.jobs_${eclipseJobsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.jobs.source_${eclipseJobsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.jobs_${org.eclipse.core.jobs}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.jobs.source_${org.eclipse.core.jobs}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.jobs.pom</pomFile>
                 </configuration>
               </execution>
@@ -519,8 +708,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.text_${eclipseTextVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.text.source_${eclipseTextVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.text_${org.eclipse.text}.jar</file>
+                  <sources>${downloaded}/org.eclipse.text.source_${org.eclipse.text}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.text.pom</pomFile>
                 </configuration>
               </execution>
@@ -531,8 +720,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.search_${eclipseSearchVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.search.source_${eclipseSearchVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.search_${org.eclipse.search}.jar</file>
+                  <sources>${downloaded}/org.eclipse.search.source_${org.eclipse.search}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.search.pom</pomFile>
                 </configuration>
               </execution>
@@ -543,9 +732,45 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ltk.core.refactoring_${eclipseLtkRefactoringVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ltk.core.refactoring.source_${eclipseLtkRefactoringVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ltk.core.refactoring_${org.eclipse.ltk.core.refactoring}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ltk.core.refactoring.source_${org.eclipse.ltk.core.refactoring}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ltk.core.refactoring.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-eclipse-ltk-ui-refactoring</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ltk.ui.refactoring_${org.eclipse.ltk.ui.refactoring}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ltk.ui.refactoring.source_${org.eclipse.ltk.ui.refactoring}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ltk.ui.refactoring.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-pde-core</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.pde.core_${org.eclipse.pde.core}.jar</file>
+                  <sources>${downloaded}/org.eclipse.pde.core.source_${org.eclipse.pde.core}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.pde.core.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-pde-ui</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.pde.ui_${org.eclipse.pde.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.pde.ui.source_${org.eclipse.pde.ui}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.pde.ui.pom</pomFile>
                 </configuration>
               </execution>
             </executions>
@@ -571,8 +796,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.m2e.core_${eclipseM2eCoreVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.m2e.core.source_${eclipseM2eCoreVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.m2e.core_${org.eclipse.m2e.core}.jar</file>
+                  <sources>${downloaded}/org.eclipse.m2e.core.source_${org.eclipse.m2e.core}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.pom</pomFile>
                 </configuration>
               </execution>
@@ -599,9 +824,21 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.jdt.core_${jdtVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.jdt.core.source_${jdtVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.jdt.core_${org.eclipse.jdt.core}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.core.source_${org.eclipse.jdt.core}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.core.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-jdt-core-manipulation</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.core.manipulation_${org.eclipse.jdt.core.manipulation}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.core.manipulation.source_${org.eclipse.jdt.core.manipulation}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.core.manipulation.pom</pomFile>
                 </configuration>
               </execution>
               <execution>
@@ -611,8 +848,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.jdt.ui_${jdtUiVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.jdt.ui.source_${jdtUiVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.jdt.ui_${org.eclipse.jdt.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.ui.source_${org.eclipse.jdt.ui}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.ui.pom</pomFile>
                 </configuration>
               </execution>
@@ -623,9 +860,21 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.jdt.launching_${jdtLaunchingVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.jdt.launching.source_${jdtLaunchingVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.jdt.launching_${org.eclipse.jdt.launching}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.launching.source_${org.eclipse.jdt.launching}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.launching.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-jdt-debug-ui</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.debug.ui_${org.eclipse.jdt.debug.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.debug.ui.source_${org.eclipse.jdt.debug.ui}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.debug.ui.pom</pomFile>
                 </configuration>
               </execution>
             </executions>
@@ -651,8 +900,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.workbench_${uiWorkbenchVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.workbench.source_${uiWorkbenchVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.workbench_${org.eclipse.ui.workbench}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.workbench.source_${org.eclipse.ui.workbench}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.pom</pomFile>
                 </configuration>
               </execution>
@@ -663,8 +912,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.workbench.texteditor_${uiWorkbenchTexteditorVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.workbench.texteditor.source_${uiWorkbenchTexteditorVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.workbench.texteditor_${org.eclipse.ui.workbench.texteditor}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.workbench.texteditor.source_${org.eclipse.ui.workbench.texteditor}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.texteditor.pom</pomFile>
                 </configuration>
               </execution>
@@ -675,8 +924,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.jface_${uiJfaceVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.jface.source_${uiJfaceVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.jface_${org.eclipse.jface}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jface.source_${org.eclipse.jface}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jface.pom</pomFile>
                 </configuration>
               </execution>
@@ -687,8 +936,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.jface.text_${uiJfaceTextVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.jface.text.source_${uiJfaceTextVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.jface.text_${org.eclipse.jface.text}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jface.text.source_${org.eclipse.jface.text}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jface.text.pom</pomFile>
                 </configuration>
               </execution>
@@ -699,8 +948,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.swt.win32.win32.x86_${uiSwtVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.swt.win32.win32.x86.source_${uiSwtVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.swt.win32.win32.x86_${org.eclipse.swt.win32.win32.x86}.jar</file>
+                  <sources>${downloaded}/org.eclipse.swt.win32.win32.x86.source_${org.eclipse.swt.win32.win32.x86}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.swt.win32.win32.x86.pom</pomFile>
                 </configuration>
               </execution>
@@ -711,8 +960,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.ide_${uiIdeVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.ide.source_${uiIdeVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.ide_${org.eclipse.ui.ide}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.ide.source_${org.eclipse.ui.ide}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.ide.pom</pomFile>
                 </configuration>
               </execution>
@@ -723,9 +972,33 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.editors_${uiEditorsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.editors.source_${uiEditorsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.editors_${org.eclipse.ui.editors}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.editors.source_${org.eclipse.ui.editors}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.editors.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-console</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.console_${org.eclipse.ui.console}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.console.source_${org.eclipse.ui.console}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.console.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui</id>
+                <goals>
+                  <goal>deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui_${org.eclipse.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.source_${org.eclipse.ui}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.pom</pomFile>
                 </configuration>
               </execution>
               <execution>
@@ -735,8 +1008,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.views_${uiViewsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.views.source_${uiViewsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.views_${org.eclipse.ui.views}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.views.source_${org.eclipse.ui.views}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.views.pom</pomFile>
                 </configuration>
               </execution>
@@ -747,8 +1020,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.forms_${uiFormsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.forms.source_${uiFormsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.forms_${org.eclipse.ui.forms}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.forms.source_${org.eclipse.ui.forms}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.forms.pom</pomFile>
                 </configuration>
               </execution>
@@ -777,9 +1050,21 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.jdt.core_${jdtVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.jdt.core.source_${jdtVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.jdt.core_${org.eclipse.jdt.core}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.core.source_${org.eclipse.jdt.core}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.core.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-jdt-core-manipulation</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.core.manipulation_${org.eclipse.jdt.core.manipulation}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.core.manipulation.source_${org.eclipse.jdt.core.manipulation}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.core.manipulation.pom</pomFile>
                 </configuration>
               </execution>
               <execution>
@@ -789,9 +1074,33 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.jdt.ui_${jdtUiVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.jdt.ui.source_${jdtUiVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.jdt.ui_${org.eclipse.jdt.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.ui.source_${org.eclipse.jdt.ui}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.ui.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-jdt-launching</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.launching_${org.eclipse.jdt.launching}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.launching.source_${org.eclipse.jdt.launching}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.launching.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-jdt-debug-ui</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.jdt.debug.ui_${org.eclipse.jdt.debug.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jdt.debug.ui.source_${org.eclipse.jdt.debug.ui}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.jdt.debug.ui.pom</pomFile>
                 </configuration>
               </execution>
               <execution>
@@ -801,8 +1110,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.workbench_${uiWorkbenchVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.workbench.source_${uiWorkbenchVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.workbench_${org.eclipse.ui.workbench}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.workbench.source_${org.eclipse.ui.workbench}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.pom</pomFile>
                 </configuration>
               </execution>
@@ -813,8 +1122,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.workbench.texteditor_${uiWorkbenchTexteditorVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.workbench.texteditor.source_${uiWorkbenchTexteditorVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.workbench.texteditor_${org.eclipse.ui.workbench.texteditor}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.workbench.texteditor.source_${org.eclipse.ui.workbench.texteditor}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.workbench.texteditor.pom</pomFile>
                 </configuration>
               </execution>
@@ -825,8 +1134,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.jface_${uiJfaceVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.jface.source_${uiJfaceVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.jface_${org.eclipse.jface}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jface.source_${org.eclipse.jface}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jface.pom</pomFile>
                 </configuration>
               </execution>
@@ -837,8 +1146,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.jface.text_${uiJfaceTextVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.jface.text.source_${uiJfaceTextVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.jface.text_${org.eclipse.jface.text}.jar</file>
+                  <sources>${downloaded}/org.eclipse.jface.text.source_${org.eclipse.jface.text}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.jface.text.pom</pomFile>
                 </configuration>
               </execution>
@@ -849,8 +1158,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.swt.win32.win32.x86_${uiSwtVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.swt.win32.win32.x86.source_${uiSwtVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.swt.win32.win32.x86_${org.eclipse.swt.win32.win32.x86}.jar</file>
+                  <sources>${downloaded}/org.eclipse.swt.win32.win32.x86.source_${org.eclipse.swt.win32.win32.x86}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.swt.win32.win32.x86.pom</pomFile>
                 </configuration>
               </execution>
@@ -861,8 +1170,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.ide_${uiIdeVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.ide.source_${uiIdeVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.ide_${org.eclipse.ui.ide}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.ide.source_${org.eclipse.ui.ide}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.ide.pom</pomFile>
                 </configuration>
               </execution>
@@ -873,9 +1182,33 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.editors_${uiEditorsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.editors.source_${uiEditorsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.editors_${org.eclipse.ui.editors}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.editors.source_${org.eclipse.ui.editors}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.editors.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui-console</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui.console_${org.eclipse.ui.console}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.console.source_${org.eclipse.ui.console}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.console.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-ui</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ui_${org.eclipse.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.source_${org.eclipse.ui}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ui.pom</pomFile>
                 </configuration>
               </execution>
               <execution>
@@ -885,8 +1218,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.views_${uiViewsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.views.source_${uiViewsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.views_${org.eclipse.ui.views}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.views.source_${org.eclipse.ui.views}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.views.pom</pomFile>
                 </configuration>
               </execution>
@@ -897,8 +1230,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ui.forms_${uiFormsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ui.forms.source_${uiFormsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ui.forms_${org.eclipse.ui.forms}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ui.forms.source_${org.eclipse.ui.forms}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ui.forms.pom</pomFile>
                 </configuration>
               </execution>
@@ -909,8 +1242,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.osgi_${osgiVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.osgi.source_${osgiVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.osgi_${org.eclipse.osgi}.jar</file>
+                  <sources>${downloaded}/org.eclipse.osgi.source_${org.eclipse.osgi}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.osgi.pom</pomFile>
                 </configuration>
               </execution>
@@ -921,9 +1254,21 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.equinox.common_${equinoxVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.equinox.common.source_${equinoxVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.equinox.common_${org.eclipse.equinox.common}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.common.source_${org.eclipse.equinox.common}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.common.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-equinox-security</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.equinox.security_${org.eclipse.equinox.security}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.security.source_${org.eclipse.equinox.security}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.security.pom</pomFile>
                 </configuration>
               </execution>
               <execution>
@@ -933,8 +1278,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.equinox.registry_${equinoxRegistryVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.equinox.registry.source_${equinoxRegistryVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.equinox.registry_${org.eclipse.equinox.registry}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.registry.source_${org.eclipse.equinox.registry}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.registry.pom</pomFile>
                 </configuration>
               </execution>
@@ -945,8 +1290,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.equinox.preferences_${equinoxPreferencesVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.equinox.preferences.source_${equinoxPreferencesVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.equinox.preferences_${org.eclipse.equinox.preferences}.jar</file>
+                  <sources>${downloaded}/org.eclipse.equinox.preferences.source_${org.eclipse.equinox.preferences}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.equinox.preferences.pom</pomFile>
                 </configuration>
               </execution>
@@ -957,8 +1302,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.resources_${eclipseResourcesVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.resources.source_${eclipseResourcesVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.resources_${org.eclipse.core.resources}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.resources.source_${org.eclipse.core.resources}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.resources.pom</pomFile>
                 </configuration>
               </execution>
@@ -969,8 +1314,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.commands_${eclipseCommandsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.commands.source_${eclipseCommandsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.commands_${org.eclipse.core.commands}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.commands.source_${org.eclipse.core.commands}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.commands.pom</pomFile>
                 </configuration>
               </execution>
@@ -981,8 +1326,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.contenttype_${eclipseContenttypeVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.contenttype.source_${eclipseContenttypeVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.contenttype_${org.eclipse.core.contenttype}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.contenttype.source_${org.eclipse.core.contenttype}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.contenttype.pom</pomFile>
                 </configuration>
               </execution>
@@ -993,8 +1338,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.expressions_${eclipseExpressionsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.expressions.source_${eclipseExpressionsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.expressions_${org.eclipse.core.expressions}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.expressions.source_${org.eclipse.core.expressions}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.expressions.pom</pomFile>
                 </configuration>
               </execution>
@@ -1005,8 +1350,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.filesystem_${eclipseFilesystemVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.filesystem.source_${eclipseFilesystemVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.filesystem_${org.eclipse.core.filesystem}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.filesystem.source_${org.eclipse.core.filesystem}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.filesystem.pom</pomFile>
                 </configuration>
               </execution>
@@ -1017,8 +1362,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.runtime_${eclipseRuntimeVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.runtime.source_${eclipseRuntimeVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.runtime_${org.eclipse.core.runtime}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.runtime.source_${org.eclipse.core.runtime}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.runtime.pom</pomFile>
                 </configuration>
               </execution>
@@ -1029,8 +1374,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.core.jobs_${eclipseJobsVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.core.jobs.source_${eclipseJobsVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.core.jobs_${org.eclipse.core.jobs}.jar</file>
+                  <sources>${downloaded}/org.eclipse.core.jobs.source_${org.eclipse.core.jobs}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.core.jobs.pom</pomFile>
                 </configuration>
               </execution>
@@ -1041,8 +1386,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.text_${eclipseTextVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.text.source_${eclipseTextVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.text_${org.eclipse.text}.jar</file>
+                  <sources>${downloaded}/org.eclipse.text.source_${org.eclipse.text}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.text.pom</pomFile>
                 </configuration>
               </execution>
@@ -1053,8 +1398,8 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.search_${eclipseSearchVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.search.source_${eclipseSearchVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.search_${org.eclipse.search}.jar</file>
+                  <sources>${downloaded}/org.eclipse.search.source_${org.eclipse.search}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.search.pom</pomFile>
                 </configuration>
               </execution>
@@ -1065,9 +1410,57 @@
                 </goals>
                 <phase>deploy</phase>
                 <configuration>
-                  <file>${downloaded}/org.eclipse.ltk.core.refactoring_${eclipseLtkRefactoringVersion}.jar</file>
-                  <sources>${downloaded}/org.eclipse.ltk.core.refactoring.source_${eclipseLtkRefactoringVersion}.jar</sources>
+                  <file>${downloaded}/org.eclipse.ltk.core.refactoring_${org.eclipse.ltk.core.refactoring}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ltk.core.refactoring.source_${org.eclipse.ltk.core.refactoring}.jar</sources>
                   <pomFile>${project.build.outputDirectory}/org.eclipse.ltk.core.refactoring.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-eclipse-ltk-ui-refactoring</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.ltk.ui.refactoring_${org.eclipse.ltk.ui.refactoring}.jar</file>
+                  <sources>${downloaded}/org.eclipse.ltk.ui.refactoring.source_${org.eclipse.ltk.ui.refactoring}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.ltk.ui.refactoring.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-pde-core</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.pde.core_${org.eclipse.pde.core}.jar</file>
+                  <sources>${downloaded}/org.eclipse.pde.core.source_${org.eclipse.pde.core}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.pde.core.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-pde-ui</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.pde.ui_${org.eclipse.pde.ui}.jar</file>
+                  <sources>${downloaded}/org.eclipse.pde.ui.source_${org.eclipse.pde.ui}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.pde.ui.pom</pomFile>
+                </configuration>
+              </execution>
+              <execution>
+                <id>deploy-m2e-core</id>
+                <goals>
+                  <goal>sign-and-deploy-file</goal>
+                </goals>
+                <phase>deploy</phase>
+                <configuration>
+                  <file>${downloaded}/org.eclipse.m2e.core_${org.eclipse.m2e.core}.jar</file>
+                  <sources>${downloaded}/org.eclipse.m2e.core.source_${org.eclipse.m2e.core}.jar</sources>
+                  <pomFile>${project.build.outputDirectory}/org.eclipse.m2e.core.pom</pomFile>
                 </configuration>
               </execution>
             </executions>

@@ -10,15 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.dto.test;
 
-import org.eclipse.scout.sdk.core.model.IField;
-import org.eclipse.scout.sdk.core.model.IMethod;
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
-import org.eclipse.scout.sdk.core.parser.JavaParser;
+import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataAnnotation;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
-import org.eclipse.scout.sdk.core.testing.TestingUtils;
 import org.eclipse.scout.sdk.dto.test.util.CoreScoutTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -39,14 +38,15 @@ public class NestedMultiLevelFormFieldTest {
   }
 
   private static void checkAbstractTemplateFieldData() {
-    IType modelType = TestingUtils.getType("formdata.client.ui.template.formfield.replace.levels.AbstractTemplateField", CoreScoutTestingUtils.SOURCE_FOLDERS);
+    IType modelType = CoreScoutTestingUtils.createClientJavaEnvironment().findType("formdata.client.ui.template.formfield.replace.levels.AbstractTemplateField");
     FormDataAnnotation formDataAnnotation = DtoUtils.findFormDataAnnotation(modelType);
 
-    ILookupEnvironment lookupEnvironment = JavaParser.create(CoreScoutTestingUtils.getSharedClasspath(), false);
-    StringBuilder sourceBuilder = DtoUtils.createFormDataSource(modelType, formDataAnnotation, lookupEnvironment, "\n", null);
-    Assert.assertNull(sourceBuilder); // the formdata annotation of AbstractTemplateField is set to 'use'. therefore nothing should be generated.
+    IJavaEnvironment sharedLookupEnvironment = CoreScoutTestingUtils.createSharedJavaEnvironment();
+    ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, formDataAnnotation, sharedLookupEnvironment);
+    String source = DtoUtils.createJavaCode(cuSrc, sharedLookupEnvironment, "\n", null);
+    Assert.assertNull(source); // the formdata annotation of AbstractTemplateField is set to 'use'. therefore nothing should be generated.
 
-    IType dto = TestingUtils.getType("formdata.shared.ui.template.formfield.replace.levels.AbstractTemplateFieldData", CoreScoutTestingUtils.SOURCE_FOLDERS);
+    IType dto = CoreScoutTestingUtils.createClientJavaEnvironment().findType("formdata.shared.ui.template.formfield.replace.levels.AbstractTemplateFieldData");
     Assert.assertNotNull(dto);
     testApiOfAbstractTemplateFieldData(dto);
   }
@@ -120,7 +120,7 @@ public class NestedMultiLevelFormFieldTest {
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'AbstractTemplateFieldData'", 1 /*constructor*/, abstractTemplateFieldData.getMethods().size());
+    Assert.assertEquals("method count of 'AbstractTemplateFieldData'", 0 /* no constructor*/, abstractTemplateFieldData.getMethods().size());
 
     Assert.assertEquals("inner types count of 'AbstractTemplateFieldData'", 0, abstractTemplateFieldData.getTypes().size());
   }

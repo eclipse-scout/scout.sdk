@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.osgi</artifactId>
-  <version>${osgiVersionMaven}</version>
+  <version>${org.eclipse.osgi-maven}</version>
 
   <name>Scout SDK org.eclipse.osgi dependency (Incubation)</name>
   <description>This is org.eclipse.osgi jar used by Scout SDK</description>

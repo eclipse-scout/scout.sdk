@@ -39,9 +39,9 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>org.eclipse.luna-dependencies.target</file>
+                  <file>org.eclipse.mars-dependencies.target</file>
                   <type>target</type>
-                  <classifier>org.eclipse.luna-dependencies</classifier>
+                  <classifier>org.eclipse.mars-dependencies</classifier>
                 </artifact>
               </artifacts>
             </configuration>

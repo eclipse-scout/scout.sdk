@@ -17,8 +17,12 @@ package org.eclipse.scout.sdk.core.sourcebuilder;
  * @since 3.10.0 07.03.2013
  */
 public interface IJavaElementSourceBuilder extends ISourceBuilder {
-  ICommentSourceBuilder getCommentSourceBuilder();
+
+  void setElementName(String elementName);
 
   String getElementName();
 
+  ISourceBuilder getComment();
+
+  void setComment(ISourceBuilder comment);
 }

@@ -23,15 +23,13 @@
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.scout.sdk.core</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <!-- Test Dependencies -->
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.12</version>
     </dependency>
   </dependencies>
 

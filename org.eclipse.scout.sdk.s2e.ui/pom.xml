@@ -32,9 +32,8 @@
     <!-- Build Dependencies -->
     <!-- Build Dependencies (Provided) -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.eclipse.scout.sdk.s2e</groupId>
       <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -67,7 +66,8 @@
             <Require-Bundle>
               org.eclipse.scout.sdk.s2e;bundle-version="[5.2,5.3)";visibility:=reexport,
               org.eclipse.jface.text;bundle-version="[3.7.2,4)",
-              org.eclipse.core.runtime;bundle-version="[3.4,4)";visibility:=reexport
+              org.eclipse.core.runtime;bundle-version="[3.4,4)";visibility:=reexport,
+              org.eclipse.ui;visibility:=reexport
             </Require-Bundle>
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator</Bundle-Activator>
           </instructions>

@@ -14,13 +14,24 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.model.Flags;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
+import org.eclipse.scout.sdk.core.model.api.ISourceRange;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
+import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.sourcebuilder.AbstractAnnotatableSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.AbstractMemberSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.IMethodParameterSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.MethodParameterSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.typeparameter.ITypeParameterSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.typeparameter.TypeParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
 /**
@@ -29,20 +40,37 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
-public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implements IMethodSourceBuilder {
+public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements IMethodSourceBuilder {
 
   private String m_returnTypeSignature;
-  private final List<MethodParameterDescription> m_parameters;
-  private final List<String> m_exceptionSignatures;
-  private IMethodBodySourceBuilder m_methodBodySourceBuilder;
+  private final List<IMethodParameterSourceBuilder> m_parameters = new ArrayList<>();
+  private final List<ITypeParameterSourceBuilder> m_typeParameters = new ArrayList<>();
+  private final List<String> m_exceptionSignatures = new ArrayList<>();
+  private ISourceBuilder m_body;
+
+  public MethodSourceBuilder(IMethod element) {
+    super(element);
+    for (ITypeParameter t : element.getTypeParameters()) {
+      addTypeParameter(new TypeParameterSourceBuilder(t));
+    }
+    setReturnTypeSignature(SignatureUtils.getTypeSignature(element.getReturnType()));
+    for (IMethodParameter param : element.getParameters()) {
+      addParameter(new MethodParameterSourceBuilder(param));
+    }
+    for (IType t : element.getExceptionTypes()) {
+      addExceptionSignature(SignatureUtils.getTypeSignature(t));
+    }
+    ISourceRange body = element.getSourceOfBody();
+    if (body != null) {
+      setBody(new RawSourceBuilder(body.toString()));
+    }
+  }
 
   /**
    * @param elementName
    */
   public MethodSourceBuilder(String elementName) {
     super(elementName);
-    m_parameters = new ArrayList<>();
-    m_exceptionSignatures = new ArrayList<>();
   }
 
   @Override
@@ -50,37 +78,40 @@ public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implem
     super.createSource(source, lineDelimiter, context, validator);
     //method declaration
     source.append(Flags.toString(getFlags())).append(" ");
-    if (!StringUtils.isEmpty(getReturnTypeSignature())) {
-      source.append(SignatureUtils.getTypeReference(getReturnTypeSignature(), validator) + " ");
+
+    // type parameters
+    if (!m_typeParameters.isEmpty()) {
+      source.append(ISignatureConstants.C_GENERIC_START);
+      for (ITypeParameterSourceBuilder p : m_typeParameters) {
+        p.createSource(source, lineDelimiter, context, validator);
+        source.append(", ");
+      }
+      source.setLength(source.length() - 2);
+      source.append(ISignatureConstants.C_GENERIC_END);
+    }
+
+    if (!StringUtils.isEmpty(getReturnTypeSignature())) {//constructor
+      source.append(SignatureUtils.useSignature(getReturnTypeSignature(), validator) + " ");
     }
     source.append(getElementName());
     source.append("(");
     // parameters
-    Iterator<MethodParameterDescription> parameterIterator = getParameters().iterator();
-    if (parameterIterator.hasNext()) {
-      MethodParameterDescription param = parameterIterator.next();
-      if (param.getFlags() != Flags.AccDefault) {
-        source.append(Flags.toString(param.getFlags())).append(" ");
+    if (!m_parameters.isEmpty()) {
+      for (IMethodParameterSourceBuilder param : m_parameters) {
+        param.createSource(source, lineDelimiter, context, validator);
+        source.append(", ");
       }
-      source.append(SignatureUtils.getTypeReference(param.getSignature(), validator)).append(" ").append(param.getName());
-    }
-    while (parameterIterator.hasNext()) {
-      source.append(", ");
-      MethodParameterDescription param = parameterIterator.next();
-      if (param.getFlags() != Flags.AccDefault) {
-        source.append(Flags.toString(param.getFlags())).append(" ");
-      }
-      source.append(SignatureUtils.getTypeReference(param.getSignature(), validator)).append(" ").append(param.getName());
+      source.setLength(source.length() - 2);
     }
     source.append(")");
     // exceptions
     Iterator<String> exceptionSigIterator = getExceptionSignatures().iterator();
     if (exceptionSigIterator.hasNext()) {
       // first
-      source.append(" throws ").append(SignatureUtils.getTypeReference(exceptionSigIterator.next(), validator));
+      source.append(" throws ").append(SignatureUtils.useSignature(exceptionSigIterator.next(), validator));
     }
     while (exceptionSigIterator.hasNext()) {
-      source.append(", ").append(SignatureUtils.getTypeReference(exceptionSigIterator.next(), validator));
+      source.append(", ").append(SignatureUtils.useSignature(exceptionSigIterator.next(), validator));
 
     }
     if (Flags.isInterface(getFlags()) || Flags.isAbstract(getFlags())) {
@@ -90,19 +121,15 @@ public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implem
       // content
       source.append("{").append(lineDelimiter);
       int beforeContent = source.length();
-      createMethodBody(source, lineDelimiter, context, validator);
+      if (getBody() != null) {
+        getBody().createSource(source, lineDelimiter, context, validator);
+      }
       if (beforeContent < source.length()) {
         source.append(lineDelimiter);
       }
       source.append("}");
     }
 
-  }
-
-  public void createMethodBody(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-    if (getMethodBodySourceBuilder() != null) {
-      getMethodBodySourceBuilder().createSource(this, source, lineDelimiter, context, validator);
-    }
   }
 
   @Override
@@ -116,33 +143,54 @@ public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implem
   }
 
   @Override
-  public void setParameters(Set<MethodParameterDescription> parameters) {
-    m_parameters.clear();
-    m_parameters.addAll(parameters);
-  }
-
-  @Override
-  public boolean addParameter(MethodParameterDescription parameter) {
+  public boolean addParameter(IMethodParameterSourceBuilder parameter) {
     return m_parameters.add(parameter);
   }
 
   @Override
-  public boolean removeParameter(MethodParameterDescription parameter) {
-    return m_parameters.remove(parameter);
+  public boolean removeParameter(String elementName) {
+    for (Iterator<IMethodParameterSourceBuilder> it = m_parameters.iterator(); it.hasNext();) {
+      if (elementName.equals(it.next().getElementName())) {
+        it.remove();
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
-  public List<MethodParameterDescription> getParameters() {
+  public List<IMethodParameterSourceBuilder> getParameters() {
     return Collections.unmodifiableList(m_parameters);
+  }
+
+  @Override
+  public void addTypeParameter(ITypeParameterSourceBuilder typeParameter) {
+    m_typeParameters.add(typeParameter);
+  }
+
+  @Override
+  public boolean removeTypeParameter(String elementName) {
+    for (Iterator<ITypeParameterSourceBuilder> it = m_typeParameters.iterator(); it.hasNext();) {
+      if (elementName.equals(it.next().getElementName())) {
+        it.remove();
+        return true;
+      }
+    }
+    return false;
+  }
+
+  @Override
+  public List<ITypeParameterSourceBuilder> getTypeParameters() {
+    return Collections.unmodifiableList(m_typeParameters);
   }
 
   @Override
   public String getMethodIdentifier() {
     List<String> methodParamSignatures = new ArrayList<>(m_parameters.size());
-    for (MethodParameterDescription param : m_parameters) {
-      methodParamSignatures.add(param.getSignature());
+    for (IMethodParameterSourceBuilder param : m_parameters) {
+      methodParamSignatures.add(param.getDataTypeSignature());
     }
-    return SignatureUtils.getMethodIdentifier(getElementName(), methodParamSignatures);
+    return SignatureUtils.createMethodIdentifier(getElementName(), methodParamSignatures);
   }
 
   @Override
@@ -172,12 +220,12 @@ public class MethodSourceBuilder extends AbstractAnnotatableSourceBuilder implem
   }
 
   @Override
-  public IMethodBodySourceBuilder getMethodBodySourceBuilder() {
-    return m_methodBodySourceBuilder;
+  public ISourceBuilder getBody() {
+    return m_body;
   }
 
   @Override
-  public void setMethodBodySourceBuilder(IMethodBodySourceBuilder methodBodySourceBuilder) {
-    m_methodBodySourceBuilder = methodBodySourceBuilder;
+  public void setBody(ISourceBuilder body) {
+    m_body = body;
   }
 }

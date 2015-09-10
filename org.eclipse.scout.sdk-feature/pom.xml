@@ -24,36 +24,6 @@
 
   <name>Eclipse Scout SDK Feature</name>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk.s2e</groupId>
-      <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
-      <classifier>sources</classifier>
-    </dependency>
-  </dependencies>
-
   <build>
     <plugins>
       <plugin>

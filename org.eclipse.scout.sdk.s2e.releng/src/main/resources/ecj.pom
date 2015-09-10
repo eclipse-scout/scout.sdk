@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <!--
+    Originally downloaded here:
+    http://download.eclipse.org/eclipse/downloads/drops4/R-4.5-201506032000/#JDTCORE
+  -->
+  <groupId>org.eclipse.scout.sdk</groupId>
+  <artifactId>ecj</artifactId>
+  <version>${ecj-maven}</version>
+
+  <name>Scout SDK org.eclipse.core.commands dependency (Incubation)</name>
+  <description>This is Eclipse JDT Core Batch Compiler used by Scout SDK</description>
+  <url>http://www.eclipse.org/scout/</url>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>scout-dev@eclipse.org</id>
+      <name>Scout Development Team</name>
+    </developer>
+  </developers>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.ant</groupId>
+      <artifactId>ant</artifactId>
+      <version>1.9.4</version>
+      <optional>true</optional>
+    </dependency>
+  </dependencies>
+</project>

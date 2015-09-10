@@ -16,8 +16,11 @@ import java.io.StringReader;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.sourcebuilder.ICommentSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.field.IFieldSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkException;
 
@@ -29,7 +32,7 @@ import org.eclipse.scout.sdk.core.util.SdkException;
  */
 public final class CommentSourceBuilderFactory {
 
-  public static volatile IJavaElementCommentBuilder javaElementCommentBuilder;
+  public static volatile ICommentSourceBuilderDelegate commentSourceBuilderDelegate;
 
   private static final Pattern REGEX_COMMENT_PATTERN1 = Pattern.compile("^s*\\/\\*\\*s*$");
   private static final Pattern REGEX_COMMENT_PATTERN2 = Pattern.compile("^s*\\*\\*\\/s*$");
@@ -38,69 +41,70 @@ public final class CommentSourceBuilderFactory {
   private CommentSourceBuilderFactory() {
   }
 
-  private static final ICommentSourceBuilder EMPTY_COMMENT_SOURCE_BUILDER = new ICommentSourceBuilder() {
+  private static final ISourceBuilder EMPTY_COMMENT_SOURCE_BUILDER = new ISourceBuilder() {
     @Override
-    public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+    public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     }
   };
 
-  public static ICommentSourceBuilder createPreferencesCompilationUnitCommentBuilder() {
-    if (javaElementCommentBuilder != null) {
-      return javaElementCommentBuilder.createPreferencesCompilationUnitCommentBuilder();
+  public static ISourceBuilder createDefaultCompilationUnitComment(ICompilationUnitSourceBuilder target) {
+    if (commentSourceBuilderDelegate != null) {
+      return commentSourceBuilderDelegate.createCompilationUnitComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
-  public static ICommentSourceBuilder createPreferencesMethodOverrideComment(String interfaceFqn) {
-    if (javaElementCommentBuilder != null) {
-      return javaElementCommentBuilder.createPreferencesMethodOverrideComment(interfaceFqn);
+  public static ISourceBuilder createDefaultTypeComment(ITypeSourceBuilder target) {
+    if (commentSourceBuilderDelegate != null) {
+      return commentSourceBuilderDelegate.createTypeComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
-  public static ICommentSourceBuilder createPreferencesTypeCommentBuilder() {
-    if (javaElementCommentBuilder != null) {
-      return javaElementCommentBuilder.createPreferencesTypeCommentBuilder();
+  public static ISourceBuilder createDefaultMethodComment(IMethodSourceBuilder target) {
+    if (commentSourceBuilderDelegate != null) {
+      return commentSourceBuilderDelegate.createMethodComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
-  public static ICommentSourceBuilder createPreferencesMethodCommentBuilder() {
-    if (javaElementCommentBuilder != null) {
-      return javaElementCommentBuilder.createPreferencesMethodCommentBuilder();
+  public static ISourceBuilder createDefaultOverrideMethodComment(IMethodSourceBuilder target, String interfaceFqn) {
+    if (commentSourceBuilderDelegate != null) {
+      return commentSourceBuilderDelegate.createOverrideMethodComment(target, interfaceFqn);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
-  public static ICommentSourceBuilder createPreferencesMethodGetterCommentBuilder() {
-    if (javaElementCommentBuilder != null) {
-      return javaElementCommentBuilder.createPreferencesMethodGetterCommentBuilder();
+  public static ISourceBuilder createDefaultGetterMethodComment(IMethodSourceBuilder target) {
+    if (commentSourceBuilderDelegate != null) {
+      return commentSourceBuilderDelegate.createGetterMethodComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
-  public static ICommentSourceBuilder createPreferencesMethodSetterCommentBuilder() {
-    if (javaElementCommentBuilder != null) {
-      return javaElementCommentBuilder.createPreferencesMethodSetterCommentBuilder();
+  public static ISourceBuilder createDefaultSetterMethodComment(IMethodSourceBuilder target) {
+    if (commentSourceBuilderDelegate != null) {
+      return commentSourceBuilderDelegate.createSetterMethodComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
-  public static ICommentSourceBuilder createPreferencesFieldCommentBuilder() {
-    if (javaElementCommentBuilder != null) {
-      return javaElementCommentBuilder.createPreferencesFieldCommentBuilder();
+  public static ISourceBuilder createDefaultFieldComment(IFieldSourceBuilder target) {
+    if (commentSourceBuilderDelegate != null) {
+      return commentSourceBuilderDelegate.createFieldComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   /**
    * @param comment
+   *          without / ** and * /
    * @return
    */
-  public static ICommentSourceBuilder createCustomCommentBuilder(final String comment) {
-    return new ICommentSourceBuilder() {
+  public static ISourceBuilder createCustomCommentBuilder(final String comment) {
+    return new ISourceBuilder() {
       @Override
-      public void createSource(ISourceBuilder sourceBuilder, StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         // normalize comment
         StringBuilder commentBuilder = new StringBuilder();
         try (BufferedReader inputReader = new BufferedReader(new StringReader(comment))) {
@@ -134,4 +138,5 @@ public final class CommentSourceBuilderFactory {
       }
     };
   }
+
 }

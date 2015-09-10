@@ -18,18 +18,19 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.model.FieldFilters;
-import org.eclipse.scout.sdk.core.model.Flags;
-import org.eclipse.scout.sdk.core.model.IField;
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.model.TypeFilters;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IConstantMetaValue;
+import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.MetaValueType;
 import org.eclipse.scout.sdk.core.s.AnnotationEnums.SdkColumnCommand;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
 import org.eclipse.scout.sdk.core.s.model.ScoutTypeComparators;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
+import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.FieldSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.FieldSourceBuilderFactory;
@@ -40,8 +41,11 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.FieldFilters;
+import org.eclipse.scout.sdk.core.util.Filters;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.TypeFilters;
 
 /**
  * <h3>{@link TableRowDataTypeSourceBuilder}</h3>
@@ -55,13 +59,13 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
 
   private final IType m_columnContainer; // e.g. ITable or ITableExtension
   private final IType m_modelType; // e.g. IPageWithTable, ITableField, ITableExtension
-  private final ILookupEnvironment m_lookpEnvironment;
+  private final IJavaEnvironment m_lookpEnvironment;
 
-  public TableRowDataTypeSourceBuilder(String elementName, IType columnContainer, IType modelType, ILookupEnvironment lookupEnv) {
+  public TableRowDataTypeSourceBuilder(String elementName, IType columnContainer, IType modelType, IJavaEnvironment env) {
     super(elementName);
     m_columnContainer = columnContainer;
     m_modelType = modelType;
-    m_lookpEnvironment = lookupEnv;
+    m_lookpEnvironment = env;
   }
 
   @Override
@@ -80,7 +84,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
 
     // row data class flags
     int flags = Flags.AccPublic;
-    if (getParentTypeSourceBuilder() != null) {
+    if (getDeclaringElement() instanceof ITypeSourceBuilder) {
       flags |= Flags.AccStatic;
     }
     if (Flags.isAbstract(getColumnContainer().getFlags()) || Flags.isAbstract(getModelType().getFlags())) {
@@ -94,11 +98,11 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
 
     // serialVersionUidBuilder
     IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
-    addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
+    addSortedField(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
 
     // constructor
-    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructor(getElementName());
+    addSortedMethod(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
 
     // get all columns
     Set<IType> columns = getColumns(getColumnContainer(), rowDataSuperClassType);
@@ -114,8 +118,8 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
       IFieldSourceBuilder constantFieldBuilder = new FieldSourceBuilder(constantColName);
       constantFieldBuilder.setFlags(ROW_DATA_FIELD_FLAGS);
       constantFieldBuilder.setSignature(Signature.createTypeSignature(String.class.getName()));
-      constantFieldBuilder.setValue("\"" + columnBeanName + "\"");
-      addSortedFieldSourceBuilder(new CompositeObject(SortedMemberKeyFactory.FIELD_CONSTANT + 1, i, columnBeanName), constantFieldBuilder);
+      constantFieldBuilder.setValue(new RawSourceBuilder(CoreUtils.toStringLiteral(columnBeanName)));
+      addSortedField(new CompositeObject(SortedMemberKeyFactory.FIELD_CONSTANT + 1, i, columnBeanName), constantFieldBuilder);
 
       // member
       IFieldSourceBuilder memberFieldBuilder = new FieldSourceBuilder("m_" + columnBeanName);
@@ -124,15 +128,15 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
       // try to find the column value type with the local hierarchy first.
       String columnValueTypeSignature = DtoUtils.getColumnValueTypeSignature(column);
       memberFieldBuilder.setSignature(columnValueTypeSignature);
-      addSortedFieldSourceBuilder(new CompositeObject(SortedMemberKeyFactory.FIELD_MEMBER + 1, i, columnBeanName), memberFieldBuilder);
+      addSortedField(new CompositeObject(SortedMemberKeyFactory.FIELD_MEMBER + 1, i, columnBeanName), memberFieldBuilder);
 
       // getter
       IMethodSourceBuilder getterBuilder = MethodSourceBuilderFactory.createGetter(memberFieldBuilder);
-      addSortedMethodSourceBuilder(new CompositeObject(SortedMemberKeyFactory.METHOD_PROPERTY_ACCESS, i, 1, getterBuilder), getterBuilder);
+      addSortedMethod(new CompositeObject(SortedMemberKeyFactory.METHOD_PROPERTY_ACCESS, i, 1, getterBuilder), getterBuilder);
 
       // setter
       IMethodSourceBuilder setterBuilder = MethodSourceBuilderFactory.createSetter(memberFieldBuilder);
-      addSortedMethodSourceBuilder(new CompositeObject(SortedMemberKeyFactory.METHOD_PROPERTY_ACCESS, i, 2, setterBuilder), setterBuilder);
+      addSortedMethod(new CompositeObject(SortedMemberKeyFactory.METHOD_PROPERTY_ACCESS, i, 2, setterBuilder), setterBuilder);
 
       i++;
     }
@@ -153,7 +157,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
 
     // the declaring type is a IPageWithTableExtension -> search the inner table extension
     if (CoreUtils.isInstanceOf(declaringType, IRuntimeClasses.IPageWithTableExtension)) {
-      IType tableExtension = CoreUtils.findInnerTypeInSuperHierarchy(declaringType, TypeFilters.getSubtypeFilter(IRuntimeClasses.ITableExtension));
+      IType tableExtension = CoreUtils.findInnerTypeInSuperHierarchy(declaringType, TypeFilters.subtypeOf(IRuntimeClasses.ITableExtension));
       if (tableExtension != null) {
         declaringType = tableExtension; // switch to the table as column holder
       }
@@ -162,7 +166,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     // the declaring type holds columns
     TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     // do not re-use the fieldHierarchy for the subtype filter!
-    IFilter<IType> filter = TypeFilters.getMultiFilterAnd(TypeFilters.getSubtypeFilter(IRuntimeClasses.IColumn), new IFilter<IType>() {
+    IFilter<IType> filter = Filters.and(TypeFilters.subtypeOf(IRuntimeClasses.IColumn), new IFilter<IType>() {
       @Override
       public boolean evaluate(IType type) {
         SdkColumnCommand command = DtoUtils.findColumnDataSdkColumnCommand(type);
@@ -187,11 +191,11 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     Set<String> usedColumnBeanNames = new HashSet<>();
     IType currentRowDataSuperType = rowDataSuperType;
     while (currentRowDataSuperType != null && !IRuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getName())) {
-      List<IField> columnFields = CoreUtils.getFields(currentRowDataSuperType, FieldFilters.getFlagsFilter(ROW_DATA_FIELD_FLAGS));
+      List<IField> columnFields = CoreUtils.getFields(currentRowDataSuperType, FieldFilters.flags(ROW_DATA_FIELD_FLAGS));
       for (IField column : columnFields) {
-        Object val = column.getValue();
-        if (val instanceof String) {
-          usedColumnBeanNames.add(val.toString());
+        IConstantMetaValue val = column.getConstantValue();
+        if (val != null && val.getType() == MetaValueType.String) {
+          usedColumnBeanNames.add(val.getObject(String.class));
         }
       }
       currentRowDataSuperType = currentRowDataSuperType.getSuperClass();
@@ -212,21 +216,21 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
   }
 
   protected String computeTableRowDataSuperClassSignature() {
-    ITypeSourceBuilder surroundingTableBeanSourceBuilder = getParentTypeSourceBuilder();
-    if (surroundingTableBeanSourceBuilder == null) {
+    if (!(getDeclaringElement() instanceof ITypeSourceBuilder)) {
       // row data extension. no super class
       return null;
     }
 
+    ITypeSourceBuilder surroundingTableBeanSourceBuilder = (ITypeSourceBuilder) getDeclaringElement();
     String superTypeOfSurroundingTableBeanSourceBuilder = surroundingTableBeanSourceBuilder.getSuperTypeSignature();
     if (!Signature.createTypeSignature(IRuntimeClasses.AbstractTablePageData).equals(superTypeOfSurroundingTableBeanSourceBuilder)
         && !Signature.createTypeSignature(IRuntimeClasses.AbstractTableFieldBeanData).equals(superTypeOfSurroundingTableBeanSourceBuilder)) {
       // use the row data in the super page data.
       IType superType = m_lookpEnvironment.findType(SignatureUtils.toFullyQualifiedName(superTypeOfSurroundingTableBeanSourceBuilder));
 
-      IType innerType = CoreUtils.getInnerType(superType, TypeFilters.getSubtypeFilter(IRuntimeClasses.AbstractTableRowData));
+      IType innerType = CoreUtils.getInnerType(superType, TypeFilters.subtypeOf(IRuntimeClasses.AbstractTableRowData));
       if (innerType != null) {
-        return SignatureUtils.getResolvedSignature(innerType);
+        return SignatureUtils.getTypeSignature(innerType);
       }
     }
     return Signature.createTypeSignature(IRuntimeClasses.AbstractTableRowData);

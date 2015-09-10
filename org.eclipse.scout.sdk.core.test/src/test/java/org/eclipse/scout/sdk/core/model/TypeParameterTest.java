@@ -15,7 +15,9 @@ import java.util.AbstractList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.CoreTestingUtils;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
+import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -32,8 +34,8 @@ public class TypeParameterTest {
     Assert.assertEquals(1, typeParameters.size());
 
     ITypeParameter param = typeParameters.get(0);
-    Assert.assertEquals("X", param.getName());
-    Assert.assertEquals(childClassType, param.getType());
+    Assert.assertEquals("X", param.getElementName());
+    Assert.assertEquals(childClassType, param.getDeclaringMember());
 
     List<IType> bounds = param.getBounds();
     Assert.assertEquals(3, bounds.size());
@@ -63,13 +65,14 @@ public class TypeParameterTest {
     Assert.assertEquals(2, typeParameters.size());
 
     ITypeParameter param = typeParameters.get(0);
-    Assert.assertEquals("T", param.getName());
-    Assert.assertEquals(baseClassType, param.getType());
+    Assert.assertEquals("T", param.getElementName());
+    Assert.assertEquals(baseClassType, param.getDeclaringMember());
     Assert.assertEquals(0, param.getBounds().size());
 
     param = typeParameters.get(1);
-    Assert.assertEquals("Z", param.getName());
-    Assert.assertEquals(baseClassType, param.getType());
+    Assert.assertEquals("Z", param.getElementName());
+    Assert.assertEquals(baseClassType, param.getDeclaringMember());
     Assert.assertEquals(0, param.getBounds().size());
   }
+
 }

@@ -22,11 +22,6 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
 public interface ISourceBuilder {
 
   /**
-   * validates the receiver source builder.
-   */
-  void validate();
-
-  /**
    * appends the source to the given builder.
    *
    * @param source

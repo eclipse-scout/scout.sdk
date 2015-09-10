@@ -34,6 +34,23 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
     m_hash = Arrays.deepHashCode(m_value);
   }
 
+  public static CompositeObject concat(CompositeObject... objects) {
+    int n = 0;
+    for (CompositeObject o : objects) {
+      n += (o.m_value != null ? o.m_value.length : 0);
+    }
+    Object[] a = new Object[n];
+    int pos = 0;
+    for (CompositeObject o : objects) {
+      int i = (o.m_value != null ? o.m_value.length : 0);
+      if (i > 0) {
+        System.arraycopy(o.m_value, 0, a, pos, i);
+        pos += i;
+      }
+    }
+    return new CompositeObject(a);
+  }
+
   @Override
   public int hashCode() {
     return m_hash;

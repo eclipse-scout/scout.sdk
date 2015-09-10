@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.equinox.common</artifactId>
-  <version>${equinoxVersionMaven}</version>
+  <version>${org.eclipse.equinox.common-maven}</version>
 
   <name>Scout SDK org.eclipse.equinox.common dependency (Incubation)</name>
   <description>This is org.eclipse.equinox.common jar used by Scout SDK</description>

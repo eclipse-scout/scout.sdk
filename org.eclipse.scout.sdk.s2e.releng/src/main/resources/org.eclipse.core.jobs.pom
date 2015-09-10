@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.core.jobs</artifactId>
-  <version>${eclipseJobsVersionMaven}</version>
+  <version>${org.eclipse.core.jobs-maven}</version>
 
   <name>Scout SDK org.eclipse.core.jobs dependency (Incubation)</name>
   <description>This is org.eclipse.core.jobs jar used by Scout SDK</description>
@@ -33,7 +33,7 @@
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.equinox.common</artifactId>
-      <version>[3.2.0,4.0.0)</version>
+      <version>${org.eclipse.equinox.common-range}</version>
     </dependency>
   </dependencies>
 </project>

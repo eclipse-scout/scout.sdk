@@ -12,12 +12,12 @@ package org.eclipse.scout.sdk.core.sourcebuilder.type;
 
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.model.ITypeParameter;
-import org.eclipse.scout.sdk.core.sourcebuilder.IAnnotatableSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.ICommentSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.IMemberSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.typeparameter.ITypeParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 
 /**
@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.core.util.CompositeObject;
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
-public interface ITypeSourceBuilder extends IAnnotatableSourceBuilder {
+public interface ITypeSourceBuilder extends IMemberSourceBuilder {
 
   /**
    * @return
@@ -39,6 +39,17 @@ public interface ITypeSourceBuilder extends IAnnotatableSourceBuilder {
   String getSuperTypeSignature();
 
   /**
+   * @return the parent {@link ITypeSourceBuilder} or {@link ICompilationUnitSourceBuilder}
+   */
+  ISourceBuilder getDeclaringElement();
+
+  /**
+   * @param parent
+   *          {@link ITypeSourceBuilder} or {@link ICompilationUnitSourceBuilder}
+   */
+  void setDeclaringElement(ISourceBuilder parent);
+
+  /**
    * @return Gets the fully qualified name this type will have after it has been created.
    */
   String getFullyQualifiedName();
@@ -46,49 +57,17 @@ public interface ITypeSourceBuilder extends IAnnotatableSourceBuilder {
   /**
    * @return
    */
-  List<IFieldSourceBuilder> getFieldSourceBuilders();
+  List<IFieldSourceBuilder> getFields();
 
   /**
    * @return
    */
-  List<IMethodSourceBuilder> getMethodSourceBuilders();
+  List<IMethodSourceBuilder> getMethods();
 
   /**
    * @return
    */
-  List<ITypeSourceBuilder> getTypeSourceBuilder();
-
-  /**
-   * @param commentSourceBuilder
-   */
-  void setCommentSourceBuilder(ICommentSourceBuilder commentSourceBuilder);
-
-  /**
-   * @param flags
-   */
-  void setFlags(int flags);
-
-  /**
-   * @return
-   */
-  int getFlags();
-
-  /**
-   * @param builder
-   */
-  void addAnnotationSourceBuilder(IAnnotationSourceBuilder builder);
-
-  /**
-   * @param sortKey
-   * @param builder
-   */
-  void addSortedAnnotationSourceBuilder(CompositeObject sortKey, IAnnotationSourceBuilder builder);
-
-  /**
-   * @param childOp
-   * @return
-   */
-  boolean removeAnnotationSourceBuilder(IAnnotationSourceBuilder childOp);
+  List<ITypeSourceBuilder> getTypes();
 
   /**
    * @param superTypeSignature
@@ -114,86 +93,64 @@ public interface ITypeSourceBuilder extends IAnnotatableSourceBuilder {
   /**
    * @param builder
    */
-  void addFieldSourceBuilder(IFieldSourceBuilder builder);
+  void addField(IFieldSourceBuilder builder);
 
   /**
    * @param sortKey
    * @param builder
    */
-  void addSortedFieldSourceBuilder(CompositeObject sortKey, IFieldSourceBuilder builder);
+  void addSortedField(CompositeObject sortKey, IFieldSourceBuilder builder);
 
   /**
    * @param builder
    * @return
    */
-  boolean removeFieldSourceBuilder(IFieldSourceBuilder builder);
+  boolean removeField(String elementName);
 
   /**
    * @param builder
    */
-  void addMethodSourceBuilder(IMethodSourceBuilder builder);
+  void addMethod(IMethodSourceBuilder builder);
 
   /**
    * @param sortKey
    * @param builder
    */
-  void addSortedMethodSourceBuilder(CompositeObject sortKey, IMethodSourceBuilder builder);
+  void addSortedMethod(CompositeObject sortKey, IMethodSourceBuilder builder);
 
   /**
    * @param builder
    * @return
    */
-  boolean removeMethodSourceBuilder(IMethodSourceBuilder builder);
+  boolean removeMethod(String elementName);
 
   /**
    * @param builder
    */
-  void addTypeSourceBuilder(ITypeSourceBuilder builder);
+  void addType(ITypeSourceBuilder builder);
 
   /**
    * @param sortKey
    * @param builder
    */
-  void addSortedTypeSourceBuilder(CompositeObject sortKey, ITypeSourceBuilder builder);
+  void addSortedType(CompositeObject sortKey, ITypeSourceBuilder builder);
 
   /**
    * @param builder
    * @return
    */
-  boolean removeTypeSourceBuilder(ITypeSourceBuilder builder);
-
-  /**
-   * @return
-   */
-  ITypeSourceBuilder getParentTypeSourceBuilder();
-
-  /**
-   * @param parentBuilder
-   */
-  void setParentTypeSourceBuilder(ITypeSourceBuilder parentBuilder);
-
-  /**
-   * @return
-   */
-  String getParentFullyQualifiedName();
-
-  /**
-   * @param parentFullyQualifiedName
-   */
-  void setParentFullyQualifiedName(String parentFullyQualifiedName);
+  boolean removeType(String elementName);
 
   /**
    * @param typeParameter
    */
-  void addTypeParameter(ITypeParameter typeParameter);
-
-  /**
-   * @param typeParameters
-   */
-  void setTypeParameters(List<? extends ITypeParameter> typeParameters);
+  void addTypeParameter(ITypeParameterSourceBuilder typeParameter);
 
   /**
    * @return
    */
-  List<ITypeParameter> getTypeParameters();
+  List<ITypeParameterSourceBuilder> getTypeParameters();
+
+  boolean removeTypeParameter(String elementName);
+
 }

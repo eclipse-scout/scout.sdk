@@ -30,15 +30,27 @@
 
   <dependencies>
     <!-- Build Dependencies -->
-    <!-- Build Dependencies (Provided) -->
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.scout.sdk.core</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.scout.sdk</groupId>
+          <artifactId>ecj</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.eclipse.scout.sdk</groupId>
+          <artifactId>ecj</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
+    <!-- Build Dependencies (Provided) -->
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.jdt.core</artifactId>
@@ -54,6 +66,11 @@
       <artifactId>org.eclipse.m2e.core</artifactId>
       <scope>provided</scope>
     </dependency>
+      <dependency>
+        <groupId>org.eclipse.scout.sdk</groupId>
+        <artifactId>org.eclipse.ui.console</artifactId>
+        <scope>provided</scope>
+      </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
@@ -70,13 +87,23 @@
           <instructions>
             <Import-Package>
               !javax.*,
+              !org.eclipse.core.runtime*,
+              !org.eclipse.core.resources*,
+              !org.eclipse.jdt.core*,
+              !org.eclipse.jdt.internal*,
               !org.eclipse.jface.text*,
               !org.apache.maven.model*,
               !org.codehaus.plexus*,
+              !org.eclipse.text*,
               *
             </Import-Package>
             <Require-Bundle>
-              org.eclipse.jface.text;bundle-version="[3.7.2,4)";visibility:=reexport
+              org.eclipse.core.runtime;bundle-version="[3.7,4)";visibility:=reexport,
+              org.eclipse.core.resources;visibility:=reexport,
+              org.eclipse.jdt.core;bundle-version="[3.11,4)";visibility:=reexport,
+              org.eclipse.ui.console;bundle-version="[3.6,4)";visibility:=reexport,
+              org.eclipse.jface.text;bundle-version="[3.7.2,4)";visibility:=reexport,
+              org.eclipse.m2e.core;visibility:=reexport
             </Require-Bundle>
 
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator</Bundle-Activator>

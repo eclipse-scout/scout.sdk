@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.ui.ide</artifactId>
-  <version>${uiIdeVersionMaven}</version>
+  <version>${org.eclipse.ui.ide-maven}</version>
 
   <name>Scout SDK org.eclipse.ui.ide dependency (Incubation)</name>
   <description>This is org.eclipse.ui.ide jar used by Scout SDK</description>
@@ -32,43 +32,35 @@
   <dependencies>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.core.filesystem</artifactId>
-      <version>[1.0.0,2.0.0)</version>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.core.resources</artifactId>
-      <version>[3.7.0,4.0.0)</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
-      <version>[3.2.0,4.0.0)</version>
+      <version>${org.eclipse.core.runtime-range}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.ui.forms</artifactId>
-      <version>[3.3.0,4.0.0)</version>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
-      <artifactId>org.eclipse.ui.views</artifactId>
-      <version>[3.2.0,4.0.0)</version>
-      <optional>true</optional>
+      <artifactId>org.eclipse.core.filesystem</artifactId>
+      <version>${org.eclipse.core.filesystem-range}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.ui.workbench</artifactId>
-      <version>[3.7.0,4.0.0)</version>
+      <version>${org.eclipse.ui.workbench-range}</version>
     </dependency>
-
-<!-- org.eclipse.equinox.bidi;bundle-version="[0.10.0,2.0.0)" -->
-<!-- org.eclipse.equinox.p2.engine;bundle-version="[2.0.0,3.0.0)" -->
-<!-- org.eclipse.equinox.p2.metadata;bundle-version="[2.0.0,3.0.0)" -->
-<!-- org.eclipse.help;bundle-version="[3.2.0,4.0.0)" -->
-<!-- org.eclipse.jface.text;bundle-version="[3.2.0,4.0.0)" -->
-<!-- org.eclipse.ui;bundle-version="[3.106.0,4.0.0)" -->
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.jface.text</artifactId>
+      <version>${org.eclipse.jface.text-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui</artifactId>
+      <version>${org.eclipse.ui-range}</version>
+    </dependency>
+    <!-- org.eclipse.help;bundle-version="[3.2.0,4.0.0)" -->
+    <!-- org.eclipse.equinox.p2.engine;bundle-version="[2.0.0,3.0.0)" -->
+    <!-- org.eclipse.equinox.p2.metadata;bundle-version="[2.0.0,3.0.0)" -->
+    <!-- org.eclipse.equinox.bidi;bundle-version="[0.10.0,2.0.0)" -->
+    <!-- org.eclipse.e4.core.services;bundle-version="2.0.0", -->
+    <!-- org.eclipse.e4.core.contexts;bundle-version="[1.3.100,2.0.0)", -->
+    <!-- org.eclipse.e4.ui.workbench;bundle-version="[1.3.0,2.0.0)" -->
   </dependencies>
 </project>

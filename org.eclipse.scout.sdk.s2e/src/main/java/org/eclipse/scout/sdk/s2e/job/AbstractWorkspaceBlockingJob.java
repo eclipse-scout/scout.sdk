@@ -16,9 +16,9 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.scout.sdk.s2e.IWorkingCopyManager;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
 
 /**
  * <h3>{@link AbstractWorkspaceBlockingJob}</h3> Job which runs with the workspace root as scheduling rule.

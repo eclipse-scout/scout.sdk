@@ -13,8 +13,10 @@ package org.eclipse.scout.sdk.core.model;
 import java.io.IOException;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.CoreTestingUtils;
+import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IImport;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -27,7 +29,7 @@ public class ImportDeclarationTest {
     ICompilationUnit childClassIcu = CoreTestingUtils.getChildClassIcu();
     Assert.assertNotNull(childClassIcu);
 
-    IImportDeclaration imp = childClassIcu.getImports().values().iterator().next();
+    IImport imp = childClassIcu.getImports().iterator().next();
     Assert.assertNotNull(imp);
     Assert.assertEquals(childClassIcu, imp.getCompilationUnit());
     Assert.assertEquals(Signature.getQualifier(IOException.class.getName()), imp.getQualifier());
@@ -40,7 +42,7 @@ public class ImportDeclarationTest {
     ICompilationUnit childClassIcu = CoreTestingUtils.getChildClassIcu();
     Assert.assertNotNull(childClassIcu);
 
-    IImportDeclaration imp = childClassIcu.getImports().values().iterator().next();
+    IImport imp = childClassIcu.getImports().iterator().next();
     Assert.assertFalse(StringUtils.isBlank(imp.toString()));
   }
 }

@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.core.resources</artifactId>
-  <version>${eclipseResourcesVersionMaven}</version>
+  <version>${org.eclipse.core.resources-maven}</version>
 
   <name>Scout SDK org.eclipse.core.resources dependency (Incubation)</name>
   <description>This is org.eclipse.core.resources jar used by Scout SDK</description>
@@ -33,17 +33,17 @@
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.core.expressions</artifactId>
-      <version>[3.2.0,4.0.0)</version>
+      <version>${org.eclipse.core.expressions-range}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.core.filesystem</artifactId>
-      <version>[1.3.0,2.0.0)</version>
+      <version>${org.eclipse.core.filesystem-range}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
-      <version>[3.7.0,4.0.0)</version>
+      <version>${org.eclipse.core.runtime-range}</version>
     </dependency>
   </dependencies>
 </project>

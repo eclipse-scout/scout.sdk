@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table;
 
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.AbstractTableBeanSourceBuilder;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataAnnotation;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
@@ -31,8 +31,8 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
    * @param elementName
    * @param setup
    */
-  public TableFieldBeanFormDataSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, String typeName, ILookupEnvironment lookupEnv) {
-    super(modelType, typeName, lookupEnv, false);
+  public TableFieldBeanFormDataSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, String typeName, IJavaEnvironment env) {
+    super(modelType, typeName, env, false);
     m_formDataAnnotation = formDataAnnotation;
     setup();
   }

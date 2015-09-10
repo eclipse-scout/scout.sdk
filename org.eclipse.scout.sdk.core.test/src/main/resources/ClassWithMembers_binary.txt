@@ -1,0 +1,42 @@
+package org.eclipse.scout.sdk.core.fixture;
+
+public class ClassWithMembers<T> {
+  String a1;
+  public String a2;
+  protected String a3;
+  private String a4;
+  private final String a5 = "5";
+
+  private static String b1;
+  private static final String b2 = "2";
+  private static final String b3;
+
+  private String c1;
+  private String c2;
+  private String c3;
+  private String c4;
+
+  private int d1;
+  private int d2;
+
+  private Map<T, String> e1;
+
+  @TestAnnotation(en = TestEnum.A)
+  public String m1(@TestAnnotation(en = TestEnum.B) String type) {
+  }
+
+  @TestAnnotation(en = TestEnum.A)
+  public T m2(@TestAnnotation(en = TestEnum.B) Class<T> type) {
+  }
+
+  @TestAnnotation(en = TestEnum.A)
+  public <U extends T, V extends U> U m3(@TestAnnotation(en = TestEnum.B) Class<U> type, V v, T t) {
+  }
+
+  public class InnerMemberClass {
+  }
+
+  public static class InnerStaticClass {
+  }
+
+}

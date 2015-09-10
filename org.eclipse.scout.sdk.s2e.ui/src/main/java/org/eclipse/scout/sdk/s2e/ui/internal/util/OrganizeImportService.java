@@ -18,7 +18,7 @@ import org.eclipse.jdt.internal.corext.codemanipulation.CodeGenerationSettings;
 import org.eclipse.jdt.internal.corext.codemanipulation.OrganizeImportsOperation;
 import org.eclipse.jdt.internal.ui.preferences.JavaPreferencesSettings;
 import org.eclipse.jdt.ui.SharedASTProvider;
-import org.eclipse.scout.sdk.s2e.IOrganizeImportService;
+import org.eclipse.scout.sdk.s2e.util.IOrganizeImportService;
 
 /**
  * <h3>{@link OrganizeImportService}</h3>

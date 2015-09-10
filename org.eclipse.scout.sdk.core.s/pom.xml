@@ -23,9 +23,8 @@
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
-      <groupId>${project.groupId}</groupId>
+      <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.scout.sdk.core</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <!-- Build Dependencies (Provided) -->
   </dependencies>

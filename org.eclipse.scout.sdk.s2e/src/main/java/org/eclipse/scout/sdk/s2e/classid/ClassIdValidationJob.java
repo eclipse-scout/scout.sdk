@@ -50,7 +50,7 @@ import org.eclipse.jface.text.Document;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
-import org.eclipse.scout.sdk.s2e.job.OperationJob;
+import org.eclipse.scout.sdk.s2e.job.WorkspaceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
@@ -286,7 +286,7 @@ public final class ClassIdValidationJob extends AbstractJob {
 
   public static synchronized void executeAsync(final long startDelay) {
     Job currentJob = Job.getJobManager().currentJob();
-    if (currentJob instanceof OperationJob) {
+    if (currentJob instanceof WorkspaceBlockingOperationJob) {
       // do not schedule a check run if the event comes from the scout sdk itself. we assume it does a correct job.
       return;
     }

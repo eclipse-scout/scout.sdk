@@ -10,8 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder.field;
 
-import org.eclipse.scout.sdk.core.model.Flags;
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
+import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
 
 /**
  * <h3>{@link FieldSourceBuilderFactory}</h3>
@@ -35,11 +36,13 @@ public final class FieldSourceBuilderFactory {
    *          without an ending semicolon e.g. <code>"1L"</code>
    * @return
    */
-  public static IFieldSourceBuilder createFieldSourceBuilder(String fieldName, String signature, int flags, String value) {
+  public static IFieldSourceBuilder createFieldSourceBuilder(String fieldName, String signature, int flags, String initializerJavaSource) {
     FieldSourceBuilder fieldSourceBuilder = new FieldSourceBuilder(fieldName);
     fieldSourceBuilder.setFlags(flags);
     fieldSourceBuilder.setSignature(signature);
-    fieldSourceBuilder.setValue(value);
+    if (initializerJavaSource != null) {
+      fieldSourceBuilder.setValue(new RawSourceBuilder(initializerJavaSource));
+    }
     return fieldSourceBuilder;
   }
 }

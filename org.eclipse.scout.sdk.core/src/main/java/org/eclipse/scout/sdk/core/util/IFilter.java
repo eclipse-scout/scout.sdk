@@ -18,5 +18,5 @@ package org.eclipse.scout.sdk.core.util;
  */
 public interface IFilter<E> {
 
-  boolean evaluate(E method);
+  boolean evaluate(E element);
 }

@@ -13,8 +13,8 @@ package org.eclipse.scout.sdk.s2e.ui.internal.handler;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
-import org.eclipse.scout.sdk.s2e.job.OperationJob;
-import org.eclipse.scout.sdk.s2e.operation.wellform.WellformAllOperation;
+import org.eclipse.scout.sdk.s2e.job.WorkspaceBlockingOperationJob;
+import org.eclipse.scout.sdk.s2e.workspace.wellform.WellformAllOperation;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.handlers.HandlerUtil;
@@ -34,7 +34,7 @@ public class WellformAllHandler extends AbstractHandler {
     messageBox.setText("Do you really want to wellform all Scout classes?");
     int answer = messageBox.open();
     if (answer == SWT.YES) {
-      new OperationJob(new WellformAllOperation()).schedule();
+      new WorkspaceBlockingOperationJob(new WellformAllOperation()).schedule();
     }
     return null;
   }

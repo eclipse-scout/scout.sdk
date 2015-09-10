@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.ui.workbench.texteditor</artifactId>
-  <version>${uiWorkbenchVersionMaven}</version>
+  <version>${org.eclipse.ui.workbench.texteditor-maven}</version>
 
   <name>Scout SDK org.eclipse.ui.workbench.texteditor dependency (Incubation)</name>
   <description>This is org.eclipse.ui.workbench.texteditor jar used by Scout SDK</description>
@@ -33,17 +33,17 @@
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
-      <version>[3.5.0,4.0.0)</version>
+      <version>${org.eclipse.core.runtime-range}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.core.expressions</artifactId>
-      <version>[3.4.100,4.0.0)</version>
+      <version>${org.eclipse.core.expressions-range}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.jface.text</artifactId>
-      <version>[3.8.0,4.0.0)</version>
+      <version>${org.eclipse.jface.text-range}</version>
     </dependency>
 
     <!-- org.eclipse.compare.core;bundle-version="[3.5.0,4.0.0)", -->

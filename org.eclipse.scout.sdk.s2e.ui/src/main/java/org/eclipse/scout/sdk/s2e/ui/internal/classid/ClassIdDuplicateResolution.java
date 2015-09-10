@@ -22,13 +22,13 @@ import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
-import org.eclipse.scout.sdk.s2e.IOperation;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
-import org.eclipse.scout.sdk.s2e.job.OperationJob;
-import org.eclipse.scout.sdk.s2e.operation.AnnotationNewOperation;
+import org.eclipse.scout.sdk.s2e.job.WorkspaceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.workspace.AnnotationNewOperation;
+import org.eclipse.scout.sdk.s2e.workspace.IWorkspaceBlockingOperation;
 import org.eclipse.ui.IMarkerResolution;
 
 /**
@@ -54,14 +54,14 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
   public void run(final IMarker marker) {
     final IType parent = (IType) m_annotation.getAncestor(IJavaElement.TYPE);
     if (JdtUtils.exists(parent)) {
-      List<IOperation> ops = new LinkedList<>();
+      List<IWorkspaceBlockingOperation> ops = new LinkedList<>();
       String newId = ClassIdGenerators.generateNewId(new ClassIdGenerationContext(parent));
       if (StringUtils.isNotBlank(newId)) {
         ops.add(createUpdateAnnotationInJavaSourceOperation(parent, newId));
       }
 
       if (!ops.isEmpty()) {
-        OperationJob j = new OperationJob(ops);
+        WorkspaceBlockingOperationJob j = new WorkspaceBlockingOperationJob(ops);
         j.addJobChangeListener(new JobChangeAdapter() {
           @Override
           public void done(IJobChangeEvent event) {
@@ -79,7 +79,7 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
     }
   }
 
-  private static IOperation createUpdateAnnotationInJavaSourceOperation(IType annotationOwner, String newId) {
+  private static IWorkspaceBlockingOperation createUpdateAnnotationInJavaSourceOperation(IType annotationOwner, String newId) {
     return new AnnotationNewOperation(ScoutAnnotationSourceBuilderFactory.createClassIdAnnotation(newId), annotationOwner);
   }
 }

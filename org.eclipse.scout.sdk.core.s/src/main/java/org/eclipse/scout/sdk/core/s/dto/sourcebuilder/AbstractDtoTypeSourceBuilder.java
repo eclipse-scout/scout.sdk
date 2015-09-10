@@ -10,42 +10,40 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
 
-import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.model.Flags;
-import org.eclipse.scout.sdk.core.model.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.IAnnotation;
-import org.eclipse.scout.sdk.core.model.IAnnotationValue;
-import org.eclipse.scout.sdk.core.model.IMethod;
-import org.eclipse.scout.sdk.core.model.IPropertyBean;
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
+import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IMetaValue;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IPropertyBean;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
+import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.SortedMemberKeyFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.FieldSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodBodySourceBuilderFactory;
-import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodParameterDescription;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.MethodParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.IFilter;
-import org.eclipse.scout.sdk.core.util.PropertyMap;
 
 /**
  * <h3>{@link AbstractDtoTypeSourceBuilder}</h3>
@@ -53,25 +51,25 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  * @author Andreas Hoegger
  * @since 3.10.0 27.08.2013
  */
-public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
+public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder implements IDtoSourceBuilder {
 
   private static final Pattern ENDING_SEMICOLON_PATTERN = Pattern.compile("\\;$");
   protected static final String SIG_FOR_IS_METHOD_NAME = ISignatureConstants.SIG_BOOLEAN;
 
   private final IType m_modelType;
-  private final ILookupEnvironment m_lookupEnv;
+  private final IJavaEnvironment m_env;
 
-  public AbstractDtoTypeSourceBuilder(IType modelType, String typeName, ILookupEnvironment lookupEnv) {
-    this(modelType, typeName, lookupEnv, true);
+  public AbstractDtoTypeSourceBuilder(IType modelType, String typeName, IJavaEnvironment env) {
+    this(modelType, typeName, env, true);
   }
 
   /**
    * @param elementName
    */
-  public AbstractDtoTypeSourceBuilder(IType modelType, String typeName, ILookupEnvironment lookupEnv, boolean setup) {
+  public AbstractDtoTypeSourceBuilder(IType modelType, String typeName, IJavaEnvironment env, boolean setup) {
     super(typeName);
     m_modelType = modelType;
-    m_lookupEnv = lookupEnv;
+    m_env = env;
     if (setup) {
       setup();
     }
@@ -97,15 +95,15 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
 
   protected void createContent() {
     // constructor
-    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(getElementName());
-    addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+    IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructor(getElementName());
+    addSortedMethod(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
 
     // serial version uid
     IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
-    addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
+    addSortedField(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
 
     // copy annotations over to the DTO
-    copyAnnotations(getModelType(), getModelType(), this, getLookupEnvironment());
+    copyAnnotations(getModelType(), getModelType(), this, getJavaEnvironment());
   }
 
   /**
@@ -113,89 +111,30 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
    */
   protected abstract String computeSuperTypeSignature();
 
-  protected static String getAnnotationValueSource(IAnnotationValue v, IImportValidator validator, int numValues) {
-    StringBuilder sb = new StringBuilder();
-    if (numValues > 1 || !"value".equals(v.getName())) {
-      sb.append(v.getName()).append(" = ");
-    }
-    appendAnnotationSource(v, validator, sb);
-    return sb.toString();
-  }
-
-  protected static void appendAnnotationSource(IAnnotationValue v, IImportValidator validator, StringBuilder sb) {
-    switch (v.getValueType()) {
-      case Char:
-        sb.append('\'').append(((Character) v.getValue()).charValue()).append('\'');
-        break;
-      case Byte:
-      case Int:
-      case Short:
-        sb.append(((Number) v.getValue()).intValue());
-        break;
-      case Bool:
-        sb.append(((Boolean) v.getValue()).booleanValue());
-        break;
-      case Long:
-        sb.append(((Number) v.getValue()).longValue()).append('L');
-        break;
-      case Double:
-        sb.append(((Number) v.getValue()).doubleValue());
-        break;
-      case Float:
-        sb.append(((Number) v.getValue()).floatValue()).append('f');
-        break;
-      case String:
-        boolean isClassId = IRuntimeClasses.ClassId.equals(v.getOwnerAnnotation().getType().getName());
-        String val = v.getValue().toString();
-        if (isClassId) {
-          val += "-formdata";
-        }
-        sb.append(CoreUtils.toStringLiteral(val));
-        break;
-      case Type:
-        IType t = (IType) v.getValue();
-        sb.append(validator.getTypeName(SignatureUtils.getResolvedSignature(t))).append(".class");
-        break;
-      case Array:
-        IAnnotationValue[] arr = (IAnnotationValue[]) v.getValue();
-        sb.append('{');
-        if (arr.length > 0) {
-          appendAnnotationSource(arr[0], validator, sb);
-          for (int i = 1; i < arr.length; i++) {
-            sb.append(", ");
-            appendAnnotationSource(arr[i], validator, sb);
-          }
-        }
-        sb.append('}');
-        break;
+  /**
+   * Override default {@link IMetaValue#createAptSource(IImportValidator)} for strings of ClassId annotations
+   */
+  protected static void filterAnnotationValues(IAnnotationSourceBuilder builder, IAnnotation a) {
+    if (IRuntimeClasses.ClassId.equals(a.getType().getName())) {
+      String id = a.getValue("value").getMetaValue().getObject(String.class);
+      id += "-formdata";
+      builder.putValue("value", CoreUtils.toStringLiteral(id));
     }
   }
 
-  protected static void copyAnnotations(IAnnotatable annotationOwner, final IType declaringType, ITypeSourceBuilder sourceBuilder, final ILookupEnvironment lookupEnv) {
-    List<IAnnotation> annotations = annotationOwner.getAnnotations();
+  protected static void copyAnnotations(IAnnotatable annotationOwner, final IType declaringType, ITypeSourceBuilder sourceBuilder, final IJavaEnvironment env) {
+    List<? extends IAnnotation> annotations = annotationOwner.getAnnotations();
     for (IAnnotation a : annotations) {
       final IAnnotation annotation = a;
       final IType annotationDeclarationType = annotation.getType();
       final String elementName = annotationDeclarationType.getName();
 
       boolean mustCopyAnnotation = !IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName) && !IRuntimeClasses.Data.equals(elementName)
-          && isAnnotationDtoRelevant(annotationDeclarationType) && CoreUtils.isOnClasspath(annotationDeclarationType, lookupEnv);
+          && isAnnotationDtoRelevant(annotationDeclarationType) && CoreUtils.isOnClasspath(env, annotationDeclarationType);
       if (mustCopyAnnotation) {
-        AnnotationSourceBuilder asb = new AnnotationSourceBuilder(Signature.createTypeSignature(elementName)) {
-          @Override
-          public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-            // copy over all params
-            Collection<IAnnotationValue> annotValues = annotation.getValues().values();
-            for (IAnnotationValue v : annotValues) {
-              String param = getAnnotationValueSource(v, validator, annotValues.size());
-              if (StringUtils.isNotEmpty(param)) {
-                super.addParameter(param);
-              }
-            }
-            super.createSource(source, lineDelimiter, context, validator);
-          }
-        };
-        sourceBuilder.addAnnotationSourceBuilder(asb);
+        AnnotationSourceBuilder asb = new AnnotationSourceBuilder(a);
+        filterAnnotationValues(asb, a);
+        sourceBuilder.addAnnotation(asb);
       }
     }
   }
@@ -220,7 +159,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
       final String upperCaseBeanName = CoreUtils.ensureStartWithUpperCase(beanName);
 
       String propName = upperCaseBeanName + "Property";
-      String resolvedSignature = SignatureUtils.getResolvedSignature(desc.getBeanType());
+      String resolvedSignature = SignatureUtils.getTypeSignature(desc.getBeanType());
       String unboxedSignature = SignatureUtils.boxPrimitiveSignature(resolvedSignature);
 
       // property class
@@ -230,10 +169,10 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
       superTypeSig = ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll(ISignatureConstants.C_GENERIC_START + Matcher.quoteReplacement(unboxedSignature) + ISignatureConstants.C_GENERIC_END + ISignatureConstants.C_SEMICOLON);
       propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
       IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
-      propertyTypeBuilder.addSortedFieldSourceBuilder(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
-      IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructorSourceBuilder(propName);
-      propertyTypeBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
-      addSortedTypeSourceBuilder(SortedMemberKeyFactory.createTypeFormDataPropertyKey(propertyTypeBuilder), propertyTypeBuilder);
+      propertyTypeBuilder.addSortedField(SortedMemberKeyFactory.createFieldSerialVersionUidKey(serialVersionUidBuilder), serialVersionUidBuilder);
+      IMethodSourceBuilder constructorBuilder = MethodSourceBuilderFactory.createConstructor(propName);
+      propertyTypeBuilder.addSortedMethod(SortedMemberKeyFactory.createMethodConstructorKey(constructorBuilder), constructorBuilder);
+      addSortedType(SortedMemberKeyFactory.createTypeFormDataPropertyKey(propertyTypeBuilder), propertyTypeBuilder);
 
       // copy annotations over to the DTO
       IMethod propertyMethod = desc.getReadMethod();
@@ -241,32 +180,32 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
         propertyMethod = desc.getWriteMethod();
       }
       if (propertyMethod != null) {
-        copyAnnotations(propertyMethod, propertyMethod.getDeclaringType(), propertyTypeBuilder, getLookupEnvironment());
+        copyAnnotations(propertyMethod, propertyMethod.getDeclaringType(), propertyTypeBuilder, getJavaEnvironment());
       }
 
       // getter
       IMethodSourceBuilder propertyGetterBuilder = new MethodSourceBuilder("get" + propName);
       propertyGetterBuilder.setFlags(Flags.AccPublic);
       propertyGetterBuilder.setReturnTypeSignature(Signature.createTypeSignature(propName, false));
-      propertyGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("return getPropertyByClass(" + propName + ".class);"));
-      addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(propertyGetterBuilder), propertyGetterBuilder);
+      propertyGetterBuilder.setBody(new RawSourceBuilder("return getPropertyByClass(" + propName + ".class);"));
+      addSortedMethod(SortedMemberKeyFactory.createMethodPropertyKey(propertyGetterBuilder), propertyGetterBuilder);
 
       // legacy getter
       IMethodSourceBuilder legacyPropertyGetterBuilder = new MethodSourceBuilder((SIG_FOR_IS_METHOD_NAME.equals(resolvedSignature) ? "is" : "get") + upperCaseBeanName);
-      legacyPropertyGetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
+      legacyPropertyGetterBuilder.setComment(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
       legacyPropertyGetterBuilder.setFlags(Flags.AccPublic);
       legacyPropertyGetterBuilder.setReturnTypeSignature(resolvedSignature);
-      legacyPropertyGetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody(getLegacyGetterMethodBody(resolvedSignature, propName)));
-      addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertyGetterBuilder), legacyPropertyGetterBuilder);
+      legacyPropertyGetterBuilder.setBody(new RawSourceBuilder(getLegacyGetterMethodBody(resolvedSignature, propName)));
+      addSortedMethod(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertyGetterBuilder), legacyPropertyGetterBuilder);
 
       // legacy setter
       IMethodSourceBuilder legacyPropertySetterBuilder = new MethodSourceBuilder("set" + upperCaseBeanName);
-      legacyPropertySetterBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
+      legacyPropertySetterBuilder.setComment(CommentSourceBuilderFactory.createCustomCommentBuilder("access method for property " + upperCaseBeanName + "."));
       legacyPropertySetterBuilder.setFlags(Flags.AccPublic);
       legacyPropertySetterBuilder.setReturnTypeSignature(ISignatureConstants.SIG_VOID);
-      legacyPropertySetterBuilder.addParameter(new MethodParameterDescription(lowerCaseBeanName, resolvedSignature));
-      legacyPropertySetterBuilder.setMethodBodySourceBuilder(MethodBodySourceBuilderFactory.createSimpleMethodBody("get" + propName + "().setValue(" + lowerCaseBeanName + ");"));
-      addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertySetterBuilder), legacyPropertySetterBuilder);
+      legacyPropertySetterBuilder.addParameter(new MethodParameterSourceBuilder(lowerCaseBeanName, resolvedSignature));
+      legacyPropertySetterBuilder.setBody(new RawSourceBuilder("get" + propName + "().setValue(" + lowerCaseBeanName + ");"));
+      addSortedMethod(SortedMemberKeyFactory.createMethodPropertyKey(legacyPropertySetterBuilder), legacyPropertySetterBuilder);
     }
   }
 
@@ -305,8 +244,9 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder {
     return source.toString();
   }
 
-  public ILookupEnvironment getLookupEnvironment() {
-    return m_lookupEnv;
+  @Override
+  public IJavaEnvironment getJavaEnvironment() {
+    return m_env;
   }
 
   protected static final IFilter<IPropertyBean> DTO_PROPERTY_FILTER = new IFilter<IPropertyBean>() {

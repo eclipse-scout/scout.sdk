@@ -11,13 +11,12 @@
 package org.eclipse.scout.sdk.core.sourcebuilder.method;
 
 import java.util.List;
-import java.util.Set;
 
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.sourcebuilder.IAnnotatableSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.ICommentSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
-import org.eclipse.scout.sdk.core.util.CompositeObject;
+import org.eclipse.scout.sdk.core.sourcebuilder.IMemberSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.IMethodParameterSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.typeparameter.ITypeParameterSourceBuilder;
 
 /**
  * <h3>{@link IMethodSourceBuilder}</h3>
@@ -25,7 +24,17 @@ import org.eclipse.scout.sdk.core.util.CompositeObject;
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
-public interface IMethodSourceBuilder extends IAnnotatableSourceBuilder {
+public interface IMethodSourceBuilder extends IMemberSourceBuilder {
+
+  /**
+   * Returns a unique identifier of this method. The identifier looks like
+   * 'methodname(param1Signature,param2Signature)'.<br>
+   * The result of this method can be used to compare methods together with the
+   * {@link SignatureUtils#getMethodIdentifier(org.eclipse.jdt.core.IMethod)}.
+   *
+   * @return
+   */
+  String getMethodIdentifier();
 
   /**
    * @return
@@ -33,73 +42,19 @@ public interface IMethodSourceBuilder extends IAnnotatableSourceBuilder {
   String getReturnTypeSignature();
 
   /**
-   * @return
-   */
-  List<String> getExceptionSignatures();
-
-  /**
-   * @return
-   */
-  List<MethodParameterDescription> getParameters();
-
-  /**
-   * @return
-   */
-  IMethodBodySourceBuilder getMethodBodySourceBuilder();
-
-  /**
-   * @param commentSourceBuilder
-   */
-  void setCommentSourceBuilder(ICommentSourceBuilder commentSourceBuilder);
-
-  /**
-   * @param flags
-   */
-  void setFlags(int flags);
-
-  /**
-   * @param builder
-   */
-  void addAnnotationSourceBuilder(IAnnotationSourceBuilder builder);
-
-  /**
-   * @return
-   */
-  int getFlags();
-
-  /**
-   * @param sortKey
-   * @param builder
-   */
-  void addSortedAnnotationSourceBuilder(CompositeObject sortKey, IAnnotationSourceBuilder builder);
-
-  /**
-   * @param childOp
-   * @return
-   */
-  boolean removeAnnotationSourceBuilder(IAnnotationSourceBuilder childOp);
-
-  /**
    * @param returnTypeSignature
    */
   void setReturnTypeSignature(String returnTypeSignature);
 
   /**
-   * @param parameters
-   */
-  void setParameters(Set<MethodParameterDescription> parameters);
-
-  /**
-   * @param parameter
    * @return
    */
-  boolean addParameter(MethodParameterDescription parameter);
+  List<String> getExceptionSignatures();
 
   /**
-   * @param parameter
-   * @return
+   * @param exceptionSignatures
    */
-  boolean removeParameter(MethodParameterDescription parameter);
+  void setExceptionSignatures(List<String> exceptionSignatures);
 
   /**
    * @param exceptionSignature
@@ -113,23 +68,38 @@ public interface IMethodSourceBuilder extends IAnnotatableSourceBuilder {
   boolean removeExceptionSignature(String exceptionSignature);
 
   /**
-   * @param exceptionSignatures
+   * @return
    */
-  void setExceptionSignatures(List<String> exceptionSignatures);
+  ISourceBuilder getBody();
 
   /**
    * @param methodBodySourceBuilder
    */
-  void setMethodBodySourceBuilder(IMethodBodySourceBuilder methodBodySourceBuilder);
+  void setBody(ISourceBuilder body);
 
   /**
-   * Returns a unique identifier of this method. The identifier looks like
-   * 'methodname(param1Signature,param2Signature)'.<br>
-   * The result of this method can be used to compare methods together with the
-   * {@link SignatureUtils#getMethodIdentifier(org.eclipse.jdt.core.IMethod)}.
-   *
    * @return
    */
-  String getMethodIdentifier();
+  List<IMethodParameterSourceBuilder> getParameters();
+
+  boolean addParameter(IMethodParameterSourceBuilder parameter);
+
+  /**
+   * @param parameter
+   * @return
+   */
+  boolean removeParameter(String elementName);
+
+  /**
+   * @param typeParameter
+   */
+  void addTypeParameter(ITypeParameterSourceBuilder typeParameter);
+
+  /**
+   * @return
+   */
+  List<ITypeParameterSourceBuilder> getTypeParameters();
+
+  boolean removeTypeParameter(String elementName);
 
 }

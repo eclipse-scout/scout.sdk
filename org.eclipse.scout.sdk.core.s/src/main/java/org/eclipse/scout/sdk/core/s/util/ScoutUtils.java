@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.core.s.util;
 
 import java.math.BigDecimal;
 
-import org.eclipse.scout.sdk.core.model.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
+import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 
@@ -26,7 +26,7 @@ public final class ScoutUtils {
 
   /**
    * Gets the value of the @Order annotation of the given {@link IAnnotatable}.
-   * 
+   *
    * @param a
    *          The {@link IAnnotatable} for which to return the @Order annotation value
    * @return The order annotation value or <code>null</code> if there is no order {@link IAnnotation} on the given
@@ -43,7 +43,7 @@ public final class ScoutUtils {
 
   /**
    * Checks whether an @Replace annotation exists on the given element.
-   * 
+   *
    * @param element
    *          The element to check.
    * @return <code>true</code> if a @Replace annotation exists on the given element, <code>false</code> otherwise.

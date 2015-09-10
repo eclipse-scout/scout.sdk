@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder;
 
-import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
+import org.eclipse.scout.sdk.core.model.api.IJavaElement;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
 /**
@@ -22,31 +22,36 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  */
 public abstract class AbstractJavaElementSourceBuilder implements IJavaElementSourceBuilder {
 
-  private final String m_elementName;
-  private ICommentSourceBuilder m_commentSourceBuilder;
+  private String m_elementName;
+  private ISourceBuilder m_comment;
+
+  public AbstractJavaElementSourceBuilder(IJavaElement element) {
+    this(element.getElementName());
+  }
 
   public AbstractJavaElementSourceBuilder(String elementName) {
     m_elementName = elementName;
   }
 
   @Override
-  public void validate() {
-    if (StringUtils.isEmpty(getElementName())) {
-      throw new IllegalArgumentException("element name is null or empty!");
-    }
-  }
-
-  @Override
   public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+    if (getElementName() == null) {
+      throw new IllegalArgumentException("element name is null!");
+    }
     // comment
     createComment(source, lineDelimiter, context, validator);
   }
 
   protected void createComment(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-    if (getCommentSourceBuilder() != null) {
-      getCommentSourceBuilder().createSource(this, source, lineDelimiter, context, validator);
+    if (getComment() != null) {
+      getComment().createSource(source, lineDelimiter, context, validator);
       source.append(lineDelimiter);
     }
+  }
+
+  @Override
+  public void setElementName(String elementName) {
+    m_elementName = elementName;
   }
 
   @Override
@@ -54,13 +59,14 @@ public abstract class AbstractJavaElementSourceBuilder implements IJavaElementSo
     return m_elementName;
   }
 
-  public void setCommentSourceBuilder(ICommentSourceBuilder commentSourceBuilder) {
-    m_commentSourceBuilder = commentSourceBuilder;
+  @Override
+  public void setComment(ISourceBuilder commentSourceBuilder) {
+    m_comment = commentSourceBuilder;
   }
 
   @Override
-  public ICommentSourceBuilder getCommentSourceBuilder() {
-    return m_commentSourceBuilder;
+  public ISourceBuilder getComment() {
+    return m_comment;
   }
 
 }

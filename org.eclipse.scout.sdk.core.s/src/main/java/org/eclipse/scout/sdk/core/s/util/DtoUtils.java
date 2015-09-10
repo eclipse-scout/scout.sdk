@@ -12,24 +12,22 @@ package org.eclipse.scout.sdk.core.s.util;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
-import org.eclipse.scout.sdk.core.model.ExpressionValueType;
-import org.eclipse.scout.sdk.core.model.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.IAnnotation;
-import org.eclipse.scout.sdk.core.model.IAnnotationValue;
-import org.eclipse.scout.sdk.core.model.IMethod;
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.model.TypeFilters;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
+import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IMetaValue;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.MetaValueType;
 import org.eclipse.scout.sdk.core.s.AnnotationEnums.DefaultSubtypeSdkCommand;
 import org.eclipse.scout.sdk.core.s.AnnotationEnums.SdkColumnCommand;
 import org.eclipse.scout.sdk.core.s.AnnotationEnums.SdkCommand;
@@ -45,15 +43,18 @@ import org.eclipse.scout.sdk.core.s.model.ScoutAnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
+import org.eclipse.scout.sdk.core.sourcebuilder.ExpressionSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.TypeFilters;
 
 /**
  * Contains utilities for DTO creation
@@ -70,7 +71,6 @@ public final class DtoUtils {
    * Parses the possible available {@link IRuntimeClasses#ColumnData} annotation on the given type. If the type is not
    * annotated, <code>null</code> is returned.
    *
-   * @throws JavaModelException
    * @since 3.10.0-M5
    */
   public static SdkColumnCommand findColumnDataSdkColumnCommand(IType type) {
@@ -97,7 +97,6 @@ public final class DtoUtils {
    * Checks whether the given type is annotated with a {@link IRuntimeClasses#ColumnData} annotation and if so, this
    * method returns its <code>value()</code> as resolved type signature. Otherwise <code>null</code>.
    *
-   * @throws JavaModelException
    * @since 3.10.0-M5
    */
   private static SdkColumnCommand getColumnDataAnnotationValue(IType type) {
@@ -202,9 +201,9 @@ public final class DtoUtils {
       IType replacedType = modelType.getSuperClass();
       IType replacedFormFieldDataType = DtoUtils.getFormDataType(replacedType);
       if (replacedFormFieldDataType != null) {
-        superTypeSignature = SignatureUtils.getResolvedSignature(replacedFormFieldDataType);
+        superTypeSignature = SignatureUtils.getTypeSignature(replacedFormFieldDataType);
       }
-      sourceBuilder.addAnnotationSourceBuilder(ScoutAnnotationSourceBuilderFactory.createReplaceAnnotationBuilder());
+      sourceBuilder.addAnnotation(ScoutAnnotationSourceBuilderFactory.createReplaceAnnotationBuilder());
     }
     if (superTypeSignature == null) {
       superTypeSignature = DtoUtils.computeSuperTypeSignatureForFormData(modelType, formDataAnnotation);
@@ -219,12 +218,12 @@ public final class DtoUtils {
       if (genericOrdinalDefinitionType != null && CoreUtils.isGenericType(superType)) {
         IType genericType = computeDtoGenericType(formField, genericOrdinalDefinitionType, formDataAnnotation.getGenericOrdinal());
         if (genericType != null) {
-          String genericTypeName = SignatureUtils.toFullyQualifiedName(SignatureUtils.getResolvedSignature(genericType));
+          String genericTypeName = SignatureUtils.toFullyQualifiedName(SignatureUtils.getTypeSignature(genericType));
           return Signature.createTypeSignature(superType.getName() + ISignatureConstants.C_GENERIC_START + genericTypeName + ISignatureConstants.C_GENERIC_END);
         }
       }
     }
-    return SignatureUtils.getResolvedSignature(superType);
+    return SignatureUtils.getTypeSignature(superType);
   }
 
   private static IType computeDtoGenericType(IType contextType, IType annotationOwnerType, int genericOrdinal) {
@@ -271,7 +270,7 @@ public final class DtoUtils {
           anot.setSuperType(superDataType);
         }
         else {
-          IType t = type.getLookupEnvironment().findType(IRuntimeClasses.AbstractFormFieldData);
+          IType t = type.getJavaEnvironment().findType(IRuntimeClasses.AbstractFormFieldData);
           anot.setSuperType(t);
         }
       }
@@ -289,7 +288,6 @@ public final class DtoUtils {
    * @param form
    *          the form for which the form data should be returned.
    * @return the form data type or null if it could not be found.
-   * @throws JavaModelException
    */
   public static IType findDtoForForm(IType form) {
     if (form == null) {
@@ -306,7 +304,6 @@ public final class DtoUtils {
    * @param page
    *          the page for which the page data should be returned.
    * @return the page data class or null.
-   * @throws JavaModelException
    */
   public static IType findDtoForPage(IType page) {
     if (page == null) {
@@ -366,7 +363,7 @@ public final class DtoUtils {
       }
     }
 
-    IType value = (IType) annotation.getValue("value").getValue();
+    IType value = annotation.getValue("value").getMetaValue().getObject(IType.class);
     return value;
   }
 
@@ -425,8 +422,8 @@ public final class DtoUtils {
     IAnnotationValue valueRaw = annotation.getValue("value");
 
     IType dtoType = null;
-    if (valueRaw != null) {
-      dtoType = (IType) valueRaw.getValue();
+    if (valueRaw != null && !valueRaw.isSyntheticDefaultValue()) {
+      dtoType = valueRaw.getMetaValue().getObject(IType.class);
     }
 
     // sdk command
@@ -455,18 +452,16 @@ public final class DtoUtils {
     // interfaces
     List<IType> interfaceSignatures = null;
     IAnnotationValue interfacesRaw = annotation.getValue("interfaces");
-    if (interfacesRaw != null) {
-      if (interfacesRaw.getValueType() == ExpressionValueType.Type) {
+    if (interfacesRaw != null && !interfacesRaw.isSyntheticDefaultValue()) {
+      IMetaValue value = interfacesRaw.getMetaValue();
+      if (value.getType() == MetaValueType.Type) {
         interfaceSignatures = new ArrayList<>(1);
-        interfaceSignatures.add((IType) interfacesRaw.getValue());
+        interfaceSignatures.add(value.getObject(IType.class));
       }
-      else if (interfacesRaw.getValueType() == ExpressionValueType.Array) {
-        IAnnotationValue[] interacesRaw = (IAnnotationValue[]) interfacesRaw.getValue();
-        if (interacesRaw.length > 0) {
-          interfaceSignatures = new ArrayList<>(interacesRaw.length);
-          for (IAnnotationValue o : interacesRaw) {
-            interfaceSignatures.add((IType) o.getValue());
-          }
+      else if (value.getType() == MetaValueType.Array) {
+        IType[] array = value.getObject(IType[].class);
+        if (array.length > 0) {
+          interfaceSignatures = new ArrayList<>(Arrays.asList(array));
         }
       }
     }
@@ -511,7 +506,7 @@ public final class DtoUtils {
     }
   }
 
-  public static void addFormDataAdditionalInterfaces(FormDataAnnotation formDataAnnotation, ITypeSourceBuilder sourceBuilder, ILookupEnvironment context) {
+  public static void addFormDataAdditionalInterfaces(FormDataAnnotation formDataAnnotation, ITypeSourceBuilder sourceBuilder, IJavaEnvironment context) {
     Set<IType> interfaces = formDataAnnotation.getInterfaceSignatures();
     if (interfaces.isEmpty()) {
       return;
@@ -519,8 +514,8 @@ public final class DtoUtils {
 
     Set<IType> allSuperInterfaces = new HashSet<>();
     for (IType ifcType : interfaces) {
-      if (CoreUtils.isOnClasspath(ifcType, context)) {
-        sourceBuilder.addInterfaceSignature(SignatureUtils.getResolvedSignature(ifcType));
+      if (CoreUtils.isOnClasspath(context, ifcType)) {
+        sourceBuilder.addInterfaceSignature(SignatureUtils.getTypeSignature(ifcType));
         allSuperInterfaces.add(ifcType);
         allSuperInterfaces.addAll(CoreUtils.getAllSuperInterfaces(ifcType));
       }
@@ -531,139 +526,121 @@ public final class DtoUtils {
         allSuperInterfaceMethods.add(SignatureUtils.getMethodIdentifier(m));
       }
     }
-    for (IMethodSourceBuilder msb : sourceBuilder.getMethodSourceBuilders()) {
+    for (IMethodSourceBuilder msb : sourceBuilder.getMethods()) {
       if (allSuperInterfaceMethods.contains(msb.getMethodIdentifier())) {
-        msb.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createOverrideAnnotationSourceBuilder());
+        msb.addAnnotation(AnnotationSourceBuilderFactory.createOverride());
       }
     }
   }
 
-  public static StringBuilder createTableRowDataTypeSource(IType modelType, DataAnnotation dataAnnotation, ILookupEnvironment lookupEnvironment, String lineDelimiter, PropertyMap contextProperties) {
+  public static ICompilationUnitSourceBuilder createTableRowDataBuilder(IType modelType, DataAnnotation dataAnnotation, IJavaEnvironment sharedEnv) {
     if (dataAnnotation == null) {
       return null;
     }
     Validate.notNull(modelType);
-    Validate.notNull(lookupEnvironment);
+    Validate.notNull(sharedEnv);
 
-    String pckName = Signature.getQualifier(dataAnnotation.getDataType().getName());
+    String targetPackage = Signature.getQualifier(dataAnnotation.getDataType().getName());
 
-    ITypeSourceBuilder rowDataSourceBuilder = createTableRowDataTypeSourceBuilder(modelType, dataAnnotation, lookupEnvironment);
-    return createDtoSource(modelType, lineDelimiter, rowDataSourceBuilder, pckName, lookupEnvironment, contextProperties);
-  }
-
-  public static ITypeSourceBuilder createTableRowDataTypeSourceBuilder(IType modelType, DataAnnotation dataAnnotation, ILookupEnvironment lookupEnv) {
     String dataTypeName = dataAnnotation.getDataType().getSimpleName();
 
-    ITypeSourceBuilder rowDataSourceBuilder = new TableRowDataTypeSourceBuilder(dataTypeName, modelType, modelType, lookupEnv);
+    ITypeSourceBuilder rowDataTypeSrc = new TableRowDataTypeSourceBuilder(dataTypeName, modelType, modelType, sharedEnv);
 
     // primary class comment
-    rowDataSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder(GENERATED_JAVADOC));
+    rowDataTypeSrc.setComment(CommentSourceBuilderFactory.createCustomCommentBuilder(GENERATED_JAVADOC));
 
     // @Extends annotation
-    addDtoExtendsAnnotation(rowDataSourceBuilder, dataAnnotation.getAnnotationHolder());
+    addDtoExtendsAnnotation(rowDataTypeSrc, dataAnnotation.getAnnotationHolder());
 
     //@Generated annotation
-    rowDataSourceBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createGeneratedAnnotation("RowDataUpdateOperation", GENERATED_MSG));
+    rowDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated("RowDataUpdateOperation", GENERATED_MSG));
 
-    return rowDataSourceBuilder;
+    ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(rowDataTypeSrc.getElementName() + ".java", targetPackage);
+    cuSrc.addType(rowDataTypeSrc);
+    cuSrc.setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(cuSrc));
+    return cuSrc;
   }
 
-  public static StringBuilder createPageDataSource(IType modelType, DataAnnotation dataAnnotation, ILookupEnvironment lookupEnvironment, String lineDelimiter, PropertyMap contextProperties) {
+  public static ICompilationUnitSourceBuilder createPageDataBuilder(IType modelType, DataAnnotation dataAnnotation, IJavaEnvironment sharedEnv) {
     if (dataAnnotation == null) {
       return null;
     }
     Validate.notNull(modelType);
-    Validate.notNull(lookupEnvironment);
+    Validate.notNull(sharedEnv);
 
-    String pckName = Signature.getQualifier(dataAnnotation.getDataType().getName());
+    String targetPackage = Signature.getQualifier(dataAnnotation.getDataType().getName());
 
-    ITypeSourceBuilder pageDataSourceBuilder = createPageDataSourceBuilder(modelType, dataAnnotation, lookupEnvironment);
-    return createDtoSource(modelType, lineDelimiter, pageDataSourceBuilder, pckName, lookupEnvironment, contextProperties);
-  }
-
-  public static ITypeSourceBuilder createPageDataSourceBuilder(IType modelType, DataAnnotation pageDataAnnotation, ILookupEnvironment lookupEnv) {
-    ITypeSourceBuilder pageDataSourceBuilder = new TableBeanDataSourceBuilder(modelType, pageDataAnnotation, pageDataAnnotation.getDataType().getSimpleName(), lookupEnv);
+    ITypeSourceBuilder pageDataTypeSrc = new TableBeanDataSourceBuilder(modelType, dataAnnotation, dataAnnotation.getDataType().getSimpleName(), sharedEnv);
 
     // primary class comment
-    pageDataSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder(GENERATED_JAVADOC));
+    pageDataTypeSrc.setComment(CommentSourceBuilderFactory.createCustomCommentBuilder(GENERATED_JAVADOC));
 
     //@Generated annotation
-    pageDataSourceBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createGeneratedAnnotation("PageDataUpdateOperation", GENERATED_MSG));
-    return pageDataSourceBuilder;
+    pageDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated("PageDataUpdateOperation", GENERATED_MSG));
+
+    ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(pageDataTypeSrc.getElementName() + ".java", targetPackage);
+    cuSrc.addType(pageDataTypeSrc);
+    cuSrc.setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(cuSrc));
+    return cuSrc;
   }
 
-  public static ITypeSourceBuilder createFormDataSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, ILookupEnvironment lookupEnv) {
-    IType superType = formDataAnnotation.getSuperType();
-    if (superType != null) {
-      ITypeSourceBuilder formDataSourceBuilder = null;
-      if (CoreUtils.isInstanceOf(superType, IRuntimeClasses.AbstractTableFieldBeanData)) {
-        // fill table bean
-        formDataSourceBuilder = new TableFieldBeanFormDataSourceBuilder(modelType, formDataAnnotation, formDataAnnotation.getFormDataType().getSimpleName(), lookupEnv);
-      }
-      else {
-        formDataSourceBuilder = new CompositeFormDataTypeSourceBuilder(modelType, formDataAnnotation, formDataAnnotation.getFormDataType().getSimpleName(), lookupEnv);
-      }
-
-      // primary class comment
-      formDataSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createCustomCommentBuilder(GENERATED_JAVADOC));
-
-      // @Extends annotation
-      addDtoExtendsAnnotation(formDataSourceBuilder, formDataAnnotation.getAnnotationOwner());
-
-      // @Generated annotation
-      formDataSourceBuilder.addAnnotationSourceBuilder(AnnotationSourceBuilderFactory.createGeneratedAnnotation("FormDataUpdateOperation", GENERATED_MSG));
-
-      // add interfaces and @Override annotation for all methods that exist in the given interfaces
-      addFormDataAdditionalInterfaces(formDataAnnotation, formDataSourceBuilder, lookupEnv);
-
-      return formDataSourceBuilder;
-    }
-    return null;
-  }
-
-  public static StringBuilder createFormDataSource(IType modelType, FormDataAnnotation formDataAnnotation, ILookupEnvironment lookupEnvironment, String lineDelimiter, PropertyMap contextProperties) {
+  public static ICompilationUnitSourceBuilder createFormDataBuilder(IType modelType, FormDataAnnotation formDataAnnotation, IJavaEnvironment sharedEnv) {
     if (!FormDataAnnotation.isCreate(formDataAnnotation)) {
       return null;
     }
     Validate.notNull(modelType);
-    Validate.notNull(lookupEnvironment);
+    Validate.notNull(sharedEnv);
 
-    String pckName = Signature.getQualifier(formDataAnnotation.getFormDataType().getName());
-    ITypeSourceBuilder formDataSourceBuilder = DtoUtils.createFormDataSourceBuilder(modelType, formDataAnnotation, lookupEnvironment);
-    return createDtoSource(modelType, lineDelimiter, formDataSourceBuilder, pckName, lookupEnvironment, contextProperties);
+    String targetPackage = Signature.getQualifier(formDataAnnotation.getFormDataType().getName());
+
+    IType superType = formDataAnnotation.getSuperType();
+    if (superType != null) {
+      ITypeSourceBuilder formDataTypeSrc = null;
+      if (CoreUtils.isInstanceOf(superType, IRuntimeClasses.AbstractTableFieldBeanData)) {
+        // fill table bean
+        formDataTypeSrc = new TableFieldBeanFormDataSourceBuilder(modelType, formDataAnnotation, formDataAnnotation.getFormDataType().getSimpleName(), sharedEnv);
+      }
+      else {
+        formDataTypeSrc = new CompositeFormDataTypeSourceBuilder(modelType, formDataAnnotation, formDataAnnotation.getFormDataType().getSimpleName(), sharedEnv);
+      }
+
+      // primary class comment
+      formDataTypeSrc.setComment(CommentSourceBuilderFactory.createCustomCommentBuilder(GENERATED_JAVADOC));
+
+      // @Extends annotation
+      addDtoExtendsAnnotation(formDataTypeSrc, formDataAnnotation.getAnnotationOwner());
+
+      // @Generated annotation
+      formDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated("FormDataUpdateOperation", GENERATED_MSG));
+
+      // add interfaces and @Override annotation for all methods that exist in the given interfaces
+      addFormDataAdditionalInterfaces(formDataAnnotation, formDataTypeSrc, sharedEnv);
+
+      ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(formDataTypeSrc.getElementName() + ".java", targetPackage);
+      cuSrc.addType(formDataTypeSrc);
+      cuSrc.setComment(CommentSourceBuilderFactory.createDefaultCompilationUnitComment(cuSrc));
+      return cuSrc;
+    }
+    return null;
   }
 
-  private static StringBuilder createDtoSource(IType modelType, String lineDelimiter, ITypeSourceBuilder dtoSourceBuilder, String targetPackage, ILookupEnvironment lookupEnvironment, PropertyMap contextProperties) {
+  public static String createJavaCode(ICompilationUnitSourceBuilder cuSrc, IJavaEnvironment env, String lineDelimiter, PropertyMap context) {
+    if (cuSrc == null) {
+      return null;
+    }
     if (lineDelimiter == null) {
       lineDelimiter = System.getProperty("line.separator");
     }
-
-    CompilationUnitSourceBuilder dtoCuSourceBuilder = new CompilationUnitSourceBuilder(dtoSourceBuilder.getElementName(), targetPackage);
-    dtoCuSourceBuilder.addTypeSourceBuilder(dtoSourceBuilder);
-    dtoCuSourceBuilder.setCommentSourceBuilder(CommentSourceBuilderFactory.createPreferencesCompilationUnitCommentBuilder());
-
-    ImportValidator validator = new ImportValidator(targetPackage, lookupEnvironment);
-
-    // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
-    consumeAllTypeNamesRec(dtoSourceBuilder, validator);
-
+    ImportValidator validator = new ImportValidator(env);
     StringBuilder sourceBuilder = new StringBuilder();
-    dtoCuSourceBuilder.createSource(sourceBuilder, lineDelimiter, contextProperties, validator);
-    return sourceBuilder;
-  }
-
-  private static void consumeAllTypeNamesRec(ITypeSourceBuilder builder, IImportValidator validator) {
-    String fqn = builder.getFullyQualifiedName();
-    validator.getTypeName(Signature.createTypeSignature(fqn));
-    for (ITypeSourceBuilder child : builder.getTypeSourceBuilder()) {
-      consumeAllTypeNamesRec(child, validator);
-    }
+    cuSrc.createSource(sourceBuilder, lineDelimiter, context, validator);
+    return sourceBuilder.toString();
   }
 
   private static void addDtoExtendsAnnotation(ITypeSourceBuilder target, IAnnotatable extendsAnnotationHolder) {
     AnnotationSourceBuilder extendsAnnotation = getExtendsAnnotationSourceBuilder(extendsAnnotationHolder);
     if (extendsAnnotation != null) {
-      target.addAnnotationSourceBuilder(extendsAnnotation);
+      target.addAnnotation(extendsAnnotation);
     }
   }
 
@@ -682,7 +659,7 @@ public final class DtoUtils {
         else if (CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IPageWithTable)) {
           IType pageDto = findDtoForPage(primaryType);
 
-          List<IType> rowDataInPageDto = CoreUtils.getInnerTypes(pageDto, TypeFilters.getSubtypeFilter(IRuntimeClasses.AbstractTableRowData));
+          List<IType> rowDataInPageDto = CoreUtils.getInnerTypes(pageDto, TypeFilters.subtypeOf(IRuntimeClasses.AbstractTableRowData));
           extendedDto = null;
           if (rowDataInPageDto != null && !rowDataInPageDto.isEmpty()) {
             extendedDto = rowDataInPageDto.get(0);
@@ -691,14 +668,8 @@ public final class DtoUtils {
 
         if (extendedDto != null) {
           final IType dto = extendedDto;
-          AnnotationSourceBuilder asb = new AnnotationSourceBuilder(Signature.createTypeSignature(IRuntimeClasses.Extends)) {
-            @Override
-            public void createSource(StringBuilder source, String lineDelimiter, PropertyMap ownerProject, IImportValidator validator) {
-              String typeName = validator.getTypeName(SignatureUtils.getResolvedSignature(dto));
-              addParameter(typeName + ".class");
-              super.createSource(source, lineDelimiter, ownerProject, validator);
-            }
-          };
+          AnnotationSourceBuilder asb = new AnnotationSourceBuilder(IRuntimeClasses.Extends);
+          asb.putValue("value", ExpressionSourceBuilderFactory.createClassLiteral(SignatureUtils.getTypeSignature(dto)));
           return asb;
         }
       }
@@ -712,8 +683,8 @@ public final class DtoUtils {
       IAnnotation extendsAnnotation = CoreUtils.getAnnotation(curType, IRuntimeClasses.Extends);
       if (extendsAnnotation != null) {
         IAnnotationValue value = extendsAnnotation.getValue("value");
-        if (value != null) {
-          return (IType) value.getValue();
+        if (value != null && !value.isSyntheticDefaultValue()) {
+          return value.getMetaValue().getObject(IType.class);
         }
       }
       curType = curType.getSuperClass();
@@ -730,7 +701,6 @@ public final class DtoUtils {
    * @param localHierarchy
    *          The super hierarchy of the given model type.
    * @return The owner of the given extension or null.
-   * @throws CoreException
    */
   public static IType getExtendedType(IType modelType) {
     // 1. try to read from @Extends annotation

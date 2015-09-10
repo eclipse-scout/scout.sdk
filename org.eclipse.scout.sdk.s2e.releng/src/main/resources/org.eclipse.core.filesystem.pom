@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.core.filesystem</artifactId>
-  <version>${eclipseFilesystemVersionMaven}</version>
+  <version>${org.eclipse.core.filesystem-maven}</version>
 
   <name>Scout SDK org.eclipse.core.filesystem dependency (Incubation)</name>
   <description>This is org.eclipse.core.filesystem jar used by Scout SDK</description>
@@ -33,17 +33,17 @@
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.equinox.common</artifactId>
-      <version>[3.2.0,4.0.0)</version>
+      <version>${org.eclipse.equinox.common-range}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.equinox.registry</artifactId>
-      <version>[3.2.0,4.0.0)</version>
+      <version>${org.eclipse.equinox.registry-range}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.osgi</artifactId>
-      <version>[3.2.0,4.0.0)</version>
+      <version>${org.eclipse.osgi-range}</version>
     </dependency>
   </dependencies>
 </project>

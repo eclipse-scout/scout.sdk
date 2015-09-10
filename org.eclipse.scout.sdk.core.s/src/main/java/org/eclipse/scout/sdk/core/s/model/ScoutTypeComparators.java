@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.s.model;
 
 import java.util.Comparator;
 
-import org.eclipse.scout.sdk.core.model.IType;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.s.util.ScoutUtils;
 

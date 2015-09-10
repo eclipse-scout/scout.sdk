@@ -13,10 +13,7 @@ package org.eclipse.scout.sdk.core.sourcebuilder.annotation;
 import javax.annotation.Generated;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 
 /**
  * <h3>{@link AnnotationSourceBuilderFactory}</h3>
@@ -29,32 +26,48 @@ public final class AnnotationSourceBuilderFactory {
   private AnnotationSourceBuilderFactory() {
   }
 
-  public static IAnnotationSourceBuilder createOverrideAnnotationSourceBuilder() {
-    return new AnnotationSourceBuilder(Signature.createTypeSignature(Override.class.getName()));
+  private static final String GENERATED_MSG = "This class is auto generated. No manual modifications recommended.";
+
+  public static IAnnotationSourceBuilder createOverride() {
+    return new AnnotationSourceBuilder(Override.class.getName());
   }
 
-  public static IAnnotationSourceBuilder createSupressWarningAnnotation(String parameter) {
-    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(Signature.createTypeSignature(SuppressWarnings.class.getName()));
-    orderAnnoation.addParameter(parameter);
-    return orderAnnoation;
+  public static IAnnotationSourceBuilder createDeprecated() {
+    return new AnnotationSourceBuilder(Deprecated.class.getName());
   }
 
-  public static IAnnotationSourceBuilder createGeneratedAnnotation(String classThatGeneratedTheCode) {
-    return createGeneratedAnnotation(classThatGeneratedTheCode, null);
+  /**
+   * @param text
+   *          without quotes
+   * @return
+   */
+  public static IAnnotationSourceBuilder createSupressWarnings(String text) {
+    AnnotationSourceBuilder a = new AnnotationSourceBuilder(SuppressWarnings.class.getName());
+    a.putValue("value", CoreUtils.toStringLiteral(text));
+    return a;
   }
 
-  public static IAnnotationSourceBuilder createGeneratedAnnotation(final String classThatGeneratedTheCode, final String comments) {
-    return new AnnotationSourceBuilder(Signature.createTypeSignature(Generated.class.getName())) {
-      @Override
-      public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append('@').append(SignatureUtils.getTypeReference(getSignature(), validator)).append('(');
-        source.append("value = \"").append(classThatGeneratedTheCode).append("\"");
-        if (StringUtils.isNotBlank(comments)) {
-          source.append(", comments = \"").append(comments).append("\"");
-        }
-        source.append(")");
-      }
-    };
+  /**
+   * @param typeThatGeneratedTheCode
+   *          should be the effective type that caused generation of this new type. This is useful for housekeeping. If
+   *          the typeThatGeneratedTheCode does not exist anymore then all generated classes can be deleted as well.
+   */
+  public static IAnnotationSourceBuilder createGenerated(String typeThatGeneratedTheCode) {
+    return createGenerated(typeThatGeneratedTheCode, GENERATED_MSG);
+  }
+
+  /**
+   * @param typeThatGeneratedTheCode
+   *          should be the effective type that caused generation of this new type. This is useful for housekeeping. If
+   *          the typeThatGeneratedTheCode does not exist anymore then all generated classes can be deleted as well.
+   */
+  public static IAnnotationSourceBuilder createGenerated(final String typeThatGeneratedTheCode, final String comments) {
+    AnnotationSourceBuilder a = new AnnotationSourceBuilder(Generated.class.getName());
+    a.putValue("value", CoreUtils.toStringLiteral(typeThatGeneratedTheCode));
+    if (StringUtils.isNotBlank(comments)) {
+      a.putValue("comments", CoreUtils.toStringLiteral(comments));
+    }
+    return a;
   }
 
 }

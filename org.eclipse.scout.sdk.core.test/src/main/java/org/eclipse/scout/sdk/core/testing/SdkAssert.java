@@ -15,29 +15,29 @@ import java.util.List;
 import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.compiler.ASTVisitor;
 import org.eclipse.jdt.internal.compiler.ast.CompilationUnitDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.QualifiedTypeReference;
 import org.eclipse.jdt.internal.compiler.lookup.ClassScope;
 import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
-import org.eclipse.scout.sdk.core.model.CompilationUnit;
-import org.eclipse.scout.sdk.core.model.Flags;
-import org.eclipse.scout.sdk.core.model.IAnnotatable;
-import org.eclipse.scout.sdk.core.model.IAnnotation;
-import org.eclipse.scout.sdk.core.model.ICompilationUnit;
-import org.eclipse.scout.sdk.core.model.IField;
-import org.eclipse.scout.sdk.core.model.IMember;
-import org.eclipse.scout.sdk.core.model.IMethod;
-import org.eclipse.scout.sdk.core.model.IMethodParameter;
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.model.JavaModelUtils;
-import org.eclipse.scout.sdk.core.model.MethodFilters;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
+import org.eclipse.scout.sdk.core.model.api.IAnnotation;
+import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IMember;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.spi.internal.DeclarationCompilationUnitWithJdt;
+import org.eclipse.scout.sdk.core.model.spi.internal.JavaEnvironmentWithJdt;
+import org.eclipse.scout.sdk.core.model.spi.internal.SpiWithJdtUtils;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.IFilter;
+import org.eclipse.scout.sdk.core.util.MethodFilters;
 import org.junit.Assert;
 
 /**
@@ -176,12 +176,12 @@ public class SdkAssert extends Assert {
     IMethod method = CoreUtils.getMethod(type, new IFilter<IMethod>() {
       @Override
       public boolean evaluate(IMethod candidate) {
-        if (Objects.equals(methodName, candidate.getName())) {
+        if (Objects.equals(methodName, candidate.getElementName())) {
           List<IMethodParameter> refParameterSignatures = candidate.getParameters();
           if (parameterSignatures.length == refParameterSignatures.size()) {
             boolean matches = true;
             for (int i = 0; i < parameterSignatures.length; i++) {
-              if (!equalSignature(getResolvedSignature(parameterSignatures[i], candidate.getDeclaringType()), SignatureUtils.getResolvedSignature(refParameterSignatures.get(i).getType()))) {
+              if (!equalSignature(getResolvedSignature(parameterSignatures[i], candidate.getDeclaringType()), SignatureUtils.getTypeSignature(refParameterSignatures.get(i).getDataType()))) {
                 matches = false;
                 break;
               }
@@ -231,7 +231,7 @@ public class SdkAssert extends Assert {
    *         in no particular order.
    */
   public static IMethod assertMethodExistInSuperTypeHierarchy(String message, IType type, String methodName) {
-    IMethod method = CoreUtils.findMethodInSuperHierarchy(type, MethodFilters.getNameFilter(methodName));
+    IMethod method = CoreUtils.findMethodInSuperHierarchy(type, MethodFilters.name(methodName));
     if (method == null) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Method '").append(methodName).append("'");
@@ -251,7 +251,7 @@ public class SdkAssert extends Assert {
   }
 
   public static void assertMethodReturnTypeSignature(String message, IMethod method, String expectedSignature) {
-    String signature = SignatureUtils.getResolvedSignature(method.getReturnType());
+    String signature = SignatureUtils.getTypeSignature(method.getReturnType());
     expectedSignature = getResolvedSignature(expectedSignature, method.getDeclaringType());
     if (!equalSignature(signature, expectedSignature)) {
       if (message == null) {
@@ -298,11 +298,11 @@ public class SdkAssert extends Assert {
   }
 
   public static void assertFieldSignature(String message, IField field, String expectedSignature) {
-    String resolvedSignature = SignatureUtils.getResolvedSignature(field.getDataType());
+    String resolvedSignature = SignatureUtils.getTypeSignature(field.getDataType());
     expectedSignature = getResolvedSignature(expectedSignature, field.getDeclaringType());
     if (!equalSignature(resolvedSignature, expectedSignature)) {
       if (message == null) {
-        StringBuilder messageBuilder = new StringBuilder("Field '").append(field.getName()).append("' does not have the expected type signature! [expected:'")
+        StringBuilder messageBuilder = new StringBuilder("Field '").append(field.getElementName()).append("' does not have the expected type signature! [expected:'")
             .append(expectedSignature).append("', actual:'").append(resolvedSignature).append("']");
         message = messageBuilder.toString();
       }
@@ -340,7 +340,7 @@ public class SdkAssert extends Assert {
   }
 
   public static void assertHasSuperTypeSignature(String message, IType type, String superTypeSignature) {
-    String refSuperTypeSig = SignatureUtils.getResolvedSignature(type.getSuperClass());
+    String refSuperTypeSig = SignatureUtils.getTypeSignature(type.getSuperClass());
     superTypeSignature = getResolvedSignature(superTypeSignature, type);
     if (!equalSignature(refSuperTypeSig, superTypeSignature)) {
       if (message == null) {
@@ -362,7 +362,7 @@ public class SdkAssert extends Assert {
       // resolve
       for (int i = 0; i < interfaceSignatures.length; i++) {
         interfaceSignatures[i] = getResolvedSignature(interfaceSignatures[i], type);
-        refInterfaceSignatures[i] = SignatureUtils.getResolvedSignature(refInterfaces.get(i));
+        refInterfaceSignatures[i] = SignatureUtils.getTypeSignature(refInterfaces.get(i));
       }
       // sort
       Arrays.sort(interfaceSignatures);
@@ -402,7 +402,6 @@ public class SdkAssert extends Assert {
    * @param message
    * @param type
    * @return
-   * @throws JavaModelException
    */
   public static IField assertSerialVersionUidExists(String message, IType type) {
     IField field = assertFieldExist(message, type, "serialVersionUID");
@@ -422,7 +421,7 @@ public class SdkAssert extends Assert {
     if (annotation == null) {
       StringBuilder message = new StringBuilder("Element '");
       if (annotatable instanceof IMember) {
-        message.append(((IMember) annotatable).getName());
+        message.append(((IMember) annotatable).getElementName());
       }
       else {
         message.append(annotatable.toString());
@@ -441,7 +440,7 @@ public class SdkAssert extends Assert {
     int memberFlags = member.getFlags();
     if ((flags & memberFlags) != flags) {
       if (message == null) {
-        StringBuilder messageBuilder = new StringBuilder("member '").append(member.getName()).append("'");
+        StringBuilder messageBuilder = new StringBuilder("member '").append(member.getElementName()).append("'");
         messageBuilder.append(" has flags [").append(Flags.toString(memberFlags)).append("] expected [").append(Flags.toString(flags)).append("]!");
         message = messageBuilder.toString();
       }
@@ -459,7 +458,6 @@ public class SdkAssert extends Assert {
    *
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
-   * @throws JavaModelException
    */
 
   /**
@@ -480,7 +478,6 @@ public class SdkAssert extends Assert {
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
-   * @throws JavaModelException
    */
   public static FlagAssert assertPrivate(String message, IMember member) {
     return new FlagAssert(message, member).assertPrivate();
@@ -504,7 +501,6 @@ public class SdkAssert extends Assert {
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
-   * @throws JavaModelException
    */
   public static FlagAssert assertProtected(String message, IMember member) {
     return new FlagAssert(message, member).assertProtected();
@@ -528,7 +524,6 @@ public class SdkAssert extends Assert {
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
-   * @throws JavaModelException
    */
   public static FlagAssert assertPublic(String message, IMember member) {
     return new FlagAssert(message, member).assertPublic();
@@ -552,7 +547,6 @@ public class SdkAssert extends Assert {
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
-   * @throws JavaModelException
    */
   public static FlagAssert assertAbstract(String message, IMember member) {
     return new FlagAssert(message, member).assertAbstract();
@@ -576,7 +570,6 @@ public class SdkAssert extends Assert {
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
-   * @throws JavaModelException
    */
   public static FlagAssert assertFinal(String message, IMember member) {
     return new FlagAssert(message, member).assertFinal();
@@ -600,7 +593,6 @@ public class SdkAssert extends Assert {
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
-   * @throws JavaModelException
    */
   public static FlagAssert assertInterface(String message, IMember member) {
     return new FlagAssert(message, member).assertInterface();
@@ -624,7 +616,6 @@ public class SdkAssert extends Assert {
    * @param message
    * @param member
    * @return {@link FlagAssert} where the private flag is not anymore included.
-   * @throws JavaModelException
    */
   public static FlagAssert assertStatic(String message, IMember member) {
     return new FlagAssert(message, member).assertStatic();
@@ -723,7 +714,7 @@ public class SdkAssert extends Assert {
         if (m_message == null) {
           StringBuilder message = new StringBuilder("member");
           if (m_member != null) {
-            message.append(" '").append(m_member.getName()).append("'");
+            message.append(" '").append(m_member.getElementName()).append("'");
           }
           message.append(" has still flags [").append(Flags.toString(m_flags)).append("]!");
           fail(message.toString());
@@ -739,7 +730,7 @@ public class SdkAssert extends Assert {
       if (m_message == null) {
         StringBuilder message = new StringBuilder("member");
         if (m_member != null) {
-          message.append(" '").append(m_member.getName()).append("'");
+          message.append(" '").append(m_member.getElementName()).append("'");
         }
         message.append(" is not ").append(flagName).append("!");
         fail(message.toString());
@@ -793,7 +784,7 @@ public class SdkAssert extends Assert {
       List<IMethodParameter> parameters = m_method.getParameters();
       if (parameters.size() != expected) {
         StringBuilder messageBuilder = new StringBuilder();
-        messageBuilder.append("Parameter count of method '").append(m_method.getName()).append("': expected:'").append(expected).append("' actual:'").append(parameters.size()).append("'.");
+        messageBuilder.append("Parameter count of method '").append(m_method.getElementName()).append("': expected:'").append(expected).append("' actual:'").append(parameters.size()).append("'.");
         fail(messageBuilder.toString());
       }
       return this;
@@ -801,13 +792,13 @@ public class SdkAssert extends Assert {
 
     public MethodAssert assertConstructor() {
       if (!m_method.isConstructor()) {
-        fail("method '" + m_method.getName() + "' is expected to be a constructor.");
+        fail("method '" + m_method.getElementName() + "' is expected to be a constructor.");
       }
       return this;
     }
 
     public MethodAssert assertReturnType(String returnTypeFqn) {
-      String retSig = SignatureUtils.getResolvedSignature(m_method.getReturnType());
+      String retSig = SignatureUtils.getTypeSignature(m_method.getReturnType());
       String qualifier = Signature.getSignatureQualifier(retSig);
       String simpleName = Signature.getSignatureSimpleName(retSig);
       if (StringUtils.isNotBlank(qualifier)) {
@@ -881,26 +872,31 @@ public class SdkAssert extends Assert {
   private static String resolveSignature(String unresolvedSig, final IType context) {
     String signatureSimpleName = Signature.getSignatureSimpleName(unresolvedSig);
     IType type = null;
+
+    type = context.innerTypes().withSimpleName(signatureSimpleName).first();
+    if (type != null) {
+      return SignatureUtils.getTypeSignature(type);
+    }
+
     ICompilationUnit compilationUnit = context.getCompilationUnit();
     if (compilationUnit != null) {
       type = compilationUnit.findTypeBySimpleName(signatureSimpleName);
-    }
-
-    if (type != null) {
-      return SignatureUtils.getResolvedSignature(type);
+      if (type != null) {
+        return SignatureUtils.getTypeSignature(type);
+      }
     }
 
     // cannot be found by the scope. search for fully qualified references
     final char[] signatureSimpleNameChar = signatureSimpleName.toCharArray();
     final String[] holder = new String[1];
-    CompilationUnitDeclaration ast = ((CompilationUnit) context.getCompilationUnit()).getAst();
+    CompilationUnitDeclaration ast = ((DeclarationCompilationUnitWithJdt) context.getCompilationUnit().unwrap()).getInternalCompilationUnitDeclaration();
     ast.traverse(new ASTVisitor() {
       @Override
       public boolean visit(QualifiedTypeReference qualifiedTypeReference, ClassScope scope) {
         char[][] tokens = qualifiedTypeReference.tokens;
         char[] simpleName = tokens[tokens.length - 1];
         if (holder[0] == null && Arrays.equals(signatureSimpleNameChar, simpleName) && qualifiedTypeReference.resolvedType instanceof ReferenceBinding) {
-          holder[0] = SignatureUtils.getResolvedSignature(JavaModelUtils.bindingToType(qualifiedTypeReference.resolvedType, context.getLookupEnvironment()));
+          holder[0] = SignatureUtils.getTypeSignature(SpiWithJdtUtils.bindingToType((JavaEnvironmentWithJdt) context.getJavaEnvironment().unwrap(), qualifiedTypeReference.resolvedType).wrap());
           return false;
         }
         return true;
@@ -914,7 +910,7 @@ public class SdkAssert extends Assert {
     for (IMethod m : context.getMethods()) {
       IType rawDefType = findRawType(m.getReturnType(), signatureSimpleName);
       if (rawDefType != null) {
-        return SignatureUtils.getResolvedSignature(rawDefType);
+        return SignatureUtils.getTypeSignature(rawDefType);
       }
     }
     return null;

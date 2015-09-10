@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.eclipse.scout.sdk</groupId>
+  <artifactId>org.eclipse.pde.ui</artifactId>
+  <version>${org.eclipse.pde.ui-maven}</version>
+
+  <name>Scout SDK org.eclipse.pde.ui dependency (Incubation)</name>
+  <description>This is org.eclipse.pde.ui jar used by Scout SDK</description>
+  <url>http://www.eclipse.org/scout/</url>
+
+  <licenses>
+    <license>
+      <name>Eclipse Public License</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+
+  <scm>
+    <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git</url>
+  </scm>
+
+  <developers>
+    <developer>
+      <id>scout-dev@eclipse.org</id>
+      <name>Scout Development Team</name>
+    </developer>
+  </developers>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.pde.core</artifactId>
+      <version>${org.eclipse.pde.core-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.core.runtime</artifactId>
+      <version>${org.eclipse.core.runtime-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui.ide</artifactId>
+      <version>${org.eclipse.ui.ide-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui.views</artifactId>
+      <version>${org.eclipse.ui.views-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.jface.text</artifactId>
+      <version>${org.eclipse.jface.text-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui.workbench.texteditor</artifactId>
+      <version>${org.eclipse.ui.workbench.texteditor-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui.editors</artifactId>
+      <version>${org.eclipse.ui.editors-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.jdt.core</artifactId>
+      <version>${org.eclipse.jdt.core-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.jdt.ui</artifactId>
+      <version>${org.eclipse.jdt.ui-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.search</artifactId>
+      <version>${org.eclipse.search-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui.forms</artifactId>
+      <version>${org.eclipse.ui.forms-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
+      <version>${org.eclipse.ltk.core.refactoring-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.core.filesystem</artifactId>
+      <version>${org.eclipse.core.filesystem-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ltk.ui.refactoring</artifactId>
+      <version>${org.eclipse.ltk.ui.refactoring-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.core.expressions</artifactId>
+      <version>${org.eclipse.core.expressions-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.core.resources</artifactId>
+      <version>${org.eclipse.core.resources-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui</artifactId>
+      <version>${org.eclipse.ui-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.jdt.debug.ui</artifactId>
+      <version>${org.eclipse.jdt.debug.ui-range}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk</groupId>
+      <artifactId>org.eclipse.ui.console</artifactId>
+      <version>${org.eclipse.ui.console-range}</version>
+    </dependency>
+<!-- org.eclipse.debug.ui;bundle-version="[3.10.0,4.0.0)", -->
+<!-- org.eclipse.jdt.launching;bundle-version="[3.2.0,4.0.0)", -->
+<!-- org.eclipse.pde.build;bundle-version="[3.2.0,4.0.0)", -->
+<!-- org.eclipse.team.core;bundle-version="[3.2.0,4.0.0)", -->
+<!-- org.eclipse.ant.launching;bundle-version="[1.0.400,2.0.0)", -->
+<!-- org.eclipse.ant.ui;bundle-version="[3.1.0,4.0.0)", -->
+<!-- org.eclipse.jdt.junit;bundle-version="[3.2.0,4.0.0)", -->
+<!-- org.eclipse.ui.intro;bundle-version="[3.2.0,4.0.0)", -->
+<!-- org.eclipse.ui.cheatsheets;bundle-version="[3.2.0,4.0.0)", -->
+<!-- org.eclipse.update.configurator;bundle-version="[3.1.0,4.0.0)", -->
+<!-- org.eclipse.ui.views.log;bundle-version="[1.0.0,2.0.0)", -->
+<!-- org.eclipse.core.variables;bundle-version="[3.1.0,4.0.0)", -->
+<!-- org.eclipse.compare;bundle-version="[3.2.0,4.0.0)", -->
+<!-- org.eclipse.ui.navigator.resources;bundle-version="[3.3.100,4.0.0)", -->
+<!-- org.eclipse.equinox.p2.ui;bundle-version="[2.0.0,3.0.0)", -->
+<!-- org.eclipse.equinox.p2.metadata;bundle-version="[2.0.0,3.0.0)", -->
+<!-- org.eclipse.equinox.p2.engine;bundle-version="[2.0.0,3.0.0)", -->
+<!-- org.eclipse.equinox.p2.core;bundle-version="[2.0.0,3.0.0)", -->
+<!-- org.eclipse.equinox.p2.director;bundle-version="[2.1.0,3.0.0)", -->
+<!-- org.eclipse.equinox.p2.artifact.repository;bundle-version="[1.0.100,2.0.0)", -->
+<!-- org.eclipse.equinox.p2.metadata.repository;bundle-version="[1.0.100,2.0.0)", -->
+<!-- org.eclipse.equinox.p2.operations;bundle-version="[2.0.0,3.0.0)", -->
+<!-- org.eclipse.equinox.p2.repository;bundle-version="[2.0.0,3.0.0)", -->
+<!-- org.eclipse.equinox.frameworkadmin;bundle-version="[2.0.0,3.0.0)", -->
+<!-- org.eclipse.equinox.frameworkadmin.equinox;bundle-version="[1.0.100,2.0.0)", -->
+<!-- org.eclipse.pde.launching;bundle-version="[3.6.0,4.0.0)";visibility:=reexport, -->
+<!-- org.eclipse.equinox.simpleconfigurator;bundle-version="[1.0.200,2.0.0)", -->
+<!-- org.eclipse.equinox.p2.repository.tools;bundle-version="[2.0.100,3.0.0)", -->
+<!-- org.eclipse.team.ui;bundle-version="[3.6.100,4.0.0)", -->
+<!-- org.eclipse.help;bundle-version="[3.4.0,4.0.0)", -->
+<!-- org.eclipse.debug.core;bundle-version="[3.10.0,4.0.0)", -->
+<!-- org.eclipse.ui.trace;bundle-version="[1.0.0,2.0.0)", -->
+<!-- org.eclipse.equinox.bidi;bundle-version="[0.0.0,1.0.0)" -->
+  </dependencies>
+</project>

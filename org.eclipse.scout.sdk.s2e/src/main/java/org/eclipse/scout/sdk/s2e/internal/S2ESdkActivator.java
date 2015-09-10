@@ -12,10 +12,9 @@ package org.eclipse.scout.sdk.s2e.internal;
 
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.scout.sdk.s2e.internal.dto.DtoAutoUpdateManager;
-import org.eclipse.scout.sdk.s2e.internal.dto.FormDataDtoUpdateHandler;
-import org.eclipse.scout.sdk.s2e.internal.dto.PageDataAutoUpdateHandler;
-import org.eclipse.scout.sdk.s2e.internal.dto.RowDataAutoUpdateHandler;
+import org.eclipse.scout.sdk.core.util.SdkConsole;
+import org.eclipse.scout.sdk.s2e.internal.dto.DtoTypeChangedHandler;
+import org.eclipse.scout.sdk.s2e.internal.trigger.TypeChangedManager;
 import org.eclipse.scout.sdk.s2e.log.SdkLogManager;
 import org.osgi.framework.BundleContext;
 
@@ -29,7 +28,7 @@ public class S2ESdkActivator extends Plugin {
   private static S2ESdkActivator plugin;
 
   private SdkLogManager m_logManager;
-  private DtoAutoUpdateManager m_autoUpdateManager;
+  private TypeChangedManager m_typeChangedManager;
 
   @Override
   public void start(BundleContext context) throws Exception {
@@ -37,24 +36,25 @@ public class S2ESdkActivator extends Plugin {
 
     plugin = this;
 
+    //attach sdk console to workbench
+    SdkConsole.spi = new WorkbenchSdkConsoleSpi();
+
     // log manager
     m_logManager = new SdkLogManager(this);
+    m_typeChangedManager = new TypeChangedManager();
 
     // DTO auto update
-    m_autoUpdateManager = new DtoAutoUpdateManager();
-    m_autoUpdateManager.addModelDataUpdateHandler(new FormDataDtoUpdateHandler());
-    m_autoUpdateManager.addModelDataUpdateHandler(new PageDataAutoUpdateHandler());
-    m_autoUpdateManager.addModelDataUpdateHandler(new RowDataAutoUpdateHandler());
+    m_typeChangedManager.addTypeChangedHandler(new DtoTypeChangedHandler());
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
-    m_autoUpdateManager.dispose();
-    m_autoUpdateManager = null;
+    m_typeChangedManager.dispose();
+    m_typeChangedManager = null;
 
     m_logManager = null;
-    plugin = null;
 
+    plugin = null;
     super.stop(context);
   }
 
@@ -64,57 +64,70 @@ public class S2ESdkActivator extends Plugin {
 
   public static void logInfo(Throwable t) {
     plugin.m_logManager.logInfo(t);
+    SdkConsole.println("S2ESdk: INFO:", t);
   }
 
   public static void logInfo(String message) {
     plugin.m_logManager.logInfo(message);
+    SdkConsole.println("S2ESdk: INFO: " + message);
   }
 
   public static void logInfo(String message, Throwable t) {
     plugin.m_logManager.logInfo(message, t);
+    SdkConsole.println("S2ESdk: INFO: " + message, t);
   }
 
   public static void logWarning(String message) {
     plugin.m_logManager.logWarning(message);
+    SdkConsole.println("S2ESdk: WARNING: " + message);
   }
 
   public static void logWarning(Throwable t) {
     plugin.m_logManager.logWarning(t);
+    SdkConsole.println("S2ESdk: WARNING:", t);
   }
 
   public static void logWarning(String message, Throwable t) {
     plugin.m_logManager.logWarning(message, t);
+    SdkConsole.println("S2ESdk: WARNING: " + message, t);
   }
 
   public static void logError(Throwable t) {
     plugin.m_logManager.logError(t);
+    SdkConsole.println("S2ESdk: ERROR:", t);
   }
 
   public static void logError(String message) {
     plugin.m_logManager.logError(message);
+    SdkConsole.println("S2ESdk: ERROR: " + message);
   }
 
   public static void logError(String message, Throwable t) {
     plugin.m_logManager.logError(message, t);
+    SdkConsole.println("S2ESdk: ERROR: " + message, t);
   }
 
   public static void log(int level, Throwable t) {
     plugin.m_logManager.log(level, t);
+    SdkConsole.println("S2ESdk: LEVEL " + level + ":", t);
   }
 
   public static void log(int level, String message) {
     plugin.m_logManager.log(level, message);
+    SdkConsole.println("S2ESdk: LEVEL " + level + ": " + message);
   }
 
   public static void log(int level, String message, Throwable t) {
     plugin.m_logManager.log(level, message, t);
+    SdkConsole.println("S2ESdk: LEVEL " + level + ": " + message, t);
   }
 
   public static void log(IStatus status) {
     plugin.m_logManager.log(status);
+    SdkConsole.println("S2ESdk: STATUS " + status);
   }
 
-  public DtoAutoUpdateManager getAutoUpdateManager() {
-    return m_autoUpdateManager;
+  public TypeChangedManager getTypeChangedManager() {
+    return m_typeChangedManager;
   }
 }

@@ -4,7 +4,7 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.ui.forms</artifactId>
-  <version>${uiFormsVersionMaven}</version>
+  <version>${org.eclipse.ui.forms-maven}</version>
 
   <name>Scout SDK org.eclipse.ui.forms dependency (Incubation)</name>
   <description>This is org.eclipse.ui.forms jar used by Scout SDK</description>
@@ -33,12 +33,14 @@
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
-      <version>[3.6.0,4.0.0)</version>
+      <version>${org.eclipse.core.runtime-range}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk</groupId>
       <artifactId>org.eclipse.jface</artifactId>
-      <version>[3.6.0,4.0.0)</version>
+      <version>${org.eclipse.jface-range}</version>
     </dependency>
+    <!-- org.eclipse.e4.ui.css.core;bundle-version="0.10.100", -->
+    <!-- org.eclipse.e4.ui.css.swt;bundle-version="0.11.100" -->
   </dependencies>
 </project>

@@ -11,9 +11,11 @@
 package org.eclipse.scout.sdk.core.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.Long;
+import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -25,7 +27,7 @@ public class CompilationUnitTest {
   public void testIcu() {
     ICompilationUnit baseClassIcu = CoreTestingUtils.getBaseClassIcu();
     Assert.assertNotNull(baseClassIcu);
-    Assert.assertNotNull(baseClassIcu.getLookupEnvironment());
+    Assert.assertNotNull(baseClassIcu.getJavaEnvironment());
     Assert.assertEquals(BaseClass.class.getName(), baseClassIcu.getMainType().getName());
 
     Assert.assertEquals(5, baseClassIcu.getImports().size());

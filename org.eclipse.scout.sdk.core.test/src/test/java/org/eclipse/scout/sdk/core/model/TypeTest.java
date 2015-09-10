@@ -17,14 +17,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.InterfaceLevel0;
 import org.eclipse.scout.sdk.core.fixture.InterfaceLevel1;
 import org.eclipse.scout.sdk.core.fixture.WildcardChildClass;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.testing.TestingUtils;
+import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
+import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -59,8 +63,8 @@ public class TypeTest {
     Assert.assertEquals(1, childClassType.getTypeParameters().size());
     ITypeParameter firstTypeParam = childClassType.getTypeParameters().get(0);
     Assert.assertNotNull(firstTypeParam);
-    Assert.assertEquals(childClassType, firstTypeParam.getType());
-    Assert.assertEquals("X", firstTypeParam.getName());
+    Assert.assertEquals(childClassType, firstTypeParam.getDeclaringMember());
+    Assert.assertEquals("X", firstTypeParam.getElementName());
     Assert.assertEquals(3, firstTypeParam.getBounds().size());
     Assert.assertEquals(AbstractList.class.getName(), firstTypeParam.getBounds().get(0).getName());
     Assert.assertEquals(Runnable.class.getName(), firstTypeParam.getBounds().get(1).getName());
@@ -83,13 +87,13 @@ public class TypeTest {
 
   @Test
   public void testWildcard() {
-    IType wildcardType = TestingUtils.getType(WildcardChildClass.class.getName(), CoreTestingUtils.SOURCE_FOLDER);
-    IType returnType = wildcardType.getMethods().get(1).getReturnType();
+    IType wildcardType = CoreTestingUtils.createJavaEnvironment().findType(WildcardChildClass.class.getName());
+    IType returnType = wildcardType.getMethods().get(0).getReturnType();
     IType firstArg = returnType.getTypeArguments().get(0);
     Assert.assertTrue(firstArg.isWildcardType());
     Assert.assertEquals(BaseClass.class.getName(), firstArg.getName());
     Assert.assertEquals(2, firstArg.getTypeArguments().size());
-    Assert.assertEquals("Ljava.lang.Class<+Lorg.eclipse.scout.sdk.core.fixture.BaseClass<**>;>;", SignatureUtils.getResolvedSignature(returnType));
+    Assert.assertEquals("Ljava.lang.Class<+Lorg.eclipse.scout.sdk.core.fixture.BaseClass<**>;>;", SignatureUtils.getTypeSignature(returnType));
   }
 
   @Test
@@ -100,10 +104,10 @@ public class TypeTest {
     Assert.assertEquals(0, baseClassType.getArrayDimension());
     Assert.assertEquals(Flags.AccPublic, baseClassType.getFlags());
     Assert.assertEquals(1, baseClassType.getAnnotations().size());
-    Assert.assertNull(baseClassType.getCompilationUnit());
+    Assert.assertTrue(baseClassType.getCompilationUnit().isSynthetic());
     Assert.assertNull(baseClassType.getDeclaringType());
     Assert.assertEquals(2, baseClassType.getFields().size());
-    Assert.assertEquals(3, baseClassType.getMethods().size());
+    Assert.assertEquals(2, baseClassType.getMethods().size());
     Assert.assertEquals(BaseClass.class.getName(), baseClassType.getName());
     Assert.assertEquals(BaseClass.class.getSimpleName(), baseClassType.getSimpleName());
     Assert.assertEquals(Object.class.getName(), baseClassType.getSuperClass().getName());
@@ -119,14 +123,14 @@ public class TypeTest {
     Assert.assertEquals(2, baseClassType.getTypeParameters().size());
     ITypeParameter firstTypeParam = baseClassType.getTypeParameters().get(0);
     Assert.assertNotNull(firstTypeParam);
-    Assert.assertEquals(baseClassType, firstTypeParam.getType());
-    Assert.assertEquals("T", firstTypeParam.getName());
+    Assert.assertEquals(baseClassType, firstTypeParam.getDeclaringMember());
+    Assert.assertEquals("T", firstTypeParam.getElementName());
     Assert.assertEquals(0, firstTypeParam.getBounds().size());
 
     ITypeParameter secondTypeParam = baseClassType.getTypeParameters().get(1);
     Assert.assertNotNull(secondTypeParam);
-    Assert.assertEquals(baseClassType, secondTypeParam.getType());
-    Assert.assertEquals("Z", secondTypeParam.getName());
+    Assert.assertEquals(baseClassType, secondTypeParam.getDeclaringMember());
+    Assert.assertEquals("Z", secondTypeParam.getElementName());
     Assert.assertEquals(0, secondTypeParam.getBounds().size());
 
     // member types
@@ -153,7 +157,14 @@ public class TypeTest {
 
   @Test
   public void testInnerTypeDirectly() {
-    IType innerClass2 = TestingUtils.getType("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2");
+    //explicitly add target/classes, by default this would be ignored
+    IJavaEnvironment env = new JavaEnvironmentBuilder()
+        .withExcludeScoutSdk()
+        .withExcludeAllSources()
+        .withClassesFolder("target/classes")
+        .build();
+
+    IType innerClass2 = env.findType("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2");
     testInnerType(innerClass2);
   }
 
@@ -172,10 +183,10 @@ public class TypeTest {
     Assert.assertEquals(0, innerClass2.getArrayDimension());
     Assert.assertEquals(Flags.AccProtected, innerClass2.getFlags());
     Assert.assertEquals(0, innerClass2.getAnnotations().size());
-    Assert.assertNull(innerClass2.getCompilationUnit());
-    Assert.assertEquals(CoreTestingUtils.getBaseClassType(), innerClass2.getDeclaringType());
+    Assert.assertTrue(innerClass2.getCompilationUnit().isSynthetic());
+    Assert.assertEquals(CoreTestingUtils.getBaseClassType().getName(), innerClass2.getDeclaringType().getName());
     Assert.assertEquals(1, innerClass2.getFields().size());
-    Assert.assertEquals(1, innerClass2.getMethods().size());
+    Assert.assertEquals(0, innerClass2.getMethods().size());
     Assert.assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerClass2.getName());
     Assert.assertEquals("InnerClass2", innerClass2.getSimpleName());
     Assert.assertEquals(ArrayList.class.getName(), innerClass2.getSuperClass().getName());
@@ -203,6 +214,6 @@ public class TypeTest {
     Assert.assertFalse(firstTypeArg.isAnonymous());
     Assert.assertTrue(firstTypeArg.isArray());
     Assert.assertEquals(1, firstTypeArg.getArrayDimension());
-    Assert.assertEquals(BigDecimal.class.getName(), firstTypeArg.getName());
+    Assert.assertEquals(BigDecimal.class.getName(), firstTypeArg.getLeafComponentType().getName());
   }
 }

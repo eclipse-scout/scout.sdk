@@ -24,8 +24,13 @@
       <menuContribution locationURI="menu:org.eclipse.ui.main.menu?after=additions">
          <menu id="org.eclipse.scout.sdk.s2e.ui.menu" label="Scout">
             <command
-               commandId="org.eclipse.scout.sdk.s2e.ui.commands.updateDto"
-               id="org.eclipse.scout.sdk.s2e.ui.menu.updateDto"
+               commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerAllTypeChangedHandlers"
+               id="org.eclipse.scout.sdk.s2e.ui.menu.triggerAllTypeChangedHandlers"
+               style="push">
+            </command>
+            <command
+               commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
+               id="org.eclipse.scout.sdk.s2e.ui.menu.triggerSelectedTypeChangedHandlers"
                style="push">
             </command>
             <separator
@@ -76,8 +81,13 @@
             id="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </category>
       <command
-            name="Update all DTO classes..."
-            id="org.eclipse.scout.sdk.s2e.ui.commands.updateDto"
+            name="Update all generated classes..."
+            id="org.eclipse.scout.sdk.s2e.ui.commands.triggerAllTypeChangedHandlers"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+      </command>
+      <command
+            name="Update generated classes in selected projects..."
+            id="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
       <command
@@ -88,8 +98,12 @@
    </extension>
    <extension point="org.eclipse.ui.handlers">
       <handler
-            commandId="org.eclipse.scout.sdk.s2e.ui.commands.updateDto"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.UpdateAllDtoHandler">
+            commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerAllTypeChangedHandlers"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.TriggerAllTypeChangedHandlers">
+      </handler>
+      <handler
+            commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.TriggerSelectedTypeChangedHandlers">
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellform"

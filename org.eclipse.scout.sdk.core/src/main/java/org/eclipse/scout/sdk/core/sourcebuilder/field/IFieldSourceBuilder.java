@@ -10,10 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder.field;
 
-import org.eclipse.scout.sdk.core.sourcebuilder.IAnnotatableSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.ICommentSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
-import org.eclipse.scout.sdk.core.util.CompositeObject;
+import org.eclipse.scout.sdk.core.sourcebuilder.ExpressionSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.sourcebuilder.IMemberSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 
 /**
  * <h3>{@link IFieldSourceBuilder}</h3>
@@ -21,7 +20,7 @@ import org.eclipse.scout.sdk.core.util.CompositeObject;
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
-public interface IFieldSourceBuilder extends IAnnotatableSourceBuilder {
+public interface IFieldSourceBuilder extends IMemberSourceBuilder {
 
   /**
    * @return
@@ -29,50 +28,17 @@ public interface IFieldSourceBuilder extends IAnnotatableSourceBuilder {
   String getSignature();
 
   /**
-   * @return
-   */
-  String getValue();
-
-  /**
-   * @param commentSourceBuilder
-   */
-  void setCommentSourceBuilder(ICommentSourceBuilder commentSourceBuilder);
-
-  /**
-   * @param flags
-   */
-  void setFlags(int flags);
-
-  /**
-   * @return
-   */
-  int getFlags();
-
-  /**
-   * @param builder
-   */
-  void addAnnotationSourceBuilder(IAnnotationSourceBuilder builder);
-
-  /**
    * @param signature
    */
   void setSignature(String signature);
 
   /**
+   * see {@link ExpressionSourceBuilderFactory}
+   *
    * @param value
    */
-  void setValue(String value);
+  void setValue(ISourceBuilder value);
 
-  /**
-   * @param sortKey
-   * @param builder
-   */
-  void addSortedAnnotationSourceBuilder(CompositeObject sortKey, IAnnotationSourceBuilder builder);
-
-  /**
-   * @param childOp
-   * @return
-   */
-  boolean removeAnnotationSourceBuilder(IAnnotationSourceBuilder childOp);
+  ISourceBuilder getValue();
 
 }

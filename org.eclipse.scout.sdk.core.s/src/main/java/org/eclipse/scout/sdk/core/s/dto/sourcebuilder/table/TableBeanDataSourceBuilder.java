@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table;
 
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.parser.ILookupEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.AbstractTableBeanSourceBuilder;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.DataAnnotation;
@@ -33,8 +33,8 @@ public class TableBeanDataSourceBuilder extends AbstractTableBeanSourceBuilder {
    * @param elementName
    * @param setup
    */
-  public TableBeanDataSourceBuilder(IType modelType, DataAnnotation dataAnnotation, String typeName, ILookupEnvironment lookupEnv) {
-    super(modelType, typeName, lookupEnv, false);
+  public TableBeanDataSourceBuilder(IType modelType, DataAnnotation dataAnnotation, String typeName, IJavaEnvironment env) {
+    super(modelType, typeName, env, false);
     m_dataAnnotation = dataAnnotation;
     setup();
   }
@@ -45,7 +45,7 @@ public class TableBeanDataSourceBuilder extends AbstractTableBeanSourceBuilder {
     if (superDataType == null) {
       return Signature.createTypeSignature(IRuntimeClasses.AbstractTablePageData);
     }
-    return SignatureUtils.getResolvedSignature(superDataType);
+    return SignatureUtils.getTypeSignature(superDataType);
   }
 
   public DataAnnotation getDataAnnotation() {

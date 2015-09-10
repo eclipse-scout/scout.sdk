@@ -12,23 +12,30 @@ package org.eclipse.scout.sdk.core.sourcebuilder.type;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.model.Flags;
-import org.eclipse.scout.sdk.core.model.IType;
-import org.eclipse.scout.sdk.core.model.ITypeParameter;
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
-import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.sourcebuilder.AbstractAnnotatableSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.AbstractMemberSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.field.FieldSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.typeparameter.ITypeParameterSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.typeparameter.TypeParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
@@ -38,19 +45,39 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
-public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implements ITypeSourceBuilder {
-
+public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements ITypeSourceBuilder {
   private String m_superTypeSignature;
-  private List<ITypeParameter> m_typeParameters;
-  private String m_parentFullyQualifiedName;
-  private ITypeSourceBuilder m_parentSourceBuilder;
-  private final List<String> m_interfaceSignatures;
-  private final List<IFieldSourceBuilder> m_fieldSourceBuilders;
-  private final Map<CompositeObject, IFieldSourceBuilder> m_sortedFieldSourceBuilders;
-  private final List<IMethodSourceBuilder> m_methodSourceBuilders;
-  private final Map<CompositeObject, IMethodSourceBuilder> m_sortedMethodSourceBuilders;
-  private final List<ITypeSourceBuilder> m_typeSourceBuilders;
-  private final Map<CompositeObject, ITypeSourceBuilder> m_sortedTypeSourceBuilders;
+  private ISourceBuilder m_declaringElement;
+  private final List<ITypeParameterSourceBuilder> m_typeParameters = new ArrayList<>();
+  private final List<String> m_interfaceSignatures = new ArrayList<>();
+  private final List<IFieldSourceBuilder> m_fields = new ArrayList<>();
+  private final Map<CompositeObject, IFieldSourceBuilder> m_sortedFields = new TreeMap<>();
+  private final List<IMethodSourceBuilder> m_methods = new ArrayList<>();
+  private final Map<CompositeObject, IMethodSourceBuilder> m_sortedMethods = new TreeMap<>();
+  private final List<ITypeSourceBuilder> m_types = new ArrayList<>();
+  private final Map<CompositeObject, ITypeSourceBuilder> m_sortedTypes = new TreeMap<>();
+
+  public TypeSourceBuilder(IType element) {
+    super(element);
+    for (ITypeParameter p : element.getTypeParameters()) {
+      addTypeParameter(new TypeParameterSourceBuilder(p));
+    }
+    if (element.getSuperClass() != null && !"java.lang.Object".equals(element.getSuperClass().getName())) {
+      setSuperTypeSignature(SignatureUtils.getTypeSignature(element.getSuperClass()));
+    }
+    for (IType i : element.getSuperInterfaces()) {
+      addInterfaceSignature(SignatureUtils.getTypeSignature(i));
+    }
+    for (IField field : element.getFields()) {
+      addField(new FieldSourceBuilder(field));
+    }
+    for (IMethod method : element.getMethods()) {
+      addMethod(new MethodSourceBuilder(method));
+    }
+    for (IType type : element.getTypes()) {
+      addType(new TypeSourceBuilder(type));
+    }
+  }
 
   /**
    * @param elementName
@@ -58,76 +85,37 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
    */
   public TypeSourceBuilder(String elementName) {
     super(elementName);
-    m_typeParameters = new ArrayList<>();
-    m_interfaceSignatures = new ArrayList<>();
-    m_fieldSourceBuilders = new ArrayList<>();
-    m_sortedFieldSourceBuilders = new TreeMap<>();
-    m_methodSourceBuilders = new ArrayList<>();
-    m_sortedMethodSourceBuilders = new TreeMap<>();
-    m_typeSourceBuilders = new ArrayList<>();
-    m_sortedTypeSourceBuilders = new TreeMap<>();
   }
 
   @Override
-  public void validate() {
-    super.validate();
+  public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator0) {
+    IImportValidator validator = new EnclosingTypeScopedImportValidator(validator0, this);
+
+    super.createSource(source, lineDelimiter, context, validator);
+
     if (Flags.isInterface(getFlags()) && getSuperTypeSignature() != null) {
       throw new IllegalArgumentException("An interface can not have a superclass.");
     }
-  }
 
-  protected String typeParamToSource(ITypeParameter param, IImportValidator validator) {
-    List<IType> boundsSignatures = param.getBounds();
-    boolean hasBounds = !boundsSignatures.isEmpty();
-
-    StringBuilder fqnBuilder = new StringBuilder();
-    if (StringUtils.isNotBlank(param.getName())) {
-      fqnBuilder.append(param.getName());
-    }
-    else if (hasBounds) {
-      fqnBuilder.append('?');
-    }
-
-    if (hasBounds) {
-      fqnBuilder.append(" extends ");
-      Iterator<IType> iterator = boundsSignatures.iterator();
-      String sig = SignatureUtils.getResolvedSignature(iterator.next());
-      fqnBuilder.append(SignatureUtils.getTypeReference(sig, validator));
-      while (iterator.hasNext()) {
-        sig = SignatureUtils.getResolvedSignature(iterator.next());
-        fqnBuilder.append(" & ").append(SignatureUtils.getTypeReference(sig, validator));
-      }
-    }
-    return fqnBuilder.toString();
-  }
-
-  @Override
-  public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-    super.createSource(source, lineDelimiter, context, validator);
     // type definition
     source.append(Flags.toString(getFlags())).append(" ");
     source.append(((getFlags() & Flags.AccInterface) != 0) ? ("interface ") : ("class "));
     source.append(getElementName());
-    // parameter types
-    if (getTypeParameters().size() > 0) {
+
+    // type parameters
+    if (!m_typeParameters.isEmpty()) {
       source.append(ISignatureConstants.C_GENERIC_START);
-      Iterator<ITypeParameter> it = getTypeParameters().iterator();
-      // first
-      ITypeParameter tp = it.next();
-      source.append(typeParamToSource(tp, validator));
-      // rest
-      while (it.hasNext()) {
+      for (ITypeParameterSourceBuilder p : m_typeParameters) {
+        p.createSource(source, lineDelimiter, context, validator);
         source.append(", ");
-        tp = it.next();
-        source.append(typeParamToSource(tp, validator));
       }
+      source.setLength(source.length() - 2);
       source.append(ISignatureConstants.C_GENERIC_END);
     }
-    validator.getTypeName(Signature.createTypeSignature(getFullyQualifiedName()));
 
     // super type (extends)
     if (!StringUtils.isEmpty(getSuperTypeSignature())) {
-      String superTypeRefName = SignatureUtils.getTypeReference(getSuperTypeSignature(), validator);
+      String superTypeRefName = SignatureUtils.useSignature(getSuperTypeSignature(), validator);
       source.append(" extends ").append(superTypeRefName);
     }
 
@@ -135,9 +123,9 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
     Iterator<String> interfaceSigIterator = getInterfaceSignatures().iterator();
     if (interfaceSigIterator.hasNext()) {
       source.append(((getFlags() & Flags.AccInterface) != 0) ? (" extends ") : (" implements "));
-      source.append(SignatureUtils.getTypeReference(interfaceSigIterator.next(), validator));
+      source.append(SignatureUtils.useSignature(interfaceSigIterator.next(), validator));
       while (interfaceSigIterator.hasNext()) {
-        source.append(", ").append(SignatureUtils.getTypeReference(interfaceSigIterator.next(), validator));
+        source.append(", ").append(SignatureUtils.useSignature(interfaceSigIterator.next(), validator));
       }
     }
     source.append("{");
@@ -155,7 +143,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
    */
   protected void createTypeContent(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     // fields
-    List<IFieldSourceBuilder> fieldSourceBuilders = getFieldSourceBuilders();
+    List<IFieldSourceBuilder> fieldSourceBuilders = getFields();
     if (!fieldSourceBuilders.isEmpty()) {
       source.append(lineDelimiter);
       for (IFieldSourceBuilder builder : fieldSourceBuilders) {
@@ -166,7 +154,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
       }
     }
     // methods
-    List<IMethodSourceBuilder> methodSourceBuilders = getMethodSourceBuilders();
+    List<IMethodSourceBuilder> methodSourceBuilders = getMethods();
     if (!methodSourceBuilders.isEmpty()) {
       source.append(lineDelimiter);
       for (IMethodSourceBuilder op : methodSourceBuilders) {
@@ -177,7 +165,7 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
       }
     }
     // inner types
-    List<ITypeSourceBuilder> innerTypes = getTypeSourceBuilder();
+    List<ITypeSourceBuilder> innerTypes = getTypes();
     if (!innerTypes.isEmpty()) {
       source.append(lineDelimiter);
       for (ITypeSourceBuilder op : innerTypes) {
@@ -190,18 +178,24 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
   }
 
   @Override
-  public void addTypeParameter(ITypeParameter typeParameter) {
+  public void addTypeParameter(ITypeParameterSourceBuilder typeParameter) {
     m_typeParameters.add(typeParameter);
   }
 
   @Override
-  public void setTypeParameters(List<? extends ITypeParameter> typeParameters) {
-    m_typeParameters = new ArrayList<>(typeParameters);
+  public boolean removeTypeParameter(String elementName) {
+    for (Iterator<ITypeParameterSourceBuilder> it = m_typeParameters.iterator(); it.hasNext();) {
+      if (elementName.equals(it.next().getElementName())) {
+        it.remove();
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
-  public List<ITypeParameter> getTypeParameters() {
-    return m_typeParameters;
+  public List<ITypeParameterSourceBuilder> getTypeParameters() {
+    return Collections.unmodifiableList(m_typeParameters);
   }
 
   @Override
@@ -236,183 +230,173 @@ public class TypeSourceBuilder extends AbstractAnnotatableSourceBuilder implemen
   }
 
   @Override
-  public void addFieldSourceBuilder(IFieldSourceBuilder builder) {
+  public void addField(IFieldSourceBuilder builder) {
     if (builder == null) {
       throw new IllegalArgumentException("Source builder can not be null.");
     }
-    if (!m_sortedFieldSourceBuilders.isEmpty()) {
+    if (!m_sortedFields.isEmpty()) {
       throw new IllegalStateException("This builder has already sorted field builder. A mix between sorted and unsorted field builders is not supported.");
     }
-    m_fieldSourceBuilders.add(builder);
+    m_fields.add(builder);
   }
 
   @Override
-  public void addSortedFieldSourceBuilder(CompositeObject sortKey, IFieldSourceBuilder builder) {
+  public void addSortedField(CompositeObject sortKey, IFieldSourceBuilder builder) {
     if (builder == null) {
       throw new IllegalArgumentException("Source builder can not be null.");
     }
-    if (!m_fieldSourceBuilders.isEmpty()) {
+    if (!m_fields.isEmpty()) {
       throw new IllegalStateException("This builder has already unsorted field builder. A mix between sorted and unsorted field builders is not supported.");
     }
-    m_sortedFieldSourceBuilders.put(sortKey, builder);
+    m_sortedFields.put(sortKey, builder);
   }
 
   @Override
-  public boolean removeFieldSourceBuilder(IFieldSourceBuilder builder) {
-    boolean removed = m_fieldSourceBuilders.remove(builder);
-    if (!removed) {
-      Iterator<Entry<CompositeObject, IFieldSourceBuilder>> it = m_sortedFieldSourceBuilders.entrySet().iterator();
-      while (it.hasNext()) {
-        if (it.next().getValue().equals(builder)) {
-          it.remove();
-          return true;
-        }
+  public boolean removeField(String elementName) {
+    for (Iterator<IFieldSourceBuilder> it = m_fields.iterator(); it.hasNext();) {
+      if (elementName.equals(it.next().getElementName())) {
+        it.remove();
+        return true;
       }
-      return false;
     }
-    return removed;
+    for (Iterator<IFieldSourceBuilder> it = m_sortedFields.values().iterator(); it.hasNext();) {
+      if (elementName.equals(it.next().getElementName())) {
+        it.remove();
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
-  public List<IFieldSourceBuilder> getFieldSourceBuilders() {
-    List<IFieldSourceBuilder> ops = new ArrayList<>(m_fieldSourceBuilders.size() + m_sortedFieldSourceBuilders.size());
-    ops.addAll(m_fieldSourceBuilders);
-    ops.addAll(m_sortedFieldSourceBuilders.values());
+  public List<IFieldSourceBuilder> getFields() {
+    List<IFieldSourceBuilder> ops = new ArrayList<>(m_fields.size() + m_sortedFields.size());
+    ops.addAll(m_fields);
+    ops.addAll(m_sortedFields.values());
     return ops;
   }
 
   @Override
-  public void addMethodSourceBuilder(IMethodSourceBuilder builder) {
+  public void addMethod(IMethodSourceBuilder builder) {
     if (builder == null) {
       throw new IllegalArgumentException("Source builder can not be null.");
     }
-    if (!m_sortedMethodSourceBuilders.isEmpty()) {
+    if (!m_sortedMethods.isEmpty()) {
       throw new IllegalStateException("This source builder has already sorted method builders. A mix between sorted and unsorted method builders is not supported.");
     }
-    m_methodSourceBuilders.add(builder);
+    m_methods.add(builder);
   }
 
   @Override
-  public void addSortedMethodSourceBuilder(CompositeObject sortKey, IMethodSourceBuilder builder) {
+  public void addSortedMethod(CompositeObject sortKey, IMethodSourceBuilder builder) {
     if (builder == null) {
       throw new IllegalArgumentException("Source builder can not be null.");
     }
-    if (!m_methodSourceBuilders.isEmpty()) {
+    if (!m_methods.isEmpty()) {
       throw new IllegalStateException("This source builder has already unsorted method builders. A mix between sorted and unsorted method builders is not supported.");
     }
-    m_sortedMethodSourceBuilders.put(sortKey, builder);
+    m_sortedMethods.put(sortKey, builder);
   }
 
   @Override
-  public boolean removeMethodSourceBuilder(IMethodSourceBuilder builder) {
-    boolean removed = m_methodSourceBuilders.remove(builder);
-    if (!removed) {
-      Iterator<Entry<CompositeObject, IMethodSourceBuilder>> it = m_sortedMethodSourceBuilders.entrySet().iterator();
-      while (it.hasNext()) {
-        if (it.next().getValue().equals(builder)) {
-          it.remove();
-          return true;
-        }
+  public boolean removeMethod(String elementName) {
+    for (Iterator<IMethodSourceBuilder> it = m_methods.iterator(); it.hasNext();) {
+      if (elementName.equals(it.next().getElementName())) {
+        it.remove();
+        return true;
       }
-      return false;
     }
-    return removed;
+    for (Iterator<IMethodSourceBuilder> it = m_sortedMethods.values().iterator(); it.hasNext();) {
+      if (elementName.equals(it.next().getElementName())) {
+        it.remove();
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
-  public List<IMethodSourceBuilder> getMethodSourceBuilders() {
-    List<IMethodSourceBuilder> builders = new ArrayList<>(m_methodSourceBuilders.size() + m_sortedMethodSourceBuilders.size());
-    builders.addAll(m_methodSourceBuilders);
-    builders.addAll(m_sortedMethodSourceBuilders.values());
+  public List<IMethodSourceBuilder> getMethods() {
+    List<IMethodSourceBuilder> builders = new ArrayList<>(m_methods.size() + m_sortedMethods.size());
+    builders.addAll(m_methods);
+    builders.addAll(m_sortedMethods.values());
     return builders;
   }
 
   @Override
-  public void addTypeSourceBuilder(ITypeSourceBuilder builder) {
+  public void addType(ITypeSourceBuilder builder) {
     if (builder == null) {
       throw new IllegalArgumentException("Source builder can not be null.");
     }
-    if (!m_sortedTypeSourceBuilders.isEmpty()) {
+    if (!m_sortedTypes.isEmpty()) {
       throw new IllegalStateException("This builder has already sorted inner type builders. A mix between sorted and unsorted inner type builders is not supported.");
     }
-    m_typeSourceBuilders.add(builder);
-    builder.setParentTypeSourceBuilder(this);
+    m_types.add(builder);
+    builder.setDeclaringElement(this);
   }
 
   @Override
-  public void addSortedTypeSourceBuilder(CompositeObject sortKey, ITypeSourceBuilder builder) {
+  public void addSortedType(CompositeObject sortKey, ITypeSourceBuilder builder) {
     if (builder == null) {
       throw new IllegalArgumentException("Source builder can not be null.");
     }
-    if (!m_typeSourceBuilders.isEmpty()) {
+    if (!m_types.isEmpty()) {
       throw new IllegalStateException("This builder has already unsorted inner type builders. A mix between sorted and unsorted inner type builders is not supported.");
     }
-    m_sortedTypeSourceBuilders.put(sortKey, builder);
-    builder.setParentTypeSourceBuilder(this);
+    m_sortedTypes.put(sortKey, builder);
+    builder.setDeclaringElement(this);
   }
 
   @Override
-  public boolean removeTypeSourceBuilder(ITypeSourceBuilder builder) {
-    boolean removed = m_typeSourceBuilders.remove(builder);
-    if (!removed) {
-      Iterator<Entry<CompositeObject, ITypeSourceBuilder>> it = m_sortedTypeSourceBuilders.entrySet().iterator();
-      while (it.hasNext()) {
-        if (it.next().getValue().equals(builder)) {
-          it.remove();
-          return true;
-        }
+  public boolean removeType(String elementName) {
+    ITypeSourceBuilder builder = null;
+    for (Iterator<ITypeSourceBuilder> it = m_types.iterator(); it.hasNext();) {
+      builder = it.next();
+      if (elementName.equals(builder.getElementName())) {
+        builder.setDeclaringElement(null);
+        it.remove();
+        return true;
       }
-      return false;
     }
-    return removed;
+    for (Iterator<ITypeSourceBuilder> it = m_sortedTypes.values().iterator(); it.hasNext();) {
+      builder = it.next();
+      if (elementName.equals(builder.getElementName())) {
+        builder.setDeclaringElement(null);
+        it.remove();
+        return true;
+      }
+    }
+    return false;
   }
 
   @Override
-  public List<ITypeSourceBuilder> getTypeSourceBuilder() {
-    List<ITypeSourceBuilder> typeBuilders = new ArrayList<>(m_typeSourceBuilders.size() + m_sortedTypeSourceBuilders.size());
-    typeBuilders.addAll(m_typeSourceBuilders);
-    typeBuilders.addAll(m_sortedTypeSourceBuilders.values());
+  public List<ITypeSourceBuilder> getTypes() {
+    List<ITypeSourceBuilder> typeBuilders = new ArrayList<>(m_types.size() + m_sortedTypes.size());
+    typeBuilders.addAll(m_types);
+    typeBuilders.addAll(m_sortedTypes.values());
     return typeBuilders;
   }
 
   @Override
+  public ISourceBuilder getDeclaringElement() {
+    return m_declaringElement;
+  }
+
+  @Override
+  public void setDeclaringElement(ISourceBuilder declaringElement) {
+    m_declaringElement = declaringElement;
+  }
+
+  @Override
   public String getFullyQualifiedName() {
-    ITypeSourceBuilder parentSourceBuilder = getParentTypeSourceBuilder();
-    StringBuilder sb = null;
-    if (parentSourceBuilder != null) {
-      sb = new StringBuilder(parentSourceBuilder.getFullyQualifiedName());
-      sb.append('$');
+    ISourceBuilder parent = getDeclaringElement();
+    if (parent instanceof ITypeSourceBuilder) {
+      return ((ITypeSourceBuilder) parent).getFullyQualifiedName() + "$" + getElementName();
     }
-    else {
-      String pfqn = getParentFullyQualifiedName();
-      if (pfqn != null) {
-        sb = new StringBuilder(pfqn);
-        sb.append('.');
-      }
+    if (parent instanceof ICompilationUnitSourceBuilder) {
+      return ((ICompilationUnitSourceBuilder) parent).getPackageName() + "." + getElementName();
     }
-    if (sb == null) {
-      return null;
-    }
-    return sb.append(getElementName()).toString();
+    return null;
   }
 
-  @Override
-  public ITypeSourceBuilder getParentTypeSourceBuilder() {
-    return m_parentSourceBuilder;
-  }
-
-  @Override
-  public void setParentTypeSourceBuilder(ITypeSourceBuilder parentBuilder) {
-    m_parentSourceBuilder = parentBuilder;
-  }
-
-  @Override
-  public String getParentFullyQualifiedName() {
-    return m_parentFullyQualifiedName;
-  }
-
-  @Override
-  public void setParentFullyQualifiedName(String parentFullyQualifiedName) {
-    m_parentFullyQualifiedName = parentFullyQualifiedName;
-  }
 }
