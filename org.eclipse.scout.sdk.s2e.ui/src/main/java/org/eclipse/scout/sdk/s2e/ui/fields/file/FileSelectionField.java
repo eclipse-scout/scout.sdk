@@ -40,7 +40,7 @@ import org.eclipse.swt.widgets.Label;
 
 /**
  * <h3>FileSelectionField</h3> For selecting folders or files on the local disk.
- * 
+ *
  * @author Andreas Hoegger
  * @since 5.1.0
  * @see IFileSelectionListener
@@ -93,15 +93,22 @@ public class FileSelectionField extends TextField {
       public void modifyText(ModifyEvent e) {
         try {
           if (m_inputLock.acquire()) {
-            // try to find product
             String input = getText();
-            File newFile = new File(input);
-            // check parent
-            if (newFile.getParentFile() != null && newFile.getParentFile().exists()) {
-              setFileInternal(newFile);
+            if (StringUtils.isBlank(input)) {
+              setFileInternal(null);
             }
             else {
-              setFileInternal(null);
+              File newFile = new File(input);
+
+              // validate path
+              try {
+                newFile.getCanonicalPath(); // fails on invalid path
+                setFileInternal(newFile);
+              }
+              catch (Exception ex) {
+                // the supplied string is no valid path for this OS.
+                setFileInternal(null);
+              }
             }
           }
         }
