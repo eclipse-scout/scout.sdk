@@ -161,8 +161,8 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     m_useWsLoc.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        m_targetDirectoryField.setEnabled(!m_useWsLoc.getSelection());
         setUseWorkspaceLocationInternal(m_useWsLoc.getSelection());
+        updateTargetDirViewState();
         pingStateChanging();
       }
     });
@@ -187,15 +187,34 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
     setUseWorkspaceLocationInternal(true);
 
     // target directory
-    File file = null;
-    String recentTargetDir = getDialogSettings().get(SETTINGS_TARGET_DIR);
-    if (recentTargetDir != null) {
-      file = new File(recentTargetDir);
+    updateTargetDirViewState();
+  }
+
+  protected void updateTargetDirViewState() {
+    if (isControlCreated()) {
+      m_targetDirectoryField.setEnabled(!isUseWorkspaceLocation());
     }
-    else {
+
+    File file = null;
+    if (isUseWorkspaceLocation()) {
       file = getWorkspaceLocation();
     }
-    setTargetDirectoryInternal(file);
+    else {
+      File wsLoc = getWorkspaceLocation();
+      if (getTargetDirectory() == null || wsLoc.equals(getTargetDirectory())) {
+        String recentTargetDir = getDialogSettings().get(SETTINGS_TARGET_DIR);
+        if (recentTargetDir != null) {
+          file = new File(recentTargetDir);
+        }
+        else {
+          file = wsLoc;
+        }
+      }
+    }
+
+    if (file != null) {
+      setTargetDirectory(file);
+    }
   }
 
   public static File getWorkspaceLocation() {
