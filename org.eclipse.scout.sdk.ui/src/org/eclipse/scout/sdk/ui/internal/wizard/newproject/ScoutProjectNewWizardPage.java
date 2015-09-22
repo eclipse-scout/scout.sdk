@@ -505,7 +505,7 @@ public class ScoutProjectNewWizardPage extends AbstractProjectNewWizardPage impl
     if (StringUtility.isNullOrEmpty(getProjectAlias())) {
       return new Status(IStatus.ERROR, ScoutSdkUi.PLUGIN_ID, Texts.get("ProjectAliasMissing"));
     }
-    if (getProjectAlias().matches("[a-zA-Z]{1}[a-zA-Z0-9]*[a-zA-Z]{1}")) {
+    if (getProjectAlias().matches("[a-zA-Z]{1}[a-zA-Z0-9]*")) {
       return Status.OK_STATUS;
     }
     else {

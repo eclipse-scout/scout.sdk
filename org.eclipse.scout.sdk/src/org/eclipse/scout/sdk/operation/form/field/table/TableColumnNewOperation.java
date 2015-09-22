@@ -82,6 +82,9 @@ public class TableColumnNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
+    // check before the inner type is created!
+    boolean isExtension = TypeUtility.getSupertypeHierarchy(getDeclaringType()).contains(TypeUtility.getType(IRuntimeClasses.IExtension));
+
     OrderedInnerTypeNewOperation columnOp = new OrderedInnerTypeNewOperation(getTypeName(), getDeclaringType(), isFormatSource());
     columnOp.setOrderDefinitionType(TypeUtility.getType(IRuntimeClasses.IColumn));
     columnOp.setSibling(getSibling());
@@ -99,7 +102,7 @@ public class TableColumnNewOperation implements IOperation {
     columnOp.run(monitor, workingCopyManager);
     m_createdColumn = columnOp.getCreatedType();
 
-    if (!TypeUtility.getSupertypeHierarchy(getDeclaringType()).contains(TypeUtility.getType(IRuntimeClasses.IExtension))) { // no getters for extensions
+    if (!isExtension) { // no getters for extensions
       // getter on declaring table
       InnerTypeGetterCreateOperation getterOp = new InnerTypeGetterCreateOperation(getCreatedColumn(), getDeclaringType(), true);
       getterOp.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
