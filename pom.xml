@@ -14,11 +14,11 @@
 
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk</artifactId>
-  <version>5.1.0-SNAPSHOT</version>
+  <version>5.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <properties>
-    <scout.rt.version>5.1.0-SNAPSHOT</scout.rt.version>
+    <scout.rt.version>5.2.0-SNAPSHOT</scout.rt.version>
     <jdk.source.version>1.7</jdk.source.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
