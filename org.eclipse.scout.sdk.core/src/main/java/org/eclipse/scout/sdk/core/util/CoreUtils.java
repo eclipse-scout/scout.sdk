@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.util;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -17,6 +18,12 @@ import java.io.Reader;
 import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
 import java.security.KeyPair;
 import java.security.KeyPairGenerator;
@@ -103,6 +110,30 @@ public final class CoreUtils {
     PKCS8EncodedKeySpec pkcs8EncodedKeySpec = new PKCS8EncodedKeySpec(keyPair.getPrivate().getEncoded());
 
     return new String[]{DatatypeConverter.printBase64Binary(pkcs8EncodedKeySpec.getEncoded()) /*private key*/, DatatypeConverter.printBase64Binary(x509EncodedKeySpec.getEncoded()) /* public key*/};
+  }
+
+  /**
+   * Deletes the given file or folder.<br>
+   * In case the given {@link File} is a folder the contents of the folder are deleted recursively.
+   * 
+   * @param dirToDelete
+   *          The file or folder to delete.
+   * @throws IOException
+   */
+  public static void deleteFolder(File dirToDelete) throws IOException {
+    Files.walkFileTree(Paths.get(dirToDelete.toURI()), new SimpleFileVisitor<Path>() {
+      @Override
+      public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+        Files.delete(file);
+        return FileVisitResult.CONTINUE;
+      }
+
+      @Override
+      public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
+        Files.delete(dir);
+        return FileVisitResult.CONTINUE;
+      }
+    });
   }
 
   /**

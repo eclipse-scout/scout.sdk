@@ -15,14 +15,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.SimpleFileVisitor;
 import java.nio.file.StandardCopyOption;
 import java.nio.file.StandardOpenOption;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.security.GeneralSecurityException;
 import java.util.HashMap;
 import java.util.Map;
@@ -278,19 +274,7 @@ public final class ScoutProjectNewHelper {
   protected static void mkdirs(File dirToCreate) throws IOException {
     if (dirToCreate.exists()) {
       // to ensure we have a clean folder
-      Files.walkFileTree(Paths.get(dirToCreate.toURI()), new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-          Files.delete(file);
-          return FileVisitResult.CONTINUE;
-        }
-
-        @Override
-        public FileVisitResult postVisitDirectory(Path dir, IOException exc) throws IOException {
-          Files.delete(dir);
-          return FileVisitResult.CONTINUE;
-        }
-      });
+      CoreUtils.deleteFolder(dirToCreate);
     }
     Files.createDirectories(Paths.get(dirToCreate.toURI()));
   }
