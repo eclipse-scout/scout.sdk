@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
-import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
+import org.eclipse.scout.sdk.core.util.JavaEnvironmentBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 

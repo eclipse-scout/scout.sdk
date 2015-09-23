@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.model;
 
 import org.eclipse.scout.sdk.core.TypeNames;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
+import org.eclipse.scout.sdk.core.util.JavaEnvironmentBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 

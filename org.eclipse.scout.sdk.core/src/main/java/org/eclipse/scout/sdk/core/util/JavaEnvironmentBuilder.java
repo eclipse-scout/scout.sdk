@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.core.testing;
+package org.eclipse.scout.sdk.core.util;
 
 import java.io.File;
 import java.net.URISyntaxException;
@@ -27,8 +27,6 @@ import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.spi.internal.JavaEnvironmentWithJdt;
 import org.eclipse.scout.sdk.core.model.spi.internal.WorkspaceFileSystem;
-import org.eclipse.scout.sdk.core.util.CompositeObject;
-import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
  * helpers used in order to create a testing {@link IJavaEnvironment} implemented by a {@link IJavaEnvironment}

@@ -23,8 +23,8 @@ import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataAnnotation;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.s.util.ScoutUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
-import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
+import org.eclipse.scout.sdk.core.util.JavaEnvironmentBuilder;
 import org.junit.Assert;
 
 /**

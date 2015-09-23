@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
-import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
+import org.eclipse.scout.sdk.core.util.JavaEnvironmentBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 

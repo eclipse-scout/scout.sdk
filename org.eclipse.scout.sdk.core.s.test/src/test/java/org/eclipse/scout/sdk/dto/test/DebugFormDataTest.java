@@ -17,23 +17,24 @@ import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
-import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
- * TODO imo remove and also remove FormDataTest.properties
+ * This test can be used to debug form data generation
  */
-public class FormDataTest {
+public class DebugFormDataTest {
+  @Ignore
   @Test
-  public void testCreateFormData() throws IOException {
-    IJavaEnvironment env = CoreTestingUtils.importJavaEnvironment(getClass().getResourceAsStream("FormDataTest.properties"));
-    IType t = env.findType("com.bsiag.crm.client.core.person.PersonForm");
+  public void testFormData() throws IOException {
+    IJavaEnvironment env = CoreUtils.importJavaEnvironment(getClass().getResourceAsStream("/env-DebugFormDataTest.properties"));
 
+    IType t = env.findType("com.bsiag.crm.client.core.person.PersonForm");
     StringBuilder buf = new StringBuilder();
     ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(t, DtoUtils.findFormDataAnnotation(t), env);
     cuSrc.createSource(buf, "\n", new PropertyMap(), new ImportValidator(env));
-
     System.out.println(buf);
   }
 

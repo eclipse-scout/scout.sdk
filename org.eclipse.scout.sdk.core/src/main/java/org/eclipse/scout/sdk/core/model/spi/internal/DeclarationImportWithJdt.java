@@ -56,7 +56,11 @@ public class DeclarationImportWithJdt extends AbstractJavaElementWithJdt<IImport
 
   @Override
   public String getName() {
-    return CharOperation.toString(m_astNode.tokens);
+    String name = CharOperation.toString(m_astNode.getImportName());
+    if (m_astNode.trailingStarPosition > 0) {
+      name += ".*";
+    }
+    return name;
   }
 
   @Override

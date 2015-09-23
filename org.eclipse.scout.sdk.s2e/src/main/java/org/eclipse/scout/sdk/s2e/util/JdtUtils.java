@@ -572,6 +572,10 @@ public final class JdtUtils {
       job.join(0L, monitor);
       ArrayList<IType> result = new ArrayList<>(ops.size());
       for (CompilationUnitWriteOperation op : ops) {
+        if (op == null) {
+          result.add(null);
+          continue;
+        }
         result.add(op.getCompilationUnit().getTypes()[0]);
       }
       return result;
@@ -588,6 +592,10 @@ public final class JdtUtils {
       job.join(0L, monitor);
       ArrayList<IFile> result = new ArrayList<>(ops.size());
       for (ResourceWriteOperation op : ops) {
+        if (op == null) {
+          result.add(null);
+          continue;
+        }
         result.add(op.getFile());
       }
       return result;

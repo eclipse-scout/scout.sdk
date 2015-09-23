@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.Writer;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
 import java.security.GeneralSecurityException;
@@ -34,6 +35,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Objects;
+import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +55,7 @@ import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IPropertyBean;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.PropertyBean;
+import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
@@ -1303,5 +1306,58 @@ public final class CoreUtils {
       return new BigDecimal(((Number) rawVal).doubleValue());
     }
     return null;
+  }
+
+  public static void exportJavaEnvironment(IJavaEnvironment env, Writer w) throws IOException {
+    StringBuilder src = new StringBuilder();
+    StringBuilder bin = new StringBuilder();
+    for (ClasspathSpi cp : env.unwrap().getClasspath()) {
+      (cp.isSource() ? src : bin).append("\n    " + cp.getPath() + ",");
+    }
+    Properties p = new Properties();
+    p.setProperty("src", src.toString());
+    p.setProperty("bin", bin.toString());
+    p.store(w, "");
+  }
+
+  public static IJavaEnvironment importJavaEnvironment(InputStream in) throws IOException {
+    Properties p = new Properties();
+    p.load(in);
+    return importJavaEnvironment(p);
+  }
+
+  public static IJavaEnvironment importJavaEnvironment(Reader r) throws IOException {
+    Properties p = new Properties();
+    p.load(r);
+    return importJavaEnvironment(p);
+  }
+
+  /**
+   * @param p
+   *
+   *          <pre>
+   *  allowErrors=true,
+   * src=path1, path2, ...
+   * bin=path1, path2, ...
+   *          </pre>
+   *
+   * @return
+   */
+  public static IJavaEnvironment importJavaEnvironment(Properties p) {
+    JavaEnvironmentBuilder builder = new JavaEnvironmentBuilder()
+        .withIncludeRunningClasspath(false);
+    for (String s : p.getProperty("src").split(",")) {
+      s = s.trim();
+      if (!s.isEmpty()) {
+        builder.withAbsoluteSourcePath(s);
+      }
+    }
+    for (String s : p.getProperty("bin").split(",")) {
+      s = s.trim();
+      if (!s.isEmpty()) {
+        builder.withAbsoluteBinaryPath(s);
+      }
+    }
+    return builder.build();
   }
 }
