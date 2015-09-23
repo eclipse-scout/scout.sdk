@@ -664,7 +664,7 @@
   <repositories>
 
     <repository>
-      <!-- TODO remove this before releasing -->
+      <!-- TODO sle remove this before releasing -->
       <id>eclipse-scout-snapshots</id>
       <url>https://repo.eclipse.org/content/repositories/scout-snapshots/</url>
     </repository>

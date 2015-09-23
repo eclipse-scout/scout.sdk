@@ -33,7 +33,7 @@ public interface IResourceBuilder extends IResourceFragmentBuilder {
    * Typically this is a code generation error or semantic check issue
    *
    * @param taskType
-   *          such as TODO, FIXME, ...
+   *          such as uppercase of todo, fixme, ...
    * @param msg
    * @param exceptions
    */

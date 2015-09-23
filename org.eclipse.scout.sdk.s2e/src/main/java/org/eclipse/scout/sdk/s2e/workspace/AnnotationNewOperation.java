@@ -84,7 +84,7 @@ public class AnnotationNewOperation implements IWorkspaceBlockingOperation {
       pck = packageDeclarations[0].getElementName();
     }
 
-    IJavaEnvironment env = ScoutSdkCore.createLookupEnvironment(m_declaringMember.getJavaProject());
+    IJavaEnvironment env = ScoutSdkCore.createJavaEnvironment(m_declaringMember.getJavaProject());
     IImportValidator validator = new CompilationUnitScopedImportValidator(new ImportValidator(env), pck);
     Document doc = new Document(icu.getSource());
 

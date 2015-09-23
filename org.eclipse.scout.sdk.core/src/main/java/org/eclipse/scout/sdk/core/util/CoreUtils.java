@@ -1112,7 +1112,6 @@ public final class CoreUtils {
    *          The {@link IType} to check.
    * @param queryType
    *          The fully qualified name of the super type to check.
-   * @return TODO mvi (imo) deprecate this and use ClassX, AnnotationX and {@link #isAssignableFrom(IType, IType)}
    */
   public static boolean isInstanceOf(IType typeToCheck, String queryType) {
     return findSuperType(typeToCheck, queryType) != null;

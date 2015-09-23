@@ -63,8 +63,7 @@ public final class ScoutSdkCore {
    * @return The new created {@link IJavaEnvironment}.
    * @throws CoreException
    */
-  //TODO imo rename
-  public static IJavaEnvironment createLookupEnvironment(IJavaProject javaProject) throws CoreException {
+  public static IJavaEnvironment createJavaEnvironment(IJavaProject javaProject) throws CoreException {
     Validate.notNull(javaProject);
     return new JavaEnvironmentWithJdt(createClasspaths(javaProject)).wrap();
   }

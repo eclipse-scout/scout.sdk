@@ -128,13 +128,6 @@ public class CompilationUnitWriteOperation implements IWorkspaceBlockingOperatio
       // save buffer
       m_cu.getBuffer().save(monitor, true);
 
-      // organize import required to ensure the JDT settings for the imports are applied
-      //TODO mvi: (by imo) this is very very slow! how can we speed this up?
-      /*
-      OrganizeImportOperation o = new OrganizeImportOperation(m_cu);
-      o.validate();
-      o.run(monitor, workingCopyManager);
-      */
       m_cu.commitWorkingCopy(true, monitor);
     }
     catch (Exception e) {

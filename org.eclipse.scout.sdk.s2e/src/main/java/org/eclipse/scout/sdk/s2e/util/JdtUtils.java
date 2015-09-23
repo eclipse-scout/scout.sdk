@@ -82,7 +82,7 @@ public final class JdtUtils {
    * @throws CoreException
    */
   public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType) throws CoreException {
-    return jdtTypeToScoutType(jdtType, ScoutSdkCore.createLookupEnvironment(jdtType.getJavaProject()));
+    return jdtTypeToScoutType(jdtType, ScoutSdkCore.createJavaEnvironment(jdtType.getJavaProject()));
   }
 
   /**

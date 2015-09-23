@@ -46,7 +46,7 @@ public class CachingJavaEnvironmentProvider implements IJavaEnvironmentProvider 
     }
     IJavaEnvironment env = m_envs.get(jdtProject);
     if (env == null) {
-      env = ScoutSdkCore.createLookupEnvironment(jdtProject);
+      env = ScoutSdkCore.createJavaEnvironment(jdtProject);
       m_envs.put(jdtProject, env);
     }
     return env;
