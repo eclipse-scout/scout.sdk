@@ -38,10 +38,12 @@ public final class SdkConsole {
   public static String formatException(Throwable t) {
     try (StringWriter w = new StringWriter(); PrintWriter p = new PrintWriter(w)) {
       t.printStackTrace(p);
+      p.close();
+      w.close();
       return w.toString();
     }
     catch (IOException e) {
-      return t.toString();
+      return "[" + e + "]" + t.toString();
     }
   }
 

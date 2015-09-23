@@ -41,30 +41,27 @@ public class WorkspaceBlockingOperationJob extends AbstractWorkspaceBlockingJob 
   private WorkspaceBlockingOperationJob(List<? extends IWorkspaceBlockingOperation> operations) {
     super("");
     m_operations = operations;
+    for (Iterator<? extends IWorkspaceBlockingOperation> it = m_operations.iterator(); it.hasNext();) {
+      if (it.next() == null) {
+        it.remove();
+      }
+    }
     updateJobName();
   }
 
   private void updateJobName() {
     synchronized (m_operations) {
       StringBuilder nameBuilder = new StringBuilder();
-      if (!m_operations.isEmpty()) {
-        Iterator<? extends IWorkspaceBlockingOperation> operationIt = m_operations.iterator();
-        IWorkspaceBlockingOperation currentOperation = operationIt.next();
-        String itOpName = currentOperation.getOperationName();
+      for (IWorkspaceBlockingOperation op : m_operations) {
+        String itOpName = op.getOperationName();
         if (itOpName == null) {
-          S2ESdkActivator.logWarning("operation '" + currentOperation.getClass().getName() + "' does not have a name");
+          S2ESdkActivator.logWarning("operation '" + op.getClass().getName() + "' does not have a name");
           itOpName = "Missing operation name.";
         }
-        nameBuilder.append(itOpName);
-        while (operationIt.hasNext()) {
-          currentOperation = operationIt.next();
-          itOpName = currentOperation.getOperationName();
-          if (itOpName == null) {
-            S2ESdkActivator.logWarning("operation '" + currentOperation.getClass().getName() + "' does not have a name");
-            itOpName = "Missing operation name.";
-          }
-          nameBuilder.append(", ").append(itOpName);
+        if (nameBuilder.length() > 0) {
+          nameBuilder.append(", ");
         }
+        nameBuilder.append(itOpName);
       }
       setName(nameBuilder.toString());
     }

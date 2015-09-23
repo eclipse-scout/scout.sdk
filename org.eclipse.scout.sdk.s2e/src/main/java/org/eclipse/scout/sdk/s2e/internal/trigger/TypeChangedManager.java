@@ -505,6 +505,7 @@ public class TypeChangedManager implements ITypeChangedManager {
     private P_RunTriggerOperationsJob(Collection<ITypeChangedOperation> ops) {
       super("Auto-updating derived resources");
       m_ops = ops;
+      setUser(true);
       setRule(RunTriggerOperationsJobRule.INSTANCE);
     }
 
