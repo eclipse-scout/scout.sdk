@@ -90,7 +90,7 @@ public class TriggerSelectedDerivedResourceHandlers extends AbstractHandler {
         jset.add(e);
       }
     }
-    return SearchEngine.createJavaSearchScope(jset.toArray(new IJavaElement[0]));
+    return SearchEngine.createJavaSearchScope(jset.toArray(new IJavaElement[0]), false);
   }
 
 }
