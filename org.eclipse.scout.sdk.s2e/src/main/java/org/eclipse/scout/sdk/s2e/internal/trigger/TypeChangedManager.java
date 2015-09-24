@@ -531,6 +531,7 @@ public class TypeChangedManager implements ITypeChangedManager {
         }
         try {
           monitor.setTaskName(operation.getOperationName());
+          monitor.subTask(operation.getOperationName());
           operation.validate();
           operation.run(monitor);
         }
