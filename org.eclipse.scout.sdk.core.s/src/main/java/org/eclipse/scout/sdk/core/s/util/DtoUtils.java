@@ -553,7 +553,7 @@ public final class DtoUtils {
     addDtoExtendsAnnotation(rowDataTypeSrc, dataAnnotation.getAnnotationHolder());
 
     //@Generated annotation
-    rowDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated("RowDataUpdateOperation", GENERATED_MSG));
+    rowDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated(modelType.getName(), GENERATED_MSG));
 
     ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(rowDataTypeSrc.getElementName() + ".java", targetPackage);
     cuSrc.addType(rowDataTypeSrc);
@@ -576,7 +576,7 @@ public final class DtoUtils {
     pageDataTypeSrc.setComment(CommentSourceBuilderFactory.createCustomCommentBuilder(GENERATED_JAVADOC));
 
     //@Generated annotation
-    pageDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated("PageDataUpdateOperation", GENERATED_MSG));
+    pageDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated(modelType.getName(), GENERATED_MSG));
 
     ICompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(pageDataTypeSrc.getElementName() + ".java", targetPackage);
     cuSrc.addType(pageDataTypeSrc);
@@ -611,7 +611,7 @@ public final class DtoUtils {
       addDtoExtendsAnnotation(formDataTypeSrc, formDataAnnotation.getAnnotationOwner());
 
       // @Generated annotation
-      formDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated("FormDataUpdateOperation", GENERATED_MSG));
+      formDataTypeSrc.addAnnotation(AnnotationSourceBuilderFactory.createGenerated(modelType.getName(), GENERATED_MSG));
 
       // add interfaces and @Override annotation for all methods that exist in the given interfaces
       addFormDataAdditionalInterfaces(formDataAnnotation, formDataTypeSrc, sharedEnv);

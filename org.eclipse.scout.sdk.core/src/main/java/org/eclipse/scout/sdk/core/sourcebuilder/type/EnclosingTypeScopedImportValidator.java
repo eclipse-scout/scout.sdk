@@ -29,19 +29,38 @@ import org.eclipse.scout.sdk.core.signature.Signature;
  */
 public class EnclosingTypeScopedImportValidator extends WrappedImportValidator {
   private final String m_enclosingTypeName;
-  private final Set<String> m_enclosedTypeNames;
-  private final IType m_superType;
+  private final Set<String> m_enclosedTypeNames = new HashSet<>();
+  private final Set<String> m_enclosedTypeSimpleNames = new HashSet<>();
 
   public EnclosingTypeScopedImportValidator(IImportValidator inner, ITypeSourceBuilder enclosingTypeSrc) {
     super(inner);
     m_enclosingTypeName = enclosingTypeSrc.getElementName();
-    m_enclosedTypeNames = new HashSet<>();
+    //declared inner types
     for (ITypeSourceBuilder typeSrc : enclosingTypeSrc.getTypes()) {
-      m_enclosedTypeNames.add(typeSrc.getElementName());
+      m_enclosedTypeNames.add(typeSrc.getFullyQualifiedName());
+      m_enclosedTypeSimpleNames.add(typeSrc.getElementName());
     }
+    //super class inner types
+    //TODO imo eventually cache all inner types of newly created typesourcebuilders in a dto cache
     IJavaEnvironment env = getJavaEnvironment();
-    String superSig = enclosingTypeSrc.getSuperTypeSignature();
-    m_superType = (env != null && superSig != null ? env.findType(Signature.toString(superSig)) : null);
+    if (env != null) {
+      HashSet<String> superSignatures = new HashSet<>();
+      if (enclosingTypeSrc.getSuperTypeSignature() != null) {
+        superSignatures.add(enclosingTypeSrc.getSuperTypeSignature());
+      }
+      superSignatures.addAll(enclosingTypeSrc.getInterfaceSignatures());
+      for (String sig : superSignatures) {
+        IType t = env.findType(Signature.toString(sig));
+        if (t != null) {
+          for (IType s : t.superTypes().withSelf(true).withSuperTypes(true).list()) {
+            for (IType i : s.innerTypes().withRecursiveInnerTypes(true).list()) {
+              m_enclosedTypeNames.add(i.getName());
+              m_enclosedTypeSimpleNames.add(i.getSimpleName());
+            }
+          }
+        }
+      }
+    }
   }
 
   @Override
@@ -58,16 +77,12 @@ public class EnclosingTypeScopedImportValidator extends WrappedImportValidator {
     }
 
     //same qualifier as superclass
-    IType s = m_superType;
-    while (s != null) {
-      if (Objects.equals(s.getName(), cand.getQualifier())) {
-        return cand.getSimpleName();
-      }
-      s = s.getSuperClass();
+    if (m_enclosedTypeNames.contains(cand.getQualifier())) {
+      return cand.getSimpleName();
     }
 
     // check if simpleName (with other qualifier) exists in same enclosing type
-    if (m_enclosedTypeNames.contains(cand.getSimpleName())) {
+    if (m_enclosedTypeSimpleNames.contains(cand.getSimpleName())) {
       //must qualify
       return cand.getQualifiedName();
     }
