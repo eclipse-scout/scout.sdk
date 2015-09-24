@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.sourcebuilder.type;
 
 import java.util.HashSet;
-import java.util.Objects;
 import java.util.Set;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
@@ -19,7 +18,7 @@ import org.eclipse.scout.sdk.core.importvalidator.ImportElementCandidate;
 import org.eclipse.scout.sdk.core.importvalidator.WrappedImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 
 /**
  * Do not instantiate this class directly, it is automatically created in
@@ -28,34 +27,39 @@ import org.eclipse.scout.sdk.core.signature.Signature;
  * ignore imports when the referenced type is a member type of the enclosing type or superclasses of it
  */
 public class EnclosingTypeScopedImportValidator extends WrappedImportValidator {
-  private final String m_enclosingTypeName;
-  private final Set<String> m_enclosedTypeNames = new HashSet<>();
-  private final Set<String> m_enclosedTypeSimpleNames = new HashSet<>();
+  private final String m_enclosingQualifier;
+  //as far as these types exist already!
+  private final Set<String> m_enclosingQualifiers = new HashSet<>();
+  //as far as these types exist already!
+  private final Set<String> m_enclosedSimpleNames = new HashSet<>();
 
   public EnclosingTypeScopedImportValidator(IImportValidator inner, ITypeSourceBuilder enclosingTypeSrc) {
     super(inner);
-    m_enclosingTypeName = enclosingTypeSrc.getElementName();
+    m_enclosingQualifier = enclosingTypeSrc.getFullyQualifiedName();
+    //self
+    m_enclosingQualifiers.add(m_enclosingQualifier);
     //declared inner types
     for (ITypeSourceBuilder typeSrc : enclosingTypeSrc.getTypes()) {
-      m_enclosedTypeNames.add(typeSrc.getFullyQualifiedName());
-      m_enclosedTypeSimpleNames.add(typeSrc.getElementName());
+      m_enclosedSimpleNames.add(typeSrc.getElementName());
     }
-    //super class inner types
+    //super types
     //TODO imo eventually cache all inner types of newly created typesourcebuilders in a dto cache
     IJavaEnvironment env = getJavaEnvironment();
     if (env != null) {
       HashSet<String> superSignatures = new HashSet<>();
+      superSignatures.addAll(enclosingTypeSrc.getInterfaceSignatures());
       if (enclosingTypeSrc.getSuperTypeSignature() != null) {
         superSignatures.add(enclosingTypeSrc.getSuperTypeSignature());
       }
-      superSignatures.addAll(enclosingTypeSrc.getInterfaceSignatures());
       for (String sig : superSignatures) {
-        IType t = env.findType(Signature.toString(sig));
+        String qname = SignatureUtils.toFullyQualifiedName(sig);
+        m_enclosingQualifiers.add(qname);
+        IType t = env.findType(qname);
         if (t != null) {
-          for (IType s : t.superTypes().withSelf(true).withSuperTypes(true).list()) {
-            for (IType i : s.innerTypes().withRecursiveInnerTypes(true).list()) {
-              m_enclosedTypeNames.add(i.getName());
-              m_enclosedTypeSimpleNames.add(i.getSimpleName());
+          for (IType s : t.superTypes().withSuperTypes(true).list()) {
+            m_enclosingQualifiers.add(s.getName());
+            for (IType i : s.innerTypes().list()) {
+              m_enclosedSimpleNames.add(i.getSimpleName());
             }
           }
         }
@@ -65,24 +69,18 @@ public class EnclosingTypeScopedImportValidator extends WrappedImportValidator {
 
   @Override
   public String getQualifier() {
-    String q = super.getQualifier();
-    return (q != null ? q + "." : "") + m_enclosingTypeName;
+    return m_enclosingQualifier;
   }
 
   @Override
   public String checkCurrentScope(ImportElementCandidate cand) {
     //same qualifier
-    if (Objects.equals(getQualifier(), cand.getQualifier())) {
-      return cand.getSimpleName();
-    }
-
-    //same qualifier as superclass
-    if (m_enclosedTypeNames.contains(cand.getQualifier())) {
+    if (m_enclosingQualifiers.contains(cand.getQualifier())) {
       return cand.getSimpleName();
     }
 
     // check if simpleName (with other qualifier) exists in same enclosing type
-    if (m_enclosedTypeSimpleNames.contains(cand.getSimpleName())) {
+    if (m_enclosedSimpleNames.contains(cand.getSimpleName())) {
       //must qualify
       return cand.getQualifiedName();
     }
