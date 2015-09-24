@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnit
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.TypeFilters;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
-import org.eclipse.scout.sdk.s2e.trigger.AbstractTypeChangedOperation;
+import org.eclipse.scout.sdk.s2e.trigger.AbstractDerivedResourceOperation;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
@@ -33,9 +33,9 @@ import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
 /**
  *
  */
-public class DtoTypeUpdateOperation extends AbstractTypeChangedOperation {
+public class DtoDerivedResourceOperation extends AbstractDerivedResourceOperation {
 
-  public DtoTypeUpdateOperation(org.eclipse.jdt.core.IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException {
+  public DtoDerivedResourceOperation(org.eclipse.jdt.core.IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException {
     super(jdtType, envProvider);
   }
 

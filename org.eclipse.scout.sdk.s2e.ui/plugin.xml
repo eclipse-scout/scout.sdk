@@ -99,11 +99,11 @@
    <extension point="org.eclipse.ui.handlers">
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerAllTypeChangedHandlers"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.TriggerAllTypeChangedHandlers">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.TriggerAllDerivedResourceHandlers">
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.TriggerSelectedTypeChangedHandlers">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.TriggerSelectedDerivedResourceHandlers">
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellform"

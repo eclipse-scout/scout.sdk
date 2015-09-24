@@ -38,24 +38,24 @@ import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.trigger.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.trigger.ITypeChangedHandler;
-import org.eclipse.scout.sdk.s2e.trigger.ITypeChangedManager;
-import org.eclipse.scout.sdk.s2e.trigger.ITypeChangedOperation;
+import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
+import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
+import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceOperation;
 
 /**
- * <h3>{@link TypeChangedManager}</h3>
+ * <h3>{@link DerivedResourceManager}</h3>
  *
  * @author Matthias Villiger
  * @author Andreas Hoegger
  * @since 3.10.0 15.08.2013
  */
-public class TypeChangedManager implements ITypeChangedManager {
+public class DerivedResourceManager implements IDerivedResourceManager {
 
   public static final String TYPE_CHANGED_TRIGGER_JOB_FAMILY = "AUTO_UPDATE_JOB_FAMILY";
   public static final String JAVA_DELTA_CHECK_JOB_FAMILY = "JAVA_DELTA_CHECK_JOB_FAMILY";
 
   private final AtomicBoolean m_enabled;
-  private final List<ITypeChangedHandler> m_updateHandlers;
+  private final List<IDerivedResourceHandler> m_updateHandlers;
 
   private P_JavaChangeListener m_javaChangeListener;
 
@@ -65,11 +65,11 @@ public class TypeChangedManager implements ITypeChangedManager {
   private final P_JavaChangeEventCheckJob m_javaDeltaCheckJob;
 
   // queue that buffers all trigger operations that need to be executed
-  private final ArrayBlockingQueue<ITypeChangedOperation> m_triggerOperations;
+  private final ArrayBlockingQueue<IDerivedResourceOperation> m_triggerOperations;
   // job that executes all the buffered trigger operations (visible to the user)
   private final P_RunQueuedTriggerOperationsJob m_runTriggerOperationsJob;
 
-  public TypeChangedManager() {
+  public DerivedResourceManager() {
     m_enabled = new AtomicBoolean(true);
     m_updateHandlers = new ArrayList<>();
 
@@ -93,19 +93,19 @@ public class TypeChangedManager implements ITypeChangedManager {
   }
 
   @Override
-  public void addTypeChangedHandler(ITypeChangedHandler handler) {
+  public void addDerivedResourceHandler(IDerivedResourceHandler handler) {
     m_updateHandlers.add(handler);
   }
 
   @Override
-  public void removeTypeChangedHandler(ITypeChangedHandler handler) {
+  public void removeDerivedResourceHandler(IDerivedResourceHandler handler) {
     m_updateHandlers.remove(handler);
   }
 
   @Override
   public void trigger(IType jdtType) {
     IJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
-    for (ITypeChangedOperation operation : createOperations(jdtType, envProvider)) {
+    for (IDerivedResourceOperation operation : createOperations(jdtType, envProvider)) {
       if (addElementToQueueSecure(m_triggerOperations, operation, operation.getOperationName(), -1, null)) {
         //ok
       }
@@ -120,13 +120,13 @@ public class TypeChangedManager implements ITypeChangedManager {
     new P_RunAllTriggerOperationsJob(this, scope).schedule();
   }
 
-  protected Collection<ITypeChangedOperation> createOperations(IType t, IJavaEnvironmentProvider envProvider) {
-    ArrayList<ITypeChangedOperation> all = null;
-    for (ITypeChangedHandler handler : m_updateHandlers) {
+  protected Collection<IDerivedResourceOperation> createOperations(IType t, IJavaEnvironmentProvider envProvider) {
+    ArrayList<IDerivedResourceOperation> all = null;
+    for (IDerivedResourceHandler handler : m_updateHandlers) {
       try {
-        List<ITypeChangedOperation> ops = handler.createOperations(t, envProvider);
+        List<IDerivedResourceOperation> ops = handler.createOperations(t, envProvider);
         if (ops != null && !ops.isEmpty()) {
-          all = (all != null ? all : new ArrayList<ITypeChangedOperation>());
+          all = (all != null ? all : new ArrayList<IDerivedResourceOperation>());
           all.addAll(ops);
         }
       }
@@ -134,16 +134,16 @@ public class TypeChangedManager implements ITypeChangedManager {
         S2ESdkActivator.logError("Unable to create operation with handler '" + handler.getClass() + "'.", e);
       }
     }
-    return all != null ? all : Collections.<ITypeChangedOperation> emptyList();
+    return all != null ? all : Collections.<IDerivedResourceOperation> emptyList();
   }
 
-  protected Collection<ITypeChangedOperation> createAllOperations(IJavaSearchScope scope, IJavaEnvironmentProvider envProvider) {
-    ArrayList<ITypeChangedOperation> all = null;
-    for (ITypeChangedHandler handler : m_updateHandlers) {
+  protected Collection<IDerivedResourceOperation> createAllOperations(IJavaSearchScope scope, IJavaEnvironmentProvider envProvider) {
+    ArrayList<IDerivedResourceOperation> all = null;
+    for (IDerivedResourceHandler handler : m_updateHandlers) {
       try {
-        List<ITypeChangedOperation> ops = handler.createAllOperations(scope, envProvider);
+        List<IDerivedResourceOperation> ops = handler.createAllOperations(scope, envProvider);
         if (ops != null && !ops.isEmpty()) {
-          all = (all != null ? all : new ArrayList<ITypeChangedOperation>());
+          all = (all != null ? all : new ArrayList<IDerivedResourceOperation>());
           all.addAll(ops);
         }
       }
@@ -151,7 +151,7 @@ public class TypeChangedManager implements ITypeChangedManager {
         S2ESdkActivator.logError("Error while collecting all types from '" + handler.getClass() + "'.", e);
       }
     }
-    return all != null ? all : Collections.<ITypeChangedOperation> emptyList();
+    return all != null ? all : Collections.<IDerivedResourceOperation> emptyList();
   }
 
   @Override
@@ -306,14 +306,14 @@ public class TypeChangedManager implements ITypeChangedManager {
    */
   private static final class P_JavaChangeEventCheckJob extends AbstractJob {
 
-    private final TypeChangedManager m_manager;
+    private final DerivedResourceManager m_manager;
     private final ArrayBlockingQueue<ElementChangedEvent> m_queueToConsume;
-    private final ArrayBlockingQueue<ITypeChangedOperation> m_operationCollector;
+    private final ArrayBlockingQueue<IDerivedResourceOperation> m_operationCollector;
     private final P_RunQueuedTriggerOperationsJob m_runTriggerOperationsJob;
 
-    private P_JavaChangeEventCheckJob(TypeChangedManager manager, ArrayBlockingQueue<ElementChangedEvent> queueToConsume, ArrayBlockingQueue<ITypeChangedOperation> operationCollector,
+    private P_JavaChangeEventCheckJob(DerivedResourceManager manager, ArrayBlockingQueue<ElementChangedEvent> queueToConsume, ArrayBlockingQueue<IDerivedResourceOperation> operationCollector,
         P_RunQueuedTriggerOperationsJob runtriggerOperationsJob) {
-      super("Check if java deltas triggers a " + ITypeChangedHandler.class.getSimpleName());
+      super("Check if java deltas triggers a " + IDerivedResourceHandler.class.getSimpleName());
       setSystem(true);
       setUser(false);
       setPriority(DECORATE);
@@ -383,7 +383,7 @@ public class TypeChangedManager implements ITypeChangedManager {
       for (ICompilationUnit icu : icus) {
         try {
           for (IType t : icu.getTypes()) {
-            for (ITypeChangedOperation operation : m_manager.createOperations(t, envProvider)) {
+            for (IDerivedResourceOperation operation : m_manager.createOperations(t, envProvider)) {
               if (!m_operationCollector.contains(operation)) {
                 if (addElementToQueueSecure(m_operationCollector, operation, operation.getOperationName(), -1, null)) {
                   //ok, continue
@@ -409,10 +409,10 @@ public class TypeChangedManager implements ITypeChangedManager {
    */
   private static final class P_RunQueuedTriggerOperationsJob extends Job {
 
-    private final ArrayBlockingQueue<ITypeChangedOperation> m_queueToConsume;
+    private final ArrayBlockingQueue<IDerivedResourceOperation> m_queueToConsume;
     private boolean m_isAborted;
 
-    private P_RunQueuedTriggerOperationsJob(ArrayBlockingQueue<ITypeChangedOperation> queueToConsume) {
+    private P_RunQueuedTriggerOperationsJob(ArrayBlockingQueue<IDerivedResourceOperation> queueToConsume) {
       super("Auto-updating derived resources");
       setRule(RunTriggerOperationsJobRule.INSTANCE);
       setPriority(Job.DECORATE);
@@ -478,7 +478,7 @@ public class TypeChangedManager implements ITypeChangedManager {
         }
 
         // already remove the operation here. if there is a problem with this operation we don't want to keep trying
-        ITypeChangedOperation operation = m_queueToConsume.poll();
+        IDerivedResourceOperation operation = m_queueToConsume.poll();
         try {
           monitor.setTaskName(operation.getOperationName() + "' [" + i + " of " + numOperations + "]");
           monitor.subTask(operation.getOperationName());
@@ -498,10 +498,10 @@ public class TypeChangedManager implements ITypeChangedManager {
    * Job that executes some trigger operations with normal prio, not enqueued, immediately, cancellable.
    */
   private static final class P_RunAllTriggerOperationsJob extends Job {
-    private TypeChangedManager m_manager;
+    private DerivedResourceManager m_manager;
     private IJavaSearchScope m_scope;
 
-    private P_RunAllTriggerOperationsJob(TypeChangedManager manager, IJavaSearchScope scope) {
+    private P_RunAllTriggerOperationsJob(DerivedResourceManager manager, IJavaSearchScope scope) {
       super("Auto-updating derived resources");
       m_manager = manager;
       m_scope = scope;
@@ -522,14 +522,14 @@ public class TypeChangedManager implements ITypeChangedManager {
 
       monitor.setTaskName("Preparing update handlers...");
       IJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
-      Collection<ITypeChangedOperation> ops = m_manager.createAllOperations(m_scope, envProvider);
+      Collection<IDerivedResourceOperation> ops = m_manager.createAllOperations(m_scope, envProvider);
 
       if (ops.size() < 1) {
         return Status.OK_STATUS;
       }
 
       monitor.beginTask(getName(), ops.size());
-      for (ITypeChangedOperation operation : ops) {
+      for (IDerivedResourceOperation operation : ops) {
         if (monitor.isCanceled()) {
           return Status.CANCEL_STATUS;
         }

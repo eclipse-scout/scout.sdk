@@ -13,8 +13,8 @@ package org.eclipse.scout.sdk.s2e.internal;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Plugin;
 import org.eclipse.scout.sdk.core.util.SdkConsole;
-import org.eclipse.scout.sdk.s2e.internal.dto.DtoTypeChangedHandler;
-import org.eclipse.scout.sdk.s2e.internal.trigger.TypeChangedManager;
+import org.eclipse.scout.sdk.s2e.internal.dto.DtoDerivedResourceHandler;
+import org.eclipse.scout.sdk.s2e.internal.trigger.DerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.log.SdkLogManager;
 import org.osgi.framework.BundleContext;
 
@@ -28,7 +28,7 @@ public class S2ESdkActivator extends Plugin {
   private static S2ESdkActivator plugin;
 
   private SdkLogManager m_logManager;
-  private TypeChangedManager m_typeChangedManager;
+  private DerivedResourceManager m_derivedResourceManager;
 
   @Override
   public void start(BundleContext context) throws Exception {
@@ -41,16 +41,16 @@ public class S2ESdkActivator extends Plugin {
 
     // log manager
     m_logManager = new SdkLogManager(this);
-    m_typeChangedManager = new TypeChangedManager();
+    m_derivedResourceManager = new DerivedResourceManager();
 
     // DTO auto update
-    m_typeChangedManager.addTypeChangedHandler(new DtoTypeChangedHandler());
+    m_derivedResourceManager.addDerivedResourceHandler(new DtoDerivedResourceHandler());
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
-    m_typeChangedManager.dispose();
-    m_typeChangedManager = null;
+    m_derivedResourceManager.dispose();
+    m_derivedResourceManager = null;
 
     m_logManager = null;
 
@@ -127,7 +127,7 @@ public class S2ESdkActivator extends Plugin {
     SdkConsole.println("S2ESdk: STATUS " + status);
   }
 
-  public TypeChangedManager getTypeChangedManager() {
-    return m_typeChangedManager;
+  public DerivedResourceManager getDerivedResourceManager() {
+    return m_derivedResourceManager;
   }
 }

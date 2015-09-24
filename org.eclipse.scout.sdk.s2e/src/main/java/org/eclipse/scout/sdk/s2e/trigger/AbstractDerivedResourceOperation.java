@@ -18,12 +18,12 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 /**
  *
  */
-public abstract class AbstractTypeChangedOperation implements ITypeChangedOperation {
+public abstract class AbstractDerivedResourceOperation implements IDerivedResourceOperation {
   private final IJavaEnvironmentProvider m_envProvider;
   private final org.eclipse.jdt.core.IType m_jdtType;
   private final IType m_modelType;
 
-  protected AbstractTypeChangedOperation(org.eclipse.jdt.core.IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException {
+  protected AbstractDerivedResourceOperation(org.eclipse.jdt.core.IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException {
     m_jdtType = jdtType;
     m_envProvider = envProvider;
     m_modelType = m_envProvider.jdtTypeToScoutType(jdtType);
@@ -75,6 +75,6 @@ public abstract class AbstractTypeChangedOperation implements ITypeChangedOperat
     if (obj == null || obj.getClass() != this.getClass()) {
       return false;
     }
-    return m_modelType.equals(((AbstractTypeChangedOperation) obj).m_modelType);
+    return m_modelType.equals(((AbstractDerivedResourceOperation) obj).m_modelType);
   }
 }

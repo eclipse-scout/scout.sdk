@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.core.model.spi.internal.JavaEnvironmentWithJdt;
 import org.eclipse.scout.sdk.core.model.spi.internal.WorkspaceFileSystem;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.internal.WorkingCopyManager;
-import org.eclipse.scout.sdk.s2e.trigger.ITypeChangedManager;
+import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
 
 /**
@@ -37,12 +37,12 @@ public final class ScoutSdkCore {
   }
 
   /**
-   * Gets the {@link ITypeChangedManager} responsible for automatically update Scout DTOs in the Eclipse IDE.
+   * Gets the {@link IDerivedResourceManager} responsible for automatically update Scout DTOs in the Eclipse IDE.
    *
    * @return
    */
-  public static ITypeChangedManager getTypeChangedManager() {
-    return S2ESdkActivator.getDefault().getTypeChangedManager();
+  public static IDerivedResourceManager getDerivedResourceManager() {
+    return S2ESdkActivator.getDefault().getDerivedResourceManager();
   }
 
   /**

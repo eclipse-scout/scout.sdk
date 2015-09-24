@@ -24,26 +24,26 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.trigger.ITypeChangedHandler;
-import org.eclipse.scout.sdk.s2e.trigger.ITypeChangedOperation;
+import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
+import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceOperation;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
  *
  */
-public class DtoTypeChangedHandler implements ITypeChangedHandler {
+public class DtoDerivedResourceHandler implements IDerivedResourceHandler {
 
   @Override
-  public List<ITypeChangedOperation> createOperations(IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException {
+  public List<IDerivedResourceOperation> createOperations(IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException {
     if (!acceptType(jdtType)) {
       return Collections.emptyList();
     }
-    return Collections.<ITypeChangedOperation> singletonList(new DtoTypeUpdateOperation(jdtType, envProvider));
+    return Collections.<IDerivedResourceOperation> singletonList(new DtoDerivedResourceOperation(jdtType, envProvider));
   }
 
   @Override
-  public List<ITypeChangedOperation> createAllOperations(IJavaSearchScope scope, IJavaEnvironmentProvider envProvider) throws CoreException {
-    ArrayList<ITypeChangedOperation> list = new ArrayList<>();
+  public List<IDerivedResourceOperation> createAllOperations(IJavaSearchScope scope, IJavaEnvironmentProvider envProvider) throws CoreException {
+    ArrayList<IDerivedResourceOperation> list = new ArrayList<>();
     for (IType jdtType : findAllCandidates(scope)) {
       list.addAll(createOperations(jdtType, envProvider));
     }

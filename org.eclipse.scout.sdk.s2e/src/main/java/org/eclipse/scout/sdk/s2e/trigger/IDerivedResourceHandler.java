@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (c) 2013 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,31 +10,25 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.trigger;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IType;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
 
 /**
- * <h3>{@link ITypeChangedOperation}</h3><br>
+ * <h3>{@link IDerivedResourceHandler}</h3>
  *
- * @author imo
- * @since 5.1
+ * @author Andreas Hoegger
+ * @since 3.10.0 16.08.2013
  */
-public interface ITypeChangedOperation {
+public interface IDerivedResourceHandler {
 
-  String getOperationName();
-
-  /**
-   * throw a {@link IllegalArgumentException} if the operation should not be executed and has invalid parameters
-   */
-  void validate();
+  List<IDerivedResourceOperation> createOperations(IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException;
 
   /**
-   * Usually the run method is called of a job implementation.
-   *
-   * @param monitor
-   *          to provide progress information and observe the cancel state.
+   * @param collector
    * @throws CoreException
    */
-  void run(IProgressMonitor monitor) throws CoreException;
-
+  List<IDerivedResourceOperation> createAllOperations(IJavaSearchScope scope, IJavaEnvironmentProvider envProvider) throws CoreException;
 }

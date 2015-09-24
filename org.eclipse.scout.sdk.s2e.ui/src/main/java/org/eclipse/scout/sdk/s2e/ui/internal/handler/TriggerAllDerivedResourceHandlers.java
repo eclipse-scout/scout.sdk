@@ -20,12 +20,12 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * <h3>{@link TriggerAllTypeChangedHandlers}</h3>
+ * <h3>{@link TriggerAllDerivedResourceHandlers}</h3>
  *
  * @author Matthias Villiger
  * @since 5.1.0
  */
-public class TriggerAllTypeChangedHandlers extends AbstractHandler {
+public class TriggerAllDerivedResourceHandlers extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -34,7 +34,7 @@ public class TriggerAllTypeChangedHandlers extends AbstractHandler {
     messageBox.setText("Do you really want to update all @Generated classes?");
     int answer = messageBox.open();
     if (answer == SWT.YES) {
-      ScoutSdkCore.getTypeChangedManager().triggerAll(SearchEngine.createWorkspaceScope());
+      ScoutSdkCore.getDerivedResourceManager().triggerAll(SearchEngine.createWorkspaceScope());
     }
     return null;
   }

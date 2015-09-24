@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFact
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
 import org.eclipse.scout.sdk.s2e.log.SdkLogManager;
-import org.eclipse.scout.sdk.s2e.trigger.ITypeChangedManager;
+import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.ui.internal.util.JdtSettingsCommentSourceBuilderDelegate;
 import org.eclipse.scout.sdk.s2e.ui.internal.util.OrganizeImportService;
 import org.eclipse.scout.sdk.s2e.util.IOrganizeImportService;
@@ -74,8 +74,8 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     getPreferenceStore().addPropertyChangeListener(m_preferencesPropertyListener);
 
     // start DTO auto-update manager if required
-    getPreferenceStore().setDefault(ITypeChangedManager.PROP_AUTO_UPDATE, true);
-    ScoutSdkCore.getTypeChangedManager().setEnabled(getPreferenceStore().getBoolean(ITypeChangedManager.PROP_AUTO_UPDATE));
+    getPreferenceStore().setDefault(IDerivedResourceManager.PROP_AUTO_UPDATE, true);
+    ScoutSdkCore.getDerivedResourceManager().setEnabled(getPreferenceStore().getBoolean(IDerivedResourceManager.PROP_AUTO_UPDATE));
 
     // start class id validation
     ClassIdValidationJob.install();
@@ -257,7 +257,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     protected IStatus run(IProgressMonitor monitor) {
       Job[] triggerJobs = null;
       while (!monitor.isCanceled()) {
-        triggerJobs = getJobManager().find(org.eclipse.scout.sdk.s2e.internal.trigger.TypeChangedManager.TYPE_CHANGED_TRIGGER_JOB_FAMILY);
+        triggerJobs = getJobManager().find(org.eclipse.scout.sdk.s2e.internal.trigger.DerivedResourceManager.TYPE_CHANGED_TRIGGER_JOB_FAMILY);
         if (triggerJobs.length < 1) {
           // no job is running -> finish
           return Status.OK_STATUS;
@@ -288,9 +288,9 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
         return;
       }
 
-      if (ITypeChangedManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
+      if (IDerivedResourceManager.PROP_AUTO_UPDATE.equals(event.getProperty())) {
         boolean autoUpdate = Boolean.parseBoolean(newValue.toString());
-        ScoutSdkCore.getTypeChangedManager().setEnabled(autoUpdate);
+        ScoutSdkCore.getDerivedResourceManager().setEnabled(autoUpdate);
       }
     }
   }

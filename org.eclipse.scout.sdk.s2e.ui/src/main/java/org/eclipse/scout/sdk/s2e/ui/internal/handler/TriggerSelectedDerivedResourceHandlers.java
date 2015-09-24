@@ -31,14 +31,14 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * <h3>{@link TriggerSelectedTypeChangedHandlers}</h3>
+ * <h3>{@link TriggerSelectedDerivedResourceHandlers}</h3>
  * <p>
  * Only trigger in the selected workspace projects
  *
  * @author Matthias Villiger
  * @since 5.1.0
  */
-public class TriggerSelectedTypeChangedHandlers extends AbstractHandler {
+public class TriggerSelectedDerivedResourceHandlers extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
@@ -47,7 +47,7 @@ public class TriggerSelectedTypeChangedHandlers extends AbstractHandler {
     messageBox.setText("Do you really want to update all @Generated classes?");
     int answer = messageBox.open();
     if (answer == SWT.YES) {
-      ScoutSdkCore.getTypeChangedManager().triggerAll(createJavaSeachScope(event));
+      ScoutSdkCore.getDerivedResourceManager().triggerAll(createJavaSeachScope(event));
     }
     return null;
   }

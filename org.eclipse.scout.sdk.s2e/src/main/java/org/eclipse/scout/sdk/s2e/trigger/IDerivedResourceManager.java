@@ -14,13 +14,14 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 
 /**
- * <h3>{@link ITypeChangedManager}</h3> Manages the lifecycle of the Scout DTO auto update feature. <br>
+ * <h3>{@link IDerivedResourceManager}</h3> Manages the lifecycle of any resources that are to be generated based on an
+ * existing resource.<br>
  *
  * @author Andreas Hoegger
  * @since 3.10.0 21.08.2013
  * @noinstantiate This class is not intended to be instantiated by clients.
  */
-public interface ITypeChangedManager {
+public interface IDerivedResourceManager {
   String PROP_AUTO_UPDATE = "org.eclipse.scout.sdk.propAutoUpdate";
 
   /**
@@ -45,21 +46,21 @@ public interface ITypeChangedManager {
   void setEnabled(boolean enabled);
 
   /**
-   * Adds an update handler to resolve the necessary operations for a compilation unit candidate.
+   * Adds a handler to resolve the necessary operations for a compilation unit candidate.
    *
    * @param handler
    */
-  void addTypeChangedHandler(ITypeChangedHandler handler);
+  void addDerivedResourceHandler(IDerivedResourceHandler handler);
 
   /**
-   * Removes an update handler
+   * Removes a handler
    *
    * @param handler
    */
-  void removeTypeChangedHandler(ITypeChangedHandler handler);
+  void removeDerivedResourceHandler(IDerivedResourceHandler handler);
 
   /**
-   * Trigger a change on a observed type
+   * Trigger a change on an observed type
    */
   void trigger(IType jdtType);
 

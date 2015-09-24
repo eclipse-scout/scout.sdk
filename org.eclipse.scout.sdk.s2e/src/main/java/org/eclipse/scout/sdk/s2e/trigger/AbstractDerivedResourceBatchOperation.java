@@ -19,11 +19,11 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 /**
  *
  */
-public abstract class AbstractTypeChangedBatchOperation implements ITypeChangedOperation {
+public abstract class AbstractDerivedResourceBatchOperation implements IDerivedResourceOperation {
   private final IJavaEnvironmentProvider m_envProvider;
   private final Collection<org.eclipse.jdt.core.IType> m_jdtTypes;
 
-  protected AbstractTypeChangedBatchOperation(Collection<org.eclipse.jdt.core.IType> jdtTypes, IJavaEnvironmentProvider envProvider) {
+  protected AbstractDerivedResourceBatchOperation(Collection<org.eclipse.jdt.core.IType> jdtTypes, IJavaEnvironmentProvider envProvider) {
     m_jdtTypes = jdtTypes;
     m_envProvider = envProvider;
   }

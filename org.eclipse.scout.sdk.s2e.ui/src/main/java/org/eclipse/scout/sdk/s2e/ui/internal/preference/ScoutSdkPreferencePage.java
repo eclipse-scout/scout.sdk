@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.s2e.ui.internal.preference;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.scout.sdk.s2e.trigger.ITypeChangedManager;
+import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -29,7 +29,7 @@ public class ScoutSdkPreferencePage extends FieldEditorPreferencePage implements
 
   @Override
   public void createFieldEditors() {
-    m_updateFormDataAutomaticallyField = new BooleanFieldEditor(ITypeChangedManager.PROP_AUTO_UPDATE, "Automatically update generated classes", getFieldEditorParent());
+    m_updateFormDataAutomaticallyField = new BooleanFieldEditor(IDerivedResourceManager.PROP_AUTO_UPDATE, "Automatically update generated classes", getFieldEditorParent());
     addField(m_updateFormDataAutomaticallyField);
   }
 
