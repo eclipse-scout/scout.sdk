@@ -117,8 +117,7 @@ public class TypeChangedManager implements ITypeChangedManager {
 
   @Override
   public void triggerAll(IJavaSearchScope scope) {
-    IJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
-    new P_RunTriggerOperationsJob(createAllOperations(scope, envProvider)).schedule();
+    new P_RunAllTriggerOperationsJob(this, scope).schedule();
   }
 
   protected Collection<ITypeChangedOperation> createOperations(IType t, IJavaEnvironmentProvider envProvider) {
@@ -498,13 +497,14 @@ public class TypeChangedManager implements ITypeChangedManager {
   /**
    * Job that executes some trigger operations with normal prio, not enqueued, immediately, cancellable.
    */
-  private static final class P_RunTriggerOperationsJob extends Job {
+  private static final class P_RunAllTriggerOperationsJob extends Job {
+    private TypeChangedManager m_manager;
+    private IJavaSearchScope m_scope;
 
-    private final Collection<ITypeChangedOperation> m_ops;
-
-    private P_RunTriggerOperationsJob(Collection<ITypeChangedOperation> ops) {
+    private P_RunAllTriggerOperationsJob(TypeChangedManager manager, IJavaSearchScope scope) {
       super("Auto-updating derived resources");
-      m_ops = ops;
+      m_manager = manager;
+      m_scope = scope;
       setUser(true);
       setRule(RunTriggerOperationsJobRule.INSTANCE);
     }
@@ -520,18 +520,22 @@ public class TypeChangedManager implements ITypeChangedManager {
         return Status.CANCEL_STATUS;
       }
 
-      if (m_ops.size() < 1) {
+      monitor.setTaskName("Preparing update handlers...");
+      IJavaEnvironmentProvider envProvider = new CachingJavaEnvironmentProvider();
+      Collection<ITypeChangedOperation> ops = m_manager.createAllOperations(m_scope, envProvider);
+
+      if (ops.size() < 1) {
         return Status.OK_STATUS;
       }
 
-      monitor.beginTask(getName(), m_ops.size());
-      for (ITypeChangedOperation operation : m_ops) {
+      monitor.beginTask(getName(), ops.size());
+      for (ITypeChangedOperation operation : ops) {
         if (monitor.isCanceled()) {
           return Status.CANCEL_STATUS;
         }
         try {
           monitor.setTaskName(operation.getOperationName());
-          monitor.subTask(operation.getOperationName());
+          monitor.subTask("");
           operation.validate();
           operation.run(monitor);
         }
