@@ -11,9 +11,12 @@
 package org.eclipse.scout.sdk.core.util;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.Reader;
 import java.io.Writer;
 import java.math.BigDecimal;
@@ -115,7 +118,7 @@ public final class CoreUtils {
   /**
    * Deletes the given file or folder.<br>
    * In case the given {@link File} is a folder the contents of the folder are deleted recursively.
-   * 
+   *
    * @param dirToDelete
    *          The file or folder to delete.
    * @throws IOException
@@ -195,6 +198,20 @@ public final class CoreUtils {
       out.append(buffer, 0, length);
     }
     return out;
+  }
+
+  public static File writeTempFile(String prefix, String suffix, String content) throws IOException {
+    File f = File.createTempFile(prefix, suffix);
+    try (OutputStreamWriter out = new OutputStreamWriter(new FileOutputStream(f), "UTF-8")) {
+      out.write(content);
+    }
+    return f;
+  }
+
+  public static String readTempFile(File f) throws IOException {
+    try (FileInputStream in = new FileInputStream(f)) {
+      return inputStreamToString(in, "UTF-8").toString();
+    }
   }
 
   /**

@@ -10,7 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.internal.dto;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -23,9 +22,9 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
-import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceOperation;
+import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
@@ -43,11 +42,7 @@ public class DtoDerivedResourceHandler implements IDerivedResourceHandler {
 
   @Override
   public List<IDerivedResourceOperation> createAllOperations(IJavaSearchScope scope, IJavaEnvironmentProvider envProvider) throws CoreException {
-    ArrayList<IDerivedResourceOperation> list = new ArrayList<>();
-    for (IType jdtType : findAllCandidates(scope)) {
-      list.addAll(createOperations(jdtType, envProvider));
-    }
-    return list;
+    return Collections.<IDerivedResourceOperation> singletonList(new DtoDerivedResourceBatchOperation(findAllCandidates(scope), envProvider));
   }
 
   protected Collection<IType> findAllCandidates(IJavaSearchScope scope) throws JavaModelException, CoreException {

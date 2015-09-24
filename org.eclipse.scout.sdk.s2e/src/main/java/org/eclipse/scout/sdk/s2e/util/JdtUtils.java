@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.util;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -54,6 +56,7 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
@@ -557,6 +560,24 @@ public final class JdtUtils {
     PropertyMap context = new PropertyMap();
     context.setProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, p);
     return context;
+  }
+
+  public static File writeTempFile(String prefix, String suffix, String content) throws CoreException {
+    try {
+      return CoreUtils.writeTempFile(prefix, suffix, content);
+    }
+    catch (IOException e) {
+      throw new CoreException(new ScoutStatus("writeTempFile " + prefix + "..." + suffix, e));
+    }
+  }
+
+  public static String readTempFile(File f) throws CoreException {
+    try {
+      return CoreUtils.readTempFile(f);
+    }
+    catch (IOException e) {
+      throw new CoreException(new ScoutStatus("readTempFile " + f.getPath(), e));
+    }
   }
 
   /**
