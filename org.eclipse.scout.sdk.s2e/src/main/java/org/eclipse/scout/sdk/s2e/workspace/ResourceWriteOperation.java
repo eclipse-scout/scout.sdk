@@ -72,6 +72,7 @@ public class ResourceWriteOperation implements IWorkspaceBlockingOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Validate.notNull(workingCopyManager);
+    monitor.subTask("write " + m_file.getProjectRelativePath());
     String newSource = m_content;
 
     // compare

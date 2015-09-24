@@ -107,6 +107,8 @@ public class CompilationUnitWriteOperation implements IWorkspaceBlockingOperatio
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     Validate.notNull(workingCopyManager);
+    monitor.subTask("write " + m_cu.getPath());
+
     // format source
     SourceFormatOperation op = new SourceFormatOperation(m_cu.getJavaProject(), new Document(JdtUtils.readTempFile(m_tmpFile)), null);
     op.validate();

@@ -46,7 +46,7 @@ public class DtoDerivedResourceBatchOperation extends AbstractDerivedResourceBat
         return;
       }
       try {
-        monitor.subTask(jdtType.getFullyQualifiedName());
+        monitor.subTask("process " + jdtType.getFullyQualifiedName());
         IType modelType = envProvider.jdtTypeToScoutType(jdtType);
         CompilationUnitWriteOperation op = DtoS2eUtils.newDtoOp(jdtType, modelType, getJavaEnvironmentProvider(), monitor);
         if (op != null) {
@@ -58,6 +58,7 @@ public class DtoDerivedResourceBatchOperation extends AbstractDerivedResourceBat
       }
     }
 
+    monitor.subTask("write new content");
     JdtUtils.writeTypes(allOps, monitor);
   }
 

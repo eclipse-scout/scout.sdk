@@ -44,9 +44,9 @@ public final class DtoS2eUtils {
       IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, a1, sharedEnv);
 
-      IJavaProject p = jdtType.getJavaProject();
+      IJavaProject p = derivedJdtType.getJavaProject();
       String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(p), JdtUtils.propertyMap(p));
-      return new CompilationUnitWriteOperation(jdtType, newSource);
+      return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 
     //PageData
@@ -60,9 +60,9 @@ public final class DtoS2eUtils {
       IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createPageDataBuilder(modelType, a2, sharedEnv);
 
-      IJavaProject p = jdtType.getJavaProject();
+      IJavaProject p = derivedJdtType.getJavaProject();
       String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(p), JdtUtils.propertyMap(p));
-      return new CompilationUnitWriteOperation(jdtType, newSource);
+      return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 
     //RowData
@@ -76,9 +76,9 @@ public final class DtoS2eUtils {
       IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createTableRowDataBuilder(modelType, a3, sharedEnv);
 
-      IJavaProject p = jdtType.getJavaProject();
+      IJavaProject p = derivedJdtType.getJavaProject();
       String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(p), JdtUtils.propertyMap(p));
-      return new CompilationUnitWriteOperation(jdtType, newSource);
+      return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 
     return null;
