@@ -111,6 +111,7 @@ public class CompilationUnitWriteOperation implements IWorkspaceBlockingOperatio
 
     // format source
     SourceFormatOperation op = new SourceFormatOperation(m_cu.getJavaProject(), new Document(JdtUtils.readTempFile(m_tmpFile)), null);
+    m_tmpFile.delete();
     op.validate();
     op.run(monitor, null);
     String newSource = op.getDocument().get();
