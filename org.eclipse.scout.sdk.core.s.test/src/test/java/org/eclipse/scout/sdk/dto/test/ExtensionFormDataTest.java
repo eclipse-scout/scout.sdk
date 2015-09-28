@@ -10,9 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.dto.test;
 
+import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
 import org.eclipse.scout.sdk.dto.test.util.CoreScoutTestingUtils;
 import org.junit.Assert;
@@ -51,6 +53,57 @@ public class ExtensionFormDataTest {
     String extensionName = "ThirdIntegerColumn";
     IType dto = CoreScoutTestingUtils.createRowDataAssertNoCompileErrors("formdata.client.extensions." + extensionName);
     testApiOfThirdIntegerColumnData(dto);
+  }
+
+  @Test
+  public void testSimpleTableFormExtension() {
+    String extensionName = "SimpleTableFormExtension";
+    IType dto = CoreScoutTestingUtils.createRowDataAssertNoCompileErrors("formdata.client.extensions." + extensionName);
+    testApiOfSimpleTableFormExtensionData(dto);
+
+    // verify the value of the @Extends annotation
+    IAnnotation annotation = dto.annotations().withName(IScoutRuntimeTypes.Extends).first();
+    IType originalRowData = annotation.value("value").metaValue().get(IType.class);
+    Assert.assertEquals("formdata.shared.services.process.SimpleTableFormData$TestTable$TestTableRowData", originalRowData.name());
+  }
+
+  /**
+   * @Generated with org.eclipse.scout.sdk.core.testing.ApiTestGenerator
+   */
+  private static void testApiOfSimpleTableFormExtensionData(IType simpleTableFormExtensionData) {
+    SdkAssert.assertHasFlags(simpleTableFormExtensionData, 1);
+    SdkAssert.assertHasSuperIntefaceSignatures(simpleTableFormExtensionData, new String[]{"Ljava.io.Serializable;"});
+    Assert.assertEquals("annotation count", 2, simpleTableFormExtensionData.annotations().list().size());
+    SdkAssert.assertAnnotation(simpleTableFormExtensionData, "org.eclipse.scout.commons.annotations.Extends");
+    SdkAssert.assertAnnotation(simpleTableFormExtensionData, "javax.annotation.Generated");
+
+    // fields of SimpleTableFormExtensionData
+    Assert.assertEquals("field count of 'formdata.shared.extension.SimpleTableFormExtensionData'", 3, simpleTableFormExtensionData.fields().list().size());
+    IField serialVersionUID = SdkAssert.assertFieldExist(simpleTableFormExtensionData, "serialVersionUID");
+    SdkAssert.assertHasFlags(serialVersionUID, 26);
+    SdkAssert.assertFieldSignature(serialVersionUID, "J");
+    Assert.assertEquals("annotation count", 0, serialVersionUID.annotations().list().size());
+    IField myExtension = SdkAssert.assertFieldExist(simpleTableFormExtensionData, "myExtension");
+    SdkAssert.assertHasFlags(myExtension, 25);
+    SdkAssert.assertFieldSignature(myExtension, "Ljava.lang.String;");
+    Assert.assertEquals("annotation count", 0, myExtension.annotations().list().size());
+    IField m_myExtension = SdkAssert.assertFieldExist(simpleTableFormExtensionData, "m_myExtension");
+    SdkAssert.assertHasFlags(m_myExtension, 2);
+    SdkAssert.assertFieldSignature(m_myExtension, "Ljava.math.BigDecimal;");
+    Assert.assertEquals("annotation count", 0, m_myExtension.annotations().list().size());
+
+    Assert.assertEquals("method count of 'formdata.shared.extension.SimpleTableFormExtensionData'", 3, simpleTableFormExtensionData.methods().list().size());
+    IMethod simpleTableFormExtensionData1 = SdkAssert.assertMethodExist(simpleTableFormExtensionData, "SimpleTableFormExtensionData", new String[]{});
+    Assert.assertTrue(simpleTableFormExtensionData1.isConstructor());
+    Assert.assertEquals("annotation count", 0, simpleTableFormExtensionData1.annotations().list().size());
+    IMethod getMyExtension = SdkAssert.assertMethodExist(simpleTableFormExtensionData, "getMyExtension", new String[]{});
+    SdkAssert.assertMethodReturnTypeSignature(getMyExtension, "Ljava.math.BigDecimal;");
+    Assert.assertEquals("annotation count", 0, getMyExtension.annotations().list().size());
+    IMethod setMyExtension = SdkAssert.assertMethodExist(simpleTableFormExtensionData, "setMyExtension", new String[]{"Ljava.math.BigDecimal;"});
+    SdkAssert.assertMethodReturnTypeSignature(setMyExtension, "V");
+    Assert.assertEquals("annotation count", 0, setMyExtension.annotations().list().size());
+
+    Assert.assertEquals("inner types count of 'SimpleTableFormExtensionData'", 0, simpleTableFormExtensionData.innerTypes().list().size());
   }
 
   private static void testApiOfMultiColumnExtensionData(IType multiColumnExtensionData) {

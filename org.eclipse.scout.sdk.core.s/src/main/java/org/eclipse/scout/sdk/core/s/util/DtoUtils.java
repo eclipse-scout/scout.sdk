@@ -596,19 +596,20 @@ public final class DtoUtils {
         IType primaryType = CoreUtils.getPrimaryType(extendedType);
         IType extendedDto = null;
         if (primaryType.isInstanceOf(IScoutRuntimeTypes.IForm) || primaryType.isInstanceOf(IScoutRuntimeTypes.IFormField)) {
-          extendedDto = findDtoForForm(primaryType);
+          if (extendedType.isInstanceOf(IScoutRuntimeTypes.ITable) && extendedType.declaringType() != null) {
+            IType tableFieldDto = getFormDataType(extendedType.declaringType());
+            extendedDto = getRowDataFor(tableFieldDto);
+          }
+          else {
+            extendedDto = findDtoForForm(primaryType);
+          }
         }
         else if (primaryType.isInstanceOf(IScoutRuntimeTypes.IExtension)) {
           extendedDto = findDtoForPage(primaryType);
         }
         else if (primaryType.isInstanceOf(IScoutRuntimeTypes.IPageWithTable)) {
           IType pageDto = findDtoForPage(primaryType);
-
-          List<IType> rowDataInPageDto = pageDto.innerTypes().withInstanceOf(IScoutRuntimeTypes.AbstractTableRowData).list();
-          extendedDto = null;
-          if (rowDataInPageDto != null && !rowDataInPageDto.isEmpty()) {
-            extendedDto = rowDataInPageDto.get(0);
-          }
+          extendedDto = pageDto.innerTypes().withInstanceOf(IScoutRuntimeTypes.AbstractTableRowData).first();
         }
 
         if (extendedDto != null) {
@@ -620,6 +621,14 @@ public final class DtoUtils {
       }
     }
     return null;
+  }
+
+  private static IType getRowDataFor(IType tableDto) {
+    if (tableDto == null) {
+      return null;
+    }
+
+    return tableDto.innerTypes().withInstanceOf(IScoutRuntimeTypes.AbstractTableRowData).first();
   }
 
   private static IType findExtendsAnnotationValue(IType element) {
