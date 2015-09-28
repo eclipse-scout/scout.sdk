@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
  * @author Ivan Motsch
  * @since 4.1.0 09.11.2014
  */
-public interface TypeParameterSpi extends AnnotatableSpi {
+public interface TypeParameterSpi extends JavaElementSpi {
 
   /**
    * Gets all bounds of this {@link TypeParameterSpi}. The first bound will be the class parameter (if existing)

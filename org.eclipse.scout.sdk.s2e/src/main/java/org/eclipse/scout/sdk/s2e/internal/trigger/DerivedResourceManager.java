@@ -34,13 +34,13 @@ import org.eclipse.jdt.core.IJavaElementDelta;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.trigger.CachingJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceOperation;
+import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 
 /**
  * <h3>{@link DerivedResourceManager}</h3>
@@ -131,7 +131,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         }
       }
       catch (Throwable e) {
-        S2ESdkActivator.logError("Unable to create operation with handler '" + handler.getClass() + "'.", e);
+        SdkLog.error("Unable to create operation with handler '" + handler.getClass() + "'.", e);
       }
     }
     return all != null ? all : Collections.<IDerivedResourceOperation> emptyList();
@@ -148,7 +148,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
         }
       }
       catch (Throwable e) {
-        S2ESdkActivator.logError("Error while collecting all types from '" + handler.getClass() + "'.", e);
+        SdkLog.error("Error while collecting all types from '" + handler.getClass() + "'.", e);
       }
     }
     return all != null ? all : Collections.<IDerivedResourceOperation> emptyList();
@@ -232,7 +232,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       }
     }
     while (interrupted);
-    S2ESdkActivator.logWarning("Too many thread interrupts while waiting for space in the scout trigger queue. Skipping '" + name + "'.");
+    SdkLog.warning("Too many thread interrupts while waiting for space in the scout trigger queue. Skipping '" + name + "'.");
     return false; // we had too many interrupts. we don't want to wait any longer (no endless looping).
   }
 
@@ -396,7 +396,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           }
         }
         catch (Exception e) {
-          S2ESdkActivator.logError("Unable to handle event for compilation unit '" + icu.getElementName() + "'.", e);
+          SdkLog.error("Unable to handle event for compilation unit '" + icu.getElementName() + "'.", e);
           return false;
         }
       }
@@ -486,7 +486,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           operation.run(monitor);
         }
         catch (Throwable e) {
-          S2ESdkActivator.logError("Error while '" + operation.getOperationName() + "'.", e);
+          SdkLog.error("Error while '" + operation.getOperationName() + "'.", e);
         }
         monitor.worked(1);
       }
@@ -540,7 +540,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           operation.run(monitor);
         }
         catch (Throwable e) {
-          S2ESdkActivator.logError("Error while '" + operation.getOperationName() + "'.", e);
+          SdkLog.error("Error while '" + operation.getOperationName() + "'.", e);
         }
         monitor.worked(1);
       }

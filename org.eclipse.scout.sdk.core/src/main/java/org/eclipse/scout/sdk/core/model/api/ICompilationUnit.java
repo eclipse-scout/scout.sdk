@@ -37,21 +37,13 @@ public interface ICompilationUnit extends IJavaElement {
    * @return The {@link IPackage} of this {@link ICompilationUnit} or {@link IPackage#DEFAULT_PACKAGE} for the default
    *         package.
    */
-  IPackage getPackage();
+  IPackage containingPackage();
 
   /**
    * Gets a {@link Map} that contains all imports. The {@link Map} iterates over the imports in the order as they appear
    * in the source.
    */
-  List<IImport> getImports();
-
-  /**
-   * Gets all {@link IType}s that are defined in this {@link ICompilationUnit} in the order as they are defined in the
-   * java source file.
-   *
-   * @return A {@link List} with all {@link IType}s of this {@link ICompilationUnit}.
-   */
-  List<IType> getTypes();
+  List<IImport> imports();
 
   /**
    * Gets the main {@link IType} of this {@link ICompilationUnit}. This is the {@link IType} whose name matches the name
@@ -59,7 +51,7 @@ public interface ICompilationUnit extends IJavaElement {
    *
    * @return The main {@link IType} or <code>null</code> if no main type is defined in this {@link ICompilationUnit}.
    */
-  IType getMainType();
+  IType mainType();
 
   /**
    * Resolves the given simple type name in the context of this {@link ICompilationUnit} to an {@link IType}.
@@ -69,14 +61,12 @@ public interface ICompilationUnit extends IJavaElement {
    * @return The {@link IType} with given simpleName as it is referenced by this {@link ICompilationUnit} or
    *         <code>null</code> if no such simpleName is referenced by this {@link ICompilationUnit}.
    */
-  IType findTypeBySimpleName(String simpleName);
+  IType resolveTypeBySimpleName(String simpleName);
 
-  ISourceRange getJavaDoc();
+  ISourceRange javaDoc();
 
   @Override
   CompilationUnitSpi unwrap();
-
-  //additional convenience methods
 
   TypeQuery types();
 }

@@ -25,17 +25,17 @@ public abstract class AbstractMemberImplementor<SPI extends MemberSpi> extends A
   }
 
   @Override
-  public IType getDeclaringType() {
-    return WrapperUtils.wrapType(m_spi.getDeclaringType());
+  public IType declaringType() {
+    return JavaEnvironmentImplementor.wrapType(m_spi.getDeclaringType());
   }
 
   @Override
-  public int getFlags() {
+  public int flags() {
     return m_spi.getFlags();
   }
 
   @Override
-  public List<ITypeParameter> getTypeParameters() {
+  public List<ITypeParameter> typeParameters() {
     return new WrappedList<>(m_spi.getTypeParameters());
   }
 
@@ -45,7 +45,7 @@ public abstract class AbstractMemberImplementor<SPI extends MemberSpi> extends A
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public ISourceRange javaDoc() {
     return m_spi.getJavaDoc();
   }
 

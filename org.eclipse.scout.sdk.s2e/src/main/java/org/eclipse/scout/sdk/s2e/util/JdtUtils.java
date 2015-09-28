@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.util;
 
-import java.io.File;
-import java.io.IOException;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.nio.charset.Charset;
@@ -26,6 +24,7 @@ import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -40,6 +39,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.IType;
@@ -56,19 +56,23 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
-import org.eclipse.scout.sdk.s2e.job.WorkspaceBlockingOperationJob;
+import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
 import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
 import org.eclipse.scout.sdk.s2e.workspace.ResourceWriteOperation;
 
 /**
+ * <h3>{@link JdtUtils}</h3>
+ * <p>
+ * Contains utility methods for JDT objects.
  *
+ * @author Matthias Villiger
+ * @since 5.1.0
  */
 public final class JdtUtils {
   private static final Comparator<IType> COMPARATOR = new P_TypeMatchComparator();
@@ -86,6 +90,20 @@ public final class JdtUtils {
    */
   public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType) throws CoreException {
     return jdtTypeToScoutType(jdtType, ScoutSdkCore.createJavaEnvironment(jdtType.getJavaProject()));
+  }
+
+  /**
+   * Gets the {@link IPackageFragmentRoot} of the given {@link IJavaElement}.
+   *
+   * @param e
+   *          The {@link IJavaElement} for which the source folder should be returned.
+   * @return The {@link IPackageFragmentRoot} of the given element.
+   */
+  public static IPackageFragmentRoot getSourceFolder(IJavaElement e) {
+    if (e == null) {
+      return null;
+    }
+    return (IPackageFragmentRoot) e.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
   }
 
   /**
@@ -170,7 +188,7 @@ public final class JdtUtils {
   public static Set<org.eclipse.jdt.core.IType> resolveJdtTypes(final String fqn) throws CoreException {
     //speed tuning, only search for last component of pattern, remaining checks are done in accept
     String fastPat = Signature.getSimpleName(fqn);
-    final TreeSet<IType> matchList = new TreeSet<>(COMPARATOR);
+    final Set<IType> matchList = new TreeSet<>(COMPARATOR);
     new SearchEngine().search(SearchPattern.createPattern(fastPat, IJavaSearchConstants.TYPE, IJavaSearchConstants.DECLARATIONS, SearchPattern.R_EXACT_MATCH), new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
         SearchEngine.createWorkspaceScope(), new SearchRequestor() {
           @Override
@@ -314,7 +332,7 @@ public final class JdtUtils {
       }
     }
     catch (Exception e) {
-      S2ESdkActivator.logWarning("Could not get source of annotation '" + name + "' in element '" + element.toString() + "'.", e);
+      SdkLog.warning("Could not get source of annotation '" + name + "' in element '" + element.toString() + "'.", e);
     }
 
     if (annotSource == null || annotSource.startsWith(startSimple) || annotSource.startsWith(startFq)) {
@@ -349,7 +367,7 @@ public final class JdtUtils {
       }
     }
     catch (JavaModelException e) {
-      S2ESdkActivator.logWarning("Unable to find source for annotation '" + annotation.getElementName() + "' in '" + member.getElementName() + "'.", e);
+      SdkLog.warning("Unable to find source for annotation '" + annotation.getElementName() + "' in '" + member.getElementName() + "'.", e);
     }
     return null;
   }
@@ -520,15 +538,10 @@ public final class JdtUtils {
     return JavaCore.newTypeHierarchy(region, null, null);
   }
 
-  private static void addBinaryInnerTypesToRegionRec(IType declaringType, IRegion region) {
-    try {
-      for (IType child : declaringType.getTypes()) {
-        region.add(child);
-        addBinaryInnerTypesToRegionRec(child, region);
-      }
-    }
-    catch (JavaModelException e) {
-      S2ESdkActivator.logError("Unable to get inner types of type '" + declaringType.getFullyQualifiedName() + "'.", e);
+  private static void addBinaryInnerTypesToRegionRec(IType declaringType, IRegion region) throws JavaModelException {
+    for (IType child : declaringType.getTypes()) {
+      region.add(child);
+      addBinaryInnerTypesToRegionRec(child, region);
     }
   }
 
@@ -562,64 +575,68 @@ public final class JdtUtils {
     return context;
   }
 
-  public static File writeTempFile(String prefix, String suffix, String content) throws CoreException {
-    try {
-      return CoreUtils.writeTempFile(prefix, suffix, content);
+  public static List<IType> writeTypesWithResult(List<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+    writeTypes(ops, monitor);
+
+    List<IType> result = new ArrayList<>(ops.size());
+    for (CompilationUnitWriteOperation op : ops) {
+      if (op == null) {
+        result.add(null);
+        continue;
+      }
+      result.add(op.getCompilationUnit().getTypes()[0]);
     }
-    catch (IOException e) {
-      throw new CoreException(new ScoutStatus("writeTempFile " + prefix + "..." + suffix, e));
-    }
+    return result;
   }
 
-  public static String readTempFile(File f) throws CoreException {
-    try {
-      return CoreUtils.readTempFile(f);
+  public static void writeTypes(List<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+    if (ops == null || ops.isEmpty()) {
+      return;
     }
-    catch (IOException e) {
-      throw new CoreException(new ScoutStatus("readTempFile " + f.getPath(), e));
-    }
-  }
 
-  /**
-   * @param ops
-   * @param monitor
-   * @return the main types of the modified compilation units
-   * @throws CoreException
-   */
-  public static List<IType> writeTypes(List<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
-    WorkspaceBlockingOperationJob job = new WorkspaceBlockingOperationJob(ops);
+    IResource[] lockedResources = new IResource[ops.size()];
+    for (int i = 0; i < ops.size(); i++) {
+      lockedResources[i] = ops.get(i).getCompilationUnit().getResource();
+    }
+
+    ResourceBlockingOperationJob job = new ResourceBlockingOperationJob(ops, lockedResources);
     job.schedule();
     try {
       job.join(0L, monitor);
-      ArrayList<IType> result = new ArrayList<>(ops.size());
-      for (CompilationUnitWriteOperation op : ops) {
-        if (op == null) {
-          result.add(null);
-          continue;
-        }
-        result.add(op.getCompilationUnit().getTypes()[0]);
-      }
-      return result;
     }
     catch (OperationCanceledException | InterruptedException e) {
-      throw new CoreException(new ScoutStatus(e));
+      throw new CoreException(new ScoutStatus("Unable to wait until compilation units have been written.", e));
     }
   }
 
-  public static List<IFile> writeResources(List<ResourceWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
-    WorkspaceBlockingOperationJob job = new WorkspaceBlockingOperationJob(ops);
+  public static List<IFile> writeResourcesWithResult(List<ResourceWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+    writeResources(ops, monitor);
+
+    List<IFile> result = new ArrayList<>(ops.size());
+    for (ResourceWriteOperation op : ops) {
+      if (op == null) {
+        result.add(null);
+        continue;
+      }
+      result.add(op.getFile());
+    }
+    return result;
+  }
+
+  public static void writeResources(List<ResourceWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+    if (ops == null || ops.isEmpty()) {
+      return;
+    }
+
+    IResource[] lockedResources = new IResource[ops.size()];
+    for (int i = 0; i < ops.size(); i++) {
+      lockedResources[i] = ops.get(i).getFile();
+    }
+
+    ResourceBlockingOperationJob job = new ResourceBlockingOperationJob(ops, lockedResources);
     job.schedule();
     try {
       job.join(0L, monitor);
-      ArrayList<IFile> result = new ArrayList<>(ops.size());
-      for (ResourceWriteOperation op : ops) {
-        if (op == null) {
-          result.add(null);
-          continue;
-        }
-        result.add(op.getFile());
-      }
-      return result;
     }
     catch (OperationCanceledException | InterruptedException e) {
       throw new CoreException(new ScoutStatus(e));

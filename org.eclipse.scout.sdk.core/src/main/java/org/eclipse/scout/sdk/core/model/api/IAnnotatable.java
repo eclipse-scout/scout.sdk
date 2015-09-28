@@ -10,8 +10,6 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
-import java.util.List;
-
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.sugar.AnnotationQuery;
 
@@ -23,18 +21,10 @@ import org.eclipse.scout.sdk.core.model.sugar.AnnotationQuery;
  * @see IAnnotation
  */
 public interface IAnnotatable extends IJavaElement {
-  /**
-   * Gets all the {@link IAnnotation}s that are defined for the receiver.<br>
-   * The {@link List} iterates over the {@link IAnnotation}s in the order as they appear in the source or class file.
-   *
-   * @return A {@link List} containing all {@link IAnnotation}s of the receiver object. Never returns <code>null</code>.
-   */
-  List<? extends IAnnotation> getAnnotations();
 
   @Override
   AnnotatableSpi unwrap();
 
-  //additional convenience methods
   AnnotationQuery<IAnnotation> annotations();
 
 }

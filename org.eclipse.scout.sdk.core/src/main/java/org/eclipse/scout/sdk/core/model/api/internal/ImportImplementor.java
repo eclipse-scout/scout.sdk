@@ -24,22 +24,22 @@ public class ImportImplementor extends AbstractJavaElementImplementor<ImportSpi>
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return m_spi.getName();
   }
 
   @Override
-  public String getSimpleName() {
+  public String simpleName() {
     return m_spi.getSimpleName();
   }
 
   @Override
-  public String getQualifier() {
+  public String qualifier() {
     return m_spi.getQualifier();
   }
 
   @Override
-  public ICompilationUnit getCompilationUnit() {
+  public ICompilationUnit compilationUnit() {
     return m_spi.getCompilationUnit().wrap();
   }
 

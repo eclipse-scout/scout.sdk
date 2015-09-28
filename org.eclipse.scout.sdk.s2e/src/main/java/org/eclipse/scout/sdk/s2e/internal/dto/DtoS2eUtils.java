@@ -15,14 +15,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.DataAnnotation;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataAnnotation;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.TypeFilters;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
@@ -34,13 +32,13 @@ public final class DtoS2eUtils {
 
   public static CompilationUnitWriteOperation newDtoOp(org.eclipse.jdt.core.IType jdtType, IType modelType, IJavaEnvironmentProvider envProvider, IProgressMonitor monitor) throws CoreException {
     //FormData
-    FormDataAnnotation a1 = findDataAnnotationForFormData(modelType);
+    FormDataAnnotationDescriptor a1 = findDataAnnotationForFormData(modelType);
     if (a1 != null) {
       if (modelType.equals(a1.getFormDataType())) {
-        S2ESdkActivator.logError("FormData annotation points to itself. DTO generation not possible.", new Exception("Wrong @FormData annotation value."));
+        SdkLog.error("FormData annotation points to itself. DTO generation not possible.", new Exception("Wrong @FormData annotation value."));
         return null;
       }
-      org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a1.getFormDataType().getName());
+      org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a1.getFormDataType().name());
       IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, a1, sharedEnv);
 
@@ -50,13 +48,13 @@ public final class DtoS2eUtils {
     }
 
     //PageData
-    DataAnnotation a2 = findDataAnnotationForPageData(modelType);
+    DataAnnotationDescriptor a2 = findDataAnnotationForPageData(modelType);
     if (a2 != null) {
       if (modelType.equals(a2.getDataType())) {
-        S2ESdkActivator.logError("Data annotation points to itself. DTO generation not possible.", new Exception("Wrong @Data annotation value"));
+        SdkLog.error("Data annotation points to itself. DTO generation not possible.", new Exception("Wrong @Data annotation value"));
         return null;
       }
-      org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a2.getDataType().getName());
+      org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a2.getDataType().name());
       IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createPageDataBuilder(modelType, a2, sharedEnv);
 
@@ -66,13 +64,13 @@ public final class DtoS2eUtils {
     }
 
     //RowData
-    DataAnnotation a3 = findDataAnnotationForRowData(modelType);
+    DataAnnotationDescriptor a3 = findDataAnnotationForRowData(modelType);
     if (a3 != null) {
       if (modelType.equals(a3.getDataType())) {
-        S2ESdkActivator.logError("Data annotation points to itself. DTO generation not possible.", new Exception("Wrong @FormData annotation value."));
+        SdkLog.error("Data annotation points to itself. DTO generation not possible.", new Exception("Wrong @FormData annotation value."));
         return null;
       }
-      org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a3.getDataType().getName());
+      org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a3.getDataType().name());
       IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createTableRowDataBuilder(modelType, a3, sharedEnv);
 
@@ -84,31 +82,31 @@ public final class DtoS2eUtils {
     return null;
   }
 
-  private static FormDataAnnotation findDataAnnotationForFormData(IType modelType) {
-    FormDataAnnotation formDataAnnotation = DtoUtils.findFormDataAnnotation(modelType);
-    if (FormDataAnnotation.isCreate(formDataAnnotation) && formDataAnnotation.getFormDataType() != null) {
+  private static FormDataAnnotationDescriptor findDataAnnotationForFormData(IType modelType) {
+    FormDataAnnotationDescriptor formDataAnnotation = DtoUtils.getFormDataAnnotationDescriptor(modelType);
+    if (FormDataAnnotationDescriptor.isCreate(formDataAnnotation) && formDataAnnotation.getFormDataType() != null) {
       return formDataAnnotation;
     }
     return null;
   }
 
-  private static DataAnnotation findDataAnnotationForPageData(IType model) {
-    if (CoreUtils.isInstanceOf(model, IRuntimeClasses.IPageWithTable)) {
-      return DtoUtils.findDataAnnotation(model);
+  private static DataAnnotationDescriptor findDataAnnotationForPageData(IType model) {
+    if (model.isInstanceOf(IScoutRuntimeTypes.IPageWithTable)) {
+      return DtoUtils.getDataAnnotationDescriptor(model);
     }
     return null;
   }
 
-  private static DataAnnotation findDataAnnotationForRowData(IType model) {
+  private static DataAnnotationDescriptor findDataAnnotationForRowData(IType model) {
     // direct column or table extension
-    if (CoreUtils.isInstanceOf(model, IRuntimeClasses.IColumn) || CoreUtils.isInstanceOf(model, IRuntimeClasses.ITableExtension)) {
-      return DtoUtils.findDataAnnotation(model);
+    if (model.isInstanceOf(IScoutRuntimeTypes.IColumn) || model.isInstanceOf(IScoutRuntimeTypes.ITableExtension)) {
+      return DtoUtils.getDataAnnotationDescriptor(model);
     }
     // check for table extension in IPageWithTableExtension
-    if (CoreUtils.isInstanceOf(model, IRuntimeClasses.IPageWithTableExtension)) {
-      IType innerTableExtension = CoreUtils.getInnerType(model, TypeFilters.subtypeOf(IRuntimeClasses.ITableExtension));
+    if (model.isInstanceOf(IScoutRuntimeTypes.IPageWithTableExtension)) {
+      IType innerTableExtension = model.innerTypes().withInstanceOf(IScoutRuntimeTypes.ITableExtension).first();
       if (innerTableExtension != null) {
-        return DtoUtils.findDataAnnotation(model);
+        return DtoUtils.getDataAnnotationDescriptor(model);
       }
     }
     return null;

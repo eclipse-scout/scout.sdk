@@ -29,17 +29,17 @@ public abstract class AbstractJavaElementImplementor<SPI extends JavaElementSpi>
   }
 
   @Override
-  public IJavaEnvironment getJavaEnvironment() {
+  public IJavaEnvironment javaEnvironment() {
     return m_spi.getJavaEnvironment().wrap();
   }
 
   @Override
-  public final String getElementName() {
+  public final String elementName() {
     return m_spi.getElementName();
   }
 
   @Override
-  public ISourceRange getSource() {
+  public ISourceRange source() {
     return m_spi.getSource();
   }
 
@@ -61,7 +61,6 @@ public abstract class AbstractJavaElementImplementor<SPI extends JavaElementSpi>
   @Override
   public abstract String toString();
 
-  @Override
   @SuppressWarnings("unchecked")
   public void internalSetSpi(JavaElementSpi spi) {
     m_spi = (SPI) spi;

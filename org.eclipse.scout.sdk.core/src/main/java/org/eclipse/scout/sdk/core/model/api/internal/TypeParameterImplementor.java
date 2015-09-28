@@ -12,13 +12,11 @@ package org.eclipse.scout.sdk.core.model.api.internal;
 
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
-import org.eclipse.scout.sdk.core.model.sugar.AnnotationQuery;
 import org.eclipse.scout.sdk.core.signature.Signature;
 
 /**
@@ -27,7 +25,7 @@ import org.eclipse.scout.sdk.core.signature.Signature;
  * @author Ivan Motsch
  * @since 4.1.0 09.11.2014
  */
-public class TypeParameterImplementor extends AbstractAnnotatableImplementor<TypeParameterSpi>implements ITypeParameter {
+public class TypeParameterImplementor extends AbstractJavaElementImplementor<TypeParameterSpi>implements ITypeParameter {
 
   private String m_signature;
 
@@ -36,12 +34,12 @@ public class TypeParameterImplementor extends AbstractAnnotatableImplementor<Typ
   }
 
   @Override
-  public IMember getDeclaringMember() {
+  public IMember declaringMember() {
     return m_spi.getDeclaringMember().wrap();
   }
 
   @Override
-  public List<IType> getBounds() {
+  public List<IType> bounds() {
     return new WrappedList<>(m_spi.getBounds());
   }
 
@@ -61,23 +59,15 @@ public class TypeParameterImplementor extends AbstractAnnotatableImplementor<Typ
   //additional convenience methods
 
   @Override
-  public String getSignature() {
+  public String signature() {
     if (m_signature == null) {
-      List<IType> bounds = getBounds();
+      List<IType> bounds = bounds();
       String[] boundSignatures = new String[bounds.size()];
       for (int i = 0; i < boundSignatures.length; i++) {
-        boundSignatures[i] = bounds.get(i).getSignature();
+        boundSignatures[i] = bounds.get(i).signature();
       }
-      m_signature = Signature.createTypeParameterSignature(getElementName(), boundSignatures);
+      m_signature = Signature.createTypeParameterSignature(elementName(), boundSignatures);
     }
     return m_signature;
   }
-
-  @Override
-  public AnnotationQuery<IAnnotation> annotations() {
-    IMember decl = getDeclaringMember();
-    IType containerType = decl instanceof IType ? (IType) decl : decl.getDeclaringType();
-    return new AnnotationQuery<>(containerType, this);
-  }
-
 }

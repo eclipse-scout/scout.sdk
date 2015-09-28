@@ -24,7 +24,8 @@ public final class MethodFilters {
   }
 
   /**
-   * Creates and gets a filter accepting all {@link IMethod}s having an annotation with given annotation name.
+   * Creates and gets a filter accepting all {@link IMethod}s having an annotation with given annotation fully qualified
+   * name.
    *
    * @param annotationTypeFqn
    *          The fully qualified annotation name.
@@ -34,7 +35,7 @@ public final class MethodFilters {
     return new IFilter<IMethod>() {
       @Override
       public boolean evaluate(IMethod method) {
-        return CoreUtils.getAnnotation(method, annotationTypeFqn) != null;
+        return method.annotations().withName(annotationTypeFqn).existsAny();
       }
 
       @Override
@@ -57,7 +58,7 @@ public final class MethodFilters {
     return new IFilter<IMethod>() {
       @Override
       public boolean evaluate(IMethod method) {
-        return method.getElementName().equals(methodName);
+        return method.elementName().equals(methodName);
       }
 
       @Override
@@ -84,7 +85,7 @@ public final class MethodFilters {
     return new IFilter<IMethod>() {
       @Override
       public boolean evaluate(IMethod method) {
-        return regex.matcher(method.getElementName()).matches();
+        return regex.matcher(method.elementName()).matches();
       }
 
       @Override
@@ -100,7 +101,7 @@ public final class MethodFilters {
   }
 
   /**
-   * Creates and gets a method filter that accepts all methods having ALL of the given flags
+   * Creates and gets a method filter that accepts all methods having at least ALL of the given flags
    *
    * @param flags
    *          The flags that each accepted method must have.
@@ -110,7 +111,7 @@ public final class MethodFilters {
     return new IFilter<IMethod>() {
       @Override
       public boolean evaluate(IMethod method) {
-        return (method.getFlags() & flags) == flags;
+        return (method.flags() & flags) == flags;
       }
 
       @Override

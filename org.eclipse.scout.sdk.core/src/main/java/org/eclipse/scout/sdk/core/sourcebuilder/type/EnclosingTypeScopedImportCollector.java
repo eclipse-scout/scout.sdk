@@ -13,27 +13,27 @@ package org.eclipse.scout.sdk.core.sourcebuilder.type;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.importvalidator.ImportElementCandidate;
-import org.eclipse.scout.sdk.core.importvalidator.WrappedImportValidator;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
+import org.eclipse.scout.sdk.core.importcollector.WrappedImportCollector;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 
 /**
  * Do not instantiate this class directly, it is automatically created in
- * {@link ITypeSourceBuilder#createSource(StringBuilder, String, org.eclipse.scout.sdk.core.util.PropertyMap, IImportValidator)}
+ * {@link ITypeSourceBuilder#createSource(StringBuilder, String, org.eclipse.scout.sdk.core.util.PropertyMap, IImportCollector)}
  * <p>
  * ignore imports when the referenced type is a member type of the enclosing type or superclasses of it
  */
-public class EnclosingTypeScopedImportValidator extends WrappedImportValidator {
+public class EnclosingTypeScopedImportCollector extends WrappedImportCollector {
   private final String m_enclosingQualifier;
   //as far as these types exist already!
   private final Set<String> m_enclosingQualifiers = new HashSet<>();
   //as far as these types exist already!
   private final Set<String> m_enclosedSimpleNames = new HashSet<>();
 
-  public EnclosingTypeScopedImportValidator(IImportValidator inner, ITypeSourceBuilder enclosingTypeSrc) {
+  public EnclosingTypeScopedImportCollector(IImportCollector inner, ITypeSourceBuilder enclosingTypeSrc) {
     super(inner);
     m_enclosingQualifier = enclosingTypeSrc.getFullyQualifiedName();
     //self
@@ -43,10 +43,9 @@ public class EnclosingTypeScopedImportValidator extends WrappedImportValidator {
       m_enclosedSimpleNames.add(typeSrc.getElementName());
     }
     //super types
-    //TODO imo eventually cache all inner types of newly created typesourcebuilders in a dto cache
     IJavaEnvironment env = getJavaEnvironment();
     if (env != null) {
-      HashSet<String> superSignatures = new HashSet<>();
+      Set<String> superSignatures = new HashSet<>();
       superSignatures.addAll(enclosingTypeSrc.getInterfaceSignatures());
       if (enclosingTypeSrc.getSuperTypeSignature() != null) {
         superSignatures.add(enclosingTypeSrc.getSuperTypeSignature());
@@ -57,9 +56,9 @@ public class EnclosingTypeScopedImportValidator extends WrappedImportValidator {
         IType t = env.findType(qname);
         if (t != null) {
           for (IType s : t.superTypes().withSuperTypes(true).list()) {
-            m_enclosingQualifiers.add(s.getName());
+            m_enclosingQualifiers.add(s.name());
             for (IType i : s.innerTypes().list()) {
-              m_enclosedSimpleNames.add(i.getSimpleName());
+              m_enclosedSimpleNames.add(i.elementName());
             }
           }
         }
@@ -73,7 +72,7 @@ public class EnclosingTypeScopedImportValidator extends WrappedImportValidator {
   }
 
   @Override
-  public String checkCurrentScope(ImportElementCandidate cand) {
+  public String checkCurrentScope(SignatureDescriptor cand) {
     //same qualifier
     if (m_enclosingQualifiers.contains(cand.getQualifier())) {
       return cand.getSimpleName();

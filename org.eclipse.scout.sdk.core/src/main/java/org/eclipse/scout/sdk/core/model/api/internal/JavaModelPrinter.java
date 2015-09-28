@@ -34,21 +34,19 @@ public final class JavaModelPrinter {
   }
 
   protected static void printAnnotations(IAnnotatable anotatable, StringBuilder sb, boolean includeDetails) {
-    if (anotatable.getAnnotations().size() > 0) {
-      for (IAnnotation a : anotatable.getAnnotations()) {
-        printAnnotation(a, sb, includeDetails);
-        sb.append(includeDetails ? '\n' : ' ');
-      }
+    for (IAnnotation a : anotatable.annotations().list()) {
+      printAnnotation(a, sb, includeDetails);
+      sb.append(includeDetails ? '\n' : ' ');
     }
   }
 
   protected static void printAnnotation(IAnnotation a, StringBuilder sb, boolean includeDetails) {
     sb.append("@");
-    sb.append(a.getType().getSimpleName());
-    Map<String, IAnnotationValue> values = a.getValues();
+    sb.append(a.type().elementName());
+    Map<String, IAnnotationValue> values = a.values();
     int n = 0;
     for (Map.Entry<String, IAnnotationValue> e : values.entrySet()) {
-      if (!e.getValue().isSyntheticDefaultValue()) {
+      if (!e.getValue().isDefaultValue()) {
         n++;
       }
     }
@@ -56,12 +54,12 @@ public final class JavaModelPrinter {
       sb.append("(");
       if (includeDetails) {
         for (Map.Entry<String, IAnnotationValue> e : values.entrySet()) {
-          if (e.getValue().isSyntheticDefaultValue()) {
+          if (e.getValue().isDefaultValue()) {
             continue;
           }
           sb.append(e.getKey());
           sb.append("=");
-          sb.append(e.getValue().getMetaValue().toString());
+          sb.append(e.getValue().metaValue().toString());
           sb.append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
@@ -78,57 +76,56 @@ public final class JavaModelPrinter {
   }
 
   public static void print(IPackage p, StringBuilder sb) {
-    if (p.getName() == null) {
+    if (p.name() == null) {
       sb.append("(default-package)");
       return;
     }
-    sb.append("package ").append(p.getName());
+    sb.append("package ").append(p.name());
   }
 
   public static void print(IMethodParameter mp, StringBuilder sb) {
     printAnnotations(mp, sb, false);
-    sb.append(mp.getDataType().getName()).append(' ').append(mp.getElementName());
+    sb.append(mp.dataType().name()).append(' ').append(mp.elementName());
   }
 
   public static void print(IImport id, StringBuilder sb) {
-    sb.append("import ").append(id.isStatic() ? "static " : "").append(id.getName());
+    sb.append("import ").append(id.isStatic() ? "static " : "").append(id.name());
   }
 
   public static void print(ICompilationUnit icu, StringBuilder sb) {
-    sb.append(icu.getElementName());
+    sb.append(icu.elementName());
   }
 
   public static void print(ITypeParameter tp, StringBuilder sb) {
-    printAnnotations(tp, sb, false);
-    sb.append(tp.getElementName());
-    if (tp.getBounds().size() > 0) {
+    sb.append(tp.elementName());
+    if (tp.bounds().size() > 0) {
       sb.append(" extends ");
-      sb.append(tp.getBounds().get(0).getName());
-      for (int i = 1; i < tp.getBounds().size(); i++) {
+      sb.append(tp.bounds().get(0).name());
+      for (int i = 1; i < tp.bounds().size(); i++) {
         sb.append(" & ");
-        sb.append(tp.getBounds().get(i).getName());
+        sb.append(tp.bounds().get(i).name());
       }
     }
   }
 
   public static void print(IType t, StringBuilder sb) {
     printAnnotations(t, sb, false);
-    if (Flags.isAnnotation(t.getFlags())) {
+    if (Flags.isAnnotation(t.flags())) {
       sb.append("@interface ");
     }
-    else if (Flags.isInterface(t.getFlags())) {
+    else if (Flags.isInterface(t.flags())) {
       sb.append("interface ");
     }
     else {
       sb.append("class ");
     }
-    sb.append(t.getName());
-    if (t.getTypeParameters().size() > 0) {
+    sb.append(t.name());
+    if (t.typeParameters().size() > 0) {
       sb.append('<');
-      print(t.getTypeParameters().get(0), sb);
-      for (int i = 1; i < t.getTypeParameters().size(); i++) {
+      print(t.typeParameters().get(0), sb);
+      for (int i = 1; i < t.typeParameters().size(); i++) {
         sb.append(", ");
-        print(t.getTypeParameters().get(i), sb);
+        print(t.typeParameters().get(i), sb);
       }
       sb.append('>');
     }
@@ -136,22 +133,22 @@ public final class JavaModelPrinter {
 
   public static void print(IMethod m, StringBuilder sb) {
     printAnnotations(m, sb, false);
-    if (m.getTypeParameters().size() > 0) {
+    if (m.typeParameters().size() > 0) {
       sb.append('<');
-      print(m.getTypeParameters().get(0), sb);
-      for (int i = 1; i < m.getTypeParameters().size(); i++) {
+      print(m.typeParameters().get(0), sb);
+      for (int i = 1; i < m.typeParameters().size(); i++) {
         sb.append(", ");
-        print(m.getTypeParameters().get(i), sb);
+        print(m.typeParameters().get(i), sb);
       }
       sb.append('>');
     }
     if (!m.isConstructor()) {
-      sb.append(m.getReturnType().getName());
+      sb.append(m.returnType().name());
       sb.append(' ');
     }
-    sb.append(m.getElementName());
+    sb.append(m.elementName());
     sb.append('(');
-    List<IMethodParameter> parameters = m.getParameters();
+    List<IMethodParameter> parameters = m.parameters().list();
     if (parameters.size() > 0) {
       print(parameters.get(0), sb);
       for (int i = 1; i < parameters.size(); i++) {
@@ -164,16 +161,16 @@ public final class JavaModelPrinter {
 
   public static void print(IField f, StringBuilder sb) {
     printAnnotations(f, sb, false);
-    sb.append(f.getDataType().getSimpleName());
+    sb.append(f.dataType().elementName());
     sb.append(' ');
-    sb.append(f.getElementName());
-    if (f.getConstantValue() != null) {
+    sb.append(f.elementName());
+    if (f.constantValue() != null) {
       sb.append(" = ");
-      sb.append(f.getConstantValue().toString());
+      sb.append(f.constantValue().toString());
     }
   }
 
   public static void print(IAnnotationValue av, StringBuilder sb) {
-    sb.append(av.getMetaValue().toString());
+    sb.append(av.metaValue().toString());
   }
 }

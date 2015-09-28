@@ -10,8 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi;
 
-import org.eclipse.scout.sdk.core.model.api.IConstantMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 
 /**
@@ -28,7 +28,7 @@ public interface FieldSpi extends MemberSpi {
    *
    * @return The constant value of this {@link FieldSpi} if it can be computed or <code>null</code> otherwise.
    */
-  IConstantMetaValue getConstantValue();
+  IMetaValue getConstantValue();
 
   /**
    * Gets the data type of this {@link FieldSpi}.

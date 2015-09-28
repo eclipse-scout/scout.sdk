@@ -30,29 +30,29 @@ public class TypeParameterTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    List<ITypeParameter> typeParameters = childClassType.getTypeParameters();
+    List<ITypeParameter> typeParameters = childClassType.typeParameters();
     Assert.assertEquals(1, typeParameters.size());
 
     ITypeParameter param = typeParameters.get(0);
-    Assert.assertEquals("X", param.getElementName());
-    Assert.assertEquals(childClassType, param.getDeclaringMember());
+    Assert.assertEquals("X", param.elementName());
+    Assert.assertEquals(childClassType, param.declaringMember());
 
-    List<IType> bounds = param.getBounds();
+    List<IType> bounds = param.bounds();
     Assert.assertEquals(3, bounds.size());
-    Assert.assertEquals(AbstractList.class.getName(), bounds.get(0).getName());
-    Assert.assertEquals(Runnable.class.getName(), bounds.get(1).getName());
-    Assert.assertEquals(Serializable.class.getName(), bounds.get(2).getName());
+    Assert.assertEquals(AbstractList.class.getName(), bounds.get(0).name());
+    Assert.assertEquals(Runnable.class.getName(), bounds.get(1).name());
+    Assert.assertEquals(Serializable.class.getName(), bounds.get(2).name());
 
     IType abstractListBound = bounds.get(0);
-    Assert.assertEquals(String.class.getName(), abstractListBound.getTypeArguments().get(0).getName());
+    Assert.assertEquals(String.class.getName(), abstractListBound.typeArguments().get(0).name());
   }
 
   @Test
   public void testToString() {
-    ITypeParameter childTypeParam = CoreTestingUtils.getChildClassType().getTypeParameters().get(0);
+    ITypeParameter childTypeParam = CoreTestingUtils.getChildClassType().typeParameters().get(0);
     Assert.assertFalse(StringUtils.isBlank(childTypeParam.toString()));
 
-    ITypeParameter baseTypeParam = CoreTestingUtils.getBaseClassType().getTypeParameters().get(1);
+    ITypeParameter baseTypeParam = CoreTestingUtils.getBaseClassType().typeParameters().get(1);
     Assert.assertFalse(StringUtils.isBlank(baseTypeParam.toString()));
   }
 
@@ -61,18 +61,18 @@ public class TypeParameterTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    List<ITypeParameter> typeParameters = baseClassType.getTypeParameters();
+    List<ITypeParameter> typeParameters = baseClassType.typeParameters();
     Assert.assertEquals(2, typeParameters.size());
 
     ITypeParameter param = typeParameters.get(0);
-    Assert.assertEquals("T", param.getElementName());
-    Assert.assertEquals(baseClassType, param.getDeclaringMember());
-    Assert.assertEquals(0, param.getBounds().size());
+    Assert.assertEquals("T", param.elementName());
+    Assert.assertEquals(baseClassType, param.declaringMember());
+    Assert.assertEquals(0, param.bounds().size());
 
     param = typeParameters.get(1);
-    Assert.assertEquals("Z", param.getElementName());
-    Assert.assertEquals(baseClassType, param.getDeclaringMember());
-    Assert.assertEquals(0, param.getBounds().size());
+    Assert.assertEquals("Z", param.elementName());
+    Assert.assertEquals(baseClassType, param.declaringMember());
+    Assert.assertEquals(0, param.bounds().size());
   }
 
 }

@@ -18,9 +18,9 @@ import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
  * <h3>{@link ITypeParameter}</h3> Represents a type parameter.
  *
  * @author Ivan Motsch
- * @since 4.1.0 09.11.2014
+ * @since 5.1.0
  */
-public interface ITypeParameter extends IAnnotatable {
+public interface ITypeParameter extends IJavaElement {
 
   /**
    * Gets all bounds of this {@link ITypeParameter}. The first bound will be the class parameter (if existing) followed
@@ -31,16 +31,16 @@ public interface ITypeParameter extends IAnnotatable {
    *
    * @return A {@link List} containing all bounds of this {@link ITypeParameter}.
    */
-  List<IType> getBounds();
+  List<IType> bounds();
 
   /**
    * Gets the {@link IMember} this {@link ITypeParameter} belongs to.
    *
    * @return The {@link IMember} this {@link ITypeParameter} belongs to.
    */
-  IMember getDeclaringMember();
+  IMember declaringMember();
 
-  String getSignature();
+  String signature();
 
   @Override
   TypeParameterSpi unwrap();

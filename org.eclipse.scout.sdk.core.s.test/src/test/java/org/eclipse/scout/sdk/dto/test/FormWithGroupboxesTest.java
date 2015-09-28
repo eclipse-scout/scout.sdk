@@ -36,12 +36,12 @@ public class FormWithGroupboxesTest {
     SdkAssert.assertHasSuperTypeSignature(formWithGroupBoxesFormData, "QAbstractFormData;");
 
     // fields of FormWithGroupBoxesFormData
-    Assert.assertEquals("field count of 'FormWithGroupBoxesFormData'", 1, formWithGroupBoxesFormData.getFields().size());
+    Assert.assertEquals("field count of 'FormWithGroupBoxesFormData'", 1, formWithGroupBoxesFormData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(formWithGroupBoxesFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'FormWithGroupBoxesFormData'", 3, formWithGroupBoxesFormData.getMethods().size());
+    Assert.assertEquals("method count of 'FormWithGroupBoxesFormData'", 3, formWithGroupBoxesFormData.methods().list().size());
     IMethod formWithGroupBoxesFormData1 = SdkAssert.assertMethodExist(formWithGroupBoxesFormData, "FormWithGroupBoxesFormData", new String[]{});
     Assert.assertTrue(formWithGroupBoxesFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(formWithGroupBoxesFormData1, null);
@@ -50,41 +50,41 @@ public class FormWithGroupboxesTest {
     IMethod getInnerInteger = SdkAssert.assertMethodExist(formWithGroupBoxesFormData, "getInnerInteger", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getInnerInteger, "QInnerInteger;");
 
-    Assert.assertEquals("inner types count of 'FormWithGroupBoxesFormData'", 2, formWithGroupBoxesFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'FormWithGroupBoxesFormData'", 2, formWithGroupBoxesFormData.innerTypes().list().size());
     // type FlatString
     IType flatString = SdkAssert.assertTypeExists(formWithGroupBoxesFormData, "FlatString");
     SdkAssert.assertHasFlags(flatString, 9);
     SdkAssert.assertHasSuperTypeSignature(flatString, "QAbstractValueFieldData<QString;>;");
 
     // fields of FlatString
-    Assert.assertEquals("field count of 'FlatString'", 1, flatString.getFields().size());
+    Assert.assertEquals("field count of 'FlatString'", 1, flatString.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(flatString, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'FlatString'", 1, flatString.getMethods().size());
+    Assert.assertEquals("method count of 'FlatString'", 1, flatString.methods().list().size());
     IMethod flatString1 = SdkAssert.assertMethodExist(flatString, "FlatString", new String[]{});
     Assert.assertTrue(flatString1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(flatString1, null);
 
-    Assert.assertEquals("inner types count of 'FlatString'", 0, flatString.getTypes().size());
+    Assert.assertEquals("inner types count of 'FlatString'", 0, flatString.innerTypes().list().size());
     // type InnerInteger
     IType innerInteger = SdkAssert.assertTypeExists(formWithGroupBoxesFormData, "InnerInteger");
     SdkAssert.assertHasFlags(innerInteger, 9);
     SdkAssert.assertHasSuperTypeSignature(innerInteger, "QAbstractValueFieldData<QInteger;>;");
 
     // fields of InnerInteger
-    Assert.assertEquals("field count of 'InnerInteger'", 1, innerInteger.getFields().size());
+    Assert.assertEquals("field count of 'InnerInteger'", 1, innerInteger.fields().list().size());
     IField serialVersionUID2 = SdkAssert.assertFieldExist(innerInteger, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'InnerInteger'", 1, innerInteger.getMethods().size());
+    Assert.assertEquals("method count of 'InnerInteger'", 1, innerInteger.methods().list().size());
     IMethod innerInteger1 = SdkAssert.assertMethodExist(innerInteger, "InnerInteger", new String[]{});
     Assert.assertTrue(innerInteger1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(innerInteger1, null);
 
-    Assert.assertEquals("inner types count of 'InnerInteger'", 0, innerInteger.getTypes().size());
+    Assert.assertEquals("inner types count of 'InnerInteger'", 0, innerInteger.innerTypes().list().size());
   }
 
 }

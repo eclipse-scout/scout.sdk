@@ -13,20 +13,20 @@ package org.eclipse.scout.sdk.s2e.workspace;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.IJavaElement;
-import org.eclipse.scout.sdk.s2e.job.WorkspaceBlockingOperationJob;
+import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 
 /**
- * <h3>{@link IWorkspaceBlockingOperation}</h3><br>
+ * <h3>{@link IOperation}</h3><br>
  * An operation is usually used to create, modify or delete some java elements. To execute one or a set of operations
- * the best way is to use the {@link WorkspaceBlockingOperationJob}.<br>
- * <h4>NOTE</h4> When an operation is not used with and {@link WorkspaceBlockingOperationJob} the user is responsible to call validate
- * first and execute only on succeeded validation.
+ * the best way is to use the {@link ResourceBlockingOperationJob}.<br>
+ * <h4>NOTE</h4> When an operation is not used with and {@link ResourceBlockingOperationJob} the user is responsible to
+ * call validate first and execute only on succeeded validation.
  *
  * @author Andreas Hoegger
  * @since 3.8.0 23.02.2012
- * @see WorkspaceBlockingOperationJob
+ * @see ResourceBlockingOperationJob
  */
-public interface IWorkspaceBlockingOperation {
+public interface IOperation {
 
   String getOperationName();
 
@@ -37,7 +37,7 @@ public interface IWorkspaceBlockingOperation {
 
   /**
    * Usually the run method is called of a job implementation.
-   * 
+   *
    * @param monitor
    *          to provide progress information and observe the cancel state.
    * @param workingCopyManager

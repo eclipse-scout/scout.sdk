@@ -10,33 +10,28 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.ui.internal;
 
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
+import java.util.logging.Level;
+
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.runtime.Platform;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.scout.sdk.core.sourcebuilder.comment.CommentSourceBuilderFactory;
+import org.eclipse.scout.sdk.core.util.SdkConsole;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
-import org.eclipse.scout.sdk.s2e.log.SdkLogManager;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceManager;
 import org.eclipse.scout.sdk.s2e.ui.internal.util.JdtSettingsCommentSourceBuilderDelegate;
-import org.eclipse.scout.sdk.s2e.ui.internal.util.OrganizeImportService;
-import org.eclipse.scout.sdk.s2e.util.IOrganizeImportService;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.SWTError;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.IWorkbenchListener;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.ServiceRegistration;
 
 /**
  *
@@ -48,9 +43,6 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
 
   private static S2ESdkUiActivator plugin;
 
-  private IWorkbenchListener m_shutdownListener;
-  private SdkLogManager m_logManager;
-  private ServiceRegistration<?> m_organizeImportServiceRegistration;
   private IPropertyChangeListener m_preferencesPropertyListener;
 
   @Override
@@ -60,11 +52,15 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     // shared instance
     plugin = this;
 
-    // logger
-    m_logManager = new SdkLogManager(this);
+    //attach sdk console to workbench
+    SdkConsole.spi = new WorkbenchSdkConsoleSpi();
 
-    // organize import service
-    m_organizeImportServiceRegistration = context.registerService(IOrganizeImportService.class.getName(), new OrganizeImportService(), null);
+    // init Sdk log level to all logs if running in dev mode
+    if (StringUtils.isBlank(System.getProperty(SdkLog.LOG_LEVEL_PROPERTY_NAME)) && (Platform.inDebugMode() || Platform.inDevelopmentMode())) {
+      System.setProperty(SdkLog.LOG_LEVEL_PROPERTY_NAME, Level.ALL.getName());
+    }
+
+    // comment source builder
     CommentSourceBuilderFactory.commentSourceBuilderDelegate = new JdtSettingsCommentSourceBuilderDelegate();
 
     // property change listener (scout preferences)
@@ -80,34 +76,10 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     // start class id validation
     ClassIdValidationJob.install();
     ClassIdValidationJob.executeAsync(15000);
-
-    // listener for workspace shutdown (to wait for DTO updates to complete)
-    m_shutdownListener = new IWorkbenchListener() {
-      @Override
-      public boolean preShutdown(IWorkbench workbench, boolean forced) {
-        try {
-          new P_AutoUpdateOperationsShutdownJob().schedule();
-        }
-        catch (Exception e) {
-          logError(e);
-        }
-        catch (NoClassDefFoundError er) {
-          // can happen if the workbench is so far in shutdown, that no more classes are loaded for bundles.
-        }
-        return true;
-      }
-
-      @Override
-      public void postShutdown(IWorkbench workbench) {
-      }
-    };
-    PlatformUI.getWorkbench().addWorkbenchListener(m_shutdownListener);
   }
 
   @Override
   public void stop(BundleContext context) throws Exception {
-    PlatformUI.getWorkbench().removeWorkbenchListener(m_shutdownListener);
-
     ClassIdValidationJob.uninstall();
 
     if (m_preferencesPropertyListener != null) {
@@ -117,12 +89,6 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
 
     CommentSourceBuilderFactory.commentSourceBuilderDelegate = null;
 
-    if (m_organizeImportServiceRegistration != null) {
-      m_organizeImportServiceRegistration.unregister();
-      m_organizeImportServiceRegistration = null;
-    }
-
-    m_logManager = null;
     plugin = null;
 
     super.stop(context);
@@ -130,58 +96,6 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
 
   public static S2ESdkUiActivator getDefault() {
     return plugin;
-  }
-
-  public static void logInfo(Throwable t) {
-    plugin.m_logManager.logInfo(t);
-  }
-
-  public static void logInfo(String message) {
-    plugin.m_logManager.logInfo(message);
-  }
-
-  public static void logInfo(String message, Throwable t) {
-    plugin.m_logManager.logInfo(message, t);
-  }
-
-  public static void logWarning(String message) {
-    plugin.m_logManager.logWarning(message);
-  }
-
-  public static void logWarning(Throwable t) {
-    plugin.m_logManager.logWarning(t);
-  }
-
-  public static void logWarning(String message, Throwable t) {
-    plugin.m_logManager.logWarning(message, t);
-  }
-
-  public static void logError(Throwable t) {
-    plugin.m_logManager.logError(t);
-  }
-
-  public static void logError(String message) {
-    plugin.m_logManager.logError(message);
-  }
-
-  public static void logError(String message, Throwable t) {
-    plugin.m_logManager.logError(message, t);
-  }
-
-  public static void log(int level, Throwable t) {
-    plugin.m_logManager.log(level, t);
-  }
-
-  public static void log(int level, String message) {
-    plugin.m_logManager.log(level, message);
-  }
-
-  public static void log(int level, String message, Throwable t) {
-    plugin.m_logManager.log(level, message, t);
-  }
-
-  public static void log(IStatus status) {
-    plugin.m_logManager.log(status);
   }
 
   @Override
@@ -242,42 +156,6 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
       section = dialogSettings.addNewSection(name);
     }
     return section;
-  }
-
-  private static final class P_AutoUpdateOperationsShutdownJob extends Job {
-    private P_AutoUpdateOperationsShutdownJob() {
-      super("Waiting until all derived resources have been updated...");
-      setUser(true);
-
-      // ensures the shutdown is blocked until update is complete or the user decides to cancel
-      setRule(ResourcesPlugin.getWorkspace().getRoot());
-    }
-
-    @Override
-    protected IStatus run(IProgressMonitor monitor) {
-      Job[] triggerJobs = null;
-      while (!monitor.isCanceled()) {
-        triggerJobs = getJobManager().find(org.eclipse.scout.sdk.s2e.internal.trigger.DerivedResourceManager.TYPE_CHANGED_TRIGGER_JOB_FAMILY);
-        if (triggerJobs.length < 1) {
-          // no job is running -> finish
-          return Status.OK_STATUS;
-        }
-        try {
-          Thread.sleep(2000);
-        }
-        catch (InterruptedException e) {
-        }
-      }
-
-      // the trigger job should be cancelled
-      if (triggerJobs != null && triggerJobs.length > 0) {
-        for (Job j : triggerJobs) {
-          j.cancel(); // will cancel as soon as possible
-        }
-      }
-
-      return Status.CANCEL_STATUS;
-    }
   }
 
   private static final class P_PreferenceStorePropertyListener implements IPropertyChangeListener {

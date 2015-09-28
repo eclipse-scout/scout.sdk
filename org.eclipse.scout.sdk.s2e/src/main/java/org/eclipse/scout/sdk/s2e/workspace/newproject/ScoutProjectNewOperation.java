@@ -31,8 +31,8 @@ import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
+import org.eclipse.scout.sdk.s2e.workspace.IOperation;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
-import org.eclipse.scout.sdk.s2e.workspace.IWorkspaceBlockingOperation;
 
 /**
  * <h3>{@link ScoutProjectNewOperation}</h3>
@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.s2e.workspace.IWorkspaceBlockingOperation;
  * @author Matthias Villiger
  * @since 5.1.0
  */
-public class ScoutProjectNewOperation implements IWorkspaceBlockingOperation {
+public class ScoutProjectNewOperation implements IOperation {
 
   public static final String CUSTOM_TEMPLATE_PROP_NAME = "scoutProjectTemplatePath";
   private static final String EXEC_ENV_PREFIX = "JavaSE-";

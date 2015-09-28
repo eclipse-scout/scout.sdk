@@ -40,7 +40,7 @@ public interface AnnotationValueSpi extends JavaElementSpi {
    * @return true if this {@link AnnotationValueSpi} was not declared in source code but is the default value of the
    *         annotation
    */
-  boolean isSyntheticDefaultValue();
+  boolean isDefaultValue();
 
   ISourceRange getSourceOfExpression();
 

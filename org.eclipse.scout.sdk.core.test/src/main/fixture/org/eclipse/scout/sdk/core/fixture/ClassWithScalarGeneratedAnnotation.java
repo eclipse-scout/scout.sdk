@@ -15,7 +15,7 @@ import javax.annotation.Generated;
 /**
  * <h3>{@link ClassWithScalarGeneratedAnnotation}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 @Generated("g")

@@ -15,22 +15,18 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 /**
  * <h3>{@link SourceRangeWithJdt}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class SourceRangeWithJdt implements ISourceRange {
-  private final org.eclipse.jdt.internal.compiler.env.ICompilationUnit m_sourceUnit;
-  private final int m_start;
-  private final int m_end;
+  private final String m_content;
 
   public SourceRangeWithJdt(org.eclipse.jdt.internal.compiler.env.ICompilationUnit sourceUnit, int start, int end) {
-    m_sourceUnit = sourceUnit;
-    m_start = start;
-    m_end = end;
+    m_content = new String(sourceUnit.getContents(), start, end - start + 1);
   }
 
   @Override
   public String toString() {
-    return new String(m_sourceUnit.getContents(), m_start, m_end - m_start + 1);
+    return m_content;
   }
 }

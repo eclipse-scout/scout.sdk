@@ -15,7 +15,6 @@ import java.util.Map;
 
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
-import org.eclipse.scout.sdk.core.model.spi.internal.BindingTypeWithJdt;
 
 /**
  * <h3>{@link CompilationUnitSpi}</h3> Represents a compilation unit usually defined by a .java file.
@@ -26,7 +25,7 @@ import org.eclipse.scout.sdk.core.model.spi.internal.BindingTypeWithJdt;
 public interface CompilationUnitSpi extends JavaElementSpi {
 
   /**
-   * @return true if this {@link CompilationUnitSpi} is synthetic based on a binary type {@link BindingTypeWithJdt}
+   * @return true if this {@link CompilationUnitSpi} is synthetic based on a binary type.
    *         <p>
    *         Synthetic {@link CompilationUnitSpi}s have a singleton type list, no imports and no source attached
    */

@@ -14,6 +14,7 @@ import java.lang.reflect.Modifier;
 import java.util.Collections;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.lookup.ArrayBinding;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
@@ -32,7 +33,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 /**
  * <h3>{@link BindingArrayTypeWithJdt}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class BindingArrayTypeWithJdt extends AbstractTypeWithJdt {
@@ -54,7 +55,7 @@ public class BindingArrayTypeWithJdt extends AbstractTypeWithJdt {
     m_isWildcard = isWildcard;
     m_arrayDimension = binding.dimensions;
     m_leafComponentType = SpiWithJdtUtils.bindingToType(env, binding.leafComponentType);
-    m_name = m_leafComponentType.getName() + createArraySuffix(m_arrayDimension);
+    m_name = m_leafComponentType.getName() + StringUtils.leftPad("", m_arrayDimension * 2, "[]");
   }
 
   @Override
@@ -65,15 +66,6 @@ public class BindingArrayTypeWithJdt extends AbstractTypeWithJdt {
   @Override
   protected IType internalCreateApi() {
     return new TypeImplementor(this);
-  }
-
-  private static String createArraySuffix(int arrayDim) {
-    char[] arr = new char[arrayDim * 2];
-    for (int i = 0; i < arr.length; i += 2) {
-      arr[i] = '[';
-      arr[i + 1] = ']';
-    }
-    return new String(arr);
   }
 
   @Override

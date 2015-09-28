@@ -14,22 +14,22 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.importvalidator.ImportElementCandidate;
-import org.eclipse.scout.sdk.core.importvalidator.WrappedImportValidator;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
+import org.eclipse.scout.sdk.core.importcollector.WrappedImportCollector;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
 
 /**
  * Do not instantiate this class directly, it is automatically created in
- * {@link ICompilationUnitSourceBuilder#createSource(StringBuilder, String, org.eclipse.scout.sdk.core.util.PropertyMap, IImportValidator)}
+ * {@link ICompilationUnitSourceBuilder#createSource(StringBuilder, String, org.eclipse.scout.sdk.core.util.PropertyMap, IImportCollector)}
  * <p>
  * ignore imports when in same package or types in same compilation unit
  */
-public class CompilationUnitScopedImportValidator extends WrappedImportValidator {
+public class CompilationUnitScopedImportCollector extends WrappedImportCollector {
   private final String m_packageName;
   private final Map<String/* simpleName */, Boolean /* exists in own package*/> m_existsInSamePackageCache = new HashMap<>();
 
-  public CompilationUnitScopedImportValidator(IImportValidator inner, String packageName) {
+  public CompilationUnitScopedImportCollector(IImportCollector inner, String packageName) {
     super(inner);
     m_packageName = packageName;
   }
@@ -40,7 +40,7 @@ public class CompilationUnitScopedImportValidator extends WrappedImportValidator
   }
 
   @Override
-  public String checkCurrentScope(ImportElementCandidate cand) {
+  public String checkCurrentScope(SignatureDescriptor cand) {
     //same qualifier
     if (Objects.equals(getQualifier(), cand.getQualifier())) {
       return cand.getSimpleName();
@@ -52,7 +52,7 @@ public class CompilationUnitScopedImportValidator extends WrappedImportValidator
       Boolean existsInSamePackage = m_existsInSamePackageCache.get(cand.getSimpleName());
       if (existsInSamePackage == null) {
         // load to cache
-        String nameInOwnPackage = getQualifier() + "." + cand.getSimpleName();
+        String nameInOwnPackage = getQualifier() + '.' + cand.getSimpleName();
         existsInSamePackage = env.findType(nameInOwnPackage) != null;
         m_existsInSamePackageCache.put(cand.getSimpleName(), existsInSamePackage);
       }

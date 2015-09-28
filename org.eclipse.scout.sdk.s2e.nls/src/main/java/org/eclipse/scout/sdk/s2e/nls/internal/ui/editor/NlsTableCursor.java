@@ -123,7 +123,6 @@ public class NlsTableCursor {
   }
 
   private void showInheritedWarning() {
-    // TODO mvi handle warning
   }
 
   /**

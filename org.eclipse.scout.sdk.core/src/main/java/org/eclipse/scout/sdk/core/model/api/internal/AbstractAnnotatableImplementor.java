@@ -10,19 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api.internal;
 
-import java.util.List;
-
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 
 public abstract class AbstractAnnotatableImplementor<SPI extends AnnotatableSpi> extends AbstractJavaElementImplementor<SPI>implements IAnnotatable {
-
   protected AbstractAnnotatableImplementor(SPI spi) {
     super(spi);
-  }
-
-  @Override
-  public List<AnnotationImplementor> getAnnotations() {
-    return new WrappedList<>(m_spi.getAnnotations());
   }
 }

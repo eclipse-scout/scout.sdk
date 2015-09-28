@@ -22,6 +22,7 @@ import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 
 public final class UniqueIdExtensionPoint {
@@ -57,7 +58,7 @@ public final class UniqueIdExtensionPoint {
                   providers.put(new CompositeObject(getPriority(providerElememt), provider.getClass().getName()), provider);
                 }
                 catch (Exception t) {
-                  S2ESdkActivator.logError("Error registering code id provider '" + providerElememt.getNamespaceIdentifier() + "'.", t);
+                  SdkLog.error("Error registering code id provider '" + providerElememt.getNamespaceIdentifier() + "'.", t);
                 }
               }
             }
@@ -76,7 +77,7 @@ public final class UniqueIdExtensionPoint {
       priority = Integer.MAX_VALUE - Integer.parseInt(prio); /* descending order: highest prio first */
     }
     catch (Exception e) {
-      S2ESdkActivator.logWarning("could not parse priority of " + EXTENSION_POINT_NAME + " extension '" + element.getName() + "'", e);
+      SdkLog.warning("could not parse priority of " + EXTENSION_POINT_NAME + " extension '" + element.getName() + "'", e);
     }
     return priority;
   }
@@ -100,7 +101,7 @@ public final class UniqueIdExtensionPoint {
         }
       }
       catch (Exception e) {
-        S2ESdkActivator.logWarning("Exception in codeIdExtension '" + p.getClass().getName() + "'.", e);
+        SdkLog.warning("Exception in codeIdExtension '" + p.getClass().getName() + "'.", e);
       }
     }
     return null;

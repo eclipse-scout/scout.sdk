@@ -26,14 +26,14 @@ public interface IField extends IMember {
    *
    * @return The constant value of this {@link IField} if it can be computed or <code>null</code> otherwise.
    */
-  IConstantMetaValue getConstantValue();
+  IMetaValue constantValue();
 
   /**
    * Gets the data type of this {@link IField}.
    *
    * @return The {@link IType} describing the data type of this {@link IField}. Never returns <code>null</code>.
    */
-  IType getDataType();
+  IType dataType();
 
   /**
    * If this {@link IField} is a synthetic parameterized Field (for example the super class of a parameterized type with
@@ -41,9 +41,9 @@ public interface IField extends IMember {
    * <p>
    * Otherwise this is returned
    */
-  IField getOriginalField();
+  IField originalField();
 
-  ISourceRange getSourceOfInitializer();
+  ISourceRange sourceOfInitializer();
 
   @Override
   FieldSpi unwrap();

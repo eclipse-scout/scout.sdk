@@ -23,7 +23,7 @@ public class PackageImplementor extends AbstractJavaElementImplementor<PackageSp
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return m_spi.getName();
   }
 

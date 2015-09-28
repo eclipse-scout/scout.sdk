@@ -19,6 +19,7 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
@@ -59,22 +60,22 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
 
   public TypeSourceBuilder(IType element) {
     super(element);
-    for (ITypeParameter p : element.getTypeParameters()) {
+    for (ITypeParameter p : element.typeParameters()) {
       addTypeParameter(new TypeParameterSourceBuilder(p));
     }
-    if (element.getSuperClass() != null && !"java.lang.Object".equals(element.getSuperClass().getName())) {
-      setSuperTypeSignature(SignatureUtils.getTypeSignature(element.getSuperClass()));
+    if (element.superClass() != null && !"java.lang.Object".equals(element.superClass().name())) {
+      setSuperTypeSignature(SignatureUtils.getTypeSignature(element.superClass()));
     }
-    for (IType i : element.getSuperInterfaces()) {
+    for (IType i : element.superInterfaces()) {
       addInterfaceSignature(SignatureUtils.getTypeSignature(i));
     }
-    for (IField field : element.getFields()) {
+    for (IField field : element.fields().list()) {
       addField(new FieldSourceBuilder(field));
     }
-    for (IMethod method : element.getMethods()) {
+    for (IMethod method : element.methods().list()) {
       addMethod(new MethodSourceBuilder(method));
     }
-    for (IType type : element.getTypes()) {
+    for (IType type : element.innerTypes().list()) {
       addType(new TypeSourceBuilder(type));
     }
   }
@@ -88,8 +89,9 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
   }
 
   @Override
-  public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator0) {
-    IImportValidator validator = new EnclosingTypeScopedImportValidator(validator0, this);
+  public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+    IImportCollector collector = new EnclosingTypeScopedImportCollector(validator.getImportCollector(), this);
+    validator.setImportCollector(collector);
 
     super.createSource(source, lineDelimiter, context, validator);
 
@@ -115,7 +117,7 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
 
     // super type (extends)
     if (!StringUtils.isEmpty(getSuperTypeSignature())) {
-      String superTypeRefName = SignatureUtils.useSignature(getSuperTypeSignature(), validator);
+      String superTypeRefName = validator.useSignature(getSuperTypeSignature());
       source.append(" extends ").append(superTypeRefName);
     }
 
@@ -123,9 +125,9 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
     Iterator<String> interfaceSigIterator = getInterfaceSignatures().iterator();
     if (interfaceSigIterator.hasNext()) {
       source.append(((getFlags() & Flags.AccInterface) != 0) ? (" extends ") : (" implements "));
-      source.append(SignatureUtils.useSignature(interfaceSigIterator.next(), validator));
+      source.append(validator.useSignature(interfaceSigIterator.next()));
       while (interfaceSigIterator.hasNext()) {
-        source.append(", ").append(SignatureUtils.useSignature(interfaceSigIterator.next(), validator));
+        source.append(", ").append(validator.useSignature(interfaceSigIterator.next()));
       }
     }
     source.append("{");

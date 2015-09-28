@@ -12,7 +12,7 @@ package org.eclipse.scout.sdk.core.sourcebuilder.typeparameter;
 
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.sourcebuilder.IAnnotatableSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.IJavaElementSourceBuilder;
 
 /**
  * <h3>{@link ITypeParameterSourceBuilder}</h3>
@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.IAnnotatableSourceBuilder;
  * @author Andreas Hoegger
  * @since 3.10.0 07.03.2013
  */
-public interface ITypeParameterSourceBuilder extends IAnnotatableSourceBuilder {
+public interface ITypeParameterSourceBuilder extends IJavaElementSourceBuilder {
 
   List<String> getBoundsSignatures();
 

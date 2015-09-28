@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.core.model;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.fixture.TestAnnotation;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
@@ -29,14 +29,14 @@ public class FieldTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    IField myStringField = childClassType.getFields().get(0);
+    IField myStringField = childClassType.fields().first();
     Assert.assertNotNull(myStringField);
 
-    Assert.assertEquals("myStringValue", myStringField.getConstantValue().getObject(String.class));
-    Assert.assertEquals(String.class.getName(), myStringField.getDataType().getName());
-    Assert.assertEquals(childClassType, myStringField.getDeclaringType());
-    Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myStringField.getFlags());
-    Assert.assertEquals("myString", myStringField.getElementName());
+    Assert.assertEquals("myStringValue", myStringField.constantValue().get(String.class));
+    Assert.assertEquals(String.class.getName(), myStringField.dataType().name());
+    Assert.assertEquals(childClassType, myStringField.declaringType());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myStringField.flags());
+    Assert.assertEquals("myString", myStringField.elementName());
   }
 
   @Test
@@ -44,7 +44,7 @@ public class FieldTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    IField myStringField = childClassType.getFields().get(0);
+    IField myStringField = childClassType.fields().first();
     Assert.assertNotNull(myStringField);
 
     Assert.assertFalse(StringUtils.isBlank(myStringField.toString()));
@@ -55,15 +55,15 @@ public class FieldTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    IField mTestField = childClassType.getFields().get(1);
+    IField mTestField = childClassType.fields().list().get(1);
     Assert.assertNotNull(mTestField);
 
-    Assert.assertNull(mTestField.getConstantValue());
-    Assert.assertEquals(int.class.getName(), mTestField.getDataType().getLeafComponentType().getName());
-    Assert.assertEquals(2, mTestField.getDataType().getArrayDimension());
-    Assert.assertEquals(childClassType, mTestField.getDeclaringType());
-    Assert.assertEquals(Flags.AccProtected | Flags.AccFinal, mTestField.getFlags());
-    Assert.assertEquals("m_test", mTestField.getElementName());
+    Assert.assertNull(mTestField.constantValue());
+    Assert.assertEquals(int.class.getName(), mTestField.dataType().leafComponentType().name());
+    Assert.assertEquals(2, mTestField.dataType().arrayDimension());
+    Assert.assertEquals(childClassType, mTestField.declaringType());
+    Assert.assertEquals(Flags.AccProtected | Flags.AccFinal, mTestField.flags());
+    Assert.assertEquals("m_test", mTestField.elementName());
   }
 
   @Test
@@ -71,12 +71,12 @@ public class FieldTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    IField mTestField = childClassType.getFields().get(1);
+    IField mTestField = childClassType.fields().list().get(1);
     Assert.assertNotNull(mTestField);
 
-    Assert.assertEquals(1, mTestField.getAnnotations().size());
-    Assert.assertEquals(mTestField, mTestField.getAnnotations().get(0).getOwner());
-    Assert.assertEquals(TestAnnotation.class.getName(), mTestField.getAnnotations().get(0).getType().getName());
+    Assert.assertEquals(1, mTestField.annotations().list().size());
+    Assert.assertEquals(mTestField, mTestField.annotations().first().owner());
+    Assert.assertEquals(TestAnnotation.class.getName(), mTestField.annotations().first().type().name());
   }
 
   @Test
@@ -84,10 +84,10 @@ public class FieldTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IField myLongField = baseClassType.getFields().get(0);
-    Assert.assertEquals(1, myLongField.getAnnotations().size());
-    Assert.assertEquals(myLongField, myLongField.getAnnotations().get(0).getOwner());
-    Assert.assertEquals(TestAnnotation.class.getName(), myLongField.getAnnotations().get(0).getType().getName());
+    IField myLongField = baseClassType.fields().first();
+    Assert.assertEquals(1, myLongField.annotations().list().size());
+    Assert.assertEquals(myLongField, myLongField.annotations().first().owner());
+    Assert.assertEquals(TestAnnotation.class.getName(), myLongField.annotations().first().type().name());
   }
 
   @Test
@@ -95,13 +95,13 @@ public class FieldTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IField myLongField = baseClassType.getFields().get(0);
+    IField myLongField = baseClassType.fields().first();
     Assert.assertNotNull(myLongField);
 
-    Assert.assertEquals(TypeNames.java_lang_Long, myLongField.getDataType().getName());
-    Assert.assertEquals(baseClassType, myLongField.getDeclaringType());
-    Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myLongField.getFlags());
-    Assert.assertEquals("myLong", myLongField.getElementName());
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Long, myLongField.dataType().name());
+    Assert.assertEquals(baseClassType, myLongField.declaringType());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, myLongField.flags());
+    Assert.assertEquals("myLong", myLongField.elementName());
   }
 
   @Test
@@ -109,14 +109,14 @@ public class FieldTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IField anonymousClassField = baseClassType.getFields().get(1);
+    IField anonymousClassField = baseClassType.fields().list().get(1);
     Assert.assertNotNull(anonymousClassField);
 
-    Assert.assertNull(anonymousClassField.getConstantValue());
-    Assert.assertEquals(Runnable.class.getName(), anonymousClassField.getDataType().getName());
-    Assert.assertEquals(0, anonymousClassField.getDataType().getArrayDimension());
-    Assert.assertEquals(baseClassType, anonymousClassField.getDeclaringType());
-    Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, anonymousClassField.getFlags());
-    Assert.assertEquals("ANONYMOUS_CLASS", anonymousClassField.getElementName());
+    Assert.assertNull(anonymousClassField.constantValue());
+    Assert.assertEquals(Runnable.class.getName(), anonymousClassField.dataType().name());
+    Assert.assertEquals(0, anonymousClassField.dataType().arrayDimension());
+    Assert.assertEquals(baseClassType, anonymousClassField.declaringType());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccStatic | Flags.AccFinal, anonymousClassField.flags());
+    Assert.assertEquals("ANONYMOUS_CLASS", anonymousClassField.elementName());
   }
 }

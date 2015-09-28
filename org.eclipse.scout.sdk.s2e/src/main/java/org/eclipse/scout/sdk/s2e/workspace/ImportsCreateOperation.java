@@ -17,7 +17,7 @@ import java.util.TreeSet;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.s2e.util.JdtUtils;
  * @author Matthias Villiger
  * @since 4.0.0 27.03.2014
  */
-public class ImportsCreateOperation implements IWorkspaceBlockingOperation {
+public class ImportsCreateOperation implements IOperation {
 
   private final Set<String> m_importsToCreate;
   private final ICompilationUnit m_icu;
@@ -43,7 +43,7 @@ public class ImportsCreateOperation implements IWorkspaceBlockingOperation {
     }
   }
 
-  public ImportsCreateOperation(ICompilationUnit icu, IImportValidator validator) {
+  public ImportsCreateOperation(ICompilationUnit icu, IImportCollector validator) {
     this(icu);
     if (validator != null) {
       setImportsToCreate(validator.createImportDeclarations());

@@ -27,21 +27,21 @@ public class CompilationUnitTest {
   public void testIcu() {
     ICompilationUnit baseClassIcu = CoreTestingUtils.getBaseClassIcu();
     Assert.assertNotNull(baseClassIcu);
-    Assert.assertNotNull(baseClassIcu.getJavaEnvironment());
-    Assert.assertEquals(BaseClass.class.getName(), baseClassIcu.getMainType().getName());
+    Assert.assertNotNull(baseClassIcu.javaEnvironment());
+    Assert.assertEquals(BaseClass.class.getName(), baseClassIcu.mainType().name());
 
-    Assert.assertEquals(5, baseClassIcu.getImports().size());
-    Assert.assertEquals(1, baseClassIcu.getTypes().size());
-    Assert.assertEquals(2, baseClassIcu.getTypes().get(0).getTypes().size());
+    Assert.assertEquals(5, baseClassIcu.imports().size());
+    Assert.assertEquals(1, baseClassIcu.types().list().size());
+    Assert.assertEquals(2, baseClassIcu.types().first().innerTypes().list().size());
   }
 
   @Test
   public void testFindTypeBySimpleName() {
     ICompilationUnit baseClassIcu = CoreTestingUtils.getBaseClassIcu();
-    IType sdkLong = baseClassIcu.findTypeBySimpleName(Long.class.getSimpleName());
+    IType sdkLong = baseClassIcu.resolveTypeBySimpleName(Long.class.getSimpleName());
 
     Assert.assertNotNull(sdkLong);
-    Assert.assertEquals(Long.class.getName(), sdkLong.getName());
+    Assert.assertEquals(Long.class.getName(), sdkLong.name());
   }
 
   @Test

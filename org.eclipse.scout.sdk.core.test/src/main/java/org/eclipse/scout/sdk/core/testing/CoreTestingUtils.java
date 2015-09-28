@@ -10,12 +10,18 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.testing;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.Reader;
+import java.io.Writer;
+import java.util.Properties;
+
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.util.JavaEnvironmentBuilder;
+import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 
 /**
  * helpers used for general core unit tests (not specific to scout generated code)
@@ -50,24 +56,24 @@ public final class CoreTestingUtils {
 
   public static IType getBaseClassType() {
     ICompilationUnit icu = getChildClassIcu(); // do not get from getBaseClassIcu()
-    return icu.getTypes().get(0).getSuperClass();
+    return icu.types().first().superClass();
   }
 
   public static IType getChildClassType() {
     ICompilationUnit icu = getChildClassIcu();
-    return icu.getTypes().get(0);
+    return icu.types().first();
   }
 
   public static synchronized ICompilationUnit getChildClassIcu() {
     if (childClassIcu == null) {
-      childClassIcu = createJavaEnvironment().findType(ChildClass.class.getName()).getCompilationUnit();
+      childClassIcu = createJavaEnvironment().findType(ChildClass.class.getName()).compilationUnit();
     }
     return childClassIcu;
   }
 
   public static synchronized ICompilationUnit getBaseClassIcu() {
     if (baseClassIcu == null) {
-      baseClassIcu = createJavaEnvironment().findType(BaseClass.class.getName()).getCompilationUnit();
+      baseClassIcu = createJavaEnvironment().findType(BaseClass.class.getName()).compilationUnit();
     }
     return baseClassIcu;
   }
@@ -86,4 +92,56 @@ public final class CoreTestingUtils {
     return s.replaceAll("\\s+", " ").trim();
   }
 
+  public static IJavaEnvironment importJavaEnvironment(InputStream in) throws IOException {
+    Properties p = new Properties();
+    p.load(in);
+    return importJavaEnvironment(p);
+  }
+
+  public static IJavaEnvironment importJavaEnvironment(Reader r) throws IOException {
+    Properties p = new Properties();
+    p.load(r);
+    return importJavaEnvironment(p);
+  }
+
+  public static void exportJavaEnvironment(IJavaEnvironment env, Writer w) throws IOException {
+    StringBuilder src = new StringBuilder();
+    StringBuilder bin = new StringBuilder();
+    for (ClasspathSpi cp : env.unwrap().getClasspath()) {
+      (cp.isSource() ? src : bin).append("\n    " + cp.getPath() + ",");
+    }
+    Properties p = new Properties();
+    p.setProperty("src", src.toString());
+    p.setProperty("bin", bin.toString());
+    p.store(w, "");
+  }
+
+  /**
+   * @param p
+   *
+   *          <pre>
+   *  allowErrors=true,
+   * src=path1, path2, ...
+   * bin=path1, path2, ...
+   *          </pre>
+   *
+   * @return
+   */
+  public static IJavaEnvironment importJavaEnvironment(Properties p) {
+    JavaEnvironmentBuilder builder = new JavaEnvironmentBuilder()
+        .withIncludeRunningClasspath(false);
+    for (String s : p.getProperty("src").split(",")) {
+      s = s.trim();
+      if (!s.isEmpty()) {
+        builder.withAbsoluteSourcePath(s);
+      }
+    }
+    for (String s : p.getProperty("bin").split(",")) {
+      s = s.trim();
+      if (!s.isEmpty()) {
+        builder.withAbsoluteBinaryPath(s);
+      }
+    }
+    return builder.build();
+  }
 }

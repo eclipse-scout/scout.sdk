@@ -26,7 +26,7 @@ public interface AnnotationSpi extends JavaElementSpi {
    * Gets all attributes of this {@link AnnotationSpi}.<br>
    * The {@link Map} iterates over the attributes in the order as they appear in the source or class file.
    *
-   * @return A {@link Map} containing the attribute name ({@link AnnotationValueSpi#getName()}) as key and the
+   * @return A {@link Map} containing the attribute name ({@link AnnotationValueSpi#name()}) as key and the
    *         {@link AnnotationValueSpi} as value. Never returns <code>null</code>.
    */
   Map<String, AnnotationValueSpi> getValues();

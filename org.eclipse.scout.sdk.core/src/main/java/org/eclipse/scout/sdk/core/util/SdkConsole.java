@@ -8,6 +8,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+import org.apache.commons.lang3.StringUtils;
+
 public final class SdkConsole {
 
   public static void clear() {
@@ -28,18 +30,21 @@ public final class SdkConsole {
     if (msg != null) {
       spi.println(msg);
     }
-    if (exceptions != null) {
-      for (Throwable t : exceptions) {
-        spi.println(formatException(t));
+
+    if (exceptions == null) {
+      return;
+    }
+
+    for (Throwable t : exceptions) {
+      if (t != null) {
+        spi.println(getStackTrace(t));
       }
     }
   }
 
-  public static String formatException(Throwable t) {
+  public static String getStackTrace(Throwable t) {
     try (StringWriter w = new StringWriter(); PrintWriter p = new PrintWriter(w)) {
       t.printStackTrace(p);
-      p.close();
-      w.close();
       return w.toString();
     }
     catch (IOException e) {
@@ -58,10 +63,10 @@ public final class SdkConsole {
     void println(String s);
   }
 
-  public static SdkConsole.SdkConsoleSpi DEFAULT_SPI = new SdkConsole.SdkConsoleSpi() {
+  private static final SdkConsole.SdkConsoleSpi DEFAULT_SPI = new SdkConsole.SdkConsoleSpi() {
     @Override
     public void clear() {
-      System.out.println("_________________________________________________");
+      System.out.println(StringUtils.leftPad("", 50, '_'));
     }
 
     @Override
@@ -71,6 +76,6 @@ public final class SdkConsole {
   };
 
   //default writes to sysout
-  public static SdkConsole.SdkConsoleSpi spi = DEFAULT_SPI;
+  public static volatile SdkConsole.SdkConsoleSpi spi = DEFAULT_SPI;
 
 }

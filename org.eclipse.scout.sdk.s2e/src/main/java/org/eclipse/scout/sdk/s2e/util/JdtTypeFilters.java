@@ -16,7 +16,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.util.IFilter;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link JdtTypeFilters}</h3>
@@ -61,7 +61,7 @@ public final class JdtTypeFilters {
       return !Flags.isAbstract(flags) && !Flags.isInterface(flags) && !Flags.isDeprecated(flags);
     }
     catch (JavaModelException e) {
-      S2ESdkActivator.logWarning("Unable to retrieve flags of type '" + type.getFullyQualifiedName() + "'.", e);
+      SdkLog.warning("Unable to retrieve flags of type '" + type.getFullyQualifiedName() + "'.", e);
       return false;
     }
   }
@@ -86,7 +86,7 @@ public final class JdtTypeFilters {
           }
         }
         catch (JavaModelException e) {
-          S2ESdkActivator.logWarning("Unable to gets uper hierarchy for type '" + candidate.getFullyQualifiedName() + "'.", e);
+          SdkLog.warning("Unable to gets uper hierarchy for type '" + candidate.getFullyQualifiedName() + "'.", e);
         }
 
         return false;

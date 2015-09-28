@@ -26,7 +26,7 @@ public final class FieldFilters {
 
   /**
    * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a field name (
-   * {@link IField#getName()}) matches the given name.
+   * {@link IField#name()}) matches the given name.
    *
    * @param name
    *          The name for which the {@link IFilter} should evaluate to <code>true</code>
@@ -36,14 +36,14 @@ public final class FieldFilters {
     return new IFilter<IField>() {
       @Override
       public boolean evaluate(IField field) {
-        return Objects.equals(field.getElementName(), name);
+        return Objects.equals(field.elementName(), name);
       }
     };
   }
 
   /**
    * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a field name
-   * {@link IField#getName()}) matches the given regular expression.
+   * {@link IField#name()}) matches the given regular expression.
    *
    * @param regex
    *          The regex for which the {@link IFilter} should evaluate to <code>true</code>.
@@ -54,14 +54,14 @@ public final class FieldFilters {
     return new IFilter<IField>() {
       @Override
       public boolean evaluate(IField field) {
-        return regex.matcher(field.getElementName()).matches();
+        return regex.matcher(field.elementName()).matches();
       }
     };
   }
 
   /**
-   * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a field has all of the given flags
-   * ( {@link IField#getFlags()}).
+   * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a field has at least all of the
+   * given flags ( {@link IField#flags()}).
    *
    * @param flags
    *          The flags for which the {@link IFilter} should evaluate to <code>true</code>
@@ -72,7 +72,7 @@ public final class FieldFilters {
     return new IFilter<IField>() {
       @Override
       public boolean evaluate(IField field) {
-        return (flags & field.getFlags()) == flags;
+        return (flags & field.flags()) == flags;
       }
     };
   }

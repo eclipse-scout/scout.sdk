@@ -25,7 +25,7 @@ public interface IMethodParameter extends IAnnotatable {
    *
    * @return The {@link IType} that represents the data type of this parameter.
    */
-  IType getDataType();
+  IType dataType();
 
   /**
    * Gets the flags of this method parameter (e.g. final). Use the class {@link Flags} to decode the resulting
@@ -36,14 +36,14 @@ public interface IMethodParameter extends IAnnotatable {
    * @return An {@link Integer} holding all the flags of this method.
    * @see Flags
    */
-  int getFlags();
+  int flags();
 
   /**
    * Gets the {@link IMethod} this parameter belongs to
    *
    * @return The {@link IMethod} this parameter belongs to. Never returns <code>null</code>.
    */
-  IMethod getDeclaringMethod();
+  IMethod declaringMethod();
 
   @Override
   MethodParameterSpi unwrap();

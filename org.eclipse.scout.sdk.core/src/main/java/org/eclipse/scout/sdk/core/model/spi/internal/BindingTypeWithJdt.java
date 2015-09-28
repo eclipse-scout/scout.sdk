@@ -159,7 +159,7 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
   public String getName() {
     if (m_name == null) {
       if (m_binding.compoundName == null) {
-        // for typevariable bindings
+        // for type variable bindings
         m_name = new String(m_binding.sourceName);
       }
       else {

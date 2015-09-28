@@ -26,22 +26,22 @@ public class AnnotationValueImplementor extends AbstractJavaElementImplementor<A
   }
 
   @Override
-  public IMetaValue getMetaValue() {
+  public IMetaValue metaValue() {
     return m_spi.getMetaValue();
   }
 
   @Override
-  public IAnnotation getDeclaringAnnotation() {
+  public IAnnotation declaringAnnotation() {
     return m_spi.getDeclaringAnnotation().wrap();
   }
 
   @Override
-  public boolean isSyntheticDefaultValue() {
-    return m_spi.isSyntheticDefaultValue();
+  public boolean isDefaultValue() {
+    return m_spi.isDefaultValue();
   }
 
   @Override
-  public ISourceRange getSourceOfExpression() {
+  public ISourceRange sourceOfExpression() {
     return m_spi.getSourceOfExpression();
   }
 

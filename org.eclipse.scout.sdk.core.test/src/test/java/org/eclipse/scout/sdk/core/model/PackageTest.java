@@ -32,10 +32,10 @@ public class PackageTest {
     ICompilationUnit childClassIcu = CoreTestingUtils.getChildClassIcu();
     Assert.assertNotNull(childClassIcu);
 
-    IPackage pck = childClassIcu.getPackage();
+    IPackage pck = childClassIcu.containingPackage();
     Assert.assertNotNull(pck);
 
-    Assert.assertEquals(FIXTURE_PACKAGE, pck.getName());
+    Assert.assertEquals(FIXTURE_PACKAGE, pck.name());
     Assert.assertEquals("package " + FIXTURE_PACKAGE, pck.toString());
   }
 
@@ -44,7 +44,7 @@ public class PackageTest {
     ICompilationUnit childClassIcu = CoreTestingUtils.getChildClassIcu();
     Assert.assertNotNull(childClassIcu);
 
-    IPackage pck = childClassIcu.getPackage();
+    IPackage pck = childClassIcu.containingPackage();
     Assert.assertFalse(StringUtils.isBlank(pck.toString()));
   }
 
@@ -53,10 +53,10 @@ public class PackageTest {
     IType childClass = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClass);
 
-    IPackage pck = childClass.getPackage();
+    IPackage pck = childClass.containingPackage();
     Assert.assertNotNull(pck);
 
-    Assert.assertEquals(FIXTURE_PACKAGE, pck.getName());
+    Assert.assertEquals(FIXTURE_PACKAGE, pck.name());
     Assert.assertEquals("package " + FIXTURE_PACKAGE, pck.toString());
   }
 
@@ -65,10 +65,10 @@ public class PackageTest {
     IType childClass = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(childClass);
 
-    IPackage pck = childClass.getPackage();
+    IPackage pck = childClass.containingPackage();
     Assert.assertNotNull(pck);
 
-    Assert.assertEquals(FIXTURE_PACKAGE, pck.getName());
+    Assert.assertEquals(FIXTURE_PACKAGE, pck.name());
     Assert.assertEquals("package " + FIXTURE_PACKAGE, pck.toString());
   }
 }

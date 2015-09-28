@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 public class BindingAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnotation>implements AnnotationSpi {
   private final AnnotatableSpi m_owner;
   private final AnnotationBinding m_binding;
-  private LinkedHashMap<String, AnnotationValueSpi> m_values;//sorted
+  private Map<String, AnnotationValueSpi> m_values;//sorted
   private TypeSpi m_type;
 
   BindingAnnotationWithJdt(JavaEnvironmentWithJdt env, AnnotatableSpi owner, AnnotationBinding binding) {
@@ -69,7 +69,7 @@ public class BindingAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnota
   public Map<String, AnnotationValueSpi> getValues() {
     if (m_values == null) {
       Map<String, ElementValuePair> defaultsMap = SpiWithJdtUtils.getBindingAnnotationSyntheticDefaultValues(m_env, m_binding.getAnnotationType());
-      final LinkedHashMap<String, AnnotationValueSpi> result = new LinkedHashMap<>(defaultsMap.size());
+      final Map<String, AnnotationValueSpi> result = new LinkedHashMap<>(defaultsMap.size());
       //fill keys only in correct sort order
       for (String name : defaultsMap.keySet()) {
         result.put(name, null);

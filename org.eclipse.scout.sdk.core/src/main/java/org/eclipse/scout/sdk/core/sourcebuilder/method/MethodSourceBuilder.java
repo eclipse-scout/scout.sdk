@@ -50,17 +50,17 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
 
   public MethodSourceBuilder(IMethod element) {
     super(element);
-    for (ITypeParameter t : element.getTypeParameters()) {
+    for (ITypeParameter t : element.typeParameters()) {
       addTypeParameter(new TypeParameterSourceBuilder(t));
     }
-    setReturnTypeSignature(SignatureUtils.getTypeSignature(element.getReturnType()));
-    for (IMethodParameter param : element.getParameters()) {
+    setReturnTypeSignature(SignatureUtils.getTypeSignature(element.returnType()));
+    for (IMethodParameter param : element.parameters().list()) {
       addParameter(new MethodParameterSourceBuilder(param));
     }
-    for (IType t : element.getExceptionTypes()) {
+    for (IType t : element.exceptionTypes()) {
       addExceptionSignature(SignatureUtils.getTypeSignature(t));
     }
-    ISourceRange body = element.getSourceOfBody();
+    ISourceRange body = element.sourceOfBody();
     if (body != null) {
       setBody(new RawSourceBuilder(body.toString()));
     }
@@ -91,7 +91,7 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
     }
 
     if (!StringUtils.isEmpty(getReturnTypeSignature())) {//constructor
-      source.append(SignatureUtils.useSignature(getReturnTypeSignature(), validator) + " ");
+      source.append(validator.useSignature(getReturnTypeSignature()) + " ");
     }
     source.append(getElementName());
     source.append("(");
@@ -108,10 +108,10 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
     Iterator<String> exceptionSigIterator = getExceptionSignatures().iterator();
     if (exceptionSigIterator.hasNext()) {
       // first
-      source.append(" throws ").append(SignatureUtils.useSignature(exceptionSigIterator.next(), validator));
+      source.append(" throws ").append(validator.useSignature(exceptionSigIterator.next()));
     }
     while (exceptionSigIterator.hasNext()) {
-      source.append(", ").append(SignatureUtils.useSignature(exceptionSigIterator.next(), validator));
+      source.append(", ").append(validator.useSignature(exceptionSigIterator.next()));
 
     }
     if (Flags.isInterface(getFlags()) || Flags.isAbstract(getFlags())) {

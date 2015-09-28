@@ -14,19 +14,20 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkConsole;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link ResourceBuilder}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  */
 public class ResourceBuilder implements IResourceBuilder {
   private final String m_packageName;
   private final String m_fileName;
-  private final ArrayList<IResourceFragmentBuilder> m_fragments = new ArrayList<>();
+  private final List<IResourceFragmentBuilder> m_fragments = new ArrayList<>();
   private final StringBuilder m_errors = new StringBuilder();
 
   /**
@@ -69,20 +70,20 @@ public class ResourceBuilder implements IResourceBuilder {
 
   @Override
   public void addErrorMessage(String taskType, String msg, Throwable... exceptions) {
-    SdkConsole.println(getPackageName() + " " + getFileName() + " " + msg, exceptions);
+    SdkLog.warning(getPackageName() + " " + getFileName() + " " + msg, exceptions);
     if (msg != null) {
       m_errors.append(taskType + " [generator] " + msg);
       m_errors.append("\n");
     }
     if (exceptions != null) {
       for (Throwable t : exceptions) {
-        m_errors.append(SdkConsole.formatException(t));
+        m_errors.append(SdkConsole.getStackTrace(t));
         m_errors.append("\n");
       }
     }
   }
 
-  protected void appendErrorMessages(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+  protected void appendErrorMessages(StringBuilder source, String lineDelimiter, PropertyMap context, IImportCollector validator) {
     if (m_errors.length() > 0) {
       source.append("/*");
       source.append(lineDelimiter);

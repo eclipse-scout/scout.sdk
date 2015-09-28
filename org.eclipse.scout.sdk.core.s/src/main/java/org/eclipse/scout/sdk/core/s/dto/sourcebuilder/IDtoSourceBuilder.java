@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 /**
  * <h3>{@link IDtoSourceBuilder}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  */
 public interface IDtoSourceBuilder extends ISourceBuilder {
   /**

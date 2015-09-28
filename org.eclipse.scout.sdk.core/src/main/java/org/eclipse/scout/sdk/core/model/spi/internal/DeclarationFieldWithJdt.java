@@ -20,7 +20,6 @@ import org.eclipse.jdt.internal.compiler.ast.FieldDeclaration;
 import org.eclipse.jdt.internal.compiler.ast.Initializer;
 import org.eclipse.jdt.internal.compiler.ast.Javadoc;
 import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
-import org.eclipse.scout.sdk.core.model.api.IConstantMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
@@ -39,7 +38,7 @@ public class DeclarationFieldWithJdt extends AbstractMemberWithJdt<IField>implem
   private String m_nameS;
   private TypeSpi m_type;
   private List<DeclarationAnnotationWithJdt> m_annotations;
-  private AtomicReference<IConstantMetaValue> m_constRef;
+  private AtomicReference<IMetaValue> m_constRef;
 
   DeclarationFieldWithJdt(JavaEnvironmentWithJdt env, DeclarationTypeWithJdt declaringType, FieldDeclaration astNode) {
     super(env);
@@ -77,13 +76,13 @@ public class DeclarationFieldWithJdt extends AbstractMemberWithJdt<IField>implem
   }
 
   @Override
-  public IConstantMetaValue getConstantValue() {
+  public IMetaValue getConstantValue() {
     if (m_constRef == null) {
       if (m_astNode.initialization != null) {
         Object compiledValue = SpiWithJdtUtils.compileExpression(m_astNode.initialization, null);
         IMetaValue resolvedValue = SpiWithJdtUtils.resolveCompiledValue(m_env, this, compiledValue);
-        if (resolvedValue instanceof IConstantMetaValue) {
-          m_constRef = new AtomicReference<>((IConstantMetaValue) resolvedValue);
+        if (resolvedValue != null) {
+          m_constRef = new AtomicReference<>(resolvedValue);
           return m_constRef.get();
         }
       }

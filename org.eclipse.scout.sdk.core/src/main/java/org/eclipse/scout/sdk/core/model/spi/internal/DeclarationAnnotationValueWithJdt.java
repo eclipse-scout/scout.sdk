@@ -69,7 +69,7 @@ public class DeclarationAnnotationValueWithJdt extends AbstractJavaElementWithJd
   }
 
   @Override
-  public boolean isSyntheticDefaultValue() {
+  public boolean isDefaultValue() {
     return m_syntheticDefaultValue;
   }
 

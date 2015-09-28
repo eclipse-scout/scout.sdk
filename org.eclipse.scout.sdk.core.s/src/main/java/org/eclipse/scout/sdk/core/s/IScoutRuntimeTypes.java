@@ -13,10 +13,7 @@ package org.eclipse.scout.sdk.core.s;
 /**
  * Classes indices and values used in the scout runtime.
  */
-public interface IRuntimeClasses {
-
-  // annotation attribute names
-  String ORDER_ANNOTATION_VALUE = "value";
+public interface IScoutRuntimeTypes {
 
   // type parameter positions
   int TYPE_PARAM_EXTENSION__OWNER = 0;

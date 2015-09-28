@@ -39,7 +39,7 @@ public final class ExpressionSourceBuilderFactory {
     return new ISourceBuilder() {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        String typeName = SignatureUtils.useSignature(signature, validator);
+        String typeName = validator.useSignature(signature);
         source.append(typeName + ".class");
       }
     };
@@ -49,7 +49,7 @@ public final class ExpressionSourceBuilderFactory {
     return new ISourceBuilder() {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        String typeName = SignatureUtils.useSignature(enumSignature, validator);
+        String typeName = validator.useSignature(enumSignature);
         source.append(typeName + "." + enumField);
       }
     };
@@ -106,52 +106,52 @@ public final class ExpressionSourceBuilderFactory {
   }
 
   public static ISourceBuilder createFromMetaValue(final IMetaValue metaValue) {
-    switch (metaValue.getType()) {
+    switch (metaValue.type()) {
       case Null:
         return new RawSourceBuilder("null");
       case Int:
-        return new RawSourceBuilder(metaValue.getObject(Integer.class).toString());
+        return new RawSourceBuilder(metaValue.get(Integer.class).toString());
       case Byte:
-        return new RawSourceBuilder(metaValue.getObject(Byte.class).toString());
+        return new RawSourceBuilder(metaValue.get(Byte.class).toString());
       case Short:
-        return new RawSourceBuilder(metaValue.getObject(Short.class).toString());
+        return new RawSourceBuilder(metaValue.get(Short.class).toString());
       case Char:
-        char ch = metaValue.getObject(Character.class);
+        char ch = metaValue.get(Character.class);
         return new RawSourceBuilder("'" + ch + "'");
       case Float:
-        float f = metaValue.getObject(Float.class);
+        float f = metaValue.get(Float.class);
         return new RawSourceBuilder(f + "f");
       case Double:
-        return new RawSourceBuilder(metaValue.getObject(Double.class).toString());
+        return new RawSourceBuilder(metaValue.get(Double.class).toString());
       case Bool:
-        return new RawSourceBuilder(metaValue.getObject(Boolean.class).toString());
+        return new RawSourceBuilder(metaValue.get(Boolean.class).toString());
       case Long:
-        long l = metaValue.getObject(Long.class);
+        long l = metaValue.get(Long.class);
         return new RawSourceBuilder(l + "L");
       case String:
-        String s = metaValue.getObject(String.class);
+        String s = metaValue.get(String.class);
         return new RawSourceBuilder(CoreUtils.toStringLiteral(s));
       case Type:
-        IType type = metaValue.getObject(IType.class);
+        IType type = metaValue.get(IType.class);
         return createClassLiteral(SignatureUtils.getTypeSignature(type));
       case Enum:
-        IField field = metaValue.getObject(IField.class);
-        return createEnumValue(SignatureUtils.getTypeSignature(field.getDeclaringType()), field.getElementName());
+        IField field = metaValue.get(IField.class);
+        return createEnumValue(SignatureUtils.getTypeSignature(field.declaringType()), field.elementName());
       case Annotation:
-        IAnnotation a = metaValue.getObject(IAnnotation.class);
+        IAnnotation a = metaValue.get(IAnnotation.class);
         return new AnnotationSourceBuilder(a);
       case Array:
-        IMetaValue[] metaArray = ((IArrayMetaValue) metaValue).getMetaValueArray();
+        IMetaValue[] metaArray = ((IArrayMetaValue) metaValue).metaValueArray();
         int n = metaArray.length;
         //use newlines on multi-dimensional arrays and annotation arrays only
-        boolean useNewlines = (n > 0 && (metaArray[0].getType() == MetaValueType.Array || metaArray[0].getType() == MetaValueType.Annotation));
+        boolean useNewlines = (n > 0 && (metaArray[0].type() == MetaValueType.Array || metaArray[0].type() == MetaValueType.Annotation));
         ArrayList<ISourceBuilder> sourceBuilderList = new ArrayList<>(n);
         for (IMetaValue metaElement : metaArray) {
           sourceBuilderList.add(createFromMetaValue(metaElement));
         }
         return createArray(sourceBuilderList, useNewlines);
       default:
-        return new RawSourceBuilder("UNKNOWN(" + metaValue.getType() + ", " + metaValue + ")");
+        return new RawSourceBuilder("UNKNOWN(" + metaValue.type() + ", " + metaValue + ")");
     }
   }
 }

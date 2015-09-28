@@ -38,75 +38,75 @@ public class AnnotationTest {
     Assert.assertNotNull(childClassType);
 
     // type annotation
-    List<? extends IAnnotation> annotations = childClassType.getAnnotations();
+    List<IAnnotation> annotations = childClassType.annotations().list();
     Assert.assertEquals(1, annotations.size());
     IAnnotation annotation = annotations.get(0);
     int nreal = 0, nsynth = 0;
-    for (IAnnotationValue v : annotation.getValues().values()) {
-      nreal += (v.isSyntheticDefaultValue() ? 0 : 1);
-      nsynth += (v.isSyntheticDefaultValue() ? 1 : 0);
+    for (IAnnotationValue v : annotation.values().values()) {
+      nreal += (v.isDefaultValue() ? 0 : 1);
+      nsynth += (v.isDefaultValue() ? 1 : 0);
     }
     Assert.assertEquals(1, nreal);
     Assert.assertEquals(2, nsynth);
-    Assert.assertNotNull(annotation.getValue("values"));
-    Assert.assertEquals(childClassType, annotation.getOwner());
-    Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
+    Assert.assertNotNull(annotation.value("values"));
+    Assert.assertEquals(childClassType, annotation.owner());
+    Assert.assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
     // methodInChildClass annotation
-    IMethod methodInChildClass = childClassType.getMethods().get(1);
-    Assert.assertEquals(1, methodInChildClass.getAnnotations().size());
-    annotation = methodInChildClass.getAnnotations().get(0);
+    IMethod methodInChildClass = childClassType.methods().list().get(1);
+    Assert.assertEquals(1, methodInChildClass.annotations().list().size());
+    annotation = methodInChildClass.annotations().first();
     nreal = 0;
     nsynth = 0;
-    for (IAnnotationValue v : annotation.getValues().values()) {
-      nreal += (v.isSyntheticDefaultValue() ? 0 : 1);
-      nsynth += (v.isSyntheticDefaultValue() ? 1 : 0);
+    for (IAnnotationValue v : annotation.values().values()) {
+      nreal += (v.isDefaultValue() ? 0 : 1);
+      nsynth += (v.isDefaultValue() ? 1 : 0);
     }
     Assert.assertEquals(2, nreal);
     Assert.assertEquals(1, nsynth);
-    Assert.assertNotNull(annotation.getValue("values"));
-    Assert.assertNotNull(annotation.getValue("en"));
-    Assert.assertEquals(methodInChildClass, annotation.getOwner());
-    Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
+    Assert.assertNotNull(annotation.value("values"));
+    Assert.assertNotNull(annotation.value("en"));
+    Assert.assertEquals(methodInChildClass, annotation.owner());
+    Assert.assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
     // firstCase annotation
-    IMethod firstCase = childClassType.getMethods().get(2);
-    Assert.assertEquals(1, firstCase.getAnnotations().size());
-    annotation = firstCase.getAnnotations().get(0);
-    Assert.assertEquals(1, annotation.getValues().size());
-    Assert.assertNotNull(annotation.getValue("value"));
-    Assert.assertEquals(firstCase, annotation.getOwner());
-    Assert.assertEquals(SuppressWarnings.class.getName(), annotation.getType().getName());
+    IMethod firstCase = childClassType.methods().list().get(2);
+    Assert.assertEquals(1, firstCase.annotations().list().size());
+    annotation = firstCase.annotations().first();
+    Assert.assertEquals(1, annotation.values().size());
+    Assert.assertNotNull(annotation.value("value"));
+    Assert.assertEquals(firstCase, annotation.owner());
+    Assert.assertEquals(SuppressWarnings.class.getName(), annotation.type().name());
   }
 
   @Test
   public void testAnnotationsWithAnnotationValues() {
     IType wildcardBaseClass = CoreTestingUtils.createJavaEnvironment().findType("org.eclipse.scout.sdk.core.fixture.WildcardBaseClass");
-    IAnnotation testAnnot = wildcardBaseClass.getAnnotations().get(0);
-    IAnnotationValue value = testAnnot.getValue("inner");
+    IAnnotation testAnnot = wildcardBaseClass.annotations().first();
+    IAnnotationValue value = testAnnot.value("inner");
     Assert.assertNotNull(value);
-    Assert.assertTrue(value.getMetaValue().getType() == MetaValueType.Array);
+    Assert.assertTrue(value.metaValue().type() == MetaValueType.Array);
 
-    IMetaValue[] arr = ((IArrayMetaValue) value.getMetaValue()).getMetaValueArray();
+    IMetaValue[] arr = ((IArrayMetaValue) value.metaValue()).metaValueArray();
     Assert.assertEquals(2, arr.length);
 
-    IAnnotation annot0 = arr[0].getObject(IAnnotation.class);
-    Assert.assertEquals(wildcardBaseClass, annot0.getOwner());
-    Assert.assertEquals(ValueAnnot.class.getName(), annot0.getType().getName());
-    Assert.assertEquals("a", annot0.getValue("value").getMetaValue().getObject(String.class));
+    IAnnotation annot0 = arr[0].get(IAnnotation.class);
+    Assert.assertEquals(wildcardBaseClass, annot0.owner());
+    Assert.assertEquals(ValueAnnot.class.getName(), annot0.type().name());
+    Assert.assertEquals("a", annot0.value("value").metaValue().get(String.class));
 
-    IAnnotation annot1 = arr[1].getObject(IAnnotation.class);
-    Assert.assertEquals(wildcardBaseClass, annot1.getOwner());
-    Assert.assertEquals(ValueAnnot.class.getName(), annot1.getType().getName());
-    Assert.assertEquals("b", annot1.getValue("value").getMetaValue().getObject(String.class));
+    IAnnotation annot1 = arr[1].get(IAnnotation.class);
+    Assert.assertEquals(wildcardBaseClass, annot1.owner());
+    Assert.assertEquals(ValueAnnot.class.getName(), annot1.type().name());
+    Assert.assertEquals("b", annot1.value("value").metaValue().get(String.class));
   }
 
   @Test
   public void testToString() {
-    IAnnotation annotation = CoreTestingUtils.getChildClassType().getMethods().get(2).getAnnotations().get(0);
+    IAnnotation annotation = CoreTestingUtils.getChildClassType().methods().list().get(2).annotations().first();
     Assert.assertFalse(StringUtils.isBlank(annotation.toString()));
 
-    annotation = CoreTestingUtils.getBaseClassType().getAnnotations().get(0);
+    annotation = CoreTestingUtils.getBaseClassType().annotations().first();
     Assert.assertFalse(StringUtils.isBlank(annotation.toString()));
   }
 
@@ -116,42 +116,42 @@ public class AnnotationTest {
     Assert.assertNotNull(baseClassType);
 
     // type annotation
-    List<? extends IAnnotation> annotations = baseClassType.getAnnotations();
+    List<IAnnotation> annotations = baseClassType.annotations().list();
     Assert.assertEquals(1, annotations.size());
     IAnnotation annotation = annotations.get(0);
     int nreal = 0, nsynth = 0;
-    for (IAnnotationValue v : annotation.getValues().values()) {
-      nreal += (v.isSyntheticDefaultValue() ? 0 : 1);
-      nsynth += (v.isSyntheticDefaultValue() ? 1 : 0);
+    for (IAnnotationValue v : annotation.values().values()) {
+      nreal += (v.isDefaultValue() ? 0 : 1);
+      nsynth += (v.isDefaultValue() ? 1 : 0);
     }
     Assert.assertEquals(1, nreal);
     Assert.assertEquals(2, nsynth);
-    Assert.assertNotNull(annotation.getValue("values"));
-    Assert.assertEquals(baseClassType, annotation.getOwner());
-    Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
+    Assert.assertNotNull(annotation.value("values"));
+    Assert.assertEquals(baseClassType, annotation.owner());
+    Assert.assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
     // methodInBaseClass annotation
-    IMethod methodInBaseClass = baseClassType.getMethods().get(0);
-    Assert.assertEquals(2, methodInBaseClass.getAnnotations().size());
+    IMethod methodInBaseClass = baseClassType.methods().list().get(0);
+    Assert.assertEquals(2, methodInBaseClass.annotations().list().size());
 
-    annotation = methodInBaseClass.getAnnotations().get(0);
+    annotation = methodInBaseClass.annotations().first();
     nreal = 0;
     nsynth = 0;
-    for (IAnnotationValue v : annotation.getValues().values()) {
-      nreal += (v.isSyntheticDefaultValue() ? 0 : 1);
-      nsynth += (v.isSyntheticDefaultValue() ? 1 : 0);
+    for (IAnnotationValue v : annotation.values().values()) {
+      nreal += (v.isDefaultValue() ? 0 : 1);
+      nsynth += (v.isDefaultValue() ? 1 : 0);
     }
     Assert.assertEquals(1, nreal);
     Assert.assertEquals(2, nsynth);
-    Assert.assertNotNull(annotation.getValue("values"));
-    Assert.assertNotNull(annotation.getValue("en"));//default value TestEnum.A
-    Assert.assertEquals(methodInBaseClass, annotation.getOwner());
-    Assert.assertEquals(TestAnnotation.class.getName(), annotation.getType().getName());
+    Assert.assertNotNull(annotation.value("values"));
+    Assert.assertNotNull(annotation.value("en"));//default value TestEnum.A
+    Assert.assertEquals(methodInBaseClass, annotation.owner());
+    Assert.assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
-    annotation = methodInBaseClass.getAnnotations().get(1);
-    Assert.assertEquals(0, annotation.getValues().size());
-    Assert.assertEquals(methodInBaseClass, annotation.getOwner());
-    Assert.assertEquals(MarkerAnnotation.class.getName(), annotation.getType().getName());
+    annotation = methodInBaseClass.annotations().list().get(1);
+    Assert.assertEquals(0, annotation.values().size());
+    Assert.assertEquals(methodInBaseClass, annotation.owner());
+    Assert.assertEquals(MarkerAnnotation.class.getName(), annotation.type().name());
   }
 
   @Test
@@ -160,12 +160,12 @@ public class AnnotationTest {
     IType deprChildType = CoreTestingUtils.createJavaEnvironment().findType(org.eclipse.scout.sdk.core.fixture.DeprecatedChildClass.class.getName());
     Assert.assertNotNull(deprChildType);
 
-    IType deprBaseType = deprChildType.getSuperClass();
+    IType deprBaseType = deprChildType.superClass();
 
-    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.getFlags());
-    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.getFlags());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.flags());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.flags());
 
-    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.getMethods().get(0).getFlags());
-    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.getMethods().get(0).getFlags());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprChildType.methods().list().get(0).flags());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccDeprecated, deprBaseType.methods().list().get(0).flags());
   }
 }

@@ -14,7 +14,7 @@ import java.io.Serializable;
 import java.util.AbstractList;
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.InterfaceLevel1;
 import org.eclipse.scout.sdk.core.fixture.InterfaceLevel2;
@@ -33,7 +33,7 @@ import org.junit.Test;
 public class CoreUtilsTest {
   @Test
   public void testGetInnerTypes() {
-    List<IType> innerTypes = CoreUtils.getInnerTypes(CoreTestingUtils.getBaseClassType(), TypeFilters.flags(Flags.AccStatic), TypeComparators.typeNameComparator());
+    List<IType> innerTypes = CoreTestingUtils.getBaseClassType().innerTypes().withFilter(TypeFilters.flags(Flags.AccStatic)).list();
     Assert.assertEquals(1, innerTypes.size());
   }
 
@@ -53,24 +53,17 @@ public class CoreUtilsTest {
 
   @Test
   public void testFindInnerType() {
-    Assert.assertEquals(CoreTestingUtils.getBaseClassType().getTypes().get(0), CoreUtils.findInnerType(CoreTestingUtils.getBaseClassType(), "InnerClass1"));
+    Assert.assertEquals(CoreTestingUtils.getBaseClassType().innerTypes().first(), CoreTestingUtils.getBaseClassType().innerTypes().withSimpleName("InnerClass1").first());
   }
 
   @Test
   public void testGetAllSuperInterfaces() {
-    Assert.assertEquals(2, CoreUtils.getAllSuperInterfaces(CoreTestingUtils.getBaseClassType()).size());
-  }
-
-  @Test
-  public void testIsGenericType() {
-    Assert.assertTrue(CoreUtils.isGenericType(CoreTestingUtils.getChildClassType()));
-    Assert.assertTrue(CoreUtils.isGenericType(CoreTestingUtils.getBaseClassType()));
-    Assert.assertFalse(CoreUtils.isGenericType(CoreTestingUtils.getBaseClassType().getTypes().get(0)));
+    Assert.assertEquals(2, CoreTestingUtils.getBaseClassType().superTypes().withSelf(false).withSuperClasses(false).list().size());
   }
 
   @Test
   public void testGetFields() {
-    Assert.assertEquals(1, CoreUtils.getFields(CoreTestingUtils.getChildClassType(), FieldFilters.name("m_test")).size());
+    Assert.assertEquals(1, CoreTestingUtils.getChildClassType().fields().withName("m_test").list().size());
   }
 
   @Test
@@ -88,16 +81,16 @@ public class CoreUtilsTest {
 
   @Test
   public void testFindMethodInSuperHierarchy() {
-    IMethod methodInBaseClass = CoreUtils.findMethodInSuperHierarchy(CoreTestingUtils.getChildClassType(), MethodFilters.annotationName(MarkerAnnotation.class.getName()));
+    IMethod methodInBaseClass = CoreTestingUtils.getChildClassType().methods().withSuperTypes(true).withFilter(MethodFilters.annotationName(MarkerAnnotation.class.getName())).first();
     Assert.assertNotNull(methodInBaseClass);
-    Assert.assertEquals("methodInBaseClass", methodInBaseClass.getElementName());
+    Assert.assertEquals("methodInBaseClass", methodInBaseClass.elementName());
   }
 
   @Test
   public void testFindInnerTypeInSuperHierarchy() {
     IType innerTypeInSuperClass = CoreUtils.findInnerTypeInSuperHierarchy(CoreTestingUtils.getChildClassType(), TypeFilters.simpleName("InnerClass2"));
     Assert.assertNotNull(innerTypeInSuperClass);
-    Assert.assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerTypeInSuperClass.getName());
+    Assert.assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerTypeInSuperClass.name());
   }
 
   @Test
@@ -140,37 +133,36 @@ public class CoreUtilsTest {
 
   @Test
   public void testGetAnnotation() {
-    Assert.assertNotNull(CoreUtils.getAnnotation(CoreTestingUtils.getBaseClassType().getMethods().get(0), MarkerAnnotation.class.getName()));
-    Assert.assertNotNull(CoreUtils.getAnnotation(CoreTestingUtils.getBaseClassType().getMethods().get(0), MarkerAnnotation.class.getSimpleName()));
+    Assert.assertNotNull(CoreTestingUtils.getBaseClassType().methods().first().annotations().withName(MarkerAnnotation.class.getName()).first());
   }
 
   @Test
   public void testIsOnClasspath() {
-    Assert.assertTrue(CoreUtils.isOnClasspath(CoreTestingUtils.getChildClassIcu().getJavaEnvironment(), TypeNames.java_lang_Long));
-    Assert.assertTrue(CoreUtils.isOnClasspath(CoreTestingUtils.getChildClassIcu().getJavaEnvironment(), org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
-    Assert.assertFalse(CoreUtils.isOnClasspath(CoreTestingUtils.getChildClassIcu().getJavaEnvironment(), "not.existing.Type"));
+    Assert.assertTrue(CoreUtils.isOnClasspath(CoreTestingUtils.getChildClassIcu().javaEnvironment(), IJavaRuntimeTypes.java_lang_Long));
+    Assert.assertTrue(CoreUtils.isOnClasspath(CoreTestingUtils.getChildClassIcu().javaEnvironment(), org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
+    Assert.assertFalse(CoreUtils.isOnClasspath(CoreTestingUtils.getChildClassIcu().javaEnvironment(), "not.existing.Type"));
   }
 
   @Test
   public void testIsInstanceOf() {
-    Assert.assertTrue(CoreUtils.isInstanceOf(CoreTestingUtils.getChildClassType(), BaseClass.class.getName()));
-    Assert.assertTrue(CoreUtils.isInstanceOf(CoreTestingUtils.getChildClassType(), InterfaceLevel2.class.getName()));
-    Assert.assertFalse(CoreUtils.isInstanceOf(CoreTestingUtils.getChildClassType(), org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
-    Assert.assertFalse(CoreUtils.isInstanceOf(CoreTestingUtils.getChildClassType(), TypeNames.java_lang_Long));
+    Assert.assertTrue(CoreTestingUtils.getChildClassType().isInstanceOf(BaseClass.class.getName()));
+    Assert.assertTrue(CoreTestingUtils.getChildClassType().isInstanceOf(InterfaceLevel2.class.getName()));
+    Assert.assertFalse(CoreTestingUtils.getChildClassType().isInstanceOf(org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
+    Assert.assertFalse(CoreTestingUtils.getChildClassType().isInstanceOf(IJavaRuntimeTypes.java_lang_Long));
   }
 
   @Test
   public void testGetMethod() {
-    Assert.assertNotNull(CoreUtils.getMethod(CoreTestingUtils.getBaseClassType(), "method2InBaseClass"));
-    Assert.assertNull(CoreUtils.getMethod(CoreTestingUtils.getBaseClassType(), "method2InBaseclass"));
+    Assert.assertNotNull(CoreTestingUtils.getBaseClassType().methods().withName("method2InBaseClass").first());
+    Assert.assertNull(CoreTestingUtils.getBaseClassType().methods().withName("method2InBaseclass").first());
   }
 
   @Test
   public void testGetMethods() {
-    List<IMethod> methods = CoreUtils.getMethods(CoreTestingUtils.getBaseClassType(), MethodFilters.flags(Flags.AccSynchronized));
+    List<IMethod> methods = CoreTestingUtils.getBaseClassType().methods().withFilter(MethodFilters.flags(Flags.AccSynchronized)).list();
     Assert.assertEquals(1, methods.size());
 
-    methods = CoreUtils.getMethods(CoreTestingUtils.getBaseClassType(), MethodFilters.flags(Flags.AccPrivate));
+    methods = CoreTestingUtils.getBaseClassType().methods().withFilter(MethodFilters.flags(Flags.AccPrivate)).list();
     Assert.assertEquals(0, methods.size());
   }
 

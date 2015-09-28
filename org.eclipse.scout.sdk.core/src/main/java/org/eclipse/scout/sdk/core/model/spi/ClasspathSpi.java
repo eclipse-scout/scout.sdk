@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.model.spi;
 /**
  * <h3>{@link ClasspathSpi}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public interface ClasspathSpi {
@@ -21,4 +21,6 @@ public interface ClasspathSpi {
   boolean isSource();
 
   String getPath();
+
+  String getEncoding();
 }

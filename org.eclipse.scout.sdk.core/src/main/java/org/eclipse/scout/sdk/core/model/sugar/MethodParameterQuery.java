@@ -13,25 +13,26 @@ package org.eclipse.scout.sdk.core.model.sugar;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
+import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link MethodParameterQuery}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class MethodParameterQuery {
-  private final IMethod m_method;
+  private final MethodSpi m_method;
   private String m_name;
   private IType m_dataType;
   private IFilter<IMethodParameter> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
-  public MethodParameterQuery(IMethod method) {
+  public MethodParameterQuery(MethodSpi method) {
     m_method = method;
   }
 
@@ -72,20 +73,21 @@ public class MethodParameterQuery {
   }
 
   protected boolean accept(IMethodParameter p) {
-    if (m_name != null && !m_name.equals(p.getElementName())) {
+    if (m_name != null && !m_name.equals(p.elementName())) {
       return false;
     }
     if (m_filter != null && !m_filter.evaluate(p)) {
       return false;
     }
-    if (m_dataType != null && !m_dataType.getSignature().equals(p.getDataType().getSignature())) {
+    if (m_dataType != null && !m_dataType.signature().equals(p.dataType().signature())) {
       return false;
     }
     return true;
   }
 
-  protected void visit(IMethod m, List<IMethodParameter> result, int maxCount) {
-    for (IMethodParameter p : m.getParameters()) {
+  protected void visit(MethodSpi m, List<IMethodParameter> result, int maxCount) {
+    for (MethodParameterSpi spi : m.getParameters()) {
+      IMethodParameter p = spi.wrap();
       if (accept(p)) {
         result.add(p);
         if (result.size() >= maxCount) {
@@ -95,18 +97,18 @@ public class MethodParameterQuery {
     }
   }
 
-  public boolean exists() {
+  public boolean existsAny() {
     return first() != null;
   }
 
   public IMethodParameter first() {
-    ArrayList<IMethodParameter> result = new ArrayList<>(1);
+    List<IMethodParameter> result = new ArrayList<>(1);
     visit(m_method, result, 1);
     return result.isEmpty() ? null : result.get(0);
   }
 
   public List<IMethodParameter> list() {
-    ArrayList<IMethodParameter> result = new ArrayList<>();
+    List<IMethodParameter> result = new ArrayList<>();
     visit(m_method, result, m_maxResultCount);
     return result;
   }

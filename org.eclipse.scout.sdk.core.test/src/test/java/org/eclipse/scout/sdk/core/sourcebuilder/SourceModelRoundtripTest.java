@@ -13,6 +13,8 @@ package org.eclipse.scout.sdk.core.sourcebuilder;
 import java.io.IOException;
 
 import org.eclipse.scout.sdk.core.fixture.ClassWithMembers;
+import org.eclipse.scout.sdk.core.importcollector.EmptyImportCollector;
+import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
@@ -27,7 +29,7 @@ import org.junit.Test;
 /**
  * <h3>{@link SourceModelRoundtripTest}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class SourceModelRoundtripTest {
@@ -40,9 +42,9 @@ public class SourceModelRoundtripTest {
     String src1 = CoreUtils.inputStreamToString(ClassWithMembers.class.getResourceAsStream("/ClassWithMembers_source.txt"), "UTF-8").toString();
 
     StringBuilder buf = new StringBuilder();
-    ImportValidator v = new ImportValidator(env);
+    IImportValidator validator = new ImportValidator(new ImportCollector());
     //v.addImport(type.getName());
-    new CompilationUnitSourceBuilder(type.getCompilationUnit()).createSource(buf, "\n", new PropertyMap(), v);
+    new CompilationUnitSourceBuilder(type.compilationUnit()).createSource(buf, "\n", new PropertyMap(), validator);
     String src2 = buf.toString();
     Assert.assertEquals(CoreTestingUtils.removeWhitespace(src1), CoreTestingUtils.removeWhitespace(src2));
   }
@@ -55,7 +57,7 @@ public class SourceModelRoundtripTest {
     String src1 = CoreUtils.inputStreamToString(ClassWithMembers.class.getResourceAsStream("/ClassWithMembers_binary.txt"), "UTF-8").toString();
 
     StringBuilder buf = new StringBuilder();
-    new CompilationUnitSourceBuilder(type.getCompilationUnit()).createSource(buf, "\n", new PropertyMap(), IImportValidator.DUMMY);
+    new CompilationUnitSourceBuilder(type.compilationUnit()).createSource(buf, "\n", new PropertyMap(), new ImportValidator(new EmptyImportCollector()));
     String src2 = buf.toString();
 
     Assert.assertEquals(CoreTestingUtils.removeWhitespace(src1), CoreTestingUtils.removeWhitespace(src2));

@@ -756,7 +756,6 @@ public abstract class AbstractNlsProject implements INlsProject {
             break;
           }
           case NlsProjectEvent.TYPE_TRANSLATION_RESOURCE_ADDED: {
-            // TODO mvi
             break;
           }
         }

@@ -61,7 +61,7 @@ public class ExtensionFormDataTest {
     SdkAssert.assertAnnotation(multiColumnExtensionData, "javax.annotation.Generated");
 
     // fields of MultiColumnExtensionData
-    Assert.assertEquals("field count of 'MultiColumnExtensionData'", 5, multiColumnExtensionData.getFields().size());
+    Assert.assertEquals("field count of 'MultiColumnExtensionData'", 5, multiColumnExtensionData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(multiColumnExtensionData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
@@ -78,7 +78,7 @@ public class ExtensionFormDataTest {
     SdkAssert.assertHasFlags(m_fourthDouble, 2);
     SdkAssert.assertFieldSignature(m_fourthDouble, "QBigDecimal;");
 
-    Assert.assertEquals("method count of 'MultiColumnExtensionData'", 5, multiColumnExtensionData.getMethods().size());
+    Assert.assertEquals("method count of 'MultiColumnExtensionData'", 5, multiColumnExtensionData.methods().list().size());
     IMethod multiColumnExtensionData1 = SdkAssert.assertMethodExist(multiColumnExtensionData, "MultiColumnExtensionData", new String[]{});
     Assert.assertTrue(multiColumnExtensionData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(multiColumnExtensionData1, null);
@@ -91,7 +91,7 @@ public class ExtensionFormDataTest {
     IMethod setFourthDouble = SdkAssert.assertMethodExist(multiColumnExtensionData, "setFourthDouble", new String[]{"QBigDecimal;"});
     SdkAssert.assertMethodReturnTypeSignature(setFourthDouble, "V");
 
-    Assert.assertEquals("inner types count of 'MultiColumnExtensionData'", 0, multiColumnExtensionData.getTypes().size());
+    Assert.assertEquals("inner types count of 'MultiColumnExtensionData'", 0, multiColumnExtensionData.innerTypes().list().size());
   }
 
   private static void testApiOfPropertyExtensionData(IType propertyExtensionData) {
@@ -102,12 +102,12 @@ public class ExtensionFormDataTest {
     SdkAssert.assertAnnotation(propertyExtensionData, "javax.annotation.Generated");
 
     // fields of PropertyExtensionData
-    Assert.assertEquals("field count of 'PropertyExtensionData'", 1, propertyExtensionData.getFields().size());
+    Assert.assertEquals("field count of 'PropertyExtensionData'", 1, propertyExtensionData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(propertyExtensionData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'PropertyExtensionData'", 4, propertyExtensionData.getMethods().size());
+    Assert.assertEquals("method count of 'PropertyExtensionData'", 4, propertyExtensionData.methods().list().size());
     IMethod propertyExtensionData1 = SdkAssert.assertMethodExist(propertyExtensionData, "PropertyExtensionData", new String[]{});
     Assert.assertTrue(propertyExtensionData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(propertyExtensionData1, null);
@@ -118,24 +118,24 @@ public class ExtensionFormDataTest {
     IMethod getLongValueProperty = SdkAssert.assertMethodExist(propertyExtensionData, "getLongValueProperty", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getLongValueProperty, "QLongValueProperty;");
 
-    Assert.assertEquals("inner types count of 'PropertyExtensionData'", 1, propertyExtensionData.getTypes().size());
+    Assert.assertEquals("inner types count of 'PropertyExtensionData'", 1, propertyExtensionData.innerTypes().list().size());
     // type LongValueProperty
     IType longValueProperty = SdkAssert.assertTypeExists(propertyExtensionData, "LongValueProperty");
     SdkAssert.assertHasFlags(longValueProperty, 9);
     SdkAssert.assertHasSuperTypeSignature(longValueProperty, "QAbstractPropertyData<QLong;>;");
 
     // fields of LongValueProperty
-    Assert.assertEquals("field count of 'LongValueProperty'", 1, longValueProperty.getFields().size());
+    Assert.assertEquals("field count of 'LongValueProperty'", 1, longValueProperty.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(longValueProperty, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'LongValueProperty'", 1, longValueProperty.getMethods().size());
+    Assert.assertEquals("method count of 'LongValueProperty'", 1, longValueProperty.methods().list().size());
     IMethod longValueProperty1 = SdkAssert.assertMethodExist(longValueProperty, "LongValueProperty", new String[]{});
     Assert.assertTrue(longValueProperty1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(longValueProperty1, null);
 
-    Assert.assertEquals("inner types count of 'LongValueProperty'", 0, longValueProperty.getTypes().size());
+    Assert.assertEquals("inner types count of 'LongValueProperty'", 0, longValueProperty.innerTypes().list().size());
   }
 
   private static void testApiOfThirdIntegerColumnData(IType thirdIntegerColumnData) {
@@ -146,7 +146,7 @@ public class ExtensionFormDataTest {
     SdkAssert.assertAnnotation(thirdIntegerColumnData, "javax.annotation.Generated");
 
     // fields of ThirdIntegerColumnData
-    Assert.assertEquals("field count of 'ThirdIntegerColumnData'", 3, thirdIntegerColumnData.getFields().size());
+    Assert.assertEquals("field count of 'ThirdIntegerColumnData'", 3, thirdIntegerColumnData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(thirdIntegerColumnData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
@@ -157,7 +157,7 @@ public class ExtensionFormDataTest {
     SdkAssert.assertHasFlags(m_thirdInteger, 2);
     SdkAssert.assertFieldSignature(m_thirdInteger, "QInteger;");
 
-    Assert.assertEquals("method count of 'ThirdIntegerColumnData'", 3, thirdIntegerColumnData.getMethods().size());
+    Assert.assertEquals("method count of 'ThirdIntegerColumnData'", 3, thirdIntegerColumnData.methods().list().size());
     IMethod thirdIntegerColumnData1 = SdkAssert.assertMethodExist(thirdIntegerColumnData, "ThirdIntegerColumnData", new String[]{});
     Assert.assertTrue(thirdIntegerColumnData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(thirdIntegerColumnData1, null);
@@ -166,7 +166,7 @@ public class ExtensionFormDataTest {
     IMethod setThirdInteger = SdkAssert.assertMethodExist(thirdIntegerColumnData, "setThirdInteger", new String[]{"QInteger;"});
     SdkAssert.assertMethodReturnTypeSignature(setThirdInteger, "V");
 
-    Assert.assertEquals("inner types count of 'ThirdIntegerColumnData'", 0, thirdIntegerColumnData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ThirdIntegerColumnData'", 0, thirdIntegerColumnData.innerTypes().list().size());
   }
 
   private static void testApiOfMultipleExtGroupBoxExtensionData(IType multipleExtGroupBoxExtensionData) {
@@ -177,12 +177,12 @@ public class ExtensionFormDataTest {
     SdkAssert.assertAnnotation(multipleExtGroupBoxExtensionData, "javax.annotation.Generated");
 
     // fields of MultipleExtGroupBoxExtensionData
-    Assert.assertEquals("field count of 'MultipleExtGroupBoxExtensionData'", 1, multipleExtGroupBoxExtensionData.getFields().size());
+    Assert.assertEquals("field count of 'MultipleExtGroupBoxExtensionData'", 1, multipleExtGroupBoxExtensionData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(multipleExtGroupBoxExtensionData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'MultipleExtGroupBoxExtensionData'", 3, multipleExtGroupBoxExtensionData.getMethods().size());
+    Assert.assertEquals("method count of 'MultipleExtGroupBoxExtensionData'", 3, multipleExtGroupBoxExtensionData.methods().list().size());
     IMethod multipleExtGroupBoxExtensionData1 = SdkAssert.assertMethodExist(multipleExtGroupBoxExtensionData, "MultipleExtGroupBoxExtensionData", new String[]{});
     Assert.assertTrue(multipleExtGroupBoxExtensionData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(multipleExtGroupBoxExtensionData1, null);
@@ -191,41 +191,41 @@ public class ExtensionFormDataTest {
     IMethod getThirdDate = SdkAssert.assertMethodExist(multipleExtGroupBoxExtensionData, "getThirdDate", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getThirdDate, "QThirdDate;");
 
-    Assert.assertEquals("inner types count of 'MultipleExtGroupBoxExtensionData'", 2, multipleExtGroupBoxExtensionData.getTypes().size());
+    Assert.assertEquals("inner types count of 'MultipleExtGroupBoxExtensionData'", 2, multipleExtGroupBoxExtensionData.innerTypes().list().size());
     // type SecondDouble
     IType secondDouble = SdkAssert.assertTypeExists(multipleExtGroupBoxExtensionData, "SecondDouble");
     SdkAssert.assertHasFlags(secondDouble, 9);
     SdkAssert.assertHasSuperTypeSignature(secondDouble, "QAbstractValueFieldData<QBigDecimal;>;");
 
     // fields of SecondDouble
-    Assert.assertEquals("field count of 'SecondDouble'", 1, secondDouble.getFields().size());
+    Assert.assertEquals("field count of 'SecondDouble'", 1, secondDouble.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(secondDouble, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'SecondDouble'", 1, secondDouble.getMethods().size());
+    Assert.assertEquals("method count of 'SecondDouble'", 1, secondDouble.methods().list().size());
     IMethod secondDouble1 = SdkAssert.assertMethodExist(secondDouble, "SecondDouble", new String[]{});
     Assert.assertTrue(secondDouble1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(secondDouble1, null);
 
-    Assert.assertEquals("inner types count of 'SecondDouble'", 0, secondDouble.getTypes().size());
+    Assert.assertEquals("inner types count of 'SecondDouble'", 0, secondDouble.innerTypes().list().size());
     // type ThirdDate
     IType thirdDate = SdkAssert.assertTypeExists(multipleExtGroupBoxExtensionData, "ThirdDate");
     SdkAssert.assertHasFlags(thirdDate, 9);
     SdkAssert.assertHasSuperTypeSignature(thirdDate, "QAbstractValueFieldData<QDate;>;");
 
     // fields of ThirdDate
-    Assert.assertEquals("field count of 'ThirdDate'", 1, thirdDate.getFields().size());
+    Assert.assertEquals("field count of 'ThirdDate'", 1, thirdDate.fields().list().size());
     IField serialVersionUID2 = SdkAssert.assertFieldExist(thirdDate, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'ThirdDate'", 1, thirdDate.getMethods().size());
+    Assert.assertEquals("method count of 'ThirdDate'", 1, thirdDate.methods().list().size());
     IMethod thirdDate1 = SdkAssert.assertMethodExist(thirdDate, "ThirdDate", new String[]{});
     Assert.assertTrue(thirdDate1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(thirdDate1, null);
 
-    Assert.assertEquals("inner types count of 'ThirdDate'", 0, thirdDate.getTypes().size());
+    Assert.assertEquals("inner types count of 'ThirdDate'", 0, thirdDate.innerTypes().list().size());
   }
 
 }

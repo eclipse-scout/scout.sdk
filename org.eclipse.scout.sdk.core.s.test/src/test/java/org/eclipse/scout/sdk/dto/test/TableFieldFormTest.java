@@ -37,12 +37,12 @@ public class TableFieldFormTest {
     SdkAssert.assertAnnotation(tableFieldFormData, "javax.annotation.Generated");
 
     // fields of TableFieldFormData
-    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData'", 1, tableFieldFormData.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData'", 1, tableFieldFormData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(tableFieldFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData'", 5, tableFieldFormData.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData'", 5, tableFieldFormData.methods().list().size());
     IMethod tableFieldFormData1 = SdkAssert.assertMethodExist(tableFieldFormData, "TableFieldFormData", new String[]{});
     Assert.assertTrue(tableFieldFormData1.isConstructor());
     IMethod getCompanyTable = SdkAssert.assertMethodExist(tableFieldFormData, "getCompanyTable", new String[]{});
@@ -54,19 +54,19 @@ public class TableFieldFormTest {
     IMethod getTableFieldWithExternalTable = SdkAssert.assertMethodExist(tableFieldFormData, "getTableFieldWithExternalTable", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTableFieldWithExternalTable, "Lformdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable;");
 
-    Assert.assertEquals("inner types count of 'TableFieldFormData'", 4, tableFieldFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'TableFieldFormData'", 4, tableFieldFormData.innerTypes().list().size());
     // type CompanyTable
     IType companyTable = SdkAssert.assertTypeExists(tableFieldFormData, "CompanyTable");
     SdkAssert.assertHasFlags(companyTable, 9);
     SdkAssert.assertHasSuperTypeSignature(companyTable, "Lformdata.shared.services.process.AbstractCompanyTableFieldData;");
 
     // fields of CompanyTable
-    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable'", 1, companyTable.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable'", 1, companyTable.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(companyTable, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable'", 8, companyTable.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable'", 8, companyTable.methods().list().size());
     IMethod companyTable1 = SdkAssert.assertMethodExist(companyTable, "CompanyTable", new String[]{});
     Assert.assertTrue(companyTable1.isConstructor());
     IMethod addRow = SdkAssert.assertMethodExist(companyTable, "addRow", new String[]{});
@@ -90,35 +90,35 @@ public class TableFieldFormTest {
     IMethod setRows = SdkAssert.assertMethodExist(companyTable, "setRows", new String[]{"[Lformdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    Assert.assertEquals("inner types count of 'CompanyTable'", 1, companyTable.getTypes().size());
+    Assert.assertEquals("inner types count of 'CompanyTable'", 1, companyTable.innerTypes().list().size());
     // type CompanyTableRowData
     IType companyTableRowData = SdkAssert.assertTypeExists(companyTable, "CompanyTableRowData");
     SdkAssert.assertHasFlags(companyTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(companyTableRowData, "Lformdata.shared.services.process.AbstractCompanyTableFieldData$AbstractCompanyTableRowData;");
 
     // fields of CompanyTableRowData
-    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData'", 1, companyTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData'", 1, companyTableRowData.fields().list().size());
     IField serialVersionUID2 = SdkAssert.assertFieldExist(companyTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData'", 1, companyTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$CompanyTable$CompanyTableRowData'", 1, companyTableRowData.methods().list().size());
     IMethod companyTableRowData1 = SdkAssert.assertMethodExist(companyTableRowData, "CompanyTableRowData", new String[]{});
     Assert.assertTrue(companyTableRowData1.isConstructor());
 
-    Assert.assertEquals("inner types count of 'CompanyTableRowData'", 0, companyTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'CompanyTableRowData'", 0, companyTableRowData.innerTypes().list().size());
     // type ConcreteTable
     IType concreteTable = SdkAssert.assertTypeExists(tableFieldFormData, "ConcreteTable");
     SdkAssert.assertHasFlags(concreteTable, 9);
     SdkAssert.assertHasSuperTypeSignature(concreteTable, "Lorg.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;");
 
     // fields of ConcreteTable
-    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable'", 1, concreteTable.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable'", 1, concreteTable.fields().list().size());
     IField serialVersionUID3 = SdkAssert.assertFieldExist(concreteTable, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable'", 8, concreteTable.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable'", 8, concreteTable.methods().list().size());
     IMethod concreteTable1 = SdkAssert.assertMethodExist(concreteTable, "ConcreteTable", new String[]{});
     Assert.assertTrue(concreteTable1.isConstructor());
     IMethod addRow2 = SdkAssert.assertMethodExist(concreteTable, "addRow", new String[]{});
@@ -142,14 +142,14 @@ public class TableFieldFormTest {
     IMethod setRows1 = SdkAssert.assertMethodExist(concreteTable, "setRows", new String[]{"[Lformdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows1, "V");
 
-    Assert.assertEquals("inner types count of 'ConcreteTable'", 1, concreteTable.getTypes().size());
+    Assert.assertEquals("inner types count of 'ConcreteTable'", 1, concreteTable.innerTypes().list().size());
     // type ConcreteTableRowData
     IType concreteTableRowData = SdkAssert.assertTypeExists(concreteTable, "ConcreteTableRowData");
     SdkAssert.assertHasFlags(concreteTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(concreteTableRowData, "Lorg.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;");
 
     // fields of ConcreteTableRowData
-    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData'", 5, concreteTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData'", 5, concreteTableRowData.fields().list().size());
     IField serialVersionUID4 = SdkAssert.assertFieldExist(concreteTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
@@ -166,7 +166,7 @@ public class TableFieldFormTest {
     SdkAssert.assertHasFlags(m_extKey, 2);
     SdkAssert.assertFieldSignature(m_extKey, "Ljava.lang.Integer;");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData'", 5, concreteTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$ConcreteTable$ConcreteTableRowData'", 5, concreteTableRowData.methods().list().size());
     IMethod concreteTableRowData1 = SdkAssert.assertMethodExist(concreteTableRowData, "ConcreteTableRowData", new String[]{});
     Assert.assertTrue(concreteTableRowData1.isConstructor());
     IMethod getName = SdkAssert.assertMethodExist(concreteTableRowData, "getName", new String[]{});
@@ -178,19 +178,19 @@ public class TableFieldFormTest {
     IMethod setExtKey = SdkAssert.assertMethodExist(concreteTableRowData, "setExtKey", new String[]{"Ljava.lang.Integer;"});
     SdkAssert.assertMethodReturnTypeSignature(setExtKey, "V");
 
-    Assert.assertEquals("inner types count of 'ConcreteTableRowData'", 0, concreteTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ConcreteTableRowData'", 0, concreteTableRowData.innerTypes().list().size());
     // type PersonTable
     IType personTable = SdkAssert.assertTypeExists(tableFieldFormData, "PersonTable");
     SdkAssert.assertHasFlags(personTable, 9);
     SdkAssert.assertHasSuperTypeSignature(personTable, "Lorg.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;");
 
     // fields of PersonTable
-    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$PersonTable'", 1, personTable.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$PersonTable'", 1, personTable.fields().list().size());
     IField serialVersionUID5 = SdkAssert.assertFieldExist(personTable, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID5, 26);
     SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$PersonTable'", 8, personTable.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$PersonTable'", 8, personTable.methods().list().size());
     IMethod personTable1 = SdkAssert.assertMethodExist(personTable, "PersonTable", new String[]{});
     Assert.assertTrue(personTable1.isConstructor());
     IMethod addRow4 = SdkAssert.assertMethodExist(personTable, "addRow", new String[]{});
@@ -214,14 +214,14 @@ public class TableFieldFormTest {
     IMethod setRows2 = SdkAssert.assertMethodExist(personTable, "setRows", new String[]{"[Lformdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows2, "V");
 
-    Assert.assertEquals("inner types count of 'PersonTable'", 1, personTable.getTypes().size());
+    Assert.assertEquals("inner types count of 'PersonTable'", 1, personTable.innerTypes().list().size());
     // type PersonTableRowData
     IType personTableRowData = SdkAssert.assertTypeExists(personTable, "PersonTableRowData");
     SdkAssert.assertHasFlags(personTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(personTableRowData, "Lorg.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;");
 
     // fields of PersonTableRowData
-    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData'", 11, personTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData'", 11, personTableRowData.fields().list().size());
     IField serialVersionUID6 = SdkAssert.assertFieldExist(personTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID6, 26);
     SdkAssert.assertFieldSignature(serialVersionUID6, "J");
@@ -256,7 +256,7 @@ public class TableFieldFormTest {
     SdkAssert.assertHasFlags(m_custom, 2);
     SdkAssert.assertFieldSignature(m_custom, "Ljava.util.Set<Ljava.util.Map<Ljava.lang.String;Ljava.lang.Integer;>;>;");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData'", 11, personTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$PersonTable$PersonTableRowData'", 11, personTableRowData.methods().list().size());
     IMethod personTableRowData1 = SdkAssert.assertMethodExist(personTableRowData, "PersonTableRowData", new String[]{});
     Assert.assertTrue(personTableRowData1.isConstructor());
     IMethod getPersonNr = SdkAssert.assertMethodExist(personTableRowData, "getPersonNr", new String[]{});
@@ -280,19 +280,19 @@ public class TableFieldFormTest {
     IMethod setCustom = SdkAssert.assertMethodExist(personTableRowData, "setCustom", new String[]{"Ljava.util.Set<Ljava.util.Map<Ljava.lang.String;Ljava.lang.Integer;>;>;"});
     SdkAssert.assertMethodReturnTypeSignature(setCustom, "V");
 
-    Assert.assertEquals("inner types count of 'PersonTableRowData'", 0, personTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'PersonTableRowData'", 0, personTableRowData.innerTypes().list().size());
     // type TableFieldWithExternalTable
     IType tableFieldWithExternalTable = SdkAssert.assertTypeExists(tableFieldFormData, "TableFieldWithExternalTable");
     SdkAssert.assertHasFlags(tableFieldWithExternalTable, 9);
     SdkAssert.assertHasSuperTypeSignature(tableFieldWithExternalTable, "Lorg.eclipse.scout.rt.shared.data.form.fields.tablefield.AbstractTableFieldBeanData;");
 
     // fields of TableFieldWithExternalTable
-    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable'", 1, tableFieldWithExternalTable.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable'", 1, tableFieldWithExternalTable.fields().list().size());
     IField serialVersionUID7 = SdkAssert.assertFieldExist(tableFieldWithExternalTable, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID7, 26);
     SdkAssert.assertFieldSignature(serialVersionUID7, "J");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable'", 8, tableFieldWithExternalTable.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable'", 8, tableFieldWithExternalTable.methods().list().size());
     IMethod tableFieldWithExternalTable1 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "TableFieldWithExternalTable", new String[]{});
     Assert.assertTrue(tableFieldWithExternalTable1.isConstructor());
     IMethod addRow6 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "addRow", new String[]{});
@@ -316,14 +316,14 @@ public class TableFieldFormTest {
     IMethod setRows3 = SdkAssert.assertMethodExist(tableFieldWithExternalTable, "setRows", new String[]{"[Lformdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows3, "V");
 
-    Assert.assertEquals("inner types count of 'TableFieldWithExternalTable'", 1, tableFieldWithExternalTable.getTypes().size());
+    Assert.assertEquals("inner types count of 'TableFieldWithExternalTable'", 1, tableFieldWithExternalTable.innerTypes().list().size());
     // type TableFieldWithExternalTableRowData
     IType tableFieldWithExternalTableRowData = SdkAssert.assertTypeExists(tableFieldWithExternalTable, "TableFieldWithExternalTableRowData");
     SdkAssert.assertHasFlags(tableFieldWithExternalTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(tableFieldWithExternalTableRowData, "Lorg.eclipse.scout.rt.shared.data.basic.table.AbstractTableRowData;");
 
     // fields of TableFieldWithExternalTableRowData
-    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData'", 7, tableFieldWithExternalTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData'", 7, tableFieldWithExternalTableRowData.fields().list().size());
     IField serialVersionUID8 = SdkAssert.assertFieldExist(tableFieldWithExternalTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID8, 26);
     SdkAssert.assertFieldSignature(serialVersionUID8, "J");
@@ -346,7 +346,7 @@ public class TableFieldFormTest {
     SdkAssert.assertHasFlags(m_bb, 2);
     SdkAssert.assertFieldSignature(m_bb, "Ljava.lang.String;");
 
-    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData'", 7, tableFieldWithExternalTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.services.process.TableFieldFormData$TableFieldWithExternalTable$TableFieldWithExternalTableRowData'", 7, tableFieldWithExternalTableRowData.methods().list().size());
     IMethod tableFieldWithExternalTableRowData1 = SdkAssert.assertMethodExist(tableFieldWithExternalTableRowData, "TableFieldWithExternalTableRowData", new String[]{});
     Assert.assertTrue(tableFieldWithExternalTableRowData1.isConstructor());
     IMethod getAa = SdkAssert.assertMethodExist(tableFieldWithExternalTableRowData, "getAa", new String[]{});
@@ -362,7 +362,7 @@ public class TableFieldFormTest {
     IMethod setBb = SdkAssert.assertMethodExist(tableFieldWithExternalTableRowData, "setBb", new String[]{"Ljava.lang.String;"});
     SdkAssert.assertMethodReturnTypeSignature(setBb, "V");
 
-    Assert.assertEquals("inner types count of 'TableFieldWithExternalTableRowData'", 0, tableFieldWithExternalTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'TableFieldWithExternalTableRowData'", 0, tableFieldWithExternalTableRowData.innerTypes().list().size());
   }
 
 }

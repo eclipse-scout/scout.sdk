@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
+import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
@@ -26,14 +27,14 @@ import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
-import org.eclipse.scout.sdk.core.util.JavaEnvironmentBuilder;
+import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
 /**
  * <h3>{@link CreateAndOverrideNewCompilationUnitTest}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class CreateAndOverrideNewCompilationUnitTest {
@@ -46,10 +47,10 @@ public class CreateAndOverrideNewCompilationUnitTest {
     ICompilationUnitSourceBuilder cuSrc = createBaseClass();
     cuSrc.getMainType().getMethods().get(0).setReturnTypeSignature(Signature.createTypeSignature("FooBar"));
     StringBuilder buf = new StringBuilder();
-    cuSrc.createSource(buf, "\n", null, new ImportValidator(env));
+    cuSrc.createSource(buf, "\n", null, new ImportValidator(new ImportCollector(env)));
     env.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), buf);
 
-    ICompilationUnit cu = env.findType("a.b.c.BaseClass").getCompilationUnit();
+    ICompilationUnit cu = env.findType("a.b.c.BaseClass").compilationUnit();
     String expected = "" +
         "package a.b.c;\n" +
         "public class BaseClass{\n" +
@@ -57,19 +58,19 @@ public class CreateAndOverrideNewCompilationUnitTest {
         "    System.out.println(\"base class\");\n" +
         "  }\n" +
         "}\n";
-    Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.getSource().toString()));
+    Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().toString()));
 
-    Assert.assertNotNull(env.getCompileErrors("a.b.c.BaseClass"));
+    Assert.assertNotNull(env.compileErrors("a.b.c.BaseClass"));
 
     //now fix the unresolved type error
     cuSrc.getMainType().getMethods().get(0).setReturnTypeSignature(Signature.createTypeSignature("void"));
     buf = new StringBuilder();
-    cuSrc.createSource(buf, "\n", null, new ImportValidator(env));
+    cuSrc.createSource(buf, "\n", null, new ImportValidator(new ImportCollector(env)));
     env.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), buf);
     env.reload();
-    cu = env.findType("a.b.c.BaseClass").getCompilationUnit();
+    cu = env.findType("a.b.c.BaseClass").compilationUnit();
 
-    Assert.assertNull(env.getCompileErrors("a.b.c.BaseClass"));
+    Assert.assertNull(env.compileErrors("a.b.c.BaseClass"));
   }
 
   @Test
@@ -78,9 +79,9 @@ public class CreateAndOverrideNewCompilationUnitTest {
 
     ICompilationUnitSourceBuilder cuSrc = createBaseClass();
     StringBuilder buf = new StringBuilder();
-    cuSrc.createSource(buf, "\n", null, new ImportValidator(env));
+    cuSrc.createSource(buf, "\n", null, new ImportValidator(new ImportCollector(env)));
     env.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), buf);
-    ICompilationUnit cu = env.findType("a.b.c.BaseClass").getCompilationUnit();
+    ICompilationUnit cu = env.findType("a.b.c.BaseClass").compilationUnit();
 
     String expected = "" +
         "package a.b.c;\n" +
@@ -89,11 +90,11 @@ public class CreateAndOverrideNewCompilationUnitTest {
         "    System.out.println(\"base class\");\n" +
         "  }\n" +
         "}\n";
-    Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.getSource().toString()));
+    Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().toString()));
 
     //now read the type from the env
     IType t2 = env.findType("a.b.c.BaseClass");
-    Assert.assertEquals(cu.getMainType().methods().withName("run").first().getSource().toString(), t2.methods().withName("run").first().getSource().toString());
+    Assert.assertEquals(cu.mainType().methods().withName("run").first().source().toString(), t2.methods().withName("run").first().source().toString());
   }
 
   @Test
@@ -102,17 +103,17 @@ public class CreateAndOverrideNewCompilationUnitTest {
 
     ICompilationUnitSourceBuilder cuSrc = createBaseClass();
     StringBuilder buf = new StringBuilder();
-    cuSrc.createSource(buf, "\n", null, new ImportValidator(env));
+    cuSrc.createSource(buf, "\n", null, new ImportValidator(new ImportCollector(env)));
     env.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), buf);
-    ICompilationUnit cu = env.findType("a.b.c.BaseClass").getCompilationUnit();
+    ICompilationUnit cu = env.findType("a.b.c.BaseClass").compilationUnit();
 
     //and now add a subclass
 
     cuSrc = createSubClass();
     buf = new StringBuilder();
-    cuSrc.createSource(buf, "\n", null, new ImportValidator(env));
+    cuSrc.createSource(buf, "\n", null, new ImportValidator(new ImportCollector(env)));
     env.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), buf);
-    cu = env.findType("a.b.c.d.SubClass").getCompilationUnit();
+    cu = env.findType("a.b.c.d.SubClass").compilationUnit();
 
     String expected = "" +
         "package a.b.c.d;\n" +
@@ -124,7 +125,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
         "    System.out.println(\"sub class\");\n" +
         "  }\n" +
         "}\n";
-    Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.getSource().toString()));
+    Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().toString()));
   }
 
   @Test
@@ -134,26 +135,26 @@ public class CreateAndOverrideNewCompilationUnitTest {
     //create base type
     ICompilationUnitSourceBuilder cuSrc = createBaseClass();
     StringBuilder buf = new StringBuilder();
-    cuSrc.createSource(buf, "\n", null, new ImportValidator(env));
+    cuSrc.createSource(buf, "\n", null, new ImportValidator(new ImportCollector(env)));
     env.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), buf);
-    ICompilationUnit cu = env.findType("a.b.c.BaseClass").getCompilationUnit();
+    ICompilationUnit cu = env.findType("a.b.c.BaseClass").compilationUnit();
 
     //create sub type
     cuSrc = createSubClass();
     buf = new StringBuilder();
-    cuSrc.createSource(buf, "\n", null, new ImportValidator(env));
+    cuSrc.createSource(buf, "\n", null, new ImportValidator(new ImportCollector(env)));
     env.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), buf);
-    cu = env.findType("a.b.c.d.SubClass").getCompilationUnit();
+    cu = env.findType("a.b.c.d.SubClass").compilationUnit();
 
     //re-create modified base type
 
     cuSrc = createBaseClass();
     cuSrc.getMainType().getMethods().get(0).setBody(new RawSourceBuilder("System.out.println(\"modified base class\");"));
     buf = new StringBuilder();
-    cuSrc.createSource(buf, "\n", null, new ImportValidator(env));
+    cuSrc.createSource(buf, "\n", null, new ImportValidator(new ImportCollector(env)));
     env.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), buf);
     env.reload();
-    cu = env.findType("a.b.c.BaseClass").getCompilationUnit();
+    cu = env.findType("a.b.c.BaseClass").compilationUnit();
 
     String expected = "" +
         "package a.b.c;\n" +
@@ -162,21 +163,21 @@ public class CreateAndOverrideNewCompilationUnitTest {
         "    System.out.println(\"modified base class\");\n" +
         "  }\n" +
         "}\n";
-    Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.getSource().toString()));
+    Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().toString()));
 
     //now read the type from the env
     IType t2 = env.findType("a.b.c.BaseClass");
-    Assert.assertEquals(cu.getMainType().methods().withName("run").first().getSource().toString(), t2.methods().withName("run").first().getSource().toString());
+    Assert.assertEquals(cu.mainType().methods().withName("run").first().source().toString(), t2.methods().withName("run").first().source().toString());
 
     //and again re-create modified base type
 
     cuSrc = createBaseClass();
     cuSrc.getMainType().getMethods().get(0).setBody(new RawSourceBuilder("System.out.println(\"again modified base class\");"));
     buf = new StringBuilder();
-    cuSrc.createSource(buf, "\n", null, new ImportValidator(env));
+    cuSrc.createSource(buf, "\n", null, new ImportValidator(new ImportCollector(env)));
     env.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), buf);
     env.reload();
-    cu = env.findType("a.b.c.BaseClass").getCompilationUnit();
+    cu = env.findType("a.b.c.BaseClass").compilationUnit();
 
     expected = "" +
         "package a.b.c;\n" +
@@ -185,11 +186,11 @@ public class CreateAndOverrideNewCompilationUnitTest {
         "    System.out.println(\"again modified base class\");\n" +
         "  }\n" +
         "}\n";
-    Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.getSource().toString()));
+    Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().toString()));
 
     //now read the type from the env
     t2 = env.findType("a.b.c.BaseClass");
-    Assert.assertEquals(cu.getMainType().methods().withName("run").first().getSource().toString(), t2.methods().withName("run").first().getSource().toString());
+    Assert.assertEquals(cu.mainType().methods().withName("run").first().source().toString(), t2.methods().withName("run").first().source().toString());
 
   }
 

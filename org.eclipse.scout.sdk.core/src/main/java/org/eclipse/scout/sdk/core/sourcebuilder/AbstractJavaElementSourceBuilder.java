@@ -26,7 +26,7 @@ public abstract class AbstractJavaElementSourceBuilder implements IJavaElementSo
   private ISourceBuilder m_comment;
 
   public AbstractJavaElementSourceBuilder(IJavaElement element) {
-    this(element.getElementName());
+    this(element.elementName());
   }
 
   public AbstractJavaElementSourceBuilder(String elementName) {

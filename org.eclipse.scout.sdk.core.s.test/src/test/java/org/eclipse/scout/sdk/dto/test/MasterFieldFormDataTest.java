@@ -41,12 +41,12 @@ public class MasterFieldFormDataTest {
     SdkAssert.assertHasSuperTypeSignature(masterFieldTestFormData, "QAbstractFormData;");
 
     // fields of MasterFieldTestFormData
-    Assert.assertEquals("field count of 'MasterFieldTestFormData'", 1, masterFieldTestFormData.getFields().size());
+    Assert.assertEquals("field count of 'MasterFieldTestFormData'", 1, masterFieldTestFormData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(masterFieldTestFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'MasterFieldTestFormData'", 3, masterFieldTestFormData.getMethods().size());
+    Assert.assertEquals("method count of 'MasterFieldTestFormData'", 3, masterFieldTestFormData.methods().list().size());
     IMethod masterFieldTestFormData1 = SdkAssert.assertMethodExist(masterFieldTestFormData, "MasterFieldTestFormData", new String[]{});
     Assert.assertTrue(masterFieldTestFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(masterFieldTestFormData1, null);
@@ -55,40 +55,40 @@ public class MasterFieldFormDataTest {
     IMethod getMySlave = SdkAssert.assertMethodExist(masterFieldTestFormData, "getMySlave", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getMySlave, "QMySlave;");
 
-    Assert.assertEquals("inner types count of 'MasterFieldTestFormData'", 2, masterFieldTestFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'MasterFieldTestFormData'", 2, masterFieldTestFormData.innerTypes().list().size());
     // type MyMaster
     IType myMaster = SdkAssert.assertTypeExists(masterFieldTestFormData, "MyMaster");
     SdkAssert.assertHasFlags(myMaster, 9);
     SdkAssert.assertHasSuperTypeSignature(myMaster, "QAbstractValueFieldData<QString;>;");
 
     // fields of MyMaster
-    Assert.assertEquals("field count of 'MyMaster'", 1, myMaster.getFields().size());
+    Assert.assertEquals("field count of 'MyMaster'", 1, myMaster.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(myMaster, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'MyMaster'", 1, myMaster.getMethods().size());
+    Assert.assertEquals("method count of 'MyMaster'", 1, myMaster.methods().list().size());
     IMethod myMaster1 = SdkAssert.assertMethodExist(myMaster, "MyMaster", new String[]{});
     Assert.assertTrue(myMaster1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(myMaster1, null);
 
-    Assert.assertEquals("inner types count of 'MyMaster'", 0, myMaster.getTypes().size());
+    Assert.assertEquals("inner types count of 'MyMaster'", 0, myMaster.innerTypes().list().size());
     // type MySlave
     IType mySlave = SdkAssert.assertTypeExists(masterFieldTestFormData, "MySlave");
     SdkAssert.assertHasFlags(mySlave, 9);
     SdkAssert.assertHasSuperTypeSignature(mySlave, "QAbstractValueFieldData<QString;>;");
 
     // fields of MySlave
-    Assert.assertEquals("field count of 'MySlave'", 1, mySlave.getFields().size());
+    Assert.assertEquals("field count of 'MySlave'", 1, mySlave.fields().list().size());
     IField serialVersionUID2 = SdkAssert.assertFieldExist(mySlave, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
 
-    Assert.assertEquals("method count of 'MySlave'", 1, mySlave.getMethods().size());
+    Assert.assertEquals("method count of 'MySlave'", 1, mySlave.methods().list().size());
     IMethod mySlave1 = SdkAssert.assertMethodExist(mySlave, "MySlave", new String[]{});
     Assert.assertTrue(mySlave1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(mySlave1, null);
 
-    Assert.assertEquals("inner types count of 'MySlave'", 0, mySlave.getTypes().size());
+    Assert.assertEquals("inner types count of 'MySlave'", 0, mySlave.innerTypes().list().size());
   }
 }

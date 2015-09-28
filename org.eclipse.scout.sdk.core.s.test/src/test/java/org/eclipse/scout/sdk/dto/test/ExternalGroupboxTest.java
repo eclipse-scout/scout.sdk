@@ -36,35 +36,35 @@ public class ExternalGroupboxTest {
     SdkAssert.assertHasSuperTypeSignature(abstractExternalGroupBoxData, "QAbstractFormFieldData;");
 
     // fields of AbstractExternalGroupBoxData
-    Assert.assertEquals("field count of 'AbstractExternalGroupBoxData'", 1, abstractExternalGroupBoxData.getFields().size());
+    Assert.assertEquals("field count of 'AbstractExternalGroupBoxData'", 1, abstractExternalGroupBoxData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(abstractExternalGroupBoxData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'AbstractExternalGroupBoxData'", 2, abstractExternalGroupBoxData.getMethods().size());
+    Assert.assertEquals("method count of 'AbstractExternalGroupBoxData'", 2, abstractExternalGroupBoxData.methods().list().size());
     IMethod abstractExternalGroupBoxData1 = SdkAssert.assertMethodExist(abstractExternalGroupBoxData, "AbstractExternalGroupBoxData", new String[]{});
     Assert.assertTrue(abstractExternalGroupBoxData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(abstractExternalGroupBoxData1, null);
     IMethod getExternalString = SdkAssert.assertMethodExist(abstractExternalGroupBoxData, "getExternalString", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getExternalString, "QExternalString;");
 
-    Assert.assertEquals("inner types count of 'AbstractExternalGroupBoxData'", 1, abstractExternalGroupBoxData.getTypes().size());
+    Assert.assertEquals("inner types count of 'AbstractExternalGroupBoxData'", 1, abstractExternalGroupBoxData.innerTypes().list().size());
     // type ExternalString
     IType externalString = SdkAssert.assertTypeExists(abstractExternalGroupBoxData, "ExternalString");
     SdkAssert.assertHasFlags(externalString, 9);
     SdkAssert.assertHasSuperTypeSignature(externalString, "QAbstractValueFieldData<QString;>;");
 
     // fields of ExternalString
-    Assert.assertEquals("field count of 'ExternalString'", 1, externalString.getFields().size());
+    Assert.assertEquals("field count of 'ExternalString'", 1, externalString.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(externalString, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'ExternalString'", 1, externalString.getMethods().size());
+    Assert.assertEquals("method count of 'ExternalString'", 1, externalString.methods().list().size());
     IMethod externalString1 = SdkAssert.assertMethodExist(externalString, "ExternalString", new String[]{});
     Assert.assertTrue(externalString1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(externalString1, null);
 
-    Assert.assertEquals("inner types count of 'ExternalString'", 0, externalString.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExternalString'", 0, externalString.innerTypes().list().size());
   }
 }

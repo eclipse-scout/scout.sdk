@@ -14,12 +14,12 @@ import java.util.Collection;
 
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.Long;
+import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
-import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -36,53 +36,55 @@ public class SignatureUtilsTest {
     String expected = Signature.createTypeSignature("java.util.Set<java.util.HashMap<org.eclipse.scout.sdk.core.fixture.Long, java.util.List<java.lang.Object>[]>>[][][]");
     Assert.assertNotNull(expected);
 
-    IMethod firstCase = CoreUtils.getMethod(type, "firstCase");
+    IMethod firstCase = type.methods().withName("firstCase").first();
     Assert.assertNotNull(type);
-    Assert.assertEquals(expected, SignatureUtils.getTypeSignature(firstCase.getReturnType()));
+    Assert.assertEquals(expected, SignatureUtils.getTypeSignature(firstCase.returnType()));
   }
 
   @Test
   public void testSimpleSignature() {
     String signature = "Ljava.lang.String;";
-    IImportValidator validator = new ImportValidator();
-    Assert.assertEquals(SignatureUtils.useSignature(signature, validator), "String");
+    IImportValidator validator = new ImportValidator(new ImportCollector());
+    Assert.assertEquals(validator.useSignature(signature), "String");
   }
 
   @Test
   public void testGetResolvedSignature_Long() {
-    ImportValidator importValidator = new ImportValidator();
-    Assert.assertEquals("Long", SignatureUtils.useName(Long.class.getName(), importValidator));
+    IImportValidator validator = new ImportValidator(new ImportCollector());
+    Assert.assertEquals("Long", validator.useName(Long.class.getName()));
   }
 
   @Test
   public void testGetSimpleTypeSignature_LongArray() {
-    ImportValidator importValidator = new ImportValidator();
+    IImportValidator validator = new ImportValidator(new ImportCollector());
     String signature = Signature.createArraySignature(Signature.createTypeSignature(Long.class.getName()), 1);
-    Assert.assertEquals("Long[]", SignatureUtils.useSignature(signature, importValidator));
+    Assert.assertEquals("Long[]", validator.useSignature(signature));
   }
 
   @Test
   public void testGetSimpleTypeSignature_ArrayOfStringSets() {
-    ImportValidator importValidator = new ImportValidator();
+    ImportCollector collector = new ImportCollector();
+    IImportValidator validator = new ImportValidator(collector);
     String signature = Signature.createTypeSignature("java.util.Set<java.lang.String>[]");
-    Assert.assertEquals("Set<String>[]", SignatureUtils.useSignature(signature, importValidator));
-    Collection<String> imports = importValidator.createImportDeclarations();
+    Assert.assertEquals("Set<String>[]", validator.useSignature(signature));
+    Collection<String> imports = collector.createImportDeclarations();
     Assert.assertTrue(imports.contains("import java.util.Set;"));
   }
 
   @Test
   public void testObjectSignatureSlashBased() {
-    ImportValidator importValidator = new ImportValidator();
+    IImportValidator validator = new ImportValidator(new ImportCollector());
     String signature = "Ljava/lang/Object;";
-    Assert.assertEquals("java/lang/Object", SignatureUtils.useSignature(signature, importValidator));
+    Assert.assertEquals("java/lang/Object", validator.useSignature(signature));
   }
 
   @Test
   public void testGetSimpleTypeSignature_3dimArrayOfLongArrayOfObjectListsArrayMapSets() {
-    ImportValidator importValidator = new ImportValidator();
+    ImportCollector collector = new ImportCollector();
+    IImportValidator validator = new ImportValidator(collector);
     String signature = Signature.createTypeSignature("java.util.Set<java.util.HashMap<java.lang.Long, java.util.List<java.lang.Object>[]>>[][][]");
-    Assert.assertEquals("Set<HashMap<Long, List<Object>[]>>[][][]", SignatureUtils.useSignature(signature, importValidator));
-    Collection<String> imports = importValidator.createImportDeclarations();
+    Assert.assertEquals("Set<HashMap<Long, List<Object>[]>>[][][]", validator.useSignature(signature));
+    Collection<String> imports = collector.createImportDeclarations();
     Assert.assertTrue(imports.contains("import java.util.Set;"));
     Assert.assertTrue(imports.contains("import java.util.HashMap;"));
     Assert.assertTrue(imports.contains("import java.util.List;"));
@@ -91,26 +93,27 @@ public class SignatureUtilsTest {
   @Test
   public void testClassParameterized() {
     String signature = "[Ljava.lang.Class<+[Lcom.bsiag.scout.client.ui.desktop.outline.IOutline;>;";
-    ImportValidator validator = new ImportValidator();
+    IImportValidator validator = new ImportValidator(new ImportCollector());
 
-    String result = SignatureUtils.useSignature(signature, validator);
+    String result = validator.useSignature(signature);
     Assert.assertEquals("Class<? extends IOutline[]>[]", result);
   }
 
   @Test
   public void testComplexNestedArrayListHashMapArray() {
     String signature = "[Ljava.util.HashMap<Ljava.util.ArrayList<[[Ljava.lang.String;>;Lorg.eclipse.scout.sdk.workspace.member.IScoutType;>;";
-    ImportValidator validator = new ImportValidator();
-    String result = SignatureUtils.useSignature(signature, validator);
+    IImportValidator validator = new ImportValidator(new ImportCollector());
+    String result = validator.useSignature(signature);
     Assert.assertEquals("HashMap<ArrayList<String[][]>, IScoutType>[]", result);
   }
 
   @Test
   public void testGenericExtendsWithArray() {
     String signature = "[Ljava.lang.Class<+[Lcom.bsiag.scout.client.ui.desktop.outline.IOutline;>;";
-    IImportValidator validator = new ImportValidator();
-    Assert.assertEquals(SignatureUtils.useSignature(signature, validator), "Class<? extends IOutline[]>[]");
-    Collection<String> imports = validator.createImportDeclarations();
+    ImportCollector collector = new ImportCollector();
+    IImportValidator validator = new ImportValidator(collector);
+    Assert.assertEquals(validator.useSignature(signature), "Class<? extends IOutline[]>[]");
+    Collection<String> imports = collector.createImportDeclarations();
     Assert.assertTrue(imports.remove("import com.bsiag.scout.client.ui.desktop.outline.IOutline;"));
     Assert.assertTrue(imports.isEmpty());
   }

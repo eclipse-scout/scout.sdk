@@ -18,9 +18,9 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
 
   UnresolvedTypeImplementor(IType type) {
     m_type = type;
-    m_name = type.getName();
-    m_package = type.getPackage();
-    m_simpleName = type.getSimpleName();
+    m_name = type.name();
+    m_package = type.containingPackage();
+    m_simpleName = type.elementName();
   }
 
   UnresolvedTypeImplementor(IJavaEnvironment env, String name) {
@@ -41,12 +41,12 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
    * @return the fully qualified name
    */
   @Override
-  public String getName() {
+  public String name() {
     return m_name;
   }
 
   @Override
-  public IPackage getPackage() {
+  public IPackage containingPackage() {
     return m_package;
   }
 
@@ -54,13 +54,13 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
    * @return the simple name
    */
   @Override
-  public String getSimpleName() {
+  public String elementName() {
     return m_simpleName;
   }
 
   @Override
-  public String getSignature() {
-    return Signature.createTypeSignature(getName());
+  public String signature() {
+    return Signature.createTypeSignature(name());
   }
 
   /**
@@ -68,22 +68,22 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
    */
   @Override
   public boolean exists() {
-    return getType() != null;
+    return type() != null;
   }
 
   @Override
-  public IType getType() {
+  public IType type() {
     return m_type;
   }
 
   @Override
   public String toString() {
-    return getName();
+    return name();
   }
 
   @Override
   public int hashCode() {
-    return getName().hashCode();
+    return name().hashCode();
   }
 
   @Override
@@ -98,7 +98,7 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
       return false;
     }
     UnresolvedTypeImplementor other = (UnresolvedTypeImplementor) obj;
-    return this.getName().equals(other.getName());
+    return this.name().equals(other.name());
   }
 
 }

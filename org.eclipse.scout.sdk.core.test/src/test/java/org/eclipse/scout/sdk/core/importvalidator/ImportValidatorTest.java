@@ -14,18 +14,19 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.fixture.BaseClass;
 import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.fixture.ImportTestClass;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
+import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitScopedImportValidator;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitScopedImportCollector;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.type.EnclosingTypeScopedImportValidator;
+import org.eclipse.scout.sdk.core.sourcebuilder.type.EnclosingTypeScopedImportCollector;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.junit.Assert;
 import org.junit.Test;
@@ -37,15 +38,17 @@ public class ImportValidatorTest {
 
   @Test
   public void testJavaLangPackage() {
-    IImportValidator iv = createImportValidator("test");
-    String longName = SignatureUtils.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG, iv);
+    IImportCollector iv = createImportCollector("test");
+    IImportValidator validator = new ImportValidator(iv);
+
+    String longName = validator.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG);
     Assert.assertEquals(Long.class.getSimpleName(), longName);
 
-    String longName2 = SignatureUtils.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG, iv);
+    String longName2 = validator.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG);
     Assert.assertEquals(Long.class.getSimpleName(), longName2);
 
     String ownClassFqn = "test.blub.MyClass";
-    String ownName = SignatureUtils.useName(ownClassFqn, iv);
+    String ownName = validator.useName(ownClassFqn);
     Assert.assertEquals("MyClass", ownName);
 
     Collection<String> importsToCreate = iv.createImportDeclarations();
@@ -54,17 +57,18 @@ public class ImportValidatorTest {
 
   @Test
   public void testOwnPackage() {
-    IImportValidator iv = createImportValidator("test.own.pck");
+    IImportCollector iv = createImportCollector("test.own.pck");
+    IImportValidator validator = new ImportValidator(iv);
 
-    String longName = SignatureUtils.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG, iv);
+    String longName = validator.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG);
     Assert.assertEquals(Long.class.getSimpleName(), longName);
 
     String ownClassFqn = "test.blub.MyClass";
-    String ownName = SignatureUtils.useName(ownClassFqn, iv);
+    String ownName = validator.useName(ownClassFqn);
     Assert.assertEquals("MyClass", ownName);
 
     String ownClassFqn2 = "test.own.pck.MyClass2";
-    String ownName2 = SignatureUtils.useName(ownClassFqn2, iv);
+    String ownName2 = validator.useName(ownClassFqn2);
     Assert.assertEquals("MyClass2", ownName2);
 
     Collection<String> importsToCreate = iv.createImportDeclarations();
@@ -73,9 +77,10 @@ public class ImportValidatorTest {
 
   @Test
   public void testPrimitives() {
-    IImportValidator iv = createImportValidator("test");
+    IImportCollector iv = createImportCollector("test");
+    IImportValidator validator = new ImportValidator(iv);
 
-    String intName = SignatureUtils.useSignature(ISignatureConstants.SIG_INT, iv);
+    String intName = validator.useSignature(ISignatureConstants.SIG_INT);
     Assert.assertEquals(Signature.getSignatureSimpleName(ISignatureConstants.SIG_INT), intName);
 
     Collection<String> importsToCreate = iv.createImportDeclarations();
@@ -84,17 +89,18 @@ public class ImportValidatorTest {
 
   @Test
   public void testNullPackage() {
-    IImportValidator iv = createImportValidator((String) null);
+    IImportCollector iv = createImportCollector((String) null);
+    IImportValidator validator = new ImportValidator(iv);
 
-    String longName = SignatureUtils.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG, iv);
+    String longName = validator.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG);
     Assert.assertEquals(Long.class.getSimpleName(), longName);
 
     String ownClassFqn = "test.blub.MyClass";
-    String ownName = SignatureUtils.useName(ownClassFqn, iv);
+    String ownName = validator.useName(ownClassFqn);
     Assert.assertEquals("MyClass", ownName);
 
     String ownClassFqn2 = "test.own.pck.MyClass2";
-    String ownName2 = SignatureUtils.useName(ownClassFqn2, iv);
+    String ownName2 = validator.useName(ownClassFqn2);
     Assert.assertEquals("MyClass2", ownName2);
 
     Collection<String> importsToCreate = iv.createImportDeclarations();
@@ -103,17 +109,18 @@ public class ImportValidatorTest {
 
   @Test
   public void testQualifiedPackage() {
-    IImportValidator iv = createImportValidator("test");
+    IImportCollector iv = createImportCollector("test");
+    IImportValidator validator = new ImportValidator(iv);
 
-    String longName = SignatureUtils.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG, iv);
+    String longName = validator.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG);
     Assert.assertEquals(Long.class.getSimpleName(), longName);
 
     String ownClassFqn = "test.blub.MyClass";
-    String ownName = SignatureUtils.useName(ownClassFqn, iv);
+    String ownName = validator.useName(ownClassFqn);
     Assert.assertEquals("MyClass", ownName);
 
     String ownClassFqn2 = "test.own.pck.MyClass";
-    String ownName2 = SignatureUtils.useName(ownClassFqn2, iv);
+    String ownName2 = validator.useName(ownClassFqn2);
     Assert.assertEquals(ownClassFqn2, ownName2);
 
     Collection<String> importsToCreate = iv.createImportDeclarations();
@@ -123,66 +130,70 @@ public class ImportValidatorTest {
   @Test
   public void testWithInnerClasses() {
     String sig = "La.b.c.MyClass$InnerClass$SecondInner;";
-    IImportValidator iv = createImportValidator("a.b.c");
-    Assert.assertEquals("SecondInner", SignatureUtils.useSignature(sig, iv));
-    Assert.assertEquals("a.b.c.SecondInner", SignatureUtils.useName("a.b.c.SecondInner", iv));
+    IImportCollector iv = createImportCollector("a.b.c");
+    IImportValidator validator = new ImportValidator(iv);
+
+    Assert.assertEquals("SecondInner", validator.useSignature(sig));
+    Assert.assertEquals("a.b.c.SecondInner", validator.useName("a.b.c.SecondInner"));
   }
 
   @Test
   public void testIcuWithInnerClassesThatAlsoExistInOwnPackage() {
     IType importTest = CoreTestingUtils.createJavaEnvironment().findType(ImportTestClass.class.getName());
-    IImportValidator iv = createImportValidator(importTest);
+    IImportCollector iv = createImportValidator(importTest);
+    IImportValidator validator = new ImportValidator(iv);
 
-    Assert.assertEquals(ImportTestClass.Long.class.getSimpleName(), SignatureUtils.useName(importTest.getTypes().get(0).getName(), iv));
-    Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), SignatureUtils.useName(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), iv));
+    Assert.assertEquals(ImportTestClass.Long.class.getSimpleName(), validator.useName(importTest.innerTypes().first().name()));
+    Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), validator.useName(org.eclipse.scout.sdk.core.fixture.Long.class.getName()));
   }
 
   @Test
   public void testWithDuplicateInOwnPackage() {
-    IImportValidator iv = createImportValidator(CoreTestingUtils.getBaseClassIcu());
+    IImportCollector iv = createImportValidator(CoreTestingUtils.getBaseClassIcu());
+    IImportValidator validator = new ImportValidator(iv);
 
     // long on foreign package
-    String longName = SignatureUtils.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG, iv);
-    Assert.assertEquals(TypeNames.java_lang_Long, longName);
+    String longName = validator.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG);
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Long, longName);
 
-    longName = SignatureUtils.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG, iv);
-    Assert.assertEquals(TypeNames.java_lang_Long, longName);
+    longName = validator.useSignature(ISignatureConstants.SIG_JAVA_LANG_LONG);
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Long, longName);
 
     // long in own package
-    longName = SignatureUtils.useName(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), iv);
+    longName = validator.useName(org.eclipse.scout.sdk.core.fixture.Long.class.getName());
     Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getSimpleName(), longName);
 
     // own class in own package
-    String baseClassName = SignatureUtils.useName(BaseClass.class.getName(), iv);
+    String baseClassName = validator.useName(BaseClass.class.getName());
     Assert.assertEquals(BaseClass.class.getSimpleName(), baseClassName);
 
     // other class in own package
-    String childClassName = SignatureUtils.useName(ChildClass.class.getName(), iv);
+    String childClassName = validator.useName(ChildClass.class.getName());
     Assert.assertEquals(ChildClass.class.getSimpleName(), childClassName);
   }
 
-  static IImportValidator createImportValidator(String packageName) {
-    return new CompilationUnitScopedImportValidator(new ImportValidator(), packageName);
+  static IImportCollector createImportCollector(String packageName) {
+    return new CompilationUnitScopedImportCollector(new ImportCollector(), packageName);
   }
 
-  static IImportValidator createImportValidator(ICompilationUnit cu) {
+  static IImportCollector createImportValidator(ICompilationUnit cu) {
     CompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(cu);
-    IImportValidator validator0 = new ImportValidator(cu.getJavaEnvironment());
+    IImportCollector validator0 = new ImportCollector(cu.javaEnvironment());
     for (String s : cuSrc.getDeclaredImports()) {
       validator0.addImport(s);
     }
-    IImportValidator validator1 = new CompilationUnitScopedImportValidator(validator0, cuSrc.getPackageName());
+    IImportCollector validator1 = new CompilationUnitScopedImportCollector(validator0, cuSrc.getPackageName());
     return validator1;
   }
 
-  static IImportValidator createImportValidator(IType t) {
-    CompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(t.getCompilationUnit());
-    IImportValidator validator0 = new ImportValidator(t.getJavaEnvironment());
+  static IImportCollector createImportValidator(IType t) {
+    CompilationUnitSourceBuilder cuSrc = new CompilationUnitSourceBuilder(t.compilationUnit());
+    IImportCollector validator0 = new ImportCollector(t.javaEnvironment());
     for (String s : cuSrc.getDeclaredImports()) {
       validator0.addImport(s);
     }
-    IImportValidator validator1 = new CompilationUnitScopedImportValidator(validator0, cuSrc.getPackageName());
-    IImportValidator validator2 = new EnclosingTypeScopedImportValidator(validator1, cuSrc.getMainType());
+    IImportCollector validator1 = new CompilationUnitScopedImportCollector(validator0, cuSrc.getPackageName());
+    IImportCollector validator2 = new EnclosingTypeScopedImportCollector(validator1, cuSrc.getMainType());
     return validator2;
   }
 

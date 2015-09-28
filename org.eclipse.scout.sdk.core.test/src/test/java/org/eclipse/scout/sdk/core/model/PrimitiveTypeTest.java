@@ -10,9 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model;
 
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.util.JavaEnvironmentBuilder;
+import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -20,7 +20,7 @@ import org.junit.Test;
  * <h3>{@link PrimitiveTypeTest}</h3>
  * <p>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class PrimitiveTypeTest {
@@ -31,15 +31,15 @@ public class PrimitiveTypeTest {
         .withExcludeScoutSdk()
         .build();
 
-    Assert.assertNotNull(env.findType(TypeNames._short));
-    Assert.assertNotNull(env.findType(TypeNames._int));
-    Assert.assertNotNull(env.findType(TypeNames._float));
-    Assert.assertNotNull(env.findType(TypeNames._long));
-    Assert.assertNotNull(env.findType(TypeNames._double));
-    Assert.assertNotNull(env.findType(TypeNames._boolean));
-    Assert.assertNotNull(env.findType(TypeNames._char));
-    Assert.assertNotNull(env.findType(TypeNames._byte));
-    Assert.assertNotNull(env.findType(TypeNames._void));
+    Assert.assertNotNull(env.findType(IJavaRuntimeTypes._short));
+    Assert.assertNotNull(env.findType(IJavaRuntimeTypes._int));
+    Assert.assertNotNull(env.findType(IJavaRuntimeTypes._float));
+    Assert.assertNotNull(env.findType(IJavaRuntimeTypes._long));
+    Assert.assertNotNull(env.findType(IJavaRuntimeTypes._double));
+    Assert.assertNotNull(env.findType(IJavaRuntimeTypes._boolean));
+    Assert.assertNotNull(env.findType(IJavaRuntimeTypes._char));
+    Assert.assertNotNull(env.findType(IJavaRuntimeTypes._byte));
+    Assert.assertNotNull(env.findType(IJavaRuntimeTypes._void));
 
     Assert.assertNull(env.findType("null"));
   }

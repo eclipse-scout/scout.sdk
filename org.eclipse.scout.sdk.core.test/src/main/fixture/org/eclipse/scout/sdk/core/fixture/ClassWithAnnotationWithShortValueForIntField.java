@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.fixture;
 /**
  * <h3>{@link ClassWithAnnotationWithShortValueForIntField}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 @AnnotationWithDefaultValues(num = (short) 4)

@@ -28,21 +28,21 @@ public interface IMember extends IAnnotatable {
    * @return The flags of this {@link IMember}.
    * @see Flags
    */
-  int getFlags();
+  int flags();
 
   /**
    * @return The {@link IType} this member is defined in. Never returns <code>null</code> for {@link IMethod} and
    *         {@link IField}. For {@link IType} this is the enclosing type that may be null.
    */
-  IType getDeclaringType();
+  IType declaringType();
 
   /**
    * Gets all {@link ITypeParameter}s defined by this {@link IType} in the order as they appear in the source or class
    * file.<br>
    * <br>
    * Type parameters are declarations as defined by the hosting {@link IType}. They may have minimal bounds defined.<br>
-   * The difference to {@link #getTypeArguments()} is that {@link #getTypeParameters()} returns the parameter as they
-   * are declared by the class file while {@link #getTypeArguments()} holds the currently bound real {@link IType}s.<br>
+   * The difference to {@link #typeArguments()} is that {@link #typeParameters()} returns the parameter as they
+   * are declared by the class file while {@link #typeArguments()} holds the currently bound real {@link IType}s.<br>
    * <br>
    * <b>Example: </b><br>
    * <code>public class NumberList&lt;T extends java.lang.Number&gt; {}</code><br>
@@ -54,7 +54,7 @@ public interface IMember extends IAnnotatable {
    *
    * @return
    */
-  List<ITypeParameter> getTypeParameters();
+  List<ITypeParameter> typeParameters();
 
   /**
    * Specifies if this {@link IType} has {@link ITypeParameter}s.
@@ -63,7 +63,7 @@ public interface IMember extends IAnnotatable {
    */
   boolean hasTypeParameters();
 
-  ISourceRange getJavaDoc();
+  ISourceRange javaDoc();
 
   @Override
   MemberSpi unwrap();

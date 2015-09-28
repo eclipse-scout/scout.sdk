@@ -20,26 +20,24 @@ import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
  */
 public interface IJavaElement {
 
-  IJavaEnvironment getJavaEnvironment();
+  IJavaEnvironment javaEnvironment();
 
   /**
    * @return the element name
    *         <p>
    *         this is the relative or simple name of the element inside its containing scope
    */
-  String getElementName();
+  String elementName();
 
   /**
-   * @return the source of the element or null. The source is only available if the compilation unit is one of the
-   *         following
+   * @return The source of the element or <code>null</code>.<br>
+   *         The source is only available if the compilation unit is one of the following:
    *         <ul>
    *         <li>source in workspace</li>
-   *         <li>class in jar and source attachement to jar is defined</li>
+   *         <li>class in jar and source attachment to jar is defined</li>
    *         </ul>
    */
-  ISourceRange getSource();
+  ISourceRange source();
 
   JavaElementSpi unwrap();
-
-  void internalSetSpi(JavaElementSpi spi);
 }

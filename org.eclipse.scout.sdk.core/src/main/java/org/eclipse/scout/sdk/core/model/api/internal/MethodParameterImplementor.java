@@ -30,17 +30,17 @@ public class MethodParameterImplementor extends AbstractAnnotatableImplementor<M
   }
 
   @Override
-  public IMethod getDeclaringMethod() {
+  public IMethod declaringMethod() {
     return m_spi.getDeclaringMethod().wrap();
   }
 
   @Override
-  public IType getDataType() {
-    return WrapperUtils.wrapType(m_spi.getDataType());
+  public IType dataType() {
+    return JavaEnvironmentImplementor.wrapType(m_spi.getDataType());
   }
 
   @Override
-  public int getFlags() {
+  public int flags() {
     return m_spi.getFlags();
   }
 
@@ -55,7 +55,7 @@ public class MethodParameterImplementor extends AbstractAnnotatableImplementor<M
 
   @Override
   public AnnotationQuery<IAnnotation> annotations() {
-    return new AnnotationQuery<>(getDeclaringMethod().getDeclaringType(), this);
+    return new AnnotationQuery<>(declaringMethod().declaringType(), m_spi);
   }
 
 }

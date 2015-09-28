@@ -16,7 +16,6 @@ import org.eclipse.jdt.internal.compiler.impl.Constant;
 import org.eclipse.jdt.internal.compiler.lookup.TypeIds;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IArrayMetaValue;
-import org.eclipse.scout.sdk.core.model.api.IConstantMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -29,7 +28,7 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
 /**
  * <h3>{@link MetaValueFactory}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public final class MetaValueFactory {
@@ -37,13 +36,30 @@ public final class MetaValueFactory {
   private MetaValueFactory() {
   }
 
+  private static final IMetaValue NULL_META_VALUE = new IMetaValue() {
+    @Override
+    public MetaValueType type() {
+      return MetaValueType.Null;
+    }
+
+    @Override
+    public <T> T get(Class<T> expectedType) {
+      return null;
+    }
+
+    @Override
+    public String toString() {
+      return "null";
+    }
+  };
+
   protected static abstract class AbstractValue implements IMetaValue {
 
     protected abstract Object getInternalObject(Class<?> expectedType);
 
     @SuppressWarnings("unchecked")
     @Override
-    public <T> T getObject(Class<T> expectedType) {
+    public <T> T get(Class<T> expectedType) {
       if (expectedType.isArray()) {
         //value is scalar, requested is array (for example the Generated annotation)
         T array = (T) Array.newInstance(expectedType.getComponentType(), 1);
@@ -54,22 +70,21 @@ public final class MetaValueFactory {
     }
   }
 
-  protected static abstract class AbstractConstantMetaValue extends AbstractValue implements IConstantMetaValue {
+  protected static abstract class AbstractConstantMetaValue extends AbstractValue {
     private final Constant c;
 
     protected AbstractConstantMetaValue(Constant c) {
       this.c = c;
     }
 
-    @Override
-    public final Constant getInternalConstant() {
+    protected final Constant getInternalConstant() {
       return c;
     }
 
     @Override
     protected final Object getInternalObject(Class<?> expectedType) {
       if (expectedType == Object.class) {
-        switch (getType()) {
+        switch (type()) {
           case Bool:
             return c.booleanValue();
           case Byte:
@@ -128,7 +143,7 @@ public final class MetaValueFactory {
   }
 
   public static IMetaValue createNull() {
-    return IMetaValue.NULL;
+    return NULL_META_VALUE;
   }
 
   public static IMetaValue createUnknown(final Object o) {
@@ -137,7 +152,7 @@ public final class MetaValueFactory {
     }
     return new AbstractValue() {
       @Override
-      public MetaValueType getType() {
+      public MetaValueType type() {
         return MetaValueType.Unknown;
       }
 
@@ -148,7 +163,7 @@ public final class MetaValueFactory {
 
       @Override
       public String toString() {
-        return "UNKNOWN([" + o.toString() + ")";
+        return "UNKNOWN(" + o.toString() + ")";
       }
     };
   }
@@ -159,7 +174,7 @@ public final class MetaValueFactory {
     }
     return new AbstractValue() {
       @Override
-      public MetaValueType getType() {
+      public MetaValueType type() {
         return MetaValueType.Type;
       }
 
@@ -187,7 +202,7 @@ public final class MetaValueFactory {
     }
     return new AbstractValue() {
       @Override
-      public MetaValueType getType() {
+      public MetaValueType type() {
         return MetaValueType.Enum;
       }
 
@@ -215,7 +230,7 @@ public final class MetaValueFactory {
     }
     return new AbstractValue() {
       @Override
-      public MetaValueType getType() {
+      public MetaValueType type() {
         return MetaValueType.Annotation;
       }
 
@@ -240,12 +255,12 @@ public final class MetaValueFactory {
     }
     return new AbstractArrayMetaValue() {
       @Override
-      public MetaValueType getType() {
+      public MetaValueType type() {
         return MetaValueType.Array;
       }
 
       @Override
-      public IMetaValue[] getMetaValueArray() {
+      public IMetaValue[] metaValueArray() {
         return metaArray;
       }
 
@@ -256,7 +271,7 @@ public final class MetaValueFactory {
 
       @SuppressWarnings("unchecked")
       @Override
-      public <T> T getObject(Class<T> expectedType) {
+      public <T> T get(Class<T> expectedType) {
         int n = metaArray.length;
         Object array;
         Class<?> elementType;
@@ -270,13 +285,13 @@ public final class MetaValueFactory {
         }
         else if (n == 1) {
           //value is array with length 1, requested is scalar (for example the Generated annotation)
-          return metaArray[0].getObject(expectedType);
+          return metaArray[0].get(expectedType);
         }
         else {
           throw new ClassCastException("expected type must be an array type: " + expectedType);
         }
         for (int i = 0; i < n; i++) {
-          Array.set(array, i, metaArray[i].getObject(elementType));
+          Array.set(array, i, metaArray[i].get(elementType));
         }
         return (T) array;
       }
@@ -286,7 +301,7 @@ public final class MetaValueFactory {
         int n = metaArray.length;
         //use newlines on multi-dimensional arrays and annotation arrays only
         char blockSeparator;
-        if (n > 0 && (metaArray[0].getType() == MetaValueType.Array || metaArray[0].getType() == MetaValueType.Annotation)) {
+        if (n > 0 && (metaArray[0].type() == MetaValueType.Array || metaArray[0].type() == MetaValueType.Annotation)) {
           blockSeparator = '\n';
         }
         else {
@@ -320,7 +335,7 @@ public final class MetaValueFactory {
       case TypeIds.T_int: {
         return new AbstractConstantMetaValue(c) {
           @Override
-          public MetaValueType getType() {
+          public MetaValueType type() {
             return MetaValueType.Int;
           }
 
@@ -334,7 +349,7 @@ public final class MetaValueFactory {
         return new AbstractConstantMetaValue(c) {
 
           @Override
-          public MetaValueType getType() {
+          public MetaValueType type() {
             return MetaValueType.Byte;
           }
 
@@ -347,7 +362,7 @@ public final class MetaValueFactory {
       case TypeIds.T_short: {
         return new AbstractConstantMetaValue(c) {
           @Override
-          public MetaValueType getType() {
+          public MetaValueType type() {
             return MetaValueType.Short;
           }
 
@@ -362,7 +377,7 @@ public final class MetaValueFactory {
       {
         return new AbstractConstantMetaValue(c) {
           @Override
-          public MetaValueType getType() {
+          public MetaValueType type() {
             return MetaValueType.Char;
           }
 
@@ -377,7 +392,7 @@ public final class MetaValueFactory {
       {
         return new AbstractConstantMetaValue(c) {
           @Override
-          public MetaValueType getType() {
+          public MetaValueType type() {
             return MetaValueType.Float;
           }
 
@@ -392,7 +407,7 @@ public final class MetaValueFactory {
       {
         return new AbstractConstantMetaValue(c) {
           @Override
-          public MetaValueType getType() {
+          public MetaValueType type() {
             return MetaValueType.Double;
           }
 
@@ -407,7 +422,7 @@ public final class MetaValueFactory {
       {
         return new AbstractConstantMetaValue(c) {
           @Override
-          public MetaValueType getType() {
+          public MetaValueType type() {
             return MetaValueType.Bool;
           }
 
@@ -420,7 +435,7 @@ public final class MetaValueFactory {
       case TypeIds.T_long: {
         return new AbstractConstantMetaValue(c) {
           @Override
-          public MetaValueType getType() {
+          public MetaValueType type() {
             return MetaValueType.Long;
           }
 
@@ -435,7 +450,7 @@ public final class MetaValueFactory {
       {
         return new AbstractConstantMetaValue(c) {
           @Override
-          public MetaValueType getType() {
+          public MetaValueType type() {
             return MetaValueType.String;
           }
 

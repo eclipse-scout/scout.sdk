@@ -19,30 +19,13 @@ package org.eclipse.scout.sdk.core.model.api;
 public interface IMetaValue {
 
   /**
-   * @return the type of the object returned with {@link #getObject(Class)}
+   * @return the type of the object returned with {@link #get(Class)}
    */
-  MetaValueType getType();
+  MetaValueType type();
 
   /**
    * @param expectedType
-   * @return the value as defined by {@link #getType()} as {@link MetaValueType}
+   * @return the value as defined by {@link #type()} as {@link MetaValueType}
    */
-  <T> T getObject(Class<T> expectedType);
-
-  IMetaValue NULL = new IMetaValue() {
-    @Override
-    public MetaValueType getType() {
-      return MetaValueType.Null;
-    }
-
-    @Override
-    public <T> T getObject(Class<T> expectedType) {
-      return null;
-    }
-
-    @Override
-    public String toString() {
-      return "null";
-    }
-  };
+  <T> T get(Class<T> expectedType);
 }

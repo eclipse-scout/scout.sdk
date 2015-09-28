@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
  * <h3>{@link org_eclipse_scout_sdk_core_fixture_AnnotationWithDefaultValues}</h3> managed wrapper for
  * {@link AnnotationWithDefaultValues}
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class org_eclipse_scout_sdk_core_fixture_AnnotationWithDefaultValues extends AbstractManagedAnnotation {

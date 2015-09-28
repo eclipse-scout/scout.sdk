@@ -10,30 +10,59 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.job;
 
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.MultiRule;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
 
 /**
- * <h3>{@link AbstractWorkspaceBlockingJob}</h3> Job which runs with the workspace root as scheduling rule.
+ * <h3>{@link AbstractResourceBlockingJob}</h3> Job which runs with a specific resource lock.
  *
  * @since 5.1.0
  */
-public abstract class AbstractWorkspaceBlockingJob extends AbstractJob {
+public abstract class AbstractResourceBlockingJob extends AbstractJob {
 
   private boolean m_debug;
   private Exception m_callerTrace;
 
-  public AbstractWorkspaceBlockingJob(String name) {
+  /**
+   * Creates a new job blocking on the given resources.
+   *
+   * @param name
+   *          The name of the job
+   * @param blockedResources
+   *          The resources this job should block or <code>null</code> if the full workspace should be blocked.
+   */
+  public AbstractResourceBlockingJob(String name, IResource... blockedResources) {
     super(name);
-    setRule(ResourcesPlugin.getWorkspace().getRoot());
+    if (blockedResources == null || blockedResources.length < 1) {
+      setRule(ResourcesPlugin.getWorkspace().getRoot());
+    }
+    else if (blockedResources.length == 1) {
+      setRule(blockedResources[0]);
+    }
+    else {
+      setRule(new MultiRule(blockedResources));
+    }
     m_debug = Platform.inDevelopmentMode();
+  }
+
+  /**
+   * Creates a new job blocking the full workspace.
+   *
+   * @param name
+   *          Name of the job
+   */
+  public AbstractResourceBlockingJob(String name) {
+    this(name, (IResource[]) null);
   }
 
   @Override
@@ -56,7 +85,7 @@ public abstract class AbstractWorkspaceBlockingJob extends AbstractJob {
       return doRun(monitor);
     }
     finally {
-      S2ESdkActivator.logInfo("Operation job '" + getName() + "' took " + (System.currentTimeMillis() - start) + "ms to execute.");
+      SdkLog.info("Operation job '" + getName() + "' took " + (System.currentTimeMillis() - start) + "ms to execute.");
     }
   }
 
@@ -72,7 +101,7 @@ public abstract class AbstractWorkspaceBlockingJob extends AbstractJob {
           e.initCause(m_callerTrace);
         }
         Status errorStatus = new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, e.getMessage(), e);
-        S2ESdkActivator.log(errorStatus);
+        SdkLog.error(e.getMessage(), e);
         monitor.setCanceled(true);
         return errorStatus;
       }

@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.fixture.TestAnnotation.TestEnum;
 /**
  * <h3>{@link ClassWithMembers}</h3> used in SourceModelRoundtripTest
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 @SuppressWarnings("unused")

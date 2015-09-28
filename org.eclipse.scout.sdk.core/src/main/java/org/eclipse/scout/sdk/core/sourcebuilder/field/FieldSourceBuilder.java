@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.sourcebuilder.field;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
@@ -37,12 +38,12 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
    */
   public FieldSourceBuilder(IField element) {
     super(element);
-    setSignature(SignatureUtils.getTypeSignature(element.getDataType()));
-    if (element.getSourceOfInitializer() != null) {
-      setValue(new RawSourceBuilder(element.getSourceOfInitializer().toString()));
+    setSignature(SignatureUtils.getTypeSignature(element.dataType()));
+    if (element.sourceOfInitializer() != null) {
+      setValue(new RawSourceBuilder(element.sourceOfInitializer().toString()));
     }
-    else if (element.getConstantValue() != null) {
-      setValue(ExpressionSourceBuilderFactory.createFromMetaValue(element.getConstantValue()));
+    else if (element.constantValue() != null) {
+      setValue(ExpressionSourceBuilderFactory.createFromMetaValue(element.constantValue()));
     }
   }
 
@@ -55,7 +56,7 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
 
   /**
    * when overridden to assign a specific value to the field, use
-   * {@link SignatureUtils#useSignature(String, IImportValidator)} to determ class references (fully qualified vs.
+   * {@link SignatureUtils#useSignature(String, IImportCollector)} to determ class references (fully qualified vs.
    * simple name).
    */
   @Override
@@ -77,7 +78,7 @@ public class FieldSourceBuilder extends AbstractMemberSourceBuilder implements I
       source.append(" ");
     }
     // field type
-    source.append(SignatureUtils.useSignature(getSignature(), validator)).append(" ");
+    source.append(validator.useSignature(getSignature())).append(" ");
     source.append(getElementName());
     // init value
     if (getValue() != null) {

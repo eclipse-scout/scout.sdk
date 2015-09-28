@@ -19,22 +19,22 @@ import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.sourcebuilder.AbstractAnnotatableSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.AbstractJavaElementSourceBuilder;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
 /**
  * <h3>{@link TypeParameterSourceBuilder}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
-public class TypeParameterSourceBuilder extends AbstractAnnotatableSourceBuilder implements ITypeParameterSourceBuilder {
+public class TypeParameterSourceBuilder extends AbstractJavaElementSourceBuilder implements ITypeParameterSourceBuilder {
 
   private final List<String> m_boundsSignatures = new ArrayList<>();
 
   public TypeParameterSourceBuilder(ITypeParameter element) {
     super(element);
-    for (IType t : element.getBounds()) {
+    for (IType t : element.bounds()) {
       addBoundSignature(SignatureUtils.getTypeSignature(t));
     }
   }
@@ -71,7 +71,7 @@ public class TypeParameterSourceBuilder extends AbstractAnnotatableSourceBuilder
     if (!m_boundsSignatures.isEmpty()) {
       source.append(" extends ");
       for (String sig : m_boundsSignatures) {
-        source.append(SignatureUtils.useSignature(sig, validator));
+        source.append(validator.useSignature(sig));
         source.append(" & ");
       }
       source.setLength(source.length() - 3);

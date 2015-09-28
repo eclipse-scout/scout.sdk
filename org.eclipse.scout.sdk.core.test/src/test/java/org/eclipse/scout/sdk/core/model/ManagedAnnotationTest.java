@@ -14,7 +14,7 @@ import java.math.RoundingMode;
 
 import javax.annotation.Generated;
 
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.annotation.javax_annotation_Generated;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithDefaultValues;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithShortValueForIntField;
@@ -47,8 +47,8 @@ public class ManagedAnnotationTest {
     Assert.assertEquals("one", a.string());
     Assert.assertEquals(env.findType(RoundingMode.class.getName()).fields().withName("HALF_UP").first(), a.enumValue());
     Assert.assertEquals(env.findType(String.class.getName()), a.type());
-    Assert.assertEquals(env.findType(Generated.class.getName()), a.anno().getType());
-    Assert.assertEquals("g", a.anno().getValue("value").getMetaValue().getObject(String.class));
+    Assert.assertEquals(env.findType(Generated.class.getName()), a.anno().type());
+    Assert.assertEquals("g", a.anno().value("value").metaValue().get(String.class));
   }
 
   @Test
@@ -60,8 +60,8 @@ public class ManagedAnnotationTest {
     Assert.assertEquals("alpha", a.string());
     Assert.assertEquals(env.findType(RoundingMode.class.getName()).fields().withName("HALF_UP").first(), a.enumValue());
     Assert.assertEquals(env.findType(String.class.getName()), a.type());
-    Assert.assertEquals(env.findType(Generated.class.getName()), a.anno().getType());
-    Assert.assertEquals("g1", a.anno().getValue("value").getMetaValue().getObject(String.class));
+    Assert.assertEquals(env.findType(Generated.class.getName()), a.anno().type());
+    Assert.assertEquals("g1", a.anno().value("value").metaValue().get(String.class));
   }
 
   @Test
@@ -85,8 +85,8 @@ public class ManagedAnnotationTest {
     Assert.assertEquals("alpha", a.string((String) null));
     Assert.assertEquals(env.findType(RoundingMode.class.getName()).fields().withName("HALF_UP").first(), a.enumValue((IField) null));
     Assert.assertEquals(env.findType(String.class.getName()), a.type((IType) null));
-    Assert.assertEquals(env.findType(Generated.class.getName()), a.anno((IAnnotation) null).getType());
-    Assert.assertEquals("g1", a.anno((IAnnotation) null).getValue("value").getMetaValue().getObject(String.class));
+    Assert.assertEquals(env.findType(Generated.class.getName()), a.anno((IAnnotation) null).type());
+    Assert.assertEquals("g1", a.anno((IAnnotation) null).value("value").metaValue().get(String.class));
   }
 
   @Test
@@ -97,7 +97,7 @@ public class ManagedAnnotationTest {
     Assert.assertEquals(5, a.num(5));
     Assert.assertEquals("two", a.string("two"));
     Assert.assertEquals(env.findType(RoundingMode.class.getName()).fields().withName("HALF_EVEN").first(), a.enumValue(env.findType(RoundingMode.class.getName()).fields().withName("HALF_EVEN").first()));
-    Assert.assertEquals(env.findType(TypeNames.java_lang_Integer), a.type(env.findType(TypeNames.java_lang_Integer)));
+    Assert.assertEquals(env.findType(IJavaRuntimeTypes.java_lang_Integer), a.type(env.findType(IJavaRuntimeTypes.java_lang_Integer)));
   }
 
   @Test
@@ -108,7 +108,7 @@ public class ManagedAnnotationTest {
     Assert.assertEquals(Integer.MIN_VALUE, a.num(5));
     Assert.assertEquals("alpha", a.string("two"));
     Assert.assertEquals(env.findType(RoundingMode.class.getName()).fields().withName("HALF_UP").first(), a.enumValue(env.findType(RoundingMode.class.getName()).fields().withName("HALF_UP").first()));
-    Assert.assertEquals(env.findType(String.class.getName()), a.type(env.findType(TypeNames.java_lang_Integer)));
+    Assert.assertEquals(env.findType(String.class.getName()), a.type(env.findType(IJavaRuntimeTypes.java_lang_Integer)));
   }
 
   /**
@@ -151,7 +151,7 @@ public class ManagedAnnotationTest {
     IJavaEnvironment env = CoreTestingUtils.createJavaEnvironment();
     IType t = env.findType(ClassWithAnnotationWithShortValueForIntField.class.getName());
     org_eclipse_scout_sdk_core_fixture_AnnotationWithDefaultValues a = t.annotations().withManagedWrapper(org_eclipse_scout_sdk_core_fixture_AnnotationWithDefaultValues.class).first();
-    Assert.assertEquals(new Integer(4), a.unwrap().getValue("num").getMetaValue().getObject(int.class));
+    Assert.assertEquals(new Integer(4), a.unwrap().value("num").metaValue().get(int.class));
     Assert.assertTrue(4 == a.num());
 //    Assert.assertEquals(new String[]{"g"}, );
   }

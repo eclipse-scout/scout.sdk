@@ -28,7 +28,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
-import org.eclipse.scout.sdk.core.util.JavaEnvironmentBuilder;
+import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -41,40 +41,40 @@ public class TypeTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    Assert.assertEquals(0, childClassType.getArrayDimension());
-    Assert.assertEquals(Flags.AccPublic, childClassType.getFlags());
-    Assert.assertEquals(1, childClassType.getAnnotations().size());
-    Assert.assertEquals(CoreTestingUtils.getChildClassIcu(), childClassType.getCompilationUnit());
-    Assert.assertNull(childClassType.getDeclaringType());
-    Assert.assertEquals(2, childClassType.getFields().size());
-    Assert.assertEquals(3, childClassType.getMethods().size());
-    Assert.assertEquals(ChildClass.class.getName(), childClassType.getName());
-    Assert.assertEquals(ChildClass.class.getSimpleName(), childClassType.getSimpleName());
-    Assert.assertEquals(BaseClass.class.getName(), childClassType.getSuperClass().getName());
+    Assert.assertEquals(0, childClassType.arrayDimension());
+    Assert.assertEquals(Flags.AccPublic, childClassType.flags());
+    Assert.assertEquals(1, childClassType.annotations().list().size());
+    Assert.assertEquals(CoreTestingUtils.getChildClassIcu(), childClassType.compilationUnit());
+    Assert.assertNull(childClassType.declaringType());
+    Assert.assertEquals(2, childClassType.fields().list().size());
+    Assert.assertEquals(3, childClassType.methods().list().size());
+    Assert.assertEquals(ChildClass.class.getName(), childClassType.name());
+    Assert.assertEquals(ChildClass.class.getSimpleName(), childClassType.elementName());
+    Assert.assertEquals(BaseClass.class.getName(), childClassType.superClass().name());
     Assert.assertFalse(childClassType.isAnonymous());
     Assert.assertFalse(childClassType.isArray());
     Assert.assertTrue(childClassType.hasTypeParameters());
 
     // super interfaces
-    Assert.assertEquals(1, childClassType.getSuperInterfaces().size());
-    Assert.assertEquals(InterfaceLevel0.class.getName(), childClassType.getSuperInterfaces().get(0).getName());
+    Assert.assertEquals(1, childClassType.superInterfaces().size());
+    Assert.assertEquals(InterfaceLevel0.class.getName(), childClassType.superInterfaces().get(0).name());
 
     // type parameters
-    Assert.assertEquals(1, childClassType.getTypeParameters().size());
-    ITypeParameter firstTypeParam = childClassType.getTypeParameters().get(0);
+    Assert.assertEquals(1, childClassType.typeParameters().size());
+    ITypeParameter firstTypeParam = childClassType.typeParameters().get(0);
     Assert.assertNotNull(firstTypeParam);
-    Assert.assertEquals(childClassType, firstTypeParam.getDeclaringMember());
-    Assert.assertEquals("X", firstTypeParam.getElementName());
-    Assert.assertEquals(3, firstTypeParam.getBounds().size());
-    Assert.assertEquals(AbstractList.class.getName(), firstTypeParam.getBounds().get(0).getName());
-    Assert.assertEquals(Runnable.class.getName(), firstTypeParam.getBounds().get(1).getName());
-    Assert.assertEquals(Serializable.class.getName(), firstTypeParam.getBounds().get(2).getName());
+    Assert.assertEquals(childClassType, firstTypeParam.declaringMember());
+    Assert.assertEquals("X", firstTypeParam.elementName());
+    Assert.assertEquals(3, firstTypeParam.bounds().size());
+    Assert.assertEquals(AbstractList.class.getName(), firstTypeParam.bounds().get(0).name());
+    Assert.assertEquals(Runnable.class.getName(), firstTypeParam.bounds().get(1).name());
+    Assert.assertEquals(Serializable.class.getName(), firstTypeParam.bounds().get(2).name());
 
     // member types
-    Assert.assertEquals(0, childClassType.getTypes().size());
+    Assert.assertEquals(0, childClassType.innerTypes().list().size());
 
     // type arguments
-    Assert.assertEquals(0, childClassType.getTypeArguments().size());
+    Assert.assertEquals(0, childClassType.typeArguments().size());
   }
 
   @Test
@@ -88,11 +88,11 @@ public class TypeTest {
   @Test
   public void testWildcard() {
     IType wildcardType = CoreTestingUtils.createJavaEnvironment().findType(WildcardChildClass.class.getName());
-    IType returnType = wildcardType.getMethods().get(0).getReturnType();
-    IType firstArg = returnType.getTypeArguments().get(0);
+    IType returnType = wildcardType.methods().first().returnType();
+    IType firstArg = returnType.typeArguments().get(0);
     Assert.assertTrue(firstArg.isWildcardType());
-    Assert.assertEquals(BaseClass.class.getName(), firstArg.getName());
-    Assert.assertEquals(2, firstArg.getTypeArguments().size());
+    Assert.assertEquals(BaseClass.class.getName(), firstArg.name());
+    Assert.assertEquals(2, firstArg.typeArguments().size());
     Assert.assertEquals("Ljava.lang.Class<+Lorg.eclipse.scout.sdk.core.fixture.BaseClass<**>;>;", SignatureUtils.getTypeSignature(returnType));
   }
 
@@ -101,58 +101,58 @@ public class TypeTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    Assert.assertEquals(0, baseClassType.getArrayDimension());
-    Assert.assertEquals(Flags.AccPublic, baseClassType.getFlags());
-    Assert.assertEquals(1, baseClassType.getAnnotations().size());
-    Assert.assertTrue(baseClassType.getCompilationUnit().isSynthetic());
-    Assert.assertNull(baseClassType.getDeclaringType());
-    Assert.assertEquals(2, baseClassType.getFields().size());
-    Assert.assertEquals(2, baseClassType.getMethods().size());
-    Assert.assertEquals(BaseClass.class.getName(), baseClassType.getName());
-    Assert.assertEquals(BaseClass.class.getSimpleName(), baseClassType.getSimpleName());
-    Assert.assertEquals(Object.class.getName(), baseClassType.getSuperClass().getName());
+    Assert.assertEquals(0, baseClassType.arrayDimension());
+    Assert.assertEquals(Flags.AccPublic, baseClassType.flags());
+    Assert.assertEquals(1, baseClassType.annotations().list().size());
+    Assert.assertTrue(baseClassType.compilationUnit().isSynthetic());
+    Assert.assertNull(baseClassType.declaringType());
+    Assert.assertEquals(2, baseClassType.fields().list().size());
+    Assert.assertEquals(2, baseClassType.methods().list().size());
+    Assert.assertEquals(BaseClass.class.getName(), baseClassType.name());
+    Assert.assertEquals(BaseClass.class.getSimpleName(), baseClassType.elementName());
+    Assert.assertEquals(Object.class.getName(), baseClassType.superClass().name());
     Assert.assertFalse(baseClassType.isAnonymous());
     Assert.assertFalse(baseClassType.isArray());
     Assert.assertTrue(baseClassType.hasTypeParameters());
 
     // super interfaces
-    Assert.assertEquals(1, baseClassType.getSuperInterfaces().size());
-    Assert.assertEquals(InterfaceLevel1.class.getName(), baseClassType.getSuperInterfaces().get(0).getName());
+    Assert.assertEquals(1, baseClassType.superInterfaces().size());
+    Assert.assertEquals(InterfaceLevel1.class.getName(), baseClassType.superInterfaces().get(0).name());
 
     // type parameters
-    Assert.assertEquals(2, baseClassType.getTypeParameters().size());
-    ITypeParameter firstTypeParam = baseClassType.getTypeParameters().get(0);
+    Assert.assertEquals(2, baseClassType.typeParameters().size());
+    ITypeParameter firstTypeParam = baseClassType.typeParameters().get(0);
     Assert.assertNotNull(firstTypeParam);
-    Assert.assertEquals(baseClassType, firstTypeParam.getDeclaringMember());
-    Assert.assertEquals("T", firstTypeParam.getElementName());
-    Assert.assertEquals(0, firstTypeParam.getBounds().size());
+    Assert.assertEquals(baseClassType, firstTypeParam.declaringMember());
+    Assert.assertEquals("T", firstTypeParam.elementName());
+    Assert.assertEquals(0, firstTypeParam.bounds().size());
 
-    ITypeParameter secondTypeParam = baseClassType.getTypeParameters().get(1);
+    ITypeParameter secondTypeParam = baseClassType.typeParameters().get(1);
     Assert.assertNotNull(secondTypeParam);
-    Assert.assertEquals(baseClassType, secondTypeParam.getDeclaringMember());
-    Assert.assertEquals("Z", secondTypeParam.getElementName());
-    Assert.assertEquals(0, secondTypeParam.getBounds().size());
+    Assert.assertEquals(baseClassType, secondTypeParam.declaringMember());
+    Assert.assertEquals("Z", secondTypeParam.elementName());
+    Assert.assertEquals(0, secondTypeParam.bounds().size());
 
     // member types
-    Assert.assertEquals(2, baseClassType.getTypes().size());
-    Assert.assertEquals(Flags.AccStatic, baseClassType.getTypes().get(0).getFlags());
-    Assert.assertEquals(baseClassType, baseClassType.getTypes().get(0).getDeclaringType());
-    Assert.assertEquals(Flags.AccProtected, baseClassType.getTypes().get(1).getFlags());
-    Assert.assertEquals(baseClassType, baseClassType.getTypes().get(1).getDeclaringType());
+    Assert.assertEquals(2, baseClassType.innerTypes().list().size());
+    Assert.assertEquals(Flags.AccStatic, baseClassType.innerTypes().first().flags());
+    Assert.assertEquals(baseClassType, baseClassType.innerTypes().first().declaringType());
+    Assert.assertEquals(Flags.AccProtected, baseClassType.innerTypes().list().get(1).flags());
+    Assert.assertEquals(baseClassType, baseClassType.innerTypes().list().get(1).declaringType());
 
     // type arguments
-    List<IType> typeArguments = baseClassType.getTypeArguments();
+    List<IType> typeArguments = baseClassType.typeArguments();
     Assert.assertEquals(2, typeArguments.size());
     IType firstTypeArg = typeArguments.get(0);
     Assert.assertTrue(firstTypeArg.isAnonymous());
-    Assert.assertEquals(AbstractList.class.getName(), firstTypeArg.getSuperClass().getName());
-    Assert.assertEquals(2, firstTypeArg.getSuperInterfaces().size());
-    Assert.assertEquals(Runnable.class.getName(), firstTypeArg.getSuperInterfaces().get(0).getName());
-    Assert.assertEquals(Serializable.class.getName(), firstTypeArg.getSuperInterfaces().get(1).getName());
+    Assert.assertEquals(AbstractList.class.getName(), firstTypeArg.superClass().name());
+    Assert.assertEquals(2, firstTypeArg.superInterfaces().size());
+    Assert.assertEquals(Runnable.class.getName(), firstTypeArg.superInterfaces().get(0).name());
+    Assert.assertEquals(Serializable.class.getName(), firstTypeArg.superInterfaces().get(1).name());
 
     IType secondTypeArg = typeArguments.get(1);
     Assert.assertFalse(secondTypeArg.isAnonymous());
-    Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), secondTypeArg.getName());
+    Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), secondTypeArg.name());
   }
 
   @Test
@@ -173,47 +173,47 @@ public class TypeTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    IType innerClass2 = baseClassType.getTypes().get(1);
+    IType innerClass2 = baseClassType.innerTypes().list().get(1);
     testInnerType(innerClass2);
   }
 
   private static void testInnerType(IType innerClass2) {
     Assert.assertNotNull(innerClass2);
 
-    Assert.assertEquals(0, innerClass2.getArrayDimension());
-    Assert.assertEquals(Flags.AccProtected, innerClass2.getFlags());
-    Assert.assertEquals(0, innerClass2.getAnnotations().size());
-    Assert.assertTrue(innerClass2.getCompilationUnit().isSynthetic());
-    Assert.assertEquals(CoreTestingUtils.getBaseClassType().getName(), innerClass2.getDeclaringType().getName());
-    Assert.assertEquals(1, innerClass2.getFields().size());
-    Assert.assertEquals(0, innerClass2.getMethods().size());
-    Assert.assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerClass2.getName());
-    Assert.assertEquals("InnerClass2", innerClass2.getSimpleName());
-    Assert.assertEquals(ArrayList.class.getName(), innerClass2.getSuperClass().getName());
+    Assert.assertEquals(0, innerClass2.arrayDimension());
+    Assert.assertEquals(Flags.AccProtected, innerClass2.flags());
+    Assert.assertEquals(0, innerClass2.annotations().list().size());
+    Assert.assertTrue(innerClass2.compilationUnit().isSynthetic());
+    Assert.assertEquals(CoreTestingUtils.getBaseClassType().name(), innerClass2.declaringType().name());
+    Assert.assertEquals(1, innerClass2.fields().list().size());
+    Assert.assertEquals(0, innerClass2.methods().list().size());
+    Assert.assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerClass2.name());
+    Assert.assertEquals("InnerClass2", innerClass2.elementName());
+    Assert.assertEquals(ArrayList.class.getName(), innerClass2.superClass().name());
     Assert.assertFalse(innerClass2.isAnonymous());
     Assert.assertFalse(innerClass2.isArray());
     Assert.assertFalse(innerClass2.hasTypeParameters());
 
     // super interfaces
-    Assert.assertEquals(0, innerClass2.getSuperInterfaces().size());
+    Assert.assertEquals(0, innerClass2.superInterfaces().size());
 
     // type parameters
-    Assert.assertEquals(0, innerClass2.getTypeParameters().size());
+    Assert.assertEquals(0, innerClass2.typeParameters().size());
 
     // member types
-    Assert.assertEquals(0, innerClass2.getTypes().size());
+    Assert.assertEquals(0, innerClass2.innerTypes().list().size());
 
     // type arguments
-    List<IType> typeArguments = innerClass2.getTypeArguments();
+    List<IType> typeArguments = innerClass2.typeArguments();
     Assert.assertEquals(0, typeArguments.size());
 
     // super type arguments
-    List<IType> superTypeArguments = innerClass2.getSuperClass().getTypeArguments();
+    List<IType> superTypeArguments = innerClass2.superClass().typeArguments();
     Assert.assertEquals(1, superTypeArguments.size());
     IType firstTypeArg = superTypeArguments.get(0);
     Assert.assertFalse(firstTypeArg.isAnonymous());
     Assert.assertTrue(firstTypeArg.isArray());
-    Assert.assertEquals(1, firstTypeArg.getArrayDimension());
-    Assert.assertEquals(BigDecimal.class.getName(), firstTypeArg.getLeafComponentType().getName());
+    Assert.assertEquals(1, firstTypeArg.arrayDimension());
+    Assert.assertEquals(BigDecimal.class.getName(), firstTypeArg.leafComponentType().name());
   }
 }

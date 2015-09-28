@@ -21,7 +21,7 @@ import java.util.Collection;
  */
 public class CompositeObject implements Comparable<CompositeObject>, Serializable {
   private static final long serialVersionUID = 0L;
-  private final Object[] m_value;
+  protected final Object[] m_value;
   private final int m_hash;
 
   public CompositeObject(Object... a) {
@@ -115,7 +115,7 @@ public class CompositeObject implements Comparable<CompositeObject>, Serializabl
   }
 
   @SuppressWarnings("unchecked")
-  private static int compareImpl(Object a, Object b) {
+  protected int compareImpl(Object a, Object b) {
     if (a == null && b == null) {
       return 0;
     }

@@ -15,7 +15,7 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
 /**
  * <h3>{@link IResourceFragmentBuilder}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  */
 public interface IResourceFragmentBuilder {
 

@@ -8,38 +8,48 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.core.util;
+package org.eclipse.scout.sdk.core.testing;
 
 import java.io.File;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.regex.Pattern;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.spi.internal.ClasspathEntry;
 import org.eclipse.scout.sdk.core.model.spi.internal.JavaEnvironmentWithJdt;
 import org.eclipse.scout.sdk.core.model.spi.internal.WorkspaceFileSystem;
+import org.eclipse.scout.sdk.core.util.CompositeObject;
+import org.eclipse.scout.sdk.core.util.SdkException;
 
 /**
- * helpers used in order to create a testing {@link IJavaEnvironment} implemented by a {@link IJavaEnvironment}
+ * <h3>{@link JavaEnvironmentBuilder}</h3> Contains helpers used in order to create a {@link IJavaEnvironment}.
+ *
+ * @author Ivan Motsch
+ * @since 5.2.0
  */
 public final class JavaEnvironmentBuilder {
   private final File m_curDir = new File("").getAbsoluteFile();
   private boolean m_includeRunningClasspath = true;
   private boolean m_includeSources = true;
-  private final ArrayList<Pattern> m_sourceExcludes = new ArrayList<>();
-  private final ArrayList<Pattern> m_binaryExcludes = new ArrayList<>();
-  private final TreeMap<CompositeObject, Classpath> m_srcPaths = new TreeMap<>();
-  private final TreeMap<CompositeObject, Classpath> m_binPaths = new TreeMap<>();
-  private final LinkedHashSet<File> m_findSourceAttachmentFor = new LinkedHashSet<>();
+  private final List<Pattern> m_sourceExcludes = new ArrayList<>();
+  private final List<Pattern> m_binaryExcludes = new ArrayList<>();
+  private final Map<CompositeObject, ClasspathEntry> m_srcPaths = new TreeMap<>();
+  private final Map<CompositeObject, ClasspathEntry> m_binPaths = new TreeMap<>();
+  private final Set<File> m_findSourceAttachmentFor = new LinkedHashSet<>();
 
   public JavaEnvironmentBuilder() {
   }
@@ -239,30 +249,24 @@ public final class JavaEnvironmentBuilder {
    * Append path to binary path collector. Only append if the path exists
    */
   protected void appendBinaryPath(File f) {
-    Classpath cp = WorkspaceFileSystem.createClasspath(f, false);
+    Classpath cp = WorkspaceFileSystem.createClasspath(f, false, StandardCharsets.UTF_8.name());
     if (cp == null) {
       return;
     }
     CompositeObject key = new CompositeObject(f.isDirectory() ? 1 : 2, cp.getPath());
-    if (m_binPaths.put(key, cp) != null) {
-      return;
-    }
-    //System.out.println("INCLUDE BIN " + f);
+    m_binPaths.put(key, new ClasspathEntry(cp, StandardCharsets.UTF_8.name()));
   }
 
   /**
    * Append path to source path collector. Only append if the path exists
    */
   protected void appendSourcePath(File f) {
-    Classpath cp = WorkspaceFileSystem.createClasspath(f, true);
+    Classpath cp = WorkspaceFileSystem.createClasspath(f, true, null);
     if (cp == null) {
       return;
     }
     CompositeObject key = new CompositeObject(f.isDirectory() ? 1 : 2, cp.getPath());
-    if (m_srcPaths.put(key, cp) != null) {
-      return;
-    }
-    //System.out.println("INCLUDE SRC " + f);
+    m_srcPaths.put(key, new ClasspathEntry(cp, StandardCharsets.UTF_8.name()));
   }
 
   protected void findSourceAttachments() {
@@ -295,10 +299,10 @@ public final class JavaEnvironmentBuilder {
       findSourceAttachments();
     }
 
-    Collection<Classpath> all = new ArrayList<>();
+    Collection<ClasspathEntry> all = new ArrayList<>();
     all.addAll(m_srcPaths.values());
     all.addAll(m_binPaths.values());
-    return new JavaEnvironmentWithJdt(all.toArray(new Classpath[0])).wrap();
+    return new JavaEnvironmentWithJdt(all.toArray(new ClasspathEntry[all.size()])).wrap();
   }
 
 }

@@ -67,11 +67,6 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk.deps</groupId>
-      <artifactId>org.eclipse.ui.console</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
       <scope>provided</scope>
@@ -101,7 +96,6 @@
               org.eclipse.core.runtime;bundle-version="[3.7,4)";visibility:=reexport,
               org.eclipse.core.resources;visibility:=reexport,
               org.eclipse.jdt.core;bundle-version="[3.11,4)";visibility:=reexport,
-              org.eclipse.ui.console;bundle-version="[3.6,4)";visibility:=reexport,
               org.eclipse.jface.text;bundle-version="[3.7.2,4)";visibility:=reexport,
               org.eclipse.m2e.core;visibility:=reexport
             </Require-Bundle>

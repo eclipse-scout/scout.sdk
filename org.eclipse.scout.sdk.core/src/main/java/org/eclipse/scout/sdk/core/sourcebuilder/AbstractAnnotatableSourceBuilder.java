@@ -36,7 +36,7 @@ public abstract class AbstractAnnotatableSourceBuilder extends AbstractJavaEleme
 
   public AbstractAnnotatableSourceBuilder(IAnnotatable element) {
     super(element);
-    for (IAnnotation a : element.getAnnotations()) {
+    for (IAnnotation a : element.annotations().list()) {
       addAnnotation(new AnnotationSourceBuilder(a));
     }
   }

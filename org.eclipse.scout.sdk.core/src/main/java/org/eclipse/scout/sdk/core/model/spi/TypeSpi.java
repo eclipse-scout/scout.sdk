@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 
 /**
  * <h3>{@link TypeSpi}</h3> Represents a java data type. This includes classes, interfaces, enums, primitives, the
- * void-type ({@link #VOID}) & the wildcard-type ("?").
+ * void-type & the wildcard-type ("?").
  *
  * @author Matthias Villiger
  * @since 5.1.0
@@ -61,7 +61,7 @@ public interface TypeSpi extends MemberSpi {
   TypeSpi getOriginalType();
 
   /**
-   * Specifies if this is an anonymous class. If <code>true</code> the {@link #getSimpleName()} will return an empty
+   * Specifies if this is an anonymous class. If <code>true</code> the {@link #simpleName()} will return an empty
    * {@link String} and {@link #getName()} will have no last segment.
    *
    * @return <code>true</code> if it is an anonymous class, <code>false</code> otherwise.

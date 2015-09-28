@@ -19,8 +19,8 @@ import javax.swing.event.EventListenerList;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.util.OptimisticLock;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ui.fields.text.TextField;
-import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.ModifyEvent;
@@ -225,7 +225,7 @@ public class FileSelectionField extends TextField {
         l.fileSelected(file);
       }
       catch (Exception t) {
-        S2ESdkUiActivator.logError("error during listener notification.", t);
+        SdkLog.error("error during listener notification.", t);
       }
     }
   }

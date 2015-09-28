@@ -18,10 +18,10 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.workspace.IOperation;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
-import org.eclipse.scout.sdk.s2e.workspace.IWorkspaceBlockingOperation;
 
 /**
  * <h3>{@link WellformAllOperation}</h3>
@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.s2e.workspace.IWorkspaceBlockingOperation;
  * @author Matthias Villiger
  * @since 5.1.0
  */
-public class WellformAllOperation implements IWorkspaceBlockingOperation {
+public class WellformAllOperation implements IOperation {
 
   @Override
   public String getOperationName() {
@@ -47,7 +47,7 @@ public class WellformAllOperation implements IWorkspaceBlockingOperation {
     monitor.beginTask("Wellform Scout classes...", numTicks);
     monitor.setTaskName("Searching for classes...");
     Set<IType> types = new HashSet<>();
-    String[] roots = new String[]{IRuntimeClasses.ICodeType, IRuntimeClasses.IDesktop, IRuntimeClasses.IDesktopExtension, IRuntimeClasses.IForm, IRuntimeClasses.IWizard, IRuntimeClasses.IPage, IRuntimeClasses.IOutline};
+    String[] roots = new String[]{IScoutRuntimeTypes.ICodeType, IScoutRuntimeTypes.IDesktop, IScoutRuntimeTypes.IDesktopExtension, IScoutRuntimeTypes.IForm, IScoutRuntimeTypes.IWizard, IScoutRuntimeTypes.IPage, IScoutRuntimeTypes.IOutline};
     for (String root : roots) {
       Set<IType> rootTypes = JdtUtils.resolveJdtTypes(root);
       for (IType t : rootTypes) {

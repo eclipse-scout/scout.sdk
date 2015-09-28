@@ -39,14 +39,14 @@ public interface MemberSpi extends AnnotatableSpi {
   TypeSpi getDeclaringType();
 
   /**
-   * Gets all {@link TypeParameterSpi}s defined by this {@link TypeSpi} in the order as they appear in the source or
+   * Gets all {@link TypeParameterSpi}s defined by this {@link MemberSpi} in the order as they appear in the source or
    * class file.<br>
    * <br>
-   * Type parameters are declarations as defined by the hosting {@link TypeSpi}. They may have minimal bounds defined.
+   * Type parameters are declarations as defined by the hosting {@link MemberSpi}. They may have minimal bounds defined.
    * <br>
-   * The difference to {@link #getTypeArguments()} is that {@link #getTypeParameters()} returns the parameter as they
-   * are declared by the class file while {@link #getTypeArguments()} holds the currently bound real {@link TypeSpi}s.
-   * <br>
+   * The difference to {@link TypeSpi#getTypeArguments()} is that {@link #getTypeParameters()} returns the parameter as
+   * they are declared by the class file while {@link #typeArguments()} holds the currently bound real
+   * {@link TypeSpi}s. <br>
    * <br>
    * <b>Example: </b><br>
    * <code>public class NumberList&lt;T extends java.lang.Number&gt; {}</code><br>
@@ -56,14 +56,15 @@ public interface MemberSpi extends AnnotatableSpi {
    * <code>getDoubleValues.getReturnType().getTypeParameters().getBounds() = java.lang.Number</code><br>
    * <code>getDoubleValues.getReturnType().getTypeArguments() = java.lang.Double</code>
    *
-   * @return
+   * @return A {@link List} containing all {@link TypeParameterSpi}s of this {@link MemberSpi}. Never returns
+   *         <code>null</code>.
    */
   List<TypeParameterSpi> getTypeParameters();
 
   /**
-   * Specifies if this {@link TypeSpi} has {@link TypeParameterSpi}s.
+   * Specifies if this {@link MemberSpi} has {@link TypeParameterSpi}s.
    *
-   * @return <code>true</code> if this is a parameterized {@link TypeSpi} (using generics), <code>false</code>
+   * @return <code>true</code> if this is a parameterized {@link MemberSpi} (using generics), <code>false</code>
    *         otherwise.
    */
   boolean hasTypeParameters();

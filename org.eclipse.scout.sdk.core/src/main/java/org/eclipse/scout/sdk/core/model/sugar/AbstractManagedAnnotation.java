@@ -13,7 +13,7 @@ import org.eclipse.scout.sdk.core.util.SdkException;
 /**
  * <h3>{@link AbstractManagedAnnotation}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public abstract class AbstractManagedAnnotation {
@@ -38,42 +38,65 @@ public abstract class AbstractManagedAnnotation {
    */
   @SuppressWarnings("unchecked")
   protected <T> T getValue(String name, Class<T> expectedType, Object optionalCustomDefaultValue) {
-    IAnnotationValue av = m_ann.getValue(name);
-    if (av == null || av.isSyntheticDefaultValue()) {
+    IAnnotationValue av = m_ann.value(name);
+    if (av == null || av.isDefaultValue()) {
       if (optionalCustomDefaultValue != null && Array.getLength(optionalCustomDefaultValue) > 0) {
         return (T) Array.get(optionalCustomDefaultValue, 0);
       }
     }
     if (av == null) {
-      throw new SdkException("annotation " + m_ann.getElementName() + " has no attribute named '" + name + "'");
+      throw new SdkException("Annotation '" + m_ann.elementName() + "' has no attribute named '" + name + "'.");
     }
     //ManagedAnnotation array (from IAnnotation array)
     if (expectedType.isArray() && AbstractManagedAnnotation.class.isAssignableFrom(expectedType.getComponentType())) {
-      IAnnotation[] a = av.getMetaValue().getObject(IAnnotation[].class);
+      IAnnotation[] a = av.metaValue().get(IAnnotation[].class);
       Class<? extends AbstractManagedAnnotation> componentType = (Class<? extends AbstractManagedAnnotation>) expectedType.getComponentType();
       T array = (T) Array.newInstance(componentType, a.length);
       for (int i = 0; i < a.length; i++) {
-        Array.set(array, i, ManagedAnnotationUtil.wrap(a[i], componentType));
+        Array.set(array, i, wrap(a[i], componentType));
       }
       return array;
     }
     //ManagedAnnotation element (from IAnnotation)
     if (AbstractManagedAnnotation.class.isAssignableFrom(expectedType)) {
       Class<? extends AbstractManagedAnnotation> xType = (Class<? extends AbstractManagedAnnotation>) expectedType;
-      return (T) ManagedAnnotationUtil.wrap(av.getMetaValue().getObject(IAnnotation.class), xType);
+      return (T) wrap(av.metaValue().get(IAnnotation.class), xType);
     }
-    return av.getMetaValue().getObject(expectedType);
+    return av.metaValue().get(expectedType);
   }
 
   protected boolean isDefaultValue(String name) {
-    IAnnotationValue av = m_ann.getValue(name);
+    IAnnotationValue av = m_ann.value(name);
     if (av == null) {
       return false;
     }
-    return av.isSyntheticDefaultValue();
+    return av.isDefaultValue();
   }
 
   public IAnnotation unwrap() {
     return m_ann;
+  }
+
+  public static <A extends AbstractManagedAnnotation> A wrap(IAnnotation a, Class<A> managedAnnotationType) {
+    try {
+      A annotation = managedAnnotationType.newInstance();
+      annotation.postConstruct(a);
+      return annotation;
+    }
+    catch (Exception e) {
+      throw new IllegalArgumentException("create " + managedAnnotationType.getName() + " with " + a, e);
+    }
+  }
+
+  /**
+   * @return the value of the static field TYPE_NAME
+   */
+  public static String typeName(Class<? extends AbstractManagedAnnotation> a) {
+    try {
+      return (String) a.getField("TYPE_NAME").get(null);
+    }
+    catch (IllegalArgumentException | IllegalAccessException | NoSuchFieldException | SecurityException e) {
+      throw new SdkException("failed to read field " + a.getName() + ".TYPE_NAME. Each managed annotation must define its fully qualified name using a field called 'TYPE_NAME'. ", e);
+    }
   }
 }

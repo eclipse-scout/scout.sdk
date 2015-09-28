@@ -14,12 +14,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link TypeQuery}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class TypeQuery {
@@ -27,6 +28,7 @@ public class TypeQuery {
   private boolean m_includeRecursiveInnerTypes = false;
   private String m_name;
   private String m_simpleName;
+  private String m_instanceOfFqn;
   private IFilter<IType> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
@@ -65,6 +67,11 @@ public class TypeQuery {
     return this;
   }
 
+  public TypeQuery withInstanceOf(String typeFqn) {
+    m_instanceOfFqn = typeFqn;
+    return this;
+  }
+
   /**
    * @param filter
    * @return this
@@ -84,13 +91,16 @@ public class TypeQuery {
   }
 
   protected boolean accept(IType t) {
-    if (m_name != null && !m_name.equals(t.getName())) {
+    if (m_name != null && !m_name.equals(t.name())) {
       return false;
     }
-    if (m_simpleName != null && !m_simpleName.equals(t.getSimpleName())) {
+    if (m_simpleName != null && !m_simpleName.equals(t.elementName())) {
       return false;
     }
     if (m_filter != null && !m_filter.evaluate(t)) {
+      return false;
+    }
+    if (m_instanceOfFqn != null && !t.isInstanceOf(m_instanceOfFqn)) {
       return false;
     }
     return true;
@@ -110,7 +120,7 @@ public class TypeQuery {
     }
     if (m_includeRecursiveInnerTypes) {
       for (IType t : types) {
-        visitRec(t.getTypes(), result, maxCount);
+        visitRec(new WrappedList<IType>(t.unwrap().getTypes()), result, maxCount);
         if (result.size() >= maxCount) {
           return;
         }
@@ -118,18 +128,18 @@ public class TypeQuery {
     }
   }
 
-  public boolean exists() {
+  public boolean existsAny() {
     return first() != null;
   }
 
   public IType first() {
-    ArrayList<IType> result = new ArrayList<>(1);
+    List<IType> result = new ArrayList<>(1);
     visitRec(m_types, result, 1);
     return result.isEmpty() ? null : result.get(0);
   }
 
   public List<IType> list() {
-    ArrayList<IType> result = new ArrayList<>();
+    List<IType> result = new ArrayList<>();
     visitRec(m_types, result, m_maxResultCount);
     return result;
   }

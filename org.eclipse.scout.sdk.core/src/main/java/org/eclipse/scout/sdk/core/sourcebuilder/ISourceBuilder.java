@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder;
 
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
@@ -31,7 +32,7 @@ public interface ISourceBuilder {
    * @param context
    *          context information in which the source is being created.
    * @param validator
-   *          the {@link IImportValidator} to use.
+   *          the {@link IImportCollector} to use.
    */
   void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator);
 

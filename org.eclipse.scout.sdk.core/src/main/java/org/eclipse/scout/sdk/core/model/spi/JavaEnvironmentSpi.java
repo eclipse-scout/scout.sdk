@@ -5,13 +5,14 @@ import java.util.Collection;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 
 /**
- * <h3>{@link JavaEnvironmentSpi}</h3> Represents a lookup environment (classpath) capable to resolve {@link TypeSpi}s
- * by name.
+ * <h3>{@link JavaEnvironmentSpi}</h3> Represents a Java lookup environment (classpath) capable to resolve
+ * {@link TypeSpi}s by name.
  *
  * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface JavaEnvironmentSpi {
+
   PackageSpi getPackage(String name);
 
   /**

@@ -21,6 +21,7 @@ import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 
 /**
@@ -65,14 +66,14 @@ public final class ClassIdGenerators {
                     priority = parseDouble(prio);
                   }
                   else {
-                    S2ESdkActivator.logWarning("No priority found for extension '" + element.getNamespaceIdentifier() + "'. Using 0.0");
+                    SdkLog.warning("No priority found for extension '" + element.getNamespaceIdentifier() + "'. Using 0.0");
                     priority = Double.valueOf(0.0);
                   }
 
                   tmp.put(new CompositeObject(-priority, generator.getClass().getName(), generator), generator);
                 }
                 catch (Exception e) {
-                  S2ESdkActivator.logWarning("Could not load classIdGenerator extension '" + element.getNamespaceIdentifier() + "'.", e);
+                  SdkLog.warning("Could not load classIdGenerator extension '" + element.getNamespaceIdentifier() + "'.", e);
                 }
               }
             }

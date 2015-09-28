@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -88,12 +88,12 @@ public final class VoidTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public String getName() {
-    return TypeNames._void;
+    return IJavaRuntimeTypes._void;
   }
 
   @Override
   public String getElementName() {
-    return TypeNames._void;
+    return IJavaRuntimeTypes._void;
   }
 
   @Override
@@ -148,7 +148,7 @@ public final class VoidTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   public String toString() {
-    return TypeNames._void;
+    return IJavaRuntimeTypes._void;
   }
 
   @Override
@@ -166,7 +166,7 @@ public final class VoidTypeWithJdt extends AbstractTypeWithJdt {
     return new ISourceRange() {
       @Override
       public String toString() {
-        return TypeNames._void;
+        return IJavaRuntimeTypes._void;
       }
     };
   }

@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.util;
 import java.util.Collection;
 
 /**
- * Contains {@link IFilter}s for {@link T}s.
+ * Contains {@link IFilter}s.
  */
 public final class Filters {
 
@@ -95,12 +95,10 @@ public final class Filters {
       public String toString() {
         StringBuilder text = new StringBuilder();
         text.append((or ? "OR" : "AND") + "{");
-        if (filters != null) {
-          for (int i = 0; i < filters.length; i++) {
-            text.append(filters[i]);
-            if (i < filters.length - 1) {
-              text.append(", ");
-            }
+        for (int i = 0; i < filters.length; i++) {
+          text.append(filters[i]);
+          if (i < filters.length - 1) {
+            text.append(", ");
           }
         }
         return text.toString();

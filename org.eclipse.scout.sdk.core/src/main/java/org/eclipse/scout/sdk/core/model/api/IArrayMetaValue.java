@@ -17,5 +17,5 @@ package org.eclipse.scout.sdk.core.model.api;
  * @since 5.1.0
  */
 public interface IArrayMetaValue extends IMetaValue {
-  IMetaValue[] getMetaValueArray();
+  IMetaValue[] metaValueArray();
 }

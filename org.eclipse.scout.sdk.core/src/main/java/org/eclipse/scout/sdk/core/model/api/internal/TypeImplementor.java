@@ -13,13 +13,11 @@ package org.eclipse.scout.sdk.core.model.api.internal;
 import java.util.List;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
-import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -41,23 +39,18 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
   }
 
   @Override
-  public String getSimpleName() {
-    return m_spi.getElementName();
-  }
-
-  @Override
   public boolean isArray() {
     return m_spi.isArray();
   }
 
   @Override
-  public int getArrayDimension() {
+  public int arrayDimension() {
     return m_spi.getArrayDimension();
   }
 
   @Override
-  public IType getLeafComponentType() {
-    return WrapperUtils.wrapType(m_spi.getLeafComponentType());
+  public IType leafComponentType() {
+    return JavaEnvironmentImplementor.wrapType(m_spi.getLeafComponentType());
   }
 
   @Override
@@ -71,52 +64,37 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
   }
 
   @Override
-  public String getName() {
+  public String name() {
     return m_spi.getName();
   }
 
   @Override
-  public IPackage getPackage() {
+  public IPackage containingPackage() {
     return m_spi.getPackage().wrap();
   }
 
   @Override
-  public List<IField> getFields() {
-    return new WrappedList<>(m_spi.getFields());
+  public IType superClass() {
+    return JavaEnvironmentImplementor.wrapType(m_spi.getSuperClass());
   }
 
   @Override
-  public List<IMethod> getMethods() {
-    return new WrappedList<>(m_spi.getMethods());
-  }
-
-  @Override
-  public List<IType> getTypes() {
-    return new WrappedList<>(m_spi.getTypes());
-  }
-
-  @Override
-  public IType getSuperClass() {
-    return WrapperUtils.wrapType(m_spi.getSuperClass());
-  }
-
-  @Override
-  public List<IType> getSuperInterfaces() {
+  public List<IType> superInterfaces() {
     return new WrappedList<>(m_spi.getSuperInterfaces());
   }
 
   @Override
-  public List<IType> getTypeArguments() {
+  public List<IType> typeArguments() {
     return new WrappedList<>(m_spi.getTypeArguments());
   }
 
   @Override
-  public IType getOriginalType() {
+  public IType originalType() {
     return m_spi.getOriginalType().wrap();
   }
 
   @Override
-  public ICompilationUnit getCompilationUnit() {
+  public ICompilationUnit compilationUnit() {
     return m_spi.getCompilationUnit().wrap();
   }
 
@@ -126,7 +104,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
   }
 
   @Override
-  public ISourceRange getSourceOfStaticInitializer() {
+  public ISourceRange sourceOfStaticInitializer() {
     return m_spi.getSourceOfStaticInitializer();
   }
 
@@ -147,16 +125,16 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
 
   @Override
   public boolean isVoid() {
-    return getName().equals(TypeNames._void);
+    return name().equals(IJavaRuntimeTypes._void);
   }
 
   @Override
   public boolean isInterface() {
-    return Flags.isInterface(getFlags());
+    return Flags.isInterface(flags());
   }
 
   @Override
-  public String getSignature() {
+  public String signature() {
     if (m_signature == null) {
       StringBuilder builder = new StringBuilder();
       buildSignatureRec(this, builder);
@@ -170,14 +148,14 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
 
   protected static void buildSignatureRec(IType type, StringBuilder builder) {
     if (type.isArray()) {
-      buildSignatureRec(type.getLeafComponentType(), builder);
-      for (int i = 0; i < type.getArrayDimension(); i++) {
+      buildSignatureRec(type.leafComponentType(), builder);
+      for (int i = 0; i < type.arrayDimension(); i++) {
         builder.append(ISignatureConstants.C_ARRAY);
         builder.append(Signature.C_ARRAY_END);
       }
       return;
     }
-    String name = type.getName();
+    String name = type.name();
     boolean isWildCardOnly = name == null; // name may be null for wildcard only types (<?>)
     if (type.isWildcardType()) {
       builder.append('?');
@@ -191,7 +169,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
     }
 
     // generics
-    List<IType> typeArgs = type.getTypeArguments();
+    List<IType> typeArgs = type.typeArguments();
     if (typeArgs.size() > 0) {
       builder.append(ISignatureConstants.C_GENERIC_START);
       buildSignatureRec(typeArgs.get(0), builder);
@@ -205,7 +183,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
 
   @Override
   public AnnotationQuery<IAnnotation> annotations() {
-    return new AnnotationQuery<>(this, this);
+    return new AnnotationQuery<>(this, m_spi);
   }
 
   @Override
@@ -215,7 +193,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
 
   @Override
   public TypeQuery innerTypes() {
-    return new TypeQuery(getTypes());
+    return new TypeQuery(new WrappedList<IType>(m_spi.getTypes()));
   }
 
   @Override
@@ -230,7 +208,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
 
   @Override
   public boolean isInstanceOf(String queryType) {
-    return superTypes().withName(queryType).exists();
+    return superTypes().withName(queryType).existsAny();
   }
 
   private static final Pattern PRIMITIVE_TYPE_ASSIGNABLE_PAT =
@@ -243,12 +221,12 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
   @Override
   public boolean isAssignableFrom(IType specificClass) {
     if ((this.isPrimitive() || specificClass.isPrimitive())) {
-      return PRIMITIVE_TYPE_ASSIGNABLE_PAT.matcher(this.getSimpleName() + "=" + specificClass.getSimpleName()).matches();
+      return PRIMITIVE_TYPE_ASSIGNABLE_PAT.matcher(this.elementName() + "=" + specificClass.elementName()).matches();
     }
     if ((this.isArray() || specificClass.isArray())) {
-      return this.getName().equals(specificClass.getName());
+      return this.name().equals(specificClass.name());
     }
-    return specificClass.superTypes().withName(this.getName()).exists();
+    return specificClass.superTypes().withName(this.name()).existsAny();
   }
 
   @Override
@@ -256,74 +234,74 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
     if (!isPrimitive()) {
       return this;
     }
-    IJavaEnvironment env = getJavaEnvironment();
-    switch (getName()) {
-      case TypeNames._boolean: {
-        return env.findType(TypeNames.java_lang_Boolean);
+    IJavaEnvironment env = javaEnvironment();
+    switch (name()) {
+      case IJavaRuntimeTypes._boolean: {
+        return env.findType(IJavaRuntimeTypes.java_lang_Boolean);
       }
-      case TypeNames._char: {
-        return env.findType(TypeNames.java_lang_Character);
+      case IJavaRuntimeTypes._char: {
+        return env.findType(IJavaRuntimeTypes.java_lang_Character);
       }
-      case TypeNames._byte: {
-        return env.findType(TypeNames.java_lang_Byte);
+      case IJavaRuntimeTypes._byte: {
+        return env.findType(IJavaRuntimeTypes.java_lang_Byte);
       }
-      case TypeNames._short: {
-        return env.findType(TypeNames.java_lang_Short);
+      case IJavaRuntimeTypes._short: {
+        return env.findType(IJavaRuntimeTypes.java_lang_Short);
       }
-      case TypeNames._int: {
-        return env.findType(TypeNames.java_lang_Integer);
+      case IJavaRuntimeTypes._int: {
+        return env.findType(IJavaRuntimeTypes.java_lang_Integer);
       }
-      case TypeNames._long: {
-        return env.findType(TypeNames.java_lang_Long);
+      case IJavaRuntimeTypes._long: {
+        return env.findType(IJavaRuntimeTypes.java_lang_Long);
       }
-      case TypeNames._float: {
-        return env.findType(TypeNames.java_lang_Float);
+      case IJavaRuntimeTypes._float: {
+        return env.findType(IJavaRuntimeTypes.java_lang_Float);
       }
-      case TypeNames._double: {
-        return env.findType(TypeNames.java_lang_Double);
+      case IJavaRuntimeTypes._double: {
+        return env.findType(IJavaRuntimeTypes.java_lang_Double);
       }
-      case TypeNames._void: {
-        return env.findType(TypeNames.java_lang_Void);
+      case IJavaRuntimeTypes._void: {
+        return env.findType(IJavaRuntimeTypes.java_lang_Void);
       }
       default:
-        throw new IllegalStateException("unknown primitive type: " + getName());
+        throw new IllegalStateException("unknown primitive type: " + name());
     }
   }
 
   @Override
   public IType unboxPrimitiveType() {
-    String s = getName();
+    String s = name();
     if (s.length() > 19) {
       return null;
     }
-    IJavaEnvironment env = getJavaEnvironment();
+    IJavaEnvironment env = javaEnvironment();
     switch (s) {
-      case TypeNames.java_lang_Boolean: {
-        return env.findType(TypeNames._boolean);
+      case IJavaRuntimeTypes.java_lang_Boolean: {
+        return env.findType(IJavaRuntimeTypes._boolean);
       }
-      case TypeNames.java_lang_Character: {
-        return env.findType(TypeNames._char);
+      case IJavaRuntimeTypes.java_lang_Character: {
+        return env.findType(IJavaRuntimeTypes._char);
       }
-      case TypeNames.java_lang_Byte: {
-        return env.findType(TypeNames._byte);
+      case IJavaRuntimeTypes.java_lang_Byte: {
+        return env.findType(IJavaRuntimeTypes._byte);
       }
-      case TypeNames.java_lang_Short: {
-        return env.findType(TypeNames._short);
+      case IJavaRuntimeTypes.java_lang_Short: {
+        return env.findType(IJavaRuntimeTypes._short);
       }
-      case TypeNames.java_lang_Integer: {
-        return env.findType(TypeNames._int);
+      case IJavaRuntimeTypes.java_lang_Integer: {
+        return env.findType(IJavaRuntimeTypes._int);
       }
-      case TypeNames.java_lang_Long: {
-        return env.findType(TypeNames._long);
+      case IJavaRuntimeTypes.java_lang_Long: {
+        return env.findType(IJavaRuntimeTypes._long);
       }
-      case TypeNames.java_lang_Float: {
-        return env.findType(TypeNames._float);
+      case IJavaRuntimeTypes.java_lang_Float: {
+        return env.findType(IJavaRuntimeTypes._float);
       }
-      case TypeNames.java_lang_Double: {
-        return env.findType(TypeNames._double);
+      case IJavaRuntimeTypes.java_lang_Double: {
+        return env.findType(IJavaRuntimeTypes._double);
       }
-      case TypeNames.java_lang_Void: {
-        return env.findType(TypeNames._void);
+      case IJavaRuntimeTypes.java_lang_Void: {
+        return env.findType(IJavaRuntimeTypes._void);
       }
       default:
         return null;

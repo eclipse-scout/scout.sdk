@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
 /**
  * <h3>{@link MethodParameterSourceBuilder}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class MethodParameterSourceBuilder extends AbstractAnnotatableSourceBuilder implements IMethodParameterSourceBuilder {
@@ -29,8 +29,8 @@ public class MethodParameterSourceBuilder extends AbstractAnnotatableSourceBuild
 
   public MethodParameterSourceBuilder(IMethodParameter element) {
     super(element);
-    setFlags(element.getFlags());
-    setDataTypeSignature(SignatureUtils.getTypeSignature(element.getDataType()));
+    setFlags(element.flags());
+    setDataTypeSignature(SignatureUtils.getTypeSignature(element.dataType()));
   }
 
   /**
@@ -67,7 +67,7 @@ public class MethodParameterSourceBuilder extends AbstractAnnotatableSourceBuild
     if (m_flags != Flags.AccDefault) {
       source.append(Flags.toString(m_flags)).append(" ");
     }
-    source.append(SignatureUtils.useSignature(m_dataTypeSignature, validator)).append(" ");
+    source.append(validator.useSignature(m_dataTypeSignature)).append(" ");
     source.append(getElementName());
   }
 

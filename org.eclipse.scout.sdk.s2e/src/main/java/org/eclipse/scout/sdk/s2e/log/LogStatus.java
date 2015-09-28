@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link LogStatus}</h3>
@@ -63,7 +64,7 @@ public class LogStatus extends Status {
     Set<String> ignoredPackagePrefixes = new HashSet<>(maxNumPrefixes);
     ignoredPackagePrefixes.add(Thread.class.getName());
     ignoredPackagePrefixes.add(LogStatus.class.getName());
-    ignoredPackagePrefixes.add(SdkLogManager.class.getName());
+    ignoredPackagePrefixes.add(SdkLog.class.getName());
     if (wrapperClass != null) {
       ignoredPackagePrefixes.add(wrapperClass.getName());
     }

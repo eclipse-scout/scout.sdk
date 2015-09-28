@@ -23,7 +23,7 @@ public final class TypeFilters {
   private static final IFilter<IType> INTERFACE_FILTER = new IFilter<IType>() {
     @Override
     public boolean evaluate(IType candidate) {
-      int flags = candidate.getFlags();
+      int flags = candidate.flags();
       return Flags.isInterface(flags) && !Flags.isDeprecated(flags);
     }
   };
@@ -36,7 +36,7 @@ public final class TypeFilters {
   private static final IFilter<IType> TOP_LEVEL_FILTER = new IFilter<IType>() {
     @Override
     public boolean evaluate(IType type) {
-      return type != null && type.getDeclaringType() == null;
+      return type != null && type.declaringType() == null;
     }
   };
   private static final IFilter<IType> NO_GENERIC_FILTER = new IFilter<IType>() {
@@ -48,14 +48,14 @@ public final class TypeFilters {
   private static final IFilter<IType> ENUM_TYPE_FILTER = new IFilter<IType>() {
     @Override
     public boolean evaluate(IType type) {
-      int flags = type.getFlags();
+      int flags = type.flags();
       return Flags.isEnum(flags) && !Flags.isDeprecated(flags) && !Flags.isAbstract(flags);
     }
   };
   private static final IFilter<IType> NO_SURROUNDING_CONTEXT_TYPE_FILTER = new IFilter<IType>() {
     @Override
     public boolean evaluate(IType type) {
-      return type != null && !type.isAnonymous() && (type.getDeclaringType() == null || Flags.isStatic(type.getFlags()));
+      return type != null && !type.isAnonymous() && (type.declaringType() == null || Flags.isStatic(type.flags()));
     }
   };
 
@@ -64,16 +64,17 @@ public final class TypeFilters {
 
   /**
    * Creates and gets a {@link IFilter} that evaluates to <code>true</code> for all {@link IType}s that are not of the
-   * given type (fully qualified name).
+   * given {@link IType}.
    *
    * @param type
+   *          The {@link IType} to exclude
    * @return The created {@link IFilter}
    */
   public static IFilter<IType> exclude(final IType type) {
     return new IFilter<IType>() {
       @Override
       public boolean evaluate(IType candidate) {
-        return !type.getName().equals(candidate.getName());
+        return !type.name().equals(candidate.name());
       }
     };
   }
@@ -86,11 +87,11 @@ public final class TypeFilters {
    *          The fully qualified type name the candidates must be <code>instanceof</code>.
    * @return The created {@link IFilter}
    */
-  public static IFilter<IType> subtypeOf(final String type) {
+  public static IFilter<IType> instanceOf(final String type) {
     return new IFilter<IType>() {
       @Override
       public boolean evaluate(IType candidate) {
-        return CoreUtils.isInstanceOf(candidate, type);
+        return candidate.isInstanceOf(type);
       }
     };
   }
@@ -103,87 +104,47 @@ public final class TypeFilters {
    *          The super {@link IType}.
    * @return The created {@link IFilter}
    */
-  public static IFilter<IType> subtypeOf(IType type) {
-    return subtypeOf(type.getName());
+  public static IFilter<IType> instanceOf(IType type) {
+    return instanceOf(type.name());
   }
 
   /**
    * Creates a new {@link IFilter} that only returns {@link IType}s where the simple name exactly matches the given
-   * typeName.
+   * typeName (case sensitive).
    *
    * @param typeName
    *          The simple name the types must have.
    * @return The newly created {@link IFilter}
    */
   public static IFilter<IType> simpleName(final String typeName) {
-    return simpleName(typeName, true);
-  }
-
-  /**
-   * Creates a new {@link IFilter} that only returns {@link IType}s where the simple name matches the given typeName.
-   *
-   * @param typeName
-   *          The simple name the types must have.
-   * @param caseSensitive
-   *          {@code true} if case-sensitive comparison should be performed, {@code false} otherwise.
-   * @return The newly created {@link IFilter}
-   */
-  public static IFilter<IType> simpleName(final String typeName, boolean caseSensitive) {
-    if (caseSensitive) {
-      return new IFilter<IType>() {
-        @Override
-        public boolean evaluate(IType type) {
-          return typeName.equals(type.getSimpleName());
-        }
-      };
-    }
     return new IFilter<IType>() {
       @Override
       public boolean evaluate(IType type) {
-        return typeName.equalsIgnoreCase(type.getSimpleName());
+        return typeName.equals(type.elementName());
       }
     };
   }
 
   /**
    * Creates and gets a new {@link IFilter} that accepts all types where the simple name matches the given regular
-   * expression. <br>
-   * <b>Note: The given regex uses case-insensitive matching!</b>
+   * expression.
    *
    * @param regex
-   *          The regex to use for the matching.
-   * @return the created filter
-   * @see Pattern#CASE_INSENSITIVE
-   */
-  public static IFilter<IType> simpleNameRegex(final String regex) {
-    return simpleNameRegex(regex, Pattern.CASE_INSENSITIVE);
-  }
-
-  /**
-   * Creates and gets a new {@link IFilter} that accepts all types where the simple name matches the given regular
-   * expression with the given expression flags.
-   *
-   * @param regex
-   *          The expression to use
-   * @param regexFlags
-   *          The regex flags to use. A bit mask that may include {@link Pattern#CASE_INSENSITIVE},
-   *          {@link Pattern#MULTILINE}, {@link Pattern#DOTALL}, {@link Pattern#UNICODE_CASE}, {@link Pattern#CANON_EQ},
-   *          {@link Pattern#UNIX_LINES}, {@link Pattern#LITERAL} and {@link Pattern#COMMENTS}
+   *          The regular expression {@link Pattern} to use.
    * @return the created filter
    * @see Pattern
    */
-  public static IFilter<IType> simpleNameRegex(final String regex, int regexFlags) {
-    final Pattern pat = Pattern.compile(regex, regexFlags);
+  public static IFilter<IType> simpleNameRegex(final Pattern regex) {
     return new IFilter<IType>() {
       @Override
       public boolean evaluate(IType type) {
-        return pat.matcher(type.getSimpleName()).matches();
+        return regex.matcher(type.elementName()).matches();
       }
     };
   }
 
   /**
-   * Gets a {@link IFilter} that only accepts primary types (having {@link IType#getDeclaringType()} == null).
+   * Gets a {@link IFilter} that only accepts primary types (having {@link IType#declaringType()} == null).
    *
    * @return The primary type {@link IFilter}.
    */
@@ -202,7 +163,7 @@ public final class TypeFilters {
     return new IFilter<IType>() {
       @Override
       public boolean evaluate(IType type) {
-        int typeFlags = type.getFlags();
+        int typeFlags = type.flags();
         return ((typeFlags & flags) == flags);
       }
     };
@@ -220,9 +181,9 @@ public final class TypeFilters {
   }
 
   /**
-   * Gets a {@link IFilter} that only accepts interface {@link IType}s.
+   * Gets a {@link IFilter} that only accepts interface {@link IType}s that are not deprecated.
    *
-   * @return The {@link IFilter} only accepting interfaces.
+   * @return The {@link IFilter} only accepting interfaces whicht are not deprecated.
    */
   public static IFilter<IType> interfaces() {
     return INTERFACE_FILTER;
@@ -237,7 +198,8 @@ public final class TypeFilters {
 
   /**
    * Returns an {@link IFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}. <br>
-   * More formally: Accepts all {@link IType}s that are either static or primary types (= have no declaring type).
+   * More formally: Accepts all non-anonymous {@link IType}s that are either static or primary types (= have no
+   * declaring type).
    *
    * @return an {@link IFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}.
    */
@@ -262,7 +224,7 @@ public final class TypeFilters {
     if (type.isAnonymous()) {
       return false;
     }
-    int flags = type.getFlags();
+    int flags = type.flags();
     return !Flags.isAbstract(flags) && !Flags.isInterface(flags) && !Flags.isDeprecated(flags);
   }
 

@@ -66,29 +66,6 @@ public class DeclarationCompilationUnitWithJdt extends AbstractJavaElementWithJd
     return new CompilationUnitImplementor(this);
   }
 
-  protected static char[] computeUniqueKey(CompilationUnitDeclaration ast) {
-    StringBuilder sig = new StringBuilder();
-    ImportReference currentPackage = ast.currentPackage;
-    if (currentPackage != null) {
-      char[][] importName = currentPackage.getImportName();
-      if (importName != null && importName.length > 0) {
-        for (char[] part : importName) {
-          sig.append(part);
-          sig.append('.');
-        }
-      }
-    }
-    char[] mainTypeName = ast.getMainTypeName();
-    if (mainTypeName != null) {
-      sig.append(mainTypeName);
-    }
-
-    int sigLength = sig.length();
-    char[] uniqueKey = new char[sigLength];
-    sig.getChars(0, sigLength, uniqueKey, 0);
-    return uniqueKey;
-  }
-
   @Override
   public boolean isSynthetic() {
     return false;
@@ -209,7 +186,7 @@ public class DeclarationCompilationUnitWithJdt extends AbstractJavaElementWithJd
         m_imports = new ArrayList<>(0);
       }
       else {
-        ArrayList<DeclarationImportWithJdt> result = new ArrayList<>(imports.length);
+        List<DeclarationImportWithJdt> result = new ArrayList<>(imports.length);
         for (ImportReference imp : imports) {
           DeclarationImportWithJdt importDeclaration = m_env.createDeclarationImport(this, imp);
           result.add(importDeclaration);

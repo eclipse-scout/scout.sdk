@@ -4,11 +4,11 @@
  */
 package org.eclipse.scout.sdk.core.annotation;
 
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
 
 public class javax_annotation_Generated extends AbstractManagedAnnotation {
-  public static final String TYPE_NAME = TypeNames.javax_annotation_Generated;
+  public static final String TYPE_NAME = IJavaRuntimeTypes.javax_annotation_Generated;
 
   public String[] value() {
     return getValue("value", String[].class, null);

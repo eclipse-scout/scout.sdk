@@ -12,6 +12,8 @@ package org.eclipse.scout.sdk.core.model.api.internal;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -24,41 +26,43 @@ import org.eclipse.scout.sdk.core.model.spi.AnnotationValueSpi;
  *
  */
 public class AnnotationImplementor extends AbstractJavaElementImplementor<AnnotationSpi>implements IAnnotation {
-  private LinkedHashMap<String, IAnnotationValue> m_values;
+  private Map<String, IAnnotationValue> m_values;
 
   public AnnotationImplementor(AnnotationSpi spi) {
     super(spi);
   }
 
   @Override
-  public String getName() {
-    return getType().getName();
+  public String name() {
+    return type().name();
   }
 
   @Override
-  public IType getType() {
+  public IType type() {
     return m_spi.getType().wrap();
   }
 
   @Override
-  public IAnnotationValue getValue(String name) {
-    return getValues().get(name);
+  public IAnnotationValue value(String name) {
+    return values().get(name);
   }
 
   @Override
-  public Map<String, IAnnotationValue> getValues() {
+  public Map<String, IAnnotationValue> values() {
     if (m_values == null) {
-      m_values = new LinkedHashMap<>();
-      for (Map.Entry<String, AnnotationValueSpi> e : m_spi.getValues().entrySet()) {
+      Set<Entry<String, AnnotationValueSpi>> entrySet = m_spi.getValues().entrySet();
+      Map<String, IAnnotationValue> values = new LinkedHashMap<>(entrySet.size());
+      for (Map.Entry<String, AnnotationValueSpi> e : entrySet) {
         AnnotationValueSpi spiValue = e.getValue();
-        m_values.put(e.getKey(), spiValue != null ? spiValue.wrap() : null);
+        values.put(e.getKey(), spiValue != null ? spiValue.wrap() : null);
       }
+      m_values = values;
     }
     return m_values;
   }
 
   @Override
-  public IAnnotatable getOwner() {
+  public IAnnotatable owner() {
     return m_spi.getOwner().wrap();
   }
 

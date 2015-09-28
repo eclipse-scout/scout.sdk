@@ -15,7 +15,7 @@ import java.util.List;
 /**
  * <h3>{@link IResourceBuilder}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  */
 public interface IResourceBuilder extends IResourceFragmentBuilder {
 

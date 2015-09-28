@@ -12,9 +12,9 @@ package org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.AbstractTableBeanSourceBuilder;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.DataAnnotation;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 
@@ -26,14 +26,14 @@ import org.eclipse.scout.sdk.core.signature.SignatureUtils;
  */
 public class TableBeanDataSourceBuilder extends AbstractTableBeanSourceBuilder {
 
-  private DataAnnotation m_dataAnnotation;
+  private DataAnnotationDescriptor m_dataAnnotation;
 
   /**
    * @param modelType
    * @param elementName
    * @param setup
    */
-  public TableBeanDataSourceBuilder(IType modelType, DataAnnotation dataAnnotation, String typeName, IJavaEnvironment env) {
+  public TableBeanDataSourceBuilder(IType modelType, DataAnnotationDescriptor dataAnnotation, String typeName, IJavaEnvironment env) {
     super(modelType, typeName, env, false);
     m_dataAnnotation = dataAnnotation;
     setup();
@@ -43,12 +43,12 @@ public class TableBeanDataSourceBuilder extends AbstractTableBeanSourceBuilder {
   protected String computeSuperTypeSignature() {
     IType superDataType = getDataAnnotation().getSuperDataType();
     if (superDataType == null) {
-      return Signature.createTypeSignature(IRuntimeClasses.AbstractTablePageData);
+      return Signature.createTypeSignature(IScoutRuntimeTypes.AbstractTablePageData);
     }
     return SignatureUtils.getTypeSignature(superDataType);
   }
 
-  public DataAnnotation getDataAnnotation() {
+  public DataAnnotationDescriptor getDataAnnotation() {
     return m_dataAnnotation;
   }
 }

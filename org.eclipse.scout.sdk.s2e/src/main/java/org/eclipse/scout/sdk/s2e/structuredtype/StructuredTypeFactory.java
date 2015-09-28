@@ -16,8 +16,8 @@ import java.util.Set;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.structuredtype.ScoutStructuredType;
 import org.eclipse.scout.sdk.s2e.structuredtype.IStructuredType.Categories;
 import org.eclipse.scout.sdk.s2e.util.JdtTypeCache;
@@ -48,92 +48,92 @@ public final class StructuredTypeFactory {
     if (supertypeHierarchy == null) {
       return null;
     }
-    if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.ICompositeField, typeCache)) {
+    if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.ICompositeField, typeCache)) {
       return createStructuredCompositeField(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.ITableField, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.ITableField, typeCache)) {
       return createStructuredTableField(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.ITreeField, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.ITreeField, typeCache)) {
       return createStructuredTreeField(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IPlannerField, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IPlannerField, typeCache)) {
       return createStructuredPlannerField(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IComposerField, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IComposerField, typeCache)) {
       return createStructuredComposer(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IDataModelAttribute, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IDataModelAttribute, typeCache)) {
       return createStructuredComposer(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IDataModelEntity, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IDataModelEntity, typeCache)) {
       return createStructuredComposer(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IFormField, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IFormField, typeCache)) {
       return createStructuredFormField(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IForm, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IForm, typeCache)) {
       return createStructuredForm(type, null);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.ICalendar, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.ICalendar, typeCache)) {
       return createStructuredCalendar(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.ICodeType, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.ICodeType, typeCache)) {
       return createStructuredCodeType(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.ICode, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.ICode, typeCache)) {
       return createStructuredCode(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IDesktop, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IDesktop, typeCache)) {
       return createStructuredDesktop(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IDesktopExtension, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IDesktopExtension, typeCache)) {
       return createStructuredDesktop(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IOutline, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IOutline, typeCache)) {
       return createStructuredOutline(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IPageWithNodes, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IPageWithNodes, typeCache)) {
       return createStructuredPageWithNodes(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IPageWithTable, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IPageWithTable, typeCache)) {
       return createStructuredPageWithTable(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.ITable, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.ITable, typeCache)) {
       return createStructuredTable(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IWizard, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IWizard, typeCache)) {
       return createStructuredWizard(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IWizardStep, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IWizardStep, typeCache)) {
       return createStructuredWizardStep(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IMenu, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IMenu, typeCache)) {
       return createStructuredMenu(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IColumn, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IColumn, typeCache)) {
       return createStructuredColumn(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IActivityMap, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IActivityMap, typeCache)) {
       return createStructuredActivityMap(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IFormHandler, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IFormHandler, typeCache)) {
       return createStructuredFormHandler(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IKeyStroke, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IKeyStroke, typeCache)) {
       return createStructuredKeyStroke(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IButton, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IButton, typeCache)) {
       return createStructuredButton(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IViewButton, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IViewButton, typeCache)) {
       return createStructuredViewButton(type);
     }
-    else if (hierarchyContains(supertypeHierarchy, IRuntimeClasses.IToolButton, typeCache)) {
+    else if (hierarchyContains(supertypeHierarchy, IScoutRuntimeTypes.IToolButton, typeCache)) {
       return createStructuredToolButton(type);
     }
     else {
-      S2ESdkActivator.logInfo("no structured type defined for type '" + type.getFullyQualifiedName() + "'.");
+      SdkLog.info("no structured type defined for type '" + type.getFullyQualifiedName() + "'.");
       return createUnknownStructuredType(type);
     }
   }

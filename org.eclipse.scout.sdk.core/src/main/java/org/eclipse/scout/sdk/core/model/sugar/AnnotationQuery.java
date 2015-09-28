@@ -14,22 +14,29 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
+import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
+import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
+import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link AnnotationQuery}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class AnnotationQuery<T> {
   private final IType m_containerType;
-  private final IAnnotatable m_owner;
+  private final AnnotatableSpi m_owner;
+  private final String m_methodId;
+
   private boolean m_includeSuperClasses = false;
   private boolean m_includeSuperInterfaces = false;
   private String m_name;
@@ -37,9 +44,15 @@ public class AnnotationQuery<T> {
   private IFilter<IAnnotation> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
-  public AnnotationQuery(IType containerType, IAnnotatable owner) {
+  public AnnotationQuery(IType containerType, AnnotatableSpi owner) {
     m_containerType = containerType;
     m_owner = owner;
+    if (owner instanceof MethodSpi) {
+      m_methodId = SignatureUtils.createMethodIdentifier(((MethodSpi) owner).wrap());
+    }
+    else {
+      m_methodId = null;
+    }
   }
 
   /**
@@ -115,10 +128,10 @@ public class AnnotationQuery<T> {
   }
 
   protected boolean accept(IAnnotation a) {
-    if (m_name != null && !m_name.equals(a.getName())) {
+    if (m_name != null && !m_name.equals(a.name())) {
       return false;
     }
-    if (m_managedWrapperType != null && !ManagedAnnotationUtil.typeName(m_managedWrapperType).equals(a.getName())) {
+    if (m_managedWrapperType != null && !AbstractManagedAnnotation.typeName(m_managedWrapperType).equals(a.name())) {
       return false;
     }
     if (m_filter != null && !m_filter.evaluate(a)) {
@@ -136,41 +149,57 @@ public class AnnotationQuery<T> {
    * @param result
    * @param maxCount
    */
-  protected void visitRec(IType type, IAnnotatable owner, List<IAnnotation> result, int maxCount) {
+  protected void visitRec(IType type, AnnotatableSpi owner, List<IAnnotation> result, int maxCount, boolean onlyTraverse) {
     if (type == null) {
       return;
     }
-    if (owner == null) {
-      if (m_owner instanceof IType) {
-        owner = type;
+    if (!onlyTraverse) {
+      if (owner == null) {
+        if (m_owner instanceof TypeSpi) {
+          owner = type.unwrap();
+        }
+        else if (m_owner instanceof MethodSpi) {
+          // find method with same signature
+          IMethod m = type.methods().withFilter(new IFilter<IMethod>() {
+            @Override
+            public boolean evaluate(IMethod element) {
+              return m_methodId.equals(SignatureUtils.createMethodIdentifier(element));
+            }
+          }).first();
+
+          if (m != null) {
+            owner = m.unwrap();
+          }
+        }
+        else if (m_owner instanceof FieldSpi) {
+          IField f = type.fields().withName(m_owner.getElementName()).first();
+          if (f != null) {
+            owner = f.unwrap();
+          }
+        }
       }
-      else if (m_owner instanceof IMethod) {
-        owner = type.methods().withName(m_owner.getElementName()).first();
-      }
-      else if (m_owner instanceof IField) {
-        owner = type.fields().withName(m_owner.getElementName()).first();
-      }
-    }
-    if (owner != null) {
-      for (IAnnotation a : owner.getAnnotations()) {
-        if (accept(a)) {
-          result.add(a);
-          if (result.size() >= maxCount) {
-            return;
+      if (owner != null) {
+        for (AnnotationSpi spi : owner.getAnnotations()) {
+          IAnnotation a = spi.wrap();
+          if (accept(a)) {
+            result.add(a);
+            if (result.size() >= maxCount) {
+              return;
+            }
           }
         }
       }
     }
-    if (m_includeSuperClasses) {
-      visitRec(type.getSuperClass(), null, result, maxCount);
+    if (m_includeSuperClasses || m_includeSuperInterfaces) {
+      visitRec(type.superClass(), null, result, maxCount, !m_includeSuperClasses);
       if (result.size() >= maxCount) {
         return;
       }
     }
 
     if (m_includeSuperInterfaces) {
-      for (IType superInterface : type.getSuperInterfaces()) {
-        visitRec(superInterface, null, result, maxCount);
+      for (IType superInterface : type.superInterfaces()) {
+        visitRec(superInterface, null, result, maxCount, false);
         if (result.size() >= maxCount) {
           return;
         }
@@ -178,34 +207,34 @@ public class AnnotationQuery<T> {
     }
   }
 
-  public boolean exists() {
+  public boolean existsAny() {
     return first() != null;
   }
 
   @SuppressWarnings("unchecked")
   public T first() {
-    ArrayList<IAnnotation> result = new ArrayList<>(1);
-    visitRec(m_containerType, m_owner, result, 1);
+    List<IAnnotation> result = new ArrayList<>(1);
+    visitRec(m_containerType, m_owner, result, 1, false);
     if (result.isEmpty()) {
       return null;
     }
     if (m_managedWrapperType != null) {
-      return (T) ManagedAnnotationUtil.wrap(result.get(0), m_managedWrapperType);
+      return (T) AbstractManagedAnnotation.wrap(result.get(0), m_managedWrapperType);
     }
     return (T) result.get(0);
   }
 
   @SuppressWarnings("unchecked")
   public List<T> list() {
-    ArrayList<IAnnotation> result = new ArrayList<>();
-    visitRec(m_containerType, m_owner, result, m_maxResultCount);
+    List<IAnnotation> result = new ArrayList<>();
+    visitRec(m_containerType, m_owner, result, m_maxResultCount, false);
     if (result.isEmpty()) {
       return Collections.emptyList();
     }
     if (m_managedWrapperType != null) {
-      ArrayList<AbstractManagedAnnotation> managedList = new ArrayList<>(result.size());
+      List<AbstractManagedAnnotation> managedList = new ArrayList<>(result.size());
       for (IAnnotation a : result) {
-        managedList.add(ManagedAnnotationUtil.wrap(a, m_managedWrapperType));
+        managedList.add(AbstractManagedAnnotation.wrap(a, m_managedWrapperType));
       }
       return (List<T>) managedList;
     }

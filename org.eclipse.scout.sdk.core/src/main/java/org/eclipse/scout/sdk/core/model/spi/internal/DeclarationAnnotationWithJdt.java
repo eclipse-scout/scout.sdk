@@ -33,7 +33,7 @@ public class DeclarationAnnotationWithJdt extends AbstractJavaElementWithJdt<IAn
   private final AnnotatableSpi m_owner;
   private final org.eclipse.jdt.internal.compiler.ast.Annotation m_astNode;
   private final TypeBinding m_typeBinding;
-  private LinkedHashMap<String, AnnotationValueSpi> m_values;//sorted
+  private Map<String, AnnotationValueSpi> m_values;//sorted
   private TypeSpi m_type;
 
   DeclarationAnnotationWithJdt(JavaEnvironmentWithJdt env, AnnotatableSpi owner, org.eclipse.jdt.internal.compiler.ast.Annotation astNode) {
@@ -75,7 +75,7 @@ public class DeclarationAnnotationWithJdt extends AbstractJavaElementWithJdt<IAn
   public Map<String, AnnotationValueSpi> getValues() {
     if (m_values == null) {
       Map<String, MemberValuePair> defaultsMap = SpiWithJdtUtils.getDeclarationAnnotationSyntheticDefaultValues(m_env, m_typeBinding);
-      final LinkedHashMap<String, AnnotationValueSpi> result = new LinkedHashMap<>(defaultsMap.size());
+      final Map<String, AnnotationValueSpi> result = new LinkedHashMap<>(defaultsMap.size());
       //fill keys only in correct sort order
       for (String name : defaultsMap.keySet()) {
         result.put(name, null);

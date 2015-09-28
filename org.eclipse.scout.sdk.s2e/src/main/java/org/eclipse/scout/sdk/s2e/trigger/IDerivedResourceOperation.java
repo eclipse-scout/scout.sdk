@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 /**
  * <h3>{@link IDerivedResourceOperation}</h3><br>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1
  */
 public interface IDerivedResourceOperation {

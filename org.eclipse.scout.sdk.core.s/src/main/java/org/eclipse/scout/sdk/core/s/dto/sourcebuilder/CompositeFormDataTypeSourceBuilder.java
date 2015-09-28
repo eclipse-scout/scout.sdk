@@ -15,8 +15,8 @@ import java.util.List;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataAnnotation;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataTypeSourceBuilder;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table.TableFieldBeanFormDataSourceBuilder;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
@@ -28,7 +28,6 @@ import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.MethodSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.TypeFilters;
 
 /**
  * <h3>{@link CompositeFormDataTypeSourceBuilder}</h3>
@@ -38,7 +37,7 @@ import org.eclipse.scout.sdk.core.util.TypeFilters;
  */
 public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilder {
 
-  public CompositeFormDataTypeSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, String typeName, IJavaEnvironment env) {
+  public CompositeFormDataTypeSourceBuilder(IType modelType, FormDataAnnotationDescriptor formDataAnnotation, String typeName, IJavaEnvironment env) {
     super(modelType, formDataAnnotation, typeName, env);
   }
 
@@ -49,29 +48,29 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
   }
 
   private void createCompositeFieldFormData(IType compositeType) {
-    List<IType> innerTypes = CoreUtils.getInnerTypes(compositeType, TypeFilters.subtypeOf(IRuntimeClasses.IFormField));
+    List<IType> innerTypes = compositeType.innerTypes().withInstanceOf(IScoutRuntimeTypes.IFormField).list();
     for (IType formField : innerTypes) {
       boolean fieldExtendsTemplateField = false;
 
-      if (Flags.isPublic(formField.getFlags())) {
-        FormDataAnnotation fieldAnnotation = DtoUtils.findFormDataAnnotation(formField);
+      if (Flags.isPublic(formField.flags())) {
+        FormDataAnnotationDescriptor fieldAnnotation = DtoUtils.getFormDataAnnotationDescriptor(formField);
 
-        if (FormDataAnnotation.isCreate(fieldAnnotation)) {
+        if (FormDataAnnotationDescriptor.isCreate(fieldAnnotation)) {
           IType formDataType = fieldAnnotation.getFormDataType();
           String formDataTypeName = null;
           if (formDataType == null) {
-            formDataTypeName = DtoUtils.removeFieldSuffix(formField.getSimpleName());
+            formDataTypeName = DtoUtils.removeFieldSuffix(formField.elementName());
           }
           else {
-            formDataTypeName = formDataType.getSimpleName();
+            formDataTypeName = formDataType.elementName();
           }
 
           ITypeSourceBuilder fieldSourceBuilder = null;
-          if (CoreUtils.isInstanceOf(fieldAnnotation.getSuperType(), IRuntimeClasses.AbstractTableFieldBeanData)) {
+          if (fieldAnnotation.getSuperType().isInstanceOf(IScoutRuntimeTypes.AbstractTableFieldBeanData)) {
             // fill table bean
             fieldSourceBuilder = new TableFieldBeanFormDataSourceBuilder(formField, fieldAnnotation, formDataTypeName, getJavaEnvironment());
           }
-          else if (CoreUtils.isInstanceOf(formField, IRuntimeClasses.ICompositeField) && !CoreUtils.isInstanceOf(formField, IRuntimeClasses.IValueField)) {
+          else if (formField.isInstanceOf(IScoutRuntimeTypes.ICompositeField) && !formField.isInstanceOf(IScoutRuntimeTypes.IValueField)) {
             // field extends a field template.
             fieldExtendsTemplateField = true;
             fieldSourceBuilder = new CompositeFormDataTypeSourceBuilder(formField, fieldAnnotation, formDataTypeName, getJavaEnvironment());
@@ -101,18 +100,18 @@ public class CompositeFormDataTypeSourceBuilder extends FormDataTypeSourceBuilde
           getterBuilder.setBody(new RawSourceBuilder("return getFieldByClass(" + formDataTypeName + ".class);"));
           addSortedMethod(SortedMemberKeyFactory.createMethodPropertyKey(getterBuilder), getterBuilder);
         }
-        else if (FormDataAnnotation.isIgnore(fieldAnnotation)) {
+        else if (FormDataAnnotationDescriptor.isIgnore(fieldAnnotation)) {
           continue;
         }
 
-        if (CoreUtils.isInstanceOf(formField, IRuntimeClasses.ICompositeField) && !fieldExtendsTemplateField) {
+        if (formField.isInstanceOf(IScoutRuntimeTypes.ICompositeField) && !fieldExtendsTemplateField) {
           createCompositeFieldFormData(formField);
         }
       }
     }
 
     // step into extensions
-    for (IType formFieldExtension : CoreUtils.getInnerTypes(compositeType, TypeFilters.subtypeOf(IRuntimeClasses.ICompositeFieldExtension))) {
+    for (IType formFieldExtension : compositeType.innerTypes().withInstanceOf(IScoutRuntimeTypes.ICompositeFieldExtension).list()) {
       createCompositeFieldFormData(formFieldExtension);
     }
   }

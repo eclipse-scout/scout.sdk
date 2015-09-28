@@ -27,14 +27,17 @@ import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
 import org.eclipse.jface.text.IRegion;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
+import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitScopedImportValidator;
+import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitScopedImportCollector;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
@@ -47,7 +50,7 @@ import org.eclipse.text.edits.TextEdit;
  * @author Andreas Hoegger
  * @since 3.10.0 06.12.2012
  */
-public class AnnotationNewOperation implements IWorkspaceBlockingOperation {
+public class AnnotationNewOperation implements IOperation {
 
   private static final Pattern REGEX_WHITE_SPACE_START = Pattern.compile("^(\\s+).*");
 
@@ -61,7 +64,7 @@ public class AnnotationNewOperation implements IWorkspaceBlockingOperation {
 
   @Override
   public String getOperationName() {
-    return "create annotation " + Signature.getSignatureSimpleName(m_sourceBuilder.getName()) + "...";
+    return "create annotation " + Signature.getSimpleName(m_sourceBuilder.getName()) + "...";
   }
 
   @Override
@@ -85,25 +88,25 @@ public class AnnotationNewOperation implements IWorkspaceBlockingOperation {
     }
 
     IJavaEnvironment env = ScoutSdkCore.createJavaEnvironment(m_declaringMember.getJavaProject());
-    IImportValidator validator = new CompilationUnitScopedImportValidator(new ImportValidator(env), pck);
+    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(env), pck);
     Document doc = new Document(icu.getSource());
 
-    TextEdit edit = createEdit(validator, doc, icu.findRecommendedLineSeparator());
+    TextEdit edit = createEdit(new ImportValidator(collector), doc, icu.findRecommendedLineSeparator());
     try {
       edit.apply(doc);
       icu.getBuffer().setContents(doc.get());
 
       // create imports
-      new ImportsCreateOperation(icu, validator).run(monitor, workingCopyManager);
+      new ImportsCreateOperation(icu, collector).run(monitor, workingCopyManager);
     }
     catch (Exception e) {
-      S2ESdkActivator.logWarning("could not add annotation to '" + m_declaringMember.getElementName() + "'.", e);
+      SdkLog.warning("could not add annotation to '" + m_declaringMember.getElementName() + "'.", e);
     }
   }
 
   protected ISourceRange getAnnotationReplaceRange(Document sourceDocument, String newLine, String newAnnotationSource) throws JavaModelException, BadLocationException {
-    String sn = Signature.getSignatureSimpleName(m_sourceBuilder.getName());
-    String fqn = Signature.getSignatureQualifier(m_sourceBuilder.getName()) + "." + sn;
+    String sn = Signature.getSimpleName(m_sourceBuilder.getName());
+    String fqn = Signature.getQualifier(m_sourceBuilder.getName()) + "." + sn;
     int newLineLength = newLine.length();
 
     IRegion lineOfMemberName = sourceDocument.getLineInformationOfOffset(m_declaringMember.getNameRange().getOffset());

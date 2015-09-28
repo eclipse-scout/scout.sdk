@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2010 BSI Business Systems Integration AG.
+ * Copyright (c) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -10,145 +10,56 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.importvalidator;
 
-import java.util.Collection;
-import java.util.Collections;
-
-import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.signature.SignatureUtils;
-import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
+import org.eclipse.scout.sdk.core.model.api.IType;
 
 /**
- * <h3>{@link IImportValidator}</h3>
+ * <h3>{@link IImportValidator}</h3> Validates imports to fully qualified references and returns the type reference to
+ * use in the source code.
  *
- * @author Andreas Hoegger
- * @since 3.7.0
+ * @author Matthias Villiger
+ * @since 5.2.0
  */
 public interface IImportValidator {
   /**
-   * a dummy {@link IImportValidator} that can be used for {@link Object#toString()} sort of operations
-   */
-  IImportValidator DUMMY = new IImportValidator() {
-
-    @Override
-    public IJavaEnvironment getJavaEnvironment() {
-      return null;
-    }
-
-    @Override
-    public String getQualifier() {
-      return null;
-    }
-
-    @Override
-    public void addStaticImport(String fqn) {
-    }
-
-    @Override
-    public void addImport(String fqn) {
-    }
-
-    @Override
-    public void reserveElement(ImportElementCandidate cand) {
-    }
-
-    @Override
-    public String registerElement(ImportElementCandidate cand) {
-      return cand.getSimpleName();
-    }
-
-    @Override
-    public String checkExistingImports(ImportElementCandidate cand) {
-      return cand.getSimpleName();
-    }
-
-    @Override
-    public String checkCurrentScope(ImportElementCandidate cand) {
-      return null;
-    }
-
-    @Override
-    public Collection<String> createImportDeclarations() {
-      return Collections.emptySet();
-    }
-  };
-
-  IJavaEnvironment getJavaEnvironment();
-
-  /**
-   * @return the qualifier of the scope this {@link IImportValidator} represents.
-   *         <p>
-   *         {@link ICompilationUnitSourceBuilder} wraps this {@link IImportValidator} and uses the packageName
-   *         <p>
-   *         Inner {@link ITypeSourceBuilder} use a wrapped {@link IImportValidator} that uses the outer type qualified
-   *         name
-   */
-  String getQualifier();
-
-  /**
-   * Adds the given fully qualified name to the list of static imports to be created.<br>
-   * Any already existing mapping for the same simple name of the given qualified name will be replaced.
+   * Gets the type reference to the given {@link IType}.
    *
-   * @param fqn
-   *          The fully qualified name to add.
+   * @param type
+   *          The {@link IType} to which a reference should be returned.
+   * @return The reference to the given {@link IType} to use in the source code.
    */
-  void addStaticImport(String fqn);
+  String useType(IType type);
 
   /**
-   * Adds the given fully qualified name to the list of imports to be created.<br>
-   * Any already existing mapping for the same simple name of the given qualified name will be replaced.
+   * Gets the reference to the given fully qualified names.
    *
-   * @param fqn
-   *          The fully qualified name to add.
+   * @param fullyQualifiedNames
+   *          The fully qualified names. <br>
+   *          E.g. <code>java.lang.Long</code> or <code>java.util.List&lt;java.lang.String&gt;</code>.
+   * @return The references to the given names to use in the source code.
    */
-  void addImport(String fqn);
+  String useName(String fullyQualifiedNames);
 
   /**
-   * Reserve the name for potential usages. This does not already add an import declaration but reserves the potential
-   * import declaration in case a different package name is asked for its import resolved name.
+   * Gets the reference to the given signature.
    *
    * @param signature
-   *          a signature e.g. 'Ljava.lang.String;'
+   *          The fully parameterized signature for which to return the reference.<br>
+   *          E.g. <code>Ljava.util.Set&lt;Ljava.lang.String;&gt;;</code>.
+   * @return The references to the given signature to use in the source code.
    */
-  void reserveElement(ImportElementCandidate cand);
+  String useSignature(String signature);
 
   /**
-   * Do not use this method directly, use {@link SignatureUtils#useSignature(String, IImportValidator)} instead
-   *
-   * @return the simple name for this signature and registers the name. Use
-   *         {@link #checkElement(ImportElementCandidate)} before calling this method.
+   * @return The {@link IImportCollector} responsible to collect all used imports.
    */
-  String registerElement(ImportElementCandidate cand);
+  IImportCollector getImportCollector();
 
   /**
-   * @param cand
-   * @return the simple name if there is already an import for this type
-   *         <p>
-   *         return the qualified name if there is already an import for another type with same simple name
-   *         <p>
-   *         return null if there is no import yet, call {@link #checkCurrentScope(ImportElementCandidate)} for further
-   *         analysis
+   * Sets a new {@link IImportCollector} to this validator.
+   * 
+   * @param collector
+   *          The new {@link IImportCollector} to use.
    */
-  String checkExistingImports(ImportElementCandidate cand);
-
-  /**
-   * Call {@link #checkExistingImports(ImportElementCandidate)} first.
-   *
-   * @param cand
-   * @return the simple name if the element is visible in the current scope without adding an import.
-   *         <p>
-   *         return the qualified name if the element would hide another simple name in the current scope.
-   *         <p>
-   *         return null if the current scope doesn't know such an element. A call to
-   *         {@link #registerElement(ImportElementCandidate)} may be performed.
-   */
-  String checkCurrentScope(ImportElementCandidate cand);
-
-  /**
-   * Gets the list of imports to be created.<br>
-   *
-   * @return An array containing all fully qualified import declarations that needs to be created
-   *         <code>import (static)? $qualifiedName;</code> as well as empty string group separators
-   */
-  Collection<String> createImportDeclarations();
+  void setImportCollector(IImportCollector collector);
 }

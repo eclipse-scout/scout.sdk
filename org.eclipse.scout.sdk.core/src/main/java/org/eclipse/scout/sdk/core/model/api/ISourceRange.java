@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.model.api;
 /**
  * <h3>{@link ISourceRange}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public interface ISourceRange {

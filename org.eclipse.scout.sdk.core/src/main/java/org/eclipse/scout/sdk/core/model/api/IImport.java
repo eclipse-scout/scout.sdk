@@ -25,22 +25,22 @@ public interface IImport extends IJavaElement {
    *
    * @return the {@link ICompilationUnit} this import belongs to.
    */
-  ICompilationUnit getCompilationUnit();
+  ICompilationUnit compilationUnit();
 
   /**
    * @return the fully qualified name of the type imported.
    */
-  String getName();
+  String name();
 
   /**
    * @return the simple name of the imported type.
    */
-  String getSimpleName();
+  String simpleName();
 
   /**
    * @return the qualifier of the imported type.
    */
-  String getQualifier();
+  String qualifier();
 
   boolean isStatic();
 

@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.fixture.PropertyTestClass;
 import org.eclipse.scout.sdk.core.model.api.IPropertyBean;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -35,44 +35,44 @@ public class PropertyBeanTest {
     List<IPropertyBean> propertyBeans = new ArrayList<>(CoreUtils.getPropertyBeans(propTestClass, null, new Comparator<IPropertyBean>() {
       @Override
       public int compare(IPropertyBean o1, IPropertyBean o2) {
-        return o1.getBeanName().compareTo(o2.getBeanName());
+        return o1.name().compareTo(o2.name());
       }
     }));
     Assert.assertEquals(5, propertyBeans.size());
 
     IPropertyBean aloneProp = propertyBeans.get(0);
-    Assert.assertEquals("Alone", aloneProp.getBeanName());
-    Assert.assertEquals(String.class.getName(), aloneProp.getBeanType().getName());
-    Assert.assertEquals(propTestClass, aloneProp.getDeclaringType());
-    Assert.assertNull(aloneProp.getReadMethod());
-    Assert.assertNotNull(aloneProp.getWriteMethod());
+    Assert.assertEquals("Alone", aloneProp.name());
+    Assert.assertEquals(String.class.getName(), aloneProp.type().name());
+    Assert.assertEquals(propTestClass, aloneProp.declaringType());
+    Assert.assertNull(aloneProp.readMethod());
+    Assert.assertNotNull(aloneProp.writeMethod());
 
     IPropertyBean falseProp = propertyBeans.get(1);
-    Assert.assertEquals("False", falseProp.getBeanName());
-    Assert.assertEquals(TypeNames.java_lang_Boolean, falseProp.getBeanType().getName());
-    Assert.assertEquals(propTestClass, falseProp.getDeclaringType());
-    Assert.assertNotNull(falseProp.getReadMethod());
-    Assert.assertNotNull(falseProp.getWriteMethod());
+    Assert.assertEquals("False", falseProp.name());
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Boolean, falseProp.type().name());
+    Assert.assertEquals(propTestClass, falseProp.declaringType());
+    Assert.assertNotNull(falseProp.readMethod());
+    Assert.assertNotNull(falseProp.writeMethod());
 
     IPropertyBean onlyProp = propertyBeans.get(2);
-    Assert.assertEquals("Only", onlyProp.getBeanName());
-    Assert.assertEquals(TypeNames.java_lang_Integer, onlyProp.getBeanType().getName());
-    Assert.assertEquals(propTestClass, onlyProp.getDeclaringType());
-    Assert.assertNotNull(onlyProp.getReadMethod());
-    Assert.assertNull(onlyProp.getWriteMethod());
+    Assert.assertEquals("Only", onlyProp.name());
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Integer, onlyProp.type().name());
+    Assert.assertEquals(propTestClass, onlyProp.declaringType());
+    Assert.assertNotNull(onlyProp.readMethod());
+    Assert.assertNull(onlyProp.writeMethod());
 
     IPropertyBean stringProp = propertyBeans.get(3);
-    Assert.assertEquals("String", stringProp.getBeanName());
-    Assert.assertEquals(String.class.getName(), stringProp.getBeanType().getName());
-    Assert.assertEquals(propTestClass, stringProp.getDeclaringType());
-    Assert.assertNotNull(stringProp.getReadMethod());
-    Assert.assertNotNull(stringProp.getWriteMethod());
+    Assert.assertEquals("String", stringProp.name());
+    Assert.assertEquals(String.class.getName(), stringProp.type().name());
+    Assert.assertEquals(propTestClass, stringProp.declaringType());
+    Assert.assertNotNull(stringProp.readMethod());
+    Assert.assertNotNull(stringProp.writeMethod());
 
     IPropertyBean trueProp = propertyBeans.get(4);
-    Assert.assertEquals("True", trueProp.getBeanName());
-    Assert.assertEquals("boolean", trueProp.getBeanType().getName());
-    Assert.assertEquals(propTestClass, trueProp.getDeclaringType());
-    Assert.assertNotNull(trueProp.getReadMethod());
-    Assert.assertNotNull(trueProp.getWriteMethod());
+    Assert.assertEquals("True", trueProp.name());
+    Assert.assertEquals("boolean", trueProp.type().name());
+    Assert.assertEquals(propTestClass, trueProp.declaringType());
+    Assert.assertNotNull(trueProp.readMethod());
+    Assert.assertNotNull(trueProp.writeMethod());
   }
 }

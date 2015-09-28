@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
 /**
  * <h3>{@link RawSourceBuilder}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class RawSourceBuilder implements ISourceBuilder {

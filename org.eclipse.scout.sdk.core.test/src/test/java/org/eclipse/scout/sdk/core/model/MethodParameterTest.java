@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.model;
 import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
@@ -31,50 +31,50 @@ public class MethodParameterTest {
   public void testDeclaringMethodParameters() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
-    Assert.assertEquals(3, childClassType.getMethods().size());
-    IMethod method = childClassType.getMethods().get(1);
-    List<IMethodParameter> methodInChildClassParams = method.getParameters();
+    Assert.assertEquals(3, childClassType.methods().list().size());
+    IMethod method = childClassType.methods().list().get(1);
+    List<IMethodParameter> methodInChildClassParams = method.parameters().list();
     Assert.assertEquals(2, methodInChildClassParams.size());
 
     IMethodParameter firstParam = methodInChildClassParams.get(0);
-    Assert.assertEquals("firstParam", firstParam.getElementName());
-    Assert.assertEquals(Flags.AccFinal, firstParam.getFlags());
-    Assert.assertEquals(method, firstParam.getDeclaringMethod());
-    Assert.assertEquals(String.class.getName(), firstParam.getDataType().getName());
+    Assert.assertEquals("firstParam", firstParam.elementName());
+    Assert.assertEquals(Flags.AccFinal, firstParam.flags());
+    Assert.assertEquals(method, firstParam.declaringMethod());
+    Assert.assertEquals(String.class.getName(), firstParam.dataType().name());
 
     IMethodParameter secondParam = methodInChildClassParams.get(1);
-    Assert.assertEquals("secondParam", secondParam.getElementName());
-    Assert.assertEquals(Flags.AccFinal, secondParam.getFlags());
-    Assert.assertEquals(method, secondParam.getDeclaringMethod());
-    Assert.assertEquals(List.class.getName(), secondParam.getDataType().getName());
+    Assert.assertEquals("secondParam", secondParam.elementName());
+    Assert.assertEquals(Flags.AccFinal, secondParam.flags());
+    Assert.assertEquals(method, secondParam.declaringMethod());
+    Assert.assertEquals(List.class.getName(), secondParam.dataType().name());
   }
 
   @Test
   public void testToString() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
-    Assert.assertFalse(StringUtils.isBlank(childClassType.getMethods().get(1).getParameters().get(1).toString()));
+    Assert.assertFalse(StringUtils.isBlank(childClassType.methods().list().get(1).parameters().list().get(1).toString()));
 
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
-    Assert.assertFalse(StringUtils.isBlank(baseClassType.getMethods().get(0).getParameters().get(0).toString()));
+    Assert.assertFalse(StringUtils.isBlank(baseClassType.methods().first().parameters().first().toString()));
   }
 
   @Test
   public void testBindingMethodParameters() {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
-    Assert.assertEquals(2, baseClassType.getMethods().size());
-    IMethod method = baseClassType.getMethods().get(0);
-    List<IMethodParameter> methodInBaseClassParams = method.getParameters();
+    Assert.assertEquals(2, baseClassType.methods().list().size());
+    IMethod method = baseClassType.methods().first();
+    List<IMethodParameter> methodInBaseClassParams = method.parameters().list();
     Assert.assertEquals(1, methodInBaseClassParams.size());
 
     IMethodParameter runnableParam = methodInBaseClassParams.get(0);
-    Assert.assertEquals("arg0", runnableParam.getElementName()); // parameter names not supported for binary types
-    Assert.assertEquals(Flags.AccDefault, runnableParam.getFlags()); // final not supported for binary types
-    Assert.assertEquals(method, runnableParam.getDeclaringMethod());
-    Assert.assertEquals(TypeNames.java_lang_Double, runnableParam.getDataType().getLeafComponentType().getName());
-    Assert.assertTrue(runnableParam.getDataType().isArray());
-    Assert.assertEquals(1, runnableParam.getDataType().getArrayDimension());
+    Assert.assertEquals("arg0", runnableParam.elementName()); // parameter names not supported for binary types
+    Assert.assertEquals(Flags.AccDefault, runnableParam.flags()); // final not supported for binary types
+    Assert.assertEquals(method, runnableParam.declaringMethod());
+    Assert.assertEquals(IJavaRuntimeTypes.java_lang_Double, runnableParam.dataType().leafComponentType().name());
+    Assert.assertTrue(runnableParam.dataType().isArray());
+    Assert.assertEquals(1, runnableParam.dataType().arrayDimension());
   }
 }

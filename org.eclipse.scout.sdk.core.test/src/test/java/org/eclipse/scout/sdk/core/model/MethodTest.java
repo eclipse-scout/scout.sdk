@@ -33,49 +33,49 @@ public class MethodTest {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
 
-    Assert.assertEquals(3, childClassType.getMethods().size());
+    Assert.assertEquals(3, childClassType.methods().list().size());
 
     // constructor
-    IMethod constr = childClassType.getMethods().get(0);
-    Assert.assertEquals(childClassType, constr.getDeclaringType());
-    Assert.assertEquals(0, constr.getExceptionTypes().size());
-    Assert.assertEquals(Flags.AccPublic, constr.getFlags());
-    Assert.assertEquals(childClassType.getSimpleName(), constr.getElementName());
-    Assert.assertEquals(0, constr.getParameters().size());
-    Assert.assertNull(constr.getReturnType());
+    IMethod constr = childClassType.methods().first();
+    Assert.assertEquals(childClassType, constr.declaringType());
+    Assert.assertEquals(0, constr.exceptionTypes().size());
+    Assert.assertEquals(Flags.AccPublic, constr.flags());
+    Assert.assertEquals(childClassType.elementName(), constr.elementName());
+    Assert.assertEquals(0, constr.parameters().list().size());
+    Assert.assertNull(constr.returnType());
     Assert.assertTrue(constr.isConstructor());
-    Assert.assertEquals(0, constr.getAnnotations().size());
+    Assert.assertEquals(0, constr.annotations().list().size());
 
     // methodInChildClass
-    IMethod methodInChildClass = childClassType.getMethods().get(1);
-    Assert.assertEquals(childClassType, methodInChildClass.getDeclaringType());
-    Assert.assertEquals(1, methodInChildClass.getExceptionTypes().size());
-    Assert.assertEquals(IOException.class.getName(), methodInChildClass.getExceptionTypes().get(0).getName());
-    Assert.assertEquals(Flags.AccProtected | Flags.AccSynchronized, methodInChildClass.getFlags());
-    Assert.assertEquals("methodInChildClass", methodInChildClass.getElementName());
-    Assert.assertEquals(2, methodInChildClass.getParameters().size());
-    Assert.assertEquals("boolean", methodInChildClass.getReturnType().getLeafComponentType().getName());
-    Assert.assertTrue(methodInChildClass.getReturnType().isArray());
+    IMethod methodInChildClass = childClassType.methods().list().get(1);
+    Assert.assertEquals(childClassType, methodInChildClass.declaringType());
+    Assert.assertEquals(1, methodInChildClass.exceptionTypes().size());
+    Assert.assertEquals(IOException.class.getName(), methodInChildClass.exceptionTypes().get(0).name());
+    Assert.assertEquals(Flags.AccProtected | Flags.AccSynchronized, methodInChildClass.flags());
+    Assert.assertEquals("methodInChildClass", methodInChildClass.elementName());
+    Assert.assertEquals(2, methodInChildClass.parameters().list().size());
+    Assert.assertEquals("boolean", methodInChildClass.returnType().leafComponentType().name());
+    Assert.assertTrue(methodInChildClass.returnType().isArray());
     Assert.assertFalse(methodInChildClass.isConstructor());
-    Assert.assertEquals(1, methodInChildClass.getAnnotations().size());
+    Assert.assertEquals(1, methodInChildClass.annotations().list().size());
 
     // firstCase
-    IMethod firstCase = childClassType.getMethods().get(2);
-    Assert.assertEquals(childClassType, firstCase.getDeclaringType());
-    Assert.assertEquals(0, firstCase.getExceptionTypes().size());
-    Assert.assertEquals(Flags.AccPrivate, firstCase.getFlags());
-    Assert.assertEquals("firstCase", firstCase.getElementName());
-    Assert.assertEquals(0, firstCase.getParameters().size());
-    Assert.assertEquals(Set.class.getName(), firstCase.getReturnType().getLeafComponentType().getName());
+    IMethod firstCase = childClassType.methods().list().get(2);
+    Assert.assertEquals(childClassType, firstCase.declaringType());
+    Assert.assertEquals(0, firstCase.exceptionTypes().size());
+    Assert.assertEquals(Flags.AccPrivate, firstCase.flags());
+    Assert.assertEquals("firstCase", firstCase.elementName());
+    Assert.assertEquals(0, firstCase.parameters().list().size());
+    Assert.assertEquals(Set.class.getName(), firstCase.returnType().leafComponentType().name());
     Assert.assertFalse(firstCase.isConstructor());
-    Assert.assertEquals(1, firstCase.getAnnotations().size());
+    Assert.assertEquals(1, firstCase.annotations().list().size());
   }
 
   @Test
   public void testToString() {
     IType childClassType = CoreTestingUtils.getChildClassType();
     Assert.assertNotNull(childClassType);
-    Assert.assertFalse(StringUtils.isBlank(childClassType.getMethods().get(1).toString()));
+    Assert.assertFalse(StringUtils.isBlank(childClassType.methods().list().get(1).toString()));
   }
 
   @Test
@@ -83,32 +83,32 @@ public class MethodTest {
     IType baseClassType = CoreTestingUtils.getBaseClassType();
     Assert.assertNotNull(baseClassType);
 
-    Assert.assertEquals(2, baseClassType.getMethods().size());
+    Assert.assertEquals(2, baseClassType.methods().list().size());
 
     // methodInBaseClass
-    IMethod methodInBaseClass = baseClassType.getMethods().get(0);
-    Assert.assertEquals(baseClassType, methodInBaseClass.getDeclaringType());
-    Assert.assertEquals(2, methodInBaseClass.getExceptionTypes().size());
-    Assert.assertEquals(IOError.class.getName(), methodInBaseClass.getExceptionTypes().get(0).getName());
-    Assert.assertEquals(FileNotFoundException.class.getName(), methodInBaseClass.getExceptionTypes().get(1).getName());
-    Assert.assertEquals(Flags.AccProtected, methodInBaseClass.getFlags());
-    Assert.assertEquals("methodInBaseClass", methodInBaseClass.getElementName());
-    Assert.assertEquals(1, methodInBaseClass.getParameters().size());
-    Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), methodInBaseClass.getReturnType().getLeafComponentType().getName());
-    Assert.assertEquals(2, methodInBaseClass.getReturnType().getArrayDimension());
-    Assert.assertTrue(methodInBaseClass.getReturnType().isArray());
+    IMethod methodInBaseClass = baseClassType.methods().first();
+    Assert.assertEquals(baseClassType, methodInBaseClass.declaringType());
+    Assert.assertEquals(2, methodInBaseClass.exceptionTypes().size());
+    Assert.assertEquals(IOError.class.getName(), methodInBaseClass.exceptionTypes().get(0).name());
+    Assert.assertEquals(FileNotFoundException.class.getName(), methodInBaseClass.exceptionTypes().get(1).name());
+    Assert.assertEquals(Flags.AccProtected, methodInBaseClass.flags());
+    Assert.assertEquals("methodInBaseClass", methodInBaseClass.elementName());
+    Assert.assertEquals(1, methodInBaseClass.parameters().list().size());
+    Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), methodInBaseClass.returnType().leafComponentType().name());
+    Assert.assertEquals(2, methodInBaseClass.returnType().arrayDimension());
+    Assert.assertTrue(methodInBaseClass.returnType().isArray());
     Assert.assertFalse(methodInBaseClass.isConstructor());
-    Assert.assertEquals(2, methodInBaseClass.getAnnotations().size());
+    Assert.assertEquals(2, methodInBaseClass.annotations().list().size());
 
     // method2InBaseClass
-    IMethod method2InBaseClass = baseClassType.getMethods().get(1);
-    Assert.assertEquals(baseClassType, method2InBaseClass.getDeclaringType());
-    Assert.assertEquals(0, method2InBaseClass.getExceptionTypes().size());
-    Assert.assertEquals(Flags.AccPublic | Flags.AccSynchronized | Flags.AccFinal, method2InBaseClass.getFlags());
-    Assert.assertEquals("method2InBaseClass", method2InBaseClass.getElementName());
-    Assert.assertEquals(0, method2InBaseClass.getParameters().size());
-    Assert.assertEquals("void", method2InBaseClass.getReturnType().getName());
+    IMethod method2InBaseClass = baseClassType.methods().list().get(1);
+    Assert.assertEquals(baseClassType, method2InBaseClass.declaringType());
+    Assert.assertEquals(0, method2InBaseClass.exceptionTypes().size());
+    Assert.assertEquals(Flags.AccPublic | Flags.AccSynchronized | Flags.AccFinal, method2InBaseClass.flags());
+    Assert.assertEquals("method2InBaseClass", method2InBaseClass.elementName());
+    Assert.assertEquals(0, method2InBaseClass.parameters().list().size());
+    Assert.assertEquals("void", method2InBaseClass.returnType().name());
     Assert.assertFalse(method2InBaseClass.isConstructor());
-    Assert.assertEquals(0, method2InBaseClass.getAnnotations().size());
+    Assert.assertEquals(0, method2InBaseClass.annotations().list().size());
   }
 }

@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IPropertyBean;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
@@ -86,7 +86,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
   protected void setupBuilder() {
     // flags
     int flags = Flags.AccPublic;
-    if (Flags.isAbstract(getModelType().getFlags())) {
+    if (Flags.isAbstract(getModelType().flags())) {
       flags |= Flags.AccAbstract;
     }
     setFlags(flags);
@@ -112,24 +112,24 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
   protected abstract String computeSuperTypeSignature();
 
   /**
-   * Override default {@link IMetaValue#createAptSource(IImportValidator)} for strings of ClassId annotations
+   * Override default {@link IMetaValue#createAptSource(IImportCollector)} for strings of ClassId annotations
    */
   protected static void filterAnnotationValues(IAnnotationSourceBuilder builder, IAnnotation a) {
-    if (IRuntimeClasses.ClassId.equals(a.getType().getName())) {
-      String id = a.getValue("value").getMetaValue().getObject(String.class);
+    if (IScoutRuntimeTypes.ClassId.equals(a.type().name())) {
+      String id = a.value("value").metaValue().get(String.class);
       id += "-formdata";
       builder.putValue("value", CoreUtils.toStringLiteral(id));
     }
   }
 
   protected static void copyAnnotations(IAnnotatable annotationOwner, final IType declaringType, ITypeSourceBuilder sourceBuilder, final IJavaEnvironment env) {
-    List<? extends IAnnotation> annotations = annotationOwner.getAnnotations();
+    List<IAnnotation> annotations = annotationOwner.annotations().list();
     for (IAnnotation a : annotations) {
       final IAnnotation annotation = a;
-      final IType annotationDeclarationType = annotation.getType();
-      final String elementName = annotationDeclarationType.getName();
+      final IType annotationDeclarationType = annotation.type();
+      final String elementName = annotationDeclarationType.name();
 
-      boolean mustCopyAnnotation = !IRuntimeClasses.FormData.equals(elementName) && !IRuntimeClasses.Order.equals(elementName) && !IRuntimeClasses.PageData.equals(elementName) && !IRuntimeClasses.Data.equals(elementName)
+      boolean mustCopyAnnotation = !IScoutRuntimeTypes.FormData.equals(elementName) && !IScoutRuntimeTypes.Order.equals(elementName) && !IScoutRuntimeTypes.PageData.equals(elementName) && !IScoutRuntimeTypes.Data.equals(elementName)
           && isAnnotationDtoRelevant(annotationDeclarationType) && CoreUtils.isOnClasspath(env, annotationDeclarationType);
       if (mustCopyAnnotation) {
         AnnotationSourceBuilder asb = new AnnotationSourceBuilder(a);
@@ -139,12 +139,11 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
     }
   }
 
-  protected static boolean isAnnotationDtoRelevant(IType annotation) {
-    if (annotation == null) {
+  protected static boolean isAnnotationDtoRelevant(IType annotationType) {
+    if (annotationType == null) {
       return false;
     }
-    IAnnotation dtoReleventAnnotation = CoreUtils.getAnnotation(annotation, IRuntimeClasses.DtoRelevant);
-    return dtoReleventAnnotation != null;
+    return annotationType.annotations().withName(IScoutRuntimeTypes.DtoRelevant).existsAny();
   }
 
   public IType getModelType() {
@@ -154,18 +153,18 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
   protected void collectProperties() {
     List<IPropertyBean> beanPropertyDescriptors = CoreUtils.getPropertyBeans(getModelType(), DTO_PROPERTY_FILTER, BEAN_NAME_COMPARATOR);
     for (IPropertyBean desc : beanPropertyDescriptors) {
-      String beanName = CoreUtils.ensureValidParameterName(desc.getBeanName());
+      String beanName = CoreUtils.ensureValidParameterName(desc.name());
       String lowerCaseBeanName = CoreUtils.ensureStartWithLowerCase(beanName);
       final String upperCaseBeanName = CoreUtils.ensureStartWithUpperCase(beanName);
 
       String propName = upperCaseBeanName + "Property";
-      String resolvedSignature = SignatureUtils.getTypeSignature(desc.getBeanType());
+      String resolvedSignature = SignatureUtils.getTypeSignature(desc.type());
       String unboxedSignature = SignatureUtils.boxPrimitiveSignature(resolvedSignature);
 
       // property class
       TypeSourceBuilder propertyTypeBuilder = new TypeSourceBuilder(propName);
       propertyTypeBuilder.setFlags(Flags.AccPublic | Flags.AccStatic);
-      String superTypeSig = Signature.createTypeSignature(IRuntimeClasses.AbstractPropertyData);
+      String superTypeSig = Signature.createTypeSignature(IScoutRuntimeTypes.AbstractPropertyData);
       superTypeSig = ENDING_SEMICOLON_PATTERN.matcher(superTypeSig).replaceAll(ISignatureConstants.C_GENERIC_START + Matcher.quoteReplacement(unboxedSignature) + ISignatureConstants.C_GENERIC_END + ISignatureConstants.C_SEMICOLON);
       propertyTypeBuilder.setSuperTypeSignature(superTypeSig);
       IFieldSourceBuilder serialVersionUidBuilder = FieldSourceBuilderFactory.createSerialVersionUidBuilder();
@@ -175,12 +174,12 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
       addSortedType(SortedMemberKeyFactory.createTypeFormDataPropertyKey(propertyTypeBuilder), propertyTypeBuilder);
 
       // copy annotations over to the DTO
-      IMethod propertyMethod = desc.getReadMethod();
+      IMethod propertyMethod = desc.readMethod();
       if (propertyMethod == null) {
-        propertyMethod = desc.getWriteMethod();
+        propertyMethod = desc.writeMethod();
       }
       if (propertyMethod != null) {
-        copyAnnotations(propertyMethod, propertyMethod.getDeclaringType(), propertyTypeBuilder, getJavaEnvironment());
+        copyAnnotations(propertyMethod, propertyMethod.declaringType(), propertyTypeBuilder, getJavaEnvironment());
       }
 
       // getter
@@ -253,17 +252,20 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
     @Override
     public boolean evaluate(IPropertyBean property) {
       // read and write method must exist
-      boolean readAndWriteMethodsExist = property.getReadMethod() != null && property.getWriteMethod() != null;
+      boolean readAndWriteMethodsExist = property.readMethod() != null && property.writeMethod() != null;
       if (!readAndWriteMethodsExist) {
         return false;
       }
 
       // @FormData or @Data annotation must exist
-      boolean isReadMethodDtoRelevant = CoreUtils.getAnnotation(property.getReadMethod(), IRuntimeClasses.FormData) != null || CoreUtils.getAnnotation(property.getReadMethod(), IRuntimeClasses.Data) != null;
+      boolean isReadMethodDtoRelevant = property.readMethod().annotations().withName(IScoutRuntimeTypes.FormData).existsAny()
+          || property.readMethod().annotations().withName(IScoutRuntimeTypes.Data).existsAny();
       if (!isReadMethodDtoRelevant) {
         return false;
       }
-      return CoreUtils.getAnnotation(property.getWriteMethod(), IRuntimeClasses.FormData) != null || CoreUtils.getAnnotation(property.getWriteMethod(), IRuntimeClasses.Data) != null;
+
+      return property.writeMethod().annotations().withName(IScoutRuntimeTypes.FormData).existsAny()
+          || property.writeMethod().annotations().withName(IScoutRuntimeTypes.Data).existsAny();
     }
   };
 
@@ -279,8 +281,8 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
       else if (p2 == null) {
         return -1;
       }
-      CompositeObject m1c = new CompositeObject(p1.getBeanName(), p1);
-      CompositeObject m2c = new CompositeObject(p2.getBeanName(), p2);
+      CompositeObject m1c = new CompositeObject(p1.name(), p1);
+      CompositeObject m2c = new CompositeObject(p2.name(), p2);
       return m1c.compareTo(m2c);
     }
   };

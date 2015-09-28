@@ -54,7 +54,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkException;
-import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link JavaElementCommentBuilderService}</h3>
@@ -424,7 +424,7 @@ public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBu
       projectStore.load();
     }
     catch (IOException e) {
-      S2ESdkUiActivator.logError(e);
+      SdkLog.error(e);
     }
     return projectStore.findTemplateById(id);
   }

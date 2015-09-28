@@ -16,12 +16,12 @@ import java.util.List;
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.parser.ScannerHelper;
 import org.eclipse.jdt.internal.compiler.util.Util;
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 
 /**
  * Basic signature operations
  *
- * @see org.eclipse.scout.sdk.core.signature.Signature
+ * @see org.eclipse.jdt.core.Signature
  */
 public final class Signature implements ISignatureConstants {
 
@@ -36,15 +36,15 @@ public final class Signature implements ISignatureConstants {
   private static final char[] EXTENDS = "extends".toCharArray();
   private static final char[] SUPER = "super".toCharArray();
 
-  private static final char[] BOOLEAN = TypeNames._boolean.toCharArray();
-  private static final char[] BYTE = TypeNames._byte.toCharArray();
-  private static final char[] CHAR = TypeNames._char.toCharArray();
-  private static final char[] DOUBLE = TypeNames._double.toCharArray();
-  private static final char[] FLOAT = TypeNames._float.toCharArray();
-  private static final char[] INT = TypeNames._int.toCharArray();
-  private static final char[] LONG = TypeNames._long.toCharArray();
-  private static final char[] SHORT = TypeNames._short.toCharArray();
-  private static final char[] VOID = TypeNames._void.toCharArray();
+  private static final char[] BOOLEAN = IJavaRuntimeTypes._boolean.toCharArray();
+  private static final char[] BYTE = IJavaRuntimeTypes._byte.toCharArray();
+  private static final char[] CHAR = IJavaRuntimeTypes._char.toCharArray();
+  private static final char[] DOUBLE = IJavaRuntimeTypes._double.toCharArray();
+  private static final char[] FLOAT = IJavaRuntimeTypes._float.toCharArray();
+  private static final char[] INT = IJavaRuntimeTypes._int.toCharArray();
+  private static final char[] LONG = IJavaRuntimeTypes._long.toCharArray();
+  private static final char[] SHORT = IJavaRuntimeTypes._short.toCharArray();
+  private static final char[] VOID = IJavaRuntimeTypes._void.toCharArray();
 
   private Signature() {
   }

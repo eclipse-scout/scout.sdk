@@ -19,13 +19,13 @@ import java.util.TreeSet;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
-import org.eclipse.scout.sdk.core.model.api.IConstantMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.MetaValueType;
-import org.eclipse.scout.sdk.core.s.AnnotationEnums.SdkColumnCommand;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.annotation.ColumnDataAnnotation.SdkColumnCommand;
 import org.eclipse.scout.sdk.core.s.model.ScoutTypeComparators;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.signature.Signature;
@@ -87,7 +87,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     if (getDeclaringElement() instanceof ITypeSourceBuilder) {
       flags |= Flags.AccStatic;
     }
-    if (Flags.isAbstract(getColumnContainer().getFlags()) || Flags.isAbstract(getModelType().getFlags())) {
+    if (Flags.isAbstract(getColumnContainer().flags()) || Flags.isAbstract(getModelType().flags())) {
       flags |= Flags.AccAbstract;
     }
     setFlags(flags);
@@ -143,21 +143,21 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
   }
 
   protected static String getColumnBeanName(IType column) {
-    return CoreUtils.ensureStartWithLowerCase(DtoUtils.removeFieldSuffix(column.getSimpleName()));
+    return CoreUtils.ensureStartWithLowerCase(DtoUtils.removeFieldSuffix(column.elementName()));
   }
 
   protected static Set<IType> getColumns(IType declaringType, IType rowDataSuperType) {
 
     // the declaring type is a column itself
-    if (CoreUtils.isInstanceOf(declaringType, IRuntimeClasses.IColumn)) {
+    if (declaringType.isInstanceOf(IScoutRuntimeTypes.IColumn)) {
       Set<IType> result = new HashSet<>(1);
       result.add(declaringType);
       return result;
     }
 
     // the declaring type is a IPageWithTableExtension -> search the inner table extension
-    if (CoreUtils.isInstanceOf(declaringType, IRuntimeClasses.IPageWithTableExtension)) {
-      IType tableExtension = CoreUtils.findInnerTypeInSuperHierarchy(declaringType, TypeFilters.subtypeOf(IRuntimeClasses.ITableExtension));
+    if (declaringType.isInstanceOf(IScoutRuntimeTypes.IPageWithTableExtension)) {
+      IType tableExtension = CoreUtils.findInnerTypeInSuperHierarchy(declaringType, TypeFilters.instanceOf(IScoutRuntimeTypes.ITableExtension));
       if (tableExtension != null) {
         declaringType = tableExtension; // switch to the table as column holder
       }
@@ -166,20 +166,20 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     // the declaring type holds columns
     TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
     // do not re-use the fieldHierarchy for the subtype filter!
-    IFilter<IType> filter = Filters.and(TypeFilters.subtypeOf(IRuntimeClasses.IColumn), new IFilter<IType>() {
+    IFilter<IType> filter = Filters.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IColumn), new IFilter<IType>() {
       @Override
       public boolean evaluate(IType type) {
-        SdkColumnCommand command = DtoUtils.findColumnDataSdkColumnCommand(type);
-        return command == null || command == SdkColumnCommand.CREATE;
+        SdkColumnCommand cmd = DtoUtils.getColumnDataSdkColumnCommand(type);
+        return cmd == null || cmd.equals(SdkColumnCommand.CREATE);
       }
     });
 
     // collect all columns that exist in the table and all of its super classes
     IType curTableType = declaringType;
     while (curTableType != null) {
-      List<IType> columns = CoreUtils.getInnerTypes(curTableType, filter);
+      List<IType> columns = curTableType.innerTypes().withFilter(filter).list();
       allColumnsUpTheHierarchy.addAll(columns);
-      curTableType = curTableType.getSuperClass();
+      curTableType = curTableType.superClass();
     }
 
     if (rowDataSuperType == null) {
@@ -190,15 +190,15 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     // collect all columns that exist in the row data and all of its super classes
     Set<String> usedColumnBeanNames = new HashSet<>();
     IType currentRowDataSuperType = rowDataSuperType;
-    while (currentRowDataSuperType != null && !IRuntimeClasses.AbstractTableRowData.equals(currentRowDataSuperType.getName())) {
-      List<IField> columnFields = CoreUtils.getFields(currentRowDataSuperType, FieldFilters.flags(ROW_DATA_FIELD_FLAGS));
+    while (currentRowDataSuperType != null && !IScoutRuntimeTypes.AbstractTableRowData.equals(currentRowDataSuperType.name())) {
+      List<IField> columnFields = currentRowDataSuperType.fields().withFilter(FieldFilters.flags(ROW_DATA_FIELD_FLAGS)).list();
       for (IField column : columnFields) {
-        IConstantMetaValue val = column.getConstantValue();
-        if (val != null && val.getType() == MetaValueType.String) {
-          usedColumnBeanNames.add(val.getObject(String.class));
+        IMetaValue val = column.constantValue();
+        if (val != null && val.type() == MetaValueType.String) {
+          usedColumnBeanNames.add(val.get(String.class));
         }
       }
-      currentRowDataSuperType = currentRowDataSuperType.getSuperClass();
+      currentRowDataSuperType = currentRowDataSuperType.superClass();
     }
 
     // filter the already existing columns out
@@ -223,17 +223,17 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
 
     ITypeSourceBuilder surroundingTableBeanSourceBuilder = (ITypeSourceBuilder) getDeclaringElement();
     String superTypeOfSurroundingTableBeanSourceBuilder = surroundingTableBeanSourceBuilder.getSuperTypeSignature();
-    if (!Signature.createTypeSignature(IRuntimeClasses.AbstractTablePageData).equals(superTypeOfSurroundingTableBeanSourceBuilder)
-        && !Signature.createTypeSignature(IRuntimeClasses.AbstractTableFieldBeanData).equals(superTypeOfSurroundingTableBeanSourceBuilder)) {
+    if (!Signature.createTypeSignature(IScoutRuntimeTypes.AbstractTablePageData).equals(superTypeOfSurroundingTableBeanSourceBuilder)
+        && !Signature.createTypeSignature(IScoutRuntimeTypes.AbstractTableFieldBeanData).equals(superTypeOfSurroundingTableBeanSourceBuilder)) {
       // use the row data in the super page data.
       IType superType = m_lookpEnvironment.findType(SignatureUtils.toFullyQualifiedName(superTypeOfSurroundingTableBeanSourceBuilder));
 
-      IType innerType = CoreUtils.getInnerType(superType, TypeFilters.subtypeOf(IRuntimeClasses.AbstractTableRowData));
+      IType innerType = superType.innerTypes().withInstanceOf(IScoutRuntimeTypes.AbstractTableRowData).first();
       if (innerType != null) {
         return SignatureUtils.getTypeSignature(innerType);
       }
     }
-    return Signature.createTypeSignature(IRuntimeClasses.AbstractTableRowData);
+    return Signature.createTypeSignature(IScoutRuntimeTypes.AbstractTableRowData);
   }
 
   public IType getColumnContainer() {

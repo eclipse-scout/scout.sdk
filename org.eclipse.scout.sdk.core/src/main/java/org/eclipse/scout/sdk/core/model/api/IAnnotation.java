@@ -23,18 +23,18 @@ import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
 public interface IAnnotation extends IJavaElement {
 
   /**
-   * @return the fully qualified type name of the annotations {@link #getType()}
+   * @return the fully qualified type name of the annotations {@link #type()}
    */
-  String getName();
+  String name();
 
   /**
    * Gets all attributes of this {@link IAnnotation}.<br>
    * The {@link Map} iterates over the attributes in the order as they appear in the source or class file.
    *
-   * @return A {@link Map} containing the attribute name ({@link IAnnotationValue#getName()}) as key and the
+   * @return A {@link Map} containing the attribute name ({@link IAnnotationValue#name()}) as key and the
    *         {@link IAnnotationValue} as value. Never returns <code>null</code>.
    */
-  Map<String, IAnnotationValue> getValues();
+  Map<String, IAnnotationValue> values();
 
   /**
    * Gets the {@link IAnnotationValue} of the annotation attribute with the given name.
@@ -44,14 +44,14 @@ public interface IAnnotation extends IJavaElement {
    * @return The {@link IAnnotationValue} with the given name or <code>null</code> if no attribute with given name
    *         exists.
    */
-  IAnnotationValue getValue(String name);
+  IAnnotationValue value(String name);
 
   /**
    * Gets the object on which this {@link IAnnotation} is defined.
    *
    * @return The owner {@link IAnnotatable} of this {@link IAnnotation}. Never returns <code>null</code>.
    */
-  IAnnotatable getOwner();
+  IAnnotatable owner();
 
   /**
    * Gets the annotation definition {@link IType}.<br>
@@ -59,7 +59,7 @@ public interface IAnnotation extends IJavaElement {
    *
    * @return The annotation definition type. Never returns <code>null</code>.
    */
-  IType getType();
+  IType type();
 
   @Override
   AnnotationSpi unwrap();

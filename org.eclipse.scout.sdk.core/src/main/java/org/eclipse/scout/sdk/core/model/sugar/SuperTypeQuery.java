@@ -19,9 +19,9 @@ import org.eclipse.scout.sdk.core.util.IFilter;
 /**
  * <h3>{@link SuperTypeQuery}</h3>
  * <p>
- * By default all recursive super classes and recurisive super interface are included
- * 
- * @author imo
+ * By default all recursive super classes and recursive super interface are included
+ *
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class SuperTypeQuery {
@@ -121,10 +121,10 @@ public class SuperTypeQuery {
     if (!m_includeSelf && m_type == t) {
       return false;
     }
-    if (m_name != null && !m_name.equals(t.getName())) {
+    if (m_name != null && !m_name.equals(t.name())) {
       return false;
     }
-    if (m_simpleName != null && !m_simpleName.equals(t.getSimpleName())) {
+    if (m_simpleName != null && !m_simpleName.equals(t.elementName())) {
       return false;
     }
     if (m_filter != null && !m_filter.evaluate(t)) {
@@ -133,26 +133,28 @@ public class SuperTypeQuery {
     return true;
   }
 
-  protected void visitRec(IType t, List<IType> result, int maxCount) {
+  protected void visitRec(IType t, List<IType> result, int maxCount, boolean onlyTraverse) {
     if (t == null) {
       return;
     }
-    if (accept(t)) {
-      result.add(t);
-      if (result.size() >= maxCount) {
-        return;
+    if (!onlyTraverse) {
+      if (accept(t)) {
+        result.add(t);
+        if (result.size() >= maxCount) {
+          return;
+        }
       }
     }
-    if (m_includeSuperClasses) {
-      visitRec(t.getSuperClass(), result, maxCount);
+    if (m_includeSuperClasses || m_includeSuperInterfaces) {
+      visitRec(t.superClass(), result, maxCount, !m_includeSuperClasses);
       if (result.size() >= maxCount) {
         return;
       }
     }
 
     if (m_includeSuperInterfaces) {
-      for (IType superInterface : t.getSuperInterfaces()) {
-        visitRec(superInterface, result, maxCount);
+      for (IType superInterface : t.superInterfaces()) {
+        visitRec(superInterface, result, maxCount, false);
         if (result.size() >= maxCount) {
           return;
         }
@@ -160,19 +162,19 @@ public class SuperTypeQuery {
     }
   }
 
-  public boolean exists() {
+  public boolean existsAny() {
     return first() != null;
   }
 
   public IType first() {
-    ArrayList<IType> result = new ArrayList<>(1);
-    visitRec(m_type, result, 1);
+    List<IType> result = new ArrayList<>(1);
+    visitRec(m_type, result, 1, false);
     return result.isEmpty() ? null : result.get(0);
   }
 
   public List<IType> list() {
-    ArrayList<IType> result = new ArrayList<>();
-    visitRec(m_type, result, m_maxResultCount);
+    List<IType> result = new ArrayList<>();
+    visitRec(m_type, result, m_maxResultCount, false);
     return result;
   }
 

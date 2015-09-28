@@ -22,14 +22,14 @@ import org.eclipse.jdt.core.ToolFactory;
 import org.eclipse.jdt.core.formatter.CodeFormatter;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.text.edits.MalformedTreeException;
 import org.eclipse.text.edits.TextEdit;
 
 /**
  * <h3>SourceFormatOperation</h3> equivalent to CONT-SHIFT-F in Eclipse ...
  */
-public class SourceFormatOperation implements IWorkspaceBlockingOperation {
+public class SourceFormatOperation implements IOperation {
   private final IJavaProject m_project;
   private Document m_document;
   private ISourceRange m_range;
@@ -96,13 +96,13 @@ public class SourceFormatOperation implements IWorkspaceBlockingOperation {
       }
     }
     catch (MalformedTreeException e) {
-      S2ESdkActivator.logError(e);
+      SdkLog.error(e);
     }
     catch (IllegalArgumentException e) {
-      S2ESdkActivator.logError(e);
+      SdkLog.error(e);
     }
     catch (BadLocationException e) {
-      S2ESdkActivator.logError(e);
+      SdkLog.error(e);
     }
   }
 

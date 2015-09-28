@@ -37,45 +37,45 @@ public class AnnotationCopyTest {
   private static void testApiOfAnnotationCopyTestFormData(IType annotationCopyTestFormData) {
     SdkAssert.assertHasFlags(annotationCopyTestFormData, 1);
     SdkAssert.assertHasSuperTypeSignature(annotationCopyTestFormData, "Lorg.eclipse.scout.rt.shared.data.form.AbstractFormData;");
-    Assert.assertEquals("annotation count", 1, annotationCopyTestFormData.getAnnotations().size());
+    Assert.assertEquals("annotation count", 1, annotationCopyTestFormData.annotations().list().size());
     SdkAssert.assertAnnotation(annotationCopyTestFormData, "javax.annotation.Generated");
 
     // fields of AnnotationCopyTestFormData
-    Assert.assertEquals("field count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData'", 1, annotationCopyTestFormData.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData'", 1, annotationCopyTestFormData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(annotationCopyTestFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
-    Assert.assertEquals("annotation count", 0, serialVersionUID.getAnnotations().size());
+    Assert.assertEquals("annotation count", 0, serialVersionUID.annotations().list().size());
 
-    Assert.assertEquals("method count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData'", 2, annotationCopyTestFormData.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData'", 2, annotationCopyTestFormData.methods().list().size());
     IMethod annotationCopyTestFormData1 = SdkAssert.assertMethodExist(annotationCopyTestFormData, "AnnotationCopyTestFormData", new String[]{});
     Assert.assertTrue(annotationCopyTestFormData1.isConstructor());
-    Assert.assertEquals("annotation count", 0, annotationCopyTestFormData1.getAnnotations().size());
+    Assert.assertEquals("annotation count", 0, annotationCopyTestFormData1.annotations().list().size());
     IMethod getFirst = SdkAssert.assertMethodExist(annotationCopyTestFormData, "getFirst", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getFirst, "Lformdata.shared.ui.forms.AnnotationCopyTestFormData$First;");
-    Assert.assertEquals("annotation count", 0, getFirst.getAnnotations().size());
+    Assert.assertEquals("annotation count", 0, getFirst.annotations().list().size());
 
-    Assert.assertEquals("inner types count of 'AnnotationCopyTestFormData'", 1, annotationCopyTestFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'AnnotationCopyTestFormData'", 1, annotationCopyTestFormData.innerTypes().list().size());
     // type First
     IType first = SdkAssert.assertTypeExists(annotationCopyTestFormData, "First");
     SdkAssert.assertHasFlags(first, 9);
     SdkAssert.assertHasSuperTypeSignature(first, "Lorg.eclipse.scout.rt.shared.data.form.fields.AbstractValueFieldData<Ljava.lang.String;>;");
-    Assert.assertEquals("annotation count", 1, first.getAnnotations().size());
+    Assert.assertEquals("annotation count", 1, first.annotations().list().size());
     SdkAssert.assertAnnotation(first, "formdata.shared.SharedAnnotation");
 
     // fields of First
-    Assert.assertEquals("field count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData$First'", 1, first.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData$First'", 1, first.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(first, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
-    Assert.assertEquals("annotation count", 0, serialVersionUID1.getAnnotations().size());
+    Assert.assertEquals("annotation count", 0, serialVersionUID1.annotations().list().size());
 
-    Assert.assertEquals("method count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData$First'", 1, first.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.ui.forms.AnnotationCopyTestFormData$First'", 1, first.methods().list().size());
     IMethod first1 = SdkAssert.assertMethodExist(first, "First", new String[]{});
     Assert.assertTrue(first1.isConstructor());
-    Assert.assertEquals("annotation count", 0, first1.getAnnotations().size());
+    Assert.assertEquals("annotation count", 0, first1.annotations().list().size());
 
-    Assert.assertEquals("inner types count of 'First'", 0, first.getTypes().size());
+    Assert.assertEquals("inner types count of 'First'", 0, first.innerTypes().list().size());
   }
 
 }

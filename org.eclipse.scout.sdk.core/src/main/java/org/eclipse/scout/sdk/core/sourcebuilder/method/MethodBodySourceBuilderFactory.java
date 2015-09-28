@@ -15,7 +15,6 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
-import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.methodparameter.IMethodParameterSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
@@ -83,9 +82,8 @@ public final class MethodBodySourceBuilderFactory {
     return new ISourceBuilder() {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append("return ").append(SignatureUtils.useSignature(typeSignature, validator)).append(".class;");
+        source.append("return ").append(validator.useSignature(typeSignature)).append(".class;");
       }
     };
   }
-
 }

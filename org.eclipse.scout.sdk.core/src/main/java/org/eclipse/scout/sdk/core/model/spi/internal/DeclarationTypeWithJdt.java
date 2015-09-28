@@ -309,7 +309,7 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
       sb.append('.');
     }
 
-//  // collect declaring types
+    // collect declaring types
     Deque<char[]> namesBottomUp = new LinkedList<>();
     TypeDeclaration declaringType = td;
     while (declaringType != null) {

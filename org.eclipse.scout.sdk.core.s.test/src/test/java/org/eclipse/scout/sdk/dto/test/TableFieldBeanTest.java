@@ -76,12 +76,12 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasSuperTypeSignature(abstractAddressTableFieldData, "QAbstractTableFieldBeanData;");
 
     // fields of AbstractAddressTableFieldData
-    Assert.assertEquals("field count of 'AbstractAddressTableFieldData'", 1, abstractAddressTableFieldData.getFields().size());
+    Assert.assertEquals("field count of 'AbstractAddressTableFieldData'", 1, abstractAddressTableFieldData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(abstractAddressTableFieldData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'AbstractAddressTableFieldData'", 8, abstractAddressTableFieldData.getMethods().size());
+    Assert.assertEquals("method count of 'AbstractAddressTableFieldData'", 8, abstractAddressTableFieldData.methods().list().size());
     IMethod abstractAddressTableFieldData1 = SdkAssert.assertMethodExist(abstractAddressTableFieldData, "AbstractAddressTableFieldData", new String[]{});
     Assert.assertTrue(abstractAddressTableFieldData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(abstractAddressTableFieldData1, null);
@@ -106,14 +106,14 @@ public class TableFieldBeanTest {
     IMethod setRows = SdkAssert.assertMethodExist(abstractAddressTableFieldData, "setRows", new String[]{"[QAbstractAddressTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    Assert.assertEquals("inner types count of 'AbstractAddressTableFieldData'", 1, abstractAddressTableFieldData.getTypes().size());
+    Assert.assertEquals("inner types count of 'AbstractAddressTableFieldData'", 1, abstractAddressTableFieldData.innerTypes().list().size());
     // type AbstractAddressTableRowData
     IType abstractAddressTableRowData = SdkAssert.assertTypeExists(abstractAddressTableFieldData, "AbstractAddressTableRowData");
     SdkAssert.assertHasFlags(abstractAddressTableRowData, 1033);
     SdkAssert.assertHasSuperTypeSignature(abstractAddressTableRowData, "QAbstractTableRowData;");
 
     // fields of AbstractAddressTableRowData
-    Assert.assertEquals("field count of 'AbstractAddressTableRowData'", 7, abstractAddressTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'AbstractAddressTableRowData'", 7, abstractAddressTableRowData.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(abstractAddressTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
@@ -136,7 +136,7 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasFlags(m_poBoxAddress, 2);
     SdkAssert.assertFieldSignature(m_poBoxAddress, "QBoolean;");
 
-    Assert.assertEquals("method count of 'AbstractAddressTableRowData'", 7, abstractAddressTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'AbstractAddressTableRowData'", 7, abstractAddressTableRowData.methods().list().size());
     IMethod abstractAddressTableRowData1 = SdkAssert.assertMethodExist(abstractAddressTableRowData, "AbstractAddressTableRowData", new String[]{});
     Assert.assertTrue(abstractAddressTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(abstractAddressTableRowData1, null);
@@ -153,7 +153,7 @@ public class TableFieldBeanTest {
     IMethod setPoBoxAddress = SdkAssert.assertMethodExist(abstractAddressTableRowData, "setPoBoxAddress", new String[]{"QBoolean;"});
     SdkAssert.assertMethodReturnTypeSignature(setPoBoxAddress, "V");
 
-    Assert.assertEquals("inner types count of 'AbstractAddressTableRowData'", 0, abstractAddressTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'AbstractAddressTableRowData'", 0, abstractAddressTableRowData.innerTypes().list().size());
   }
 
   /**
@@ -165,12 +165,12 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasSuperTypeSignature(tableFieldBaseFormData, "QAbstractFormData;");
 
     // fields of TableFieldBaseFormData
-    Assert.assertEquals("field count of 'TableFieldBaseFormData'", 1, tableFieldBaseFormData.getFields().size());
+    Assert.assertEquals("field count of 'TableFieldBaseFormData'", 1, tableFieldBaseFormData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(tableFieldBaseFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'TableFieldBaseFormData'", 6, tableFieldBaseFormData.getMethods().size());
+    Assert.assertEquals("method count of 'TableFieldBaseFormData'", 6, tableFieldBaseFormData.methods().list().size());
     IMethod tableFieldBaseFormData1 = SdkAssert.assertMethodExist(tableFieldBaseFormData, "TableFieldBaseFormData", new String[]{});
     Assert.assertTrue(tableFieldBaseFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(tableFieldBaseFormData1, null);
@@ -185,19 +185,19 @@ public class TableFieldBeanTest {
     IMethod getTable = SdkAssert.assertMethodExist(tableFieldBaseFormData, "getTable", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTable, "QTable;");
 
-    Assert.assertEquals("inner types count of 'TableFieldBaseFormData'", 5, tableFieldBaseFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'TableFieldBaseFormData'", 5, tableFieldBaseFormData.innerTypes().list().size());
     // type AddressTable
     IType addressTable = SdkAssert.assertTypeExists(tableFieldBaseFormData, "AddressTable");
     SdkAssert.assertHasFlags(addressTable, 9);
     SdkAssert.assertHasSuperTypeSignature(addressTable, "QAbstractAddressTableFieldData;");
 
     // fields of AddressTable
-    Assert.assertEquals("field count of 'AddressTable'", 1, addressTable.getFields().size());
+    Assert.assertEquals("field count of 'AddressTable'", 1, addressTable.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(addressTable, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'AddressTable'", 8, addressTable.getMethods().size());
+    Assert.assertEquals("method count of 'AddressTable'", 8, addressTable.methods().list().size());
     IMethod addressTable1 = SdkAssert.assertMethodExist(addressTable, "AddressTable", new String[]{});
     Assert.assertTrue(addressTable1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(addressTable1, null);
@@ -222,14 +222,14 @@ public class TableFieldBeanTest {
     IMethod setRows = SdkAssert.assertMethodExist(addressTable, "setRows", new String[]{"[QAddressTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    Assert.assertEquals("inner types count of 'AddressTable'", 1, addressTable.getTypes().size());
+    Assert.assertEquals("inner types count of 'AddressTable'", 1, addressTable.innerTypes().list().size());
     // type AddressTableRowData
     IType addressTableRowData = SdkAssert.assertTypeExists(addressTable, "AddressTableRowData");
     SdkAssert.assertHasFlags(addressTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(addressTableRowData, "QAbstractAddressTableRowData;");
 
     // fields of AddressTableRowData
-    Assert.assertEquals("field count of 'AddressTableRowData'", 3, addressTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'AddressTableRowData'", 3, addressTableRowData.fields().list().size());
     IField serialVersionUID2 = SdkAssert.assertFieldExist(addressTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
@@ -240,7 +240,7 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasFlags(m_city, 2);
     SdkAssert.assertFieldSignature(m_city, "QString;");
 
-    Assert.assertEquals("method count of 'AddressTableRowData'", 3, addressTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'AddressTableRowData'", 3, addressTableRowData.methods().list().size());
     IMethod addressTableRowData1 = SdkAssert.assertMethodExist(addressTableRowData, "AddressTableRowData", new String[]{});
     Assert.assertTrue(addressTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(addressTableRowData1, null);
@@ -249,19 +249,19 @@ public class TableFieldBeanTest {
     IMethod setCity = SdkAssert.assertMethodExist(addressTableRowData, "setCity", new String[]{"QString;"});
     SdkAssert.assertMethodReturnTypeSignature(setCity, "V");
 
-    Assert.assertEquals("inner types count of 'AddressTableRowData'", 0, addressTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'AddressTableRowData'", 0, addressTableRowData.innerTypes().list().size());
     // type EmptyTable
     IType emptyTable = SdkAssert.assertTypeExists(tableFieldBaseFormData, "EmptyTable");
     SdkAssert.assertHasFlags(emptyTable, 9);
     SdkAssert.assertHasSuperTypeSignature(emptyTable, "QAbstractTableFieldBeanData;");
 
     // fields of EmptyTable
-    Assert.assertEquals("field count of 'EmptyTable'", 1, emptyTable.getFields().size());
+    Assert.assertEquals("field count of 'EmptyTable'", 1, emptyTable.fields().list().size());
     IField serialVersionUID3 = SdkAssert.assertFieldExist(emptyTable, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'EmptyTable'", 8, emptyTable.getMethods().size());
+    Assert.assertEquals("method count of 'EmptyTable'", 8, emptyTable.methods().list().size());
     IMethod emptyTable1 = SdkAssert.assertMethodExist(emptyTable, "EmptyTable", new String[]{});
     Assert.assertTrue(emptyTable1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(emptyTable1, null);
@@ -286,36 +286,36 @@ public class TableFieldBeanTest {
     IMethod setRows1 = SdkAssert.assertMethodExist(emptyTable, "setRows", new String[]{"[QEmptyTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows1, "V");
 
-    Assert.assertEquals("inner types count of 'EmptyTable'", 1, emptyTable.getTypes().size());
+    Assert.assertEquals("inner types count of 'EmptyTable'", 1, emptyTable.innerTypes().list().size());
     // type EmptyTableRowData
     IType emptyTableRowData = SdkAssert.assertTypeExists(emptyTable, "EmptyTableRowData");
     SdkAssert.assertHasFlags(emptyTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(emptyTableRowData, "QAbstractTableRowData;");
 
     // fields of EmptyTableRowData
-    Assert.assertEquals("field count of 'EmptyTableRowData'", 1, emptyTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'EmptyTableRowData'", 1, emptyTableRowData.fields().list().size());
     IField serialVersionUID4 = SdkAssert.assertFieldExist(emptyTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
 
-    Assert.assertEquals("method count of 'EmptyTableRowData'", 1, emptyTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'EmptyTableRowData'", 1, emptyTableRowData.methods().list().size());
     IMethod emptyTableRowData1 = SdkAssert.assertMethodExist(emptyTableRowData, "EmptyTableRowData", new String[]{});
     Assert.assertTrue(emptyTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(emptyTableRowData1, null);
 
-    Assert.assertEquals("inner types count of 'EmptyTableRowData'", 0, emptyTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'EmptyTableRowData'", 0, emptyTableRowData.innerTypes().list().size());
     // type NoTable
     IType noTable = SdkAssert.assertTypeExists(tableFieldBaseFormData, "NoTable");
     SdkAssert.assertHasFlags(noTable, 9);
     SdkAssert.assertHasSuperTypeSignature(noTable, "QAbstractTableFieldBeanData;");
 
     // fields of NoTable
-    Assert.assertEquals("field count of 'NoTable'", 1, noTable.getFields().size());
+    Assert.assertEquals("field count of 'NoTable'", 1, noTable.fields().list().size());
     IField serialVersionUID5 = SdkAssert.assertFieldExist(noTable, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID5, 26);
     SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
-    Assert.assertEquals("method count of 'NoTable'", 3, noTable.getMethods().size());
+    Assert.assertEquals("method count of 'NoTable'", 3, noTable.methods().list().size());
     IMethod noTable1 = SdkAssert.assertMethodExist(noTable, "NoTable", new String[]{});
     Assert.assertTrue(noTable1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(noTable1, null);
@@ -326,19 +326,19 @@ public class TableFieldBeanTest {
     SdkAssert.assertMethodReturnTypeSignature(getRowType2, "QClass<+QAbstractTableRowData;>;");
     SdkAssert.assertAnnotation(getRowType2, "java.lang.Override");
 
-    Assert.assertEquals("inner types count of 'NoTable'", 0, noTable.getTypes().size());
+    Assert.assertEquals("inner types count of 'NoTable'", 0, noTable.innerTypes().list().size());
     // type PersonTable
     IType personTable = SdkAssert.assertTypeExists(tableFieldBaseFormData, "PersonTable");
     SdkAssert.assertHasFlags(personTable, 9);
     SdkAssert.assertHasSuperTypeSignature(personTable, "QAbstractPersonTableFieldData;");
 
     // fields of PersonTable
-    Assert.assertEquals("field count of 'PersonTable'", 1, personTable.getFields().size());
+    Assert.assertEquals("field count of 'PersonTable'", 1, personTable.fields().list().size());
     IField serialVersionUID6 = SdkAssert.assertFieldExist(personTable, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID6, 26);
     SdkAssert.assertFieldSignature(serialVersionUID6, "J");
 
-    Assert.assertEquals("method count of 'PersonTable'", 8, personTable.getMethods().size());
+    Assert.assertEquals("method count of 'PersonTable'", 8, personTable.methods().list().size());
     IMethod personTable1 = SdkAssert.assertMethodExist(personTable, "PersonTable", new String[]{});
     Assert.assertTrue(personTable1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(personTable1, null);
@@ -363,36 +363,36 @@ public class TableFieldBeanTest {
     IMethod setRows2 = SdkAssert.assertMethodExist(personTable, "setRows", new String[]{"[QPersonTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows2, "V");
 
-    Assert.assertEquals("inner types count of 'PersonTable'", 1, personTable.getTypes().size());
+    Assert.assertEquals("inner types count of 'PersonTable'", 1, personTable.innerTypes().list().size());
     // type PersonTableRowData
     IType personTableRowData = SdkAssert.assertTypeExists(personTable, "PersonTableRowData");
     SdkAssert.assertHasFlags(personTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(personTableRowData, "QAbstractPersonTableRowData;");
 
     // fields of PersonTableRowData
-    Assert.assertEquals("field count of 'PersonTableRowData'", 1, personTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'PersonTableRowData'", 1, personTableRowData.fields().list().size());
     IField serialVersionUID7 = SdkAssert.assertFieldExist(personTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID7, 26);
     SdkAssert.assertFieldSignature(serialVersionUID7, "J");
 
-    Assert.assertEquals("method count of 'PersonTableRowData'", 1, personTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'PersonTableRowData'", 1, personTableRowData.methods().list().size());
     IMethod personTableRowData1 = SdkAssert.assertMethodExist(personTableRowData, "PersonTableRowData", new String[]{});
     Assert.assertTrue(personTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(personTableRowData1, null);
 
-    Assert.assertEquals("inner types count of 'PersonTableRowData'", 0, personTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'PersonTableRowData'", 0, personTableRowData.innerTypes().list().size());
     // type Table
     IType table = SdkAssert.assertTypeExists(tableFieldBaseFormData, "Table");
     SdkAssert.assertHasFlags(table, 9);
     SdkAssert.assertHasSuperTypeSignature(table, "QAbstractTableFieldBeanData;");
 
     // fields of Table
-    Assert.assertEquals("field count of 'Table'", 1, table.getFields().size());
+    Assert.assertEquals("field count of 'Table'", 1, table.fields().list().size());
     IField serialVersionUID8 = SdkAssert.assertFieldExist(table, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID8, 26);
     SdkAssert.assertFieldSignature(serialVersionUID8, "J");
 
-    Assert.assertEquals("method count of 'Table'", 8, table.getMethods().size());
+    Assert.assertEquals("method count of 'Table'", 8, table.methods().list().size());
     IMethod table1 = SdkAssert.assertMethodExist(table, "Table", new String[]{});
     Assert.assertTrue(table1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(table1, null);
@@ -417,14 +417,14 @@ public class TableFieldBeanTest {
     IMethod setRows3 = SdkAssert.assertMethodExist(table, "setRows", new String[]{"[QTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows3, "V");
 
-    Assert.assertEquals("inner types count of 'Table'", 1, table.getTypes().size());
+    Assert.assertEquals("inner types count of 'Table'", 1, table.innerTypes().list().size());
     // type TableRowData
     IType tableRowData = SdkAssert.assertTypeExists(table, "TableRowData");
     SdkAssert.assertHasFlags(tableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(tableRowData, "QAbstractTableRowData;");
 
     // fields of TableRowData
-    Assert.assertEquals("field count of 'TableRowData'", 5, tableRowData.getFields().size());
+    Assert.assertEquals("field count of 'TableRowData'", 5, tableRowData.fields().list().size());
     IField serialVersionUID9 = SdkAssert.assertFieldExist(tableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID9, 26);
     SdkAssert.assertFieldSignature(serialVersionUID9, "J");
@@ -441,7 +441,7 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasFlags(m_second, 2);
     SdkAssert.assertFieldSignature(m_second, "QString;");
 
-    Assert.assertEquals("method count of 'TableRowData'", 5, tableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'TableRowData'", 5, tableRowData.methods().list().size());
     IMethod tableRowData1 = SdkAssert.assertMethodExist(tableRowData, "TableRowData", new String[]{});
     Assert.assertTrue(tableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(tableRowData1, null);
@@ -454,7 +454,7 @@ public class TableFieldBeanTest {
     IMethod setSecond = SdkAssert.assertMethodExist(tableRowData, "setSecond", new String[]{"QString;"});
     SdkAssert.assertMethodReturnTypeSignature(setSecond, "V");
 
-    Assert.assertEquals("inner types count of 'TableRowData'", 0, tableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'TableRowData'", 0, tableRowData.innerTypes().list().size());
   }
 
   /**
@@ -466,12 +466,12 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasSuperTypeSignature(tableFieldExFormData, "QTableFieldBaseFormData;");
 
     // fields of TableFieldExFormData
-    Assert.assertEquals("field count of 'TableFieldExFormData'", 1, tableFieldExFormData.getFields().size());
+    Assert.assertEquals("field count of 'TableFieldExFormData'", 1, tableFieldExFormData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(tableFieldExFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'TableFieldExFormData'", 6, tableFieldExFormData.getMethods().size());
+    Assert.assertEquals("method count of 'TableFieldExFormData'", 6, tableFieldExFormData.methods().list().size());
     IMethod tableFieldExFormData1 = SdkAssert.assertMethodExist(tableFieldExFormData, "TableFieldExFormData", new String[]{});
     Assert.assertTrue(tableFieldExFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(tableFieldExFormData1, null);
@@ -486,7 +486,7 @@ public class TableFieldBeanTest {
     IMethod getTableExtended = SdkAssert.assertMethodExist(tableFieldExFormData, "getTableExtended", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTableExtended, "QTableExtended;");
 
-    Assert.assertEquals("inner types count of 'TableFieldExFormData'", 5, tableFieldExFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'TableFieldExFormData'", 5, tableFieldExFormData.innerTypes().list().size());
     // type EmptyTableExtended
     IType emptyTableExtended = SdkAssert.assertTypeExists(tableFieldExFormData, "EmptyTableExtended");
     SdkAssert.assertHasFlags(emptyTableExtended, 9);
@@ -494,12 +494,12 @@ public class TableFieldBeanTest {
     SdkAssert.assertAnnotation(emptyTableExtended, "org.eclipse.scout.commons.annotations.Replace");
 
     // fields of EmptyTableExtended
-    Assert.assertEquals("field count of 'EmptyTableExtended'", 1, emptyTableExtended.getFields().size());
+    Assert.assertEquals("field count of 'EmptyTableExtended'", 1, emptyTableExtended.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(emptyTableExtended, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'EmptyTableExtended'", 8, emptyTableExtended.getMethods().size());
+    Assert.assertEquals("method count of 'EmptyTableExtended'", 8, emptyTableExtended.methods().list().size());
     IMethod emptyTableExtended1 = SdkAssert.assertMethodExist(emptyTableExtended, "EmptyTableExtended", new String[]{});
     Assert.assertTrue(emptyTableExtended1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(emptyTableExtended1, null);
@@ -524,14 +524,14 @@ public class TableFieldBeanTest {
     IMethod setRows = SdkAssert.assertMethodExist(emptyTableExtended, "setRows", new String[]{"[QEmptyTableExtendedRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    Assert.assertEquals("inner types count of 'EmptyTableExtended'", 1, emptyTableExtended.getTypes().size());
+    Assert.assertEquals("inner types count of 'EmptyTableExtended'", 1, emptyTableExtended.innerTypes().list().size());
     // type EmptyTableExtendedRowData
     IType emptyTableExtendedRowData = SdkAssert.assertTypeExists(emptyTableExtended, "EmptyTableExtendedRowData");
     SdkAssert.assertHasFlags(emptyTableExtendedRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(emptyTableExtendedRowData, "QEmptyTableRowData;");
 
     // fields of EmptyTableExtendedRowData
-    Assert.assertEquals("field count of 'EmptyTableExtendedRowData'", 3, emptyTableExtendedRowData.getFields().size());
+    Assert.assertEquals("field count of 'EmptyTableExtendedRowData'", 3, emptyTableExtendedRowData.fields().list().size());
     IField serialVersionUID2 = SdkAssert.assertFieldExist(emptyTableExtendedRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
@@ -542,7 +542,7 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasFlags(m_single, 2);
     SdkAssert.assertFieldSignature(m_single, "QString;");
 
-    Assert.assertEquals("method count of 'EmptyTableExtendedRowData'", 3, emptyTableExtendedRowData.getMethods().size());
+    Assert.assertEquals("method count of 'EmptyTableExtendedRowData'", 3, emptyTableExtendedRowData.methods().list().size());
     IMethod emptyTableExtendedRowData1 = SdkAssert.assertMethodExist(emptyTableExtendedRowData, "EmptyTableExtendedRowData", new String[]{});
     Assert.assertTrue(emptyTableExtendedRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(emptyTableExtendedRowData1, null);
@@ -551,7 +551,7 @@ public class TableFieldBeanTest {
     IMethod setSingle = SdkAssert.assertMethodExist(emptyTableExtendedRowData, "setSingle", new String[]{"QString;"});
     SdkAssert.assertMethodReturnTypeSignature(setSingle, "V");
 
-    Assert.assertEquals("inner types count of 'EmptyTableExtendedRowData'", 0, emptyTableExtendedRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'EmptyTableExtendedRowData'", 0, emptyTableExtendedRowData.innerTypes().list().size());
     // type ExtendedAddress
     IType extendedAddress = SdkAssert.assertTypeExists(tableFieldExFormData, "ExtendedAddress");
     SdkAssert.assertHasFlags(extendedAddress, 9);
@@ -559,12 +559,12 @@ public class TableFieldBeanTest {
     SdkAssert.assertAnnotation(extendedAddress, "org.eclipse.scout.commons.annotations.Replace");
 
     // fields of ExtendedAddress
-    Assert.assertEquals("field count of 'ExtendedAddress'", 1, extendedAddress.getFields().size());
+    Assert.assertEquals("field count of 'ExtendedAddress'", 1, extendedAddress.fields().list().size());
     IField serialVersionUID3 = SdkAssert.assertFieldExist(extendedAddress, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID3, 26);
     SdkAssert.assertFieldSignature(serialVersionUID3, "J");
 
-    Assert.assertEquals("method count of 'ExtendedAddress'", 8, extendedAddress.getMethods().size());
+    Assert.assertEquals("method count of 'ExtendedAddress'", 8, extendedAddress.methods().list().size());
     IMethod extendedAddress1 = SdkAssert.assertMethodExist(extendedAddress, "ExtendedAddress", new String[]{});
     Assert.assertTrue(extendedAddress1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedAddress1, null);
@@ -589,14 +589,14 @@ public class TableFieldBeanTest {
     IMethod setRows1 = SdkAssert.assertMethodExist(extendedAddress, "setRows", new String[]{"[QExtendedAddressRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows1, "V");
 
-    Assert.assertEquals("inner types count of 'ExtendedAddress'", 1, extendedAddress.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExtendedAddress'", 1, extendedAddress.innerTypes().list().size());
     // type ExtendedAddressRowData
     IType extendedAddressRowData = SdkAssert.assertTypeExists(extendedAddress, "ExtendedAddressRowData");
     SdkAssert.assertHasFlags(extendedAddressRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(extendedAddressRowData, "QAddressTableRowData;");
 
     // fields of ExtendedAddressRowData
-    Assert.assertEquals("field count of 'ExtendedAddressRowData'", 3, extendedAddressRowData.getFields().size());
+    Assert.assertEquals("field count of 'ExtendedAddressRowData'", 3, extendedAddressRowData.fields().list().size());
     IField serialVersionUID4 = SdkAssert.assertFieldExist(extendedAddressRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID4, 26);
     SdkAssert.assertFieldSignature(serialVersionUID4, "J");
@@ -607,7 +607,7 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasFlags(m_state, 2);
     SdkAssert.assertFieldSignature(m_state, "QString;");
 
-    Assert.assertEquals("method count of 'ExtendedAddressRowData'", 3, extendedAddressRowData.getMethods().size());
+    Assert.assertEquals("method count of 'ExtendedAddressRowData'", 3, extendedAddressRowData.methods().list().size());
     IMethod extendedAddressRowData1 = SdkAssert.assertMethodExist(extendedAddressRowData, "ExtendedAddressRowData", new String[]{});
     Assert.assertTrue(extendedAddressRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedAddressRowData1, null);
@@ -616,7 +616,7 @@ public class TableFieldBeanTest {
     IMethod setState = SdkAssert.assertMethodExist(extendedAddressRowData, "setState", new String[]{"QString;"});
     SdkAssert.assertMethodReturnTypeSignature(setState, "V");
 
-    Assert.assertEquals("inner types count of 'ExtendedAddressRowData'", 0, extendedAddressRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExtendedAddressRowData'", 0, extendedAddressRowData.innerTypes().list().size());
     // type ExtendedPersonTable
     IType extendedPersonTable = SdkAssert.assertTypeExists(tableFieldExFormData, "ExtendedPersonTable");
     SdkAssert.assertHasFlags(extendedPersonTable, 9);
@@ -624,12 +624,12 @@ public class TableFieldBeanTest {
     SdkAssert.assertAnnotation(extendedPersonTable, "org.eclipse.scout.commons.annotations.Replace");
 
     // fields of ExtendedPersonTable
-    Assert.assertEquals("field count of 'ExtendedPersonTable'", 1, extendedPersonTable.getFields().size());
+    Assert.assertEquals("field count of 'ExtendedPersonTable'", 1, extendedPersonTable.fields().list().size());
     IField serialVersionUID5 = SdkAssert.assertFieldExist(extendedPersonTable, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID5, 26);
     SdkAssert.assertFieldSignature(serialVersionUID5, "J");
 
-    Assert.assertEquals("method count of 'ExtendedPersonTable'", 8, extendedPersonTable.getMethods().size());
+    Assert.assertEquals("method count of 'ExtendedPersonTable'", 8, extendedPersonTable.methods().list().size());
     IMethod extendedPersonTable1 = SdkAssert.assertMethodExist(extendedPersonTable, "ExtendedPersonTable", new String[]{});
     Assert.assertTrue(extendedPersonTable1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedPersonTable1, null);
@@ -654,14 +654,14 @@ public class TableFieldBeanTest {
     IMethod setRows2 = SdkAssert.assertMethodExist(extendedPersonTable, "setRows", new String[]{"[QExtendedPersonTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows2, "V");
 
-    Assert.assertEquals("inner types count of 'ExtendedPersonTable'", 1, extendedPersonTable.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExtendedPersonTable'", 1, extendedPersonTable.innerTypes().list().size());
     // type ExtendedPersonTableRowData
     IType extendedPersonTableRowData = SdkAssert.assertTypeExists(extendedPersonTable, "ExtendedPersonTableRowData");
     SdkAssert.assertHasFlags(extendedPersonTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(extendedPersonTableRowData, "QPersonTableRowData;");
 
     // fields of ExtendedPersonTableRowData
-    Assert.assertEquals("field count of 'ExtendedPersonTableRowData'", 3, extendedPersonTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'ExtendedPersonTableRowData'", 3, extendedPersonTableRowData.fields().list().size());
     IField serialVersionUID6 = SdkAssert.assertFieldExist(extendedPersonTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID6, 26);
     SdkAssert.assertFieldSignature(serialVersionUID6, "J");
@@ -672,7 +672,7 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasFlags(m_lastName, 2);
     SdkAssert.assertFieldSignature(m_lastName, "QString;");
 
-    Assert.assertEquals("method count of 'ExtendedPersonTableRowData'", 3, extendedPersonTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'ExtendedPersonTableRowData'", 3, extendedPersonTableRowData.methods().list().size());
     IMethod extendedPersonTableRowData1 = SdkAssert.assertMethodExist(extendedPersonTableRowData, "ExtendedPersonTableRowData", new String[]{});
     Assert.assertTrue(extendedPersonTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(extendedPersonTableRowData1, null);
@@ -681,7 +681,7 @@ public class TableFieldBeanTest {
     IMethod setLastName = SdkAssert.assertMethodExist(extendedPersonTableRowData, "setLastName", new String[]{"QString;"});
     SdkAssert.assertMethodReturnTypeSignature(setLastName, "V");
 
-    Assert.assertEquals("inner types count of 'ExtendedPersonTableRowData'", 0, extendedPersonTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ExtendedPersonTableRowData'", 0, extendedPersonTableRowData.innerTypes().list().size());
     // type NoTableExtended
     IType noTableExtended = SdkAssert.assertTypeExists(tableFieldExFormData, "NoTableExtended");
     SdkAssert.assertHasFlags(noTableExtended, 9);
@@ -689,12 +689,12 @@ public class TableFieldBeanTest {
     SdkAssert.assertAnnotation(noTableExtended, "org.eclipse.scout.commons.annotations.Replace");
 
     // fields of NoTableExtended
-    Assert.assertEquals("field count of 'NoTableExtended'", 1, noTableExtended.getFields().size());
+    Assert.assertEquals("field count of 'NoTableExtended'", 1, noTableExtended.fields().list().size());
     IField serialVersionUID7 = SdkAssert.assertFieldExist(noTableExtended, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID7, 26);
     SdkAssert.assertFieldSignature(serialVersionUID7, "J");
 
-    Assert.assertEquals("method count of 'NoTableExtended'", 8, noTableExtended.getMethods().size());
+    Assert.assertEquals("method count of 'NoTableExtended'", 8, noTableExtended.methods().list().size());
     IMethod noTableExtended1 = SdkAssert.assertMethodExist(noTableExtended, "NoTableExtended", new String[]{});
     Assert.assertTrue(noTableExtended1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(noTableExtended1, null);
@@ -719,14 +719,14 @@ public class TableFieldBeanTest {
     IMethod setRows3 = SdkAssert.assertMethodExist(noTableExtended, "setRows", new String[]{"[QNoTableExtendedRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows3, "V");
 
-    Assert.assertEquals("inner types count of 'NoTableExtended'", 1, noTableExtended.getTypes().size());
+    Assert.assertEquals("inner types count of 'NoTableExtended'", 1, noTableExtended.innerTypes().list().size());
     // type NoTableExtendedRowData
     IType noTableExtendedRowData = SdkAssert.assertTypeExists(noTableExtended, "NoTableExtendedRowData");
     SdkAssert.assertHasFlags(noTableExtendedRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(noTableExtendedRowData, "QAbstractTableRowData;");
 
     // fields of NoTableExtendedRowData
-    Assert.assertEquals("field count of 'NoTableExtendedRowData'", 3, noTableExtendedRowData.getFields().size());
+    Assert.assertEquals("field count of 'NoTableExtendedRowData'", 3, noTableExtendedRowData.fields().list().size());
     IField serialVersionUID8 = SdkAssert.assertFieldExist(noTableExtendedRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID8, 26);
     SdkAssert.assertFieldSignature(serialVersionUID8, "J");
@@ -737,7 +737,7 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasFlags(m_new, 2);
     SdkAssert.assertFieldSignature(m_new, "QString;");
 
-    Assert.assertEquals("method count of 'NoTableExtendedRowData'", 3, noTableExtendedRowData.getMethods().size());
+    Assert.assertEquals("method count of 'NoTableExtendedRowData'", 3, noTableExtendedRowData.methods().list().size());
     IMethod noTableExtendedRowData1 = SdkAssert.assertMethodExist(noTableExtendedRowData, "NoTableExtendedRowData", new String[]{});
     Assert.assertTrue(noTableExtendedRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(noTableExtendedRowData1, null);
@@ -746,7 +746,7 @@ public class TableFieldBeanTest {
     IMethod setNew = SdkAssert.assertMethodExist(noTableExtendedRowData, "setNew", new String[]{"QString;"});
     SdkAssert.assertMethodReturnTypeSignature(setNew, "V");
 
-    Assert.assertEquals("inner types count of 'NoTableExtendedRowData'", 0, noTableExtendedRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'NoTableExtendedRowData'", 0, noTableExtendedRowData.innerTypes().list().size());
     // type TableExtended
     IType tableExtended = SdkAssert.assertTypeExists(tableFieldExFormData, "TableExtended");
     SdkAssert.assertHasFlags(tableExtended, 9);
@@ -754,12 +754,12 @@ public class TableFieldBeanTest {
     SdkAssert.assertAnnotation(tableExtended, "org.eclipse.scout.commons.annotations.Replace");
 
     // fields of TableExtended
-    Assert.assertEquals("field count of 'TableExtended'", 1, tableExtended.getFields().size());
+    Assert.assertEquals("field count of 'TableExtended'", 1, tableExtended.fields().list().size());
     IField serialVersionUID9 = SdkAssert.assertFieldExist(tableExtended, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID9, 26);
     SdkAssert.assertFieldSignature(serialVersionUID9, "J");
 
-    Assert.assertEquals("method count of 'TableExtended'", 8, tableExtended.getMethods().size());
+    Assert.assertEquals("method count of 'TableExtended'", 8, tableExtended.methods().list().size());
     IMethod tableExtended1 = SdkAssert.assertMethodExist(tableExtended, "TableExtended", new String[]{});
     Assert.assertTrue(tableExtended1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(tableExtended1, null);
@@ -784,14 +784,14 @@ public class TableFieldBeanTest {
     IMethod setRows4 = SdkAssert.assertMethodExist(tableExtended, "setRows", new String[]{"[QTableExtendedRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows4, "V");
 
-    Assert.assertEquals("inner types count of 'TableExtended'", 1, tableExtended.getTypes().size());
+    Assert.assertEquals("inner types count of 'TableExtended'", 1, tableExtended.innerTypes().list().size());
     // type TableExtendedRowData
     IType tableExtendedRowData = SdkAssert.assertTypeExists(tableExtended, "TableExtendedRowData");
     SdkAssert.assertHasFlags(tableExtendedRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(tableExtendedRowData, "QTableRowData;");
 
     // fields of TableExtendedRowData
-    Assert.assertEquals("field count of 'TableExtendedRowData'", 3, tableExtendedRowData.getFields().size());
+    Assert.assertEquals("field count of 'TableExtendedRowData'", 3, tableExtendedRowData.fields().list().size());
     IField serialVersionUID10 = SdkAssert.assertFieldExist(tableExtendedRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID10, 26);
     SdkAssert.assertFieldSignature(serialVersionUID10, "J");
@@ -802,7 +802,7 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasFlags(m_boolean, 2);
     SdkAssert.assertFieldSignature(m_boolean, "QBoolean;");
 
-    Assert.assertEquals("method count of 'TableExtendedRowData'", 3, tableExtendedRowData.getMethods().size());
+    Assert.assertEquals("method count of 'TableExtendedRowData'", 3, tableExtendedRowData.methods().list().size());
     IMethod tableExtendedRowData1 = SdkAssert.assertMethodExist(tableExtendedRowData, "TableExtendedRowData", new String[]{});
     Assert.assertTrue(tableExtendedRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(tableExtendedRowData1, null);
@@ -811,7 +811,7 @@ public class TableFieldBeanTest {
     IMethod setBoolean = SdkAssert.assertMethodExist(tableExtendedRowData, "setBoolean", new String[]{"QBoolean;"});
     SdkAssert.assertMethodReturnTypeSignature(setBoolean, "V");
 
-    Assert.assertEquals("inner types count of 'TableExtendedRowData'", 0, tableExtendedRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'TableExtendedRowData'", 0, tableExtendedRowData.innerTypes().list().size());
   }
 
   /**
@@ -823,31 +823,31 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasSuperTypeSignature(baseWithExtendedTableFormData, "QAbstractFormData;");
 
     // fields of BaseWithExtendedTableFormData
-    Assert.assertEquals("field count of 'BaseWithExtendedTableFormData'", 1, baseWithExtendedTableFormData.getFields().size());
+    Assert.assertEquals("field count of 'BaseWithExtendedTableFormData'", 1, baseWithExtendedTableFormData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(baseWithExtendedTableFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'BaseWithExtendedTableFormData'", 2, baseWithExtendedTableFormData.getMethods().size());
+    Assert.assertEquals("method count of 'BaseWithExtendedTableFormData'", 2, baseWithExtendedTableFormData.methods().list().size());
     IMethod baseWithExtendedTableFormData1 = SdkAssert.assertMethodExist(baseWithExtendedTableFormData, "BaseWithExtendedTableFormData", new String[]{});
     Assert.assertTrue(baseWithExtendedTableFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(baseWithExtendedTableFormData1, null);
     IMethod getTableInForm = SdkAssert.assertMethodExist(baseWithExtendedTableFormData, "getTableInForm", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getTableInForm, "QTableInForm;");
 
-    Assert.assertEquals("inner types count of 'BaseWithExtendedTableFormData'", 1, baseWithExtendedTableFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'BaseWithExtendedTableFormData'", 1, baseWithExtendedTableFormData.innerTypes().list().size());
     // type TableInForm
     IType tableInForm = SdkAssert.assertTypeExists(baseWithExtendedTableFormData, "TableInForm");
     SdkAssert.assertHasFlags(tableInForm, 9);
     SdkAssert.assertHasSuperTypeSignature(tableInForm, "QAbstractTableFieldBeanData;");
 
     // fields of TableInForm
-    Assert.assertEquals("field count of 'TableInForm'", 1, tableInForm.getFields().size());
+    Assert.assertEquals("field count of 'TableInForm'", 1, tableInForm.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(tableInForm, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'TableInForm'", 8, tableInForm.getMethods().size());
+    Assert.assertEquals("method count of 'TableInForm'", 8, tableInForm.methods().list().size());
     IMethod tableInForm1 = SdkAssert.assertMethodExist(tableInForm, "TableInForm", new String[]{});
     Assert.assertTrue(tableInForm1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(tableInForm1, null);
@@ -872,14 +872,14 @@ public class TableFieldBeanTest {
     IMethod setRows = SdkAssert.assertMethodExist(tableInForm, "setRows", new String[]{"[QTableInFormRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    Assert.assertEquals("inner types count of 'TableInForm'", 1, tableInForm.getTypes().size());
+    Assert.assertEquals("inner types count of 'TableInForm'", 1, tableInForm.innerTypes().list().size());
     // type TableInFormRowData
     IType tableInFormRowData = SdkAssert.assertTypeExists(tableInForm, "TableInFormRowData");
     SdkAssert.assertHasFlags(tableInFormRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(tableInFormRowData, "QAbstractTableRowData;");
 
     // fields of TableInFormRowData
-    Assert.assertEquals("field count of 'TableInFormRowData'", 5, tableInFormRowData.getFields().size());
+    Assert.assertEquals("field count of 'TableInFormRowData'", 5, tableInFormRowData.fields().list().size());
     IField serialVersionUID2 = SdkAssert.assertFieldExist(tableInFormRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
@@ -896,7 +896,7 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasFlags(m_colInDesktopForm, 2);
     SdkAssert.assertFieldSignature(m_colInDesktopForm, "QString;");
 
-    Assert.assertEquals("method count of 'TableInFormRowData'", 5, tableInFormRowData.getMethods().size());
+    Assert.assertEquals("method count of 'TableInFormRowData'", 5, tableInFormRowData.methods().list().size());
     IMethod tableInFormRowData1 = SdkAssert.assertMethodExist(tableInFormRowData, "TableInFormRowData", new String[]{});
     Assert.assertTrue(tableInFormRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(tableInFormRowData1, null);
@@ -909,7 +909,7 @@ public class TableFieldBeanTest {
     IMethod setColInDesktopForm = SdkAssert.assertMethodExist(tableInFormRowData, "setColInDesktopForm", new String[]{"QString;"});
     SdkAssert.assertMethodReturnTypeSignature(setColInDesktopForm, "V");
 
-    Assert.assertEquals("inner types count of 'TableInFormRowData'", 0, tableInFormRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'TableInFormRowData'", 0, tableInFormRowData.innerTypes().list().size());
   }
 
   /**
@@ -921,31 +921,31 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasSuperTypeSignature(childWithExtendedTableFormData, "QBaseWithExtendedTableFormData;");
 
     // fields of ChildWithExtendedTableFormData
-    Assert.assertEquals("field count of 'ChildWithExtendedTableFormData'", 1, childWithExtendedTableFormData.getFields().size());
+    Assert.assertEquals("field count of 'ChildWithExtendedTableFormData'", 1, childWithExtendedTableFormData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(childWithExtendedTableFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'ChildWithExtendedTableFormData'", 2, childWithExtendedTableFormData.getMethods().size());
+    Assert.assertEquals("method count of 'ChildWithExtendedTableFormData'", 2, childWithExtendedTableFormData.methods().list().size());
     IMethod childWithExtendedTableFormData1 = SdkAssert.assertMethodExist(childWithExtendedTableFormData, "ChildWithExtendedTableFormData", new String[]{});
     Assert.assertTrue(childWithExtendedTableFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(childWithExtendedTableFormData1, null);
     IMethod getChildTable = SdkAssert.assertMethodExist(childWithExtendedTableFormData, "getChildTable", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getChildTable, "QChildTable;");
 
-    Assert.assertEquals("inner types count of 'ChildWithExtendedTableFormData'", 1, childWithExtendedTableFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ChildWithExtendedTableFormData'", 1, childWithExtendedTableFormData.innerTypes().list().size());
     // type ChildTable
     IType childTable = SdkAssert.assertTypeExists(childWithExtendedTableFormData, "ChildTable");
     SdkAssert.assertHasFlags(childTable, 9);
     SdkAssert.assertHasSuperTypeSignature(childTable, "QAbstractTableFieldBeanData;");
 
     // fields of ChildTable
-    Assert.assertEquals("field count of 'ChildTable'", 1, childTable.getFields().size());
+    Assert.assertEquals("field count of 'ChildTable'", 1, childTable.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(childTable, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'ChildTable'", 8, childTable.getMethods().size());
+    Assert.assertEquals("method count of 'ChildTable'", 8, childTable.methods().list().size());
     IMethod childTable1 = SdkAssert.assertMethodExist(childTable, "ChildTable", new String[]{});
     Assert.assertTrue(childTable1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(childTable1, null);
@@ -970,14 +970,14 @@ public class TableFieldBeanTest {
     IMethod setRows = SdkAssert.assertMethodExist(childTable, "setRows", new String[]{"[QChildTableRowData;"});
     SdkAssert.assertMethodReturnTypeSignature(setRows, "V");
 
-    Assert.assertEquals("inner types count of 'ChildTable'", 1, childTable.getTypes().size());
+    Assert.assertEquals("inner types count of 'ChildTable'", 1, childTable.innerTypes().list().size());
     // type ChildTableRowData
     IType childTableRowData = SdkAssert.assertTypeExists(childTable, "ChildTableRowData");
     SdkAssert.assertHasFlags(childTableRowData, 9);
     SdkAssert.assertHasSuperTypeSignature(childTableRowData, "QAbstractTableRowData;");
 
     // fields of ChildTableRowData
-    Assert.assertEquals("field count of 'ChildTableRowData'", 7, childTableRowData.getFields().size());
+    Assert.assertEquals("field count of 'ChildTableRowData'", 7, childTableRowData.fields().list().size());
     IField serialVersionUID2 = SdkAssert.assertFieldExist(childTableRowData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID2, 26);
     SdkAssert.assertFieldSignature(serialVersionUID2, "J");
@@ -1000,7 +1000,7 @@ public class TableFieldBeanTest {
     SdkAssert.assertHasFlags(m_colInDesktopForm, 2);
     SdkAssert.assertFieldSignature(m_colInDesktopForm, "QString;");
 
-    Assert.assertEquals("method count of 'ChildTableRowData'", 7, childTableRowData.getMethods().size());
+    Assert.assertEquals("method count of 'ChildTableRowData'", 7, childTableRowData.methods().list().size());
     IMethod childTableRowData1 = SdkAssert.assertMethodExist(childTableRowData, "ChildTableRowData", new String[]{});
     Assert.assertTrue(childTableRowData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(childTableRowData1, null);
@@ -1017,6 +1017,6 @@ public class TableFieldBeanTest {
     IMethod setColInDesktopForm = SdkAssert.assertMethodExist(childTableRowData, "setColInDesktopForm", new String[]{"QString;"});
     SdkAssert.assertMethodReturnTypeSignature(setColInDesktopForm, "V");
 
-    Assert.assertEquals("inner types count of 'ChildTableRowData'", 0, childTableRowData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ChildTableRowData'", 0, childTableRowData.innerTypes().list().size());
   }
 }

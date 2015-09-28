@@ -16,9 +16,9 @@ import java.util.Comparator;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link ScoutJdtTypeComparators}</h3>
@@ -65,16 +65,16 @@ public final class ScoutJdtTypeComparators {
 
       private double getOrderAnnotationValue(IType type) {
         if (JdtUtils.exists(type)) {
-          IAnnotation annotation = JdtUtils.getAnnotation(type, IRuntimeClasses.Order);
+          IAnnotation annotation = JdtUtils.getAnnotation(type, IScoutRuntimeTypes.Order);
           if (JdtUtils.exists(annotation)) {
             try {
-              BigDecimal val = JdtUtils.getAnnotationValueNumeric(annotation, IRuntimeClasses.ORDER_ANNOTATION_VALUE);
+              BigDecimal val = JdtUtils.getAnnotationValueNumeric(annotation, "value");
               if (val != null) {
                 return val.doubleValue();
               }
             }
             catch (JavaModelException e) {
-              S2ESdkActivator.logWarning("Unable to get @Order annotation value of type '" + type.getFullyQualifiedName() + "'.", e);
+              SdkLog.warning("Unable to get @Order annotation value of type '" + type.getFullyQualifiedName() + "'.", e);
             }
           }
         }

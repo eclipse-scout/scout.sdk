@@ -25,24 +25,17 @@ import org.eclipse.scout.sdk.core.model.sugar.SuperMethodQuery;
 public interface IMethod extends IMember {
 
   /**
-   * @return Gets return data {@link IType} of this {@link IMethod} or {@link IType#VOID}.
-   * @see IType#VOID
+   * @return Gets the return data {@link IType} of this {@link IMethod}. The result may be the void type.
+   * @see IType#isVoid()
    */
-  IType getReturnType();
-
-  /**
-   * Gets all {@link IMethodParameter}s in the order as they appear in the method.
-   *
-   * @return A {@link List} with all {@link IMethodParameter}s of this {@link IMethod}.
-   */
-  List<IMethodParameter> getParameters();
+  IType returnType();
 
   /**
    * Gets all exception declarations of this {@link IMethod} in the order as they appear in the source or class file.
    *
    * @return a {@link List} containing all thrown {@link IType}s of this {@link IMethod}.
    */
-  List<IType> getExceptionTypes();
+  List<IType> exceptionTypes();
 
   /**
    * Gets if this method is a constructor.
@@ -57,14 +50,12 @@ public interface IMethod extends IMember {
    * <p>
    * Otherwise this is returned
    */
-  IMethod getOriginalMethod();
+  IMethod originalMethod();
 
-  ISourceRange getSourceOfBody();
+  ISourceRange sourceOfBody();
 
   @Override
   MethodSpi unwrap();
-
-  //additional convenience methods
 
   SuperMethodQuery superMethods();
 

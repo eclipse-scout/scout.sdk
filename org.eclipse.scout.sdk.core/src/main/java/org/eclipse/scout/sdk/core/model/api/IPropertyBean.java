@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
  * Use {@link CoreUtils#getPropertyBeans(IType, org.apache.commons.collections.Predicate, java.util.Comparator)} to get
  * {@link IPropertyBean}s.
  *
- * @author Ivan Motsch
+ * @author Andreas Hoegger
  * @since 3.0.0
  * @see CoreUtils#getPropertyBeans(IType, org.apache.commons.collections.Predicate, java.util.Comparator)
  */
@@ -26,25 +26,25 @@ public interface IPropertyBean {
   /**
    * @return The declaring type that is hosting this property bean.
    */
-  IType getDeclaringType();
+  IType declaringType();
 
   /**
    * @return The property's getter method or <code>null</code> if it is write-only.
    */
-  IMethod getReadMethod();
+  IMethod readMethod();
 
   /**
    * @return The property's setter method or <code>null</code> if it is read-only.
    */
-  IMethod getWriteMethod();
+  IMethod writeMethod();
 
   /**
    * @return The bean's name.
    */
-  String getBeanName();
+  String name();
 
   /**
    * @return The data type of the bean.
    */
-  IType getBeanType();
+  IType type();
 }

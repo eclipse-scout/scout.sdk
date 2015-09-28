@@ -23,7 +23,7 @@ public interface IPackage extends IJavaElement {
   /**
    * @return The name of the package or <code>null</code> if it is the default package.
    */
-  String getName();
+  String name();
 
   @Override
   PackageSpi unwrap();

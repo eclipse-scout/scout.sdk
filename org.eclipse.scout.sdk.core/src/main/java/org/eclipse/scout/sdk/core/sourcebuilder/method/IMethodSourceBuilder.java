@@ -30,7 +30,7 @@ public interface IMethodSourceBuilder extends IMemberSourceBuilder {
    * Returns a unique identifier of this method. The identifier looks like
    * 'methodname(param1Signature,param2Signature)'.<br>
    * The result of this method can be used to compare methods together with the
-   * {@link SignatureUtils#getMethodIdentifier(org.eclipse.jdt.core.IMethod)}.
+   * {@link SignatureUtils#createMethodIdentifier(org.eclipse.scout.sdk.core.model.api.IMethod)}.
    *
    * @return
    */

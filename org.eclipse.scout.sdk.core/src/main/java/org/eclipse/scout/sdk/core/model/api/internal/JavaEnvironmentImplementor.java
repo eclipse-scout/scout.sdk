@@ -15,11 +15,12 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.IUnresolvedType;
 import org.eclipse.scout.sdk.core.model.api.MissingTypeException;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
+import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 
 /**
  * <h3>{@link JavaEnvironmentImplementor}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class JavaEnvironmentImplementor implements IJavaEnvironment {
@@ -31,7 +32,11 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
 
   @Override
   public IType findType(String fqn) {
-    return WrapperUtils.wrapType(m_spi.findType(fqn));
+    return wrapType(m_spi.findType(fqn));
+  }
+
+  static IType wrapType(TypeSpi spi) {
+    return spi != null ? spi.wrap() : null;
   }
 
   @Override
@@ -59,7 +64,7 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
   }
 
   @Override
-  public String getCompileErrors(String fqn) {
+  public String compileErrors(String fqn) {
     return m_spi.getCompileErrors(fqn);
   }
 
@@ -68,7 +73,6 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
     return m_spi;
   }
 
-  @Override
   public void internalSetSpi(JavaEnvironmentSpi newSpi) {
     m_spi = newSpi;
   }

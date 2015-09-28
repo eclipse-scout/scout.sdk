@@ -25,22 +25,22 @@ public interface IAnnotationValue extends IJavaElement {
    *
    * @return never null
    */
-  IMetaValue getMetaValue();
+  IMetaValue metaValue();
 
   /**
    * Gets the {@link IAnnotation} this {@link IAnnotationValue} belongs to.
    *
    * @return The declaring {@link IAnnotation}
    */
-  IAnnotation getDeclaringAnnotation();
+  IAnnotation declaringAnnotation();
 
   /**
    * @return true if this {@link IAnnotationValue} was not declared in source code but is the default value of the
    *         annotation
    */
-  boolean isSyntheticDefaultValue();
+  boolean isDefaultValue();
 
-  ISourceRange getSourceOfExpression();
+  ISourceRange sourceOfExpression();
 
   @Override
   AnnotationValueSpi unwrap();

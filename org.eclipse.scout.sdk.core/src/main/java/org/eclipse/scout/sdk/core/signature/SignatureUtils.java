@@ -14,12 +14,9 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.importvalidator.ImportElementCandidate;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.model.api.ITypeParameter;
 
 /**
  * <h3>{@link SignatureUtils}</h3> Helper methods to deal with Signatures.
@@ -57,17 +54,10 @@ public final class SignatureUtils {
   }
 
   /**
-   * Convenience for t!=null? {@link IType#getSignature()} : null
+   * Convenience for: t != null ? {@link IType#signature()} : null
    */
   public static String getTypeSignature(IType t) {
-    return t != null ? t.getSignature() : null;
-  }
-
-  /**
-   * Convenience for p!=null? {@link ITypeParameter#getSignature()} : null
-   */
-  public static String getTypeParameterSignature(ITypeParameter p) {
-    return p != null ? p.getSignature() : null;
+    return t != null ? t.signature() : null;
   }
 
   /**
@@ -77,13 +67,13 @@ public final class SignatureUtils {
    *          The method for which the identifier should be created
    * @return The created identifier
    */
-  public static String getMethodIdentifier(IMethod method) {
-    List<IMethodParameter> parameters = method.getParameters();
+  public static String createMethodIdentifier(IMethod method) {
+    List<IMethodParameter> parameters = method.parameters().list();
     List<String> signatures = new ArrayList<>(parameters.size());
     for (IMethodParameter mp : parameters) {
-      signatures.add(getTypeSignature(mp.getDataType()));
+      signatures.add(getTypeSignature(mp.dataType()));
     }
-    return createMethodIdentifier(method.getElementName(), signatures);
+    return createMethodIdentifier(method.elementName(), signatures);
   }
 
   /**
@@ -171,86 +161,4 @@ public final class SignatureUtils {
     }
     return signature;
   }
-
-  /**
-   * @param type
-   * @param validator
-   *          an import validator to decide simple name vs. fully qualified name.
-   * @return the type reference that can be used in the source code
-   */
-  public static String useType(IType type, IImportValidator validator) {
-    return useSignature(SignatureUtils.getTypeSignature(type), validator);
-  }
-
-  /**
-   * @param fullyQualifiedName
-   *          for example java.lang.Long or java.util.List<java.lang.String>
-   * @param validator
-   *          an import validator to decide simple name vs. fully qualified name.
-   * @return the type reference that can be used in the source code
-   */
-  public static String useName(String fullyQualifiedName, IImportValidator validator) {
-    return useSignature(Signature.createTypeSignature(fullyQualifiedName), validator);
-  }
-
-  /**
-   * @param signature
-   *          fully parameterized signature
-   * @param validator
-   *          an import validator to decide simple name vs. fully qualified name.
-   * @return the type reference that can be used in the source code
-   */
-  public static String useSignature(String signature, IImportValidator validator) {
-    StringBuilder sigBuilder = new StringBuilder();
-    int arrayCount = 0;
-    switch (Signature.getTypeSignatureKind(signature)) {
-      case ISignatureConstants.WILDCARD_TYPE_SIGNATURE:
-        sigBuilder.append("?");
-        if (signature.length() > 1) {
-          sigBuilder.append(" extends ");
-          sigBuilder.append(useSignature(signature.substring(1), validator));
-        }
-        break;
-      case ISignatureConstants.ARRAY_TYPE_SIGNATURE:
-        arrayCount = Signature.getArrayCount(signature);
-        sigBuilder.append(useSignature(signature.substring(arrayCount), validator));
-        break;
-      case ISignatureConstants.BASE_TYPE_SIGNATURE:
-        sigBuilder.append(Signature.getSignatureSimpleName(signature));
-        break;
-      case ISignatureConstants.TYPE_VARIABLE_SIGNATURE:
-        sigBuilder.append(toFullyQualifiedName(signature));
-        break;
-      default:
-        String[] typeArguments = Signature.getTypeArguments(signature);
-        signature = Signature.getTypeErasure(signature);
-
-        //check and register
-        ImportElementCandidate cand = new ImportElementCandidate(signature);
-        String use = validator.checkExistingImports(cand);
-        if (use == null) {
-          use = validator.checkCurrentScope(cand);
-        }
-        if (use == null) {
-          use = validator.registerElement(cand);
-        }
-        sigBuilder.append(use);
-
-        if (typeArguments != null && typeArguments.length > 0) {
-          sigBuilder.append(ISignatureConstants.C_GENERIC_START);
-          sigBuilder.append(useSignature(typeArguments[0], validator));
-          for (int i = 1; i < typeArguments.length; i++) {
-            sigBuilder.append(", ");
-            sigBuilder.append(useSignature(typeArguments[i], validator));
-          }
-          sigBuilder.append(ISignatureConstants.C_GENERIC_END);
-        }
-        break;
-    }
-    for (int i = 0; i < arrayCount; i++) {
-      sigBuilder.append("[]");
-    }
-    return sigBuilder.toString();
-  }
-
 }

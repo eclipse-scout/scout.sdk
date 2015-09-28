@@ -38,22 +38,22 @@ public class ReplacingFormTest {
   private static void testApiOfReplacingFormData(IType replacingFormData) {
     SdkAssert.assertHasFlags(replacingFormData, 1);
     SdkAssert.assertHasSuperTypeSignature(replacingFormData, "Lformdata.shared.ui.forms.AnnotationCopyTestFormData;");
-    Assert.assertEquals("annotation count", 2, replacingFormData.getAnnotations().size());
+    Assert.assertEquals("annotation count", 2, replacingFormData.annotations().list().size());
     SdkAssert.assertAnnotation(replacingFormData, "org.eclipse.scout.commons.annotations.Replace");
     SdkAssert.assertAnnotation(replacingFormData, "javax.annotation.Generated");
 
     // fields of ReplacingFormData
-    Assert.assertEquals("field count of 'formdata.shared.ui.forms.ReplacingFormData'", 1, replacingFormData.getFields().size());
+    Assert.assertEquals("field count of 'formdata.shared.ui.forms.ReplacingFormData'", 1, replacingFormData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(replacingFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
-    Assert.assertEquals("annotation count", 0, serialVersionUID.getAnnotations().size());
+    Assert.assertEquals("annotation count", 0, serialVersionUID.annotations().list().size());
 
-    Assert.assertEquals("method count of 'formdata.shared.ui.forms.ReplacingFormData'", 1, replacingFormData.getMethods().size());
+    Assert.assertEquals("method count of 'formdata.shared.ui.forms.ReplacingFormData'", 1, replacingFormData.methods().list().size());
     IMethod replacingFormData1 = SdkAssert.assertMethodExist(replacingFormData, "ReplacingFormData", new String[]{});
     Assert.assertTrue(replacingFormData1.isConstructor());
-    Assert.assertEquals("annotation count", 0, replacingFormData1.getAnnotations().size());
+    Assert.assertEquals("annotation count", 0, replacingFormData1.annotations().list().size());
 
-    Assert.assertEquals("inner types count of 'ReplacingFormData'", 0, replacingFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'ReplacingFormData'", 0, replacingFormData.innerTypes().list().size());
   }
 }

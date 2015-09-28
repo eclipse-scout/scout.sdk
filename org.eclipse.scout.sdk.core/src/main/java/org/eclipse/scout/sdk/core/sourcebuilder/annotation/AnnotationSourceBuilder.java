@@ -19,7 +19,6 @@ import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
 import org.eclipse.scout.sdk.core.signature.Signature;
-import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.AbstractJavaElementSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.ExpressionSourceBuilderFactory;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
@@ -39,12 +38,12 @@ public class AnnotationSourceBuilder extends AbstractJavaElementSourceBuilder im
 
   public AnnotationSourceBuilder(IAnnotation element) {
     super(element);
-    m_name = element.getType().getName();
-    for (IAnnotationValue av : element.getValues().values()) {
-      if (av.isSyntheticDefaultValue()) {
+    m_name = element.type().name();
+    for (IAnnotationValue av : element.values().values()) {
+      if (av.isDefaultValue()) {
         continue;
       }
-      putValue(av.getElementName(), ExpressionSourceBuilderFactory.createFromMetaValue(av.getMetaValue()));
+      putValue(av.elementName(), ExpressionSourceBuilderFactory.createFromMetaValue(av.metaValue()));
     }
   }
 
@@ -64,7 +63,7 @@ public class AnnotationSourceBuilder extends AbstractJavaElementSourceBuilder im
       throw new IllegalArgumentException("name required!");
     }
 
-    source.append("@" + SignatureUtils.useName(getName(), validator));
+    source.append("@" + validator.useName(getName()));
     if (m_values.size() > 0) {
       source.append('(');
       if (m_values.size() == 1 && m_values.containsKey("value")) {

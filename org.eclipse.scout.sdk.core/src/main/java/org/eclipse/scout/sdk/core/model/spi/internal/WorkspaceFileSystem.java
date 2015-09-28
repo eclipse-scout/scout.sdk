@@ -2,6 +2,7 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -18,6 +19,7 @@ import org.eclipse.jdt.internal.compiler.env.INameEnvironment;
 import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.jdt.internal.compiler.util.Util;
+import org.eclipse.scout.sdk.core.util.SdkException;
 
 public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
   private Classpath[] m_classpaths;
@@ -31,20 +33,16 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
    */
   public WorkspaceFileSystem(Classpath[] paths) {
     final int length = paths.length;
-    int counter = 0;
     this.m_classpaths = new FileSystem.Classpath[length];
-    for (int i = 0; i < length; i++) {
-      final Classpath classpath = paths[i];
-      try {
+    try {
+      for (int i = 0; i < length; i++) {
+        final Classpath classpath = paths[i];
         classpath.initialize();
-        this.m_classpaths[counter++] = classpath;
-      }
-      catch (IOException exception) {
-        // nop
+        this.m_classpaths[i] = classpath;
       }
     }
-    if (counter != length) {
-      System.arraycopy(this.m_classpaths, 0, (this.m_classpaths = new FileSystem.Classpath[counter]), 0, counter);
+    catch (IOException exception) {
+      throw new SdkException("Unable to initialize classpath.", exception);
     }
   }
 
@@ -56,7 +54,7 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
     if (fileName.endsWith(".java")) {
       fileName = fileName.substring(0, fileName.length() - 5) + ".class";
     }
-    String key = (packageName.isEmpty() ? "" : packageName.replace('.', '/') + "/") + fileName;
+    String key = (packageName.isEmpty() ? "" : packageName.replace('.', '/') + '/') + fileName;
     m_overrideCompilationUnits.put(key, cu);
     //register additional packages
     if (packageName0 != null && packageName0.length > 0) {
@@ -165,17 +163,18 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
     return null;
   }
 
-  public static Classpath createClasspath(File f, boolean source) {
+  public static Classpath createClasspath(File f, boolean source, String encoding) {
     if (f.exists()) {
-      Classpath classpath = source
-          ? FileSystem.getClasspath(f.getAbsolutePath(), "UTF-8", true, null, null)
-          : FileSystem.getClasspath(f.getAbsolutePath(), "UTF-8", false, null, null);
+      if (encoding == null) {
+        encoding = StandardCharsets.UTF_8.name();
+      }
+      Classpath classpath = FileSystem.getClasspath(f.getAbsolutePath(), encoding, source, null, null);
       try {
         classpath.initialize();
         return classpath;
       }
       catch (IOException e) {
-        // ignore
+        throw new SdkException("Unable to initialize classpath '" + f.getAbsolutePath() + "'.", e);
       }
     }
     return null;

@@ -35,32 +35,27 @@ public class CompilationUnitImplementor extends AbstractJavaElementImplementor<C
   }
 
   @Override
-  public IPackage getPackage() {
+  public IPackage containingPackage() {
     return m_spi.getPackage().wrap();
   }
 
   @Override
-  public IType findTypeBySimpleName(String simpleName) {
-    return WrapperUtils.wrapType(m_spi.findTypeBySimpleName(simpleName));
+  public IType resolveTypeBySimpleName(String simpleName) {
+    return JavaEnvironmentImplementor.wrapType(m_spi.findTypeBySimpleName(simpleName));
   }
 
   @Override
-  public IType getMainType() {
-    return WrapperUtils.wrapType(m_spi.getMainType());
+  public IType mainType() {
+    return JavaEnvironmentImplementor.wrapType(m_spi.getMainType());
   }
 
   @Override
-  public List<IType> getTypes() {
-    return new WrappedList<>(m_spi.getTypes());
-  }
-
-  @Override
-  public List<IImport> getImports() {
+  public List<IImport> imports() {
     return new WrappedList<>(m_spi.getImports());
   }
 
   @Override
-  public ISourceRange getJavaDoc() {
+  public ISourceRange javaDoc() {
     return m_spi.getJavaDoc();
   }
 
@@ -71,10 +66,8 @@ public class CompilationUnitImplementor extends AbstractJavaElementImplementor<C
     return sb.toString();
   }
 
-  //additional convenience methods
-
   @Override
   public TypeQuery types() {
-    return new TypeQuery(getTypes());
+    return new TypeQuery(new WrappedList<IType>(m_spi.getTypes()));
   }
 }

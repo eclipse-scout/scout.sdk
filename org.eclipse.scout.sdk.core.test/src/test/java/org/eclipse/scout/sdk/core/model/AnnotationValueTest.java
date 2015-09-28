@@ -38,49 +38,49 @@ public class AnnotationValueTest {
     Assert.assertNotNull(childClassType);
 
     // ChildClass Annotation
-    IAnnotationValue testAnnotValues = childClassType.getAnnotations().get(0).getValue("values");
-    Assert.assertEquals("values", testAnnotValues.getElementName());
-    Assert.assertEquals(MetaValueType.Array, testAnnotValues.getMetaValue().getType());
-    Assert.assertEquals(childClassType.getAnnotations().get(0), testAnnotValues.getDeclaringAnnotation());
+    IAnnotationValue testAnnotValues = childClassType.annotations().first().value("values");
+    Assert.assertEquals("values", testAnnotValues.elementName());
+    Assert.assertEquals(MetaValueType.Array, testAnnotValues.metaValue().type());
+    Assert.assertEquals(childClassType.annotations().first(), testAnnotValues.declaringAnnotation());
 
-    IMetaValue[] arr = ((IArrayMetaValue) testAnnotValues.getMetaValue()).getMetaValueArray();
+    IMetaValue[] arr = ((IArrayMetaValue) testAnnotValues.metaValue()).metaValueArray();
     Assert.assertEquals(2, arr.length);
 
-    Assert.assertEquals(MetaValueType.Type, arr[0].getType());
-    Assert.assertEquals(Serializable.class.getName(), arr[0].getObject(IType.class).getName());
+    Assert.assertEquals(MetaValueType.Type, arr[0].type());
+    Assert.assertEquals(Serializable.class.getName(), arr[0].get(IType.class).name());
 
-    Assert.assertEquals(MetaValueType.Type, arr[1].getType());
-    Assert.assertEquals(Runnable.class.getName(), arr[1].getObject(IType.class).getName());
+    Assert.assertEquals(MetaValueType.Type, arr[1].type());
+    Assert.assertEquals(Runnable.class.getName(), arr[1].get(IType.class).name());
 
     // methodInChildClass annotation values
-    Map<String, IAnnotationValue> methodInChildClassValueMap = new HashMap<>(childClassType.getMethods().get(1).getAnnotations().get(0).getValues());
+    Map<String, IAnnotationValue> methodInChildClassValueMap = new HashMap<>(childClassType.methods().list().get(1).annotations().first().values());
     IAnnotationValue methodInChildClassValue1 = methodInChildClassValueMap.get("values");
-    Assert.assertEquals("values", methodInChildClassValue1.getElementName());
-    Assert.assertEquals(MetaValueType.Type, methodInChildClassValue1.getMetaValue().getType());
-    Assert.assertEquals(childClassType.getMethods().get(1).getAnnotations().get(0), methodInChildClassValue1.getDeclaringAnnotation());
-    Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), methodInChildClassValue1.getMetaValue().getObject(IType.class).getName());
+    Assert.assertEquals("values", methodInChildClassValue1.elementName());
+    Assert.assertEquals(MetaValueType.Type, methodInChildClassValue1.metaValue().type());
+    Assert.assertEquals(childClassType.methods().list().get(1).annotations().first(), methodInChildClassValue1.declaringAnnotation());
+    Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), methodInChildClassValue1.metaValue().get(IType.class).name());
 
     IAnnotationValue methodInChildClassValue2 = methodInChildClassValueMap.get("en");
-    Assert.assertEquals("en", methodInChildClassValue2.getElementName());
-    Assert.assertEquals(MetaValueType.Enum, methodInChildClassValue2.getMetaValue().getType());
-    Assert.assertEquals(childClassType.getMethods().get(1).getAnnotations().get(0), methodInChildClassValue2.getDeclaringAnnotation());
-    Assert.assertEquals("A", methodInChildClassValue2.getMetaValue().getObject(IField.class).getElementName());
+    Assert.assertEquals("en", methodInChildClassValue2.elementName());
+    Assert.assertEquals(MetaValueType.Enum, methodInChildClassValue2.metaValue().type());
+    Assert.assertEquals(childClassType.methods().list().get(1).annotations().first(), methodInChildClassValue2.declaringAnnotation());
+    Assert.assertEquals("A", methodInChildClassValue2.metaValue().get(IField.class).elementName());
 
     // firstCase annotation value
-    IAnnotationValue suppressWarningValue = childClassType.getMethods().get(2).getAnnotations().get(0).getValue("value");
-    Assert.assertEquals("value", suppressWarningValue.getElementName());
-    Assert.assertEquals(MetaValueType.String, suppressWarningValue.getMetaValue().getType());
-    Assert.assertEquals(childClassType.getMethods().get(2).getAnnotations().get(0), suppressWarningValue.getDeclaringAnnotation());
-    Assert.assertEquals("unused", suppressWarningValue.getMetaValue().getObject(String.class));
+    IAnnotationValue suppressWarningValue = childClassType.methods().list().get(2).annotations().first().value("value");
+    Assert.assertEquals("value", suppressWarningValue.elementName());
+    Assert.assertEquals(MetaValueType.String, suppressWarningValue.metaValue().type());
+    Assert.assertEquals(childClassType.methods().list().get(2).annotations().first(), suppressWarningValue.declaringAnnotation());
+    Assert.assertEquals("unused", suppressWarningValue.metaValue().get(String.class));
   }
 
   @Test
   public void testToString() {
-    List<IAnnotationValue> values = new ArrayList<>(CoreTestingUtils.getChildClassType().getMethods().get(1).getAnnotations().get(0).getValues().values());
+    List<IAnnotationValue> values = new ArrayList<>(CoreTestingUtils.getChildClassType().methods().list().get(1).annotations().first().values().values());
     IAnnotationValue methodInChildClassValue1 = values.get(0);
     Assert.assertFalse(StringUtils.isBlank(methodInChildClassValue1.toString()));
 
-    IAnnotationValue testAnnotValues = CoreTestingUtils.getBaseClassType().getAnnotations().get(0).getValue("values");
+    IAnnotationValue testAnnotValues = CoreTestingUtils.getBaseClassType().annotations().first().value("values");
     Assert.assertFalse(StringUtils.isBlank(testAnnotValues.toString()));
   }
 
@@ -90,34 +90,34 @@ public class AnnotationValueTest {
     Assert.assertNotNull(baseClassType);
 
     // BaseClass annotation
-    IAnnotationValue testAnnotValues = baseClassType.getAnnotations().get(0).getValue("values");
-    Assert.assertEquals("values", testAnnotValues.getElementName());
-    Assert.assertEquals(MetaValueType.Array, testAnnotValues.getMetaValue().getType());
-    Assert.assertEquals(baseClassType.getAnnotations().get(0), testAnnotValues.getDeclaringAnnotation());
+    IAnnotationValue testAnnotValues = baseClassType.annotations().first().value("values");
+    Assert.assertEquals("values", testAnnotValues.elementName());
+    Assert.assertEquals(MetaValueType.Array, testAnnotValues.metaValue().type());
+    Assert.assertEquals(baseClassType.annotations().first(), testAnnotValues.declaringAnnotation());
 
-    IMetaValue[] arr = ((IArrayMetaValue) testAnnotValues.getMetaValue()).getMetaValueArray();
+    IMetaValue[] arr = ((IArrayMetaValue) testAnnotValues.metaValue()).metaValueArray();
     Assert.assertEquals(2, arr.length);
 
-    Assert.assertEquals(MetaValueType.Type, arr[0].getType());
-    Assert.assertEquals(Serializable.class.getName(), arr[0].getObject(IType.class).getName());
+    Assert.assertEquals(MetaValueType.Type, arr[0].type());
+    Assert.assertEquals(Serializable.class.getName(), arr[0].get(IType.class).name());
 
-    Assert.assertEquals(MetaValueType.Type, arr[1].getType());
-    Assert.assertEquals(Runnable.class.getName(), arr[1].getObject(IType.class).getName());
+    Assert.assertEquals(MetaValueType.Type, arr[1].type());
+    Assert.assertEquals(Runnable.class.getName(), arr[1].get(IType.class).name());
 
     // methodInBaseClass annotation
-    IAnnotatable methodInBaseClass = baseClassType.getMethods().get(0);
-    testAnnotValues = methodInBaseClass.getAnnotations().get(0).getValue("values");
-    Assert.assertEquals("values", testAnnotValues.getElementName());
-    Assert.assertEquals(MetaValueType.Array, testAnnotValues.getMetaValue().getType());
-    Assert.assertEquals(methodInBaseClass.getAnnotations().get(0), testAnnotValues.getDeclaringAnnotation());
+    IAnnotatable methodInBaseClass = baseClassType.methods().list().get(0);
+    testAnnotValues = methodInBaseClass.annotations().first().value("values");
+    Assert.assertEquals("values", testAnnotValues.elementName());
+    Assert.assertEquals(MetaValueType.Array, testAnnotValues.metaValue().type());
+    Assert.assertEquals(methodInBaseClass.annotations().first(), testAnnotValues.declaringAnnotation());
 
-    arr = ((IArrayMetaValue) testAnnotValues.getMetaValue()).getMetaValueArray();
+    arr = ((IArrayMetaValue) testAnnotValues.metaValue()).metaValueArray();
     Assert.assertEquals(2, arr.length);
 
-    Assert.assertEquals(MetaValueType.Type, arr[0].getType());
-    Assert.assertEquals(Serializable.class.getName(), arr[0].getObject(IType.class).getName());
+    Assert.assertEquals(MetaValueType.Type, arr[0].type());
+    Assert.assertEquals(Serializable.class.getName(), arr[0].get(IType.class).name());
 
-    Assert.assertEquals(MetaValueType.Type, arr[1].getType());
-    Assert.assertEquals(Runnable.class.getName(), arr[1].getObject(IType.class).getName());
+    Assert.assertEquals(MetaValueType.Type, arr[1].type());
+    Assert.assertEquals(Runnable.class.getName(), arr[1].get(IType.class).name());
   }
 }

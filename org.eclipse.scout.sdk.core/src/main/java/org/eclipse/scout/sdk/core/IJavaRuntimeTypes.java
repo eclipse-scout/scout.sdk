@@ -7,7 +7,7 @@ package org.eclipse.scout.sdk.core;
 /**
  *
  */
-public interface TypeNames {
+public interface IJavaRuntimeTypes {
 
   // primitive types
 

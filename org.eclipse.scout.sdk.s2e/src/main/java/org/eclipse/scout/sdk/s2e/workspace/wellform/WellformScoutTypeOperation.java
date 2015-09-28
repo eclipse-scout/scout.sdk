@@ -28,19 +28,19 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.structuredtype.IStructuredType;
 import org.eclipse.scout.sdk.s2e.structuredtype.StructuredTypeFactory;
 import org.eclipse.scout.sdk.s2e.util.JdtTypeCache;
+import org.eclipse.scout.sdk.s2e.workspace.IOperation;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
-import org.eclipse.scout.sdk.s2e.workspace.IWorkspaceBlockingOperation;
 import org.eclipse.scout.sdk.s2e.workspace.SourceFormatOperation;
 import org.eclipse.text.edits.ReplaceEdit;
 
 /**
  *
  */
-public class WellformScoutTypeOperation implements IWorkspaceBlockingOperation {
+public class WellformScoutTypeOperation implements IOperation {
 
   private static final Pattern LEADING_SPACES_REGEX = Pattern.compile("\\s*$");
   private static final Pattern TRAILING_SPACES_REGEX = Pattern.compile("^\\s*");
@@ -115,7 +115,7 @@ public class WellformScoutTypeOperation implements IWorkspaceBlockingOperation {
       icuBuffer.setContents(sourceDoc.get());
     }
     catch (Exception e) {
-      S2ESdkActivator.logWarning("Could not wellform type '" + type.getFullyQualifiedName() + "'.", e);
+      SdkLog.warning("Could not wellform type '" + type.getFullyQualifiedName() + "'.", e);
     }
   }
 

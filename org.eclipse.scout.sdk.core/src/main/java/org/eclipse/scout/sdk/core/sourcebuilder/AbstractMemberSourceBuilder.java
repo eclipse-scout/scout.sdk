@@ -10,10 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder;
 
-import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMember;
-import org.eclipse.scout.sdk.core.util.PropertyMap;
 
 /**
  * <h3>{@link AbstractMemberSourceBuilder}</h3>
@@ -26,19 +24,14 @@ public abstract class AbstractMemberSourceBuilder extends AbstractAnnotatableSou
 
   public AbstractMemberSourceBuilder(IMember element) {
     super(element);
-    setFlags(element.getFlags());
-    if (element.getJavaDoc() != null) {
-      setComment(new RawSourceBuilder(element.getJavaDoc().toString()));
+    setFlags(element.flags());
+    if (element.javaDoc() != null) {
+      setComment(new RawSourceBuilder(element.javaDoc().toString()));
     }
   }
 
   public AbstractMemberSourceBuilder(String elementName) {
     super(elementName);
-  }
-
-  @Override
-  public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-    super.createSource(source, lineDelimiter, context, validator);
   }
 
   /**

@@ -21,7 +21,6 @@ import org.eclipse.jdt.internal.compiler.ast.Javadoc;
 import org.eclipse.jdt.internal.compiler.lookup.FieldBinding;
 import org.eclipse.jdt.internal.compiler.lookup.ReferenceBinding;
 import org.eclipse.jdt.internal.compiler.lookup.SourceTypeBinding;
-import org.eclipse.scout.sdk.core.model.api.IConstantMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
@@ -42,7 +41,7 @@ public class BindingFieldWithJdt extends AbstractMemberWithJdt<IField>implements
   private String m_name;
   private TypeSpi m_type;
   private List<BindingAnnotationWithJdt> m_annotations;
-  private AtomicReference<IConstantMetaValue> m_constRef;
+  private AtomicReference<IMetaValue> m_constRef;
   private FieldSpi m_originalField;
 
   BindingFieldWithJdt(JavaEnvironmentWithJdt env, AbstractTypeWithJdt declaringType, FieldBinding binding) {
@@ -112,21 +111,22 @@ public class BindingFieldWithJdt extends AbstractMemberWithJdt<IField>implements
   }
 
   @Override
-  public IConstantMetaValue getConstantValue() {
+  public IMetaValue getConstantValue() {
     if (m_constRef == null) {
       IMetaValue resolvedValue = SpiWithJdtUtils.resolveCompiledValue(m_env, this, m_binding.constant());
-      if (resolvedValue instanceof IConstantMetaValue) {
-        m_constRef = new AtomicReference<>((IConstantMetaValue) resolvedValue);
+      if (resolvedValue != null) {
+        m_constRef = new AtomicReference<>(resolvedValue);
         return m_constRef.get();
       }
+
       FieldBinding origBinding = m_binding.original();
       ReferenceBinding refBinding = origBinding.declaringClass;
       if (refBinding instanceof SourceTypeBinding) {
         SourceTypeBinding stb = (SourceTypeBinding) refBinding;
         Expression initEx = stb.scope.referenceContext.declarationOf(origBinding).initialization;
         resolvedValue = SpiWithJdtUtils.resolveCompiledValue(m_env, this, SpiWithJdtUtils.compileExpression(initEx, SpiWithJdtUtils.classScopeOf(this)));
-        if (resolvedValue instanceof IConstantMetaValue) {
-          m_constRef = new AtomicReference<>((IConstantMetaValue) resolvedValue);
+        if (resolvedValue != null) {
+          m_constRef = new AtomicReference<>(resolvedValue);
           return m_constRef.get();
         }
       }

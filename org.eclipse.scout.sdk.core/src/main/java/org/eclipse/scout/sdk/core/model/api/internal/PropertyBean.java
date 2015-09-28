@@ -8,9 +8,13 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.core.model.api;
+package org.eclipse.scout.sdk.core.model.api.internal;
 
 import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.eclipse.scout.sdk.core.model.api.IMethod;
+import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
+import org.eclipse.scout.sdk.core.model.api.IPropertyBean;
+import org.eclipse.scout.sdk.core.model.api.IType;
 
 /**
  * Default description of a Java bean property.
@@ -29,11 +33,11 @@ public class PropertyBean implements IPropertyBean {
 
   @Override
   public String toString() {
-    return m_declaringType.getName() + "#" + m_beanName;
+    return m_declaringType.name() + "#" + m_beanName;
   }
 
   @Override
-  public IType getDeclaringType() {
+  public IType declaringType() {
     return m_declaringType;
   }
 
@@ -42,30 +46,33 @@ public class PropertyBean implements IPropertyBean {
   }
 
   @Override
-  public String getBeanName() {
+  public String name() {
     return m_beanName;
   }
 
   @Override
-  public IType getBeanType() {
+  public IType type() {
     if (m_readMethod != null) {
-      return m_readMethod.getReturnType();
+      return m_readMethod.returnType();
     }
 
-    if (m_writeMethod != null && m_writeMethod.getParameters().size() > 0) {
-      return m_writeMethod.getParameters().get(0).getDataType();
+    if (m_writeMethod != null) {
+      IMethodParameter parameter = m_writeMethod.parameters().first();
+      if (parameter != null) {
+        return parameter.dataType();
+      }
     }
 
     return null;
   }
 
   @Override
-  public IMethod getReadMethod() {
+  public IMethod readMethod() {
     return m_readMethod;
   }
 
   @Override
-  public IMethod getWriteMethod() {
+  public IMethod writeMethod() {
     return m_writeMethod;
   }
 

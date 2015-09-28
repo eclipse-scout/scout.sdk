@@ -14,7 +14,6 @@ import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
-import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
@@ -37,27 +36,22 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi>imple
   }
 
   @Override
-  public IType getReturnType() {
-    return WrapperUtils.wrapType(m_spi.getReturnType());
+  public IType returnType() {
+    return JavaEnvironmentImplementor.wrapType(m_spi.getReturnType());
   }
 
   @Override
-  public List<IMethodParameter> getParameters() {
-    return new WrappedList<>(m_spi.getParameters());
-  }
-
-  @Override
-  public List<IType> getExceptionTypes() {
+  public List<IType> exceptionTypes() {
     return new WrappedList<>(m_spi.getExceptionTypes());
   }
 
   @Override
-  public IMethod getOriginalMethod() {
+  public IMethod originalMethod() {
     return m_spi.getOriginalMethod().wrap();
   }
 
   @Override
-  public ISourceRange getSourceOfBody() {
+  public ISourceRange sourceOfBody() {
     return m_spi.getSourceOfBody();
   }
 
@@ -77,12 +71,12 @@ public class MethodImplementor extends AbstractMemberImplementor<MethodSpi>imple
 
   @Override
   public AnnotationQuery<IAnnotation> annotations() {
-    return new AnnotationQuery<>(getDeclaringType(), this);
+    return new AnnotationQuery<>(declaringType(), m_spi);
   }
 
   @Override
   public MethodParameterQuery parameters() {
-    return new MethodParameterQuery(this);
+    return new MethodParameterQuery(m_spi);
   }
 
 }

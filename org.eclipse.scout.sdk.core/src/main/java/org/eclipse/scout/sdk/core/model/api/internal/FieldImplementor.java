@@ -11,8 +11,8 @@
 package org.eclipse.scout.sdk.core.model.api.internal;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IConstantMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IField;
+import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
@@ -25,22 +25,22 @@ public class FieldImplementor extends AbstractMemberImplementor<FieldSpi>impleme
   }
 
   @Override
-  public IConstantMetaValue getConstantValue() {
+  public IMetaValue constantValue() {
     return m_spi.getConstantValue();
   }
 
   @Override
-  public IType getDataType() {
-    return WrapperUtils.wrapType(m_spi.getDataType());
+  public IType dataType() {
+    return JavaEnvironmentImplementor.wrapType(m_spi.getDataType());
   }
 
   @Override
-  public IField getOriginalField() {
+  public IField originalField() {
     return m_spi.getOriginalField().wrap();
   }
 
   @Override
-  public ISourceRange getSourceOfInitializer() {
+  public ISourceRange sourceOfInitializer() {
     return m_spi.getSourceOfInitializer();
   }
 
@@ -55,7 +55,7 @@ public class FieldImplementor extends AbstractMemberImplementor<FieldSpi>impleme
 
   @Override
   public AnnotationQuery<IAnnotation> annotations() {
-    return new AnnotationQuery<>(getDeclaringType(), this);
+    return new AnnotationQuery<>(declaringType(), m_spi);
   }
 
 }

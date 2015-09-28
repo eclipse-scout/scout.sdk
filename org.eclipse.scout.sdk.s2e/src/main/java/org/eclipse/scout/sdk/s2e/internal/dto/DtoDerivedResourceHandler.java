@@ -21,7 +21,7 @@ import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceOperation;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
@@ -47,17 +47,17 @@ public class DtoDerivedResourceHandler implements IDerivedResourceHandler {
 
   protected Collection<IType> findAllCandidates(IJavaSearchScope scope) throws JavaModelException, CoreException {
     HashSet<IType> collector = new HashSet<>();
-    for (org.eclipse.jdt.core.IType candidate : JdtUtils.findAllTypesAnnotatedWith(IRuntimeClasses.Data, scope, new NullProgressMonitor())) {
+    for (org.eclipse.jdt.core.IType candidate : JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.Data, scope, new NullProgressMonitor())) {
       if (acceptType(candidate)) {
         collector.add(candidate);
       }
     }
-    for (org.eclipse.jdt.core.IType candidate : JdtUtils.findAllTypesAnnotatedWith(IRuntimeClasses.FormData, scope, new NullProgressMonitor())) {
+    for (org.eclipse.jdt.core.IType candidate : JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.FormData, scope, new NullProgressMonitor())) {
       if (acceptType(candidate)) {
         collector.add(candidate);
       }
     }
-    for (org.eclipse.jdt.core.IType candidate : JdtUtils.findAllTypesAnnotatedWith(IRuntimeClasses.PageData, scope, new NullProgressMonitor())) {
+    for (org.eclipse.jdt.core.IType candidate : JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.PageData, scope, new NullProgressMonitor())) {
       if (acceptType(candidate)) {
         collector.add(candidate);
       }
@@ -72,7 +72,7 @@ public class DtoDerivedResourceHandler implements IDerivedResourceHandler {
         !jdtType.isBinary() &&
         jdtType.getDeclaringType() == null &&
         Flags.isPublic(jdtType.getFlags()) &&
-        JdtUtils.getFirstAnnotationInSupertypeHierarchy(jdtType, IRuntimeClasses.Data, IRuntimeClasses.FormData, IRuntimeClasses.PageData) != null;
+        JdtUtils.getFirstAnnotationInSupertypeHierarchy(jdtType, IScoutRuntimeTypes.Data, IScoutRuntimeTypes.FormData, IScoutRuntimeTypes.PageData) != null;
   }
 
 }

@@ -40,6 +40,7 @@ import org.eclipse.jdt.internal.compiler.ast.MarkerAnnotation;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
 import org.eclipse.jdt.internal.compiler.ast.NameReference;
 import org.eclipse.jdt.internal.compiler.ast.NormalAnnotation;
+import org.eclipse.jdt.internal.compiler.ast.NullLiteral;
 import org.eclipse.jdt.internal.compiler.ast.QualifiedAllocationExpression;
 import org.eclipse.jdt.internal.compiler.ast.QualifiedNameReference;
 import org.eclipse.jdt.internal.compiler.ast.Reference;
@@ -70,7 +71,7 @@ import org.eclipse.jdt.internal.compiler.lookup.TypeIds;
 import org.eclipse.jdt.internal.compiler.lookup.TypeVariableBinding;
 import org.eclipse.jdt.internal.compiler.lookup.VoidTypeBinding;
 import org.eclipse.jdt.internal.compiler.lookup.WildcardBinding;
-import org.eclipse.scout.sdk.core.TypeNames;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
@@ -85,6 +86,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.util.SameCompositeObject;
 
 /**
  *
@@ -109,31 +111,31 @@ public final class SpiWithJdtUtils {
     Validate.notNull(fqn);
     if (fqn.length() <= 7) {
       switch (fqn) {
-        case TypeNames._boolean: {
+        case IJavaRuntimeTypes._boolean: {
           return TypeBinding.BOOLEAN;
         }
-        case TypeNames._char: {
+        case IJavaRuntimeTypes._char: {
           return TypeBinding.CHAR;
         }
-        case TypeNames._byte: {
+        case IJavaRuntimeTypes._byte: {
           return TypeBinding.BYTE;
         }
-        case TypeNames._short: {
+        case IJavaRuntimeTypes._short: {
           return TypeBinding.SHORT;
         }
-        case TypeNames._int: {
+        case IJavaRuntimeTypes._int: {
           return TypeBinding.INT;
         }
-        case TypeNames._long: {
+        case IJavaRuntimeTypes._long: {
           return TypeBinding.LONG;
         }
-        case TypeNames._float: {
+        case IJavaRuntimeTypes._float: {
           return TypeBinding.FLOAT;
         }
-        case TypeNames._double: {
+        case IJavaRuntimeTypes._double: {
           return TypeBinding.DOUBLE;
         }
-        case TypeNames._void: {
+        case IJavaRuntimeTypes._void: {
           return TypeBinding.VOID;
         }
       }
@@ -502,11 +504,14 @@ public final class SpiWithJdtUtils {
    * {@link AnnotationValueSpi}
    */
   static IMetaValue resolveCompiledValue(JavaEnvironmentWithJdt env, AnnotatableSpi owner, Object compiledValue) {
-    if (compiledValue == null) {
+    if (compiledValue == null || Constant.NotAConstant.equals(compiledValue)) {
+      return null;
+    }
+    if (compiledValue instanceof NullLiteral) {
       return MetaValueFactory.createNull();
     }
 
-    if (compiledValue instanceof Constant && !Constant.NotAConstant.equals(compiledValue)) {
+    if (compiledValue instanceof Constant) {
       // primitives and string
       return MetaValueFactory.createFromConstant((Constant) compiledValue);
     }
@@ -602,12 +607,12 @@ public final class SpiWithJdtUtils {
   }
 
   /**
-   * @return the (cached) default values {@link AnnotationValueSpi#isSyntheticDefaultValue()} for the annotation in
-   *         correct source order of the annotation type declaration
+   * @return the (cached) default values {@link AnnotationValueSpi#isDefaultValue()} for the annotation in correct
+   *         source order of the annotation type declaration
    */
   static LinkedHashMap<String, ElementValuePair> getBindingAnnotationSyntheticDefaultValues(JavaEnvironmentWithJdt env, ReferenceBinding annotationType) {
     Map<Object, Object> cache = env.getPerformanceCache();
-    SameReferences key = new SameReferences(annotationType, "defaultEvp");
+    SameCompositeObject key = new SameCompositeObject(annotationType, "defaultEvp");
     @SuppressWarnings("unchecked")
     LinkedHashMap<String, ElementValuePair> defaultValues = (LinkedHashMap<String, ElementValuePair>) cache.get(key);
     if (defaultValues == null) {
@@ -643,7 +648,7 @@ public final class SpiWithJdtUtils {
 
   static LinkedHashMap<String, MemberValuePair> getDeclarationAnnotationSyntheticDefaultValues(JavaEnvironmentWithJdt env, TypeBinding typeBinding) {
     Map<Object, Object> cache = env.getPerformanceCache();
-    SameReferences key = new SameReferences(typeBinding, "defaultMvp");
+    SameCompositeObject key = new SameCompositeObject(typeBinding, "defaultMvp");
     @SuppressWarnings("unchecked")
     LinkedHashMap<String, MemberValuePair> defaultValues = (LinkedHashMap<String, MemberValuePair>) cache.get(key);
     if (defaultValues == null) {
@@ -739,12 +744,12 @@ public final class SpiWithJdtUtils {
   public static String createMethodId(MethodSpi m) {
     StringBuilder buf = new StringBuilder();
     buf.append(m.getElementName());
-    buf.append("(");
+    buf.append('(');
     for (MethodParameterSpi p : m.getParameters()) {
       buf.append(Signature.createTypeSignature(p.getDataType().getName()));
-      buf.append(",");
+      buf.append(',');
     }
-    buf.append(")");
+    buf.append(')');
     return buf.toString();
   }
 

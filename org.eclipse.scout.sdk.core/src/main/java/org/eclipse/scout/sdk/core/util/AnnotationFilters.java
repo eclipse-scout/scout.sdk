@@ -24,25 +24,25 @@ public final class AnnotationFilters {
   }
 
   /**
-   * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a annotation name ( matches the
-   * given name.
+   * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if an annotation name (
+   * {@link IAnnotation#name()}) matches the given name.
    *
    * @param name
-   *          The name for which the {@link IFilter} should evaluate to <code>true</code>
+   *          The name for which the {@link IFilter} should evaluate to <code>true</code>.
    * @return The new created {@link IFilter} matching the given name.
    */
   public static IFilter<IAnnotation> name(final String name) {
     return new IFilter<IAnnotation>() {
       @Override
       public boolean evaluate(IAnnotation annotation) {
-        return Objects.equals(annotation.getType().getName(), name);
+        return Objects.equals(annotation.type().name(), name);
       }
     };
   }
 
   /**
-   * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a annotation name
-   * {@link IAnnotation#getName()}) matches the given regular expression.
+   * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a annotation name (
+   * {@link IAnnotation#name()}) matches the given regular expression.
    *
    * @param regex
    *          The regex for which the {@link IFilter} should evaluate to <code>true</code>.
@@ -53,7 +53,7 @@ public final class AnnotationFilters {
     return new IFilter<IAnnotation>() {
       @Override
       public boolean evaluate(IAnnotation annotation) {
-        return regex.matcher(annotation.getType().getName()).matches();
+        return regex.matcher(annotation.type().name()).matches();
       }
     };
   }

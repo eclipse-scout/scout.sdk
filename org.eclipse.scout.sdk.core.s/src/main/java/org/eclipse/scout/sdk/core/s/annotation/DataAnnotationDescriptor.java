@@ -8,37 +8,49 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.core.s.dto.sourcebuilder;
+package org.eclipse.scout.sdk.core.s.annotation;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 
 /**
- * Describes a parsed {@link IRuntimeClasses#Data} or {@link IRuntimeClasses#PageData} annotation.
+ * <h3>{@link DataAnnotationDescriptor}</h3> Descriptor holding all meta data of a {@link IScoutRuntimeTypes#Data} or
+ * {@link IScoutRuntimeTypes#PageData} annotation.
  *
- * @since 3.10.0-M1
+ * @author Matthias Villiger
+ * @since @since 3.10.0-M1
  */
-public class DataAnnotation {
+public class DataAnnotationDescriptor {
 
   private final IType m_dataType;
   private final IType m_superDataType;
   private final IAnnotatable m_annotationHolder;
 
-  public DataAnnotation(IType dataType, IType superdataType, IAnnotatable holder) {
+  public DataAnnotationDescriptor(IType dataType, IType superdataType, IAnnotatable holder) {
     m_dataType = dataType;
     m_superDataType = superdataType;
     m_annotationHolder = holder;
   }
 
+  /**
+   * @return The DTO class this annotation references (e.g. PersonPageData)
+   */
   public IType getDataType() {
     return m_dataType;
   }
 
+  /**
+   * @return The DTO super class as defined by a model super class having a @Data annotation (e.g.
+   *         AbstractPersonPageData).
+   */
   public IType getSuperDataType() {
     return m_superDataType;
   }
 
+  /**
+   * @return The holder of the @Data annotation (e.g. PersonPage)
+   */
   public IAnnotatable getAnnotationHolder() {
     return m_annotationHolder;
   }

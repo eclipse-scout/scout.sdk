@@ -27,6 +27,7 @@ import java.util.Set;
  * <h3>{@link BasicPropertySupport}</h3> Property map supporting property change event listeners.
  *
  * @since 5.1.0
+ * @see IWeakEventListener
  */
 public class BasicPropertySupport {
 
@@ -267,7 +268,7 @@ public class BasicPropertySupport {
         if (m_listeners == null) {
           m_listeners = new ArrayList<>();
         }
-        if (listener instanceof WeakEventListener) {
+        if (listener instanceof IWeakEventListener) {
           m_listeners.add(new WeakReference<>(listener));
         }
         else {
@@ -305,7 +306,7 @@ public class BasicPropertySupport {
         children = new ArrayList<>();
         m_childListeners.put(propertyName, children);
       }
-      if (listener instanceof WeakEventListener) {
+      if (listener instanceof IWeakEventListener) {
         children.add(new WeakReference<>(listener));
       }
       else {
@@ -329,7 +330,7 @@ public class BasicPropertySupport {
     if (listeners == null) {
       return;
     }
-    if (listener instanceof WeakEventListener) {
+    if (listener instanceof IWeakEventListener) {
       for (int i = 0, n = listeners.size(); i < n; i++) {
         Object o = listeners.get(i);
         if (o instanceof WeakReference && ((WeakReference<?>) o).get() == listener) {

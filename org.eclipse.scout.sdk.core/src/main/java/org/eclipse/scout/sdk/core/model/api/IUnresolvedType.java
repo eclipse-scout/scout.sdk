@@ -26,14 +26,14 @@ public interface IUnresolvedType {
    * @return The {@link IPackage} of this {@link IUnresolvedType} or {@link IPackage#DEFAULT_PACKAGE} for the default
    *         package. Never returns <code>null</code>.
    */
-  IPackage getPackage();
+  IPackage containingPackage();
 
   /**
    * Gets the simple name of this {@link IUnresolvedType}.
    *
    * @return The simple name of this {@link IUnresolvedType}.
    */
-  String getSimpleName();
+  String elementName();
 
   /**
    * Gets the fully qualified name of this {@link IUnresolvedType}.<br>
@@ -43,17 +43,17 @@ public interface IUnresolvedType {
    *
    * @return The fully qualified name of this {@link IUnresolvedType}.
    */
-  String getName();
+  String name();
 
-  String getSignature();
+  String signature();
 
   /**
-   * @return true if {@link #getType()} returns not null
+   * @return true if {@link #type()} returns not null
    */
   boolean exists();
 
   /**
    * @return the existing type or null if it does not exist
    */
-  IType getType();
+  IType type();
 }

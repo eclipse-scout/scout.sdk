@@ -18,12 +18,13 @@ import java.util.Map;
 import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.importvalidator.ImportElementCandidate;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IImport;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.signature.Signature;
+import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
 import org.eclipse.scout.sdk.core.sourcebuilder.AbstractJavaElementSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
@@ -31,6 +32,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkConsole;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link CompilationUnitSourceBuilder}</h3>
@@ -51,19 +53,19 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
    */
   public CompilationUnitSourceBuilder(ICompilationUnit element) {
     super(element);
-    m_packageName = element.getPackage().getName();
-    for (IImport imp : element.getImports()) {
+    m_packageName = element.containingPackage().name();
+    for (IImport imp : element.imports()) {
       if (imp.isStatic()) {
-        addDeclaredStaticImport(imp.getName());
+        addDeclaredStaticImport(imp.name());
       }
       else {
-        addDeclaredImport(imp.getName());
+        addDeclaredImport(imp.name());
       }
     }
-    if (element.getJavaDoc() != null) {
-      setComment(new RawSourceBuilder(element.getJavaDoc().toString()));
+    if (element.javaDoc() != null) {
+      setComment(new RawSourceBuilder(element.javaDoc().toString()));
     }
-    for (IType type : element.getTypes()) {
+    for (IType type : element.types().list()) {
       addType(new TypeSourceBuilder(type));
     }
   }
@@ -77,11 +79,13 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   }
 
   @Override
-  public final void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator0) {
-    IImportValidator validator = new CompilationUnitScopedImportValidator(validator0, getPackageName());
+  public final void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+    // add CU scope to import validator chain
+    IImportCollector collector = new CompilationUnitScopedImportCollector(validator.getImportCollector(), getPackageName());
+    validator.setImportCollector(collector);
 
     // loop through all types recursively to ensure all simple names that will be created are "consumed" in the import validator
-    consumeAllTypeNamesRec(m_types, validator);
+    consumeAllTypeNamesRec(m_types, collector);
 
     // empty package name is default package
     if (getPackageName() == null) {
@@ -90,10 +94,10 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
 
     //declared imports
     for (String s : m_declaredImports) {
-      validator.addImport(s);
+      collector.addImport(s);
     }
     for (String s : m_declaredStaticImports) {
-      validator.addStaticImport(s);
+      collector.addStaticImport(s);
     }
 
     // header
@@ -113,7 +117,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
     }
 
     // imports
-    Collection<String> importsToCreate = validator.createImportDeclarations();
+    Collection<String> importsToCreate = collector.createImportDeclarations();
     if (importsToCreate.size() > 0) {
       for (String imp : importsToCreate) {
         headerSourceBuilder.append(imp).append(lineDelimiter);
@@ -123,14 +127,14 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
     source.append(headerSourceBuilder);
     source.append(typeSourceBuilder);
     source.append(lineDelimiter);
-    appendErrorMessages(source, lineDelimiter, context, validator);
+    appendErrorMessages(source, lineDelimiter, context, collector);
   }
 
-  private static void consumeAllTypeNamesRec(Collection<ITypeSourceBuilder> typeBuilders, IImportValidator validator) {
+  private static void consumeAllTypeNamesRec(Collection<ITypeSourceBuilder> typeBuilders, IImportCollector collector) {
     for (ITypeSourceBuilder typeSrc : typeBuilders) {
       String fqn = typeSrc.getFullyQualifiedName();
-      validator.reserveElement(new ImportElementCandidate(Signature.createTypeSignature(fqn)));
-      consumeAllTypeNamesRec(typeSrc.getTypes(), validator);
+      collector.reserveElement(new SignatureDescriptor(Signature.createTypeSignature(fqn)));
+      consumeAllTypeNamesRec(typeSrc.getTypes(), collector);
     }
   }
 
@@ -221,20 +225,20 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
 
   @Override
   public void addErrorMessage(String taskType, String msg, Throwable... exceptions) {
-    SdkConsole.println(getPackageName() + " " + getElementName() + " " + msg, exceptions);
+    SdkLog.warning(getPackageName() + " " + getElementName() + " " + msg, exceptions);
     if (msg != null) {
       m_errors.append(taskType + " [generator] " + msg);
       m_errors.append("\n");
     }
     if (exceptions != null) {
       for (Throwable t : exceptions) {
-        m_errors.append(SdkConsole.formatException(t));
+        m_errors.append(SdkConsole.getStackTrace(t));
         m_errors.append("\n");
       }
     }
   }
 
-  protected void appendErrorMessages(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
+  protected void appendErrorMessages(StringBuilder source, String lineDelimiter, PropertyMap context, IImportCollector collector) {
     if (m_errors.length() > 0) {
       source.append("/*");
       source.append(lineDelimiter);

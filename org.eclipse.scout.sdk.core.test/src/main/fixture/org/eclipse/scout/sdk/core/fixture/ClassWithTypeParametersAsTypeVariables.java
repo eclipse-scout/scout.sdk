@@ -4,5 +4,7 @@
  */
 package org.eclipse.scout.sdk.core.fixture;
 
-public class ClassWithTypeParametersAsTypeVariables<A, B extends CharSequence/*these are the type variables*/> extends ClassWithTypeVariables<A, B/*these are the type params*/> {
+import java.nio.CharBuffer;
+
+public class ClassWithTypeParametersAsTypeVariables<A, B extends CharBuffer/*these are the type variables*/> extends ClassWithTypeVariables<A, B/*these are the type params*/> {
 }

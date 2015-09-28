@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.model.sugar.TypeQuery;
 
 /**
  * <h3>{@link IType}</h3> Represents a java data type. This includes classes, interfaces, enums, primitives, the
- * void-type ({@link #VOID}) & the wildcard-type ("?").
+ * void-type & the wildcard-type ("?").
  *
  * @author Matthias Villiger
  * @since 5.1.0
@@ -34,14 +34,7 @@ public interface IType extends IMember {
    * @return The {@link IPackage} of this {@link IType} or {@link IPackage#DEFAULT_PACKAGE} for the default package.
    *         Never returns <code>null</code>.
    */
-  IPackage getPackage();
-
-  /**
-   * Gets the simple name of this {@link IType}.
-   *
-   * @return The simple name of this {@link IType}.
-   */
-  String getSimpleName();
+  IPackage containingPackage();
 
   /**
    * Gets the fully qualified name of this {@link IType}.<br>
@@ -51,16 +44,16 @@ public interface IType extends IMember {
    *
    * @return The fully qualified name of this {@link IType}.
    */
-  String getName();
+  String name();
 
   /**
    * Gets all arguments passed to the type parameters of this {@link IType}.<br>
-   * See {@link #getTypeParameters()} for more details.
+   * See {@link #typeParameters()} for more details.
    *
    * @return A {@link List} holding all {@link IType}s arguments.
-   * @see #getTypeParameters()
+   * @see #typeParameters()
    */
-  List<IType> getTypeArguments();
+  List<IType> typeArguments();
 
   /**
    * If this {@link IType} is a synthetic parameterized type (for example the super class of a parameterized type with
@@ -68,11 +61,11 @@ public interface IType extends IMember {
    * <p>
    * Otherwise this is returned
    */
-  IType getOriginalType();
+  IType originalType();
 
   /**
-   * Specifies if this is an anonymous class. If <code>true</code> the {@link #getSimpleName()} will return an empty
-   * {@link String} and {@link #getName()} will have no last segment.
+   * Specifies if this is an anonymous class. If <code>true</code> the {@link #simpleName()} will return an empty
+   * {@link String} and {@link #name()} will have no last segment.
    *
    * @return <code>true</code> if it is an anonymous class, <code>false</code> otherwise.
    */
@@ -83,42 +76,19 @@ public interface IType extends IMember {
    *
    * @return The super {@link IType} or <code>null</code>.
    */
-  IType getSuperClass();
+  IType superClass();
 
   /**
    * Gets all direct super interfaces of this {@link IType} in the order as they appear in the source or class file.
    *
    * @return A {@link List} containing all direct super interfaces of this {@link IType}.
    */
-  List<IType> getSuperInterfaces();
+  List<IType> superInterfaces();
 
   /**
    * @return the source of the static initializer without the { and } brackets
    */
-  ISourceRange getSourceOfStaticInitializer();
-
-  /**
-   * Gets all direct member {@link IType}s of this {@link IType} in the order as they appear in the source or class
-   * file.
-   *
-   * @return A {@link List} holding all member {@link IType}s.
-   */
-  List<IType> getTypes();
-
-  /**
-   * Gets the {@link IField}s of this {@link IType} in the order as they are defined in the source or class file.
-   *
-   * @return A {@link List} holding all {@link IField}s of this {@link IType}.
-   */
-  List<IField> getFields();
-
-  /**
-   * Gets all direct member {@link IMethod}s of this {@link IType} in the order as they appear in the source or class
-   * file.
-   *
-   * @return A {@link List} holding all member {@link IMethod}s.
-   */
-  List<IMethod> getMethods();
+  ISourceRange sourceOfStaticInitializer();
 
   /**
    * Gets if this {@link IType} represents a primitive type. See also {@link #primitiveType()}
@@ -129,7 +99,7 @@ public interface IType extends IMember {
 
   /**
    * Gets if this {@link IType} represents an array type.<br>
-   * If the result is <code>true</code> this means the array dimension is &gt; 0 (see {@link #getArrayDimension()}).
+   * If the result is <code>true</code> this means the array dimension is &gt; 0 (see {@link #arrayDimension()}).
    *
    * @return <code>true</code> if this {@link IType} represents an array type, <code>false</code> otherwise.
    */
@@ -144,14 +114,14 @@ public interface IType extends IMember {
    *
    * @return The array dimension of this {@link IType}.
    */
-  int getArrayDimension();
+  int arrayDimension();
 
   /**
    * Only valid on arrays {@link #isArray()}
    *
    * @return the leaf component type of the array that is the type without []
    */
-  IType getLeafComponentType();
+  IType leafComponentType();
 
   /**
    * Gets if this {@link IType} represents a wildcard type ("?").
@@ -169,7 +139,7 @@ public interface IType extends IMember {
    *
    * @return The {@link ICompilationUnit} that belongs to this {@link IType} <code>null</code>.
    */
-  ICompilationUnit getCompilationUnit();
+  ICompilationUnit compilationUnit();
 
   @Override
   TypeSpi unwrap();
@@ -182,7 +152,7 @@ public interface IType extends IMember {
 
   boolean isInterface();
 
-  String getSignature();
+  String signature();
 
   SuperTypeQuery superTypes();
 
@@ -195,10 +165,10 @@ public interface IType extends IMember {
   /**
    * Checks if the given {@link IType} has the given queryType in its super hierarchy.
    *
-   * @param typeToCheck
-   *          The {@link IType} to check.
    * @param queryType
    *          The fully qualified name of the super type to check.
+   * @return <code>true</code> if the given fully qualified name exists in the super hierarchy of this {@link IType}.
+   *         <code>false</code> otherwise.
    */
   boolean isInstanceOf(String queryType);
 

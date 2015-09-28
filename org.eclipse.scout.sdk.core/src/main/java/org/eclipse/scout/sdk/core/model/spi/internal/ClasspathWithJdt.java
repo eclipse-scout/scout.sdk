@@ -11,13 +11,12 @@
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
 import org.eclipse.jdt.internal.compiler.batch.ClasspathLocation;
-import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 
 public class ClasspathWithJdt implements ClasspathSpi {
-  private final Classpath m_cp;
+  private final ClasspathEntry m_cp;
 
-  ClasspathWithJdt(Classpath cp) {
+  ClasspathWithJdt(ClasspathEntry cp) {
     m_cp = cp;
   }
 
@@ -26,12 +25,17 @@ public class ClasspathWithJdt implements ClasspathSpi {
     //1=source
     //2=binary
     //3=mixed or unknown (target/classes = 2 or 3)
-    return (m_cp instanceof ClasspathLocation) ? ((ClasspathLocation) m_cp).getMode() == 1 : false;
+    return (m_cp.getClasspath() instanceof ClasspathLocation) ? ((ClasspathLocation) m_cp.getClasspath()).getMode() == 1 : false;
   }
 
   @Override
   public String getPath() {
-    return m_cp.getPath();
+    return m_cp.getClasspath().getPath();
+  }
+
+  @Override
+  public String getEncoding() {
+    return m_cp.getEncoding();
   }
 
   @Override

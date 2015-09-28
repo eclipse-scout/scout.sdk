@@ -11,12 +11,20 @@
 package org.eclipse.scout.sdk.core.util;
 
 /**
- * <h3>{@link IFilter}</h3>
+ * <h3>{@link IFilter}</h3> Defines a functor interface implemented by classes that evaluate a predicate test on an
+ * element.
  *
  * @author Matthias Villiger
  * @since 5.1.0
  */
 public interface IFilter<E> {
 
+  /**
+   * Evaluate the {@link IFilter} by executing against the given element.
+   * 
+   * @param element
+   *          The element to evaluate the {@link IFilter} against.
+   * @return <code>true</code> if the filter accepts the given element. <code>false</code> otherwise.
+   */
   boolean evaluate(E element);
 }

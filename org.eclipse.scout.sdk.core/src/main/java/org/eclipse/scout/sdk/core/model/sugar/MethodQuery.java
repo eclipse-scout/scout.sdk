@@ -15,12 +15,13 @@ import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
  * <h3>{@link MethodQuery}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
 public class MethodQuery {
@@ -96,7 +97,7 @@ public class MethodQuery {
   }
 
   protected boolean accept(IMethod f) {
-    if (m_name != null && !m_name.equals(f.getElementName())) {
+    if (m_name != null && !m_name.equals(f.elementName())) {
       return false;
     }
     if (m_filter != null && !m_filter.evaluate(f)) {
@@ -105,28 +106,30 @@ public class MethodQuery {
     return true;
   }
 
-  protected void visitRec(IType t, List<IMethod> result, int maxCount) {
+  protected void visitRec(IType t, List<IMethod> result, int maxCount, boolean onlyTraverse) {
     if (t == null) {
       return;
     }
-    for (IMethod f : t.getMethods()) {
-      if (accept(f)) {
-        result.add(f);
-        if (result.size() >= maxCount) {
-          return;
+    if (!onlyTraverse) {
+      for (IMethod f : new WrappedList<IMethod>(t.unwrap().getMethods())) {
+        if (accept(f)) {
+          result.add(f);
+          if (result.size() >= maxCount) {
+            return;
+          }
         }
       }
     }
-    if (m_includeSuperClasses) {
-      visitRec(t.getSuperClass(), result, maxCount);
+    if (m_includeSuperClasses || m_includeSuperInterfaces) {
+      visitRec(t.superClass(), result, maxCount, !m_includeSuperClasses);
       if (result.size() >= maxCount) {
         return;
       }
     }
 
     if (m_includeSuperInterfaces) {
-      for (IType superInterface : t.getSuperInterfaces()) {
-        visitRec(superInterface, result, maxCount);
+      for (IType superInterface : t.superInterfaces()) {
+        visitRec(superInterface, result, maxCount, false);
         if (result.size() >= maxCount) {
           return;
         }
@@ -134,19 +137,19 @@ public class MethodQuery {
     }
   }
 
-  public boolean exists() {
+  public boolean existsAny() {
     return first() != null;
   }
 
   public IMethod first() {
-    ArrayList<IMethod> result = new ArrayList<>(1);
-    visitRec(m_type, result, 1);
+    List<IMethod> result = new ArrayList<>(1);
+    visitRec(m_type, result, 1, false);
     return result.isEmpty() ? null : result.get(0);
   }
 
   public List<IMethod> list() {
-    ArrayList<IMethod> result = new ArrayList<>();
-    visitRec(m_type, result, m_maxResultCount);
+    List<IMethod> result = new ArrayList<>(m_type.unwrap().getMethods().size());
+    visitRec(m_type, result, m_maxResultCount, false);
     return result;
   }
 

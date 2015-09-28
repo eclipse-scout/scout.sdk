@@ -24,6 +24,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.internal.compiler.SourceElementParser;
 import org.eclipse.jdt.internal.core.JavaModelManager;
 import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
@@ -79,14 +80,14 @@ public class WorkingCopyManager implements IWorkingCopyManager {
       }
     }
     catch (JavaModelException e) {
-      S2ESdkActivator.logError("could not commit working copy '" + icu.getElementName() + "'", e);
+      SdkLog.error("could not commit working copy '" + icu.getElementName() + "'", e);
     }
     finally {
       try {
         icu.discardWorkingCopy();
       }
       catch (JavaModelException e) {
-        S2ESdkActivator.logError("could not discard working copy '" + icu.getElementName() + "'", e);
+        SdkLog.error("could not discard working copy '" + icu.getElementName() + "'", e);
       }
     }
   }

@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.s2e.ui.internal.wizard.newproject;
 
 import org.eclipse.jface.viewers.IStructuredSelection;
-import org.eclipse.scout.sdk.s2e.job.WorkspaceBlockingOperationJob;
+import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.ui.internal.ISdkIcons;
 import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.ui.wizard.AbstractWizard;
@@ -60,7 +60,7 @@ public class ScoutProjectNewWizard extends AbstractWizard implements INewWizard 
     getDialogSettings().put(ScoutProjectNewWizardPage.SETTINGS_TARGET_DIR, path);
 
     // run operation
-    new WorkspaceBlockingOperationJob(op).schedule();
+    new ResourceBlockingOperationJob(op).schedule();
 
     return true;
   }

@@ -10,21 +10,19 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.dto.test.util;
 
-import java.util.Objects;
 import java.util.regex.Pattern;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.DataAnnotation;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataAnnotation;
+import org.eclipse.scout.sdk.core.s.annotation.DataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
+import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
-import org.eclipse.scout.sdk.core.s.util.ScoutUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
-import org.eclipse.scout.sdk.core.util.JavaEnvironmentBuilder;
 import org.junit.Assert;
 
 /**
@@ -66,7 +64,7 @@ public final class CoreScoutTestingUtils {
   private static IType createDtoAssertNoCompileErrors(String modelFqn, boolean rowData) {
     // get model type
     IType modelType = createClientJavaEnvironment().findType(modelFqn);
-    DataAnnotation dataAnnotation = DtoUtils.findDataAnnotation(modelType);
+    DataAnnotationDescriptor dataAnnotation = DtoUtils.getDataAnnotationDescriptor(modelType);
 
     // build classpath for shared project
     IJavaEnvironment sharedEnv = createSharedJavaEnvironment();
@@ -84,10 +82,10 @@ public final class CoreScoutTestingUtils {
     // ensure it compiles and get model of dto
     sharedEnv.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), new StringBuilder(source));
     sharedEnv.reload();
-    ICompilationUnit dtoIcu = sharedEnv.findType(cuSrc.getMainType().getFullyQualifiedName()).getCompilationUnit();
-    Assert.assertNull(sharedEnv.getCompileErrors(dtoIcu.getMainType().getName()));
+    ICompilationUnit dtoIcu = sharedEnv.findType(cuSrc.getMainType().getFullyQualifiedName()).compilationUnit();
+    Assert.assertNull(sharedEnv.compileErrors(dtoIcu.mainType().name()));
 
-    return dtoIcu.getMainType();
+    return dtoIcu.mainType();
   }
 
   public static IType createFormDataAssertNoCompileErrors(String modelFqn) {
@@ -98,17 +96,17 @@ public final class CoreScoutTestingUtils {
     IJavaEnvironment sharedEnv = createSharedJavaEnvironment();
 
     // build source
-    FormDataAnnotation formDataAnnotation = DtoUtils.findFormDataAnnotation(modelType);
+    FormDataAnnotationDescriptor formDataAnnotation = DtoUtils.getFormDataAnnotationDescriptor(modelType);
     ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, formDataAnnotation, sharedEnv);
     String source = DtoUtils.createJavaCode(cuSrc, sharedEnv, "\n", null);
 
     // ensure it compiles and get model of dto
     sharedEnv.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), new StringBuilder(source));
     sharedEnv.reload();
-    ICompilationUnit dtoIcu = sharedEnv.findType(cuSrc.getMainType().getFullyQualifiedName()).getCompilationUnit();
-    Assert.assertNull(sharedEnv.getCompileErrors(dtoIcu.getMainType().getName()));
+    ICompilationUnit dtoIcu = sharedEnv.findType(cuSrc.getMainType().getFullyQualifiedName()).compilationUnit();
+    Assert.assertNull(sharedEnv.compileErrors(dtoIcu.mainType().name()));
 
-    return dtoIcu.getMainType();
+    return dtoIcu.mainType();
   }
 
   /**
@@ -118,21 +116,31 @@ public final class CoreScoutTestingUtils {
    * @param annotatable
    * @param orderNr
    */
-  public static void assertOrderAnnotation(String message, IAnnotatable annotatable, Double orderNr) {
-    Double memberOrderNr = ScoutUtils.getOrderAnnotationValue(annotatable);
-    if (!Objects.equals(orderNr, memberOrderNr)) {
+  public static void assertOrderAnnotation(String message, IAnnotatable annotatable, double orderNr) {
+    OrderAnnotation orderAnnotation = annotatable.annotations().withManagedWrapper(OrderAnnotation.class).first();
+    if (orderAnnotation == null) {
       if (message == null) {
-        StringBuilder messageBuilder = new StringBuilder("Order annotation not equal: exptected '").append(orderNr).append("'; found on member");
-        if (annotatable instanceof IMember) {
-          messageBuilder.append(" '").append(((IMember) annotatable).getElementName()).append("'");
-        }
+        StringBuilder messageBuilder = new StringBuilder("No @Order annotation found on member '");
+        messageBuilder.append(annotatable.elementName()).append("'.");
+        messageBuilder.append(" Expected: order value '").append(orderNr).append("'!");
+        message = messageBuilder.toString();
+      }
+      Assert.fail(message);
+      return;
+    }
+
+    double memberOrderNr = orderAnnotation.value();
+    if (orderNr != memberOrderNr) {
+      if (message == null) {
+        StringBuilder messageBuilder = new StringBuilder("Order annotation not equal: exptected '").append(orderNr).append("'; found on member '");
+        messageBuilder.append(annotatable.elementName()).append("'");
         messageBuilder.append(" is '").append(memberOrderNr).append("'!");
         message = messageBuilder.toString();
       }
       Assert.fail(message);
     }
 
-    Assert.assertEquals(message, memberOrderNr, orderNr);
+    Assert.assertEquals(message, memberOrderNr, orderNr, 0.00001);
   }
 
   /**

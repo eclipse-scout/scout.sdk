@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
  * <h3>{@link DeclarationTypeParameterWithJdt}</h3>
  *
  * @author Ivan Motsch
- * @since 4.1.0 09.11.2014
+ * @since 5.1.0
  */
 public class DeclarationTypeParameterWithJdt extends AbstractJavaElementWithJdt<ITypeParameter>implements TypeParameterSpi {
   private final AbstractMemberWithJdt<?> m_declaringMember;
@@ -40,7 +40,6 @@ public class DeclarationTypeParameterWithJdt extends AbstractJavaElementWithJdt<
   private final int m_index;
   private final String m_name;
   private List<TypeSpi> m_bounds;
-  private List<DeclarationAnnotationWithJdt> m_annotations;
 
   DeclarationTypeParameterWithJdt(JavaEnvironmentWithJdt env, AbstractMemberWithJdt<?> declaringMember, org.eclipse.jdt.internal.compiler.ast.TypeParameter astNode, int index) {
     super(env);
@@ -144,18 +143,9 @@ public class DeclarationTypeParameterWithJdt extends AbstractJavaElementWithJdt<
   }
 
   @Override
-  public List<DeclarationAnnotationWithJdt> getAnnotations() {
-    if (m_annotations == null) {
-      m_annotations = SpiWithJdtUtils.createDeclarationAnnotations(m_env, this, m_astNode.annotations);
-    }
-    return m_annotations;
-  }
-
-  @Override
   public ISourceRange getSource() {
     CompilationUnitSpi cu = SpiWithJdtUtils.declaringTypeOf(this).getCompilationUnit();
     org.eclipse.jdt.internal.compiler.ast.TypeParameter decl = m_astNode;
     return m_env.getSource(cu, decl.declarationSourceStart, decl.declarationSourceEnd);
   }
-
 }

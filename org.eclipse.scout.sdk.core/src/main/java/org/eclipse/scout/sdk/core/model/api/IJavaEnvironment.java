@@ -24,32 +24,33 @@ public interface IJavaEnvironment {
   /**
    * Tries to find the {@link IType} with the given name in the receiver {@link IJavaEnvironment} (classpath).
    * <p>
-   * Also primitive types such as int, float, void, null etc. are supported
+   * Also primitive types such as int, float, void, null etc. are supported.
    *
    * @param fqn
    *          The fully qualified name of the {@link IType} to find. For inner {@link IType}s the inner part must be
-   *          separated using '$': <code>org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass</code>.
-   * @return The {@link Iype} matching the given fully qualified name or <code>null</code> if it could not be found.
+   *          separated using '$'.<br>
+   *          Example: <code>org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass</code>.
+   * @return The {@link IType} matching the given fully qualified name or <code>null</code> if it could not be found.
    */
   IType findType(String fqn);
 
   IUnresolvedType findUnresolvedType(String fqn);
 
   /**
-   * When filesystem changes occured and the current {@link IType}, {@link ICompilationUnit} should not be lost, this
+   * When filesystem changes occurred and the current {@link IType}, {@link ICompilationUnit} should not be lost, this
    * method can be called in order to reload the spi core of the {@link IJavaEnvironment} and replace all spi cores of
    * the wrapped classes with the updated version.
    * <p>
    * All {@link IType}, {@link ICompilationUnit} etc. remain valid and are updated with the new state of the filesystem
    * including optional overrides that were registered using
-   * {@link #compileAndRegisterCompilationUnit(String, String, StringBuilder, boolean)}
+   * {@link #registerCompilationUnitOverride(String, String, StringBuilder)}
    */
   void reload();
 
   /**
    * Register an override for a (possibly) existing compilation unit.
    * <p>
-   * When the type was NEVER loaded before using {@link #findType(String)}, {@link #findUnresolvedType(String)} and id
+   * When the type was NEVER loaded before using {@link #findType(String)}, {@link #findUnresolvedType(String)} and is
    * not implicitly referenced by any of the currently loaded types, THEN a call to {@link #findType(String)} will
    * immediately parse and resolve this new type.
    * <p>
@@ -66,9 +67,7 @@ public interface IJavaEnvironment {
    *          type name
    * @return null if the type has no compilation errors
    */
-  String getCompileErrors(String fqn);
+  String compileErrors(String fqn);
 
   JavaEnvironmentSpi unwrap();
-
-  void internalSetSpi(JavaEnvironmentSpi newSpi);
 }

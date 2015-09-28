@@ -69,7 +69,7 @@ public class BindingAnnotationValueWithJdt extends AbstractJavaElementWithJdt<IA
   }
 
   @Override
-  public boolean isSyntheticDefaultValue() {
+  public boolean isDefaultValue() {
     return m_syntheticDefaultValue;
 
   }

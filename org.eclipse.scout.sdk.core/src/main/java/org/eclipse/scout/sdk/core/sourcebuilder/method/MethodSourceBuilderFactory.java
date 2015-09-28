@@ -72,7 +72,7 @@ public final class MethodSourceBuilderFactory {
       if (superCandidate != null) {
         IType superType = lookupContext.findType(SignatureUtils.toFullyQualifiedName(superCandidate));
         if (superType != null) {
-          IMethod methodToOverride = CoreUtils.findMethodInSuperHierarchy(superType, filter);
+          IMethod methodToOverride = superType.methods().withSuperTypes(true).withFilter(filter).first();
           if (methodToOverride != null) {
             return methodToOverride;
           }
@@ -104,7 +104,7 @@ public final class MethodSourceBuilderFactory {
   }
 
   public static IMethodSourceBuilder createOverride(String methodName, IType declaringType) {
-    IMethod methodToOverride = CoreUtils.findMethodInSuperHierarchy(declaringType, MethodFilters.name(methodName));
+    IMethod methodToOverride = declaringType.methods().withSuperTypes(true).withName(methodName).first();
     if (methodToOverride == null) {
       return null;
     }
@@ -116,13 +116,13 @@ public final class MethodSourceBuilderFactory {
    * @return a new method source builder that overrides the parameter method
    */
   public static IMethodSourceBuilder createOverride(IMethod method) {
-    final MethodSourceBuilder builder = new MethodSourceBuilder(method.getElementName());
+    final MethodSourceBuilder builder = new MethodSourceBuilder(method.elementName());
 
     // return type
-    builder.setReturnTypeSignature(SignatureUtils.getTypeSignature(method.getReturnType()));
+    builder.setReturnTypeSignature(SignatureUtils.getTypeSignature(method.returnType()));
 
     // exceptions
-    List<IType> excpetions = method.getExceptionTypes();
+    List<IType> excpetions = method.exceptionTypes();
     List<String> resolvedExceptionSignatures = new ArrayList<>(excpetions.size());
     for (IType t : excpetions) {
       resolvedExceptionSignatures.add(SignatureUtils.getTypeSignature(t));
@@ -130,26 +130,26 @@ public final class MethodSourceBuilderFactory {
     builder.setExceptionSignatures(resolvedExceptionSignatures);
 
     // parameters
-    List<IMethodParameter> parameters = method.getParameters();
+    List<IMethodParameter> parameters = method.parameters().list();
     if (parameters.size() > 0) {
       for (IMethodParameter m : parameters) {
-        IMethodParameterSourceBuilder d = new MethodParameterSourceBuilder(m.getElementName(), SignatureUtils.getTypeSignature(m.getDataType()));
-        if (m.getFlags() != Flags.AccDefault) {
-          d.setFlags(m.getFlags());
+        IMethodParameterSourceBuilder d = new MethodParameterSourceBuilder(m.elementName(), SignatureUtils.getTypeSignature(m.dataType()));
+        if (m.flags() != Flags.AccDefault) {
+          d.setFlags(m.flags());
         }
         builder.addParameter(d);
       }
     }
 
     // flags
-    int flags = method.getFlags() & ~(Flags.AccTransient | Flags.AccBridge | Flags.AccAbstract);
-    if (Flags.isInterface(method.getDeclaringType().getFlags()) && Flags.isPackageDefault(flags)) {
+    int flags = method.flags() & ~(Flags.AccTransient | Flags.AccBridge | Flags.AccAbstract);
+    if (Flags.isInterface(method.declaringType().flags()) && Flags.isPackageDefault(flags)) {
       flags = flags | Flags.AccPublic;
     }
     builder.setFlags(flags);
 
     // add default body
-    if (!(Flags.isInterface(method.getDeclaringType().getFlags()) || Flags.isAbstract(method.getFlags()))) {
+    if (!(Flags.isInterface(method.declaringType().flags()) || Flags.isAbstract(method.flags()))) {
       builder.setBody(MethodBodySourceBuilderFactory.createSuperCall(builder, true));
     }
 

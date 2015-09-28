@@ -16,7 +16,7 @@ import java.util.Collection;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.core.model.api.IType;
-import org.eclipse.scout.sdk.core.util.SdkConsole;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.trigger.AbstractDerivedResourceBatchOperation;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
@@ -54,7 +54,7 @@ public class DtoDerivedResourceBatchOperation extends AbstractDerivedResourceBat
         }
       }
       catch (Throwable t) {
-        SdkConsole.println("ERROR: " + getClass().getSimpleName() + ": " + jdtType.getFullyQualifiedName(), t);
+        SdkLog.error(getClass().getSimpleName() + ": " + jdtType.getFullyQualifiedName(), t);
       }
     }
 

@@ -30,7 +30,7 @@ public class DtoDerivedResourceOperation extends AbstractDerivedResourceOperatio
 
   @Override
   public String getOperationName() {
-    return "Update DTO for '" + getModelType().getName() + "'.";
+    return "Update DTO for '" + getModelType().name() + "'.";
   }
 
   @Override

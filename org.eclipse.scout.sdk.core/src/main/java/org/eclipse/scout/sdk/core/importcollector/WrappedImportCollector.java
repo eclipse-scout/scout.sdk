@@ -1,13 +1,14 @@
-package org.eclipse.scout.sdk.core.importvalidator;
+package org.eclipse.scout.sdk.core.importcollector;
 
 import java.util.Collection;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
+import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
 
-public class WrappedImportValidator implements IImportValidator {
-  private final IImportValidator m_inner;
+public class WrappedImportCollector implements IImportCollector {
+  private final IImportCollector m_inner;
 
-  public WrappedImportValidator(IImportValidator inner) {
+  public WrappedImportCollector(IImportCollector inner) {
     m_inner = inner;
   }
 
@@ -32,22 +33,22 @@ public class WrappedImportValidator implements IImportValidator {
   }
 
   @Override
-  public void reserveElement(ImportElementCandidate cand) {
+  public void reserveElement(SignatureDescriptor cand) {
     m_inner.reserveElement(cand);
   }
 
   @Override
-  public String registerElement(ImportElementCandidate cand) {
+  public String registerElement(SignatureDescriptor cand) {
     return m_inner.registerElement(cand);
   }
 
   @Override
-  public String checkExistingImports(ImportElementCandidate cand) {
+  public String checkExistingImports(SignatureDescriptor cand) {
     return m_inner.checkExistingImports(cand);
   }
 
   @Override
-  public String checkCurrentScope(ImportElementCandidate cand) {
+  public String checkCurrentScope(SignatureDescriptor cand) {
     return m_inner.checkCurrentScope(cand);
   }
 

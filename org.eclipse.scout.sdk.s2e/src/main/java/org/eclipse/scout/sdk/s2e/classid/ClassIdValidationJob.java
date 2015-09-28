@@ -47,10 +47,10 @@ import org.eclipse.jdt.core.search.SearchRequestor;
 import org.eclipse.jdt.core.search.TypeReferenceMatch;
 import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.Document;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
-import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
-import org.eclipse.scout.sdk.s2e.job.WorkspaceBlockingOperationJob;
+import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
@@ -97,7 +97,7 @@ public final class ClassIdValidationJob extends AbstractJob {
                   IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
                   if (element == null) {
                     // e.g. when the annotation is fully qualified. try reading from owner
-                    element = JdtUtils.getAnnotation(ownerType, IRuntimeClasses.ClassId);
+                    element = JdtUtils.getAnnotation(ownerType, IScoutRuntimeTypes.ClassId);
                   }
                   if (element instanceof IAnnotation && JdtUtils.exists(element)) {
                     result.add((IAnnotation) element);
@@ -114,10 +114,10 @@ public final class ClassIdValidationJob extends AbstractJob {
       //nop
     }
     catch (CoreException ex) {
-      S2ESdkActivator.logError("unable to find @ClassId annotation references in workspace.", ex);
+      SdkLog.error("unable to find @ClassId annotation references in workspace.", ex);
     }
     catch (IllegalArgumentException iae) {
-      S2ESdkActivator.logInfo("@ClassId validation job cancelled.", iae);
+      SdkLog.info("@ClassId validation job cancelled.", iae);
     }
     return result;
   }
@@ -218,7 +218,7 @@ public final class ClassIdValidationJob extends AbstractJob {
       ResourcesPlugin.getWorkspace().getRoot().deleteMarkers(CLASS_ID_DUPLICATE_MARKER_ID, true, IResource.DEPTH_INFINITE);
     }
     catch (CoreException e) {
-      S2ESdkActivator.logError("unable to remove old class id duplicate markers", e);
+      SdkLog.error("unable to remove old class id duplicate markers", e);
     }
   }
 
@@ -258,7 +258,7 @@ public final class ClassIdValidationJob extends AbstractJob {
 
       if (element.getElementType() == IJavaElement.ANNOTATION) {
         IAnnotation annotation = (IAnnotation) element;
-        if (JdtUtils.exists(annotation) && annotation.getElementName().endsWith(Signature.getSimpleName(IRuntimeClasses.ClassId))) {
+        if (JdtUtils.exists(annotation) && annotation.getElementName().endsWith(Signature.getSimpleName(IScoutRuntimeTypes.ClassId))) {
           executeAsync(1000);
         }
         return true; // finished processing
@@ -286,7 +286,7 @@ public final class ClassIdValidationJob extends AbstractJob {
 
   public static synchronized void executeAsync(final long startDelay) {
     Job currentJob = Job.getJobManager().currentJob();
-    if (currentJob instanceof WorkspaceBlockingOperationJob) {
+    if (currentJob instanceof ResourceBlockingOperationJob) {
       // do not schedule a check run if the event comes from the scout sdk itself. we assume it does a correct job.
       return;
     }
@@ -297,7 +297,7 @@ public final class ClassIdValidationJob extends AbstractJob {
         try {
           // get the class id type outside of the validation job
           // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
-          Set<IType> classIds = JdtUtils.resolveJdtTypes(IRuntimeClasses.ClassId);
+          Set<IType> classIds = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ClassId);
           for (IType classId : classIds) {
             if (JdtUtils.exists(classId)) {
               // cancel currently running job. we are starting a new one right afterwards
@@ -313,10 +313,10 @@ public final class ClassIdValidationJob extends AbstractJob {
         catch (IllegalStateException e) {
           // can happen e.g. when the preference nodes are changed: "java.lang.IllegalStateException: Preference node "org.eclipse.jdt.core" has been removed."
           // in that case we just ignore the event and check back later.
-          S2ESdkActivator.logInfo("Could not schedule class id validation.", e);
+          SdkLog.info("Could not schedule class id validation.", e);
         }
         catch (Exception e) {
-          S2ESdkActivator.logError("Error while preparing to search for duplicate @ClassIds.", e);
+          SdkLog.error("Error while preparing to search for duplicate @ClassIds.", e);
         }
         return Status.OK_STATUS;
       }

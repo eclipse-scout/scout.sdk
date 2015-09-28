@@ -44,10 +44,10 @@ import org.eclipse.jdt.ui.text.java.IProblemLocation;
 import org.eclipse.jdt.ui.text.java.IQuickAssistProcessor;
 import org.eclipse.jdt.ui.text.java.correction.CUCorrectionProposal;
 import org.eclipse.jface.text.IDocument;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
-import org.eclipse.scout.sdk.s2e.ui.internal.S2ESdkUiActivator;
 import org.eclipse.scout.sdk.s2e.util.DefaultAstVisitor;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.text.edits.TextEdit;
@@ -88,7 +88,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
 
     // annotation
     SingleMemberAnnotation newAnnotation = td.getAST().newSingleMemberAnnotation();
-    newAnnotation.setTypeName(td.getAST().newSimpleName(Signature.getSimpleName(IRuntimeClasses.ClassId)));
+    newAnnotation.setTypeName(td.getAST().newSimpleName(Signature.getSimpleName(IScoutRuntimeTypes.ClassId)));
 
     // value
     StringLiteral id = td.getAST().newStringLiteral();
@@ -101,7 +101,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
 
     // imports
     if (!isClassIdImportPresent(type.getCompilationUnit())) {
-      cuRewrite.getImportRewrite().addImport(IRuntimeClasses.ClassId);
+      cuRewrite.getImportRewrite().addImport(IScoutRuntimeTypes.ClassId);
     }
 
     // add the annotation
@@ -170,7 +170,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
 
   private static boolean isClassIdImportPresent(ICompilationUnit icu) throws JavaModelException {
     for (IImportDeclaration importDecl : icu.getImports()) {
-      if (IRuntimeClasses.ClassId.equals(importDecl.getElementName())) {
+      if (IScoutRuntimeTypes.ClassId.equals(importDecl.getElementName())) {
         return true;
       }
     }
@@ -200,11 +200,11 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
               if (!t.isBinary() && !t.isAnonymous()) {
                 ITypeHierarchy superTypeHierarchy = t.newSupertypeHierarchy(null);
 
-                Set<IType> jdtTypes = JdtUtils.resolveJdtTypes(IRuntimeClasses.ITypeWithClassId);
+                Set<IType> jdtTypes = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
                 for (IType iTypeWithClassId : jdtTypes) {
                   if (JdtUtils.exists(iTypeWithClassId)) {
                     if (superTypeHierarchy.contains(iTypeWithClassId)) {
-                      IAnnotation annotation = JdtUtils.getAnnotation(t, IRuntimeClasses.ClassId);
+                      IAnnotation annotation = JdtUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
                       return new ClassIdTarget(typeDecl, t, annotation);
                     }
                   }
@@ -212,7 +212,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
               }
             }
             catch (CoreException e) {
-              S2ESdkUiActivator.logError("Unable to check if type '" + t.getFullyQualifiedName() + "' is anonymous.", e);
+              SdkLog.error("Unable to check if type '" + t.getFullyQualifiedName() + "' is anonymous.", e);
             }
           }
         }

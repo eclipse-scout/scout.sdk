@@ -36,35 +36,35 @@ public class IgnoredFieldsFormTest {
     SdkAssert.assertHasSuperTypeSignature(ignoredFieldsFormData, "QAbstractFormData;");
 
     // fields of IgnoredFieldsFormData
-    Assert.assertEquals("field count of 'IgnoredFieldsFormData'", 1, ignoredFieldsFormData.getFields().size());
+    Assert.assertEquals("field count of 'IgnoredFieldsFormData'", 1, ignoredFieldsFormData.fields().list().size());
     IField serialVersionUID = SdkAssert.assertFieldExist(ignoredFieldsFormData, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID, 26);
     SdkAssert.assertFieldSignature(serialVersionUID, "J");
 
-    Assert.assertEquals("method count of 'IgnoredFieldsFormData'", 2, ignoredFieldsFormData.getMethods().size());
+    Assert.assertEquals("method count of 'IgnoredFieldsFormData'", 2, ignoredFieldsFormData.methods().list().size());
     IMethod ignoredFieldsFormData1 = SdkAssert.assertMethodExist(ignoredFieldsFormData, "IgnoredFieldsFormData", new String[]{});
     Assert.assertTrue(ignoredFieldsFormData1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(ignoredFieldsFormData1, null);
     IMethod getNotIgnored = SdkAssert.assertMethodExist(ignoredFieldsFormData, "getNotIgnored", new String[]{});
     SdkAssert.assertMethodReturnTypeSignature(getNotIgnored, "QNotIgnored;");
 
-    Assert.assertEquals("inner types count of 'IgnoredFieldsFormData'", 1, ignoredFieldsFormData.getTypes().size());
+    Assert.assertEquals("inner types count of 'IgnoredFieldsFormData'", 1, ignoredFieldsFormData.innerTypes().list().size());
     // type NotIgnored
     IType notIgnored = SdkAssert.assertTypeExists(ignoredFieldsFormData, "NotIgnored");
     SdkAssert.assertHasFlags(notIgnored, 9);
     SdkAssert.assertHasSuperTypeSignature(notIgnored, "QAbstractValueFieldData<QString;>;");
 
     // fields of NotIgnored
-    Assert.assertEquals("field count of 'NotIgnored'", 1, notIgnored.getFields().size());
+    Assert.assertEquals("field count of 'NotIgnored'", 1, notIgnored.fields().list().size());
     IField serialVersionUID1 = SdkAssert.assertFieldExist(notIgnored, "serialVersionUID");
     SdkAssert.assertHasFlags(serialVersionUID1, 26);
     SdkAssert.assertFieldSignature(serialVersionUID1, "J");
 
-    Assert.assertEquals("method count of 'NotIgnored'", 1, notIgnored.getMethods().size());
+    Assert.assertEquals("method count of 'NotIgnored'", 1, notIgnored.methods().list().size());
     IMethod notIgnored1 = SdkAssert.assertMethodExist(notIgnored, "NotIgnored", new String[]{});
     Assert.assertTrue(notIgnored1.isConstructor());
     SdkAssert.assertMethodReturnTypeSignature(notIgnored1, null);
 
-    Assert.assertEquals("inner types count of 'NotIgnored'", 0, notIgnored.getTypes().size());
+    Assert.assertEquals("inner types count of 'NotIgnored'", 0, notIgnored.innerTypes().list().size());
   }
 }

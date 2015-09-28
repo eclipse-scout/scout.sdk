@@ -13,10 +13,9 @@ package org.eclipse.scout.sdk.core.s.model;
 import java.util.ArrayList;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
-import org.eclipse.scout.sdk.core.s.AnnotationEnums.DefaultSubtypeSdkCommand;
-import org.eclipse.scout.sdk.core.s.AnnotationEnums.SdkCommand;
-import org.eclipse.scout.sdk.core.s.IRuntimeClasses;
-import org.eclipse.scout.sdk.core.signature.SignatureUtils;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.DefaultSubtypeSdkCommand;
+import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotation.SdkCommand;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.AnnotationSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
@@ -31,7 +30,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
   }
 
   public static IAnnotationSourceBuilder createOrderAnnotation(double orderNr) {
-    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(IRuntimeClasses.Order);
+    AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(IScoutRuntimeTypes.Order);
     orderAnnoation.putValue("value", Double.toString(orderNr));
     return orderAnnoation;
   }
@@ -44,7 +43,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
    * @return the created source builder
    */
   public static IAnnotationSourceBuilder createClassIdAnnotation(String classIdValue) {
-    AnnotationSourceBuilder classIdAnnoation = new AnnotationSourceBuilder(IRuntimeClasses.ClassId);
+    AnnotationSourceBuilder classIdAnnoation = new AnnotationSourceBuilder(IScoutRuntimeTypes.ClassId);
     classIdAnnoation.putValue("value", CoreUtils.toStringLiteral(classIdValue));
     return classIdAnnoation;
   }
@@ -54,31 +53,31 @@ public final class ScoutAnnotationSourceBuilderFactory {
   }
 
   public static IAnnotationSourceBuilder createPageDataAnnotation(final String pageDataTypeSignature) {
-    return new AnnotationSourceBuilder(IRuntimeClasses.PageData) {
+    return new AnnotationSourceBuilder(IScoutRuntimeTypes.PageData) {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        source.append('@').append(SignatureUtils.useName(getName(), validator)).append('(');
-        source.append(SignatureUtils.useSignature(pageDataTypeSignature, validator));
+        source.append('@').append(validator.useName(getName())).append('(');
+        source.append(validator.useSignature(pageDataTypeSignature));
         source.append(".class)");
       }
     };
   }
 
   public static IAnnotationSourceBuilder createFormDataAnnotation(final String formDataSignature, final SdkCommand sdkCommand, final DefaultSubtypeSdkCommand defaultSubtypeCommand) {
-    return new AnnotationSourceBuilder(IRuntimeClasses.FormData) {
+    return new AnnotationSourceBuilder(IScoutRuntimeTypes.FormData) {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
-        String formDataTypeRef = SignatureUtils.useName(getName(), validator);
+        String formDataTypeRef = validator.useName(getName());
         source.append("@").append(formDataTypeRef);
         ArrayList<String> args = new ArrayList<>(3);
         if (formDataSignature != null) {
-          args.add("value = " + SignatureUtils.useSignature(formDataSignature, validator) + ".class");
+          args.add("value = " + validator.useSignature(formDataSignature) + ".class");
         }
         if (sdkCommand != null) {
           StringBuilder b = new StringBuilder();
           b.append("sdkCommand = ");
           b.append(formDataTypeRef).append(".");
-          b.append(SignatureUtils.useName(sdkCommand.getDeclaringClass().getName(), validator));
+          b.append(validator.useName(sdkCommand.getDeclaringClass().getName()));
           b.append(".").append(sdkCommand.name());
           args.add(b.toString());
         }
@@ -86,7 +85,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
           StringBuilder b = new StringBuilder();
           b.append("defaultSubtypeSdkCommand = ");
           b.append(formDataTypeRef).append(".");
-          b.append(SignatureUtils.useName(defaultSubtypeCommand.getDeclaringClass().getName(), validator));
+          b.append(validator.useName(defaultSubtypeCommand.getDeclaringClass().getName()));
           b.append(".").append(defaultSubtypeCommand.name());
           args.add(b.toString());
         }
@@ -105,7 +104,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
   }
 
   public static IAnnotationSourceBuilder createReplaceAnnotationBuilder() {
-    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IRuntimeClasses.Replace);
+    AnnotationSourceBuilder sourceBuilder = new AnnotationSourceBuilder(IScoutRuntimeTypes.Replace);
     return sourceBuilder;
   }
 }

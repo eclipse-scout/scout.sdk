@@ -12,8 +12,8 @@ package org.eclipse.scout.sdk.core.s.dto.sourcebuilder.table;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.AbstractTableBeanSourceBuilder;
-import org.eclipse.scout.sdk.core.s.dto.sourcebuilder.form.FormDataAnnotation;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 
 /**
@@ -24,14 +24,14 @@ import org.eclipse.scout.sdk.core.s.util.DtoUtils;
  */
 public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSourceBuilder {
 
-  private FormDataAnnotation m_formDataAnnotation;
+  private FormDataAnnotationDescriptor m_formDataAnnotation;
 
   /**
    * @param modelType
    * @param elementName
    * @param setup
    */
-  public TableFieldBeanFormDataSourceBuilder(IType modelType, FormDataAnnotation formDataAnnotation, String typeName, IJavaEnvironment env) {
+  public TableFieldBeanFormDataSourceBuilder(IType modelType, FormDataAnnotationDescriptor formDataAnnotation, String typeName, IJavaEnvironment env) {
     super(modelType, typeName, env, false);
     m_formDataAnnotation = formDataAnnotation;
     setup();
@@ -48,7 +48,7 @@ public class TableFieldBeanFormDataSourceBuilder extends AbstractTableBeanSource
     return DtoUtils.computeSuperTypeSignatureForFormData(getModelType(), getFormDataAnnotation(), this);
   }
 
-  public FormDataAnnotation getFormDataAnnotation() {
+  public FormDataAnnotationDescriptor getFormDataAnnotation() {
     return m_formDataAnnotation;
   }
 }

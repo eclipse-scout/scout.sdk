@@ -13,19 +13,22 @@ package org.eclipse.scout.sdk.core.model.api.internal;
 import java.util.AbstractList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.RandomAccess;
 
+import org.apache.commons.lang3.Validate;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 
 /**
  * <h3>{@link WrappedList}</h3>
  *
- * @author imo
+ * @author Ivan Motsch
  * @since 5.1.0
  */
-public class WrappedList<T> extends AbstractList<T> {
+public class WrappedList<T> extends AbstractList<T>implements RandomAccess {
   private final List<? extends JavaElementSpi> m_spiList;
 
   public WrappedList(List<? extends JavaElementSpi> spiList) {
+    Validate.isInstanceOf(RandomAccess.class, spiList);
     m_spiList = spiList;
   }
 

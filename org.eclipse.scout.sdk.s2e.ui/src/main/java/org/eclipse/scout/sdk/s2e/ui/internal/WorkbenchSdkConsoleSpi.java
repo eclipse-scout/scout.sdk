@@ -1,4 +1,4 @@
-package org.eclipse.scout.sdk.s2e.internal;
+package org.eclipse.scout.sdk.s2e.ui.internal;
 
 import java.io.IOException;
 
@@ -32,7 +32,7 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.SdkConsoleSpi {
   private static final String CONSOLE_NAME = "Scout SDK";
   private static final String CONSOLE_TYPE = "org.eclipse.scout.sdk";
 
-  private static IOConsole currentConsole(boolean autoCreate) {
+  public static IOConsole currentConsole(boolean autoCreate) {
     IConsoleManager mgr = ConsolePlugin.getDefault().getConsoleManager();
     IOConsole console = null;
     for (IConsole c : mgr.getConsoles()) {
@@ -48,8 +48,9 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.SdkConsoleSpi {
       }
       mgr.removeConsoles(new IConsole[]{c});
     }
+
     if (console == null && autoCreate) {
-      console = new IOConsole(CONSOLE_NAME, CONSOLE_TYPE, null) {
+      console = new IOConsole(CONSOLE_NAME, CONSOLE_TYPE, S2ESdkUiActivator.getImageDescriptor(ISdkIcons.EclipseScout)) {
         @Override
         public void clearConsole() {
           super.clearConsole();

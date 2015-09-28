@@ -40,7 +40,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.core.JarEntryFile;
 import org.eclipse.jface.window.Window;
-import org.eclipse.scout.sdk.core.util.WeakEventListener;
+import org.eclipse.scout.sdk.core.util.IWeakEventListener;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model.TranslationFileNewModel;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.ui.TranslationFileNewDialog;
@@ -265,7 +265,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
     return fileName;
   }
 
-  private class P_NlsClassPropertyChangeListener implements PropertyChangeListener, WeakEventListener {
+  private class P_NlsClassPropertyChangeListener implements PropertyChangeListener, IWeakEventListener {
     @Override
     public void propertyChange(PropertyChangeEvent evt) {
       if (NlsType.PROP_TRANSLATION_FILE_PREFIX.equals(evt.getPropertyName()) || NlsType.PROP_TRANSLATION_FOLDER_NAME.equals(evt.getPropertyName())) {
