@@ -674,19 +674,20 @@ public final class DtoUtils {
         IType primaryType = CoreUtils.getPrimaryType(extendedType);
         IType extendedDto = null;
         if (CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IForm) || CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IFormField)) {
-          extendedDto = findDtoForForm(primaryType);
+          if (CoreUtils.isInstanceOf(extendedType, IRuntimeClasses.ITable) && extendedType.getDeclaringType() != null) {
+            IType tableFieldDto = getFormDataType(extendedType.getDeclaringType());
+            extendedDto = getRowDataFor(tableFieldDto);
+          }
+          else {
+            extendedDto = findDtoForForm(primaryType);
+          }
         }
         else if (CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IExtension)) {
           extendedDto = findDtoForPage(primaryType);
         }
         else if (CoreUtils.isInstanceOf(primaryType, IRuntimeClasses.IPageWithTable)) {
           IType pageDto = findDtoForPage(primaryType);
-
-          List<IType> rowDataInPageDto = CoreUtils.getInnerTypes(pageDto, TypeFilters.getSubtypeFilter(IRuntimeClasses.AbstractTableRowData));
-          extendedDto = null;
-          if (rowDataInPageDto != null && !rowDataInPageDto.isEmpty()) {
-            extendedDto = rowDataInPageDto.get(0);
-          }
+          extendedDto = getRowDataFor(pageDto);
         }
 
         if (extendedDto != null) {
@@ -702,6 +703,18 @@ public final class DtoUtils {
           return asb;
         }
       }
+    }
+    return null;
+  }
+
+  private static IType getRowDataFor(IType tableDto) {
+    if (tableDto == null) {
+      return null;
+    }
+
+    List<IType> rowDataInTableDto = CoreUtils.getInnerTypes(tableDto, TypeFilters.getSubtypeFilter(IRuntimeClasses.AbstractTableRowData));
+    if (!rowDataInTableDto.isEmpty()) {
+      return rowDataInTableDto.get(0);
     }
     return null;
   }
