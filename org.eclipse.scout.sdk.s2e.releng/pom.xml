@@ -60,6 +60,7 @@
         </excludes>
       </resource>
     </resources>
+
     <pluginManagement>
       <plugins>
         <plugin>
@@ -80,7 +81,7 @@
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.1</version>
+          <version>3.0-SNAPSHOT</version>
           <configuration>
             <url>${forgeSnapshotUrl}</url>
             <repositoryId>${forgeSnapshotId}</repositoryId>
@@ -123,7 +124,7 @@
             <repository>
               <id>eclipse_mars</id>
               <url>http://download.eclipse.org/releases/mars/</url>
-<!--               <url>https://scout.bsiag.com/repository/eclipse.releases.mars</url> -->
+              <!-- <url>https://scout.bsiag.com/repository/eclipse.releases.mars</url> -->
               <layout>p2</layout>
             </repository>
           </source>
@@ -471,19 +472,6 @@
     </plugins>
   </build>
 
-  <pluginRepositories>
-    <pluginRepository>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <id>sonatype-public-repository</id>
-      <url>https://oss.sonatype.org/content/groups/public</url>
-    </pluginRepository>
-  </pluginRepositories>
-
   <distributionManagement>
     <repository>
       <id>${forgeReleaseId}</id>
@@ -500,6 +488,17 @@
       <url>http://staging</url>
     </site>
   </distributionManagement>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <id>apache.snapshots</id>
+      <name>Apache Snapshot Repository</name>
+      <url>http://repository.apache.org/snapshots</url>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+    </pluginRepository>
+  </pluginRepositories>
 
   <profiles>
     <profile>
@@ -526,6 +525,7 @@
                 </configuration>
               </execution>
             </executions>
+            <inherited>false</inherited>
           </plugin>
         </plugins>
       </build>
