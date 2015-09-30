@@ -23,7 +23,7 @@
   <dependencies>
     <!-- Build Dependencies -->
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>ecj</artifactId>
     </dependency>
     <dependency>

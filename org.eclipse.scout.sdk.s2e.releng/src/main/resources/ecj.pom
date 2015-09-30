@@ -6,7 +6,7 @@
     Originally downloaded here:
     http://download.eclipse.org/eclipse/downloads/drops4/R-4.5-201506032000/#JDTCORE
   -->
-  <groupId>org.eclipse.scout.sdk</groupId>
+  <groupId>org.eclipse.scout.sdk.deps</groupId>
   <artifactId>ecj</artifactId>
   <version>${ecj-maven}</version>
 

@@ -2,7 +2,7 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.eclipse.scout.sdk</groupId>
+  <groupId>org.eclipse.scout.sdk.deps</groupId>
   <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
   <version>${org.eclipse.jdt.core.manipulation-maven}</version>
 
@@ -31,32 +31,32 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
       <version>${org.eclipse.core.runtime-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.core.resources</artifactId>
       <version>${org.eclipse.core.resources-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
       <version>${org.eclipse.ltk.core.refactoring-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jdt.core</artifactId>
       <version>${org.eclipse.jdt.core-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.core.expressions</artifactId>
       <version>${org.eclipse.core.expressions-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.text</artifactId>
       <version>${org.eclipse.text-range}</version>
     </dependency>

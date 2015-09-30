@@ -35,7 +35,7 @@
       <artifactId>org.eclipse.scout.sdk.core</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.eclipse.scout.sdk</groupId>
+          <groupId>org.eclipse.scout.sdk.deps</groupId>
           <artifactId>ecj</artifactId>
         </exclusion>
       </exclusions>
@@ -45,32 +45,32 @@
       <artifactId>org.eclipse.scout.sdk.core.s</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.eclipse.scout.sdk</groupId>
+          <groupId>org.eclipse.scout.sdk.deps</groupId>
           <artifactId>ecj</artifactId>
         </exclusion>
       </exclusions>
     </dependency>
     <!-- Build Dependencies (Provided) -->
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jdt.core</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jdt.launching</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.m2e.core</artifactId>
       <scope>provided</scope>
     </dependency>
-      <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
-        <artifactId>org.eclipse.ui.console</artifactId>
-        <scope>provided</scope>
-      </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.ui.console</artifactId>
+      <scope>provided</scope>
+    </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>

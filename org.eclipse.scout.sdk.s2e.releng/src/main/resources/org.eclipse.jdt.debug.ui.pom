@@ -2,7 +2,7 @@
 <project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.eclipse.scout.sdk</groupId>
+  <groupId>org.eclipse.scout.sdk.deps</groupId>
   <artifactId>org.eclipse.jdt.debug.ui</artifactId>
   <version>${org.eclipse.jdt.debug.ui-maven}</version>
 
@@ -31,92 +31,92 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.ui.ide</artifactId>
       <version>${org.eclipse.ui.ide-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jface.text</artifactId>
       <version>${org.eclipse.jface.text-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.ui.workbench.texteditor</artifactId>
       <version>${org.eclipse.ui.workbench.texteditor-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.ui.editors</artifactId>
       <version>${org.eclipse.ui.editors-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.core.expressions</artifactId>
       <version>${org.eclipse.core.expressions-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jdt.core</artifactId>
       <version>${org.eclipse.jdt.core-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jdt.ui</artifactId>
       <version>${org.eclipse.jdt.ui-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.core.runtime</artifactId>
       <version>${org.eclipse.core.runtime-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
       <version>${org.eclipse.ltk.core.refactoring-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.search</artifactId>
       <version>${org.eclipse.search-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.ui.forms</artifactId>
       <version>${org.eclipse.ui.forms-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.core.resources</artifactId>
       <version>${org.eclipse.core.resources-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.core.filesystem</artifactId>
       <version>${org.eclipse.core.filesystem-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jface</artifactId>
       <version>${org.eclipse.jface-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.ui.views</artifactId>
       <version>${org.eclipse.ui.views-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.ui</artifactId>
       <version>${org.eclipse.ui-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
       <version>${org.eclipse.jdt.core.manipulation-range}</version>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.ui.console</artifactId>
       <version>${org.eclipse.ui.console-range}</version>
     </dependency>

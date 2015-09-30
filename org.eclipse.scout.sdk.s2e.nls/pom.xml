@@ -37,12 +37,12 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jdt.ui</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.eclipse.scout.sdk</groupId>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.ui.workbench</artifactId>
       <scope>provided</scope>
     </dependency>

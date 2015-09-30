@@ -253,142 +253,142 @@
         <version>${maven.model.dependency.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>ecj</artifactId>
         <version>${ecj-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.core.commands</artifactId>
         <version>${org.eclipse.core.commands-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.equinox</artifactId>
         <version>${org.eclipse.equinox-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.equinox.common</artifactId>
         <version>${org.eclipse.equinox.common-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.equinox.preferences</artifactId>
         <version>${org.eclipse.equinox.preferences-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.equinox.registry</artifactId>
         <version>${org.eclipse.equinox.registry-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.equinox.security</artifactId>
         <version>${org.eclipse.equinox.security-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.core.expressions</artifactId>
         <version>${org.eclipse.core.expressions-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.core.filesystem</artifactId>
         <version>${org.eclipse.core.filesystem-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.core.resources</artifactId>
         <version>${org.eclipse.core.resources-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.core.runtime</artifactId>
         <version>${org.eclipse.core.runtime-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.jdt.core.manipulation</artifactId>
         <version>${org.eclipse.jdt.core.manipulation-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.jdt.core</artifactId>
         <version>${org.eclipse.jdt.core-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.jdt.debug.ui</artifactId>
         <version>${org.eclipse.jdt.debug.ui-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.jdt.launching</artifactId>
         <version>${org.eclipse.jdt.launching-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.jdt.ui</artifactId>
         <version>${org.eclipse.jdt.ui-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.jface.text</artifactId>
         <version>${org.eclipse.jface.text-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.ltk.core.refactoring</artifactId>
         <version>${org.eclipse.ltk.core.refactoring-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.ltk.ui.refactoring</artifactId>
         <version>${org.eclipse.ltk.ui.refactoring-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.m2e.core</artifactId>
         <version>${org.eclipse.m2e.core-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.pde.core</artifactId>
         <version>${org.eclipse.pde.core-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.pde.ui</artifactId>
         <version>${org.eclipse.pde.ui-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.search</artifactId>
         <version>${org.eclipse.search-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.ui.console</artifactId>
         <version>${org.eclipse.ui.console-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.ui.editors</artifactId>
         <version>${org.eclipse.ui.editors-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.ui.ide</artifactId>
         <version>${org.eclipse.ui.ide-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.ui.workbench</artifactId>
         <version>${org.eclipse.ui.workbench-maven}</version>
       </dependency>
       <dependency>
-        <groupId>org.eclipse.scout.sdk</groupId>
+        <groupId>org.eclipse.scout.sdk.deps</groupId>
         <artifactId>org.eclipse.ui</artifactId>
         <version>${org.eclipse.ui-maven}</version>
       </dependency>
