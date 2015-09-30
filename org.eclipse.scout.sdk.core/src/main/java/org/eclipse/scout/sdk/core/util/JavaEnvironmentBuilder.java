@@ -60,7 +60,8 @@ public final class JavaEnvironmentBuilder {
    * @return this
    */
   public JavaEnvironmentBuilder withExcludeScoutSdk() {
-    return withExclude(".*" + Pattern.quote(".scout.sdk.") + ".*");
+//    return withExclude(".*" + Pattern.quote(".scout.sdk.") + ".*"); TODO MVILLIGER
+    return this;
   }
 
   /**
