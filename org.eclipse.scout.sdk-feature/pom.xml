@@ -14,89 +14,12 @@
 
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
-    <artifactId>org.eclipse.scout.sdk.p2-build</artifactId>
+    <artifactId>org.eclipse.scout.sdk</artifactId>
     <version>5.2.0-SNAPSHOT</version>
-    <relativePath>../org.eclipse.scout.sdk.p2-build</relativePath>
   </parent>
 
   <artifactId>org.eclipse.scout.sdk-feature</artifactId>
   <packaging>eclipse-feature</packaging>
 
   <name>Eclipse Scout SDK Feature</name>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho.extras</groupId>
-        <artifactId>tycho-source-feature-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>generate-source-feature</id>
-            <goals>
-              <goal>source-feature</goal>
-            </goals>
-            <configuration>
-              <excludes>
-                <!-- <plugin id="org.eclipse.scout.sdk.compatibility.v37v41.fragment" /> -->
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-p2-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>default-p2-metadata-default</id>
-            <configuration>
-              <attachP2Metadata>false</attachP2Metadata>
-            </configuration>
-          </execution>
-          <execution>
-            <id>attach-p2-metadata</id>
-            <phase>package</phase>
-            <goals>
-              <goal>p2-metadata</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.basepom.maven</groupId>
-        <artifactId>duplicate-finder-maven-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
-  <profiles>
-    <profile>
-      <id>eclipse-sign</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.eclipse.cbi.maven.plugins</groupId>
-            <artifactId>eclipse-jarsigner-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign</id>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-p2-plugin</artifactId>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
 </project>

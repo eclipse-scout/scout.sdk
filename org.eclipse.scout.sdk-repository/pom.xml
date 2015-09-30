@@ -14,9 +14,8 @@
 
   <parent>
     <groupId>org.eclipse.scout.sdk</groupId>
-    <artifactId>org.eclipse.scout.sdk.p2-build</artifactId>
+    <artifactId>org.eclipse.scout.sdk</artifactId>
     <version>5.2.0-SNAPSHOT</version>
-    <relativePath>../org.eclipse.scout.sdk.p2-build</relativePath>
   </parent>
 
   <artifactId>org.eclipse.scout.sdk-repository</artifactId>
@@ -27,32 +26,4 @@
   <properties>
     <p2repo-zip-path>${project.build.directory}/org.eclipse.scout.sdk-repository-${project.version}.zip</p2repo-zip-path>
   </properties>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.eclipse.tycho</groupId>
-        <artifactId>tycho-p2-publisher-plugin</artifactId>
-        <configuration>
-          <publishArtifacts>true</publishArtifacts>
-        </configuration>
-      </plugin>
-
-      <plugin>
-        <groupId>org.basepom.maven</groupId>
-        <artifactId>duplicate-finder-maven-plugin</artifactId>
-        <configuration>
-          <skip>true</skip>
-        </configuration>
-      </plugin>
-    </plugins>
-    <extensions>
-      <!-- Enabling the use of FTP -->
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ftp</artifactId>
-        <version>1.0-beta-6</version>
-      </extension>
-    </extensions>
-  </build>
 </project>

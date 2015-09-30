@@ -12,18 +12,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <parent>
+    <groupId>org.eclipse.scout</groupId>
+    <artifactId>maven_sdk_plugin_config-master</artifactId>
+    <version>1.4-SNAPSHOT</version>
+  </parent>
+
   <groupId>org.eclipse.scout.sdk</groupId>
   <artifactId>org.eclipse.scout.sdk</artifactId>
   <version>5.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <properties>
-    <scout.rt.version>5.2.0-SNAPSHOT</scout.rt.version>
-    <jdk.source.version>1.7</jdk.source.version>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <maven.build.timestamp.format>yyyyMMdd-HHmmss</maven.build.timestamp.format>
-    <maven.model.dependency.version>3.3.3</maven.model.dependency.version>
+    <scout.rt.version>${project.version}</scout.rt.version>
 
     <!-- exclude the unit tests from sonar -->
     <sonar.exclusions>file:**/org.eclipse.scout.sdk.test/**</sonar.exclusions>
@@ -176,19 +177,7 @@
     <org.eclipse.m2e.core>1.6.0.20150526-2032</org.eclipse.m2e.core>
     <org.eclipse.m2e.core-maven>${org.eclipse.m2e.core}-SNAPSHOT</org.eclipse.m2e.core-maven>
     <org.eclipse.m2e.core-range>[1.6.0,1.6.1)</org.eclipse.m2e.core-range>
-
-    <!-- version of Tycho used by org.eclipse.scout.sdk.core.releng build and profiles eclipse-sign and eclipse-pack -->
-    <tycho.version>0.22.0</tycho.version>
-    <tycho-extras.version>${tycho.version}</tycho-extras.version>
-    <cbi-plugins.version>1.1.2</cbi-plugins.version>
-
-    <tycho-repo.url>https://oss.sonatype.org/content/repositories/public/</tycho-repo.url>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <!--
-      repo for released versions of CBI. Note, we intentionally use as specific a repo as possible.
-      See bug 471835.
-    -->
-    <eclipse-repo.url>https://repo.eclipse.org/content/repositories/cbi/</eclipse-repo.url>
+    <maven.model.dependency.version>3.3.3</maven.model.dependency.version>
   </properties>
 
   <dependencyManagement>
@@ -473,196 +462,10 @@
     </dependencies>
   </dependencyManagement>
 
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-          <groupId>org.codehaus.mojo</groupId>
-          <artifactId>build-helper-maven-plugin</artifactId>
-          <version>1.9.1</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <version>3.3</version>
-          <configuration>
-            <compilerId>jdt</compilerId>
-            <source>${jdk.source.version}</source>
-            <target>${jdk.source.version}</target>
-            <compilerArgs>
-              <arg>-proc:none</arg>
-            </compilerArgs>
-          </configuration>
-          <dependencies>
-            <dependency>
-              <groupId>org.eclipse.tycho</groupId>
-              <artifactId>tycho-compiler-jdt</artifactId>
-              <version>${tycho.version}</version>
-            </dependency>
-          </dependencies>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
-          <version>2.18.1</version>
-          <configuration>
-            <testFailureIgnore>true</testFailureIgnore>
-          </configuration>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-jar-plugin</artifactId>
-          <version>2.6</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-source-plugin</artifactId>
-          <version>2.4</version>
-          <executions>
-            <execution>
-              <id>attach-sources</id>
-              <goals>
-                <goal>jar-no-fork</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-
-        <plugin>
-          <artifactId>maven-clean-plugin</artifactId>
-          <version>2.6.1</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-install-plugin</artifactId>
-          <version>2.5.2</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-deploy-plugin</artifactId>
-          <version>2.8.2</version>
-          <configuration>
-            <!-- <deployAtEnd>true</deployAtEnd> -->
-          </configuration>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-site-plugin</artifactId>
-          <version>3.4</version>
-        </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.10</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho.extras</groupId>
-          <artifactId>tycho-pack200a-plugin</artifactId>
-          <version>${tycho-extras.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.cbi.maven.plugins</groupId>
-          <artifactId>eclipse-jarsigner-plugin</artifactId>
-          <version>${cbi-plugins.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho.extras</groupId>
-          <artifactId>tycho-pack200b-plugin</artifactId>
-          <version>${tycho-extras.version}</version>
-        </plugin>
-
-        <plugin>
-          <groupId>org.eclipse.tycho</groupId>
-          <artifactId>tycho-p2-plugin</artifactId>
-          <version>${tycho.version}</version>
-        </plugin>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself. -->
-        <plugin>
-          <groupId>org.eclipse.m2e</groupId>
-          <artifactId>lifecycle-mapping</artifactId>
-          <version>1.0.0</version>
-          <configuration>
-            <lifecycleMappingMetadata>
-              <pluginExecutions>
-                <pluginExecution>
-                  <pluginExecutionFilter>
-                    <groupId>org.eclipse.cbi.maven.plugins</groupId>
-                    <artifactId>eclipse-cbi-plugin</artifactId>
-                    <versionRange>[1.1.2,)</versionRange>
-                    <goals>
-                      <goal>generate-api-build-xml</goal>
-                    </goals>
-                  </pluginExecutionFilter>
-                  <action>
-                    <ignore></ignore>
-                  </action>
-                </pluginExecution>
-              </pluginExecutions>
-            </lifecycleMappingMetadata>
-          </configuration>
-        </plugin>
-      </plugins>
-    </pluginManagement>
-
-    <plugins>
-      <plugin>
-        <groupId>org.basepom.maven</groupId>
-        <artifactId>duplicate-finder-maven-plugin</artifactId>
-        <version>1.2.0</version>
-        <executions>
-          <execution>
-            <id>default</id>
-            <phase>verify</phase>
-            <goals>
-              <goal>check</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <printEqualFiles>false</printEqualFiles>
-          <failBuildInCaseOfDifferentContentConflict>true</failBuildInCaseOfDifferentContentConflict>
-          <failBuildInCaseOfEqualContentConflict>true</failBuildInCaseOfEqualContentConflict>
-          <failBuildInCaseOfConflict>true</failBuildInCaseOfConflict>
-          <checkCompileClasspath>true</checkCompileClasspath>
-          <checkRuntimeClasspath>true</checkRuntimeClasspath>
-          <checkTestClasspath>true</checkTestClasspath>
-          <skip>false</skip>
-          <quiet>false</quiet>
-          <preferLocal>true</preferLocal>
-          <useResultFile>false</useResultFile>
-          <includePomProjects>true</includePomProjects>
-          <ignoredResourcePatterns>
-            <ignoredResourcePattern>.*ico$</ignoredResourcePattern>
-            <ignoredResourcePattern>.*gif$</ignoredResourcePattern>
-            <ignoredResourcePattern>.*png$</ignoredResourcePattern>
-            <ignoredResourcePattern>.*html$</ignoredResourcePattern>
-            <ignoredResourcePattern>.*xml$</ignoredResourcePattern>
-            <ignoredResourcePattern>.*properties$</ignoredResourcePattern>
-            <ignoredResourcePattern>.*txt$</ignoredResourcePattern>
-            <ignoredResourcePattern>.api_description$</ignoredResourcePattern>
-            <ignoredResourcePattern>.options$</ignoredResourcePattern>
-          </ignoredResourcePatterns>
-          <ignoredDependencies>
-            <dependency>
-              <groupId>log4j</groupId>
-              <artifactId>log4j</artifactId>
-            </dependency>
-          </ignoredDependencies>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-
   <licenses>
     <license>
       <name>Eclipse Public License v1.0</name>
+      <url>http://www.eclipse.org/legal/epl-v10.html</url>
       <comments>All rights reserved.
 
        This program and the accompanying materials are made
@@ -694,12 +497,6 @@
 
   <repositories>
     <repository>
-      <!-- TODO sle remove this before releasing -->
-      <id>eclipse-scout-snapshots</id>
-      <url>https://repo.eclipse.org/content/repositories/scout-snapshots/</url>
-    </repository>
-
-    <repository>
       <snapshots>
         <enabled>false</enabled>
       </snapshots>
@@ -717,18 +514,22 @@
 
   <pluginRepositories>
     <pluginRepository>
-      <id>tycho</id>
-      <url>${tycho-repo.url}</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
       <snapshots>
-        <enabled>true</enabled>
+        <enabled>false</enabled>
       </snapshots>
+      <id>eclipse.release</id>
+      <name>eclipse-release-repo</name>
+      <url>https://repo.eclipse.org/content/groups/releases/</url>
     </pluginRepository>
     <pluginRepository>
-      <id>eclipse</id>
-      <url>${eclipse-repo.url}</url>
+      <snapshots></snapshots>
+      <id>eclipse.snapshot</id>
+      <name>eclipse-snapshot-repo</name>
+      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <id>tycho</id>
+      <url>${tycho-repo.url}</url>
       <releases>
         <enabled>true</enabled>
       </releases>
@@ -753,75 +554,6 @@
 
   <profiles>
     <profile>
-      <id>eclipse-sign</id>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.eclipse.tycho.extras</groupId>
-            <artifactId>tycho-pack200a-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>pack200-normalize</id>
-                <goals>
-                  <goal>normalize</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.eclipse.cbi.maven.plugins</groupId>
-            <artifactId>eclipse-jarsigner-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>sign</id>
-                <goals>
-                  <goal>sign</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.eclipse.tycho.extras</groupId>
-            <artifactId>tycho-pack200b-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>pack200-pack</id>
-                <goals>
-                  <goal>pack</goal>
-                </goals>
-              </execution>
-            </executions>
-          </plugin>
-
-          <plugin>
-            <groupId>org.eclipse.tycho</groupId>
-            <artifactId>tycho-p2-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>attach-p2-metadata</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>p2-metadata</goal>
-                </goals>
-              </execution>
-            </executions>
-            <configuration>
-              <defaultP2Metadata>false</defaultP2Metadata>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-    <profile>
-      <id>sonar</id>
-      <modules>
-        <module>org.eclipse.scout.sdk.parent</module>
-      </modules>
-    </profile>
-
-    <profile>
       <id>default</id>
       <activation>
         <property>
@@ -829,9 +561,17 @@
         </property>
       </activation>
       <modules>
-        <module>org.eclipse.scout.sdk.parent</module>
+        <module>org.eclipse.scout.sdk.core</module>
+        <module>org.eclipse.scout.sdk.core.test</module>
+        <module>org.eclipse.scout.sdk.core.s</module>
+        <module>org.eclipse.scout.sdk.core.s.test</module>
+
+        <module>org.eclipse.scout.sdk.s2e</module>
+        <module>org.eclipse.scout.sdk.s2e.ui</module>
+        <module>org.eclipse.scout.sdk.s2e.nls</module>
       </modules>
     </profile>
+
     <profile>
       <id>p2-build</id>
       <activation>
@@ -840,8 +580,67 @@
         </property>
       </activation>
       <modules>
-        <module>org.eclipse.scout.sdk.p2-build</module>
+        <module>org.eclipse.scout.sdk-target</module>
+        <module>org.eclipse.scout.sdk-feature</module>
+        <module>org.eclipse.scout.sdk-repository</module>
       </modules>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.eclipse.scout.sdk.s2e</groupId>
+          <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
+          <exclusions>
+            <exclusion>
+              <groupId>org.eclipse.scout.sdk.deps</groupId>
+              <artifactId>org.eclipse.jdt.core</artifactId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.scout.sdk.s2e</groupId>
+          <artifactId>org.eclipse.scout.sdk.s2e</artifactId>
+          <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.scout.sdk.s2e</groupId>
+          <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.scout.sdk.s2e</groupId>
+          <artifactId>org.eclipse.scout.sdk.s2e.nls</artifactId>
+          <classifier>sources</classifier>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.scout.sdk.s2e</groupId>
+          <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.eclipse.scout.sdk.s2e</groupId>
+          <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
+          <classifier>sources</classifier>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <pluginManagement>
+          <plugins>
+            <plugin>
+              <groupId>org.eclipse.tycho</groupId>
+              <artifactId>target-platform-configuration</artifactId>
+              <configuration>
+                <target>
+                  <artifact>
+                    <groupId>org.eclipse.scout.sdk</groupId>
+                    <artifactId>org.eclipse.scout.sdk-target</artifactId>
+                    <version>${project.version}</version>
+                    <classifier>org.eclipse.mars-dependencies</classifier>
+                  </artifact>
+                </target>
+              </configuration>
+            </plugin>
+          </plugins>
+        </pluginManagement>
+      </build>
     </profile>
   </profiles>
 </project>

@@ -38,7 +38,7 @@ public class ScoutProjectNewTest {
       System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, targetDirectory.getAbsolutePath());
 
       MavenCli cli = new MavenCli();
-      int result = cli.doMain(new String[]{"clean", "test"}, pomDir.getAbsolutePath(), System.out, System.err);
+      int result = cli.doMain(new String[]{"clean", "test", "-X", "-Dmaven.ext.class.path=''"}, pomDir.getAbsolutePath(), System.out, System.err);
       Assert.assertEquals("ERROR: Created Scout project does not compile. See former log entries for details.", 0, result);
     }
     finally {

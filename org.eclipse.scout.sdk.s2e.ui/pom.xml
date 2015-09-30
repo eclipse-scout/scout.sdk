@@ -13,12 +13,12 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>org.eclipse.scout.sdk.s2e</groupId>
-    <artifactId>org.eclipse.scout.sdk.s2e.parent</artifactId>
+    <groupId>org.eclipse.scout.sdk</groupId>
+    <artifactId>org.eclipse.scout.sdk</artifactId>
     <version>5.2.0-SNAPSHOT</version>
-    <relativePath>../org.eclipse.scout.sdk.s2e.parent</relativePath>
   </parent>
 
+  <groupId>org.eclipse.scout.sdk.s2e</groupId>
   <artifactId>org.eclipse.scout.sdk.s2e.ui</artifactId>
   <packaging>bundle</packaging>
 
@@ -51,14 +51,6 @@
         <configuration>
           <instructions>
             <Import-Package>
-              <!-- org.eclipse.scout.sdk.*;version="[5.2,5.3)", -->
-              <!-- org.eclipse.jdt.*;version="[3.10,4)", -->
-              <!-- org.eclipse.core.resources.*;version="[3.9,4)", -->
-              <!-- org.eclipse.core.runtime.jobs.*;version="[3.10,4)", -->
-              <!-- org.eclipse.jface.text.*;version="[3.9,4)", -->
-              <!-- org.eclipse.jface.*;version="[3.10,4)", -->
-              <!-- org.eclipse.swt.*;version="[3.103,4)", -->
-              <!-- org.eclipse.ui.*;version="[3.5,4)", -->
               !org.eclipse.core.runtime*,
               !org.eclipse.jface.text*,
               *
