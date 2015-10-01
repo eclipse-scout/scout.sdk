@@ -10,10 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.fixture;
 
-import org.eclipse.scout.sdk.core.model.AnnotationQueryTest;
-
 /**
- * <h3>{@link AnnotationQueryTestFixture}</h3> Fixture used in Test {@link AnnotationQueryTest}.
+ * <h3>{@link AnnotationQueryTestFixture}</h3> Fixture used in Test AnnotationQueryTest.
  *
  * @author Matthias Villiger
  * @since 5.2.0
