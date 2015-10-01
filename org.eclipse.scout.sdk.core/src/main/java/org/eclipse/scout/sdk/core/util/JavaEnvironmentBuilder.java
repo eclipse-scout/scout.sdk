@@ -55,13 +55,12 @@ public final class JavaEnvironmentBuilder {
   }
 
   /**
-   * Exclude all paths containing <code>.scout.sdk.</code>
+   * Exclude classes paths containing <code>.scout.sdk.</code>
    *
    * @return this
    */
   public JavaEnvironmentBuilder withExcludeScoutSdk() {
-//    return withExclude(".*" + Pattern.quote(".scout.sdk.") + ".*"); TODO MVILLIGER
-    return this;
+    return withExclude(".*" + Pattern.quote(".scout.sdk.") + ".*" + "target/classes");
   }
 
   /**
