@@ -81,12 +81,12 @@
             id="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </category>
       <command
-            name="Update all generated classes..."
+            name="Update all derived resources..."
             id="org.eclipse.scout.sdk.s2e.ui.commands.triggerAllTypeChangedHandlers"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
       <command
-            name="Update generated classes in selected projects..."
+            name="Update derived resources in selected scope..."
             id="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>

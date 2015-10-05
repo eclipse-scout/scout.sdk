@@ -12,7 +12,6 @@ package org.eclipse.scout.sdk.s2e.util;
 
 import java.io.Serializable;
 import java.math.BigDecimal;
-import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -34,6 +33,7 @@ import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
+import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaElement;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
@@ -118,11 +118,6 @@ public final class JdtUtils {
    * @throws CoreException
    */
   public static org.eclipse.scout.sdk.core.model.api.IType jdtTypeToScoutType(IType jdtType, IJavaEnvironment env) throws CoreException {
-    IFile resource = (IFile) jdtType.getResource();
-    String charsetName = resource.getCharset();
-    if (!Charset.isSupported(charsetName)) {
-      throw new CoreException(new ScoutStatus("Unsupported charset '" + charsetName + "' for resource '" + resource.getLocation().toOSString() + "'. Skipping.", new Exception("origin")));
-    }
     return env.findType(jdtType.getFullyQualifiedName('$'));
   }
 
@@ -383,7 +378,7 @@ public final class JdtUtils {
    * @throws CoreException
    */
   public static Set<IType> findAllTypesAnnotatedWith(String annotationName, IJavaSearchScope scope, IProgressMonitor monitor) throws CoreException {
-    final LinkedHashSet<IType> result = new LinkedHashSet<>();
+    final Set<IType> result = new LinkedHashSet<>();
     SearchRequestor collector = new SearchRequestor() {
       @Override
       public void acceptSearchMatch(SearchMatch match) throws CoreException {
@@ -575,8 +570,8 @@ public final class JdtUtils {
     return context;
   }
 
-  public static List<IType> writeTypesWithResult(List<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
-    writeTypes(ops, monitor);
+  public static List<IType> writeTypesWithResult(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+    writeTypes(ops, monitor, true);
 
     List<IType> result = new ArrayList<>(ops.size());
     for (CompilationUnitWriteOperation op : ops) {
@@ -589,28 +584,38 @@ public final class JdtUtils {
     return result;
   }
 
-  public static void writeTypes(List<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+  public static void writeTypes(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) throws CoreException {
     if (ops == null || ops.isEmpty()) {
       return;
     }
 
-    IResource[] lockedResources = new IResource[ops.size()];
-    for (int i = 0; i < ops.size(); i++) {
-      lockedResources[i] = ops.get(i).getCompilationUnit().getResource();
+    Set<IResource> lockedResources = new HashSet<>(ops.size());
+    for (CompilationUnitWriteOperation op : ops) {
+      if (op != null) {
+        ICompilationUnit icu = op.getCompilationUnit();
+        if (icu != null) {
+          IResource r = getExistingParent(icu.getResource());
+          if (r != null) {
+            lockedResources.add(r);
+          }
+        }
+      }
     }
 
-    ResourceBlockingOperationJob job = new ResourceBlockingOperationJob(ops, lockedResources);
+    ResourceBlockingOperationJob job = new ResourceBlockingOperationJob(ops, lockedResources.toArray(new IResource[lockedResources.size()]));
     job.schedule();
-    try {
-      job.join(0L, monitor);
-    }
-    catch (OperationCanceledException | InterruptedException e) {
-      throw new CoreException(new ScoutStatus("Unable to wait until compilation units have been written.", e));
+    if (waitUntilWritten) {
+      try {
+        job.join(0L, monitor);
+      }
+      catch (OperationCanceledException | InterruptedException e) {
+        throw new CoreException(new ScoutStatus("Unable to wait until compilation units have been written.", e));
+      }
     }
   }
 
-  public static List<IFile> writeResourcesWithResult(List<ResourceWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
-    writeResources(ops, monitor);
+  public static List<IFile> writeResourcesWithResult(Collection<ResourceWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+    writeResources(ops, monitor, true);
 
     List<IFile> result = new ArrayList<>(ops.size());
     for (ResourceWriteOperation op : ops) {
@@ -623,24 +628,39 @@ public final class JdtUtils {
     return result;
   }
 
-  public static void writeResources(List<ResourceWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+  public static void writeResources(Collection<ResourceWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) throws CoreException {
     if (ops == null || ops.isEmpty()) {
       return;
     }
 
-    IResource[] lockedResources = new IResource[ops.size()];
-    for (int i = 0; i < ops.size(); i++) {
-      lockedResources[i] = ops.get(i).getFile();
+    Set<IResource> lockedResources = new HashSet<>(ops.size());
+    for (ResourceWriteOperation op : ops) {
+      if (op != null) {
+        IResource r = getExistingParent(op.getFile());
+        if (r != null) {
+          lockedResources.add(r);
+        }
+      }
     }
 
-    ResourceBlockingOperationJob job = new ResourceBlockingOperationJob(ops, lockedResources);
+    ResourceBlockingOperationJob job = new ResourceBlockingOperationJob(ops, lockedResources.toArray(new IResource[lockedResources.size()]));
     job.schedule();
-    try {
-      job.join(0L, monitor);
+    if (waitUntilWritten) {
+      try {
+        job.join(0L, monitor);
+      }
+      catch (OperationCanceledException | InterruptedException e) {
+        throw new CoreException(new ScoutStatus(e));
+      }
     }
-    catch (OperationCanceledException | InterruptedException e) {
-      throw new CoreException(new ScoutStatus(e));
+  }
+
+  private static IResource getExistingParent(IResource startResource) {
+    IResource curResource = startResource;
+    while (curResource != null && !curResource.exists()) {
+      curResource = curResource.getParent();
     }
+    return curResource;
   }
 
 }

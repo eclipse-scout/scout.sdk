@@ -39,11 +39,12 @@ public final class DtoS2eUtils {
         return null;
       }
       org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a1.getFormDataType().name());
-      IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
+      IJavaProject derivedProject = derivedJdtType.getJavaProject();
+
+      IJavaEnvironment sharedEnv = envProvider.get(derivedProject);
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, a1, sharedEnv);
 
-      IJavaProject p = derivedJdtType.getJavaProject();
-      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(p), JdtUtils.propertyMap(p));
+      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(derivedProject), JdtUtils.propertyMap(derivedProject));
       return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 
@@ -55,11 +56,12 @@ public final class DtoS2eUtils {
         return null;
       }
       org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a2.getDataType().name());
-      IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
+      IJavaProject derivedProject = derivedJdtType.getJavaProject();
+
+      IJavaEnvironment sharedEnv = envProvider.get(derivedProject);
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createPageDataBuilder(modelType, a2, sharedEnv);
 
-      IJavaProject p = derivedJdtType.getJavaProject();
-      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(p), JdtUtils.propertyMap(p));
+      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(derivedProject), JdtUtils.propertyMap(derivedProject));
       return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 
@@ -71,11 +73,12 @@ public final class DtoS2eUtils {
         return null;
       }
       org.eclipse.jdt.core.IType derivedJdtType = jdtType.getJavaProject().findType(a3.getDataType().name());
+      IJavaProject derivedProject = derivedJdtType.getJavaProject();
+
       IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createTableRowDataBuilder(modelType, a3, sharedEnv);
 
-      IJavaProject p = derivedJdtType.getJavaProject();
-      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(p), JdtUtils.propertyMap(p));
+      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(derivedProject), JdtUtils.propertyMap(derivedProject));
       return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 

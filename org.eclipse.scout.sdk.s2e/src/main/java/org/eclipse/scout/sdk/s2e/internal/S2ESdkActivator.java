@@ -11,7 +11,7 @@
 package org.eclipse.scout.sdk.s2e.internal;
 
 import org.eclipse.core.runtime.Plugin;
-import org.eclipse.scout.sdk.s2e.internal.dto.DtoDerivedResourceHandler;
+import org.eclipse.scout.sdk.s2e.internal.dto.DtoDerivedResourceHandlerFactory;
 import org.eclipse.scout.sdk.s2e.internal.trigger.DerivedResourceManager;
 import org.osgi.framework.BundleContext;
 
@@ -34,7 +34,7 @@ public class S2ESdkActivator extends Plugin {
 
     // DTO auto update
     m_derivedResourceManager = new DerivedResourceManager();
-    m_derivedResourceManager.addDerivedResourceHandler(new DtoDerivedResourceHandler());
+    m_derivedResourceManager.addDerivedResourceHandlerFactory(new DtoDerivedResourceHandlerFactory());
   }
 
   @Override

@@ -17,7 +17,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 /**
  * <h3>{@link IJavaEnvironmentProvider}</h3>
  * <p>
- * Provides {@link IJavaEnvironment} and tries to optimize caching.
+ * Provides {@link IJavaEnvironment} instances.
  *
  * @author Ivan Motsch
  * @since 5.1.0

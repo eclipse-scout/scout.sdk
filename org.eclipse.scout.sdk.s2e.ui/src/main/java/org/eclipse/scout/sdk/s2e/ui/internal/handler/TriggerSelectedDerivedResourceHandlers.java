@@ -43,16 +43,20 @@ public class TriggerSelectedDerivedResourceHandlers extends AbstractHandler {
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
     MessageBox messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-    messageBox.setMessage("This will update all @Generated classes in the selected projects.\nDepending on the size of your workspace this can take several minutes.\nDo you really want to update all @Generated classes?");
-    messageBox.setText("Do you really want to update all @Generated classes?");
+    messageBox.setMessage("This will update all derived resources in the selected scope.\nDepending on the size of your selection this can take several minutes.\nDo you really want to continue?");
+    messageBox.setText("Do you really want to update the derived resources in the selected scope?");
     int answer = messageBox.open();
     if (answer == SWT.YES) {
-      ScoutSdkCore.getDerivedResourceManager().triggerAll(createJavaSeachScope(event));
+      IJavaElement[] searchInElements = createJavaSeachScope(event);
+      if (searchInElements.length > 0) {
+        IJavaSearchScope searchScope = SearchEngine.createJavaSearchScope(searchInElements, false);
+        ScoutSdkCore.getDerivedResourceManager().triggerAll(searchScope);
+      }
     }
     return null;
   }
 
-  private static IJavaSearchScope createJavaSeachScope(ExecutionEvent event) {
+  private static IJavaElement[] createJavaSeachScope(ExecutionEvent event) {
     Set<IResource> resourceSet = new LinkedHashSet<>();
     ISelection selection0 = HandlerUtil.getCurrentSelection(event);
     if (!selection0.isEmpty() && selection0 instanceof IStructuredSelection) {
@@ -86,11 +90,11 @@ public class TriggerSelectedDerivedResourceHandlers extends AbstractHandler {
     Set<IJavaElement> jset = new LinkedHashSet<>();
     for (IResource r : resourceSet) {
       IJavaElement e = JavaCore.create(r);
-      if (e.exists()) {
+      if (e != null && e.exists()) {
         jset.add(e);
       }
     }
-    return SearchEngine.createJavaSearchScope(jset.toArray(new IJavaElement[0]), false);
+    return jset.toArray(new IJavaElement[jset.size()]);
   }
 
 }

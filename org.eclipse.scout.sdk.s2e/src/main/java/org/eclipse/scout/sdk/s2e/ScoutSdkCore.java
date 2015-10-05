@@ -67,12 +67,9 @@ public final class ScoutSdkCore {
 
   /**
    * Creates an {@link IJavaEnvironment} based on an Eclipse {@link IJavaProject} and its classpath.
-   *
+   * 
    * @param javaProject
    *          the {@link IJavaProject} used to create the {@link IJavaEnvironment} for.
-   * @param allowErrors
-   *          <code>true</code> if the resulting environment should be lenient with compile errors. If
-   *          <code>false</code> the lookup environment will throw exceptions as soon as compile errors are found.
    * @return The new created {@link IJavaEnvironment}.
    * @throws CoreException
    */

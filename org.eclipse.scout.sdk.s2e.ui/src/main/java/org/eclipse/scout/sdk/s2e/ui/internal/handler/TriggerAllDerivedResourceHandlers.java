@@ -30,8 +30,8 @@ public class TriggerAllDerivedResourceHandlers extends AbstractHandler {
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {
     MessageBox messageBox = new MessageBox(HandlerUtil.getActiveShellChecked(event), SWT.ICON_QUESTION | SWT.YES | SWT.NO);
-    messageBox.setMessage("This will update all @Generated classes.\nDepending on the size of your workspace this can take several minutes.\nDo you really want to update all @Generated classes?");
-    messageBox.setText("Do you really want to update all @Generated classes?");
+    messageBox.setMessage("This will update all derived resources.\nDepending on the size of your workspace this can take several minutes.\nDo you really want to continue?");
+    messageBox.setText("Do you really want to update all derived resources?");
     int answer = messageBox.open();
     if (answer == SWT.YES) {
       ScoutSdkCore.getDerivedResourceManager().triggerAll(SearchEngine.createWorkspaceScope());

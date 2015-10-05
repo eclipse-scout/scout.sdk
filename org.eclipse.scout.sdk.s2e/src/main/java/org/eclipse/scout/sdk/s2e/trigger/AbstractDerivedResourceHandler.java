@@ -12,29 +12,27 @@ package org.eclipse.scout.sdk.s2e.trigger;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.scout.sdk.core.util.CoreUtils;
 
 /**
- * <h3>{@link IDerivedResourceOperation}</h3><br>
+ * <h3>{@link AbstractDerivedResourceHandler}</h3>
  *
- * @author Ivan Motsch
- * @since 5.1
+ * @author Matthias Villiger
+ * @since 5.2.0
  */
-public interface IDerivedResourceOperation {
+public abstract class AbstractDerivedResourceHandler implements IDerivedResourceHandler {
 
-  String getOperationName();
+  @Override
+  public final void run(IProgressMonitor monitor) throws CoreException {
+    String backup = CoreUtils.getUsername();
+    try {
+      CoreUtils.setUsernameForThread("Scout robot");
+      runImpl(monitor);
+    }
+    finally {
+      CoreUtils.setUsernameForThread(backup);
+    }
+  }
 
-  /**
-   * throw a {@link IllegalArgumentException} if the operation should not be executed and has invalid parameters
-   */
-  void validate();
-
-  /**
-   * Usually the run method is called of a job implementation.
-   *
-   * @param monitor
-   *          to provide progress information and observe the cancel state.
-   * @throws CoreException
-   */
-  void run(IProgressMonitor monitor) throws CoreException;
-
+  protected abstract void runImpl(IProgressMonitor monitor) throws CoreException;
 }

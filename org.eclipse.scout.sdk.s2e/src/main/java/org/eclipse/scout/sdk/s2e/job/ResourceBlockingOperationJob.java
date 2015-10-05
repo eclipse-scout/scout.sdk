@@ -61,6 +61,10 @@ public class ResourceBlockingOperationJob extends AbstractResourceBlockingJob {
     StringBuilder nameBuilder = new StringBuilder();
     if (operations != null) {
       for (IOperation op : operations) {
+        if (op == null) {
+          continue;
+        }
+
         String itOpName = op.getOperationName();
         if (itOpName == null) {
           SdkLog.warning("operation '" + op.getClass().getName() + "' does not have a name");

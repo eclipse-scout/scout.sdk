@@ -15,7 +15,6 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.MultiRule;
 import org.eclipse.scout.sdk.core.util.SdkLog;
@@ -30,7 +29,6 @@ import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
  */
 public abstract class AbstractResourceBlockingJob extends AbstractJob {
 
-  private boolean m_debug;
   private Exception m_callerTrace;
 
   /**
@@ -52,7 +50,6 @@ public abstract class AbstractResourceBlockingJob extends AbstractJob {
     else {
       setRule(new MultiRule(blockedResources));
     }
-    m_debug = Platform.inDevelopmentMode();
   }
 
   /**
@@ -73,19 +70,12 @@ public abstract class AbstractResourceBlockingJob extends AbstractJob {
 
   @Override
   protected final IStatus run(IProgressMonitor monitor) {
-    if (isDebug()) {
-      return debugDoRun(monitor);
-    }
-    return doRun(monitor);
-  }
-
-  private IStatus debugDoRun(IProgressMonitor monitor) {
     long start = System.currentTimeMillis();
     try {
       return doRun(monitor);
     }
     finally {
-      SdkLog.info("Operation job '" + getName() + "' took " + (System.currentTimeMillis() - start) + "ms to execute.");
+      SdkLog.debug("Operation job '" + getName() + "' took " + (System.currentTimeMillis() - start) + "ms to execute.");
     }
   }
 
@@ -117,12 +107,4 @@ public abstract class AbstractResourceBlockingJob extends AbstractJob {
   }
 
   protected abstract void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException;
-
-  public void setDebug(boolean debug) {
-    m_debug = debug;
-  }
-
-  public boolean isDebug() {
-    return m_debug;
-  }
 }

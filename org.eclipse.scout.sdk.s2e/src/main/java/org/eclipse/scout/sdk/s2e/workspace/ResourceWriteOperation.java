@@ -52,7 +52,7 @@ public class ResourceWriteOperation implements IOperation {
 
   @Override
   public String getOperationName() {
-    return "Change " + m_file.getProjectRelativePath();
+    return "Write " + m_file.getProjectRelativePath();
   }
 
   public IFile getFile() {

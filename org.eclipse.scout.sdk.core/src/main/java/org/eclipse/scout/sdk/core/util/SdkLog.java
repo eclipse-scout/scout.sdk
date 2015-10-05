@@ -46,6 +46,14 @@ public final class SdkLog {
     log(level, null, throwables);
   }
 
+  public static void debug(Throwable... throwables) {
+    debug(null, throwables);
+  }
+
+  public static void debug(String message, Throwable... throwables) {
+    log(Level.FINE, message, throwables);
+  }
+
   public static void info(Throwable... throwables) {
     info(null, throwables);
   }

@@ -10,14 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.internal.dto;
 
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.trigger.AbstractDerivedResourceBatchOperation;
+import org.eclipse.scout.sdk.s2e.trigger.AbstractDerivedResourceBatchHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
@@ -25,22 +25,21 @@ import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
 /**
  *
  */
-public class DtoDerivedResourceBatchOperation extends AbstractDerivedResourceBatchOperation {
+public class DtoDerivedResourceBatchHandler extends AbstractDerivedResourceBatchHandler {
 
-  public DtoDerivedResourceBatchOperation(Collection<org.eclipse.jdt.core.IType> jdtTypes, IJavaEnvironmentProvider envProvider) {
+  public DtoDerivedResourceBatchHandler(Collection<org.eclipse.jdt.core.IType> jdtTypes, IJavaEnvironmentProvider envProvider) {
     super(jdtTypes, envProvider);
   }
 
   @Override
-  public String getOperationName() {
-    return "Update all DTO";
+  public String getName() {
+    return "Update all DTOs";
   }
 
   @Override
   protected void runImpl(IProgressMonitor monitor) throws CoreException {
     IJavaEnvironmentProvider envProvider = getJavaEnvironmentProvider();
 
-    ArrayList<CompilationUnitWriteOperation> allOps = new ArrayList<>();
     for (org.eclipse.jdt.core.IType jdtType : getJdtTypes()) {
       if (monitor.isCanceled()) {
         return;
@@ -50,16 +49,13 @@ public class DtoDerivedResourceBatchOperation extends AbstractDerivedResourceBat
         IType modelType = envProvider.jdtTypeToScoutType(jdtType);
         CompilationUnitWriteOperation op = DtoS2eUtils.newDtoOp(jdtType, modelType, getJavaEnvironmentProvider(), monitor);
         if (op != null) {
-          allOps.add(op);
+          JdtUtils.writeTypes(Collections.singletonList(op), monitor, false);
         }
       }
       catch (Throwable t) {
         SdkLog.error(getClass().getSimpleName() + ": " + jdtType.getFullyQualifiedName(), t);
       }
     }
-
-    monitor.subTask("write new content");
-    JdtUtils.writeTypes(allOps, monitor);
   }
 
 }
