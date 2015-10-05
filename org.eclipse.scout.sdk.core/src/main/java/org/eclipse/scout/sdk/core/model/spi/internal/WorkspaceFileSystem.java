@@ -80,7 +80,7 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
     }
 
     String qp2 = File.separatorChar == '/' ? qualifiedPackageName : qualifiedPackageName.replace('/', File.separatorChar);
-    if (qualifiedPackageName == qp2) {
+    if (qualifiedPackageName.equals(qp2)) {
       for (int i = 0, length = this.m_classpaths.length; i < length; i++) {
         if (this.m_classpaths[i].isPackage(qualifiedPackageName)) {
           return true;

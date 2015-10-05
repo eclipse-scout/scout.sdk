@@ -137,12 +137,10 @@ public class SuperTypeQuery {
     if (t == null) {
       return;
     }
-    if (!onlyTraverse) {
-      if (accept(t)) {
-        result.add(t);
-        if (result.size() >= maxCount) {
-          return;
-        }
+    if (!onlyTraverse && accept(t)) {
+      result.add(t);
+      if (result.size() >= maxCount) {
+        return;
       }
     }
     if (m_includeSuperClasses || m_includeSuperInterfaces) {

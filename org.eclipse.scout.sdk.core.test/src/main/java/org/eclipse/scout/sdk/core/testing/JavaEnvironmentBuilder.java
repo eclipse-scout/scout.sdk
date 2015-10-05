@@ -221,7 +221,6 @@ public final class JavaEnvironmentBuilder {
       String s = f.getAbsolutePath().replace(File.separatorChar, '/');
       for (Pattern p : m_binaryExcludes) {
         if (p.matcher(s).matches()) {
-          //System.out.println("EXCLUDE BIN " + s);
           return;
         }
       }
@@ -237,7 +236,6 @@ public final class JavaEnvironmentBuilder {
       String s = f.getAbsolutePath().replace(File.separatorChar, '/');
       for (Pattern p : m_sourceExcludes) {
         if (p.matcher(s).matches()) {
-          //System.out.println("EXCLUDE SRC " + s);
           return;
         }
       }

@@ -129,8 +129,12 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
       final IType annotationDeclarationType = annotation.type();
       final String elementName = annotationDeclarationType.name();
 
-      boolean mustCopyAnnotation = !IScoutRuntimeTypes.FormData.equals(elementName) && !IScoutRuntimeTypes.Order.equals(elementName) && !IScoutRuntimeTypes.PageData.equals(elementName) && !IScoutRuntimeTypes.Data.equals(elementName)
-          && isAnnotationDtoRelevant(annotationDeclarationType) && CoreUtils.isOnClasspath(env, annotationDeclarationType);
+      boolean mustCopyAnnotation = !IScoutRuntimeTypes.FormData.equals(elementName)
+          && !IScoutRuntimeTypes.Order.equals(elementName)
+          && !IScoutRuntimeTypes.PageData.equals(elementName)
+          && !IScoutRuntimeTypes.Data.equals(elementName)
+          && isAnnotationDtoRelevant(annotationDeclarationType)
+          && CoreUtils.isOnClasspath(env, annotationDeclarationType);
       if (mustCopyAnnotation) {
         AnnotationSourceBuilder asb = new AnnotationSourceBuilder(a);
         filterAnnotationValues(asb, a);

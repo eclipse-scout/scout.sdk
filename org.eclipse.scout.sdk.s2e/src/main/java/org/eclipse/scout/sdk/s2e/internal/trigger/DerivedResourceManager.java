@@ -209,6 +209,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           m_javaDeltaCheckJob.join(3000);
         }
         catch (InterruptedException e) {
+          // nop
         }
       }
     }
@@ -368,6 +369,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           event = m_queueToConsume.take(); // blocks until deltas are available
         }
         catch (InterruptedException e1) {
+          // nop
         }
         if (monitor.isCanceled()) {
           return Status.CANCEL_STATUS;

@@ -20,7 +20,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.jdt.core.Flags;
 import org.eclipse.jdt.core.IType;
-import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
@@ -46,7 +45,7 @@ public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandler
     return Collections.<IDerivedResourceHandler> singletonList(new DtoDerivedResourceBatchHandler(findAllCandidates(scope), envProvider));
   }
 
-  protected Collection<IType> findAllCandidates(IJavaSearchScope scope) throws JavaModelException, CoreException {
+  protected Collection<IType> findAllCandidates(IJavaSearchScope scope) throws CoreException {
     Set<IType> collector = new HashSet<>();
     for (org.eclipse.jdt.core.IType candidate : JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.Data, scope, new NullProgressMonitor())) {
       if (acceptType(candidate)) {

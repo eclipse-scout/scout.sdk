@@ -70,12 +70,10 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
   @Override
   public IJavaCompletionProposal[] getAssists(final IInvocationContext context, IProblemLocation[] locations) throws CoreException {
     final ClassIdTarget selectedType = getTarget(context.getCoveringNode());
-    if (selectedType != null) {
-      if (!JdtUtils.exists(selectedType.annotation)) {
-        CompilationUnitRewrite rewrite = createRewrite(selectedType.type, selectedType.td);
-        if (rewrite != null) {
-          return new IJavaCompletionProposal[]{new ClassIdAddProposal(rewrite)};
-        }
+    if (selectedType != null && !JdtUtils.exists(selectedType.annotation)) {
+      CompilationUnitRewrite rewrite = createRewrite(selectedType.type, selectedType.td);
+      if (rewrite != null) {
+        return new IJavaCompletionProposal[]{new ClassIdAddProposal(rewrite)};
       }
     }
     return null;
@@ -202,11 +200,9 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
 
                 Set<IType> jdtTypes = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
                 for (IType iTypeWithClassId : jdtTypes) {
-                  if (JdtUtils.exists(iTypeWithClassId)) {
-                    if (superTypeHierarchy.contains(iTypeWithClassId)) {
-                      IAnnotation annotation = JdtUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
-                      return new ClassIdTarget(typeDecl, t, annotation);
-                    }
+                  if (JdtUtils.exists(iTypeWithClassId) && superTypeHierarchy.contains(iTypeWithClassId)) {
+                    IAnnotation annotation = JdtUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
+                    return new ClassIdTarget(typeDecl, t, annotation);
                   }
                 }
               }

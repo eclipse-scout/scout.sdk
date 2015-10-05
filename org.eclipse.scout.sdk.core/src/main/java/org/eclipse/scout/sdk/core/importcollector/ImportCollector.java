@@ -188,8 +188,8 @@ public class ImportCollector implements IImportCollector {
     private String m_group;
     private boolean m_used;
 
-    private ImportElement(boolean _static, String packageName, String simpleName, boolean used) {
-      m_static = _static;
+    private ImportElement(boolean isStatic, String packageName, String simpleName, boolean used) {
+      m_static = isStatic;
       m_packageName = packageName;
       m_simpleName = simpleName;
       m_used = used;
