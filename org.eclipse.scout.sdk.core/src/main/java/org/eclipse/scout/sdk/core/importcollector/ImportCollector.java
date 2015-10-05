@@ -182,13 +182,13 @@ public class ImportCollector implements IImportCollector {
   }
 
   private static final class ImportElement {
-    final boolean m_static;
-    final String m_packageName;
-    final String m_simpleName;
-    String m_group;
-    boolean m_used;
+    private final boolean m_static;
+    private final String m_packageName;
+    private final String m_simpleName;
+    private String m_group;
+    private boolean m_used;
 
-    ImportElement(boolean _static, String packageName, String simpleName, boolean used) {
+    private ImportElement(boolean _static, String packageName, String simpleName, boolean used) {
       m_static = _static;
       m_packageName = packageName;
       m_simpleName = simpleName;
@@ -213,7 +213,7 @@ public class ImportCollector implements IImportCollector {
     }
 
     public String createImportDeclaration() {
-      return "import " + (m_static ? "static " : "") + m_packageName + '.' + m_simpleName + ";";
+      return "import " + (m_static ? "static " : "") + m_packageName + '.' + m_simpleName + ';';
     }
   }
 
@@ -229,9 +229,9 @@ public class ImportCollector implements IImportCollector {
     private static String prefix(ImportElement e) {
       StringBuilder buf = new StringBuilder();
       buf.append(e.m_group);
-      buf.append(".");
+      buf.append('.');
       buf.append(e.m_packageName);
-      buf.append(".");
+      buf.append('.');
       buf.append(e.m_simpleName);
       return buf.toString();
     }

@@ -1,5 +1,5 @@
 /*******************************************************************************
- * Copyright (c) 2015 BSI Business Systems Integration AG.
+ * Copyright (m_constant) 2015 BSI Business Systems Integration AG.
  * All rights reserved. This program and the accompanying materials
  * are made available under the terms of the Eclipse Public License v1.0
  * which accompanies this distribution, and is available at
@@ -53,7 +53,7 @@ public final class MetaValueFactory {
     }
   };
 
-  protected static abstract class AbstractValue implements IMetaValue {
+  protected abstract static class AbstractValue implements IMetaValue {
 
     protected abstract Object getInternalObject(Class<?> expectedType);
 
@@ -70,15 +70,15 @@ public final class MetaValueFactory {
     }
   }
 
-  protected static abstract class AbstractConstantMetaValue extends AbstractValue {
-    private final Constant c;
+  protected abstract static class AbstractConstantMetaValue extends AbstractValue {
+    private final Constant m_constant;
 
     protected AbstractConstantMetaValue(Constant c) {
-      this.c = c;
+      this.m_constant = c;
     }
 
     protected final Constant getInternalConstant() {
-      return c;
+      return m_constant;
     }
 
     @Override
@@ -86,60 +86,60 @@ public final class MetaValueFactory {
       if (expectedType == Object.class) {
         switch (type()) {
           case Bool:
-            return c.booleanValue();
+            return m_constant.booleanValue();
           case Byte:
-            return c.byteValue();
+            return m_constant.byteValue();
           case Char:
-            return c.charValue();
+            return m_constant.charValue();
           case Double:
-            return c.doubleValue();
+            return m_constant.doubleValue();
           case Float:
-            return c.floatValue();
+            return m_constant.floatValue();
           case Int:
-            return c.intValue();
+            return m_constant.intValue();
           case Long:
-            return c.longValue();
+            return m_constant.longValue();
           case Short:
-            return c.shortValue();
+            return m_constant.shortValue();
           case String:
-            return c.stringValue();
+            return m_constant.stringValue();
           default:
-            return c;
+            return m_constant;
         }
       }
       if (expectedType == boolean.class || expectedType == Boolean.class) {
-        return c.booleanValue();
+        return m_constant.booleanValue();
       }
       if (expectedType == byte.class || expectedType == Byte.class) {
-        return c.byteValue();
+        return m_constant.byteValue();
       }
       if (expectedType == char.class || expectedType == Character.class) {
-        return c.charValue();
+        return m_constant.charValue();
       }
       if (expectedType == double.class || expectedType == Double.class) {
-        return c.doubleValue();
+        return m_constant.doubleValue();
       }
       if (expectedType == float.class || expectedType == Float.class) {
-        return c.floatValue();
+        return m_constant.floatValue();
       }
       if (expectedType == int.class || expectedType == Integer.class) {
-        return c.intValue();
+        return m_constant.intValue();
       }
       if (expectedType == long.class || expectedType == Long.class) {
-        return c.longValue();
+        return m_constant.longValue();
       }
       if (expectedType == short.class || expectedType == Short.class) {
-        return c.shortValue();
+        return m_constant.shortValue();
       }
       if (expectedType == String.class) {
-        return c.stringValue();
+        return m_constant.stringValue();
       }
-      return c;
+      return m_constant;
     }
 
   }
 
-  protected static abstract class AbstractArrayMetaValue extends AbstractValue implements IArrayMetaValue {
+  protected abstract static class AbstractArrayMetaValue extends AbstractValue implements IArrayMetaValue {
   }
 
   public static IMetaValue createNull() {

@@ -68,12 +68,12 @@ public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandler
 
   protected boolean acceptType(IType jdtType) throws CoreException {
     //fast check before doing expensive source parsing
-    return JdtUtils.exists(jdtType) &&
-        !jdtType.isAnonymous() &&
-        !jdtType.isBinary() &&
-        jdtType.getDeclaringType() == null &&
-        Flags.isPublic(jdtType.getFlags()) &&
-        JdtUtils.getFirstAnnotationInSupertypeHierarchy(jdtType, IScoutRuntimeTypes.Data, IScoutRuntimeTypes.FormData, IScoutRuntimeTypes.PageData) != null;
+    return JdtUtils.exists(jdtType)
+        && !jdtType.isAnonymous()
+        && !jdtType.isBinary()
+        && jdtType.getDeclaringType() == null
+        && Flags.isPublic(jdtType.getFlags())
+        && JdtUtils.getFirstAnnotationInSupertypeHierarchy(jdtType, IScoutRuntimeTypes.Data, IScoutRuntimeTypes.FormData, IScoutRuntimeTypes.PageData) != null;
   }
 
   @Override

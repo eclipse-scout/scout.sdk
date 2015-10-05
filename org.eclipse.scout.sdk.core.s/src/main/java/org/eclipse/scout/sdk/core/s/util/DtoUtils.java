@@ -126,7 +126,7 @@ public final class DtoUtils {
       return null;
     }
 
-    if (primaryType != null && modelType.isInstanceOf(IScoutRuntimeTypes.IForm)) {
+    if (modelType.isInstanceOf(IScoutRuntimeTypes.IForm)) {
       // model type is a form and we have a corresponding DTO type (a form data).
       return primaryType;
     }

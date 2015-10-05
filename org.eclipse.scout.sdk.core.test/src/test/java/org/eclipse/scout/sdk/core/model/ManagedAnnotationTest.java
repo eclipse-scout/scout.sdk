@@ -15,7 +15,7 @@ import java.math.RoundingMode;
 import javax.annotation.Generated;
 
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
-import org.eclipse.scout.sdk.core.annotation.javax_annotation_Generated;
+import org.eclipse.scout.sdk.core.annotation.GeneratedAnnotation;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithDefaultValues;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithShortValueForIntField;
 import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithSingleValues;
@@ -137,7 +137,7 @@ public class ManagedAnnotationTest {
   public void testArrayCoercion() {
     IJavaEnvironment env = CoreTestingUtils.createJavaEnvironment();
     IType t = env.findType(ClassWithScalarGeneratedAnnotation.class.getName());
-    javax_annotation_Generated a = t.annotations().withManagedWrapper(javax_annotation_Generated.class).first();
+    GeneratedAnnotation a = t.annotations().withManagedWrapper(GeneratedAnnotation.class).first();
     Assert.assertArrayEquals(new String[]{"g"}, a.value());
   }
 

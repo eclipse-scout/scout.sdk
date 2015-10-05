@@ -1,16 +1,32 @@
 package org.eclipse.scout.sdk.core.util;
 
+import java.util.Arrays;
+import java.util.Collection;
+
 /**
  * <h3>{@link SameCompositeObject}</h3> Composite object used to compare compositions of objects by sameness a1==b1 AND
  * a2==b2 AND ...
  *
  * @since 5.1.0
  */
-public class SameCompositeObject extends CompositeObject {
-  private static final long serialVersionUID = 1L;
+public class SameCompositeObject {
+
+  private final Object[] m_value;
+  private int m_hash;
 
   public SameCompositeObject(Object... a) {
-    super(a);
+    if (a != null && a.length == 1 && a[0] instanceof Collection<?>) {
+      m_value = ((Collection<?>) a[0]).toArray();
+    }
+    else {
+      m_value = a;
+    }
+    m_hash = Arrays.hashCode(m_value);
+  }
+
+  @Override
+  public int hashCode() {
+    return m_hash;
   }
 
   @Override

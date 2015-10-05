@@ -610,11 +610,11 @@ public final class SpiWithJdtUtils {
    * @return the (cached) default values {@link AnnotationValueSpi#isDefaultValue()} for the annotation in correct
    *         source order of the annotation type declaration
    */
-  static LinkedHashMap<String, ElementValuePair> getBindingAnnotationSyntheticDefaultValues(JavaEnvironmentWithJdt env, ReferenceBinding annotationType) {
+  static Map<String, ElementValuePair> getBindingAnnotationSyntheticDefaultValues(JavaEnvironmentWithJdt env, ReferenceBinding annotationType) {
     Map<Object, Object> cache = env.getPerformanceCache();
     SameCompositeObject key = new SameCompositeObject(annotationType, "defaultEvp");
     @SuppressWarnings("unchecked")
-    LinkedHashMap<String, ElementValuePair> defaultValues = (LinkedHashMap<String, ElementValuePair>) cache.get(key);
+    Map<String, ElementValuePair> defaultValues = (LinkedHashMap<String, ElementValuePair>) cache.get(key);
     if (defaultValues == null) {
       MethodBinding[] valueMethods = annotationType.methods();
       //sort
@@ -625,7 +625,7 @@ public final class SpiWithJdtUtils {
           AbstractMethodDeclaration d1 = m1.sourceMethod();
           AbstractMethodDeclaration d2 = m2.sourceMethod();
           if (d1 != null && d2 != null) {
-            return new Integer(d1.declarationSourceStart).compareTo(new Integer(d2.declarationSourceStart));
+            return Integer.compare(d1.declarationSourceStart, d2.declarationSourceStart);
           }
           return 0;
         }
@@ -646,11 +646,11 @@ public final class SpiWithJdtUtils {
     return new LinkedHashMap<>(defaultValues);
   }
 
-  static LinkedHashMap<String, MemberValuePair> getDeclarationAnnotationSyntheticDefaultValues(JavaEnvironmentWithJdt env, TypeBinding typeBinding) {
+  static Map<String, MemberValuePair> getDeclarationAnnotationSyntheticDefaultValues(JavaEnvironmentWithJdt env, TypeBinding typeBinding) {
     Map<Object, Object> cache = env.getPerformanceCache();
     SameCompositeObject key = new SameCompositeObject(typeBinding, "defaultMvp");
     @SuppressWarnings("unchecked")
-    LinkedHashMap<String, MemberValuePair> defaultValues = (LinkedHashMap<String, MemberValuePair>) cache.get(key);
+    Map<String, MemberValuePair> defaultValues = (LinkedHashMap<String, MemberValuePair>) cache.get(key);
     if (defaultValues == null) {
       MethodBinding[] valueMethods = ((ReferenceBinding) typeBinding).methods();
       defaultValues = new LinkedHashMap<>(valueMethods.length);
@@ -662,7 +662,7 @@ public final class SpiWithJdtUtils {
           AbstractMethodDeclaration d1 = m1.sourceMethod();
           AbstractMethodDeclaration d2 = m2.sourceMethod();
           if (d1 != null && d2 != null) {
-            return new Integer(d1.declarationSourceStart).compareTo(new Integer(d2.declarationSourceStart));
+            return Integer.compare(d1.declarationSourceStart, d2.declarationSourceStart);
           }
           return 0;
         }

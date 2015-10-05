@@ -52,10 +52,9 @@ public class DtoDerivedResourceBatchHandler extends AbstractDerivedResourceBatch
           JdtUtils.writeTypes(Collections.singletonList(op), monitor, false);
         }
       }
-      catch (Throwable t) {
+      catch (Exception t) {
         SdkLog.error(getClass().getSimpleName() + ": " + jdtType.getFullyQualifiedName(), t);
       }
     }
   }
-
 }

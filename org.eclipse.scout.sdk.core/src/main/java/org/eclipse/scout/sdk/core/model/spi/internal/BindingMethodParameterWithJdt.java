@@ -51,10 +51,8 @@ public class BindingMethodParameterWithJdt extends AbstractJavaElementWithJdt<IM
   @Override
   protected JavaElementSpi internalFindNewElement(JavaEnvironmentWithJdt newEnv) {
     MethodSpi newMethod = (MethodSpi) getDeclaringMethod().internalFindNewElement(newEnv);
-    if (newMethod != null) {
-      if (newMethod.getParameters().size() > m_index) {
-        return newMethod.getParameters().get(m_index);
-      }
+    if (newMethod != null && newMethod.getParameters().size() > m_index) {
+      return newMethod.getParameters().get(m_index);
     }
     return null;
   }

@@ -52,10 +52,8 @@ public class DeclarationTypeParameterWithJdt extends AbstractJavaElementWithJdt<
   @Override
   protected JavaElementSpi internalFindNewElement(JavaEnvironmentWithJdt newEnv) {
     MemberSpi newMember = (MemberSpi) getDeclaringMember().internalFindNewElement(newEnv);
-    if (newMember != null) {
-      if (newMember.getTypeParameters().size() > m_index) {
-        return newMember.getTypeParameters().get(m_index);
-      }
+    if (newMember != null && newMember.getTypeParameters().size() > m_index) {
+      return newMember.getTypeParameters().get(m_index);
     }
     return null;
   }

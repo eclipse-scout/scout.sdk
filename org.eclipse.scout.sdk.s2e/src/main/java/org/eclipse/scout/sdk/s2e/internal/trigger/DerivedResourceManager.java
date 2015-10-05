@@ -137,7 +137,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
           all.addAll(ops);
         }
       }
-      catch (Throwable e) {
+      catch (Exception e) {
         SdkLog.error("Unable to create operation with handler '" + factory.getClass() + "'.", e);
       }
     }
@@ -165,7 +165,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
               all.addAll(ops);
             }
           }
-          catch (Throwable e) {
+          catch (Exception e) {
             SdkLog.error("Error while collecting all types from '" + handler.getClass() + "'.", e);
           }
         }
@@ -524,7 +524,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
             SdkLog.debug("Derived Resource Handler '" + handler.getName() + "' took " + (System.currentTimeMillis() - start) + "ms to execute.");
           }
         }
-        catch (Throwable e) {
+        catch (Exception e) {
           SdkLog.error("Error while '" + handler.getName() + "'.", e);
         }
         monitor.worked(1);
@@ -582,7 +582,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
             handler.validate();
             handler.run(monitor);
           }
-          catch (Throwable e) {
+          catch (Exception e) {
             SdkLog.error("Error while '" + handler.getName() + "'.", e);
           }
           monitor.worked(1);

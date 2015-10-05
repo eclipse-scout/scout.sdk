@@ -147,9 +147,7 @@ public class SdkAssert extends Assert {
     if (method == null) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Method '").append(methodName).append("'");
-        if (type != null) {
-          messageBuilder.append(" in type '").append(type.name()).append("'");
-        }
+        messageBuilder.append(" in type '").append(type.name()).append("'");
         messageBuilder.append(" does not exist!");
         message = messageBuilder.toString();
       }
@@ -193,9 +191,7 @@ public class SdkAssert extends Assert {
     if (method == null) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Method '").append(methodName).append("'");
-        if (type != null) {
-          messageBuilder.append(" in type '").append(type.name()).append("'");
-        }
+        messageBuilder.append(" in type '").append(type.name()).append("'");
         messageBuilder.append(" does not exist! [parameters: ");
         for (int i = 0; i < parameterSignatures.length; i++) {
           messageBuilder.append("'").append(parameterSignatures[i]).append("'");
@@ -233,9 +229,7 @@ public class SdkAssert extends Assert {
     if (method == null) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Method '").append(methodName).append("'");
-        if (type != null) {
-          messageBuilder.append(" in type '").append(type.name()).append("'");
-        }
+        messageBuilder.append(" in type '").append(type.name()).append("'");
         messageBuilder.append(" does not exist!");
         message = messageBuilder.toString();
       }
@@ -280,9 +274,7 @@ public class SdkAssert extends Assert {
     if (field == null) {
       if (message == null) {
         StringBuilder messageBuilder = new StringBuilder("Field '").append(fieldName).append("'");
-        if (type != null) {
-          messageBuilder.append(" in type '").append(type.name()).append("'");
-        }
+        messageBuilder.append(" in type '").append(type.name()).append("'");
         messageBuilder.append(" does not exist!");
         message = messageBuilder.toString();
       }
