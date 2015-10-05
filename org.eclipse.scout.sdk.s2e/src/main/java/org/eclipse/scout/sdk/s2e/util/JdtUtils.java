@@ -24,13 +24,10 @@ import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.OperationCanceledException;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.core.runtime.preferences.IScopeContext;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -53,6 +50,7 @@ import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
 import org.eclipse.jdt.core.search.SearchPattern;
 import org.eclipse.jdt.core.search.SearchRequestor;
+import org.eclipse.jdt.internal.core.util.Util;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.signature.Signature;
@@ -558,10 +556,18 @@ public final class JdtUtils {
     return getLocalTypeHierarchy(el);
   }
 
+  /**
+   * Returns the line separator for the given project.<br>
+   * If the project is null, returns the line separator for the workspace.<br>
+   * If still null, return the system line separator.
+   *
+   * @param p
+   *          The {@link IJavaProject} for which the line separator should be returned or <code>null</code> if the
+   *          workspace preference should be returned.
+   * @return The preferred line separator.
+   */
   public static String lineSeparator(IJavaProject p) {
-    IScopeContext[] scopeContext = new IScopeContext[]{new ProjectScope(p.getProject())};
-    String lineSeparator = Platform.getPreferencesService().getString(Platform.PI_RUNTIME, Platform.PREF_LINE_SEPARATOR, "\n", scopeContext);
-    return lineSeparator;
+    return Util.getLineSeparator(null, p);
   }
 
   public static PropertyMap propertyMap(IJavaProject p) {

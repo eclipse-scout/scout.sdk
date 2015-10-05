@@ -10,12 +10,14 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls;
 
+import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ProjectScope;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Platform;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.preferences.IScopeContext;
+import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.dialogs.IDialogSettings;
 import org.eclipse.jface.resource.ColorRegistry;
 import org.eclipse.jface.resource.ImageDescriptor;
@@ -127,13 +129,29 @@ public class NlsCore extends AbstractUIPlugin {
   }
 
   public static String getLineSeparator(IResource r) {
-    String defaultLineSep = System.getProperty("line.separator");
-    if (r == null) {
-      return defaultLineSep;
+    if (Platform.isRunning()) {
+
+      // line delimiter in project preference
+      IProject project = r.getProject();
+      IScopeContext[] scopeContext;
+      if (project != null) {
+        scopeContext = new IScopeContext[]{new ProjectScope(project.getProject())};
+        String lineSeparator = Platform.getPreferencesService().getString(Platform.PI_RUNTIME, Platform.PREF_LINE_SEPARATOR, null, scopeContext);
+        if (lineSeparator != null) {
+          return lineSeparator;
+        }
+      }
+
+      // line delimiter in workspace preference
+      scopeContext = new IScopeContext[]{InstanceScope.INSTANCE};
+      String lineSeparator = Platform.getPreferencesService().getString(Platform.PI_RUNTIME, Platform.PREF_LINE_SEPARATOR, null, scopeContext);
+      if (lineSeparator != null) {
+        return lineSeparator;
+      }
     }
 
-    IScopeContext[] scopeContext = new IScopeContext[]{new ProjectScope(r.getProject())};
-    return Platform.getPreferencesService().getString(Platform.PI_RUNTIME, Platform.PREF_LINE_SEPARATOR, defaultLineSep, scopeContext);
+    // system line delimiter
+    return System.getProperty("line.separator");
   }
 
   public static Image getImage(String name) {

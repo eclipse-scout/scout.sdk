@@ -28,7 +28,7 @@ public interface IResourceBuilder extends IResourceFragmentBuilder {
   List<IResourceFragmentBuilder> getFragments();
 
   /**
-   * Add an error message that is appended to the end of the comopilation unit as triple-X comment
+   * Add an error message that is appended to the end of the compilation unit as triple-X comment
    * <p>
    * Typically this is a code generation error or semantic check issue
    *

@@ -44,7 +44,7 @@ public final class DtoS2eUtils {
       IJavaEnvironment sharedEnv = envProvider.get(derivedProject);
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, a1, sharedEnv);
 
-      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(derivedProject), JdtUtils.propertyMap(derivedProject));
+      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, derivedJdtType.getCompilationUnit().findRecommendedLineSeparator(), JdtUtils.propertyMap(derivedProject));
       return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 
@@ -61,7 +61,7 @@ public final class DtoS2eUtils {
       IJavaEnvironment sharedEnv = envProvider.get(derivedProject);
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createPageDataBuilder(modelType, a2, sharedEnv);
 
-      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(derivedProject), JdtUtils.propertyMap(derivedProject));
+      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, derivedJdtType.getCompilationUnit().findRecommendedLineSeparator(), JdtUtils.propertyMap(derivedProject));
       return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 
@@ -78,7 +78,7 @@ public final class DtoS2eUtils {
       IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createTableRowDataBuilder(modelType, a3, sharedEnv);
 
-      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, JdtUtils.lineSeparator(derivedProject), JdtUtils.propertyMap(derivedProject));
+      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, derivedJdtType.getCompilationUnit().findRecommendedLineSeparator(), JdtUtils.propertyMap(derivedProject));
       return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 
