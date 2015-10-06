@@ -175,12 +175,10 @@ public class FileSelectionField extends TextField {
               }
             }
           }
-          if (extension == null) {
-            if (extIndex > -1 && extIndex < getFilterExtensions().length) {
-              extension = getFilterExtensions()[extIndex];
-              extension = extension.replaceFirst("\\**", "");
-              fileName = fileName + extension;
-            }
+          if (extension == null && extIndex > -1 && extIndex < getFilterExtensions().length) {
+            extension = getFilterExtensions()[extIndex];
+            extension = extension.replaceFirst("\\**", "");
+            fileName = fileName + extension;
           }
         }
       }

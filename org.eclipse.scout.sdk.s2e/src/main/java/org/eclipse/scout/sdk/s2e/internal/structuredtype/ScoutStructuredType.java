@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.regex.Matcher;
@@ -603,7 +604,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeFormFields(List<IJavaElement> workingSet) {
-    TreeSet<IType> formFields = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> formFields = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.IFormField));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -616,7 +617,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeColumns(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.IColumn));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -629,7 +630,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeCodes(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.ICode));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -642,7 +643,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeForms(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.IForm));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -655,7 +656,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeTables(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.ITable));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -684,7 +685,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeTrees(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.ITree));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -697,7 +698,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeCalendar(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.ICalendar));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -710,7 +711,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeCalendarItemProvider(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.ICalendarItemProvider));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -723,7 +724,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeWizards(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.IWizard));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -736,7 +737,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeWizardSteps(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.IWizardStep));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -749,7 +750,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeMenus(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.IMenu));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -762,7 +763,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeViewbuttons(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.IViewButton));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();
@@ -775,7 +776,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   protected void visitTypeToolbuttons(List<IJavaElement> workingSet) {
-    TreeSet<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator());
+    Set<IType> types = new TreeSet<>(ScoutJdtTypeComparators.getOrderAnnotationComparator(false));
     IFilter<IType> filter = JdtTypeFilters.getMultiFilterAnd(JdtTypeFilters.getClassFilter(), JdtTypeFilters.getSubtypeFilter(IScoutRuntimeTypes.IToolButton));
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IType candidate = (IType) it.next();

@@ -22,32 +22,33 @@ public final class ScoutTypeComparators {
   private ScoutTypeComparators() {
   }
 
-  protected static final Comparator<IType> ORDER_ANNOTATION_COMPARATOR = new Comparator<IType>() {
-    @Override
-    public int compare(IType t1, IType t2) {
-      // 1. order annotation value
-      double val1 = OrderAnnotation.valueOf(t1);
-      double val2 = OrderAnnotation.valueOf(t2);
-      int result = Double.compare(val1, val2);
-      if (result != 0) {
-        return result;
-      }
-      // 2. simple name
-      result = t1.elementName().compareTo(t2.elementName());
-      if (result != 0) {
-        return result;
-      }
-      // 3. fully qualified name
-      return t1.name().compareTo(t2.name());
-    }
-  };
-
   /**
-   * Gets a {@link Comparator} that sorts {@link IType}s by their @Order annotation value.
+   * Creates a {@link Comparator} to compare two {@link IType}s in respect of their @Order annotation.
    *
-   * @return The order annotation value comparator.
+   * @param isBean
+   *          Specifies if the {@link IType}s to be compared are Scout Beans or not.<br>
+   *          Scout Beans and other Scout orderables have different default orders (order if no annotation is present).
+   * @return The new created {@link Comparator}.
    */
-  public static Comparator<IType> getOrderAnnotationComparator() {
-    return ORDER_ANNOTATION_COMPARATOR;
+  public static Comparator<IType> getOrderAnnotationComparator(final boolean isBean) {
+    return new Comparator<IType>() {
+      @Override
+      public int compare(IType t1, IType t2) {
+        // 1. order annotation value
+        double val1 = OrderAnnotation.valueOf(t1, isBean);
+        double val2 = OrderAnnotation.valueOf(t2, isBean);
+        int result = Double.compare(val1, val2);
+        if (result != 0) {
+          return result;
+        }
+        // 2. simple name
+        result = t1.elementName().compareTo(t2.elementName());
+        if (result != 0) {
+          return result;
+        }
+        // 3. fully qualified name
+        return t1.name().compareTo(t2.name());
+      }
+    };
   }
 }

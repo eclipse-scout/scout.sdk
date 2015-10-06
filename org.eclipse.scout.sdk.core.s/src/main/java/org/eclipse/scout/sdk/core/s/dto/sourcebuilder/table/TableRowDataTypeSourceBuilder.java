@@ -164,7 +164,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     }
 
     // the declaring type holds columns
-    TreeSet<IType> allColumnsUpTheHierarchy = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator());
+    Set<IType> allColumnsUpTheHierarchy = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
     // do not re-use the fieldHierarchy for the subtype filter!
     IFilter<IType> filter = Filters.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IColumn), new IFilter<IType>() {
       @Override

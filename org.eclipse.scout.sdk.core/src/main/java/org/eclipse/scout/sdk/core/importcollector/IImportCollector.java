@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.importcollector;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
@@ -98,10 +99,25 @@ public interface IImportCollector {
   String checkCurrentScope(SignatureDescriptor cand);
 
   /**
-   * Gets the list of imports to be created.<br>
+   * Gets the list of imports to be created (sorted and grouped, including empty lines).<br>
    *
-   * @return An array containing all fully qualified import declarations that needs to be created
-   *         <code>import (static)? $qualifiedName;</code> as well as empty string group separators
+   * @return A {@link Collection} containing all fully qualified <code>import</code> declarations (including import
+   *         keyword and flags) that needs to be created (e.g. <code>import (static)? $qualifiedName;</code>) as well as
+   *         empty string group separators.
    */
-  Collection<String> createImportDeclarations();
+  List<String> createImportDeclarations();
+
+  /**
+   * Gets all fully qualified static imports of this collector.
+   * 
+   * @return A {@link Collection} with all fully qualified static imports.
+   */
+  Collection<String> getStaticImports();
+
+  /**
+   * Gets all fully qualified non-static imports of this collector.
+   * 
+   * @return A {@link Collection} with all fully qualified non-static imports.
+   */
+  Collection<String> getImports();
 }

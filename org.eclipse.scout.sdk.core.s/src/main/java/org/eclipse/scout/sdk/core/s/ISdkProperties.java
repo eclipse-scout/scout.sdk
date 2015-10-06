@@ -33,5 +33,7 @@ public interface ISdkProperties {
    * Must match the default order number used in the Scout runtime. See
    * org.eclipse.scout.commons.annotations.IOrdered.DEFAULT_ORDER
    */
-  double DEFAULT_ORDER = 98765432123456789d;
+  double DEFAULT_VIEW_ORDER = 98765432123456789d;
+
+  double DEFAULT_BEAN_ORDER = 0d;
 }

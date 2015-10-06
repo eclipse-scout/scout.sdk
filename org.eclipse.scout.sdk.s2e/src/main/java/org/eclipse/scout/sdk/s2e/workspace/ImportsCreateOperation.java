@@ -36,6 +36,12 @@ public class ImportsCreateOperation implements IOperation {
     m_icu = icu;
   }
 
+  /**
+   * @param icu
+   *          The owner {@link ICompilationUnit}.
+   * @param importsToCreate
+   *          Fully qualified imports without any key words like <code>import</code>.
+   */
   public ImportsCreateOperation(ICompilationUnit icu, Set<String> importsToCreate) {
     this(icu);
     if (importsToCreate != null) {
@@ -46,7 +52,7 @@ public class ImportsCreateOperation implements IOperation {
   public ImportsCreateOperation(ICompilationUnit icu, IImportCollector validator) {
     this(icu);
     if (validator != null) {
-      setImportsToCreate(validator.createImportDeclarations());
+      setImportsToCreate(validator.getImports() /* static imports not yet supported */);
     }
   }
 

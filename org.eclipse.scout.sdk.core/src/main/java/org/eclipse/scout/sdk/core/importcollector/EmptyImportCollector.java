@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.importcollector;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
@@ -63,7 +64,17 @@ public class EmptyImportCollector implements IImportCollector {
   }
 
   @Override
-  public Collection<String> createImportDeclarations() {
-    return Collections.emptySet();
+  public List<String> createImportDeclarations() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public Collection<String> getStaticImports() {
+    return Collections.emptyList();
+  }
+
+  @Override
+  public Collection<String> getImports() {
+    return Collections.emptyList();
   }
 }

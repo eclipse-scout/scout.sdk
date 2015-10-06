@@ -29,10 +29,13 @@ public class OrderAnnotation extends AbstractManagedAnnotation {
     return getValue("value", double.class, null);
   }
 
-  public static double valueOf(IAnnotatable owner) {
+  public static double valueOf(IAnnotatable owner, boolean isBean) {
     OrderAnnotation orderAnnotation = owner.annotations().withManagedWrapper(OrderAnnotation.class).first();
     if (orderAnnotation == null) {
-      return ISdkProperties.DEFAULT_ORDER; // default order of the scout runtime
+      if (isBean) {
+        return ISdkProperties.DEFAULT_BEAN_ORDER; // default order of the scout runtime for beans
+      }
+      return ISdkProperties.DEFAULT_VIEW_ORDER; // default order of the scout runtime for views
     }
     return orderAnnotation.value();
   }

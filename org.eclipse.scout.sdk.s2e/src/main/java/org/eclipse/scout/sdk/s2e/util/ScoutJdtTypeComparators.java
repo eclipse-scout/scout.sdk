@@ -52,33 +52,43 @@ public final class ScoutJdtTypeComparators {
     };
   }
 
-  public static Comparator<IType> getOrderAnnotationComparator() {
+  public static Comparator<IType> getOrderAnnotationComparator(final boolean isBean) {
     return new Comparator<IType>() {
       @Override
       public int compare(IType t1, IType t2) {
-        int result = Double.compare(getOrderAnnotationValue(t1), getOrderAnnotationValue(t2));
+        // 1. order annotation value
+        int result = Double.compare(getOrderAnnotationValue(t1, isBean), getOrderAnnotationValue(t2, isBean));
         if (result != 0) {
           return result;
         }
+
+        // 2. simple name
+        result = t1.getElementName().compareTo(t2.getElementName());
+        if (result != 0) {
+          return result;
+        }
+
+        // 3. fully qualified name
         return t1.getFullyQualifiedName().compareTo(t2.getFullyQualifiedName());
       }
 
-      private double getOrderAnnotationValue(IType type) {
+      private double getOrderAnnotationValue(IType type, boolean b) {
         if (JdtUtils.exists(type)) {
           IAnnotation annotation = JdtUtils.getAnnotation(type, IScoutRuntimeTypes.Order);
-          if (JdtUtils.exists(annotation)) {
-            try {
-              BigDecimal val = JdtUtils.getAnnotationValueNumeric(annotation, "value");
-              if (val != null) {
-                return val.doubleValue();
-              }
-            }
-            catch (JavaModelException e) {
-              SdkLog.warning("Unable to get @Order annotation value of type '" + type.getFullyQualifiedName() + "'.", e);
+          try {
+            BigDecimal val = JdtUtils.getAnnotationValueNumeric(annotation, "value");
+            if (val != null) {
+              return val.doubleValue();
             }
           }
+          catch (JavaModelException e) {
+            SdkLog.warning("Unable to get @Order annotation value of type '" + type.getFullyQualifiedName() + "'.", e);
+          }
         }
-        return ISdkProperties.DEFAULT_ORDER; // default order of the scout runtime
+        if (b) {
+          return ISdkProperties.DEFAULT_BEAN_ORDER; // default order of the scout runtime for beans
+        }
+        return ISdkProperties.DEFAULT_VIEW_ORDER; // default order of the scout runtime for view elements
       }
     };
   }

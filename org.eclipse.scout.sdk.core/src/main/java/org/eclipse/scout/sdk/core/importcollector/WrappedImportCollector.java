@@ -1,6 +1,7 @@
 package org.eclipse.scout.sdk.core.importcollector;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
@@ -53,8 +54,17 @@ public class WrappedImportCollector implements IImportCollector {
   }
 
   @Override
-  public Collection<String> createImportDeclarations() {
+  public List<String> createImportDeclarations() {
     return m_inner.createImportDeclarations();
   }
 
+  @Override
+  public Collection<String> getStaticImports() {
+    return m_inner.getStaticImports();
+  }
+
+  @Override
+  public Collection<String> getImports() {
+    return m_inner.getImports();
+  }
 }

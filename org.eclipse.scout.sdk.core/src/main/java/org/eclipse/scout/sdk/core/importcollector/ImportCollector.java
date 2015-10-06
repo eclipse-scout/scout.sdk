@@ -128,12 +128,30 @@ public class ImportCollector implements IImportCollector {
   }
 
   @Override
-  public Collection<String> createImportDeclarations() {
+  public Collection<String> getImports() {
+    return getImports(m_imports.values());
+  }
+
+  @Override
+  public Collection<String> getStaticImports() {
+    return getImports(m_staticImports.values());
+  }
+
+  protected static Collection<String> getImports(Collection<ImportElement> imports) {
+    List<String> result = new ArrayList<>(imports.size());
+    for (ImportElement e : imports) {
+      result.add(e.getImport());
+    }
+    return result;
+  }
+
+  @Override
+  public List<String> createImportDeclarations() {
     return organizeImports(m_staticImports.values(), m_imports.values());
   }
 
   protected List<String> organizeImports(Collection<ImportElement> unsortedList1, Collection<ImportElement> unsortedList2) {
-    LinkedList<ImportElement> workList = new LinkedList<>();
+    List<ImportElement> workList = new LinkedList<>();
     workList.addAll(unsortedList1);
     workList.addAll(unsortedList2);
 
@@ -174,7 +192,7 @@ public class ImportCollector implements IImportCollector {
       i++;
     }
 
-    ArrayList<String> result = new ArrayList<>(workList.size());
+    List<String> result = new ArrayList<>(workList.size());
     for (ImportElement e : workList) {
       result.add(e != null ? e.createImportDeclaration() : "");
     }
@@ -212,8 +230,12 @@ public class ImportCollector implements IImportCollector {
       }
     }
 
+    public String getImport() {
+      return new StringBuilder().append(m_packageName).append('.').append(m_simpleName).toString();
+    }
+
     public String createImportDeclaration() {
-      return "import " + (m_static ? "static " : "") + m_packageName + '.' + m_simpleName + ';';
+      return new StringBuilder().append("import ").append(m_static ? "static " : "").append(getImport()).append(';').toString();
     }
   }
 

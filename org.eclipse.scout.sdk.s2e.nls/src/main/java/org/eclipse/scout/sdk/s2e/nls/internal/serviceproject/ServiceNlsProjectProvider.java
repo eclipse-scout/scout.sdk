@@ -31,6 +31,8 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
+import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
+import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsProjectProvider;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
@@ -83,7 +85,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         try {
           if (!Flags.isAbstract(candidate.getFlags()) && SourceRange.isAvailable(candidate.getSourceRange()) && acceptsFilter(projectFilter, candidate)) {
             // only accept non-abstract types with source available and fulfills the given project filter
-            TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(candidate, getPriority(candidate));
+            TextProviderServiceDeclaration d = new TextProviderServiceDeclaration(candidate, getOrder(candidate));
             result.add(d);
           }
         }
@@ -117,10 +119,10 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     return projects.contains(candidate.getJavaProject().getProject().getName());
   }
 
-  private static double getPriority(IType registration) {
+  private static double getOrder(IType registration) {
     // check class annotation
     try {
-      IAnnotation a = JdtUtils.getAnnotation(registration, "org.eclipse.scout.commons.annotations.Order");
+      IAnnotation a = JdtUtils.getAnnotation(registration, IScoutRuntimeTypes.Order);
       BigDecimal val = JdtUtils.getAnnotationValueNumeric(a, "value");
       if (val != null) {
         return val.doubleValue();
@@ -130,8 +132,8 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       //nop
     }
 
-    // if nothing defined: default ranking = 0
-    return 0.0;
+    // if nothing defined: default order
+    return ISdkProperties.DEFAULT_BEAN_ORDER;
   }
 
   private static ServiceNlsProject getServiceNlsProject(IType serviceType) throws JavaModelException {
