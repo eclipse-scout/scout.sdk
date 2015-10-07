@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 /**
  *
  */
-public class BindingTypeParameterWithJdt extends AbstractJavaElementWithJdt<ITypeParameter>implements TypeParameterSpi {
+public class BindingTypeParameterWithJdt extends AbstractJavaElementWithJdt<ITypeParameter> implements TypeParameterSpi {
   private final AbstractMemberWithJdt<?> m_declaringMember;
   private final TypeVariableBinding m_binding;
   private final int m_index;

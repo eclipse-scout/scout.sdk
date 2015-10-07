@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 /**
  *
  */
-public class BindingAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnotation>implements AnnotationSpi {
+public class BindingAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnotation> implements AnnotationSpi {
   private final AnnotatableSpi m_owner;
   private final AnnotationBinding m_binding;
   private Map<String, AnnotationElementSpi> m_values;//sorted

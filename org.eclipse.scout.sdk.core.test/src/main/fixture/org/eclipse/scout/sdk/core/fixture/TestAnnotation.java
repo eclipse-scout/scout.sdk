@@ -35,9 +35,9 @@ public @interface TestAnnotation {
     B
   }
 
-  Class<?>[]values() default {List.class};
+  Class<?>[] values() default {List.class};
 
   TestEnum en() default TestEnum.A;
 
-  ValueAnnot[]inner() default {};
+  ValueAnnot[] inner() default {};
 }

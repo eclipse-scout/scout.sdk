@@ -10,13 +10,13 @@ import java.math.RoundingMode;
  *
  */
 public @interface AnnotationWithArrayValues {
-  public int[]nums();
+  public int[] nums();
 
-  public RoundingMode[]enumValues();
+  public RoundingMode[] enumValues();
 
-  public String[]strings();
+  public String[] strings();
 
-  public Class<?>[]types();
+  public Class<?>[] types();
 
-  public AnnotationWithSingleValues[]annos();
+  public AnnotationWithSingleValues[] annos();
 }

@@ -18,7 +18,7 @@ public @interface AnnotationWithSingleValues {
 
   public String string();
 
-  public Class<?>type();
+  public Class<?> type();
 
   public Generated anno();
 }

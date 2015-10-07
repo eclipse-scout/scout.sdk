@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 /**
  *
  */
-public class DeclarationAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnotation>implements AnnotationSpi {
+public class DeclarationAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnotation> implements AnnotationSpi {
   private final AnnotatableSpi m_owner;
   private final org.eclipse.jdt.internal.compiler.ast.Annotation m_astNode;
   private final TypeBinding m_typeBinding;

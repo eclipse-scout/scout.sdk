@@ -75,8 +75,8 @@ import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
-import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
@@ -148,7 +148,7 @@ public final class SpiWithJdtUtils {
     return binding;
   }
 
-  static TypeSpi bindingToInnerType(JavaEnvironmentWithJdt env, TypeBinding primaryTypeBinding, String[] parts) {
+  static TypeSpi bindingToInnerType(JavaEnvironmentWithJdt env, TypeBinding primaryTypeBinding, String innerTypes) {
     if (primaryTypeBinding == null) {
       return null;
     }
@@ -156,7 +156,7 @@ public final class SpiWithJdtUtils {
     TypeSpi result = bindingToType(env, primaryTypeBinding);
 
     // it is an inner type: step into
-    StringTokenizer st = new StringTokenizer(parts[1], String.valueOf(ISignatureConstants.C_DOLLAR), false);
+    StringTokenizer st = new StringTokenizer(innerTypes, String.valueOf(ISignatureConstants.C_DOLLAR), false);
     while (st.hasMoreTokens()) {
       String name = st.nextToken();
 
@@ -569,15 +569,46 @@ public final class SpiWithJdtUtils {
     return -1;
   }
 
-  static String[] splitToPrimaryType(String fqn) {
+  static class TypeDescriptor {
+    final String m_primaryTypeName;
+    final String m_innerTypeNames;
+    final int m_arrayDimension;
+
+    boolean hasInnerType() {
+      return m_innerTypeNames != null;
+    }
+
+    private TypeDescriptor(String primaryTypeName, String innerTypeNames, int arrayDimension) {
+      super();
+      m_primaryTypeName = primaryTypeName;
+      m_innerTypeNames = innerTypeNames;
+      m_arrayDimension = arrayDimension;
+    }
+
+  }
+
+  static TypeDescriptor getTypeDescriptor(String fqn) {
     // check for inner types
     int firstDollarPos = fqn.indexOf(ISignatureConstants.C_DOLLAR);
+    int arrayDim = getArrayDimension(fqn);
+    if (arrayDim > 0) {
+      // remove array indicators
+      fqn = fqn.substring(0, fqn.length() - arrayDim * 2);
+    }
     if (firstDollarPos > 0) {
       String primaryType = fqn.substring(0, firstDollarPos);
       String innerTypePart = fqn.substring(firstDollarPos + 1);
-      return new String[]{primaryType, innerTypePart};
+      return new TypeDescriptor(primaryType, innerTypePart, arrayDim);
     }
-    return new String[]{fqn};
+    return new TypeDescriptor(fqn, null, arrayDim);
+  }
+
+  private static int getArrayDimension(String fqn) {
+    int pos = fqn.indexOf("[]");
+    if (pos < 0) {
+      return 0;
+    }
+    return (fqn.length() - pos) / 2;
   }
 
   static boolean hasDeprecatedAnnotation(AnnotationBinding[] annotations) {

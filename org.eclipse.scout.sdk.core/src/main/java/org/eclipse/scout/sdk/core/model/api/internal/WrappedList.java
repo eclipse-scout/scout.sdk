@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
  * @author Ivan Motsch
  * @since 5.1.0
  */
-public class WrappedList<T> extends AbstractList<T>implements RandomAccess {
+public class WrappedList<T> extends AbstractList<T> implements RandomAccess {
   private final List<? extends JavaElementSpi> m_spiList;
 
   public WrappedList(List<? extends JavaElementSpi> spiList) {

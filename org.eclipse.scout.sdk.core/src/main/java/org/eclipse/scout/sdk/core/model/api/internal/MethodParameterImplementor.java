@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.model.sugar.AnnotationQuery;
  * @author Ivan Motsch
  * @since 3.8.0 06.12.2012
  */
-public class MethodParameterImplementor extends AbstractAnnotatableImplementor<MethodParameterSpi>implements IMethodParameter {
+public class MethodParameterImplementor extends AbstractAnnotatableImplementor<MethodParameterSpi> implements IMethodParameter {
 
   public MethodParameterImplementor(MethodParameterSpi spi) {
     super(spi);

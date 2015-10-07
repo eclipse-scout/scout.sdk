@@ -24,7 +24,7 @@ import org.eclipse.scout.sdk.core.model.sugar.SuperMethodQuery;
 /**
  *
  */
-public class MethodImplementor extends AbstractMemberImplementor<MethodSpi>implements IMethod {
+public class MethodImplementor extends AbstractMemberImplementor<MethodSpi> implements IMethod {
 
   public MethodImplementor(MethodSpi spi) {
     super(spi);

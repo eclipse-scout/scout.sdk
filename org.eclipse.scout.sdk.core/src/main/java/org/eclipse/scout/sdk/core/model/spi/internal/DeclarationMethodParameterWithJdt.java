@@ -29,7 +29,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
  * @author Ivan Motsch
  * @since 3.8.0 06.12.2012
  */
-public class DeclarationMethodParameterWithJdt extends AbstractJavaElementWithJdt<IMethodParameter>implements MethodParameterSpi {
+public class DeclarationMethodParameterWithJdt extends AbstractJavaElementWithJdt<IMethodParameter> implements MethodParameterSpi {
   private final DeclarationMethodWithJdt m_declaringMethod;
   private final Argument m_astNode;
   private final int m_index;

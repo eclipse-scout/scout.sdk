@@ -42,8 +42,8 @@ public final class FieldFilters {
   }
 
   /**
-   * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a field name
-   * {@link IField#name()}) matches the given regular expression.
+   * Creates and returns a new {@link IFilter} that evaluates to <code>true</code> if a field name {@link IField#name()}
+   * ) matches the given regular expression.
    *
    * @param regex
    *          The regex for which the {@link IFilter} should evaluate to <code>true</code>.

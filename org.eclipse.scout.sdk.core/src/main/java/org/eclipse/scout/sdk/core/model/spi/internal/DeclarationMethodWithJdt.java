@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 /**
  *
  */
-public class DeclarationMethodWithJdt extends AbstractMemberWithJdt<IMethod>implements MethodSpi {
+public class DeclarationMethodWithJdt extends AbstractMemberWithJdt<IMethod> implements MethodSpi {
   private final DeclarationTypeWithJdt m_declaringType;
   private final AbstractMethodDeclaration m_astNode;
   private TypeSpi m_returnType;

@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 /**
  *
  */
-public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod>implements MethodSpi {
+public class BindingMethodWithJdt extends AbstractMemberWithJdt<IMethod> implements MethodSpi {
   private final BindingTypeWithJdt m_declaringType;
   private final MethodBinding m_binding;
   private TypeSpi m_returnType;

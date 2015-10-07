@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.model.sugar.TypeQuery;
 /**
  *
  */
-public class CompilationUnitImplementor extends AbstractJavaElementImplementor<CompilationUnitSpi>implements ICompilationUnit {
+public class CompilationUnitImplementor extends AbstractJavaElementImplementor<CompilationUnitSpi> implements ICompilationUnit {
 
   public CompilationUnitImplementor(CompilationUnitSpi spi) {
     super(spi);

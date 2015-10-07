@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 /**
  *
  */
-public class SyntheticCompilationUnitWithJdt extends AbstractJavaElementWithJdt<ICompilationUnit>implements CompilationUnitSpi {
+public class SyntheticCompilationUnitWithJdt extends AbstractJavaElementWithJdt<ICompilationUnit> implements CompilationUnitSpi {
   private final TypeSpi m_mainType;
 
   SyntheticCompilationUnitWithJdt(JavaEnvironmentWithJdt env, BindingTypeWithJdt mainType) {

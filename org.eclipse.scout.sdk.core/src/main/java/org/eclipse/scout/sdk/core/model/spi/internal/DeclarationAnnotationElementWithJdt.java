@@ -23,7 +23,7 @@ import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 /**
  *
  */
-public class DeclarationAnnotationElementWithJdt extends AbstractJavaElementWithJdt<IAnnotationElement>implements AnnotationElementSpi {
+public class DeclarationAnnotationElementWithJdt extends AbstractJavaElementWithJdt<IAnnotationElement> implements AnnotationElementSpi {
   private final DeclarationAnnotationWithJdt m_declaringAnnotation;
   private final MemberValuePair m_astNode;
   private final String m_name;

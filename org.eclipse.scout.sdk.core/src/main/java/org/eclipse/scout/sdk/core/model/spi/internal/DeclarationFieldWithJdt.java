@@ -30,7 +30,7 @@ import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 
-public class DeclarationFieldWithJdt extends AbstractMemberWithJdt<IField>implements FieldSpi {
+public class DeclarationFieldWithJdt extends AbstractMemberWithJdt<IField> implements FieldSpi {
   private final DeclarationTypeWithJdt m_declaringType;
   private final FieldDeclaration m_astNode;
   private final char[] m_name;

@@ -45,8 +45,8 @@ public interface MemberSpi extends AnnotatableSpi {
    * Type parameters are declarations as defined by the hosting {@link MemberSpi}. They may have minimal bounds defined.
    * <br>
    * The difference to {@link TypeSpi#getTypeArguments()} is that {@link #getTypeParameters()} returns the parameter as
-   * they are declared by the class file while {@link #typeArguments()} holds the currently bound real
-   * {@link TypeSpi}s. <br>
+   * they are declared by the class file while {@link #typeArguments()} holds the currently bound real {@link TypeSpi}s.
+   * <br>
    * <br>
    * <b>Example: </b><br>
    * <code>public class NumberList&lt;T extends java.lang.Number&gt; {}</code><br>

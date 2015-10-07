@@ -53,6 +53,11 @@ public class BindingBaseTypeWithJdt extends AbstractTypeWithJdt {
   }
 
   @Override
+  public BaseTypeBinding getInternalBinding() {
+    return m_btb;
+  }
+
+  @Override
   protected IType internalCreateApi() {
     return new TypeImplementor(this);
   }

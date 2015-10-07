@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.signature.Signature;
  * @author Ivan Motsch
  * @since 4.1.0 09.11.2014
  */
-public class TypeParameterImplementor extends AbstractJavaElementImplementor<TypeParameterSpi>implements ITypeParameter {
+public class TypeParameterImplementor extends AbstractJavaElementImplementor<TypeParameterSpi> implements ITypeParameter {
 
   private String m_signature;
 

@@ -16,7 +16,7 @@ import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 /**
  *
  */
-public class PackageImplementor extends AbstractJavaElementImplementor<PackageSpi>implements IPackage {
+public class PackageImplementor extends AbstractJavaElementImplementor<PackageSpi> implements IPackage {
 
   public PackageImplementor(PackageSpi spi) {
     super(spi);

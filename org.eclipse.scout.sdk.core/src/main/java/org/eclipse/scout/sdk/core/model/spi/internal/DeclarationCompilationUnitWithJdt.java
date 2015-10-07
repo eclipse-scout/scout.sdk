@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 /**
  *
  */
-public class DeclarationCompilationUnitWithJdt extends AbstractJavaElementWithJdt<ICompilationUnit>implements CompilationUnitSpi {
+public class DeclarationCompilationUnitWithJdt extends AbstractJavaElementWithJdt<ICompilationUnit> implements CompilationUnitSpi {
   private final CompilationUnitDeclaration m_astNode;
   private PackageSpi m_package;
   private String m_fileName;

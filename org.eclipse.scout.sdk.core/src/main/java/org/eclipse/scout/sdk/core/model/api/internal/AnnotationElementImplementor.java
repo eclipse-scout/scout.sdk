@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 /**
  *
  */
-public class AnnotationElementImplementor extends AbstractJavaElementImplementor<AnnotationElementSpi>implements IAnnotationElement {
+public class AnnotationElementImplementor extends AbstractJavaElementImplementor<AnnotationElementSpi> implements IAnnotationElement {
 
   public AnnotationElementImplementor(AnnotationElementSpi spi) {
     super(spi);

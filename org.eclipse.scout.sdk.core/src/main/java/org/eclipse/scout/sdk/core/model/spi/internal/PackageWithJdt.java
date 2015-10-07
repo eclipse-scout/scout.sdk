@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 /**
  *
  */
-public class PackageWithJdt extends AbstractJavaElementWithJdt<IPackage>implements PackageSpi {
+public class PackageWithJdt extends AbstractJavaElementWithJdt<IPackage> implements PackageSpi {
   private final String m_name;
 
   PackageWithJdt(JavaEnvironmentWithJdt env, String name) {

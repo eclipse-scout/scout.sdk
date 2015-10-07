@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 /**
  *
  */
-public class DeclarationImportWithJdt extends AbstractJavaElementWithJdt<IImport>implements ImportSpi {
+public class DeclarationImportWithJdt extends AbstractJavaElementWithJdt<IImport> implements ImportSpi {
   private final ImportReference m_astNode;
   private final DeclarationCompilationUnitWithJdt m_cu;
 

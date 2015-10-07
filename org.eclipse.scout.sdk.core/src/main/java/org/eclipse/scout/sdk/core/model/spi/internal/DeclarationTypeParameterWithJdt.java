@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
  * @author Ivan Motsch
  * @since 5.1.0
  */
-public class DeclarationTypeParameterWithJdt extends AbstractJavaElementWithJdt<ITypeParameter>implements TypeParameterSpi {
+public class DeclarationTypeParameterWithJdt extends AbstractJavaElementWithJdt<ITypeParameter> implements TypeParameterSpi {
   private final AbstractMemberWithJdt<?> m_declaringMember;
   private final org.eclipse.jdt.internal.compiler.ast.TypeParameter m_astNode;
   private final int m_index;

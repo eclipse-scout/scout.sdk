@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.sugar.AnnotationQuery;
 
-public class FieldImplementor extends AbstractMemberImplementor<FieldSpi>implements IField {
+public class FieldImplementor extends AbstractMemberImplementor<FieldSpi> implements IField {
 
   public FieldImplementor(FieldSpi spi) {
     super(spi);

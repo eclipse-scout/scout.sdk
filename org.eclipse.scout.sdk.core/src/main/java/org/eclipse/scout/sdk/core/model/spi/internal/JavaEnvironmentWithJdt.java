@@ -46,6 +46,7 @@ import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 import org.eclipse.scout.sdk.core.model.spi.PackageSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+import org.eclipse.scout.sdk.core.model.spi.internal.SpiWithJdtUtils.TypeDescriptor;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.SameCompositeObject;
 
@@ -87,14 +88,20 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     CompositeObject key = new CompositeObject(TypeSpi.class, fqn);
     Object elem = m_performanceCache.get(key);
     if (elem == null && !m_performanceCache.containsKey(key)) {
-      String[] parts = SpiWithJdtUtils.splitToPrimaryType(fqn);
-      TypeBinding binding = SpiWithJdtUtils.findTypeBinding(parts[0], m_compiler);
-      if (parts.length < 2) {
+      TypeDescriptor desc = SpiWithJdtUtils.getTypeDescriptor(fqn);
+      TypeBinding binding = SpiWithJdtUtils.findTypeBinding(desc.m_primaryTypeName, m_compiler);
+      if (desc.hasInnerType()) {
+        elem = SpiWithJdtUtils.bindingToInnerType(this, binding, desc.m_innerTypeNames);
+      }
+      else {
         // no inner types: directly return answer
         elem = SpiWithJdtUtils.bindingToType(this, binding);
       }
-      else {
-        elem = SpiWithJdtUtils.bindingToInnerType(this, binding, parts);
+      if (desc.m_arrayDimension > 0 && elem instanceof AbstractTypeWithJdt) {
+        TypeBinding b = ((AbstractTypeWithJdt) elem).getInternalBinding();
+        if (b != null) {
+          elem = SpiWithJdtUtils.bindingToType(this, m_compiler.lookupEnvironment.createArrayType(b, desc.m_arrayDimension));
+        }
       }
       m_performanceCache.put(key, elem);
     }

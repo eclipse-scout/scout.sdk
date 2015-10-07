@@ -34,7 +34,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 /**
  *
  */
-public class BindingFieldWithJdt extends AbstractMemberWithJdt<IField>implements FieldSpi {
+public class BindingFieldWithJdt extends AbstractMemberWithJdt<IField> implements FieldSpi {
   private final AbstractTypeWithJdt m_declaringType;
   private final FieldBinding m_binding;
   private int m_flags;

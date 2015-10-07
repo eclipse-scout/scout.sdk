@@ -18,7 +18,7 @@ public @interface AnnotationWithDefaultValues {
 
   public String string() default "one";
 
-  public Class<?>type() default String.class;
+  public Class<?> type() default String.class;
 
   public Generated anno() default @Generated("g") ;
 }

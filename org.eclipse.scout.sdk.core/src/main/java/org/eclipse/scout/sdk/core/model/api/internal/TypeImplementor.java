@@ -31,7 +31,7 @@ import org.eclipse.scout.sdk.core.model.sugar.TypeQuery;
 import org.eclipse.scout.sdk.core.signature.ISignatureConstants;
 import org.eclipse.scout.sdk.core.signature.Signature;
 
-public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implements IType {
+public class TypeImplementor extends AbstractMemberImplementor<TypeSpi> implements IType {
   private String m_signature;
 
   public TypeImplementor(TypeSpi spi) {

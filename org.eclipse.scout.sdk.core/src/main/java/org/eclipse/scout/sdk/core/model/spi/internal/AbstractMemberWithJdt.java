@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 import org.eclipse.scout.sdk.core.model.api.IMember;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
 
-public abstract class AbstractMemberWithJdt<API extends IMember> extends AbstractJavaElementWithJdt<API>implements MemberSpi {
+public abstract class AbstractMemberWithJdt<API extends IMember> extends AbstractJavaElementWithJdt<API> implements MemberSpi {
 
   AbstractMemberWithJdt(JavaEnvironmentWithJdt env) {
     super(env);

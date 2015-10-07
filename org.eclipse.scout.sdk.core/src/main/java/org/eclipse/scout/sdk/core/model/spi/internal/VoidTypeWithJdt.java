@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
@@ -44,6 +45,11 @@ public final class VoidTypeWithJdt extends AbstractTypeWithJdt {
   @Override
   protected IType internalCreateApi() {
     return new TypeImplementor(this);
+  }
+
+  @Override
+  public TypeBinding getInternalBinding() {
+    return null;
   }
 
   @Override

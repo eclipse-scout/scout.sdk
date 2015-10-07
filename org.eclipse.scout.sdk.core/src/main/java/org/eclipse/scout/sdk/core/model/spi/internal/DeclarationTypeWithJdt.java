@@ -77,6 +77,11 @@ public class DeclarationTypeWithJdt extends AbstractTypeWithJdt {
   }
 
   @Override
+  public TypeBinding getInternalBinding() {
+    return null;
+  }
+
+  @Override
   protected IType internalCreateApi() {
     return new TypeImplementor(this);
   }

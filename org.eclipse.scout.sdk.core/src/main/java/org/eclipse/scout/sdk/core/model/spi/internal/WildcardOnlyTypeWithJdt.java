@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -41,6 +42,11 @@ public class WildcardOnlyTypeWithJdt extends AbstractTypeWithJdt {
   @Override
   protected JavaElementSpi internalFindNewElement(JavaEnvironmentWithJdt newEnv) {
     return newEnv.createWildcardOnlyType();
+  }
+
+  @Override
+  public TypeBinding getInternalBinding() {
+    return null;
   }
 
   @Override

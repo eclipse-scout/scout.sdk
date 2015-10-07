@@ -10,13 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.spi.internal;
 
+import org.eclipse.jdt.internal.compiler.lookup.TypeBinding;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 
-public abstract class AbstractTypeWithJdt extends AbstractMemberWithJdt<IType>implements TypeSpi {
+public abstract class AbstractTypeWithJdt extends AbstractMemberWithJdt<IType> implements TypeSpi {
 
   AbstractTypeWithJdt(JavaEnvironmentWithJdt env) {
     super(env);
   }
+
+  abstract TypeBinding getInternalBinding();
 
 }

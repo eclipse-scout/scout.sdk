@@ -98,6 +98,7 @@ public class BindingTypeWithJdt extends AbstractTypeWithJdt {
     return stb != null ? stb.scope : null;
   }
 
+  @Override
   public ReferenceBinding getInternalBinding() {
     return m_binding;
   }

@@ -60,7 +60,7 @@ public class BindingArrayTypeWithJdt extends AbstractTypeWithJdt {
 
   @Override
   protected JavaElementSpi internalFindNewElement(JavaEnvironmentWithJdt newEnv) {
-    return newEnv.findType(getName());//TODO imo write a test for newEnv.findType("int[]") and findType("java.lang.String[][]")
+    return newEnv.findType(getName());
   }
 
   @Override
@@ -83,6 +83,7 @@ public class BindingArrayTypeWithJdt extends AbstractTypeWithJdt {
     return m_leafComponentType;
   }
 
+  @Override
   public ArrayBinding getInternalBinding() {
     return m_binding;
   }
