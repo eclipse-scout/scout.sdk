@@ -35,5 +35,8 @@ public interface ISdkProperties {
    */
   double DEFAULT_VIEW_ORDER = 98765432123456789d;
 
-  double DEFAULT_BEAN_ORDER = 0d;
+  /**
+   * The default bean order if no @Order annotation is present (according to the Scout Runtime)
+   */
+  double DEFAULT_BEAN_ORDER = 5000d;
 }
