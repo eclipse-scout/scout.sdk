@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.core.fixture.ChildClass;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.api.internal.JavaEnvironmentImplementor;
 import org.eclipse.scout.sdk.core.model.spi.ClasspathSpi;
 
 /**
@@ -62,6 +63,13 @@ public final class CoreTestingUtils {
   public static IType getChildClassType() {
     ICompilationUnit icu = getChildClassIcu();
     return icu.types().first();
+  }
+
+  public static String getCompileErrors(IJavaEnvironment env, String fqn) {
+    if (env instanceof JavaEnvironmentImplementor) {
+      return ((JavaEnvironmentImplementor) env).compileErrors(fqn);
+    }
+    throw new UnsupportedOperationException(IJavaEnvironment.class.getName() + " implementation '" + env.getClass().getName() + "' is not supported.");
   }
 
   public static synchronized ICompilationUnit getChildClassIcu() {

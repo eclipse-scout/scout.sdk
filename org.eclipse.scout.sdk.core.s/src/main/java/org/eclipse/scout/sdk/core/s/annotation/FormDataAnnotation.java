@@ -69,22 +69,22 @@ public class FormDataAnnotation extends AbstractManagedAnnotation {
   }
 
   public boolean isValueDefault() {
-    return isDefaultValue("value");
+    return isDefault("value");
   }
 
   public boolean isSdkCommandDefault() {
-    return isDefaultValue("sdkCommand");
+    return isDefault("sdkCommand");
   }
 
   public boolean isDefaultSubtypeSdkCommandDefault() {
-    return isDefaultValue("defaultSubtypeSdkCommand");
+    return isDefault("defaultSubtypeSdkCommand");
   }
 
   public boolean isGenericOrdinalDefault() {
-    return isDefaultValue("genericOrdinal");
+    return isDefault("genericOrdinal");
   }
 
   public boolean isInterfacesDefault() {
-    return isDefaultValue("interfaces");
+    return isDefault("interfaces");
   }
 }

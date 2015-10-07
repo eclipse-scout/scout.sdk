@@ -76,7 +76,7 @@ import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.AnnotationValueSpi;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.FieldSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.MemberSpi;
@@ -264,8 +264,8 @@ public final class SpiWithJdtUtils {
     else if (owner instanceof AnnotationSpi) {
       return declaringTypeOf(((AnnotationSpi) owner).getOwner());
     }
-    else if (owner instanceof AnnotationValueSpi) {
-      return declaringTypeOf(((AnnotationValueSpi) owner).getDeclaringAnnotation());
+    else if (owner instanceof AnnotationElementSpi) {
+      return declaringTypeOf(((AnnotationElementSpi) owner).getDeclaringAnnotation());
     }
     return null;
   }
@@ -379,7 +379,7 @@ public final class SpiWithJdtUtils {
     return null;
   }
 
-  static MemberValuePair findAnnotationValueDeclaration(BindingAnnotationValueWithJdt a) {
+  static MemberValuePair findAnnotationValueDeclaration(BindingAnnotationElementWithJdt a) {
     Annotation annotationDeclaration = findAnnotationDeclaration(a.getDeclaringAnnotation());
     if (annotationDeclaration == null) {
       return null;
@@ -501,7 +501,7 @@ public final class SpiWithJdtUtils {
   /**
    * transform a raw annotation value from {@link ElementValuePair#getValue(Expression)} or compiled expression value
    * from {@link #compileExpression(Expression, ClassScope)} to a {@link IMetaValue} that can be wrapped inside a
-   * {@link AnnotationValueSpi}
+   * {@link AnnotationElementSpi}
    */
   static IMetaValue resolveCompiledValue(JavaEnvironmentWithJdt env, AnnotatableSpi owner, Object compiledValue) {
     if (compiledValue == null || Constant.NotAConstant.equals(compiledValue)) {
@@ -607,7 +607,7 @@ public final class SpiWithJdtUtils {
   }
 
   /**
-   * @return the (cached) default values {@link AnnotationValueSpi#isDefaultValue()} for the annotation in correct
+   * @return the (cached) default values {@link AnnotationElementSpi#isDefaultValue()} for the annotation in correct
    *         source order of the annotation type declaration
    */
   static Map<String, ElementValuePair> getBindingAnnotationSyntheticDefaultValues(JavaEnvironmentWithJdt env, ReferenceBinding annotationType) {

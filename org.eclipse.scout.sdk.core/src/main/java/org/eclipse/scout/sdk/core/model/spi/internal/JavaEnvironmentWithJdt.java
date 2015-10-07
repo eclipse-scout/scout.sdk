@@ -230,13 +230,13 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     return (BindingAnnotationWithJdt) elem;
   }
 
-  public synchronized BindingAnnotationValueWithJdt createBindingAnnotationValue(BindingAnnotationWithJdt owner, ElementValuePair bindingPair, boolean syntheticDefaultValue) {
+  public synchronized BindingAnnotationElementWithJdt createBindingAnnotationValue(BindingAnnotationWithJdt owner, ElementValuePair bindingPair, boolean syntheticDefaultValue) {
     SameCompositeObject key = new SameCompositeObject(owner, bindingPair);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new BindingAnnotationValueWithJdt(this, owner, bindingPair, syntheticDefaultValue));
+      m_compilerCache.put(key, elem = new BindingAnnotationElementWithJdt(this, owner, bindingPair, syntheticDefaultValue));
     }
-    return (BindingAnnotationValueWithJdt) elem;
+    return (BindingAnnotationElementWithJdt) elem;
   }
 
   public synchronized BindingArrayTypeWithJdt createBindingArrayType(ArrayBinding binding, boolean isWildcard) {
@@ -311,13 +311,13 @@ public class JavaEnvironmentWithJdt implements JavaEnvironmentSpi {
     return (DeclarationAnnotationWithJdt) elem;
   }
 
-  public synchronized DeclarationAnnotationValueWithJdt createDeclarationAnnotationValue(DeclarationAnnotationWithJdt declaringAnnotation, MemberValuePair astNode, boolean syntheticDefaultValue) {
+  public synchronized DeclarationAnnotationElementWithJdt createDeclarationAnnotationValue(DeclarationAnnotationWithJdt declaringAnnotation, MemberValuePair astNode, boolean syntheticDefaultValue) {
     SameCompositeObject key = new SameCompositeObject(astNode);
     JavaElementSpi elem = m_compilerCache.get(key);
     if (elem == null) {
-      m_compilerCache.put(key, elem = new DeclarationAnnotationValueWithJdt(this, declaringAnnotation, astNode, syntheticDefaultValue));
+      m_compilerCache.put(key, elem = new DeclarationAnnotationElementWithJdt(this, declaringAnnotation, astNode, syntheticDefaultValue));
     }
-    return (DeclarationAnnotationValueWithJdt) elem;
+    return (DeclarationAnnotationElementWithJdt) elem;
   }
 
   public synchronized DeclarationCompilationUnitWithJdt createDeclarationCompilationUnit(CompilationUnitDeclaration astNode) {

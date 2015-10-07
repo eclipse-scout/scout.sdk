@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
- * <h3>{@link MethodParameterQuery}</h3>
+ * <h3>{@link MethodParameterQuery}</h3> Method parameter query that by default returns all parameters of a method.
  *
  * @author Ivan Motsch
  * @since 5.1.0
@@ -37,8 +37,11 @@ public class MethodParameterQuery {
   }
 
   /**
+   * Limits the {@link IMethodParameter}s to the one with the given name.
+   *
    * @param name
-   * @return this
+   *          The name to search. Default is no filtering on name.
+   * @return
    */
   public MethodParameterQuery withName(String name) {
     m_name = name;
@@ -46,7 +49,10 @@ public class MethodParameterQuery {
   }
 
   /**
+   * Limits the {@link IMethodParameter}s to the ones with the given data type.
+   *
    * @param dataType
+   *          The data type to limit the result to. Default is no data type filter.
    * @return this
    */
   public MethodParameterQuery withDataType(IType dataType) {
@@ -55,7 +61,10 @@ public class MethodParameterQuery {
   }
 
   /**
+   * Limit the {@link IMethodParameter}s to the ones that accept the given {@link IFilter}.
+   *
    * @param filter
+   *          The filter. Default none.
    * @return this
    */
   public MethodParameterQuery withFilter(IFilter<IMethodParameter> filter) {
@@ -64,7 +73,10 @@ public class MethodParameterQuery {
   }
 
   /**
+   * Limit the number of {@link IMethodParameter}s to search.
+   *
    * @param maxResultCount
+   *          The maximum number of {@link IMethodParameter}s to search. Default is unlimited.
    * @return this
    */
   public MethodParameterQuery withMaxResultCount(int maxResultCount) {
@@ -97,18 +109,34 @@ public class MethodParameterQuery {
     }
   }
 
+  /**
+   * Checks if there is at least one {@link IMethodParameter} that fulfills this query.
+   *
+   * @return <code>true</code> if at least one {@link IMethodParameter} fulfills this query, <code>false</code>
+   *         otherwise.
+   */
   public boolean existsAny() {
     return first() != null;
   }
 
+  /**
+   * Gets the first {@link IMethodParameter} that fulfills this query.
+   *
+   * @return The first {@link IMethodParameter} that fulfills this query or <code>null</code> if there is none.
+   */
   public IMethodParameter first() {
     List<IMethodParameter> result = new ArrayList<>(1);
     visit(m_method, result, 1);
     return result.isEmpty() ? null : result.get(0);
   }
 
+  /**
+   * Gets all {@link IMethodParameter}s that fulfill this query.
+   *
+   * @return A {@link List} with all {@link IMethodParameter}s that fulfill this query. Never returns <code>null</code>.
+   */
   public List<IMethodParameter> list() {
-    List<IMethodParameter> result = new ArrayList<>();
+    List<IMethodParameter> result = new ArrayList<>(m_method.getParameters().size());
     visit(m_method, result, m_maxResultCount);
     return result;
   }

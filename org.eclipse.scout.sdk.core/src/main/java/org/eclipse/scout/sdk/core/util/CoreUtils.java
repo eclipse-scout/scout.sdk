@@ -500,7 +500,7 @@ public final class CoreUtils {
       return null;
     }
     IType item = levelType.typeArguments().get(typeParamIndex);
-    if (!item.isAnonymous()) {
+    if (!item.isParameterType()) {
       // direct bind
       return Arrays.asList(item);
     }

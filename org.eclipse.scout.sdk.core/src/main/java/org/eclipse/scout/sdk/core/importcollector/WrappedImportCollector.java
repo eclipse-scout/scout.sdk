@@ -6,6 +6,12 @@ import java.util.List;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
 
+/**
+ * <h3>{@link WrappedImportCollector}</h3> Import collector wrapper.
+ *
+ * @author Ivan Motsch
+ * @since 5.2.0
+ */
 public class WrappedImportCollector implements IImportCollector {
   private final IImportCollector m_inner;
 

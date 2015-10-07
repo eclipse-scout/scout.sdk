@@ -8,41 +8,42 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.core.model.api;
+package org.eclipse.scout.sdk.core.model.spi;
 
-import org.eclipse.scout.sdk.core.model.spi.AnnotationValueSpi;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
+import org.eclipse.scout.sdk.core.model.api.IMetaValue;
+import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 
 /**
- * <h3>{@link IAnnotationValue}</h3>
+ * <h3>{@link AnnotationElementSpi}</h3>
  *
  * @author Matthias Villiger
  * @since 5.1.0
  */
-public interface IAnnotationValue extends IJavaElement {
+public interface AnnotationElementSpi extends JavaElementSpi {
 
   /**
    * Gets the value of the annotation attribute.
    *
    * @return never null
    */
-  IMetaValue metaValue();
+  IMetaValue getMetaValue();
 
   /**
-   * Gets the {@link IAnnotation} this {@link IAnnotationValue} belongs to.
+   * Gets the {@link AnnotationSpi} this {@link AnnotationElementSpi} belongs to.
    *
-   * @return The declaring {@link IAnnotation}
+   * @return The declaring {@link AnnotationSpi}
    */
-  IAnnotation declaringAnnotation();
+  AnnotationSpi getDeclaringAnnotation();
 
   /**
-   * @return true if this {@link IAnnotationValue} was not declared in source code but is the default value of the
+   * @return true if this {@link AnnotationElementSpi} was not declared in source code but is the default value of the
    *         annotation
    */
   boolean isDefaultValue();
 
-  ISourceRange sourceOfExpression();
+  ISourceRange getSourceOfExpression();
 
   @Override
-  AnnotationValueSpi unwrap();
-
+  IAnnotationElement wrap();
 }

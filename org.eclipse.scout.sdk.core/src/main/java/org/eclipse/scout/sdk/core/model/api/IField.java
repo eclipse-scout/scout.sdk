@@ -36,13 +36,19 @@ public interface IField extends IMember {
   IType dataType();
 
   /**
-   * If this {@link IField} is a synthetic parameterized Field (for example the super class of a parameterized type with
-   * applied type arguments) then this method returns the original field without the type arguments applied.
-   * <p>
-   * Otherwise this is returned
+   * @return If this {@link IField} is a synthetic parameterized Field (for example the super class of a parameterized
+   *         type with applied type arguments) then this method returns the original field without the type arguments
+   *         applied.
+   *         <p>
+   *         Otherwise the receiver is returned.
    */
   IField originalField();
 
+  /**
+   * Gets the source of this {@link IField} behind the equals character.
+   * 
+   * @return The initializer source or <code>null</code> if no source is available.
+   */
   ISourceRange sourceOfInitializer();
 
   @Override

@@ -11,7 +11,6 @@
 package org.eclipse.scout.sdk.core.model.api;
 
 import java.util.List;
-import java.util.Map;
 
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.sugar.TypeQuery;
@@ -25,9 +24,10 @@ import org.eclipse.scout.sdk.core.model.sugar.TypeQuery;
 public interface ICompilationUnit extends IJavaElement {
 
   /**
-   * @return true if this {@link ICompilationUnit} is synthetic based on a binary type {@link BindingType}
-   *         <p>
-   *         Synthetic {@link ICompilationUnit}s have a singleton type list, no imports and no source attached
+   * Synthetic {@link ICompilationUnit}s are based on binary {@link IType}s. Such {@link ICompilationUnit}s have a
+   * singleton type list, no imports and no source attached.
+   *
+   * @return <code>true</code> if this {@link ICompilationUnit} is synthetic based on a binary type.
    */
   boolean isSynthetic();
 
@@ -40,10 +40,16 @@ public interface ICompilationUnit extends IJavaElement {
   IPackage containingPackage();
 
   /**
-   * Gets a {@link Map} that contains all imports. The {@link Map} iterates over the imports in the order as they appear
-   * in the source.
+   * @return All imports in the order as they appear in the source. Never returns <code>null</code>.
    */
   List<IImport> imports();
+
+  /**
+   * Gets a {@link TypeQuery} to retrieve all {@link IType}s in this {@link ICompilationUnit}.
+   *
+   * @return A new {@link TypeQuery} for the nested {@link IType}s of this {@link ICompilationUnit}.
+   */
+  TypeQuery types();
 
   /**
    * Gets the main {@link IType} of this {@link ICompilationUnit}. This is the {@link IType} whose name matches the name
@@ -63,10 +69,16 @@ public interface ICompilationUnit extends IJavaElement {
    */
   IType resolveTypeBySimpleName(String simpleName);
 
+  /**
+   * Gets the java doc source of this {@link ICompilationUnit}. This is the java doc added on top of the java file
+   * (before the imports).
+   * 
+   * @return The {@link ISourceRange} for the java doc of this {@link ICompilationUnit} or <code>null</code> if no
+   *         source is attached.
+   */
   ISourceRange javaDoc();
 
   @Override
   CompilationUnitSpi unwrap();
 
-  TypeQuery types();
 }

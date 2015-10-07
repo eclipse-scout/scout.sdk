@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
- * <h3>{@link MethodQuery}</h3>
+ * <h3>{@link MethodQuery}</h3> Method query that by default returns all {@link IMethod}s in an {@link IType}.
  *
  * @author Ivan Motsch
  * @since 5.1.0
@@ -37,10 +37,11 @@ public class MethodQuery {
   }
 
   /**
-   * Include / Exclude super classes and super types for visiting
+   * Include or exclude super types visiting when searching for {@link IMethod}s.
    *
    * @param b
-   *          default false
+   *          <code>true</code> if all super classes and super interfaces should be checked for {@link IMethod}s.
+   *          Default is <code>false</code>.
    * @return this
    */
   public MethodQuery withSuperTypes(boolean b) {
@@ -50,8 +51,11 @@ public class MethodQuery {
   }
 
   /**
+   * Include or exclude super class visiting when searching for {@link IMethod}s.
+   *
    * @param b
-   *          default false
+   *          <code>true</code> if all super classes should be checked for {@link IMethod}s. Default is
+   *          <code>false</code>.
    * @return this
    */
   public MethodQuery withSuperClasses(boolean b) {
@@ -60,8 +64,11 @@ public class MethodQuery {
   }
 
   /**
+   * Include or exclude super interfaces visiting when searching for {@link IMethod}s.
+   *
    * @param b
-   *          default fasle
+   *          <code>true</code> if all super interfaces should be checked for {@link IMethod}s. Default is
+   *          <code>false</code>.
    * @return this
    */
   public MethodQuery withSuperInterfaces(boolean b) {
@@ -70,7 +77,10 @@ public class MethodQuery {
   }
 
   /**
+   * Limit the {@link IMethod}s to the given name (see {@link IMethod#elementName()}).
+   *
    * @param name
+   *          The {@link IMethod} name. Default is no filtering.
    * @return this
    */
   public MethodQuery withName(String name) {
@@ -79,7 +89,10 @@ public class MethodQuery {
   }
 
   /**
+   * Limit the {@link IMethod}s to the ones that accept the given {@link IFilter}.
+   *
    * @param filter
+   *          The filter. Default none.
    * @return this
    */
   public MethodQuery withFilter(IFilter<IMethod> filter) {
@@ -88,7 +101,10 @@ public class MethodQuery {
   }
 
   /**
+   * Limit the number of {@link IMethod}s to search.
+   *
    * @param maxResultCount
+   *          The maximum number of methods to search. Default is unlimited.
    * @return this
    */
   public MethodQuery withMaxResultCount(int maxResultCount) {
@@ -137,16 +153,31 @@ public class MethodQuery {
     }
   }
 
+  /**
+   * Checks if there is at least one {@link IMethod} that fulfills this query.
+   *
+   * @return <code>true</code> if at least one {@link IMethod} fulfills this query, <code>false</code> otherwise.
+   */
   public boolean existsAny() {
     return first() != null;
   }
 
+  /**
+   * Gets the first {@link IMethod} that fulfills this query.
+   *
+   * @return The first {@link IMethod} that fulfills this query or <code>null</code> if there is none.
+   */
   public IMethod first() {
     List<IMethod> result = new ArrayList<>(1);
     visitRec(m_type, result, 1, false);
     return result.isEmpty() ? null : result.get(0);
   }
 
+  /**
+   * Gets all {@link IMethod}s that fulfill this query.
+   *
+   * @return A {@link List} with all {@link IMethod}s that fulfill this query. Never returns <code>null</code>.
+   */
   public List<IMethod> list() {
     List<IMethod> result = new ArrayList<>(m_type.unwrap().getMethods().size());
     visitRec(m_type, result, m_maxResultCount, false);

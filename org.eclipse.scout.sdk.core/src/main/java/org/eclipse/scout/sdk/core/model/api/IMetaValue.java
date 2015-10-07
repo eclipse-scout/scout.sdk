@@ -19,13 +19,16 @@ package org.eclipse.scout.sdk.core.model.api;
 public interface IMetaValue {
 
   /**
-   * @return the type of the object returned with {@link #get(Class)}
+   * @return the real type of the object returned with {@link #get(Class)}
    */
   MetaValueType type();
 
   /**
+   * Gets the value converted into the given class.
+   *
    * @param expectedType
-   * @return the value as defined by {@link #type()} as {@link MetaValueType}
+   *          The class it should be converted. Must be compatible with the value returned in {@link #type()}.
+   * @return the value converted into the given class.
    */
   <T> T get(Class<T> expectedType);
 }

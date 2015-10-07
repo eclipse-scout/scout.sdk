@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.fixture.TestAnnotation;
 import org.eclipse.scout.sdk.core.fixture.ValueAnnot;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IArrayMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
@@ -42,13 +42,13 @@ public class AnnotationTest {
     Assert.assertEquals(1, annotations.size());
     IAnnotation annotation = annotations.get(0);
     int nreal = 0, nsynth = 0;
-    for (IAnnotationValue v : annotation.values().values()) {
-      nreal += (v.isDefaultValue() ? 0 : 1);
-      nsynth += (v.isDefaultValue() ? 1 : 0);
+    for (IAnnotationElement v : annotation.elements().values()) {
+      nreal += (v.isDefault() ? 0 : 1);
+      nsynth += (v.isDefault() ? 1 : 0);
     }
     Assert.assertEquals(1, nreal);
     Assert.assertEquals(2, nsynth);
-    Assert.assertNotNull(annotation.value("values"));
+    Assert.assertNotNull(annotation.element("values"));
     Assert.assertEquals(childClassType, annotation.owner());
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
@@ -58,14 +58,14 @@ public class AnnotationTest {
     annotation = methodInChildClass.annotations().first();
     nreal = 0;
     nsynth = 0;
-    for (IAnnotationValue v : annotation.values().values()) {
-      nreal += (v.isDefaultValue() ? 0 : 1);
-      nsynth += (v.isDefaultValue() ? 1 : 0);
+    for (IAnnotationElement v : annotation.elements().values()) {
+      nreal += (v.isDefault() ? 0 : 1);
+      nsynth += (v.isDefault() ? 1 : 0);
     }
     Assert.assertEquals(2, nreal);
     Assert.assertEquals(1, nsynth);
-    Assert.assertNotNull(annotation.value("values"));
-    Assert.assertNotNull(annotation.value("en"));
+    Assert.assertNotNull(annotation.element("values"));
+    Assert.assertNotNull(annotation.element("en"));
     Assert.assertEquals(methodInChildClass, annotation.owner());
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
@@ -73,8 +73,8 @@ public class AnnotationTest {
     IMethod firstCase = childClassType.methods().list().get(2);
     Assert.assertEquals(1, firstCase.annotations().list().size());
     annotation = firstCase.annotations().first();
-    Assert.assertEquals(1, annotation.values().size());
-    Assert.assertNotNull(annotation.value("value"));
+    Assert.assertEquals(1, annotation.elements().size());
+    Assert.assertNotNull(annotation.element("value"));
     Assert.assertEquals(firstCase, annotation.owner());
     Assert.assertEquals(SuppressWarnings.class.getName(), annotation.type().name());
   }
@@ -83,22 +83,22 @@ public class AnnotationTest {
   public void testAnnotationsWithAnnotationValues() {
     IType wildcardBaseClass = CoreTestingUtils.createJavaEnvironment().findType("org.eclipse.scout.sdk.core.fixture.WildcardBaseClass");
     IAnnotation testAnnot = wildcardBaseClass.annotations().first();
-    IAnnotationValue value = testAnnot.value("inner");
+    IAnnotationElement value = testAnnot.element("inner");
     Assert.assertNotNull(value);
-    Assert.assertTrue(value.metaValue().type() == MetaValueType.Array);
+    Assert.assertTrue(value.value().type() == MetaValueType.Array);
 
-    IMetaValue[] arr = ((IArrayMetaValue) value.metaValue()).metaValueArray();
+    IMetaValue[] arr = ((IArrayMetaValue) value.value()).metaValueArray();
     Assert.assertEquals(2, arr.length);
 
     IAnnotation annot0 = arr[0].get(IAnnotation.class);
     Assert.assertEquals(wildcardBaseClass, annot0.owner());
     Assert.assertEquals(ValueAnnot.class.getName(), annot0.type().name());
-    Assert.assertEquals("a", annot0.value("value").metaValue().get(String.class));
+    Assert.assertEquals("a", annot0.element("value").value().get(String.class));
 
     IAnnotation annot1 = arr[1].get(IAnnotation.class);
     Assert.assertEquals(wildcardBaseClass, annot1.owner());
     Assert.assertEquals(ValueAnnot.class.getName(), annot1.type().name());
-    Assert.assertEquals("b", annot1.value("value").metaValue().get(String.class));
+    Assert.assertEquals("b", annot1.element("value").value().get(String.class));
   }
 
   @Test
@@ -120,13 +120,13 @@ public class AnnotationTest {
     Assert.assertEquals(1, annotations.size());
     IAnnotation annotation = annotations.get(0);
     int nreal = 0, nsynth = 0;
-    for (IAnnotationValue v : annotation.values().values()) {
-      nreal += (v.isDefaultValue() ? 0 : 1);
-      nsynth += (v.isDefaultValue() ? 1 : 0);
+    for (IAnnotationElement v : annotation.elements().values()) {
+      nreal += (v.isDefault() ? 0 : 1);
+      nsynth += (v.isDefault() ? 1 : 0);
     }
     Assert.assertEquals(1, nreal);
     Assert.assertEquals(2, nsynth);
-    Assert.assertNotNull(annotation.value("values"));
+    Assert.assertNotNull(annotation.element("values"));
     Assert.assertEquals(baseClassType, annotation.owner());
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
@@ -137,19 +137,19 @@ public class AnnotationTest {
     annotation = methodInBaseClass.annotations().first();
     nreal = 0;
     nsynth = 0;
-    for (IAnnotationValue v : annotation.values().values()) {
-      nreal += (v.isDefaultValue() ? 0 : 1);
-      nsynth += (v.isDefaultValue() ? 1 : 0);
+    for (IAnnotationElement v : annotation.elements().values()) {
+      nreal += (v.isDefault() ? 0 : 1);
+      nsynth += (v.isDefault() ? 1 : 0);
     }
     Assert.assertEquals(1, nreal);
     Assert.assertEquals(2, nsynth);
-    Assert.assertNotNull(annotation.value("values"));
-    Assert.assertNotNull(annotation.value("en"));//default value TestEnum.A
+    Assert.assertNotNull(annotation.element("values"));
+    Assert.assertNotNull(annotation.element("en"));//default value TestEnum.A
     Assert.assertEquals(methodInBaseClass, annotation.owner());
     Assert.assertEquals(TestAnnotation.class.getName(), annotation.type().name());
 
     annotation = methodInBaseClass.annotations().list().get(1);
-    Assert.assertEquals(0, annotation.values().size());
+    Assert.assertEquals(0, annotation.elements().size());
     Assert.assertEquals(methodInBaseClass, annotation.owner());
     Assert.assertEquals(MarkerAnnotation.class.getName(), annotation.type().name());
   }

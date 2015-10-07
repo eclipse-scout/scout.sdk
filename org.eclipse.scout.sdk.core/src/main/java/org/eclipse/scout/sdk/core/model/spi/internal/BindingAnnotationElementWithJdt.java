@@ -14,17 +14,17 @@ import org.apache.commons.lang3.Validate;
 import org.eclipse.jdt.internal.compiler.ast.Expression;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
 import org.eclipse.jdt.internal.compiler.lookup.ElementValuePair;
-import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
-import org.eclipse.scout.sdk.core.model.api.internal.AnnotationValueImplementor;
-import org.eclipse.scout.sdk.core.model.spi.AnnotationValueSpi;
+import org.eclipse.scout.sdk.core.model.api.internal.AnnotationElementImplementor;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 
 /**
  *
  */
-public class BindingAnnotationValueWithJdt extends AbstractJavaElementWithJdt<IAnnotationValue>implements AnnotationValueSpi {
+public class BindingAnnotationElementWithJdt extends AbstractJavaElementWithJdt<IAnnotationElement>implements AnnotationElementSpi {
   private final BindingAnnotationWithJdt m_declaringAnnotation;
   private final ElementValuePair m_binding;
   private final String m_name;
@@ -32,7 +32,7 @@ public class BindingAnnotationValueWithJdt extends AbstractJavaElementWithJdt<IA
   private Expression m_sourceExpression;
   private IMetaValue m_value;
 
-  BindingAnnotationValueWithJdt(JavaEnvironmentWithJdt env, BindingAnnotationWithJdt owner, ElementValuePair bindingPair, boolean syntheticDefaultValue) {
+  BindingAnnotationElementWithJdt(JavaEnvironmentWithJdt env, BindingAnnotationWithJdt owner, ElementValuePair bindingPair, boolean syntheticDefaultValue) {
     super(env);
     m_declaringAnnotation = Validate.notNull(owner);
     m_binding = Validate.notNull(bindingPair);
@@ -47,8 +47,8 @@ public class BindingAnnotationValueWithJdt extends AbstractJavaElementWithJdt<IA
   }
 
   @Override
-  protected IAnnotationValue internalCreateApi() {
-    return new AnnotationValueImplementor(this);
+  protected IAnnotationElement internalCreateApi() {
+    return new AnnotationElementImplementor(this);
   }
 
   public ElementValuePair getInternalBinding() {

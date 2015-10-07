@@ -28,20 +28,40 @@ public interface IImport extends IJavaElement {
   ICompilationUnit compilationUnit();
 
   /**
-   * @return the fully qualified name of the type imported.
+   * Gets the full import name.<br>
+   * If the import is a type or method import, the fully qualified name of the type or method is returned.<br>
+   * If the import contains a wildcard (e.g. java.util.*), the wildcard will be part of the full import name which then
+   * denotes a package.
+   *
+   * @return The full import name.
    */
-  String name();
+  @Override
+  String elementName();
 
   /**
-   * @return the simple name of the imported type.
+   * Gets the last segment of the import (without wildcards).<br>
+   * If the import is a type or method import, the simple type name or method name is returned.<br>
+   * If the import is a wildcard package import (e.g. java.util.*), the last package segment is returned.
+   *
+   * @return The last non-wildcard segment of the import.
    */
   String simpleName();
 
   /**
-   * @return the qualifier of the imported type.
+   * Gets all but the last segments of the import (without wildcards).<br>
+   * If the import is a type import, the qualifier of the type is returned.<br>
+   * If the import is a method import, the fully qualified name of the declaring type of the method is returned.<br>
+   * If the import is a wildcard package import (e.g. java.util.*), all but the last segments are returned.
+   *
+   * @return All but the last non-wildcard segments of the import.
    */
   String qualifier();
 
+  /**
+   * Specifies if it is a static method import.
+   *
+   * @return <code>true</code> if it is a static method import, <code>false</code> otherwise.
+   */
   boolean isStatic();
 
   @Override

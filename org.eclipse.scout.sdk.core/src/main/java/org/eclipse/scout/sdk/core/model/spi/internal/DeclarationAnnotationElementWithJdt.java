@@ -13,24 +13,24 @@ package org.eclipse.scout.sdk.core.model.spi.internal;
 import org.eclipse.jdt.internal.compiler.ast.Expression;
 import org.eclipse.jdt.internal.compiler.ast.MemberValuePair;
 import org.eclipse.jdt.internal.compiler.lookup.ClassScope;
-import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
-import org.eclipse.scout.sdk.core.model.api.internal.AnnotationValueImplementor;
-import org.eclipse.scout.sdk.core.model.spi.AnnotationValueSpi;
+import org.eclipse.scout.sdk.core.model.api.internal.AnnotationElementImplementor;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 
 /**
  *
  */
-public class DeclarationAnnotationValueWithJdt extends AbstractJavaElementWithJdt<IAnnotationValue>implements AnnotationValueSpi {
+public class DeclarationAnnotationElementWithJdt extends AbstractJavaElementWithJdt<IAnnotationElement>implements AnnotationElementSpi {
   private final DeclarationAnnotationWithJdt m_declaringAnnotation;
   private final MemberValuePair m_astNode;
   private final String m_name;
   private final boolean m_syntheticDefaultValue;
   private IMetaValue m_value;
 
-  DeclarationAnnotationValueWithJdt(JavaEnvironmentWithJdt env, DeclarationAnnotationWithJdt declaringAnnotation, MemberValuePair astNode, boolean syntheticDefaultValue) {
+  DeclarationAnnotationElementWithJdt(JavaEnvironmentWithJdt env, DeclarationAnnotationWithJdt declaringAnnotation, MemberValuePair astNode, boolean syntheticDefaultValue) {
     super(env);
     m_declaringAnnotation = declaringAnnotation;
     m_astNode = astNode;
@@ -45,8 +45,8 @@ public class DeclarationAnnotationValueWithJdt extends AbstractJavaElementWithJd
   }
 
   @Override
-  protected IAnnotationValue internalCreateApi() {
-    return new AnnotationValueImplementor(this);
+  protected IAnnotationElement internalCreateApi() {
+    return new AnnotationElementImplementor(this);
   }
 
   @Override

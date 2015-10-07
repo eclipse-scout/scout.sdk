@@ -16,7 +16,7 @@ import java.util.Map;
 import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.ICompilationUnit;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IImport;
@@ -43,23 +43,23 @@ public final class JavaModelPrinter {
   protected static void printAnnotation(IAnnotation a, StringBuilder sb, boolean includeDetails) {
     sb.append("@");
     sb.append(a.type().elementName());
-    Map<String, IAnnotationValue> values = a.values();
+    Map<String, IAnnotationElement> values = a.elements();
     int n = 0;
-    for (Map.Entry<String, IAnnotationValue> e : values.entrySet()) {
-      if (!e.getValue().isDefaultValue()) {
+    for (Map.Entry<String, IAnnotationElement> e : values.entrySet()) {
+      if (!e.getValue().isDefault()) {
         n++;
       }
     }
     if (n > 0) {
       sb.append("(");
       if (includeDetails) {
-        for (Map.Entry<String, IAnnotationValue> e : values.entrySet()) {
-          if (e.getValue().isDefaultValue()) {
+        for (Map.Entry<String, IAnnotationElement> e : values.entrySet()) {
+          if (e.getValue().isDefault()) {
             continue;
           }
           sb.append(e.getKey());
           sb.append("=");
-          sb.append(e.getValue().metaValue().toString());
+          sb.append(e.getValue().value().toString());
           sb.append(",");
         }
         sb.deleteCharAt(sb.length() - 1);
@@ -89,7 +89,7 @@ public final class JavaModelPrinter {
   }
 
   public static void print(IImport id, StringBuilder sb) {
-    sb.append("import ").append(id.isStatic() ? "static " : "").append(id.name());
+    sb.append("import ").append(id.isStatic() ? "static " : "").append(id.elementName());
   }
 
   public static void print(ICompilationUnit icu, StringBuilder sb) {
@@ -170,7 +170,7 @@ public final class JavaModelPrinter {
     }
   }
 
-  public static void print(IAnnotationValue av, StringBuilder sb) {
-    sb.append(av.metaValue().toString());
+  public static void print(IAnnotationElement av, StringBuilder sb) {
+    sb.append(av.value().toString());
   }
 }

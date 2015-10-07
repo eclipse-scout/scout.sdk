@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
- * <h3>{@link FieldQuery}</h3>
+ * <h3>{@link FieldQuery}</h3> Field query that by default returns all {@link IField}s directly declared on the owner.
  *
  * @author Ivan Motsch
  * @since 5.1.0
@@ -37,10 +37,11 @@ public class FieldQuery {
   }
 
   /**
-   * Include / Exclude super classes and super types for visiting
+   * Include or exclude super types visiting when searching for {@link IField}s.
    *
    * @param b
-   *          default false
+   *          <code>true</code> if all super classes and super interfaces should be checked for {@link IField}s. Default
+   *          is <code>false</code>.
    * @return this
    */
   public FieldQuery withSuperTypes(boolean b) {
@@ -50,8 +51,11 @@ public class FieldQuery {
   }
 
   /**
+   * Include or exclude super class visiting when searching for {@link IField}s.
+   *
    * @param b
-   *          default false
+   *          <code>true</code> if all super classes should be checked for {@link IField}s. Default is
+   *          <code>false</code>.
    * @return this
    */
   public FieldQuery withSuperClasses(boolean b) {
@@ -60,8 +64,11 @@ public class FieldQuery {
   }
 
   /**
+   * Include or exclude super interface visiting when searching for {@link IField}s.
+   *
    * @param b
-   *          default false
+   *          <code>true</code> if all super interfaces should be checked for {@link IField}s. Default is
+   *          <code>false</code>.
    * @return this
    */
   public FieldQuery withSuperInterfaces(boolean b) {
@@ -70,7 +77,10 @@ public class FieldQuery {
   }
 
   /**
+   * Limit the {@link IField}s to the given name (see {@link IField#elementName()}).
+   *
    * @param name
+   *          The {@link IField} name. Default is no filtering.
    * @return this
    */
   public FieldQuery withName(String name) {
@@ -79,7 +89,10 @@ public class FieldQuery {
   }
 
   /**
+   * Limit the {@link IField}s to the ones that accept the given {@link IFilter}.
+   *
    * @param filter
+   *          The filter. Default none.
    * @return this
    */
   public FieldQuery withFilter(IFilter<IField> filter) {
@@ -88,7 +101,10 @@ public class FieldQuery {
   }
 
   /**
+   * Limit the number of {@link IField}s to search.
+   *
    * @param maxResultCount
+   *          The maximum number of fields to search. Default is unlimited.
    * @return this
    */
   public FieldQuery withMaxResultCount(int maxResultCount) {
@@ -137,18 +153,33 @@ public class FieldQuery {
     }
   }
 
+  /**
+   * Checks if there is at least one {@link IField} that fulfills this query.
+   *
+   * @return <code>true</code> if at least one {@link IField} fulfills this query, <code>false</code> otherwise.
+   */
   public boolean existsAny() {
     return first() != null;
   }
 
+  /**
+   * Gets the first {@link IField} that fulfills this query.
+   *
+   * @return The first {@link IField} that fulfills this query or <code>null</code> if there is none.
+   */
   public IField first() {
     List<IField> result = new ArrayList<>(1);
     visitRec(m_type, result, 1, false);
     return result.isEmpty() ? null : result.get(0);
   }
 
+  /**
+   * Gets all {@link IField}s that fulfill this query.
+   *
+   * @return A {@link List} with all {@link IField}s that fulfill this query. Never returns <code>null</code>.
+   */
   public List<IField> list() {
-    List<IField> result = new ArrayList<>();
+    List<IField> result = new ArrayList<>(m_type.unwrap().getFields().size());
     visitRec(m_type, result, m_maxResultCount, false);
     return result;
   }

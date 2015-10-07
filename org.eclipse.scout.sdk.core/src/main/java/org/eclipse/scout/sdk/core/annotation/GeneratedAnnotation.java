@@ -4,9 +4,17 @@
  */
 package org.eclipse.scout.sdk.core.annotation;
 
+import javax.annotation.Generated;
+
 import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
 
+/**
+ * <h3>{@link GeneratedAnnotation}</h3> Managed annotation for {@link Generated}
+ *
+ * @author Ivan Motsch
+ * @since 5.2.0
+ */
 public class GeneratedAnnotation extends AbstractManagedAnnotation {
   public static final String TYPE_NAME = IJavaRuntimeTypes.javax_annotation_Generated;
 

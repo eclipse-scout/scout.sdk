@@ -51,7 +51,7 @@ public class TypeTest {
     Assert.assertEquals(ChildClass.class.getName(), childClassType.name());
     Assert.assertEquals(ChildClass.class.getSimpleName(), childClassType.elementName());
     Assert.assertEquals(BaseClass.class.getName(), childClassType.superClass().name());
-    Assert.assertFalse(childClassType.isAnonymous());
+    Assert.assertFalse(childClassType.isParameterType());
     Assert.assertFalse(childClassType.isArray());
     Assert.assertTrue(childClassType.hasTypeParameters());
 
@@ -111,7 +111,7 @@ public class TypeTest {
     Assert.assertEquals(BaseClass.class.getName(), baseClassType.name());
     Assert.assertEquals(BaseClass.class.getSimpleName(), baseClassType.elementName());
     Assert.assertEquals(Object.class.getName(), baseClassType.superClass().name());
-    Assert.assertFalse(baseClassType.isAnonymous());
+    Assert.assertFalse(baseClassType.isParameterType());
     Assert.assertFalse(baseClassType.isArray());
     Assert.assertTrue(baseClassType.hasTypeParameters());
 
@@ -144,14 +144,14 @@ public class TypeTest {
     List<IType> typeArguments = baseClassType.typeArguments();
     Assert.assertEquals(2, typeArguments.size());
     IType firstTypeArg = typeArguments.get(0);
-    Assert.assertTrue(firstTypeArg.isAnonymous());
+    Assert.assertTrue(firstTypeArg.isParameterType());
     Assert.assertEquals(AbstractList.class.getName(), firstTypeArg.superClass().name());
     Assert.assertEquals(2, firstTypeArg.superInterfaces().size());
     Assert.assertEquals(Runnable.class.getName(), firstTypeArg.superInterfaces().get(0).name());
     Assert.assertEquals(Serializable.class.getName(), firstTypeArg.superInterfaces().get(1).name());
 
     IType secondTypeArg = typeArguments.get(1);
-    Assert.assertFalse(secondTypeArg.isAnonymous());
+    Assert.assertFalse(secondTypeArg.isParameterType());
     Assert.assertEquals(org.eclipse.scout.sdk.core.fixture.Long.class.getName(), secondTypeArg.name());
   }
 
@@ -190,7 +190,7 @@ public class TypeTest {
     Assert.assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerClass2.name());
     Assert.assertEquals("InnerClass2", innerClass2.elementName());
     Assert.assertEquals(ArrayList.class.getName(), innerClass2.superClass().name());
-    Assert.assertFalse(innerClass2.isAnonymous());
+    Assert.assertFalse(innerClass2.isParameterType());
     Assert.assertFalse(innerClass2.isArray());
     Assert.assertFalse(innerClass2.hasTypeParameters());
 
@@ -211,7 +211,7 @@ public class TypeTest {
     List<IType> superTypeArguments = innerClass2.superClass().typeArguments();
     Assert.assertEquals(1, superTypeArguments.size());
     IType firstTypeArg = superTypeArguments.get(0);
-    Assert.assertFalse(firstTypeArg.isAnonymous());
+    Assert.assertFalse(firstTypeArg.isParameterType());
     Assert.assertTrue(firstTypeArg.isArray());
     Assert.assertEquals(1, firstTypeArg.arrayDimension());
     Assert.assertEquals(BigDecimal.class.getName(), firstTypeArg.leafComponentType().name());

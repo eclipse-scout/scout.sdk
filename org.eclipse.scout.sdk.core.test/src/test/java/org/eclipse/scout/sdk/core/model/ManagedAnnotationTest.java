@@ -48,7 +48,7 @@ public class ManagedAnnotationTest {
     Assert.assertEquals(env.findType(RoundingMode.class.getName()).fields().withName("HALF_UP").first(), a.enumValue());
     Assert.assertEquals(env.findType(String.class.getName()), a.type());
     Assert.assertEquals(env.findType(Generated.class.getName()), a.anno().type());
-    Assert.assertEquals("g", a.anno().value("value").metaValue().get(String.class));
+    Assert.assertEquals("g", a.anno().element("value").value().get(String.class));
   }
 
   @Test
@@ -61,7 +61,7 @@ public class ManagedAnnotationTest {
     Assert.assertEquals(env.findType(RoundingMode.class.getName()).fields().withName("HALF_UP").first(), a.enumValue());
     Assert.assertEquals(env.findType(String.class.getName()), a.type());
     Assert.assertEquals(env.findType(Generated.class.getName()), a.anno().type());
-    Assert.assertEquals("g1", a.anno().value("value").metaValue().get(String.class));
+    Assert.assertEquals("g1", a.anno().element("value").value().get(String.class));
   }
 
   @Test
@@ -86,7 +86,7 @@ public class ManagedAnnotationTest {
     Assert.assertEquals(env.findType(RoundingMode.class.getName()).fields().withName("HALF_UP").first(), a.enumValue((IField) null));
     Assert.assertEquals(env.findType(String.class.getName()), a.type((IType) null));
     Assert.assertEquals(env.findType(Generated.class.getName()), a.anno((IAnnotation) null).type());
-    Assert.assertEquals("g1", a.anno((IAnnotation) null).value("value").metaValue().get(String.class));
+    Assert.assertEquals("g1", a.anno((IAnnotation) null).element("value").value().get(String.class));
   }
 
   @Test
@@ -151,7 +151,7 @@ public class ManagedAnnotationTest {
     IJavaEnvironment env = CoreTestingUtils.createJavaEnvironment();
     IType t = env.findType(ClassWithAnnotationWithShortValueForIntField.class.getName());
     org_eclipse_scout_sdk_core_fixture_AnnotationWithDefaultValues a = t.annotations().withManagedWrapper(org_eclipse_scout_sdk_core_fixture_AnnotationWithDefaultValues.class).first();
-    Assert.assertEquals(new Integer(4), a.unwrap().value("num").metaValue().get(int.class));
+    Assert.assertEquals(new Integer(4), a.unwrap().element("num").value().get(int.class));
     Assert.assertTrue(4 == a.num());
 //    Assert.assertEquals(new String[]{"g"}, );
   }

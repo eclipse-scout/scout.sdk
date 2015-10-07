@@ -40,21 +40,28 @@ public class DtoDerivedResourceBatchHandler extends AbstractDerivedResourceBatch
   protected void runImpl(IProgressMonitor monitor) throws CoreException {
     IJavaEnvironmentProvider envProvider = getJavaEnvironmentProvider();
 
-    for (org.eclipse.jdt.core.IType jdtType : getJdtTypes()) {
-      if (monitor.isCanceled()) {
-        return;
-      }
-      try {
-        monitor.subTask("process " + jdtType.getFullyQualifiedName());
-        IType modelType = envProvider.jdtTypeToScoutType(jdtType);
-        CompilationUnitWriteOperation op = DtoS2eUtils.newDtoOp(jdtType, modelType, getJavaEnvironmentProvider(), monitor);
-        if (op != null) {
-          JdtUtils.writeTypes(Collections.singletonList(op), monitor, false);
+    monitor.beginTask(getName(), getJdtTypes().size());
+    try {
+      for (org.eclipse.jdt.core.IType jdtType : getJdtTypes()) {
+        if (monitor.isCanceled()) {
+          return;
         }
+        try {
+          monitor.subTask("process " + jdtType.getFullyQualifiedName());
+          IType modelType = envProvider.jdtTypeToScoutType(jdtType);
+          CompilationUnitWriteOperation op = DtoS2eUtils.newDtoOp(jdtType, modelType, getJavaEnvironmentProvider(), monitor);
+          if (op != null) {
+            JdtUtils.writeTypes(Collections.singletonList(op), monitor, false);
+          }
+        }
+        catch (Exception t) {
+          SdkLog.error(getClass().getSimpleName() + ": " + jdtType.getFullyQualifiedName(), t);
+        }
+        monitor.worked(1);
       }
-      catch (Exception t) {
-        SdkLog.error(getClass().getSimpleName() + ": " + jdtType.getFullyQualifiedName(), t);
-      }
+    }
+    finally {
+      monitor.done();
     }
   }
 }

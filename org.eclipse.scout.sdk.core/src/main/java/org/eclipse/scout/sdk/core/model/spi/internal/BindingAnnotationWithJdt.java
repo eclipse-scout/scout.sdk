@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.AnnotationImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.AnnotationValueSpi;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
@@ -33,7 +33,7 @@ import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 public class BindingAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnotation>implements AnnotationSpi {
   private final AnnotatableSpi m_owner;
   private final AnnotationBinding m_binding;
-  private Map<String, AnnotationValueSpi> m_values;//sorted
+  private Map<String, AnnotationElementSpi> m_values;//sorted
   private TypeSpi m_type;
 
   BindingAnnotationWithJdt(JavaEnvironmentWithJdt env, AnnotatableSpi owner, AnnotationBinding binding) {
@@ -66,10 +66,10 @@ public class BindingAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnota
   }
 
   @Override
-  public Map<String, AnnotationValueSpi> getValues() {
+  public Map<String, AnnotationElementSpi> getValues() {
     if (m_values == null) {
       Map<String, ElementValuePair> defaultsMap = SpiWithJdtUtils.getBindingAnnotationSyntheticDefaultValues(m_env, m_binding.getAnnotationType());
-      final Map<String, AnnotationValueSpi> result = new LinkedHashMap<>(defaultsMap.size());
+      final Map<String, AnnotationElementSpi> result = new LinkedHashMap<>(defaultsMap.size());
       //fill keys only in correct sort order
       for (String name : defaultsMap.keySet()) {
         result.put(name, null);
@@ -78,7 +78,7 @@ public class BindingAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnota
       ElementValuePair[] bindingPairs = m_binding.getElementValuePairs();
       if (bindingPairs != null && bindingPairs.length > 0) {
         for (ElementValuePair bindingPair : bindingPairs) {
-          BindingAnnotationValueWithJdt v = m_env.createBindingAnnotationValue(this, bindingPair, false);
+          BindingAnnotationElementWithJdt v = m_env.createBindingAnnotationValue(this, bindingPair, false);
           result.put(v.getElementName(), v);
         }
       }
@@ -94,7 +94,7 @@ public class BindingAnnotationWithJdt extends AbstractJavaElementWithJdt<IAnnota
   }
 
   @Override
-  public AnnotationValueSpi getValue(String name) {
+  public AnnotationElementSpi getValue(String name) {
     return getValues().get(name);
   }
 

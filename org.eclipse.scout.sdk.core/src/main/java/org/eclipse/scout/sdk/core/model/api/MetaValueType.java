@@ -13,62 +13,44 @@ package org.eclipse.scout.sdk.core.model.api;
 /**
  * <h3>{@link MetaValueType}</h3>
  *
- * @author Ivan Motsch
+ * @author Matthias Villiger
  * @since 5.1.0
  */
 public enum MetaValueType {
   /**
    * {@link IMetaValue#getObject()} is a {@link Character}
-   * <p>
-   * The meta value itself is a {@link IMetaValue}
    */
   Char,
   /**
    * {@link IMetaValue#getObject()} is a {@link Byte}
-   * <p>
-   * The meta value itself is a {@link IMetaValue}
    */
   Byte,
   /**
    * {@link IMetaValue#getObject()} is a {@link Integer}
-   * <p>
-   * The meta value itself is a {@link IMetaValue}
    */
   Int,
   /**
    * {@link IMetaValue#getObject()} is a {@link Short}
-   * <p>
-   * The meta value itself is a {@link IMetaValue}
    */
   Short,
   /**
    * {@link IMetaValue#getObject()} is a {@link Boolean}
-   * <p>
-   * The meta value itself is a {@link IMetaValue}
    */
   Bool,
   /**
    * {@link IMetaValue#getObject()} is a {@link Long}
-   * <p>
-   * The meta value itself is a {@link IMetaValue}
    */
   Long,
   /**
    * {@link IMetaValue#getObject()} is a {@link Double}
-   * <p>
-   * The meta value itself is a {@link IMetaValue}
    */
   Double,
   /**
    * {@link IMetaValue#getObject()} is a {@link Float}
-   * <p>
-   * The meta value itself is a {@link IMetaValue}
    */
   Float,
   /**
    * {@link IMetaValue#getObject()} is a {@link Float}
-   * <p>
-   * The meta value itself is a {@link IMetaValue}
    */
   String,
   /**

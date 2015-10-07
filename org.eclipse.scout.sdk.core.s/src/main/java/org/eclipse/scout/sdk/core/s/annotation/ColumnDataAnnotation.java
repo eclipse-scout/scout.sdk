@@ -43,7 +43,7 @@ public class ColumnDataAnnotation extends AbstractManagedAnnotation {
   }
 
   public boolean isValueDefault() {
-    return isDefaultValue("value");
+    return isDefault("value");
   }
 
   public static SdkColumnCommand valueOf(IAnnotatable owner) {

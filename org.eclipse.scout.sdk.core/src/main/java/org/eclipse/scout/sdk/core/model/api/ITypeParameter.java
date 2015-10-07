@@ -40,6 +40,9 @@ public interface ITypeParameter extends IJavaElement {
    */
   IMember declaringMember();
 
+  /**
+   * @return The full signature of this {@link ITypeParameter}.
+   */
   String signature();
 
   @Override

@@ -41,10 +41,10 @@ public class ImportCollector implements IImportCollector {
     this(icu.javaEnvironment());
     for (IImport imp : icu.imports()) {
       if (imp.isStatic()) {
-        addStaticImport(imp.name());
+        addStaticImport(imp.elementName());
       }
       else {
-        addImport(imp.name());
+        addImport(imp.elementName());
       }
     }
   }

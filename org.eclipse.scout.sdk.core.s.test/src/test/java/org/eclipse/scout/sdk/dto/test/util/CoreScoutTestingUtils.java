@@ -21,6 +21,7 @@ import org.eclipse.scout.sdk.core.s.annotation.FormDataAnnotationDescriptor;
 import org.eclipse.scout.sdk.core.s.annotation.OrderAnnotation;
 import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
+import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
 import org.eclipse.scout.sdk.core.testing.SdkAssert;
 import org.junit.Assert;
@@ -83,7 +84,7 @@ public final class CoreScoutTestingUtils {
     sharedEnv.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), new StringBuilder(source));
     sharedEnv.reload();
     ICompilationUnit dtoIcu = sharedEnv.findType(cuSrc.getMainType().getFullyQualifiedName()).compilationUnit();
-    Assert.assertNull(sharedEnv.compileErrors(dtoIcu.mainType().name()));
+    Assert.assertNull(CoreTestingUtils.getCompileErrors(sharedEnv, dtoIcu.mainType().name()));
 
     return dtoIcu.mainType();
   }
@@ -104,7 +105,7 @@ public final class CoreScoutTestingUtils {
     sharedEnv.registerCompilationUnitOverride(cuSrc.getPackageName(), cuSrc.getElementName(), new StringBuilder(source));
     sharedEnv.reload();
     ICompilationUnit dtoIcu = sharedEnv.findType(cuSrc.getMainType().getFullyQualifiedName()).compilationUnit();
-    Assert.assertNull(sharedEnv.compileErrors(dtoIcu.mainType().name()));
+    Assert.assertNull(CoreTestingUtils.getCompileErrors(sharedEnv, dtoIcu.mainType().name()));
 
     return dtoIcu.mainType();
   }

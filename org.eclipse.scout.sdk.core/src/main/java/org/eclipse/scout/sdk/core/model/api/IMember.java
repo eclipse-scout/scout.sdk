@@ -31,8 +31,10 @@ public interface IMember extends IAnnotatable {
   int flags();
 
   /**
-   * @return The {@link IType} this member is defined in. Never returns <code>null</code> for {@link IMethod} and
-   *         {@link IField}. For {@link IType} this is the enclosing type that may be null.
+   * Gets the {@link IType} this {@link IMember} is defined in.
+   *
+   * @return The declaring {@link IType}. Never returns <code>null</code> for {@link IMethod} and {@link IField}. For
+   *         {@link IType} this is the enclosing type that may be null for primary types.
    */
   IType declaringType();
 
@@ -41,8 +43,8 @@ public interface IMember extends IAnnotatable {
    * file.<br>
    * <br>
    * Type parameters are declarations as defined by the hosting {@link IType}. They may have minimal bounds defined.<br>
-   * The difference to {@link #typeArguments()} is that {@link #typeParameters()} returns the parameter as they
-   * are declared by the class file while {@link #typeArguments()} holds the currently bound real {@link IType}s.<br>
+   * The difference to {@link #typeArguments()} is that {@link #typeParameters()} returns the parameter as they are
+   * declared by the class file while {@link #typeArguments()} holds the currently bound real {@link IType}s.<br>
    * <br>
    * <b>Example: </b><br>
    * <code>public class NumberList&lt;T extends java.lang.Number&gt; {}</code><br>
@@ -63,6 +65,12 @@ public interface IMember extends IAnnotatable {
    */
   boolean hasTypeParameters();
 
+  /**
+   * Gets the java doc source for this {@link IMember}.
+   * 
+   * @return The {@link ISourceRange} for the java doc of this {@link IMember} or <code>null</code> if no source is
+   *         attached.
+   */
   ISourceRange javaDoc();
 
   @Override

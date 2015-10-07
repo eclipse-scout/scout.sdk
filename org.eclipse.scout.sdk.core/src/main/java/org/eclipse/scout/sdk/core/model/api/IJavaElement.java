@@ -20,12 +20,15 @@ import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
  */
 public interface IJavaElement {
 
+  /**
+   * Gets the {@link IJavaEnvironment} this element belongs to.
+   *
+   * @return The owning {@link IJavaEnvironment}.
+   */
   IJavaEnvironment javaEnvironment();
 
   /**
-   * @return the element name
-   *         <p>
-   *         this is the relative or simple name of the element inside its containing scope
+   * @return the name of this element.
    */
   String elementName();
 
@@ -39,5 +42,10 @@ public interface IJavaElement {
    */
   ISourceRange source();
 
+  /**
+   * Unwraps the java element into its underlying SPI class.
+   *
+   * @return The service provider interface that belongs to the receiver.
+   */
   JavaElementSpi unwrap();
 }

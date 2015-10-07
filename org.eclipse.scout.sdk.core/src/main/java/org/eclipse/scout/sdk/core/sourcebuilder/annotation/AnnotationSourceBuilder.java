@@ -17,7 +17,7 @@ import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.sourcebuilder.AbstractJavaElementSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.ExpressionSourceBuilderFactory;
@@ -39,11 +39,11 @@ public class AnnotationSourceBuilder extends AbstractJavaElementSourceBuilder im
   public AnnotationSourceBuilder(IAnnotation element) {
     super(element);
     m_name = element.type().name();
-    for (IAnnotationValue av : element.values().values()) {
-      if (av.isDefaultValue()) {
+    for (IAnnotationElement av : element.elements().values()) {
+      if (av.isDefault()) {
         continue;
       }
-      putValue(av.elementName(), ExpressionSourceBuilderFactory.createFromMetaValue(av.metaValue()));
+      putValue(av.elementName(), ExpressionSourceBuilderFactory.createFromMetaValue(av.value()));
     }
   }
 

@@ -11,22 +11,22 @@
 package org.eclipse.scout.sdk.core.model.api.internal;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
 import org.eclipse.scout.sdk.core.model.api.ISourceRange;
-import org.eclipse.scout.sdk.core.model.spi.AnnotationValueSpi;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 
 /**
  *
  */
-public class AnnotationValueImplementor extends AbstractJavaElementImplementor<AnnotationValueSpi>implements IAnnotationValue {
+public class AnnotationElementImplementor extends AbstractJavaElementImplementor<AnnotationElementSpi>implements IAnnotationElement {
 
-  public AnnotationValueImplementor(AnnotationValueSpi spi) {
+  public AnnotationElementImplementor(AnnotationElementSpi spi) {
     super(spi);
   }
 
   @Override
-  public IMetaValue metaValue() {
+  public IMetaValue value() {
     return m_spi.getMetaValue();
   }
 
@@ -36,7 +36,7 @@ public class AnnotationValueImplementor extends AbstractJavaElementImplementor<A
   }
 
   @Override
-  public boolean isDefaultValue() {
+  public boolean isDefault() {
     return m_spi.isDefaultValue();
   }
 

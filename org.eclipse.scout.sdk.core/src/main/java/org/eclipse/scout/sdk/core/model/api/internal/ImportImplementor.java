@@ -17,15 +17,10 @@ import org.eclipse.scout.sdk.core.model.spi.ImportSpi;
 /**
  *
  */
-public class ImportImplementor extends AbstractJavaElementImplementor<ImportSpi>implements IImport {
+public class ImportImplementor extends AbstractJavaElementImplementor<ImportSpi> implements IImport {
 
   public ImportImplementor(ImportSpi spi) {
     super(spi);
-  }
-
-  @Override
-  public String name() {
-    return m_spi.getName();
   }
 
   @Override

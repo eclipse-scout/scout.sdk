@@ -19,7 +19,8 @@ import org.eclipse.scout.sdk.core.util.IFilter;
 /**
  * <h3>{@link SuperTypeQuery}</h3>
  * <p>
- * By default all recursive super classes and recursive super interface are included
+ * Super type query that by default includes all super classes and super interface (recursive) and the start
+ * {@link IType} itself.
  *
  * @author Ivan Motsch
  * @since 5.1.0
@@ -39,8 +40,11 @@ public class SuperTypeQuery {
   }
 
   /**
+   * Specifies if the starting {@link IType} itself should be part of the result.
+   *
    * @param b
-   *          default true
+   *          <code>true</code> to include the starting {@link IType}, <code>false</code> otherwise. Default is
+   *          <code>true</code>.
    * @return this
    */
   public SuperTypeQuery withSelf(boolean b) {
@@ -49,10 +53,11 @@ public class SuperTypeQuery {
   }
 
   /**
-   * Include / Exclude super classes and super types for visiting
+   * Include or exclude super types visiting when searching for {@link IType}s.
    *
    * @param b
-   *          default false
+   *          <code>true</code> if all super classes and super interfaces should be part of the result. Default is
+   *          <code>true</code>.
    * @return this
    */
   public SuperTypeQuery withSuperTypes(boolean b) {
@@ -62,8 +67,10 @@ public class SuperTypeQuery {
   }
 
   /**
+   * Include or exclude super classes in the result.
+   *
    * @param b
-   *          default true
+   *          <code>true</code> if all super classes should be part of the result. Default is <code>true</code>.
    * @return this
    */
   public SuperTypeQuery withSuperClasses(boolean b) {
@@ -72,8 +79,11 @@ public class SuperTypeQuery {
   }
 
   /**
+   * Include or exclude super interfaces in the result.
+   *
    * @param b
-   *          default true
+   *          <code>true</code> if all super interfaces should be part of the result (recursively). Default is
+   *          <code>true</code>.
    * @return this
    */
   public SuperTypeQuery withSuperInterfaces(boolean b) {
@@ -82,7 +92,10 @@ public class SuperTypeQuery {
   }
 
   /**
+   * Limit the result to {@link IType}s with the given fully qualified name (see {@link IType#name()}).
+   *
    * @param name
+   *          The fully qualified name to limit to.
    * @return this
    */
   public SuperTypeQuery withName(String name) {
@@ -91,7 +104,10 @@ public class SuperTypeQuery {
   }
 
   /**
-   * @param simpleName
+   * Limit the result to {@link IType}s with the given sipmle name (see {@link IType#elementName()}).
+   *
+   * @param name
+   *          The simple name to limit to.
    * @return this
    */
   public SuperTypeQuery withSimpleName(String simpleName) {
@@ -100,7 +116,10 @@ public class SuperTypeQuery {
   }
 
   /**
+   * Limit the {@link IType}s to the ones that accept the given {@link IFilter}.
+   *
    * @param filter
+   *          The filter. Default none.
    * @return this
    */
   public SuperTypeQuery withFilter(IFilter<IType> filter) {
@@ -109,7 +128,10 @@ public class SuperTypeQuery {
   }
 
   /**
+   * Limit the number of {@link IType}s to search.
+   *
    * @param maxResultCount
+   *          The maximum number of {@link IType} to search. Default is unlimited.
    * @return this
    */
   public SuperTypeQuery withMaxResultCount(int maxResultCount) {
@@ -160,16 +182,31 @@ public class SuperTypeQuery {
     }
   }
 
+  /**
+   * Checks if there is at least one {@link IType} that fulfills this query.
+   *
+   * @return <code>true</code> if at least one {@link IType} fulfills this query, <code>false</code> otherwise.
+   */
   public boolean existsAny() {
     return first() != null;
   }
 
+  /**
+   * Gets the first {@link IType} that fulfills this query.
+   *
+   * @return The first {@link IType} that fulfills this query or <code>null</code> if there is none.
+   */
   public IType first() {
     List<IType> result = new ArrayList<>(1);
     visitRec(m_type, result, 1, false);
     return result.isEmpty() ? null : result.get(0);
   }
 
+  /**
+   * Gets all {@link IType}s that fulfill this query.
+   *
+   * @return A {@link List} with all {@link IType}s that fulfill this query. Never returns <code>null</code>.
+   */
   public List<IType> list() {
     List<IType> result = new ArrayList<>();
     visitRec(m_type, result, m_maxResultCount, false);

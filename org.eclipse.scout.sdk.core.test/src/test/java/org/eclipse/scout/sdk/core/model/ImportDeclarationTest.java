@@ -34,7 +34,7 @@ public class ImportDeclarationTest {
     Assert.assertEquals(childClassIcu, imp.compilationUnit());
     Assert.assertEquals(Signature.getQualifier(IOException.class.getName()), imp.qualifier());
     Assert.assertEquals(Signature.getSimpleName(IOException.class.getName()), imp.simpleName());
-    Assert.assertEquals(IOException.class.getName(), imp.name());
+    Assert.assertEquals(IOException.class.getName(), imp.elementName());
   }
 
   @Test

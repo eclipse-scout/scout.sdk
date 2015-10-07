@@ -63,7 +63,7 @@ public class ExtensionFormDataTest {
 
     // verify the value of the @Extends annotation
     IAnnotation annotation = dto.annotations().withName(IScoutRuntimeTypes.Extends).first();
-    IType originalRowData = annotation.value("value").metaValue().get(IType.class);
+    IType originalRowData = annotation.element("value").value().get(IType.class);
     Assert.assertEquals("formdata.shared.services.process.SimpleTableFormData$TestTable$TestTableRowData", originalRowData.name());
   }
 

@@ -20,7 +20,7 @@ import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
@@ -304,7 +304,7 @@ public final class DtoUtils {
     // fall back to legacy name:
     IAnnotation annotation = type.annotations().withName(IScoutRuntimeTypes.PageData).first(); // fall back to old name
     if (annotation != null) {
-      return annotation.value("value").metaValue().get(IType.class);
+      return annotation.element("value").value().get(IType.class);
     }
 
     return null; // not found
@@ -636,9 +636,9 @@ public final class DtoUtils {
     while (curType != null) {
       IAnnotation extendsAnnotation = curType.annotations().withName(IScoutRuntimeTypes.Extends).first();
       if (extendsAnnotation != null) {
-        IAnnotationValue value = extendsAnnotation.value("value");
-        if (value != null && !value.isDefaultValue()) {
-          return value.metaValue().get(IType.class);
+        IAnnotationElement value = extendsAnnotation.element("value");
+        if (value != null && !value.isDefault()) {
+          return value.value().get(IType.class);
         }
       }
       curType = curType.superClass();

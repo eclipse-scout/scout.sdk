@@ -17,16 +17,17 @@ import java.util.Set;
 
 import org.eclipse.scout.sdk.core.model.api.IAnnotatable;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.AnnotationValueSpi;
+import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
 
 /**
  *
  */
-public class AnnotationImplementor extends AbstractJavaElementImplementor<AnnotationSpi>implements IAnnotation {
-  private Map<String, IAnnotationValue> m_values;
+public class AnnotationImplementor extends AbstractJavaElementImplementor<AnnotationSpi> implements IAnnotation {
+  private Map<String, IAnnotationElement> m_values;
 
   public AnnotationImplementor(AnnotationSpi spi) {
     super(spi);
@@ -43,17 +44,17 @@ public class AnnotationImplementor extends AbstractJavaElementImplementor<Annota
   }
 
   @Override
-  public IAnnotationValue value(String name) {
-    return values().get(name);
+  public IAnnotationElement element(String name) {
+    return elements().get(name);
   }
 
   @Override
-  public Map<String, IAnnotationValue> values() {
+  public Map<String, IAnnotationElement> elements() {
     if (m_values == null) {
-      Set<Entry<String, AnnotationValueSpi>> entrySet = m_spi.getValues().entrySet();
-      Map<String, IAnnotationValue> values = new LinkedHashMap<>(entrySet.size());
-      for (Map.Entry<String, AnnotationValueSpi> e : entrySet) {
-        AnnotationValueSpi spiValue = e.getValue();
+      Set<Entry<String, AnnotationElementSpi>> entrySet = m_spi.getValues().entrySet();
+      Map<String, IAnnotationElement> values = new LinkedHashMap<>(entrySet.size());
+      for (Map.Entry<String, AnnotationElementSpi> e : entrySet) {
+        AnnotationElementSpi spiValue = e.getValue();
         values.put(e.getKey(), spiValue != null ? spiValue.wrap() : null);
       }
       m_values = values;
@@ -64,6 +65,11 @@ public class AnnotationImplementor extends AbstractJavaElementImplementor<Annota
   @Override
   public IAnnotatable owner() {
     return m_spi.getOwner().wrap();
+  }
+
+  @Override
+  public <A extends AbstractManagedAnnotation> A wrap(Class<A> managedAnnotationType) {
+    return AbstractManagedAnnotation.wrap(this, managedAnnotationType);
   }
 
   @Override

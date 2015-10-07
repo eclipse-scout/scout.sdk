@@ -59,7 +59,7 @@ public class TypeImplementor extends AbstractMemberImplementor<TypeSpi>implement
   }
 
   @Override
-  public boolean isAnonymous() {
+  public boolean isParameterType() {
     return m_spi.isAnonymous();
   }
 

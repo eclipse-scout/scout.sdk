@@ -21,7 +21,7 @@ import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.internal.AnnotationImplementor;
 import org.eclipse.scout.sdk.core.model.spi.AnnotatableSpi;
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
-import org.eclipse.scout.sdk.core.model.spi.AnnotationValueSpi;
+import org.eclipse.scout.sdk.core.model.spi.AnnotationElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.CompilationUnitSpi;
 import org.eclipse.scout.sdk.core.model.spi.JavaElementSpi;
 import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
@@ -33,7 +33,7 @@ public class DeclarationAnnotationWithJdt extends AbstractJavaElementWithJdt<IAn
   private final AnnotatableSpi m_owner;
   private final org.eclipse.jdt.internal.compiler.ast.Annotation m_astNode;
   private final TypeBinding m_typeBinding;
-  private Map<String, AnnotationValueSpi> m_values;//sorted
+  private Map<String, AnnotationElementSpi> m_values;//sorted
   private TypeSpi m_type;
 
   DeclarationAnnotationWithJdt(JavaEnvironmentWithJdt env, AnnotatableSpi owner, org.eclipse.jdt.internal.compiler.ast.Annotation astNode) {
@@ -67,15 +67,15 @@ public class DeclarationAnnotationWithJdt extends AbstractJavaElementWithJdt<IAn
   }
 
   @Override
-  public AnnotationValueSpi getValue(String name) {
+  public AnnotationElementSpi getValue(String name) {
     return getValues().get(name);
   }
 
   @Override
-  public Map<String, AnnotationValueSpi> getValues() {
+  public Map<String, AnnotationElementSpi> getValues() {
     if (m_values == null) {
       Map<String, MemberValuePair> defaultsMap = SpiWithJdtUtils.getDeclarationAnnotationSyntheticDefaultValues(m_env, m_typeBinding);
-      final Map<String, AnnotationValueSpi> result = new LinkedHashMap<>(defaultsMap.size());
+      final Map<String, AnnotationElementSpi> result = new LinkedHashMap<>(defaultsMap.size());
       //fill keys only in correct sort order
       for (String name : defaultsMap.keySet()) {
         result.put(name, null);
@@ -84,7 +84,7 @@ public class DeclarationAnnotationWithJdt extends AbstractJavaElementWithJdt<IAn
       MemberValuePair[] memberValuePairs = m_astNode.memberValuePairs();
       if (memberValuePairs != null && memberValuePairs.length > 0) {
         for (MemberValuePair p : memberValuePairs) {
-          DeclarationAnnotationValueWithJdt v = m_env.createDeclarationAnnotationValue(this, p, false);
+          DeclarationAnnotationElementWithJdt v = m_env.createDeclarationAnnotationValue(this, p, false);
           result.put(v.getElementName(), v);
         }
       }

@@ -55,7 +55,7 @@ public final class TypeFilters {
   private static final IFilter<IType> NO_SURROUNDING_CONTEXT_TYPE_FILTER = new IFilter<IType>() {
     @Override
     public boolean evaluate(IType type) {
-      return type != null && !type.isAnonymous() && (type.declaringType() == null || Flags.isStatic(type.flags()));
+      return type != null && !type.isParameterType() && (type.declaringType() == null || Flags.isStatic(type.flags()));
     }
   };
 
@@ -171,7 +171,7 @@ public final class TypeFilters {
 
   /**
    * Gets a {@link IFilter} that accepts only types that are classes.<br>
-   * A class is defined as a type that is neither anonymous, abstract, an interface or deprecated.
+   * A class is defined as a type that is neither a parameter type, abstract, an interface or deprecated.
    *
    * @return The {@link IFilter} that only accepts classes.
    * @see #isClass(IType)
@@ -198,7 +198,7 @@ public final class TypeFilters {
 
   /**
    * Returns an {@link IFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}. <br>
-   * More formally: Accepts all non-anonymous {@link IType}s that are either static or primary types (= have no
+   * More formally: Accepts all non-parameter types {@link IType}s that are either static or primary types (= have no
    * declaring type).
    *
    * @return an {@link IFilter} that accepts all {@link IType}s that have no surrounding context {@link IType}.
@@ -209,19 +209,19 @@ public final class TypeFilters {
 
   /**
    * Gets if the given type is a class.<br>
-   * A class is defined as a type that is neither an anonymous, abstract, interface or a deprecated type.
+   * A class is defined as a type that is neither a parameter type, abstract, interface or deprecated.
    *
    * @param type
    *          The type to check
-   * @return true if the given type is not anonymous and has none of the following flags: abstract, interface,
+   * @return true if the given type is not a parameter type and has none of the following flags: abstract, interface,
    *         deprecated
    * @see Flags#isAbstract(int)
    * @see Flags#isInterface(int)
    * @see Flags#isDeprecated(int)
-   * @see IType#isAnonymous()
+   * @see IType#isParameterType()
    */
   protected static boolean isClass(IType type) {
-    if (type.isAnonymous()) {
+    if (type.isParameterType()) {
       return false;
     }
     int flags = type.flags();

@@ -27,7 +27,8 @@ import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
- * <h3>{@link AnnotationQuery}</h3>
+ * <h3>{@link AnnotationQuery}</h3> Annotation query that by default returns all annotations directly defined on the
+ * owner.
  *
  * @author Ivan Motsch
  * @since 5.1.0
@@ -56,10 +57,11 @@ public class AnnotationQuery<T> {
   }
 
   /**
-   * Include / Exclude super classes and super types for visiting
+   * Include or exclude super types visiting when searching for annotations.
    *
    * @param b
-   *          default false
+   *          <code>true</code> if all super classes and super interfaces should be checked for annotations. Default is
+   *          <code>false</code>.
    * @return this
    */
   public AnnotationQuery<T> withSuperTypes(boolean b) {
@@ -69,8 +71,10 @@ public class AnnotationQuery<T> {
   }
 
   /**
+   * Include or exclude super class visiting when searching for annotations.
+   *
    * @param b
-   *          default false
+   *          <code>true</code> if all super classes should be checked for annotations. Default is <code>false</code>.
    * @return this
    */
   public AnnotationQuery<T> withSuperClasses(boolean b) {
@@ -79,8 +83,11 @@ public class AnnotationQuery<T> {
   }
 
   /**
+   * Include or exclude super interface visiting when searching for annotations.
+   *
    * @param b
-   *          default false
+   *          <code>true</code> if all super interfaces should be checked for annotations. Default is <code>false</code>
+   *          .
    * @return this
    */
   public AnnotationQuery<T> withSuperInterfaces(boolean b) {
@@ -89,8 +96,10 @@ public class AnnotationQuery<T> {
   }
 
   /**
+   * Limit the annotations to the given fully qualified annotation type name (see {@link IAnnotation#type()}).
+   *
    * @param name
-   *          fully qualified name
+   *          The fully qualified name. Default is no filtering.
    * @return this
    */
   public AnnotationQuery<T> withName(String fullyQualifiedName) {
@@ -99,8 +108,10 @@ public class AnnotationQuery<T> {
   }
 
   /**
-   * @param managed
-   *          type
+   * Limit the annotations to the given managed annotation type and convert the result into the narrowed managed type.
+   *
+   * @param managedWrapperType
+   *          The managed annotation type class. Default no filtering.
    * @return this
    */
   @SuppressWarnings("unchecked")
@@ -110,7 +121,10 @@ public class AnnotationQuery<T> {
   }
 
   /**
+   * Limit the annotations to the ones that accept the given {@link IFilter}.
+   *
    * @param filter
+   *          The filter. Default none.
    * @return this
    */
   public AnnotationQuery<T> withFilter(IFilter<IAnnotation> filter) {
@@ -119,7 +133,10 @@ public class AnnotationQuery<T> {
   }
 
   /**
+   * Limit the number of annotations to search.
+   *
    * @param maxResultCount
+   *          The maximum number of annotations to search. Default is unlimited.
    * @return this
    */
   public AnnotationQuery<T> withMaxResultCount(int maxResultCount) {
@@ -207,10 +224,20 @@ public class AnnotationQuery<T> {
     }
   }
 
+  /**
+   * Checks if there is at least one annotation that fulfills this query.
+   *
+   * @return <code>true</code> if at least one annotation fulfills this query, <code>false</code> otherwise.
+   */
   public boolean existsAny() {
     return first() != null;
   }
 
+  /**
+   * Gets the first annotation that fulfills this query.
+   *
+   * @return The first annotation that fulfills this query or <code>null</code> if there is none.
+   */
   @SuppressWarnings("unchecked")
   public T first() {
     List<IAnnotation> result = new ArrayList<>(1);
@@ -219,14 +246,19 @@ public class AnnotationQuery<T> {
       return null;
     }
     if (m_managedWrapperType != null) {
-      return (T) AbstractManagedAnnotation.wrap(result.get(0), m_managedWrapperType);
+      return (T) result.get(0).wrap(m_managedWrapperType);
     }
     return (T) result.get(0);
   }
 
+  /**
+   * Gets all annotations that fulfill this query.
+   *
+   * @return A {@link List} with all annotations that fulfill this query. Never returns <code>null</code>.
+   */
   @SuppressWarnings("unchecked")
   public List<T> list() {
-    List<IAnnotation> result = new ArrayList<>();
+    List<IAnnotation> result = new ArrayList<>(m_owner.getAnnotations().size());
     visitRec(m_containerType, m_owner, result, m_maxResultCount, false);
     if (result.isEmpty()) {
       return Collections.emptyList();
@@ -234,7 +266,7 @@ public class AnnotationQuery<T> {
     if (m_managedWrapperType != null) {
       List<AbstractManagedAnnotation> managedList = new ArrayList<>(result.size());
       for (IAnnotation a : result) {
-        managedList.add(AbstractManagedAnnotation.wrap(a, m_managedWrapperType));
+        managedList.add(a.wrap(m_managedWrapperType));
       }
       return (List<T>) managedList;
     }

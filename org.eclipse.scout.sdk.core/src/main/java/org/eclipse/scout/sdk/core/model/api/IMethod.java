@@ -25,7 +25,8 @@ import org.eclipse.scout.sdk.core.model.sugar.SuperMethodQuery;
 public interface IMethod extends IMember {
 
   /**
-   * @return Gets the return data {@link IType} of this {@link IMethod}. The result may be the void type.
+   * @return Gets the return data {@link IType} of this {@link IMethod}. The result may be the void type. Never returns
+   *         <code>null</code>.
    * @see IType#isVoid()
    */
   IType returnType();
@@ -45,6 +46,12 @@ public interface IMethod extends IMember {
   boolean isConstructor();
 
   /**
+   * @return the method name without any brackets.
+   */
+  @Override
+  String elementName();
+
+  /**
    * If this {@link IMethod} is a synthetic parameterized method (for example the super class of a parameterized type
    * with applied type arguments) then this method returns the original method without the type arguments applied.
    * <p>
@@ -52,12 +59,27 @@ public interface IMethod extends IMember {
    */
   IMethod originalMethod();
 
+  /**
+   * Gets the method body source.
+   *
+   * @return The source of the method body or <code>null</code> if no source is available.
+   */
   ISourceRange sourceOfBody();
 
   @Override
   MethodSpi unwrap();
 
+  /**
+   * Gets a {@link SuperMethodQuery} to access methods overridden by this {@link IMethod}.
+   *
+   * @return The new {@link SuperMethodQuery} for this {@link IMethod}.
+   */
   SuperMethodQuery superMethods();
 
+  /**
+   * Gets a {@link MethodParameterQuery} to access the parameters of this {@link IMethod}.
+   *
+   * @return The new {@link MethodParameterQuery} for this {@link IMethod}.
+   */
   MethodParameterQuery parameters();
 }

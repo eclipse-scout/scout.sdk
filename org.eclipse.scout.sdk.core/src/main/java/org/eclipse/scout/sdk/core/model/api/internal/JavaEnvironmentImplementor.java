@@ -63,7 +63,6 @@ public class JavaEnvironmentImplementor implements IJavaEnvironment {
     m_spi.registerCompilationUnitOverride(packageName, fileName, buf);
   }
 
-  @Override
   public String compileErrors(String fqn) {
     return m_spi.getCompileErrors(fqn);
   }

@@ -56,10 +56,10 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
     m_packageName = element.containingPackage().name();
     for (IImport imp : element.imports()) {
       if (imp.isStatic()) {
-        addDeclaredStaticImport(imp.name());
+        addDeclaredStaticImport(imp.elementName());
       }
       else {
-        addDeclaredImport(imp.name());
+        addDeclaredImport(imp.elementName());
       }
     }
     if (element.javaDoc() != null) {

@@ -18,7 +18,7 @@ package org.eclipse.scout.sdk.core.model.api;
  */
 public interface ISourceRange {
   /**
-   * @return the content
+   * @return the source as {@link String}.
    */
   @Override
   String toString();

@@ -13,9 +13,11 @@ package org.eclipse.scout.sdk.core.model.api;
 import java.util.Map;
 
 import org.eclipse.scout.sdk.core.model.spi.AnnotationSpi;
+import org.eclipse.scout.sdk.core.model.sugar.AbstractManagedAnnotation;
 
 /**
- * <h3>{@link IAnnotation}</h3>
+ * <h3>{@link IAnnotation}</h3><br>
+ * Represents an annotation declaration.
  *
  * @author Matthias Villiger
  * @since 5.1.0
@@ -31,20 +33,20 @@ public interface IAnnotation extends IJavaElement {
    * Gets all attributes of this {@link IAnnotation}.<br>
    * The {@link Map} iterates over the attributes in the order as they appear in the source or class file.
    *
-   * @return A {@link Map} containing the attribute name ({@link IAnnotationValue#name()}) as key and the
-   *         {@link IAnnotationValue} as value. Never returns <code>null</code>.
+   * @return A {@link Map} containing the attribute name ({@link IAnnotationElement#name()}) as key and the
+   *         {@link IAnnotationElement} as value. Never returns <code>null</code>.
    */
-  Map<String, IAnnotationValue> values();
+  Map<String, IAnnotationElement> elements();
 
   /**
-   * Gets the {@link IAnnotationValue} of the annotation attribute with the given name.
+   * Gets the {@link IAnnotationElement} of the annotation attribute with the given name.
    *
    * @param name
-   *          The name of the {@link IAnnotationValue} to return.
-   * @return The {@link IAnnotationValue} with the given name or <code>null</code> if no attribute with given name
+   *          The name of the {@link IAnnotationElement} to return.
+   * @return The {@link IAnnotationElement} with the given name or <code>null</code> if no attribute with given name
    *         exists.
    */
-  IAnnotationValue value(String name);
+  IAnnotationElement element(String name);
 
   /**
    * Gets the object on which this {@link IAnnotation} is defined.
@@ -60,6 +62,15 @@ public interface IAnnotation extends IJavaElement {
    * @return The annotation definition type. Never returns <code>null</code>.
    */
   IType type();
+
+  /**
+   * Wraps this {@link IAnnotation} into the given {@link AbstractManagedAnnotation} class.
+   * 
+   * @param managedAnnotationType
+   *          The managed annotation class. The class must match this {@link IAnnotation} type.
+   * @return The newly created managed annotation.
+   */
+  <A extends AbstractManagedAnnotation> A wrap(Class<A> managedAnnotationType);
 
   @Override
   AnnotationSpi unwrap();

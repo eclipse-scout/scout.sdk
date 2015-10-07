@@ -116,7 +116,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
    */
   protected static void filterAnnotationValues(IAnnotationSourceBuilder builder, IAnnotation a) {
     if (IScoutRuntimeTypes.ClassId.equals(a.type().name())) {
-      String id = a.value("value").metaValue().get(String.class);
+      String id = a.element("value").value().get(String.class);
       id += "-formdata";
       builder.putValue("value", CoreUtils.toStringLiteral(id));
     }

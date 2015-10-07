@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.fixture.ClassWithAnnotationWithSingleValues;
 import org.eclipse.scout.sdk.core.importcollector.EmptyImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
-import org.eclipse.scout.sdk.core.model.api.IAnnotationValue;
+import org.eclipse.scout.sdk.core.model.api.IAnnotationElement;
 import org.eclipse.scout.sdk.core.model.api.IArrayMetaValue;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IMetaValue;
@@ -98,13 +98,13 @@ public class AnnotationSourceTest {
     assertAnnotationArrayValues(a, "annos", MetaValueType.Annotation, AnnotationImplementor.class, new String[]{"*", "*"},
         "{@AnnotationWithSingleValues(type = Integer.class,enumValue = RoundingMode.HALF_UP,num = 11,string = \"beta\",anno = @Generated(\"g1\")), @AnnotationWithSingleValues(type = Integer.class,enumValue = RoundingMode.HALF_DOWN,num = 12,string = ClassWithAnnotationConstants.BETA,anno = @Generated(\"g2\"))}");
     //deep check
-    IAnnotation annos0 = a.value("annos").metaValue().get(IAnnotation[].class)[0];
+    IAnnotation annos0 = a.element("annos").value().get(IAnnotation[].class)[0];
     assertAnnotationValue(annos0, "num", MetaValueType.Int, Integer.class, "11", "11");
     assertAnnotationValue(annos0, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_UP", "RoundingMode.HALF_UP");
     assertAnnotationValue(annos0, "string", MetaValueType.String, String.class, "\"beta\"", "\"beta\"");
     assertAnnotationValue(annos0, "type", MetaValueType.Type, TypeImplementor.class, "Integer.class", "Integer.class");
     assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated(\"g1\")", "@Generated(\"g1\")");
-    IAnnotation annos1 = a.value("annos").metaValue().get(IAnnotation[].class)[1];
+    IAnnotation annos1 = a.element("annos").value().get(IAnnotation[].class)[1];
     assertAnnotationValue(annos1, "num", MetaValueType.Int, Integer.class, "12", "12");
     assertAnnotationValue(annos1, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_DOWN", "RoundingMode.HALF_DOWN");
     assertAnnotationValue(annos1, "string", MetaValueType.String, String.class, "\"beta\"", "ClassWithAnnotationConstants.BETA");
@@ -121,13 +121,13 @@ public class AnnotationSourceTest {
     assertAnnotationArrayValues(a, "annos", MetaValueType.Annotation, AnnotationImplementor.class, new String[]{"*", "*"},
         "{@AnnotationWithSingleValues(type = Double.class,enumValue = RoundingMode.HALF_EVEN,num = 31,string = \"delta\",anno = @Generated(\"g3\")), @AnnotationWithSingleValues(type = Double.class,enumValue = RoundingMode.HALF_EVEN,num = 32,string = ClassWithAnnotationConstants.DELTA,anno = @Generated(\"g4\"))}");
     //deep check
-    annos0 = a.value("annos").metaValue().get(IAnnotation[].class)[0];
+    annos0 = a.element("annos").value().get(IAnnotation[].class)[0];
     assertAnnotationValue(annos0, "num", MetaValueType.Int, Integer.class, "31", "31");
     assertAnnotationValue(annos0, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_EVEN", "RoundingMode.HALF_EVEN");
     assertAnnotationValue(annos0, "string", MetaValueType.String, String.class, "\"delta\"", "\"delta\"");
     assertAnnotationValue(annos0, "type", MetaValueType.Type, TypeImplementor.class, "Double.class", "Double.class");
     assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated(\"g3\")", "@Generated(\"g3\")");
-    annos1 = a.value("annos").metaValue().get(IAnnotation[].class)[1];
+    annos1 = a.element("annos").value().get(IAnnotation[].class)[1];
     assertAnnotationValue(annos1, "num", MetaValueType.Int, Integer.class, "32", "32");
     assertAnnotationValue(annos1, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_EVEN", "RoundingMode.HALF_EVEN");
     assertAnnotationValue(annos1, "string", MetaValueType.String, String.class, "\"delta\"", "ClassWithAnnotationConstants.DELTA");
@@ -185,13 +185,13 @@ public class AnnotationSourceTest {
     assertAnnotationArrayValues(a, "types", MetaValueType.Type, TypeImplementor.class, new String[]{"String.class", "String.class"}, null);
     assertAnnotationArrayValues(a, "annos", MetaValueType.Annotation, AnnotationImplementor.class, new String[]{"*", "*"}, null);
     //deep check
-    IAnnotation annos0 = a.value("annos").metaValue().get(IAnnotation[].class)[0];
+    IAnnotation annos0 = a.element("annos").value().get(IAnnotation[].class)[0];
     assertAnnotationValue(annos0, "num", MetaValueType.Int, Integer.class, "11", null);
     assertAnnotationValue(annos0, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_UP", null);
     assertAnnotationValue(annos0, "string", MetaValueType.String, String.class, "\"beta\"", null);
     assertAnnotationValue(annos0, "type", MetaValueType.Type, TypeImplementor.class, "Integer.class", null);
     assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated({\"g1\"})", null);
-    IAnnotation annos1 = a.value("annos").metaValue().get(IAnnotation[].class)[1];
+    IAnnotation annos1 = a.element("annos").value().get(IAnnotation[].class)[1];
     assertAnnotationValue(annos1, "num", MetaValueType.Int, Integer.class, "12", null);
     assertAnnotationValue(annos1, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_DOWN", null);
     assertAnnotationValue(annos1, "string", MetaValueType.String, String.class, "\"beta\"", null);
@@ -207,13 +207,13 @@ public class AnnotationSourceTest {
     assertAnnotationArrayValues(a, "types", MetaValueType.Type, TypeImplementor.class, new String[]{"Float.class", "Float.class"}, null);
     assertAnnotationArrayValues(a, "annos", MetaValueType.Annotation, AnnotationImplementor.class, new String[]{"*", "*"}, null);
     //deep check
-    annos0 = a.value("annos").metaValue().get(IAnnotation[].class)[0];
+    annos0 = a.element("annos").value().get(IAnnotation[].class)[0];
     assertAnnotationValue(annos0, "num", MetaValueType.Int, Integer.class, "31", null);
     assertAnnotationValue(annos0, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_EVEN", null);
     assertAnnotationValue(annos0, "string", MetaValueType.String, String.class, "\"delta\"", null);
     assertAnnotationValue(annos0, "type", MetaValueType.Type, TypeImplementor.class, "Double.class", null);
     assertAnnotationValue(annos0, "anno", MetaValueType.Annotation, AnnotationImplementor.class, "@Generated({\"g3\"})", null);
-    annos1 = a.value("annos").metaValue().get(IAnnotation[].class)[1];
+    annos1 = a.element("annos").value().get(IAnnotation[].class)[1];
     assertAnnotationValue(annos1, "num", MetaValueType.Int, Integer.class, "32", null);
     assertAnnotationValue(annos1, "enumValue", MetaValueType.Enum, FieldImplementor.class, "RoundingMode.HALF_EVEN", null);
     assertAnnotationValue(annos1, "string", MetaValueType.String, String.class, "\"delta\"", null);
@@ -222,8 +222,8 @@ public class AnnotationSourceTest {
   }
 
   private static void assertAnnotationValue(IAnnotation a, String key, MetaValueType valueType, Class<?> modelType, String aptSource, String expressionSource) {
-    IAnnotationValue av = a.value(key);
-    IMetaValue mv = av.metaValue();
+    IAnnotationElement av = a.element(key);
+    IMetaValue mv = av.value();
     Assert.assertEquals(valueType, mv.type());
     Assert.assertEquals(modelType, mv.get(Object.class).getClass());
     StringBuilder buf = new StringBuilder();
@@ -234,8 +234,8 @@ public class AnnotationSourceTest {
   }
 
   private static void assertAnnotationArrayValues(IAnnotation a, String key, MetaValueType elementValueType, Class<?> elementModelType, String[] aptSources, String expressionSource) {
-    IAnnotationValue av = a.value(key);
-    IMetaValue mv = av.metaValue();
+    IAnnotationElement av = a.element(key);
+    IMetaValue mv = av.value();
     Assert.assertEquals(MetaValueType.Array, mv.type());
     Assert.assertTrue(mv instanceof IArrayMetaValue);
     IMetaValue[] elements = ((IArrayMetaValue) mv).metaValueArray();

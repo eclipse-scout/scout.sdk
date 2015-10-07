@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 
 /**
@@ -22,9 +23,9 @@ import org.eclipse.scout.sdk.core.model.spi.JavaEnvironmentSpi;
 public interface IJavaEnvironment {
 
   /**
-   * Tries to find the {@link IType} with the given name in the receiver {@link IJavaEnvironment} (classpath).
+   * Tries to find the {@link IType} with the given name.
    * <p>
-   * Also primitive types such as int, float, void, null etc. are supported.
+   * Also primitive types such as int, float, void, null etc. are supported (see {@link IJavaRuntimeTypes}).
    *
    * @param fqn
    *          The fully qualified name of the {@link IType} to find. For inner {@link IType}s the inner part must be
@@ -63,11 +64,9 @@ public interface IJavaEnvironment {
   void registerCompilationUnitOverride(String packageName, String fileName, StringBuilder buf);
 
   /**
-   * @param fqn
-   *          type name
-   * @return null if the type has no compilation errors
+   * Unwraps the {@link IJavaEnvironment} into its underlying SPI class.
+   *
+   * @return The service provider interface that belongs to this {@link IJavaEnvironment}.
    */
-  String compileErrors(String fqn);
-
   JavaEnvironmentSpi unwrap();
 }

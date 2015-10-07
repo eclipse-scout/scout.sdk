@@ -60,7 +60,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
         "}\n";
     Assert.assertEquals(CoreTestingUtils.normalizeWhitespace(expected), CoreTestingUtils.normalizeWhitespace(cu.source().toString()));
 
-    Assert.assertNotNull(env.compileErrors("a.b.c.BaseClass"));
+    Assert.assertNotNull(CoreTestingUtils.getCompileErrors(env, "a.b.c.BaseClass"));
 
     //now fix the unresolved type error
     cuSrc.getMainType().getMethods().get(0).setReturnTypeSignature(Signature.createTypeSignature("void"));
@@ -70,7 +70,7 @@ public class CreateAndOverrideNewCompilationUnitTest {
     env.reload();
     cu = env.findType("a.b.c.BaseClass").compilationUnit();
 
-    Assert.assertNull(env.compileErrors("a.b.c.BaseClass"));
+    Assert.assertNull(CoreTestingUtils.getCompileErrors(env, "a.b.c.BaseClass"));
   }
 
   @Test

@@ -18,7 +18,7 @@ import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
- * <h3>{@link TypeQuery}</h3>
+ * <h3>{@link TypeQuery}</h3> Inner types query that by default returns all direct inner types of the container.
  *
  * @author Ivan Motsch
  * @since 5.1.0
@@ -37,10 +37,11 @@ public class TypeQuery {
   }
 
   /**
-   * Set to true to include inner types inner types (recursively)
+   * Specify if {@link IType}s found by this query should be further searched for their inner {@link IType}s
+   * (recursively).<br>
    *
    * @param b
-   *          default false
+   *          Set to <code>true</code> to include inner types recursively. Default <code>false</code>.
    * @return this
    */
   public TypeQuery withRecursiveInnerTypes(boolean b) {
@@ -49,8 +50,10 @@ public class TypeQuery {
   }
 
   /**
+   * Limit the {@link IType}s to the given fully qualified name (see {@link IType#name()}).
+   *
    * @param name
-   *          fully qualified name
+   *          The {@link IType} fully qualified name. Default is no filtering.
    * @return this
    */
   public TypeQuery withName(String fullyQualifiedName) {
@@ -59,7 +62,10 @@ public class TypeQuery {
   }
 
   /**
-   * @param simpleName
+   * Limit the {@link IType}s to the given simple name (see {@link IType#elementName()}).
+   *
+   * @param name
+   *          The {@link IType} simple name. Default is no filtering.
    * @return this
    */
   public TypeQuery withSimpleName(String simpleName) {
@@ -67,13 +73,24 @@ public class TypeQuery {
     return this;
   }
 
+  /**
+   * Limit the {@link IType}s to the ones that are <code>instanceof</code> the given fully qualified name.<br>
+   * This means all resulting {@link IType}s must have the given fully qualified type name in their super hierarchy.
+   *
+   * @param typeFqn
+   *          The fully qualified name.
+   * @return this
+   */
   public TypeQuery withInstanceOf(String typeFqn) {
     m_instanceOfFqn = typeFqn;
     return this;
   }
 
   /**
+   * Limit the {@link IType}s to the ones that accept the given {@link IFilter}.
+   *
    * @param filter
+   *          The filter. Default none.
    * @return this
    */
   public TypeQuery withFilter(IFilter<IType> filter) {
@@ -82,7 +99,10 @@ public class TypeQuery {
   }
 
   /**
+   * Limit the number of {@link IType}s to search.
+   *
    * @param maxResultCount
+   *          The maximum number of {@link IType}s to search. Default is unlimited.
    * @return this
    */
   public TypeQuery withMaxResultCount(int maxResultCount) {
@@ -128,18 +148,33 @@ public class TypeQuery {
     }
   }
 
+  /**
+   * Checks if there is at least one {@link IType} that fulfills this query.
+   *
+   * @return <code>true</code> if at least one {@link IType} fulfills this query, <code>false</code> otherwise.
+   */
   public boolean existsAny() {
     return first() != null;
   }
 
+  /**
+   * Gets the first {@link IType} that fulfills this query.
+   *
+   * @return The first {@link IType} that fulfills this query or <code>null</code> if there is none.
+   */
   public IType first() {
     List<IType> result = new ArrayList<>(1);
     visitRec(m_types, result, 1);
     return result.isEmpty() ? null : result.get(0);
   }
 
+  /**
+   * Gets all {@link IType}s that fulfill this query.
+   *
+   * @return A {@link List} with all {@link IType}s that fulfill this query. Never returns <code>null</code>.
+   */
   public List<IType> list() {
-    List<IType> result = new ArrayList<>();
+    List<IType> result = new ArrayList<>(m_types.size());
     visitRec(m_types, result, m_maxResultCount);
     return result;
   }
