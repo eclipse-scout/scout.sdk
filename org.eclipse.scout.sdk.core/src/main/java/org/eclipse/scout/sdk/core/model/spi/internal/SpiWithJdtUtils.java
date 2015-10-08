@@ -569,7 +569,7 @@ public final class SpiWithJdtUtils {
     return -1;
   }
 
-  static class TypeDescriptor {
+  static final class TypeDescriptor {
     final String m_primaryTypeName;
     final String m_innerTypeNames;
     final int m_arrayDimension;
@@ -716,7 +716,7 @@ public final class SpiWithJdtUtils {
     return new LinkedHashMap<>(defaultValues);
   }
 
-  static class FindAnnotationVisitor extends ASTVisitor {
+  private static final class FindAnnotationVisitor extends ASTVisitor {
     private final AnnotationBinding m_binding;
     private Annotation m_result;
 
@@ -751,7 +751,7 @@ public final class SpiWithJdtUtils {
     }
   }
 
-  static class FindMemberValuePairVisitor extends ASTVisitor {
+  private static final class FindMemberValuePairVisitor extends ASTVisitor {
     private final ElementValuePair m_binding;
     private MemberValuePair m_result;
 

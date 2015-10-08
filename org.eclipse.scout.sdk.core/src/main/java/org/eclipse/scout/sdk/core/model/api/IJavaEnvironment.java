@@ -25,12 +25,19 @@ public interface IJavaEnvironment {
   /**
    * Tries to find the {@link IType} with the given name.
    * <p>
-   * Also primitive types such as int, float, void, null etc. are supported (see {@link IJavaRuntimeTypes}).
+   * Primitive types such as int, float, void, etc. are supported (see {@link IJavaRuntimeTypes}).<br>
+   * Array types are supported with suffix <code>[]</code>.
    *
    * @param fqn
    *          The fully qualified name of the {@link IType} to find. For inner {@link IType}s the inner part must be
-   *          separated using '$'.<br>
-   *          Example: <code>org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass</code>.
+   *          separated using '$'. Array types must have the array suffix for each dimension.<br>
+   *          Examples:
+   *          <ul>
+   *          <li><code>org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass</code></li>
+   *          <li><code>int[][]</code></li>
+   *          <li><code>java.lang.Long</code></li>
+   *          <li><code>org.eclipse.scout.hello.world.MainClass$InnerClass$AnotherInnerClass[]</code></li>
+   *          </ul>
    * @return The {@link IType} matching the given fully qualified name or <code>null</code> if it could not be found.
    */
   IType findType(String fqn);
@@ -38,11 +45,11 @@ public interface IJavaEnvironment {
   IUnresolvedType findUnresolvedType(String fqn);
 
   /**
-   * When filesystem changes occurred and the current {@link IType}, {@link ICompilationUnit} should not be lost, this
-   * method can be called in order to reload the spi core of the {@link IJavaEnvironment} and replace all spi cores of
+   * When file system changes occurred and the current {@link IType}, {@link ICompilationUnit} should not be lost, this
+   * method can be called in order to reload the SPI core of the {@link IJavaEnvironment} and replace all SPI cores of
    * the wrapped classes with the updated version.
    * <p>
-   * All {@link IType}, {@link ICompilationUnit} etc. remain valid and are updated with the new state of the filesystem
+   * All {@link IType}, {@link ICompilationUnit} etc. remain valid and are updated with the new state of the file system
    * including optional overrides that were registered using
    * {@link #registerCompilationUnitOverride(String, String, StringBuilder)}
    */
@@ -58,8 +65,11 @@ public interface IJavaEnvironment {
    * In all other cases it is recommended to call {@link #reload()}
    *
    * @param packageName
+   *          The package name of the compilation unit. Use <code>null</code> for the default package.
    * @param fileName
+   *          The filename of the compilation unit (e.g. MyClass.java).
    * @param buf
+   *          A {@link StringBuilder} holding the content of the compilation unit.
    */
   void registerCompilationUnitOverride(String packageName, String fileName, StringBuilder buf);
 

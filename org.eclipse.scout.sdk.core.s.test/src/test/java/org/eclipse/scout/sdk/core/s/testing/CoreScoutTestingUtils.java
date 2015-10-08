@@ -8,7 +8,7 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.dto.test.util;
+package org.eclipse.scout.sdk.core.s.testing;
 
 import java.util.regex.Pattern;
 

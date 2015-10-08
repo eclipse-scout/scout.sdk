@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.core.s.model;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
@@ -69,7 +70,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         String formDataTypeRef = validator.useName(getName());
         source.append("@").append(formDataTypeRef);
-        ArrayList<String> args = new ArrayList<>(3);
+        List<String> args = new ArrayList<>(3);
         if (formDataSignature != null) {
           args.add("value = " + validator.useSignature(formDataSignature) + ".class");
         }
@@ -90,14 +91,14 @@ public final class ScoutAnnotationSourceBuilderFactory {
           args.add(b.toString());
         }
         if (args.size() > 0) {
-          source.append("(");
+          source.append('(');
           for (int i = 0; i < args.size(); i++) {
             source.append(args.get(i));
             if (i < args.size() - 1) {
               source.append(", ");
             }
           }
-          source.append(")");
+          source.append(')');
         }
       }
     };
