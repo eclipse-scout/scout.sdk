@@ -14,6 +14,8 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URLConnection;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -42,7 +44,8 @@ public final class ScoutProjectNewHelper {
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"\\/<>=:]+");
   public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
 
-  public static final String[] BINARY_FILE_EXTENSIONS = new String[]{"gif", "png", "ico", "jpg", "jpeg", "zip", "ear", "war", "jar", "class"};
+  public static final String[] TEXT_FILE_EXTENSIONS = new String[]{"xml", "java", "launch", "properties", "nls", "html", "htm", "js", "css", "json"};
+
   public static final String PROPERTY_MARKER = "@@";
   public static final String DEFAULT_JAVA_VERSION = "1.8";
 
@@ -176,7 +179,7 @@ public final class ScoutProjectNewHelper {
         if (entry.isDirectory()) {
           mkdirs(targetFile);
         }
-        else if (isTextFile(resultingName)) {
+        else if (isTextFile(resultingName, templateZipFile)) {
           extractTxtFile(templateZipFile, props, targetFile);
         }
         else {
@@ -232,36 +235,54 @@ public final class ScoutProjectNewHelper {
     return null;
   }
 
-  protected static boolean isTextFile(String name) {
-    // try content type detection first
+  protected static String getFileExtension(String name) {
+    int lastDotPos = name.lastIndexOf('.');
+    if (lastDotPos < 0) {
+      return "";
+    }
+
+    return name.substring(lastDotPos + 1);
+  }
+
+  protected static String getContentType(String name, InputStream data) {
     try {
       String contentType = Files.probeContentType(Paths.get(name));
       if (StringUtils.isNotEmpty(contentType)) {
-        return contentType.toLowerCase().contains("text");
+        return contentType;
+      }
+
+      if (data != null) {
+        contentType = URLConnection.guessContentTypeFromStream(data);
+        if (StringUtils.isNotEmpty(contentType)) {
+          return contentType;
+        }
       }
     }
     catch (Exception e) {
       // nop
     }
+    return null;
+  }
 
-    // fallback: file extension
-    int lastDotPos = name.lastIndexOf('.');
-    if (lastDotPos < 0) {
-      return false;
-    }
-
-    String ext = name.substring(lastDotPos + 1);
-    if (StringUtils.isEmpty(ext)) {
-      return false;
-    }
-
-    for (String s : BINARY_FILE_EXTENSIONS) {
-      if (s.equalsIgnoreCase(ext)) {
-        return false;
+  protected static boolean isTextFile(String name, InputStream data) {
+    // fast detect: known text file types
+    String fileExt = getFileExtension(name);
+    for (String txtExtension : TEXT_FILE_EXTENSIONS) {
+      if (txtExtension.equalsIgnoreCase(fileExt)) {
+        return true;
       }
     }
 
-    return true;
+    // try content type detection
+    String contentType = getContentType(name, data);
+    if (StringUtils.isNotBlank(contentType)) {
+      String lowerContentType = contentType.toLowerCase();
+      // Note: application/plain is no official content type (see http://www.iana.org/assignments/media-types/media-types.xhtml).
+      // Even though it is used on some platforms
+      return lowerContentType.contains("text") || lowerContentType.contains("xml") || lowerContentType.equals("application/plain");
+    }
+
+    return false;
   }
 
   protected static void ensureNoUnreplacedProperties(String s) throws IOException {
