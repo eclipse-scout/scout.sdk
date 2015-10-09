@@ -10,10 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.fixture;
 
-import org.eclipse.scout.sdk.core.model.sugar.QueryTest;
-
 /**
- * <h3>{@link AbstractBaseClass}</h3> Fixture used in {@link QueryTest}
+ * <h3>{@link AbstractBaseClass}</h3>
  *
  * @author Matthias Villiger
  * @since 5.2.0
