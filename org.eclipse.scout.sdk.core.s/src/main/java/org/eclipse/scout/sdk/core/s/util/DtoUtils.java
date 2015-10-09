@@ -71,7 +71,7 @@ public final class DtoUtils {
    *
    * @since 3.10.0-M5
    */
-  public static SdkColumnCommand getColumnDataSdkColumnCommand(IType type) {
+  public static SdkColumnCommand getSdkColumnCommand(IType type) {
     if (type == null) {
       return null;
     }
@@ -82,7 +82,7 @@ public final class DtoUtils {
     }
 
     IType replacedType = type.superClass();
-    if (getColumnDataSdkColumnCommand(replacedType) != SdkColumnCommand.IGNORE) {
+    if (getSdkColumnCommand(replacedType) != SdkColumnCommand.IGNORE) {
       return SdkColumnCommand.IGNORE;
     }
     if (sdkColumnCommand == null) {
@@ -615,7 +615,7 @@ public final class DtoUtils {
         if (extendedDto != null) {
           final IType dto = extendedDto;
           AnnotationSourceBuilder asb = new AnnotationSourceBuilder(IScoutRuntimeTypes.Extends);
-          asb.putValue("value", ExpressionSourceBuilderFactory.createClassLiteral(SignatureUtils.getTypeSignature(dto)));
+          asb.putElement("value", ExpressionSourceBuilderFactory.createClassLiteral(SignatureUtils.getTypeSignature(dto)));
           return asb;
         }
       }

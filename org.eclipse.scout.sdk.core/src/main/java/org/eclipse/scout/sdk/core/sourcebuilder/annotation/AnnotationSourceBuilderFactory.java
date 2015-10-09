@@ -10,9 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder.annotation;
 
-import javax.annotation.Generated;
-
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.scout.sdk.core.IJavaRuntimeTypes;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 
 /**
@@ -29,11 +28,11 @@ public final class AnnotationSourceBuilderFactory {
   private static final String GENERATED_MSG = "This class is auto generated. No manual modifications recommended.";
 
   public static IAnnotationSourceBuilder createOverride() {
-    return new AnnotationSourceBuilder(Override.class.getName());
+    return new AnnotationSourceBuilder(IJavaRuntimeTypes.java_lang_Override);
   }
 
   public static IAnnotationSourceBuilder createDeprecated() {
-    return new AnnotationSourceBuilder(Deprecated.class.getName());
+    return new AnnotationSourceBuilder(IJavaRuntimeTypes.java_lang_Deprecated);
   }
 
   /**
@@ -42,8 +41,8 @@ public final class AnnotationSourceBuilderFactory {
    * @return
    */
   public static IAnnotationSourceBuilder createSupressWarnings(String text) {
-    AnnotationSourceBuilder a = new AnnotationSourceBuilder(SuppressWarnings.class.getName());
-    a.putValue("value", CoreUtils.toStringLiteral(text));
+    AnnotationSourceBuilder a = new AnnotationSourceBuilder(IJavaRuntimeTypes.java_lang_SuppressWarnings);
+    a.putElement("value", CoreUtils.toStringLiteral(text));
     return a;
   }
 
@@ -62,12 +61,11 @@ public final class AnnotationSourceBuilderFactory {
    *          the typeThatGeneratedTheCode does not exist anymore then all generated classes can be deleted as well.
    */
   public static IAnnotationSourceBuilder createGenerated(final String typeThatGeneratedTheCode, final String comments) {
-    AnnotationSourceBuilder a = new AnnotationSourceBuilder(Generated.class.getName());
-    a.putValue("value", CoreUtils.toStringLiteral(typeThatGeneratedTheCode));
+    AnnotationSourceBuilder a = new AnnotationSourceBuilder(IJavaRuntimeTypes.javax_annotation_Generated);
+    a.putElement("value", CoreUtils.toStringLiteral(typeThatGeneratedTheCode));
     if (StringUtils.isNotBlank(comments)) {
-      a.putValue("comments", CoreUtils.toStringLiteral(comments));
+      a.putElement("comments", CoreUtils.toStringLiteral(comments));
     }
     return a;
   }
-
 }

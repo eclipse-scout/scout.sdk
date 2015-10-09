@@ -41,8 +41,6 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
-import org.eclipse.scout.sdk.core.util.FieldFilters;
-import org.eclipse.scout.sdk.core.util.Filters;
 import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.TypeFilters;
@@ -165,18 +163,18 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
 
     // the declaring type holds columns
     Set<IType> allColumnsUpTheHierarchy = new TreeSet<>(ScoutTypeComparators.getOrderAnnotationComparator(false));
-    IFilter<IType> filter = Filters.and(TypeFilters.instanceOf(IScoutRuntimeTypes.IColumn), new IFilter<IType>() {
+    IFilter<IType> filter = new IFilter<IType>() {
       @Override
       public boolean evaluate(IType type) {
-        SdkColumnCommand cmd = DtoUtils.getColumnDataSdkColumnCommand(type);
+        SdkColumnCommand cmd = DtoUtils.getSdkColumnCommand(type);
         return cmd == null || cmd.equals(SdkColumnCommand.CREATE);
       }
-    });
+    };
 
     // collect all columns that exist in the table and all of its super classes
     IType curTableType = declaringType;
     while (curTableType != null) {
-      List<IType> columns = curTableType.innerTypes().withFilter(filter).list();
+      List<IType> columns = curTableType.innerTypes().withInstanceOf(IScoutRuntimeTypes.IColumn).withFilter(filter).list();
       allColumnsUpTheHierarchy.addAll(columns);
       curTableType = curTableType.superClass();
     }
@@ -190,7 +188,7 @@ public class TableRowDataTypeSourceBuilder extends TypeSourceBuilder {
     Set<String> usedColumnBeanNames = new HashSet<>();
     IType currentRowDataSuperType = rowDataSuperType;
     while (currentRowDataSuperType != null && !IScoutRuntimeTypes.AbstractTableRowData.equals(currentRowDataSuperType.name())) {
-      List<IField> columnFields = currentRowDataSuperType.fields().withFilter(FieldFilters.flags(ROW_DATA_FIELD_FLAGS)).list();
+      List<IField> columnFields = currentRowDataSuperType.fields().withFlags(ROW_DATA_FIELD_FLAGS).list();
       for (IField column : columnFields) {
         IMetaValue val = column.constantValue();
         if (val != null && val.type() == MetaValueType.String) {

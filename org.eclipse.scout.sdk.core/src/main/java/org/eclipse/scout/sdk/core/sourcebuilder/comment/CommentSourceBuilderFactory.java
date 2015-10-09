@@ -32,7 +32,7 @@ import org.eclipse.scout.sdk.core.util.SdkException;
  */
 public final class CommentSourceBuilderFactory {
 
-  public static volatile ICommentSourceBuilderDelegate commentSourceBuilderDelegate;
+  public static volatile ICommentSourceBuilderSpi commentSourceBuilderSpi;
 
   private static final Pattern REGEX_COMMENT_PATTERN1 = Pattern.compile("^s*\\/\\*\\*s*$");
   private static final Pattern REGEX_COMMENT_PATTERN2 = Pattern.compile("^s*\\*\\*\\/s*$");
@@ -48,50 +48,50 @@ public final class CommentSourceBuilderFactory {
   };
 
   public static ISourceBuilder createDefaultCompilationUnitComment(ICompilationUnitSourceBuilder target) {
-    if (commentSourceBuilderDelegate != null) {
-      return commentSourceBuilderDelegate.createCompilationUnitComment(target);
+    if (commentSourceBuilderSpi != null) {
+      return commentSourceBuilderSpi.createCompilationUnitComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultTypeComment(ITypeSourceBuilder target) {
-    if (commentSourceBuilderDelegate != null) {
-      return commentSourceBuilderDelegate.createTypeComment(target);
+    if (commentSourceBuilderSpi != null) {
+      return commentSourceBuilderSpi.createTypeComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultMethodComment(IMethodSourceBuilder target) {
-    if (commentSourceBuilderDelegate != null) {
-      return commentSourceBuilderDelegate.createMethodComment(target);
+    if (commentSourceBuilderSpi != null) {
+      return commentSourceBuilderSpi.createMethodComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultOverrideMethodComment(IMethodSourceBuilder target, String interfaceFqn) {
-    if (commentSourceBuilderDelegate != null) {
-      return commentSourceBuilderDelegate.createOverrideMethodComment(target, interfaceFqn);
+    if (commentSourceBuilderSpi != null) {
+      return commentSourceBuilderSpi.createOverrideMethodComment(target, interfaceFqn);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultGetterMethodComment(IMethodSourceBuilder target) {
-    if (commentSourceBuilderDelegate != null) {
-      return commentSourceBuilderDelegate.createGetterMethodComment(target);
+    if (commentSourceBuilderSpi != null) {
+      return commentSourceBuilderSpi.createGetterMethodComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultSetterMethodComment(IMethodSourceBuilder target) {
-    if (commentSourceBuilderDelegate != null) {
-      return commentSourceBuilderDelegate.createSetterMethodComment(target);
+    if (commentSourceBuilderSpi != null) {
+      return commentSourceBuilderSpi.createSetterMethodComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }
 
   public static ISourceBuilder createDefaultFieldComment(IFieldSourceBuilder target) {
-    if (commentSourceBuilderDelegate != null) {
-      return commentSourceBuilderDelegate.createFieldComment(target);
+    if (commentSourceBuilderSpi != null) {
+      return commentSourceBuilderSpi.createFieldComment(target);
     }
     return EMPTY_COMMENT_SOURCE_BUILDER;
   }

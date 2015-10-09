@@ -8,24 +8,34 @@
  * Contributors:
  *     BSI Business Systems Integration AG - initial API and implementation
  ******************************************************************************/
-package org.eclipse.scout.sdk.core.util;
+package org.eclipse.scout.sdk.core.fixture;
+
+import org.eclipse.scout.sdk.core.model.sugar.QueryTest;
 
 /**
- * <h3>{@link IFilter}</h3> Defines a functor interface implemented by classes that evaluate a predicate test on an
- * element.<br>
- * Use the {@link Filters} class to combine {@link IFilter}s
+ * <h3>{@link AbstractBaseClass}</h3> Fixture used in {@link QueryTest}
  *
  * @author Matthias Villiger
- * @since 5.1.0
+ * @since 5.2.0
  */
-public interface IFilter<E> {
+public abstract class AbstractBaseClass implements AutoCloseable {
 
-  /**
-   * Evaluate the {@link IFilter} by executing against the given element.
-   *
-   * @param element
-   *          The element to evaluate the {@link IFilter} against.
-   * @return <code>true</code> if the filter accepts the given element. <code>false</code> otherwise.
-   */
-  boolean evaluate(E element);
+  @MarkerAnnotation
+  protected void blub() {
+  }
+
+  protected void blub(String overload) {
+
+  }
+
+  void methodWithParams(@TestAnnotation final String firstParam, Long second, Integer third) {
+  }
+
+  class InnerOne {
+    class InnerTwo {
+      class InnerThree {
+
+      }
+    }
+  }
 }

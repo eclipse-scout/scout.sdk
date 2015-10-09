@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.model.sugar;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IField;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
@@ -29,6 +30,7 @@ public class FieldQuery {
   private boolean m_includeSuperClasses = false;
   private boolean m_includeSuperInterfaces = false;
   private String m_name;
+  private int m_flags = -1;
   private IFilter<IField> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
@@ -77,6 +79,19 @@ public class FieldQuery {
   }
 
   /**
+   * Limit the {@link IField}s to the ones having at least all of the given flags.
+   *
+   * @param flags
+   *          The flags that must exist on the {@link IField}.
+   * @return this
+   * @see Flags
+   */
+  public FieldQuery withFlags(int flags) {
+    m_flags = flags;
+    return this;
+  }
+
+  /**
    * Limit the {@link IField}s to the given name (see {@link IField#elementName()}).
    *
    * @param name
@@ -114,6 +129,9 @@ public class FieldQuery {
 
   protected boolean accept(IField f) {
     if (m_name != null && !m_name.equals(f.elementName())) {
+      return false;
+    }
+    if (m_flags >= 0 && (f.flags() & m_flags) != m_flags) {
       return false;
     }
     if (m_filter != null && !m_filter.evaluate(f)) {

@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.core.sourcebuilder;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IAnnotation;
@@ -50,19 +51,20 @@ public final class ExpressionSourceBuilderFactory {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         String typeName = validator.useSignature(enumSignature);
-        source.append(typeName + "." + enumField);
+        source.append(typeName + '.' + enumField);
       }
     };
   }
 
   /**
    * @param elements
-   *          (string names not yet quoted)
+   *          the {@link String} array elements (not yet quoted).
    * @param formatWithNewlines
-   * @return an array builder that creates a { ... } expression with quoted string names
+   *          If <code>true</code> each element will be placed on a separate line.
+   * @return an array builder that creates a { ... } expression with quoted string names.
    */
   public static ISourceBuilder createQuotedStringArray(final Collection<String> elements, final boolean formatWithNewlines) {
-    ArrayList<ISourceBuilder> a = new ArrayList<>(elements.size());
+    List<ISourceBuilder> a = new ArrayList<>(elements.size());
     for (final String s : elements) {
       a.add(new ISourceBuilder() {
         @Override
@@ -76,7 +78,9 @@ public final class ExpressionSourceBuilderFactory {
 
   /**
    * @param elements
+   *          The elements of the array
    * @param formatWithNewlines
+   *          If <code>true</code> each element will be placed on a separate line.
    * @return an array builder that creates a { ... } expression that can be used for annotation values of type array
    */
   public static ISourceBuilder createArray(final Collection<? extends ISourceBuilder> elements, final boolean formatWithNewlines) {

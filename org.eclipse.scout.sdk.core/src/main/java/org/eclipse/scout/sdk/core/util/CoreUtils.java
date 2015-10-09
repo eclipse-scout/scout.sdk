@@ -571,8 +571,7 @@ public final class CoreUtils {
    * @see <a href="http://www.oracle.com/technetwork/java/javase/documentation/spec-136004.html">JavaBeans Spec</a>
    */
   public static List<IPropertyBean> getPropertyBeans(IType type, IFilter<IPropertyBean> propertyFilter, Comparator<IPropertyBean> comparator) {
-    IFilter<IMethod> filter = Filters.and(MethodFilters.flags(Flags.AccPublic), MethodFilters.nameRegex(BEAN_METHOD_NAME));
-    List<IMethod> methods = type.methods().withFilter(filter).list();
+    List<IMethod> methods = type.methods().withFlags(Flags.AccPublic).withName(BEAN_METHOD_NAME).list();
     Map<String, PropertyBean> beans = new HashMap<>(methods.size());
     for (IMethod m : methods) {
       Matcher matcher = BEAN_METHOD_NAME.matcher(m.elementName());

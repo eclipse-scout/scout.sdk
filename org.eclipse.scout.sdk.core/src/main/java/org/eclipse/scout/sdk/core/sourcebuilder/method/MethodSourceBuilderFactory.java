@@ -30,7 +30,6 @@ import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
 import org.eclipse.scout.sdk.core.util.Filters;
 import org.eclipse.scout.sdk.core.util.IFilter;
-import org.eclipse.scout.sdk.core.util.MethodFilters;
 
 /**
  * <h3>{@link MethodSourceBuilderFactory}</h3>
@@ -86,13 +85,20 @@ public final class MethodSourceBuilderFactory {
     return createOverride(typeSourceBuilder, lookupContext, methodName, null);
   }
 
-  public static IMethodSourceBuilder createOverride(ITypeSourceBuilder typeSourceBuilder, IJavaEnvironment lookupContext, String methodName, IFilter<IMethod> methodFilter) {
+  public static IMethodSourceBuilder createOverride(ITypeSourceBuilder typeSourceBuilder, IJavaEnvironment lookupContext, final String methodName, IFilter<IMethod> methodFilter) {
     IFilter<IMethod> filter = null;
+    IFilter<IMethod> nameFilter = new IFilter<IMethod>() {
+      @Override
+      public boolean evaluate(IMethod element) {
+        return element.elementName().equals(methodName);
+      }
+    };
+
     if (methodFilter == null) {
-      filter = MethodFilters.name(methodName);
+      filter = nameFilter;
     }
     else {
-      filter = Filters.and(MethodFilters.name(methodName), methodFilter);
+      filter = Filters.and(nameFilter, methodFilter);
     }
 
     IMethod methodToOverride = getMethodToOverride(typeSourceBuilder, lookupContext, filter);

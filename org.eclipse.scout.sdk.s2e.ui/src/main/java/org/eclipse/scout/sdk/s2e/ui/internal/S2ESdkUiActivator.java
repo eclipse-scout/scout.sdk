@@ -61,7 +61,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
     }
 
     // comment source builder
-    CommentSourceBuilderFactory.commentSourceBuilderDelegate = new JdtSettingsCommentSourceBuilderDelegate();
+    CommentSourceBuilderFactory.commentSourceBuilderSpi = new JdtSettingsCommentSourceBuilderDelegate();
 
     // property change listener (scout preferences)
     if (m_preferencesPropertyListener == null) {
@@ -87,7 +87,7 @@ public class S2ESdkUiActivator extends AbstractUIPlugin {
       m_preferencesPropertyListener = null;
     }
 
-    CommentSourceBuilderFactory.commentSourceBuilderDelegate = null;
+    CommentSourceBuilderFactory.commentSourceBuilderSpi = null;
 
     plugin = null;
 

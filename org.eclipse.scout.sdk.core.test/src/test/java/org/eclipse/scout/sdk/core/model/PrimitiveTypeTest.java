@@ -28,7 +28,7 @@ public class PrimitiveTypeTest {
   @Test
   public void testExistence() {
     IJavaEnvironment env = new JavaEnvironmentBuilder()
-        .withExcludeScoutSdk()
+        .withoutScoutSdk()
         .build();
 
     Assert.assertNotNull(env.findType(IJavaRuntimeTypes._short));

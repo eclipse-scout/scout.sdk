@@ -24,11 +24,15 @@ import org.eclipse.scout.sdk.core.util.CompositeObject;
 public interface IAnnotatableSourceBuilder extends IJavaElementSourceBuilder {
 
   /**
+   * Adds the given {@link IAnnotatableSourceBuilder} without a specific order
+   * 
    * @param builder
    */
   void addAnnotation(IAnnotationSourceBuilder builder);
 
   /**
+   * Adds the given {@link IAnnotationSourceBuilder} with the giver sort object.
+   * 
    * @param sortKey
    * @param builder
    */

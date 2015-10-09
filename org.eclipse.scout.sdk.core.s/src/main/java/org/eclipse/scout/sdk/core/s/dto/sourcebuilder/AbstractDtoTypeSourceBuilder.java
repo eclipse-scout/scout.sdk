@@ -118,7 +118,7 @@ public abstract class AbstractDtoTypeSourceBuilder extends TypeSourceBuilder imp
     if (IScoutRuntimeTypes.ClassId.equals(a.type().name())) {
       String id = a.element("value").value().get(String.class);
       id += "-formdata";
-      builder.putValue("value", CoreUtils.toStringLiteral(id));
+      builder.putElement("value", CoreUtils.toStringLiteral(id));
     }
   }
 

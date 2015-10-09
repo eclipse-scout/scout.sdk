@@ -34,16 +34,16 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
 public class AnnotationSourceBuilder extends AbstractJavaElementSourceBuilder implements IAnnotationSourceBuilder {
 
   private final String m_name;
-  private final LinkedHashMap<String, ISourceBuilder> m_values = new LinkedHashMap<>();
+  private final Map<String, ISourceBuilder> m_values = new LinkedHashMap<>();
 
-  public AnnotationSourceBuilder(IAnnotation element) {
-    super(element);
-    m_name = element.type().name();
-    for (IAnnotationElement av : element.elements().values()) {
+  public AnnotationSourceBuilder(IAnnotation annotation) {
+    super(annotation);
+    m_name = annotation.type().name();
+    for (IAnnotationElement av : annotation.elements().values()) {
       if (av.isDefault()) {
         continue;
       }
-      putValue(av.elementName(), ExpressionSourceBuilderFactory.createFromMetaValue(av.value()));
+      putElement(av.elementName(), ExpressionSourceBuilderFactory.createFromMetaValue(av.value()));
     }
   }
 
@@ -90,29 +90,29 @@ public class AnnotationSourceBuilder extends AbstractJavaElementSourceBuilder im
   }
 
   @Override
-  public IAnnotationSourceBuilder putValue(String name, String javaSource) {
-    putValue(name, new RawSourceBuilder(javaSource));
+  public IAnnotationSourceBuilder putElement(String name, String javaSource) {
+    putElement(name, new RawSourceBuilder(javaSource));
     return this;
   }
 
   @Override
-  public IAnnotationSourceBuilder putValue(String name, ISourceBuilder value) {
+  public IAnnotationSourceBuilder putElement(String name, ISourceBuilder value) {
     m_values.put(name, value);
     return this;
   }
 
   @Override
-  public boolean removeValue(String name) {
+  public boolean removeElement(String name) {
     return m_values.remove(name) != null;
   }
 
   @Override
-  public ISourceBuilder getValue(String name) {
+  public ISourceBuilder getElement(String name) {
     return m_values.get(name);
   }
 
   @Override
-  public Map<String, ISourceBuilder> getValues() {
+  public Map<String, ISourceBuilder> getElements() {
     return Collections.unmodifiableMap(m_values);
   }
 

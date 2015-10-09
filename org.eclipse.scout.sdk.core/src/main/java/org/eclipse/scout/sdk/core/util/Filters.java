@@ -10,10 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.util;
 
-import java.util.Collection;
-
 /**
- * Contains {@link IFilter}s.
+ * Contains {@link IFilter} helper methods.
+ * 
+ * @see #or(IFilter...)
+ * @see #and(IFilter...)
  */
 public final class Filters {
 
@@ -21,28 +22,10 @@ public final class Filters {
   }
 
   /**
-   * Collect all items and return always false.
-   * <p>
-   * This filter can be used in the various {@link CoreUtils} find methods when all items should be collected.
-   * <p>
-   * When used together with the {@link #and(IFilter...)} a collector can be built that only collects the items that are
-   * accepted by the former filters.
-   */
-  public static <T> IFilter<T> collect(final Collection<T> collection) {
-    return new IFilter<T>() {
-      @Override
-      public boolean evaluate(T element) {
-        collection.add(element);
-        return false;
-      }
-    };
-  }
-
-  /**
    * Gets a {@link IFilter} which evaluates to <code>true</code> if at least one of the given not-null {@link IFilter}s
    * evaluates to <code>true</code>.
    * <p>
-   * This is the conditional AND. The filter list is not processed any further once a filter element accepts.
+   * This is the conditional or. The filter list is not processed any further once a filter element accepts.
    *
    * @param filters
    *          The {@link IFilter}s to evaluate.

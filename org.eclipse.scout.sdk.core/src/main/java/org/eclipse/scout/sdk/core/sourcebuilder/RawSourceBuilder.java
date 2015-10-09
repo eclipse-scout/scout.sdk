@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.sourcebuilder;
 
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 
@@ -31,12 +32,7 @@ public class RawSourceBuilder implements ISourceBuilder {
   }
 
   public void setContent(String content) {
-    if (content == null) {
-      m_content = null;
-    }
-    else {
-      m_content = content.trim();
-    }
+    m_content = StringUtils.trim(content);
   }
 
   @Override

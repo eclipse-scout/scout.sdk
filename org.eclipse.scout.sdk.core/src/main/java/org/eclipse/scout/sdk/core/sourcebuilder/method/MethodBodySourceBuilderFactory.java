@@ -59,10 +59,10 @@ public final class MethodBodySourceBuilderFactory {
         }
         source.append("super");
         if (!isConstructor) {
-          source.append(".");
+          source.append('.');
           source.append(methodBuilder.getElementName());
         }
-        source.append("(");
+        source.append('(');
         List<IMethodParameterSourceBuilder> parameters = methodBuilder.getParameters();
         if (parameters.size() > 0) {
           IMethodParameterSourceBuilder param = parameters.get(0);

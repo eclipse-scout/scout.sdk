@@ -14,10 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
-import org.eclipse.scout.sdk.core.util.SdkConsole;
-import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link ResourceBuilder}</h3>
@@ -28,7 +25,7 @@ public class ResourceBuilder implements IResourceBuilder {
   private final String m_packageName;
   private final String m_fileName;
   private final List<IResourceFragmentBuilder> m_fragments = new ArrayList<>();
-  private final StringBuilder m_errors = new StringBuilder();
+  private IResourceFragmentBuilder m_footerSourceBuilder;
 
   /**
    * @param packageName
@@ -45,6 +42,11 @@ public class ResourceBuilder implements IResourceBuilder {
       if (builder != null) {
         builder.createResource(source, lineDelimiter, context);
       }
+    }
+
+    // footer
+    if (m_footerSourceBuilder != null) {
+      m_footerSourceBuilder.createResource(source, lineDelimiter, context);
     }
   }
 
@@ -69,27 +71,7 @@ public class ResourceBuilder implements IResourceBuilder {
   }
 
   @Override
-  public void addErrorMessage(String taskType, String msg, Throwable... exceptions) {
-    SdkLog.warning(getPackageName() + " " + getFileName() + " " + msg, exceptions);
-    if (msg != null) {
-      m_errors.append(taskType + " [generator] " + msg);
-      m_errors.append("\n");
-    }
-    if (exceptions != null) {
-      for (Throwable t : exceptions) {
-        m_errors.append(SdkConsole.getStackTrace(t));
-        m_errors.append("\n");
-      }
-    }
-  }
-
-  protected void appendErrorMessages(StringBuilder source, String lineDelimiter, PropertyMap context, IImportCollector validator) {
-    if (m_errors.length() > 0) {
-      source.append("/*");
-      source.append(lineDelimiter);
-      source.append(m_errors.toString().replace("\n", lineDelimiter));
-      source.append(lineDelimiter);
-      source.append("*/");
-    }
+  public void setFooter(IResourceFragmentBuilder footerSourceBuilder) {
+    m_footerSourceBuilder = footerSourceBuilder;
   }
 }

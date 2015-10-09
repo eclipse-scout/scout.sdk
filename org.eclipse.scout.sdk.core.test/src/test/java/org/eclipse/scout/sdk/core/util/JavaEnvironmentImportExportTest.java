@@ -20,8 +20,8 @@ public class JavaEnvironmentImportExportTest {
   @Test
   public void testInMemory() throws IOException {
     IJavaEnvironment env = new JavaEnvironmentBuilder()
-        .withExcludeScoutSdk()
-        .withExclude(".*" + Pattern.quote("/target/generated-sources/annotations") + ".*")
+        .withoutScoutSdk()
+        .without(".*" + Pattern.quote("/target/generated-sources/annotations") + ".*")
         .build();
 
     StringWriter w1 = new StringWriter();

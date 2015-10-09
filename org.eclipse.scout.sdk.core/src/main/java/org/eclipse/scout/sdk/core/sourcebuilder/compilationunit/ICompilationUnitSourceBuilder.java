@@ -13,6 +13,7 @@ package org.eclipse.scout.sdk.core.sourcebuilder.compilationunit;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.sourcebuilder.IJavaElementSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 
@@ -31,16 +32,12 @@ public interface ICompilationUnitSourceBuilder extends IJavaElementSourceBuilder
   void addDeclaredStaticImport(String name);
 
   /**
-   * Add an error message that is appended to the end of the comopilation unit as triple-X comment
-   * <p>
-   * Typically this is a code generation error or semantic check issue
+   * Set any source to the end of the {@link ICompilationUnitSourceBuilder} after the last type.
    *
-   * @param taskType
-   *          such as uppercase of todo, fixme, ...
-   * @param msg
-   * @param exceptions
+   * @param builder
+   *          The source to add.
    */
-  void addErrorMessage(String taskType, String msg, Throwable... exceptions);
+  void setFooter(ISourceBuilder builder);
 
   List<String> getDeclaredImports();
 

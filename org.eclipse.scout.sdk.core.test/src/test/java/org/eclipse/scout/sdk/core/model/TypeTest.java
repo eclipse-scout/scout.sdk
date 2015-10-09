@@ -159,8 +159,8 @@ public class TypeTest {
   public void testInnerTypeDirectly() {
     //explicitly add target/classes, by default this would be ignored
     IJavaEnvironment env = new JavaEnvironmentBuilder()
-        .withExcludeScoutSdk()
-        .withExcludeAllSources()
+        .withoutScoutSdk()
+        .withoutAllSources()
         .withClassesFolder("target/classes")
         .build();
 

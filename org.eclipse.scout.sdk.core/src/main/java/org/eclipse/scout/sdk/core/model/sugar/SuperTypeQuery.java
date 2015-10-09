@@ -11,10 +11,15 @@
 package org.eclipse.scout.sdk.core.model.sugar;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
+import org.eclipse.scout.sdk.core.util.Filters;
 import org.eclipse.scout.sdk.core.util.IFilter;
+import org.eclipse.scout.sdk.core.util.TypeFilters;
 
 /**
  * <h3>{@link SuperTypeQuery}</h3>
@@ -32,6 +37,7 @@ public class SuperTypeQuery {
   private boolean m_includeSuperInterfaces = true;
   private String m_name;
   private String m_simpleName;
+  private int m_flags = -1;
   private IFilter<IType> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
@@ -92,6 +98,19 @@ public class SuperTypeQuery {
   }
 
   /**
+   * Limit the {@link IType}s to the ones having at least all of the given flags.
+   *
+   * @param flags
+   *          The flags that must exist on the {@link IType}.
+   * @return this
+   * @see Flags
+   */
+  public SuperTypeQuery withFlags(int flags) {
+    m_flags = flags;
+    return this;
+  }
+
+  /**
    * Limit the result to {@link IType}s with the given fully qualified name (see {@link IType#name()}).
    *
    * @param name
@@ -121,6 +140,8 @@ public class SuperTypeQuery {
    * @param filter
    *          The filter. Default none.
    * @return this
+   * @see TypeFilters
+   * @see Filters
    */
   public SuperTypeQuery withFilter(IFilter<IType> filter) {
     m_filter = filter;
@@ -143,6 +164,9 @@ public class SuperTypeQuery {
     if (!m_includeSelf && m_type == t) {
       return false;
     }
+    if (m_flags >= 0 && (t.flags() & m_flags) != m_flags) {
+      return false;
+    }
     if (m_name != null && !m_name.equals(t.name())) {
       return false;
     }
@@ -155,7 +179,7 @@ public class SuperTypeQuery {
     return true;
   }
 
-  protected void visitRec(IType t, List<IType> result, int maxCount, boolean onlyTraverse) {
+  protected void visitRec(IType t, Set<IType> result, int maxCount, boolean onlyTraverse) {
     if (t == null) {
       return;
     }
@@ -197,9 +221,9 @@ public class SuperTypeQuery {
    * @return The first {@link IType} that fulfills this query or <code>null</code> if there is none.
    */
   public IType first() {
-    List<IType> result = new ArrayList<>(1);
+    Set<IType> result = new HashSet<>(1);
     visitRec(m_type, result, 1, false);
-    return result.isEmpty() ? null : result.get(0);
+    return result.isEmpty() ? null : result.iterator().next();
   }
 
   /**
@@ -208,9 +232,9 @@ public class SuperTypeQuery {
    * @return A {@link List} with all {@link IType}s that fulfill this query. Never returns <code>null</code>.
    */
   public List<IType> list() {
-    List<IType> result = new ArrayList<>();
+    Set<IType> result = new HashSet<>();
     visitRec(m_type, result, m_maxResultCount, false);
-    return result;
+    return new ArrayList<>(result);
   }
 
 }

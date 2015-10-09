@@ -6,8 +6,10 @@ package org.eclipse.scout.sdk.core.model.api.internal;
 
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IPackage;
+import org.eclipse.scout.sdk.core.model.api.ISourceRange;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.IUnresolvedType;
+import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
 import org.eclipse.scout.sdk.core.signature.Signature;
 
 public class UnresolvedTypeImplementor implements IUnresolvedType {
@@ -15,17 +17,20 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
   private final String m_name;
   private final IPackage m_package;
   private final String m_simpleName;
+  private final IJavaEnvironment m_env;
 
   UnresolvedTypeImplementor(IType type) {
     m_type = type;
     m_name = type.name();
     m_package = type.containingPackage();
     m_simpleName = type.elementName();
+    m_env = type.javaEnvironment();
   }
 
   UnresolvedTypeImplementor(IJavaEnvironment env, String name) {
     m_type = null;
     m_name = name;
+    m_env = env;
     int dot = name.lastIndexOf('.');
     if (dot > 0) {
       m_package = env.unwrap().getPackage(name.substring(0, dot)).wrap();
@@ -37,9 +42,11 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
     }
   }
 
-  /**
-   * @return the fully qualified name
-   */
+  @Override
+  public IJavaEnvironment javaEnvironment() {
+    return m_env;
+  }
+
   @Override
   public String name() {
     return m_name;
@@ -50,9 +57,6 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
     return m_package;
   }
 
-  /**
-   * @return the simple name
-   */
   @Override
   public String elementName() {
     return m_simpleName;
@@ -101,4 +105,19 @@ public class UnresolvedTypeImplementor implements IUnresolvedType {
     return this.name().equals(other.name());
   }
 
+  @Override
+  public ISourceRange source() {
+    if (type() != null) {
+      return type().source();
+    }
+    return null;
+  }
+
+  @Override
+  public TypeSpi unwrap() {
+    if (type() != null) {
+      return type().unwrap();
+    }
+    return null;
+  }
 }

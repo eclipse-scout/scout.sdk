@@ -14,7 +14,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.scout.sdk.core.model.api.IMethodParameter;
-import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.spi.MethodParameterSpi;
 import org.eclipse.scout.sdk.core.model.spi.MethodSpi;
 import org.eclipse.scout.sdk.core.util.IFilter;
@@ -28,7 +27,7 @@ import org.eclipse.scout.sdk.core.util.IFilter;
 public class MethodParameterQuery {
   private final MethodSpi m_method;
   private String m_name;
-  private IType m_dataType;
+  private String m_dataTypeFqn;
   private IFilter<IMethodParameter> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
@@ -49,14 +48,14 @@ public class MethodParameterQuery {
   }
 
   /**
-   * Limits the {@link IMethodParameter}s to the ones with the given data type.
+   * Limits the {@link IMethodParameter}s to the ones with the given data type fully qualified name.
    *
-   * @param dataType
+   * @param dataTypeFqn
    *          The data type to limit the result to. Default is no data type filter.
    * @return this
    */
-  public MethodParameterQuery withDataType(IType dataType) {
-    m_dataType = dataType;
+  public MethodParameterQuery withDataType(String dataTypeFqn) {
+    m_dataTypeFqn = dataTypeFqn;
     return this;
   }
 
@@ -91,7 +90,7 @@ public class MethodParameterQuery {
     if (m_filter != null && !m_filter.evaluate(p)) {
       return false;
     }
-    if (m_dataType != null && !m_dataType.signature().equals(p.dataType().signature())) {
+    if (m_dataTypeFqn != null && !m_dataTypeFqn.equals(p.dataType().name())) {
       return false;
     }
     return true;

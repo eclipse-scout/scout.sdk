@@ -39,7 +39,7 @@ public final class CoreTestingUtils {
    */
   public static IJavaEnvironment createJavaEnvironment() {
     return new JavaEnvironmentBuilder()
-        .withExcludeScoutSdk()
+        .withoutScoutSdk()
         .withSourceFolder("src/main/fixture")
         .build();
   }
@@ -49,8 +49,8 @@ public final class CoreTestingUtils {
    */
   public static IJavaEnvironment createJavaEnvironmentWithBinaries() {
     return new JavaEnvironmentBuilder()
-        .withExcludeScoutSdk()
-        .withExcludeAllSources()
+        .withoutScoutSdk()
+        .withoutAllSources()
         .withClassesFolder("target/classes")
         .build();
   }
@@ -137,7 +137,7 @@ public final class CoreTestingUtils {
    */
   public static IJavaEnvironment importJavaEnvironment(Properties p) {
     JavaEnvironmentBuilder builder = new JavaEnvironmentBuilder()
-        .withIncludeRunningClasspath(false);
+        .withRunningClasspath(false);
     for (String s : p.getProperty("src").split(",")) {
       s = s.trim();
       if (!s.isEmpty()) {

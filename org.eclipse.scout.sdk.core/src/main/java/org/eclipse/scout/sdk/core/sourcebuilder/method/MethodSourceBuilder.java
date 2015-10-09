@@ -77,7 +77,7 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
   public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     super.createSource(source, lineDelimiter, context, validator);
     //method declaration
-    source.append(Flags.toString(getFlags())).append(" ");
+    source.append(Flags.toString(getFlags())).append(' ');
 
     // type parameters
     if (!m_typeParameters.isEmpty()) {
@@ -94,7 +94,7 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
       source.append(validator.useSignature(getReturnTypeSignature()) + " ");
     }
     source.append(getElementName());
-    source.append("(");
+    source.append('(');
     // parameters
     if (!m_parameters.isEmpty()) {
       for (IMethodParameterSourceBuilder param : m_parameters) {
@@ -103,7 +103,7 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
       }
       source.setLength(source.length() - 2);
     }
-    source.append(")");
+    source.append(')');
     // exceptions
     Iterator<String> exceptionSigIterator = getExceptionSignatures().iterator();
     if (exceptionSigIterator.hasNext()) {
@@ -115,11 +115,11 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
 
     }
     if (Flags.isInterface(getFlags()) || Flags.isAbstract(getFlags())) {
-      source.append(";");
+      source.append(';');
     }
     else {
       // content
-      source.append("{").append(lineDelimiter);
+      source.append('{').append(lineDelimiter);
       int beforeContent = source.length();
       if (getBody() != null) {
         getBody().createSource(source, lineDelimiter, context, validator);
@@ -127,7 +127,7 @@ public class MethodSourceBuilder extends AbstractMemberSourceBuilder implements 
       if (beforeContent < source.length()) {
         source.append(lineDelimiter);
       }
-      source.append("}");
+      source.append('}');
     }
 
   }

@@ -65,9 +65,9 @@ public class MethodParameterSourceBuilder extends AbstractAnnotatableSourceBuild
   public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
     super.createSource(source, lineDelimiter, context, validator);
     if (m_flags != Flags.AccDefault) {
-      source.append(Flags.toString(m_flags)).append(" ");
+      source.append(Flags.toString(m_flags)).append(' ');
     }
-    source.append(validator.useSignature(m_dataTypeSignature)).append(" ");
+    source.append(validator.useSignature(m_dataTypeSignature)).append(' ');
     source.append(getElementName());
   }
 

@@ -33,7 +33,7 @@ import org.junit.Test;
 public class CoreUtilsTest {
   @Test
   public void testGetInnerTypes() {
-    List<IType> innerTypes = CoreTestingUtils.getBaseClassType().innerTypes().withFilter(TypeFilters.flags(Flags.AccStatic)).list();
+    List<IType> innerTypes = CoreTestingUtils.getBaseClassType().innerTypes().withFlags(Flags.AccStatic).list();
     Assert.assertEquals(1, innerTypes.size());
   }
 
@@ -81,14 +81,19 @@ public class CoreUtilsTest {
 
   @Test
   public void testFindMethodInSuperHierarchy() {
-    IMethod methodInBaseClass = CoreTestingUtils.getChildClassType().methods().withSuperTypes(true).withFilter(MethodFilters.annotationName(MarkerAnnotation.class.getName())).first();
+    IMethod methodInBaseClass = CoreTestingUtils.getChildClassType().methods().withSuperTypes(true).withAnnotation(MarkerAnnotation.class.getName()).first();
     Assert.assertNotNull(methodInBaseClass);
     Assert.assertEquals("methodInBaseClass", methodInBaseClass.elementName());
   }
 
   @Test
   public void testFindInnerTypeInSuperHierarchy() {
-    IType innerTypeInSuperClass = CoreUtils.findInnerTypeInSuperHierarchy(CoreTestingUtils.getChildClassType(), TypeFilters.simpleName("InnerClass2"));
+    IType innerTypeInSuperClass = CoreUtils.findInnerTypeInSuperHierarchy(CoreTestingUtils.getChildClassType(), new IFilter<IType>() {
+      @Override
+      public boolean evaluate(IType element) {
+        return "InnerClass2".equals(element.elementName());
+      }
+    });
     Assert.assertNotNull(innerTypeInSuperClass);
     Assert.assertEquals("org.eclipse.scout.sdk.core.fixture.BaseClass$InnerClass2", innerTypeInSuperClass.name());
   }
@@ -159,10 +164,10 @@ public class CoreUtilsTest {
 
   @Test
   public void testGetMethods() {
-    List<IMethod> methods = CoreTestingUtils.getBaseClassType().methods().withFilter(MethodFilters.flags(Flags.AccSynchronized)).list();
+    List<IMethod> methods = CoreTestingUtils.getBaseClassType().methods().withFlags(Flags.AccSynchronized).list();
     Assert.assertEquals(1, methods.size());
 
-    methods = CoreTestingUtils.getBaseClassType().methods().withFilter(MethodFilters.flags(Flags.AccPrivate)).list();
+    methods = CoreTestingUtils.getBaseClassType().methods().withFlags(Flags.AccPrivate).list();
     Assert.assertEquals(0, methods.size());
   }
 

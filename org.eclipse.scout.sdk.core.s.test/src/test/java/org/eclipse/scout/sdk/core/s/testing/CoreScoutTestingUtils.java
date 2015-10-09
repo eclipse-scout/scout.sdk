@@ -36,7 +36,7 @@ public final class CoreScoutTestingUtils {
 
   public static IJavaEnvironment createClientJavaEnvironment() {
     return new JavaEnvironmentBuilder()
-        .withExcludeScoutSdk()
+        .withoutScoutSdk()
         .withSourceFolder("src/main/client")
         .withSourceFolder("src/main/shared")
         .build();
@@ -48,8 +48,8 @@ public final class CoreScoutTestingUtils {
    */
   public static IJavaEnvironment createSharedJavaEnvironment() {
     return new JavaEnvironmentBuilder()
-        .withExcludeScoutSdk()
-        .withExclude(".*" + Pattern.quote("org.eclipse.scout.rt.client") + ".*")
+        .withoutScoutSdk()
+        .without(".*" + Pattern.quote("org.eclipse.scout.rt.client") + ".*")
         .withSourceFolder("src/main/shared")
         .build();
   }

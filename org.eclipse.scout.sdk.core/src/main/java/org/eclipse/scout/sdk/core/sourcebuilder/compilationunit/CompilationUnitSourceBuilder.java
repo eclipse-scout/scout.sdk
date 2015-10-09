@@ -26,13 +26,12 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureDescriptor;
 import org.eclipse.scout.sdk.core.sourcebuilder.AbstractJavaElementSourceBuilder;
+import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.RawSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.ITypeSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.type.TypeSourceBuilder;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
-import org.eclipse.scout.sdk.core.util.SdkConsole;
-import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link CompilationUnitSourceBuilder}</h3>
@@ -46,7 +45,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   private final List<String> m_declaredStaticImports = new ArrayList<>();
   private final List<ITypeSourceBuilder> m_types = new ArrayList<>();
   private final Map<CompositeObject, ITypeSourceBuilder> m_sortedTypes = new TreeMap<>();
-  private final StringBuilder m_errors = new StringBuilder();
+  private ISourceBuilder m_footerSourceBuilder;
 
   /**
    * @param elementName
@@ -103,13 +102,14 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
     // header
     StringBuilder headerSourceBuilder = new StringBuilder();
     super.createSource(headerSourceBuilder, lineDelimiter, context, validator);
+
     // package declaration
     if (!StringUtils.isEmpty(getPackageName())) {
       headerSourceBuilder.append("package ").append(getPackageName()).append(";").append(lineDelimiter).append(lineDelimiter);
     }
 
-    StringBuilder typeSourceBuilder = new StringBuilder();
     // type sources
+    StringBuilder typeSourceBuilder = new StringBuilder();
     for (ITypeSourceBuilder typeBuilder : getTypes()) {
       if (typeBuilder != null) {
         typeBuilder.createSource(typeSourceBuilder, lineDelimiter, context, validator);
@@ -124,10 +124,15 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
       }
       headerSourceBuilder.append(lineDelimiter);
     }
+
     source.append(headerSourceBuilder);
     source.append(typeSourceBuilder);
     source.append(lineDelimiter);
-    appendErrorMessages(source, lineDelimiter, context, collector);
+
+    // footer
+    if (m_footerSourceBuilder != null) {
+      m_footerSourceBuilder.createSource(source, lineDelimiter, context, validator);
+    }
   }
 
   private static void consumeAllTypeNamesRec(Collection<ITypeSourceBuilder> typeBuilders, IImportCollector collector) {
@@ -224,27 +229,7 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   }
 
   @Override
-  public void addErrorMessage(String taskType, String msg, Throwable... exceptions) {
-    SdkLog.warning(getPackageName() + " " + getElementName() + " " + msg, exceptions);
-    if (msg != null) {
-      m_errors.append(taskType + " [generator] " + msg);
-      m_errors.append("\n");
-    }
-    if (exceptions != null) {
-      for (Throwable t : exceptions) {
-        m_errors.append(SdkConsole.getStackTrace(t));
-        m_errors.append("\n");
-      }
-    }
-  }
-
-  protected void appendErrorMessages(StringBuilder source, String lineDelimiter, PropertyMap context, IImportCollector collector) {
-    if (m_errors.length() > 0) {
-      source.append("/*");
-      source.append(lineDelimiter);
-      source.append(m_errors.toString().replace("\n", lineDelimiter));
-      source.append(lineDelimiter);
-      source.append("*/");
-    }
+  public void setFooter(ISourceBuilder footerSourceBuilder) {
+    m_footerSourceBuilder = footerSourceBuilder;
   }
 }

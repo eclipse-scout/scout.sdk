@@ -45,7 +45,7 @@ import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.signature.Signature;
 import org.eclipse.scout.sdk.core.signature.SignatureUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.ISourceBuilder;
-import org.eclipse.scout.sdk.core.sourcebuilder.comment.ICommentSourceBuilderDelegate;
+import org.eclipse.scout.sdk.core.sourcebuilder.comment.ICommentSourceBuilderSpi;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.field.IFieldSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.method.IMethodSourceBuilder;
@@ -62,7 +62,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
  * @author Andreas Hoegger
  * @since 3.10.0 12.07.2013
  */
-public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBuilderDelegate {
+public class JdtSettingsCommentSourceBuilderDelegate implements ICommentSourceBuilderSpi {
   private static final String[] EMPTY = new String[0];
   private static final String UNDEFINED_VAR_VALUE = "undefined";
 

@@ -100,7 +100,7 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
     }
 
     // type definition
-    source.append(Flags.toString(getFlags())).append(" ");
+    source.append(Flags.toString(getFlags())).append(' ');
     source.append(((getFlags() & Flags.AccInterface) != 0) ? ("interface ") : ("class "));
     source.append(getElementName());
 
@@ -130,10 +130,10 @@ public class TypeSourceBuilder extends AbstractMemberSourceBuilder implements IT
         source.append(", ").append(validator.useSignature(interfaceSigIterator.next()));
       }
     }
-    source.append("{");
+    source.append('{');
     createTypeContent(source, lineDelimiter, context, validator);
     source.append(lineDelimiter);
-    source.append("}");
+    source.append('}');
   }
 
   /**

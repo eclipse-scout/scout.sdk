@@ -28,14 +28,10 @@ public interface IResourceBuilder extends IResourceFragmentBuilder {
   List<IResourceFragmentBuilder> getFragments();
 
   /**
-   * Add an error message that is appended to the end of the compilation unit as triple-X comment
-   * <p>
-   * Typically this is a code generation error or semantic check issue
+   * Set any source to the end of the {@link IResourceBuilder} after the last resource fragment.
    *
-   * @param taskType
-   *          such as uppercase of todo, fixme, ...
-   * @param msg
-   * @param exceptions
+   * @param builder
+   *          The source to add.
    */
-  void addErrorMessage(String taskType, String msg, Throwable... exceptions);
+  void setFooter(IResourceFragmentBuilder builder);
 }

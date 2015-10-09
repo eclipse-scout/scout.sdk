@@ -12,10 +12,14 @@ package org.eclipse.scout.sdk.core.model.sugar;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
+import org.eclipse.scout.sdk.core.model.api.Flags;
+import org.eclipse.scout.sdk.core.model.api.IAnnotation;
 import org.eclipse.scout.sdk.core.model.api.IMethod;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
+import org.eclipse.scout.sdk.core.util.Filters;
 import org.eclipse.scout.sdk.core.util.IFilter;
 
 /**
@@ -29,6 +33,9 @@ public class MethodQuery {
   private boolean m_includeSuperClasses = false;
   private boolean m_includeSuperInterfaces = false;
   private String m_name;
+  private String m_annotationFqn;
+  private int m_flags = -1;
+  private Pattern m_methodNamePattern;
   private IFilter<IMethod> m_filter;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
@@ -47,6 +54,31 @@ public class MethodQuery {
   public MethodQuery withSuperTypes(boolean b) {
     m_includeSuperClasses = b;
     m_includeSuperInterfaces = b;
+    return this;
+  }
+
+  /**
+   * Limit the {@link IMethod}s to the ones having an {@link IAnnotation} with the given fully qualified name.
+   *
+   * @param fqn
+   *          The fully qualified name of the {@link IAnnotation} that must exist on the {@link IMethod}.
+   * @return this
+   */
+  public MethodQuery withAnnotation(String fqn) {
+    m_annotationFqn = fqn;
+    return this;
+  }
+
+  /**
+   * Limit the {@link IMethod}s to the ones having at least all of the given flags.
+   *
+   * @param flags
+   *          The flags that must exist on the {@link IMethod}
+   * @return this
+   * @see Flags
+   */
+  public MethodQuery withFlags(int flags) {
+    m_flags = flags;
     return this;
   }
 
@@ -89,11 +121,26 @@ public class MethodQuery {
   }
 
   /**
+   * Limit to the {@link IMethod}s whose name ({@link IMethod#elementName()}) matches the given regular expression
+   * pattern.
+   *
+   * @param namePattern
+   *          The regular expression the method name must match
+   * @return this
+   * @see Pattern
+   */
+  public MethodQuery withName(Pattern namePattern) {
+    m_methodNamePattern = namePattern;
+    return this;
+  }
+
+  /**
    * Limit the {@link IMethod}s to the ones that accept the given {@link IFilter}.
    *
    * @param filter
    *          The filter. Default none.
    * @return this
+   * @see Filters
    */
   public MethodQuery withFilter(IFilter<IMethod> filter) {
     m_filter = filter;
@@ -117,6 +164,15 @@ public class MethodQuery {
       return false;
     }
     if (m_filter != null && !m_filter.evaluate(f)) {
+      return false;
+    }
+    if (m_flags >= 0 && (f.flags() & m_flags) != m_flags) {
+      return false;
+    }
+    if (m_methodNamePattern != null && !m_methodNamePattern.matcher(f.elementName()).matches()) {
+      return false;
+    }
+    if (m_annotationFqn != null && !f.annotations().withName(m_annotationFqn).existsAny()) {
       return false;
     }
     return true;

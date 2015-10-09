@@ -10,21 +10,21 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.core.model.api;
 
+import org.eclipse.scout.sdk.core.model.spi.TypeSpi;
+
 /**
- * <h3>{@link IUnresolvedType}</h3> Represents a java data type. This includes classes, interfaces, enums, primitives,
- * the void-type ({@link #VOID}) & the wildcard-type ("?").
+ * <h3>{@link IUnresolvedType}</h3> Represents a java data type which may not yet exist on the classpath.<br>
+ * Use {@link IJavaEnvironment#findUnresolvedType(String)} to retrieve {@link IUnresolvedType}s.
  *
- * @author Matthias Villiger
- * @since 5.1.0
+ * @author Ivan Motsch
+ * @since 5.2.0
  */
-public interface IUnresolvedType {
+public interface IUnresolvedType extends IJavaElement {
 
   /**
-   * Gets the {@link IPackage} of this {@link IUnresolvedType}.<br>
-   * For primitives, the void-type and the wildcard-type this method returns the {@link IPackage#DEFAULT_PACKAGE}.
+   * Gets the {@link IPackage} of this {@link IUnresolvedType}.
    *
-   * @return The {@link IPackage} of this {@link IUnresolvedType} or {@link IPackage#DEFAULT_PACKAGE} for the default
-   *         package. Never returns <code>null</code>.
+   * @return The {@link IPackage} of this {@link IUnresolvedType}. Never returns <code>null</code>.
    */
   IPackage containingPackage();
 
@@ -33,6 +33,7 @@ public interface IUnresolvedType {
    *
    * @return The simple name of this {@link IUnresolvedType}.
    */
+  @Override
   String elementName();
 
   /**
@@ -45,15 +46,34 @@ public interface IUnresolvedType {
    */
   String name();
 
+  /**
+   * @return The type signature of this {@link IUnresolvedType}.
+   */
   String signature();
 
   /**
-   * @return true if {@link #type()} returns not null
+   * @return <code>true</code> if this {@link IUnresolvedType} actually exists. <code>false</code> otherwise.
    */
   boolean exists();
 
   /**
-   * @return the existing type or null if it does not exist
+   * @return the existing type or <code>null</code> if it not {@link #exists()}.
    */
   IType type();
+
+  /**
+   * Unwraps this {@link IUnresolvedType} into its underlying {@link TypeSpi}.
+   *
+   * @return The service provider interface for this {@link IUnresolvedType} if it {@link #exists()}. <code>null</code>
+   *         otherwise.
+   */
+  @Override
+  TypeSpi unwrap();
+
+  /**
+   * @return The {@link ISourceRange} of this {@link IUnresolvedType} if it {@link #exists()} and the underlying
+   *         {@link #type()} has source attached. <code>null</code> otherwise.
+   */
+  @Override
+  ISourceRange source();
 }

@@ -34,7 +34,7 @@ public interface IAnnotationSourceBuilder extends IJavaElementSourceBuilder {
    * 
    * @return this
    */
-  IAnnotationSourceBuilder putValue(String name, String value);
+  IAnnotationSourceBuilder putElement(String name, String value);
 
   /**
    * see {@link ExpressionSourceBuilderFactory}
@@ -43,12 +43,12 @@ public interface IAnnotationSourceBuilder extends IJavaElementSourceBuilder {
    * @param value
    * @return this
    */
-  IAnnotationSourceBuilder putValue(String name, ISourceBuilder value);
+  IAnnotationSourceBuilder putElement(String name, ISourceBuilder value);
 
-  ISourceBuilder getValue(String name);
+  ISourceBuilder getElement(String name);
 
-  Map<String, ISourceBuilder> getValues();
+  Map<String, ISourceBuilder> getElements();
 
-  boolean removeValue(String name);
+  boolean removeElement(String name);
 
 }

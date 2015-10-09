@@ -59,7 +59,7 @@ public final class JavaEnvironmentBuilder {
    *
    * @return this
    */
-  public JavaEnvironmentBuilder withIncludeRunningClasspath(boolean b) {
+  public JavaEnvironmentBuilder withRunningClasspath(boolean b) {
     m_includeRunningClasspath = b;
     return this;
   }
@@ -69,8 +69,8 @@ public final class JavaEnvironmentBuilder {
    *
    * @return this
    */
-  public JavaEnvironmentBuilder withExcludeScoutSdk() {
-    return withExclude(".*" + Pattern.quote(".scout.sdk.") + ".*" + "target/classes");
+  public JavaEnvironmentBuilder withoutScoutSdk() {
+    return without(".*" + Pattern.quote(".scout.sdk.") + ".*" + "target/classes");
   }
 
   /**
@@ -80,7 +80,7 @@ public final class JavaEnvironmentBuilder {
    *          file path pattern with '/' as delimiter
    * @return this
    */
-  public JavaEnvironmentBuilder withExclude(String regex) {
+  public JavaEnvironmentBuilder without(String regex) {
     m_sourceExcludes.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
     m_binaryExcludes.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
     return this;
@@ -91,7 +91,7 @@ public final class JavaEnvironmentBuilder {
    *
    * @return this
    */
-  public JavaEnvironmentBuilder withExcludeAllSources() {
+  public JavaEnvironmentBuilder withoutAllSources() {
     m_includeSources = false;
     return this;
   }
@@ -101,7 +101,7 @@ public final class JavaEnvironmentBuilder {
    *
    * @return this
    */
-  public JavaEnvironmentBuilder withExcludeSources(String regex) {
+  public JavaEnvironmentBuilder withoutSources(String regex) {
     m_sourceExcludes.add(Pattern.compile(regex, Pattern.CASE_INSENSITIVE));
     return this;
   }

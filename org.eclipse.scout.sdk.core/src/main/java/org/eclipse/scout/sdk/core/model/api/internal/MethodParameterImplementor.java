@@ -51,11 +51,8 @@ public class MethodParameterImplementor extends AbstractAnnotatableImplementor<M
     return sb.toString();
   }
 
-  //additional convenience methods
-
   @Override
   public AnnotationQuery<IAnnotation> annotations() {
     return new AnnotationQuery<>(declaringMethod().declaringType(), m_spi);
   }
-
 }

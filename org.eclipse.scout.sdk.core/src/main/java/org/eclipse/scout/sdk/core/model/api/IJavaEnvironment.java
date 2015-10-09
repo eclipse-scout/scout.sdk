@@ -42,6 +42,19 @@ public interface IJavaEnvironment {
    */
   IType findType(String fqn);
 
+  /**
+   * Returns an {@link IUnresolvedType} for the given fully qualified name.<br>
+   * If the given fully qualified name can be found on the classpath the returned {@link IUnresolvedType} will exist
+   * (see {@link IUnresolvedType#exists()}). Otherwise a non-existing {@link IUnresolvedType} will be returned.<br>
+   * <br>
+   * <b>Note:</b><br>
+   * {@link IUnresolvedType}s are never cached in the {@link IJavaEnvironment}. Calls to this methdo will always create
+   * new instances. This allows to get a resolved version later on.
+   *
+   * @param fqn
+   *          The fully qualified name of the type. See {@link #findType(String)} for details.
+   * @return A new {@link IUnresolvedType}. Never returns <code>null</code>.
+   */
   IUnresolvedType findUnresolvedType(String fqn);
 
   /**

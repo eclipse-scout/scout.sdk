@@ -1,8 +1,14 @@
 package org.eclipse.scout.sdk.s2e.ui.internal;
 
 import java.io.IOException;
+import java.util.logging.Level;
 
+import org.apache.commons.lang3.StringUtils;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Platform;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.scout.sdk.core.util.SdkConsole;
+import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.ui.console.ConsolePlugin;
 import org.eclipse.ui.console.IConsole;
 import org.eclipse.ui.console.IConsoleManager;
@@ -22,10 +28,50 @@ public class WorkbenchSdkConsoleSpi implements SdkConsole.SdkConsoleSpi {
   @Override
   public void println(String s) {
     try (IOConsoleOutputStream out = currentConsole(true).newOutputStream()) {
-      out.write(s + "\n");
+      out.write(s);
+      out.write('\n');
     }
     catch (IOException e) {
       //nop
+    }
+
+    // dev mode: also log to Eclipse log
+    if (Platform.inDebugMode() || Platform.inDevelopmentMode()) {
+      S2ESdkActivator.getDefault().getLog().log(new Status(parseSeverity(s), S2ESdkActivator.PLUGIN_ID, s));
+    }
+  }
+
+  private static int parseSeverity(String s) {
+    if (StringUtils.length(s) < 1) {
+      return IStatus.OK;
+    }
+
+    if (s.charAt(0) != '[') {
+      return IStatus.OK;
+    }
+
+    int endPos = s.indexOf(']');
+    if (endPos <= 0) {
+      return IStatus.OK;
+    }
+
+    String level = s.substring(1, endPos);
+    try {
+      Level l = Level.parse(level);
+      int num = l.intValue();
+      if (num == Level.SEVERE.intValue()) {
+        return IStatus.ERROR;
+      }
+      else if (num == Level.WARNING.intValue()) {
+        return IStatus.WARNING;
+      }
+      else {
+        return IStatus.INFO;
+      }
+    }
+    catch (IllegalArgumentException e) {
+      // cannot parse
+      return IStatus.OK;
     }
   }
 

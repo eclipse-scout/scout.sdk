@@ -13,9 +13,12 @@ package org.eclipse.scout.sdk.core.model.sugar;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.eclipse.scout.sdk.core.model.api.Flags;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.model.api.internal.WrappedList;
+import org.eclipse.scout.sdk.core.util.Filters;
 import org.eclipse.scout.sdk.core.util.IFilter;
+import org.eclipse.scout.sdk.core.util.TypeFilters;
 
 /**
  * <h3>{@link TypeQuery}</h3> Inner types query that by default returns all direct inner types of the container.
@@ -30,6 +33,7 @@ public class TypeQuery {
   private String m_simpleName;
   private String m_instanceOfFqn;
   private IFilter<IType> m_filter;
+  private int m_flags = -1;
   private int m_maxResultCount = Integer.MAX_VALUE;
 
   public TypeQuery(List<IType> types) {
@@ -46,6 +50,19 @@ public class TypeQuery {
    */
   public TypeQuery withRecursiveInnerTypes(boolean b) {
     m_includeRecursiveInnerTypes = b;
+    return this;
+  }
+
+  /**
+   * Limit the {@link IType}s to the ones having at least all of the given flags.
+   *
+   * @param flags
+   *          The flags that must exist on the {@link IType}.
+   * @return this
+   * @see Flags
+   */
+  public TypeQuery withFlags(int flags) {
+    m_flags = flags;
     return this;
   }
 
@@ -92,6 +109,8 @@ public class TypeQuery {
    * @param filter
    *          The filter. Default none.
    * @return this
+   * @see TypeFilters
+   * @see Filters
    */
   public TypeQuery withFilter(IFilter<IType> filter) {
     m_filter = filter;
@@ -115,6 +134,9 @@ public class TypeQuery {
       return false;
     }
     if (m_simpleName != null && !m_simpleName.equals(t.elementName())) {
+      return false;
+    }
+    if (m_flags >= 0 && (t.flags() & m_flags) != m_flags) {
       return false;
     }
     if (m_filter != null && !m_filter.evaluate(t)) {

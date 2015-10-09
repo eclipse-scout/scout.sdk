@@ -32,7 +32,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
 
   public static IAnnotationSourceBuilder createOrderAnnotation(double orderNr) {
     AnnotationSourceBuilder orderAnnoation = new AnnotationSourceBuilder(IScoutRuntimeTypes.Order);
-    orderAnnoation.putValue("value", Double.toString(orderNr));
+    orderAnnoation.putElement("value", Double.toString(orderNr));
     return orderAnnoation;
   }
 
@@ -45,7 +45,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
    */
   public static IAnnotationSourceBuilder createClassIdAnnotation(String classIdValue) {
     AnnotationSourceBuilder classIdAnnoation = new AnnotationSourceBuilder(IScoutRuntimeTypes.ClassId);
-    classIdAnnoation.putValue("value", CoreUtils.toStringLiteral(classIdValue));
+    classIdAnnoation.putElement("value", CoreUtils.toStringLiteral(classIdValue));
     return classIdAnnoation;
   }
 
@@ -53,8 +53,8 @@ public final class ScoutAnnotationSourceBuilderFactory {
     return createFormDataAnnotation(null, null, null);
   }
 
-  public static IAnnotationSourceBuilder createPageDataAnnotation(final String pageDataTypeSignature) {
-    return new AnnotationSourceBuilder(IScoutRuntimeTypes.PageData) {
+  public static IAnnotationSourceBuilder createDataAnnotation(final String pageDataTypeSignature) {
+    return new AnnotationSourceBuilder(IScoutRuntimeTypes.Data) {
       @Override
       public void createSource(StringBuilder source, String lineDelimiter, PropertyMap context, IImportValidator validator) {
         source.append('@').append(validator.useName(getName())).append('(');
@@ -77,7 +77,7 @@ public final class ScoutAnnotationSourceBuilderFactory {
         if (sdkCommand != null) {
           StringBuilder b = new StringBuilder();
           b.append("sdkCommand = ");
-          b.append(formDataTypeRef).append(".");
+          b.append(formDataTypeRef).append('.');
           b.append(validator.useName(sdkCommand.getDeclaringClass().getName()));
           b.append(".").append(sdkCommand.name());
           args.add(b.toString());
@@ -85,9 +85,9 @@ public final class ScoutAnnotationSourceBuilderFactory {
         if (defaultSubtypeCommand != null) {
           StringBuilder b = new StringBuilder();
           b.append("defaultSubtypeSdkCommand = ");
-          b.append(formDataTypeRef).append(".");
+          b.append(formDataTypeRef).append('.');
           b.append(validator.useName(defaultSubtypeCommand.getDeclaringClass().getName()));
-          b.append(".").append(defaultSubtypeCommand.name());
+          b.append('.').append(defaultSubtypeCommand.name());
           args.add(b.toString());
         }
         if (args.size() > 0) {

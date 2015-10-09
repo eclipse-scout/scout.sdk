@@ -23,7 +23,7 @@ public interface ISdkProperties {
   String CONTEXT_PROPERTY_JAVA_PROJECT = "JavaProject";
 
   /**
-   * The default order of scout elements.
+   * The default view order.
    * <p>
    * The value of this constant is "rather large, but not <i>that</i> large". For most projects it is the biggest of all
    * orders. But it is not as big that precision is lost during calculations due to the IEEE floating point arithmetic.
