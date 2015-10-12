@@ -279,7 +279,7 @@ public final class ScoutProjectNewHelper {
       String lowerContentType = contentType.toLowerCase();
       // Note: application/plain is no official content type (see http://www.iana.org/assignments/media-types/media-types.xhtml).
       // Even though it is used on some platforms
-      return lowerContentType.contains("text") || lowerContentType.contains("xml") || lowerContentType.equals("application/plain");
+      return lowerContentType.contains("text") || lowerContentType.contains("xml") || "application/plain".equals(lowerContentType);
     }
 
     return false;

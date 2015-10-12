@@ -28,10 +28,17 @@ public interface IResourceBuilder extends IResourceFragmentBuilder {
   List<IResourceFragmentBuilder> getFragments();
 
   /**
-   * Set any source to the end of the {@link IResourceBuilder} after the last resource fragment.
+   * Adds an {@link IResourceFragmentBuilder} to this {@link IResourceBuilder} which is appended to the file at the very
+   * end.
    *
    * @param builder
-   *          The source to add.
+   *          The {@link IResourceFragmentBuilder} to add.
    */
-  void setFooter(IResourceFragmentBuilder builder);
+  void addFooter(IResourceFragmentBuilder builder);
+
+  /**
+   * @return A {@link List} with all footer {@link IResourceFragmentBuilder}s in the order in which they have been
+   *         added.
+   */
+  List<IResourceFragmentBuilder> getFooters();
 }

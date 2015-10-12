@@ -44,8 +44,8 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   private final List<String> m_declaredImports = new ArrayList<>();
   private final List<String> m_declaredStaticImports = new ArrayList<>();
   private final List<ITypeSourceBuilder> m_types = new ArrayList<>();
+  private final List<ISourceBuilder> m_footerSourceBuilders = new ArrayList<>();
   private final Map<CompositeObject, ITypeSourceBuilder> m_sortedTypes = new TreeMap<>();
-  private ISourceBuilder m_footerSourceBuilder;
 
   /**
    * @param elementName
@@ -130,8 +130,8 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
     source.append(lineDelimiter);
 
     // footer
-    if (m_footerSourceBuilder != null) {
-      m_footerSourceBuilder.createSource(source, lineDelimiter, context, validator);
+    for (ISourceBuilder f : m_footerSourceBuilders) {
+      f.createSource(source, lineDelimiter, context, validator);
     }
   }
 
@@ -229,7 +229,12 @@ public class CompilationUnitSourceBuilder extends AbstractJavaElementSourceBuild
   }
 
   @Override
-  public void setFooter(ISourceBuilder footerSourceBuilder) {
-    m_footerSourceBuilder = footerSourceBuilder;
+  public void addFooter(ISourceBuilder footerSourceBuilder) {
+    m_footerSourceBuilders.add(footerSourceBuilder);
+  }
+
+  @Override
+  public List<ISourceBuilder> getFooters() {
+    return new ArrayList<>(m_footerSourceBuilders);
   }
 }

@@ -31,14 +31,6 @@ public interface ICompilationUnitSourceBuilder extends IJavaElementSourceBuilder
 
   void addDeclaredStaticImport(String name);
 
-  /**
-   * Set any source to the end of the {@link ICompilationUnitSourceBuilder} after the last type.
-   *
-   * @param builder
-   *          The source to add.
-   */
-  void setFooter(ISourceBuilder builder);
-
   List<String> getDeclaredImports();
 
   List<String> getDeclaredStaticImports();
@@ -66,4 +58,18 @@ public interface ICompilationUnitSourceBuilder extends IJavaElementSourceBuilder
    * @return
    */
   boolean removeType(String elementName);
+
+  /**
+   * Adds an {@link ISourceBuilder} to this {@link ICompilationUnitSourceBuilder} which is appended to the compilation
+   * unit at the very end (after the last closing bracket).
+   *
+   * @param builder
+   *          The {@link ISourceBuilder} to add.
+   */
+  void addFooter(ISourceBuilder builder);
+
+  /**
+   * @return A {@link List} with all footer {@link ISourceBuilder}s in the order in which they have been added.
+   */
+  List<ISourceBuilder> getFooters();
 }

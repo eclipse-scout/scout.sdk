@@ -25,7 +25,7 @@ public class ResourceBuilder implements IResourceBuilder {
   private final String m_packageName;
   private final String m_fileName;
   private final List<IResourceFragmentBuilder> m_fragments = new ArrayList<>();
-  private IResourceFragmentBuilder m_footerSourceBuilder;
+  private final List<IResourceFragmentBuilder> m_footerSourceBuilders = new ArrayList<>();
 
   /**
    * @param packageName
@@ -45,8 +45,8 @@ public class ResourceBuilder implements IResourceBuilder {
     }
 
     // footer
-    if (m_footerSourceBuilder != null) {
-      m_footerSourceBuilder.createResource(source, lineDelimiter, context);
+    for (IResourceFragmentBuilder f : m_footerSourceBuilders) {
+      f.createResource(source, lineDelimiter, context);
     }
   }
 
@@ -71,7 +71,12 @@ public class ResourceBuilder implements IResourceBuilder {
   }
 
   @Override
-  public void setFooter(IResourceFragmentBuilder footerSourceBuilder) {
-    m_footerSourceBuilder = footerSourceBuilder;
+  public void addFooter(IResourceFragmentBuilder footerSourceBuilder) {
+    m_footerSourceBuilders.add(footerSourceBuilder);
+  }
+
+  @Override
+  public List<IResourceFragmentBuilder> getFooters() {
+    return new ArrayList<>(m_footerSourceBuilders);
   }
 }
