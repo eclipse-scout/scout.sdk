@@ -207,18 +207,17 @@ public final class DtoUtils {
 
     if (annotationOwnerType.typeArguments().size() <= genericOrdinal) {
       // cannot be found in arguments. check parameters
-      if (annotationOwnerType.typeParameters().size() > genericOrdinal) {
+      int numTypeParams = annotationOwnerType.typeParameters().size();
+      if (numTypeParams > genericOrdinal) {
         List<IType> params = annotationOwnerType.typeParameters().get(genericOrdinal).bounds();
         if (!params.isEmpty()) {
           return params.get(0);
         }
+        return null;
       }
-      else {
-        // invalid index in annotation
-        throw new SdkException("Invalid genericOrdinal value on class '" + annotationOwnerType.name() + "'.");
-      }
+      // invalid index in annotation
+      throw new SdkException("Invalid genericOrdinal value on class '" + annotationOwnerType.name() + "': " + genericOrdinal + ". This class has only " + numTypeParams + " type parameters.");
     }
-
     List<IType> resolvedTypeParamValue = CoreUtils.getResolvedTypeParamValue(contextType, annotationOwnerType, genericOrdinal);
     if (resolvedTypeParamValue == null || resolvedTypeParamValue.isEmpty()) {
       return null;
