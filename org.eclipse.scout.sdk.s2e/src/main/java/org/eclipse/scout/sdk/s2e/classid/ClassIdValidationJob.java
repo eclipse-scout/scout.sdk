@@ -39,6 +39,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.core.Signature;
 import org.eclipse.jdt.core.search.IJavaSearchConstants;
+import org.eclipse.jdt.core.search.IJavaSearchScope;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.core.search.SearchMatch;
 import org.eclipse.jdt.core.search.SearchParticipant;
@@ -67,45 +68,54 @@ public final class ClassIdValidationJob extends AbstractJob {
   public static final String CLASS_ID_ATTR_ANNOTATION = "SCOUT_CLASS_ID_ATTR_ANNOTATION";
 
   private static IElementChangedListener listener;
-  private final IType m_classIdType;
+  private final Set<IType> m_classIdTypes;
 
-  private ClassIdValidationJob(IType classIdType) {
+  private ClassIdValidationJob(Set<IType> classIdTypes) {
     super(ClassIdValidationJob.class.getName());
     setSystem(true);
     setUser(false);
     setRule(new P_SchedulingRule());
     setPriority(Job.BUILD);
-    m_classIdType = classIdType;
+    m_classIdTypes = classIdTypes;
   }
 
   private Set<IAnnotation> getAllClassIdAnnotationsInWorkspace(final IProgressMonitor monitor) {
     final Set<IAnnotation> result = new HashSet<>();
     try {
       SearchEngine e = new SearchEngine();
-      e.search(SearchPattern.createPattern(m_classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH),
-          new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()},
-          SearchEngine.createWorkspaceScope(), new SearchRequestor() {
-            @Override
-            public void acceptSearchMatch(SearchMatch match) throws CoreException {
-              if (monitor.isCanceled()) {
-                return;
+      IJavaSearchScope workspaceScope = SearchEngine.createWorkspaceScope();
+      SearchRequestor requestor = new SearchRequestor() {
+        @Override
+        public void acceptSearchMatch(SearchMatch match) throws CoreException {
+          if (monitor.isCanceled()) {
+            return;
+          }
+          Object owner = match.getElement();
+          if (owner instanceof IType) {
+            IType ownerType = (IType) owner;
+            if (JdtUtils.exists(ownerType)) {
+              IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
+              if (element == null) {
+                // e.g. when the annotation is fully qualified. try reading from owner
+                element = JdtUtils.getAnnotation(ownerType, IScoutRuntimeTypes.ClassId);
               }
-              Object owner = match.getElement();
-              if (owner instanceof IType) {
-                IType ownerType = (IType) owner;
-                if (JdtUtils.exists(ownerType)) {
-                  IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
-                  if (element == null) {
-                    // e.g. when the annotation is fully qualified. try reading from owner
-                    element = JdtUtils.getAnnotation(ownerType, IScoutRuntimeTypes.ClassId);
-                  }
-                  if (element instanceof IAnnotation && JdtUtils.exists(element)) {
-                    result.add((IAnnotation) element);
-                  }
-                }
+              if (element instanceof IAnnotation && JdtUtils.exists(element)) {
+                result.add((IAnnotation) element);
               }
             }
-          }, monitor);
+          }
+        }
+      };
+
+      for (IType classIdType : m_classIdTypes) {
+        if (monitor.isCanceled()) {
+          return result;
+        }
+        if (JdtUtils.exists(classIdType)) {
+          SearchPattern pattern = SearchPattern.createPattern(classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH);
+          e.search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, workspaceScope, requestor, monitor);
+        }
+      }
     }
     catch (IllegalStateException ise) {
       // nop (workspace closed)
@@ -169,14 +179,13 @@ public final class ClassIdValidationJob extends AbstractJob {
     return ids;
   }
 
-  private static Set<IAnnotation> getVisibleClassIds(IAnnotation current, List<IAnnotation> matchesById) {
-    Set<IAnnotation> visibleMatches = new HashSet<>(matchesById.size());
+  private static boolean hasVisibleClassIds(IAnnotation current, List<IAnnotation> matchesById) {
     for (IAnnotation m : matchesById) {
       if (m != current && JdtUtils.isOnClasspath(m, current.getJavaProject())) {
-        visibleMatches.add(m);
+        return true;
       }
     }
-    return visibleMatches;
+    return false;
   }
 
   private static void createDuplicateMarkers(Map<String, List<IAnnotation>> annotations) throws CoreException {
@@ -187,8 +196,7 @@ public final class ClassIdValidationJob extends AbstractJob {
           IType parent = (IType) duplicate.getAncestor(IJavaElement.TYPE);
           if (JdtUtils.exists(parent)) {
             // duplicate found: check if they can see each others
-            Set<IAnnotation> visibleDuplicates = getVisibleClassIds(duplicate, matchesById);
-            if (visibleDuplicates.size() > 0) {
+            if (hasVisibleClassIds(duplicate, matchesById)) {
               ISourceRange sourceRange = duplicate.getSourceRange();
               if (sourceRange != null && sourceRange.getOffset() >= 0) {
                 IMarker marker = duplicate.getResource().createMarker(CLASS_ID_DUPLICATE_MARKER_ID);
@@ -298,17 +306,17 @@ public final class ClassIdValidationJob extends AbstractJob {
           // get the class id type outside of the validation job
           // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
           Set<IType> classIds = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ClassId);
-          for (IType classId : classIds) {
-            if (JdtUtils.exists(classId)) {
-              // cancel currently running job. we are starting a new one right afterwards
-              Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
-
-              JdtUtils.waitForJdt();
-
-              // start the new validation
-              new ClassIdValidationJob(classId).schedule(startDelay);
-            }
+          if (classIds.isEmpty()) {
+            return Status.OK_STATUS;
           }
+
+          // cancel currently running job. we are starting a new one right afterwards
+          Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
+
+          JdtUtils.waitForJdt();
+
+          // start the new validation
+          new ClassIdValidationJob(classIds).schedule(startDelay);
         }
         catch (IllegalStateException e) {
           // can happen e.g. when the preference nodes are changed: "java.lang.IllegalStateException: Preference node "org.eclipse.jdt.core" has been removed."
