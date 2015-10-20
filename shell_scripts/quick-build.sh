@@ -41,3 +41,5 @@ echo ''
 echo ''
 
 mvn clean install -B -e -DskipTests=true -Pdev $*
+processError
+mvn clean install -Dp2 -B -e -T0.5C -DskipTests=true -Pdev $*
