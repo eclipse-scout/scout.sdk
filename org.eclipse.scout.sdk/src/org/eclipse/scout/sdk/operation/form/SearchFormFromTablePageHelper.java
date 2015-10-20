@@ -61,18 +61,15 @@ public final class SearchFormFromTablePageHelper {
     INlsProject nlsProvider = ScoutTypeUtility.findNlsProject(tablePage);
     if (formData != null) {
       // execResetSearchFilter method
-      IMethodSourceBuilder execResetSearchFilterBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(searchFormBuilder, "execResetSearchFilter");
-      execResetSearchFilterBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
+      IMethodSourceBuilder execCreateFormDataBuilder = MethodSourceBuilderFactory.createOverrideMethodSourceBuilder(searchFormBuilder, "execCreateFormData");
+      execCreateFormDataBuilder.setMethodBodySourceBuilder(new IMethodBodySourceBuilder() {
         @Override
         public void createSource(IMethodSourceBuilder methodBuilder, StringBuilder source, String lineDelimiter, IJavaProject ownerProject, IImportValidator validator) throws CoreException {
-          source.append("super.execResetSearchFilter(searchFilter);").append(lineDelimiter);
           String simpleFormDataName = validator.getTypeName(SignatureCache.createTypeSignature(formData.getFullyQualifiedName()));
-          source.append(simpleFormDataName + " formData = new " + simpleFormDataName + "();").append(lineDelimiter);
-          source.append("exportFormData(formData);").append(lineDelimiter);
-          source.append("searchFilter.setFormData(formData);");
+          source.append("return new " + simpleFormDataName + "();");
         }
       });
-      searchFormBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execResetSearchFilterBuilder), execResetSearchFilterBuilder);
+      searchFormBuilder.addSortedMethodSourceBuilder(SortedMemberKeyFactory.createMethodExecKey(execCreateFormDataBuilder), execCreateFormDataBuilder);
     }
     // main box
     ITypeSourceBuilder mainBoxBuilder = addFormField(SdkProperties.TYPE_NAME_MAIN_BOX, RuntimeClasses.getSuperTypeSignature(IRuntimeClasses.IGroupBox, searchFormProject), SdkProperties.ORDER_ANNOTATION_VALUE_STEP, searchFormFqn, searchFormBuilder, searchFormBuilder);
