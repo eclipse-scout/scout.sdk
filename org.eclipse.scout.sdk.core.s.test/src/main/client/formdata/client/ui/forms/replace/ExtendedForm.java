@@ -17,7 +17,6 @@ import org.eclipse.scout.commons.annotations.Order;
 import org.eclipse.scout.commons.annotations.Replace;
 import org.eclipse.scout.commons.exception.ProcessingException;
 import org.eclipse.scout.rt.client.ui.form.fields.stringfield.AbstractStringField;
-import org.eclipse.scout.rt.shared.data.form.ValidationRule;
 import org.eclipse.scout.rt.shared.services.common.code.ICodeType;
 
 import formdata.shared.services.process.replace.ExtendedFormData;
@@ -225,7 +224,6 @@ public class ExtendedForm extends BaseForm {
     }
 
     @Override
-    @ValidationRule(value = ValidationRule.CODE_TYPE, skip = true)
     protected Class<? extends ICodeType<?, Long>> getConfiguredCodeType() {
       return super.getConfiguredCodeType();
     }
