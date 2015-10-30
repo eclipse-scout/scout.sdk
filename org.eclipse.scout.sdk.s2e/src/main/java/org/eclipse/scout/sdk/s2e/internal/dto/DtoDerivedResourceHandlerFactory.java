@@ -68,6 +68,7 @@ public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandler
   protected boolean acceptType(IType jdtType) throws CoreException {
     //fast check before doing expensive source parsing
     return JdtUtils.exists(jdtType)
+        && JdtUtils.exists(jdtType.getJavaProject()) // required!
         && !jdtType.isAnonymous()
         && !jdtType.isBinary()
         && jdtType.getDeclaringType() == null

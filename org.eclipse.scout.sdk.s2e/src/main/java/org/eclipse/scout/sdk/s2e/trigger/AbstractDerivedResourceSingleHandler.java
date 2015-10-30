@@ -10,6 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.trigger;
 
+import org.apache.commons.lang3.Validate;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.scout.sdk.core.model.api.IType;
 
@@ -22,7 +23,7 @@ public abstract class AbstractDerivedResourceSingleHandler extends AbstractDeriv
   private final IType m_modelType;
 
   protected AbstractDerivedResourceSingleHandler(org.eclipse.jdt.core.IType jdtType, IJavaEnvironmentProvider envProvider) throws CoreException {
-    m_jdtType = jdtType;
+    m_jdtType = Validate.notNull(jdtType);
     m_envProvider = envProvider;
     m_modelType = m_envProvider.jdtTypeToScoutType(jdtType);
   }
@@ -35,6 +36,13 @@ public abstract class AbstractDerivedResourceSingleHandler extends AbstractDeriv
     return m_envProvider;
   }
 
+  protected String getModelFullyQualifiedName() {
+    return m_jdtType.getFullyQualifiedName();
+  }
+
+  /**
+   * @return The model {@link IType} or <code>null<code> if it could not be found.
+   */
   protected final IType getModelType() {
     return m_modelType;
   }
@@ -45,12 +53,15 @@ public abstract class AbstractDerivedResourceSingleHandler extends AbstractDeriv
       throw new IllegalArgumentException("jdt type must exist: [" + (m_jdtType != null ? m_jdtType.getFullyQualifiedName() : null) + "]");
     }
     if (m_modelType == null) {
-      throw new IllegalArgumentException("model type must exist: [" + m_modelType + "]");
+      throw new IllegalArgumentException("model type must exist: [" + getModelFullyQualifiedName() + "]");
     }
   }
 
   @Override
   public int hashCode() {
+    if (m_modelType == null) {
+      return 0;
+    }
     return m_modelType.hashCode();
   }
 

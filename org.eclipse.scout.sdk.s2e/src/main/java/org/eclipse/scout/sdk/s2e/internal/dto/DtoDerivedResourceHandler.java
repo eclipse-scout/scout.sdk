@@ -30,7 +30,7 @@ public class DtoDerivedResourceHandler extends AbstractDerivedResourceSingleHand
 
   @Override
   public String getName() {
-    return "Update DTO for '" + getModelType().name() + "'.";
+    return "Update DTO for '" + getModelFullyQualifiedName() + "'.";
   }
 
   @Override
