@@ -17,7 +17,7 @@ import org.eclipse.core.resources.IResourceDelta;
 import org.eclipse.core.resources.IResourceDeltaVisitor;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.WeakResourceChangeListener;
 
 public class WorkspaceNlsFile extends AbstractNlsFile {
@@ -65,7 +65,7 @@ public class WorkspaceNlsFile extends AbstractNlsFile {
         }
       }
       catch (CoreException e) {
-        NlsCore.logWarning(e);
+        SdkLog.warning(e);
       }
     }
   } // end class P_NlsFileChangeListener

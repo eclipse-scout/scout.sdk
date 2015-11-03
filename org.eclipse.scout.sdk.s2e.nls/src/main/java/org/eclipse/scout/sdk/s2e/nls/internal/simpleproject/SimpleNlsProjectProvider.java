@@ -18,6 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsProjectProvider;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
@@ -33,11 +34,11 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
 
   protected INlsProject getNlsProject(IType type) {
     if (type == null) {
-      NlsCore.logError("NLS type cannot be null.");
+      SdkLog.error("NLS type cannot be null.");
       return null;
     }
     if (!type.exists()) {
-      NlsCore.logError("NLS type '" + type.getFullyQualifiedName() + "' does not exist.");
+      SdkLog.error("NLS type '" + type.getFullyQualifiedName() + "' does not exist.");
       return null;
     }
 
@@ -82,12 +83,12 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
                   // also give the other providers a chance to parse
                   return NlsCore.getNlsWorkspace().getNlsProject(new Object[]{type});
                 }
-                NlsCore.logWarning("Could not find type '" + nlsFile.getNlsTypeName() + "'.");
+                SdkLog.warning("Could not find type '" + nlsFile.getNlsTypeName() + "'.");
               }
             }
           }
           catch (CoreException e) {
-            NlsCore.logWarning("Could not load NlsFile: " + f.getFullPath().toString(), e);
+            SdkLog.warning("Could not load NlsFile: " + f.getFullPath().toString(), e);
           }
         }
       }

@@ -22,6 +22,7 @@ import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.StructuredSelection;
 import org.eclipse.jface.viewers.TableViewer;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.INlsIcons;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
@@ -333,7 +334,7 @@ public class NlsTable extends Composite {
       job.join();
     }
     catch (InterruptedException e) {
-      NlsCore.logWarning(e);
+      SdkLog.warning(e);
     }
     m_viewer.refresh(false);
     return job.getResult().isOK();

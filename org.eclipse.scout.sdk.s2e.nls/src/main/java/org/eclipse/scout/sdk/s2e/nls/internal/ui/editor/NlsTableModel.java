@@ -19,6 +19,7 @@ import org.eclipse.jface.viewers.ITableColorProvider;
 import org.eclipse.jface.viewers.ITableLabelProvider;
 import org.eclipse.jface.viewers.Viewer;
 import org.eclipse.jface.viewers.ViewerComparator;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.INlsIcons;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.internal.model.InheritedNlsEntry;
@@ -165,7 +166,7 @@ public class NlsTableModel extends ViewerComparator implements IStructuredConten
         return numA.compareTo(numB);
       }
       catch (NumberFormatException e) {
-        NlsCore.logInfo("no valid number '" + a + "' or '" + b + "'", e);
+        SdkLog.info("no valid number '" + a + "' or '" + b + "'", e);
       }
     }
 

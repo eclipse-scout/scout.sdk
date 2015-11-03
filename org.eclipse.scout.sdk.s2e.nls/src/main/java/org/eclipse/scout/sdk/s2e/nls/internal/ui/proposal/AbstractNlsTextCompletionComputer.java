@@ -28,6 +28,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.IRegion;
 import org.eclipse.jface.text.contentassist.ICompletionProposal;
 import org.eclipse.jface.text.contentassist.IContextInformation;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
@@ -85,7 +86,7 @@ public abstract class AbstractNlsTextCompletionComputer implements IJavaCompleti
       }
     }
     catch (Exception e) {
-      NlsCore.logWarning("could not compute nls proposals.", e);
+      SdkLog.warning("could not compute nls proposals.", e);
     }
     return proposals;
   }

@@ -33,6 +33,7 @@ import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.SourceRange;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.core.s.ISdkProperties;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsProjectProvider;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
@@ -91,7 +92,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
         }
         catch (JavaModelException e) {
           // this element seems to be corrupt -> ignore
-          NlsCore.logWarning("Attempt to access source range of type '" + candidate.getFullyQualifiedName() + "' failed. Type will be skipped.", e);
+          SdkLog.warning("Attempt to access source range of type '" + candidate.getFullyQualifiedName() + "' failed. Type will be skipped.", e);
         }
       }
     }
@@ -138,17 +139,17 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   private static ServiceNlsProject getServiceNlsProject(IType serviceType) throws JavaModelException {
     if (serviceType == null) {
-      NlsCore.logError("nls service type cannot be null.");
+      SdkLog.error("nls service type cannot be null.");
       return null;
     }
     if (!JdtUtils.exists(serviceType)) {
-      NlsCore.logError("nls service type '" + serviceType.getFullyQualifiedName() + "' does not exist.");
+      SdkLog.error("nls service type '" + serviceType.getFullyQualifiedName() + "' does not exist.");
       return null;
     }
 
     NlsServiceType type = new NlsServiceType(serviceType);
     if (type.getTranslationsFolderName() == null) {
-      NlsCore.logWarning("The NLS Service for Type '" + serviceType.getFullyQualifiedName() + "' could not be parsed. Ensure that the method '" + NlsServiceType.DYNAMIC_NLS_BASE_NAME_GETTER
+      SdkLog.warning("The NLS Service for Type '" + serviceType.getFullyQualifiedName() + "' could not be parsed. Ensure that the method '" + NlsServiceType.DYNAMIC_NLS_BASE_NAME_GETTER
           + "' is available and returns a String literal like \"resources.texts.Texts\" directly.");
       return null;
     }
@@ -246,7 +247,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
             return getAllProjects(getScoutProjectNamesForProject((IJavaProject) args[1]));
           }
           catch (CoreException e) {
-            NlsCore.logWarning("Could not load text provider services.", e);
+            SdkLog.warning("Could not load text provider services.", e);
           }
         }
         else if (args[1] instanceof IType) {
@@ -255,7 +256,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
             return getAllProjects(getScoutProjectNamesForType((IType) args[1]));
           }
           catch (CoreException e) {
-            NlsCore.logWarning("Could not load text provider services for type '" + args[1].toString() + "'.", e);
+            SdkLog.warning("Could not load text provider services for type '" + args[1].toString() + "'.", e);
           }
         }
       }
@@ -268,7 +269,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       return getNlsProjectTreeProjectName(wsBundles);
     }
     catch (CoreException e) {
-      NlsCore.logWarning("Could not load full text provider service tree.", e);
+      SdkLog.warning("Could not load full text provider service tree.", e);
       return null;
     }
   }
@@ -281,7 +282,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       }
     }
     catch (CoreException e) {
-      NlsCore.logWarning("Could not load text provider services for file: " + f.getFullPath().toString(), e);
+      SdkLog.warning("Could not load text provider services for file: " + f.getFullPath().toString(), e);
     }
     return null;
   }
@@ -308,7 +309,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       return getNlsProjectTree(textservice);
     }
     catch (CoreException e) {
-      NlsCore.logWarning("Could not load text provider services for " + textservice.getFullyQualifiedName(), e);
+      SdkLog.warning("Could not load text provider services for " + textservice.getFullyQualifiedName(), e);
       return null;
     }
   }

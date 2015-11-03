@@ -14,7 +14,7 @@ import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 public class Language {
 
@@ -29,7 +29,7 @@ public class Language {
   public Language(Locale locale) {
     if (locale == null) {
       IllegalArgumentException e = new IllegalArgumentException("locale cannot be null!");
-      NlsCore.logError(e.getMessage(), e);
+      SdkLog.error(e.getMessage(), e);
       throw e;
     }
     m_locale = locale;

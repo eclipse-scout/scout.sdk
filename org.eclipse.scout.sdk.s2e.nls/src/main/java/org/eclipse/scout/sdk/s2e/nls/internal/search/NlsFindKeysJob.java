@@ -10,26 +10,31 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.internal.search;
 
+import java.io.IOException;
+import java.nio.file.FileVisitResult;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.regex.Pattern;
 
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.core.runtime.jobs.Job;
+import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaCore;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
-import org.eclipse.search.core.text.TextSearchEngine;
-import org.eclipse.search.core.text.TextSearchScope;
 import org.eclipse.search.ui.text.Match;
 
 /**
@@ -37,80 +42,135 @@ import org.eclipse.search.ui.text.Match;
  */
 public class NlsFindKeysJob extends Job {
 
-  private final Pattern m_searchPattern;
-  private NlsKeySearchRequestor m_searchRequstor;
+  private final List<String> m_searchKeys;
+  private final Map<String, List<Match>> m_matches;
 
   public NlsFindKeysJob(String nlsKey, String jobTitle) {
-    this(Pattern.compile("\\\"" + nlsKey + "\\\""), jobTitle);
+    super(jobTitle);
+    m_searchKeys = new ArrayList<>(1);
+    m_searchKeys.add("\"" + nlsKey + "\"");
+    m_matches = new HashMap<>(m_searchKeys.size());
   }
 
   /**
    * @param name
    */
   public NlsFindKeysJob(INlsProject project, String jobTitle) {
-    this(createPatternForAllNlsKeys(project), jobTitle);
-  }
-
-  public NlsFindKeysJob(Pattern searchPattern, String jobName) {
-    super(jobName);
-    m_searchPattern = searchPattern;
-    m_searchRequstor = new NlsKeySearchRequestor();
+    super(jobTitle);
+    m_searchKeys = new ArrayList<>();
+    for (INlsEntry e : project.getAllEntries()) {
+      if (e.getType() == INlsEntry.TYPE_LOCAL) {
+        m_searchKeys.add("\"" + e.getKey() + "\"");
+      }
+    }
+    m_matches = new HashMap<>(m_searchKeys.size());
   }
 
   @Override
   public IStatus run(IProgressMonitor monitor) {
-    if (m_searchPattern == null) {
-      return Status.OK_STATUS;
-    }
-
-    IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
-    ArrayList<IResource> searchScopeRessources = new ArrayList<>();
-    TextSearchScope searchScope = null;
     try {
-      for (IProject project : projects) {
-        if (project.exists() && project.isOpen() && project.hasNature(JavaCore.NATURE_ID)) {
-          searchScopeRessources.add(project);
+      m_matches.clear();
+      IJavaProject[] javaProjects = JavaCore.create(ResourcesPlugin.getWorkspace().getRoot()).getJavaProjects();
+      monitor.beginTask("Searching for NLS keys", javaProjects.length);
+      for (IJavaProject root : javaProjects) {
+        monitor.setTaskName("Searching in '" + root.getElementName() + "'.");
+
+        IProject p = root.getProject();
+        Path outputLocation = Paths.get(new java.io.File(p.getLocation().toOSString(), root.getOutputLocation().removeFirstSegments(1).toOSString()).toURI());
+        searchInFolder(Paths.get(p.getLocation().toFile().toURI()), p.getDefaultCharset(), outputLocation, monitor);
+
+        if (monitor.isCanceled()) {
+          return Status.OK_STATUS;
         }
+        monitor.worked(1);
       }
-      searchScope = TextSearchScope.newSearchScope(searchScopeRessources.toArray(new IResource[searchScopeRessources.size()]), Pattern.compile(".*\\.java"), false);
     }
-    catch (CoreException e) {
-      NlsCore.logError("Could not create java projects for nls search.", e);
+    catch (Exception e) {
+      SdkLog.error("Could not create java projects for nls search.", e);
     }
-    TextSearchEngine.create().search(searchScope, m_searchRequstor, m_searchPattern, monitor);
+    finally {
+      monitor.done();
+    }
     return Status.OK_STATUS;
   }
 
-  public Map<String, List<Match>> getMatches() {
-    if (getState() != Job.NONE) {
-      throw new IllegalAccessError("job has not finished yet.");
+  protected void searchInFolder(Path folder, final String charset, final Path outputFolder, final IProgressMonitor monitor) throws IOException {
+    Files.walkFileTree(folder,
+        new SimpleFileVisitor<Path>() {
+          @Override
+          public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs) throws IOException {
+            if (monitor.isCanceled()) {
+              return FileVisitResult.TERMINATE;
+            }
+            if (dir.equals(outputFolder)) {
+              return FileVisitResult.SKIP_SUBTREE;
+            }
+            boolean isHiddenDir = dir.getFileName().toString().startsWith(".");
+            if (isHiddenDir) {
+              return FileVisitResult.SKIP_SUBTREE;
+            }
+            return FileVisitResult.CONTINUE;
+          }
+
+          @Override
+          public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+            String fileName = file.getFileName().toString().toLowerCase();
+            if (attrs.isRegularFile() && (fileName.endsWith(".java") || fileName.endsWith(".html"))) {
+              searchInFile(file, charset, monitor);
+            }
+            if (monitor.isCanceled()) {
+              return FileVisitResult.TERMINATE;
+            }
+            return FileVisitResult.CONTINUE;
+          }
+        });
+  }
+
+  protected void searchInFile(Path file, String charset, IProgressMonitor monitor) throws IOException {
+    String content = new String(Files.readAllBytes(file), charset);
+    IFile[] workspaceFiles = ResourcesPlugin.getWorkspace().getRoot().findFilesForLocationURI(file.toUri());
+    if (workspaceFiles.length < 1) {
+      return;
     }
-    return m_searchRequstor.getAllMatches();
-  }
-
-  public Match[] getMatches(String key) {
-    if (getState() != Job.NONE) {
-      throw new IllegalAccessError("job has not finished yet.");
+    IFile workspaceFile = workspaceFiles[0];
+    if (!workspaceFile.exists()) {
+      return;
     }
-    return m_searchRequstor.getMatches(key);
-  }
 
-  public NlsKeySearchRequestor getSearchRequstor() {
-    return m_searchRequstor;
-  }
+    for (String search : m_searchKeys) {
+      int pos = 0;
+      int index = -1;
+      while ((index = content.indexOf(search, pos)) >= 0) {
+        if (monitor.isCanceled()) {
+          return;
+        }
 
-  public static Pattern createPatternForAllNlsKeys(INlsProject project) {
-    Set<String> allKeys = project.getAllKeys();
-    Iterator<String> iterator = allKeys.iterator();
-    if (iterator.hasNext()) {
-      String key = iterator.next();
-      StringBuilder patternBuilder = new StringBuilder();
-      patternBuilder.append("\\\"").append(key).append("\\\"");
-      while (iterator.hasNext()) {
-        patternBuilder.append("|\\\"").append(iterator.next()).append("\\\"");
+        Match match = new Match(workspaceFile, index, search.length());
+        String key = search.substring(1, search.length() - 1); // remove starting and ending double quotes
+        acceptNlsKeyMatch(key, match);
+        pos = index + search.length();
       }
-      return Pattern.compile(patternBuilder.toString());
     }
-    return null;
+  }
+
+  protected void acceptNlsKeyMatch(String nlsKey, Match match) {
+    List<Match> list = m_matches.get(nlsKey);
+    if (list == null) {
+      list = new ArrayList<>();
+      m_matches.put(nlsKey, list);
+    }
+    list.add(match);
+  }
+
+  public List<Match> getMatches(String nlsKey) {
+    List<Match> list = m_matches.get(nlsKey);
+    if (list == null) {
+      return Collections.emptyList();
+    }
+    return new ArrayList<>(list);
+  }
+
+  public Map<String, List<Match>> getAllMatches() {
+    return new HashMap<>(m_matches);
   }
 }

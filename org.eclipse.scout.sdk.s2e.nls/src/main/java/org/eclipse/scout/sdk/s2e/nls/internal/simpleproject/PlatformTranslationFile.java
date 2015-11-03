@@ -13,7 +13,7 @@ package org.eclipse.scout.sdk.s2e.nls.internal.simpleproject;
 import java.io.InputStream;
 
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.scout.sdk.s2e.nls.resource.AbstractTranslationResource;
 
@@ -25,7 +25,7 @@ public class PlatformTranslationFile extends AbstractTranslationResource {
       parseResource(is);
     }
     catch (Exception e) {
-      NlsCore.logError("could not parse translation file: " + getLanguage().getDispalyName(), e);
+      SdkLog.error("could not parse translation file: " + getLanguage().getDispalyName(), e);
     }
   }
 

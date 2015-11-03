@@ -26,7 +26,7 @@ import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.util.BasicPropertySupport;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.WeakResourceChangeListener;
 
@@ -105,7 +105,7 @@ public class NlsType implements INlsType {
       loadSuperTypeHierarchy();
     }
     catch (JavaModelException e) {
-      NlsCore.logError("could not reload NLS type '" + m_type.getFullyQualifiedName() + "'.", e);
+      SdkLog.error("could not reload NLS type '" + m_type.getFullyQualifiedName() + "'.", e);
     }
   }
 
@@ -168,7 +168,7 @@ public class NlsType implements INlsType {
         }
       }
       catch (CoreException e) {
-        NlsCore.logWarning(e);
+        SdkLog.warning(e);
       }
     }
   }// end class P_NlsResourceChangeListener

@@ -31,6 +31,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.scout.sdk.s2e.nls.resource.AbstractTranslationResource;
@@ -66,14 +67,14 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
       m_file.refreshLocal(IResource.DEPTH_ZERO, monitor);
     }
     catch (CoreException e) {
-      NlsCore.logInfo("Could not refresh file '" + m_file.getLocation().toOSString() + "'.", e);
+      SdkLog.warning("Could not refresh file '" + m_file.getLocation().toOSString() + "'.", e);
     }
 
     try (InputStream io = m_file.getContents()) {
       parseResource(io);
     }
     catch (Exception e) {
-      NlsCore.logError("cold not reload translation file: " + m_file.getName(), e);
+      SdkLog.error("cold not reload translation file: " + m_file.getName(), e);
     }
   }
 
@@ -102,7 +103,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
   public void commitChanges(IProgressMonitor monitor) {
     synchronized (m_file) {
       if (!m_file.exists()) {
-        NlsCore.logError("File: " + m_file.getName() + " not found!");
+        SdkLog.error("File: " + m_file.getName() + " not found!");
       }
 
       Properties prop = new Properties();
@@ -134,10 +135,10 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
         m_file.refreshLocal(IResource.DEPTH_ONE, monitor);
       }
       catch (IOException e1) {
-        NlsCore.logError("could not refresh file: " + m_file.getName(), e1);
+        SdkLog.error("could not refresh file: " + m_file.getName(), e1);
       }
       catch (CoreException e1) {
-        NlsCore.logError("could not refresh file: " + m_file.getName(), e1);
+        SdkLog.error("could not refresh file: " + m_file.getName(), e1);
       }
     }
   }
@@ -166,7 +167,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
         }
       }
       catch (CoreException e) {
-        NlsCore.logWarning(e);
+        SdkLog.warning(e);
       }
     }
   }

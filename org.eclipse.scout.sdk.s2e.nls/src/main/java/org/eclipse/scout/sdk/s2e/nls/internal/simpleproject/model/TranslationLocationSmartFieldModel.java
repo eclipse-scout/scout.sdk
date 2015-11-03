@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.jdt.ui.ISharedImages;
 import org.eclipse.jdt.ui.JavaUI;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.INlsFolder;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.SimpleNlsProject;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.fields.ISmartFieldModel;
@@ -44,7 +44,7 @@ public class TranslationLocationSmartFieldModel implements ISmartFieldModel {
       }
     }
     catch (CoreException e) {
-      NlsCore.logWarning(e);
+      SdkLog.warning(e);
     }
   }
 

@@ -24,6 +24,7 @@ import javax.swing.event.EventListenerList;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 
@@ -118,7 +119,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
         listener.translationResourceChanged(event);
       }
       catch (Exception t) {
-        NlsCore.logError("error during listener notification.", t);
+        SdkLog.error("error during listener notification.", t);
       }
     }
   }
@@ -182,7 +183,7 @@ public abstract class AbstractTranslationResource implements ITranslationResourc
   @Override
   public void reload(IProgressMonitor monitor) {
     if (!isReadOnly()) {
-      NlsCore.logWarning("reload should be overwritten in writeable resources! " + this.getClass().getName());
+      SdkLog.warning("reload should be overwritten in writeable resources! " + this.getClass().getName());
     }
   }
 

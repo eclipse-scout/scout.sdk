@@ -20,6 +20,7 @@ import org.eclipse.core.runtime.IExtension;
 import org.eclipse.core.runtime.IExtensionPoint;
 import org.eclipse.core.runtime.IExtensionRegistry;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.osgi.framework.Bundle;
 
@@ -70,7 +71,7 @@ public final class NlsExportImportExtensionPoints {
               wizardExt.setWizard((Class<? extends AbstractImportExportWizard>) wizard);
             }
             else {
-              NlsCore.logError("extension '" + extension.getExtensionPointUniqueIdentifier() + "' has a wizard not instance of '" + AbstractImportExportWizard.class.getName() + "'. Ignoring extension.");
+              SdkLog.error("extension '" + extension.getExtensionPointUniqueIdentifier() + "' has a wizard not instance of '" + AbstractImportExportWizard.class.getName() + "'. Ignoring extension.");
               continue;
             }
           }
@@ -87,7 +88,7 @@ public final class NlsExportImportExtensionPoints {
           wizardExtensions.add(wizardExt);
         }
         catch (ClassNotFoundException e) {
-          NlsCore.logError("could not create an executable extension of point '" + extension.getExtensionPointUniqueIdentifier() + "'.", e);
+          SdkLog.error("could not create an executable extension of point '" + extension.getExtensionPointUniqueIdentifier() + "'.", e);
         }
       }
     }

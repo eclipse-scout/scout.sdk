@@ -32,7 +32,7 @@ import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.scout.sdk.core.util.OptimisticLock;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.internal.model.InheritedNlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
@@ -184,7 +184,7 @@ public abstract class AbstractNlsProject implements INlsProject {
       for (INlsEntry e : entries) {
         IStatus status = r.remove(e.getKey(), m);
         if (!status.isOK()) {
-          NlsCore.logError(status.getMessage(), status.getException());
+          SdkLog.error(status.getMessage(), status.getException());
         }
       }
       r.commitChanges(m);
@@ -380,11 +380,11 @@ public abstract class AbstractNlsProject implements INlsProject {
       monitor.beginTask("update Key", IProgressMonitor.UNKNOWN);
       NlsEntry originalEntry = m_entries.remove(entry.getKey());
       if (originalEntry == null) {
-        NlsCore.logError("The nls entry with the key '" + entry.getKey() + "' can not be found");
+        SdkLog.error("The nls entry with the key '" + entry.getKey() + "' can not be found");
         return;
       }
       else if (originalEntry.getType() == INlsEntry.TYPE_INHERITED) {
-        NlsCore.logError("The inherited NLS entry '" + originalEntry.getKey() + "' can not be modified");
+        SdkLog.error("The inherited NLS entry '" + originalEntry.getKey() + "' can not be modified");
         return;
       }
       else {
@@ -519,7 +519,7 @@ public abstract class AbstractNlsProject implements INlsProject {
       try {
         NlsEntry entry = m_entries.get(superRow.getKey());
         if (entry == null) {
-          NlsCore.logError("NLS entry with key:'" + superRow.getKey() + "' not found");
+          SdkLog.error("NLS entry with key:'" + superRow.getKey() + "' not found");
           return;
         }
         if (entry.getType() == INlsEntry.TYPE_INHERITED) {
@@ -545,7 +545,7 @@ public abstract class AbstractNlsProject implements INlsProject {
       }
     }
     catch (CoreException e) {
-      NlsCore.logError("could not load tranlstion property resources.", e);
+      SdkLog.error("could not load tranlstion property resources.", e);
     }
   }
 
@@ -608,7 +608,7 @@ public abstract class AbstractNlsProject implements INlsProject {
         listener.notifyProjectChanged(event);
       }
       catch (Exception t) {
-        NlsCore.logError("error during listener notification.", t);
+        SdkLog.error("error during listener notification.", t);
       }
     }
   }

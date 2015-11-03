@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.internal.model;
 
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.scout.sdk.s2e.nls.model.NlsEntry;
@@ -29,12 +29,12 @@ public class InheritedNlsEntry extends NlsEntry {
 
   @Override
   public void addTranslation(Language language, String text) {
-    NlsCore.logError("an inhertited NLS entry can not be modified!", new Exception());
+    SdkLog.error("an inhertited NLS entry can not be modified!", new Exception());
   }
 
   @Override
   public void setKey(String key) {
-    NlsCore.logError("an inhertited NLS entry can not be modified!", new Exception());
+    SdkLog.error("an inhertited NLS entry can not be modified!", new Exception());
   }
 
 }

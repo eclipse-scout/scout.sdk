@@ -17,7 +17,7 @@ import org.eclipse.jface.text.BadLocationException;
 import org.eclipse.jface.text.DocumentEvent;
 import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.swt.graphics.Image;
@@ -80,7 +80,7 @@ public class NlsProposal extends AbstractNlsProposal {
       replaceWith(document, offset, m_nlsEntry.getKey());
     }
     catch (BadLocationException e) {
-      NlsCore.logError(e);
+      SdkLog.error(e);
     }
   }
 
@@ -94,7 +94,7 @@ public class NlsProposal extends AbstractNlsProposal {
         return m_nlsEntry.getKey().toLowerCase().startsWith(prefix.toLowerCase());
       }
       catch (BadLocationException e) {
-        NlsCore.logWarning(e);
+        SdkLog.warning(e);
         return false;
       }
     }

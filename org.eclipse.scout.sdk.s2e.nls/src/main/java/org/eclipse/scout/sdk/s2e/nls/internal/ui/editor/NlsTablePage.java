@@ -22,7 +22,7 @@ import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.StructuredSelection;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.internal.model.InheritedNlsEntry;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.action.CopyPasteAction;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.action.FindReferencesAction;
@@ -31,7 +31,6 @@ import org.eclipse.scout.sdk.s2e.nls.internal.ui.action.NlsEntryNewAction;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.action.NlsRefreshAction;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.action.RemoveAction;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.action.TranslationNewAction;
-import org.eclipse.scout.sdk.s2e.nls.internal.ui.action.UpdateKeyUsageCountAction;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.action.UpdateReferenceCountAction;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.importexport.NlsExportAction;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.importexport.NlsImportAction;
@@ -146,7 +145,7 @@ public class NlsTablePage extends Composite {
         refreshAciton.join();
       }
       catch (InterruptedException e) {
-        NlsCore.logWarning(e);
+        SdkLog.warning(e);
       }
       m_nlsProjects = refreshAciton.getNlsProject();
     }
@@ -265,8 +264,6 @@ public class NlsTablePage extends Composite {
         manager.add(new Separator());
       }
       manager.add(new FindReferencesAction(m_nlsProjects, entry.getKey()));
-      manager.add(new UpdateReferenceCountAction(m_nlsProjects, m_table, m_tableModel));
-      manager.add(new UpdateKeyUsageCountAction(m_nlsProjects, m_table, m_tableModel));
       if (cursorText != null && cursorText.length() > 0) {
         manager.add(new Separator());
         manager.add(new CopyPasteAction("Copy", cursorText, m_table.getDisplay()));
@@ -278,7 +275,6 @@ public class NlsTablePage extends Composite {
     }
 
     private void addMultiSelectMenues(MenuManager manager, List<INlsEntry> entries) {
-      manager.add(new UpdateReferenceCountAction(m_nlsProjects, m_table, m_tableModel));
       manager.add(new Separator());
       manager.add(new RemoveAction("Remove entries", m_nlsProjects, entries));
     }

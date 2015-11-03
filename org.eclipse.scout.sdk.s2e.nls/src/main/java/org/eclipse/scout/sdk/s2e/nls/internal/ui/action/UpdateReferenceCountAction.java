@@ -10,16 +10,16 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.internal.ui.action;
 
+import org.eclipse.core.runtime.jobs.IJobChangeEvent;
+import org.eclipse.core.runtime.jobs.JobChangeAdapter;
 import org.eclipse.jface.action.Action;
 import org.eclipse.scout.sdk.s2e.nls.INlsIcons;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.internal.model.NlsReferenceProvider;
-import org.eclipse.scout.sdk.s2e.nls.internal.search.INlsKeySearchListener;
 import org.eclipse.scout.sdk.s2e.nls.internal.search.NlsFindKeysJob;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.editor.NlsTable;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.editor.NlsTableModel;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
-import org.eclipse.search.ui.text.Match;
 
 /**
  * <h4>UpdateReferenceCountAction</h4>
@@ -42,7 +42,7 @@ public class UpdateReferenceCountAction extends Action {
   @Override
   public void run() {
     m_job = new NlsFindKeysJob(m_project, getText());
-    m_job.getSearchRequstor().addFindReferencesListener(new P_JobListener());
+    m_job.addJobChangeListener(new P_JobListener());
     m_job.schedule();
   }
 
@@ -59,25 +59,24 @@ public class UpdateReferenceCountAction extends Action {
     m_table.getDisplay().asyncExec(new Runnable() {
       @Override
       public void run() {
+        if (m_table.isDisposed()) {
+          return;
+        }
         UpdateReferenceCountAction.this.setEnabled(true);
-        m_tableModel.setReferenceProvider(new NlsReferenceProvider(m_job.getMatches()));
+        m_tableModel.setReferenceProvider(new NlsReferenceProvider(m_job.getAllMatches()));
         m_table.refreshAll(false);
       }
     });
   }
 
-  private class P_JobListener implements INlsKeySearchListener {
+  private class P_JobListener extends JobChangeAdapter {
     @Override
-    public void beginReporting() {
+    public void scheduled(IJobChangeEvent event) {
       handleBeginSearch();
     }
 
     @Override
-    public void foundMatch(String key, Match match) {
-    }
-
-    @Override
-    public void endReporting() {
+    public void done(IJobChangeEvent event) {
       handleEndSearch();
     }
   }

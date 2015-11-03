@@ -15,7 +15,7 @@ import java.util.Properties;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 public abstract class AbstractNlsFile {
 
@@ -48,7 +48,7 @@ public abstract class AbstractNlsFile {
       props.load(io);
     }
     catch (Exception e) {
-      NlsCore.logWarning("could not open stream to read NLS file :'" + file.getFullPath() + "'", e);
+      SdkLog.warning("could not open stream to read NLS file :'" + file.getFullPath() + "'", e);
     }
     m_nlsTypeName = props.getProperty(MANIFEST_CLASS);
   }

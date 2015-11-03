@@ -10,7 +10,7 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.importexport;
 
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h4>ImportExportExtensionPoint</h4>
@@ -38,7 +38,7 @@ public class WizardExtension {
       return m_wizard.newInstance();
     }
     catch (Exception e) {
-      NlsCore.logError("could not create a new instance of wizard '" + getName() + "'.", e);
+      SdkLog.error("could not create a new instance of wizard '" + getName() + "'.", e);
       return null;
     }
   }

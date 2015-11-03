@@ -92,42 +92,6 @@ public class NlsCore extends AbstractUIPlugin {
     return plugin;
   }
 
-  public static void logInfo(Throwable t) {
-    plugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, "", t));
-  }
-
-  public static void logInfo(String message) {
-    plugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message));
-  }
-
-  public static void logInfo(String message, Throwable t) {
-    plugin.getLog().log(new Status(IStatus.INFO, PLUGIN_ID, message, t));
-  }
-
-  public static void logWarning(String message) {
-    plugin.getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message));
-  }
-
-  public static void logWarning(Throwable t) {
-    plugin.getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, "", t));
-  }
-
-  public static void logWarning(String message, Throwable t) {
-    plugin.getLog().log(new Status(IStatus.WARNING, PLUGIN_ID, message, t));
-  }
-
-  public static void logError(Throwable t) {
-    plugin.getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, "", t));
-  }
-
-  public static void logError(String message) {
-    plugin.getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message));
-  }
-
-  public static void logError(String message, Throwable t) {
-    plugin.getLog().log(new Status(IStatus.ERROR, PLUGIN_ID, message, t));
-  }
-
   public static String getLineSeparator(IResource r) {
     if (Platform.isRunning()) {
 

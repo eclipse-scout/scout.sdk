@@ -17,6 +17,7 @@ import org.eclipse.jface.text.IDocument;
 import org.eclipse.jface.text.ITextViewer;
 import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.INlsIcons;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.internal.ui.action.NlsEntryNewAction;
@@ -59,7 +60,7 @@ public class NewNlsProposal extends AbstractNlsProposal {
       }
     }
     catch (BadLocationException e) {
-      NlsCore.logError(e);
+      SdkLog.error(e);
     }
     return false;
   }
@@ -77,7 +78,7 @@ public class NewNlsProposal extends AbstractNlsProposal {
       searchText = document.get(initalOffset - getPrefix().length(), getPrefix().length() + offset - initalOffset);
     }
     catch (BadLocationException e1) {
-      NlsCore.logWarning(e1);
+      SdkLog.warning(e1);
     }
     String proposalFieldText = "";
 
@@ -97,7 +98,7 @@ public class NewNlsProposal extends AbstractNlsProposal {
       action.join();
     }
     catch (InterruptedException e) {
-      NlsCore.logWarning(e);
+      SdkLog.warning(e);
     }
 
     m_nlsEntry = action.getEntry();
@@ -106,7 +107,7 @@ public class NewNlsProposal extends AbstractNlsProposal {
         replaceWith(document, offset, m_nlsEntry.getKey());
       }
       catch (BadLocationException e) {
-        NlsCore.logError(e);
+        SdkLog.error(e);
       }
     }
   }

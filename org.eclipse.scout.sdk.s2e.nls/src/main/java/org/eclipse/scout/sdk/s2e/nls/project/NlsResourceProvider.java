@@ -18,7 +18,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.scout.sdk.s2e.nls.resource.ITranslationResource;
 
@@ -34,7 +34,7 @@ public class NlsResourceProvider {
   public void addResource(ITranslationResource r) {
     Language language = r.getLanguage();
     if (m_resourceMap.containsKey(language)) {
-      NlsCore.logWarning("language already exists!");
+      SdkLog.warning("language already exists!");
     }
     else {
       m_resourceMap.put(language, r);
@@ -75,7 +75,7 @@ public class NlsResourceProvider {
    */
   public void remove(ITranslationResource r) {
     if (!m_resourceMap.containsValue(r)) {
-      NlsCore.logWarning("trying to remove a non existing resource!");
+      SdkLog.warning("trying to remove a non existing resource!");
     }
     else {
       m_resourceMap.remove(r.getLanguage());

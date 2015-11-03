@@ -10,6 +10,8 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.internal.search;
 
+import java.util.List;
+
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -52,9 +54,9 @@ public class NlsKeySearchQuery extends FileSearchQuery {
   public IStatus run(IProgressMonitor monitor) {
     NlsFindKeysJob nlsFindReferencesJob = new NlsFindKeysJob(getNlsKey(), getLabel());
     nlsFindReferencesJob.run(monitor);
-    Match[] matches = nlsFindReferencesJob.getMatches(getNlsKey());
+    List<Match> matches = nlsFindReferencesJob.getMatches(getNlsKey());
     getSearchResult().removeAll();
-    getSearchResult().addMatches(matches);
+    getSearchResult().addMatches(matches.toArray(new Match[matches.size()]));
     return Status.OK_STATUS;
   }
 

@@ -19,6 +19,7 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.action.Action;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.INlsIcons;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsEntry;
@@ -56,7 +57,7 @@ public class RemoveAction extends Action {
       m_status = job.getResult();
     }
     catch (InterruptedException e) {
-      NlsCore.logError("cold not remove the row key: " + getVerbose(m_entries) + " in translation resources", e);
+      SdkLog.error("cold not remove the row key: " + getVerbose(m_entries) + " in translation resources", e);
     }
   }
 

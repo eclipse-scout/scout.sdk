@@ -41,6 +41,7 @@ import org.eclipse.jdt.core.JavaCore;
 import org.eclipse.jdt.internal.core.JarEntryFile;
 import org.eclipse.jface.window.Window;
 import org.eclipse.scout.sdk.core.util.IWeakEventListener;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.model.TranslationFileNewModel;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.ui.TranslationFileNewDialog;
@@ -70,7 +71,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
     if (getNlsType().getType().isReadOnly()) {
       IPackageFragmentRoot r = (IPackageFragmentRoot) getNlsType().getType().getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
       if (r == null) {
-        NlsCore.logWarning("Could not find text resource for type '" + getNlsType().getType().getFullyQualifiedName() + "'.");
+        SdkLog.warning("Could not find text resource for type '" + getNlsType().getType().getFullyQualifiedName() + "'.");
         return new ArrayList<>(0);
       }
       return loadTranslationFilesFromPlatform(getNlsType(), r);
@@ -101,7 +102,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
 
     IPackageFragment textFolder = r.getPackageFragment(path);
     if (textFolder == null) {
-      NlsCore.logWarning("Folder '" + nlsType.getTranslationsFolderName() + "' could not be found in '" + r.getElementName() + "'. Will be ignored.");
+      SdkLog.warning("Folder '" + nlsType.getTranslationsFolderName() + "' could not be found in '" + r.getElementName() + "'. Will be ignored.");
     }
     else {
       for (Object o : textFolder.getNonJavaResources()) {
@@ -111,7 +112,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
             translationFiles.add(new PlatformTranslationFile(is, getLanguage(f.getName())));
           }
           catch (Exception e) {
-            NlsCore.logError("Could not load NLS files of bundle '" + r.getElementName() + "'.", e);
+            SdkLog.error("Could not load NLS files of bundle '" + r.getElementName() + "'.", e);
           }
         }
       }
@@ -145,7 +146,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
           createTranslationFile(m_model.getLanguage(), m_model.getFolder(), new NullProgressMonitor());
         }
         catch (CoreException e) {
-          NlsCore.logError("Unable to create new language.", e);
+          SdkLog.error("Unable to create new language.", e);
         }
       }
 
@@ -163,7 +164,7 @@ public class SimpleNlsProject extends AbstractNlsProject {
         setParent(NlsCore.getNlsWorkspace().getNlsProject(new Object[]{superType}));
       }
       catch (CoreException e) {
-        NlsCore.logError("parent of NLS project could not be found. Looked for type '" + superType.getFullyQualifiedName() + "'", e);
+        SdkLog.error("parent of NLS project could not be found. Looked for type '" + superType.getFullyQualifiedName() + "'", e);
       }
     }
   }

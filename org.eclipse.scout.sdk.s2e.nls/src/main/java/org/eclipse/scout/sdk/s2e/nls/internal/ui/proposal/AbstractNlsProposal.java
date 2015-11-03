@@ -23,7 +23,7 @@ import org.eclipse.jface.text.contentassist.ICompletionProposalExtension2;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension3;
 import org.eclipse.jface.text.contentassist.ICompletionProposalExtension4;
 import org.eclipse.jface.text.contentassist.IContextInformation;
-import org.eclipse.scout.sdk.s2e.nls.NlsCore;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.text.edits.ReplaceEdit;
 
@@ -89,7 +89,7 @@ public abstract class AbstractNlsProposal implements IJavaCompletionProposal, IC
       }
     }
     catch (BadLocationException e) {
-      NlsCore.logError(e);
+      SdkLog.error(e);
     }
     return false;
   }
@@ -165,7 +165,7 @@ public abstract class AbstractNlsProposal implements IJavaCompletionProposal, IC
         replaceEdit.apply(document);
       }
       catch (Exception e) {
-        NlsCore.logWarning(e);
+        SdkLog.warning(e);
       }
     }
   }

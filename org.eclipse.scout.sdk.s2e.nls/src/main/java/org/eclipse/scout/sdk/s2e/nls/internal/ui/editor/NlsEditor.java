@@ -15,6 +15,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.internal.core.JarEntryFile;
 import org.eclipse.jdt.internal.ui.javaeditor.JarEntryEditorInput;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
 import org.eclipse.ui.IEditorInput;
@@ -48,7 +49,7 @@ public class NlsEditor extends MultiPageEditorPart {
         storage = ((IStorageEditorInput) input).getStorage();
       }
       catch (CoreException e) {
-        NlsCore.logWarning(e);
+        SdkLog.warning(e);
       }
       if (storage instanceof JarEntryFile) {
         IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage(), input, EditorsUI.DEFAULT_TEXT_EDITOR_ID, true);
@@ -89,7 +90,7 @@ public class NlsEditor extends MultiPageEditorPart {
       setPageText(m_tablePageIndex, "Translations");
     }
     catch (CoreException e) {
-      NlsCore.logError("could not load file: " + input.getName(), e);
+      SdkLog.error("could not load file: " + input.getName(), e);
     }
   }
 
