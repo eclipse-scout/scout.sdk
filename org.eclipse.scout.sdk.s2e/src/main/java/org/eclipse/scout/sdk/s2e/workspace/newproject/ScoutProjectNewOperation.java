@@ -10,13 +10,9 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.workspace.newproject;
 
-import java.io.BufferedInputStream;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.zip.ZipInputStream;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
@@ -42,7 +38,10 @@ import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
  */
 public class ScoutProjectNewOperation implements IOperation {
 
-  public static final String CUSTOM_TEMPLATE_PROP_NAME = "scoutProjectTemplatePath";
+  public static final String TEMPLATE_GROUP_ID = "org.eclipse.scout.archetype.groupId";
+  public static final String TEMPLATE_ARTIFACT_ID = "org.eclipse.scout.archetype.artifactId";
+  public static final String TEMPLATE_VERSION = "org.eclipse.scout.archetype.version";
+
   private static final String EXEC_ENV_PREFIX = "JavaSE-";
   private static final String MIN_JVM_VERSION = "1.7";
 
@@ -62,34 +61,27 @@ public class ScoutProjectNewOperation implements IOperation {
 
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
-    ZipInputStream sourceTemplate = null;
     try {
-      String customTemplateLocation = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(CUSTOM_TEMPLATE_PROP_NAME);
-      if (StringUtils.isNotBlank(customTemplateLocation)) {
-        File template = new File(customTemplateLocation);
-        if (template.isFile()) {
-          sourceTemplate = new ZipInputStream(new BufferedInputStream(new FileInputStream(template)));
-        }
+      String groupId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_GROUP_ID);
+      String artifactId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_ARTIFACT_ID);
+      String version = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_VERSION);
+      if (StringUtils.isBlank(groupId) || StringUtils.isBlank(artifactId) || StringUtils.isBlank(version)) {
+        // use default
+        groupId = null;
+        artifactId = null;
+        version = null;
       }
 
       monitor.beginTask(getOperationName(), 100);
-      ScoutProjectNewHelper.createProject(getTargetDirectory(), getSymbolicName(), getDisplayName(), sourceTemplate, Double.toString(getExecEnvVersion(getDefaultJvmExecutionEnvironment())));
-      monitor.worked(1);
+      ScoutProjectNewHelper.createProject(getTargetDirectory(), getSymbolicName(), getDisplayName(), Double.toString(getExecEnvVersion(getDefaultJvmExecutionEnvironment())), groupId, artifactId, version);
+      monitor.worked(10);
 
-      importIntoWorkspace(new SubProgressMonitor(monitor, 99));
+      importIntoWorkspace(new SubProgressMonitor(monitor, 90));
     }
-    catch (IOException e) {
+    catch (Exception e) {
       throw new CoreException(new ScoutStatus("Unable to create Scout Project.", e));
     }
     finally {
-      if (sourceTemplate != null) {
-        try {
-          sourceTemplate.close();
-        }
-        catch (IOException e) {
-          // nop;
-        }
-      }
       monitor.done();
     }
   }
@@ -157,7 +149,8 @@ public class ScoutProjectNewOperation implements IOperation {
    * @throws CoreException
    */
   protected void importIntoWorkspace(IProgressMonitor monitor) throws CoreException {
-    File[] subFolders = getTargetDirectory().listFiles();
+    File baseFolder = new File(getTargetDirectory(), getSymbolicName() + ScoutProjectNewHelper.ROOT_PROJECT_SUFFIX);
+    File[] subFolders = baseFolder.listFiles();
     Collection<MavenProjectInfo> projects = new ArrayList<>(subFolders.length);
     for (File subFolder : subFolders) {
       File pom = new File(subFolder, "pom.xml");

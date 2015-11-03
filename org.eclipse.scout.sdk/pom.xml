@@ -33,18 +33,18 @@
     <module>../org.eclipse.scout.sdk.s2e</module>
     <module>../org.eclipse.scout.sdk.s2e.ui</module>
     <module>../org.eclipse.scout.sdk.s2e.nls</module>
+
+    <module>../scout-helloworld-app</module>
   </modules>
 
   <properties>
     <scout.rt.version>${project.version}</scout.rt.version>
 
     <!-- exclude the unit tests from sonar -->
-    <sonar.exclusions>file:**/org.eclipse.scout.sdk.test/**</sonar.exclusions>
+    <sonar.exclusions>file:**/org.eclipse.scout.sdk*test/**</sonar.exclusions>
 
     <!-- exclude the unit tests and UI (we have no UI tests anyway) from sonar -->
-    <sonar.coverage.exclusions>file:**/org.eclipse.scout.sdk.test/**,
-      file:**/org.eclipse.scout.sdk.ui/**,
-      file:**/org.eclipse.scout.sdk.rap.ui/**</sonar.coverage.exclusions>
+    <sonar.coverage.exclusions>file:**/org.eclipse.scout.sdk*test/**</sonar.coverage.exclusions>
 
     <!-- dependencies to Eclipse artifacts deployed by org.eclipse.scout.sdk.core.releng/ -->
     <ecj>4.5</ecj>
@@ -394,6 +394,41 @@
         <artifactId>org.eclipse.ui</artifactId>
         <version>${org.eclipse.ui-maven}</version>
       </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-embedder</artifactId>
+        <version>3.3.3</version>
+      </dependency>
+      <dependency>
+        <groupId>ch.qos.logback</groupId>
+        <artifactId>logback-classic</artifactId>
+        <version>1.1.3</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <version>1.7.12</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.aether</groupId>
+        <artifactId>aether-connector-basic</artifactId>
+        <version>1.0.2.v20150114</version>
+      </dependency>
+      <dependency>
+        <groupId>org.eclipse.aether</groupId>
+        <artifactId>aether-transport-wagon</artifactId>
+        <version>1.0.2.v20150114</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-http</artifactId>
+        <version>2.10</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-provider-api</artifactId>
+        <version>2.10</version>
+      </dependency>
       <!-- Test Dependencies -->
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -424,48 +459,6 @@
         <groupId>commons-collections</groupId>
         <artifactId>commons-collections</artifactId>
         <version>3.2</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-embedder</artifactId>
-        <version>3.3.3</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>1.1.3</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jul-to-slf4j</artifactId>
-        <version>1.7.12</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.aether</groupId>
-        <artifactId>aether-connector-basic</artifactId>
-        <version>1.0.2.v20150114</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.eclipse.aether</groupId>
-        <artifactId>aether-transport-wagon</artifactId>
-        <version>1.0.2.v20150114</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-http</artifactId>
-        <version>2.10</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-provider-api</artifactId>
-        <version>2.10</version>
-        <scope>test</scope>
       </dependency>
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>

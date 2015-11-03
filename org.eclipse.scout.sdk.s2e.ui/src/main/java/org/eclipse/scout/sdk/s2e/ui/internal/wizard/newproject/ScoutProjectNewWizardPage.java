@@ -229,13 +229,30 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
   }
 
   protected IStatus getStatusSymbolicName() {
+    // check name pattern
     String msg = ScoutProjectNewHelper.getSymbolicNameErrorMessage(getSymbolicName());
     if (msg != null) {
       return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, msg);
     }
+
+    // check folder existence on file system
+    File folder = null;
+    if (isUseWorkspaceLocation()) {
+      folder = getWorkspaceLocation();
+    }
+    else {
+      folder = getTargetDirectory();
+    }
+    if (folder != null) {
+      if (new File(folder, getSymbolicName() + ScoutProjectNewHelper.ROOT_PROJECT_SUFFIX).exists()) {
+        return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Symbolic Name already exists in this target directory.");
+      }
+    }
+
+    // check project existence in workspace
     for (IProject p : ResourcesPlugin.getWorkspace().getRoot().getProjects()) {
-      if (p.getName().startsWith(getSymbolicName() + ".")) {
-        return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "Projects with this Symbolic Name already exist.");
+      if (p.getName().startsWith(getSymbolicName() + '.')) {
+        return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Symbolic Name already exists in the workspace.");
       }
     }
     return Status.OK_STATUS;
