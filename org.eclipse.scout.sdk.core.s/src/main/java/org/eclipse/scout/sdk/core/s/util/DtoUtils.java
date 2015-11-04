@@ -160,7 +160,7 @@ public final class DtoUtils {
     IType declaringType = recursiveDeclaringType.declaringType();
     if (declaringType == null) {
       // primary type
-      if (FormDataAnnotationDescriptor.isSdkCommandCreate(formDataAnnotation) || FormDataAnnotationDescriptor.isSdkCommandUse(formDataAnnotation)) {
+      if (FormDataAnnotationDescriptor.isCreate(formDataAnnotation) || FormDataAnnotationDescriptor.isSdkCommandUse(formDataAnnotation)) {
         return formDataAnnotation.getFormDataType();
       }
       return null;
