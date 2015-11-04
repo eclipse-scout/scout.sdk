@@ -93,7 +93,7 @@
               org.eclipse.core.resources;visibility:=reexport,
               org.eclipse.jdt.core;bundle-version="[3.11,4)";visibility:=reexport,
               org.eclipse.jface.text;bundle-version="[3.7.2,4)";visibility:=reexport,
-              org.eclipse.m2e.maven.runtime;bundle-version="[1.6.2,2)";visibility:=reexport
+              org.eclipse.m2e.maven.runtime;bundle-version="[1.6.0,2)";visibility:=reexport
             </Require-Bundle>
 
             <Bundle-Activator>org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator</Bundle-Activator>
