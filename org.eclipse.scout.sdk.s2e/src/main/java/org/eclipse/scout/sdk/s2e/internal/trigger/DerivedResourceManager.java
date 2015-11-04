@@ -393,7 +393,7 @@ public class DerivedResourceManager implements IDerivedResourceManager {
       }
 
       int elementType = curElement.getElementType();
-      if (elementType == IJavaElement.COMPILATION_UNIT && curElement.exists()) {
+      if (elementType == IJavaElement.COMPILATION_UNIT && delta.getKind() != IJavaElementDelta.REMOVED && curElement.exists()) {
         collector.add((ICompilationUnit) curElement);
       }
 
