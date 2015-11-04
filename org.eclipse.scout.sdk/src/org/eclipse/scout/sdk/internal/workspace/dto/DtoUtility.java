@@ -350,7 +350,7 @@ public final class DtoUtility {
     IType declaringType = recursiveDeclaringType.getDeclaringType();
     if (declaringType == null) {
       // primary type
-      if (FormDataAnnotation.isSdkCommandCreate(formDataAnnotation) || FormDataAnnotation.isSdkCommandUse(formDataAnnotation)) {
+      if (FormDataAnnotation.isCreate(formDataAnnotation) || FormDataAnnotation.isSdkCommandUse(formDataAnnotation)) {
         return TypeUtility.getTypeBySignature(formDataAnnotation.getFormDataTypeSignature());
       }
       return null;
