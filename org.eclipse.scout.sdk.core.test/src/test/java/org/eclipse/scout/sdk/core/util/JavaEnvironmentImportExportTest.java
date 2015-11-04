@@ -32,7 +32,15 @@ public class JavaEnvironmentImportExportTest {
     StringWriter w2 = new StringWriter();
     CoreTestingUtils.exportJavaEnvironment(env, w2);
 
-    Assert.assertEquals(w1.toString(), w2.toString());
+    Assert.assertEquals(getStringWithoutTimeComment(w1), getStringWithoutTimeComment(w2));
   }
 
+  private static String getStringWithoutTimeComment(StringWriter w) {
+    StringBuffer buffer = w.getBuffer();
+    int startOfBin = buffer.indexOf("bin");
+    if (startOfBin >= 0) {
+      buffer.replace(0, startOfBin, "");
+    }
+    return buffer.toString();
+  }
 }
