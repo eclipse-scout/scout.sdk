@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.zip.ZipError;
 
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.resources.IMarker;
@@ -122,6 +123,10 @@ public final class ClassIdValidationJob extends AbstractJob {
     }
     catch (OperationCanceledException oce) {
       //nop
+    }
+    catch (ZipError ze) {
+      // can happen if the search engine is running and a e.g. maven update changes the underlying runtime zip file
+      SdkLog.warning("unable to find @ClassId annotation references in workspace.", ze);
     }
     catch (CoreException ex) {
       SdkLog.error("unable to find @ClassId annotation references in workspace.", ex);
