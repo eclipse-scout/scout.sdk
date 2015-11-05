@@ -25,6 +25,9 @@
   <packaging>pom</packaging>
 
   <modules>
+    <!-- Must be at first position -->
+    <module>../scout-helloworld-app</module>
+
     <module>../org.eclipse.scout.sdk.core</module>
     <module>../org.eclipse.scout.sdk.core.test</module>
     <module>../org.eclipse.scout.sdk.core.s</module>
@@ -33,8 +36,6 @@
     <module>../org.eclipse.scout.sdk.s2e</module>
     <module>../org.eclipse.scout.sdk.s2e.ui</module>
     <module>../org.eclipse.scout.sdk.s2e.nls</module>
-
-    <module>../scout-helloworld-app</module>
   </modules>
 
   <properties>
