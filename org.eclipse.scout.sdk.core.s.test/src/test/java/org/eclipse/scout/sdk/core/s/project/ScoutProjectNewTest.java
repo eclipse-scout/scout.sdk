@@ -33,7 +33,7 @@ public class ScoutProjectNewTest {
     File targetDirectory = Files.createTempDirectory(ScoutProjectNewTest.class.getSimpleName() + "-projectDir").toFile();
     try {
       ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_SYMBOLIC_NAME, "test", getJavaVersion());
-      File pomDir = new File(targetDirectory, PROJECT_SYMBOLIC_NAME + ScoutProjectNewHelper.ROOT_PROJECT_SUFFIX + File.separatorChar + "parent");
+      File pomDir = new File(targetDirectory, PROJECT_SYMBOLIC_NAME + File.separatorChar + PROJECT_SYMBOLIC_NAME + ".parent");
       new MavenCliRunner().execute(pomDir, new String[]{"clean", "test", "-X", "-Dmaven.ext.class.path=''"});
     }
     finally {

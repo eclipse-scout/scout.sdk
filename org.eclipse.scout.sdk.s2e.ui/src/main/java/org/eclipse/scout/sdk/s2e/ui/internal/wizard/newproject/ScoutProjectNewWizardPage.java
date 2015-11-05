@@ -244,7 +244,7 @@ public class ScoutProjectNewWizardPage extends AbstractWizardPage {
       folder = getTargetDirectory();
     }
     if (folder != null) {
-      if (new File(folder, getSymbolicName() + ScoutProjectNewHelper.ROOT_PROJECT_SUFFIX).exists()) {
+      if (new File(folder, getSymbolicName()).exists()) {
         return new Status(IStatus.ERROR, S2ESdkUiActivator.PLUGIN_ID, "A project with this Symbolic Name already exists in this target directory.");
       }
     }

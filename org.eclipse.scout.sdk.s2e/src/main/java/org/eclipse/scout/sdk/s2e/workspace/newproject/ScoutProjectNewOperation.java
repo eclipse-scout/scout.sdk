@@ -149,7 +149,7 @@ public class ScoutProjectNewOperation implements IOperation {
    * @throws CoreException
    */
   protected void importIntoWorkspace(IProgressMonitor monitor) throws CoreException {
-    File baseFolder = new File(getTargetDirectory(), getSymbolicName() + ScoutProjectNewHelper.ROOT_PROJECT_SUFFIX);
+    File baseFolder = new File(getTargetDirectory(), getSymbolicName());
     File[] subFolders = baseFolder.listFiles();
     Collection<MavenProjectInfo> projects = new ArrayList<>(subFolders.length);
     for (File subFolder : subFolders) {

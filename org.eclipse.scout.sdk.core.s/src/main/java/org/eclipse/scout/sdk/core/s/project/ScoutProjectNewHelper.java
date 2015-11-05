@@ -13,12 +13,30 @@ package org.eclipse.scout.sdk.core.s.project;
 import java.io.File;
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Pattern;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.Result;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.eclipse.scout.sdk.core.s.util.MavenCliRunner;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 /**
  * <h3>{@link ScoutProjectNewHelper}</h3>
@@ -28,7 +46,6 @@ import org.eclipse.scout.sdk.core.util.CoreUtils;
  */
 public class ScoutProjectNewHelper {
 
-  public static final String ROOT_PROJECT_SUFFIX = ".root";
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"\\/<>=:]+");
   public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
   public static final String DEFAULT_JAVA_VERSION = "1.8";
@@ -67,13 +84,71 @@ public class ScoutProjectNewHelper {
     String[] authKeysForDev = CoreUtils.generateKeyPair();
     String[] args = new String[]{"archetype:generate", "-B", "-X",
         "-DarchetypeGroupId=" + groupId, "-DarchetypeArtifactId=" + artifactId, "-DarchetypeVersion=" + version,
-        "-DgroupId=" + symbolicName, "-DartifactId=" + symbolicName + ROOT_PROJECT_SUFFIX, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + symbolicName,
+        "-DgroupId=" + symbolicName, "-DartifactId=" + symbolicName, "-Dversion=1.0.0-SNAPSHOT", "-Dpackage=" + symbolicName,
         "-DdisplayName=" + displayName, "-DscoutAuthPublicKey=" + authKeysForWar[1], "-DscoutAuthPrivateKey=" + authKeysForWar[0], "-DscoutAuthPublicKeyDev=" + authKeysForDev[1], "-DscoutAuthPrivateKeyDev=" + authKeysForDev[0],
         "-DjavaVersion=" + javaVersion, "-DuserName=" + CoreUtils.getUsername(),
         "-Dmaven.ext.class.path=''"};
 
     // execute archetype generation
     new MavenCliRunner().execute(targetDirectory, args);
+
+    postProcessRootPom(new File(targetDirectory, symbolicName));
+  }
+
+  /**
+   * Workaround so that only the parent module is referenced in the root (remove non-parent modules)
+   */
+  protected static void postProcessRootPom(File targetDirectory) throws IOException {
+    try {
+      File pom = new File(targetDirectory, "pom.xml");
+      if (!pom.isFile()) {
+        return;
+      }
+
+      DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+      DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+      Document doc = docBuilder.parse(pom);
+
+      Element modules = getFirstChildElement(doc.getDocumentElement(), "modules");
+
+      NodeList childNodes = modules.getChildNodes();
+      List<Node> nodesToRemove = new ArrayList<>();
+      for (int i = 0; i < childNodes.getLength(); i++) {
+        Node n = childNodes.item(i);
+        if (n.getNodeType() == Node.TEXT_NODE) {
+          nodesToRemove.add(n);
+        }
+        else if (n.getNodeType() == Node.ELEMENT_NODE && "module".equals(((Element) n).getTagName()) && !n.getTextContent().trim().endsWith(".parent")) {
+          nodesToRemove.add(n);
+        }
+      }
+      for (Node n : nodesToRemove) {
+        modules.removeChild(n);
+      }
+
+      writeDocument(doc, new StreamResult(pom));
+    }
+    catch (ParserConfigurationException | SAXException | TransformerException e) {
+      throw new IOException(e);
+    }
+  }
+
+  protected static void writeDocument(Document document, Result result) throws TransformerException {
+    TransformerFactory tf = TransformerFactory.newInstance();
+    Transformer transformer = tf.newTransformer();
+    transformer.setOutputProperty(OutputKeys.INDENT, "no");
+    transformer.transform(new DOMSource(document), result);
+  }
+
+  protected static Element getFirstChildElement(Element parent, String tagName) {
+    NodeList children = parent.getElementsByTagName(tagName);
+    for (int i = 0; i < children.getLength(); ++i) {
+      Node n = children.item(i);
+      if (n.getNodeType() == Node.ELEMENT_NODE) {
+        return ((Element) n);
+      }
+    }
+    return null;
   }
 
   public static String getDisplayNameErrorMEssage(String displayNameCandidate) {
