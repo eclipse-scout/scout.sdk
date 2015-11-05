@@ -134,6 +134,9 @@ public final class ClassIdValidationJob extends AbstractJob {
     catch (IllegalArgumentException iae) {
       SdkLog.info("@ClassId validation job cancelled.", iae);
     }
+    catch (Exception e) {
+      SdkLog.error("unable to find @ClassId annotation references in workspace.", e);
+    }
     return result;
   }
 
