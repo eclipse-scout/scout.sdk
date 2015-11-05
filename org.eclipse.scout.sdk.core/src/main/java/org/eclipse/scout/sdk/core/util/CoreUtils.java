@@ -378,7 +378,7 @@ public final class CoreUtils {
 
     switch (parameter.charAt(0)) {
       case ISignatureConstants.C_BOOLEAN:
-        return "true";
+        return Boolean.FALSE.toString();
       case ISignatureConstants.C_BYTE:
       case ISignatureConstants.C_CHAR:
       case ISignatureConstants.C_DOUBLE:
