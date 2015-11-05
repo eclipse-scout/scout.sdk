@@ -576,7 +576,7 @@ public final class JdtUtils {
     return context;
   }
 
-  public static List<IType> writeTypesWithResult(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
+  public static List<IType> writeTypesWithResult(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws JavaModelException {
     writeTypes(ops, monitor, true);
 
     List<IType> result = new ArrayList<>(ops.size());
@@ -590,7 +590,7 @@ public final class JdtUtils {
     return result;
   }
 
-  public static void writeTypes(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) throws CoreException {
+  public static void writeTypes(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) {
     if (ops == null || ops.isEmpty()) {
       return;
     }
@@ -615,7 +615,7 @@ public final class JdtUtils {
         job.join(0L, monitor);
       }
       catch (OperationCanceledException | InterruptedException e) {
-        throw new CoreException(new ScoutStatus("Unable to wait until compilation units have been written.", e));
+        SdkLog.info("Unable to wait until compilation units have been written.", e);
       }
     }
   }
