@@ -56,7 +56,7 @@ public interface IScoutRuntimeTypes {
   String IExtension = "org.eclipse.scout.rt.shared.extension.IExtension";
   String IFormExtension = "org.eclipse.scout.rt.client.extension.ui.form.IFormExtension";
   String IFormFieldExtension = "org.eclipse.scout.rt.client.extension.ui.form.fields.IFormFieldExtension";
-  String IScoutLogger = "org.eclipse.scout.commons.logger.IScoutLogger";
+  String Logger = "org.slf4j.Logger";
   String ITreeField = "org.eclipse.scout.rt.client.ui.form.fields.treefield.ITreeField";
   String IPlannerField = "org.eclipse.scout.rt.client.ui.form.fields.plannerfield.IPlannerField";
   String IComposerField = "org.eclipse.scout.rt.client.ui.form.fields.composer.IComposerField";

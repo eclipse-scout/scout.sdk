@@ -443,7 +443,7 @@ public class ScoutStructuredType implements IStructuredType {
       // static
       if ((f.getFlags() & Flags.AccStatic) != 0) {
         String fieldDataType = Signature.toString(f.getTypeSignature());
-        if (Signature.getSimpleName(IScoutRuntimeTypes.IScoutLogger).equals(fieldDataType) || IScoutRuntimeTypes.IScoutLogger.equals(fieldDataType)) {
+        if (Signature.getSimpleName(IScoutRuntimeTypes.Logger).equals(fieldDataType) || IScoutRuntimeTypes.Logger.equals(fieldDataType)) {
           loggers.add(f);
           it.remove();
         }
