@@ -105,7 +105,7 @@ public class NlsFindKeysJob extends Job {
             if (dir.equals(outputFolder)) {
               return FileVisitResult.SKIP_SUBTREE;
             }
-            boolean isHiddenDir = dir.getFileName().toString().startsWith(".");
+            boolean isHiddenDir = dir.getFileName() != null && dir.getFileName().toString().startsWith(".");
             if (isHiddenDir) {
               return FileVisitResult.SKIP_SUBTREE;
             }
@@ -114,7 +114,11 @@ public class NlsFindKeysJob extends Job {
 
           @Override
           public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-            String fileName = file.getFileName().toString().toLowerCase();
+            Path path = file.getFileName();
+            if (path == null) {
+              return FileVisitResult.CONTINUE;
+            }
+            String fileName = path.toString().toLowerCase();
             if (attrs.isRegularFile() && (fileName.endsWith(".java") || fileName.endsWith(".html"))) {
               searchInFile(file, charset, monitor);
             }

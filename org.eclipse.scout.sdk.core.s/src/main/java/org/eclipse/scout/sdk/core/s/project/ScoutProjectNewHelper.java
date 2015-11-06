@@ -44,11 +44,14 @@ import org.xml.sax.SAXException;
  * @author Matthias Villiger
  * @since 5.2.0
  */
-public class ScoutProjectNewHelper {
+public final class ScoutProjectNewHelper {
 
   public static final Pattern DISPLAY_NAME_PATTERN = Pattern.compile("[^\"\\/<>=:]+");
   public static final Pattern SYMBOLIC_NAME_PATTERN = Pattern.compile("^[a-z]{1}[a-z0-9_]{0,32}(\\.[a-z]{1}[a-z0-9_]{0,32}){0,16}$");
   public static final String DEFAULT_JAVA_VERSION = "1.8";
+
+  private ScoutProjectNewHelper() {
+  }
 
   public static void createProject(File targetDirectory, String symbolicName, String displayName) throws IOException, GeneralSecurityException {
     createProject(targetDirectory, symbolicName, displayName, null);
