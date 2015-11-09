@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_p2_plugin_config-master</artifactId>
-    <version>1.6.3</version>
+    <version>1.6.4</version>
     <relativePath></relativePath>
   </parent>
 
@@ -97,7 +97,27 @@
         </plugin>
       </plugins>
     </pluginManagement>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-plugin</artifactId>
+        <configuration>
+          <basedir>${project.basedir}/..</basedir>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>flatten-maven-plugin</artifactId>
+        <inherited>false</inherited>
+        <configuration>
+          <flattenMode>bom</flattenMode>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
+
+  <!-- primarily for license header generation -->
+  <inceptionYear>2015</inceptionYear>
 
   <licenses>
     <license>
@@ -124,6 +144,8 @@
 
   <scm>
     <connection>scm:git:git://git.eclipse.org/gitroot/scout/org.eclipse.scout.sdk.git</connection>
+    <developerConnection>scm:git:ssh://${eclipse_gerrit_username}@git.eclipse.org:29418/scout/org.eclipse.scout.sdk</developerConnection>
+    <tag>releases/5.2.x</tag>
     <url>http://git.eclipse.org/c/scout/org.eclipse.scout.sdk.git/</url>
   </scm>
 
