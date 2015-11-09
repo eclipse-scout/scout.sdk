@@ -23,7 +23,6 @@ import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.testing.CoreTestingUtils;
 import org.eclipse.scout.sdk.core.testing.JavaEnvironmentBuilder;
-import org.eclipse.scout.sdk.core.testing.SdkAssert;
 import org.junit.Assert;
 
 /**
@@ -43,8 +42,8 @@ public final class CoreScoutTestingUtils {
   }
 
   /**
-   * @return a {@link IJavaEnvironment} for org.eclipse.*.shared tests, without the org.eclipse.scout.rt.client
-   *         dependency
+   * @return a {@link org.eclipse.scout.sdk.core.model.api.IJavaEnvironment} for org.eclipse.*.shared tests, without the
+   *         org.eclipse.scout.rt.client dependency
    */
   public static IJavaEnvironment createSharedJavaEnvironment() {
     return new JavaEnvironmentBuilder()
@@ -111,7 +110,8 @@ public final class CoreScoutTestingUtils {
   }
 
   /**
-   * fails if the {@link IAnnotatable} does not have an order annotation with the <code>orderNr</code>.
+   * fails if the {@link org.eclipse.scout.sdk.core.model.api.IAnnotatable} does not have an order annotation with the
+   * <code>orderNr</code>.
    *
    * @param message
    * @param annotatable
@@ -145,7 +145,7 @@ public final class CoreScoutTestingUtils {
   }
 
   /**
-   * @see SdkAssert#assertOrderAnnotation(String, IAnnotatable, Double)
+   * @see org.eclipse.scout.sdk.core.testing.SdkAssert#assertOrderAnnotation(String, IAnnotatable, Double)
    */
   public static void assertOrderAnnotation(IAnnotatable annotatable, Double orderNr) {
     assertOrderAnnotation(null, annotatable, orderNr);

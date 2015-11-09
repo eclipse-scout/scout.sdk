@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_plugin_config-master</artifactId>
-    <version>1.6.4</version>
+    <version>1.6.6</version>
     <relativePath></relativePath>
   </parent>
 
@@ -39,7 +39,12 @@
   </modules>
 
   <properties>
-    <scout.rt.version>${project.version}</scout.rt.version>
+    <scout.base.version>5.2.0</scout.base.version>
+    <base.version>${scout.base.version}</base.version>
+    <org.eclipse.scout.rt_version>5.2.0-SNAPSHOT</org.eclipse.scout.rt_version>
+
+    <!-- Sonar properties -->
+    <sonar.branch>releases_5.2.x</sonar.branch>
 
     <!-- exclude the unit tests from sonar -->
     <sonar.exclusions>file:**/org.eclipse.scout.sdk*test/**</sonar.exclusions>
@@ -464,20 +469,13 @@
       <dependency>
         <groupId>org.eclipse.scout.rt</groupId>
         <artifactId>org.eclipse.scout.rt.client</artifactId>
-        <version>${scout.rt.version}</version>
+        <version>${org.eclipse.scout.rt_version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-scm-plugin</artifactId>
-        <configuration>
-          <basedir>${project.basedir}/..</basedir>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>
@@ -491,6 +489,11 @@
 
   <!-- primarily for license header generation -->
   <inceptionYear>2015</inceptionYear>
+
+  <organization>
+    <name>Eclipse Scout Project</name>
+    <url>https://eclipse.org/scout</url>
+  </organization>
 
   <licenses>
     <license>
@@ -573,4 +576,89 @@
       <url>https://repo.eclipse.org/content/repositories/scout-snapshots/</url>
     </snapshotRepository>
   </distributionManagement>
+
+  <profiles>
+    <profile>
+      <id>release.setversion</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.google.code.maven-replacer-plugin</groupId>
+            <artifactId>replacer</artifactId>
+            <executions>
+              <execution>
+                <id>replace_scout_version_parent_pom</id>
+                <goals>
+                  <goal>replace</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <basedir>${project.basedir}</basedir>
+                  <includes>
+                    <include>pom.xml</include>
+                  </includes>
+                  <token>(\\x3corg.eclipse.scout.rt_version\\x3e)[0-9A-Z\\.\\-]*(\\x3c/org.eclipse.scout.rt_version\\x3e)</token>
+                  <value>$1${org.eclipse.scout.rt_version}$2</value>
+                  <unescape>true</unescape>
+                </configuration>
+              </execution>
+              <execution>
+                <id>replace_scout_version_project_helper</id>
+                <goals>
+                  <goal>replace</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <basedir>${project.basedir}/..</basedir>
+                  <includes>
+                    <include>**/ScoutProjectNewHelper.java</include>
+                  </includes>
+                  <token>(version = \\")[0-9A-Z\\.\\-]*(\\";)</token>
+                  <value>$1${org.eclipse.scout.rt_version}$2</value>
+                  <unescape>true</unescape>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>release.checkin</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-scm-plugin</artifactId>
+            <configuration>
+              <basedir>${project.basedir}/..</basedir>
+              <includes>*/pom.xml,**/ScoutProjectNewHelper.java,*/src/main/resources/archetype-resources/*/pom.xml,*/feature.xml,*/category.xml</includes>
+              <pushChanges>false</pushChanges>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>release.tag</id>
+      <build>
+        <defaultGoal>scm:tag</defaultGoal>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-scm-plugin</artifactId>
+            <configuration>
+              <basedir>${project.basedir}/..</basedir>
+              <pushChanges>false</pushChanges>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

@@ -16,6 +16,7 @@ classes/
 
 # Maven #
 target/
+.mvn/
 .surefire-*
 .flattened-pom.xml
 

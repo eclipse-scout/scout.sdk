@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_p2_plugin_config-master</artifactId>
-    <version>1.6.4</version>
+    <version>1.6.6</version>
     <relativePath></relativePath>
   </parent>
 
@@ -30,12 +30,18 @@
     <module>../org.eclipse.scout.sdk-repository</module>
   </modules>
 
+  <properties>
+    <scout.base.version>5.2.0</scout.base.version>
+    <base.version>${scout.base.version}</base.version>
+    <org.eclipse.scout.rt_version>5.2.0-SNAPSHOT</org.eclipse.scout.rt_version>
+  </properties>
+
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.eclipse.scout.sdk</groupId>
         <artifactId>org.eclipse.scout.sdk</artifactId>
-        <version>5.2.0-SNAPSHOT</version>
+        <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -99,13 +105,6 @@
     </pluginManagement>
     <plugins>
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-scm-plugin</artifactId>
-        <configuration>
-          <basedir>${project.basedir}/..</basedir>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>flatten-maven-plugin</artifactId>
         <inherited>false</inherited>
@@ -118,6 +117,11 @@
 
   <!-- primarily for license header generation -->
   <inceptionYear>2015</inceptionYear>
+
+  <organization>
+    <name>Eclipse Scout Project</name>
+    <url>https://eclipse.org/scout</url>
+  </organization>
 
   <licenses>
     <license>
@@ -200,4 +204,56 @@
       <url>https://repo.eclipse.org/content/repositories/scout-snapshots/</url>
     </snapshotRepository>
   </distributionManagement>
+
+  <profiles>
+    <profile>
+      <id>release.setversion</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.google.code.maven-replacer-plugin</groupId>
+            <artifactId>replacer</artifactId>
+            <executions>
+              <execution>
+                <id>replace_scout_version_parent_pom</id>
+                <goals>
+                  <goal>replace</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <basedir>${project.basedir}</basedir>
+                  <includes>
+                    <include>pom.xml</include>
+                  </includes>
+                  <token>(\\x3corg.eclipse.scout.rt_version\\x3e)[0-9A-Z\\.\\-]*(\\x3c/org.eclipse.scout.rt_version\\x3e)</token>
+                  <value>$1${org.eclipse.scout.rt_version}$2</value>
+                  <unescape>true</unescape>
+                </configuration>
+              </execution>
+              <execution>
+                <id>replace_scout_version_p2_files</id>
+                <goals>
+                  <goal>replace</goal>
+                </goals>
+                <phase>generate-resources</phase>
+                <configuration>
+                  <basedir>${project.basedir}/..</basedir>
+                  <includes>
+                    <include>*/feature.xml</include>
+                    <include>*/category.xml</include>
+                  </includes>
+                  <token>[0-9A-Z\\.]*.qualifier</token>
+                  <value>${org.eclipse.scout.rt_version}</value>
+                  <unescape>true</unescape>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
