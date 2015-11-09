@@ -34,7 +34,7 @@ public class ScoutProjectNewTest {
     try {
       ScoutProjectNewHelper.createProject(targetDirectory, PROJECT_SYMBOLIC_NAME, "test", getJavaVersion());
       File pomDir = new File(targetDirectory, PROJECT_SYMBOLIC_NAME + File.separatorChar + PROJECT_SYMBOLIC_NAME + ".parent");
-      new MavenCliRunner().execute(pomDir, new String[]{"clean", "test", "-B -X", "-Dmaven.ext.class.path=''"});
+      new MavenCliRunner().execute(pomDir, new String[]{"clean", "test", "-B", "-X", "-Dmaven.ext.class.path=''"}, null, null);
     }
     finally {
       CoreUtils.deleteFolder(targetDirectory);

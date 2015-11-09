@@ -25,6 +25,7 @@ import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
 import org.eclipse.scout.sdk.core.s.project.ScoutProjectNewHelper;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
 import org.eclipse.scout.sdk.s2e.workspace.IOperation;
@@ -62,6 +63,7 @@ public class ScoutProjectNewOperation implements IOperation {
   @Override
   public void run(IProgressMonitor monitor, IWorkingCopyManager workingCopyManager) throws CoreException {
     try {
+      // archetype settings
       String groupId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_GROUP_ID);
       String artifactId = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_ARTIFACT_ID);
       String version = S2ESdkActivator.getDefault().getBundle().getBundleContext().getProperty(TEMPLATE_VERSION);
@@ -72,8 +74,12 @@ public class ScoutProjectNewOperation implements IOperation {
         version = null;
       }
 
+      // maven settings
+      String globalSettings = getMavenSettings(MavenPlugin.getMavenConfiguration().getGlobalSettingsFile());
+      String settings = getMavenSettings(MavenPlugin.getMavenConfiguration().getUserSettingsFile());
+
       monitor.beginTask(getOperationName(), 100);
-      ScoutProjectNewHelper.createProject(getTargetDirectory(), getSymbolicName(), getDisplayName(), Double.toString(getExecEnvVersion(getDefaultJvmExecutionEnvironment())), groupId, artifactId, version);
+      ScoutProjectNewHelper.createProject(getTargetDirectory(), getSymbolicName(), getDisplayName(), Double.toString(getExecEnvVersion(getDefaultJvmExecutionEnvironment())), groupId, artifactId, version, globalSettings, settings);
       monitor.worked(10);
 
       importIntoWorkspace(new SubProgressMonitor(monitor, 90));
@@ -84,6 +90,18 @@ public class ScoutProjectNewOperation implements IOperation {
     finally {
       monitor.done();
     }
+  }
+
+  protected static String getMavenSettings(String in) {
+    if (StringUtils.isNotBlank(in)) {
+      File p = new File(in);
+      String absolutePath = p.getAbsolutePath();
+      if (p.isFile()) {
+        return absolutePath;
+      }
+      SdkLog.warning("Maven settings file '" + absolutePath + "' not found. Using empty settings.");
+    }
+    return null;
   }
 
   /**

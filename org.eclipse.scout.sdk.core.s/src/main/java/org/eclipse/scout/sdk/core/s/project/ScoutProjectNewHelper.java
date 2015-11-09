@@ -62,6 +62,11 @@ public final class ScoutProjectNewHelper {
   }
 
   public static void createProject(File targetDirectory, String symbolicName, String displayName, String javaVersion, String groupId, String artifactId, String version) throws IOException, GeneralSecurityException {
+    createProject(targetDirectory, symbolicName, displayName, javaVersion, groupId, artifactId, javaVersion, null, null);
+  }
+
+  public static void createProject(File targetDirectory, String symbolicName, String displayName, String javaVersion, String groupId, String artifactId, String version, String mavenGlobalSettings, String mavenSettings)
+      throws IOException, GeneralSecurityException {
     // validate input
     Validate.notNull(targetDirectory);
     String symbolicNameMsg = getSymbolicNameErrorMessage(symbolicName);
@@ -93,7 +98,7 @@ public final class ScoutProjectNewHelper {
         "-Dmaven.ext.class.path=''"};
 
     // execute archetype generation
-    new MavenCliRunner().execute(targetDirectory, args);
+    new MavenCliRunner().execute(targetDirectory, args, mavenGlobalSettings, mavenSettings);
 
     postProcessRootPom(new File(targetDirectory, symbolicName));
   }

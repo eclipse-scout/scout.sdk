@@ -15,9 +15,14 @@ import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.cli.MavenCli;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link MavenCliRunner}</h3>
@@ -38,17 +43,78 @@ public class MavenCliRunner {
     return m_stdOut;
   }
 
-  public void execute(File workingDirectory, String[] args) throws IOException {
+  protected static String[] getMavenArgs(String[] in, String mavenOpts, String globalSettings, String settings) {
+    List<String> args = new ArrayList<>();
+    for (String s : in) {
+      args.add(s);
+    }
+    if (StringUtils.isNotBlank(globalSettings)) {
+      overwriteIfExisting(args, "-gs=", globalSettings);
+    }
+    if (StringUtils.isNotBlank(settings)) {
+      overwriteIfExisting(args, "-s=", settings);
+    }
+
+    if (StringUtils.isNotBlank(mavenOpts)) {
+      String[] opts = mavenOpts.split("\\s");
+      for (String s : opts) {
+        if (StringUtils.isNotBlank(s)) {
+          int eqPos = s.indexOf('=');
+          String search = s;
+          if (eqPos > 0) {
+            search = s.substring(0, eqPos + 1);
+          }
+          if (getEntryStartingWith(args, search) == null) {
+            args.add(s);
+          }
+        }
+      }
+    }
+
+    return args.toArray(new String[args.size()]);
+  }
+
+  protected static void overwriteIfExisting(Collection<String> args, String prefix, String value) {
+    String existing = getEntryStartingWith(args, prefix);
+    if (existing != null) {
+      args.remove(existing);
+    }
+    args.add(prefix + value);
+  }
+
+  protected static String getEntryStartingWith(Iterable<String> c, String prefix) {
+    for (String s : c) {
+      if (s != null && s.startsWith(prefix)) {
+        return s;
+      }
+    }
+    return null;
+  }
+
+  public void execute(File workingDirectory, String[] args, String globalSettings, String settings) throws IOException {
     String oldMultiModuleProjectDir = System.getProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
     ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
     try {
       System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, workingDirectory.getAbsolutePath());
       String charset = StandardCharsets.UTF_8.name();
       try (ByteArrayOutputStream bOut = new ByteArrayOutputStream(); PrintStream out = new PrintStream(bOut, true, charset); ByteArrayOutputStream bErr = new ByteArrayOutputStream(); PrintStream err = new PrintStream(bErr, true, charset)) {
+
+        String[] mavenArgs = getMavenArgs(args, System.getenv().get("MAVEN_OPTS"), globalSettings, settings);
+        SdkLog.debug("Executing embedded maven with arguments:  " + Arrays.toString(mavenArgs));
+
         MavenCli cli = new MavenCli();
-        int result = cli.doMain(args, workingDirectory.getAbsolutePath(), out, err);
+        int result = cli.doMain(mavenArgs, workingDirectory.getAbsolutePath(), out, err);
+
         m_stdOut = bOut.toString(charset);
         m_errOut = bErr.toString(charset);
+
+        if (StringUtils.isNotEmpty(m_stdOut)) {
+          SdkLog.debug(m_stdOut);
+        }
+        if (StringUtils.isNotEmpty(m_errOut)) {
+          SdkLog.debug(m_errOut);
+        }
+
         if (result != 0) {
           String msg = getErrorOutput();
           if (StringUtils.isEmpty(msg)) {
