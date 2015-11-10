@@ -484,6 +484,13 @@
           <flattenMode>bom</flattenMode>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-scm-plugin</artifactId>
+        <configuration>
+          <basedir>${project.basedir}/..</basedir>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -635,26 +642,7 @@
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-scm-plugin</artifactId>
             <configuration>
-              <basedir>${project.basedir}/..</basedir>
               <includes>*/pom.xml,**/ScoutProjectNewHelper.java,*/src/main/resources/archetype-resources/*/pom.xml,*/feature.xml,*/category.xml</includes>
-              <pushChanges>false</pushChanges>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>release.tag</id>
-      <build>
-        <defaultGoal>scm:tag</defaultGoal>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-scm-plugin</artifactId>
-            <configuration>
-              <basedir>${project.basedir}/..</basedir>
-              <pushChanges>false</pushChanges>
             </configuration>
           </plugin>
         </plugins>
