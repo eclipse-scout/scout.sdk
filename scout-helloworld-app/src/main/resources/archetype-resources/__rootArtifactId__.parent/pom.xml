@@ -20,7 +20,7 @@
   <properties>
     <${groupId}.version>${project.version}</${groupId}.version>
     <jdk.source.version>${javaVersion}</jdk.source.version>
-    <org.eclipse.scout.rt_version>5.2.0.B001</org.eclipse.scout.rt_version>
+    <org.eclipse.scout.rt_version>5.2.0.M3</org.eclipse.scout.rt_version>
   </properties>
 
   <modules>
@@ -66,4 +66,38 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <repositories>
+    <repository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>eclipse.release</id>
+      <name>eclipse-release-repo</name>
+      <url>https://repo.eclipse.org/content/groups/releases/</url>
+    </repository>
+    <repository>
+      <snapshots></snapshots>
+      <id>eclipse.snapshot</id>
+      <name>eclipse-snapshot-repo</name>
+      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
+    </repository>
+  </repositories>
+
+  <pluginRepositories>
+    <pluginRepository>
+      <snapshots>
+        <enabled>false</enabled>
+      </snapshots>
+      <id>eclipse.release</id>
+      <name>eclipse-release-repo</name>
+      <url>https://repo.eclipse.org/content/groups/releases/</url>
+    </pluginRepository>
+    <pluginRepository>
+      <snapshots></snapshots>
+      <id>eclipse.snapshot</id>
+      <name>eclipse-snapshot-repo</name>
+      <url>https://repo.eclipse.org/content/groups/snapshots/</url>
+    </pluginRepository>
+  </pluginRepositories>
 </project>
