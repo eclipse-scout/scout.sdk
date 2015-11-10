@@ -43,8 +43,8 @@ public class MavenCliRunner {
     return m_stdOut;
   }
 
-  protected static String[] getMavenArgs(String[] in, String mavenOpts, String globalSettings, String settings) {
-    List<String> args = new ArrayList<>();
+  protected static String[] getMavenArgs(String[] in, String globalSettings, String settings) {
+    List<String> args = new ArrayList<>(in.length + 2);
     for (String s : in) {
       args.add(s);
     }
@@ -53,22 +53,6 @@ public class MavenCliRunner {
     }
     if (StringUtils.isNotBlank(settings)) {
       overwriteIfExisting(args, "-s=", settings);
-    }
-
-    if (StringUtils.isNotBlank(mavenOpts)) {
-      String[] opts = mavenOpts.split("\\s");
-      for (String s : opts) {
-        if (StringUtils.isNotBlank(s)) {
-          int eqPos = s.indexOf('=');
-          String search = s;
-          if (eqPos > 0) {
-            search = s.substring(0, eqPos + 1);
-          }
-          if (getEntryStartingWith(args, search) == null) {
-            args.add(s);
-          }
-        }
-      }
     }
 
     return args.toArray(new String[args.size()]);
@@ -96,10 +80,10 @@ public class MavenCliRunner {
     ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
     try {
       System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, workingDirectory.getAbsolutePath());
-      String charset = StandardCharsets.UTF_8.name();
+      String charset = StandardCharsets.UTF_16.name();
       try (ByteArrayOutputStream bOut = new ByteArrayOutputStream(); PrintStream out = new PrintStream(bOut, true, charset); ByteArrayOutputStream bErr = new ByteArrayOutputStream(); PrintStream err = new PrintStream(bErr, true, charset)) {
 
-        String[] mavenArgs = getMavenArgs(args, System.getenv().get("MAVEN_OPTS"), globalSettings, settings);
+        String[] mavenArgs = getMavenArgs(args, globalSettings, settings);
         SdkLog.debug("Executing embedded maven with arguments:  " + Arrays.toString(mavenArgs));
 
         MavenCli cli = new MavenCli();
