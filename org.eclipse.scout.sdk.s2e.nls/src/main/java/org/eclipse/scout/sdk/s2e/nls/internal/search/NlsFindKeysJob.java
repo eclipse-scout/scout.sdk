@@ -105,7 +105,8 @@ public class NlsFindKeysJob extends Job {
             if (dir.equals(outputFolder)) {
               return FileVisitResult.SKIP_SUBTREE;
             }
-            boolean isHiddenDir = dir.getFileName() != null && dir.getFileName().toString().startsWith(".");
+            Path fileName = dir.getFileName();
+            boolean isHiddenDir = fileName != null && fileName.toString().startsWith(".");
             if (isHiddenDir) {
               return FileVisitResult.SKIP_SUBTREE;
             }
