@@ -89,7 +89,7 @@ public final class ClassIdValidationJob extends AbstractJob {
         @Override
         public void acceptSearchMatch(SearchMatch match) throws CoreException {
           if (monitor.isCanceled()) {
-            return;
+            throw new OperationCanceledException();
           }
           Object owner = match.getElement();
           if (owner instanceof IType) {

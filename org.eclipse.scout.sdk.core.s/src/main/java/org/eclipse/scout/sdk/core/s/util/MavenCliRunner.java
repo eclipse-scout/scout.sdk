@@ -80,7 +80,7 @@ public class MavenCliRunner {
     ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
     try {
       System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, workingDirectory.getAbsolutePath());
-      String charset = StandardCharsets.UTF_16.name();
+      String charset = StandardCharsets.UTF_8.name();
       try (ByteArrayOutputStream bOut = new ByteArrayOutputStream(); PrintStream out = new PrintStream(bOut, true, charset); ByteArrayOutputStream bErr = new ByteArrayOutputStream(); PrintStream err = new PrintStream(bErr, true, charset)) {
 
         String[] mavenArgs = getMavenArgs(args, globalSettings, settings);
