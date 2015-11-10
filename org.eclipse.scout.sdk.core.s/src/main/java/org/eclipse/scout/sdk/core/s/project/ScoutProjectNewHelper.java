@@ -84,7 +84,7 @@ public final class ScoutProjectNewHelper {
       // use default
       groupId = "org.eclipse.scout.archetypes";
       artifactId = "scout-helloworld-app";
-      version = "5.2.0-SNAPSHOT";
+      version = "5.2.0.M3";
     }
 
     // create command
