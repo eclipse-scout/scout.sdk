@@ -33,9 +33,9 @@ _MAVEN_OPTS="$_MAVEN_OPTS -e -B"
 
 # Parallel executions of tests.
 # Half of CPU core are used in to keep other half for OS and other programs.
-mvn clean install -e -B -f org.eclipse.scout.sdk $_MAVEN_OPTS
+mvn clean install -f org.eclipse.scout.sdk $_MAVEN_OPTS
 processError
 
 # Parallel executions of maven modules
 # Half of CPU core are used in to keep other half for OS and other programs.
-mvn clean install -e -B -T0.5C -f org.eclipse.scout.sdk.p2 $_MAVEN_OPTS
+mvn clean install -T0.5C -f org.eclipse.scout.sdk.p2 $_MAVEN_OPTS
