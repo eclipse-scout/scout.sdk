@@ -1,0 +1,8 @@
+target/
+bin/
+
+!test.jar
+!compositeContent.jar
+!content.jar
+!artifacts.jar
+
