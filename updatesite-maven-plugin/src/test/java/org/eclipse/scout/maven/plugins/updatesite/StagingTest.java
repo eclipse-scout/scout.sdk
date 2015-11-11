@@ -13,7 +13,6 @@ package org.eclipse.scout.maven.plugins.updatesite;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -21,9 +20,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
-/**
- *
- */
 public class StagingTest {
 
   private File tempDir;
@@ -33,7 +29,7 @@ public class StagingTest {
   private File targetDirectory;
 
   @Before
-  public void setUp() throws IOException {
+  public void setUp() {
     URL testRepo = getClass().getResource("/repository");
     sourceDirectory = new File(testRepo.getFile());
 
@@ -45,7 +41,7 @@ public class StagingTest {
   }
 
   @After
-  public void tearDown() throws IOException {
+  public void tearDown() {
     FileUtility.deleteFile(tempDir);
   }
 
@@ -63,6 +59,9 @@ public class StagingTest {
     assertTrue(true);
   }
 
+  /**
+   * @throws MojoExecutionException
+   */
   @Test
   public void testCreateStageZip() throws MojoExecutionException {
     StagingMojo stagingMojo = new StagingMojo();
@@ -71,10 +70,25 @@ public class StagingTest {
     assertTrue(zipFile.exists());
   }
 
+  /**
+   * @throws MojoExecutionException
+   */
   @Test
-  public void testAppendChild() throws MojoExecutionException {
+  public void testAppendChildXML() throws MojoExecutionException {
     StagingMojo stagingMojo = new StagingMojo();
+    stagingMojo.setOutputDirectory(targetDirectory.getPath());
     stagingMojo.appendChild(getTestXMLFile(), "test");
+  }
+
+  /**
+   * @throws MojoExecutionException
+   */
+  @Test
+  public void testAppendChildJAR() throws MojoExecutionException {
+    StagingMojo stagingMojo = new StagingMojo();
+    stagingMojo.setOutputDirectory(targetDirectory.getPath());
+    File contentXML = StagingMojo.extractCompositeArchive(stagingMojo.getStageTargetDir(), getTestJARFile());
+    stagingMojo.appendChild(contentXML, "test");
   }
 
   private File getTestXMLFile() {

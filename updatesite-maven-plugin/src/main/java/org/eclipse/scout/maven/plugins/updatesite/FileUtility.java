@@ -43,12 +43,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.w3c.dom.Document;
 import org.xml.sax.SAXException;
 
-/**
- * <h4>FileUtility</h4>
- * 
- * @author aho
- * @since 1.1.0 (22.01.2011)
- */
 public class FileUtility {
 
   private final static int BUFFER_SIZE = 1024;
@@ -99,8 +93,7 @@ public class FileUtility {
     copyToDir(input, toDir, input.getParentFile().getAbsoluteFile().toURI());
   }
 
-  public static void copyToDir(File input, File toDir, URI relPath)
-      throws IOException {
+  public static void copyToDir(File input, File toDir, URI relPath) throws IOException {
     if (input.isDirectory()) {
       for (File f : input.listFiles()) {
         copyToDir(f, toDir, relPath);
@@ -164,8 +157,7 @@ public class FileUtility {
     return getContent(stream, true);
   }
 
-  public static byte[] getContent(InputStream stream, boolean autoClose)
-      throws IOException {
+  public static byte[] getContent(InputStream stream, boolean autoClose) throws IOException {
     BufferedInputStream in = null;
     try {
       in = new BufferedInputStream(stream);
@@ -189,8 +181,8 @@ public class FileUtility {
   }
 
   public static byte[] getContent(String filename) throws IOException {
-    try {
-      return getContent(new FileInputStream(filename), true);
+    try (FileInputStream stream = new FileInputStream(filename)) {
+      return getContent(stream, true);
     }
     catch (FileNotFoundException e) {
       IOException io = new IOException("filename: " + filename);
@@ -206,8 +198,7 @@ public class FileUtility {
     return getContent(stream, true);
   }
 
-  public static String getContent(Reader stream, boolean autoClose)
-      throws IOException {
+  public static String getContent(Reader stream, boolean autoClose) throws IOException {
     BufferedReader in = null;
     try {
       in = new BufferedReader(stream);
@@ -229,8 +220,7 @@ public class FileUtility {
     }
   }
 
-  public static void compressArchive(File srcDir, File archiveFile)
-      throws IOException {
+  public static void compressArchive(File srcDir, File archiveFile) throws IOException {
     JarOutputStream zOut = null;
     try {
       archiveFile.delete();
@@ -248,11 +238,9 @@ public class FileUtility {
     }
   }
 
-  private static void addFolderToJar(File baseDir, File srcdir,
-      JarOutputStream zOut) throws IOException {
+  private static void addFolderToJar(File baseDir, File srcdir, JarOutputStream zOut) throws IOException {
     if ((!srcdir.exists()) || (!srcdir.isDirectory())) {
-      throw new IOException("source directory " + srcdir
-          + " does not exist or is not a folder");
+      throw new IOException("source directory " + srcdir + " does not exist or is not a folder");
     }
     for (File f : srcdir.listFiles()) {
       if (f.exists() && (!f.isHidden())) {
@@ -266,8 +254,7 @@ public class FileUtility {
     }
   }
 
-  private static void addFileToJar(File baseDir, File src,
-      JarOutputStream zOut) throws IOException {
+  private static void addFileToJar(File baseDir, File src, JarOutputStream zOut) throws IOException {
     String name = src.getAbsolutePath();
     String prefix = baseDir.getAbsolutePath();
     if (prefix.endsWith("/") || prefix.endsWith("\\")) {
@@ -280,8 +267,7 @@ public class FileUtility {
     addFileToJar(name, data, timestamp, zOut);
   }
 
-  private static void addFileToJar(String name, byte[] data, long timestamp,
-      JarOutputStream zOut) throws IOException {
+  private static void addFileToJar(String name, byte[] data, long timestamp, JarOutputStream zOut) throws IOException {
     ZipEntry entry = new ZipEntry(name);
     entry.setTime(timestamp);
     zOut.putNextEntry(entry);
@@ -358,31 +344,29 @@ public class FileUtility {
           }
           continue;
         }
-        else {
-          f.getParentFile().mkdirs();
-          InputStream is = null;
-          FileOutputStream fos = null;
-          try {
-            is = jar.getInputStream(file);
-            fos = new FileOutputStream(f);
-            // Copy the bits from instream to outstream
-            byte[] buf = new byte[102400];
-            int len;
-            while ((len = is.read(buf)) > 0) {
-              fos.write(buf, 0, len);
-            }
+        f.getParentFile().mkdirs();
+        InputStream is = null;
+        FileOutputStream fos = null;
+        try {
+          is = jar.getInputStream(file);
+          fos = new FileOutputStream(f);
+          // Copy the bits from instream to outstream
+          byte[] buf = new byte[102400];
+          int len;
+          while ((len = is.read(buf)) > 0) {
+            fos.write(buf, 0, len);
           }
-          finally {
-            if (fos != null) {
-              fos.close();
-            }
-            if (is != null) {
-              is.close();
-            }
+        }
+        finally {
+          if (fos != null) {
+            fos.close();
           }
-          if (file.getTime() >= 0) {
-            f.setLastModified(file.getTime());
+          if (is != null) {
+            is.close();
           }
+        }
+        if (file.getTime() >= 0) {
+          f.setLastModified(file.getTime());
         }
       }
     }

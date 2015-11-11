@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>org.eclipse.scout.maven.plugins.updatesite</name>
+	<name>updatesite-maven-plugin</name>
 	<comment></comment>
 	<projects>
 	</projects>
@@ -20,4 +20,11 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.m2e.core.maven2Nature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>.settings</name>
+			<type>2</type>
+			<locationURI>PARENT-1-PROJECT_LOC/org.eclipse.scout.sdk-feature/.settings</locationURI>
+		</link>
+	</linkedResources>
 </projectDescription>

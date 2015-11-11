@@ -27,4 +27,42 @@
   <properties>
     <p2repo-zip-path>${project.build.directory}/org.eclipse.scout.sdk-repository-${project.version}.zip</p2repo-zip-path>
   </properties>
+
+  <profiles>
+    <profile>
+      <id>eclipse-stage</id>
+
+      <properties>
+        <buildType>N</buildType>
+        <stageTargetDir>nightly/5.2</stageTargetDir>
+        <buildId>${buildType}${master_build_timestamp}</buildId>
+        <buildsToKeep>3</buildsToKeep>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.eclipse.scout.sdk</groupId>
+            <artifactId>updatesite-maven-plugin</artifactId>
+            <version>${project.version}</version>
+            <configuration>
+              <updatesiteDir>${buildId}</updatesiteDir>
+              <compositeDir>${stageTargetDir}</compositeDir>
+              <maxSize>${buildsToKeep}</maxSize>
+            </configuration>
+            <executions>
+              <execution>
+                <id>stage</id>
+                <phase>install</phase>
+                <goals>
+                  <goal>stage</goal>
+                  <goal>publish</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

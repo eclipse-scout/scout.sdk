@@ -25,6 +25,8 @@ import java.util.Locale;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -33,9 +35,8 @@ import org.xml.sax.SAXException;
 
 /**
  * Stage the updatesite to staging area of the build server.
- * 
- * @goal stage
  */
+@Mojo(name = "stage")
 public class StagingMojo extends AbstractStagingMojo {
 
   private static final String COMPOSITE_CONTENT = "compositeContent";
@@ -48,31 +49,23 @@ public class StagingMojo extends AbstractStagingMojo {
 
   /**
    * The directory where the generated archive file will be put.
-   * 
-   * @parameter default-value="${project.build.directory}/repository"
    */
+  @Parameter(defaultValue = "${project.build.directory}/repository")
   private String p2InputDirectory;
 
   /**
    * The directory where the generated archive file will be put.
-   * 
-   * @parameter
    */
+  @Parameter
   private String updatesiteDir;
 
-  /**
-   * @parameter default-value="nightly"
-   */
+  @Parameter(defaultValue = "nightly")
   private String compositeDir;
 
-  /**
-   * @parameter default-value="http://download.eclipse.org/scout"
-   */
+  @Parameter(defaultValue = "http://download.eclipse.org/scout")
   private String repositoryUrl;
 
-  /**
-   * @parameter default-value=100
-   */
+  @Parameter(defaultValue = "100")
   private String maxSize;
 
   public String getP2InputDirectory() {
@@ -123,7 +116,9 @@ public class StagingMojo extends AbstractStagingMojo {
   }
 
   public File createCompositeRepo() throws MojoExecutionException {
-    if (getUpdatesiteDir() == null) throw new IllegalArgumentException("UpdatesiteDir cannot be null");
+    if (getUpdatesiteDir() == null) {
+      throw new IllegalArgumentException("UpdatesiteDir cannot be null");
+    }
     getLog().info("Creating composite Repository");
     try {
       File compositeRepo = new File(getStageDir(), getCompositeDirName());
@@ -138,8 +133,7 @@ public class StagingMojo extends AbstractStagingMojo {
     }
   }
 
-  private void updateCompositeJars(File outputDir)
-      throws MojoExecutionException {
+  private void updateCompositeJars(File outputDir) throws MojoExecutionException {
     File contentJar = downloadJar(getCompositeUrl(), COMPOSITE_CONTENT_JAR, outputDir.getPath());
     File artifactsJar = downloadJar(getCompositeUrl(), COMPOSITE_ARTIFACTS_JAR, outputDir.getPath());
 
@@ -167,7 +161,7 @@ public class StagingMojo extends AbstractStagingMojo {
     }
   }
 
-  private File extractCompositeArchive(File outputDir, File content) throws MojoExecutionException {
+  public static File extractCompositeArchive(File outputDir, File content) throws MojoExecutionException {
     if (content.getName() == null || !content.getName().endsWith(".jar")) {
       throw new IllegalArgumentException("Composite Archive must be a jar file " + content.getName());
     }
@@ -235,7 +229,7 @@ public class StagingMojo extends AbstractStagingMojo {
     }
   }
 
-  private String getChildElementCount(Node node) {
+  private static String getChildElementCount(Node node) {
     int count = 0;
     NodeList childNodes = node.getChildNodes();
     for (int i = 0; i < childNodes.getLength(); i++) {
@@ -246,7 +240,7 @@ public class StagingMojo extends AbstractStagingMojo {
     return "" + count;
   }
 
-  private File downloadJar(String url, String jarName, String outputDir) throws MojoExecutionException {
+  private static File downloadJar(String url, String jarName, String outputDir) throws MojoExecutionException {
     try {
       URL u = new URL(url + "/" + jarName);
       InputStream inputStream = u.openConnection().getInputStream();
@@ -304,8 +298,8 @@ public class StagingMojo extends AbstractStagingMojo {
       java.security.MessageDigest md = java.security.MessageDigest.getInstance("MD5");
       byte[] array = md.digest(content);
       StringBuffer sb = new StringBuffer();
-      for (int i = 0; i < array.length; ++i) {
-        sb.append(Integer.toHexString((array[i] & 0xFF) | 0x100).substring(1, 3));
+      for (byte element : array) {
+        sb.append(Integer.toHexString((element & 0xFF) | 0x100).substring(1, 3));
       }
       return sb.toString();
     }
@@ -317,7 +311,7 @@ public class StagingMojo extends AbstractStagingMojo {
     }
   }
 
-  private String createTimestamp() {
+  private static String createTimestamp() {
     SimpleDateFormat f = new SimpleDateFormat("yyyyMMdd-hhmmss-SSS", Locale.ENGLISH);
     return f.format(new Date());
   }

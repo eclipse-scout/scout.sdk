@@ -5,15 +5,13 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
-/**
- * @goal publish
- */
+@Mojo(name = "publish")
 public class PublishMojo extends AbstractStagingMojo {
 
-  /**
-   * @parameter default-value="/home/data/httpd/download.eclipse.org/scout/stagingArea"
-   */
+  @Parameter(defaultValue = "/home/data/httpd/download.eclipse.org/scout/stagingArea")
   private String stagingArea;
 
   @Override
