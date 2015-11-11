@@ -41,6 +41,18 @@
 
       <build>
         <plugins>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-enforcer-plugin</artifactId>
+            <configuration>
+              <rules>
+                <requirePluginVersions>
+                  <unCheckedPluginList>org.eclipse.scout.sdk:updatesite-maven-plugin</unCheckedPluginList>
+                </requirePluginVersions>
+              </rules>
+            </configuration>
+          </plugin>
           <plugin>
             <groupId>org.eclipse.scout.sdk</groupId>
             <artifactId>updatesite-maven-plugin</artifactId>
