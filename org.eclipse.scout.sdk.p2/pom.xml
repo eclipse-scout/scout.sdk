@@ -246,7 +246,7 @@
                     <include>*/category.xml</include>
                   </includes>
                   <token>[0-9A-Z\\.]*.qualifier</token>
-                  <value>${org.eclipse.scout.rt_version}</value>
+                  <value>${master_release_tagName}</value>
                   <unescape>true</unescape>
                 </configuration>
               </execution>
