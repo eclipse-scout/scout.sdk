@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMember;
-import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.ISourceRange;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.jdt.core.Signature;
@@ -80,15 +79,8 @@ public class AnnotationNewOperation implements IOperation {
 
     workingCopyManager.register(icu, monitor);
 
-    // get package
-    String pck = "";
-    IPackageDeclaration[] packageDeclarations = icu.getPackageDeclarations();
-    if (packageDeclarations.length > 0) {
-      pck = packageDeclarations[0].getElementName();
-    }
-
     IJavaEnvironment env = ScoutSdkCore.createJavaEnvironment(m_declaringMember.getJavaProject());
-    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(env), pck);
+    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(env), JdtUtils.getPackage(icu));
     Document doc = new Document(icu.getSource());
 
     TextEdit edit = createEdit(new ImportValidator(collector), doc, icu.findRecommendedLineSeparator());

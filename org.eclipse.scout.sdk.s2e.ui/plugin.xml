@@ -42,6 +42,11 @@
                id="org.eclipse.scout.sdk.s2e.ui.menu.wellform"
                style="push">
             </command>
+            <command
+               commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
+               id="org.eclipse.scout.sdk.s2e.ui.menu.missingClassId"
+               style="push">
+            </command>
          </menu>
       </menuContribution>
    </extension>
@@ -95,6 +100,11 @@
             id="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
             categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
       </command>
+      <command
+            name="Create missing @ClassId Annotations..."
+            id="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
+            categoryId="org.eclipse.scout.sdk.s2e.ui.commands.category">
+      </command>
    </extension>
    <extension point="org.eclipse.ui.handlers">
       <handler
@@ -103,11 +113,15 @@
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.triggerSelectedTypeChangedHandlers"
-            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.TriggerSelectedDerivedResourceHandlers">
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.TriggerSelectedDerivedResourceHandler">
       </handler>
       <handler
             commandId="org.eclipse.scout.sdk.s2e.ui.commands.wellform"
             class="org.eclipse.scout.sdk.s2e.ui.internal.handler.WellformAllHandler">
+      </handler>
+      <handler
+            commandId="org.eclipse.scout.sdk.s2e.ui.commands.missingClassId"
+            class="org.eclipse.scout.sdk.s2e.ui.internal.handler.CreateMissingClassIdsHandler">
       </handler>
    </extension>
 </plugin>

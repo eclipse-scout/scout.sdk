@@ -31,14 +31,14 @@ import org.eclipse.ui.IWorkingSet;
 import org.eclipse.ui.handlers.HandlerUtil;
 
 /**
- * <h3>{@link TriggerSelectedDerivedResourceHandlers}</h3>
+ * <h3>{@link TriggerSelectedDerivedResourceHandler}</h3>
  * <p>
  * Only trigger in the selected workspace projects
  *
  * @author Matthias Villiger
  * @since 5.1.0
  */
-public class TriggerSelectedDerivedResourceHandlers extends AbstractHandler {
+public class TriggerSelectedDerivedResourceHandler extends AbstractHandler {
 
   @Override
   public Object execute(ExecutionEvent event) throws ExecutionException {

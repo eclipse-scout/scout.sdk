@@ -36,6 +36,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.IMemberValuePair;
 import org.eclipse.jdt.core.IMethod;
+import org.eclipse.jdt.core.IPackageDeclaration;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
 import org.eclipse.jdt.core.IRegion;
 import org.eclipse.jdt.core.ISourceRange;
@@ -102,6 +103,25 @@ public final class JdtUtils {
       return null;
     }
     return (IPackageFragmentRoot) e.getAncestor(IJavaElement.PACKAGE_FRAGMENT_ROOT);
+  }
+
+  /**
+   * Gets the package name of the given {@link ICompilationUnit}.
+   * 
+   * @param icu
+   *          The compilation unit for which the package should be returned.
+   * @return The package or empty {@link String} if the compilation unit declares no package
+   * @throws JavaModelException
+   */
+  public static String getPackage(ICompilationUnit icu) throws JavaModelException {
+    String pck = "";
+    if (icu != null) {
+      IPackageDeclaration[] packageDeclarations = icu.getPackageDeclarations();
+      if (packageDeclarations.length > 0) {
+        pck = packageDeclarations[0].getElementName();
+      }
+    }
+    return pck;
   }
 
   /**
