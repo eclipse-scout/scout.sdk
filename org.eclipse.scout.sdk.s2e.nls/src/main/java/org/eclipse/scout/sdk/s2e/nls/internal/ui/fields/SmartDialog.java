@@ -53,17 +53,21 @@ import org.eclipse.swt.widgets.TableColumn;
 public class SmartDialog {
 
   private Shell m_shell;
-  private Shell m_parentShell;
   private ISmartFieldModel m_smartModel;
   private Table m_table;
   private TableViewer m_viewer;
   private Label m_infoLabel;
-  private P_SmartFieldTableModel m_smartTableModel;
-  private List<ISmartDialogListener> m_smartDialogListeners = new LinkedList<>();
-  private Point m_defaultSize = new Point(200, 250);
+  private Point m_defaultSize;
+
+  private final P_SmartFieldTableModel m_smartTableModel;
+  private final List<ISmartDialogListener> m_smartDialogListeners;
+  private final Shell m_parentShell;
+
   private static final Collator COLLATOR = Collator.getInstance(Locale.getDefault());
 
   public SmartDialog(Shell parentShell) {
+    m_defaultSize = new Point(200, 250);
+    m_smartDialogListeners = new LinkedList<>();
     m_smartTableModel = new P_SmartFieldTableModel();
     m_parentShell = parentShell;
     createComponent(parentShell);
@@ -320,9 +324,9 @@ public class SmartDialog {
   } // end class P_SmartFieldTableModel
 
   private class P_CompareableSmartItem implements Comparable<P_CompareableSmartItem> {
-    private Object m_item;
+    private final Object m_item;
 
-    public P_CompareableSmartItem(Object item) {
+    private P_CompareableSmartItem(Object item) {
       m_item = item;
     }
 

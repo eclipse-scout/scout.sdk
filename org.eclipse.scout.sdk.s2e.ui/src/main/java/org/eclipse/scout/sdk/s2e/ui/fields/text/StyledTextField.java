@@ -166,20 +166,20 @@ public class StyledTextField extends TextField {
     private static final String PRE_POST_FIX_REGEX = "^(#0#).*(#1#)$";
 
     private Pattern m_preSuffixPattern;
-    private StyleRange m_suffixStyleRange;
-    private StyleRange m_prefixStyleRange;
+    private final StyleRange m_suffixStyleRange;
+    private final StyleRange m_prefixStyleRange;
     private String m_suffixString = "";
     private String m_prefixString = "";
 
-    public P_SuffixListener() {
+    private P_SuffixListener() {
       this("");
     }
 
-    public P_SuffixListener(String suffix) {
+    private P_SuffixListener(String suffix) {
       this(suffix, null);
     }
 
-    public P_SuffixListener(String postfix, StyleRange style) {
+    private P_SuffixListener(String postfix, StyleRange style) {
       if (style == null) {
         style = new StyleRange(-1, -1, getDisplay().getSystemColor(SWT.COLOR_BLUE), null);
       }

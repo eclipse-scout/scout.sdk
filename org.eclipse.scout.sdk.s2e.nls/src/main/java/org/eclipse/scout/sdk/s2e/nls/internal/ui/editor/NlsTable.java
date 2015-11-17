@@ -401,7 +401,7 @@ public class NlsTable extends Composite {
   private class P_SortSelectionAdapter extends SelectionAdapter {
     private int m_index;
 
-    public P_SortSelectionAdapter(int index) {
+    private P_SortSelectionAdapter(int index) {
       m_index = index;
     }
 

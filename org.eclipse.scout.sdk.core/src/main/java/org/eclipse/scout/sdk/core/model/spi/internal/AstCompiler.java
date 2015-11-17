@@ -140,7 +140,7 @@ public class AstCompiler extends org.eclipse.jdt.internal.compiler.Compiler {
 
   private static final class P_EmptyPrintWriter extends PrintWriter {
     @SuppressWarnings("resource")
-    public P_EmptyPrintWriter() {
+    private P_EmptyPrintWriter() {
       super(new P_EmptyWriter());
     }
   }

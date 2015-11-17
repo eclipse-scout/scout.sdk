@@ -720,7 +720,7 @@ public final class SpiWithJdtUtils {
     private final AnnotationBinding m_binding;
     private Annotation m_result;
 
-    public FindAnnotationVisitor(AnnotationBinding binding) {
+    private FindAnnotationVisitor(AnnotationBinding binding) {
       m_binding = binding;
     }
 
@@ -755,7 +755,7 @@ public final class SpiWithJdtUtils {
     private final ElementValuePair m_binding;
     private MemberValuePair m_result;
 
-    public FindMemberValuePairVisitor(ElementValuePair binding) {
+    private FindMemberValuePairVisitor(ElementValuePair binding) {
       m_binding = binding;
     }
 

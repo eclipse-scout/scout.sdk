@@ -12,7 +12,7 @@ import java.util.Collection;
 public class SameCompositeObject {
 
   private final Object[] m_value;
-  private int m_hash;
+  private final int m_hash;
 
   public SameCompositeObject(Object... a) {
     if (a != null && a.length == 1 && a[0] instanceof Collection<?>) {

@@ -11,6 +11,7 @@
 package org.eclipse.scout.sdk.s2e.nls.internal.ui.formatter;
 
 import java.util.HashSet;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.eclipse.core.runtime.IStatus;
@@ -47,10 +48,10 @@ public final class InputValidator {
   }
 
   private static final class P_KeyEntryValidator implements IInputValidator {
-    private final HashSet<String> m_exceptions;
+    private final Set<String> m_exceptions;
     private final INlsProject m_project;
 
-    public P_KeyEntryValidator(INlsProject project, String[] exceptions) {
+    private P_KeyEntryValidator(INlsProject project, String[] exceptions) {
       m_exceptions = new HashSet<>(exceptions.length);
       for (String s : exceptions) {
         m_exceptions.add(s);

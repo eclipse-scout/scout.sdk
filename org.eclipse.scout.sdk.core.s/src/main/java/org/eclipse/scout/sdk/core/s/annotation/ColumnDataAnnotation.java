@@ -27,7 +27,7 @@ public class ColumnDataAnnotation extends AbstractManagedAnnotation {
   public static final String TYPE_NAME = IScoutRuntimeTypes.ColumnData;
   public static final SdkColumnCommand DEFAULT_VALUE = SdkColumnCommand.CREATE;
 
-  public static enum SdkColumnCommand {
+  public enum SdkColumnCommand {
     CREATE, IGNORE
   }
 

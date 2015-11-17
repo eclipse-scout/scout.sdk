@@ -132,7 +132,7 @@ public class NlsFilterComponent extends Composite {
   private class P_FilterModifyListener implements ModifyListener {
     private int m_columnIndex;
 
-    public P_FilterModifyListener(int columnIndex) {
+    private P_FilterModifyListener(int columnIndex) {
       m_columnIndex = columnIndex;
     }
 
@@ -147,7 +147,7 @@ public class NlsFilterComponent extends Composite {
     private final String m_pattern;
     private final Language m_lang;
 
-    public P_ViewerFilter(Language lang, String pattern) {
+    private P_ViewerFilter(Language lang, String pattern) {
       m_lang = lang;
       m_pattern = pattern.toLowerCase() + "*";
 

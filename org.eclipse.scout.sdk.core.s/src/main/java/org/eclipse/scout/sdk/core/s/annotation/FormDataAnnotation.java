@@ -26,11 +26,11 @@ public class FormDataAnnotation extends AbstractManagedAnnotation {
 
   public static final String TYPE_NAME = IScoutRuntimeTypes.FormData;
 
-  public static enum SdkCommand {
+  public enum SdkCommand {
     CREATE, USE, IGNORE, DEFAULT
   }
 
-  public static enum DefaultSubtypeSdkCommand {
+  public enum DefaultSubtypeSdkCommand {
     CREATE, IGNORE, DEFAULT
   }
 
