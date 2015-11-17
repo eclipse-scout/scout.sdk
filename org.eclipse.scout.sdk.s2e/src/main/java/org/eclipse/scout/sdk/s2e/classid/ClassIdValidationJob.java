@@ -311,6 +311,8 @@ public final class ClassIdValidationJob extends AbstractJob {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         try {
+          JdtUtils.waitForJdt();
+
           // get the class id type outside of the validation job
           // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
           Set<IType> classIds = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ClassId);
@@ -320,8 +322,6 @@ public final class ClassIdValidationJob extends AbstractJob {
 
           // cancel currently running job. we are starting a new one right afterwards
           Job.getJobManager().cancel(CLASS_ID_VALIDATION_JOB_FAMILY);
-
-          JdtUtils.waitForJdt();
 
           // start the new validation
           new ClassIdValidationJob(classIds).schedule(startDelay);
