@@ -15,7 +15,7 @@
   <parent>
     <groupId>org.eclipse.scout</groupId>
     <artifactId>maven_sdk_plugin_config-master</artifactId>
-    <version>1.6.7-SNAPSHOT</version>
+    <version>1.6.10-SNAPSHOT</version>
     <relativePath></relativePath>
   </parent>
 
@@ -43,14 +43,16 @@
     <base.version>${scout.base.version}</base.version>
     <org.eclipse.scout.rt_version>5.2.0-SNAPSHOT</org.eclipse.scout.rt_version>
 
+    <master_coverage_jacoco_destFile>${basedir}/../org.eclipse.scout.sdk/target/jacoco-all.exec</master_coverage_jacoco_destFile>
     <!-- Sonar properties -->
     <sonar.branch>releases_5.2.x</sonar.branch>
+    <sonar.jacoco.reportPath>${master_coverage_jacoco_destFile}</sonar.jacoco.reportPath>
 
     <!-- exclude the unit tests from sonar -->
-    <sonar.exclusions>file:**/org.eclipse.scout.sdk*test/**</sonar.exclusions>
+    <sonar.exclusions>*.test/**</sonar.exclusions>
 
     <!-- exclude the unit tests and UI (we have no UI tests anyway) from sonar -->
-    <sonar.coverage.exclusions>file:**/org.eclipse.scout.sdk*test/**</sonar.coverage.exclusions>
+    <sonar.coverage.exclusions>*.test/**</sonar.coverage.exclusions>
 
     <!-- dependencies to Eclipse artifacts deployed by org.eclipse.scout.sdk.core.releng/ -->
     <ecj>4.5</ecj>
