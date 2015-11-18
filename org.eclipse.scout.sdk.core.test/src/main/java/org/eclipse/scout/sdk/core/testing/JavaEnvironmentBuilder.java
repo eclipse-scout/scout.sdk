@@ -34,6 +34,7 @@ import org.eclipse.scout.sdk.core.model.spi.internal.JavaEnvironmentWithJdt;
 import org.eclipse.scout.sdk.core.model.spi.internal.WorkspaceFileSystem;
 import org.eclipse.scout.sdk.core.util.CompositeObject;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.SdkLog;
 
 /**
  * <h3>{@link JavaEnvironmentBuilder}</h3> Contains helpers used in order to create a {@link IJavaEnvironment}.
@@ -168,8 +169,7 @@ public final class JavaEnvironmentBuilder {
       }
     }
     catch (Exception e) {
-      System.out.println("Unable to read running bootstrap classpath. Fallback to minimal bootstrap classpath. Nested exception: ");
-      e.printStackTrace(System.out);
+      SdkLog.info("Unable to read running bootstrap classpath. Fallback to minimal bootstrap classpath. Nested exception: ", e);
 
       String javaHome = System.getProperty("java.home");
       if (StringUtils.isNotBlank(javaHome)) {

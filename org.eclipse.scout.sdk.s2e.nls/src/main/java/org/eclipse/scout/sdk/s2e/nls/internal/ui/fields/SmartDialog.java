@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Objects;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.jface.viewers.DoubleClickEvent;
@@ -270,11 +271,11 @@ public class SmartDialog {
     m_shell.setVisible(false);
   }
 
-  private class P_SmartFieldTableModel implements IStructuredContentProvider, ITableLabelProvider {
-    private TreeSet<P_CompareableSmartItem> m_items = new TreeSet<>();
+  private final class P_SmartFieldTableModel implements IStructuredContentProvider, ITableLabelProvider {
+    private final Set<P_CompareableSmartItem> m_items = new TreeSet<>();
 
     public void setItems(List<Object> items) {
-      m_items = new TreeSet<>();
+      m_items.clear();
       for (Object object : items) {
         m_items.add(new P_CompareableSmartItem(object));
       }
@@ -323,7 +324,7 @@ public class SmartDialog {
     }
   } // end class P_SmartFieldTableModel
 
-  private class P_CompareableSmartItem implements Comparable<P_CompareableSmartItem> {
+  private final class P_CompareableSmartItem implements Comparable<P_CompareableSmartItem> {
     private final Object m_item;
 
     private P_CompareableSmartItem(Object item) {

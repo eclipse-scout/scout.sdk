@@ -129,7 +129,7 @@ public class NlsFilterComponent extends Composite {
     }
   }
 
-  private class P_FilterModifyListener implements ModifyListener {
+  private final class P_FilterModifyListener implements ModifyListener {
     private int m_columnIndex;
 
     private P_FilterModifyListener(int columnIndex) {
@@ -142,7 +142,7 @@ public class NlsFilterComponent extends Composite {
     }
   } // end class P_FilterModifyListener
 
-  private class P_ViewerFilter extends ViewerFilter {
+  private final class P_ViewerFilter extends ViewerFilter {
 
     private final String m_pattern;
     private final Language m_lang;
@@ -172,7 +172,7 @@ public class NlsFilterComponent extends Composite {
     }
   } // end class P_ViewerFilter
 
-  private class P_FilterComponentLayout extends Layout {
+  private final class P_FilterComponentLayout extends Layout {
     @Override
     protected Point computeSize(Composite composite, int hint, int hint2, boolean flushCache) {
       // height

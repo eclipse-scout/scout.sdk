@@ -162,7 +162,7 @@ public class StyledTextField extends TextField {
     super.setText(sb.toString());
   }
 
-  private class P_SuffixListener implements Listener, VerifyKeyListener {
+  private final class P_SuffixListener implements Listener, VerifyKeyListener {
     private static final String PRE_POST_FIX_REGEX = "^(#0#).*(#1#)$";
 
     private Pattern m_preSuffixPattern;
