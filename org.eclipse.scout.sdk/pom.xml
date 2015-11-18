@@ -479,6 +479,12 @@
         <version>2.10</version>
       </dependency>
 
+      <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-lang3</artifactId>
+        <version>3.1</version>
+      </dependency>
+
       <!-- Test Dependencies -->
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -496,24 +502,6 @@
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>4.12</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-lang3</artifactId>
-        <version>3.1</version>
-      </dependency>
-
-      <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <version>2.0.1</version>
-      </dependency>
-
-      <dependency>
-        <groupId>commons-collections</groupId>
-        <artifactId>commons-collections</artifactId>
-        <version>3.2.2</version>
       </dependency>
 
       <dependency>
