@@ -80,7 +80,7 @@ public class WorkingCopyManager implements IWorkingCopyManager {
 
   private static void releaseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor, boolean save) {
     try {
-      if (save) {
+      if (save && !monitor.isCanceled()) {
         icu.commitWorkingCopy(true, monitor);
         indexCompilationUnitSync(icu);
       }
