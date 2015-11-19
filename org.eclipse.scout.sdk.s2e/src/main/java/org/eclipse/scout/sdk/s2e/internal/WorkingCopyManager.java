@@ -55,8 +55,9 @@ public class WorkingCopyManager implements IWorkingCopyManager {
   }
 
   @Override
-  public synchronized void unregisterAll(IProgressMonitor monitor, boolean save) {
-    if (save) {
+  public synchronized void unregisterAll(final IProgressMonitor monitor, final boolean save) {
+    boolean tryToSave = save && !monitor.isCanceled(); // only save if asked for save and not cancelled yet.
+    if (tryToSave) {
       List<IResource> resourcesToSave = new ArrayList<>(m_workingCopies.size());
       for (ICompilationUnit icu : m_workingCopies) {
         IResource resource = icu.getResource();
@@ -66,21 +67,21 @@ public class WorkingCopyManager implements IWorkingCopyManager {
       if (!resourcesToSave.isEmpty()) {
         IStatus result = JdtUtils.makeCommittable(resourcesToSave);
         if (!result.isOK()) {
-          save = false;
+          tryToSave = false;
           SdkLog.warning("Unable to make all resources committable. Save will be skipped.", new CoreException(result));
         }
       }
     }
 
     for (ICompilationUnit icu : m_workingCopies) {
-      releaseCompilationUnit(icu, monitor, save);
+      releaseCompilationUnit(icu, monitor, tryToSave);
     }
     m_workingCopies.clear();
   }
 
-  private static void releaseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor, boolean save) {
+  private static void releaseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor, boolean tryToSave) {
     try {
-      if (save && !monitor.isCanceled()) {
+      if (tryToSave) {
         icu.commitWorkingCopy(true, monitor);
         indexCompilationUnitSync(icu);
       }
