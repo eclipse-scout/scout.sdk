@@ -18,9 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.jdt.launching.IVMInstall;
-import org.eclipse.jdt.launching.JavaRuntime;
-import org.eclipse.jdt.launching.environments.IExecutionEnvironment;
 import org.eclipse.m2e.core.MavenPlugin;
 import org.eclipse.m2e.core.project.MavenProjectInfo;
 import org.eclipse.m2e.core.project.ProjectImportConfiguration;
@@ -43,11 +40,9 @@ public class ScoutProjectNewOperation implements IOperation {
   public static final String TEMPLATE_ARTIFACT_ID = "org.eclipse.scout.archetype.artifactId";
   public static final String TEMPLATE_VERSION = "org.eclipse.scout.archetype.version";
 
-  private static final String EXEC_ENV_PREFIX = "JavaSE-";
-  private static final String MIN_JVM_VERSION = "1.7";
-
   private String m_symbolicName;
   private String m_displayName;
+  private String m_JavaVersion;
   private File m_targetDirectory;
 
   @Override
@@ -79,7 +74,7 @@ public class ScoutProjectNewOperation implements IOperation {
       String settings = getMavenSettings(MavenPlugin.getMavenConfiguration().getUserSettingsFile());
 
       monitor.beginTask(getOperationName(), 100);
-      ScoutProjectNewHelper.createProject(getTargetDirectory(), getSymbolicName(), getDisplayName(), Double.toString(getExecEnvVersion(getDefaultJvmExecutionEnvironment())), groupId, artifactId, version, globalSettings, settings);
+      ScoutProjectNewHelper.createProject(getTargetDirectory(), getSymbolicName(), getDisplayName(), getJavaVersion(), groupId, artifactId, version, globalSettings, settings);
       monitor.worked(10);
 
       importIntoWorkspace(new SubProgressMonitor(monitor, 90));
@@ -102,63 +97,6 @@ public class ScoutProjectNewOperation implements IOperation {
       SdkLog.warning("Maven settings file '" + absolutePath + "' not found. Using empty settings.");
     }
     return null;
-  }
-
-  /**
-   * Gets the default execution environment (e.g. "JavaSE-1.8") supported in the current default JVMs and the given
-   * target platform.<br>
-   * Use {@link #getExecEnvVersion(String)} to parse the execution environment to a double.
-   *
-   * @param targetPlatformVersion
-   *          The target platform to which the execution environment must be compatible or <code>null</code> if no
-   *          compatibility should be ensured.
-   * @return A string like "JavaSE-1.8" with the latest version supported in the current default JVMs and the given
-   *         target platform.
-   * @see #getExecEnvVersion(String)
-   */
-  protected static String getDefaultJvmExecutionEnvironment() {
-    // defaults
-    String execEnv = EXEC_ENV_PREFIX + MIN_JVM_VERSION;
-    double execEnvVersion = getExecEnvVersion(execEnv);
-
-    IVMInstall defaultVm = JavaRuntime.getDefaultVMInstall();
-    if (defaultVm != null) {
-      for (IExecutionEnvironment env : JavaRuntime.getExecutionEnvironmentsManager().getExecutionEnvironments()) {
-        String executionEnvId = env.getId();
-        if (env.isStrictlyCompatible(defaultVm)) {
-          double envVersion = getExecEnvVersion(executionEnvId);
-          if (envVersion > execEnvVersion) {
-            execEnv = executionEnvId; // take the newest
-          }
-        }
-      }
-    }
-    return execEnv;
-  }
-
-  /**
-   * Takes an java execution environment (e.g. "JavaSE-1.8") and parses the version as double (in this example 1.8).<br>
-   * If an invalid value is passed, always 1.7 is returned as minimal version.<br>
-   * Use {@link #getDefaultJvmExecutionEnvironment()} to get the default execution environment in the current workspace.
-   *
-   * @param executionEnvId
-   *          The execution environment to parse.
-   * @return The version as double.
-   */
-  protected static double getExecEnvVersion(String executionEnvId) {
-    if (executionEnvId != null && executionEnvId.startsWith(EXEC_ENV_PREFIX)) {
-      String numPart = executionEnvId.substring(EXEC_ENV_PREFIX.length());
-      if (StringUtils.isNotBlank(numPart)) {
-        try {
-          double ret = Double.parseDouble(numPart);
-          return ret;
-        }
-        catch (NumberFormatException e) {
-          //nop
-        }
-      }
-    }
-    return Double.parseDouble(MIN_JVM_VERSION);
   }
 
   /**
@@ -202,5 +140,13 @@ public class ScoutProjectNewOperation implements IOperation {
 
   public void setTargetDirectory(File targetDirectory) {
     m_targetDirectory = targetDirectory;
+  }
+
+  public String getJavaVersion() {
+    return m_JavaVersion;
+  }
+
+  public void setJavaVersion(String javaVersion) {
+    m_JavaVersion = javaVersion;
   }
 }

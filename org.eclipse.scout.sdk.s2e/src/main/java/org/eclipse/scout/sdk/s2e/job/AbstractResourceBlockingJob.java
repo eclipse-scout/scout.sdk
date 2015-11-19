@@ -81,23 +81,24 @@ public abstract class AbstractResourceBlockingJob extends AbstractJob {
 
   private IStatus doRun(IProgressMonitor monitor) {
     IWorkingCopyManager workingCopyManager = ScoutSdkCore.createWorkingCopyManager();
+    boolean save = true;
     try {
       try {
         validate();
         run(monitor, workingCopyManager);
       }
       catch (Exception e) {
+        save = false;
         if (e.getCause() == e || e.getCause() == null) {
           e.initCause(m_callerTrace);
         }
         Status errorStatus = new Status(IStatus.ERROR, S2ESdkActivator.PLUGIN_ID, e.getMessage(), e);
         SdkLog.error(e.getMessage(), e);
-        monitor.setCanceled(true);
         return errorStatus;
       }
     }
     finally {
-      workingCopyManager.unregisterAll(monitor);
+      workingCopyManager.unregisterAll(monitor, save);
       monitor.done();
     }
     return Status.OK_STATUS;

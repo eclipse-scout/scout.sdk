@@ -15,19 +15,27 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspace;
+import org.eclipse.core.resources.ResourceAttributes;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.MultiStatus;
 import org.eclipse.core.runtime.OperationCanceledException;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.jdt.core.IAnnotatable;
 import org.eclipse.jdt.core.IAnnotation;
 import org.eclipse.jdt.core.ICompilationUnit;
@@ -59,6 +67,7 @@ import org.eclipse.scout.sdk.core.util.IFilter;
 import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
+import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
@@ -107,7 +116,7 @@ public final class JdtUtils {
 
   /**
    * Gets the package name of the given {@link ICompilationUnit}.
-   * 
+   *
    * @param icu
    *          The compilation unit for which the package should be returned.
    * @return The package or empty {@link String} if the compilation unit declares no package
@@ -590,26 +599,172 @@ public final class JdtUtils {
     return Util.getLineSeparator(null, p);
   }
 
+  /**
+   * Creates a new {@link PropertyMap} containing the given {@link IJavaProject}.
+   *
+   * @param p
+   *          The {@link IJavaProject} the map should contain or <code>null</code>.
+   * @return The created {@link PropertyMap}. Never returns <code>null</code>.
+   */
   public static PropertyMap propertyMap(IJavaProject p) {
     PropertyMap context = new PropertyMap();
     context.setProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, p);
     return context;
   }
 
+  /**
+   * Tries to ensure that the given {@link IResource}s can be written (not read-only).<br>
+   *
+   * @param resources
+   *          The resources that should be written
+   * @return An {@link IStatus} describing if the given resources can be written now. If {@link IStatus#isOK()} returns
+   *         <code>true</code>, it is safe to continue the write operation. Otherwise the {@link IStatus} contains the
+   *         files and reasons why this is not possible. This may be the case if the file is still read-only or because
+   *         it changed value in the mean time.
+   */
+  public static IStatus makeCommittable(Collection<IResource> resources) {
+    if (resources == null || resources.isEmpty()) {
+      return Status.OK_STATUS;
+    }
+
+    Set<IFile> existingReadOnlyFiles = new HashSet<>(resources.size());
+    for (IResource r : resources) {
+      if (r != null && r.exists() && r.getType() == IResource.FILE && isReadOnly(r)) {
+        existingReadOnlyFiles.add((IFile) r);
+      }
+    }
+    if (existingReadOnlyFiles.isEmpty()) {
+      return Status.OK_STATUS;
+    }
+
+    Map<IFile, Long> oldTimeStamps = createModificationStampMap(existingReadOnlyFiles);
+    IStatus status = ResourcesPlugin.getWorkspace().validateEdit(existingReadOnlyFiles.toArray(new IFile[existingReadOnlyFiles.size()]), IWorkspace.VALIDATE_PROMPT);
+    if (!status.isOK()) {
+      return status;
+    }
+
+    IStatus modified = null;
+    // check if the resources can be written now
+    for (IFile f : existingReadOnlyFiles) {
+      if (isReadOnly(f)) {
+        String message = "File '" + f.getFullPath() + "' is read only.";
+        modified = addStatus(modified, message);
+      }
+    }
+    // check for in between modifications
+    Map<IFile, Long> newTimeStamps = createModificationStampMap(existingReadOnlyFiles);
+    for (Entry<IFile, Long> e : oldTimeStamps.entrySet()) {
+      IFile file = e.getKey();
+      if (!e.getValue().equals(newTimeStamps.get(file))) {
+        String message = "File '" + file.getFullPath() + "' has been modified since the beginning of the operation.";
+        modified = addStatus(modified, message);
+      }
+    }
+    if (modified != null) {
+      return modified;
+    }
+    return Status.OK_STATUS;
+  }
+
+  private static IStatus addStatus(IStatus status, String msg) {
+    IStatus entry = new ScoutStatus(IStatus.ERROR, msg, null);
+    if (status == null) {
+      return entry;
+    }
+    else if (status.isMultiStatus()) {
+      ((MultiStatus) status).add(entry);
+      return status;
+    }
+    else {
+      MultiStatus result = new MultiStatus(S2ESdkActivator.PLUGIN_ID, 0, msg, null);
+      result.add(status);
+      result.add(entry);
+      return result;
+    }
+  }
+
+  private static Map<IFile, Long> createModificationStampMap(Collection<IFile> files) {
+    Map<IFile, Long> map = new HashMap<>(files.size());
+    for (IFile f : files) {
+      map.put(f, Long.valueOf(f.getModificationStamp()));
+    }
+    return map;
+  }
+
+  /**
+   * Checks if the given {@link IResource} is read-only.
+   *
+   * @param resource
+   *          The {@link IResource} to check. Must not be <code>null</code>.
+   * @return <code>true</code> if the resource is marked as read-only. <code>false</code> otherwise.
+   */
+  public static boolean isReadOnly(IResource resource) {
+    ResourceAttributes resourceAttributes = resource.getResourceAttributes();
+    if (resourceAttributes == null) {
+      // not supported on this platform for this resource
+      return false;
+    }
+    return resourceAttributes.isReadOnly();
+  }
+
+  /**
+   * Executes the given {@link CompilationUnitWriteOperation}s in a new {@link ResourceBlockingOperationJob}, waits
+   * until all have finished and returns the resulting first {@link IType}s of each created {@link ICompilationUnit}.
+   *
+   * @param ops
+   *          The {@link CompilationUnitWriteOperation}s to execute.
+   * @param monitor
+   *          The {@link IProgressMonitor}
+   * @return The first {@link IType} of each created {@link ICompilationUnit}. The {@link List} contains the results in
+   *         the same order as the given {@link Collection} returns {@link CompilationUnitWriteOperation}s. Therefore
+   *         the first {@link IType} in the resulting {@link List} belongs to the first
+   *         {@link CompilationUnitWriteOperation} in ops.
+   * @throws JavaModelException
+   */
   public static List<IType> writeTypesWithResult(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor) throws JavaModelException {
     writeTypes(ops, monitor, true);
 
     List<IType> result = new ArrayList<>(ops.size());
     for (CompilationUnitWriteOperation op : ops) {
-      if (op == null) {
-        result.add(null);
-        continue;
-      }
-      result.add(op.getCompilationUnit().getTypes()[0]);
+      result.add(getFirstType(op));
     }
     return result;
   }
 
+  private static IType getFirstType(CompilationUnitWriteOperation op) throws JavaModelException {
+    if (op == null) {
+      return null;
+    }
+
+    ICompilationUnit compilationUnit = op.getCompilationUnit();
+    if (compilationUnit == null) {
+      return null;
+    }
+
+    IType[] types = compilationUnit.getTypes();
+    if (types.length < 1) {
+      return null;
+    }
+    IType candidate = types[0];
+    if (!exists(candidate)) {
+      return null;
+    }
+
+    return candidate;
+  }
+
+  /**
+   * Executes the given {@link CompilationUnitWriteOperation}s in a new {@link ResourceBlockingOperationJob}.
+   *
+   * @param ops
+   *          The {@link CompilationUnitWriteOperation}s to execute.
+   * @param monitor
+   *          The {@link IProgressMonitor}
+   * @param waitUntilWritten
+   *          <code>true</code> if this method should block until all operations have been executed. <code>false</code>
+   *          if this method should directly return after the {@link CompilationUnitWriteOperation}s have been
+   *          scheduled.
+   */
   public static void writeTypes(Collection<CompilationUnitWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) {
     if (ops == null || ops.isEmpty()) {
       return;
@@ -640,6 +795,19 @@ public final class JdtUtils {
     }
   }
 
+  /**
+   * Executes the given {@link ResourceWriteOperation}s in a new {@link ResourceBlockingOperationJob}, waits until all
+   * have finished and returns the created {@link IFile}s.
+   *
+   * @param ops
+   *          The {@link ResourceWriteOperation}s to execute
+   * @param monitor
+   *          The {@link IProgressMonitor}
+   * @return A {@link List} containing all created {@link IFile}s in the same order as the given {@link Collection}
+   *         returns {@link ResourceWriteOperation}s. Therefore the first {@link IFile} in the resulting {@link List}
+   *         belongs to the first {@link ResourceWriteOperation} in ops.
+   * @throws CoreException
+   */
   public static List<IFile> writeResourcesWithResult(Collection<ResourceWriteOperation> ops, IProgressMonitor monitor) throws CoreException {
     writeResources(ops, monitor, true);
 
@@ -647,13 +815,26 @@ public final class JdtUtils {
     for (ResourceWriteOperation op : ops) {
       if (op == null) {
         result.add(null);
-        continue;
       }
-      result.add(op.getFile());
+      else {
+        result.add(op.getFile());
+      }
     }
     return result;
   }
 
+  /**
+   * Executes the given {@link ResourceWriteOperation}s in a new {@link ResourceBlockingOperationJob}.
+   *
+   * @param ops
+   *          The {@link ResourceWriteOperation}s to execute.
+   * @param monitor
+   *          The {@link IProgressMonitor}
+   * @param waitUntilWritten
+   *          <code>true</code> if this method should block until all operations have been executed. <code>false</code>
+   *          if this method should directly return after the {@link ResourceWriteOperation}s have been scheduled.
+   * @throws CoreException
+   */
   public static void writeResources(Collection<ResourceWriteOperation> ops, IProgressMonitor monitor, boolean waitUntilWritten) throws CoreException {
     if (ops == null || ops.isEmpty()) {
       return;
@@ -688,5 +869,4 @@ public final class JdtUtils {
     }
     return curResource;
   }
-
 }

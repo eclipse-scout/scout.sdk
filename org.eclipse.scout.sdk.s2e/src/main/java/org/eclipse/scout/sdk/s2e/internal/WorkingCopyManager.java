@@ -11,13 +11,16 @@
 package org.eclipse.scout.sdk.s2e.internal;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.JavaModelException;
@@ -27,6 +30,7 @@ import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
 
 /**
@@ -34,60 +38,62 @@ import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
  */
 public class WorkingCopyManager implements IWorkingCopyManager {
 
-  private final List<ICompilationUnit> m_workingCopies = new ArrayList<>();
+  private final Set<ICompilationUnit> m_workingCopies;
 
   public WorkingCopyManager() {
+    m_workingCopies = new LinkedHashSet<>();
   }
 
   @Override
-  public boolean register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException {
-    if (icu.isReadOnly()) {
-      throw new IllegalArgumentException("try to get a working copy of the read only icu '" + icu.getElementName() + "'.");
-    }
-    synchronized (this) {
-      if (!m_workingCopies.contains(icu)) {
-        icu.becomeWorkingCopy(monitor);
-        m_workingCopies.add(icu);
-        return true;
-      }
+  public synchronized boolean register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException {
+    if (!m_workingCopies.contains(icu)) {
+      icu.becomeWorkingCopy(monitor);
+      m_workingCopies.add(icu);
+      return true;
     }
     return false;
   }
 
   @Override
-  public synchronized void unregisterAll(IProgressMonitor monitor) {
-    for (Iterator<ICompilationUnit> it = m_workingCopies.iterator(); it.hasNext();) {
-      releaseCompilationUnit(it.next(), monitor);
+  public synchronized void unregisterAll(IProgressMonitor monitor, boolean save) {
+    if (save) {
+      List<IResource> resourcesToSave = new ArrayList<>(m_workingCopies.size());
+      for (ICompilationUnit icu : m_workingCopies) {
+        IResource resource = icu.getResource();
+        resourcesToSave.add(resource);
+      }
+
+      if (!resourcesToSave.isEmpty()) {
+        IStatus result = JdtUtils.makeCommittable(resourcesToSave);
+        if (!result.isOK()) {
+          save = false;
+          SdkLog.warning("Unable to make all resources committable. Save will be skipped.", new CoreException(result));
+        }
+      }
+    }
+
+    for (ICompilationUnit icu : m_workingCopies) {
+      releaseCompilationUnit(icu, monitor, save);
     }
     m_workingCopies.clear();
   }
 
-  @Override
-  public synchronized void unregister(ICompilationUnit icu, IProgressMonitor monitor) {
-    if (m_workingCopies.remove(icu)) {
-      releaseCompilationUnit(icu, monitor);
-    }
-  }
-
-  public void discardAll(IProgressMonitor monitor) {
-  }
-
-  private static void releaseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor) {
+  private static void releaseCompilationUnit(ICompilationUnit icu, IProgressMonitor monitor, boolean save) {
     try {
-      if (!monitor.isCanceled()) {
+      if (save) {
         icu.commitWorkingCopy(true, monitor);
         indexCompilationUnitSync(icu);
       }
     }
-    catch (JavaModelException e) {
-      SdkLog.error("could not commit working copy '" + icu.getElementName() + "'", e);
+    catch (Exception e) {
+      SdkLog.warning("Unable to commit working copy '" + icu.getElementName() + "'.", e);
     }
     finally {
       try {
         icu.discardWorkingCopy();
       }
       catch (JavaModelException e) {
-        SdkLog.error("could not discard working copy '" + icu.getElementName() + "'", e);
+        SdkLog.warning("Unable to discard working copy '" + icu.getElementName() + "'.", e);
       }
     }
   }

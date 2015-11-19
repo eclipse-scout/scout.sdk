@@ -104,24 +104,33 @@ public class WellformScoutTypeOperation implements IOperation {
     m_lineDelimiter = sourceDoc.getDefaultLineDelimiter();
     ISourceRange typeRange = type.getSourceRange();
     StringBuilder sourceBuilder = new StringBuilder();
-    buildSource(type, sourceBuilder);
-    ReplaceEdit edit = new ReplaceEdit(typeRange.getOffset(), typeRange.getLength(), sourceBuilder.toString());
-    // format
-    try {
-      edit.apply(sourceDoc);
-      SourceRange range = new SourceRange(0, sourceDoc.getLength());
-      SourceFormatOperation op = new SourceFormatOperation(type.getJavaProject(), sourceDoc, range);
-      op.run(new NullProgressMonitor(), workingCopyManager);
-      icuBuffer.setContents(sourceDoc.get());
+    boolean success = buildSource(type, sourceBuilder);
+    if (success) {
+      ReplaceEdit edit = new ReplaceEdit(typeRange.getOffset(), typeRange.getLength(), sourceBuilder.toString());
+      // format
+      try {
+        edit.apply(sourceDoc);
+        SourceRange range = new SourceRange(0, sourceDoc.getLength());
+        SourceFormatOperation op = new SourceFormatOperation(type.getJavaProject(), sourceDoc, range);
+        op.run(new NullProgressMonitor(), workingCopyManager);
+        icuBuffer.setContents(sourceDoc.get());
+      }
+      catch (Exception e) {
+        SdkLog.warning("Could not wellform type '" + type.getFullyQualifiedName() + "'.", e);
+      }
     }
-    catch (Exception e) {
-      SdkLog.warning("Could not wellform type '" + type.getFullyQualifiedName() + "'.", e);
+    else {
+      SdkLog.warning("Unable to get source of type '" + type.getFullyQualifiedName() + "'. Skipping wellform for this type.");
     }
   }
 
-  protected void buildSource(IType type, StringBuilder builder) throws CoreException {
+  protected boolean buildSource(IType type, StringBuilder builder) throws CoreException {
     IJavaElement[] children = type.getChildren();
     String typeSource = type.getSource();
+    if (typeSource == null) {
+      return false;
+    }
+
     if (children == null || children.length == 0) {
       builder.append(typeSource);
     }
@@ -187,6 +196,7 @@ public class WellformScoutTypeOperation implements IOperation {
         builder.append(classTail);
       }
     }
+    return true;
   }
 
   protected void appendFields(List<IField> fields, StringBuilder builder) throws JavaModelException {

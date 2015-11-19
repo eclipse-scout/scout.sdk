@@ -17,6 +17,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
+import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IMember;
 import org.eclipse.jdt.core.ISourceRange;
@@ -31,7 +32,6 @@ import org.eclipse.scout.sdk.core.importcollector.ImportCollector;
 import org.eclipse.scout.sdk.core.importvalidator.IImportValidator;
 import org.eclipse.scout.sdk.core.importvalidator.ImportValidator;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
-import org.eclipse.scout.sdk.core.s.ISdkProperties;
 import org.eclipse.scout.sdk.core.sourcebuilder.annotation.IAnnotationSourceBuilder;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitScopedImportCollector;
 import org.eclipse.scout.sdk.core.util.CoreUtils;
@@ -86,7 +86,8 @@ public class AnnotationNewOperation implements IOperation {
     TextEdit edit = createEdit(new ImportValidator(collector), doc, icu.findRecommendedLineSeparator());
     try {
       edit.apply(doc);
-      icu.getBuffer().setContents(doc.get());
+      IBuffer buffer = icu.getBuffer();
+      buffer.setContents(doc.get());
 
       // create imports
       new ImportsCreateOperation(icu, collector).run(monitor, workingCopyManager);
@@ -158,9 +159,7 @@ public class AnnotationNewOperation implements IOperation {
       // create new source
       StringBuilder builder = new StringBuilder();
 
-      PropertyMap context = new PropertyMap();
-      context.setProperty(ISdkProperties.CONTEXT_PROPERTY_JAVA_PROJECT, m_declaringMember.getJavaProject());
-
+      PropertyMap context = JdtUtils.propertyMap(m_declaringMember.getJavaProject());
       getSourceBuilder().createSource(builder, nl, context, validator);
 
       // find insert/replace range

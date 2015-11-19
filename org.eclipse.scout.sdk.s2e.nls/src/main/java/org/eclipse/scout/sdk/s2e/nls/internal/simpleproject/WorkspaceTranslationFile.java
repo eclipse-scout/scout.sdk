@@ -10,11 +10,11 @@
  ******************************************************************************/
 package org.eclipse.scout.sdk.s2e.nls.internal.simpleproject;
 
-import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Properties;
 
@@ -36,7 +36,9 @@ import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.scout.sdk.s2e.nls.resource.AbstractTranslationResource;
 import org.eclipse.scout.sdk.s2e.nls.resource.TranslationResourceEvent;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 import org.eclipse.scout.sdk.s2e.util.WeakResourceChangeListener;
+import org.eclipse.scout.sdk.s2e.workspace.ResourceWriteOperation;
 
 /**
  * <h4>WorkspaceTranslationFile</h4>
@@ -115,7 +117,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
       ByteArrayOutputStream os = new ByteArrayOutputStream();
       try {
         prop.store(os, null);
-        String[] lines = os.toString().split(nl);
+        String[] lines = os.toString("8859_1").split(nl); // Properties.store() uses 8859_1 encoding
         int i = 0;
         if (lines.length > 0 && lines[0].startsWith("#")) {
           i++;
@@ -131,14 +133,10 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
           builder.append(nl);
         }
 
-        m_file.setContents(new ByteArrayInputStream(builder.toString().getBytes()), IResource.KEEP_HISTORY, monitor);
-        m_file.refreshLocal(IResource.DEPTH_ONE, monitor);
+        JdtUtils.writeResources(Collections.singletonList(new ResourceWriteOperation(m_file, builder.toString())), monitor, true);
       }
-      catch (IOException e1) {
-        SdkLog.error("could not refresh file: " + m_file.getName(), e1);
-      }
-      catch (CoreException e1) {
-        SdkLog.error("could not refresh file: " + m_file.getName(), e1);
+      catch (IOException | CoreException e) {
+        SdkLog.error("could not refresh file: " + m_file.getName(), e);
       }
     }
   }

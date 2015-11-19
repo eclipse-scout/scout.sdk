@@ -94,12 +94,14 @@ public class NlsCore extends AbstractUIPlugin {
 
   public static String getLineSeparator(IResource r) {
     if (Platform.isRunning()) {
-
       // line delimiter in project preference
-      IProject project = r.getProject();
+      IProject project = null;
+      if (r != null) {
+        project = r.getProject();
+      }
       IScopeContext[] scopeContext;
       if (project != null) {
-        scopeContext = new IScopeContext[]{new ProjectScope(project.getProject())};
+        scopeContext = new IScopeContext[]{new ProjectScope(project)};
         String lineSeparator = Platform.getPreferencesService().getString(Platform.PI_RUNTIME, Platform.PREF_LINE_SEPARATOR, null, scopeContext);
         if (lineSeparator != null) {
           return lineSeparator;
@@ -115,7 +117,7 @@ public class NlsCore extends AbstractUIPlugin {
     }
 
     // system line delimiter
-    return System.getProperty("line.separator");
+    return org.eclipse.jdt.internal.compiler.util.Util.LINE_SEPARATOR;
   }
 
   public static Image getImage(String name) {

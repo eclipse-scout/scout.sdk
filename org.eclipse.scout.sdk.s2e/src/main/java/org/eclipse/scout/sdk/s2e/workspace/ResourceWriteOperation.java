@@ -12,6 +12,7 @@ package org.eclipse.scout.sdk.s2e.workspace;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Collections;
 
 import org.apache.commons.lang3.Validate;
 import org.eclipse.core.resources.IContainer;
@@ -20,7 +21,9 @@ import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.sdk.core.util.SdkLog;
+import org.eclipse.scout.sdk.s2e.util.JdtUtils;
 
 /**
  * <h3>{@link ResourceWriteOperation}</h3>
@@ -96,10 +99,15 @@ public class ResourceWriteOperation implements IOperation {
           m_file.create(stream, true, monitor);
         }
         else {
-          m_file.setContents(stream, true, true, monitor);
+          IStatus result = JdtUtils.makeCommittable(Collections.<IResource> singletonList(m_file));
+          if (result.isOK()) {
+            m_file.setContents(stream, true, true, monitor);
+          }
+          else {
+            SdkLog.warning("Unable to make all resources committable. Save will be skipped.", new CoreException(result));
+          }
         }
       }
-      m_file.refreshLocal(IResource.DEPTH_ONE, monitor);
     }
     catch (Exception e) {
       SdkLog.error("could not store '" + m_file.getProjectRelativePath() + "'.", e);

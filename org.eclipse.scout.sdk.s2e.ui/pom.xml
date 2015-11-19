@@ -39,6 +39,11 @@
     </dependency>
     <dependency>
       <groupId>org.eclipse.scout.sdk.deps</groupId>
+      <artifactId>org.eclipse.jdt.launching</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.eclipse.scout.sdk.deps</groupId>
       <artifactId>org.eclipse.jdt.ui</artifactId>
       <scope>provided</scope>
     </dependency>

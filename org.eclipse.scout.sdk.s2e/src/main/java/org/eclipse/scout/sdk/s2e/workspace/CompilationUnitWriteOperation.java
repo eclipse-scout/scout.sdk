@@ -18,6 +18,7 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.jdt.core.IBuffer;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.jdt.core.IPackageFragment;
 import org.eclipse.jdt.core.IPackageFragmentRoot;
@@ -129,10 +130,8 @@ public class CompilationUnitWriteOperation implements IOperation {
       workingCopyManager.register(m_cu, monitor);
 
       // store new form data content to buffer
-      m_cu.getBuffer().setContents(newSource);
-
-      // save buffer
-      m_cu.getBuffer().save(monitor, true);
+      IBuffer buffer = m_cu.getBuffer();
+      buffer.setContents(newSource);
     }
     catch (Exception e) {
       SdkLog.error("Could not store '" + m_cu.getPath() + "'.", e);

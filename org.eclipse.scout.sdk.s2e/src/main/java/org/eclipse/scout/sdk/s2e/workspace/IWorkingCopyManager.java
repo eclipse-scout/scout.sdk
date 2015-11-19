@@ -43,25 +43,17 @@ public interface IWorkingCopyManager {
   boolean register(ICompilationUnit icu, IProgressMonitor monitor) throws JavaModelException;
 
   /**
-   * Unregister compilation unit AFTER doing changes on it. Commits and discards working copy at the first invocation.
-   * Compilation unit may be unregistered multiple times
-   *
-   * @param icu
-   *          The compilation unit to unregister
-   * @param monitor
-   *          a progress monitor used to report progress while opening this compilation unit or null if no progress
-   *          should be reported
-   */
-  void unregister(ICompilationUnit icu, IProgressMonitor monitor);
-
-  /**
    * unregisters all working copies managed by this instance.
    *
    * @param monitor
    *          a progress monitor used to report progress while opening this compilation unit or null if no progress
    *          should be reported
+   * @param save
+   *          Specifies if the {@link ICompilationUnit}s managed by this {@link IWorkingCopyManager} should be commited
+   *          or just discarded.
+   * @throws JavaModelException
    */
-  void unregisterAll(IProgressMonitor monitor);
+  void unregisterAll(IProgressMonitor monitor, boolean save);
 
   /**
    * When doing direct source changes on the compilation unit, a reconcile is required to fire element change deltas.
