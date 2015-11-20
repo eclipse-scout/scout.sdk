@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 import org.eclipse.jdt.core.compiler.CharOperation;
 import org.eclipse.jdt.internal.compiler.batch.ClasspathJar;
@@ -20,6 +21,7 @@ import org.eclipse.jdt.internal.compiler.env.NameEnvironmentAnswer;
 import org.eclipse.jdt.internal.compiler.util.SuffixConstants;
 import org.eclipse.jdt.internal.compiler.util.Util;
 import org.eclipse.scout.sdk.core.util.SdkException;
+import org.eclipse.scout.sdk.core.util.compat.CompatibilityLayer;
 
 public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
   private Classpath[] m_classpaths;
@@ -168,7 +170,13 @@ public class WorkspaceFileSystem implements INameEnvironment, SuffixConstants {
       if (encoding == null) {
         encoding = StandardCharsets.UTF_8.name();
       }
-      Classpath classpath = FileSystem.getClasspath(f.getAbsolutePath(), encoding, source, null, null);
+
+      Classpath classpath = CompatibilityLayer.getFileSystemClasspath(f, source, encoding, new Callable<Map<?, ?>>() {
+        @Override
+        public Map<?, ?> call() throws Exception {
+          return AstCompiler.createDefaultOptions().getMap();
+        }
+      });
       try {
         classpath.initialize();
         return classpath;
