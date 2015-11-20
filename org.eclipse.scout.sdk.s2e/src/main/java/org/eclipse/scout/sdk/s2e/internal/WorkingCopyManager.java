@@ -30,7 +30,7 @@ import org.eclipse.jdt.internal.core.search.indexing.IndexManager;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
 
 /**
@@ -65,7 +65,7 @@ public class WorkingCopyManager implements IWorkingCopyManager {
       }
 
       if (!resourcesToSave.isEmpty()) {
-        IStatus result = JdtUtils.makeCommittable(resourcesToSave);
+        IStatus result = S2eUtils.makeCommittable(resourcesToSave);
         if (!result.isOK()) {
           tryToSave = false;
           SdkLog.warning("Unable to make all resources committable. Save will be skipped.", new CoreException(result));

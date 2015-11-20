@@ -18,7 +18,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.jdt.core.ICompilationUnit;
 import org.eclipse.scout.sdk.core.importcollector.IImportCollector;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**
  * <h3>{@link ImportsCreateOperation}</h3>
@@ -63,7 +63,7 @@ public class ImportsCreateOperation implements IOperation {
 
   @Override
   public void validate() {
-    if (!JdtUtils.exists(getCompilationUnit())) {
+    if (!S2eUtils.exists(getCompilationUnit())) {
       throw new IllegalArgumentException("Compilation unit must exist to create imports!");
     }
   }

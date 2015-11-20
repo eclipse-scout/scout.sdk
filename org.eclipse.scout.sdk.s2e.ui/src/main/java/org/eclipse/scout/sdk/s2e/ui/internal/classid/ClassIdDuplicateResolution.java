@@ -26,7 +26,7 @@ import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdValidationJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.workspace.AnnotationNewOperation;
 import org.eclipse.scout.sdk.s2e.workspace.IOperation;
 import org.eclipse.ui.IMarkerResolution;
@@ -53,7 +53,7 @@ public class ClassIdDuplicateResolution implements IMarkerResolution {
   @Override
   public void run(final IMarker marker) {
     final IType parent = (IType) m_annotation.getAncestor(IJavaElement.TYPE);
-    if (JdtUtils.exists(parent)) {
+    if (S2eUtils.exists(parent)) {
       List<IOperation> ops = new LinkedList<>();
       String newId = ClassIdGenerators.generateNewId(new ClassIdGenerationContext(parent));
       if (StringUtils.isNotBlank(newId)) {

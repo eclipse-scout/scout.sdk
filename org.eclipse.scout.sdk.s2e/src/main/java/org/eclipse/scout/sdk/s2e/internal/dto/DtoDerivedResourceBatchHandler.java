@@ -19,7 +19,7 @@ import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.trigger.AbstractDerivedResourceBatchHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
 
 /**
@@ -51,7 +51,7 @@ public class DtoDerivedResourceBatchHandler extends AbstractDerivedResourceBatch
           IType modelType = envProvider.jdtTypeToScoutType(jdtType);
           CompilationUnitWriteOperation op = DtoS2eUtils.newDtoOp(jdtType, modelType, getJavaEnvironmentProvider(), monitor);
           if (op != null) {
-            JdtUtils.writeTypes(Collections.singletonList(op), monitor, false);
+            S2eUtils.writeTypes(Collections.singletonList(op), monitor, false);
           }
         }
         catch (Exception t) {

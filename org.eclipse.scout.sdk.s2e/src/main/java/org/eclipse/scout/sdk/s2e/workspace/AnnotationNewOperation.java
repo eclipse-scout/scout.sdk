@@ -39,7 +39,7 @@ import org.eclipse.scout.sdk.core.util.PropertyMap;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
 import org.eclipse.scout.sdk.s2e.internal.S2ESdkActivator;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.text.edits.ReplaceEdit;
 import org.eclipse.text.edits.TextEdit;
 
@@ -68,7 +68,7 @@ public class AnnotationNewOperation implements IOperation {
 
   @Override
   public void validate() {
-    if (!JdtUtils.exists(m_declaringMember)) {
+    if (!S2eUtils.exists(m_declaringMember)) {
       throw new IllegalArgumentException("Declaring member does not exist!");
     }
   }
@@ -80,7 +80,7 @@ public class AnnotationNewOperation implements IOperation {
     workingCopyManager.register(icu, monitor);
 
     IJavaEnvironment env = ScoutSdkCore.createJavaEnvironment(m_declaringMember.getJavaProject());
-    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(env), JdtUtils.getPackage(icu));
+    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(env), S2eUtils.getPackage(icu));
     Document doc = new Document(icu.getSource());
 
     TextEdit edit = createEdit(new ImportValidator(collector), doc, icu.findRecommendedLineSeparator());
@@ -159,7 +159,7 @@ public class AnnotationNewOperation implements IOperation {
       // create new source
       StringBuilder builder = new StringBuilder();
 
-      PropertyMap context = JdtUtils.propertyMap(m_declaringMember.getJavaProject());
+      PropertyMap context = S2eUtils.propertyMap(m_declaringMember.getJavaProject());
       getSourceBuilder().createSource(builder, nl, context, validator);
 
       // find insert/replace range

@@ -36,7 +36,7 @@ import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.Language;
 import org.eclipse.scout.sdk.s2e.nls.resource.AbstractTranslationResource;
 import org.eclipse.scout.sdk.s2e.nls.resource.TranslationResourceEvent;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.WeakResourceChangeListener;
 import org.eclipse.scout.sdk.s2e.workspace.ResourceWriteOperation;
 
@@ -133,7 +133,7 @@ public class WorkspaceTranslationFile extends AbstractTranslationResource {
           builder.append(nl);
         }
 
-        JdtUtils.writeResources(Collections.singletonList(new ResourceWriteOperation(m_file, builder.toString())), monitor, true);
+        S2eUtils.writeResources(Collections.singletonList(new ResourceWriteOperation(m_file, builder.toString())), monitor, true);
       }
       catch (IOException | CoreException e) {
         SdkLog.error("could not refresh file: " + m_file.getName(), e);

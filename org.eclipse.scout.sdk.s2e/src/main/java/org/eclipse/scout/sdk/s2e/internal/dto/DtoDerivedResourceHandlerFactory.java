@@ -25,7 +25,7 @@ import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IDerivedResourceHandlerFactory;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**
  *
@@ -47,17 +47,17 @@ public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandler
 
   protected Collection<IType> findAllCandidates(IJavaSearchScope scope) throws CoreException {
     Set<IType> collector = new HashSet<>();
-    for (org.eclipse.jdt.core.IType candidate : JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.Data, scope, new NullProgressMonitor())) {
+    for (org.eclipse.jdt.core.IType candidate : S2eUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.Data, scope, new NullProgressMonitor())) {
       if (acceptType(candidate)) {
         collector.add(candidate);
       }
     }
-    for (org.eclipse.jdt.core.IType candidate : JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.FormData, scope, new NullProgressMonitor())) {
+    for (org.eclipse.jdt.core.IType candidate : S2eUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.FormData, scope, new NullProgressMonitor())) {
       if (acceptType(candidate)) {
         collector.add(candidate);
       }
     }
-    for (org.eclipse.jdt.core.IType candidate : JdtUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.PageData, scope, new NullProgressMonitor())) {
+    for (org.eclipse.jdt.core.IType candidate : S2eUtils.findAllTypesAnnotatedWith(IScoutRuntimeTypes.PageData, scope, new NullProgressMonitor())) {
       if (acceptType(candidate)) {
         collector.add(candidate);
       }
@@ -67,13 +67,13 @@ public class DtoDerivedResourceHandlerFactory implements IDerivedResourceHandler
 
   protected boolean acceptType(IType jdtType) throws CoreException {
     //fast check before doing expensive source parsing
-    return JdtUtils.exists(jdtType)
-        && JdtUtils.exists(jdtType.getJavaProject()) // required!
+    return S2eUtils.exists(jdtType)
+        && S2eUtils.exists(jdtType.getJavaProject()) // required!
         && !jdtType.isAnonymous()
         && !jdtType.isBinary()
         && jdtType.getDeclaringType() == null
         && Flags.isPublic(jdtType.getFlags())
-        && JdtUtils.getFirstAnnotationInSupertypeHierarchy(jdtType, IScoutRuntimeTypes.Data, IScoutRuntimeTypes.FormData, IScoutRuntimeTypes.PageData) != null;
+        && S2eUtils.getFirstAnnotationInSupertypeHierarchy(jdtType, IScoutRuntimeTypes.Data, IScoutRuntimeTypes.FormData, IScoutRuntimeTypes.PageData) != null;
   }
 
   @Override

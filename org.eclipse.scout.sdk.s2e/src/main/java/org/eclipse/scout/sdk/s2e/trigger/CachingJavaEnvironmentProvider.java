@@ -18,7 +18,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.scout.sdk.core.model.api.IJavaEnvironment;
 import org.eclipse.scout.sdk.core.model.api.IType;
 import org.eclipse.scout.sdk.s2e.ScoutSdkCore;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 public class CachingJavaEnvironmentProvider implements IJavaEnvironmentProvider {
   private final Map<IJavaProject, IJavaEnvironment> m_envs;
@@ -32,7 +32,7 @@ public class CachingJavaEnvironmentProvider implements IJavaEnvironmentProvider 
     if (jdtType == null) {
       return null;
     }
-    return JdtUtils.jdtTypeToScoutType(jdtType, getOrCreateEnv(jdtType.getJavaProject()));
+    return S2eUtils.jdtTypeToScoutType(jdtType, getOrCreateEnv(jdtType.getJavaProject()));
   }
 
   @Override

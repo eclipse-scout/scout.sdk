@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.core.s.util.DtoUtils;
 import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.ICompilationUnitSourceBuilder;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
 
 public final class DtoS2eUtils {
@@ -44,7 +44,7 @@ public final class DtoS2eUtils {
       IJavaEnvironment sharedEnv = envProvider.get(derivedProject);
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createFormDataBuilder(modelType, a1, sharedEnv);
 
-      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, derivedJdtType.getCompilationUnit().findRecommendedLineSeparator(), JdtUtils.propertyMap(derivedProject));
+      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, derivedJdtType.getCompilationUnit().findRecommendedLineSeparator(), S2eUtils.propertyMap(derivedProject));
       return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 
@@ -61,7 +61,7 @@ public final class DtoS2eUtils {
       IJavaEnvironment sharedEnv = envProvider.get(derivedProject);
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createPageDataBuilder(modelType, a2, sharedEnv);
 
-      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, derivedJdtType.getCompilationUnit().findRecommendedLineSeparator(), JdtUtils.propertyMap(derivedProject));
+      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, derivedJdtType.getCompilationUnit().findRecommendedLineSeparator(), S2eUtils.propertyMap(derivedProject));
       return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 
@@ -78,7 +78,7 @@ public final class DtoS2eUtils {
       IJavaEnvironment sharedEnv = envProvider.get(derivedJdtType.getJavaProject());
       ICompilationUnitSourceBuilder cuSrc = DtoUtils.createTableRowDataBuilder(modelType, a3, sharedEnv);
 
-      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, derivedJdtType.getCompilationUnit().findRecommendedLineSeparator(), JdtUtils.propertyMap(derivedProject));
+      String newSource = DtoUtils.createJavaCode(cuSrc, sharedEnv, derivedJdtType.getCompilationUnit().findRecommendedLineSeparator(), S2eUtils.propertyMap(derivedProject));
       return new CompilationUnitWriteOperation(derivedJdtType, newSource);
     }
 

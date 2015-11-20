@@ -18,7 +18,7 @@ import org.eclipse.jdt.core.IMethod;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.s2e.nls.internal.simpleproject.NlsType;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 public class NlsServiceType extends NlsType {
   private static final Pattern REGEX_RESOURCE_BUNDLE_GETTER = Pattern.compile("return\\s*\\\"([^\\\"]*)\\\"\\s*\\;", Pattern.DOTALL);
@@ -36,7 +36,7 @@ public class NlsServiceType extends NlsType {
   @Override
   protected String getBundleValue() throws JavaModelException {
     IMethod getter = m_type.getMethod(DYNAMIC_NLS_BASE_NAME_GETTER, new String[]{});
-    if (JdtUtils.exists(getter)) {
+    if (S2eUtils.exists(getter)) {
       int flags = getter.getFlags();
       int refFlags = Flags.AccProtected;
       if ((refFlags & flags) == refFlags) {

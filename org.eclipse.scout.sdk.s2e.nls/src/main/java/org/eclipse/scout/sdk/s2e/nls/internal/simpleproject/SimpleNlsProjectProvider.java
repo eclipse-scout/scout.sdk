@@ -22,7 +22,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsProjectProvider;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 public class SimpleNlsProjectProvider implements INlsProjectProvider {
 
@@ -74,7 +74,7 @@ public class SimpleNlsProjectProvider implements INlsProjectProvider {
               IJavaProject jp = JavaCore.create(nlsFile.getProject());
               if (jp != null) {
                 IType type = jp.findType(nlsFile.getNlsTypeName());
-                if (JdtUtils.exists(type)) {
+                if (S2eUtils.exists(type)) {
                   INlsProject simpleProj = getNlsProject(type);
                   if (simpleProj != null) {
                     // fast pre-check: is it directly a simple project?

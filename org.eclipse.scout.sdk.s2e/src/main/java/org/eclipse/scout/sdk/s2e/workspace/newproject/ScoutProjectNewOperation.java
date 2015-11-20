@@ -42,7 +42,7 @@ public class ScoutProjectNewOperation implements IOperation {
 
   private String m_symbolicName;
   private String m_displayName;
-  private String m_JavaVersion;
+  private String m_javaVersion;
   private File m_targetDirectory;
 
   @Override
@@ -143,10 +143,10 @@ public class ScoutProjectNewOperation implements IOperation {
   }
 
   public String getJavaVersion() {
-    return m_JavaVersion;
+    return m_javaVersion;
   }
 
   public void setJavaVersion(String javaVersion) {
-    m_JavaVersion = javaVersion;
+    m_javaVersion = javaVersion;
   }
 }

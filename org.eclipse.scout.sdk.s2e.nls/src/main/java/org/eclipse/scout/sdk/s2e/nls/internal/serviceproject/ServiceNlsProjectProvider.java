@@ -37,7 +37,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.model.INlsProjectProvider;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
@@ -79,7 +79,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
     };
 
     Set<TextProviderServiceDeclaration> result = new TreeSet<>(comparator);
-    Set<IType> baseTypes = JdtUtils.resolveJdtTypes("org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService");
+    Set<IType> baseTypes = S2eUtils.resolveJdtTypes("org.eclipse.scout.rt.shared.services.common.text.AbstractDynamicNlsTextProviderService");
     for (IType t : baseTypes) {
       ITypeHierarchy typeHierarchy = t.newTypeHierarchy(null);
       for (IType candidate : typeHierarchy.getAllSubtypes(t)) {
@@ -123,8 +123,8 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
   private static double getOrder(IType registration) {
     // check class annotation
     try {
-      IAnnotation a = JdtUtils.getAnnotation(registration, IScoutRuntimeTypes.Order);
-      BigDecimal val = JdtUtils.getAnnotationValueNumeric(a, "value");
+      IAnnotation a = S2eUtils.getAnnotation(registration, IScoutRuntimeTypes.Order);
+      BigDecimal val = S2eUtils.getAnnotationValueNumeric(a, "value");
       if (val != null) {
         return val.doubleValue();
       }
@@ -142,7 +142,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
       SdkLog.error("nls service type cannot be null.");
       return null;
     }
-    if (!JdtUtils.exists(serviceType)) {
+    if (!S2eUtils.exists(serviceType)) {
       SdkLog.error("nls service type '" + serviceType.getFullyQualifiedName() + "' does not exist.");
       return null;
     }
@@ -289,7 +289,7 @@ public class ServiceNlsProjectProvider implements INlsProjectProvider {
 
   private static IType getITypeForFile(IFile file) throws JavaModelException {
     IJavaElement element = JavaCore.create(file);
-    if (JdtUtils.exists(element)) {
+    if (S2eUtils.exists(element)) {
       if (element.getElementType() == IJavaElement.COMPILATION_UNIT) {
         ICompilationUnit icu = (ICompilationUnit) element;
         IType[] types = icu.getTypes();

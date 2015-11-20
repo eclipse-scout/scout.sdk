@@ -44,7 +44,7 @@ public final class JdtTypeCache {
   public Set<IType> getTypes(String fqn) throws CoreException {
     Set<IType> result = m_types.get(fqn);
     if (result == null) {
-      Set<IType> candidates = JdtUtils.resolveJdtTypes(fqn);
+      Set<IType> candidates = S2eUtils.resolveJdtTypes(fqn);
       m_types.put(fqn, candidates);
       result = candidates;
     }

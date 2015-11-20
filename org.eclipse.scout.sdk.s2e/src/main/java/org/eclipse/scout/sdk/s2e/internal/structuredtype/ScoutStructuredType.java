@@ -41,7 +41,7 @@ import org.eclipse.scout.sdk.core.util.SdkException;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.structuredtype.IStructuredType;
 import org.eclipse.scout.sdk.s2e.util.JdtTypeFilters;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.ScoutJdtTypeComparators;
 
 public class ScoutStructuredType implements IStructuredType {
@@ -67,7 +67,7 @@ public class ScoutStructuredType implements IStructuredType {
     m_elements = new HashMap<>();
     if (localHierarchy == null) {
       try {
-        m_typeHierarchy = JdtUtils.getLocalTypeHierarchy(type);
+        m_typeHierarchy = S2eUtils.getLocalTypeHierarchy(type);
       }
       catch (JavaModelException e) {
         throw new SdkException("Unable to build type hierarchy for type '" + type.getFullyQualifiedName() + "'.", e);
@@ -481,8 +481,8 @@ public class ScoutStructuredType implements IStructuredType {
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
       IMethod visitedMethod = method;
-      while (JdtUtils.exists(visitedMethod)) {
-        if (JdtUtils.getAnnotation(visitedMethod, IScoutRuntimeTypes.ConfigOperation) != null) {
+      while (S2eUtils.exists(visitedMethod)) {
+        if (S2eUtils.getAnnotation(visitedMethod, IScoutRuntimeTypes.ConfigOperation) != null) {
           CompositeObject key = new CompositeObject(method.getElementName(), method.getParameterNames().length, method);
           execMethods.put(key, method);
           it.remove();
@@ -499,8 +499,8 @@ public class ScoutStructuredType implements IStructuredType {
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
       IMethod visitedMethod = method;
-      while (JdtUtils.exists(visitedMethod)) {
-        if (JdtUtils.getAnnotation(visitedMethod, IScoutRuntimeTypes.ConfigProperty) != null) {
+      while (S2eUtils.exists(visitedMethod)) {
+        if (S2eUtils.getAnnotation(visitedMethod, IScoutRuntimeTypes.ConfigProperty) != null) {
           CompositeObject key = new CompositeObject(method.getElementName(), method.getParameterNames().length, method);
           methods.put(key, method);
           it.remove();
@@ -516,7 +516,7 @@ public class ScoutStructuredType implements IStructuredType {
     Map<CompositeObject, IJavaElement> methods = new TreeMap<>();
     for (Iterator<IJavaElement> it = workingSet.iterator(); it.hasNext();) {
       IMethod method = (IMethod) it.next();
-      if (JdtUtils.getAnnotation(method, IScoutRuntimeTypes.FormData) != null) {
+      if (S2eUtils.getAnnotation(method, IScoutRuntimeTypes.FormData) != null) {
         CompositeObject methodKey = createPropertyMethodKey(method);
         if (methodKey != null) {
           methods.put(methodKey, method);
@@ -550,7 +550,7 @@ public class ScoutStructuredType implements IStructuredType {
       Matcher matcher = START_HANDLER_REGEX.matcher(method.getElementName());
       if (matcher.find()) {
         String fieldName = matcher.group(1);
-        if (JdtUtils.findInnerType(getType(), fieldName + ISdkProperties.SUFFIX_FORM_HANDLER) != null) {
+        if (S2eUtils.findInnerType(getType(), fieldName + ISdkProperties.SUFFIX_FORM_HANDLER) != null) {
           CompositeObject key = new CompositeObject(method.getElementName(), method.getParameterNames().length, method);
           startHandlerMethods.put(key, method);
           it.remove();
@@ -567,7 +567,7 @@ public class ScoutStructuredType implements IStructuredType {
       Matcher matcher = METHOD_INNER_TYPE_GETTER_REGEX.matcher(method.getElementName());
       if (matcher.find()) {
         String fieldName = matcher.group(1);
-        if (JdtUtils.findInnerType(getType(), fieldName) != null) {
+        if (S2eUtils.findInnerType(getType(), fieldName) != null) {
           CompositeObject key = new CompositeObject(method.getElementName(), method.getParameterNames().length, method);
           fieldGetterMethods.put(key, method);
           it.remove();
@@ -841,7 +841,7 @@ public class ScoutStructuredType implements IStructuredType {
   }
 
   private static CompositeObject createPropertyMethodKey(IMethod method) {
-    if (JdtUtils.exists(method)) {
+    if (S2eUtils.exists(method)) {
       Matcher matcher = PROPERTY_BEAN_REGEX.matcher(method.getElementName());
       if (matcher.find()) {
         int getSetOrder = 20;
@@ -877,8 +877,8 @@ public class ScoutStructuredType implements IStructuredType {
   private static IMethod getOverwrittenMethod(IMethod method, ITypeHierarchy supertypeHierarchy) throws JavaModelException {
     IType supertype = supertypeHierarchy.getSuperclass(method.getDeclaringType());
     IFilter<IMethod> overrideFilter = getSuperMethodFilter(method);
-    while (JdtUtils.exists(supertype)) {
-      IMethod superMethod = JdtUtils.getFirstMethod(supertype, overrideFilter);
+    while (S2eUtils.exists(supertype)) {
+      IMethod superMethod = S2eUtils.getFirstMethod(supertype, overrideFilter);
       if (superMethod != null) {
         return superMethod;
       }
@@ -918,7 +918,7 @@ public class ScoutStructuredType implements IStructuredType {
     return new IFilter<IMethod>() {
       @Override
       public boolean evaluate(IMethod candidate) {
-        if (JdtUtils.exists(candidate) && candidate.getElementName().equals(ref.getElementName())) {
+        if (S2eUtils.exists(candidate) && candidate.getElementName().equals(ref.getElementName())) {
           String[] candidateParameters = candidate.getParameterTypes();
           String[] methodParameters = ref.getParameterTypes();
           if (methodParameters.length == candidateParameters.length) {

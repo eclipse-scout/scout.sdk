@@ -37,10 +37,10 @@ public final class ScoutJdtTypeComparators {
         if (o1 == o2) {
           return 0;
         }
-        if (!JdtUtils.exists(o1)) {
+        if (!S2eUtils.exists(o1)) {
           return -1;
         }
-        if (!JdtUtils.exists(o2)) {
+        if (!S2eUtils.exists(o2)) {
           return 1;
         }
         int result = o1.getElementName().compareTo(o2.getElementName());
@@ -73,10 +73,10 @@ public final class ScoutJdtTypeComparators {
       }
 
       private double getOrderAnnotationValue(IType type, boolean b) {
-        if (JdtUtils.exists(type)) {
-          IAnnotation annotation = JdtUtils.getAnnotation(type, IScoutRuntimeTypes.Order);
+        if (S2eUtils.exists(type)) {
+          IAnnotation annotation = S2eUtils.getAnnotation(type, IScoutRuntimeTypes.Order);
           try {
-            BigDecimal val = JdtUtils.getAnnotationValueNumeric(annotation, "value");
+            BigDecimal val = S2eUtils.getAnnotationValueNumeric(annotation, "value");
             if (val != null) {
               return val.doubleValue();
             }

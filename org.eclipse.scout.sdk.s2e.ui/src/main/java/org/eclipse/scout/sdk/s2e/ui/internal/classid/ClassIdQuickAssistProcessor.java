@@ -49,7 +49,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerationContext;
 import org.eclipse.scout.sdk.s2e.classid.ClassIdGenerators;
 import org.eclipse.scout.sdk.s2e.util.DefaultAstVisitor;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.text.edits.TextEdit;
 import org.eclipse.text.edits.TextEditGroup;
 
@@ -70,7 +70,7 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
   @Override
   public IJavaCompletionProposal[] getAssists(final IInvocationContext context, IProblemLocation[] locations) throws CoreException {
     final ClassIdTarget selectedType = getTarget(context.getCoveringNode());
-    if (selectedType != null && !JdtUtils.exists(selectedType.annotation)) {
+    if (selectedType != null && !S2eUtils.exists(selectedType.annotation)) {
       CompilationUnitRewrite rewrite = createRewrite(selectedType.type, selectedType.td);
       if (rewrite != null) {
         return new IJavaCompletionProposal[]{new ClassIdAddProposal(rewrite)};
@@ -192,16 +192,16 @@ public class ClassIdQuickAssistProcessor implements IQuickAssistProcessor {
         ITypeBinding resolveTypeBinding = typeDecl.resolveBinding();
         if (resolveTypeBinding != null) {
           IJavaElement javaElement = resolveTypeBinding.getJavaElement();
-          if (JdtUtils.exists(javaElement) && javaElement.getElementType() == IJavaElement.TYPE) {
+          if (S2eUtils.exists(javaElement) && javaElement.getElementType() == IJavaElement.TYPE) {
             IType t = (IType) javaElement;
             try {
               if (!t.isBinary() && !t.isAnonymous()) {
                 ITypeHierarchy superTypeHierarchy = t.newSupertypeHierarchy(null);
 
-                Set<IType> jdtTypes = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
+                Set<IType> jdtTypes = S2eUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
                 for (IType iTypeWithClassId : jdtTypes) {
-                  if (JdtUtils.exists(iTypeWithClassId) && superTypeHierarchy.contains(iTypeWithClassId)) {
-                    IAnnotation annotation = JdtUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
+                  if (S2eUtils.exists(iTypeWithClassId) && superTypeHierarchy.contains(iTypeWithClassId)) {
+                    IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
                     return new ClassIdTarget(typeDecl, t, annotation);
                   }
                 }

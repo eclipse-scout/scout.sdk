@@ -27,7 +27,7 @@ import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.jdt.core.JavaModelException;
 import org.eclipse.scout.sdk.core.util.BasicPropertySupport;
 import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.util.WeakResourceChangeListener;
 
 /**
@@ -68,7 +68,7 @@ public class NlsType implements INlsType {
 
   protected String getBundleValue() throws JavaModelException {
     IField field = m_type.getField(RESOURCE_BUNDLE_FIELD_NAME);
-    if (JdtUtils.exists(field)) {
+    if (S2eUtils.exists(field)) {
       Matcher matcher = REGEX_RESOURCE_BUNDLE_FIELD.matcher(field.getSource());
       if (matcher.find()) {
         return matcher.group(1);
@@ -80,7 +80,7 @@ public class NlsType implements INlsType {
   protected void loadSuperTypeHierarchy() throws JavaModelException {
     ITypeHierarchy superTypeHierarchy = m_type.newSupertypeHierarchy(null);
     IType firstType = superTypeHierarchy.getSuperclass(m_type);
-    if (JdtUtils.exists(firstType)) {
+    if (S2eUtils.exists(firstType)) {
       String superTypeFqn = firstType.getFullyQualifiedName();
       if (!DYNAMIC_NLS_NAME.equals(superTypeFqn) && !Object.class.getName().equals(superTypeFqn)) {
         m_propertySupport.setProperty(PROP_SUPER_TYPE, firstType);
@@ -139,7 +139,7 @@ public class NlsType implements INlsType {
   private class P_NlsResourceChangeListener implements IResourceChangeListener {
     @Override
     public void resourceChanged(IResourceChangeEvent event) {
-      if (!JdtUtils.exists(m_type)) {
+      if (!S2eUtils.exists(m_type)) {
         return;
       }
 

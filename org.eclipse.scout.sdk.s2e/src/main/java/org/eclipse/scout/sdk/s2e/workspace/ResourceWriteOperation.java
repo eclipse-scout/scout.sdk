@@ -23,7 +23,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.scout.sdk.core.util.SdkLog;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**
  * <h3>{@link ResourceWriteOperation}</h3>
@@ -99,7 +99,7 @@ public class ResourceWriteOperation implements IOperation {
           m_file.create(stream, true, monitor);
         }
         else {
-          IStatus result = JdtUtils.makeCommittable(Collections.<IResource> singletonList(m_file));
+          IStatus result = S2eUtils.makeCommittable(Collections.<IResource> singletonList(m_file));
           if (result.isOK()) {
             m_file.setContents(stream, true, true, monitor);
           }

@@ -31,7 +31,7 @@ import org.eclipse.jface.text.contentassist.IContextInformation;
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.nls.NlsCore;
 import org.eclipse.scout.sdk.s2e.nls.project.INlsProject;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**
  * <h3>{@link AbstractNlsTextCompletionComputer}</h3>
@@ -77,7 +77,7 @@ public abstract class AbstractNlsTextCompletionComputer implements IJavaCompleti
       if (matchingStart >= 0 && refType != null) {
         String prefix = linePart.substring(matchingStart, offset - lineInfo.getOffset());
         IType contextType = findContextType(context.getCompilationUnit(), offset);
-        if (JdtUtils.exists(contextType)) {
+        if (S2eUtils.exists(contextType)) {
           INlsProject nlsProject = NlsCore.getNlsWorkspace().getNlsProject(new Object[]{contextType, contextType});
           if (nlsProject != null) {
             collectProposals(proposals, nlsProject, prefix, offset);

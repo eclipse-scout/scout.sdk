@@ -75,17 +75,17 @@ import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
 import org.eclipse.scout.sdk.s2e.workspace.ResourceWriteOperation;
 
 /**
- * <h3>{@link JdtUtils}</h3>
+ * <h3>{@link S2eUtils}</h3>
  * <p>
- * Contains utility methods for JDT objects.
+ * Contains utility methods for the Scout SDK Eclipse integration.
  *
  * @author Matthias Villiger
  * @since 5.1.0
  */
-public final class JdtUtils {
+public final class S2eUtils {
   private static final Comparator<IType> COMPARATOR = new P_TypeMatchComparator();
 
-  private JdtUtils() {
+  private S2eUtils() {
   }
 
   /**

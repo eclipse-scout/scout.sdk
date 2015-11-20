@@ -16,7 +16,7 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.scout.sdk.s2e.trigger.AbstractDerivedResourceSingleHandler;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.workspace.CompilationUnitWriteOperation;
 
 /**
@@ -42,7 +42,7 @@ public class DtoDerivedResourceHandler extends AbstractDerivedResourceSingleHand
         return;
       }
 
-      JdtUtils.writeTypes(Collections.singletonList(op), monitor, false);
+      S2eUtils.writeTypes(Collections.singletonList(op), monitor, false);
     }
     finally {
       monitor.done();

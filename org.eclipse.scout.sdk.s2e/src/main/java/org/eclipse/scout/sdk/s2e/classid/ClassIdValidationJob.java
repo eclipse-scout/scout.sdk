@@ -54,7 +54,7 @@ import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.job.AbstractJob;
 import org.eclipse.scout.sdk.s2e.job.ResourceBlockingOperationJob;
 import org.eclipse.scout.sdk.s2e.log.ScoutStatus;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 
 /**
  * <h3>{@link ClassIdValidationJob}</h3>
@@ -94,13 +94,13 @@ public final class ClassIdValidationJob extends AbstractJob {
           Object owner = match.getElement();
           if (owner instanceof IType) {
             IType ownerType = (IType) owner;
-            if (JdtUtils.exists(ownerType)) {
+            if (S2eUtils.exists(ownerType)) {
               IJavaElement element = ((TypeReferenceMatch) match).getLocalElement();
               if (element == null) {
                 // e.g. when the annotation is fully qualified. try reading from owner
-                element = JdtUtils.getAnnotation(ownerType, IScoutRuntimeTypes.ClassId);
+                element = S2eUtils.getAnnotation(ownerType, IScoutRuntimeTypes.ClassId);
               }
-              if (element instanceof IAnnotation && JdtUtils.exists(element)) {
+              if (element instanceof IAnnotation && S2eUtils.exists(element)) {
                 result.add((IAnnotation) element);
               }
             }
@@ -112,7 +112,7 @@ public final class ClassIdValidationJob extends AbstractJob {
         if (monitor.isCanceled()) {
           return result;
         }
-        if (JdtUtils.exists(classIdType)) {
+        if (S2eUtils.exists(classIdType)) {
           SearchPattern pattern = SearchPattern.createPattern(classIdType, IJavaSearchConstants.ANNOTATION_TYPE_REFERENCE, SearchPattern.R_EXACT_MATCH);
           e.search(pattern, new SearchParticipant[]{SearchEngine.getDefaultSearchParticipant()}, workspaceScope, requestor, monitor);
         }
@@ -172,8 +172,8 @@ public final class ClassIdValidationJob extends AbstractJob {
         return null;
       }
 
-      if (JdtUtils.exists(r)) {
-        String id = JdtUtils.getAnnotationValueString(r, "value");
+      if (S2eUtils.exists(r)) {
+        String id = S2eUtils.getAnnotationValueString(r, "value");
         if (StringUtils.isNotEmpty(id)) {
           List<IAnnotation> files = ids.get(id);
           if (files == null) {
@@ -189,7 +189,7 @@ public final class ClassIdValidationJob extends AbstractJob {
 
   private static boolean hasVisibleClassIds(IAnnotation current, List<IAnnotation> matchesById) {
     for (IAnnotation m : matchesById) {
-      if (m != current && JdtUtils.isOnClasspath(m, current.getJavaProject())) {
+      if (m != current && S2eUtils.isOnClasspath(m, current.getJavaProject())) {
         return true;
       }
     }
@@ -202,7 +202,7 @@ public final class ClassIdValidationJob extends AbstractJob {
       if (matchesById.size() > 1) {
         for (IAnnotation duplicate : matchesById) {
           IType parent = (IType) duplicate.getAncestor(IJavaElement.TYPE);
-          if (JdtUtils.exists(parent)) {
+          if (S2eUtils.exists(parent)) {
             // duplicate found: check if they can see each others
             if (hasVisibleClassIds(duplicate, matchesById)) {
               ISourceRange sourceRange = duplicate.getSourceRange();
@@ -274,7 +274,7 @@ public final class ClassIdValidationJob extends AbstractJob {
 
       if (element.getElementType() == IJavaElement.ANNOTATION) {
         IAnnotation annotation = (IAnnotation) element;
-        if (JdtUtils.exists(annotation) && annotation.getElementName().endsWith(Signature.getSimpleName(IScoutRuntimeTypes.ClassId))) {
+        if (S2eUtils.exists(annotation) && annotation.getElementName().endsWith(Signature.getSimpleName(IScoutRuntimeTypes.ClassId))) {
           executeAsync(1000);
         }
         return true; // finished processing
@@ -311,11 +311,11 @@ public final class ClassIdValidationJob extends AbstractJob {
       @Override
       protected IStatus run(IProgressMonitor monitor) {
         try {
-          JdtUtils.waitForJdt();
+          S2eUtils.waitForJdt();
 
           // get the class id type outside of the validation job
           // because with the job rule a search cannot be performed -> IllegalArgumentException: Attempted to beginRule
-          Set<IType> classIds = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ClassId);
+          Set<IType> classIds = S2eUtils.resolveJdtTypes(IScoutRuntimeTypes.ClassId);
           if (classIds.isEmpty()) {
             return Status.OK_STATUS;
           }

@@ -51,7 +51,7 @@ public final class JdtTypeFilters {
    */
   protected static boolean isClass(IType type) {
     try {
-      if (!JdtUtils.exists(type)) {
+      if (!S2eUtils.exists(type)) {
         return false;
       }
       if (type.isAnonymous()) {
@@ -70,7 +70,7 @@ public final class JdtTypeFilters {
     return new IFilter<IType>() {
       @Override
       public boolean evaluate(IType candidate) {
-        if (!JdtUtils.exists(candidate)) {
+        if (!S2eUtils.exists(candidate)) {
           return false;
         }
         if (Objects.equals(candidate.getFullyQualifiedName(), typeFqn)) {

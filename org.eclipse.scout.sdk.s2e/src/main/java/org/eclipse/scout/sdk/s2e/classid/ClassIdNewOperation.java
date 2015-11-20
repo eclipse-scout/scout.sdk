@@ -40,7 +40,7 @@ import org.eclipse.scout.sdk.core.sourcebuilder.compilationunit.CompilationUnitS
 import org.eclipse.scout.sdk.core.util.SdkLog;
 import org.eclipse.scout.sdk.s2e.trigger.CachingJavaEnvironmentProvider;
 import org.eclipse.scout.sdk.s2e.trigger.IJavaEnvironmentProvider;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.workspace.AnnotationNewOperation;
 import org.eclipse.scout.sdk.s2e.workspace.IOperation;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
@@ -73,9 +73,9 @@ public class ClassIdNewOperation implements IOperation {
         return;
       }
 
-      Set<IType> startTypes = JdtUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
+      Set<IType> startTypes = S2eUtils.resolveJdtTypes(IScoutRuntimeTypes.ITypeWithClassId);
       for (IType startType : startTypes) {
-        if (JdtUtils.exists(startType)) {
+        if (S2eUtils.exists(startType)) {
           ITypeHierarchy hierarchy = startType.newTypeHierarchy(null);
           monitor.worked(1);
           if (monitor.isCanceled()) {
@@ -91,8 +91,8 @@ public class ClassIdNewOperation implements IOperation {
 
           int numTypes = 0;
           for (IType t : allSubtypes) {
-            if (JdtUtils.exists(t) && !t.isBinary() && t.isClass() && !t.isAnonymous() && !t.isReadOnly() && !Flags.isAbstract(t.getFlags())) {
-              IAnnotation annotation = JdtUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
+            if (S2eUtils.exists(t) && !t.isBinary() && t.isClass() && !t.isAnonymous() && !t.isReadOnly() && !Flags.isAbstract(t.getFlags())) {
+              IAnnotation annotation = S2eUtils.getAnnotation(t, IScoutRuntimeTypes.ClassId);
               if (annotation == null) {
                 ICompilationUnit icu = t.getCompilationUnit();
                 Set<IType> listByIcu = typesWithClassId.get(icu);
@@ -137,7 +137,7 @@ public class ClassIdNewOperation implements IOperation {
     workingCopyManager.register(icu, null);
 
     IJavaEnvironment environment = envProvider.get(icu.getJavaProject());
-    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(environment), JdtUtils.getPackage(icu));
+    IImportCollector collector = new CompilationUnitScopedImportCollector(new ImportCollector(environment), S2eUtils.getPackage(icu));
 
     IBuffer buffer = icu.getBuffer();
     Document sourceDoc = new Document(buffer.getContents());

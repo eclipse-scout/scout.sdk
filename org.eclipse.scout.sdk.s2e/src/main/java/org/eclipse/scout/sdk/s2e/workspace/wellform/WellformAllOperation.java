@@ -19,7 +19,7 @@ import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.ITypeHierarchy;
 import org.eclipse.scout.sdk.core.s.IScoutRuntimeTypes;
-import org.eclipse.scout.sdk.s2e.util.JdtUtils;
+import org.eclipse.scout.sdk.s2e.util.S2eUtils;
 import org.eclipse.scout.sdk.s2e.workspace.IOperation;
 import org.eclipse.scout.sdk.s2e.workspace.IWorkingCopyManager;
 
@@ -49,11 +49,11 @@ public class WellformAllOperation implements IOperation {
     Set<IType> types = new HashSet<>();
     String[] roots = new String[]{IScoutRuntimeTypes.ICodeType, IScoutRuntimeTypes.IDesktop, IScoutRuntimeTypes.IDesktopExtension, IScoutRuntimeTypes.IForm, IScoutRuntimeTypes.IWizard, IScoutRuntimeTypes.IPage, IScoutRuntimeTypes.IOutline};
     for (String root : roots) {
-      Set<IType> rootTypes = JdtUtils.resolveJdtTypes(root);
+      Set<IType> rootTypes = S2eUtils.resolveJdtTypes(root);
       for (IType t : rootTypes) {
         ITypeHierarchy codeTypeHierarchy = t.newTypeHierarchy(null);
         for (IType candidate : codeTypeHierarchy.getAllClasses()) {
-          if (JdtUtils.exists(candidate) && !candidate.isInterface() && !candidate.isBinary() && !candidate.isAnonymous() && candidate.getDeclaringType() == null) {
+          if (S2eUtils.exists(candidate) && !candidate.isInterface() && !candidate.isBinary() && !candidate.isAnonymous() && candidate.getDeclaringType() == null) {
             types.add(candidate);
           }
           if (monitor.isCanceled()) {
