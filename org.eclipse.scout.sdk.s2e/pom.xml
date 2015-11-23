@@ -85,7 +85,7 @@
             </Import-Package>
             <Require-Bundle>
               org.eclipse.core.runtime;bundle-version="[3.7,4)";visibility:=reexport,
-              org.eclipse.core.resources;visibility:=reexport,
+              org.eclipse.core.resources;bundle-version="[3.10.0,4)";visibility:=reexport,
               org.eclipse.jdt.core;bundle-version="[3.11,4)";visibility:=reexport,
               org.eclipse.jface.text;bundle-version="[3.7.2,4)";visibility:=reexport,
               org.eclipse.m2e.maven.runtime;bundle-version="[1.6.0,2)";visibility:=reexport
