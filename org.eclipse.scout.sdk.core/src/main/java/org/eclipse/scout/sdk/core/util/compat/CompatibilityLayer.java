@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import org.apache.commons.lang3.reflect.MethodUtils;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem;
 import org.eclipse.jdt.internal.compiler.batch.FileSystem.Classpath;
 import org.eclipse.jdt.internal.compiler.env.AccessRuleSet;
@@ -65,29 +66,21 @@ public final class CompatibilityLayer {
     args.add(null); // destinationPath
 
     try {
-      try {
-        // 1. try Neon version
-        Method method = FileSystem.class.getDeclaredMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class);
-        Map<?, ?> options = null;
-        try {
-          options = optionProvider.call();
-        }
-        catch (Exception e) {
-          throw new SdkException(e);
-        }
-        args.add(options); // options
-        result = (Classpath) invoke(method, null, args);
+      // 1. try Neon version
+      Method method = MethodUtils.getAccessibleMethod(FileSystem.class, "getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class, Map.class);
+      if (method != null) {
+        args.add(getOptionsMap(optionProvider)); // options
       }
-      catch (NoSuchMethodException e1) {
-        try {
-          // 2. try Mars version
-          Method method = FileSystem.class.getMethod("getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class);
-          result = (Classpath) invoke(method, null, args);
-        }
-        catch (NoSuchMethodException e2) {
-          throw new SdkException("Unable to find compatible 'getClasspath' method in class '" + FileSystem.class.getName() + "'.", e1);
+      else {
+        // 2. try Mars version
+        method = MethodUtils.getAccessibleMethod(FileSystem.class, "getClasspath", String.class, String.class, boolean.class, AccessRuleSet.class, String.class);
+        if (method == null) {
+          throw new SdkException("Unable to find compatible 'getClasspath' method in class '" + FileSystem.class.getName() + "'.");
         }
       }
+
+      // invoke
+      result = (Classpath) method.invoke(null, args.toArray());
     }
     catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException | SecurityException e) {
       throw new SdkException("Unable to call 'getClasspath' method in class '" + FileSystem.class.getName() + "'.", e);
@@ -96,7 +89,12 @@ public final class CompatibilityLayer {
     return result;
   }
 
-  private static Object invoke(Method m, Object instance, List<?> args) throws IllegalAccessException, IllegalArgumentException, InvocationTargetException {
-    return m.invoke(instance, args.toArray());
+  private static Map<?, ?> getOptionsMap(Callable<Map<?, ?>> optionProvider) {
+    try {
+      return optionProvider.call();
+    }
+    catch (Exception e) {
+      throw new SdkException(e);
+    }
   }
 }
