@@ -2,8 +2,6 @@
 BASEDIR=$(dirname $0)
 . $BASEDIR/_functions.sh
 
-export MAVEN_OPTS="$MAVEN_OPTS -Xmx256m"
-
 echo ''
 echo ''
 echo '                 uuuuuuu'
@@ -40,6 +38,6 @@ echo ''
 echo ''
 echo ''
 
-mvn clean install -B -e -DskipTests=true -Pdev $*
+mvn clean install -B -e -DskipTests=true -Pdev -f org.eclipse.scout.sdk $*
 processError
-mvn clean install -Dp2 -B -e -T0.5C -DskipTests=true -Pdev $*
+mvn clean install -B -e -T0.5C -DskipTests=true -Pdev -f org.eclipse.scout.sdk.p2 $*
