@@ -9,14 +9,15 @@ TAG=
 function usage {
   cat << EOF
 
-	${PRG} [-h] --git_username <EGerritUser> -r <RELEASE>
+	${PRG} [-h] --git_username <EGerritUser> --release <RELEASE> --scoutrt_version <RT_VERSION> --tag <TAG>
 
-	-h                                - Usage info
-	-u | --git_username <EGerritUser> - Eclipse Gerrit Username of Commiter, SSH Key is used for authorisation
-	-u | --git_username <RELEASE>     - <RELEASE> name (Optional / Default: TEST_RELEASE)
-	-t | --tag <TAG>                  - <TAG> name (Optional / Default: Project Version)
+	-h                                  - Usage info
+	-u | --git_username <EGerritUser>   - Eclipse Gerrit Username of Commiter, SSH Key is used for authorisation
+	-r | --release <RELEASE>            - <RELEASE> name (Optional / Default: TEST_RELEASE)
+	-s | --scoutrt_version <RT_VERSION> - <RT_VERSION> Release Scout Version
+	-t | --tag <TAG>                    - <TAG> name (Optional / Default: Project Version)
 
-	Example: ${PRG} -r NIGHTLY
+	Example: ${PRG} -u sleicht -r NIGHTLY -s 5.2.0.M3
 
 EOF
 }
